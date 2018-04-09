@@ -1,0 +1,3 @@
+CG id 0 n 1 1 1 width 1 timeMin 0.21 min -0.1 0 -0.6 max 1.1 1 2.1 Lucy cutoff 1
+time 2:volumeFraction 3:density 4-6:momentum 7-12:momentumFlux 13-21:contactStress 22-24:interactionForceDensity 
+0.21 0.328069 0.626566 -4.60212e-09 0 -4.60212e-08 3.56863e-17 0 3.56863e-16 0 0 3.56863e-15 0.00626625 0 0.0626625 0 0 0 0.0626625 0 0.626625 0.062663 0 0.62663

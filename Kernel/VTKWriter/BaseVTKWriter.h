@@ -1,0 +1,123 @@
+//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//For the list of developers, see <http://www.MercuryDPM.org/Team>.
+//
+//Redistribution and use in source and binary forms, with or without
+//modification, are permitted provided that the following conditions are met:
+//  * Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//  * Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+//  * Neither the name MercuryDPM nor the
+//    names of its contributors may be used to endorse or promote products
+//    derived from this software without specific prior written permission.
+//
+//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+//ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//DISCLAIMED. IN NO EVENT SHALL THE MERCURYDPM DEVELOPERS TEAM BE LIABLE FOR ANY
+//DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+//ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+//SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+#ifndef VTKWRITER_H
+#define VTKWRITER_H
+
+#include <string>
+#include <fstream>
+#include "Logger.h"
+
+/**
+ * 
+ * @tparam H some handler, e.g. particleHandler
+ */
+template<typename H>
+class BaseVTKWriter
+{
+
+public:
+    
+    BaseVTKWriter(H& handler) : handler_(handler)
+    {
+        fileCounter = 0;
+    }
+    
+    BaseVTKWriter(const BaseVTKWriter& other) : handler_(other.handler_)
+    {
+        fileCounter = other.fileCounter;
+    }
+    
+    virtual void writeVTK() const = 0;
+
+protected:
+    std::fstream makeVTKFileWithHeader() const;
+    
+    void writeVTKFooterAndClose(std::fstream& file) const;
+    
+    ///particle handler from which the particles should be written
+    H& handler_;
+    
+    mutable unsigned int fileCounter;
+    
+};
+
+template<typename T>
+std::fstream BaseVTKWriter<T>::makeVTKFileWithHeader() const
+{
+    std::string name = handler_.getName();
+    name = name.substr(0, name.length() - 7);
+
+    std::string fileName; 
+#ifdef MERCURY_USE_MPI
+    if (NUMBER_OF_PROCESSORS > 1)
+    {
+        fileName = handler_.getDPMBase()->getName() + "Processor_" + std::to_string(PROCESSOR_ID) +
+        '_' + name + '_' + std::to_string(fileCounter++)  + ".vtu";
+    }
+    else
+    {
+        fileName = handler_.getDPMBase()->getName() +
+                                 name + '_' +
+                                 std::to_string(fileCounter++) + ".vtu";
+    }
+#else
+    fileName = handler_.getDPMBase()->getName() +
+                                 name + '_' +
+                                 std::to_string(fileCounter++) + ".vtu";
+#endif
+    
+    std::fstream file;
+    file.open(fileName.c_str(), std::ios_base::out);
+    if (file.fail())
+    {
+        logger(WARN, "File % could not be opened", fileName);
+    }
+    //
+    file << "<?xml version=\"1.0\"?>\n\n";
+    file << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n";
+    file << "<UnstructuredGrid>\n";
+    return file;
+}
+
+template<typename T>
+void BaseVTKWriter<T>::writeVTKFooterAndClose(std::fstream& file) const
+{
+    file << "<Cells>\n";
+    file << "  <DataArray type=\"Int32\" Name=\"connectivity\" format=\"ascii\">\n";
+    file << "  </DataArray>\n";
+    file << "  <DataArray type=\"Int32\" Name=\"offsets\" format=\"ascii\">\n";
+    file << "  </DataArray>\n";
+    file << "  <DataArray type=\"UInt8\"  Name=\"types\" format=\"ascii\">\n";
+    file << "  </DataArray>\n";
+    file << "</Cells>\n";
+    file << "</Piece>\n";
+    file << "</UnstructuredGrid>\n";
+    file << "</VTKFile>\n";
+    file.close();
+}
+
+#endif

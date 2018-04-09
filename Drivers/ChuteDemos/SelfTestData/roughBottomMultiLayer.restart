@@ -1,0 +1,37 @@
+restart_version 1.0 name roughBottomMultiLayer
+dataFile    fileType ONE_FILE saveCount 50 counter 21 lastSavedTimeStep 1000
+fStatFile   fileType ONE_FILE saveCount 50 counter 21 lastSavedTimeStep 1000
+eneFile     fileType ONE_FILE saveCount 50 counter 21 lastSavedTimeStep 1000
+restartFile fileType ONE_FILE saveCount 50 counter 21 lastSavedTimeStep 1000
+statFile    fileType ONE_FILE saveCount 50 counter 0
+interactionFile fileType NO_FILE saveCount 0 counter 0
+xMin 0 xMax 3 yMin 0 yMax 3 zMin 0 zMax 0.024
+timeStep 0.0001 time 0.100000000000002 ntimeSteps 1000 timeMax 0.1
+systemDimensions 3 particleDimensions 3 gravity 0.4067366430758 0 -0.913545457642601 writeVTK 0 NO_FILE NO_FILE random  0 1103515245 12345 1073741824 607 273 784607267
+Species 1
+LinearViscoelasticSpecies id 0 density 1.90985931710274 stiffness 200000 dissipation 25
+Walls 3
+InfiniteWall id 0 indSpecies 0 position 0 0 0 orientation 0.707106781186548 0 0 -0.707106781186548 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0
+InfiniteWall id 1 indSpecies 0 position 0 3 0 orientation 0.707106781186548 0 0 0.707106781186548 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0
+InfiniteWall id 2 indSpecies 0 position 0 0 -2.4 orientation 0.707106781186548 0 0.707106781186548 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0
+Boundaries 1
+ChuteInsertionBoundary id 0 maxFailed 1 numberOfParticlesInserted 2 posMin 0 0 0 posMax 3 3 0.024 radMin 0.5 radMax 0.5 fixedParticleRadius 0.5 inflowVelocity 0.1 inflowVelocityVariance 0
+Particles 15
+BaseParticle id 0 indSpecies 0 position 0.111556507760684 1.89233384323298 -0.106765053122323 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.5 invMass 0
+BaseParticle id 1 indSpecies 0 position 0.387881021226738 2.5065918435019 -0.84518491717191 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.5 invMass 0
+BaseParticle id 2 indSpecies 0 position 0.938548384145947 0.358802301654267 -0.898831917884069 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.5 invMass 0
+BaseParticle id 3 indSpecies 0 position 2.51175050961687 2.98214508879506 -0.776820792944347 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.5 invMass 0
+BaseParticle id 4 indSpecies 0 position 1.30255026662966 2.1045697002742 -0.876415049890475 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.5 invMass 0
+BaseParticle id 5 indSpecies 0 position 2.23768923195838 0.82381991497167 -0.312794518032999 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.5 invMass 0
+BaseParticle id 6 indSpecies 0 position 1.57074070536459 1.14811250079995 -0.981109624731017 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.5 invMass 0
+BaseParticle id 7 indSpecies 0 position 2.15727178378304 2.04449852730715 -0.36175992764306 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.5 invMass 0
+BaseParticle id 8 indSpecies 0 position 0.184944910009886 0.512015572567779 -0.26216335635134 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.5 invMass 0
+BaseParticle id 9 indSpecies 0 position 1.61848662046287 2.88629429577265 -0.339916691608796 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.5 invMass 0
+BaseParticle id 10 indSpecies 0 position 2.66161774713723 1.43886789797005 -0.97693879621764 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.5 invMass 0
+BaseParticle id 11 indSpecies 0 position 0.616125683837686 1.28795788855969 -0.722144797544283 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.5 invMass 0
+BaseParticle id 12 indSpecies 0 position 1.26493135738289 0.833674009638803 -0.0825490384682368 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.5 invMass 0
+BaseParticle id 13 indSpecies 0 position 0.511923291853408 1.38093128532085 0.914424597119163 orientation 1 0 0 0 velocity 0.140368611825276 0 -0.0906693866710251 angularVelocity 0 0 0 force 0.4067366430758 0 -0.913545457642601 torque 0 0 0 radius 0.5 invMass 1
+BaseParticle id 14 indSpecies 0 position 0.51149010352632 2.38192428659468 0.901932822496727 orientation 1 0 0 0 velocity 0.13910772823174 0 -0.0878373957523332 angularVelocity 0 0 0 force 0.4067366430758 0 -0.913545457642601 torque 0 0 0 radius 0.5 invMass 1
+Interactions 0
+NUM_BUCKETS 13 hGridMaxLevels 3 cellOverSizeRatio 1
+FixedParticleRadius 0.5 MinInflowParticleRadius 0.5 MaxInflowParticleRadius 0.5 RoughBottomType 2 ChuteAngle 0.418879020478639 MaxFailed 1 NumCreated 2 InflowVelocity 0.1 InflowVelocityVariance 0 InflowHeight 0.02

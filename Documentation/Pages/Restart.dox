@@ -1,0 +1,69 @@
+/*! \page Restart How to restart MercuryDPM driver codes
+
+Restart your code in three steps:
+
+- Replace the simple solve command in the main function by solve(argc, argv), so you can read in command-line arguments.
+- All DPMBase variables can be read from the restart file, but your Driver code might have new variables defined; so you have to set these variables yourself. For this there is the function DPMBase::actionsOnRestart, where you can reset your own variables in case of a restart.
+- Run your code with the  command-line argument "-r" to force a restart; "-t [time]" can be used to reset final time.
+
+Below is a simple case of how to modify your code to be restart-ready:
+
+\code{cpp}
+#include "DPMBase.h"
+#include "Walls/InfiniteWall.h"
+#include "Species/LinearViscoelasticSpecies.h"
+
+class FreeFall : public DPMBase{
+public:
+
+    // Set species, particles, boundaries, walls here
+    void setupInitialConditions() override
+	{
+        LinearViscoelasticSpecies s;
+        s.setStiffness(1e5);
+        s.setDissipation(0.01);
+        s.setDensity(2e3);
+        auto sp = speciesHandler.copyAndAddObject(s);
+
+        InfiniteWall w0;
+        w0.setSpecies(speciesHandler.getObject(0));
+        w0.set(Vec3D(0,0,-1), Vec3D(0, 0, 0));
+		wallHandler.copyAndAddObject(w0);
+
+		BaseParticle p0;
+        p0.setSpecies(speciesHandler.getObject(0));
+		p0.setPosition(Vec3D(0,0,getZMax()-1e-3));
+		p0.setRadius(1e-3);
+		particleHandler.copyAndAddObject(p0);
+    }
+
+    //this function replaces setupInitialConditions in case of a restart
+    //if you have problem-specific variables, set them here
+    void actionsOnRestart() override
+    {
+    }
+
+};
+
+int main(int argc, char *argv[])
+{
+	//Start off my solving the default problem
+	FreeFall dpm;
+
+    //set FreeFall-specific parameters here
+    dpm.setName("FreeFallRestart");
+    dpm.setSaveCount(1000);
+    dpm.setTimeStep(1e-6);
+    dpm.setTimeMax(0.5);
+    dpm.setDomain(Vec3D(-1e-3,-1e-3,0e-3),Vec3D(1e-3,1e-3,10e-3));
+    dpm.setGravity(Vec3D(0,0,-9.8));
+
+    //restart and run until final time 1, using command line arguments:
+    // ./freeFallRestart -r -tmax 1
+    dpm.solve(argc,argv);
+    return 0;
+}
+\endcode
+
+
+*/

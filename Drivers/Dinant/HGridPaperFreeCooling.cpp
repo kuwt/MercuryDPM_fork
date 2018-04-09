@@ -1,0 +1,203 @@
+//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//For the list of developers, see <http://www.MercuryDPM.org/Team>.
+//
+//Redistribution and use in source and binary forms, with or without
+//modification, are permitted provided that the following conditions are met:
+//  * Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//  * Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+//  * Neither the name MercuryDPM nor the
+//    names of its contributors may be used to endorse or promote products
+//    derived from this software without specific prior written permission.
+//
+//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+//ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//DISCLAIMED. IN NO EVENT SHALL THE MERCURYDPM DEVELOPERS TEAM BE LIABLE FOR ANY
+//DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+//ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+//SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+#include <iostream>
+#include <iomanip> 
+#include <vector>
+#include <chrono>
+
+#include "HGridCountCalls.h"
+#include "HGridOptimiser.h"
+
+class HGridPaperFreeCooling : public Mercury2D
+//class HGridPaperFreeCooling : public HGridCountCalls2D
+{
+public:
+    void printTime() const
+    {
+        std::cout << "t=" << std::setprecision(4) << std::left << std::setw(7) << getTime() << ", tmax=" << std::setprecision(4) << std::left << std::setw(7) << getTimeMax() << std::endl;
+    }
+
+    double userHGridCellSize(unsigned int level)
+    {
+        if (level >= LevelSizes_.size())
+        {
+            std::cerr << "In double HGridPaperFreeCooling::userHGridCellSize(unsigned int level) with level=" << level << std::endl;
+        }
+        return LevelSizes_[level];
+    }
+
+    unsigned int getHGridTargetNumberOfBuckets() const
+    {
+        return buckets;
+    }
+
+    double buckets;
+    std::vector<double> LevelSizes_;
+};
+
+void makeRun(std::vector<double> levels)
+{
+    HGridPaperFreeCooling problem;
+    problem.readRestartFile("HGridPaperFreeCoolingRestartData.restart");
+    problem.setTimeMax(0.601);
+    //problem.setName("Run");
+    problem.setHGridDistribution(USER);
+
+    problem.setSaveCount(2500);
+
+    problem.buckets = 1e5;
+    std::stringstream name;
+    name<<"Run_";
+    for (auto it = levels.begin(); it != levels.end(); it++)
+    {
+        name<<*it<<"_";
+        problem.LevelSizes_.push_back(*it);
+    }
+    problem.LevelSizes_.push_back(nextafter(40.0, std::numeric_limits<double>::max()));
+    name<<nextafter(40.0, std::numeric_limits<double>::max());
+    problem.setName(name.str());
+    problem.setHGridMaxLevels(levels.size() + 1);
+
+    //problem.perpareCalls();
+    auto start = std::chrono::steady_clock::now();
+    problem.solve();
+    auto end = std::chrono::steady_clock::now();
+    auto diff = end - start;
+    //std::cout << "Insitu result:" << std::endl;
+    //problem.displayCalls(502);
+
+    std::cout.precision(5);
+    std::cout << " t=" << std::chrono::duration<double, std::milli>(diff).count() << std::endl;
+
+    //problem.histNumberParticlesPerCell();
+
+    /*std::cout << "Analytical result:" << std::endl;
+    HGridOptimiser HGridOpt;
+    HGridOpt.initialise(problem, 100, 0);
+    std::vector<double> hGridCellSizes = problem.LevelSizes_;
+    hGridCellSizes.insert(hGridCellSizes.begin(), 2.0 * problem.particleHandler.getSmallestParticle()->getRadius());
+    HGridOpt.calculateWork(hGridCellSizes, problem.getHGridMethod(), 1);
+    HGridOpt.histNumberParticlesPerCell(hGridCellSizes);*/
+}
+
+void makeRun()
+{
+    std::vector<double> levels;
+    return makeRun(levels);
+}
+
+template<typename U, typename ... T>
+void makeRun(std::vector<U>& levels, const U& head, const T&... tail)
+{
+    levels.push_back(head);
+    return makeRun(levels, tail...);
+}
+
+template<typename U>
+void makeRun(std::vector<U>& levels, const U& head)
+{
+    levels.push_back(head);
+    return makeRun(levels);
+}
+
+template<typename U, typename ... T>
+void makeRun(const U& head, const T&... tail)
+{
+    std::vector<U> levels;
+    return makeRun(levels, head, tail...);
+}
+
+
+int main(int argc UNUSED, char *argv[] UNUSED)
+{
+
+    {
+        //double opt=goldenSectionSearch(2.0,11.0,20.0,makeRun(11.0),0.01);
+        //std::cout<<"opt="<<opt<<std::endl;
+    }
+
+    //mathsFunc::goldenSectionSearch(makeBucketRun,1e3,1e5,1e6,1);
+
+    {
+        //makeRun();
+        //makeRun(5.484);
+        //makeRun(5.1046, 12.1486);
+        //makeRun(5.5416,14.7120,35.9764);
+        //makeRun();
+        //makeRun(2.6828,3.735,5.556,9.3346);
+        //makeRun(2.5997,3.433,4.6643,6.6705,10.489);
+        //makeRun(2.5595,3.2937,4.2858,5.6929,7.8535,11.6345);
+        //makeRun(2.54,3.2277,4.1132,5.2765,6.8591,9.1455,12.8134);
+        //makeRun(2.5308,3.197,4.0345,5.0926,6.4435,8.2041,10.5884,14.065);
+        //makeRun(2.5268,3.1838,4.001,5.0155,6.2736,7.8353,9.7834,12.2444,15.4513);
+        //makeRun(2.5255,3.1794,3.9898,4.9897,6.2174,7.7154,9.5294,11.7021,14.2579,17.1502);
+
+        //makeRun(2.6159,3.4134,4.4462,5.7876,7.5432,9.8785,13.0824,17.7339,25.2239); //k=0.01 T=19728
+        //makeRun(3.5569,6.2372,10.7486,18.0717,29.0369); //k=0.1 T=12882
+        //makeRun(5.5018,14.5081,35.2519); //k=1 T=11075
+        //makeRun(9.1194,37.1672); //k=10 T=12948
+        //makeRun(15.4315); //k=100 T=21723
+
+        //makeRun(3.5569,6.2372,10.7486,18.0717,29.0369); //k=0.1 T=12737 ,12909 ,10242 , 9604 ,1.0256e+05
+        //makeRun(3.8835,7.4034,13.7775,24.6648); //k=0.16681     T=12009 ,12266 , 9920 , 8984 ,1.0071e+05
+        //makeRun(4.2645,8.8803,17.8726,33.6257); //k=0.27826     T=11565 ,11823 , 9934 , 8748*,0.9816e+05
+        //makeRun(4.7056,10.7278,23.0915); //k=0.46416            T=11308 ,11636 , 9913*, 8796, 0.9663e+05*
+        //makeRun(5.2172,13.0891,30.3756); //k=0.77426            T=11049*,11298*, 9914 , 9030, 0.9864e+05
+        //makeRun(5.8055,16.0642); //k=1.2915                     T=11094 ,11301 ,10201 , 9250, 1.0171e+05
+        //makeRun(6.4729,19.5268); //k=2.1544                     T=11166 ,11448 ,10588 , 9573, 1.0579e+05
+        //makeRun(7.2432,24.1167); //k=3.5938                     T=11736 ,12019 ,11108 , 9760, 1.1050e+05
+        //makeRun(8.122,29.9512); //k=5.9948                      T=12375 ,12630 ,11922 ,10289, 1.1815e+05
+        //makeRun(9.1194,37.1672); //k=10                         T=12816 ,13119 ,12877 ,10776, 1,2846e+05
+
+        /*
+        makeRun(3.5569,6.2372,10.7486,18.0717,29.0369); //k=0.1
+        makeRun(3.7139,6.787,12.1566,21.1488,34.7309); //k=0.12915
+        makeRun(3.8835,7.4034,13.7775,24.6648); //k=0.16681
+        makeRun(4.0663,8.0935,15.6273,28.4401); //k=0.21544
+        makeRun(4.2645,8.8803,17.8726,33.6257); //k=0.27826
+        makeRun(4.4781,9.7665,20.5072); //k=0.35938
+        makeRun(4.7056,10.7278,23.0915); //k=0.46416
+        makeRun(4.9519,11.8323,26.3491); //k=0.59948
+        makeRun(5.2172,13.0891,30.3756); //k=0.77426
+        makeRun(5.5018,14.5081,35.2519); //k=1
+        */
+        //makeRun();
+        //makeRun(4.4781,9.7665,20.5072);
+
+        //makeRun(3.8119,7.1428,13.1061,23.3635);
+
+        //makeRun();
+        makeRun(4.0116,7.8832,15.0510,27.2159);
+        //makeRun(4.1797,8.5388,16.8815,31.2555);
+        //makeRun(4.3258,9.1311,18.6154,35.4842);
+        //makeRun(5.2525, 13.2612, 30.9498);
+
+    }
+}
+
+// 1e2 Particles 1e3 buckets
+// 1e3 Particles 1e4 buckets
+// 1e4 Particles 1e5 buckets

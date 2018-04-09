@@ -1,0 +1,12 @@
+#!/bin/bash
+ 
+filename=$1
+
+ ./fstatistics.exe $filename \
+  -stattype XZ \
+  -tmin $2 \
+  -tmax $3 \
+  -nx 250 \
+  -nz 50 \
+  -w_over_rmax 1 \
+  -o $filename.t=$2.stat

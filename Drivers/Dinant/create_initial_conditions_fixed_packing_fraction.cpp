@@ -1,0 +1,156 @@
+//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//For the list of developers, see <http://www.MercuryDPM.org/Team>.
+//
+//Redistribution and use in source and binary forms, with or without
+//modification, are permitted provided that the following conditions are met:
+//  * Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//  * Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+//  * Neither the name MercuryDPM nor the
+//    names of its contributors may be used to endorse or promote products
+//    derived from this software without specific prior written permission.
+//
+//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+//ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//DISCLAIMED. IN NO EVENT SHALL THE MERCURYDPM DEVELOPERS TEAM BE LIABLE FOR ANY
+//DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+//ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+//SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+#include "Mercury2D.h"
+#include "StatisticsVector.h"
+#include "Math/ExtendedMath.h"
+#include "Boundaries/PeriodicBoundary.h"
+#include "Particles/BaseParticle.h"
+#include "Walls/InfiniteWall.h"
+#include <sstream>
+#include <iostream>
+#include <cstdlib>
+#include "Species/LinearViscoelasticSpecies.h"
+
+template <StatType T> class create_initial_conditions_fixed_packing_fraction : public StatisticsVector<T>, public Mercury2D
+{
+	public:
+	create_initial_conditions_fixed_packing_fraction<T>() : StatisticsVector<T>() , Mercury2D()
+    {
+        species  = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
+    }
+	
+	void computeExternalForces(BaseParticle* CI)
+	{
+		/// Now add on gravity
+		CI->addForce(getGravity() * CI->getMass());
+		///Finally walls
+		computeForcesDueToWalls(CI);
+		///Background friction
+        CI->addForce (-CI->getVelocity()*0.1* species->getDissipation());
+//        CI->add_Torque(-CI->get_AngularVelocity()*0.1*getSlidingDissipation(CI->get_IndSpecies()));	
+	}
+	
+    double drand(double min, double max)
+    {
+        return min+(max-min)*rand()/(RAND_MAX+1.0);
+    }	
+	void setupInitialConditions() 
+	{
+		particleHandler.clear();
+		
+		BaseParticle P0;
+		double vmax=1;
+		double rmin=0.0064;
+		double rmax=0.008;
+		double area=(std::pow(rmin,2)*constants::pi*0.75+std::pow(rmax,2)*constants::pi*0.25)*N;
+		setXMax(sqrt(area/packingfraction));
+		setYMax(sqrt(area/packingfraction));
+
+
+		for(int i=0;i<N;i++)
+		{
+			P0.setRadius((i<3*N/4?rmin:rmax));
+            //P0.computeMass();
+			P0.setPosition(Vec3D(drand(0,getXMax()),drand(0,getYMax()),0));
+			P0.setVelocity(Vec3D(drand(-vmax,vmax),drand(-vmax,vmax),0));
+			P0.setAngularVelocity(Vec3D(0,0,0));
+			particleHandler.copyAndAddObject(P0);
+		}
+
+		wallHandler.clear();
+        boundaryHandler.clear();
+				
+		if(periodic)
+        {
+            PeriodicBoundary b0;
+            b0.set(Vec3D(1,0,0), getXMin(), getXMax());
+            boundaryHandler.copyAndAddObject(b0);
+            b0.set(Vec3D(0,1,0), getYMin(), getYMax());
+            boundaryHandler.copyAndAddObject(b0);
+        }
+        else
+        {
+            InfiniteWall w0;
+            w0.set(Vec3D( 0.0, 1.0, 0.0), getYMax());
+            wallHandler.copyAndAddObject(w0);
+            w0.set(Vec3D( 0.0,-1.0, 0.0),-getYMin());
+            wallHandler.copyAndAddObject(w0);
+            w0.set(Vec3D( 1.0, 0.0, 0.0), getXMax());
+            wallHandler.copyAndAddObject(w0);
+            w0.set(Vec3D(-1.0, 0.0, 0.0),-getXMin());
+            wallHandler.copyAndAddObject(w0);
+        }
+	}
+	
+    double packingfraction;
+    bool periodic;
+    int N;
+    LinearViscoelasticSpecies* species;
+};
+
+
+int main(int /*argc*/, char **/*argv[]*/)
+{
+    create_initial_conditions_fixed_packing_fraction<Z> problem;
+    
+    problem.setDoPeriodicWalls(false);
+    problem.setDoTimeAverage(false);
+    //problem.auto_number();
+    
+    std::cout<<"Enter number of particles: ";
+    std::string mystr;
+    getline(std::cin, mystr);
+    std::stringstream(mystr) >> problem.N;             
+    std::cout<<"number of particles="<<problem.N<<std::endl;
+    std::cout<<"Enter packinfraction: ";
+    getline (std::cin, mystr);
+    std::stringstream(mystr) >> problem.packingfraction;             
+    std::cout<<"packingfraction="<<problem.packingfraction<<std::endl;
+    std::cout<<"Use periodic boundary conditions (1=yes): ";
+    getline (std::cin, mystr);
+    std::stringstream(mystr) >> problem.periodic;             
+    std::cout<<"periodic boundaryconditions="<<problem.periodic<<std::endl;    
+
+	problem.species->setDensity(5);
+	Mdouble mass = problem.species->getMassFromRadius(0.0064);
+	problem.species->setStiffnessAndRestitutionCoefficient(10000,0.8,mass);
+	problem.getDataFile().setFileType(FileType::ONE_FILE);
+	problem.getFStatFile().setFileType(FileType::ONE_FILE);
+	
+
+	problem.setGravity(Vec3D(0,0,0));
+
+    problem.setTimeStep(0.02*helpers::computeCollisionTimeFromKAndDispAndEffectiveMass(problem.species->getStiffness(), problem.species->getDissipation(), 0.5*mass));
+	problem.setTimeMax(1e4* problem.getTimeStep());
+	//cout<<"dt:"<<problem.getTimeStep()<<" tmax:"<<problem.getTimeMax()<<endl;
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(100, problem.getTimeMax(), problem.getTimeStep()));
+    //problem.set_number_of_saves(100);
+	problem.setName("create_initial_conditions_fixed_packing_fraction");		
+	problem.write(std::cout,false);
+	
+	problem.solve();
+}
+

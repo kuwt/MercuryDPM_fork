@@ -1,0 +1,29 @@
+restart_version 1.0 name LiquidMigrationSelfTest
+dataFile    fileType ONE_FILE saveCount 100 counter 351 lastSavedTimeStep 35000
+fStatFile   fileType NO_FILE saveCount 100 counter 0
+eneFile     fileType ONE_FILE saveCount 100 counter 351 lastSavedTimeStep 35000
+restartFile fileType ONE_FILE saveCount 100 counter 351 lastSavedTimeStep 35000
+statFile    fileType ONE_FILE saveCount 100 counter 0
+interactionFile fileType NO_FILE saveCount 0 counter 0
+xMin 0 xMax 0.01 yMin 0 yMax 0.01 zMin 0 zMax 0.01
+timeStep 2e-05 time 0.700000000000419 ntimeSteps 35000 timeMax 0.7
+systemDimensions 3 particleDimensions 2 gravity 0 0 0 writeVTK 0 NO_FILE NO_FILE random  0 1103515245 12345 1073741824 607 273 784607267 xBallsArguments -v0 -solid -3dturn 1
+Species 1
+LinearViscoelasticFrictionLiquidMigrationWilletSpecies id 0 density 2000 stiffness 10000 dissipation 0 slidingStiffness 0 slidingDissipation 0 slidingFrictionCoefficient 0 slidingFrictionCoefficientStatic 0 rollingStiffness 0 rollingDissipation 0 rollingFrictionCoefficient 0 rollingFrictionCoefficientStatic 0 torsionStiffness 0 torsionDissipation 0 torsionFrictionCoefficient 0 torsionFrictionCoefficientStatic 0 liquidBridgeVolume 5e-12 distributionCoefficient 0.8 surfaceTension 1 contactAngle 0.349065850398866
+Walls 4
+InfiniteWall id 0 indSpecies 0 position 0 0 0 orientation 0 0 1 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0
+InfiniteWall id 1 indSpecies 0 position 0.01 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0
+InfiniteWall id 2 indSpecies 0 position 0 0 0 orientation 0.707106781186548 0 0 -0.707106781186548 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0
+InfiniteWall id 3 indSpecies 0 position 0 0.01 0 orientation 0.707106781186548 0 0 0.707106781186548 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0
+Boundaries 0
+Particles 5
+LiquidFilmParticle id 0 indSpecies 0 position 0.0072818886862485 0.00501037227240597 0 orientation 1 0 0 3.11958136456462e-15 velocity 0.00499384273436125 -1.95001672077219e-05 0 angularVelocity 0 0 2.6495747423592e-14 force 0.00248419889946227 -2.50435515250913e-05 0 torque 0 0 -1.06706299019341e-21 radius 0.0005 invMass 636.619772367581 liquidVolume 4.8e-13
+LiquidFilmParticle id 1 indSpecies 0 position 0.00829254680543796 0.00500018368859827 0 orientation 1 0 0 -3.68197562215172e-15 velocity -0.00286190318038523 3.99156843839451e-05 0 angularVelocity 0 0 -3.20334023212805e-14 force -0.00248419889946227 2.50435515250913e-05 0 torque 0 0 1.0654086289683e-21 radius 0.0005 invMass 636.619772367581 liquidVolume 0
+LiquidFilmParticle id 2 indSpecies 0 position 0.00070961507334707 0.00444309538896796 0 orientation 1 0 0 3.27998622811617e-15 velocity -0.0131315619522075 0.000395909358689062 0 angularVelocity 0 0 2.15274708878654e-14 force 0.000762063695216964 0.00278466778249772 0 torque 0 0 0 radius 0.0005 invMass 636.619772367581 liquidVolume 0
+LiquidFilmParticle id 3 indSpecies 0 position 0.00167408046984325 0.00613735140540772 0 orientation 1 0 0 -6.86713097105543e-16 velocity -0.00367233036395395 0.00321394863277534 0 angularVelocity 0 0 7.58756278075284e-15 force -0.00177299652727974 -0.00184446376155389 0 torque 0 0 -2.11758236813575e-22 radius 0.0005 invMass 636.619772367581 liquidVolume 0
+LiquidFilmParticle id 4 indSpecies 0 position 0.00097394776752384 0.00540899724461968 0 orientation 1 0 0 -1.95080789815397e-15 velocity -0.00213426589814959 -0.00363027350864084 0 angularVelocity 0 0 -2.3427151877611e-14 force 0.00101093283206278 -0.000940204020943833 0 torque 0 0 2.11758236813575e-22 radius 0.0005 invMass 636.619772367581 liquidVolume 0
+Interactions 3
+LinearViscoelasticFrictionLiquidMigrationWilletInteraction particleIds 0 1 timeStamp 35000 force 0.00248419889946227 -2.50435515250913e-05 0 torque 0 0 0 slidingSpring 0 0 0 rollingSpring 0 0 0 torsionSpring 0 0 0 wasInContact 1 liquidBridgeVolume 3.12e-12
+LinearViscoelasticFrictionLiquidMigrationWilletInteraction particleIds 3 4 timeStamp 35000 force -0.00177299652727974 -0.00184446376155389 0 torque 0 0 0 slidingSpring 0 0 0 rollingSpring 0 0 0 torsionSpring 0 0 0 wasInContact 1 liquidBridgeVolume 4e-12
+LinearViscoelasticFrictionLiquidMigrationWilletInteraction particleIds 2 4 timeStamp 35000 force 0.000762063695216964 0.00278466778249772 0 torque 0 0 0 slidingSpring 0 0 0 rollingSpring 0 0 0 torsionSpring 0 0 0 wasInContact 1 liquidBridgeVolume 2.4e-12
+NUM_BUCKETS 10 hGridMaxLevels 3 cellOverSizeRatio 1

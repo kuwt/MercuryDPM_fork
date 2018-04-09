@@ -1,0 +1,71 @@
+Philosophy: How to use this code.
+
+Basically the whole simulation (from generation till shearing) 
+is divided into several stages:
+
+#################################################################################
+s1_IniGeneration: here we generate a polydispersed and 
+size random distributed particle gas (fixed volume fraction)
+in a box and then relax this hot "gas" for a certain time.
+
+#################################################################################
+s2_IsotropicCompression: we take the relaxed sample from s1 and
+compress/decompress it isotropically until a certain volume fraction.
+The strainrate tensor for this case:
+			(-1 0 0)
+dot_epsilon_comp *	(0 -1 0)
+			(0 0 -1)
+
+#################################################################################
+s3_IsoRelax: take the sample from s2 (after jamming, with a fixed pressure
+or fixed volume fraction) and then relax here for a while (to get low kinetic energy).
+
+#################################################################################
+s4: This stage consist of different possibilities:
+s4-1_SimpleShearStrainrate: stress constant (e.g. sigma_yy = const) simple shear 
+with strainrate control movement of all the particles and boundaries. The strainrate
+tensor is
+			(0 1 0)					 (0 1 0)
+gamma_dot	*	(0 0 0)   + 	phi_t * dot_epsilon_yy * (0 0 0)
+			(0 0 0)					 (0 0 0)
+#################################################################################
+s4-2_PureShearStranrate: volume conserving pure shear with strainrate control,
+the strainrate tensor is
+			(1 0 0)
+dot_epsilon_D2	*	(0 -1 0)
+			(0 0 0)
+with compress in x-direction and dilate in y-direction
+
+#################################################################################
+s4-3_SimpleShearMoveBoundary: similar to s4-1, the system is sheared by applying
+velocity to Lees-Edwards boundary (not strainrate to all particles).
+
+#################################################################################
+s4-4_SimpleShearStrainrateAdhesive: similar to s4-1, the only difference is here
+the contact model is changed, reversible adhesive long range force is included,
+this adds two extra input parameters: K_adh and f_adh_max, which are adhesion stiffness
+and maximum adhesion force respectively.
+
+#################################################################################
+
+About post processing:
+Folder "tav10_new" contains the code to do spatial/temporal averaging:
+"comp.bat": run this to compile the averaging for the .f fotran codes.
+
+"tav10.help": contains the output format after doing the averaging.
+
+"tav10_box_no_time.bat": this is a batch file where you have to put together with
+your simulation data and run it. Inside this batch:
+line40: route to where you put the compiled tav10 executable/object.
+line41: boundary mode as explained in this file
+line42: output mode, no need to change
+line43: the route and name of your output data files
+line44: the route and name of your fstatistic files
+line45: 4-digit number range, if second number (last snapshot) is positive, then temporal
+averaging; if it is negative, then only spatial averaging on each snapshot over the whole box.
+line46: tmin tmax, make sure the tmax is large enough to avoid complains.
+line47-51: see the head explanations.
+
+for further questions of this averaging tool, pls. ask Stefan Luding for further help.
+
+

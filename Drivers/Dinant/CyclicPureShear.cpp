@@ -1,0 +1,219 @@
+//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//For the list of developers, see <http://www.MercuryDPM.org/Team>.
+//
+//Redistribution and use in source and binary forms, with or without
+//modification, are permitted provided that the following conditions are met:
+//  * Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//  * Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+//  * Neither the name MercuryDPM nor the
+//    names of its contributors may be used to endorse or promote products
+//    derived from this software without specific prior written permission.
+//
+//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+//ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//DISCLAIMED. IN NO EVENT SHALL THE MERCURYDPM DEVELOPERS TEAM BE LIABLE FOR ANY
+//DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+//ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+//SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+#include "Mercury2D.h"
+#include "StatisticsVector.h"
+#include "Boundaries/PeriodicBoundary.h"
+#include "Particles/BaseParticle.h"
+#include "Walls/InfiniteWall.h"
+#include <sstream>
+#include <iostream>
+#include <cstdlib>
+#include "Species/LinearViscoelasticSlidingFrictionSpecies.h"
+
+template<StatType T> class CyclicPureShear : public StatisticsVector<T>, public Mercury2D
+{
+public:
+	CyclicPureShear()
+    {
+        tc=1e-3;
+        r=0.8;
+        rho=2000;
+        tMax=10;
+        epsilonMax=0.0;
+        gammaMax=0.0;
+		cycles=2;
+    }
+
+    void setupInitialConditions()
+    {
+		setName("CyclicPureShear");
+        setSystemDimensions(2);
+        species = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
+        species->setDensity(rho);
+
+        if (readDataFile("Startpos.dat", 8))
+		{
+            std::cout << "inlezen gelukt" << std::endl;
+		}
+        else
+        {
+            std::cout << "inlezen mislukt" << std::endl;
+            exit(1);
+        }
+        setTime(0);
+        
+        Mdouble minRadius=particleHandler.getSmallestParticle()->getRadius();
+        Mdouble minMass=species->getMassFromRadius(minRadius);
+        std::cout<<"minMass="<<minMass<<" minRadius="<<minRadius<<std::endl;
+        species->setStiffness(helpers::computeKFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass (tc, r, 0.5*minMass));
+        species->setDissipation(helpers::computeDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass (tc, r, 0.5*minMass));
+
+        setGravity(Vec3D(0.0,0.0,0.0));
+        setTimeMax(tMax);
+        
+        setTimeStep(0.02*tc);
+        getDataFile().setSaveCount(0.5*tMax/tc);
+        getFStatFile().setFileType(FileType::NO_FILE);
+        getEneFile().setSaveCount(5*tMax/tc);
+        getRestartFile().setSaveCount(0.5*tMax/tc);
+        getStatFile().setSaveCount(5*tMax/tc);
+        
+        setHGridMaxLevels(1);        
+
+        if (periodic)
+        {
+            horizontalBoundary = boundaryHandler.copyAndAddObject(PeriodicBoundary());
+            verticalBoundary = boundaryHandler.copyAndAddObject(PeriodicBoundary());
+            horizontalBoundary->set(Vec3D(1, 0, 0), getXMin(), getXMax());
+            verticalBoundary->set(Vec3D(0, 1, 0), getYMin(), getYMax());
+        }
+        else
+        {
+            leftWall = wallHandler.copyAndAddObject(InfiniteWall());
+            rightWall = wallHandler.copyAndAddObject(InfiniteWall());
+            bottomWall = wallHandler.copyAndAddObject(InfiniteWall());
+            topWall = wallHandler.copyAndAddObject(InfiniteWall());
+            leftWall->set(Vec3D(-1.0, 0.0, 0.0), -getXMin());
+            rightWall->set(Vec3D(1.0, 0.0, 0.0), getXMax());
+            bottomWall->set(Vec3D(0.0, -1.0, 0.0), -getYMin());
+            topWall->set(Vec3D(0.0, 1.0, 0.0), getYMax());
+        }
+
+        xOriginal = getXMax();
+        yOriginal = getYMax();
+    }
+
+    void actionsBeforeTimeStep()
+    {
+		double q=0.5-0.5*cos(cycles * getTime() / getTimeMax() * constants::pi);
+
+        setXMax(xOriginal*sqrt(exp(q*(epsilonMax+gammaMax))));
+        setYMax(yOriginal*sqrt(exp(q*(epsilonMax-gammaMax))));
+        
+        if (periodic)
+        {
+            horizontalBoundary->moveRight(getXMax());
+            verticalBoundary->moveRight(getYMax());
+        }
+        else
+        {
+            topWall->setPosition(Vec3D(0.0,getYMax(),0.0));
+            rightWall->setPosition(Vec3D(getXMax(),0.0,0.0));
+        }
+    }
+
+    int cycles;
+    bool periodic;
+    double tc;
+    double r;
+    double rho;
+    double tMax;
+    double epsilonMax;
+    double gammaMax;
+   
+private:
+    double xOriginal;
+    double yOriginal;
+    LinearViscoelasticSpecies* species;
+    InfiniteWall* leftWall;
+    InfiniteWall* rightWall;
+    InfiniteWall* bottomWall;
+    InfiniteWall* topWall;
+    PeriodicBoundary* horizontalBoundary;
+    PeriodicBoundary* verticalBoundary;
+    
+};
+
+int main(int argc, char *argv[])
+{
+    CyclicPureShear<Z> cyclicPureShear;
+    
+    for (int i = 1; i < argc; i++)
+    {
+        std::cout << "interpreting input argument " << argv[i];
+        for (int j = i + 1; j < argc; j++)
+        {
+            if (argv[j][0] == '-')
+                break;
+            std::cout << " " << argv[j];
+        }
+        std::cout << std::endl;
+        
+        if (!strcmp(argv[i], "-cycles"))
+        {
+            cyclicPureShear.cycles=atoi(argv[i+1]);
+            i++;
+        }
+        else if (!strcmp(argv[i], "-periodic"))
+        {
+            cyclicPureShear.periodic=true;
+        }
+        else if (!strcmp(argv[i], "-walls"))
+        {
+            cyclicPureShear.periodic=false;
+        }        
+	    else if (!strcmp(argv[i], "-tc"))
+        {
+            cyclicPureShear.tc=atof(argv[i+1]);
+            i++;
+        }
+        else if (!strcmp(argv[i], "-r"))
+        {
+            cyclicPureShear.r=atof(argv[i+1]);
+            i++;
+        }
+        else if (!strcmp(argv[i], "-rho"))
+        {
+            cyclicPureShear.rho=atof(argv[i+1]);
+            i++;
+        }       
+        else if (!strcmp(argv[i], "-tMax"))
+        {
+            cyclicPureShear.tMax=atof(argv[i+1]);
+            i++;
+        }
+        else if (!strcmp(argv[i], "-epsilonMax"))
+        {
+            cyclicPureShear.epsilonMax=atof(argv[i+1]);
+            i++;
+        }
+        else if (!strcmp(argv[i], "-gammaMax"))
+        {
+            cyclicPureShear.gammaMax=atof(argv[i+1]);
+            i++;
+        }        
+		else
+        {
+            std::cerr << "Warning: not all arguments read correctly!" << std::endl;
+            exit(-10);
+        }
+    }
+        
+    cyclicPureShear.setDoPeriodicWalls(false);
+    cyclicPureShear.setDoTimeAverage(false);
+    cyclicPureShear.solve();
+}
+

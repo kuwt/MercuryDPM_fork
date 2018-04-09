@@ -1,0 +1,221 @@
+/*! \page VisualisingYourResults Visualising Your Results
+\tableofcontents
+
+Having explained in the previous section the how to run a Mercury driver code, we next explain the form of the data output, and describe how relevant information may be extracted from this data. Mercury produces data regarding a wide range of system parameters and, as such, there exist a variety of manners in which this data may be obtained and processed. This page is divided in two parts:
+- \ref UnderstandingTheOutputFiles
+- \ref VisualisingDataInParaview
+- \subpage xballs
+
+\section UnderstandingTheOutputFiles Understanding the output files
+
+Each MercuryDPM executable produces three main output files, with the extensions ‘.data’, ‘.fstat’ and ‘.ene’.
+
+For instance, building the source file <tt>example.cpp</tt> will create an executable named <tt>example</tt>.
+The output file name is set using DPMBase::getName; the MercuryDPM convention is that the name of the output file names should be equal to the name of the source file.
+Thus, execution will create output files named ‘example.data’, ‘example.fstat’ and ‘example.ene’ (other files such as ‘example.restart’ and ‘example.stat’ might be created, which will be discussed in later sections).
+
+\subsection ene The ene file
+
+The simplest of the three file types is the ‘.ene’ file, which allows us to interpret the time evolution of the various forms of energy possessed by the system. Data is written at predefined time steps, with the system’s <B> total </B> gravitational (<tt>’ene_gra’</tt>) and elastic (<tt>’ene_ela’</tt>) potential energies and translational (<tt>’ene_kin’</tt>) and rotational (<tt>’ene_rot’</tt>) kinetic energies being shown alongside the system’s centre of mass position in the <I>x</I>, <I>y</I> and <I>z</I> directions (<tt>’X_COM’</tt>, <tt>’Y_COM’</tt> and <tt>’Z_COM’</tt>, respectively).
+
+At each time step, the data is output as follows:
+
+\verbatim
+time ene_gra ene_kin ene_rot ene_ela X_COM Y_COM Z_COM
+\endverbatim
+
+\subsection data The data file
+
+The data file is perhaps the most useful and versatile of the three, as it provides full information regarding the positions and velocities of all particles within the system at each given time step.
+
+The files are formatted as follows: at <I>each time step</I>, a single line stating the number of particles in the system (<tt>N</tt>).
+This first line is structured as below:
+
+\verbatim
+N, time, xmin, ymin, zmin, xmax, ymax, zmax
+\endverbatim
+
+For each timestep, we are given information regarding
+- the number of particles <tt>N</tt>),
+- the time step <tt>time</tt> when the output was written, and
+- the maximal and minimal spatial boundaries defining the computational volume used in the simulations, <tt>xmin, ymin, zmin, xmax, ymax, zmax</tt>.
+
+This output is then followed by a series of <tt>N</tt> subsequent lines, each providing information for one particle within the system.
+These parameters are output in the following order:
+
+\verbatim
+rx, ry, rz, vx, vy, vz, rad, alpha, beta, gamma, omex, omey, omez, info
+\endverbatim
+
+For each particle, we are given information regarding
+- its current position in three dimensions \f$\vec{r}=({\tt rx}, {\tt ry}, {\tt rz})\f$,
+- the magnitudes of the three components of its instantaneous velocity \f$\vec{v}=({\tt vx}, {\tt vy}, {\tt vz})\f$,
+- the radius of the particle \f$\tt rad\f$,
+- its instantaneous angular velocity \f$\vec{\omega}=({\tt omex}, {\tt omey}, {\tt omez})\f$ and
+- its angular position, given via the three Euler angles \f$({\tt alpha}, {\tt beta}, {\tt gamma})\f$.
+- The term <tt>info</tt> represents an additional variable which can be specified by the user using DPMBase::getInfo. By default, <tt>info</tt> represents the <I>species index</I>, which stores information regarding the particle’s material/contact properties.
+
+The sequence of output lines described above is then repeated for each time step.
+
+\image html data.png "Particle properties reported in the data file"
+
+It should be noted that the above is the standard output required for <B>three-dimensional data</B>; for two-dimensional data, only five items of information are given in the initial line of each time step: 
+
+\verbatim
+N, time, xmin, zmin, xmax, zmax
+\endverbatim
+
+and eight in the subsequent <tt>N</tt> lines:
+
+\verbatim
+x, z, vx, vz, rad, qz, omez, xi
+\endverbatim
+
+\subsection fstat The fstat file
+
+The fstat is predominantly used to calculate stresses.
+
+The .fstat output files follow a similar structure to the .data files; for each time step, three lines are initially output, each preceded by a ‘hash’ symbol (#). These lines are designated as follows:
+
+\verbatim
+  # time, fstatVersion
+  # xmin ymin zmin xmax ymax zmax
+  #
+\endverbatim
+
+where <tt>time</tt> is the current time step adn <tt>fstatVersion</tt> the version number of the output format (currently one, as it has been changed once). The values provided in the second and third line ensure backward compatibility with earlier versions of Mercury, but are not used for analysis.
+
+This initial information is followed by a series of <I>N<sub>c</sub></I> lines corresponding to each of the <I>N<sub>c</sub></I> <B>particle <I>contacts</I></B> (as opposed to <B>particles</B>) within the system at the current instant in time.
+Each of these lines is structured as follows:
+
+\verbatim
+time, i, j, cx, cy, cz, delta, deltat, fn, ft, nx, ny, nz, tx, ty, tz
+\endverbatim
+
+- <tt>i</tt> indicates the number used to identify a given particle and
+- <tt>j</tt> similarly identifies its contact partner.
+- \f$\vec{c}=({\tt cx}, {\tt cy}, {\tt cz})\f$ denotes the position of the contact point in three dimensions.
+- <tt>delta</tt> represents the overlap between the two particles,
+- <tt>deltat</tt> the length of the  <i>tangential elongation</I> [Reference missing].
+- the contact force acting on particle <tt>i</tt>  is split into a normal and tangential component, \f$\vec{f}={\tt fn}\cdot\hat{n}+{\tt fn}\cdot\hat{t}\f$, where
+\f$\hat{n}=({\tt nx}, {\tt ny}, {\tt nz})\f$ and \f$\hat{t}=({\tt tx}, {\tt ty}, {\tt tz})\f$ denote unit vectors normal and tangential to the contact plane, respectively.
+
+\image html fstat.png "Contact properties reported in the fstat file; a non-spherical particle is shown to visualise that the branch vector c-ri is not necessarily parallel to the normal vector n"
+
+f\section VisualisingDataInParaview Visualising data in Paraview
+
+#### Visualising Mercury Data Using ParaView
+
+We begin by discussing the manner in which Mercury data can simply be ‘visualised’ - i.e. a direct, visual representation of the motion of all particles within the system produced.
+
+ParaView may be downloaded from http://www.paraview.org/download/ and installed by following the relevant instructions for your operating system. On Ubuntu, it can simply be installed by typing
+\verbatim
+sudo apt-get install paraview
+\endverbatim
+
+In order to visualise the data using Paraview, the <tt>data2pvd</tt> tool can be used
+to convert the ‘.data' files output by Mercury into a '.pvd' Paraview datafile
+and several VTK (.vtu) files.  We will now work through an example, using
+<tt>data2pvd</tt> to visualise a simple data set produced using the example code
+<tt>ChuteDemo</tt>. From your build directory, go to the <tt>ChuteDemos</tt> directory: 
+
+\code{.sh}
+cd Drivers/ChuteDemos
+\endcode
+
+and run the <tt>ChuteDemo</tt> code:
+
+\code{.sh}
+./ChuteDemo
+\endcode
+
+<I> Note: </I> if the code does not run, it may be necessary to first build the code by typing:
+
+\code{.sh}
+ make ChuteDemo
+\endcode 
+
+Once the code has run, you will have a series of files; for now, however, we are only interested in the '.data' files.
+
+####Running <tt>data2pvd</tt>
+
+Since <tt>data2pvd</tt> creates numerous files, it is advisable to output these to a different directory. First, we will create a directory called <tt>chute_pvd</tt>:
+
+\code{.sh}
+mkdir chute_pvd
+\endcode
+
+We will then tell <tt>data2pvd</tt> to create the files in the directory:
+
+\code{.sh}
+../../Tools/data2pvd ChuteDemo.data chute_pvd/chute
+\endcode
+
+In the above, the first of the three terms should give the path to the directory in which the <tt>data2pvd</tt> program is found (for a standard installation of Mercury, the path will be exactly as given above); the second is the name of the data file (in the current directory) which you want to visualise; the third gives the name of the directory into which the new files will be output (‘chute_pvd’) and the name of the files to be created ('chute'). 
+
+Once the files have been successfully created, we now start ParaView by simply typing:
+
+\code{.sh}
+paraview
+\endcode
+
+Which should load a screen similar to the one provided below:
+
+<I>Note:</I> for Mac users, ParaView can be opened by clicking 'Go', selecting 'Applications' and opening the file manually.
+
+\image html Tutorials/ParaView/paraview2.png
+
+The next step is to open the file by pressing the folder icon circled in the above image and navigating to the relevant directory using the panel shown below.
+
+Here, you can choose to open either the `.pvd' file, which loads the entire simulation, or the '.vtu' file, which allows the selection of a single timestep.
+
+For this tutorial, we will select the full file - ’chute.pvd'.
+
+\image html Tutorials/ParaView/openfile.png 
+
+On the left side of the ParaView window, we can now see chute.pvd, below the builtin in the Pipeline Browser. 
+
+<!-- 
+Note: you can also load the file from the terminal using 
+\code{.sh} paraview --data=chute_pvd/chute.pvd\endcode
+-->
+
+Click ‘Apply' to load the file into the pipeline.
+
+\image html Tutorials/ParaView/apply.png
+
+Now we want to actually draw our particles. To do so, open the 'filters' menu at the top of the ParaView window (or, for Mac users, at the top of the screen) and then, from the drop-down list, select the 'common' menu and click 'Glyph'.
+
+In the current case, we want to draw all our particles, with the correct size and shape. In the left-hand menu, select 'Sphere' for the ‘Glyph Type’, 'scalar' as the Scale Mode (under the ‘Scaling’ heading) and enter a Scale Factor of 2.0 (Mercury uses radii, while ParaView uses diameters).
+
+Select 'All Points' for the ‘Glyph Mode’ under the ‘Masking’ heading to make sure all of our particles are actually rendered. Finally press 'Apply' once again to apply the changes.
+
+\image html Tutorials/ParaView/zoom2.png
+
+In order to focus on our system of particles, click the 'Zoom to data' button circled in the image above.
+
+
+The particles can then be coloured according to various properties; for the current tutorial, we will colour our particles according to their velocities. To do this, with the 'Glyph1' stage selected, scroll down in the properties menu until you find 'Colouring' and select the 'Velocities' option. 
+
+The colouring can be rescaled for optimal clarity by pressing the ‘Rescale' button in the left hand menu under the ‘Colouring’ heading.
+
+\image html Tutorials/ParaView/rescale.png
+
+We are now ready to press the 'play' button near the top of the screen and see the system in motion!
+
+\image html Tutorials/ParaView/run.png
+
+The ParaView program has endless possibilities and goes way beyond the scope of this document. Please consult the ParaView
+documentation for further information.
+
+####Post-Processing Data 
+
+In the MercuryCG folder (<tt>MercuryDPM/MercuryBuild/Drivers/MercuryCG</tt>), type ‘<tt>make fstatistics</tt>’ to compile the ‘fstatistics’ analysis package.
+
+For information on how to operate fstatistics, type ‘<tt>./fstatistics -help</tt>’.
+
+The Mercury analysis package are due to be upgraded in the upcoming Version 1.1, at which point full online documentation and usage instructions will be uploaded.
+
+If you experience problems in the meantime, please do not hesitate to contact a member of the Mercury team.
+
+*/

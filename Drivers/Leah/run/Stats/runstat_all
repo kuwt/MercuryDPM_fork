@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+num=$(awk 'BEGIN{for(i=0;i<=10;i+=0.1)print i}')
+for i in $num
+	do
+	tmin=$i
+	tmax=$(echo $i+0.1 | bc)
+	./runstat $1 $tmin $tmax
+	done
+
+
+# timestep averaging over a time width of 0.1 (line 7)
+# time averaging over = i (line 3)
+# location of beginning of time window = 0.1 (line 3) 
+# to make averaging overlap, make time width larger or time step smaller

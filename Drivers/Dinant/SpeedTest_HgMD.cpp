@@ -1,0 +1,138 @@
+//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//For the list of developers, see <http://www.MercuryDPM.org/Team>.
+//
+//Redistribution and use in source and binary forms, with or without
+//modification, are permitted provided that the following conditions are met:
+//  * Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//  * Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+//  * Neither the name MercuryDPM nor the
+//    names of its contributors may be used to endorse or promote products
+//    derived from this software without specific prior written permission.
+//
+//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+//ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//DISCLAIMED. IN NO EVENT SHALL THE MERCURYDPM DEVELOPERS TEAM BE LIABLE FOR ANY
+//DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+//ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+//SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+#include "Mercury2D.h"
+#include "Boundaries/PeriodicBoundary.h"
+#include "Particles/BaseParticle.h"
+#include "Walls/InfiniteWall.h"
+#include <sstream>
+#include <iostream>
+#include <cstdlib>
+#include "Species/LinearViscoelasticSpecies.h"
+
+class pure_shear :  public Mercury2D
+{
+	public:
+	pure_shear() : Mercury2D()
+    {
+        species  = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
+    }
+	
+	void printTime() const {
+		std::cout <<"t="<< getTime()<<", tmax=" << getTimeMax() << std::endl;
+		std::cout.flush();
+	}
+
+	void computeExternalForces(BaseParticle *p)
+	{
+		p->addForce(-p->getVelocity()*0.1* species->getDissipation());
+		if (!p->isFixed()) computeForcesDueToWalls(p);
+	}
+
+	void setupInitialConditions() 
+	{
+		if(readDataFile("Startpos.dat",7))
+			std::cout <<"inlezen gelukt"<< std::endl;
+		else
+		{
+			std::cout <<"inlezen mislukt"<< std::endl;
+			exit(1);
+		}
+        setTime(0);
+		
+		wallHandler.clear();
+		boundaryHandler.clear();
+		
+        if(periodic)
+        {
+            PeriodicBoundary b0;
+            b0.set(Vec3D(1,0,0), getXMin(), getXMax());
+            boundaryHandler.copyAndAddObject(b0);
+            b0.set(Vec3D(0,1,0), getYMin(), getYMax());
+            boundaryHandler.copyAndAddObject(b0);
+        }
+        else
+        {
+            InfiniteWall w0;
+            w0.set(Vec3D( 0.0, 1.0, 0.0), getYMax());
+            wallHandler.copyAndAddObject(w0);
+            w0.set(Vec3D( 0.0,-1.0, 0.0),-getYMin());
+            wallHandler.copyAndAddObject(w0);
+            w0.set(Vec3D( 1.0, 0.0, 0.0), getXMax());
+            wallHandler.copyAndAddObject(w0);
+            w0.set(Vec3D(-1.0, 0.0, 0.0),-getXMin());
+            wallHandler.copyAndAddObject(w0);
+        }
+        		
+		xoriginal=getXMax();
+		yoriginal=getYMax();
+	}
+    
+	protected:
+	
+	void actionsBeforeTimeStep()
+	{
+		double fac=0.01;
+		double fact=exp(fac*0.5*(1-cos(getTime()/getTimeMax()*constants::pi)));
+
+		setXMax(xoriginal*fact);
+		setYMax(yoriginal/fact);
+
+        dynamic_cast<PeriodicBoundary*>(boundaryHandler.getObject(0))->moveRight(getXMax());
+        dynamic_cast<PeriodicBoundary*>(boundaryHandler.getObject(1))->moveRight(getYMax());
+		//dynamic_cast<InfiniteWall*>(wallHandler.getObject(1))->move(getXMax());
+        //dynamic_cast<InfiniteWall*>(wallHandler.getObject(3))->move(getYMax());
+    }
+
+	double xoriginal;
+	double yoriginal;
+	bool periodic;
+public:
+    LinearViscoelasticSpecies* species;
+};
+
+int main(int /*argc*/, char **/*argv[]*/)
+{
+    pure_shear problem;
+	problem.setName("SpeedTest_HgMD");		
+    
+    
+/*    problem.set_HGRID_max_levels(2);
+    problem.set_HGRID_sphere_to_cell_ratio(1);
+    problem.set_HGRID_cell_to_cell_ratio(1.48);*/
+    problem.species->setDensity(20);
+    problem.setSystemDimensions(2);
+    problem.setParticleDimensions(2);
+    problem.species->setStiffness(1e4);
+    problem.species->setDissipation(0.293865);
+	problem.setupInitialConditions();
+    problem.setTimeStep(0.02 * constants::pi / sqrt(2 * problem.species->getStiffness() / problem.particleHandler.getLightestParticle()->getMass()));
+	problem.setTimeMax((1e4-1)* problem.getTimeStep());
+	problem.setSaveCount(1000);
+	problem.solve();
+	problem.write(std::cout,false);
+}
+
+

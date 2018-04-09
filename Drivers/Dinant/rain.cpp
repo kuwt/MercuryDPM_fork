@@ -1,0 +1,119 @@
+//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//For the list of developers, see <http://www.MercuryDPM.org/Team>.
+//
+//Redistribution and use in source and binary forms, with or without
+//modification, are permitted provided that the following conditions are met:
+//  * Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//  * Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+//  * Neither the name MercuryDPM nor the
+//    names of its contributors may be used to endorse or promote products
+//    derived from this software without specific prior written permission.
+//
+//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+//ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//DISCLAIMED. IN NO EVENT SHALL THE MERCURYDPM DEVELOPERS TEAM BE LIABLE FOR ANY
+//DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+//ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+//SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+#include "Mercury2D.h"
+#include "Particles/BaseParticle.h"
+#include "Walls/InfiniteWall.h"
+#include <sstream>
+#include <iostream>
+#include <cstdlib>
+#include "Species/LinearViscoelasticSpecies.h"
+
+class rain : public Mercury2D
+{
+  public:
+	rain(): Mercury2D()
+    {
+        species  = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
+    }
+
+	void computeExternalForces(BaseParticle* CI)
+	{
+		/// Now add on gravity
+		CI->addForce(getGravity() * CI->getMass());
+		///Finally walls
+		computeForcesDueToWalls(CI);
+		///Background friction
+        CI->addForce (-CI->getVelocity()*0.1* species->getDissipation());
+	}
+
+	void setupInitialConditions() 
+	{
+		setXMax(10);
+		setYMax(20);
+
+		particleHandler.clear();		
+        BaseParticle P0;
+        P0.setRadius(0.5);
+		P0.setVelocity(Vec3D(0.0, 0.0, 0.0));
+        P0.setPosition(Vec3D(3,getYMax()-0.5,0.0));
+        particleHandler.copyAndAddObject(P0);		
+        P0.setRadius(0.3);
+		P0.setVelocity(Vec3D(0.0, 0.0, 0.0));
+        P0.setPosition(Vec3D(5,getYMax()-0.5,0.0));
+        particleHandler.copyAndAddObject(P0);					
+				
+
+        wallHandler.clear();        
+        InfiniteWall w0;
+        w0.set(Vec3D( 0.0, 1.0, 0.0), getYMax());
+        wallHandler.copyAndAddObject(w0);
+		w0.set(Vec3D( 0.0,-1.0, 0.0),-getYMin());
+		wallHandler.copyAndAddObject(w0);
+        w0.set(Vec3D( 1.0, 0.0, 0.0), getXMax());
+		wallHandler.copyAndAddObject(w0);
+        w0.set(Vec3D(-1.0, 0.0, 0.0),-getXMin());
+        wallHandler.copyAndAddObject(w0);
+	}
+
+	
+  protected:
+	
+	void actionsBeforeTimeStep()
+	{
+        if(particleHandler.getLastObject()->getPosition().Y+1.5<getYMax()&&particleHandler.getNumberOfObjects()<200)
+        {
+            BaseParticle P0;
+            P0.setRadius(random.getRandomNumber(0.3,0.5));
+    		P0.setVelocity(Vec3D(0.0, 0.0, 0.0));
+            P0.setPosition(Vec3D(random.getRandomNumber(getXMin()+0.5,getXMax()-0.5),getYMax()-0.5,0.0));
+            particleHandler.copyAndAddObject(P0);
+        }
+	}
+public:
+    LinearViscoelasticSpecies* species;
+};
+
+int main(int /*argc*/, char **/*argv[]*/)
+{
+    rain problem;
+    problem.species->setDensity(20);
+    Mdouble mass = problem.species->getMassFromRadius(0.0037);
+    problem.species->setStiffnessAndRestitutionCoefficient(10000,0.8,mass);
+    
+    problem.setTimeMax(100.0);
+    problem.setGravity(Vec3D(0,-9.81,0));
+
+    problem.setTimeStep(0.02*helpers::computeCollisionTimeFromKAndDispAndEffectiveMass(problem.species->getStiffness(), problem.species->getDissipation(), 0.5*mass));
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(100, problem.getTimeMax(), problem.getTimeStep()));
+    //problem.set_number_of_saves(100);
+    problem.setName("rain");		
+    problem.setHGridMaxLevels(1);
+    problem.write(std::cout,false);
+    
+    problem.solve();
+}
+
+

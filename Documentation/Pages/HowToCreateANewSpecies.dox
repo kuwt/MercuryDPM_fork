@@ -1,0 +1,196 @@
+/*! \page HowToCreateANewSpecies Implementing a new contact law
+\tableofcontents
+
+\section background  Background
+
+Contact laws in MercuryDPM are described by the Species and Interaction classes.
+Species contains the *parameters* of the contact law (plus the particle property density), while Interaction class contains the *functions to compute the forces*.
+
+\subsection species Species
+To *use* a contact law, you only need to get familiar with the Species class, you only need to set the parameters.
+For example, if you want to use a the Hertz-Mindlin force law, then you have to create a Species of type #HertzianViscoelasticMindlinSpecies and set its parameters:
+\code{.cpp}
+//defines a new species
+HertzianViscoelasticMindlinSpecies species;
+species.setDensity(density);
+species.setElasticModulusAndRestitutionCoefficient(elasticModulus, restitution);
+species.setShearModulus(0.5*elasticModulus/(1+poissonRatio));
+species.setSlidingFrictionCoefficient(frictionCoefficient);
+
+Mercury3D dpm;
+//adds the new species to the speciesHandler of the simulation
+dpm.speciesHandler.copyAndAddObject(species);
+\endcode
+
+Then you need to assign a species to each particle. The species added to speciesHandler can be retrieved by their index, with index 0 being the first inserted species, index 1 the second, etc:
+\code{.cpp}
+BaseParticle p0;
+//defines this particle to be of Species 0
+p0.setSpecies(speciesHandler.getObject(0));
+p0.setPosition(position);
+p0.setRadius(radius);
+particleHandler.copyAndAddObject(p0);
+\endcode
+
+For particles of the same species, the parameters of that species is used to compute interaction forces.
+If there is more than one species defined, then MercuryDPM automatically creates MixedSpecies that contains the parameters for a collision between particles of different species. By default, the parameters of the MixedSpecies are set to the harmonic mean of the parameters of the Species' parameters, i.e. the Elastic modulus for a contact between two particles of different species is computed as \f$E_{12}=2(E_1^{-1}+E_2^{-1})^{-1}\f$. If you wish to change the behaviour of the mixed contacts, you do this as follows:
+
+\code{.cpp}
+//retrieves a pointer to the MixedSpecies containing the parameters for collisions between particles of species 0 and 1
+auto mixedSpecies = dpm.speciesHandler.getMixedObject(0,1);
+//redefines the contact law parameters
+mixedSpecies->setElasticModulusAndRestitutionCoefficient(elasticModulus, restitution);
+mixedSpecies->setShearModulus(0.5*elasticModulus/(1+poissonRatio));
+mixedSpecies->setSlidingFrictionCoefficient(frictionCoefficient);
+\endcode
+
+Note, MixedSpecies have no particle properties (density), as no particle can be of a MixedSpecies type.
+
+\subsection interaction  Interaction
+The Interaction class is hidden from the user, and only used internally by MercuryDPM.
+Every time MercuryDPM detects a collision between two particles, it will create an Interaction of the right type (HertzianViscoelasticMindlinInteraction in our example), and execute the Interaction::computeForce function, which computes the interaction forces.
+
+\subsection inheritance Inheritance structure
+There are more than 30 different contact laws available in MercuryDPM, each described by one Species and one Interaction class. There are so many, because each contact law is a combination of three different contact forces: a normal force \f$f^n\f$, a friction force \f$f^t\f$, and an adhesive force \f$f^a\f$; the forces are computed in this order, as the friction and adhesion forces often depend on the normal force (as in Hertz-Mindlin). Therefore, we use diamond inheritance to define the Species. For example, #HertzianViscoelasticMindlinSpecies is simply a short name (typedef) for a Species class templated with three different interaction forces, Species<HertzianViscoelasticNormalSpecies, MindlinSpecies, EmptyAdhesiveSpecies>. See Species for more details.
+
+\section new Creating a new contact law
+
+To create a new contact law, it's easiest to start by modifying an existing one. For example, the Mindlin contact law for friction (see MindlinSpecies) was created by modifying the linear sliding friction force (see SlidingFrictionSpecies). You can see the full history of these modifications in the svn log, just type `svn log -v -r1588`.
+
+In the following, I will describe how MindlinSpecies was created, so developers can follow the same steps to create new contact laws. I will assume that you have installed the Trunk version of MercuryDPM in `MercurySource` and your build directory is `MercuryBuild`.
+
+-# The first step is to create a new Species and Interaction class for your new contact force. You can do this by copying an existing one:
+\code{.sh}
+$ cd MercurySource/Kernel/Interactions/FrictionForceInteractions/
+$ svn cp SlidingFrictionInteraction.h MindlinInteraction.h
+$ svn cp SlidingFrictionInteraction.cc MindlinInteraction.cc
+$ svn cp SlidingFrictionSpecies.h MindlinSpecies.h
+$ svn cp SlidingFrictionSpecies.cc MindlinSpecies.cc
+\endcode
+
+-# Rename the class SlidingFrictionInteraction and SlidingFrictionSpecies to MindlinInteraction and MindlinSpecies, respectively. This requires also changes to the header inclusion guards and typedefs. You can see the changes to the header files below:
+<br>`MercurySource/Kernel/Interactions/FrictionForceInteractions/SlidingFrictionInteraction.h`
+\code{.sh}
+#ifndef SLIDINGFRICTIONINTERACTION_H
+#define SLIDINGFRICTIONINTERACTION_H
+
+class SlidingFrictionSpecies;
+
+class SlidingFrictionInteraction : public virtual BaseInteraction
+{
+public:
+
+    typedef SlidingFrictionSpecies SpeciesType;
+
+    SlidingFrictionInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp);
+
+\endcode
+`MercurySource/Kernel/Interactions/FrictionForceInteractions/MindlinInteraction.h`
+\code{.sh}
+#ifndef MINDLININTERACTION_H
+#define MINDLININTERACTION_H
+
+class MindlinSpecies;
+
+class MindlinInteraction : public virtual BaseInteraction
+{
+public:
+
+    typedef MindlinSpecies SpeciesType;
+
+    MindlinInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp);
+\endcode
+`MercurySource/Kernel/Species/FrictionForceSpecies/SlidingFrictionSpecies.h`
+\code{.sh}
+#ifndef SLIDINGFRICTIONSPECIES_H
+#define SLIDINGFRICTIONSPECIES_H
+
+#include "Interactions/FrictionForceInteractions/SlidingFrictionInteraction.h"
+
+class SlidingFrictionSpecies : public virtual BaseSpecies
+{
+public:
+    typedef SlidingFrictionInteraction InteractionType;
+
+    SlidingFrictionSpecies();
+
+\endcode
+`MercurySource/Kernel/Species/FrictionForceSpecies/MindlinSpecies.h`
+\code{.sh}
+#ifndef MINDLINSPECIES_H
+#define MINDLINSPECIES_H
+
+#include "Interactions/FrictionForceInteractions/MindlinInteraction.h"
+
+class MindlinSpecies : public virtual BaseSpecies
+{
+public:
+    typedef MindlinInteraction InteractionType;
+
+    MindlinSpecies();
+\endcode
+
+-# Now add the two new cc files to the CMakeLists file, so they get compiled:
+\code{.sh}
+$ cd MercurySource/Kernel
+$ svn diff CMakeLists.txt -r 1587:1588
++	Interactions/FrictionForceInteractions/MindlinInteraction.cc
++	Species/FrictionForceSpecies/MindlinSpecies.cc
+\endcode
+
+-# Create a new typedef for the new Hertz-Mindlin contact law in
+<br>`MercurySource/Kernel/Species/HertzianViscoelasticMindlinSpecies.h`
+\code{.cpp}
+#ifndef HERTZIANVISCOELASTICMINDLINSPECIES_H
+#define HERTZIANVISCOELASTICMINDLINSPECIES_H
+
+#include "Species.h"
+#include "NormalForceSpecies/HertzianViscoelasticNormalSpecies.h"
+#include "FrictionForceSpecies/MindlinSpecies.h"
+typedef Species<HertzianViscoelasticNormalSpecies,MindlinSpecies> HertzianViscoelasticMindlinSpecies;
+typedef MixedSpecies<HertzianViscoelasticNormalSpecies,MindlinSpecies> HertzianViscoelasticMindlinMixedSpecies;
+#endif
+\endcode
+and add it to the svn repository
+\code{.cpp}
+$ svn add MercurySource/Kernel/Species/HertzianViscoelasticMindlinSpecies.h
+\endcode
+
+-# Add the new species to the SpeciesHandler::readAndAddObject and SpeciesHandler::readMixedObject, so restart files can read in the new species information
+\code{.sh}
+$ svn diff -r1587:1588 MercurySource/Kernel/SpeciesHandler.cc
+@@ -33,6 +33,7 @@
++#include "Species/HertzianViscoelasticMindlinSpecies.h"
+
+@@ -261,6 +262,12 @@
++    else if (type == "HertzianViscoelasticMindlinSpecies")
++    {
++        HertzianViscoelasticMindlinSpecies species;
++        is >> species;
++        copyAndAddObject(species);
++    }
+
+@@ -412,6 +419,11 @@
++        else if (type == "HertzianViscoelasticMindlinMixedSpecies")
++        {
++            HertzianViscoelasticMindlinMixedSpecies species;
++            is >> species;
++        }
+
+@@ -696,3 +708,4 @@
++template HertzianViscoelasticMindlinSpecies::MixedSpeciesType* SpeciesHandler::getMixedObject(const HertzianViscoelasticMindlinSpecies*,const HertzianViscoelasticMindlinSpecies*);
+\endcode
+
+-# Now try out if your new contact law is ready to compile:
+\code{.cpp}
+$ cd MercuryBuild
+$ make fullTest
+\endcode
+
+Your new contact law still does the same as the original contact law, but you have created all the new classes you need to define new behaviour. Take a look and compare the files SlidingFrictionSpecies.* and SlidingFrictionInteraction.* with MindlinSpecies.* and MindlinInteraction.* to see how the parameters and the force law definitions have changed.
+
+Once your new species works you should add a new unit test to MercuryDPM to test the species behavior. For the Mindlin Species, this is done in `Drivers/UnitTests/MindlinUnitTest.cpp`.
+
+*/
+
+

@@ -1,0 +1,408 @@
+//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//For the list of developers, see <http://www.MercuryDPM.org/Team>.
+//
+//Redistribution and use in source and binary forms, with or without
+//modification, are permitted provided that the following conditions are met:
+//  * Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//  * Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+//  * Neither the name MercuryDPM nor the
+//    names of its contributors may be used to endorse or promote products
+//    derived from this software without specific prior written permission.
+//
+//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+//ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//DISCLAIMED. IN NO EVENT SHALL THE MERCURYDPM DEVELOPERS TEAM BE LIABLE FOR ANY
+//DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+//ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+//SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#include <iostream>
+#include "Particles/BaseParticle.h"
+#include "Interactions/BaseInteraction.h"
+#include "Math/ExtendedMath.h"
+#include "DPMBase.h"
+#include "Gauss.h"
+
+namespace CGFunctions
+{
+
+template<class Coordinates>
+Gauss<Coordinates>::Gauss()
+{
+    setWidth(1.0); //sets width, cutoff, and prefactor
+    eps_ = 1e-6;
+    integralPrefactor_ = 0.0;
+    currentInteraction_ = 9999;
+#ifdef DEBUG_CONSTRUCTOR
+    std::cerr << "Gauss::Gauss() finished" << std::endl;
+#endif
+}
+
+/*!
+ * \param[in] c the object that is copied
+ */
+template<class Coordinates>
+Gauss<Coordinates>::Gauss(const Gauss& c)
+        : Coordinates(c)
+{
+    width_ = c.width_;
+    eps_ = c.eps_;
+    prefactor_ = c.prefactor_;
+    cutoff_ = c.cutoff_;
+    integralPrefactor_ = c.integralPrefactor_;
+    currentInteraction_ = c.currentInteraction_;
+#ifdef DEBUG_CONSTRUCTOR
+    std::cerr << "Gauss::copy() finished" << std::endl;
+#endif
+}
+
+template<class Coordinates>
+Gauss<Coordinates>::~Gauss()
+{
+#ifdef DEBUG_DESTRUCTOR
+    std::cerr << "Gauss::~Gauss() finished" << std::endl;
+#endif
+}
+
+/*!
+ * \param[out] os output stream
+ */
+template<class Coordinates>
+void Gauss<Coordinates>::write(std::ostream& os) const
+{
+    os << "Gauss width " << width_;
+    os << " cutoff " << cutoff_;
+}
+
+/*!
+ * \param[in] width the new width of the coarse-graining function.
+ */
+template<class Coordinates>
+void Gauss<Coordinates>::setWidth(Mdouble width)
+{
+    setWidthAndCutoff(width, 3.0 * width);
+}
+
+/*!
+ * \param[in] width the new width of the coarse-graining function.
+ * \param[in] cutoff the new cutoff of the coarse-graining function.
+ */
+template<class Coordinates>
+void Gauss<Coordinates>::setWidthAndCutoff(Mdouble width, Mdouble cutoff)
+{
+    width_ = width;
+    cutoff_ = cutoff;
+    prefactor_ = Coordinates::getGaussPrefactor(width, cutoff);
+}
+
+/*!
+ * \return the width of the coarse-graining function.
+ */
+template<class Coordinates>
+Mdouble Gauss<Coordinates>::getWidth() const
+{
+    return width_;
+}
+
+/*!
+ * \return the cutoff of the coarse-graining function.
+ */
+template<class Coordinates>
+Mdouble Gauss<Coordinates>::getCutoff() const
+{
+    return cutoff_;
+}
+
+/*!
+ * \details The cg function is used to evaluate particle statistics like density, 
+ * momentum, and kinetic stress. For Gauss, the function is defined as
+ * \f[ \phi(\vec r_i) = c \exp(-\frac{|\vec r-\vec r_i|^2}{2w^2}),\f]
+ * with prefactor c, CGPoint position r, particle position r_i and width w; the 
+ * prefactor is chosen such that \f$\int \phi(\vec r) d\vec r = 1\f$.
+ * 
+ * This implementation is only used in 2D and 3D CGCoordinates; 
+ * there are template specialisations for 0D and 1D; see evaluateCGIntegral1D. 
+ * \param[in] position position of the particle for which the cg-function is computed.
+ * \return value of the cg-function at the position of the current CGPoint.
+ * \anchor CGFunction
+ */
+template<class Coordinates>
+Mdouble Gauss<Coordinates>::evaluateCGFunction(const Vec3D& position, const Coordinates r)
+{
+    Mdouble distanceSquared = r.getDistanceSquared(position);
+    //logger(INFO,"P % d % c % w % p %", position, distanceSquared, cutoff_, width_, prefactor_);
+    return (distanceSquared > cutoff_ * cutoff_)
+           ? 0.0
+           : prefactor_ * exp(-distanceSquared / (2.0 * width_ * width_));
+}
+
+template<class Coordinates>
+Vec3D Gauss<Coordinates>::evaluateCGFunctionDerivatives(const Vec3D& position, const Coordinates& r)
+{
+    Vec3D functionDerivative;
+    functionDerivative.setZero();
+
+    std::array<bool, 3> direction = Coordinates::getCoordinateDirection();
+    for (int i = 0; i < 3; i++)
+    {
+        if (direction[i])
+        {
+            functionDerivative.setComponent(i, evaluateCGFunctionDerivativeWithFD(position, r, i));
+        }
+    }
+    return functionDerivative;
+}
+
+template<class Coordinates>
+Mdouble
+Gauss<Coordinates>::evaluateCGFunctionDerivativeWithFD(const Vec3D& position, const Coordinates& r, const int i)
+{
+    Vec3D pos;
+
+    //Important: We want to vary r with eps, but the coordinates are rather fixed
+    //Instead we vary position, but uMin requires + eps and uMax requires - eps
+    //To correct for this
+    pos = position;
+    pos.setComponent(i, position.getComponent(i) + getEps());
+    Mdouble u_min = evaluateCGFunction(pos, r);
+
+    pos = position;
+    pos.setComponent(i, position.getComponent(i) - getEps());
+    Mdouble u_plus = evaluateCGFunction(pos, r);
+
+    return (u_plus - u_min) / (2 * getEps());
+}
+
+template<class Coordinates>
+Mdouble Gauss<Coordinates>::getEps() const
+{
+    return eps_;
+}
+
+template<class Coordinates>
+void Gauss<Coordinates>::setEps(Mdouble eps)
+{
+    eps_ = eps;
+}
+
+template<>
+Mdouble Gauss<CGCoordinates::R>::evaluateCylindricalCGFunction(const Vec3D& position, const CGCoordinates::R r)
+{
+    return evaluateCGFunction(position, r) / (2.0 * constants::pi * r.getR());
+}
+
+/*!
+ * \details The line integral is used to evaluate particle statistics like density, 
+ * momentum, and kinetic stress. The function is defined as
+ * \f[ \psi(\vec r_i) = \int_{0}^{1} \phi(\vec r - \vec r_I + s r_{IP}) ds,\f]
+ * with CGPoint position r, position r_I, r_P of the endpoints I, P of the line 
+ * integral, distance \f$r_{IP} = r_P-r_I\f$,and cg function \f$\phi\f$ 
+ * (see evaluateCGFunction).
+ * 
+ * This implementation is only used in 2D and 3D CGCoordinates; 
+ * there are template specialisations for 0D and 1D; see evaluateCGIntegral1D. 
+ * \param[in] c the Interaction for which the line integral is computed.
+ * \param[in] type specifies the points (particle positions p, i and the contact 
+ * point c) between which the line integral is computed.
+ * \return value of the line integral at the position of the current CGPoint.
+ * \todo Add image.
+ */
+template<class Coordinates>
+Mdouble Gauss<Coordinates>::evaluateCGIntegral(const BaseInteraction& c, const Coordinates r, IntegralType type)
+{
+    ///\todo use getId instead of getDistance
+    if (currentInteraction_ != c.getId())
+    {
+        normalLength_ = Coordinates::getLength(c.getNormal());
+        normal_ = c.getNormal() / normalLength_;
+    }
+
+    /*! \todo if the contact oriented normal to the non-averaged directions,
+     * a standard cg function is used to avoid a 0/0 division.
+     * I'm not sure that there is a way to avoid this; to be investigated.
+     */
+    if (fabs(normalLength_) < 1e-10)
+    {
+        return evaluateCGFunction(c.getContactPoint(), r);
+    }
+
+    Mdouble iNormal;
+    if (type != IntegralType::CONTACT_TO_P)
+    {
+        iNormal = r.getINormal(c, normal_);
+    } else
+    {
+        iNormal = r.getCNormal(c, normal_);
+    }
+    if (iNormal > getCutoff())
+        return 0.0;
+
+    Mdouble pNormal;
+    Mdouble tangentialSquared;
+    if (type != IntegralType::I_TO_CONTACT)
+    {
+        pNormal = r.getPNormal(c, normal_);
+    } else
+    {
+        pNormal = r.getCNormal(c, normal_);
+        //todo originally, the code was different here, but i'm not sure why it was there:
+        //Mdouble realPNormal = r.getPNormal(c);
+        //tangentialSquared = r.getTangentialSquared(c, realPNormal);
+    }
+    if (pNormal < -getCutoff())
+        return 0.0;
+    tangentialSquared = r.getTangentialSquared(c, pNormal);
+    if (tangentialSquared > mathsFunc::square(cutoff_))
+        return 0.0;
+
+    if (currentInteraction_ != c.getId())
+    {
+        currentInteraction_ = c.getId();
+        integralPrefactor_ = Coordinates::getGaussIntegralPrefactor((pNormal - iNormal) * normalLength_, width_,
+                                                                    cutoff_);
+    }
+
+    Mdouble w_sqrt_2 = constants::sqrt_2 * getWidth();
+    return integralPrefactor_
+           * (erf(pNormal / w_sqrt_2) - erf(iNormal / w_sqrt_2))
+           * exp(-0.5 * tangentialSquared / mathsFunc::square(width_));
+}
+
+
+/*!
+ * \details This implementation is used instead of evaluateCGIntegral for 1D
+ * CGCoordinates, because the 1D case is simpler than 2D and 3D.
+ * \param[in] c the Interaction for which the line integral is computed.
+ * \param[in] type specifies the points (particle positions p, i and the contact
+ * point c) between which the line integral is computed.
+ * \return value of the line integral at the position of the current CGPoint.
+ */
+template<class Coordinates>
+Mdouble Gauss<Coordinates>::evaluateCGIntegral1D(const BaseInteraction& c, const Coordinates r, IntegralType type)
+{
+    ///\todo use getId instead of getDistance
+    if (currentInteraction_ != c.getId())
+    {
+        normalLength_ = Coordinates::getLength(c.getNormal());
+        normal_ = c.getNormal() / normalLength_;
+    }
+
+    if (fabs(normalLength_) < 1e-10)
+    {
+        return evaluateCGFunction(c.getContactPoint(), r);
+    }
+
+    Mdouble iNormal;
+    if (type != IntegralType::CONTACT_TO_P)
+    {
+        iNormal = r.getINormal(c, normal_);
+    } else
+    {
+        iNormal = r.getCNormal(c, normal_);
+    }
+    if (iNormal > getCutoff())
+        return 0.0;
+
+    Mdouble pNormal;
+    if (type != IntegralType::I_TO_CONTACT)
+    {
+        pNormal = r.getPNormal(c, normal_);
+    } else
+    {
+        pNormal = r.getCNormal(c, normal_);
+    }
+    if (pNormal < -getCutoff())
+        return 0.0;
+
+    if (currentInteraction_ != c.getId())
+    {
+        currentInteraction_ = c.getId();
+        integralPrefactor_ = r.getGaussIntegralPrefactor(pNormal - iNormal, width_, cutoff_);
+    }
+
+    Mdouble w_sqrt_2 = constants::sqrt_2 * getWidth();
+    return integralPrefactor_
+           * (erf(pNormal / w_sqrt_2) - erf(iNormal / w_sqrt_2));
+}
+
+//Template specializations
+template<>
+Mdouble Gauss<CGCoordinates::R>::evaluateCylindricalCGIntegral(const BaseInteraction& c, const CGCoordinates::R r,
+                                                               IntegralType type)
+{
+    Mdouble val = evaluateCGIntegral1D(c, r, type);
+    return val / (2.0 * constants::pi * r.getR());
+}
+
+template<>
+Mdouble
+Gauss<CGCoordinates::X>::evaluateCGIntegral(const BaseInteraction& c, const CGCoordinates::X r, IntegralType type)
+{
+    Mdouble val = evaluateCGIntegral1D(c, r, type);
+    return val;
+}
+
+/*!
+ * Template specialization of evaluateCGIntegral for 1D CGCoordinates, which is
+ * simpler than 2D or 3D, because there is no tangential direction.
+ * \param[in] i the Interaction for which the line integral is computed.
+ * \param[in] type specifies the points (particle positions p, i and the contact
+ * point c) between which the line integral is computed.
+ * \return value of the line integral at the position of the current CGPoint.
+ */
+template<>
+Mdouble
+Gauss<CGCoordinates::Y>::evaluateCGIntegral(const BaseInteraction& i, const CGCoordinates::Y r, IntegralType type)
+{
+    return evaluateCGIntegral1D(i, r, type);
+}
+
+/*!
+ * Template specialization of evaluateCGIntegral for 1D CGCoordinates, which is
+ * simpler than 2D or 3D, because there is no tangential direction.
+ * \param[in] i the Interaction for which the line integral is computed.
+ * \param[in] type specifies the points (particle positions p, i and the contact
+ * point c) between which the line integral is computed.
+ * \return value of the line integral at the position of the current CGPoint.
+ */
+template<>
+Mdouble
+Gauss<CGCoordinates::Z>::evaluateCGIntegral(const BaseInteraction& i, const CGCoordinates::Z r, IntegralType type)
+{
+    return evaluateCGIntegral1D(i, r, type);
+}
+
+/*!
+ * Template specialization of evaluateCGIntegral for CGCoordinates::O, which is
+ * very simple.
+ * \param[in] i the Interaction for which the line integral is computed.
+ * \param[in] type specifies the points (particle positions p, i and the contact
+ * point c) between which the line integral is computed.
+ * \return value of the line integral at the position of the current CGPoint.
+ */
+template<>
+Mdouble
+Gauss<CGCoordinates::O>::evaluateCGIntegral(const BaseInteraction& i, const CGCoordinates::O r, IntegralType type)
+{
+    return 1.0;
+}
+
+/*!
+ * Template specialization of evaluateCGFunction for CGCoordinates::O, which is 
+ * very simple.
+ * \param[in] position position of the particle for which the cg-function is computed.
+ * \return value of the cg-function at the position of the current CGPoint.
+ */
+template<>
+Mdouble Gauss<CGCoordinates::O>::evaluateCGFunction(const Vec3D& position, const CGCoordinates::O r)
+{
+    return 1.0;
+}
+
+} // namespace CGFunctions

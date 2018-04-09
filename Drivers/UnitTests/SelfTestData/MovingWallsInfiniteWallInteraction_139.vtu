@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="1" NumberOfCells="0">
+<Points>
+  <DataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii">
+	1.00876 0 1.00464
+  </DataArray>
+</Points>
+<PointData  Vectors="vector">
+  <DataArray type="Float32" Name="Normal" NumberOfComponents="3" format="ascii">
+	-2.60481e-06 -0 -1
+  </DataArray>
+  <DataArray type="Float32" Name="Overlap" format="ascii">
+	0.00928071
+  </DataArray>
+  <DataArray type="Float32" Name="ContactRadius" format="ascii">
+	0.0963365
+  </DataArray>
+  <DataArray type="Float32" Name="Force" format="ascii">
+	-0.0100852 0 0.00485294
+  </DataArray>
+  <DataArray type="Float32" Name="TangentialOverlap" format="ascii">
+	-0.00237519
+  </DataArray>
+  <DataArray type="Float32" Name="Torque" format="ascii">
+	0 0.00499565 0
+  </DataArray>
+</PointData>
+<Cells>
+  <DataArray type="Int32" Name="connectivity" format="ascii">
+  </DataArray>
+  <DataArray type="Int32" Name="offsets" format="ascii">
+  </DataArray>
+  <DataArray type="UInt8"  Name="types" format="ascii">
+  </DataArray>
+</Cells>
+</Piece>
+</UnstructuredGrid>
+</VTKFile>

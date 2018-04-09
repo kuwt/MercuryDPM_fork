@@ -1,0 +1,401 @@
+/*! \page MercuryCG From discrete particles to continuum fields
+
+MercuryDPM contains a unique toolbox for analysing particle data, the MercuryCG toolbox:
+<img src="MercuryCG.png" width="400">
+
+After running a Discrete Particle Simulation, one needs to analyse the data to extract relevant information. This usually requires the evaluation of continuum fields, such as density, velocity, stress, or temperature.
+MercuryCG extracts continuum fields from the particle data (positions, velocities, forces) by a method called coarse-graining, which is explained in [Goldhirsch, Granular Matter, 2010] and [Weinhart et al, Granular Matter, 2012].
+
+Three documentation pages exist for this tool:
+ - \subpage coarsegraining
+ - \subpage fstatistics
+ - \subpage livestatistics
+
+The first page describes the mathematical formulae used to extract continuum fields from particle data.
+The second page tells you how to apply the analysis tool in practice, i.e. which command to use and what options to set.
+The third page tells you how to apply analytical output to a running MercuryDPM simulation.
+
+Here are two examples of the coarse-graining method applied:
+ -# Silo flow [Weinhart et al, Powder Technology 293, 138-148 (2016)]:
+   <img src="CGSilo.png" width="400">
+   The figure on the left shows a 3D particle simulation of granular flow through a thin, rectangular silo. One can observe three regions, a static zone near the side walls, a shear band, and core flow. To properly define those regions, we use coarse graining to define the velocity \f$\vec{v}(x,z)\f$, averaged over depth y and time t, then plot the normalized pure shear, \f$s=\frac{\partial_xv_z(x,z)}{\max_z\partial_xv_z(x,z)}\f$, shown in the right figure. One can clearly see that the pure shear is large in the shear band. By fitting the pure shear values with a Gaussian, the shear band centre and width can be clearly defined.
+
+ -# Segregating flow [Weinhart et al, AIP Conf. Proc. 1542, 1202-1205 (2013)]
+   <img src="CGSegregation.png" width="400">
+   The centre image shows the flow of a mixture of particles of two different sizes down an inclined, rough surface. The simulation is periodic in x- and y-direction and evolved until the flow is steady, uniform. One can clearly see that the mixture segregates, with large particles on the top and small particles on the bottom. To find out what causes the segregation, we compute the continuum fields of the small and large particles separately and look for differences between the two mixture components. We observe that the contribution of the small particles to the granular temperature (or kinetic stress) is overproportionally large (i.e. larger than their volume fraction), shown in the top right of the figure. This suggests that segregation is driven by the kinetic stress differences between the components (and not the total stress differences, as was suggested in previous work). Note that coarse-graining clearly defines how much each mixture component contributes to the total stress, and it was only due to that clear definition of partial stresses in the coarse-graining formulation that this effect could be observed.
+
+ -# Atomistic fluids [Hartkamp et al, J. Chem. Phys. 137, 044711 (2012)]
+   <img src="CGAtoms.png" width="400">
+   Coarse-graining is also applicable to molecular dynamics simulations, in this case atomistic flow through a nanochannel. Near the channel wall, we observed oscillations in the flow density, which indicates that the flow is slightly ordered. To resolve this phenomenon, a high spatial resolution is required, which can easily be obtained in coarse-graining by using a small length scale \f$w\f$.
+*/
+
+/*! \page coarsegraining Evaluation of continuum fields
+\tableofcontents
+
+This page describes the mathematical formulas used to extract continuum fields from particle data.
+
+Discrete particle simulations create a large amount of data, such as the position
+and velocities of each interactable (particle/wall), and the forces created by
+each interaction. This data completely describes the system you are simulating,
+but it is difficult to draw any physically relevant conclusions from it.
+
+Therefore, granular assemblies are often described using continuum fields, like
+density \f$\rho\f$, momentum \f$\vec j=\rho \vec V\f$, stress
+\f$\mathbf \sigma\f$ and temperature.
+Continuum descriptions have been very sucessful in describing the macroscopic
+physical behavior of granular systems, and describe many phenomena as diverse as
+plastic/inertial flow, soil mechanics, or segregation.
+Other phenomena such as fracturing, jamming/force chains, crystallization have
+so far resisted efforts to be described by continuum theories. However, we can
+still learn a lot from evaluation their continuum properties by developing
+special continuum fields such as fabric, displacement, or orientation.
+
+\section cons Defining the basic coarse-grained fields
+
+Density, momentum, and stress, in particular, are strongly related to each
+other, as they observe the equations describing conservation of mass and
+momentum,
+\f[\partial_t\rho + \nabla\cdot(\rho \vec V) = 0,\f]
+\f[\partial_t(\rho \vec V) + \nabla\cdot(\rho \vec V \vec V) =
+   \nabla \mathbf \sigma + \rho \vec g.\f]
+
+While traditional micro-macro methods begin by defining density, momentum, and
+stress and then show that they satisfy ass and momentum balance in a statistical
+sense (ie. by ensemble averaging), coarse-graining takes a different approach:
+
+\subsection dens Density
+
+In coarse-graining, density is defined first, as the sum over all particle
+masses weighted by the distance to the evaluated position:
+\f[\rho(\vec r)=\sum_i m_i \phi(\vec r,\vec r_i),\f]
+with position \f$r\f$, particle position \f$r_i\f$.
+The coarse-graining function \f$\phi\f$ (aslo called weighting or kernel
+function) is not uniquely defined, but often a Gauss function of width \f$w\f$
+is used,
+\f[ \phi(\vec r,\vec r_i) = c \exp(-\frac{|\vec r-\vec r_i|^2}{2w^2}),\f]
+where the prefactor \f$c\f$ is chosen such that \f$\int \phi(\vec r) d\vec r = 1\f$.
+
+\subsection mom Momentum
+
+Next, the momentum at a given position is defined as the sum over all particle
+moments weighted by the distance to the position:
+\f[\vec j(\vec r)=\sum_i m_i \phi(\vec r,\vec r_i),\f]
+Thus, the velocity is defined as
+\f[\vec V(\vec r) = \frac{\vec j(\vec r,t)}{\rho(\vec r)}.\f]
+
+One can easily show that the density and momentum density fields satisfy the
+mass conservation equation *by definition*.
+
+\subsection stress Kinetic and contact stress
+
+Similarly, the stress tensor can be defined such that it identically satisfies
+the conservation of momentum. For that, we define the stress as the
+sum of the *contact stress* and the *kinetic stress*,
+\f[ \mathbf \sigma=\mathbf \sigma^{c}+\mathbf \sigma^{c}. \f]
+
+The kinetic stress can be calculated from momentum
+flux and density as
+\f[\mathbf \sigma^{k} = \mathbf k - \rho \vec V \otimes  \vec V,\f]
+where the momentum density is defined as the sum over all particles i
+\f[\mathbf k(\vec r,t)=\sum_i m_i \vec v_i \otimes \vec v_i\phi(\vec r,\vec r_i),\f]
+with particle momentum flux  \f$m_i\vec v_i \otimes \vec v_i\f$ and kernel function
+\f$\phi(\vec r,\vec r_i)\f$.
+
+The contact stress is has a slightly more complex definition:
+\f[\mathbf \sigma^{c}(\vec r,t)=\sum_{ij} \vec f_{ij} \otimes \vec l_{ij} \psi(\vec r,\vec r_i,\vec r_j),\f]
+with contact force \f$\vec f_{ij}\f$,
+branch vector \f$\vec l_{ij}= \vec c_{ij}-\vec r_i\f$,
+particle position \f$\vec r_i\f$, contact point \f$\vec c_{ij}\f$,
+and a line integral over the kernel function,
+\f[ \psi(\vec r,\vec r_i,\vec r_j) = \int_{0}^{1} \phi(\vec r - \vec r_I + s r_{IP}) ds.\f]
+
+One can show that this stress definition satisfies the momentum conservation
+equation *by definition*.
+
+*/
+
+/*! \page livestatistics Writing a particle simulation with analytical output
+  \tableofcontents
+
+This feature is still in development, so the documentation is meant for
+developers only. However, anyone is welcome to give it a try.
+
+The evaluation of coarse-grained continuum fields in Mercury is done by the
+class CG. To turn on coarse-graining (cg), one has to pick a cg function
+(e.g. Gauss) and define its parameters (e.g. width=1). Then one has to pick
+points where the continuum fields should be evaluated. While these points can be
+chosen arbitrarily, it is often advantageous to create a mesh of points along
+the Cartesian coordinates, using nx-by-ny-by-nz points, with nx=ny=nz=10.
+Finally, one has to define how often the evaluation should take place, e.g.
+every saveCount=20'000 time steps. This can be done by inserting the following
+code into the main function, before the solve command is executed:
+ > CG<CGFunctions::GaussXYZ> cg; \n
+ > cg.setNX(10); \n
+ > cg.setNY(10); \n
+ > cg.setNZ(10); \n
+ > cg.setWidth(0.15); \n
+ > cg.statFile.setSaveCount(20000); \n
+ > problem.cgHandler.copyAndAddObject(cg);
+Here, problem specifies the DPMBase object.
+The output will we written in a file named (problemName).stat.
+To change the name of the output file to e.g. (problemName).GaussXYZ.stat, add
+the line
+> cg.statFile.setName(problem.getName() + ".GaussXYZ.stat");
+Note that CGFunctions::GaussXYZ is only a typedef (=short name) for the
+class CGFunctions::Gauss<CGCoordinates::XYZ>.
+
+\section spatial Spatial averaging
+
+Most DPM problems have certain Cartesian directions in which the flow is
+homogeneous; take e.g. the problem of chute flow over a inclined plane
+[add name of demo code here], where the flow is homogeneous in x and y, and
+locally varying in z, e.g. the density satisfies rho(x,y,z)=rho(z).
+Thus, it is enough to spatially resolve the continuum fields in z and average
+over x and y. This can be done in Mercury by defining a spatially averaging cg
+function, e.g.
+ > CG<CGFunctions::GaussZ> cg; \n
+ > cg.setNZ(10); \n
+ > cg.setWidth(0.15); \n
+ > cg.statFile.setSaveCount(20000); \n
+ > problem.cgHandler.copyAndAddObject(cg);
+For fully averaged systems, use CGCoordinates::O, e.g.
+ > CG<CGFunctions::GaussO> cg;
+
+\section temporal Temporal averaging
+
+If your DPM problem is steady, it is not necessary to resolve the continuum
+fields in time. This can be done in Mercury by using time-averaging cg, e.g.
+ > TimeAveragedCG<CGFunctions::GaussZ> cg; \n
+ > cg.setNZ(10); \n
+ > cg.setWidth(0.15); \n
+ > cg.statFile.setSaveCount(20000); \n
+ > problem.cgHandler.copyAndAddObject(cg);
+To limit the time interval over which the continuum fields are evaluated to
+e.g. \f$[10,20]\f$, use
+ > cg.setTimeMin(10); \n
+ > cg.setTimeMax(20);
+
+\section temporal2 Temporal smoothing
+
+If your DPM problem is unsteady, time-dependent CG should be used.
+This, however, often leads to high fluctuations in the resulting continuum
+fields, as the amount of data that is evaluated to obtain a value for the
+continuum field is insufficient. In this case, time-smoothing can be used:
+ > TimeSmoothedCG<CGFunctions::GaussZ> cg;
+ > cg.setWidthTime(0.01);
+ > cg.setTimeStep(0.004);
+ > cg.setTimeMax(0.2);
+ > cg.statFile.setSaveCount(5);
+ > problem.cgHandler.copyAndAddObject(cg);
+Like CG, this class should be used to evaluate time-dependent fields.
+However, as the data is averaged over several time steps, the resulting
+fields are smoother and more reliable, as they use more information.
+
+\section different Different cg functions
+
+You can also use other cg functions than Gauss. The other available options are
+Heaviside, Linear and Lucy, e.g.
+ > CG<CGFunctions::LucyZ> cg;
+
+
+\section multiple Multiple cg evaluations
+
+Note that you are not limited to one choice of cg evaluation for your problem.
+For example you can create both time-averaged and time resolved data by adding
+two cg objects (just make sure that they have different names for the output
+file):
+ > CG<CGFunctions::LucyO> cg0;\n
+ > cg0.statFile.setSaveCount(20);\n
+ > cg0.statFile.setName(problem.getName() + ".LucyO.stat");\n
+ > problem.cgHandler.copyAndAddObject(cg0);\n
+ > \n
+ > TimeAveragedCG<CGFunctions::LucyO> cg1; \n
+ > cg1.statFile.setSaveCount(20000); \n
+ > problem.cgHandler.copyAndAddObject(cg1);
+
+\section code Code structure of MercuryCG
+
+Here is a list of the different classes that comprise MercuryCG.
+- class CGHandler:\n
+Handler that stores all CG objects.
+- classes CG, TimeSmoothedCG, TimeAveragedCG:\n
+The three available CG classes, used to obtain time-resolved, time smoothed,
+and time-averaged continuum fields. Contains a vector of CGPoints.
+- templated class CGPoint:\n
+Derived from a CGFields and a CGFunctions class. Does the main work of evaluating
+the continuum fields at a given position.
+- namespace CGFields:\n
+Contains the classes StandardFields etc.
+- namespace CGFunctions: \n
+Contains the templated classes Gauss, Heaviside, Linear, Lucy
+(the latter three are derived from Polynomial).
+Contains the definition of the cg function used.
+Derived from a CGCoordinates class.
+- namespace CGCoordinates: \n
+Contains the classes O, X, Y, Z, XY, XZ, YZ, XYZ:
+Contains the position of the CGPoint.
+*/
+
+/*!
+\page fstatistics Post-processing in MercuryDPM
+\tableofcontents
+
+\section sec A postprocessing tool for analysing particle data.
+
+fstatistics is a postprocessing tool: it takes an existing data set, consisting of a restart and one or more data and fstat files, and applies the coarse-graining formulations to it. The output is stored in a stat file, which can then be read by gnuplot or Matlab (via the loadstatistics.m file in Source/Matlab/thomas/) to be visualised.
+
+This document details how to use fstatistics as a post-processing tool for coarse-graining. It can also be used as a live tool, analysis the data while the simulation is still running, you have to use statistics_while_running.cpp. First, we provide the basic functionality, then show some examples, then the more complex operations are introduced.
+
+\section basics Basic functionality
+
+To explain the basic syntax of fstatistics, assume that you have the following three files: filename.restart, filename.data and filename.fstat that you want to analyse. To analyse this data,
+- change to the folder Build/Drivers/MercuryCG/,
+- compile fstatistics.cpp (\ref DirectoryStructure), then
+- run the following command \code./fstatistics filename\endcode
+
+For simplicity, I assumed here that the data files are in the folder Build/Drivers/MercuryCG/. If the data is in another folder, then you have to use the command `./fstatistics $dir/filename`, where $dir is the name of the directory.
+
+By default, fstatistics outputs the time- and space-averaged values of several continuum fields  (density, momentum, stress, and a couple more). This output is shown in the command window, as well as stored in the output file named filename.stat.
+
+This is best illustrated by an example: Compile and run the code NewtonsCradleSelfTest, which is in the same directory as fstatistics, and look at its documentation to familiarise yourself with the simulation. Then run `./fstatistics NewtonsCradleSelfTest`. The output to the screen shows you the time- and space- averaged values for several continuum fields:
+\code Averages: VolumeFraction 0.523599, Density 1, Momentum 0 0 -4.96752e-05, ...
+ \endcode
+
+You can see that the volume fraction is 0.523599, the density is 1 mass/length^3, while the momentum nearly vanishes, which agrees with the simulation data.
+
+Note that fstatistics returns the momentum instead of the velocity, as momentum has a primary definition as a coarse-grained variable, while velocity is computed by dividing two existing coarse-grained fields (momentum and density). Generally, fstatistics only outputs the primary coarse-grained variables, and the user is expected to compute any secondary fields afterwards. However, the Matlab script loadstatistics.m provides an extended set of primary and secondary variables
+
+\subsection output  Output format
+
+The output file consists of a two-line header followed by several lines of data. For the example above, the output is:
+
+\code
+VolumeFraction Density MomentumX MomentumY MomentumZ ...
+w 0.5 ...
+0 8
+0.5 0.5 2.5 0.5235987755982993 0.999999999999999 0 0 -4.967523720252783e-05 ...\endcode
+
+The first line details the different fields that are computed by fstatistics, e.g. volume fraction `Nu`, bulk density `Density` and the three momentum components `MomentumX MomentumY MomentumZ`.
+
+The second line details the coarse-graining parameters, mainly the spatial coarse-graining width `w`.
+
+The third line shows the time step (or time intervall at which the data is taken); in this case, the data is time averaged from t=0 to t=8.
+
+The remaining lines contains the coordinate of a point and the values of the continuum fields at that point (in the order specified in line 1, so colume 1-3 is the point's coordinate, column 4 is volume fraction, column 5 density, column 6-8 momentum). For globally averaged values, there is only one line of data, with the point's coordinate set to the middle of the domain.
+
+\section advanced  Advanced options
+
+ However, fstatistics can do much more than return global averages of the continuum fields. In the following, several commonally used options are discussed.
+
+\subsection temp  Temporally-resolved fields
+
+ The output file can be modified by adding additional arguments to the command line. E.g. you can use the `-timeaverage` command, which takes a boolean (0 or 1) as argument (the default value is 1):
+ \code  ./fstatistics NewtonsCradleSelfTest -timeaverage 0 \endcode
+ This tells fstatistics to turn off time-averaging. The output file now contains data from several consecutive time steps:
+
+ \code
+VolumeFraction Density MomentumX MomentumY MomentumZ ...
+w 0.5 ...
+0
+0.5 0.5 2.5 0.5235987755982988 0.9999999999999978 0 0 0 ...
+0.1
+0.5 0.5 2.5 0.5235987755982988 0.9999999999999978 0 0 -0.00443464845260919 ...
+0.2
+0.5 0.5 2.5 0.5235987755982988 0.9999999999999978 0 0 -0.0002324913042918475 ...
+...\endcode
+
+\subsection space Spatially-resolved fields
+The coarse-graining formulations can return data which is complete avegarge in space (as shown in the previous examples) or only in certain spactial directions. Note, the CG formulation returns fields at ALL points in space; however, we have to evaluate this continuum fields at a final number of 'grid points'.
+Use the `-cgtype [O,X,Y,Z,XY,XZ,YZ,XYZ]` and `-n [double]` commands to produce spatially resolved fields:
+ \code  ./fstatistics NewtonsCradleSelfTest -cgtype Z -n 100 -w 0.2\endcode
+This produces data that is resolved in the z-coordinate (but averaged in t, x and y). The 'n'-options means a 100 different z-values are evaluated, evenly spread over the domain. The output file now contains 100 lines of data, one for each z-value:
+
+\code
+VolumeFraction Density MomentumX MomentumY MomentumZ ...
+w 0.5 ...
+0 8
+0.5 0.5 0.025 0.2722069474489637 0.5198769747655011 0 0 -1.065287345058795e-05 ...
+0.5 0.5 0.075 0.2991469265707014 0.5713285448937040 0 0 -1.175249212167385e-05 ...
+0.5 0.5 0.125 0.3257896653109658 0.6222124277099292 0 0 -1.285889210570773e-05 ...
+...\endcode
+
+By default, the code uses the radius of the first particle in the restart file as the coarse-graining width, and a cut-off Gaussian coarse-graining kernel. Use the commands `-cgtype [Gaussian,Lucy,Heaviside]` and `-w [double]` to change these defaults, e.g.
+\code ./fstatistics NewtonsCradleSelfTest -stattype Z -n 1000 -w 0.5 -CGtype Lucy\endcode
+This produces z-resolved data using a Lucy kernel with a narrow cutoff radius of 0.5 (one particle radius). For an explanation of what a kernel function is, please see the section of the maths of coarse-graining \ref MercuryCG
+
+We can now visualise this data using e.g. gnuplot:
+\code
+gnuplot> p 'NewtonsCradleSelfTest.stat' u 3:5 w l
+gnuplot> p 'NewtonsCradleSelfTest.stat' u 3:5 w l
+gnuplot> p 'NewtonsCradleSelfTest.stat' u 3:5 w l
+ \endcode
+The result is a density field with peaks at the particle centre and vanishing at a distance of 0.5 from the particle centre:
+<img src="CG0.png" width="400">
+A second example
+\code ./fstatistics NewtonsCradleSelfTest -cgtype XYZ -nx 10 -ny 2 -nz 2 -w \endcode
+creates 3D fields (not very sensible for this example) evaluation on a grid which is 10 by 2 by 2. When generating multi-dimensional data -n uses a uniform grid.
+
+\subsection space2 Limiting the spatial and temporal domains:
+
+By default, fstatistics uses evaluates all time steps. However, often time-averaging over a particular time interval is desired, e.g. to look at steady-state data only, or to reduce the computational effort. You can use the `-tmin [double]` and `-tmax [double]` commands to set a time interval on which the coarse graining should be applied:
+ \code  ./fstatistics NewtonsCradleSelfTest -tmin 5 -tmax 7\endcode
+
+Similarly, one can change the spatial mesh on which the coarse-graining is evaluated: By default, fstatistics assumes that you want to evaluate the continuum fields on the domain size defined in the restart file. To change this, use the commands `-x [double] [double]`,  `-y [double] [double]` and  `-z [double] [double]`:
+ \code
+./fstatistics NewtonsCradleSelfTest -cgtype Z -n 100 -w 0.2 -z 1 2
+\endcode
+
+\subsection other Other useful commands
+
+`-w_over_rmax [double]`:
+Set the averaging width in multiples of the radius of the largest particle in the restart file.
+
+`-nx [integer]`, `-ny [integer]`, `-nz [integer]`:
+Specifies the amount of grid points in a specific coordinate direction; use `-n [integer]` to set all 3 directions at once.
+
+`-h [double]`, `-hx [double]`, `-hy [double]`, `-hz [double]`:
+Alternatively to setting the amount of grid points with `-n`, one can also specify the mesh size instead. E.g. for a domain of width 3, `-h 0.01` is equivalent to setting `-n 300`. Use `-h` to set the mesh size of all 3 directions at once, `-hx`, `-hy` or `-hz` to specify the mesh size in a specific coordinate direction.
+
+`-indSpecies [integer]`:
+Evaluates only data pertaining to a particular Species. Useful for the coarse-graining of mixtures.
+
+`-rmin [double]`, `-rmax [Mdouble]`:
+Evaluates only data pertaining to particles above or below the specified radius, respectively.
+
+`-hmax [double]`:
+Evaluates only data pertaining to particles below the specified height.
+
+`-walls [uint]`:
+only takes into account the first n walls
+
+`-verbosity [0,1,2]`:
+amount of screen output (0 minimal, 1 normal, 2 maximal)
+
+`-verbose`:
+identical to `-verbosity 2`
+
+`-stepsize [integer]`:
+Evaluates only ever n-th time step. Useful to reduce the amount of computational effort.
+
+`-o [string]`:
+Changes the name of the output file to string.stat
+
+`-timevariance [bool]`:
+Prints the time variance; only for time averaged data.
+
+`-gradient`:
+Prints the first derivative of each statistical value
+
+
+\subpage CGImages
+
+*/
+
+/*! \page CGImages Full-scale Images
+ Here, we add the links to a few CG images, otherwise Doxygen doesn't display those using the `\image` command
+ \image html CG0.png ds
+ \image html CGSegregation.png ds
+ \image html CGSilo.png ds
+ \image html MercuryCG.png ds
+ \image html CGAtoms.png ds
+*/

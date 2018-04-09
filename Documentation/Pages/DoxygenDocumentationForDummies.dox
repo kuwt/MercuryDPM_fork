@@ -1,0 +1,76 @@
+
+/*! \page Test Documenting with Doxygen for Dummies
+
+## Installing and Turning On Doxygen Documentation
+
+To download Doxygen using Ubuntu, simply open a terminal (ctrl + alt + t) type:
+
+<CODE> sudo apt-get install doxygen </CODE>
+
+Once Doxygen is successfully installed, Mercury documentation can then be turned on by typing 
+
+<CODE> ccmake . </CODE>
+
+in the "build" directory and turning &quot;<CODE>Mercury_BUILD_DOCUMENTATION</CODE>&quot; on, before configuring and generating as normal 
+(for further details, see the MercuryDPM <A HREF="http://mercurydpm.org/documentation/source-code-documentation-beta">  installation guide</A>).
+
+## Using Doxygen
+
+### Making a New Page with Doxygen:
+
+To make a new page (such as this), you need to create a ".dox" file. 
+
+The safest way to do this in Mercury is to copy an existing file using the following command:
+
+<CODE> svn cp oldFile.dox newFile.dox </CODE>
+
+This creates a new file which is simply a copy of the old. By adding &quot;<CODE>svn</CODE>&quot;, we ensure that the new file is added to the repository.
+
+The new file can then be edited at will.
+
+All Doxygen files should be started with a line that reads:
+
+<TT>/</TT><TT>*!</TT> <TT>/</TT><CODE>page [KEYWORD] [TITLE]</CODE>
+
+and ended with:
+
+<TT>*</TT><TT>/</TT>
+
+Here, the "keyword" allows the page created to be linked to from other pages using the 
+<A HREF="https://www.stack.nl/~dimitri/doxygen/manual/commands.html#cmdref"><CODE>ref</CODE> command</A> followed by the keyword.
+
+html documentation can then can then be created by simply typing 
+
+<CODE> make doc </CODE>
+
+in your build directory.
+
+### Documenting Code with Doxygen:
+
+In any of MercuryDPM's .h or .cc files, comments can be added to the code that will also appear in the Doxygen documentation by starting the comments with:
+
+<TT>/</TT><TT>*!</TT>
+
+and ending with
+
+<TT>*</TT><TT>/</TT>
+
+as above.
+
+Comments written within these symbols will not only be visible in the code itself, but will also be added to the MercuryDPM documentation.
+
+
+### Documentation Style 
+
+-# Put <B>brief comments</B> (`\``brief`) in the header (.h) files.
+-# Put <B>full comments</B> (`\``details`) in the CC (.cc) files, including documentation of the in- and out-put parameters (`\``param[in]`, `\``param[in]`).
+-# If a function is <B> deprecated </B> add the tag `\``deprecated` and <B>PROVIDE A REFERENCE TO A SUITABLE REPLACEMENT FUNCTION</B>.
+-# If a function contains a <B>bug</B>, detail the bug using the tag `\``bug` (or, better still, fix it!).
+-# Do this for every class and every member variable.
+
+
+The full MercuryDPM documentation can be viewed offline by going to <tt>/</tt><tt>Documentation/</tt><tt>html</tt> in the "build" directory and typing 
+
+`[YOUR_WEB_BROWSER] index.html`
+
+*/

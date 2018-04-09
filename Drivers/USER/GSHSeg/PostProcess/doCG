@@ -1,0 +1,7 @@
+./fstatistics GSHCube.$1 -stattype XZ -tmin 1.0 -n 100  -w 0.5  &
+sleep 1
+./fstatistics GSHCube.$1 -stattype XZ -tmin 1.0 -n 100  -w 0.5 -indSpecies 0 -statfilename GSHCube.$1.large.stat &
+sleep 1
+./fstatistics GSHCube.$1 -stattype XZ -tmin 1.0 -n 100 -w 0.5 -indSpecies 1 -statfilename GSHCube.$1.small.stat &
+sleep 1
+

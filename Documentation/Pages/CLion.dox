@@ -1,0 +1,19 @@
+/*! \page CLion CLion for MercuryDPM
+
+Writing, compiling, and debugging code is easier if you use a integrated development environment (IDE).
+For academic users we recommend CLion (you can get a free academic license); however there are many other suitable free IDE's such as Netbeans.
+
+Setting up CLion is easy:
+- Install CLion from https://www.jetbrains.com/clion and apply for a academic licence.
+- Open the application.
+- Click on <em>Import Project from Sources</em>.
+\image html CLion/CLion1.png
+- Select the MercurySource directory.
+\image html CLion/CLion2.png
+- Click on <em>Open Project</em>
+\image html CLion/CLion3.png
+
+Now your project will be set up, which will take a few minutes. After that, you are ready to go.
+
+N.B. Your build directory will be called cmake-build-debug (or cmake-build-release) and is located inside the source directory.
+*/

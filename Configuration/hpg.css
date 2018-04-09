@@ -1,0 +1,14 @@
+.title {
+	font-family:'Droid Sans';
+	color:#0f073f;
+	font-size:15px;
+}
+ .henk {
+	background-color: #F0F0FF;
+} 
+div.tabs > ul li:first-child {
+	display:none;
+}
+div.image img{ 
+    width:50%;
+}

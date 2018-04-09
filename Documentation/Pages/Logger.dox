@@ -1,0 +1,45 @@
+/*! \page LoggerGuide How to use the logger
+
+# The %Logger
+The Logger in MercuryDPM has two functions. Firstly it logs an output message to the terminal screen, and if requires acts based on the importance of the message. The other function is that it can be used to assert if code is correct. This document briefly describes how to use these two functions of the logger. First the log function is explained and later the assert function.
+
+# Log messages
+The logger can log messages to an output. Each of these messages have a log level attached to them. A log level has a twofold meaning. Firstly it indicates how important a log is, and secondly it is an indication if something went really wrong or that just some additional information is sent to the output. On compiling MercuryDPM with CMAKE the value Mercury\_LOGLEVEL can be set. It is set to loglevel DEFAULT by default. This means that all logs with a less important log level is ignored. The log levels, from important to less important, is given with a basic explanation:
+ - FATAL: Something severly went wrong with the computer and no recovery is possible. The program will exit with a fatal error message. An example would be that there is no memory allocation possible.
+ - ERROR: Something went wrong in the computation and no recovery is possible. The program will exit with an error message. Example: Dividing by zero
+ - WARN: Something might have gone wrong but it is for the user to decide if action has to be taken. Example: Setting xmax smaller than xmin.
+ - INFO: This level is used to tell some interesting information as output. Example: current timestep of the simulation.
+ - DEFAULT: This level is just defined to be a default. When Mercury\_LOGLEVEL is set to default in CMAKE, messages of lower type are ignored (i.e. VERBOSE and DEBUG).
+ - VERBOSE: This level is purely used for developers trying to find bugs.
+ - DEBUG: This is the lowest level and is mainly used to test core items of the code such as constructors and destructors. It could be used to trace bugs.
+
+Logging requires a log level, and some text to log. An example is
+\code{.cpp}
+logger(INFO,"This information will be given as output in a terminal screen");
+\endcode
+When debugging, it could be interesting to output some values and that can be done with the following syntax
+\code{.cpp}
+int particleId = 1;
+double particleVelocity = 5;
+logger(VERBOSE,"Particle % has a velocity of %",particleId,particleVelocity);
+\endcode
+
+# Assert
+A way to catch bugs is to use the function assert. Assert is a means to exit the program based on a condition that should not happen. If the condition is false, the code will exit. It is useful for catching bugs that should not happen. For instance when using a switch statement and the default action should never be taken. Another use of assert is to catch if something went wrong, like opening a file. There are two flavours in the logger: assert(...) and assert\_always(...). The difference between the first and the latter is that when compiling in release mode, assert(...) is ignored, but assert\_always(...) is still in the code. The benefit of assert(...) is that it could catch bugs in debug mode, but in release mode it is not executed and thus leading to a speedup in the code.
+The use of both functions in the logger is done as folows:
+\code{.cpp}
+    double test = 1.0;
+    // Condition is true, nothing happens
+    logger.assert_always(test==1.0,"test is not 1.0"); 
+    // Condition is false so the code breaks
+    logger.assert_always(test==2.0, "test is not 2.0 but %",test); 
+    // When compiling at release, this following assert is ignored
+    logger.assert(false,"Although I'm false, I get ignored on release");
+\endcode
+
+
+# How to create a specific logger
+It is possible to create your own module logger and give it a specific name (i.e. loggerCG for coarse graining). This allowes to log different parts of the code, and when something is logged it is clear in what part of the code it happens. Implementing an own logger must be done in the kernel of MercuryDPM and if this required please consult a developer.
+
+<!-- future: maybe log info to a file instead of std::cout ? -->
+*/

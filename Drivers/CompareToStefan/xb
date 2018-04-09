@@ -1,0 +1,2 @@
+#!/bin/tcsh
+~sluding/XBALLS/xballs.64linux -format 7 -s 1.3 -f c3d -v0 $*

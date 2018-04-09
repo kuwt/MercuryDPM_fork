@@ -1,0 +1,128 @@
+//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//For the list of developers, see <http://www.MercuryDPM.org/Team>.
+//
+//Redistribution and use in source and binary forms, with or without
+//modification, are permitted provided that the following conditions are met:
+//  * Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//  * Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+//  * Neither the name MercuryDPM nor the
+//    names of its contributors may be used to endorse or promote products
+//    derived from this software without specific prior written permission.
+//
+//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+//ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//DISCLAIMED. IN NO EVENT SHALL THE MERCURYDPM DEVELOPERS TEAM BE LIABLE FOR ANY
+//DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+//ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+//SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#include <iostream>
+#include "Particles/BaseParticle.h"
+#include "Interactions/BaseInteraction.h"
+#include "Math/ExtendedMath.h"
+#include "DPMBase.h"
+#include "TimeAveragedCG.h"
+
+template<class Coordinates, template<class> class BaseFunction, class Fields>
+TimeAveragedCG<Coordinates, BaseFunction, Fields>::TimeAveragedCG()
+        : CG<Coordinates, BaseFunction, Fields>()
+{
+    nTime_ = 0;
+#ifdef DEBUG_CONSTRUCTOR
+    std::cerr << "TimeAveragedCG::TimeAveragedCG() finished" << std::endl;
+#endif
+}
+
+template<class Coordinates, template<class> class BaseFunction, class Fields>
+TimeAveragedCG<Coordinates, BaseFunction, Fields>::TimeAveragedCG(const TimeAveragedCG& c)
+        : CG<Coordinates, BaseFunction, Fields>(c)
+{
+    nTime_ = c.nTime_;
+#ifdef DEBUG_CONSTRUCTOR
+    std::cerr << "TimeAveragedCG::copy() finished" << std::endl;
+#endif
+}
+
+template<class Coordinates, template<class> class BaseFunction, class Fields>
+TimeAveragedCG<Coordinates, BaseFunction, Fields>::~TimeAveragedCG()
+{
+#ifdef DEBUG_DESTRUCTOR
+    std::cerr << "TimeAveragedCG::~TimeAveragedCG() finished" << std::endl;
+#endif
+}
+
+template<class Coordinates, template<class> class BaseFunction, class Fields>
+void TimeAveragedCG<Coordinates, BaseFunction, Fields>::write(std::ostream& os) const
+{
+    CG<Coordinates, BaseFunction, Fields>::write(os);
+}
+
+template<class Coordinates, template<class> class BaseFunction, class Fields>
+TimeAveragedCG<Coordinates, BaseFunction, Fields>* TimeAveragedCG<Coordinates, BaseFunction, Fields>::copy() const
+{
+    return new TimeAveragedCG(*this);
+}
+
+template<class Coordinates, template<class> class BaseFunction, class Fields>
+std::string TimeAveragedCG<Coordinates, BaseFunction, Fields>::getName() const
+{
+    return "TimeAveraged" + CG<Coordinates, BaseFunction, Fields>::getName();
+}
+
+/*!
+ * \details sets the fields for all points to zero  
+ */
+template<class Coordinates, template<class> class BaseFunction, class Fields>
+void TimeAveragedCG<Coordinates, BaseFunction, Fields>::initialise()
+{
+    CG<Coordinates, BaseFunction, Fields>::initialise();
+
+    CG<Coordinates, BaseFunction, Fields>::resetVariables();
+};
+
+/*!
+ * \details computes the fields for the current time step and adds it to the
+ * previously computed timesteps; also adds one to nTime_.
+ * 
+ * Thus, at the end of evaluate, the fields contain the sum over the field 
+ * values of all time steps that have been computed so far, and nTime_ contains 
+ * the number of time steps that have been computed so far.
+ */
+template<class Coordinates, template<class> class BaseFunction, class Fields>
+void TimeAveragedCG<Coordinates, BaseFunction, Fields>::evaluate()
+{
+    ++nTime_;
+    CG<Coordinates, BaseFunction, Fields>::evaluateCommon();
+};
+
+/*!
+ * \details After all time steps have been computed, this function finishes the 
+ * computation of the average by dividing the field values by nTime_.
+ * 
+ * Thus, at the end of finish, the fields contain the average over the field 
+ * values of all time steps.
+ */
+template<class Coordinates, template<class> class BaseFunction, class Fields>
+void TimeAveragedCG<Coordinates, BaseFunction, Fields>::finish()
+{
+    //divide by volume
+    CG<Coordinates, BaseFunction, Fields>::volumeAverageVariables();
+
+    //time-average
+    for (typename CG<Coordinates, BaseFunction, Fields>::Point& c : CG<Coordinates, BaseFunction, Fields>::points_)
+    {
+        c /= nTime_;
+    }
+
+    CG<Coordinates, BaseFunction, Fields>::writeVariables();
+
+    CG<Coordinates, BaseFunction, Fields>::outputSumOfVariables();
+
+    CG<Coordinates, BaseFunction, Fields>::finish();
+}

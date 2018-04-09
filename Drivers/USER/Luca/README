@@ -1,0 +1,10 @@
+- Helicoid: the screw is implemented with angles. The edges are rounded, and the rotation works but due to mistakes in the fmod() of the angular difference it
+	doesn't work after a while it started spinning.	*** OBSOLETE. DO NOT USE. ***
+- Helicoid02: implementation is by means of the axial distance. The file is polished of unnecessary stuff and there are no computations of angles, just sqrt()s.
+	The edges are rounded.
+- Helicoid03: the same stuff of Helicoid02, but with sharp edges.
+- Helicoid04: triangular wall. NOTE: the variable "shaft radius" is needed in the function call.
+- Helicoid05: the collision with the shaft is added to Helicoid03. NOTE: the variable "shaft radius" is needed in the function call.
+	17.04.17: tested Helicoid 03 vs. Helicoid05. No difference in the particles' physics. --> *** FROM NOW ON USE HELICOID05 AS STANDARD ***
+- Helicoid06: left-handed screw implemented starting from Helicoid03. NOTE: the variable "shaft radius" is needed in the function call. *** STILL UNDER DEVELOPMENT. SHOULD NOT BE USED. ***
+- Helicoid07: evolution of Helicoid05 with modulated shaft size. *** STOPPED THE IMPLEMENTATION. FINITE SCREW NEEDED. ***

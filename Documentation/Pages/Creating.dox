@@ -1,0 +1,40 @@
+
+/*! \page creating Write Your Own Code
+
+Before you read about how to write your own code, we recommend you to work through the \ref Tutorials "Tutorials".
+
+You have now seen several MercuryDPM driver codes, so you are familiar with the code design. You also compiled, run and visualised simulations, so you know the general tools available to you. You are now ready to write your very first Driver code from scratch. The goal of this section will be to write a code that simulates a single particle bouncing around between two walls; we will call it PingPong.cpp. Some of you want to use the terminal and some others an IDE, so we will show you both ways.
+
+The first thing you need is a place to put your code. You can create your own code in one of the existing Driver directories, but we recommend you creating your own directory. This is how you do it:
+-# Copy the directory Drivers/USER/Template and rename the copy to your own name, e.g. Drivers/USER/JohnDoe.
+-# This directory contains a file called _ExampleCode.cpp_ which contains a basic MercuryDPM driver code. Rename the file to a fileName that describes the code you want to create, e.g. _PingPong.cpp_.
+-# Your directory also contains a file called _CMakeLists.txt_ which tells cmake to create make files for compiling your driver code. The file tells cmake to create a make command for each cpp file in this directory. We use the fileName to name the make command, i.e. _make PingPong_ will compile the Driver _PingPong.cpp_.
+ Therefore, the name of each cpp file has to be unique, otherwise _make_ does not know which file to compile.
+
+-# Now that we have a new cpp file, we need to execute cmake to create a make command. You do this by executing cmake in the root of the build directory
+\code{.sh}
+~/MercuryBuild/Drivers/USER/JohnDoe$ cd ../../..
+~/MercuryBuild$ cmake .
+-- Configuring done
+-- Generating done
+-- Build files have been written to: ~/MercuryBuild
+\endcode
+
+-# Now you can compile and execute your new driver code:
+\code{.sh}
+~/MercuryBuild/Drivers/USER/JohnDoe$ make PingPong
+[100%] Built target DPMBase
+[100%] Built target FreeFallRestart
+~/MercuryBuild/Drivers/USER/JohnDoe$ ./PingPong
+Hello, World!
+\endcode
+
+Now let's take a look how we can implement the PingPong example.
+
+[TODO: WRITE]
+
+# Further topics {#further}
+ - \subpage WallTypes
+ - \subpage Restart
+
+*/

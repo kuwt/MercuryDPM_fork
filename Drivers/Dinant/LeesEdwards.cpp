@@ -1,0 +1,160 @@
+//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//For the list of developers, see <http://www.MercuryDPM.org/Team>.
+//
+//Redistribution and use in source and binary forms, with or without
+//modification, are permitted provided that the following conditions are met:
+//  * Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//  * Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+//  * Neither the name MercuryDPM nor the
+//    names of its contributors may be used to endorse or promote products
+//    derived from this software without specific prior written permission.
+//
+//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+//ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//DISCLAIMED. IN NO EVENT SHALL THE MERCURYDPM DEVELOPERS TEAM BE LIABLE FOR ANY
+//DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+//ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+//SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+#include <iostream>
+
+#include "Mercury2D.h"
+#include "StatisticsVector.h"
+#include "Boundaries/LeesEdwardsBoundary.h"
+#include "Particles/BaseParticle.h"
+#include "Species/LinearViscoelasticSpecies.h"
+
+template <StatType T> class LeesEdwards : public StatisticsVector<T>, public Mercury2D
+{
+public:
+    LeesEdwards()
+    {
+        tc=1e-3;
+        r=0.8;
+        rho=2000;
+        velStart=0.1;
+        velEnd=0.1;
+        tMax=10;
+    }
+    
+    void setupInitialConditions()
+    {
+        setName("LeesEdwards");
+        setSystemDimensions(2);
+        species = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
+        species->setDensity(rho);
+
+        if (readDataFile("Startpos.dat", 8))
+		{
+            std::cout << "inlezen gelukt" << std::endl;
+		}
+        else
+        {
+            std::cout << "inlezen mislukt" << std::endl;
+            exit(1);
+        }
+        setTime(0);
+        
+        Mdouble minRadius=particleHandler.getSmallestParticle()->getRadius();
+        Mdouble minMass=species->getMassFromRadius(minRadius);
+        std::cout<<"minMass="<<minMass<<" minRadius="<<minRadius<<std::endl;
+        species->setStiffness(helpers::computeKFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass (tc, r, 0.5*minMass));
+        species->setDissipation(helpers::computeDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass (tc, r, 0.5*minMass));
+
+        setGravity(Vec3D(0.0,0.0,0.0));
+        setTimeMax(tMax);
+        
+        setTimeStep(0.02*tc);
+        getDataFile().setSaveCount(5000);
+        getFStatFile().setFileType(FileType::NO_FILE);
+        getEneFile().setSaveCount(500);
+        getRestartFile().setSaveCount(5000);
+        getStatFile().setSaveCount(500);
+        
+        setHGridMaxLevels(1);
+        
+        leesEdwardsBoundary = boundaryHandler.copyAndAddObject(LeesEdwardsBoundary());
+        leesEdwardsBoundary->set(
+            [&] (double time){
+                return 0.5*(velStart+velEnd)*time+0.5*(velStart-velEnd)*tMax/constants::pi*std::sin(time/tMax*constants::pi);},
+            [&] (double time) {
+                return 0.5*(velStart+velEnd)     +0.5*(velStart-velEnd)                   *std::cos(time/tMax*constants::pi);},
+            getXMin(),getXMax(),getYMin(),getYMax());                
+    }
+    
+    Mdouble tc;
+    Mdouble r;
+    Mdouble rho;
+    Mdouble velStart;
+    Mdouble velEnd;
+    Mdouble tMax;
+    
+private:
+    LeesEdwardsBoundary* leesEdwardsBoundary;
+    LinearViscoelasticSpecies* species;
+};
+
+int main(int argc UNUSED, char *argv[] UNUSED)
+{
+    
+    LeesEdwards<Z> leesEdwards;
+    
+    for (int i = 1; i < argc; i += 2)
+    {
+        std::cout << "interpreting input argument " << argv[i];
+        for (int j = i + 1; j < argc; j++)
+        {
+            if (argv[j][0] == '-')
+                break;
+            std::cout << " " << argv[j];
+        }
+        std::cout << std::endl;
+        
+        if (!strcmp(argv[i], "-tc"))
+        {
+            leesEdwards.tc=atof(argv[i+1]);
+        }
+        else if (!strcmp(argv[i], "-r"))
+        {
+            leesEdwards.r=atof(argv[i+1]);
+        }
+        else if (!strcmp(argv[i], "-rho"))
+        {
+            leesEdwards.rho=atof(argv[i+1]);
+        }
+        else if (!strcmp(argv[i], "-velStart"))
+        {
+            leesEdwards.velStart=atof(argv[i+1]);
+        }
+        else if (!strcmp(argv[i], "-velEnd"))
+        {
+            leesEdwards.velEnd=atof(argv[i+1]);
+        }
+        else if (!strcmp(argv[i], "-vel"))
+        {
+            leesEdwards.velStart=atof(argv[i+1]);
+            leesEdwards.velEnd=atof(argv[i+1]);
+        }        
+        else if (!strcmp(argv[i], "-tMax"))
+        {
+            leesEdwards.tMax=atof(argv[i+1]);
+        }
+        else
+        {
+            std::cerr << "Warning: not all arguments read correctly!" << std::endl;
+            exit(-10);
+        }
+    }
+    
+    leesEdwards.setDoPeriodicWalls(false);
+    leesEdwards.setDoTimeAverage(false);
+    leesEdwards.solve();
+    
+}

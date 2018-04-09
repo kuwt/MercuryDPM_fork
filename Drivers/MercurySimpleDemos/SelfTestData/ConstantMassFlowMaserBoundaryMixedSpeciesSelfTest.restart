@@ -1,0 +1,33 @@
+restart_version 1.0 name ConstantMassFlowMaserBoundaryMixedSpeciesSelfTest
+dataFile    fileType ONE_FILE saveCount 2000 counter 22 lastSavedTimeStep 40232
+fStatFile   fileType ONE_FILE saveCount 2000 counter 22 lastSavedTimeStep 40232
+eneFile     fileType ONE_FILE saveCount 2000 counter 22 lastSavedTimeStep 40232
+restartFile fileType ONE_FILE saveCount 2000 counter 22 lastSavedTimeStep 40232
+statFile    fileType ONE_FILE saveCount 2000 counter 0
+interactionFile fileType NO_FILE saveCount 0 counter 0
+xMin 0 xMax 5 yMin 0 yMax 2 zMin 0 zMax 2
+timeStep 9.94235877012513e-05 time 4.00000978039975 ntimeSteps 40232 timeMax 4
+systemDimensions 3 particleDimensions 3 gravity 0.4067366430758 0 -0.913545457642601 writeVTK 0 NO_FILE NO_FILE random  0 1103515245 12345 1073741824 607 273 784607267
+Species 4
+LinearViscoelasticSpecies id 0 density 1.90985931710274 stiffness 200000 dissipation 25
+LinearViscoelasticSpecies id 1 density 1.90985931710274 stiffness 100000 dissipation 25
+LinearViscoelasticMixedSpecies idA 1 idB 0 stiffness 150000 dissipation 25
+LinearViscoelasticSpecies id 2 density 1.90985931710274 stiffness 200000 dissipation 25
+LinearViscoelasticMixedSpecies idA 2 idB 0 stiffness 200000 dissipation 25
+LinearViscoelasticMixedSpecies idA 2 idB 1 stiffness 150000 dissipation 25
+LinearViscoelasticSpecies id 3 density 1.90985931710274 stiffness 100000 dissipation 25
+LinearViscoelasticMixedSpecies idA 3 idB 0 stiffness 150000 dissipation 25
+LinearViscoelasticMixedSpecies idA 3 idB 1 stiffness 100000 dissipation 25
+LinearViscoelasticMixedSpecies idA 3 idB 2 stiffness 150000 dissipation 25
+Walls 1
+InfiniteWall id 0 indSpecies 0 position 0 0 0 orientation 0.707106781186548 0 0.707106781186548 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0
+Boundaries 1
+ConstantMassFlowMaserBoundary id 0 normal 1 0 0 distanceLeft -3 distanceRight 2 shift 5 0 0 gapSize 3 maserIsActivated 1 numberOfMaserSpecies 2 outflowSpeciesIndex 0 maserSpeciesIndex 2 outflowSpeciesIndex 1 maserSpeciesIndex 3
+Particles 5
+BaseParticle id 0 indSpecies 2 position 1.25391883720073 0 849.049499601907 orientation 1 0 0 0 velocity 2.62695055035076 0 210.501100013344 angularVelocity 0 0 0 force 0.4067366430758 0 -0.913545457642601 torque 0 0 0 radius 0.5 invMass 1
+BaseParticle id 1 indSpecies 3 position -1.74608116279927 0 728.613613795157 orientation 1 0 0 0 velocity 2.62695055035076 0 180.391282437702 angularVelocity 0 0 0 force 0.4067366430758 0 -0.913545457642601 torque 0 0 0 radius 0.5 invMass 1
+BaseParticle id 17146 indSpecies 1 position 11.2539188372007 0 728.613613795157 orientation 1 0 0 0 velocity 2.62695055035076 0 180.391282437702 angularVelocity 0 0 0 force 0.4067366430758 0 -0.913545457642601 torque 0 0 0 radius 0.5 invMass 1
+BaseParticle id 35500 indSpecies 0 position 9.25391883720072 0 849.049499601907 orientation 1 0 0 0 velocity 2.62695055035076 0 210.501100013344 angularVelocity 0 0 0 force 0.4067366430758 0 -0.913545457642601 torque 0 0 0 radius 0.5 invMass 1
+BaseParticle id 49240 indSpecies 1 position 6.25391883720073 0 728.613613795157 orientation 1 0 0 0 velocity 2.62695055035076 0 180.391282437702 angularVelocity 0 0 0 force 0.4067366430758 0 -0.913545457642601 torque 0 0 0 radius 0.5 invMass 1
+Interactions 0
+NUM_BUCKETS 10 hGridMaxLevels 3 cellOverSizeRatio 1

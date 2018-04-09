@@ -1,0 +1,158 @@
+//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//For the list of developers, see <http://www.MercuryDPM.org/Team>.
+//
+//Redistribution and use in source and binary forms, with or without
+//modification, are permitted provided that the following conditions are met:
+//  * Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//  * Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+//  * Neither the name MercuryDPM nor the
+//    names of its contributors may be used to endorse or promote products
+//    derived from this software without specific prior written permission.
+//
+//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+//ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//DISCLAIMED. IN NO EVENT SHALL THE MERCURYDPM DEVELOPERS TEAM BE LIABLE FOR ANY
+//DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+//ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+//SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+#include "Mercury2D.h"
+#include "StatisticsVector.h"
+#include "Walls/InfiniteWall.h"
+#include <sstream>
+#include <iostream>
+#include <cstdlib>
+#include "Species/LinearViscoelasticSpecies.h"
+
+template <StatType T> class create_initial_conditions : public StatisticsVector<T>, public Mercury2D
+{
+	public:
+	create_initial_conditions<T>() : StatisticsVector<T>() , Mercury2D()
+    {
+        species  = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
+    }
+	
+	void computeExternalForces(BaseParticle* CI)
+	{
+		///Background friction
+        CI->addForce(-CI->getVelocity()*0.1* species->getDissipation());
+//        CI->add_Torque(-CI->get_AngularVelocity()*0.1*getSlidingDissipation(CI->get_IndSpecies()));	
+	}
+	
+	void setupInitialConditions() 
+	{
+		setXMax(13);
+		setYMax(13);
+		
+        particleHandler.clear();
+        		
+		BaseParticle P0;
+		int N=50;
+		double vmax=1;
+		double rmin=0.4;
+		double rmax=0.8;
+		for(int i=0;i<N;i++)
+		{
+			P0.setRadius(random.getRandomNumber(rmin,rmax));
+			//P0.computeMass();
+			P0.setPosition(Vec3D(random.getRandomNumber(0,getXMax()),random.getRandomNumber(0,getYMax()),0));
+			P0.setVelocity(Vec3D(random.getRandomNumber(-vmax,vmax),random.getRandomNumber(-vmax,vmax),0));
+			P0.setAngularVelocity(Vec3D(0,0,0));
+			particleHandler.copyAndAddObject(P0);
+		}
+				
+		wallHandler.clear();
+        boundaryHandler.clear();
+        if(periodic)
+        {
+            PeriodicBoundary b0;
+            b0.set(Vec3D(1,0,0), getXMin(), getXMax());
+            boundaryHandler.copyAndAddObject(b0);
+            b0.set(Vec3D(0,1,0), getYMin(), getYMax());
+            boundaryHandler.copyAndAddObject(b0);
+        }
+        else
+        {
+            InfiniteWall w0;
+            w0.set(Vec3D( 0.0, 1.0, 0.0), getYMax());
+            wallHandler.copyAndAddObject(w0);
+            w0.set(Vec3D( 0.0,-1.0, 0.0),-getYMin());
+            wallHandler.copyAndAddObject(w0);
+            w0.set(Vec3D( 1.0, 0.0, 0.0), getXMax());
+            wallHandler.copyAndAddObject(w0);
+            w0.set(Vec3D(-1.0, 0.0, 0.0),-getXMin());
+            wallHandler.copyAndAddObject(w0);
+        }
+	}
+	
+	protected:
+	
+	void actionsAfterTimeStep()
+	{
+		double P_wanted=1;
+		double walldamp=10;
+		double wallmass=1;
+		
+		double Xpressure=StatisticsVector<T>::getCGPoints()[0].NormalStress.XX+StatisticsVector<T>::getCGPoints()[0].TangentialStress.XX;
+		double Fx=Xpressure-P_wanted-walldamp*Xvel;
+		Xvel+=Fx* getTimeStep()/wallmass;
+		double xmax=getXMax()+Xvel* getTimeStep();
+		dynamic_cast<PeriodicBoundary*>(boundaryHandler.getObject(0))->moveRight(xmax);
+		setXMax(xmax);
+
+		/*double Ypressure=StatisticsVector<T>::getCGPoints()[0].NormalStress.YY+StatisticsVector<T>::getCGPoints()[0].TangentialStress.YY;
+		double Fy=Ypressure-P_wanted-walldamp*Yvel;
+		Yvel+=Fy*getTimeStep()/wallmass;
+		double yMax_=getYMax()+Yvel*getTimeStep();
+		dynamic_cast<PeriodicBoundary*>(boundaryHandler.getObject(1))->move_right(yMax_);
+		setYMax(yMax_);*/
+	}
+	
+	double Xvel,Yvel;
+	bool periodic;
+public:
+    LinearViscoelasticSpecies* species;
+};
+
+int main(int /*argc*/, char **/*argv[]*/)
+{
+	//pressure_controled_periodic_walls problem;   
+    create_initial_conditions<Z> problem;
+    
+    problem.setDoPeriodicWalls(false);
+    problem.setDoTimeAverage(false);
+
+	problem.species->setDensity(20);
+	Mdouble mass = problem.species->getMassFromRadius(0.4);
+	problem.species->setStiffnessAndRestitutionCoefficient(10000,0.4,mass);
+	//problem.setSlidingFrictionCoefficient(0.5);
+	//problem.setSlidingStiffness(problem.getStiffness()*2/7);
+	//problem.setSlidingDissipation(problem.getDissipation());
+	problem.getDataFile().setFileType(FileType::ONE_FILE);
+	problem.getFStatFile().setFileType(FileType::ONE_FILE);
+	problem.setGravity(Vec3D(0,0,0));
+
+    problem.setTimeStep(0.02*helpers::computeCollisionTimeFromKAndDispAndEffectiveMass(problem.species->getStiffness(), problem.species->getDissipation(), 0.5*mass));
+    problem.setTimeMax(11);
+    //problem.setTimeMax(1e5*problem.getTimeStep());
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(1000, problem.getTimeMax(), problem.getTimeStep()));
+    //problem.set_number_of_saves(1000);
+	problem.getStatFile().setSaveCount(1);
+	problem.setName("create_initial_conditions_pressure_controlled");		
+	problem.write(std::cout,false);
+    
+
+	
+	problem.solve();
+    
+    problem.particleHandler.getObject(12)->printHGrid(std::cout);std::cout<<std::endl;
+    problem.particleHandler.getObject(37)->printHGrid(std::cout);
+}
+

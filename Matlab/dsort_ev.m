@@ -1,0 +1,37 @@
+function [Vs, Ds] = dsort_ev(V, D)
+    Ds=D;
+    Vs=V;
+    tmpvec=[0;0;0];
+    if((Ds(1,1))<(Ds(2,2)))
+        tmp=Ds(1,1);
+        Ds(1,1)=Ds(2,2);
+        Ds(2,2)=tmp;
+        tmpvec=Vs(:,1);
+        Vs(:,1)=Vs(:,2);
+        Vs(:,2)=tmpvec;
+    end
+    if((Ds(2,2))<(Ds(3,3)))
+        tmp=Ds(2,2);
+        Ds(2,2)=Ds(3,3);
+        Ds(3,3)=tmp;
+        tmpvec=Vs(:,2);
+        Vs(:,2)=Vs(:,3);
+        Vs(:,3)=tmpvec;
+    end
+    if((Ds(1,1))<(Ds(2,2)))
+        tmp=Ds(1,1);
+        Ds(1,1)=Ds(2,2);
+        Ds(2,2)=tmp;
+        tmpvec=Vs(:,1);
+        Vs(:,1)=Vs(:,2);
+        Vs(:,2)=tmpvec;
+    end
+    if((Ds(2,2))<(Ds(3,3)))
+        tmp=Ds(2,2);
+        Ds(2,2)=Ds(3,3);
+        Ds(3,3)=tmp;
+        tmpvec=Vs(:,2);
+        Vs(:,2)=Vs(:,3);
+        Vs(:,3)=tmpvec;
+    end
+

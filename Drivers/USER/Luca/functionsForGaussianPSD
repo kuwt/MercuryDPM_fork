@@ -1,0 +1,274 @@
+// set the particle masses
+void setParticleMasses()
+{
+particleVolume1 = 4.0*constants::pi*pow(meanRadius1,3.)/3.;
+particleVolume2 = 4.0*constants::pi*pow(meanRadius2,3.)/3.;
+particleVolume3 = 4.0*constants::pi*pow(meanRadius3,3.)/3.;
+
+particleMass1 = particleDensity*particleVolume1;
+particleMass2 = particleDensity*particleVolume2;
+particleMass3 = particleDensity*particleVolume3;
+
+if (verbose)
+{
+std::cout << "\tParticle 1 mass: " << particleMass1 << "\n";
+std::cout << "\tParticle 2 mass: " << particleMass2 << "\n";
+std::cout << "\tParticle 3 mass: " << particleMass3 << "\n";
+}
+}
+
+// set the particle species
+void setSpecies()
+{
+speciesHandler.clear();
+
+// p1-p1
+specieP1 = new LinearViscoelasticFrictionSpecies;
+specieP1 -> setDensity(particleDensity);
+specieP1 -> setStiffnessAndRestitutionCoefficient(particleStiffness, ppRestitutionCoeff, particleMass1);
+
+specieP1 -> setSlidingFrictionCoefficient(ppSlidingFrictionCoeff);
+specieP1 -> setSlidingStiffness(particleStiffness*2.0/7.0);
+specieP1 -> setSlidingDissipation(specieP1 -> getDissipation()*2.0/7.0);
+
+specieP1 -> setRollingFrictionCoefficient(ppRollingFrictionCoeff);
+specieP1 -> setRollingStiffness(particleStiffness*2.0/7.0);
+specieP1 -> setRollingDissipation(specieP1 -> getDissipation()*2.0/7.0);
+
+specieP1 -> setTorsionFrictionCoefficient(ppTorsionFrictionCoeff);
+specieP1 -> setTorsionStiffness(particleStiffness*2.0/7.0);
+specieP1 -> setTorsionDissipation(specieP1 -> getDissipation()*2.0/7.0);
+speciesHandler.addObject(specieP1);
+
+// p2-p2
+specieP2 = new LinearViscoelasticFrictionSpecies;
+specieP2 -> setDensity(particleDensity);
+specieP2 -> setStiffnessAndRestitutionCoefficient(particleStiffness, ppRestitutionCoeff, particleMass2);
+
+specieP2 -> setSlidingFrictionCoefficient(ppSlidingFrictionCoeff);
+specieP2 -> setSlidingStiffness(particleStiffness*2.0/7.0);
+specieP2 -> setSlidingDissipation(specieP2 -> getDissipation()*2.0/7.0);
+
+specieP2 -> setRollingFrictionCoefficient(ppRollingFrictionCoeff);
+specieP2 -> setRollingStiffness(particleStiffness*2.0/7.0);
+specieP2 -> setRollingDissipation(specieP2 -> getDissipation()*2.0/7.0);
+
+specieP2 -> setTorsionFrictionCoefficient(ppTorsionFrictionCoeff);
+specieP2 -> setTorsionStiffness(particleStiffness*2.0/7.0);
+specieP2 -> setTorsionDissipation(specieP2 -> getDissipation()*2.0/7.0);
+speciesHandler.addObject(specieP2);
+
+// p3-p3
+specieP3 = new LinearViscoelasticFrictionSpecies;
+specieP3 -> setDensity(particleDensity);
+specieP3 -> setStiffnessAndRestitutionCoefficient(particleStiffness, ppRestitutionCoeff, particleMass3);
+
+specieP3 -> setSlidingFrictionCoefficient(ppSlidingFrictionCoeff);
+specieP3 -> setSlidingStiffness(particleStiffness*2.0/7.0);
+specieP3 -> setSlidingDissipation(specieP3 -> getDissipation()*2.0/7.0);
+
+specieP3 -> setRollingFrictionCoefficient(ppRollingFrictionCoeff);
+specieP3 -> setRollingStiffness(particleStiffness*2.0/7.0);
+specieP3 -> setRollingDissipation(specieP3 -> getDissipation()*2.0/7.0);
+
+specieP3 -> setTorsionFrictionCoefficient(ppTorsionFrictionCoeff);
+specieP3 -> setTorsionStiffness(particleStiffness*2.0/7.0);
+specieP3 -> setTorsionDissipation(specieP3 -> getDissipation()*2.0/7.0);
+speciesHandler.addObject(specieP3);
+
+// wall-wall
+specieWall = new LinearViscoelasticFrictionSpecies;
+specieWall -> setDensity(particleDensity);
+specieWall -> setStiffnessAndRestitutionCoefficient(wallStiffness, pWallRestitutionCoeff, (particleMass1 + particleMass2 + particleMass3)/3.0);
+
+specieWall -> setSlidingFrictionCoefficient(pWallSlidingFrictionCoeff);
+specieWall -> setSlidingStiffness(wallStiffness*2.0/7.0);
+specieWall -> setSlidingDissipation(specieWall -> getDissipation()*2.0/7.0);
+
+specieWall -> setRollingFrictionCoefficient(pWallRollingFrictionCoeff);
+specieWall -> setRollingStiffness(wallStiffness*2.0/7.0);
+specieWall -> setRollingDissipation(specieWall -> getDissipation()*2.0/7.0);
+
+specieWall -> setTorsionFrictionCoefficient(pWallTorsionFrictionCoeff);
+specieWall -> setTorsionStiffness(wallStiffness*2.0/7.0);
+specieWall -> setTorsionDissipation(specieWall -> getDissipation()*2.0/7.0);
+speciesHandler.addObject(specieWall);
+
+// p1-wall
+auto specieP1Wall = speciesHandler.getMixedObject(specieP1, specieWall);
+specieP1Wall -> setStiffnessAndRestitutionCoefficient((particleStiffness + wallStiffness)/2.0, pWallRestitutionCoeff, particleMass1);
+
+specieP1Wall -> setSlidingFrictionCoefficient(pWallSlidingFrictionCoeff);
+specieP1Wall -> setSlidingStiffness(wallStiffness*2.0/7.0);
+specieP1Wall -> setSlidingDissipation(specieP1Wall -> getDissipation()*2.0/7.0);
+
+specieP1Wall -> setRollingFrictionCoefficient(pWallRollingFrictionCoeff);
+specieP1Wall -> setRollingStiffness(wallStiffness*2.0/7.0);
+specieP1Wall -> setRollingDissipation(specieP1Wall -> getDissipation()*2.0/7.0);
+
+specieP1Wall -> setTorsionFrictionCoefficient(pWallTorsionFrictionCoeff);
+specieP1Wall -> setTorsionStiffness(wallStiffness*2.0/7.0);
+specieP1Wall -> setTorsionDissipation(specieP1Wall -> getDissipation()*2.0/7.0);
+
+// p2-wall
+auto specieP2Wall = speciesHandler.getMixedObject(specieP2, specieWall);
+specieP2Wall -> setStiffnessAndRestitutionCoefficient((particleStiffness + wallStiffness)/2.0, pWallRestitutionCoeff, particleMass2);
+
+specieP2Wall -> setSlidingFrictionCoefficient(pWallSlidingFrictionCoeff);
+specieP2Wall -> setSlidingStiffness(wallStiffness*2.0/7.0);
+specieP2Wall -> setSlidingDissipation(specieP2Wall -> getDissipation()*2.0/7.0);
+
+specieP2Wall -> setRollingFrictionCoefficient(pWallRollingFrictionCoeff);
+specieP2Wall -> setRollingStiffness(wallStiffness*2.0/7.0);
+specieP2Wall -> setRollingDissipation(specieP2Wall -> getDissipation()*2.0/7.0);
+
+specieP2Wall -> setTorsionFrictionCoefficient(pWallTorsionFrictionCoeff);
+specieP2Wall -> setTorsionStiffness(wallStiffness*2.0/7.0);
+specieP2Wall -> setTorsionDissipation(specieP2Wall -> getDissipation()*2.0/7.0);
+
+// p3-wall
+auto specieP3Wall = speciesHandler.getMixedObject(specieP3, specieWall);
+specieP3Wall -> setStiffnessAndRestitutionCoefficient((particleStiffness + wallStiffness)/2.0, pWallRestitutionCoeff, particleMass3);
+
+specieP3Wall -> setSlidingFrictionCoefficient(pWallSlidingFrictionCoeff);
+specieP3Wall -> setSlidingStiffness(wallStiffness*2.0/7.0);
+specieP3Wall -> setSlidingDissipation(specieP3Wall -> getDissipation()*2.0/7.0);
+
+specieP3Wall -> setRollingFrictionCoefficient(pWallRollingFrictionCoeff);
+specieP3Wall -> setRollingStiffness(wallStiffness*2.0/7.0);
+specieP3Wall -> setRollingDissipation(specieP3Wall -> getDissipation()*2.0/7.0);
+
+specieP3Wall -> setTorsionFrictionCoefficient(pWallTorsionFrictionCoeff);
+specieP3Wall -> setTorsionStiffness(wallStiffness*2.0/7.0);
+specieP3Wall -> setTorsionDissipation(specieP3Wall -> getDissipation()*2.0/7.0);
+
+// p1-p2
+auto specieP1P2 = speciesHandler.getMixedObject(specieP1, specieP2);
+specieP1P2 -> setStiffnessAndRestitutionCoefficient(particleStiffness, ppRestitutionCoeff, (particleMass1 + particleMass2)/2.0);
+
+specieP1P2 -> setSlidingFrictionCoefficient(ppSlidingFrictionCoeff);
+specieP1P2 -> setSlidingStiffness(wallStiffness*2.0/7.0);
+specieP1P2 -> setSlidingDissipation(specieP1P2 -> getDissipation()*2.0/7.0);
+
+specieP1P2 -> setRollingFrictionCoefficient(ppRollingFrictionCoeff);
+specieP1P2 -> setRollingStiffness(wallStiffness*2.0/7.0);
+specieP1P2 -> setRollingDissipation(specieP1P2 -> getDissipation()*2.0/7.0);
+
+specieP1P2 -> setTorsionFrictionCoefficient(ppTorsionFrictionCoeff);
+specieP1P2 -> setTorsionStiffness(wallStiffness*2.0/7.0);
+specieP1P2 -> setTorsionDissipation(specieP1P2 -> getDissipation()*2.0/7.0);
+
+// p1-p3
+auto specieP1P3 = speciesHandler.getMixedObject(specieP1, specieP3);
+specieP1P3 -> setStiffnessAndRestitutionCoefficient(particleStiffness, ppRestitutionCoeff, (particleMass1 + particleMass3)/2.0);
+
+specieP1P3 -> setSlidingFrictionCoefficient(ppSlidingFrictionCoeff);
+specieP1P3 -> setSlidingStiffness(wallStiffness*2.0/7.0);
+specieP1P3 -> setSlidingDissipation(specieP1P3 -> getDissipation()*2.0/7.0);
+
+specieP1P3 -> setRollingFrictionCoefficient(ppRollingFrictionCoeff);
+specieP1P3 -> setRollingStiffness(wallStiffness*2.0/7.0);
+specieP1P3 -> setRollingDissipation(specieP1P3 -> getDissipation()*2.0/7.0);
+
+specieP1P3 -> setTorsionFrictionCoefficient(ppTorsionFrictionCoeff);
+specieP1P3 -> setTorsionStiffness(wallStiffness*2.0/7.0);
+specieP1P3 -> setTorsionDissipation(specieP1P3 -> getDissipation()*2.0/7.0);
+
+// p1-p3
+auto specieP2P3 = speciesHandler.getMixedObject(specieP2, specieP3);
+specieP2P3 -> setStiffnessAndRestitutionCoefficient(particleStiffness, ppRestitutionCoeff, (particleMass2 + particleMass3)/2.0);
+
+specieP2P3 -> setSlidingFrictionCoefficient(ppSlidingFrictionCoeff);
+specieP2P3 -> setSlidingStiffness(wallStiffness*2.0/7.0);
+specieP2P3 -> setSlidingDissipation(specieP2P3 -> getDissipation()*2.0/7.0);
+
+specieP2P3 -> setRollingFrictionCoefficient(ppRollingFrictionCoeff);
+specieP2P3 -> setRollingStiffness(wallStiffness*2.0/7.0);
+specieP2P3 -> setRollingDissipation(specieP2P3 -> getDissipation()*2.0/7.0);
+
+specieP2P3 -> setTorsionFrictionCoefficient(ppTorsionFrictionCoeff);
+specieP2P3 -> setTorsionStiffness(wallStiffness*2.0/7.0);
+specieP2P3 -> setTorsionDissipation(specieP2P3 -> getDissipation()*2.0/7.0);
+
+if (verbose)
+{
+std::cout << "\tP1-P1 friction coefficients: " << ppSlidingFrictionCoeff << " " << ppRollingFrictionCoeff << " " << ppTorsionFrictionCoeff << "\n";
+std::cout << "\tP1-P1 stiffnesses: " << specieP1 -> getSlidingStiffness() << " " << specieP1 -> getRollingStiffness() << " " << specieP1 -> getTorsionStiffness() << "\n";
+std::cout << "\tP1-P1 dissipation coefficients: " << specieP1 -> getSlidingDissipation() << " " << specieP1 -> getRollingDissipation() << " " << specieP1 -> getTorsionDissipation() << "\n";
+std::cout << "\tP1-P1 collision time: " << std::setprecision(4) << specieP1 -> getCollisionTime(particleMass1) << "\n";
+
+std::cout << "\tP2-P2 friction coefficients: " << ppSlidingFrictionCoeff << " " << ppRollingFrictionCoeff << " " << ppTorsionFrictionCoeff << "\n";
+std::cout << "\tP2-P2 stiffnesses: " << specieP2 -> getSlidingStiffness() << " " << specieP2 -> getRollingStiffness() << " " << specieP2 -> getTorsionStiffness() << "\n";
+std::cout << "\tP2-P2 dissipation coefficients: " << specieP2 -> getSlidingDissipation() << " " << specieP2 -> getRollingDissipation() << " " << specieP2 -> getTorsionDissipation() << "\n";
+std::cout << "\tP2-P2 collision time: " << std::setprecision(4) << specieP2 -> getCollisionTime(particleMass2) << "\n";
+
+std::cout << "\tP3-P3 friction coefficients: " << ppSlidingFrictionCoeff << " " << ppRollingFrictionCoeff << " " << ppTorsionFrictionCoeff << "\n";
+std::cout << "\tP3-P3 stiffnesses: " << specieP3 -> getSlidingStiffness() << " " << specieP3 -> getRollingStiffness() << " " << specieP3 -> getTorsionStiffness() << "\n";
+std::cout << "\tP3-P3 dissipation coefficients: " << specieP3 -> getSlidingDissipation() << " " << specieP3 -> getRollingDissipation() << " " << specieP3 -> getTorsionDissipation() << "\n";
+std::cout << "\tP3-P3 collision time: " << std::setprecision(4) << specieP3 -> getCollisionTime(particleMass3) << "\n";
+
+std::cout << "\tP1-WALL friction coefficients: " << pWallSlidingFrictionCoeff << " " << pWallRollingFrictionCoeff << " " << pWallTorsionFrictionCoeff << "\n";
+std::cout << "\tP1-WALL stiffnesses: " << specieP1Wall -> getSlidingStiffness() << " " << specieP1Wall -> getRollingStiffness() << " " << specieP1Wall -> getTorsionStiffness() << "\n";
+std::cout << "\tP1-WALL dissipation coefficients: " << specieP1Wall -> getSlidingDissipation() << " " << specieP1Wall -> getRollingDissipation() << " " << specieP1Wall -> getTorsionDissipation() << "\n";
+std::cout << "\tP1-WALL collision time: " << std::setprecision(4) << specieP1Wall -> getCollisionTime(particleMass1) << "\n";
+
+std::cout << "\tP2-WALL friction coefficients: " << pWallSlidingFrictionCoeff << " " << pWallRollingFrictionCoeff << " " << pWallTorsionFrictionCoeff << "\n";
+std::cout << "\tP2-WALL stiffnesses: " << specieP2Wall -> getSlidingStiffness() << " " << specieP2Wall -> getRollingStiffness() << " " << specieP2Wall -> getTorsionStiffness() << "\n";
+std::cout << "\tP2-WALL dissipation coefficients: " << specieP2Wall -> getSlidingDissipation() << " " << specieP2Wall -> getRollingDissipation() << " " << specieP2Wall -> getTorsionDissipation() << "\n";
+std::cout << "\tP2-WALL collision time: " << std::setprecision(4) << specieP2Wall -> getCollisionTime(particleMass2) << "\n";
+
+std::cout << "\tP3-WALL friction coefficients: " << pWallSlidingFrictionCoeff << " " << pWallRollingFrictionCoeff << " " << pWallTorsionFrictionCoeff << "\n";
+std::cout << "\tP3-WALL stiffnesses: " << specieP3Wall -> getSlidingStiffness() << " " << specieP3Wall -> getRollingStiffness() << " " << specieP3Wall -> getTorsionStiffness() << "\n";
+std::cout << "\tP3-WALL dissipation coefficients: " << specieP3Wall -> getSlidingDissipation() << " " << specieP3Wall -> getRollingDissipation() << " " << specieP3Wall -> getTorsionDissipation() << "\n";
+std::cout << "\tP3-WALL collision time: " << std::setprecision(4) << specieP3Wall -> getCollisionTime(particleMass3) << "\n";
+
+std::cout << "\tP1-P2 friction coefficients: " << ppSlidingFrictionCoeff << " " << ppRollingFrictionCoeff << " " << ppTorsionFrictionCoeff << "\n";
+std::cout << "\tP1-P2 stiffnesses: " << specieP1P2 -> getSlidingStiffness() << " " << specieP1P2 -> getRollingStiffness() << " " << specieP1P2 -> getTorsionStiffness() << "\n";
+std::cout << "\tP1-P2 dissipation coefficients: " << specieP1P2 -> getSlidingDissipation() << " " << specieP1P2 -> getRollingDissipation() << " " << specieP1P2 -> getTorsionDissipation() << "\n";
+std::cout << "\tP1-P2 collision time: " << std::setprecision(4) << specieP1P2 -> getCollisionTime(0.5*(particleMass1 + particleMass2)) << "\n";
+
+std::cout << "\tP1-P3 friction coefficients: " << ppSlidingFrictionCoeff << " " << ppRollingFrictionCoeff << " " << ppTorsionFrictionCoeff << "\n";
+std::cout << "\tP1-P3 stiffnesses: " << specieP1P3 -> getSlidingStiffness() << " " << specieP1P3 -> getRollingStiffness() << " " << specieP1P3 -> getTorsionStiffness() << "\n";
+std::cout << "\tP1-P3 dissipation coefficients: " << specieP1P3 -> getSlidingDissipation() << " " << specieP1P3 -> getRollingDissipation() << " " << specieP1P3 -> getTorsionDissipation() << "\n";
+std::cout << "\tP1-P3 collision time: " << std::setprecision(4) << specieP1P3 -> getCollisionTime(0.5*(particleMass1 + particleMass3)) << "\n";
+
+std::cout << "\tP2-P3 friction coefficients: " << ppSlidingFrictionCoeff << " " << ppRollingFrictionCoeff << " " << ppTorsionFrictionCoeff << "\n";
+std::cout << "\tP2-P3 stiffnesses: " << specieP2P3 -> getSlidingStiffness() << " " << specieP2P3 -> getRollingStiffness() << " " << specieP2P3 -> getTorsionStiffness() << "\n";
+std::cout << "\tP2-P3 dissipation coefficients: " << specieP2P3 -> getSlidingDissipation() << " " << specieP2P3 -> getRollingDissipation() << " " << specieP2P3 -> getTorsionDissipation() << "\n";
+std::cout << "\tP2-P3 collision time: " << std::setprecision(4) << specieP2P3 -> getCollisionTime(0.5*(particleMass2 + particleMass3)) << "\n";
+}
+}
+
+// makes one particle set
+void makeParticleSet()
+{
+double rho, theta, z, radius;
+p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
+
+std::cout << "here\n";
+
+for (int i=0; nP1PerSet-1; i++)
+{
+p0.setSpecies(specieP1);
+do
+{
+radius = meanRadius1 + sigmaRadius1*sqrt(-2.0*log(random.getRandomNumber(0.0,1.0)))*sin(2.0*constants::pi*random.getRandomNumber(0.0,1.0));
+}
+while (radius < minCutoff1 || radius > maxCutoff1);
+p0.setRadius(radius);
+
+rho = (casingRadius - 1.1*p0.getRadius())*random.getRandomNumber(0.0,1.0);
+theta = 2.0*constants::pi*random.getRandomNumber(0.0,1.0);
+z = settledBedHeight + 2.0*initRegionHeight + initRegionHeight*random.getRandomNumber(0.0,1.0);
+
+p0.setPosition(Vec3D(rho*cos(theta), rho*sin(theta), z));
+particleHandler.copyAndAddObject(p0);
+}
+
+std::cout << "there\n";
+
+
+
+
+
+}

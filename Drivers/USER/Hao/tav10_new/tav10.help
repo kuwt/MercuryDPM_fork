@@ -1,0 +1,213 @@
+#
+# columns 1-3
+             integer cell positions (iix,iiy,iiz) - starting from 0
+#
+# columns 4-6
+             real cell positions (xpos,ypos,zpos) - lower,left corner
+#
+# column 7
+             averaging volume of cell (Vxyz)-V_{cell}
+#
+# columns 8,9
+             total number of particles and contacts
+#
+# columns 10-12
+             volume fraction xnu=<nu> and xnustdev=sqrt(<nu^2>-<nu>^2), 
+                                      both based on mass-center average
+             and volume fraction xCnu_av=<nu>_{av} based on smoothing function
+#
+# columns 13-18
+             cc0 ... number of particles with      C == 0 contacts
+             cc3 ... number of particles with 1 <= C <= 3 contacts
+             cc4 ... number of particles with      C == 4 contacts
+             cc6 ... number of particles with 5 <= C <= 6 contacts
+             cc9 ... number of particles with 7 <= C <= 9 contacts
+             ccx ... number of particles with 10 <= C     contacts
+#
+# columns 19,20
+             static pressure p1=<p> and standard deviation pstdev=sqrt(<p^2>-<p>^2)
+# columns 21-29
+             normal static stress tensor sigma_{ab}=(1/V) \sum_c l_a f^n_b
+             indices are (1-9): 11, 12, 13, 21, 22, 23, 31, 32, 33
+#
+# column 30
+             tangential static pressure pt=<p^t> 
+# columns 31-39
+             tangential static stress tensor sigma^t_{ab}=(1/V) \sum_c l_a f^t_b
+             indices are (1-9): 11, 12, 13, 21, 22, 23, 31, 32, 33
+#
+# column 40
+             dynamic pressure pt=<p^d> 
+# columns 41-49
+             dynamic stress tensor sigma^t_{ab}=(1/V) \sum_p m_p v^p_a v^p_b
+             indices are (1-9): 11, 12, 13, 21, 22, 23, 31, 32, 33
+#
+# column 50
+             time t
+#
+# columns 51-53
+             average velocities <v_1>, <v_2>, <v_3>
+             for the smoothed velocity field, see col. 114-116
+#
+# columns 54-56
+             average squared-velocities <v_1^2>, <v_2^2>, <v_3^2>
+#
+# columns 57-59
+             average displacements per time-step <d_1>/dt, <d_2>/dt, <d_3>/dt
+#
+# column 60
+             isotropic velocity gradient 
+# columns 61-69
+             velocity gradient dva/db=(va(b+db)-va(b-db)/2db
+             (based on the displacement field - NOT on velocities)
+             indices are (1-9): 11, 12, 13, 21, 22, 23, 31, 32, 33
+#
+# column 70
+             isotropic fabric (contact number density)
+# columns 71-79
+             fabric F_ab = (1/V) \sum_pc V^pc n^c_a n^c_b
+             indices are (1-9): 11, 12, 13, 21, 22, 23, 31, 32, 33
+#
+# column 80
+             normal isotropic rel. strain
+# columns 81-89
+             normal rel. strain eps_n = \sum_pc (delta/l) n^c_a n^c_b
+#
+# column 90
+             tangential isotropic rel. strain
+# columns 91-99
+             tangential rel. strain eps_n = \sum_pc (delta/l) n^c_a n^c_b
+#
+# columns 100,101
+             smoothed/weighted average of particle- and contact-number
+#
+# columns 102-106
+             First five moments (smoothed) of the size distribution
+             <a>, <a^2>, <a^3>, <a^4>, <a^5>
+#
+# columns 107-109
+             systems size in 1,2,3-directions (see col. 117-119 for ref0)
+#
+# column 110
+             not-used
+#
+# columns 111-113
+             average spin <w_a>
+#
+# columns 114-116
+             smoothed velocity field <v_a>_{av} <-> col. 51-53
+#
+# columns 117-119
+             reference systems size in 1,2,3-directions 
+             (can be used to compute dimensionless change/strain
+              see col. 107-109 for actual size)
+#
+# column 120
+             not-used
+#
+# columns 121-141 (index=column-120)
+             Cn13(1) =Cn1(1,1,1,1,iix,iiy,iiz)
+             Cn13(2) =Cn1(1,1,2,2,iix,iiy,iiz)
+             Cn13(3) =Cn1(1,1,3,3,iix,iiy,iiz)
+             Cn13(4) =Cn1(1,1,2,3,iix,iiy,iiz)
+             Cn13(5) =Cn1(1,1,1,3,iix,iiy,iiz)
+             Cn13(6) =Cn1(1,1,1,2,iix,iiy,iiz)
+             Cn13(7) =Cn1(2,2,2,2,iix,iiy,iiz)
+             Cn13(8) =Cn1(2,2,3,3,iix,iiy,iiz)
+             Cn13(9) =Cn1(2,2,2,3,iix,iiy,iiz)
+             Cn13(10)=Cn1(2,2,1,3,iix,iiy,iiz)
+             Cn13(11)=Cn1(2,2,1,2,iix,iiy,iiz)
+             Cn13(12)=Cn1(3,3,3,3,iix,iiy,iiz)
+             Cn13(13)=Cn1(3,3,2,3,iix,iiy,iiz)
+             Cn13(14)=Cn1(3,3,1,3,iix,iiy,iiz)
+             Cn13(15)=Cn1(3,3,1,2,iix,iiy,iiz)
+             Cn13(16)=Cn1(2,3,2,3,iix,iiy,iiz)
+             Cn13(17)=Cn1(2,3,1,3,iix,iiy,iiz)
+             Cn13(18)=Cn1(2,3,1,2,iix,iiy,iiz)
+             Cn13(19)=Cn1(1,3,1,3,iix,iiy,iiz)
+             Cn13(20)=Cn1(1,3,1,2,iix,iiy,iiz)
+             Cn13(21)=Cn1(1,2,1,2,iix,iiy,iiz)
+#
+# columns 146-150
+             not used
+#
+# columns 151-195 (index=column-150)
+             Ct13(1) =Ct1(1,1,1,1,iix,iiy,iiz)
+             Ct13(2) =Ct1(1,1,2,2,iix,iiy,iiz)
+             Ct13(3) =Ct1(1,1,3,3,iix,iiy,iiz)
+             Ct13(4) =Ct1(1,1,2,3,iix,iiy,iiz)
+             Ct13(5) =Ct1(1,1,3,2,iix,iiy,iiz)
+             Ct13(6) =Ct1(1,1,1,3,iix,iiy,iiz)
+             Ct13(7) =Ct1(1,1,3,1,iix,iiy,iiz)
+             Ct13(8) =Ct1(1,1,1,2,iix,iiy,iiz)
+             Ct13(9) =Ct1(1,1,2,1,iix,iiy,iiz)
+             Ct13(10)=Ct1(2,2,2,2,iix,iiy,iiz)
+             Ct13(11)=Ct1(2,2,3,3,iix,iiy,iiz)
+             Ct13(12)=Ct1(2,2,2,3,iix,iiy,iiz)
+             Ct13(13)=Ct1(2,2,3,2,iix,iiy,iiz)
+             Ct13(14)=Ct1(2,2,1,3,iix,iiy,iiz)
+             Ct13(15)=Ct1(2,2,3,1,iix,iiy,iiz)
+             Ct13(16)=Ct1(2,2,1,2,iix,iiy,iiz)
+             Ct13(17)=Ct1(2,2,2,1,iix,iiy,iiz)
+             Ct13(18)=Ct1(3,3,3,3,iix,iiy,iiz)
+             Ct13(19)=Ct1(3,3,2,3,iix,iiy,iiz)
+             Ct13(20)=Ct1(3,3,3,2,iix,iiy,iiz)
+             Ct13(21)=Ct1(3,3,1,3,iix,iiy,iiz)
+             Ct13(22)=Ct1(3,3,3,1,iix,iiy,iiz)
+             Ct13(23)=Ct1(3,3,1,2,iix,iiy,iiz)
+             Ct13(24)=Ct1(3,3,2,1,iix,iiy,iiz)
+             Ct13(25)=Ct1(2,3,2,3,iix,iiy,iiz)
+             Ct13(26)=Ct1(2,3,3,2,iix,iiy,iiz)
+             Ct13(27)=Ct1(2,3,1,3,iix,iiy,iiz)
+             Ct13(28)=Ct1(2,3,3,1,iix,iiy,iiz)
+             Ct13(29)=Ct1(2,3,1,2,iix,iiy,iiz)
+             Ct13(30)=Ct1(2,3,2,1,iix,iiy,iiz)
+             Ct13(31)=Ct1(3,2,3,2,iix,iiy,iiz)
+             Ct13(32)=Ct1(3,2,1,3,iix,iiy,iiz)
+             Ct13(33)=Ct1(3,2,3,1,iix,iiy,iiz)
+             Ct13(34)=Ct1(3,2,1,2,iix,iiy,iiz)
+             Ct13(35)=Ct1(3,2,2,1,iix,iiy,iiz)
+             Ct13(36)=Ct1(1,3,1,3,iix,iiy,iiz)
+             Ct13(37)=Ct1(1,3,3,1,iix,iiy,iiz)
+             Ct13(38)=Ct1(1,3,1,2,iix,iiy,iiz)
+             Ct13(39)=Ct1(1,3,2,1,iix,iiy,iiz)
+             Ct13(40)=Ct1(3,1,3,1,iix,iiy,iiz)
+             Ct13(41)=Ct1(3,1,1,2,iix,iiy,iiz)
+             Ct13(42)=Ct1(3,1,2,1,iix,iiy,iiz)
+             Ct13(43)=Ct1(1,2,1,2,iix,iiy,iiz)
+             Ct13(44)=Ct1(1,2,2,1,iix,iiy,iiz)
+             Ct13(45)=Ct1(2,1,2,1,iix,iiy,iiz)
+#
+# columns 196
+             not used
+# 197        <nu>_r
+# 198        N_total
+# 199        C_total
+# columns 200-239 (like the CN-stat-line in screen output)
+# 200-219    N_{index=column-203}
+# 220-239    C_{index=column-225}
+# 240        Nc0
+# 243        Nc3 (number of particles <= 3 contacts - check!)
+# 244        Nc4 (number of particles <= 4 contacts - check!)
+# 246        Nc6 etc.
+# 247        Nc9
+# 248        Ncx (number of particles  > 9 contacts)
+# 249        Cc0 0
+# 253        Cc3 (number of contacts from particles <= 3 contacts - check!)
+# 254        Cc4 (number of contacts from particles <= 4 contacts - check!)
+# 256        Cc6 etc.
+# 257        Cc9 
+# 258        Ccx (number of particles  > 9 contacts)
+# 260        Z0
+# 263        Z3
+# 264        Z4  
+# 266        Z6
+# 269        Z00 
+# 271        aa1 averaged smoothed first moment of size distribution
+# 272        aa2 averaged smoothed 2nd   moment of size distribution
+# 273        aa3 averaged smoothed 3rd   moment of size distribution
+# 274        aa4 averaged smoothed 4th   moment of size distribution
+# 275        aa5 averaged smoothed 5th   moment of size distribution
+# 276: deN 277: ek  278: epn 279: ept 
+# 280:     281:<fn> 282:<ft> 283: <d> 284: <t> 285:<d^2>286:<t^2>
+# 287:<fnr>288:<ftr>289:     290:     291:<px> 292:<py> 293:<pz>

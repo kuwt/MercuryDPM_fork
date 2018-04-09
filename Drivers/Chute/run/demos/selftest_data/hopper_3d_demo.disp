@@ -1,0 +1,6 @@
+#!/bin/bash
+x=$(echo $0 | cut -c2-)
+file=$PWD$x
+dirname=`dirname "$file"`
+cd $dirname
+../xballs -format 14 -f hopper_3d_demo.data -s 0.0204397 -cmode 0 -cmax -scala 4 -sort-sort -v0 -solidf -drotphi 0.05 -v0 -oh -200 -p 20 $*

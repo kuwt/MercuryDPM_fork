@@ -1,0 +1,32 @@
+restart_version 1.0 name FullRestartSelfTestRestarted
+dataFile    fileType ONE_FILE saveCount 20 counter 0
+fStatFile   fileType ONE_FILE saveCount 20 counter 0
+eneFile     fileType ONE_FILE saveCount 20 counter 0
+restartFile fileType ONE_FILE saveCount 20 counter 2 lastSavedTimeStep 0
+statFile    fileType ONE_FILE saveCount 20 counter 0
+interactionFile fileType NO_FILE saveCount 0 counter 0
+xMin 0 xMax 0 yMin 0 yMax 0 zMin 0 zMax 0
+timeStep 0 time 0 ntimeSteps 0 timeMax 0
+systemDimensions 3 particleDimensions 3 gravity 0 0 0 writeVTK 0 NO_FILE NO_FILE random  0 1103515245 12345 1073741824 607 273 615141746
+Species 1
+LinearViscoelasticSpecies id 0 density 1 stiffness 0 dissipation 0
+Walls 7
+Coil id 0 indSpecies 0 position 0 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 Start 0.1 0.2 0.3 Length 0.4 Radius 0.5 Revolutions 0.6 Omega 0.7 Thickness 0.8 Offset 0
+CylindricalWall id 1 indSpecies 0 position 0 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0  radius 0.1
+AxisymmetricIntersectionOfWalls id 2 indSpecies 0 position 0.1 0.2 0.3 orientation 0.853182953954939 0 -0.400713267645723 0.333927723038102 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 numIntersectionOfWalls 1 position 0.077 0.088 0.099 orientation 0.86676718645563 0 -0.372742734642644 0.331326875237906
+IntersectionOfWalls id 3 indSpecies 0 position 0 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 numIntersectionOfWalls 1 position 0.4 0.5 0.6 orientation 0.796009183964741 0 -0.503627182882345 0.335751455254897
+InfiniteWall id 4 indSpecies 0 position 0.04 0.08 0.12 orientation 0.796009183964741 0 -0.503627182882345 0.335751455254897 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0
+InfiniteWallWithHole id 5 indSpecies 0 position 0 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 normal 0.267261241912424 0.534522483824849 0.801783725737273 factor 2.67261241912424 position 1.0690449676497 holeRadius 0.5
+Screw id 6 indSpecies 0 position 0 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 start 0.1 0.2 0.3 Length 0.4 Radius 0.5 Revolutions 0.6 Omega 0.7 Thickness 0.8 Offset 0
+Boundaries 8
+AngledPeriodicBoundary id 0 normal_left 0.267261241912424 0.534522483824849 0.801783725737273 normal_right 0.455842305838552 0.56980288229819 0.683763458757828 origin 0.7 0.8 0.9
+ChuteInsertionBoundary id 1 maxFailed 13 numberOfParticlesInserted 0 posMin 0 0 0 posMax 0 0 0 radMin 0 radMax 0 fixedParticleRadius 0 inflowVelocity 0 inflowVelocityVariance 0
+CubeInsertionBoundary id 2 maxFailed 13 numberOfParticlesInserted 0 posMin 0 0 0 posMax 0 0 0 velMin 0 0 0 velMax 0 0 0 radMin 0 radMax 0
+HopperInsertionBoundary id 3 maxFailed 13 numberOfParticlesInserted 0 yMin 0 yMax 0 radMin 0 radMax 0 chuteAngle 0 fixedParticleRadius 0 isHopperCentred_ 1 hopperDim 0 hopperAngle 0 hopperLength 0 hopperExitLength 0 hopperHeight 0 lift 0 fillPercent 0
+PeriodicBoundary id 4 normal 0.267261241912424 0.534522483824849 0.801783725737273 scaleFactor 2.51428571428571 distanceLeft 2.93987366103667 distanceRight 5.87974732207334 shift 1.00571428571429 1.25714285714286 1.50857142857143
+CircularPeriodicBoundary id 5 innerRadius 0.3
+DeletionBoundary id 6 normal 0.267261241912424 0.534522483824849 0.801783725737273 scaleFactor 2.67261241912424 distance 8.39200299605013
+LeesEdwardsBoundary id 7 left 0.3 right 0.4 down 0.5 up 0.6 shift 0.1 vel 0.2
+Particles 1
+BaseParticle id 0 indSpecies 0 position 0 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 0.238732414637843
+Interactions 0
