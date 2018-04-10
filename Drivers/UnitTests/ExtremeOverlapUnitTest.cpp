@@ -117,12 +117,14 @@ int main(int argc, char *argv[])
     OverlapProblem.setName("ExtremeOverlapUnitTest");
     OverlapProblem.setFileType(FileType::NO_FILE);
 	OverlapProblem.dataFile.setFileType(FileType::ONE_FILE);
-	OverlapProblem.setSaveCount(10000);
+	OverlapProblem.setSaveCount(1e3);
     OverlapProblem.setDimension(2);
-    OverlapProblem.setTimeStep(1e-8);
-	OverlapProblem.setTimeMax(0.01);
+    OverlapProblem.setTimeStep(1e-7);
+	OverlapProblem.setTimeMax(1e-2);
 	OverlapProblem.solve(argc,argv);
     
+    /* JMFT: We don't need this any more, we have the self test system. */
+    /*
     Vec3D position = OverlapProblem.particleHandler.getObject(0)->getPosition();
     Vec3D positionToCompare = Vec3D(-1.031389999146e-06, 0.009506389407855, 0);
     if (!position.isEqualTo(positionToCompare, 1e-10))
@@ -132,9 +134,10 @@ int main(int argc, char *argv[])
     position = OverlapProblem.particleHandler.getObject(1)->getPosition();
     positionToCompare = Vec3D(0.01010314899993, 0.01487096023445, 0);
     if (!position.isEqualTo(positionToCompare, 1e-10))
-        logger(FATAL,"Large particle is in the wrong position. It is at % and should be %",position,positionToCompare);
+        logger(FATAL,"Small particle is in the wrong position. It is at % and should be %",position,positionToCompare);
     else
         std::cout << "Test passed" << std::endl;
     //std::cout.precision(13); std::cout << position << std::endl;
+    */
     return 0;
 }

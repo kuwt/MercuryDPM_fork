@@ -22,7 +22,7 @@ class FluxAndPeriodicBoundarySelfTest : public Mercury2D
 
             setTimeStep(1e-3);
             setTimeMax(1.5);
-            setSaveCount(1);
+            setSaveCount(100);
             
             speciesP = speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
             speciesP->setDensity(1);

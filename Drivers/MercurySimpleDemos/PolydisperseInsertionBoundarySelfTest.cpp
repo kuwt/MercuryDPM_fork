@@ -42,7 +42,7 @@ public:
         setGravity(Vec3D(0.0,0.0,0.0));
         setTimeStep(1e-3);
         dataFile.setSaveCount(50);
-        setTimeMax(25);
+        setTimeMax(1);
         setHGridMaxLevels(2);
 
         setXMin(0.0);
@@ -78,7 +78,7 @@ public:
         genB->setRadius(radB);
 
         auto insb = boundaryHandler.copyAndAddObject(new PolydisperseInsertionBoundary());
-        insb->setGeometry(100,
+        insb->setGeometry(1,
                 Vec3D( getXMin(), getYMin(), getZMin() ),
                 Vec3D( getXMax(), getYMax(), 0 ),
                 Vec3D(-1,-1,0),Vec3D(1,1,0));

@@ -23,7 +23,7 @@ class FluxBoundarySelfTest : public Mercury2D
 
             setTimeStep(1e-3);
             setTimeMax(1.5);
-            setSaveCount(1);
+            setSaveCount(100);
             
             speciesP = speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
             speciesP->setDensity(1);
@@ -50,7 +50,7 @@ class FluxBoundarySelfTest : public Mercury2D
             insertionBoundaryParticle->setSpecies(speciesP);
             insbA->set(
                     insertionBoundaryParticle,
-                    10,
+                    1,
                     Vec3D(-1, 0, 0),
                     Vec3D(-1, 0.2, 0),
                     Vec3D(3,0,0),
@@ -61,7 +61,7 @@ class FluxBoundarySelfTest : public Mercury2D
             insbA = boundaryHandler.copyAndAddObject(insbA);
             insbB->set(
                     insertionBoundaryParticle,
-                    10,
+                    1,
                     Vec3D(1, 0.0, 0),
                     Vec3D(1, 0.2, 0),
                     Vec3D(-5,0,0),
