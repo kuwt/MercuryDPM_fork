@@ -5,9 +5,7 @@ set(Mercury_VERSION_MAJOR 0)
 set(Mercury_VERSION_MINOR 10)
 
 set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
-
-#Directory were the external cmake modules are stored
-#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
 
 
 enable_testing()
@@ -231,4 +229,15 @@ if (Mercury_Include_Xballs_Support)
         message(FATAL_ERROR "X11 is needed, please install it")
     endif()
 endif()
+
+
+FIND_PACKAGE(Python)
+
+#find_program(PYTHON_EXEC "python" 
+#	DOC "Location of python executable to use")
+
+
+
+
+
 

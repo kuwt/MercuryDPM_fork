@@ -45,7 +45,8 @@
 #endif
 
 #ifdef assert
-#error You included assert before the logger. Please use logger.assert() instead.
+#undef assert
+//#error You included assert before the logger. Please use logger.assert() instead.
 #endif
 
 #ifdef MERCURY_FORCE_ASSERTS
