@@ -179,7 +179,7 @@ Mdouble RNG::getNormalVariate()
         do
         {
             radius = getRandomNumber(0, 1);
-            theta = getRandomNumber(0, 2*M_PI);
+            theta = getRandomNumber(0, 2*constants::pi);
         } while (radius <= epsilon); 
         // make sure that the radius generated is not too small
         // (unlikely to happen, just a safety check)

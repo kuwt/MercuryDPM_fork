@@ -441,11 +441,13 @@ bool helpers::writeToFile(std::string filename, std::string filecontent)
 
 void helpers::gnuplot(std::string command)
 {
-    #ifndef WINDOWS
+#ifdef __CYGWIN__
+    logger(WARN, "[helpers::gnuplot] is not supported on Cygwin");
+#else
     FILE *pipe = popen("gnuplot -persist", "w");
     fprintf(pipe, "%s", command.c_str());
     fflush(pipe);
-    #endif
+#endif
 }
 
 bool helpers::addToFile(std::string filename, std::string filecontent)
