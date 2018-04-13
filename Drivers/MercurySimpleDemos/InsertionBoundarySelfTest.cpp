@@ -40,19 +40,15 @@ public:
     {
         setName("InsertionBoundarySelfTest");
         setSystemDimensions(3);
-        setGravity(Vec3D(0.0,0.0,0.0));
+        setGravity(Vec3D(0, 0, 0));
         setTimeStep(1e-4);
-        dataFile.setSaveCount(50);
-        setTimeMax(0.5);
+        dataFile.setSaveCount(10);
+        setTimeMax(2e-2);
         setHGridMaxLevels(2);
 
-        setXMin(0.0);
-        setYMin(0.0);
-        setZMin(0.0);
-        setXMax(1.0);
-        setYMax(0.01);
-        setZMax(1.0);
-        
+        setMin(Vec3D(0, 0, 0));
+        setMax(Vec3D(1, 1, 1));
+
         LinearViscoelasticSpecies species;
         species.setDensity(2000);
         species.setStiffness(10000);
@@ -62,31 +58,17 @@ public:
         BaseParticle insertionBoundaryParticle;
         insertionBoundaryParticle.setSpecies(speciesHandler.getObject(0));
 
-        //CubeInsertionBoundary::set(BaseParticle* particleToCopy, int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax, double radMin, double radMax)
         CubeInsertionBoundary insertionBoundary;
-        insertionBoundary.set(&insertionBoundaryParticle,1,getMin(),getMax(),Vec3D(0,0,0),Vec3D(0,0,0),0.025,0.05);
+        insertionBoundary.set(&insertionBoundaryParticle,1,getMin(),getMax(),Vec3D(1,0,0),Vec3D(1,0,0),0.025,0.05);
         //insertionBoundary.checkBoundaryBeforeTimeStep(this);
         boundaryHandler.copyAndAddObject(insertionBoundary);
 
-//        InfiniteWall bottomWall;
-//        bottomWall.setSpecies(speciesHandler.getObject(0));
-//        bottomWall.set(Vec3D(1,1,1), 0.2*getMin()+0.8*getMax());
-//        wallHandler.copyAndAddObject(bottomWall);
-
-        PeriodicBoundary periodicBoundary;
-        periodicBoundary.set(Vec3D(1,0,0),0,1);
-        boundaryHandler.copyAndAddObject(periodicBoundary);
-        periodicBoundary.set(Vec3D(0,0,1),0,1);
-        boundaryHandler.copyAndAddObject(periodicBoundary);
     }
 
     void printTime() const override
     {
         logger(INFO,"t=%, tMax=%, N=%", getTime(),getTimeMax(), particleHandler.getSize());
     }
-
-
-    CubeInsertionBoundary* insertionBoundary;
 };
 
 int main(int argc UNUSED, char *argv[] UNUSED)

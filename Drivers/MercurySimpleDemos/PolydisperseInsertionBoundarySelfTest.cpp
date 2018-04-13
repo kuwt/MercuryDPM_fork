@@ -41,8 +41,8 @@ public:
         setSystemDimensions(2);
         setGravity(Vec3D(0.0,0.0,0.0));
         setTimeStep(1e-3);
-        dataFile.setSaveCount(50);
-        setTimeMax(1);
+        dataFile.setSaveCount(10);
+        setTimeMax(5e-1);
         setHGridMaxLevels(2);
 
         setXMin(0.0);
