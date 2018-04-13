@@ -19,6 +19,7 @@ include_directories(${Mercury_SOURCE_DIR}/Kernel/ .)
         dgesv.f dgetrs.f
         #These are the extra from LAPACK for solve Ax=B
         zgesv.f zgetrs.f)
+        add_subdirectory(Lebedev_Quadrature)
 #elseif(NOT Mercury_USE_EXTERNAL_LAPACK)
 #    add_library(LinearAlgebra STATIC
 #        #Next line for LAPACK stuff inverse and LU factorisation
