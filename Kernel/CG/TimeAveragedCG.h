@@ -55,7 +55,7 @@ class Function;
 template<class Coordinates = CGCoordinates::O,
         template<class> class BaseFunction=CGFunctions::Lucy,
         class Fields=CGFields::StandardFields>
-class TimeAveragedCG final : public CG<Coordinates, BaseFunction, Fields>
+class TimeAveragedCG : public CG<Coordinates, BaseFunction, Fields>
 {
 public:
     typedef BaseFunction<Coordinates> Function;
@@ -118,6 +118,38 @@ protected:
      * Internal variable that cannot be set by the user.
      */
     unsigned int nTime_;
+};
+
+
+/*!
+ * \brief Specialisation of TimeAveragedCG with coordinates XYZ used for LebedevCG
+ */
+template< template<class> class BaseFunction, class Fields = CGFields::StandardFields>
+//class test : public TimeAveragedCG_Lebedev<CGCoordinates::XYZ, BaseFunction, Fields>
+class TimeAveragedCGXYZ : public TimeAveragedCG<CGCoordinates::XYZ, BaseFunction, Fields>
+{
+public:
+    /*!
+     * \brief Default constructor. 
+     */
+    TimeAveragedCGXYZ();
+
+    /*!
+     * \brief Copy constructor. It copies the TimeAveragedCGFunction and all objects it contains.
+     * \param[in] p the TimeAveragedCGFunction that has to be copied
+     */
+    TimeAveragedCGXYZ(const TimeAveragedCGXYZ &p);
+
+    /*!
+     * \brief Destructor, it simply destructs the TimeAveragedCGFunction and all the objects it contains.
+     */
+    virtual ~TimeAveragedCGXYZ();
+
+    /*!
+     * \brief Copy
+     */
+    TimeAveragedCGXYZ<BaseFunction, Fields>* copy() const override;
+
 };
 
 #include "TimeAveragedCG.hcc"

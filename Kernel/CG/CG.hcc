@@ -111,6 +111,21 @@ std::string CG<Coordinates, BaseFunction, Fields>::getName() const
 }
 
 template<class Coordinates, template<class> class BaseFunction, class Fields>
+void CG<Coordinates, BaseFunction, Fields>::createMesh()
+{
+    spaceEvenly(getMin(), getMax(), {getNX(), getNY(), getNZ()}, points_);
+    std::array<bool, 3> coordinateDirections = Coordinates::getCoordinateDirection();
+    nX_ = coordinateDirections[0] ? nX_ : 1;
+    nY_ = coordinateDirections[1] ? nY_ : 1;
+    nZ_ = coordinateDirections[2] ? nZ_ : 1;
+    if (!coordinateDirections[0] || !coordinateDirections[1] || !coordinateDirections[2])
+    {
+        logger(INFO, "In CG, setting number of evaluation points to %, %, % in X, Y and Z directions respectively",
+               nX_, nY_, nZ_);
+    }
+}
+
+template<class Coordinates, template<class> class BaseFunction, class Fields>
 void CG<Coordinates, BaseFunction, Fields>::initialise()
 {
     DPMBase* dpm = getHandler()->getDPMBase();
@@ -168,18 +183,9 @@ void CG<Coordinates, BaseFunction, Fields>::initialise()
         min_.Z = dpm->getZMin();
     if (std::isinf(getMax().Z))
         max_.Z = dpm->getZMax();
-    
-    spaceEvenly(getMin(), getMax(), {getNX(), getNY(), getNZ()}, points_);
-    std::array<bool, 3> coordinateDirections = Coordinates::getCoordinateDirection();
-    nX_ = coordinateDirections[0] ? nX_ : 1;
-    nY_ = coordinateDirections[1] ? nY_ : 1;
-    nZ_ = coordinateDirections[2] ? nZ_ : 1;
-    if (!coordinateDirections[0] || !coordinateDirections[1] || !coordinateDirections[2])
-    {
-        logger(INFO, "In CG, setting number of evaluation points to %, %, % in X, Y and Z directions respectively",
-               nX_, nY_, nZ_);
-    }
-    
+
+    createMesh();    
+
     function_.setWidth(getWidth());
     function_.setEps(getEps());
     
@@ -307,6 +313,27 @@ typename CG<Coordinates, BaseFunction, Fields>::Point CG<Coordinates, BaseFuncti
     return total;
 }
 
+template<class Coordinates, template<class> class BaseFunction, class Fields>
+void CG<Coordinates, BaseFunction, Fields>::evaluateParticleAtPoint(Fields& currentInteraction,
+                                                                    const BaseParticle& p, Point& r)
+{
+    Mdouble phi = function_.evaluateCGFunction(p.getPosition(), r.coordinates);
+    //logger(INFO,"phi % %",phi,function_.getCutoff());
+    r.addParticleStatistics(phi, currentInteraction);
+
+    //Compute derivatives if required
+    if (CGFields::StandardFields::isDifferentialField())
+    {
+        Vec3D dPhi = function_.evaluateCGFunctionDerivatives(p.getPosition(), r.coordinates);
+        r.addParticleDifferentialStatistics(dPhi, currentInteraction);
+    }
+    else
+    {
+        logger(DEBUG, "Not computing differentialField");
+    }
+}
+
+
 /*!
  * \param[in] p The particle that has to be passed to all CGPoint's.
  */
@@ -341,20 +368,7 @@ void CG<Coordinates, BaseFunction, Fields>::evaluateParticle(const BaseParticle&
             for (std::size_t k = minZ; k < maxZ; k++)
             {
                 Point& r = points_[(i * nY_ + j) * nZ_ + k];
-                Mdouble phi = function_.evaluateCGFunction(p.getPosition(), r.coordinates);
-                //logger(INFO,"phi % %",phi,function_.getCutoff());
-                r.addParticleStatistics(phi, currentInteraction);
-                
-                //Compute derivatives if required
-                if (CGFields::StandardFields::isDifferentialField())
-                {
-                    Vec3D dPhi = function_.evaluateCGFunctionDerivatives(p.getPosition(), r.coordinates);
-                    r.addParticleDifferentialStatistics(dPhi, currentInteraction);
-                }
-                else
-                {
-                    logger(VERBOSE, "Not computing differentialField");
-                }
+                evaluateParticleAtPoint(currentInteraction, p, r);
             }
         }
     }

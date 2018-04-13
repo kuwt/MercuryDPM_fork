@@ -129,12 +129,19 @@ public:
     void initialise() override;
 
     /*!
+     * \brief Creates spatial mesh of CGPoints, the points where the CG-variables are evaluated
+     */
+    virtual void createMesh();
+
+    /*!
      * \brief Called after a given number of time steps (statFile::saveCount_)
      * to evaluate the CG fields.
      */
     void evaluate() override;
 
     Point evaluateTotal();
+
+    void evaluateParticleAtPoint(Fields& currentInteraction, const BaseParticle& p, Point& r);
 
     /*!
      * \brief Contains the basic for loop over all CGPoints, required to do

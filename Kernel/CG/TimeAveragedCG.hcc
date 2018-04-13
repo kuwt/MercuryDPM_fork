@@ -126,3 +126,36 @@ void TimeAveragedCG<Coordinates, BaseFunction, Fields>::finish()
 
     CG<Coordinates, BaseFunction, Fields>::finish();
 }
+
+template<template<class> class BaseFunction, class Fields>
+TimeAveragedCGXYZ<BaseFunction, Fields>::TimeAveragedCGXYZ()
+: TimeAveragedCG<CGCoordinates::XYZ, BaseFunction, Fields>()
+{
+#ifdef DEBUG_CONSTRUCTOR
+    std::cerr << "TimeAveragedCGXYZ::TimeAveragedCGXYZ() finished" << std::endl;
+#endif
+}
+
+template<template<class> class BaseFunction, class Fields>
+TimeAveragedCGXYZ<BaseFunction, Fields>::TimeAveragedCGXYZ(const TimeAveragedCGXYZ& c)
+: TimeAveragedCG<CGCoordinates::XYZ, BaseFunction, Fields>(c)
+{
+#ifdef DEBUG_CONSTRUCTOR
+    std::cerr << "TimeAveragedCGXYZ::copy() finished" << std::endl;
+#endif
+}
+
+template<template<class> class BaseFunction, class Fields>
+TimeAveragedCGXYZ<BaseFunction, Fields>::~TimeAveragedCGXYZ()
+{
+#ifdef DEBUG_DESTRUCTOR
+    std::cerr << "TimeAveragedCGXYZ::~TimeAveragedCGXYZ() finished" << std::endl;
+#endif
+}
+
+template<template<class> class BaseFunction, class Fields>
+TimeAveragedCGXYZ<BaseFunction, Fields>* TimeAveragedCGXYZ<BaseFunction, Fields>::copy() const
+{
+    return new TimeAveragedCGXYZ(*this);
+}
+

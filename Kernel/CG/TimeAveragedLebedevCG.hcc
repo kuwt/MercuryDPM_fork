@@ -1,0 +1,266 @@
+//Copyright (c) 2013-2017, The MercuryDPM Developers Team. All rights reserved.
+//For the list of developers, see <http://www.MercuryDPM.org/Team>.
+//
+//Redistribution and use in source and binary forms, with or without
+//modification, are permitted provided that the following conditions are met:
+//  * Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//  * Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+//  * Neither the name MercuryDPM nor the
+//    names of its contributors may be used to endorse or promote products
+//    derived from this software without specific prior written permission.
+//
+//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+//ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//DISCLAIMED. IN NO EVENT SHALL THE MERCURYDPM DEVELOPERS TEAM BE LIABLE FOR ANY
+//DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+//ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+//SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//#include <iostream>
+//#include "Particles/BaseParticle.h"
+//#include "Interactions/BaseInteraction.h"
+//#include "Math/ExtendedMath.h"
+//#include "DPMBase.h"
+//#include "TimeAveragedCG.h"
+
+template<template<class> class BaseFunction, class Fields>
+TimeAveragedLebedevCG<BaseFunction, Fields>::TimeAveragedLebedevCG() : TimeAveragedCGXYZ<BaseFunction, Fields>()
+{
+#ifdef DEBUG_CONSTRUCTOR
+    std::cout << "TimeAveragedLebedevCG<BaseFunction, Fields>::TimeAveragedLebedevCG() finished" << std::endl;
+#endif
+}
+
+template<template<class> class BaseFunction, class Fields>
+TimeAveragedLebedevCG<BaseFunction, Fields>::TimeAveragedLebedevCG(const TimeAveragedLebedevCG &p)
+: TimeAveragedCGXYZ<BaseFunction, Fields>(p)
+{   
+    radiusInner_ = p.radiusInner_;
+    radiusOuter_ = p.radiusOuter_;
+    nR_ = p.nR_;
+#ifdef DEBUG_CONSTRUCTOR
+    std::cout << "TimeAveragedLebedevCG<BaseFunction, Fields>::TimeAveragedLebedevCG(const TimeAveragedLebedevCG &p) finished" << std::endl;
+#endif
+}
+
+template<template<class> class BaseFunction, class Fields>
+TimeAveragedLebedevCG<BaseFunction, Fields>::~TimeAveragedLebedevCG()
+{
+#ifdef DEBUG_CONSTRUCTOR
+    std::cout << "TimeAveragedLebedevCG<, BaseFunction, Fields>::~TimeAveragedLebedevCG() finished" << std::endl;
+#endif
+}
+
+
+template< template<class> class BaseFunction, class Fields>
+TimeAveragedLebedevCG<BaseFunction, Fields>* TimeAveragedLebedevCG<BaseFunction, Fields>::copy() const
+{
+    return new TimeAveragedLebedevCG(*this);
+}
+
+template< template<class> class BaseFunction, class Fields>
+void TimeAveragedLebedevCG<BaseFunction, Fields>::createMesh()
+{
+    //Open the file with the selected order.
+    char filename[128];
+    std::sprintf(filename,"../../../analysis_tools/Quadrature_Rules/%s%s%s","./lebedev_","095",".txt");
+    std::ifstream Quadrature_file(filename);
+    if (Quadrature_file.fail()){
+        std::cout << "Error: Quadrature rules \"" << filename << "\" not found" << std::endl;
+        exit(-1);
+    }
+
+    std::string line;
+    double theta;
+    double phi;
+
+    std::vector<double> x;
+    std::vector<double> y;
+    std::vector<double> z;
+
+    while(std::getline(Quadrature_file, line))
+    {
+        // Extract values theta, phi, throw away w;
+        std::istringstream ss(line);
+        ss >> theta;
+        ss >> phi;
+
+        //convert to radians
+        theta = theta/360*2*constants::pi;
+        phi = phi/360*2*constants::pi;
+
+        //Convert to cartesian values to improve speed when the actual integration takes place
+        double radius;
+        for (int i = 0; i < nR_; i++)
+        {
+            radius = radiusInner_ + (radiusOuter_-radiusInner_)/(nR_-1)*i;
+            x.push_back(radius*std::cos(theta)*std::sin(phi));
+            y.push_back(radius*std::sin(theta)*std::sin(phi));
+            z.push_back(radius*std::cos(phi));
+        }
+    }
+
+
+    //Now create the cg points
+    std::vector<Point>& points = CG<CGCoordinates::XYZ, BaseFunction, Fields>::points_;
+    points.resize(x.size());
+    for (int i = 1; i < x.size(); i++)
+    {
+        points[i].coordinates.setXYZ({x[i],y[i],z[i]});
+    }
+}
+
+template< template<class> class BaseFunction, class Fields>
+double TimeAveragedLebedevCG<BaseFunction, Fields>::getRadiusInner()
+{
+    return radiusInner_;
+}
+
+template< template<class> class BaseFunction, class Fields>
+double TimeAveragedLebedevCG<BaseFunction, Fields>::getRadiusOuter()
+{
+    return radiusOuter_;
+}
+
+template< template<class> class BaseFunction, class Fields>
+int TimeAveragedLebedevCG<BaseFunction, Fields>::getNR()
+{
+    return nR_;
+}
+
+template< template<class> class BaseFunction, class Fields>
+void TimeAveragedLebedevCG<BaseFunction, Fields>::setR(double radiusInner, double radiusOuter)
+{
+    if (radiusInner >= radiusOuter)
+    {
+        logger(WARN,"Setting inner radius larger than outer radius");
+    }
+    radiusInner_ = radiusInner;
+    radiusOuter_ = radiusOuter;
+}
+
+template< template<class> class BaseFunction, class Fields>
+void TimeAveragedLebedevCG<BaseFunction, Fields>::setNR(int nR)
+{
+    nR_ = nR;
+}
+
+/*!
+ * \details computes the fields for the current timestep and adds it to the
+ * previously computed timesteps; also adds one to nTime_.
+ *
+ * Thus, at the end of evaluate, the fields contain the sum over the field
+ * values of all time steps that have been computed so far, and nTime_ contains
+ * the number of time steps that have been computed so far.
+ */
+template<template<class> class BaseFunction, class Fields>
+void TimeAveragedLebedevCG<BaseFunction, Fields>::evaluate()
+{
+    this->nTime_++;
+
+    // get particle statistics
+    for (BaseParticle* p : CG<CGCoordinates::XYZ, BaseFunction, Fields>::getHandler()->getDPMBase()->particleHandler)
+    {
+#ifdef MERCURY_USE_MPI
+        if (!p->isFixed() && !p->isMPIParticle() && CG<CGCoordinates::XYZ, BaseFunction, Fields>::selectedParticle_(p))
+            TimeAveragedLebedevCG<BaseFunction, Fields>::evaluateParticle(*p);
+#else
+        if (!p->isFixed() && CG<CGCoordinates::XYZ, BaseFunction, Fields>::selectedParticle_(p))
+            TimeAveragedLebedevCG<BaseFunction, Fields>::evaluateParticle(*p);
+#endif
+    }
+
+    // get contact statistics
+    if (Fields::doInteractionStatistics())
+    {
+        for (BaseInteraction *i : CG<CGCoordinates::XYZ, BaseFunction, Fields>::getHandler()->getDPMBase()->interactionHandler)
+        {
+            TimeAveragedLebedevCG<BaseFunction, Fields>::evaluateContact(*i);
+        }
+    }
+
+}
+
+template< template<class> class BaseFunction, class Fields>
+void TimeAveragedLebedevCG<BaseFunction, Fields>::evaluateParticle(BaseParticle& p)
+{
+    CGFields::StandardFields currentInteraction;
+    currentInteraction.setFields(p);
+
+    const Mdouble distance_r = sqrt(p.getPosition().X*p.getPosition().X +
+                                    p.getPosition().Y*p.getPosition().Y +
+                                    p.getPosition().Z*p.getPosition().Z);
+    if ((distance_r) < (radiusOuter_ + this->function_.getCutoff()))
+    {   
+        for ( Point& r : this->points_ )
+        {
+            this->evaluateParticleAtPoint(currentInteraction, p, r);
+        }
+    }
+}
+
+template< template<class> class BaseFunction, class Fields>
+void TimeAveragedLebedevCG<BaseFunction, Fields>::evaluateContact(BaseInteraction& c)
+{
+    IntegralType it = this->getIntegralType(c);
+    if (it==IntegralType::NONE) return;
+    CGFields::StandardFields currentInteraction;
+    currentInteraction.setFields(c,it);
+
+    const Vec3D pos = c.getContactPoint();
+    const Mdouble distance_r = sqrt(pos.X*pos.X + pos.Y*pos.Y + pos.Z*pos.Z);
+    double particle_radius = 2.0;
+    double spread = 0.5;
+    double offset = 0.5;
+    if ((distance_r) < (radiusOuter_ + this->function_.getCutoff()))
+    {
+        for ( Point& r : this->points_ )
+        {
+            Mdouble psi = this->function_.evaluateCGIntegral(c, r.coordinates, it);
+            r.addInteractionStatistics(psi, currentInteraction);
+            if (it!=IntegralType::I_TO_P)
+            {
+                Mdouble phi = this->function_.evaluateCGFunction(c.getContactPoint(), r.coordinates);
+                r.addContactPointStatistics(phi, currentInteraction);
+            }
+        }
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
