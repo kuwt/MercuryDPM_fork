@@ -26,10 +26,10 @@
 #ifndef DPMBASE_H
 #define DPMBASE_H
 
+//so that the user doesn't have to include string/io manipulations:
 #include <string>
 #include <string.h>
 #include <iomanip>
-#include <cstdlib> //needed to be cygwin compatible (system not found)
 //The vector class contains a 3D vector class.
 #include "Math/Vector.h"
 //This class defines the particle handler
@@ -48,7 +48,6 @@
 #include "SpeciesHandler.h"
 //This class defines the cg handler
 #include "CG/CGHandler.h"
-//#include "Species/Species.h"
 //This class defines the possibleContact lists
 #ifdef CONTACT_LIST_HGRID
     #include "PossibleContactList.h"

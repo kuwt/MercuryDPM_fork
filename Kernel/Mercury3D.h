@@ -27,7 +27,6 @@
 #define MERCURY3D_H
 
 #include "MercuryBase.h"
-#include <iostream>
 
 /*!
  * \brief This adds on the hierarchical grid code for 3D problems.

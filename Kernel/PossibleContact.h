@@ -56,7 +56,7 @@ public:
         Prev2_ = nullptr;
         index_ = 0;
     }
-
+    
     /*!
      * \brief Constructor that takes two BaseParticle and sets them to be the BaseParticle associated with this PossibleContact.
      * \param[in] P1 A pointer to the first BaseParticle in this PossibleContact.
@@ -74,7 +74,7 @@ public:
         Prev2_ = nullptr;
         index_ = 0;
     }
-
+    
     /*!
      * \brief Constructor that takes two BaseParticle and the next global PossibleContact in the list and constructs a PossibleContact from that.
      * \param[in] P1 A pointer to the first BaseParticle in this PossibleContact.
@@ -97,7 +97,7 @@ public:
         Next2_ = nullptr;
         Prev2_ = nullptr;
     }
-
+    
     /*!
      * \brief Constructor that should be used, takes all required information as parameters and sets it in the data-members.
      * \param[in] P1 A pointer to the first BaseParticle in this PossibleContact.
@@ -106,7 +106,8 @@ public:
      * \param[in] Next1 A pointer to the PossibleContact that comes after this one in the linked list associated with the first BaseParticle of this PossibleContact.
      * \param[in] Next2 A pointer to the PossibleContact that comes after this one in the linked list associated with the second BaseParticle of this PossibleContact.
      */
-    PossibleContact(BaseParticle* P1, BaseParticle* P2, PossibleContact* Next, PossibleContact* Next1, PossibleContact* Next2)
+    PossibleContact(BaseParticle* P1, BaseParticle* P2, PossibleContact* Next, PossibleContact* Next1,
+                    PossibleContact* Next2)
     {
         P1_ = P1;
         P2_ = P2;
@@ -130,7 +131,7 @@ public:
     {
         return P1_;
     }
-
+    
     /*!
      * \brief Gets a pointer to the second BaseParticle in this PossibleContact.
      * \return A pointer to the second BaseParticle in this PossibleContact.
@@ -139,7 +140,7 @@ public:
     {
         return P2_;
     }
-
+    
     /*!
      * \brief Given one BaseParticle of the interacting pair, this function gets the other.
      * \param[in] P A pointer to one of the BaseParticle of this PossibleContact.
@@ -153,11 +154,12 @@ public:
             return P1_;
         else
         {
-            std::cout << "Particle* getOtherParticle(Particle *P), no match for " << P->getIndex() << " posibilities are " << P1_->getIndex() << " and " << P2_->getIndex() << std::endl;
+            logger(WARN, "Particle* getOtherParticle(Particle *P), no match for % posibilities are % and %",
+                   P->getIndex(), P1_->getIndex(), P2_->getIndex());
             return nullptr;
         }
     }
-
+    
     /*!
      * \brief Gets the next PossibleContact in the general linked list of PossibleContact.
      * \return A pointer to the next PossibleContact in the linked list.
@@ -166,7 +168,7 @@ public:
     {
         return Next_;
     }
-
+    
     /*!
      * \brief Gets the next PossibleContact in the linked list of PossibleContact of the given particle.
      * \param[in] P A pointer to the BaseParticle for which we want to have the next contact of.
@@ -180,11 +182,12 @@ public:
             return Next2_;
         else
         {
-            logger(WARN, "PossibleContact* getNext(Particle* P), no match for %. Possibilities are % and %.", P->getIndex(), P1_->getIndex(), P2_->getIndex());
+            logger(WARN, "PossibleContact* getNext(Particle* P), no match for %. Possibilities are % and %.",
+                   P->getIndex(), P1_->getIndex(), P2_->getIndex());
             return nullptr;
         }
     }
-
+    
     /*!
      * \brief Gets the previous PossibleContact in the general linked list of PossibleContact.
      * \return A pointer to the previous PossibleContact in the general linked list of PossibleContact.
@@ -193,7 +196,7 @@ public:
     {
         return Prev_;
     }
-
+    
     /*!
      * \brief Gets the previous PossibleContact in the linked list of PossibleContact of the given particle.
      * \param[in] P A pointer to the BaseParticle we want to know the previous PossibleContact for.
@@ -207,11 +210,12 @@ public:
             return Prev2_;
         else
         {
-            logger(WARN, "PossibleContact* getPrevious(Particle* P), no match for %. Possibilities are % and %.", P->getIndex(), P1_->getIndex(), P2_->getIndex());
+            logger(WARN, "PossibleContact* getPrevious(Particle* P), no match for %. Possibilities are % and %.",
+                   P->getIndex(), P1_->getIndex(), P2_->getIndex());
             return nullptr;
         }
     }
-
+    
     /*!
      * \brief Gets the next PossibleContact in the linked list of PossibleContact of the first particle in this PossibleContact.
      * \return A pointer to the next PossibleContact in the linked list of PossibleContact of the first particle in this PossibleContact.
@@ -220,7 +224,7 @@ public:
     {
         return Next1_;
     }
-
+    
     /*!
      * \brief Gets the previous PossibleContact in the linked list of PossibleContact of the first particle in this PossibleContact.
      * \return A pointer to the previous PossibleContact in the linked list of PossibleContact of the first particle in this PossibleContact.
@@ -229,7 +233,7 @@ public:
     {
         return Prev1_;
     }
-
+    
     /*!
      * \brief Gets the next PossibleContact in the linked list of PossibleContact of the second particle in this PossibleContact.
      * \return A pointer to the next PossibleContact in the linked list of PossibleContact of the second particle in this PossibleContact.
@@ -238,7 +242,7 @@ public:
     {
         return Next2_;
     }
-
+    
     /*!
      * \brief Gets the previous PossibleContact in the linked list of PossibleContact of the second particle in this PossibleContact.
      * \return A pointer to the previous PossibleContact in the linked list of PossibleContact of the second particle in this PossibleContact.
@@ -247,7 +251,7 @@ public:
     {
         return Prev2_;
     }
-
+    
     /*!
      * \brief Gets the index of this PossibleContact.
      * \return The index of this PossibleContact.
@@ -265,7 +269,7 @@ public:
     {
         P1_ = P1;
     }
-
+    
     /*!
      * \brief Sets the second particle in this PossibleContact.
      * \param[in] P2 A pointer to the BaseParticle that must be set as the second BaseParticle.
@@ -274,7 +278,7 @@ public:
     {
         P2_ = P2;
     }
-
+    
     /*!
      * \brief Sets the next PossibleContact in the linked list of PossibleContac.
      * \param[in] Next A pointer to the PossibleContact which is the next PossibleContact in the linked list of PossibleContact
@@ -283,7 +287,7 @@ public:
     {
         Next_ = Next;
     }
-
+    
     /*!
      * \brief Sets the next PossibleContact in the linked list of PossibleContact of the given particle.
      * \param[in] P A pointer to the BaseParticle for which the next PossibleContact in the linked list must be set for.
@@ -296,9 +300,11 @@ public:
         else if (P2_ == P)
             Next2_ = Next;
         else
-            logger(WARN, "void setNextPosition(Particle* P,PossibleContact* Next), no match for %. Possibilities are %  and % ", P->getIndex(), P1_->getIndex(), P2_->getIndex());
+            logger(WARN,
+                   "void setNextPosition(Particle* P,PossibleContact* Next), no match for %. Possibilities are %  and % ",
+                   P->getIndex(), P1_->getIndex(), P2_->getIndex());
     }
-
+    
     /*!
      * \brief Sets the previous PossibleContact in the linked list of PossibleContact of the given particle.
      * \param[in] Prev A pointer to the PossibleContact which is the previous PossibleContact in the linked list of PossibleContact
@@ -307,7 +313,7 @@ public:
     {
         Prev_ = Prev;
     }
-
+    
     /*!
      * \brief Sets the previous PossibleContact in the linked list of PossibleContact of the given particle.
      * \param[in] P A pointer to the BaseParticle for which the previous PossibleContact in the linked list must be set for.
@@ -320,9 +326,11 @@ public:
         else if (P2_ == P)
             Prev2_ = Prev;
         else
-            logger(WARN, "void setPreviousPosition(Particle* P,PossibleContact* Prev), no match for %. Possibilities are %  and % ", P->getIndex(), P1_->getIndex(), P2_->getIndex());            
+            logger(WARN,
+                   "void setPreviousPosition(Particle* P,PossibleContact* Prev), no match for %. Possibilities are %  and % ",
+                   P->getIndex(), P1_->getIndex(), P2_->getIndex());
     }
-
+    
     /*!
      * \brief Sets the next PossibleContact in the linked list of PossibleContact of the first particle in this PossibleContact.
      * \param[in] Next1 A pointer to the PossibleContact which is the next PossibleContact for the first BaseParticle.
@@ -331,7 +339,7 @@ public:
     {
         Next1_ = Next1;
     }
-
+    
     /*!
      * \brief Sets the previous PossibleContact in the linked list of PossibleContact of the first particle in this PossibleContact.
      * \param[in] Prev1 A pointer to the PossibleContact which is the previous PossibleContact for the first BaseParticle.
@@ -340,7 +348,7 @@ public:
     {
         Prev1_ = Prev1;
     }
-
+    
     /*!
      * \brief Sets the next PossibleContact in the linked list of PossibleContact of the second particle in this PossibleContact.
      * \param[in] Next2 A pointer to the PossibleContact which is the next PossibleContact for the second BaseParticle.
@@ -349,7 +357,7 @@ public:
     {
         Next2_ = Next2;
     }
-
+    
     /*!
      * \brief Sets the previous PossibleContact in the linked list of PossibleContact of the second particle in this PossibleContact.
      * \param[in] Prev2 A pointer to the PossibleContact which is the previous PossibleContact for the second BaseParticle.
@@ -365,9 +373,9 @@ public:
      * \param[in] o The PossibleContact that must be written.
      * \return The output stream to which this PossibleContact has been written.
      */
-    friend std::ostream& operator <<(std::ostream& os, const PossibleContact& o)
+    friend std::ostream& operator<<(std::ostream& os, const PossibleContact& o)
     {
-        os<<o.index_<<" between ("<<o.P1_->getIndex()<<","<<o.P2_->getIndex()<<")";
+        os << o.index_ << " between (" << o.P1_->getIndex() << "," << o.P2_->getIndex() << ")";
         return os;
     }
 

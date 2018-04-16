@@ -3594,7 +3594,8 @@ void DPMBase::checkSettings()
     //\todo add check for individual species
 }
 
-void DPMBase::forceWriteOutputFiles() {
+void DPMBase::forceWriteOutputFiles()
+{
     setLastSavedTimeStep(NEVER);
     writeOutputFiles();
 }
@@ -3707,7 +3708,7 @@ void DPMBase::decompose()
     }
 
     //Define the mpi transfer types, which requires a definition of the species already
-    //TODO update this function for Johnny
+    ///\TODO update this function for Jonny
     logger.assert_always(speciesHandler.getNumberOfObjects() > 0, "Please create a particle species before calling solve()");
     MPIContainer::Instance().initialiseMercuryMPITypes(speciesHandler);
 
@@ -4012,18 +4013,26 @@ void DPMBase::removeOldFiles () const {
 
 /*!
  * \brief Reads, recognises and applies all valid flags passed when starting or restarting a Mercury simulation.
- * \details For all of the N = <TT>argc</TT> (argument count) command line arguments passed when starting/restarting a code
- * (e.g. -tmax, -tmin ...), compares them to the "known" arguments understood by Mercury (note that further recognised arguments
- * can be added in derived classes).
- * If a match is found, the relevant parameter is set to the corresponding value(s) following the flag and <tt>true</tt> is returned.
- * Otherwise, <tt>false</tt> is returned.
+ * \details For all of the N = <TT>argc</TT> (argument count) command line arguments passed when starting/restarting a
+ * code (e.g. -tmax, -tmin ...), compares them to the "known" arguments understood by Mercury (note that further
+ * recognised arguments can be added in derived classes).
+ * If a match is found, the relevant parameter is set to the corresponding value(s) following the flag and <tt>true</tt>
+ * is returned. Otherwise, <tt>false</tt> is returned.
  *
  * For instance, if the flag <TT>-xmin 0</TT>
- * is passed, the code's second if statement will recognise the flag, convert the subsequent string in <TT>argv</TT> to a double, and then
- * call the \ref setXMin() function to implement the new value (0) of XMin.
- * \param[in] i
- * \param[in] argc
- * \param[in] *argv[]
+ * is passed, the code's second if statement will recognise the flag, convert the subsequent string in <TT>argv</TT> to
+ * a double, and then call the \ref setXMin() function to implement the new value (0) of XMin.
+ *
+ * For developers: note the use of strcmp here. This cannot be replaced with a simpler ==, as we are comparing c-style
+ * strings (char*), instead of std::string. Thus, == would return equality of the pointers instead of the contents
+ * of the string. strcmp returns 0 if the strings are the same, and another number if they are different. This is then
+ * implicitly cast to a bool, where 0->false and other numbers will give true. Finally, the !-operator makes sure that
+ * the expression in the if-statements are true if the strings are the same, and false otherwise.
+ *
+ * \param[in] i the position of the element that will be read, note that the count starts at 1, as element 0 is the name
+ * of the executable
+ * \param[in] argc number of arguments the user has given
+ * \param[in] *argv[] the command-line arguments the user has given when calling the executable
  * \return <tt>true</tt> if the argument is successfully read, and <tt>false</tt> otherwise.
  */
 bool DPMBase::readNextArgument(int& i, int argc, char* argv[])

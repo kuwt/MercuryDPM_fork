@@ -31,7 +31,6 @@
 #ifndef BASEHANDLER_H
 #define BASEHANDLER_H
 
-#include <iostream>
 #include <vector>
 #include <type_traits>
 #include "Math/Helpers.h"

@@ -26,7 +26,6 @@
 #ifndef BASEINTERACTABLE_H
 #define BASEINTERACTABLE_H
 
-#include <list>
 #include <functional>
 #include <vector>
 

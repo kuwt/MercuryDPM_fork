@@ -23,12 +23,8 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-#include <iostream>
 #include "Math/Helpers.h"
-
 #include "BoundaryHandler.h"
-#include "Boundaries/BaseBoundary.h"
 #include "Boundaries/BasePeriodicBoundary.h"
 #include "Boundaries/AngledPeriodicBoundary.h"
 #include "Boundaries/ChuteInsertionBoundary.h"

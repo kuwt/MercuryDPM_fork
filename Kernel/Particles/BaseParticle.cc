@@ -23,12 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <Species/LinearViscoelasticSpecies.h>
-#include "InteractionHandler.h"
-#include "Particles/BaseParticle.h"
-#include "Interactions/BaseInteraction.h"
-#include "Species/ParticleSpecies.h"
-#include "ParticleHandler.h"
+#include "BaseParticle.h"
 #include "DPMBase.h"
 
 /*!
@@ -36,6 +31,7 @@
  * mass and inertia equal to 1
  */
 BaseParticle::BaseParticle()
+        : BaseInteractable()
 {
     handler_ = nullptr;
     displacement_.setZero();

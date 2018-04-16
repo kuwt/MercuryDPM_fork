@@ -27,9 +27,9 @@
 #ifndef FILE_H
 #define FILE_H
 #include <fstream>
-#include <cstdlib>
 
 // A value of File::lastSavedTimeStep_ = NEVER indicates a file was never been written
+///\todo IFCD: can we make this an int instead of unsigned int, as -1 as an unsigned is not good style?
 const unsigned NEVER = -1;
 
 /*!

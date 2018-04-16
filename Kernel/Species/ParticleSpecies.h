@@ -29,9 +29,8 @@
 #include "BaseSpecies.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/BaseInteraction.h"
-//class SpeciesHandler;
+
 class BaseInteractable;
-class BaseInteraction;
 
 //Note the getVelocity can for some Species be dependent on which point on the Species is meant.
 class ParticleSpecies : public virtual BaseSpecies

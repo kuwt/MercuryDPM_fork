@@ -26,9 +26,7 @@
 #ifndef MERCURYBASE_H
 #define MERCURYBASE_H
 
-#include <ostream>
 #include <iostream>
-#include <stdlib.h>
 
 #include "DPMBase.h"
 #include "HGrid.h"

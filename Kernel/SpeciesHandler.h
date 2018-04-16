@@ -28,8 +28,6 @@
 #define SPECIESHANDLER_H
 
 #include "BaseHandler.h"
-class BaseSpecies;
-//class ParticleSpecies;
 #include "Species/ParticleSpecies.h"
 
 /// \brief Container to store all ParticleSpecies

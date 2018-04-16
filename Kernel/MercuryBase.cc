@@ -27,9 +27,6 @@
 #include <string.h>
 
 #include "MercuryBase.h"
-#include "Math/Helpers.h"
-#include "Particles/BaseParticle.h"
-#include "Walls/BaseWall.h"
 
 MercuryBase::MercuryBase()
 {
@@ -294,7 +291,7 @@ void MercuryBase::hGridRebuild()
     for(BaseParticle* const p : particleHandler)
     {
         hGridInsertParticle(p);
-        //\todo{This is really ugly fix to force the particle to update}
+        ///\todo{This is really ugly fix to force the particle to update}
         p->setHGridX(9999);
         hGridUpdateParticle(p);
     }

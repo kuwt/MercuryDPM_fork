@@ -27,12 +27,9 @@
 #define BASEPARTICLE_H
 
 #include <vector>
-#include <iostream>
-#include "Math/ExtendedMath.h"
 #include "Math/Vector.h"
 #include "BaseInteractable.h"
 #include "HGridCell.h"
-//#include "InteractionHandler.h"
 
 class ParticleHandler;
 class SpeciesHandler;

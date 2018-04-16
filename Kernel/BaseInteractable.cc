@@ -24,10 +24,7 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-#include "BaseInteractable.h"
 #include "Particles/BaseParticle.h"
-#include "Interactions/BaseInteraction.h"
-#include "Species/ParticleSpecies.h"
 
 /*!
  * \details Simply creates an empty BaseInteractable, with all vectors relating to the positions and motions of the current object 
@@ -35,12 +32,10 @@
  * 
  * Note that the function also sets the species index (\ref indSpecies_) to zero by default, so any objects created will, by default, 
  * possess the properties associated with species 0.
- * 
- * \todo TW: why do some constructors (e.g. BaseInteractable, BaseParticle)not 
- *       explicitly call the constructor from the inherited class?
  */
 
-BaseInteractable::BaseInteractable()
+BaseInteractable::BaseInteractable() :
+        BaseObject()
 {
     //setting all vectors to zero
     position_.setZero();
