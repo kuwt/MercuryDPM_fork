@@ -14,13 +14,17 @@ public:
  * The shear is applied by pre-defined shear velocity_xy on the Lees Edwards boundary. 
  * the stress value will be set by stressYYGoal and kept constant after reaching the steady state.
  * */    
-    poly_simpleshear()
+    poly_simpleshear(std::string restartName)
     {
-        setName("mu0.01-p500-relax-abhi");
+        setName(restartName);
         readRestartFile();
         setRestarted(false);
         particleSpecies = dynamic_cast<LinearPlasticViscoelasticFrictionSpecies*>(speciesHandler.getObject(0));
-        std::cout << "input = " << getName() << std::endl;
+        double N = particleHandler.getNumberOfObjects();
+        for (int i=0; i < N; i++) {
+			particleHandler.getObject(i)->setSpecies(particleSpecies);
+		}
+        //std::cout << "input = " << getName() << std::endl;
     }
     
     LinearPlasticViscoelasticFrictionSpecies* particleSpecies;
@@ -173,20 +177,21 @@ public:
 			else 
 			{dPressure = dPressure;}
 			
-			if (getTime()> 50 && dPressure > -0.01*stressYYGoal && dPressure < 0.01*stressYYGoal && dot_strain_xy > 5e-1)
-			{alpha = 0.00914;}
-			else if(getTime()> 50 && dPressure > -0.01*stressYYGoal && dPressure < 0.01*stressYYGoal && dot_strain_xy > 1e-1 && dot_strain_xy <= 5e-1)
-			{alpha = 0.457;}
-			else if (getTime()> 50 && dPressure > -0.005*stressYYGoal && dPressure < 0.005*stressYYGoal && dot_strain_xy > 1e-2 && dot_strain_xy <= 1e-1 )
-			{alpha = 4.57;}
-			else if (getTime()> 100 && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 5e-3 && dot_strain_xy <= 1e-2 )
-			{alpha = 4.57;}
-			else if (getTime()> 400 && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 1e-3 && dot_strain_xy < 5e-3 )
-			{alpha = 0.457;}
-			else if (getTime()> 800 && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy < 1e-3)
-			{alpha = 0.0457;}
+			if (getTime()> 0.005*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 5e-1)
+			{alpha = 2*getTimeStep(), cap_factor = 0.02;} 
+			else if(getTime()> 0.005*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 1e-1 && dot_strain_xy < 5e-1)
+			{alpha = 1000*getTimeStep(), cap_factor = 0.02;}
+			else if (getTime()> 0.01*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy > 1e-2 && dot_strain_xy < 1e-1 )
+			{alpha = 1000*getTimeStep(), cap_factor = 0.02;}
+			else if (getTime()> 0.02*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 5e-3 && dot_strain_xy <= 1e-2 )
+			{alpha = 1000*getTimeStep(), cap_factor = 0.02;}
+			else if (getTime()> 0.04*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 1e-3 && dot_strain_xy < 5e-3 )
+			{alpha = 100*getTimeStep(), cap_factor = 0.02;} 
+			else if (getTime()> 0.08*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy < 1e-3)
+			{alpha = 2*getTimeStep(), cap_factor = 0.02;} 
 			else
-			{alpha = alpha;}
+			{alpha = alpha, cap_factor = cap_factor;}
+
 			
 			// amount by which position should be changed to achieve the right pressure
 			dV = dPressure * crossArea / stiffness /getTimeStep();
@@ -197,7 +202,6 @@ public:
 			setYMax(getYMax()+dV*getTimeStep()/alpha);
 			double YMax = getYMax();
 			Ly = getYMax()-getYMin();
-			//setYMin(getYMin()-getTimeStep()*dV/100.0);
 
 			Mdouble velocity = dot_strain_xy*Ly;
 			LeesEdwardsBoundary* leesEdwardsBoundary = dynamic_cast<LeesEdwardsBoundary*>(boundaryHandler.getObject(0));
@@ -211,8 +215,9 @@ public:
 
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
-	poly_simpleshear problem;
+	std::string restartName ("mu0.01-p500-relax-abhi");
 	
+	poly_simpleshear problem(restartName);
 	//!  --------------------------------------------------
     problem.particleDiameter = 2.2;		//set particle diameter
     problem.rhop = 2000.0;				//set particle density
@@ -226,29 +231,25 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     problem.mu_tor = 0.0;				//set torsional friction coefficient
     problem.Phic = 0.5;					// penetration DepthMax, the maximum depth of linear plastic-viscoelastic normal force
     problem.poly = 2;		
-    problem.stressYYGoal = 500;
+
     
     
     //! ----------------------------------------------------------------
-
-    problem.slow_factor = 0.01; //!choose between 0.001 to 5
-    problem.alpha = 0.00914; //!choose between 5 to 0.01
-	problem.cap_factor = 0.02;
+	problem.alpha = 0.00914; //!choose initially as 2*dt
+	problem.cap_factor = 1.0;
     
-    
+	problem.stressYYGoal = 500;
+    problem.dot_strain_xy = 5e-4;
+    problem.tmax = 20000;
     problem.setName("p500");
-    problem.tmax = 10000;
-    problem.dot_strain_xy = 1e0;
-
     
-    problem.setSaveCount(4000);
-    problem.eneFile.setSaveCount(1000);
+    problem.setSaveCount(8000);
+    problem.eneFile.setSaveCount(2000);
     problem.dataFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
     //problem.dataFile.setFileType(FileType::NO_FILE);
     problem.restartFile.setFileType(FileType::ONE_FILE);
     problem.fStatFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
     //problem.fStatFile.setFileType(FileType::NO_FILE);
     problem.eneFile.setFileType(FileType::ONE_FILE);
- 
     problem.solve();
 }

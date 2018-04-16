@@ -8,15 +8,15 @@
 
 class relax: public Mercury3D{
 public:
-/* s3_IsoRelax will load the 1 or more configurations from s2_IsotropicCompression
+/*! s3_IsoRelax will load the 1 or more configurations from s2_IsotropicCompression
  * and relax those samples in order to create the initial homogeneous jammed samples 
  * for the further shear process. Here we basiclly doing nothing but just let all the
  * particles cool down in the cubic box. Be aware that if the sample is compressed with
  * friciton on, the following process should be also with frition on, same for cohesion.
- * */    
-    relax()
+ **/    
+    relax(std::string restartName)
     {
-        setName("mu0-phi6802-w1.2");
+        setName(restartName);
         readRestartFile();
         setRestarted(false);
         particleSpecies = dynamic_cast<LinearPlasticViscoelasticFrictionSpecies*>(speciesHandler.getObject(0));
@@ -45,16 +45,18 @@ public:
         double Rmin = particleHandler.getObject(0)->getRadius();
 		double Rmax = particleHandler.getObject(0)->getRadius();
 		double N = particleHandler.getNumberOfObjects();
+		// particles properties and initial positions
 		Mdouble Vp = 0;
-		//! particles properties and initial positions
-		for (int i=1; i < (N-1); i++) {
-			Rmin = std::min(Rmin,particleHandler.getObject(i)->getRadius());
-			Rmax = std::max(Rmax,particleHandler.getObject(i)->getRadius());
+		for (auto& p : particleHandler) {
+			Rmin = std::min(Rmin,p->getRadius());
+			Rmax = std::max(Rmax,p->getRadius());
+			Vp = Vp + p->getVolume();
 		}
         double particleDiameter = 2.0*Rmin;
         double mass = rhop*constants::pi*mathsFunc::cubic(particleDiameter)/6.0;
         double tc = std::sqrt( mass/2.0/K1*( mathsFunc::square(constants::pi) + mathsFunc::square(log(en) ) ));
         
+
 
         setTimeStep(tc/50);
 		setTimeMax(tmax);
@@ -62,13 +64,28 @@ public:
         
         
 		
-        //! particleSpecies (d average = 2)
+        // particleSpecies (d average = 2)
         particleSpecies->setDensity(rhop);
         particleSpecies->setCollisionTimeAndRestitutionCoefficient(tc,en,mass);
         particleSpecies->setPlasticParameters(K1,K2,Kc,Phic);
+		if ( mu_slid == 0){
+		particleSpecies->setSlidingStiffness(0.0);
+		}
+		else{
 		particleSpecies->setSlidingStiffness(2.0/10.0*particleSpecies->getLoadingStiffness());
+		}
+		if ( mu_roll == 0){
+		particleSpecies->setRollingStiffness(0.0);
+		}
+		else{
 		particleSpecies->setRollingStiffness(2.0/10.0*particleSpecies->getLoadingStiffness());
+		}
+		if ( mu_tor == 0){
+		particleSpecies->setTorsionStiffness(0.0);
+		}
+		else{
 		particleSpecies->setTorsionStiffness(2.0/10.0*particleSpecies->getLoadingStiffness());
+		}
 		particleSpecies->setSlidingFrictionCoefficient(mu_slid);
 		particleSpecies->setSlidingFrictionCoefficientStatic(mu_slid);
 		particleSpecies->setRollingFrictionCoefficient(mu_roll);
@@ -78,32 +95,101 @@ public:
 		particleSpecies->setSlidingDissipation(2.0/10.0*particleSpecies->getDissipation());
 		particleSpecies->setRollingDissipation(2.0/10.0*particleSpecies->getDissipation());
 		particleSpecies->setTorsionDissipation(2.0/10.0*particleSpecies->getDissipation());
-		dampingCoefficient =  0.1*particleSpecies->getDissipation();
+		dampingCoefficient =  0.0*particleSpecies->getDissipation();
 		
 		
-		
-        for (int i=0; i < N; i++) {
-			particleHandler.getObject(i)->setSpecies(particleSpecies);
-			Vp = Vp + particleHandler.getObject(i)->getVolume();
+		for (auto& p : particleHandler) {
+			p->setSpecies(particleSpecies);
 		}
 		
 		
+		Vec3D V_mean_goal(0.0,0.0,0.0); //here ou can set the mean velocity
+		Mdouble Ek_goal = 2e7; //here you can set the injected kinetic energy
 		
+		setMeanVelocityAndKineticEnergy(V_mean_goal,Ek_goal);
+	
 		
 		std::cout << "N = " << N << std::endl;
 		std::cout << "Rmin = " << Rmin << std::endl;
 		std::cout << "Rmax = " << Rmax << std::endl;
-		
-        std::cout << "Lx = " << getXMax() << ", Ly = " << getYMax() << ", Lz = " << getZMax() << std::endl;
-        std::cout << "nu = " << Vp/(getXMax()*getYMax()*getZMax()) << std::endl;
+		std::cout << "Lx = " << getXMax()-getXMin() << ", Ly = " << getYMax()-getYMin() << ", Lz = " << getZMax()-getZMin() << std::endl;
+        std::cout << "nu = " << Vp/((getXMax()-getXMin())*(getYMax()-getYMin())*(getZMax()-getZMin())) << std::endl;
+        std::cout << "k1 = " << K1 << std::endl;
         std::cout << "output = " << getName() << std::endl;
-        
         std::cout << "delta t = " << getTimeStep() << std::endl;
         std::cout << "saving time = " <<  dataFile.getSaveCount()*getTimeStep() << std::endl;
 		 
     }
     
-   
+    /**
+     * \brief This function will help you set a fixed kinetic energy and mean velocity in your system.
+     * \details The function first generates random velocities and assign to every particle in the system.
+     * The random velocities are currently evenly distributed between -1 and 1. 
+     * Then it will calculate and correct the mean velocity to the user defined V_mean_goal.
+     * Finally, it will scale the current kinetic energy based on the user defined kinetic energy,
+     * and modify the velocity of each particle to achieve the desired kinetic energy. 
+     * \param[in] V_mean_goal The mean velocity you want to set after injecting energy
+     * \param[in] Ek_goal  The kinetic energy you want to inject into the system
+     **/
+   	void setMeanVelocityAndKineticEnergy(Vec3D V_mean_goal, Mdouble Ek_goal)
+		{
+        double N = particleHandler.getNumberOfObjects();
+        Vec3D V_mean, V_mean2, V_temp, V_mean3;
+        Vec3D Moment_sum (0,0,0), Moment_sum2(0,0,0), Moment_sum3(0,0,0);
+        Mdouble Mass_sum = 0;
+        Mdouble Ek_sum2 = 0, Ek_sum3 = 0;
+        Mdouble Ek_factor = 0;      
+        RNG rng;
+
+        //assign random velocity to each particle
+        for (auto& p : particleHandler) {		
+			p->setVelocity(Vec3D(rng.getRandomNumber(-1,1),rng.getRandomNumber(-1,1),rng.getRandomNumber(-1,1)));
+		}
+		
+		//calculate the mean velocity in the system now
+		for (auto& p : particleHandler) {
+			Mass_sum = Mass_sum + p->getMass();
+			Moment_sum =  Moment_sum + p->getMass()*p->getVelocity();
+			
+		}
+		V_mean = Moment_sum/Mass_sum;
+
+		//correct the mean velocity to zero
+		for (auto& p : particleHandler) {
+			p->addVelocity(V_mean_goal-V_mean);	
+		}
+		
+		//calculate the mean velocity and kinetic energy after correction
+		for (auto& p : particleHandler) {
+			Moment_sum2 =  Moment_sum2 + p->getMass()*p->getVelocity();
+			Ek_sum2 = Ek_sum2 + p->getKineticEnergy();
+		}
+		V_mean2 = Moment_sum2/Mass_sum;
+		
+		//calculate the scale factor for kinetic energy injection
+		Ek_factor = std::sqrt(Ek_goal/Ek_sum2);
+		
+		//set the new velocity based on the scale factor of kinetic energy
+		for (auto& p : particleHandler) {
+			p->setVelocity(Ek_factor*p->getVelocity());
+		}
+
+		
+		for (auto& p : particleHandler) {
+			Moment_sum3 =  Moment_sum3 + p->getMass()*p->getVelocity();
+			Ek_sum3 = Ek_sum3 + p->getKineticEnergy();
+		}
+		V_mean3 = Moment_sum3/Mass_sum;
+		
+		std::cout << "Mass_sum " << Mass_sum << std::endl;
+		std::cout << "Moment_sum " << Moment_sum << std::endl;
+		std::cout << "V_mean " << V_mean << std::endl;
+		std::cout << "Moment_sum2 " << Moment_sum2 << std::endl;
+		std::cout << "V_mean_2 " << V_mean2 << std::endl;
+		std::cout << "V_mean_3 " << V_mean3 << std::endl;
+		std::cout << "E_k2 " << Ek_sum2 << std::endl;
+		std::cout << "E_k3 " << Ek_sum3 << std::endl;
+		}
 		
 	
     
@@ -111,30 +197,31 @@ public:
 
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
-	relax problem;
+	std::string restartName ("mu0-w1-relaxed"); //the Prefix of your restart file from stage 1
+	relax problem(restartName);
 	
-	//!  --------------------------------------------------
+	//  --------------------------------------------------
    
 	problem.particleDiameter = 2.0;		//set particle diameter
     problem.rhop = 2000.0;				//set particle density
-    problem.en = 0.804;					//set restitution coefficient
+    problem.en = 1.0;					//set restitution coefficient
     problem.K1 = 100000;				//set loading stiffness
     problem.K2 = 100000;				//set unloading stiffness
     problem.Kc = 0.0;					//set cohesive stiffness
     
-    problem.mu_slid = 0.5;				//set sliding friction coefficient
+    problem.mu_slid = 0.0;				//set sliding friction coefficient
     problem.mu_roll = 0.0;				//set rolling friction coefficient
     problem.mu_tor = 0.0;				//set torsional friction coefficient
     problem.Phic = 0.5;					// penetration DepthMax, the maximum depth of linear plastic-viscoelastic normal force
-    problem.poly = 1.2;					//set polydispersity
-    problem.tmax = 500;				//set simulation time
-    //! ----------------------------------------------------------------
+    problem.poly = 1.0;					//set polydispersity
+    problem.tmax = 10000;				//set simulation time
+    // ----------------------------------------------------------------
 
-    problem.setName("mu0-phi6802-w1.2-relax");
+    problem.setName("mu0-w1-excitation");
     
     
-    problem.setSaveCount(40000);
-    problem.eneFile.setSaveCount(2000);
+    problem.setSaveCount(5000);
+    problem.eneFile.setSaveCount(5000);
     problem.dataFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
     problem.restartFile.setFileType(FileType::ONE_FILE);
     problem.fStatFile.setFileType(FileType::MULTIPLE_FILES_PADDED);

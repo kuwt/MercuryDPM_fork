@@ -17,9 +17,9 @@ public:
  * and the Lees Edwards boundary. the stress value will be set by stressYYGoal and kept constant after reaching
  * the steady state.
  * */    
-    poly_simpleshear()
+     poly_simpleshear(std::string restartName)
     {
-        setName("mu0.01-p250-relax-abhi");
+        setName(restartName);
         readRestartFile();
         setRestarted(false);
         particleSpecies = dynamic_cast<LinearPlasticViscoelasticFrictionSpecies*>(speciesHandler.getObject(0));
@@ -187,18 +187,18 @@ public:
 			else 
 			{dPressure = dPressure;}
 			
-			if (getTime()> 50 && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 5e-1)
-			{alpha = 0.00914, cap_factor = 0.02;} 
-			else if(getTime()> 50 && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 1e-1 && dot_strain_xy < 5e-1)
-			{alpha = 4.57, cap_factor = 0.02;}
-			else if (getTime()> 100 && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy > 1e-2 && dot_strain_xy < 1e-1 )
-			{alpha = 4.57, cap_factor = 0.02;}
-			else if (getTime()> 200 && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 5e-3 && dot_strain_xy <= 1e-2 )
-			{alpha = 4.57, cap_factor = 0.02;}
-			else if (getTime()> 400 && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 1e-3 && dot_strain_xy < 5e-3 )
-			{alpha = 0.457, cap_factor = 0.02;} 
-			else if (getTime()> 800 && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy < 1e-3)
-			{alpha = 0.0457, cap_factor = 0.02;} 
+			if (getTime()> 0.005*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 5e-1)
+			{alpha = 2*getTimeStep(), cap_factor = 0.02;} 
+			else if(getTime()> 0.005*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 1e-1 && dot_strain_xy < 5e-1)
+			{alpha = 1000*getTimeStep(), cap_factor = 0.02;}
+			else if (getTime()> 0.01*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy > 1e-2 && dot_strain_xy < 1e-1 )
+			{alpha = 1000*getTimeStep(), cap_factor = 0.02;}
+			else if (getTime()> 0.02*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 5e-3 && dot_strain_xy <= 1e-2 )
+			{alpha = 1000*getTimeStep(), cap_factor = 0.02;}
+			else if (getTime()> 0.04*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 1e-3 && dot_strain_xy < 5e-3 )
+			{alpha = 100*getTimeStep(), cap_factor = 0.02;} 
+			else if (getTime()> 0.08*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy < 1e-3)
+			{alpha = 2*getTimeStep(), cap_factor = 0.02;} 
 			else
 			{alpha = alpha, cap_factor = cap_factor;}
 			
@@ -212,16 +212,18 @@ public:
 			//std::cout << "stressYY=" << stressYY << " stressYY_static=" << stressYY_static << " stressYY_kinetic=" << stressYY_kinetic<<  " dPressure=" << dPressure << " alpha=" << alpha <<" velocity_xy=" << velocity_xy <<  "Ly" << Ly <<std::endl;
 			//std::cout << "integrated_velocity" << integrated_velocity_XY << std::endl;
 			//std::cout << " velocity_xy=" << velocity_xy << std::endl;
-			//std::cout << " move_y_old=" << slow_factor*velocity_yy*getTimeStep() << " move_y_new=" << dV*getTimeStep()/alpha<< std::endl;
+			std::cout << " tmax=" << getTimeMax() << std::endl;
 		//! move all the particles in x and y direction   	
         for (int i=0; i < N; i++) {
 			gx = (particleHandler.getObject(i)->getPosition().Y - (getYMax()+getYMin())/2.0)/Ly;
 			gy = (particleHandler.getObject(i)->getPosition().Y - getYMin())/Ly;
-			//particleHandler.getObject(i)->move(Vec3D(velocity_xy*getTimeStep()*gx,slow_factor*velocity_yy*getTimeStep()*gy, 0.0));
+			//!comment next line for volume const simple shear
 			particleHandler.getObject(i)->move(Vec3D(velocity_xy*getTimeStep()*gx,dV*getTimeStep()*gy/alpha, 0.0));
+			//!uncomment next line for volume const simple shear
 			//particleHandler.getObject(i)->move(Vec3D(velocity_xy*getTimeStep()*gx,0.0, 0.0));
 		}
-		//setYMax(getYMax()+slow_factor*velocity_yy*getTimeStep());
+		
+		//!comment next line for volume const simple shear
 			setYMax(getYMax()+dV*getTimeStep()/alpha);
 			
 			//! move the lees-edwards boundary in y direction
@@ -233,13 +235,14 @@ public:
         
            
 	}
-    
-    
+	
 };
 
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
-	poly_simpleshear problem;
+	std::string restartName ("mu0.01-p125-relax-abhi");
+    
+    poly_simpleshear problem(restartName);
 	
 	//!  --------------------------------------------------
 	problem.particleDiameter = 2.2;		//set particle diameter
@@ -254,19 +257,17 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     problem.mu_tor = 0.0;				//set torsional friction coefficient
     problem.Phic = 0.5;					// penetration DepthMax, the maximum depth of linear plastic-viscoelastic normal force
     problem.poly = 2;		
-    problem.stressYYGoal = 250;
+    
     
     
     //! ----------------------------------------------------------------
-
-    problem.slow_factor = 0.01; //!choose between 0.001 to 5
-    problem.alpha = 0.00914; //!choose between 5 to 0.01
+    problem.alpha = 0.00914; //!choose initially as 2*dt
 	problem.cap_factor = 1.0;
     
-    
-    problem.setName("p250");
+	problem.stressYYGoal = 250;
+    problem.dot_strain_xy = 5e-2;
     problem.tmax = 20000;
-    problem.dot_strain_xy = 5e-4;
+    problem.setName("5e-2");
     
     problem.setSaveCount(8000);
     problem.eneFile.setSaveCount(2000);

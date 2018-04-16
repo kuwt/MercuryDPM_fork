@@ -17,9 +17,9 @@ public:
  * and the Lees Edwards boundary. the stress value will be set by stressYYGoal and kept constant after reaching
  * the steady state.
  * */    
-    poly_simpleshear()
+    poly_simpleshear(std::string restartName)
     {
-        setName("mu0.01-p500-relax-abhi");
+        setName(restartName);
         readRestartFile();
         setRestarted(false);
         particleSpecies = dynamic_cast<LinearPlasticViscoelasticFrictionSpecies*>(speciesHandler.getObject(0));
@@ -197,18 +197,19 @@ public:
 			else 
 			{dPressure = dPressure;}
 			
-			if (getTime()> 50 && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 5e-1)
-			{alpha = 0.00914, cap_factor = 0.02;} 
-			else if(getTime()> 50 && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 1e-1 && dot_strain_xy < 5e-1)
-			{alpha = 4.57, cap_factor = 0.02;}
-			else if (getTime()> 100 && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy > 1e-2 && dot_strain_xy < 1e-1 )
-			{alpha = 4.57, cap_factor = 0.02;}
-			else if (getTime()> 200 && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 5e-3 && dot_strain_xy <= 1e-2 )
-			{alpha = 4.57, cap_factor = 0.02;}
-			else if (getTime()> 400 && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 1e-3 && dot_strain_xy < 5e-3 )
-			{alpha = 0.457, cap_factor = 0.02;} 
-			else if (getTime()> 800 && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy < 1e-3)
-			{alpha = 0.0457, cap_factor = 0.02;} 
+			
+			if (getTime()> 0.005*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 5e-1)
+			{alpha = 2*getTimeStep(), cap_factor = 0.02;} 
+			else if(getTime()> 0.005*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 1e-1 && dot_strain_xy < 5e-1)
+			{alpha = 1000*getTimeStep(), cap_factor = 0.02;}
+			else if (getTime()> 0.01*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy > 1e-2 && dot_strain_xy < 1e-1 )
+			{alpha = 1000*getTimeStep(), cap_factor = 0.02;}
+			else if (getTime()> 0.02*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 5e-3 && dot_strain_xy <= 1e-2 )
+			{alpha = 1000*getTimeStep(), cap_factor = 0.02;}
+			else if (getTime()> 0.04*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 1e-3 && dot_strain_xy < 5e-3 )
+			{alpha = 100*getTimeStep(), cap_factor = 0.02;} 
+			else if (getTime()> 0.08*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy < 1e-3)
+			{alpha = 2*getTimeStep(), cap_factor = 0.02;} 
 			else
 			{alpha = alpha, cap_factor = cap_factor;}
 			
@@ -247,37 +248,37 @@ public:
 
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
-	poly_simpleshear problem;
+	std::string restartName ("mu0.01-p125-relax");
+	
+	poly_simpleshear problem(restartName);
 	
 	//!  --------------------------------------------------
-	problem.particleDiameter = 2.2;		//set particle diameter
+	problem.particleDiameter = 2.0;		//set particle diameter
     problem.rhop = 2000.0;				//set particle density
     problem.en = 0.804;					//set restitution coefficient
-    problem.K1 = 100000;				//set loading stiffness
-    problem.K2 = 100000;				//set unloading stiffness
+    problem.K1 = 1e5;				//set loading stiffness
+    problem.K2 = 1e5;				//set unloading stiffness
     problem.Kc = 0.0;					//set cohesive stiffness
     
     problem.mu_slid = 0.01;				//set sliding friction coefficient
     problem.mu_roll = 0.0;				//set rolling friction coefficient
     problem.mu_tor = 0.0;				//set torsional friction coefficient
     problem.Phic = 0.5;					// penetration DepthMax, the maximum depth of linear plastic-viscoelastic normal force
-    problem.poly = 2;		
-    problem.stressYYGoal = 500;
+    problem.poly = 3;		
+    
     
     
     //! ----------------------------------------------------------------
-
-    problem.slow_factor = 0.01; //!choose between 0.001 to 5
-    problem.alpha = 0.00914; //!choose between 5 to 0.01
+    problem.alpha = 0.00914; //!choose initially as 2*dt
 	problem.cap_factor = 1.0;
     
+	problem.stressYYGoal = 125;
+    problem.dot_strain_xy = 5e-2;
+    problem.tmax = 20000;
+    problem.setName("5e-2");
     
-    problem.setName("p500");
-    problem.tmax = 10000;
-    problem.dot_strain_xy = 1e-1;
-    
-    problem.setSaveCount(4000);
-    problem.eneFile.setSaveCount(1000);
+    problem.setSaveCount(8000);
+    problem.eneFile.setSaveCount(2000);
     problem.dataFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
     //problem.dataFile.setFileType(FileType::NO_FILE);
     problem.restartFile.setFileType(FileType::ONE_FILE);

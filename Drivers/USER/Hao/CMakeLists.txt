@@ -21,3 +21,6 @@ foreach(CPPFILE ${CPPFILES})
 	#All cpp folder and linked agaist DPMBase
 	target_link_libraries(${EXECNAME}  Chute)
 endforeach()
+
+#copy restart input for self tests into build
+file(COPY ${CMAKE_SOURCE_DIR}/Drivers/USER/Hao/s4_SelfTestInput.restart DESTINATION .)

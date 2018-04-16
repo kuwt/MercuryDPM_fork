@@ -8,7 +8,7 @@
 
 class initial_poly : public Mercury3D{
 public:
-/* s1_IniGeneration creates the initial configuration before the 
+/*! s1_IniGeneration creates the initial configuration before the 
  * isotropic compresssion process. The particles, with given 
  * volume fracion and polydispersity, are placed in a cubic box 
  * of dimensions Xmax, Ymax, Zmax and period boundaries are applied
@@ -48,19 +48,34 @@ public:
 		
 		double mass = rhop*constants::pi*mathsFunc::cubic(2*particleDiameter/(poly+1))/6.0;  //mass or effective mass in Mercury =/frac{2}{1/m1+1/m2}
 		double tc = std::sqrt(mass/2.0/K1*( mathsFunc::square(constants::pi) + mathsFunc::square(log(en) ) )); //contact duration for smallest pair of particles
-		double Lm = std::pow(N*constants::pi*mathsFunc::cubic(particleDiameter)/6.0/volumeFraction,1.0/3.0);   //estimated box length
+		double Lm = std::pow(N*constants::pi*mathsFunc::cubic(particleDiameter)/6.0/volumeFraction,1.0/3.0)*1.000;   //estimated box length
 		Mdouble velocity = 0.0;
 		
 		setTimeStep(tc/50);
         setTimeMax(tmax);
         
-		 //! particleSpecies
+		 // particleSpecies
 		particleSpecies->setDensity(rhop);
         particleSpecies->setCollisionTimeAndRestitutionCoefficient(tc,en,mass);
         particleSpecies->setPlasticParameters(K1,K2,Kc,Phic);
+		if ( mu_slid == 0){
+		particleSpecies->setSlidingStiffness(0.0);
+		}
+		else{
 		particleSpecies->setSlidingStiffness(2.0/10.0*particleSpecies->getLoadingStiffness());
+		}
+		if ( mu_roll == 0){
+		particleSpecies->setRollingStiffness(0.0);
+		}
+		else{
 		particleSpecies->setRollingStiffness(2.0/10.0*particleSpecies->getLoadingStiffness());
+		}
+		if ( mu_tor == 0){
+		particleSpecies->setTorsionStiffness(0.0);
+		}
+		else{
 		particleSpecies->setTorsionStiffness(2.0/10.0*particleSpecies->getLoadingStiffness());
+		}
 		particleSpecies->setSlidingFrictionCoefficient(mu_slid);
 		particleSpecies->setSlidingFrictionCoefficientStatic(mu_slid);
 		particleSpecies->setRollingFrictionCoefficient(mu_roll);
@@ -96,7 +111,7 @@ public:
         setZMin(0.0);
 
         
-        //! Lees Edwards bc in y direction & periodic boundary in x direction
+        // Lees Edwards bc in y direction & periodic boundary in x direction
         //LeesEdwardsBoundary leesEdwardsBoundary;
         //leesEdwardsBoundary.set(
             //[velocity] (double time) { return time*velocity; },
@@ -104,7 +119,7 @@ public:
             //getXMin(),getXMax(),getYMin(),getYMax());
         //boundaryHandler.copyAndAddObject(leesEdwardsBoundary);
         
-        //! periodic boundary 
+        // periodic boundary 
 		PeriodicBoundary normWall;
         normWall.set(Vec3D(1.0, 0.0, 0.0), getXMin(),getXMax());
         boundaryHandler.copyAndAddObject(normWall);
@@ -121,7 +136,7 @@ public:
         std::cout << "Vp = " << Vp << std::endl;
         std::cout << "Vt = " << L*L*L << std::endl;
         std::cout << "Initial box L = " << Lm << std::endl;
-        std::cout << "Corrected box Lx = " << getXMax() << ", Ly = " << getYMax() << ", Lz = " << getZMax() << std::endl;
+        std::cout << "Corrected box Lx = " << (getXMax()-getXMin()) << ", Ly = " << (getYMax()-getYMin()) << ", Lz = " << (getZMax()-getZMin()) << std::endl;
         std::cout << "output = " << getName() << std::endl;
         std::cout << "mass = " << mass << std::endl;
         std::cout << "tc = " << tc << std::endl;
@@ -143,7 +158,7 @@ int main(int argc , char *argv[] )
 	
 	problem.particleDiameter = 2.0;		//set particle diameter
     problem.rhop = 2000.0;				//set particle density
-    problem.en = 1.0;					//set restitution coefficient
+    problem.en = 0.804;					//set restitution coefficient
     problem.K1 = 100000;				//set loading stiffness
     problem.K2 = 100000;				//set unloading stiffness
     problem.Kc = 0.0;					//set cohesive stiffness
@@ -153,18 +168,19 @@ int main(int argc , char *argv[] )
     problem.mu_tor = 0.0;				//set torsional friction coefficient
     problem.Phic = 0.5;					// penetration DepthMax, the maximum depth of linear plastic-viscoelastic normal force
     problem.N = 4096;					// number of particles
-    problem.volumeFraction = 0.50;		// initial volume fraction
+    problem.volumeFraction = 0.6;		// initial volume fraction
     problem.poly = 1.0;					//polydispersity dmax/dmin
-    //! ----------------------------------------------------------------
+    // ----------------------------------------------------------------
     
-    //! assign problem configuration: volume fraction and name
+    // assign problem configuration: volume fraction and name
     
-	problem.setName("ini_nu0.5_w1");
-	problem.tmax = 1000;
-    problem.setSaveCount(5000);
-    problem.eneFile.setSaveCount(200);
+	problem.setName("ini_nu_w1");
+	problem.tmax = 200;
+    problem.setSaveCount(500);
+    problem.eneFile.setSaveCount(500);
     
     problem.dataFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
+	//problem.restartFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
     problem.restartFile.setFileType(FileType::ONE_FILE);
     problem.fStatFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
     problem.eneFile.setFileType(FileType::ONE_FILE);

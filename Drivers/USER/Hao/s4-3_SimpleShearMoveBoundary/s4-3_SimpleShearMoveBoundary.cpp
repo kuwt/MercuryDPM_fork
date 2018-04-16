@@ -8,28 +8,32 @@
 
 class poly_simpleshear: public Mercury3D{
 public:
-/* In 's4-3_SimpleShearMoveBoundary', it will read the restart file for a relaxed
+/*! In 's4-3_SimpleShearMoveBoundary', it will read the restart file for a relaxed
  * configuration from s3_IsoRelax and start doing the shear with stress control in yy direction,
  * shear rate will be defined by strain-rate input which is du_x/dy = dot_strain_xy =gamma_dot
  * The shear is applied by pre-defined shear velocity_xy on the Lees Edwards boundary. 
  * the stress value will be set by stressYYGoal and kept constant after reaching the steady state.
  * */    
-    poly_simpleshear()
+    poly_simpleshear(std::string restartName)
     {
-        setName("mu0.5-p250-relax");
+        setName(restartName);
         readRestartFile();
         setRestarted(false);
         particleSpecies = dynamic_cast<LinearPlasticViscoelasticFrictionSpecies*>(speciesHandler.getObject(0));
-        std::cout << "input = " << getName() << std::endl;
+        double N = particleHandler.getNumberOfObjects();
+        for (int i=0; i < N; i++) {
+			particleHandler.getObject(i)->setSpecies(particleSpecies);
+		}
+        //std::cout << "input = " << getName() << std::endl;
     }
     
     LinearPlasticViscoelasticFrictionSpecies* particleSpecies;
     
-    Mdouble volumeFraction, particleDiameter, rhop, en, K1, K2, Kc, Phic, mu_slid, mu_roll,mu_tor, poly; //!material input parameters
-    Mdouble tmax, dampingCoefficient = 0.0; //!material/simulation input parameters
-    Mdouble dot_strain_xy, gx, gy, gz, Lx, Ly; //!shear strain rate variables
-    Mdouble dV, dPressure, dVL, Volume, stressYY, stressYYGoal, slow_factor, velocity_yy, alpha, cap_factor, beta_stop; //!Stress control variables
-    Mdouble stressYY_static, stressYY_kinetic, RHOP, Jy, Fy; //!stress components calculation variables
+    Mdouble volumeFraction, particleDiameter, rhop, en, K1, K2, Kc, Phic, mu_slid, mu_roll,mu_tor, poly; // material input parameters
+    Mdouble tmax, dampingCoefficient = 0.0; // material/simulation input parameters
+    Mdouble dot_strain_xy, gx, gy, gz, Lx, Ly; // shear strain rate variables
+    Mdouble dV, dPressure, dVL, Volume, stressYY, stressYYGoal, slow_factor, velocity_yy, alpha, cap_factor, beta_stop; // Stress control variables
+    Mdouble stressYY_static, stressYY_kinetic, RHOP, Jy, Fy; // stress components calculation variables
     
     void computeExternalForces (BaseParticle * CI) override	
 	{
@@ -45,7 +49,7 @@ public:
     {		
         double Rmin = particleHandler.getObject(0)->getRadius();
 		double Rmax = particleHandler.getObject(0)->getRadius();
-		//! particles properties and initial positions
+		//  particles properties and initial positions
 		double N = particleHandler.getNumberOfObjects();
 		Mdouble Vp = 0;
 		Mdouble vx = 0;
@@ -76,14 +80,29 @@ public:
         
         
 		
-        //! particleSpecies    set the species parameters
+        //  particleSpecies    set the species parameters
         particleSpecies->setDensity(rhop);
         particleSpecies->setCollisionTimeAndRestitutionCoefficient(tc,en,mass);
         particleSpecies->setPlasticParameters(K1,K2,Kc,Phic);
 		//particleSpecies->setDissipation(dissipation);
+		if ( mu_slid == 0){
+		particleSpecies->setSlidingStiffness(0.0);
+		}
+		else{
 		particleSpecies->setSlidingStiffness(2.0/10.0*particleSpecies->getLoadingStiffness());
+		}
+		if ( mu_roll == 0){
+		particleSpecies->setRollingStiffness(0.0);
+		}
+		else{
 		particleSpecies->setRollingStiffness(2.0/10.0*particleSpecies->getLoadingStiffness());
+		}
+		if ( mu_tor == 0){
+		particleSpecies->setTorsionStiffness(0.0);
+		}
+		else{
 		particleSpecies->setTorsionStiffness(2.0/10.0*particleSpecies->getLoadingStiffness());
+		}
 		particleSpecies->setSlidingFrictionCoefficient(mu_slid);
 		particleSpecies->setSlidingFrictionCoefficientStatic(mu_slid);
 		particleSpecies->setRollingFrictionCoefficient(mu_roll);
@@ -96,9 +115,9 @@ public:
 		dampingCoefficient =  0.1*particleSpecies->getDissipation();
 		setGravity(Vec3D(0.0,0.0,0.0));
 		
-		boundaryHandler.clear();								//! Delete all exist boundaries
+		boundaryHandler.clear();								//  Delete all exist boundaries
 		
-         //! Lees Edwards bc in y direction & periodic boundary in x direction
+         //  Lees Edwards bc in y direction & periodic boundary in x direction
         LeesEdwardsBoundary leesEdwardsBoundary;
         leesEdwardsBoundary.set(
             [velocity] (double time) { return time*velocity; },
@@ -106,7 +125,7 @@ public:
             getXMin(),getXMax(),getYMin(),getYMax());
         boundaryHandler.copyAndAddObject(leesEdwardsBoundary);
         
-        //! periodic boundary in z direction
+        //  periodic boundary in z direction
 		PeriodicBoundary normWall;
         normWall.set(Vec3D(0.0, 0.0, 1.0), getZMin(),getZMax());
         boundaryHandler.copyAndAddObject(normWall);
@@ -115,10 +134,8 @@ public:
 		std::cout << "Rmin = " << Rmin << std::endl;
 		std::cout << "Rmax = " << Rmax << std::endl;
 		
-        std::cout << "Lx = " << getXMax() << ", Ly = " << getYMax() << ", Lz = " << getZMax() << std::endl;
-        std::cout << "Vwall = " << velocity << std::endl;
-        std::cout << "nu = " << Vp/(getXMax()*getYMax()*getZMax()) << std::endl;
-		std::cout << "gp = " << velocity/getYMax() << std::endl;
+        std::cout << "Lx = " << getXMax()-getXMin() << ", Ly = " << getYMax()-getYMin() << ", Lz = " << getZMax()-getZMin() << std::endl;
+        std::cout << "nu = " << Vp/((getXMax()-getXMin())*(getYMax()-getYMin())*(getZMax()-getZMin())) << std::endl;
         std::cout << "k1 = " << K1 << "k2 = " << K2 << std::endl;
         std::cout << "output = " << getName() << std::endl;
         
@@ -145,7 +162,7 @@ public:
 		integrated_velocity_XY +=velocity_xy*getTimeStep();
 		Volume = (getXMax()-getXMin())*(getYMax()-getYMin())*(getZMax()-getZMin());
 		
-			//!calculate stress_yy for kinetic part
+			// calculate stress_yy for kinetic part
 			double N = particleHandler.getNumberOfObjects();
 			for (int i=0; i < N; i++) {
 			RHOP += rhop*constants::pi*mathsFunc::cubic(particleHandler.getObject(i)->getRadius()*2)/6.0; 
@@ -154,16 +171,16 @@ public:
 			}
 			stressYY_kinetic = Fy - (Jy*Jy/RHOP);
 			
-			//!calculate stress_yy for static part
+			// calculate stress_yy for static part
 			for (auto i : interactionHandler) {
 				stressYY_static += i->getForce().Y * i->getNormal().Y * i->getDistance();		
 			}
 			
-			//! calculate the stress_yy total and average over the volume
+			//  calculate the stress_yy total and average over the volume
 			stressYY = stressYY_kinetic + stressYY_static;
 			stressYY /= Volume;
 			
-			//! amount by which the pressure has to be increased
+			//  amount by which the pressure has to be increased
 			dPressure = stressYY - stressYYGoal;
 			
 			if (dPressure/stressYYGoal > cap_factor)
@@ -173,37 +190,31 @@ public:
 			else 
 			{dPressure = dPressure;}
 			
-			if (getTime()> 50 && dPressure > -0.01*stressYYGoal && dPressure < 0.01*stressYYGoal && dot_strain_xy > 5e-1)
-			{alpha = 0.00914;}
-			else if(getTime()> 50 && dPressure > -0.01*stressYYGoal && dPressure < 0.01*stressYYGoal && dot_strain_xy > 1e-1 && dot_strain_xy <= 5e-1)
-			{alpha = 0.457;}
-			else if (getTime()> 50 && dPressure > -0.005*stressYYGoal && dPressure < 0.005*stressYYGoal && dot_strain_xy > 1e-2 && dot_strain_xy <= 1e-1 )
-			{alpha = 4.57;}
-			else if (getTime()> 100 && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 5e-3 && dot_strain_xy <= 1e-2 )
-			{alpha = 4.57;}
-			else if (getTime()> 400 && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 1e-3 && dot_strain_xy < 5e-3 )
-			{alpha = 0.457;}
-			else if (getTime()> 800 && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy < 1e-3)
-			{alpha = 0.0457;}
+			if (getTime()> 0.005*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 5e-1)
+			{alpha = 2*getTimeStep(), cap_factor = 0.02;} 
+			else if(getTime()> 0.005*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 1e-1 && dot_strain_xy < 5e-1)
+			{alpha = 1000*getTimeStep(), cap_factor = 0.02;}
+			else if (getTime()> 0.01*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy > 1e-2 && dot_strain_xy < 1e-1 )
+			{alpha = 1000*getTimeStep(), cap_factor = 0.02;}
+			else if (getTime()> 0.02*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 5e-3 && dot_strain_xy <= 1e-2 )
+			{alpha = 1000*getTimeStep(), cap_factor = 0.02;}
+			else if (getTime()> 0.04*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy >= 1e-3 && dot_strain_xy < 5e-3 )
+			{alpha = 100*getTimeStep(), cap_factor = 0.02;} 
+			else if (getTime()> 0.08*getTimeMax() && dPressure > -0.001*stressYYGoal && dPressure < 0.001*stressYYGoal && dot_strain_xy < 1e-3)
+			{alpha = 2*getTimeStep(), cap_factor = 0.02;} 
 			else
-			{alpha = alpha;}
-			
-			if (dPressure/stressYYGoal < beta_stop && getTime()> 50 )
-			{dPressure = 0;}
-			else if (dPressure/stressYYGoal > -beta_stop && getTime()> 50)
-			{dPressure = 0;}
+			{alpha = alpha, cap_factor = cap_factor;}
 
 			
 			// amount by which position should be changed to achieve the right pressure
 			dV = dPressure * crossArea / stiffness /getTimeStep();
 			
 			velocity_yy = dV/getTimeStep();
-			std::cout << "stressYY=" << stressYY << " stressYY_static=" << stressYY_static << " stressYY_kinetic=" << stressYY_kinetic<<  " dPressure=" << dPressure << " alpha=" << alpha <<std::endl;
+			//std::cout << "stressYY=" << stressYY << " stressYY_static=" << stressYY_static << " stressYY_kinetic=" << stressYY_kinetic<<  " dPressure=" << dPressure << " alpha=" << alpha <<std::endl;
 			
 			setYMax(getYMax()+dV*getTimeStep()/alpha);
 			double YMax = getYMax();
 			Ly = getYMax()-getYMin();
-			//setYMin(getYMin()-getTimeStep()*dV/100.0);
 
 			Mdouble velocity = dot_strain_xy*Ly;
 			LeesEdwardsBoundary* leesEdwardsBoundary = dynamic_cast<LeesEdwardsBoundary*>(boundaryHandler.getObject(0));
@@ -217,9 +228,10 @@ public:
 
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
-	poly_simpleshear problem;
+	std::string restartName ("mu0.5-p250-relax");
 	
-	//!  --------------------------------------------------
+	poly_simpleshear problem(restartName);
+	//   --------------------------------------------------
     problem.particleDiameter = 2.0;		//set particle diameter
     problem.rhop = 2000.0;				//set particle density
     problem.en = 0.804;					//set restitution coefficient
@@ -231,31 +243,26 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     problem.mu_roll = 0.0;				//set rolling friction coefficient
     problem.mu_tor = 0.0;				//set torsional friction coefficient
     problem.Phic = 0.5;					// penetration DepthMax, the maximum depth of linear plastic-viscoelastic normal force
-    problem.poly = 3;		
-    problem.stressYYGoal = 250;
-    
-    
-    //! ----------------------------------------------------------------
-
-    problem.slow_factor = 0.01; //!choose between 0.001 to 5
-    problem.alpha = 0.00914; //!choose between 5 to 0.01
-	problem.cap_factor = 0.02;
-	
-    
-    
-    problem.setName("mu0.5-p250-1e0");
-    problem.tmax = 10000;
-    problem.dot_strain_xy = 1e0;
+    problem.poly = 3;					//polydispersity, no used...
 
     
-    problem.setSaveCount(4000);
-    problem.eneFile.setSaveCount(1000);
+    
+    //  ----------------------------------------------------------------
+	problem.alpha = 0.00914; //time-step indepedent control factor  choose initially as 2*dt
+	problem.cap_factor = 1.0;//capping factor for the stress control, no need to change
+    
+	problem.stressYYGoal = 250; //target stress
+    problem.dot_strain_xy = 5e-2; //constant shear rate
+    problem.tmax = 20000;
+    problem.setName("p250");
+    
+    problem.setSaveCount(8000);
+    problem.eneFile.setSaveCount(2000);
     problem.dataFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
     //problem.dataFile.setFileType(FileType::NO_FILE);
     problem.restartFile.setFileType(FileType::ONE_FILE);
     problem.fStatFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
     //problem.fStatFile.setFileType(FileType::NO_FILE);
     problem.eneFile.setFileType(FileType::ONE_FILE);
- 
     problem.solve();
 }

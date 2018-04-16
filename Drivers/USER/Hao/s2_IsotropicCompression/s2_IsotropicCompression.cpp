@@ -8,17 +8,16 @@
 
 class strain_iso: public Mercury3D{
 public:
-/* s2_IsotropicCompression will load the configuration from s1_IniGeneration
- * and creates the initial configuration before the 
- * shear process. The particles, with given volume fracion, are
+/*! s2_IsotropicCompression will load the configuration from s1_IniGeneration
+ * The particles, with given volume fracion, are
  * placed in a cubic box of dimensions Xmax, Ymax, Zmax
  * and period boundaries are applied in all directions.
- * With a given strain-rate, all 6 walls are moved inwards
- * isotropically to compress the particle bed to target volume fraction.
+ * With a given strain-rate, all 6 period boundaries are moved inwards
+ * isotropically to compress the particle gas to target volume fraction.
  * */    
-    strain_iso()
+    strain_iso(std::string restartName)
     {
-        setName("ini_nu0.5_w3");
+        setName(restartName);
         readRestartFile();
         setRestarted(false);
         particleSpecies = dynamic_cast<LinearPlasticViscoelasticFrictionSpecies*>(speciesHandler.getObject(0));
@@ -48,7 +47,7 @@ public:
 		double Rmax = particleHandler.getObject(0)->getRadius();
 		double N = particleHandler.getNumberOfObjects();
 		Mdouble Vp = 0;
-		//! particles properties and initial positions
+		// particles properties and initial positions
 		for (int i=1; i < (N-1); i++) {
 			Rmin = std::min(Rmin,particleHandler.getObject(i)->getRadius());
 			Rmax = std::max(Rmax,particleHandler.getObject(i)->getRadius());
@@ -64,13 +63,28 @@ public:
         
         
 		
-        //! particleSpecies (d average = 2)
+        // particleSpecies (d average = 2)
         particleSpecies->setDensity(rhop);
         particleSpecies->setCollisionTimeAndRestitutionCoefficient(tc,en,mass);
         particleSpecies->setPlasticParameters(K1,K2,Kc,Phic);
+		if ( mu_slid == 0){
+		particleSpecies->setSlidingStiffness(0.0);
+		}
+		else{
 		particleSpecies->setSlidingStiffness(2.0/10.0*particleSpecies->getLoadingStiffness());
+		}
+		if ( mu_roll == 0){
+		particleSpecies->setRollingStiffness(0.0);
+		}
+		else{
 		particleSpecies->setRollingStiffness(2.0/10.0*particleSpecies->getLoadingStiffness());
+		}
+		if ( mu_tor == 0){
+		particleSpecies->setTorsionStiffness(0.0);
+		}
+		else{
 		particleSpecies->setTorsionStiffness(2.0/10.0*particleSpecies->getLoadingStiffness());
+		}
 		particleSpecies->setSlidingFrictionCoefficient(mu_slid);
 		particleSpecies->setSlidingFrictionCoefficientStatic(mu_slid);
 		particleSpecies->setRollingFrictionCoefficient(mu_roll);
@@ -84,7 +98,7 @@ public:
 		
 		//boundaryHandler.removeObject(0);
 		
-        //! assign velocity to Lees Edward y-boundary
+        // assign velocity to Lees Edward y-boundary
         //LeesEdwardsBoundary leesEdwardsBoundary;
         //leesEdwardsBoundary.set(
             //[velocity] (double time) { return time*velocity; },
@@ -111,8 +125,9 @@ public:
 		std::cout << "Rmin = " << Rmin << std::endl;
 		std::cout << "Rmax = " << Rmax << std::endl;
 		
-        std::cout << "Lx = " << getXMax() << ", Ly = " << getYMax() << ", Lz = " << getZMax() << std::endl;
-        std::cout << "nu = " << Vp/(getXMax()*getYMax()*getZMax()) << std::endl;
+        std::cout << "Lx = " << getXMax()-getXMin() << ", Ly = " << getYMax()-getYMin() << ", Lz = " << getZMax()-getZMin() << std::endl;
+        std::cout << "nu = " << Vp/((getXMax()-getXMin())*(getYMax()-getYMin())*(getZMax()-getZMin())) << std::endl;
+        std::cout << "k1 = " << K1 << std::endl;
         std::cout << "output = " << getName() << std::endl;
         
         std::cout << "delta t = " << getTimeStep() << std::endl;
@@ -120,10 +135,10 @@ public:
 		 
     }
     
-     //! Strain-rate application before integration
+     // Strain-rate application before integration
     void actionsBeforeTimeStep() override
     {
-		Lx = (getXMax()-getXMin());					//! Box length Lx, Lyand Lz in current time step
+		Lx = (getXMax()-getXMin());					// Box length Lx, Lyand Lz in current time step
 		Ly = (getYMax()-getYMin());
 		Lz = (getZMax()-getZMin());
 		Px = (getXMax()+getXMin())/2.0;
@@ -133,7 +148,7 @@ public:
 		//std::cout << "Ly = " << Ly << std::endl;
 		//std::cout << "Lz = " << Lz << std::endl;
 		
-        //!  Change the system size according to next time step
+        //  Change the system size according to next time step
 		setXMax(getXMax()+0.5*Lx*dot_strain_xx*getTimeStep());
         setXMin(getXMin()-0.5*Lx*dot_strain_xx*getTimeStep());
         setYMax(getYMax()+0.5*Ly*dot_strain_yy*getTimeStep());
@@ -141,7 +156,7 @@ public:
         setZMax(getZMax()+0.5*Lz*dot_strain_zz*getTimeStep());
         setZMin(getZMin()-0.5*Lz*dot_strain_zz*getTimeStep());
         
-        //!  Give the strain-rate for all particles and move them to next timestep before integration
+        //  Give the strain-rate for all particles and move them to next timestep before integration
         N = particleHandler.getNumberOfObjects();
         for (int i=0; i < N; i++) {
 			Xp = particleHandler.getObject(i)-> getPosition().X - Px;
@@ -150,16 +165,16 @@ public:
 			particleHandler.getObject(i)->move(Vec3D(dot_strain_xx*getTimeStep()*Xp,dot_strain_yy*getTimeStep()*Yp, dot_strain_zz*getTimeStep()*Zp));				
         
         
-        //!  Move the boundary in x direction to next time step
+        //  Move the boundary in x direction to next time step
         PeriodicBoundary* normWall;
         normWall = dynamic_cast<PeriodicBoundary*>(boundaryHandler.getObject(0));
         normWall->set(Vec3D(1.0, 0.0, 0.0), getXMin(),getXMax());
         
-         //!  Move the boundary in y direction to next time step
+         //  Move the boundary in y direction to next time step
         normWall = dynamic_cast<PeriodicBoundary*>(boundaryHandler.getObject(1));
         normWall->set(Vec3D(0.0, 1.0, 0.0), getYMin(),getYMax());
   
-        //!  Move the boundary in z direction to next time step
+        //  Move the boundary in z direction to next time step
         normWall = dynamic_cast<PeriodicBoundary*>(boundaryHandler.getObject(2));
         normWall->set(Vec3D(0.0, 0.0, 1.0), getZMin(),getZMax());
 		
@@ -172,9 +187,11 @@ public:
 
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
-	strain_iso problem;
+	std::string restartName ("ini_nu_w1"); //the Prefix of your restart file from stage 1
 	
-	//!  --------------------------------------------------
+	strain_iso problem(restartName);
+	
+	//  --------------------------------------------------
    
 	problem.particleDiameter = 2.0;		//set particle diameter
     problem.rhop = 2000.0;				//set particle density
@@ -187,17 +204,17 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     problem.mu_roll = 0.0;				//set rolling friction coefficient
     problem.mu_tor = 0.0;				//set torsional friction coefficient
     problem.Phic = 0.5;					// penetration DepthMax, the maximum depth of linear plastic-viscoelastic normal force
-    problem.poly = 3;					//set polydispersity
-    problem.nu_ini = 0.50;				//set initial volume fraction
-    problem.nu_final = 0.82;			//set final volume fraction
+    problem.poly = 1;					//set polydispersity
+    problem.nu_ini = 0.40;				//set initial volume fraction
+    problem.nu_final = 0.90;			//set final volume fraction
     problem.tmax = 3000;				//set simulation time
-    //! ----------------------------------------------------------------
+    //----------------------------------------------------------------
 
-    problem.setName("mu0-0.5-0.82-w3");
+    problem.setName("mu0-0.4-0.9");
     
     
-    problem.setSaveCount(1000);
-    problem.eneFile.setSaveCount(200);
+    problem.setSaveCount(500);
+    problem.eneFile.setSaveCount(500);
     problem.dataFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
     problem.restartFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
     problem.fStatFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
