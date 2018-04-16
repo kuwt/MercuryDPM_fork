@@ -71,7 +71,8 @@ class MaserBlasiusParallel : public Mercury2D {
             setYMax(pars.at("reservoirHeight"));
             setZMin(0);
             setZMax(1);
-            setNumberOfDomains({pars.at("ndoms"),1,1});
+            // setNumberOfDomains({pars.at("ndoms"),1,1});
+            setNumberOfDomains({4,1,1});
 
             /* Species */
             /* JMFT: We must set up species in the constructor, or in any case before
