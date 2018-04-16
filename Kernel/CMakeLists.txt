@@ -17,6 +17,7 @@ file(GLOB Boundaries_SRC "Boundaries/*.cc")
 file(GLOB_RECURSE CG_SRC "CG/*.cc")
 file(GLOB FMM_SRC "FMM/*.cc")
 file(GLOB Math_SRC "Math/*.cc")
+file(GLOB Math_Quad_SRC "Math/Lebedev_Quadrature/*.cc")
 file(GLOB Particles_SRC "Particles/*.cc")
 file(GLOB Strings_SRC "Strings/*.cc")
 file(GLOB VTKWriter_SRC "VTKWriter/*.cc")
@@ -38,6 +39,7 @@ add_library(DPMBase STATIC
         ${CG_SRC}
         ${FMM_SRC}
         ${Math_SRC}
+        ${Math_Quad_SRC}
         ${Particles_SRC}
         ${Strings_SRC}
         ${VTKWriter_SRC}
