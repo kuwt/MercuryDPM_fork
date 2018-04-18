@@ -111,37 +111,11 @@ void FluxBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
  */
 bool FluxBoundary::checkBoundaryAfterParticleMoved(BaseParticle* p, ParticleHandler& pH)
 {
-    /*
-    fprintf(stderr, "testing for interaction between FluxBoundary %d and particle %d\n",
-            getIndex(), p->getIndex());
-    */
-    /*
-    fprintf(stderr, "prev position (%.3f,%.3f,%.3f), distance %f\n",
-            p->getPreviousPosition().X,
-            p->getPreviousPosition().Y,
-            p->getPreviousPosition().Z,
-            getDistance(p->getPreviousPosition())
-            );
-            */
-    /*
-    fprintf(stderr, "disp (%.3f,%.3f,%.3f)\n",
-            p->getDisplacement().X,
-            p->getDisplacement().Y,
-            p->getDisplacement().Z);
-
-    fprintf(stderr, "curr position (%.3f,%.3f,%.3f), distance %f\n",
-            p->getPosition().X,
-            p->getPosition().Y,
-            p->getPosition().Z,
-            getDistance(p->getPosition())
-            );
-    */
     if (getDistance(p->getPosition() - p->getDisplacement()) > 0 && getDistance(p->getPosition()) < 0)
     {
         numberOfParticlesCrossedForw_++;
         massCrossedForw_ += p->getMass();
         volumeCrossedForw_ += p->getVolume();
-        // fprintf(stderr, "particle %d has crossed forward\n", p->getIndex());
     }
     else if (getDistance(p->getPosition() - p->getDisplacement()) < 0 && getDistance(p->getPosition()) > 0)
     {
@@ -149,13 +123,6 @@ bool FluxBoundary::checkBoundaryAfterParticleMoved(BaseParticle* p, ParticleHand
         massCrossedBack_ += p->getMass();
         volumeCrossedBack_ += p->getVolume();
     }
-
-    /*
-    if (getDistance(p->getPosition) < 0)
-    {
-        massCrossedForw_ += p->getMass();
-    }
-    */
 
     return false;
 }

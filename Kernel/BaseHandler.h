@@ -115,7 +115,6 @@ public:
     /*!
      * \brief Adds a new Object to the BaseHandler.
      */
-    ///\todo TW should BaseHandler functions be virtual?
     virtual void addObject(T* object);
 
     /*!

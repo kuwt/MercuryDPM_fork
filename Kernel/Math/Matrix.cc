@@ -31,6 +31,7 @@
  */
 Matrix3D::Matrix3D()
 {
+    setZero();
 }
 
 /*!
@@ -63,7 +64,7 @@ void Matrix3D::setZero()
 /*!
  * \details Returns the sum of the diagonal elements of the maxtrix, divided by 
  * the total number of diagonal elements.
- * \return resulting scalar
+ * \return The trace of the matrix divided by 3 as an Mdouble
  */
 Mdouble Matrix3D::trace() const
 {
@@ -327,6 +328,11 @@ Matrix3D Matrix3D::inverse(const Matrix3D& A)
     return result;
 }
 
+/*!
+ * \details Solve the linear system Ax = b: A.ldivide(b) computes the solution x to A*x=b.
+ * \param[in] b Right-handside in Ax = b, as a const-reference to a Vec3D
+ * \return The solution x of Ax = b as a Vec3D.
+ */
 Vec3D Matrix3D::ldivide(const Vec3D& b)
 {
     Mdouble invdet = 1. / (XX * (YY * ZZ - YZ * ZY)

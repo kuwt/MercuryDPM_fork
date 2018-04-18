@@ -26,10 +26,9 @@
 #ifndef BaseBoundary_H
 #define BaseBoundary_H
 
+#include <set>
 #include "BaseObject.h"
 #include "Math/ExtendedMath.h"
-#include <set>
-//#include "Side.h"
 
 class BoundaryHandler;
 class PeriodicBoundaryHandler;
@@ -49,17 +48,17 @@ public:
      * \brief default constructor.
      */
     BaseBoundary();
-
+    
     /*!
      * \brief copy constructor
      */
-    BaseBoundary(const BaseBoundary &b);
+    BaseBoundary(const BaseBoundary& b);
     
     /*!
      * \brief destructor
      */
     virtual ~BaseBoundary();
-
+    
     /*!
      * \brief Used to create a copy of the object
      * NB: purely virtual function
@@ -77,39 +76,38 @@ public:
      * NB: purely virtual function, overriding the version of BaseObject
      */
     void write(std::ostream& os) const = 0;
-
-
+    
+    
     /*!
      * \brief Creates a periodic particle in case of periodic boundaries in serial build
      */
     virtual void createPeriodicParticle(BaseParticle* p UNUSED, ParticleHandler& pH UNUSED);
-
+    
     /*!
      * \brief Creates periodic copies of given particle in case of periodic boundaries
-     */    
-    virtual void createPeriodicParticles(ParticleHandler &pH UNUSED);
+     */
+    virtual void createPeriodicParticles(ParticleHandler& pH UNUSED);
     
     /*!
      * \brief Virtual function that does things to particles, each timestep after particles have moved.
-     * \todo JMFT: Does this take place before output files are written?
      */
-    virtual void checkBoundaryAfterParticlesMove(ParticleHandler &pH);
-
+    virtual void checkBoundaryAfterParticlesMove(ParticleHandler& pH);
+    
     /*!
      * \brief Virtual function that does things before each timestep.
      */
     virtual void checkBoundaryBeforeTimeStep(DPMBase* md);
-   
+    
     /*!
      * \brief Virtual function that does something after DPMBase::setupInitialConditions but before the first timestep. 
      */
     virtual void actionsBeforeTimeLoop();
-
+    
     /*!
      * \brief Sets the boundary's BoundaryHandler
      */
     void setHandler(BoundaryHandler* handler);
-
+    
     /*!
      * \brief Returns the boundary's BoundaryHandler
      */
@@ -135,15 +133,16 @@ protected:
      * be flushed from the mpi communication lista and afterwards destroyed.
      */
     std::set<BaseParticle*> particlesToBeDeleted_;
-    
+
 #endif
-    
+
 private:
     
     /*!
      * \brief pointer to the boundary's BoundaryHandler
      */
     BoundaryHandler* handler_;
-
+    
 };
+
 #endif

@@ -32,22 +32,18 @@
 BaseBoundary::BaseBoundary()
 {
     handler_ = nullptr;
-#ifdef DEBUG_CONSTRUCTOR
-    std::cout<<"BaseBoundary::BaseBoundary() finished"<<std::endl;
-#endif
+    logger(DEBUG, "BaseBoundary::BaseBoundary() finished");
 }
 
 /*!
  * \details Copy constructor
  */
 ///Note: shallow copy! Otherwise the HGrid causes a stack overflow.
-BaseBoundary::BaseBoundary(const BaseBoundary &b)
+BaseBoundary::BaseBoundary(const BaseBoundary& b)
         : BaseObject(b)
 {
     handler_ = b.handler_;
-#ifdef DEBUG_CONSTRUCTOR
-    std::cout<<"BaseBoundary::BaseBoundary(const BaseBoundary &b) finished"<<std::endl;
-#endif
+    logger(DEBUG, "BaseBoundary::BaseBoundary(const BaseBoundary &b) finished");
 }
 
 /*!
@@ -55,9 +51,7 @@ BaseBoundary::BaseBoundary(const BaseBoundary &b)
  */
 BaseBoundary::~BaseBoundary()
 {
-#ifdef DEBUG_DESTRUCTOR
-    std::cout << "BaseBoundary::~BaseBoundary() finished"<<std::endl;
-#endif 
+    logger(DEBUG, "BaseBoundary::~BaseBoundary() finished");
 }
 
 /*!
@@ -94,8 +88,9 @@ void BaseBoundary::createPeriodicParticle(BaseParticle* p UNUSED, ParticleHandle
  * NB: virtual function
  * \param[in] pH   the particle handler
  */
-void BaseBoundary::createPeriodicParticles(ParticleHandler &pH UNUSED)
-{ }
+void BaseBoundary::createPeriodicParticles(ParticleHandler& pH UNUSED)
+{
+}
 
 /*!
  * \details What this does depends on the type of boundary. 
@@ -109,14 +104,14 @@ void BaseBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
 
 /*!
  * \details checks whether given particle passed the boundary, and if so, does something
- * special with it.
+ * special with it. This is called after the particles moved, but before the force-computation.
  * NB: virtual function
  * \param[in] P    Particle checked
  * \param[out] pH  the particle handler.
  * \return returns TRUE if given particle actually did pass the boundary
  */
-void BaseBoundary::checkBoundaryAfterParticlesMove(ParticleHandler &pH)
-{ 
+void BaseBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
+{
 }
 
 /*!

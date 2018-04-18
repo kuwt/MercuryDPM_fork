@@ -2974,14 +2974,6 @@ void DPMBase::computeForcesDueToWalls(BaseParticle* pI)
                 ///\todo TW: I think this torque has the wrong sign
                 w->addTorque(-i->getTorque() + Vec3D::cross(w->getPosition() - i->getContactPoint(), i->getForce()));
             }
-
-            // JMFT: Must delete C here
-            // it was created in
-            // Species<LinearViscoelasticNormalSpecies, FrictionSpecies, EmptyAdhesiveSpecies>::getNewInteraction(BaseInteractable*, BaseInteractable*, double)
-            // delete C;
-            // JMFT (two days later): No --- C gets used (and deleted) by
-            // InteractionHandler later on. Delete here and you say hello to Mr
-            // Segfault.
         }
     }
 }
@@ -3898,7 +3890,6 @@ void DPMBase::computeOneTimeStep()
     //Computes new velocities and updates the particles accordingly
     integrateAfterForceComputation();
 
-    checkInteractionWithBoundaries(); ///\todo where is this needed?
     hGridActionsAfterIntegration();
 
     //erase interactions that have not been used during the last timestep

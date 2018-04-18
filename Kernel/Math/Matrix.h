@@ -147,12 +147,12 @@ public:
     static Matrix3D cross(const Vec3D& a, const Matrix3D& b);
     
     /*!
-     * \brief Computes the inverse of a matrix; exits if the inverse doesn't exist. 
+     * \brief Computes the inverse of a matrix.
      */
     static Matrix3D inverse (const Matrix3D& A);
 
     /*!
-     * \brief A.ldivide(b) computes the solution x to A*x=b; exits if det(A) doesn't exist.
+     * \brief A.ldivide(b) computes the solution x to A*x=b.
      */
     Vec3D ldivide(const Vec3D& b);
 
