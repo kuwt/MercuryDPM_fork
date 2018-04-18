@@ -129,13 +129,13 @@ BaseInteraction::~BaseInteraction()
 #if MERCURY_USE_MPI
     if (P_ == nullptr)
     {
-    logger(DEBUG,"Destroying a fictitious interaction used in MPI transmissions");
+        logger(DEBUG,"Destroying a fictitious interaction used in MPI transmissions");
     }
     else
     {
 #endif
-    /// \todo MX: add this assert to guard against segfault problems when running in debug mode
-    //logger.assert(P_,"Trying to destroy an interaction with P_ = nullptr");
+    logger.assert(P_ != nullptr,"Trying to destroy an interaction with P_ = nullptr");
+    logger.assert(I_ != nullptr,"Trying to destroy an interaction with I_ = nullptr");
     File& interactionFile =  getHandler()->getDPMBase()->getInteractionFile();
     if (interactionFile.getFileType() == FileType::ONE_FILE)
     {
@@ -380,11 +380,7 @@ Mdouble BaseInteraction::getContactRadius() const
  */
 BaseInteractable* BaseInteraction::getP()
 {
-    /// \todo MX: Make assert here
-    if (P_ == nullptr)
-    {
-	//assert
-    }
+    logger.assert(P_ != nullptr, "First particle in interaction % is nullptr", getId());
     return P_;
 }
 
@@ -395,11 +391,7 @@ BaseInteractable* BaseInteraction::getP()
  */
 BaseInteractable* BaseInteraction::getI()
 {
-    /// \todo: MX: make assert here
-    if (I_ == nullptr)
-    {
-	//assert
-    }
+    logger.assert(I_ != nullptr, "Second particle in interaction % is nullptr", getId());
     return I_;
 }
 
@@ -437,13 +429,9 @@ Mdouble BaseInteraction::getTimeStamp() const
 /*!
  * \details Various variables in the force law need to be integrated. This is 
  *          the place where this code goes.
- *          Note, it is empty and abstract at this point; but, not virtual as it
- *          as not called from within this class. It is only called by higher
- *          classes.
- * \param[in] timeStep  This is the current time step and is passed in case the
- *                      variables that are integrated depend on the absolute
- *                      time of the system
- *                      \todo Ant: When is this case; is there an examepl? 
+ *          Note, it is empty at this point; it can be overriden in subclasses.
+ *          For usage, see e.g. MindlinInteraction.cc.
+ * \param[in] timeStep  The time-step dt.
  */
 void BaseInteraction::integrate(Mdouble timeStep UNUSED)
 {
@@ -473,7 +461,7 @@ void BaseInteraction::setSpecies(const BaseSpecies* const species)
 void BaseInteraction::setP(BaseInteractable* P)
 {
     P_->removeInteraction(this);
-    P_=P;
+    P_ = P;
     P_->addInteraction(this);
 }
 
@@ -488,20 +476,23 @@ void BaseInteraction::setP(BaseInteractable* P)
 void BaseInteraction::setI(BaseInteractable* I)
 {
     I_->removeInteraction(this);
-    I_=I;
+    I_ = I;
     I_->addInteraction(this);
 }
 
-Vec3D BaseInteraction::getIP() const {
-    return getNormal()*getDistance();
+Vec3D BaseInteraction::getIP() const
+{
+    return getNormal() * getDistance();
 }
 
-Vec3D BaseInteraction::getIC() const {
-    return getNormal()*getDistance()+getContactPoint()-getP()->getPosition();
+Vec3D BaseInteraction::getIC() const
+{
+    return getNormal() * getDistance() + getContactPoint() - getP()->getPosition();
 }
 
-Vec3D BaseInteraction::getCP() const {
-    return getP()->getPosition()-getContactPoint();
+Vec3D BaseInteraction::getCP() const
+{
+    return getP()->getPosition() - getContactPoint();
 }
 
 /*!
@@ -1007,7 +998,7 @@ void BaseInteraction::setMPIInteraction(void *historyDataArray, unsigned int ind
 
 void* BaseInteraction::createMPIInteractionDataArray(unsigned int numberOfInteractions) const
 {
-    std::cout << "THIS SHOULD NEVER BE CALLED!!" << std::endl; /// \todo: change to always assert
+    logger(ERROR, "BaseInteraction::createMPIInteractionDataArray should never be called");
     void* historyArray;
     return historyArray;
 }
