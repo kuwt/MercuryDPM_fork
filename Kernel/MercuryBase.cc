@@ -608,43 +608,18 @@ Mdouble MercuryBase::getHGridTargetMaxInteractionRadius() const
 bool MercuryBase::checkParticleForInteraction(const BaseParticle& p)
 {
 #ifdef MERCURY_USE_MPI
+    bool interaction;
     if (NUMBER_OF_PROCESSORS == 1)
     {
-        return checkParticleForInteractionLocalPeriodic(p);
+        interaction = checkParticleForInteractionLocalPeriodic(p);
     }
-    int localInteraction = checkParticleForInteractionLocal(p);
-    
-    MPIContainer& communicator = MPIContainer::Instance();
-    int numberOfProcessors = communicator.getNumberOfProcessors();
-    
-    //The root gathers all values and computes the global value
-    int *interactionList = nullptr;
-    if (communicator.getProcessorID() == 0)
+    else
     {
-        interactionList = new int [numberOfProcessors];
+        //check locally and then collectively come to a global conclusion
+        bool interactionLocal = checkParticleForInteractionLocal(p);
+        
+        MPIContainer::Instance().allReduce(interactionLocal, interaction,  MPI::LAND);
     }
-
-    //Gather all local values
-    communicator.gather(localInteraction,interactionList);
-
-    //Compute the global value
-    int globalInteraction = 1;
-    if (communicator.getProcessorID() == 0)
-    {
-        for (int i = 0; i<numberOfProcessors; i++)
-        {
-            if (interactionList[i] == 0)
-            {
-                globalInteraction = 0;
-                break;
-            }
-        }
-    }
-    //The root now tells the other processors what the global value for the interaction is
-    communicator.broadcast(globalInteraction);
-
-    //Convert the result back to bool
-    bool interaction = globalInteraction;
 #else
     bool interaction = checkParticleForInteractionLocalPeriodic(p);
 #endif   
