@@ -103,8 +103,8 @@ public:
 		}
 		
 		
-		Vec3D V_mean_goal(0.0,0.0,0.0); //here ou can set the mean velocity
-		Mdouble Ek_goal = 2e7; //here you can set the injected kinetic energy
+		Vec3D V_mean_goal(0.01,0.0,-0.02); //here ou can set the mean velocity
+		Mdouble Ek_goal = 2e5; //here you can set the injected kinetic energy
 		
 		setMeanVelocityAndKineticEnergy(V_mean_goal,Ek_goal);
 	
@@ -134,10 +134,10 @@ public:
    	void setMeanVelocityAndKineticEnergy(Vec3D V_mean_goal, Mdouble Ek_goal)
 		{
         double N = particleHandler.getNumberOfObjects();
-        Vec3D V_mean, V_mean2, V_temp, V_mean3;
-        Vec3D Moment_sum (0,0,0), Moment_sum2(0,0,0), Moment_sum3(0,0,0);
+        Vec3D V_mean, V_mean2, V_temp, V_mean3, V_mean4;
+        Vec3D Moment_sum (0,0,0), Moment_sum2(0,0,0), Moment_sum3(0,0,0),Moment_sum4(0,0,0);
         Mdouble Mass_sum = 0;
-        Mdouble Ek_sum2 = 0, Ek_sum3 = 0;
+        Mdouble Ek_sum = 0, Ek_sum2 = 0, Ek_sum3 = 0,Ek_sum4=0, Ek_goal_new=0, Ek_mean=0;
         Mdouble Ek_factor = 0;      
         RNG rng;
 
@@ -150,13 +150,23 @@ public:
 		for (auto& p : particleHandler) {
 			Mass_sum = Mass_sum + p->getMass();
 			Moment_sum =  Moment_sum + p->getMass()*p->getVelocity();
+			Ek_sum = Ek_sum + p->getKineticEnergy();
+			Ek_mean=Ek_mean + 0.5*p->getMass()*V_mean_goal.getLengthSquared();
 			
 		}
 		V_mean = Moment_sum/Mass_sum;
+		
+		//check if the user input mean kinetic energy is lager than the total kinetic energy input, then return error
+		//if not, then subtract the mean part from the total kinetic energy to get only fluctuation of target kinetic energy
+		
+		logger.assert_always(Ek_mean<Ek_goal, "Too large mean velocity input, Kinetic energy from mean velocity part is lager than the total kinetic energy you want to set");
+
+		Ek_goal_new = Ek_goal - Ek_mean;
+		
 
 		//correct the mean velocity to zero
 		for (auto& p : particleHandler) {
-			p->addVelocity(V_mean_goal-V_mean);	
+			p->addVelocity(-V_mean);	
 		}
 		
 		//calculate the mean velocity and kinetic energy after correction
@@ -167,19 +177,31 @@ public:
 		V_mean2 = Moment_sum2/Mass_sum;
 		
 		//calculate the scale factor for kinetic energy injection
-		Ek_factor = std::sqrt(Ek_goal/Ek_sum2);
+		Ek_factor = std::sqrt(Ek_goal_new/Ek_sum2);
 		
 		//set the new velocity based on the scale factor of kinetic energy
 		for (auto& p : particleHandler) {
 			p->setVelocity(Ek_factor*p->getVelocity());
 		}
 
-		
+		//check the mean velocity after the scaling
 		for (auto& p : particleHandler) {
 			Moment_sum3 =  Moment_sum3 + p->getMass()*p->getVelocity();
 			Ek_sum3 = Ek_sum3 + p->getKineticEnergy();
 		}
 		V_mean3 = Moment_sum3/Mass_sum;
+		
+		//correct the mean velocity finally to the user set values
+		for (auto& p : particleHandler) {
+			p->addVelocity(V_mean_goal-V_mean3);	
+		}
+		
+		//check the final mean velocity and kinetic energy
+		for (auto& p : particleHandler) {
+			Moment_sum4 =  Moment_sum4 + p->getMass()*p->getVelocity();
+			Ek_sum4 = Ek_sum4 + p->getKineticEnergy();
+		}
+		V_mean4 = Moment_sum4/Mass_sum;
 		
 		std::cout << "Mass_sum " << Mass_sum << std::endl;
 		std::cout << "Moment_sum " << Moment_sum << std::endl;
@@ -187,8 +209,13 @@ public:
 		std::cout << "Moment_sum2 " << Moment_sum2 << std::endl;
 		std::cout << "V_mean_2 " << V_mean2 << std::endl;
 		std::cout << "V_mean_3 " << V_mean3 << std::endl;
+		std::cout << "V_mean_4 " << V_mean4 << std::endl;
+		std::cout << "E_k " << Ek_sum << std::endl;
+		std::cout << "E_kmean " << Ek_mean << std::endl;
 		std::cout << "E_k2 " << Ek_sum2 << std::endl;
 		std::cout << "E_k3 " << Ek_sum3 << std::endl;
+		std::cout << "E_k4 " << Ek_sum4 << std::endl;	
+
 		}
 		
 	
@@ -214,14 +241,14 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     problem.mu_tor = 0.0;				//set torsional friction coefficient
     problem.Phic = 0.5;					// penetration DepthMax, the maximum depth of linear plastic-viscoelastic normal force
     problem.poly = 1.0;					//set polydispersity
-    problem.tmax = 10000;				//set simulation time
+    problem.tmax = 0.1;				//set simulation time
     // ----------------------------------------------------------------
 
     problem.setName("mu0-w1-excitation");
     
     
-    problem.setSaveCount(5000);
-    problem.eneFile.setSaveCount(5000);
+    problem.setSaveCount(5);
+    problem.eneFile.setSaveCount(5);
     problem.dataFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
     problem.restartFile.setFileType(FileType::ONE_FILE);
     problem.fStatFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
