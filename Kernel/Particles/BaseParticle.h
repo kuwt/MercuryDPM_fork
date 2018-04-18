@@ -323,11 +323,11 @@ public:
      */
     const Vec3D getDisplacement2(Mdouble xmin, Mdouble xmax, Mdouble ymin, Mdouble ymax, Mdouble zmin, Mdouble zmax, Mdouble t) const;
 
-	/*!
-	* \brief
-	*/
-	virtual void setInertia();
-
+    /*!
+     * \brief 
+     */
+    virtual void setInertia();
+    
     /*!
      * \brief Sets the particle's inertia_ (and adjusts invInertia_ accordingly)
      */
