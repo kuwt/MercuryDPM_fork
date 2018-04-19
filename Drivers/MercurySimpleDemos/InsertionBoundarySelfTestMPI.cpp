@@ -39,22 +39,17 @@ public:
 
     InsertionBoundarySelfTest()
     {
-        /* JMFT: These need to be set here, or in main(), 
-         * *before* we call solve().
-         * Hence, we cannot put them in setupInitialConditions(). */
-        setXMin(-0.5);
-        setYMin(-0.5);
-        setZMin(-0.5);
-        setXMax(0.5);
-        setYMax(0.5);
-        setZMax(0.5);
+        /* JMFT: When using MPI, these need to be set here, or in main(),
+         * *before* we call solve().  Hence, we cannot put them in
+         * setupInitialConditions(). */
+        setMin(Vec3D(0, 0, 0));
+        setMax(Vec3D(1, 1, 1));
 
         /* JMFT: Species needs to be defined *before* calling solve() */
         LinearViscoelasticSpecies species;
         species.setDensity(2000);
         species.setStiffness(10000);
         speciesHandler.copyAndAddObject(species);
-
     }
 
     void setupInitialConditions()
@@ -63,7 +58,7 @@ public:
         setSystemDimensions(3);
         setGravity(Vec3D(0.0,0.0,0.0));
         setTimeStep(1e-4);
-        dataFile.setSaveCount(500);
+        dataFile.setSaveCount(1);
         setTimeMax(1);
         setHGridMaxLevels(2);
 
@@ -71,11 +66,9 @@ public:
         insertionBoundaryParticle->setSpecies(speciesHandler.getObject(0));
 
         //CubeInsertionBoundary
-        /*
         auto insertionBoundary = new CubeInsertionBoundary; //delete is done in boundaryHandler
         boundaryHandler.addObject(insertionBoundary);
-        insertionBoundary->set(insertionBoundaryParticle,10,Vec3D(-0.5,-0.5,-0.5),Vec3D(0.5,0.5,0.5),Vec3D(-5,-5,-5),Vec3D(5,5,5),0.1,0.2);
-        */
+        insertionBoundary->set(insertionBoundaryParticle,1,getMin(),getMax(),Vec3D(1,0,0),Vec3D(1,0,0),0.025,0.05);
 
         /*
         //ChuteInsertionBoundary
@@ -85,6 +78,7 @@ public:
         */
 
         //HopperInsertionBoundary
+        /*
         auto insertionBoundary = new HopperInsertionBoundary;
         boundaryHandler.addObject(insertionBoundary);
         double ExitHeight = 8.0;
@@ -97,6 +91,7 @@ public:
         insertionBoundary->set(insertionBoundaryParticle,100,0.0,0.0,0.1,0.1,
                                 chuteAngle, 0.0, false, 2, hopperAngle, hopperLength, ExitLength,
                                 ExitHeight, lift, fillPercentage);
+        */
 
         delete insertionBoundaryParticle;
                 
@@ -115,9 +110,9 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 
     InsertionBoundarySelfTest insertionBoundary_problem;
     // insertionBoundary_problem.setParticlesWriteVTK(true);
-    //insertionBoundary_problem.setNumberOfDomains({2,1,1}); //For cube
+    insertionBoundary_problem.setNumberOfDomains({2,1,1}); //For cube
     //insertionBoundary_problem.setNumberOfDomains({1,2,1});   //For chute
-    insertionBoundary_problem.setNumberOfDomains({1,2,1});   //For hopper
+    //insertionBoundary_problem.setNumberOfDomains({1,2,1});   //For hopper
 
     insertionBoundary_problem.solve();
 }
