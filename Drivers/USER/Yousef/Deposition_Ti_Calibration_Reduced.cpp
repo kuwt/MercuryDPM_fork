@@ -184,7 +184,7 @@ public:
         std::lognormal_distribution<> d(LogmeanRadius, LogstdRadius);
         //
         //add particles until the volume to be added is zero
-        logger(INFO,"Adding particles ...");
+        //logger(INFO,"Adding particles ...");
         BaseParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setRadius(meanRadius1);
@@ -204,9 +204,9 @@ public:
                 } while (p.getRadius()<MinRadius || p.getRadius()>MaxRadius);
                 //(p.getRadius()<0.3505*meanRadius1 || p.getRadius()>2.112*meanRadius1);
                 //(p.getRadius()<0.2*meanRadius || p.getRadius()>1.8*meanRadius); //reject too small or large radii
-                if (particleHandler.getNumberOfObjects()%100==0) std::cout << '.' << std::flush;
-                if (particleHandler.getNumberOfObjects()%1000==0) std::cout << ' ';
-                if (particleHandler.getNumberOfObjects()%10000==0) std::cout << addVolume << '\n';
+                //if (particleHandler.getNumberOfObjects()%100==0) std::cout << '.' << std::flush;
+                //if (particleHandler.getNumberOfObjects()%1000==0) std::cout << ' ';
+                //if (particleHandler.getNumberOfObjects()%10000==0) std::cout << addVolume << '\n';
             } else {
                 fillHeight += 0.01*meanRadius1; //increase fill height (slowly to insert particles as low as possible)
             }
@@ -226,7 +226,7 @@ public:
         static bool wallRemoved = false;
         if (wallRemoved==false && getTime()>=TimeRemoveWall) {
             //wallHandler.getObject(7)->setPosition(Vec3D(0,0,4));
-            logger(INFO,"walls removed");
+            //logger(INFO,"walls removed");
             wallHandler.removeObject(5);
             wallHandler.removeObject(4);
             wallRemoved = true;
@@ -234,7 +234,7 @@ public:
         //
         static bool moveTool = false;
         if (!moveTool && getTime()>= TimeMoveTool) {
-            logger(INFO,"Tool is Moving");
+            //logger(INFO,"Tool is Moving");
             wallHandler.getObject(1)->setVelocity(Vec3D(tool_Speed,0,0));
             wallHandler.getObject(2)->setVelocity(Vec3D(tool_Speed,0,0));
             wallHandler.getObject(3)->setVelocity(Vec3D(tool_Speed,0,0));
@@ -242,10 +242,10 @@ public:
         }
     }
     //
-    void printTime() const override
+    /*void printTime() const override
     {
         logger(INFO,"t=%, tMax=%, N=%", getTime(),getTimeMax(), particleHandler.getSize());
-    }
+    }*/
 
     //Another approach to perform the parametric study
     /*bool readNextArgument(int& i, int argc, char* argv[]) override
@@ -301,10 +301,10 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     Mdouble WRollingFriCoeff = 0.1;
     //
     //std::cout << "studyNum2=" << studyNum[1] << std::endl;
-    std::cout << "Sliding Friction" << SlidingFrictionCoeff << std::endl;
-    std::cout << "Rolling Friction" << RollingFrictionCoeff << std::endl;
-    std::cout << "Wall Sliding Friction" << WSlidingFriCoeff << std::endl;
-    std::cout << "Wall Rolling Friction" << WRollingFriCoeff << std::endl;
+    //std::cout << "Sliding Friction" << SlidingFrictionCoeff << std::endl;
+    //std::cout << "Rolling Friction" << RollingFrictionCoeff << std::endl;
+    //std::cout << "Wall Sliding Friction" << WSlidingFriCoeff << std::endl;
+    //std::cout << "Wall Rolling Friction" << WRollingFriCoeff << std::endl;
     //------------------------------------------------------------------------------------------------------------------------------------------------------------
     //
     deposition_problem.setName("Deposition_Ti_Calibration_Reduced"); //Deposition_gaussian_parametric
