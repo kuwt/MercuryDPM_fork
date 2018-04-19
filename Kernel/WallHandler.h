@@ -39,7 +39,7 @@ class BaseWall;
  * \details The WallHandler is a container to store all BaseWall. 
  * It is implemented by a vector of pointers to BaseWall.
  */
-class WallHandler : public BaseHandler<BaseWall>
+class WallHandler final: public BaseHandler<BaseWall>
 {
 public:
   /*!

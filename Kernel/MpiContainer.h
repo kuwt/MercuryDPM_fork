@@ -106,7 +106,8 @@ void initialiseMPI();
  * It is a signleton pattern, restricting to one instance of the class.
  * The class furthermore keeps track of the number of processors, processorID's and of asynchronous  send/receive requests. 
  */
-class MPIContainer {
+class MPIContainer final
+{
 public:
     /// \brief fetch the instance to be used for communication
     /// \return The only instance of this class

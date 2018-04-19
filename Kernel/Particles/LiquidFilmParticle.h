@@ -31,7 +31,7 @@
  * \class LiquidFilmParticle
  * \brief
  */
-class LiquidFilmParticle : public BaseParticle
+class LiquidFilmParticle final: public BaseParticle
 {
 public:
     /*!

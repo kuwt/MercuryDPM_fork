@@ -42,7 +42,7 @@ typedef std::vector<MpiPeriodicGhostParticleID*> PeriodicGhostList;
  * \details The PeriodicBoundaryHandler is a container to store all BasePeriodicBoundary. It is implemented by a vector
  * of pointers to BasePeriodicBoundary.
  */
-class PeriodicBoundaryHandler : public BaseHandler<BasePeriodicBoundary>
+class PeriodicBoundaryHandler final : public BaseHandler<BasePeriodicBoundary>
 {
 public:
     /*!

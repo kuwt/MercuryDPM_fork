@@ -30,7 +30,7 @@
 
 #include "VTKWriter/ParticleVtkWriter.h"
 
-class SphericalParticleVtkWriter
+class SphericalParticleVtkWriter final
         : public ParticleVtkWriter
 {
 

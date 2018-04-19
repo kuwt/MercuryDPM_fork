@@ -43,7 +43,7 @@
  * it also contains an index that points to the current domain of the
  * processorID. Such that the processor knows which Domain it has to compute
  */
-class DomainHandler : public BaseHandler<Domain>
+class DomainHandler final : public BaseHandler<Domain>
 {
 public:
     /*!

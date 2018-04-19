@@ -35,7 +35,7 @@
  * \brief Container to store pointers to all BaseBoundary objects
  * \details The BoundaryHandler is a container to store all BaseBoundary. It is implemented by a vector of pointers to BaseBoundary.
  */
-class BoundaryHandler : public BaseHandler<BaseBoundary>
+class BoundaryHandler final : public BaseHandler<BaseBoundary>
 {
 public:
     /*!

@@ -36,7 +36,7 @@ typedef Vec3D LabFixedCoordinates;
  * \class SuperQuad
  * \brief Class that implements superquadric particles, which are non-spherical
  */
-class SuperQuadric : public BaseParticle
+class SuperQuadric final : public BaseParticle
 {
 public:
     /*!

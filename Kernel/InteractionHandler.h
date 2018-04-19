@@ -35,7 +35,7 @@ class SpeciesHandler;
  * \details The InteractionHandler is a container to store all Interaction objects. 
  * It is implemented as a vector of BaseInteraction pointers.
  */
-class InteractionHandler : public BaseHandler<BaseInteraction>
+class InteractionHandler final : public BaseHandler<BaseInteraction>
 {
 public:
     /*!

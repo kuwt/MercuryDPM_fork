@@ -31,7 +31,7 @@
  * \class ThermalParticle
  * \brief
  */
-class ThermalParticle : public BaseParticle
+class ThermalParticle final: public BaseParticle
 {
 public:
     /*!

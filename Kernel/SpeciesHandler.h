@@ -33,7 +33,7 @@
 /// \brief Container to store all ParticleSpecies
 /// \details The SpeciesHandler is a container to store all ParticleSpecies. 
 /// It is implemented by a vector of pointers to ParticleSpecies.
-class SpeciesHandler : public BaseHandler<ParticleSpecies>
+class SpeciesHandler final : public BaseHandler<ParticleSpecies>
 {
 public:
     /// \brief Default constructor, it creates an empty SpeciesHandler.

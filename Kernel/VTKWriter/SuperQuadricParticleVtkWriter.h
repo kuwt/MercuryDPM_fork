@@ -30,7 +30,7 @@
 
 #include "VTKWriter/ParticleVtkWriter.h"
 
-class SuperQuadricParticleVtkWriter : public ParticleVtkWriter
+class SuperQuadricParticleVtkWriter final : public ParticleVtkWriter
 {
 public:
     
