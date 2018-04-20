@@ -335,7 +335,8 @@ void ParticleHandler::addGhostObject(BaseParticle* P)
 #ifdef MERCURY_USE_MPI
     if (P->getSpecies() == nullptr)
     {
-        logger(WARN, "WARNING: The particle with ID % that is added in "
+        logger(WARN, "[ParticleHandler::adGhostObject(BaseParticle*)] "
+                "WARNING: The particle with ID % that is added in "
                 "ParticleHandler::addObject does not have a species yet."
                 "Please make sure that you have "
                 "set the species somewhere in the driver code.", P->getId());
@@ -377,7 +378,7 @@ void ParticleHandler::removeObject(const unsigned int index)
     MPIContainer& communicator = MPIContainer::Instance();
     if (communicator.getNumberOfProcessors() > 1 )
     {
-        logger(WARN,"Using the function removeObject in parallel could lead to out-of-sync communication, Instead use deletion boundaries");
+        logger(WARN, "[ParticleHandler::removeObject(const unsigned int)] Using the function removeObject in parallel could lead to out-of-sync communication, Instead use deletion boundaries");
     }
 #endif
 #ifdef CONTACT_LIST_HGRID
@@ -1267,14 +1268,30 @@ std::string ParticleHandler::getName() const
     return "ParticleHandler";
 }
 
-Mdouble ParticleHandler::getVolume() const
+Mdouble ParticleHandler::getVolumeLocal() const
 {
     Mdouble volume = 0;
-    for (BaseParticle* p : *this) {
+    for (auto p : *this) {
         if (!(p->isFixed() || p->isPeriodicGhostParticle() || p->isMPIParticle()))
             volume += p->getVolume();
     }
     return volume;
+}
+
+Mdouble ParticleHandler::getVolume() const
+{
+#ifdef MERCURY_USE_MPI
+    Mdouble volumeLocal = getVolumeLocal();
+    Mdouble volumeGlobal = 0.0;
+    
+    // sum up over all domains
+    MPIContainer& communicator = MPIContainer::Instance();
+    communicator.allReduce(volumeLocal, volumeGlobal, MPI_SUM);
+
+    return volumeGlobal;
+#else
+    return getVolumeLocal();
+#endif
 }
 
 /*!

@@ -47,7 +47,7 @@ SubcriticalMaserBoundary::SubcriticalMaserBoundary()
  */
 SubcriticalMaserBoundary::SubcriticalMaserBoundary(const PeriodicBoundary& periodicBoundary) : BaseBoundary(periodicBoundary)
 {
-    logger(INFO, "Constructor ConstantMassFlowMaserBoundary(const PeriodicBoundary&) started");
+    logger(INFO, "Constructor SubcriticalMaserBoundary(const PeriodicBoundary&) started");
     distanceLeft_ = periodicBoundary.getDistanceLeft();
     distanceRight_ = periodicBoundary.getDistanceRight();
     normal_ = periodicBoundary.getNormal();
@@ -110,7 +110,7 @@ void SubcriticalMaserBoundary::read(std::istream& is)
         speciesConversionNormalToMaser_[speciesHandler.getObject(key)] = speciesHandler.getObject(value);
         speciesConversionMaserToNormal_[speciesHandler.getObject(value)] = speciesHandler.getObject(key);
     }
-    logger(DEBUG, "Finished reading ConstantMassFlowMaserBoundary. \nNormal: % \nDistanceLeft: % \nDistanceRight: % "
+    logger(DEBUG, "Finished reading SubcriticalMaserBoundary. \nNormal: % \nDistanceLeft: % \nDistanceRight: % "
             ": % \nMaserIsActivated: %", normal_, distanceLeft_, distanceRight_, maserIsActivated_);
 }
 
@@ -295,7 +295,7 @@ void SubcriticalMaserBoundary::addParticleToMaser(BaseParticle* p)
     if (conversion != speciesConversionNormalToMaser_.end())
     {
         //species known and flagged (i.e. 'converted')
-        logger(VERBOSE, "[ConstantMassFlowMaserBoundary::addParticleToMaser()] Species conversion already present");
+        logger(VERBOSE, "[SubcriticalMaserBoundary::addParticleToMaser()] Species conversion already present");
         p->setSpecies(conversion->second);
     }
     else
@@ -307,7 +307,7 @@ void SubcriticalMaserBoundary::addParticleToMaser(BaseParticle* p)
                 std::pair<const ParticleSpecies*, const ParticleSpecies*>(p->getSpecies(), newSpecies));
         speciesConversionMaserToNormal_.insert(
                 std::pair<const ParticleSpecies*, const ParticleSpecies*>(newSpecies, p->getSpecies()));
-        logger(INFO, "[ConstantMassFlowMaserBoundary::addParticleToMaser()] New species conversion created");
+        logger(INFO, "[SubcriticalMaserBoundary::addParticleToMaser()] New species conversion created");
         logger(INFO, "Original species ID: %, new species ID: %", p->getSpecies()->getId(), newSpecies->getId());
         
         //Copy over the mixed species. The delete is necessary here since it is overwritten with a copy of the old mixed

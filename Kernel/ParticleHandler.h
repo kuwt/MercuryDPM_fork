@@ -447,6 +447,8 @@ private:
 
     Mdouble getMassLocal() const;
 
+    Mdouble getVolumeLocal() const;
+
     Vec3D getMassTimesPositionLocal() const;
 
     Vec3D getMomentumLocal() const;
