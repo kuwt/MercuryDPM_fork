@@ -1060,6 +1060,8 @@ protected:
      */
     void performGhostParticleUpdate();
 
+    void synchroniseParticle(BaseParticle*, unsigned fromProcessor = 0);
+
     /*!
      * \brief updates the final time-step velocity of the ghost particles
      */

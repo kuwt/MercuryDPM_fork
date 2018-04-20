@@ -4536,6 +4536,26 @@ void DPMBase::performGhostParticleUpdate()
 #endif
 }
 
+//This function takes a base particle and then copies all the particle information from the root particle to the other particles
+// on neighbouring domains.
+void DPMBase::synchroniseParticle(BaseParticle* p, unsigned fromProcessor)
+{
+#ifdef MERCURY_USE_MPI
+    MPIContainer& communicator = MPIContainer::Instance();
+
+    //The processor that contains the particle that needs to be copied needs to identify the target, and communicate this
+    MPIParticle pInfo;
+    if (communicator.getProcessorID() == fromProcessor)
+    {
+        pInfo = copyDataFromParticleToMPIParticle(p);
+    }
+
+    //Broadcast from processor i
+    communicator.broadcast(&pInfo,MercuryMPIType::PARTICLE,fromProcessor);
+    copyDataFromMPIParticleToParticle(&pInfo, p, &particleHandler);
+#endif
+}
+
 void DPMBase::performGhostVelocityUpdate()
 {
 #ifdef MERCURY_USE_MPI
