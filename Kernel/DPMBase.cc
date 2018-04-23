@@ -3848,19 +3848,30 @@ void DPMBase::solve()
  */
 void DPMBase::computeOneTimeStep()
 {
+    logger(INFO, "starting computeOneTimeStep()");
+
+    logger(INFO, "about to call writeOutputFiles()");
     writeOutputFiles(); //everything is written at the beginning of the timestep!
+
+    logger(INFO, "about to call hGridActionsBeforeIntegration()");
     hGridActionsBeforeIntegration();
     
     //Computes the half-timestep velocity and full timestep position and updates the particles accordingly
+    logger(INFO, "about to call integrateBeforeForceComputation()");
     integrateBeforeForceComputation();
 
    //New positions require the MPI and parallel periodic boundaries to do things
+    logger(INFO, "about to call performGhostParticleUpdate()");
     performGhostParticleUpdate();
 
     /// \todo MX: this is not true anymore. all boundaries are handled here.
     /// particles have received a position update, so here the deletion boundary deletes particles
     //TODO add particles need a periodic check
+
+    logger(INFO, "about to call checkInteractionWithBoundaries()");
     checkInteractionWithBoundaries(); // INSERTION boundaries handled
+
+    logger(INFO, "about to call hGridActionsAfterIntegration()");
     hGridActionsAfterIntegration();
 
     // Compute forces
@@ -3871,34 +3882,46 @@ void DPMBase::computeOneTimeStep()
         b->checkBoundaryBeforeTimeStep(this);
     }
 
+    logger(INFO, "about to call actionsBeforeTimeStep()");
     actionsBeforeTimeStep();
 
+    logger(INFO, "about to call checkAndDuplicatePeriodicParticles()");
     checkAndDuplicatePeriodicParticles();
 
+    logger(INFO, "about to call hGridActionsBeforeTimeStep()");
     hGridActionsBeforeTimeStep();
 
     //Creates and updates interactions and computes forces based on these
+    logger(INFO, "about to call computeAllForces()");
     computeAllForces();
 
+    logger(INFO, "about to call removeDuplicatePeriodicParticles()");
     removeDuplicatePeriodicParticles();
 
+    logger(INFO, "about to call actionsAfterTimeStep()");
     actionsAfterTimeStep();
 
     // Loop over all particles doing the time integration step
+    logger(INFO, "about to call hGridActionsBeforeIntegration()");
     hGridActionsBeforeIntegration();
     
     //Computes new velocities and updates the particles accordingly
+    logger(INFO, "about to call integrateAfterForceComputation()");
     integrateAfterForceComputation();
 
+    logger(INFO, "about to call hGridActionsAfterIntegration()");
     hGridActionsAfterIntegration();
 
     //erase interactions that have not been used during the last timestep
+    logger(INFO, "about to call interactionHandler.eraseOldInteractions(getNtimeSteps())");
     interactionHandler.eraseOldInteractions(getNtimeSteps());
+    logger(INFO, "about to call interactionHandler.actionsAfterTimeStep()");
     interactionHandler.actionsAfterTimeStep();
-
 
     time_ += timeStep_;
     nTimeSteps_++;
+
+    logger(INFO, "finished computeOneTimeStep()");
 }
 
 /*!
