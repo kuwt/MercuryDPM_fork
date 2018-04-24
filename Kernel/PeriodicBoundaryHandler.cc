@@ -1736,13 +1736,13 @@ void PeriodicBoundaryHandler::flushParticles(std::set<BaseParticle*>& particlesT
  */
 void PeriodicBoundaryHandler::cleanCommunicationList(std::vector<MpiPeriodicParticleIDBase*>& list)
 {
-    for (auto it = list.begin(); it != list.end(); it++)
+    for (int i = 0; i < list.size(); i++)
     {
-        if ((*it) == nullptr)
+        if (list[i] == nullptr)
         {
-            (*it) = list.back();
+            list[i] = list.back();
             list.pop_back();
-            it--;
+            i--;
         }
     }
 }

@@ -164,12 +164,12 @@ void DeletionBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
 #ifdef MERCURY_USE_MPI
     particlesToBeDeleted_.clear();
 #endif
-    for (auto p = pH.begin(); p != pH.end(); ++p)
+    for (int i = 0; i < pH.getSize(); i++)
     {
         //If the particle is deleted, change the iterator
-        if(checkBoundaryAfterParticleMoved(*p,pH))
+        if(checkBoundaryAfterParticleMoved(pH.getObject(i),pH))
         {
-          p--;
+          i--;
         }
     }
 }

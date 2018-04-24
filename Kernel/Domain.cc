@@ -1673,6 +1673,10 @@ void Domain::flushParticlesFromList(std::vector<BaseParticle*>& list, std::set<B
     }
 
     //Secondly: we remove all nullptr's from the list
+    cleanCommunicationList(list);
+    
+/*
+    //TODO replace with function
     particleIndex = 0;
     for(auto particle_it = list.begin(); particle_it != list.end(); particle_it++)
     {
@@ -1686,6 +1690,7 @@ void Domain::flushParticlesFromList(std::vector<BaseParticle*>& list, std::set<B
         }
         particleIndex++;
     }
+*/
 }
 
 /*!
@@ -1718,16 +1723,17 @@ void Domain::cleanCommunicationLists()
  */
 void Domain::cleanCommunicationList(std::vector<BaseParticle*>& list)
 {
-    for (auto it = list.begin(); it != list.end(); it++)
+    for (int i = 0; i < list.size(); i++)
     {
-        if ((*it) == nullptr)
-        {
-            (*it) = list.back();
+        if (list[i] == nullptr)
+        {   
+            list[i] = list.back();
             list.pop_back();
-            it--;
+            i--;
         }
     }
 }
+
 
 
 
