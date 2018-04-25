@@ -89,6 +89,18 @@ void Gauss<Coordinates>::setWidth(Mdouble width)
     setWidthAndCutoff(width, 3.0 * width);
 }
 
+template<class Coordinates>
+void Gauss<Coordinates>::setStandardDeviation(Mdouble std)
+{
+    if (std::is_same<CGCoordinates::XYZ, Coordinates>::value){
+        setWidth(std/constants::sqrt_3);
+    } else if (std::is_base_of<CGCoordinates::Base_XY_XZ_YZ, Coordinates>::value) {
+        setWidth(std/constants::sqrt_2);
+    } else if (std::is_base_of<CGCoordinates::Base_X_Y_Z, Coordinates>::value) {
+        setWidth(std);
+    }
+}
+
 /*!
  * \param[in] width the new width of the coarse-graining function.
  * \param[in] cutoff the new cutoff of the coarse-graining function.
@@ -217,6 +229,8 @@ template<class Coordinates>
 Mdouble Gauss<Coordinates>::evaluateCGIntegral(const BaseInteraction& c, const Coordinates r, IntegralType type)
 {
     ///\todo use getId instead of getDistance
+    // For each interaction we are looping through several coordinates.
+    // The normal has to only computed once since it is the same for any coordinate value
     if (currentInteraction_ != c.getId())
     {
         normalLength_ = Coordinates::getLength(c.getNormal());
@@ -257,6 +271,7 @@ Mdouble Gauss<Coordinates>::evaluateCGIntegral(const BaseInteraction& c, const C
     }
     if (pNormal < -getCutoff())
         return 0.0;
+
     tangentialSquared = r.getTangentialSquared(c, pNormal);
     if (tangentialSquared > mathsFunc::square(cutoff_))
         return 0.0;
@@ -264,8 +279,8 @@ Mdouble Gauss<Coordinates>::evaluateCGIntegral(const BaseInteraction& c, const C
     if (currentInteraction_ != c.getId())
     {
         currentInteraction_ = c.getId();
-        integralPrefactor_ = Coordinates::getGaussIntegralPrefactor((pNormal - iNormal) * normalLength_, width_,
-                                                                    cutoff_);
+//        integralPrefactor_ = Coordinates::getGaussIntegralPrefactor((pNormal - iNormal) * normalLength_, width_, cutoff_);
+        integralPrefactor_ = Coordinates::getGaussIntegralPrefactor(pNormal - iNormal, width_, cutoff_);
     }
 
     Mdouble w_sqrt_2 = constants::sqrt_2 * getWidth();

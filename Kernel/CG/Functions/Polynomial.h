@@ -111,9 +111,16 @@ public:
     void setPolynomialType(PolynomialType polynomialType);
 
     /*!
-     * \brief
+     * \brief Set the cutoff radius
      */
     void setWidth(Mdouble width);
+
+    Mdouble getWidth() const;
+
+    /*!
+     * \brief Set the standard deviation
+     */
+    void setStandardDeviation(Mdouble std);
 
     /*!
      * \brief

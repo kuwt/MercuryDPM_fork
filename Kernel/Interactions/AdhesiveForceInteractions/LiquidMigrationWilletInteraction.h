@@ -28,6 +28,8 @@
 
 #include "Interactions/BaseInteraction.h"
 #include "Math/Vector.h"
+#include "ParticleHandler.h"
+#include "InteractionHandler.h"
 
 class BaseParticle;
 class LiquidMigrationWilletSpecies;
@@ -118,6 +120,10 @@ public:
     std::string getNameVTK(unsigned i) const override;
 
     std::vector<Mdouble> getFieldVTK(unsigned i) const override;
+
+    static Mdouble getTotalLiquidFilmVolume(ParticleHandler&);
+
+    static Mdouble getTotalLiquidBridgeVolume(InteractionHandler&);
 
 private:
     /*!

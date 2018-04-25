@@ -113,6 +113,11 @@ public:
     void setWidth(Mdouble width);
 
     /*!
+     * \brief Sets the standard deviation of the coarse-graining function.
+     */
+    void setStandardDeviation(Mdouble std);
+
+    /*!
      * \brief Sets the width and cutoff of the coarse-graining function.
      */
     void setWidthAndCutoff(Mdouble width, Mdouble cutoff);

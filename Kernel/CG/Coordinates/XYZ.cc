@@ -192,4 +192,7 @@ const unsigned XYZ::countVariables()
     return 3;
 }
 
+std::string XYZ::getName() {
+    return "XYZ";
+}
 

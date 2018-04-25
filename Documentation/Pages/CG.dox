@@ -1,19 +1,32 @@
-/*! \page MercuryCG From discrete particles to continuum fields
+/*! \page Mercury_CG Coarse graining: From discrete particles to continuum fields
 
-MercuryDPM contains a unique toolbox for analysing particle data, the MercuryCG toolbox:
+\section What What is MercuryCG?
+
+MercuryDPM contains a unique toolbox for analysing particle data: the MercuryCG toolbox.
 <img src="MercuryCG.png" width="400">
 
-After running a Discrete Particle Simulation, one needs to analyse the data to extract relevant information. This usually requires the evaluation of continuum fields, such as density, velocity, stress, or temperature.
-MercuryCG extracts continuum fields from the particle data (positions, velocities, forces) by a method called coarse-graining, which is explained in [Goldhirsch, Granular Matter, 2010] and [Weinhart et al, Granular Matter, 2012].
+Particle simulations create huge amounts of data (particle trajectories and interactions), but most of it is irrelevant to understand the behaviour of a particular process. What really matters to the process engineer is the macroscopic behaviour of the bulk material, which is typically described by continuum fields, such as density, velocity, stress, or temperature.
 
-Three documentation pages exist for this tool:
- - \subpage coarsegraining
+MercuryCG extracts these continuum fields from the particle data (positions, velocities, forces) via a method called coarse-graining, which is explained in [Goldhirsch, Granular Matter, 2010] and [Weinhart et al, Granular Matter, 2012].
+
+The following pages are intended for MercuryDPM users that want to use MercuryCG to extract continuum data from their particle simulations. This can be done either concurrently (during the simulation) or as a post-processing step (after the simulation, based on the output data).
+
+\section Documentation
+
+Each type of use has been documented on a separate page:.
+ - \subpage CG
+ - \subpage MercuryCG
  - \subpage fstatistics
- - \subpage livestatistics
+ - \subpage CGHandler
+ - \subpage ExperimentalCG
 
 The first page describes the mathematical formulae used to extract continuum fields from particle data.
-The second page tells you how to apply the analysis tool in practice, i.e. which command to use and what options to set.
-The third page tells you how to apply analytical output to a running MercuryDPM simulation.
+The second/third page tells you how to apply the analysis tool as a post-processing tool.
+The third page tells you how to apply concurrently, while running a MercuryDPM simulation.
+
+While the tool has been developed to analyse MercuryDPM simulations, it can also be used to extract information from other particle simulation software, and even experimental data, as long as the data provided in the MercuryDPM output format.
+
+\section Examples
 
 Here are two examples of the coarse-graining method applied:
  -# Silo flow [Weinhart et al, Powder Technology 293, 138-148 (2016)]:
@@ -29,7 +42,7 @@ Here are two examples of the coarse-graining method applied:
    Coarse-graining is also applicable to molecular dynamics simulations, in this case atomistic flow through a nanochannel. Near the channel wall, we observed oscillations in the flow density, which indicates that the flow is slightly ordered. To resolve this phenomenon, a high spatial resolution is required, which can easily be obtained in coarse-graining by using a small length scale \f$w\f$.
 */
 
-/*! \page coarsegraining Evaluation of continuum fields
+/*! \page CG Coarse graining: the definition of continuum fields
 \tableofcontents
 
 This page describes the mathematical formulas used to extract continuum fields from particle data.
@@ -114,108 +127,381 @@ equation *by definition*.
 
 */
 
-/*! \page livestatistics Writing a particle simulation with analytical output
-  \tableofcontents
+/*! \page MercuryCG MercuryCG: Post-processing discrete particle data using the coarse-graining formulation (in development)
+ \tableofcontents
 
-This feature is still in development, so the documentation is meant for
+This feature is _still in development_, so the documentation is meant for
 developers only. However, anyone is welcome to give it a try.
 
-The evaluation of coarse-grained continuum fields in Mercury is done by the
-class CG. To turn on coarse-graining (cg), one has to pick a cg function
-(e.g. Gauss) and define its parameters (e.g. width=1). Then one has to pick
-points where the continuum fields should be evaluated. While these points can be
-chosen arbitrarily, it is often advantageous to create a mesh of points along
-the Cartesian coordinates, using nx-by-ny-by-nz points, with nx=ny=nz=10.
-Finally, one has to define how often the evaluation should take place, e.g.
-every saveCount=20'000 time steps. This can be done by inserting the following
-code into the main function, before the solve command is executed:
- > CG<CGFunctions::GaussXYZ> cg; \n
- > cg.setNX(10); \n
- > cg.setNY(10); \n
- > cg.setNZ(10); \n
- > cg.setWidth(0.15); \n
- > cg.statFile.setSaveCount(20000); \n
- > problem.cgHandler.copyAndAddObject(cg);
-Here, problem specifies the DPMBase object.
-The output will we written in a file named (problemName).stat.
-To change the name of the output file to e.g. (problemName).GaussXYZ.stat, add
-the line
-> cg.statFile.setName(problem.getName() + ".GaussXYZ.stat");
-Note that CGFunctions::GaussXYZ is only a typedef (=short name) for the
-class CGFunctions::Gauss<CGCoordinates::XYZ>.
+MercuryCG is a new implementation of the \ref coarsegraining "coarse graining" toolbox \ref fstatistics "fstatistics", and will replace this toolbox in the near future.
 
-\section spatial Spatial averaging
+MercuryCG is a postprocessing tool: it takes an existing data set, consisting of a restart and one or more data and fstat files, and applies the coarse-graining formulation to it. The output is stored in a stat file, which can then be read by gnuplot or Matlab (via the readMercuryCG.m file in Drivers/MercuryCG/) to be visualised.
 
-Most DPM problems have certain Cartesian directions in which the flow is
-homogeneous; take e.g. the problem of chute flow over a inclined plane
-[add name of demo code here], where the flow is homogeneous in x and y, and
-locally varying in z, e.g. the density satisfies rho(x,y,z)=rho(z).
-Thus, it is enough to spatially resolve the continuum fields in z and average
-over x and y. This can be done in Mercury by defining a spatially averaging cg
-function, e.g.
- > CG<CGFunctions::GaussZ> cg; \n
- > cg.setNZ(10); \n
- > cg.setWidth(0.15); \n
- > cg.statFile.setSaveCount(20000); \n
- > problem.cgHandler.copyAndAddObject(cg);
-For fully averaged systems, use CGCoordinates::O, e.g.
- > CG<CGFunctions::GaussO> cg;
+This document details how to use MercuryCG as a post-processing tool. Note, coarse graining can also be applied during a MercuryDPM simulation, analysing the data while the simulation is still running; to do this, see the \ref CGHandler "CGHandler" documentation.
+
+\section basics Basic syntax
+
+First, we provide the basic syntax, then show some examples. Finally, more complex operations are introduced.
+
+Assume you want to analyse the output files of the Driver's code NewtonsCradleSelfTest, located in the folder Drivers/MercuryCG. To create the file, run the simulation using `make SquarePackingSelfTest && ./SquarePackingSelfTest` in said folder). The simulation produces two output files that MercuryCG needs: SquarePackingSelfTest.data and SquarePackingSelfTest.fstat. To analyse this data,
+- change to the folder `Drivers/MercuryCG/` in the build directory,
+- compile MercuryCG
+\code make MercuryCG \endcode
+- run the following command
+\code./MercuryCG SquarePackingSelfTest \endcode
+
+Note: If the data is in another folder than `Drivers/MercuryCG/`, you have to prepend the file path to the file name. For example, to analyse the output files of `LeesEdwardsSelfTest` in the folder `MercurySimple demos`, use the command
+\code./MercuryCG ../MercurySimpleDemos/LeesEdwardsSelfTest\endcode
+
+With the above arguments, MercuryCG outputs spatially-averaged continuum fields for each time step in the data/fstat files into a file named 'SquarePackingSelfTest.stat`. For a quick check of the output, the spatially-averaged results from the last written timestep are outputted to the screen
+\code Spatial averages: VolumeFraction 0.785398 Density 1 Momentum 0 -5.6968e-07 0 ...
+ \endcode
+
+Note that MercuryCG returns the momentum instead of the velocity, as momentum has a primary definition as a coarse-grained variable (\f$\vec{j}=\sum_i m_i\vec{v}_i\phi_i\f$), while velocity is computed by dividing two "primary" coarse-grained fields (momentum and density, \f$\vec{V}=\vec{j}/\rho\f$). Generally, MercuryCG only outputs `primary` coarse-grained variables, as they are well-defined even if no particles are present. The primary fields are also the most relevant for any macroscopic theory based on conservation principles, as they have well-defined averaging properties (they can be thought of as the density of a microscopic quantity). Secondary fields like velocity can be constructed by combining the primary fields. The script readMercuryCG.m reads the primary variables into Matlab and constructs several secondary variables (velocity, kinetic stress, temperature, etc).
+
+\subsection output  Output format
+
+The output file consists of a two-line header followed by several lines of data. For the example above, the output is:
+
+\code
+CG<O> n 1 1 1 min 0 0 -0.5 max 5 5 0.5 width 1 Lucy cutoff 1
+time 2:VolumeFraction 3:Density 4-6:Momentum ...
+0 0.785398 1 0 0 ...
+0.4 0.785398 1 0 6.72166e-05 ...
+0.6 0.785398 1 0 -1.53499e-05 ...
+0.8 0.785398 1 0 3.09892e-06 ...
+1 0.785398 1 0 -5.83261e-07 ...
+\endcode
+
+The first line outputs a few properties you need to interpret the remaining file output:
+- `%CG`: the standard #CG class was used, which evaluates each time step separately (see also #TimeAveragedCG and #TimeSmoothedCG)
+- '<O>': the coordinate type #O was used, which returns spatial averages (see also #X, #XY, #XYZ, etc)
+The first line details the different fields that are computed by fstatistics, e.g. volume fraction `Nu`, bulk density `Density` and the three momentum components `MomentumX MomentumY MomentumZ`.
+- `min 0 0 -0.5 max 5 5 0.5`: the spatial domain
+- `n 1 1 1`: a 1x1x1 mesh of values was used, which is the only option for spatially averaged statistics.
+- `width 1`: the coarse-graining width
+- `Lucy`: the type of coarse-graining function (see #Gaussian, #Lucy, #Linear and #Heaviside)
+- `cutoff 1`: the coarse-graining width
+
+The second line specifies the time/space coordinates and fields computed by MercuryCG and the respective columns.
+
+The remaining lines contains the coordinates and the values of the continuum fields at these coordinates.
+
+\section advanced  Advanced options
+
+MercuryCG can do much more than return global averages of the continuum fields. In particular, it can extract _local_ continuum fields at specific spatial coordinates. The behavior of MercuryCG is controlled via command line arguments; the most commonly used options are discussed in more detail below.
+
+\subsection temp  Temporal averaging
+
+The output file can be modified by adding additional arguments to the command line. E.g. you can use the `-timeaverage` command:
+\code  ./MercuryCG SquarePacking -timeaverage \endcode
+This tells MercuryCG to time-average. The output file now looks like this:
+
+\code TimeAveragedCG<O> min 0 0 -0.5 max 5 5 0.5 n 1 1 1 width 1 Lucy cutoff 1
+time 2:VolumeFraction 3:Density 4-6:Momentum ...
+1 0.785398 1 0 -2.3681e-05 ...\endcode
+
+\subsection space Spatially-resolved fields
+The coarse-graining formulations can extract _local_ continuum fields, whose value depends on the spatial coordinate.
+You can extract spatially resolved fields using the arguments `-coordinates XYZ -n 2 -timeaverage`. This creates a 2x2x2 grid of values over the domain and evaluates the continuum fields at each of those points.
+Note, the grid is not part of the cg formulation itself: CG returns field values at all points in space; but numerically we can only evaluate the continuum fields at a final number of points.
+The output file now contains 8 lines of data, one for each z-value:
+
+\code
+TimeAveragedCG<XYZ> min 0 0 -0.5 max 5 5 0.5 n 2 2 2 width 1 Lucy cutoff 1
+time x y z 5:VolumeFraction 6:Density 7-9:Momentum ...
+1 1.25 1.25 -0.25 0.744721 0.948208 0 -1.71359e-05 ...
+1 1.25 1.25 0.25 0.744721 0.948208 0 -1.71359e-05 ...
+1 1.25 3.75 -0.25 0.744362 0.947751 0 -2.94495e-05 ...
+1 1.25 3.75 0.25 0.744362 0.947751 0 -2.94495e-05 ...
+1 3.75 1.25 -0.25 0.744721 0.948208 0 -1.71359e-05 ...
+1 3.75 1.25 0.25 0.744721 0.948208 0 -1.71359e-05 ...
+1 3.75 3.75 -0.25 0.744362 0.947751 0 -2.94495e-0 ...
+1 3.75 3.75 0.25 0.744362 0.947751 0 -2.94495e-05 ...
+...\endcode
+
+You can also choose to spatially resolve only specific spatial coordinates and average over the remaining ones. Use the arguments '-coordinates [O,X,Y,Z,XY,XZ,YZ,XYZ]' to modify this behaviour.
+
+By default, the code uses the coarse-graining width 1, and a Lucy coarse-graining function.
+Use the arguments `-function [Gaussian,Lucy,Linear,Heaviside]` and `-w [double]` to change these defaults. For an explanation of what a kernel function is, please see the \ref CG "section on the maths of coarse-graining".
+
+\section vis Visualisation
+
+The following command produces z-resolved data using a Lucy kernel with a narrow cutoff radius of 0.5 (one particle radius).
+\code  ./MercuryCG SquarePacking -coordinates Z -n 100 -function Lucy -w 0.5 \endcode
+
+We can now visualise this data using e.g. gnuplot:
+\code
+gnuplot> p 'SquarePackingSelfTest.stat' u 2:4 w l
+gnuplot> p 'SquarePackingSelfTest.stat' u 2:4 w l
+gnuplot> p 'SquarePackingSelfTest.stat' u 2:4 w l
+ \endcode
+The result is a density field with peaks at the particle centre and vanishing at a distance of 0.5 from the particle centre:
+<img src="CG0.png" width="400">
+Alternatively, you can visualise the data in Matlab:
+\code
+$ data = readMercuryCG('SquarePackingSelfTest.stat')
+$ plot(data.z,data.Density)
+\endcode
+
+\subsection clm  Command line manual
+
+You can obtain a full list of command line options by typing the `-help` command:
+\code  ./MercuryCG -help
+
+ DESCRIPTION
+
+     MercuryCG is the postprocessing tool for extracting coarse-grained fields from particle data.
+
+ SYNTAX
+
+     You need to specify the base name of the MercuryDPM output files (data/fstat or restart files) that should be analysed.
+     Additional arguments can be specified as [-option value] pairs:
+
+         ./MercuryCG name [-option value]
+
+
+ EXAMPLES OF USE
+
+     1) To extract spatially-averaged continuum fields (i.e. the fields are functions of t only) from
+         the output files name.*, use the following command:
+
+         ./MercuryCG name -coordinates O
+
+     2) To extract fully-resolved continuum fields (i.e. the fields are functions of x, y, z and t) from the output files name.* on a 10x10x10 spatial grid, use the following command
+
+         ./MercuryCG name -coordinates XYZ -n 10
+
+ OPTIONS
+
+     -help
+         Outputs a usage message and exits
+
+     -coordinate value, -stattype value
+         Determines which spatial dimensions should be resolved.
+         Possible values are O, X, Y, Z, XY, XZ, YZ, XYZ, default is O.
+
+     -function value, -cgtype value
+         Determines the cg function.
+         Possible values are Gauss, Heaviside, Linear, Lucy, default is Lucy.
+
+     -fields value
+         Determines which fields should be extracted.
+         Possible values are StandardFields, LiquidMigrationFields, GradVelocityFields, default is StandardFields.
+
+     -timeaverage
+         If this option is specified, the data will be time-averaged.
+
+     -timesmooth
+         If this option is specified, the data will be coarse-grained in time.
+
+     -n value
+         Creates a spatial grid of n elements in each resolved dimension.
+         Equivalent to '-nx value -ny value -nz value'.
+
+     -nx value, -ny value, -nz value
+         Specifies the amount of elements in each spatial direction.
+         Will be ignored if the spatial direction is not resolved.
+         Coarse-grained fields will be evaluated at the midpoints of each element.
+         By default, the domain  is equal to the spatial domain of the DPM, as specified in the restart file (or data file if no restart file is given). However, the domain of the grid can be specified by the -x, -y, -z options.
+         For example, for '-x 0 10 -nx 5', the cg fields will be evaluated at x=1,3,5,7,9.
+
+     -h value
+         Allows you to specify the element size in stead of the number of elements of the spatial grid.
+         Equivalent to '-hx value -hy value -hz value'.
+
+     -hx value, -hz value, -hz value
+         Allows you to specify the element size in stead of the number of elements of the spatial grid.
+         Equivalent to -nx ceil((maxX-minX)/value), where [minX,maxX] is the domain of the spatial grid.
+
+     -n value
+         Creates a spatial grid of n elements in each resolved dimension.
+         Equivalent to '-nx value -ny value -nz value'.
+
+     -x value1 value2, -y value1 value2, -z value1 value2
+         Specifies the domain of the spatial grid on which the coarse-grained fields will be evaluated.
+         For example, for '-x 0 10 -nx 5', the cg fields will be evaluated at x=1,3,5,7,9.
+
+     -t value1 value2, -tmin value, -tmax value
+         Specifies the minimum and maximum time values on which the cg fields will be evaluated.
+
+     -o value
+         Specifies the name of the output file in which the cg fields are written.
+         By default, the output file will be named 'name.stat'.
+\endcode
+
+
+\subpage CGImages
+
+
+*/
+
+/*! \page  CGHandler CGHandler: Live coarse-graining during a discrete particle simulation
+
+The old fstatistics tool was based on the templated StatisticsVector class. It added functionality to DPMBase that allowed the
+evaluation of continuum fields, either during a simulation or as a post-processing step.
+For example, to add global statistical output to your simulation, you had to derive your Driver class from both Mercury3D and StatisticsVector<O>:
+\code{.cpp}
+class DriverClass : public Mercury3D, public StatisticsVector<O> {
+    // .. class definition
+}
+\endcode
+
+This setup was inflexible, however, as it allowed only the evaluation of one type of coarse-graining.
+This was replaced in MercuryCG by the #cgHandler, which can contain several CG objects if desired:
+\code{.cpp}
+class DriverClass : public Mercury3D {
+    // .. class definition
+}
+
+int main () {
+    DriverClass dpm; //declare your DPM class
+    CG<CGCoordinates::O> cg; //declare a cg object
+    cg.statFile.setSaveCount(50); //set parameters such as the output frequency
+    dpm.cgHandler.copyAndAddObject(cg); // add the CG object to the cgHandler
+    dpm.solve(); //run your DPM simulation
+}
+\endcode
+
+\section Output Output to stat-files
+
+If a cg object is added to the cgHandler, it will produce analytical data while the simulation is running.
+This data is stored in a file named <TT>$name.$n.stat</TT>, where <TT>$name</TT> is the problem name specified by #setName,
+and <TT>$n</TT> is the index of the cg object in the cgHandler. A basic example is shown in TutorialCG0.cpp.
+It produces spatially averaged statistics at every 50-th time step, resulting in the following output:
+\code{.cpp}
+::::::::::::::
+TutorialCG0.0.stat
+::::::::::::::
+CG n 1 1 1 width 1 timeMin 0.1601 min 0 0 0 max 9.92738 9.92738 9.92738 Lucy cutoff 1
+time 2:volumeFraction 3:density 4-6:momentum 7-12:momentumFlux 13-21:contactStress 22-24:interactionForceDensity
+0.1601 0.535174 1.02211 3.11529e-17 6.62723e-17 -1.38841e-17 0.000348305 9.52371e-06 -6.18274e-06 0.000314944 -1.0499
+8e-05 0.000332432 583.523 -93.4013 -191.383 -56.5639 1100.79 -52.4474 -192.268 -48.4432 853.035 0 0 0
+0.1651 0.535174 1.02211 1.19044e-17 4.79952e-16 1.43027e-15 75.5124 -29.6753 -15.9208 212.387 10.134 93.6674 1019.24
+-2.79241 5.15266 1.58597 1525.6 9.29084 12.7538 -0.135959 956.726 0 0 0
+...
+\endcode
+
+The first header line gives the user information about the type of coarse-graining applied;
+in this case, the coordinate type is O, which denotes globally-averaged statistics.
+<br/>
+The second header line denotes the column numbers of the coordinates (time)
+and the fields (volume fraction, etc) evaluated at the coordinates.
+<br/>
+All other lines contain coordinate and field values; e.g. the third line tells you that the volume fraction at time 0 was 0.6.
+<br/>
+The simple file format allow easy plotting of the data in gnuplot, e.g.
+\code{.cpp}
+>> gnuplot
+> set xlabel 'volume fraction'
+> set ylabel 'confining pressure'
+> p 'TutorialCG0.0.stat' u 2:13
+\endcode
+<img src="TutorialCG0A.png" width="400">
+
+One can also plot the same data in Matlab using loadStatistics.m provided in the Matlab folder
+\code{.m}
+>> cd ~/MercuryDPM/MercuryBuild/Drivers/Tutorials/
+>> addpath("~/MercuryDPM/MercurySource/Matlab")
+>> data = loadStatistics("TutorialCG0.0.stat");
+>> plot(data.VolumeFraction,data.ContactStressXX);
+>> xlabel('volume fraction'), ylabel('confining pressure');
+\endcode
+<img src="TutorialCG0B.png" width="400">
+
+\section CGCoordinates CGCoordinates
+
+The example above produced globally averaged statistics. However, usually coarse-graining is used to extract spatially dependent continuum fields.
+This can be done by changing the CGCoordinate type:
+\code{.cpp}
+int main () {
+  DriverClass dpm;
+  dpm.setName("Test")
+  CG<CGCoordinates::O> cgO;
+  dpm.cgHandler.copyAndAddObject(cgO); // produces globally averaged statistics
+  CG<CGCoordinates::XYZ> cgXYZ;
+  cgXYZ.setWidth(1); //set cg width
+  cgXYZ.setN(20); //set number of mesh points in each spatial direction
+  dpm.cgHandler.copyAndAddObject(cgXYZ); // produces spatially resolved statistics
+  dpm.solve();
+}
+\endcode
+
+The code above produces two sets of output: <TT>Test.0.stat</TT> contains globally averaged data,
+<TT>Test.1.stat</TT> contains spatially resolved data.
+In the latter case, the number of evaluation points and the coarse-graining width has to be specified --
+in this case, a Gaussian of width (standard deviation) 1 and a 20x20x20 mesh of evaluation points will be used.
+</br>
+Note that the latter statistics will produce huge amounts of data (8000 times more than the globally averaged statistics),
+even though we have not chosen a particularly high resolution.
+The data will further be highly fluctuating, as the continuum fields only depend on the small amount of data in the sphere around the evaluation point.
+</br>
+Thus, it is advisable to average in space when ever possible, i.e. if the data is homogeneous in space.
+Often the data is not homogeneous in all spatial directions, but in some. In that case, spatial averaging can be applied in specific directions only.
+This is done by using partially resolved CGCoordinates: X, Y, Z, XY, XZ, or YZ.
+For example, <TT>CG<CGCoordinates::Z></TT> averages over the yz-plane, but resolves the fields in z-direction.
+This is shown exemplary in <TT>TutorialCG1.1.stat</TT>:
+\code{.cpp}
+    ::::::::::::::
+    TutorialCG1.1.stat
+    ::::::::::::::
+    ...
+\endcode
+A simple matlab plot reveals that the confining stress increases in the z-direction.
+\code{.m}
+    >> cd ~/MercuryDPM/MercuryBuild/Drivers/Tutorials/
+    >> addpath("~/MercuryDPM/MercurySource/Matlab")
+    >> data = loadStatistics("TutorialCG1.1.stat");
+    >> plot(data.z,data.ContactStressZZ);
+    >> xlabel('z'), ylabel('confining pressure');
+    \endcode
+<img src="TutorialCG1.png" width="400">
+
+- Coarse-graining function:
+The default cg function is a cutoff Gaussian, but it can be changed to other functions, such as polynomial radial basis functions (a Heaviside, Linear, or a Lucy polynomial). ...
+
 
 \section temporal Temporal averaging
 
+<!-- - TimeAveragedCG and TimeSmoothedCG: -->
+
+Coarse-graining can also be applied in the time dimension. This can be done in MercuryCG by using a TimeAveragedCG or TimeSmoothedCG object:
+\code{.cpp}
+int main () {
+    DriverClass dpm;
+    dpm.setName("Test")
+    CG<CGCoordinates::O> cg;
+    dpm.cgHandler.copyAndAddObject(cgO); // produces time-resolved statistics
+    TimeSmoothedCG<CGCoordinates::O> cgTS;
+    dpm.cgHandler.copyAndAddObject(cgTS); // produces time-smoothed statistics
+    TimeAveragedCG<CGCoordinates::O> cgTA;
+    dpm.cgHandler.copyAndAddObject(cgTA); // produces fully time-averaged statistics
+    dpm.solve();
+}
+\endcode
+This can best be studied by looking at a time-dependent problem, such as a slowly sheared Lees-Edwards-style simulation:
+The friction in this system initially builds up until it reaches a maximum, then decreases towards a smaller, critical value.
+
+
 If your DPM problem is steady, it is not necessary to resolve the continuum
 fields in time. This can be done in Mercury by using time-averaging cg, e.g.
- > TimeAveragedCG<CGFunctions::GaussZ> cg; \n
- > cg.setNZ(10); \n
- > cg.setWidth(0.15); \n
- > cg.statFile.setSaveCount(20000); \n
- > problem.cgHandler.copyAndAddObject(cg);
+> TimeAveragedCG<CGFunctions::GaussZ> cg; \n
+> cg.setNZ(10); \n
+> cg.setWidth(0.15); \n
+> cg.statFile.setSaveCount(20000); \n
+> problem.cgHandler.copyAndAddObject(cg);
 To limit the time interval over which the continuum fields are evaluated to
 e.g. \f$[10,20]\f$, use
- > cg.setTimeMin(10); \n
- > cg.setTimeMax(20);
+> cg.setTimeMin(10); \n
+> cg.setTimeMax(20);
 
-\section temporal2 Temporal smoothing
+\section postprocess Post-processing
 
-If your DPM problem is unsteady, time-dependent CG should be used.
-This, however, often leads to high fluctuations in the resulting continuum
-fields, as the amount of data that is evaluated to obtain a value for the
-continuum field is insufficient. In this case, time-smoothing can be used:
- > TimeSmoothedCG<CGFunctions::GaussZ> cg;
- > cg.setWidthTime(0.01);
- > cg.setTimeStep(0.004);
- > cg.setTimeMax(0.2);
- > cg.statFile.setSaveCount(5);
- > problem.cgHandler.copyAndAddObject(cg);
-Like CG, this class should be used to evaluate time-dependent fields.
-However, as the data is averaged over several time steps, the resulting
-fields are smoother and more reliable, as they use more information.
+Processing restart files
 
-\section different Different cg functions
+\section code Documentation of MercuryCG
 
-You can also use other cg functions than Gauss. The other available options are
-Heaviside, Linear and Lucy, e.g.
- > CG<CGFunctions::LucyZ> cg;
-
-
-\section multiple Multiple cg evaluations
-
-Note that you are not limited to one choice of cg evaluation for your problem.
-For example you can create both time-averaged and time resolved data by adding
-two cg objects (just make sure that they have different names for the output
-file):
- > CG<CGFunctions::LucyO> cg0;\n
- > cg0.statFile.setSaveCount(20);\n
- > cg0.statFile.setName(problem.getName() + ".LucyO.stat");\n
- > problem.cgHandler.copyAndAddObject(cg0);\n
- > \n
- > TimeAveragedCG<CGFunctions::LucyO> cg1; \n
- > cg1.statFile.setSaveCount(20000); \n
- > problem.cgHandler.copyAndAddObject(cg1);
-
-\section code Code structure of MercuryCG
-
-Here is a list of the different classes that comprise MercuryCG.
+The list below links to the documentation of the different classes that comprise MercuryCG.
 - class CGHandler:\n
 Handler that stores all CG objects.
 - classes CG, TimeSmoothedCG, TimeAveragedCG:\n
@@ -237,7 +523,7 @@ Contains the position of the CGPoint.
 */
 
 /*!
-\page fstatistics Post-processing in MercuryDPM
+\page fstatistics fstatistics: Post-processing discrete particle data using teh coarse-graining formulation (old version)
 \tableofcontents
 
 \section sec A postprocessing tool for analysing particle data.

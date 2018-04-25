@@ -60,6 +60,7 @@ void Base_X_Y_Z::normalisePolynomialCoefficients(std::vector<Mdouble>& coefficie
     volume *= 2.0 * cutoff;
     for (std::size_t i = 0; i < coefficients.size(); i++)
         coefficients[i] /= volume;
+    //logger(INFO,"Volume %",volume);
 }
 
 const unsigned Base_X_Y_Z::countVariables()

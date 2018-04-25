@@ -47,6 +47,13 @@ InfiniteWall::InfiniteWall(const InfiniteWall& w)
     logger(DEBUG, "InfiniteWall::InfiniteWall(const InfiniteWall &p) finished");
 }
 
+InfiniteWall::InfiniteWall(const ParticleSpecies* s)
+        : BaseWall()
+{
+    setSpecies(s);
+    logger(DEBUG, "InfiniteWall::InfiniteWall(const ParticleSpecies* s) finished");
+}
+
 InfiniteWall::InfiniteWall(Vec3D normal, Vec3D point, const ParticleSpecies* species)
 {
     setNormal(normal);

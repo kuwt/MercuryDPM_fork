@@ -96,7 +96,7 @@ public:
      * \param[in] t     current simulation time.
      * \param[in] tMax  total simulation time for which the simulation is set to run.
      */
-    void set(Mdouble t, Mdouble tMax)
+    Time2Finish(Mdouble t, Mdouble tMax)
     {
         startTime_ = clock();
         time_ = t;

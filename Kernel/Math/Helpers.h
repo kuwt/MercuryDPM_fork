@@ -211,7 +211,7 @@ namespace helpers
 
     std::vector<double> readArrayFromFile(std::string filename, int& n, int& m);
 
-    void more(std::string filename, unsigned nLines=99);
+    void more(std::string filename, unsigned nLines=unsignedMax);
 
     template < typename T > std::string to_string( const T& n )
     {
@@ -219,6 +219,8 @@ namespace helpers
         stm << n ;
         return stm.str() ;
     }
+
+    std::string to_string(const Mdouble value, unsigned precision);
 
     //reads optional variables in the restart file
     // (a variable is optional, if it may or may not be defined in the restart file)

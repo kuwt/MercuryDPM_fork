@@ -1,4 +1,4 @@
-CG id 0 n 1 1 1 width 1 timeMin 0 min 0 0 -0.5 max 10 10 0.5 Lucy cutoff 1
+CG<O> min 0 0 -0.5 max 10 10 0.5 n 1 1 1 width 1 Lucy cutoff 1
 time 2:liquidBridgeVolume 3:liquidFilmVolume 
 0 1.04e-11 0
 0.01 1.04e-11 0

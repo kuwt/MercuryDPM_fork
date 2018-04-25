@@ -171,6 +171,8 @@ void BaseInteraction::write(std::ostream& os) const
 	    os << " particleWallIds " << P_->getId() << " " << I_->getId();
 	}
 	os <<" timeStamp "<<timeStamp_<< " force " << force_ << " torque " << torque_;
+    //\todo add information that can recreate the contact information (necessary for CG)
+    //	os <<" timeStamp "<<timeStamp_<< " contactPoint " << contactPoint_ << " overlap " << overlap_ << " force " << force_ << " torque " << torque_;
 }
 
 /*!

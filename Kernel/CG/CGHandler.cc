@@ -22,6 +22,8 @@
 //ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#include <Species/LinearViscoelasticFrictionSpecies.h>
+#include <Species/LinearViscoelasticSpecies.h>
 #include "CG/CGHandler.h"
 #include "DPMBase.h"
 #include "Walls/InfiniteWall.h"
@@ -140,16 +142,14 @@ void CGHandler::finish()
 
 void CGHandler::restart(std::string name)
 {
+    DPMBase* dpm = getDPMBase();
 
     // determines if the variable name contains the name of a restart file, or a problem name
     // (in which case the restart file is assumed to be name.restart)
-    DPMBase* dpm = getDPMBase();
     std::string::size_type endName = name.find(".restart");
-    if (endName == std::string::npos)
-    {
+    if (endName == std::string::npos) {
         dpm->setName(name);
-    } else
-    {
+    } else {
         dpm->setName(name.substr(0, endName));
         dpm->restartFile.setName(name);
     }
@@ -160,8 +160,26 @@ void CGHandler::restart(std::string name)
     // read restart file
     if (!dpm->readRestartFile())
     {
+        if (dpm->speciesHandler.getNumberOfObjects()==0) {
+            dpm->speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
+        }
+        std::ifstream data(dpm->dataFile.getName());
+        if (data.is_open()) {
+            Mdouble N = 0, t = 0;
+            Vec3D min, max;
+            data >> N >> t >> min >> max;
+            data.close();
+            dpm->setDomain(min,max);
+            logger(INFO,"Reading domain size from %: min %, max % ",dpm->dataFile.getName(), min,max);
+        } else {
+            logger(ERROR,"Data file could not be opened");
+        }
+        //adding 10 walls by default
+//        while (dpm->wallHandler.getNumberOfObjects()<10) {
+//            dpm->wallHandler.copyAndAddObject(InfiniteWall(dpm->speciesHandler.getLastObject()));
+//        }
         //what to do if restart file could not be loaded
-        cgLogger(INFO, "Using default dpm setup as % does not exist", dpm->restartFile.getName());
+        cgLogger(WARN, "Using default dpm setup as % does not exist", dpm->restartFile.getName());
     } else
     {
         cgLogger(INFO, "Successfully restarted from %, t=%, Np=%, Nc=%", dpm->restartFile.getFullName(), dpm->getTime(),
@@ -221,16 +239,16 @@ void CGHandler::computeContactPoints() {
             if (firstTime)
             {
                 cgLogger(WARN,
-                         "No contactPoint information and has to be recomputed; "
-                         "for complex walls and non-spherical particles, midpoint rule is assumed; "
-                         "periodic walls can create errors");
+                         "recomputing contact point, as contact point information is not available\n"
+                         "Contact point is placed assuming spherical particles\n"
+                         "Complex walls, non-spherical particles, periodic walls can create errors");
                 firstTime = false;
             }
         }
     }
 }
 
-void CGHandler::evaluateRestartFiles()
+bool CGHandler::evaluateRestartFiles()
 {
 
 #ifdef MERCURY_USE_MPI
@@ -253,12 +271,13 @@ void CGHandler::evaluateRestartFiles()
     // reset counters so reading begins with the first data/fstat file
     DPMBase* dpm = getDPMBase();
     //dpm->interactionHandler.clear();
-    dpm->dataFile.setCounter(0);
-    dpm->fStatFile.setCounter(0);
+    //dpm->dataFile.setCounter(0);
+    //dpm->fStatFile.setCounter(0);
+    //dpm->restartFile.setCounter(0);
 
     initialise();
 
-    // read data file
+    // evaluate restart files, including the one already read
     do
     {
         //recompute contact point (necessary for old restart files)
@@ -293,15 +312,14 @@ void CGHandler::evaluateRestartFiles()
         dpm->wallHandler.clear();
 
     } while (dpm->readRestartFile());
+    cgLogger(INFO, "Finished reading from %", dpm->dataFile.getFullName());
 
     finish();
-
-    cgLogger(INFO, "Finished reading from %", dpm->dataFile.getFullName());
     dpm->dataFile.close();
-
+    return true;
 }
 
-void CGHandler::evaluateDataFiles(bool evaluateFStatFiles)
+bool CGHandler::evaluateDataFiles(bool evaluateFStatFiles)
 {
 
 #ifdef MERCURY_USE_MPI
@@ -323,14 +341,17 @@ void CGHandler::evaluateDataFiles(bool evaluateFStatFiles)
 #endif
     // reset counters so reading begins with the first data/fstat file
     DPMBase* dpm = getDPMBase();
-    dpm->interactionHandler.clear();
+    //dpm->interactionHandler.clear();
     dpm->dataFile.setCounter(0);
     dpm->fStatFile.setCounter(0);
 
     initialise();
 
+    // return false if no data file can be read
+    if (!dpm->readNextDataFile()) return false;
+
     // read data file
-    while (dpm->readNextDataFile())
+    do
     {
         if (evaluateFStatFiles) dpm->readNextFStatFile();
         cgLogger(INFO, "Successfully read %, t=%, Np=%, Nc=%", dpm->dataFile.getFullName(), dpm->getTime(),
@@ -358,11 +379,10 @@ void CGHandler::evaluateDataFiles(bool evaluateFStatFiles)
             break;
         }
 
-    }
+    } while (dpm->readNextDataFile());
+    cgLogger(INFO, "Finished reading from %", dpm->dataFile.getFullName());
 
     finish();
-
-    cgLogger(INFO, "Finished reading from %", dpm->dataFile.getFullName());
     dpm->dataFile.close();
-
+    return true;
 }

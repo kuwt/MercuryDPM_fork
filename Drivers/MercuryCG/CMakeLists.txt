@@ -18,4 +18,5 @@ foreach(CPPFILE ${CPPFILES})
 endforeach()
 
 #copy loadstatistics.m into build
-file(COPY ${CMAKE_SOURCE_DIR}/Drivers/MercuryCG/loadstatistics.m DESTINATION .)
+file(COPY ${CMAKE_SOURCE_DIR}/Drivers/MercuryCG/readMercuryCG.m DESTINATION .)
+file(COPY ${CMAKE_SOURCE_DIR}/Drivers/MercuryCG/MercuryCG.txt DESTINATION .)

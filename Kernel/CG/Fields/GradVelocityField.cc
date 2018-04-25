@@ -80,6 +80,17 @@ void GradVelocityField::write(std::ostream& os) const
     os << " " << dmomentum_;
 }
 
+/*!
+ * \param[out] os the ostream into which the data is written.
+ */
+void GradVelocityField::output(std::ostream& os) const
+{
+    os << "density " << density_;
+    os << " momentum " << momentum_;
+    os << " ddensity " << ddensity_;
+    os << " dmomentum " << dmomentum_;
+}
+
 void GradVelocityField::setZero()
 {
     density_ = 0.0;

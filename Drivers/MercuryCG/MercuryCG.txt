@@ -1,0 +1,82 @@
+
+DESCRIPTION
+
+    MercuryCG is the postprocessing tool for extracting coarse-grained fields from particle data.
+
+SYNTAX
+
+    You need to specify the base name of the MercuryDPM output files (data/fstat or restart files) that should be analysed.
+    Additional arguments can be specified as [-option value] pairs:
+
+        ./MercuryCG name [-option value]
+
+
+EXAMPLES OF USE
+
+    1) To extract spatially-averaged continuum fields (i.e. the fields are functions of t only) from
+        the output files name.*, use the following command:
+
+        ./MercuryCG name -coordinates O
+
+    2) To extract fully-resolved continuum fields (i.e. the fields are functions of x, y, z and t) from the output files name.* on a 10x10x10 spatial grid, use the following command
+
+        ./MercuryCG name -coordinates XYZ -n 10
+
+OPTIONS
+
+    -help
+        Outputs a usage message and exits
+
+    -coordinate value, -stattype value
+        Determines which spatial dimensions should be resolved.
+        Possible values are O, X, Y, Z, XY, XZ, YZ, XYZ, default is O.
+
+    -function value, -cgtype value
+        Determines the cg function.
+        Possible values are Gauss, Heaviside, Linear, Lucy, default is Lucy.
+
+    -fields value
+        Determines which fields should be extracted.
+        Possible values are StandardFields, LiquidMigrationFields, GradVelocityFields, default is StandardFields.
+
+    -timeaverage
+        If this option is specified, the data will be time-averaged.
+
+    -timesmooth
+        If this option is specified, the data will be coarse-grained in time.
+
+    -n value
+        Creates a spatial grid of n elements in each resolved dimension.
+        Equivalent to '-nx value -ny value -nz value'.
+
+    -nx value, -ny value, -nz value
+        Specifies the amount of elements in each spatial direction.
+        Will be ignored if the spatial direction is not resolved.
+        Coarse-grained fields will be evaluated at the midpoints of each element.
+        By default, the domain  is equal to the spatial domain of the DPM, as specified in the restart file (or data file if no restart file is given). However, the domain of the grid can be specified by the -x, -y, -z options.
+        For example, for '-x 0 10 -nx 5', the cg fields will be evaluated at x=1,3,5,7,9.
+
+    -h value
+        Allows you to specify the element size in stead of the number of elements of the spatial grid.
+        Equivalent to '-hx value -hy value -hz value'.
+
+    -hx value, -hz value, -hz value
+        Allows you to specify the element size in stead of the number of elements of the spatial grid.
+        Equivalent to -nx ceil((maxX-minX)/value), where [minX,maxX] is the domain of the spatial grid.
+
+    -n value
+        Creates a spatial grid of n elements in each resolved dimension.
+        Equivalent to '-nx value -ny value -nz value'.
+
+    -x value1 value2, -y value1 value2, -z value1 value2
+        Specifies the domain of the spatial grid on which the coarse-grained fields will be evaluated.
+        For example, for '-x 0 10 -nx 5', the cg fields will be evaluated at x=1,3,5,7,9.
+
+    -t value1 value2, -tmin value, -tmax value
+        Specifies the minimum and maximum time values on which the cg fields will be evaluated.
+
+    -o value
+        Specifies the name of the output file in which the cg fields are written.
+        By default, the output file will be named 'name.stat'.
+
+For more information see http://docs.mercurydpm.org/Trunk/de/db6/MercuryCG.html

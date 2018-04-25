@@ -39,7 +39,7 @@
  */
 DomainHandler::DomainHandler()
 {
-    currentDomainIndex_ = NaN;
+    currentDomainIndex_ = 0;
     interactionDistance_ = 0.0;  
     logger(DEBUG, "DomainHandler::DomainHandler() finished");
 }

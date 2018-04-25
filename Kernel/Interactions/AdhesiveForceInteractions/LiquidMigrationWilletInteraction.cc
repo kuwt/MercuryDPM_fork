@@ -527,3 +527,25 @@ std::string LiquidMigrationWilletInteraction::getNameVTK(unsigned i) const {
 std::vector<Mdouble> LiquidMigrationWilletInteraction::getFieldVTK(unsigned i) const {
     return std::vector<Mdouble>(1, cbrt(liquidBridgeVolume_));
 }
+
+Mdouble LiquidMigrationWilletInteraction::getTotalLiquidFilmVolume(ParticleHandler&h) {
+    Mdouble volume = 0;
+    for (auto p : h) {
+        auto l = dynamic_cast<LiquidFilmParticle*>(p);
+        if (l) {
+            volume += l->getLiquidVolume();
+        }
+    }
+    return volume;
+}
+
+Mdouble LiquidMigrationWilletInteraction::getTotalLiquidBridgeVolume(InteractionHandler&h) {
+    Mdouble volume = 0;
+    for (auto i : h) {
+        auto l = dynamic_cast<LiquidMigrationWilletInteraction*>(i);
+        if (l) {
+            volume += l->getLiquidBridgeVolume();
+        }
+    }
+    return volume;
+}

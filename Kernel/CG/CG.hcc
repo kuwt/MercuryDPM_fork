@@ -39,10 +39,21 @@ CG<Coordinates, BaseFunction, Fields>::CG()
 }
 
 template<class Coordinates, template<class> class BaseFunction, class Fields>
+CG<Coordinates, BaseFunction, Fields>::CG(Mdouble width, unsigned n)
+{
+    function_.setWidth(width);
+    setN(n);
+#ifdef DEBUG_CONSTRUCTOR
+    std::cout << "CG<Coordinates, BaseFunction, Fields>::CG() finished" << std::endl;
+#endif
+}
+
+template<class Coordinates, template<class> class BaseFunction, class Fields>
 CG<Coordinates, BaseFunction, Fields>::CG(const CG& p)
         : BaseCG(p)
 {
     points_ = p.points_;
+    function_ = p.function_;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout << "CG<Coordinates, BaseFunction, Fields>::CG(const CG &p) finished" << std::endl;
 #endif
@@ -107,7 +118,7 @@ CG<Coordinates, BaseFunction, Fields>* CG<Coordinates, BaseFunction, Fields>::co
 template<class Coordinates, template<class> class BaseFunction, class Fields>
 std::string CG<Coordinates, BaseFunction, Fields>::getName() const
 {
-    return "CG";
+    return "CG<"+Coordinates::getName()+">";
 }
 
 template<class Coordinates, template<class> class BaseFunction, class Fields>
@@ -150,8 +161,8 @@ void CG<Coordinates, BaseFunction, Fields>::initialise()
         }
     }
     
-    if (std::isinf(getTimeMin()))
-        setTimeMin(dpm->getTime());
+    //if (std::isinf(getTimeMin()))
+    //    setTimeMin(dpm->getTime());
     
     if (std::is_same<Coordinates, CGCoordinates::R>::value || std::is_same<Coordinates, CGCoordinates::RZ>::value)
     {
@@ -183,6 +194,7 @@ void CG<Coordinates, BaseFunction, Fields>::initialise()
         min_.Z = dpm->getZMin();
     if (std::isinf(getMax().Z))
         max_.Z = dpm->getZMax();
+
 
     createMesh();    
 
@@ -243,8 +255,8 @@ void CG<Coordinates, BaseFunction, Fields>::outputSumOfVariables()
     if (CG_LOGLEVEL > Log::INFO)
     {
         std::stringstream ss;
-        evaluateTotal().Fields::write(ss);
-        cgLogger(INFO, "Total: %", ss.str());
+        evaluateAverage().Fields::output(ss);
+        cgLogger(INFO, "Spatial averages: %", ss.str());
     }
 };
 
@@ -298,9 +310,8 @@ void CG<Coordinates, BaseFunction, Fields>::evaluate()
 };
 
 template<class Coordinates, template<class> class BaseFunction, class Fields>
-typename CG<Coordinates, BaseFunction, Fields>::Point CG<Coordinates, BaseFunction, Fields>::evaluateTotal()
+typename CG<Coordinates, BaseFunction, Fields>::Point CG<Coordinates, BaseFunction, Fields>::evaluateAverage()
 {
-    Mdouble volume = Function::CoordinatesType::getDomainVolume(min_, max_);
     Point total;
     total.setZero();
     Mdouble weight = 0;
@@ -309,9 +320,10 @@ typename CG<Coordinates, BaseFunction, Fields>::Point CG<Coordinates, BaseFuncti
         total += c * c.coordinates.getWeight();
         weight += c.coordinates.getWeight();
     }
-    total /= weight / volume;
+    total /= weight;
     return total;
 }
+
 
 template<class Coordinates, template<class> class BaseFunction, class Fields>
 void CG<Coordinates, BaseFunction, Fields>::evaluateParticleAtPoint(Fields& currentInteraction,
@@ -538,4 +550,6 @@ void CG<Coordinates, BaseFunction, Fields>::finish()
 {
     cgLogger(DEBUG, "CG::finish   %", statFile.getName());
     statFile.close();
+
+    outputSumOfVariables();
 }

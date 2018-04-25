@@ -122,6 +122,7 @@ public:
         return direction;
     }
 
+    static std::string getName();
 
 protected:
 

@@ -90,3 +90,7 @@ Mdouble RZ::getTangentialSquared(const BaseInteraction& c, Mdouble pNormal) cons
            + mathsFunc::square(c.getP()->getPosition().Z - z_)
            - mathsFunc::square(pNormal);
 }
+
+std::string RZ::getName() {
+    return "RZ";
+}

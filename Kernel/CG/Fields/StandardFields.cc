@@ -48,6 +48,7 @@ StandardFields::StandardFields(const StandardFields& P)
     momentumFlux_ = P.momentumFlux_;
     contactStress_ = P.contactStress_;
     interactionForceDensity_ = P.interactionForceDensity_;
+    particleSizeDensity_ = P.particleSizeDensity_;
 #ifdef DEBUG_CONSTRUCTOR
     std::cerr << "StandardFields::copy() finished" << std::endl;
 #endif
@@ -66,12 +67,13 @@ StandardFields::~StandardFields()
  */
 void StandardFields::writeNames(std::ostream& os, const unsigned countVariables)
 {
-    os << countVariables + 1 << ":volumeFraction ";
-    os << countVariables + 2 << ":density ";
-    os << countVariables + 3 << '-' << countVariables + 5 << ":momentum ";
-    os << countVariables + 6 << '-' << countVariables + 11 << ":momentumFlux ";
-    os << countVariables + 12 << '-' << countVariables + 20 << ":contactStress ";
-    os << countVariables + 21 << '-' << countVariables + 23 << ":interactionForceDensity ";
+    os << countVariables + 1 << ":VolumeFraction "; //volume
+    os << countVariables + 2 << ":Density "; //mass
+    os << countVariables + 3 << '-' << countVariables + 5 << ":Momentum ";
+    os << countVariables + 6 << '-' << countVariables + 11 << ":MomentumFlux ";
+    os << countVariables + 12 << '-' << countVariables + 20 << ":ContactStress ";
+    os << countVariables + 21 << '-' << countVariables + 23 << ":InteractionForce ";
+    os << countVariables + 24 << '-' << countVariables + 29 << ":ParticleSize ";
 }
 
 /*!
@@ -80,11 +82,26 @@ void StandardFields::writeNames(std::ostream& os, const unsigned countVariables)
 void StandardFields::write(std::ostream& os) const
 {
     os << volumeFraction_;
-    os << " " << density_;
-    os << " " << momentum_;
-    os << " " << momentumFlux_;
-    os << " " << contactStress_;
-    os << " " << interactionForceDensity_;
+    os << ' ' << density_;
+    os << ' ' << momentum_;
+    os << ' ' << momentumFlux_;
+    os << ' ' << contactStress_;
+    os << ' ' << interactionForceDensity_;
+    for (const auto p : particleSizeDensity_) os << ' ' << p;
+}
+
+/*!
+ * \param[in,out] os the ostream into which the data is written.
+ */
+void StandardFields::output(std::ostream& os) const
+{
+    os << "VolumeFraction " << volumeFraction_;
+    os << " Density " << density_;
+    os << " Momentum " << momentum_;
+    os << " MomentumFlux " << momentumFlux_;
+    os << " ContactStress " << contactStress_;
+    os << " InteractionForce " << interactionForceDensity_;
+    os << " ParticleSize"; for (const auto p : particleSizeDensity_) os << ' ' << p;
 }
 
 void StandardFields::setZero()
@@ -95,6 +112,7 @@ void StandardFields::setZero()
     momentumFlux_.setZero();
     contactStress_.setZero();
     interactionForceDensity_.setZero();
+    for (auto& p : particleSizeDensity_) p = 0;
 }
 
 /*!
@@ -109,6 +127,8 @@ StandardFields StandardFields::getSquared() const
     P.momentumFlux_ = MatrixSymmetric3D::square(momentumFlux_);
     P.contactStress_ = Matrix3D::square(contactStress_);
     P.interactionForceDensity_ = Vec3D::square(interactionForceDensity_);
+    P.particleSizeDensity_ = particleSizeDensity_;
+    for (auto& p : P.particleSizeDensity_) p *= p;
     return P;
 }
 
@@ -124,6 +144,7 @@ StandardFields& StandardFields::operator=(const StandardFields& P)
     momentumFlux_ = P.momentumFlux_;
     contactStress_ = P.contactStress_;
     interactionForceDensity_ = P.interactionForceDensity_;
+    particleSizeDensity_ = P.particleSizeDensity_;
     return *this;
 }
 
@@ -139,6 +160,7 @@ StandardFields& StandardFields::operator+=(const StandardFields& P)
     momentumFlux_ += P.momentumFlux_;
     contactStress_ += P.contactStress_;
     interactionForceDensity_ += P.interactionForceDensity_;
+    for (size_t i=0; i<particleSizeDensity_.size(); ++i) particleSizeDensity_[i] += P.particleSizeDensity_[i];
     return *this;
 }
 
@@ -154,6 +176,7 @@ StandardFields& StandardFields::operator-=(const StandardFields& P)
     momentumFlux_ -= P.momentumFlux_;
     contactStress_ -= P.contactStress_;
     interactionForceDensity_ -= P.interactionForceDensity_;
+    for (size_t i=0; i<particleSizeDensity_.size(); ++i) particleSizeDensity_[i] -= P.particleSizeDensity_[i];
     return *this;
 }
 
@@ -170,6 +193,7 @@ StandardFields StandardFields::operator*(const Mdouble a) const
     p.momentumFlux_ = momentumFlux_ * a;
     p.contactStress_ = contactStress_ * a;
     p.interactionForceDensity_ = interactionForceDensity_ * a;
+    for (size_t i=0; i<particleSizeDensity_.size(); ++i) p.particleSizeDensity_[i] = particleSizeDensity_[i] * a;
     return p;
 }
 
@@ -185,6 +209,7 @@ StandardFields& StandardFields::operator/=(const Mdouble a)
     momentumFlux_ /= a;
     contactStress_ /= a;
     interactionForceDensity_ /= a;
+    for (auto& p : particleSizeDensity_) p /= a;
     return *this;
 }
 
@@ -198,6 +223,7 @@ void StandardFields::addParticleStatistics(Mdouble phi, const StandardFields& cu
     density_ += currentInteraction.getDensity() * phi;
     momentum_ += currentInteraction.getMomentum() * phi;
     momentumFlux_ += currentInteraction.getMomentumFlux() * phi;
+    for (size_t i=0; i<particleSizeDensity_.size(); ++i) particleSizeDensity_[i] += currentInteraction.getParticleSizeDensity(i) * phi;
 }
 
 void StandardFields::addParticleDifferentialStatistics(Vec3D& dphi, const StandardFields& currentInteraction)
@@ -256,6 +282,11 @@ void StandardFields::setFields(const BaseParticle& p)
     density_ = p.getMass();
     momentum_ = p.getVelocity() * p.getMass();
     momentumFlux_ = MatrixSymmetric3D::selfDyadic(p.getVelocity()) * p.getMass();
+    Mdouble particleSize = 1.0;
+    for (auto& ps : particleSizeDensity_) {
+        ps = particleSize;
+        particleSize *= p.getRadius();
+    }
 }
 
 void StandardFields::setCylindricalFields(const BaseInteraction& c, IntegralType type)
@@ -270,6 +301,47 @@ void StandardFields::setCylindricalFields(const BaseParticle& p)
     setFields(p);
     momentum_ = momentum_.getCylindricalTensorField(p.getPosition());
     momentumFlux_ = momentumFlux_.getCylindricalTensorField(p.getPosition());
+}
+
+void StandardFields::outputStandardisedParticleSizeMomenta(std::ostream &os) const {
+    //https://en.wikipedia.org/wiki/Moment_%28mathematics%29#Higher_moments
+    auto momenta = getStandardisedParticleSizeMomenta();
+    os << "Particle number: " << momenta[0] << '\n';
+    os << "Mean radius: " << momenta[1] << '\n';
+    os << "Standard deviation: " << std::sqrt(momenta[2]) << '\n';
+    os << "Skewness: " << momenta[3] << '\n'; //left- or right-sided
+    os << "Kurtosis: " << momenta[4] << '\n'; //heavy or light tailed (3 for normal distribution)
+    os << "5-th moment: " << momenta[5] << '\n'; //hyper skewness (0 for normal dist)
+}
+
+std::array<Mdouble, 6> StandardFields::getParticleSizeMomenta() const {
+    //https://en.wikipedia.org/wiki/Moment_(mathematics)
+    auto momenta = particleSizeDensity_;
+    for (size_t i=1; i<particleSizeDensity_.size(); ++i) {
+        momenta[i] /= particleSizeDensity_[0];
+    }
+    return momenta;
+}
+
+std::array<Mdouble, 6> StandardFields::getCentralParticleSizeMomenta() const {
+    //https://en.wikipedia.org/wiki/Central_moment
+    auto momenta = getParticleSizeMomenta();
+    Mdouble mean = momenta[1];
+    momenta[5] += -5*mean*momenta[4] +10*mean*mean*momenta[3]
+                  -10*mean*mean*mean*momenta[2] +4*mean*mean*mean*mean*mean;
+    momenta[4] += -4*mean*momenta[3] +6*mean*mean*momenta[2] -3*mean*mean*mean*mean;
+    momenta[3] += -3*mean*momenta[2] +2*mean*mean*mean;
+    momenta[2] += -mean*mean;
+    return momenta;
+}
+
+std::array<Mdouble, 6> StandardFields::getStandardisedParticleSizeMomenta() const {
+    auto momenta = getCentralParticleSizeMomenta();
+    Mdouble std = std::sqrt(momenta[2]);
+    momenta[3] /= std*std*std;
+    momenta[4] /= std*std*std*std;
+    momenta[5] /= std*std*std*std*std;
+    return momenta;
 }
 
 }

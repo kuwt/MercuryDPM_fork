@@ -35,15 +35,12 @@ BaseCG::BaseCG()
     nX_ = 1;
     nY_ = 1;
     nZ_ = 1;
-    width_ = 1.0;
     timeMin_ = -inf;
     timeMax_ = inf;
     min_ = Vec3D(-inf, -inf, -inf);
     max_ = Vec3D(inf, inf, inf);
     selectedParticle_ = [](const BaseInteractable* p) { return true; };
-#ifdef DEBUG_CONSTRUCTOR
-    std::cout << "BaseCG::BaseCG() finished" << std::endl;
-#endif
+    logger(DEBUG,"BaseCG::BaseCG() finished");
 }
 
 BaseCG::BaseCG(const BaseCG& p) : BaseObject(p)
@@ -53,7 +50,6 @@ BaseCG::BaseCG(const BaseCG& p) : BaseObject(p)
     nX_ = p.getNX();
     nY_ = p.getNY();
     nZ_ = p.getNZ();
-    width_ = p.getWidth();
     timeMin_ = p.timeMin_;
     timeMax_ = p.timeMax_;
     min_ = p.min_;
@@ -86,13 +82,14 @@ void BaseCG::read(std::istream& is UNUSED)
  */
 void BaseCG::write(std::ostream& os) const
 {
-    BaseObject::write(os);
-    os << " n " << nX_ << " " << nY_ << " " << nZ_;
-    os << " width " << width_;
-    if (!std::isinf(timeMin_)) os << " timeMin " << timeMin_;
-    if (!std::isinf(timeMax_)) os << " timeMax " << timeMax_;
+    //BaseObject::write(os);
+    os << getName();
     os << " min " << min_;
     os << " max " << max_;
+    if (!std::isinf(timeMin_)) os << " timeMin " << timeMin_;
+    if (!std::isinf(timeMax_)) os << " timeMax " << timeMax_;
+    os << " n " << nX_ << " " << nY_ << " " << nZ_;
+    os << " width " << getWidth();
     //statFile
 }
 
@@ -113,22 +110,6 @@ CGHandler* BaseCG::getHandler() const
     }
 #endif
     return handler_;
-}
-
-/*!
- * \param[in] width of the cg function for all CGPoints
- */
-void BaseCG::setWidth(Mdouble width)
-{
-    width_ = width;
-}
-
-/*!
- * \return width of the cg function for all CGPoints
- */
-Mdouble BaseCG::getWidth() const
-{
-    return width_;
 }
 
 void BaseCG::setEps(Mdouble eps)
@@ -254,3 +235,26 @@ void BaseCG::setSelectedParticle(const std::function<const bool(const BaseIntera
 {
     selectedParticle_ = selectedParticle;
 }
+
+void BaseCG::setH(Mdouble h) {
+    setHX(h);
+    setHY(h);
+    setHZ(h);
+    logger(INFO,"min % max % h % nz %",min_,max_,h,nZ_);
+}
+
+void BaseCG::setHX(Mdouble h) {
+    setNX(std::ceil((max_.X-min_.X)/h));
+    logger.assert_always(h>0 && getNX()>0,"setHX(%) generated nX=% for %<x<%",h,getNX(),min_.X,max_.X);
+}
+
+void BaseCG::setHY(Mdouble h) {
+    setNY(std::ceil((max_.Y-min_.Y)/h));
+    logger.assert_always(h>0 && getNY()>0,"setHY(%) generated nY=% for %<y<%",h,getNY(),min_.Y,max_.Y);
+}
+
+void BaseCG::setHZ(Mdouble h) {
+    setNZ(std::ceil((max_.Z-min_.Z)/h));
+    logger.assert_always(h>0 && getNZ()>0,"setHZ(%) generated nZ=% for %<z<%",h,getNZ(),min_.Z,max_.Z);
+}
+

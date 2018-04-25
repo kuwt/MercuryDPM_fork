@@ -2502,7 +2502,7 @@ bool DPMBase::readNextDataFile(unsigned int format) {
             	"particles than are currently in the particleHandler. "
             	"Newly created particles will be non-fixed spherical particles.");
             if (!readSpeciesFromDataFile_)
-     	  	logger(WARN,"Note new particles are assumed to be of species zero. "
+     	  	logger(WARN,"Note: new particles are assumed to be of species zero. "
      	  		"To read species information from the data file, "
      	  		"set readSpeciesFromDataFile to true");
      
@@ -2707,6 +2707,10 @@ void DPMBase::readNextFStatFile()
         else
 	    {
             // wall-particle contact
+            while (wallHandler.getNumberOfObjects()<=-indexI-1) {
+                wallHandler.copyAndAddObject(InfiniteWall(speciesHandler.getLastObject()));
+                logger(WARN,"Added new wall because .fstat file indicates contact with wall % that doesn't exist",-indexI-1);
+            }
             BaseWall* I = wallHandler.getObject(-indexI-1);
             C = interactionHandler.addInteraction(P, I, getNtimeSteps()+1);
             C->setFStatData(in, P, I);
@@ -2786,10 +2790,9 @@ bool DPMBase::readRestartFile()
         setRestarted(true);
         return true;
     }
-   //if the file could not be opened else
-    else
+    else /* if the file could not be opened */
     {
-        logger(WARN, "% could not be loaded.", restartFile.getFullName());
+        logger(INFO, "% could not be loaded.", restartFile.getFullName());
         return false;
     }
 }
@@ -3340,10 +3343,18 @@ void DPMBase::read(std::istream& is)
         is >> restartVersion_;
         //checking which version the current data file corresponds to, and reads the data in
         //accordingly
-        if (!restartVersion_.compare("1.0"))
-        {
+        if (!restartVersion_.compare("1.0")) {
             //reads in and saves the relevant values from the data file to the current instance of DPMBase
             std::stringstream line(std::stringstream::in | std::stringstream::out);
+
+            // Store path (if restart file is nonlocal)
+            auto slash = restartFile.getName().rfind('/');
+            std::string path;
+            if (slash != std::string::npos) {
+                path = restartFile.getName().substr(0, slash+1);
+            }
+            logger(INFO,"Adding path information to output file names: %",path);
+
 
             //line 1
             helpers::getLineFromStringStream(is, line);
@@ -3359,7 +3370,7 @@ void DPMBase::read(std::istream& is)
             line >> dummy >> name_;
             setName(name_);
 
-            //line 2
+            //Read line 2-7 (definition of i/o files)
             helpers::getLineFromStringStream(is, line);
             line >> dummy >> dataFile;
             helpers::getLineFromStringStream(is, line);
@@ -3371,11 +3382,19 @@ void DPMBase::read(std::istream& is)
             helpers::getLineFromStringStream(is, line);
             line >> dummy >> statFile;
 
+            // Add the file path from the restart file to the file names
+            dataFile.setName(path+dataFile.getName());
+            fStatFile.setName(path+fStatFile.getName());
+            eneFile.setName(path+eneFile.getName());
+            restartFile.setName(path+restartFile.getName());
+            statFile.setName(path+statFile.getName());
+
             // Get current position
             //check if the next line starts with 'interactionFile'; otherwise, skip interaction
             if (helpers::compare(is,"interactionFile")) {
                 helpers::getLineFromStringStream(is, line);
                 line >> interactionFile;
+                interactionFile.setName(path+interactionFile.getName());
             }
 
             helpers::getLineFromStringStream(is, line);

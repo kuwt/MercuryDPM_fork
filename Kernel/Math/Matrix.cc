@@ -25,6 +25,7 @@
 
 #include "Matrix.h"
 #include "ExtendedMath.h"
+using mathsFunc::square;
 
 /*!
  * \details default constructor, which is empty (i.e., only creates the object)
@@ -62,13 +63,22 @@ void Matrix3D::setZero()
 }
 
 /*!
- * \details Returns the sum of the diagonal elements of the maxtrix, divided by 
- * the total number of diagonal elements.
+ * \details Returns the sum of the diagonal elements of the matrix.
  * \return The trace of the matrix divided by 3 as an Mdouble
  */
 Mdouble Matrix3D::trace() const
 {
-    return (XX + YY + ZZ) / 3;
+    return XX + YY + ZZ;
+}
+
+/*!
+ * \details Returns an invariant of the deviatoric tensor, scaled such that it is equal to shear stress for the stress tensor.
+ * \return resulting scalar
+ */
+Mdouble Matrix3D::deviator() const
+{
+    const Mdouble P = trace()/3.0;
+    return std::sqrt(0.5*(mathsFunc::square(XX-P)+mathsFunc::square(YY-P)+mathsFunc::square(ZZ-P)) + 0.25*(mathsFunc::square(XY+YX)+mathsFunc::square(XZ+ZX)+mathsFunc::square(YZ+ZY)));
 }
 
 /*!

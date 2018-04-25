@@ -549,7 +549,8 @@ std::vector<double> helpers::readArrayFromFile(std::string filename, int& n, int
 
 void helpers::more(std::string filename, unsigned nLines)
 {
-    std::cout << "First " << nLines << " lines of " << filename << ":\n";
+    if (nLines != unsignedMax)
+        std::cout << "First " << nLines << " lines of " << filename << ":\n";
     std::fstream file;
     file.open(filename.c_str(), std::ios::in);
     if (file.fail())
@@ -564,6 +565,14 @@ void helpers::more(std::string filename, unsigned nLines)
     file.close();
 }
 
+std::string helpers::to_string(const Mdouble value, unsigned precision)
+{
+    std::ostringstream stm;
+    const Mdouble logValue = log10(value);
+    const int factor = std::pow(10,precision-std::ceil(logValue));
+    stm << std::round(value*factor)/factor;
+    return stm.str() ;
+}
 
 /**
  * Creates a DPMBase with a particles of unit size and a flat wall and loads/unloads the particle-wall contact
@@ -813,6 +822,7 @@ bool helpers::compare(std::istream& is,std::string s)
 void helpers::check(double real, double ideal, double error, std::string errorMessage) {
     logger.assert_always(mathsFunc::isEqual(real, ideal, error),
                          errorMessage + ": % (should be %) ",real, ideal);
+    logger(INFO,errorMessage + ": % (correct)",real);
 }
 
 void helpers::check(Vec3D real, Vec3D ideal, double error, std::string errorMessage) {
@@ -823,6 +833,7 @@ void helpers::check(Vec3D real, Vec3D ideal, double error, std::string errorMess
                          errorMessage + ": % (should be %) ",real, ideal);
     logger.assert_always(mathsFunc::isEqual(real.Z, ideal.Z, error),
                          errorMessage + ": % (should be %) ",real, ideal);
+    logger(INFO,errorMessage + ": % (correct)",real);
 }
 
 std::string helpers::getPath() {

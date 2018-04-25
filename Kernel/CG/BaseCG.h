@@ -62,7 +62,7 @@ public:
      */
     BaseCG();
 
-    /*!
+     /*!
      * \brief
      */
     BaseCG(const BaseCG& p);
@@ -124,13 +124,14 @@ public:
 
     /*!
      * \brief Sets width_, the coarse-graining width.
+     * \todo shoud be standard deviation, but is currently cutoff.
      */
-    void setWidth(Mdouble width);
+    virtual void setWidth(Mdouble width)=0;
 
     /*!
      * \brief Returns width_, the coarse-graining width.
      */
-    Mdouble getWidth() const;
+    virtual Mdouble getWidth() const =0;
 
     /*!
      * \brief Sets nZ_, the number of spatial mesh points in the z-direction.
@@ -167,7 +168,34 @@ public:
      */
     void setN(std::size_t n);
 
+    /*!
+     * \brief Sets nX_, nY_, nZ_, the number of spatial mesh points in each cartesian direction.
+     */
     void setN(std::array<std::size_t, 3> n);
+
+    /*!
+     * \brief Sets nX_, nY_, nZ_, the number of spatial mesh points in each cartesian direction.
+     * However, instead of explicitly defining n, the mesh size h=(max-min)/n is defined
+     */
+    void setH(Mdouble h);
+
+    /*!
+     * \brief Sets nX_ the number of spatial mesh points in the X-direction.
+     * Instead of explicitly defining nX, the mesh size hX=(max.X-min.X)/nX is defined
+     */
+    void setHX(Mdouble h);
+
+    /*!
+     * \brief Sets nX_ the number of spatial mesh points in the X-direction.
+     * Instead of explicitly defining nX, the mesh size hX=(max.X-min.X)/nX is defined
+     */
+    void setHY(Mdouble h);
+
+    /*!
+     * \brief Sets nX_ the number of spatial mesh points in the X-direction.
+     * Instead of explicitly defining nX, the mesh size hX=(max.X-min.X)/nX is defined
+     */
+    void setHZ(Mdouble h);
 
     /*!
      * \brief Sets timeMin_, the lower limit of the temporal domain.
@@ -236,7 +264,19 @@ public:
 
     Mdouble getEps() const;
 
-protected:
+    /*
+     * Sets width such that the CG function has a fixed standard deviation
+     * See CGStandardDeviationUnitTest.
+     */
+    virtual void setStandardDeviation (Mdouble std) = 0;
+
+    /*
+     * Sets width such that the CG function has the same standard deviation as a spherical cg function.
+     * See CGStandardDeviationUnitTest.
+     */
+    virtual void setRadius (Mdouble radius) = 0;
+
+    protected:
 
     /*!
      * the pointer to the CGHandler, used to get data from the CGHandler.
@@ -261,12 +301,6 @@ protected:
      * see nZ_
      */
     std::size_t nZ_;
-
-    /*!
-     * width_, the coarse-graining width, is used to set the width of the
-     * CGFunction; it is 1.0 by default, unless modified by the user.
-     */
-    Mdouble width_;
 
     /*!
      * Finite difference step size  used to computed derivatives
@@ -300,7 +334,7 @@ protected:
     Vec3D max_;
 
     /*!
-     * a function returning true for each particle that should be included in the statistics (all by default).
+     * A function returning true for each particle that should be included in the statistics (all by default).
      */
     std::function<const bool(const BaseInteractable*)> selectedParticle_;
 

@@ -57,10 +57,15 @@ public:
     void setZero();
     
     /*!
-     * \brief Mean of the diagonal elements
+     * \brief Sum of the diagonal elements
      */
     double trace() const;
-    
+
+    /*!
+     * \brief Deviator
+     */
+    double deviator() const;
+
     /*!
      * \brief Matrix addition
      */

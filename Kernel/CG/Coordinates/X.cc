@@ -87,4 +87,7 @@ Mdouble X::getCNormal(const BaseInteraction& c, const Vec3D& normal) const
     return (c.getContactPoint().X - x_) * normal.X;
 }
 
+std::string X::getName() {
+    return "X";
+}
 

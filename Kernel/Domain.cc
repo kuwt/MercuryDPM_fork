@@ -127,7 +127,7 @@ Domain::~Domain()
  */
 void Domain::constructor()
 {
-    rank_ = inf;
+    rank_ = intMax;
     domainHandler_ = nullptr;
     domainMin_ = {-inf, -inf, -inf};
     domainMax_ = {inf, inf, inf};

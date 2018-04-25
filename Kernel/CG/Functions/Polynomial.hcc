@@ -80,7 +80,7 @@ Polynomial<Coordinates>::Polynomial()
 {
     coefficients_.resize(0);
     polynomialType_ = PolynomialType::HEAVISIDE;
-    cutoff_ = 0.0;
+    cutoff_ = 1.0;
     eps_ = 1e-6;
     currentInteraction_ = 9999;
 #ifdef DEBUG_CONSTRUCTOR
@@ -123,6 +123,37 @@ void Polynomial<Coordinates>::setWidth(Mdouble width)
     setCutoff(width);
 }
 
+/*!
+ * \return the width of the coarse-graining function.
+ */
+template<class Coordinates>
+Mdouble Polynomial<Coordinates>::getWidth() const
+{
+    return getCutoff();
+}
+
+template<class Coordinates>
+void Polynomial<Coordinates>::setStandardDeviation(Mdouble std)
+{
+    if (std::is_same<CGCoordinates::O, Coordinates>::value)
+        return;
+
+    Mdouble relStd = 0;
+    int n = 0;
+    for (const auto c : coefficients_) {
+        if (std::is_base_of<CGCoordinates::Base_X_Y_Z, Coordinates>::value) {
+            relStd += c*2./(n+3);
+        } else if (std::is_base_of<CGCoordinates::Base_XY_XZ_YZ, Coordinates>::value) {
+            relStd += c*2.*constants::pi/(n+4);
+        } else /*XYZ*/ {
+            relStd += c*4.*constants::pi/(n+5);
+        }
+        ++n;
+    }
+    relStd = sqrt(relStd);
+    setCutoff(std/relStd);
+}
+
 template<class Coordinates>
 void Polynomial<Coordinates>::setCutoff(Mdouble cutoff)
 {
@@ -141,8 +172,7 @@ void Polynomial<Coordinates>::setPolynomialType(PolynomialType polynomialType)
 {
     polynomialType_ = polynomialType;
     //don't recompute before cutoff is set
-    if (cutoff_ != 0)
-        computeCoefficients();
+    computeCoefficients();
 }
 
 /*!
@@ -168,8 +198,9 @@ void Polynomial<Coordinates>::computeCoefficients()
         std::cerr << "PolynomialType not known: " << polynomialType_ << std::endl;
         exit(-1);
     }
+    logger.assert (cutoff_>0,"Cutoff % should be positive",cutoff_);
     Coordinates::normalisePolynomialCoefficients(coefficients_, cutoff_);
-    //std::cout << "X" << coefficients_[0] << " " <<  cutoff_ << std::endl; exit(-1);
+    //std::cout << "X" << coefficients_[0] << " " <<  cutoff_ << std::endl; //exit(-1);
 }
 
 template<class Coordinates>
@@ -295,6 +326,7 @@ Polynomial<Coordinates>::evaluateCGIntegral(const BaseInteraction& c, const Coor
     }
     if (pNormal < -getCutoff())
         return 0.0;
+
     tangentialSquared = r.getTangentialSquared(c, r.getPNormal(c, normal_));
     if (tangentialSquared > mathsFunc::square(cutoff_))
         return 0.0;

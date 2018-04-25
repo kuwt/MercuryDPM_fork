@@ -75,6 +75,11 @@ public:
     void write(std::ostream& os) const;
 
     /*!
+     * \brief Writes human-readable class content into an output stream, typically a stat file.
+     */
+    void output(std::ostream& os) const;
+
+    /*!
      * \brief Sets all fields to zero.
      */
     void setZero();

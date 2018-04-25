@@ -122,8 +122,6 @@ void TimeAveragedCG<Coordinates, BaseFunction, Fields>::finish()
 
     CG<Coordinates, BaseFunction, Fields>::writeVariables();
 
-    CG<Coordinates, BaseFunction, Fields>::outputSumOfVariables();
-
     CG<Coordinates, BaseFunction, Fields>::finish();
 }
 

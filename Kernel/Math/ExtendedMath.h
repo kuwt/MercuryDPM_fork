@@ -98,7 +98,7 @@ namespace mathsFunc
     /*!
      * \brief squares a number
      */
-    template<typename T> T square(T val)
+    template<typename T> T square(const T val)
     {
         return val * val;
     }
@@ -106,7 +106,7 @@ namespace mathsFunc
     /*!
      * \brief calculates the cube of a number
      */
-    template<typename T> T cubic(T val)
+    template<typename T> T cubic(const T val)
     {
         return val * val * val;
     }

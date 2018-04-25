@@ -58,7 +58,11 @@ public:
      */
     InfiniteWall(const InfiniteWall& w);
 
-    
+    /*!
+     * \brief Constructor setting species.
+     */
+    InfiniteWall(const ParticleSpecies* species);
+
     /*!
      * \brief Constructor setting values.
      */

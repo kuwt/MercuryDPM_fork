@@ -424,7 +424,7 @@ void BaseParticle::oldRead(std::istream& is)
     invInertia_.XX = invInertiaScalar;
     invInertia_.YY = invInertiaScalar;
     invInertia_.ZZ = invInertiaScalar;
-    setIndSpecies(indSpecies);
+    BaseInteractable::setIndSpecies(indSpecies);
     setId(id);
     setIndex(id);
     id++;

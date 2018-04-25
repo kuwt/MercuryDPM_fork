@@ -116,7 +116,7 @@ public:
     void finish();
 
     /*!
-     * \brief loads restart file, then runs evaluateDataFiles
+     * \brief loads restart file, before evaluateDataFiles is run
      */
     void restart(std::string name);
 
@@ -128,9 +128,9 @@ public:
      * \brief does the same as StatisticsVector::statistics_from_fstat_and_data:
      * loads a restart file (if existing), then several data files, and fstat files (if existing)
      */
-    void evaluateDataFiles(bool evaluateFStatFiles = true);
+    bool evaluateDataFiles(bool evaluateFStatFiles = true);
 
-    void evaluateRestartFiles();
+    bool evaluateRestartFiles();
 
     void computeContactPoints();
 

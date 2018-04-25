@@ -76,6 +76,15 @@ void LiquidMigrationFields::write(std::ostream& os) const
     os << " " << liquidFilmVolume_;
 }
 
+/*!
+ * \param[out] os the ostream into which the data is written.
+ */
+void LiquidMigrationFields::output(std::ostream& os) const
+{
+    os << "liquidBridgeVolume " << liquidBridgeVolume_;
+    os << " liquidFilmVolume " << liquidFilmVolume_;
+}
+
 void LiquidMigrationFields::setZero()
 {
     liquidBridgeVolume_ = 0.0;

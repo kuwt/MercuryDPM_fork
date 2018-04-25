@@ -28,6 +28,7 @@
 #include <Math/Matrix.h>
 #include <Math/MatrixSymmetric.h>
 #include <CG/Functions/IntegralType.h>
+#include <array>
 
 class BaseParticle;
 
@@ -72,6 +73,11 @@ public:
      * \brief Writes class content into an output stream, typically a stat file.
      */
     void write(std::ostream& os) const;
+
+    /*!
+     * \brief Writes human-readable class content into an output stream, typically a stat file.
+     */
+    void output(std::ostream& os) const;
 
     /*!
      * \brief Sets all fields to zero.
@@ -177,6 +183,24 @@ public:
         return interactionForceDensity_;
     }
 
+    Mdouble getParticleSizeDensity(size_t i) const
+    {
+        return particleSizeDensity_[i];
+    }
+
+    std::array<Mdouble,6> getParticleSizeDensity() const
+    {
+        return particleSizeDensity_;
+    }
+
+    std::array<Mdouble,6> getParticleSizeMomenta() const;
+
+    std::array<Mdouble,6> getCentralParticleSizeMomenta() const;
+
+    std::array<Mdouble,6> getStandardisedParticleSizeMomenta() const;
+
+    void outputStandardisedParticleSizeMomenta(std::ostream& os) const;
+
     static bool evaluateFixedParticles()
     {
         return false;
@@ -254,6 +278,18 @@ private:
      * see CGFunctions::Gauss::evaluateCGFunction.
      */
     Vec3D interactionForceDensity_;
+
+    /*!
+     * Density of particle size, and powers of particle size,
+     * \f[ \vec{PS}_k(\vec r,t)= \sum_i r_i^k \phi(\vec r),\f]
+     * with radius \f$r_i\f$.
+     *
+     * Used to compute the first five moments of the particle size distribution,
+     * \f[ <r^k>(\vec r,t)= \vec{PS}_k / \vec{PS}_0, \f]
+     * with \f$\vec{PS}_0\f$ denoting the number density.
+     */
+    std::array<Mdouble,6> particleSizeDensity_;
+
 };
 
 }

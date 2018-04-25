@@ -23,6 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <CG/TimeAveragedCG.h>
 #include "Mercury3D.h"
 #include "Math/ExtendedMath.h"
 #include "Species/HertzianViscoelasticMindlinSpecies.h"
@@ -34,8 +35,8 @@ public:
     void setupInitialConditions() override
     {
         setName("CGReadFiles");
-        dataFile.setFileType(FileType::MULTIPLE_FILES);
-        fStatFile.setFileType(FileType::MULTIPLE_FILES);
+        //dataFile.setFileType(FileType::MULTIPLE_FILES);
+        //fStatFile.setFileType(FileType::MULTIPLE_FILES);
         setSaveCount(10);
 
         HertzianViscoelasticMindlinSpecies species;
@@ -46,42 +47,43 @@ public:
         p.setSpecies(speciesHandler.getObject(0));
         p.setRadius(0.5);
         p.setPosition(Vec3D(0.0, 0.0, 0.0));
-        p.setVelocity(Vec3D(-1.0, 0.0, 0.0));
+        p.setVelocity(Vec3D(1.0, 0.0, 0.0));
         particleHandler.copyAndAddObject(p);
 
         setTimeStep(0.01);
         setTimeMax(100*getTimeStep());
         setMin(-0.5, -0.5, -0.5);
         setMax(0.5, 0.5, 0.5);
-    }
-};
-
-
-class CGReadFiles : public DPMBase
-{
-public:
-
-    void test()
-    {
-        setName("CGReadFiles2");
-        auto cg = cgHandler.copyAndAddObject(CG<CGCoordinates::O>());
-        cgHandler.restartAndEvaluateDataFiles("CGReadFiles");
-        Mdouble density = cg->getPoint(0).getDensity();
-        std::cout << getTime();
-        logger.assert_always(mathsFunc::isEqual(density,1,1e-10),
-                "Wrong density: % (should be 1)",density);
-        logger(INFO,"Test successful");
+        setGravity({1,0,0});
     }
 };
 
 int main()
 {
-    logger(INFO,"Testing if data and fstat files are successfully written, and read by the cgHandler.");
+    logger(INFO,"Testing if data and fstat files are successfully read by the cgHandler.");
 
-    CreateDataAndFStatFiles problem0;
-    problem0.solve();
+    CreateDataAndFStatFiles problem;
+    problem.solve();
 
-    CGReadFiles problem1;
-    problem1.test();
+    //evaluate cg from data file
+    DPMBase evaluate;
+    evaluate.setName("CGReadFiles2");
+    auto cg = evaluate.cgHandler.copyAndAddObject(CG<CGCoordinates::O>());
+    cg->statFile.setName("CGReadFiles2.stat");
+    evaluate.cgHandler.restartAndEvaluateDataFiles("CGReadFiles");
+
+    //evaluate time-averaged cg from data file
+    DPMBase evaluate2;
+    evaluate2.setName("CGReadFiles3");
+    auto cg2 = evaluate2.cgHandler.copyAndAddObject(TimeAveragedCG<CGCoordinates::O>());
+    cg2->statFile.setName("CGReadFiles3.stat");
+    cg2->setTimeMin(0);
+    evaluate2.cgHandler.restartAndEvaluateDataFiles("CGReadFiles");
+
+    helpers::check(cg->getPoint(0).getDensity(),1,1e-10, "Density");
+    helpers::check(cg->getPoint(0).getMomentum().X,2,1e-10, "Momentum");
+    helpers::check(cg2->getPoint(0).getDensity(),1,1e-10, "Time-averaged density");
+    helpers::check(cg2->getPoint(0).getMomentum().X,1.5,1e-10, "Time-averaged momentum");
+
     return 0;
 }

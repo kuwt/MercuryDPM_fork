@@ -91,6 +91,11 @@ public:
     CG();
 
     /*!
+     * \brief
+     */
+    CG(Mdouble width, unsigned n);
+
+    /*!
      * \brief Default copy Constructor; copies all member variables.
      */
     CG(const CG& p);
@@ -139,6 +144,14 @@ public:
      */
     void evaluate() override;
 
+    /*!
+     * \brief Computes the spatially-averaged value for each field.
+     */
+    Point evaluateAverage();
+
+    /*!
+     * \brief Computes the total value (integrated over space) for each field.
+     */
     Point evaluateTotal();
 
     void evaluateParticleAtPoint(Fields& currentInteraction, const BaseParticle& p, Point& r);
@@ -177,7 +190,40 @@ public:
         return points_;
     }
 
+    Function& getFunction()
+    {
+        return function_;
+    }
 
+    void setStandardDeviation (Mdouble std) {
+        function_.setStandardDeviation(std);
+    }
+
+    void setRadius (Mdouble radius) {
+        if (std::is_base_of<CGCoordinates::Base_X_Y_Z, Coordinates>::value) {
+            function_.setStandardDeviation(radius*sqrt(.2));
+        } else if (std::is_base_of<CGCoordinates::Base_XY_XZ_YZ, Coordinates>::value) {
+            function_.setStandardDeviation(radius*sqrt(.4));
+        } else /*XYZ*/ {
+            function_.setStandardDeviation(radius*sqrt(.6));
+        }
+    }
+
+    /*!
+     * \param[in] width of the cg function for all CGPoints
+     */
+    void setWidth(Mdouble width)
+    {
+        function_.setWidth(width);
+    }
+
+    /*!
+     * \return width of the cg function for all CGPoints
+     */
+    Mdouble getWidth() const
+    {
+        return function_.getWidth();
+    }
 protected:
 
     /*!
@@ -204,6 +250,8 @@ protected:
      * \brief plot total to console
      */
     void outputSumOfVariables();
+
+protected:
 
     /*!
      * \brief Contains the CGPoint's, i.e. the positions at which the StandardFields

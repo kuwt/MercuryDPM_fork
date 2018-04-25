@@ -1,4 +1,4 @@
-TimeAveragedCG id 1 n 30 30 1 width 0.25 timeMin 0 min 0 0 -0.5 max 10 10 0.5 Heaviside cutoff 0.25
+TimeAveragedCG<XY> min 0 0 -0.5 max 10 10 0.5 n 30 30 1 width 0.25 Heaviside cutoff 0.25
 time x y 4:liquidBridgeVolume 5:liquidFilmVolume 
 2.001 0.166667 0.166667 0 0
 2.001 0.166667 0.5 0 0
