@@ -51,7 +51,7 @@ public:
     /*!
      * \brief Assignment operator.
      */
-    InteractionHandler& operator =(const InteractionHandler& rhs);
+    InteractionHandler& operator=(const InteractionHandler& rhs);
     
     /*!
      * \brief Destructor, it destructs the InteractionHandler and all BaseInteraction it contains.

@@ -43,7 +43,7 @@ public:
     SpeciesHandler(const SpeciesHandler& other);
 
     /// \brief Assignment operator that copies all species and the pointer to the DPMBase from the given SpeciesHandler.
-    SpeciesHandler& operator =(const SpeciesHandler& rhs);
+    SpeciesHandler& operator=(const SpeciesHandler& rhs);
     
     /// \brief Destructor, it destructs the SpeciesHandler and all ParticleSpecies it contains.
     ~SpeciesHandler();

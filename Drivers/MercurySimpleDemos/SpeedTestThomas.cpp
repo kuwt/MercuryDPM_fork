@@ -26,6 +26,7 @@
 ///todo{This code is not working as is wanted}
 #include<iostream>
 #include <Species/LinearViscoelasticSpecies.h>
+#include <Particles/SphericalParticle.h>
 
 #include "Mercury3D.h"
 #include "Particles/BaseParticle.h"
@@ -46,11 +47,9 @@ public:
 		polydispersity_=polydispersity;
 		speciesHandler.copyAndAddObject(s);
 		setTimeStep(5e-5);
-	    setTimeMax(1.0);
-	    if (polydispersity==1.0)
-	    	setName("SpeedTestContactsMonodisperse");
-	    else
-	    	setName("SpeedTestContactsPolydisperse"+std::to_string(polydispersity));
+	    setTimeMax(0.18);
+    	setName("SpeedTest_P"+helpers::to_string(polydispersity,2));
+		setFileType(FileType::NO_FILE);
 	}
 
 	void computeExternalForces(BaseParticle *CI) override
@@ -61,7 +60,7 @@ public:
 
 	void setupInitialConditions() override
 	{
-	    unsigned N = 4;	//number of particles
+	    unsigned N = 10;	//number of particles
 		Mdouble r = 0.002;
 		Mdouble rMax = r*sqrt(polydispersity_);
 		Mdouble rMin = r/sqrt(polydispersity_);
@@ -73,13 +72,10 @@ public:
 	    setXMin(-getXMax());
 	    setYMin(-getYMax());
 	    setZMin(-getZMax());
-	    setFileType(FileType::NO_FILE);
-	    //eneFile.setFileType(FileType::ONE_FILE);
-    	//dataFile.setFileType(FileType::ONE_FILE);
     	setSaveCount(100);
 	    setDimension(3);
 	    
-		BaseParticle p0;		
+		SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
 		p0.setRadius(rMax);
 		for (unsigned i = 0; i < N*N*N; i++)
@@ -96,9 +92,13 @@ public:
 
 	void actionsAfterSolve() override
 	{
-		std::cout << "max diameter " << 2.0*particleHandler.getLargestParticle()->getRadius() << std::endl;
-		std::cout << "min diameter " << 2.0*particleHandler.getSmallestParticle()->getRadius() << std::endl;
-		hGridInfo();
+		logger(INFO,"%<r<%, N=%, C=%",
+			   particleHandler.getSmallestInteractionRadius(),
+			   particleHandler.getLargestInteractionRadius(),
+			   particleHandler.getNumberOfObjects(),
+			   interactionHandler.getNumberOfObjects()
+		);
+		//hGridInfo();
 	}
 
 };
@@ -106,9 +106,9 @@ public:
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
 	std::cout <<
-	"Non dissipative particles are simulated in a potential force field f_i=-r_i"
-	"Thus, we get a clump of particles with a constant collision rate."
-	"No walls, boundaries, output is added, testing the speed of particle collisions." 
+	"A gas of non-dissipative particles are simulated, colliding at a constant rate.\n"
+	"An external potential force field, f_i=-r_i, keeps the particles in the center of the box.\n"
+ 	"No walls, boundaries, file output, thus testing the speed of particle collisions."
 	<< std::endl;
 	
     Time time;
@@ -120,19 +120,68 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 
     time.tic();
  	Contact mono(&s,1.0);
-	mono.solve();    
-    std::cout << "Total time to run monodisperse simulation: " << time.toc() << "s (Expected: 1.1s)" << std::endl;
-    //expected time was measured on Thomas' mac
+	mono.solve();
+    std::cout << "Total time to run monodisperse simulation: " << time.toc() << "s (Expected: 3s)" << std::endl;
+    //expected time was measured on Thomas' pc 26-Apr-2018 (r2816, Release)
 
     time.tic();
  	Contact poly(&s,2.0);
-	poly.setTimeMax(0.4);
-	poly.solve();    
-    std::cout << "Total time to run polydisperse simulation: " << time.toc() << "s (Expected: 1.1s)" << std::endl;
+	poly.setTimeMax(0.37*poly.getTimeMax());
+	poly.solve();
+    std::cout << "Total time to run polydisperse simulation: " << time.toc() << "s (Expected: 3s)" << std::endl;
 
     time.tic();
  	Contact highPoly(&s,5.0);
- 	highPoly.setTimeMax(0.3);
-	highPoly.solve();    
-    std::cout << "Total time to run highly polydisperse simulation: " << time.toc() << "s (Expected: 1.1s)" << std::endl;
+ 	highPoly.setTimeMax(0.29*highPoly.getTimeMax());
+	highPoly.solve();
+    std::cout << "Total time to run highly polydisperse simulation: " << time.toc() << "s (Expected: 3s)" << std::endl;
+
+//	Contact mono(&s,1.0);
+//	mono.setTimeMax(1e-6);
+//	mono.solve();
+//	BaseParticle* p = mono.particleHandler.getLastObject();
+//	int i = 0;
+//	time.tic();
+//	for (int i=0;i<4e8;++i) {
+//		if(p->getHGridCell().getHGridLevel()) std::cout << i;
+//	}
+//	std::cout << "Total time: " << time.toc() << std::endl;
+//	time.tic();
+//	for (int i=0;i<4e8;++i) {
+//		if(p->getHGridCell2().getHGridLevel()) std::cout << i;
+//	}
+//	std::cout << "Total time: " << time.toc() << "inline" << std::endl;
 }
+
+// create gperftools profile:
+
+//#!/bin/bash
+//		set +x
+//		echo './profile.sh executable'
+//
+//# gperftools
+//#https://github.com/ethz-asl/programming_guidelines/wiki/Profiling-Code
+//#https://gperftools.github.io/gperftools/cpuprofile.html
+//
+//#create CPU profile
+//CPUPROFILE=/tmp/cpu LD_PRELOAD=/usr/lib/libprofiler.so.0.4.5 $*
+//		google-pprof --pdf $1 /tmp/cpu > /tmp/profile.pdf
+//		gvfs-open /tmp/profile.pdf
+
+// create gprof profile (you have to make with -pg)
+
+//#!/bin/bash
+//		set +x
+//		echo './profile.sh executable'
+//
+//#https://linoxide.com/tools/gprof-performance-analysis-programs/
+//
+//#create CPU profile
+//$*
+//		gprof $1 gmon.out > /tmp/gprofile
+
+
+
+
+
+

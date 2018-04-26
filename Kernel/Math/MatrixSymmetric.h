@@ -69,37 +69,37 @@ public:
     /*!
      * \brief Matrix addition.
      */
-    MatrixSymmetric3D operator +(const MatrixSymmetric3D &A) const;
+    MatrixSymmetric3D operator+(const MatrixSymmetric3D &A) const;
 
     /*!
      * \brief Matrix substraction.
      */
-    MatrixSymmetric3D operator -(const MatrixSymmetric3D &A) const;
+    MatrixSymmetric3D operator-(const MatrixSymmetric3D &A) const;
 
     /*!
      * \brief Scalar addition.
      */
-    MatrixSymmetric3D operator +(const Mdouble a) const;
+    MatrixSymmetric3D operator+(const Mdouble a) const;
 
     /*!
      * \brief Scalar substraction.
      */
-    MatrixSymmetric3D operator -(const Mdouble a) const;
+    MatrixSymmetric3D operator-(const Mdouble a) const;
 
     /*!
      * \brief Vector multiplication.
      */
-    friend Vec3D operator *(const MatrixSymmetric3D& A, const Vec3D& b);
+    friend Vec3D operator*(const MatrixSymmetric3D& A, const Vec3D& b);
 
     /*!
      * \brief Scalar multiplication.
      */
-    MatrixSymmetric3D operator *(const Mdouble a) const;
+    MatrixSymmetric3D operator*(const Mdouble a) const;
 
     /*!
      * \brief Scalar division.
      */
-    MatrixSymmetric3D operator /(const Mdouble a) const;
+    MatrixSymmetric3D operator/(const Mdouble a) const;
 
     /*!
      * \brief Add elements to an ostream.

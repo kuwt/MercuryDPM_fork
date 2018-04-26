@@ -90,32 +90,32 @@ public:
     /*!
      * \brief Adds another vector
      */
-    Vec3D operator +(const Vec3D& a) const;
-    
+    Vec3D operator+(const Vec3D& a) const;
+
     /*!
      * \brief Subtracts another vector
      */
-    Vec3D operator -(const Vec3D& a) const;
-    
+    Vec3D operator-(const Vec3D& a) const;
+
 //    /*!
 //     * \brief Adds a scalar
 //     */
-//    Vec3D operator +(const Mdouble a) const;
+//    Vec3D operator+(const Mdouble a) const;
 //
 //    /*!
 //     * \brief Subtracts a scalar
 //     */
-//    Vec3D operator -(const Mdouble a) const;
-    
+//    Vec3D operator-(const Mdouble a) const;
+
     /*!
      * \brief Multiplies by a scalar
      */
-    Vec3D operator *(const Mdouble a) const;
-    
+    Vec3D operator*(const Mdouble a) const;
+
     /*!
      * \brief Divides by a scalar
      */
-    Vec3D operator /(const Mdouble a) const;
+    Vec3D operator/(const Mdouble a) const;
     
     /*!
      * \brief Adds another vector

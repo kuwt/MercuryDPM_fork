@@ -55,7 +55,7 @@ public:
   /*!
    * \brief Assignment operator that copies the pointer to the DPMBase and all BaseWall in the given WallHandler.
    */
-    WallHandler& operator =(const WallHandler& rhs);
+    WallHandler& operator=(const WallHandler& rhs);
     
   /*!
    * \brief Destructor, it destructs the WallHandler and all BaseWall it contains.

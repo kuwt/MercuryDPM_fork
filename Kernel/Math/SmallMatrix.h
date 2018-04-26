@@ -130,7 +130,7 @@ public:
     {
     }
     
-    /// \brief defines the operator (n,m) to access the element on row n and column m
+    /// \brief defines the operator(n,m) to access the element on row n and column m
     Mdouble& operator()(unsigned int n, unsigned int m)
     {
         logger.assert(n < numberOfRows, "Requested row number % for a matrix with only % rows", n, numberOfRows);
@@ -139,7 +139,7 @@ public:
         return data_[n + m * numberOfRows];
     }
     
-    /// \brief defines the operator (n,m) to access the element on row n and column m
+    /// \brief defines the operator(n,m) to access the element on row n and column m
     const Mdouble& operator()(unsigned int n, unsigned int m) const
     {
         logger.assert(n < numberOfRows, "Requested row number % for a matrix with only % rows", n, numberOfRows);

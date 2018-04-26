@@ -193,13 +193,13 @@ public:
     * \brief Operator overloading used to write data obtained from an object of class File into an output stream.
     * It also returns a reference to the output stream.
     */
-    friend std::ostream& operator <<(std::ostream& os, const File& o);
+    friend std::ostream& operator<<(std::ostream& os, const File& o);
 
     /*!
      * \brief Operator overloading used to read data from the input stream into member variables of an object of class File. It also returns a reference
      * of type std::istream&
      */
-    friend std::istream& operator >>(std::istream& is, File &o);
+    friend std::istream& operator>>(std::istream& is, File &o);
 
     //member functions (other than set/get)
 

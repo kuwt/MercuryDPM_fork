@@ -89,7 +89,7 @@ bool Vec3D::isNaN() const
  * \param[in] a     vector to be added
  * \return          resulting 3D vector
  */
-Vec3D Vec3D::operator +(const Vec3D& a) const
+Vec3D Vec3D::operator+(const Vec3D& a) const
         {
     return Vec3D(X + a.X, Y + a.Y, Z + a.Z);
 }
@@ -99,8 +99,8 @@ Vec3D Vec3D::operator +(const Vec3D& a) const
  * \param[in] a     vector to be subtracted
  * \return          resulting vector
  */
-Vec3D Vec3D::operator -(const Vec3D& a) const
-        {
+Vec3D Vec3D::operator-(const Vec3D& a) const
+{
     return Vec3D(X - a.X, Y - a.Y, Z - a.Z);
 }
 
@@ -109,7 +109,7 @@ Vec3D Vec3D::operator -(const Vec3D& a) const
  * \param[in] a     the scalar to be multiplied with
  * \return          the resulting vector
  */
-Vec3D Vec3D::operator *(const Mdouble a) const
+Vec3D Vec3D::operator*(const Mdouble a) const
         {
     return Vec3D(X * a, Y * a, Z * a);
 }
@@ -119,7 +119,7 @@ Vec3D Vec3D::operator *(const Mdouble a) const
  * \param[in] a     the scalar to be divided by
  * \return          resulting vector
  */
-Vec3D Vec3D::operator /(const Mdouble a) const
+Vec3D Vec3D::operator/(const Mdouble a) const
         {
     return Vec3D(X / a, Y / a, Z / a);
 }
@@ -297,7 +297,7 @@ Mdouble Vec3D::getDistance(const Vec3D& a, const Vec3D& b)
  */
 Mdouble Vec3D::getDistanceSquared(const Vec3D& a, const Vec3D& b)
 {
-    return ((a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y) + (a.Z - b.Z) * (a.Z - b.Z));
+    return getLengthSquared(a-b);
 }
 
 /*!

@@ -907,7 +907,7 @@ std::vector<BaseInteraction*> BaseParticle::getInteractionWith(BaseParticle* con
     const Vec3D branchVector = P->getPosition() - getPosition();
     //Get the square of the distance between particle i and particle j
     const Mdouble distanceSquared = Vec3D::getLengthSquared(branchVector);
-    const Mdouble sumOfInteractionRadii = P->getInteractionRadius() + getInteractionRadius();
+    const Mdouble sumOfInteractionRadii = P->getRadius() + getRadius() + getSpecies()->getInteractionDistance();
     std::vector<BaseInteraction*> interactions;
     if (distanceSquared < (sumOfInteractionRadii * sumOfInteractionRadii))
     {

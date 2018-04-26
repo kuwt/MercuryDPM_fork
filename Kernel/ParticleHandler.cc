@@ -26,6 +26,7 @@
 
 #include <limits>
 #include <Math/Helpers.h>
+#include <Particles/SphericalParticle.h>
 #include "ParticleHandler.h"
 #include "DPMBase.h"
 #include "SpeciesHandler.h"
@@ -1051,8 +1052,12 @@ BaseParticle* ParticleHandler::createObject(const std::string& type)
     if (type == "BaseParticle"||type == "BP"||isdigit(type[0]) || isdigit(type[1]))
     {
         return new BaseParticle;
-    } 
-    else if (type == "LiquidFilmParticle") 
+    }
+    else if (type == "SphericalParticle")
+    {
+        return new SphericalParticle;
+    }
+    else if (type == "LiquidFilmParticle")
     {
         return new LiquidFilmParticle;
     }

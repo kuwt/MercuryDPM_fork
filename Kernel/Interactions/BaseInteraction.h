@@ -244,6 +244,7 @@ public:
 
     /*
      * \brief Returns a constant pointer to the first object involved in the interaction.
+     * See https://www.gamedev.net/forums/topic/550112-c-non-const-getter-in-terms-of-const-getter/
      */
     const BaseInteractable* getP() const;
 

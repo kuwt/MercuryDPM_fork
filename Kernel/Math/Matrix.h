@@ -69,42 +69,42 @@ public:
     /*!
      * \brief Matrix addition
      */
-    Matrix3D operator +(const Matrix3D& A) const;
+    Matrix3D operator+(const Matrix3D& A) const;
     
     /*!
      * \brief Matrix subtraction 
      */
-    Matrix3D operator -(const Matrix3D& A) const;
+    Matrix3D operator-(const Matrix3D& A) const;
     
     /*!
      * \brief Scalar addition
      */
-    Matrix3D operator +(const Mdouble a) const;
+    Matrix3D operator+(const Mdouble a) const;
     
     /*!
      * \brief Scalar subtraction
      */
-    Matrix3D operator -(const Mdouble a) const;
+    Matrix3D operator-(const Mdouble a) const;
     
     /*!
      * \brief Scalar multiplication
      */
-    Matrix3D operator *(const Mdouble a) const;
+    Matrix3D operator*(const Mdouble a) const;
     
     /*!
      * \brief Vector multiplication
      */
-    Vec3D operator *(const Vec3D& a) const;
+    Vec3D operator*(const Vec3D& a) const;
     
     /*!
      * \brief Matrix multiplication
      */
-    Matrix3D operator *(const Matrix3D& a) const;
+    Matrix3D operator*(const Matrix3D& a) const;
     
     /*!
      * \brief Scalar division
      */
-    Matrix3D operator /(const Mdouble a) const;
+    Matrix3D operator/(const Mdouble a) const;
     
     /*!
      * \brief Add elements to ostream

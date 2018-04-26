@@ -129,7 +129,7 @@ void BaseInteractable::setIndSpecies(unsigned int indSpecies)
  */
 const ParticleSpecies* BaseInteractable::getSpecies() const
 {
-    //logger.assert(species_,"Species of % % has to be defined",getName(),getIndex());
+    logger.assert(species_,"Species of % % has to be defined",getName(),getIndex());
     return species_;
 }
 

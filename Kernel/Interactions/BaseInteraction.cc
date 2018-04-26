@@ -404,16 +404,18 @@ BaseInteractable* BaseInteraction::getI()
  */
 const BaseInteractable* BaseInteraction::getP() const
 {
+    logger.assert(P_ != nullptr, "First particle in interaction % is nullptr", getId());
     return P_;
 }
 
 /*!
- * \details Returns a constant pointer to the second object in the interaction; often 
+ * \details Returns a constant pointer to the second object in the interaction; often
  *          a particle or a wall i.e. a general interactale hence I.
  * \return  Constant pointer to BaseInteraction often a particle or a wall.
  */
 const BaseInteractable* BaseInteraction::getI() const
 {
+    logger.assert(I_ != nullptr, "Second particle in interaction % is nullptr", getId());
     return I_;
 }
 

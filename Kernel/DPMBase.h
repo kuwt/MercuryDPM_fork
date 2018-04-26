@@ -281,7 +281,7 @@ public:
     bool findNextExistingDataFile(Mdouble tMin, bool verbose = true);
 
     /*!
-     * \brief Operator overloading of DPMBase class, writes the StatType to the given ostream
+     * \brief operator overloading of DPMBase class, writes the StatType to the given ostream
      */
     friend inline std::ostream& operator<<(std::ostream& os, const DPMBase &md);
 
