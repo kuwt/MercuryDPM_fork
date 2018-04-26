@@ -7,7 +7,7 @@
 #include "Particles/BaseParticle.h"
 #include "Boundaries/CubeInsertionBoundary.h"
 #include "Boundaries/PeriodicBoundary.h"
-#include "Boundaries/SubcriticalMaserBoundary.h"
+#include "Boundaries/SubcriticalMaserBoundaryTEST.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include <iostream>
 #include "Math/RNG.h"
@@ -101,22 +101,22 @@ class BrokenMaserMinimalExample : public Mercury2D {
                           0, 0),
                     Vec3D(pars.at("xmin"), 
                           pars.at("reservoirHeight"), 0),
-                    Vec3D(0, - sqrt(pars.at("reservoirHeight")), 0),
-                    Vec3D(0, - sqrt(pars.at("reservoirHeight")), 0),
+                    Vec3D(2, - sqrt(pars.at("reservoirHeight")), 0),
+                    Vec3D(2, - sqrt(pars.at("reservoirHeight")), 0),
                     pars.at("particleRadius"),
                     pars.at("particleRadius")
                 );
             insb = boundaryHandler.copyAndAddObject(insb);
             insb->checkBoundaryBeforeTimeStep(this);
-            boundaryHandler.removeObject(insb->getId());
 
             stillFillingUp = true;
         }
 
         void actionsAfterTimeStep() 
         {
-            logger(INFO, "In actionsAfterTimeStep()");
+            // logger(INFO, "In actionsAfterTimeStep()");
 
+            logger(INFO, "t = %, np = %", getTime(), particleHandler.getNumberOfRealObjectsLocal());
             /* Are we still filling up? If not, no need to do anything here. */
             if (!stillFillingUp) 
                 return;
@@ -125,8 +125,10 @@ class BrokenMaserMinimalExample : public Mercury2D {
 
             if (getTime() > 20*getTimeStep())
             {
+                boundaryHandler.removeObject(insb->getId());
+
                 /* MaserBoundary */
-                auto masb = new SubcriticalMaserBoundary();
+                auto masb = new SubcriticalMaserBoundaryTEST();
                 masb->set(Vec3D(1.0, 0.0, 0.0), 
                         pars.at("xmin") - pars.at("reservoirLength") + pars.at("particleRadius"), 
                         pars.at("xmin"));
@@ -151,7 +153,7 @@ class BrokenMaserMinimalExample : public Mercury2D {
                 stillFillingUp = false;
 
             }
-            logger(INFO, "Have completed actionsAfterTimeStep");
+            // logger(INFO, "Have completed actionsAfterTimeStep");
         }
 
     private:
