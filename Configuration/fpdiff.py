@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!@PYTHON_EXECUTABLE@
 
 #This does a float point comparison of columns in text files. The arguments it takes is
 #file_name 1, file_name 2, relative error (opt), zero value (opt)
