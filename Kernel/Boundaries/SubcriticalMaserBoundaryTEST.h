@@ -117,6 +117,11 @@ public:
     
     void extendBottom() const;
 
+    /*!
+     * \brief Particles that are not maser particles should be ignored
+     */
+    bool ignoreBoundary(BaseParticle* particle) override;
+
 private:
     /*!
      * \brief Flag whether or not the gap is created and particles transformed already.

@@ -173,3 +173,8 @@ void BasePeriodicBoundary::performActionsBeforeAddingParticles()
 {
 }
 
+bool BasePeriodicBoundary::ignoreBoundary(BaseParticle* particle)
+{
+    return false;
+}
+

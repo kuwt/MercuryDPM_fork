@@ -297,6 +297,12 @@ public:
      */
     void updateMaserParticle(BaseParticle* const particle);
 
+    /*!
+     * \brief Disables boundaries that need to be ignored (i.e. a non-maser particle needs to ignore the maser boundary)
+     */
+    void findBoundariesToIgnore(BaseParticle* particle, std::vector<int>& periodicComplexity, int& totalPeriodicComplexity);
+
+
 private:
     /*!
      * \brief The interaction distance between a position and the boundary for which

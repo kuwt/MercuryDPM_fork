@@ -1033,6 +1033,7 @@ void PeriodicBoundaryHandler::updateParticleStatus(std::set<BaseParticle*>& part
     int numberOfProcessors = communicator.getNumberOfProcessors();
     std::set<MpiPeriodicParticleID*> deletePeriodicIDList;
     std::set<MpiPeriodicGhostParticleID*> deletePeriodicGhostIDList;
+    std::set<BaseParticle*> specialUpdateParticleList;
 
     //For all domains
     for (int i = 0; i < numberOfProcessors; i++)
@@ -1059,6 +1060,7 @@ void PeriodicBoundaryHandler::updateParticleStatus(std::set<BaseParticle*>& part
                     logger(VERBOSE,"Real particle % changed complexity at: %", particle->getId(),
                            particle->getPosition());
                     particle->setInPeriodicDomain(false); 
+                    //Incase of a special flag 3, perform update action
                     updateMaserParticle(particle);
                 }
                 else
@@ -1863,13 +1865,6 @@ bool PeriodicBoundaryHandler::checkIfAddNewParticle(BaseParticle* particle)
     if (particle->isInPeriodicDomain())
     {
         return false;
-    }
-    for (BasePeriodicBoundary* b : *this)
-    {
-        if (b->getName() == "SubcriticalMaserBoundaryTEST" && !(particle->isMaserParticle()))
-        {
-            return false;
-        }
     }
     return true;
 }

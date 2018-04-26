@@ -229,8 +229,6 @@ void SubcriticalMaserBoundaryTEST::activateMaser()
     getPeriodicHandler()->clearCommunicationLists();
 #endif
     
-    //Flag that the maser is active!
-    maserIsActivated_ = true;
     
     //Loop over all particles to see if they are within the maser boundary
     ParticleHandler& pH = getHandler()->getDPMBase()->particleHandler;
@@ -240,7 +238,15 @@ void SubcriticalMaserBoundaryTEST::activateMaser()
         {
             particle->setMaserParticle(true);
         }
+        else
+        {
+            particle->setMaserParticle(false);
+        }
     }
+
+    //Flag that the maser is active!
+    maserIsActivated_ = true;
+
     extendBottom();
 
 #ifdef MERCURY_USE_MPI
@@ -434,3 +440,16 @@ void SubcriticalMaserBoundaryTEST::extendBottom() const
 #endif
 }
 
+
+bool SubcriticalMaserBoundaryTEST::ignoreBoundary(BaseParticle* particle)
+{
+    if (maserIsActivated_)
+    {
+        if(!particle->isMaserParticle())
+        {
+            //logger(INFO,"particle position: %",particle->getPosition());
+            return true;
+        }
+    }
+    return false;
+}

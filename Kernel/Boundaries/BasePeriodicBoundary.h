@@ -121,6 +121,7 @@ public:
      */
     virtual void performActionsBeforeAddingParticles();
 
+    virtual bool ignoreBoundary(BaseParticle* particle);
 private:
     /*!
      * \brief pointer to the periodic boundary handler
