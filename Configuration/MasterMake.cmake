@@ -8,11 +8,19 @@ include_directories(${Mercury_SOURCE_DIR}/Kernel
 
 file(GLOB SELFTESTS "*SelfTest.cpp")
 file(GLOB UNITTESTS "*UnitTest.cpp")
+file(GLOB MPITESTS  "*MPITest.cpp")
 #for each demo add a test with the same name
-foreach (TEST ${UNITTESTS} ${SELFTESTS})
-        get_filename_component(EXECNAME ${TEST} NAME_WE)
-        add_test(${EXECNAME} ${EXECNAME})
-endforeach()
+if (Mercury_USE_MPI)
+	foreach (TEST ${UNITTESTS} ${SELFTESTS} ${MPITESTS})
+        	get_filename_component(EXECNAME ${TEST} NAME_WE)
+        	add_test(${EXECNAME} ${EXECNAME})
+	endforeach()
+else()
+	foreach (TEST ${UNITTESTS} ${SELFTESTS})
+		get_filename_component(EXECNAME ${TEST} NAME_WE)
+		add_test(${EXECNAME} ${EXECNAME} )
+	endforeach()
+endif()
 
 #Part 3 : Make tests for each of the selftest_data files
 ########################################################
