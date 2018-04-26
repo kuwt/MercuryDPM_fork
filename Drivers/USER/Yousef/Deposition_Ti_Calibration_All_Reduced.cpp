@@ -215,7 +215,7 @@ public:
         //
         //
         //
-        logger(INFO," Inserted % particles",particleHandler.getNumberOfObjects());
+        //logger(INFO," Inserted % particles",particleHandler.getNumberOfObjects());
 
 
     }
@@ -308,7 +308,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     //std::cout << "Wall Rolling Friction" << WRollingFriCoeff << std::endl;
     //------------------------------------------------------------------------------------------------------------------------------------------------------------
     //
-    deposition_problem.setName("Deposition_Ti_Calibration_Reduced"); //Deposition_gaussian_parametric
+    deposition_problem.setName("Deposition_Ti_Calibration_All_Reduced"); //Deposition_gaussian_parametric
     deposition_problem.setSystemDimensions(3);
     deposition_problem.setGravity(Vec3D(0.0,0.0,gravityValue));
     //deposition_problem.setXMin(0.0);
