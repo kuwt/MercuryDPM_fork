@@ -280,8 +280,8 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     Deposition deposition_problem;
     //
     Mdouble gravityValue = -981; // g=9.81 m/s2 - 981 cm/s2
-    Mdouble XMaxDomain = (deposition_problem.scale)*(deposition_problem.scale)*900e-1; // 1stScale = 0.9 cm - 2nd Scale = 0.225 cm
-    Mdouble YMaxDomain = (deposition_problem.scale)*40e-1; // 1stScale = 0.4 cm - 2ndScale = 0.2 cm
+    Mdouble XMaxDomain = 0.8;//(deposition_problem.scale)*(deposition_problem.scale)*900e-1; // 1stScale = 0.9 cm - 2nd Scale = 0.225 cm
+    Mdouble YMaxDomain = (deposition_problem.scale)*30e-1; // 1stScale = 0.4 cm - 2ndScale = 0.2 cm
     Mdouble ZMaxDomain = (deposition_problem.scale)*20e-1; // 1st Scale = 0.2 cm - 2ndScale = 0.1 cm
     //
     Mdouble MaxSimTime = 1.2;//3.0;
@@ -298,8 +298,8 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     //
     Mdouble SlidingFrictionCoeff = 1.0/studyNum[1];//0.5;
     Mdouble RollingFrictionCoeff = 2.0/(studyNum[2]*10.0);//0.1;
-    Mdouble WSlidingFriCoeff = 1.0/studyNum[1];//0.5;
-    Mdouble WRollingFriCoeff = 2.0/(studyNum[2]*10.0);//0.1;
+    Mdouble WSlidingFriCoeff = 2.0*(1.0/studyNum[1]);//0.5;
+    Mdouble WRollingFriCoeff = 2.0*(2.0/(studyNum[2]*10.0));//0.1;
     //
     //std::cout << "studyNum2=" << studyNum[1] << std::endl;
     //std::cout << "Sliding Friction" << SlidingFrictionCoeff << std::endl;
