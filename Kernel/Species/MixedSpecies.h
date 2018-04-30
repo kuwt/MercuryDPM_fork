@@ -37,7 +37,7 @@ class BaseInteraction;
  * \details See Species for details. 
 */
 template<class NormalForceSpecies, class FrictionForceSpecies = EmptyFrictionSpecies, class AdhesiveForceSpecies = EmptyAdhesiveSpecies>
-class MixedSpecies : public NormalForceSpecies, public FrictionForceSpecies, public AdhesiveForceSpecies
+class MixedSpecies final: public NormalForceSpecies, public FrictionForceSpecies, public AdhesiveForceSpecies
 {
 public:
 

@@ -93,7 +93,7 @@ MatrixSymmetric3D MatrixSymmetric3D::operator +(const MatrixSymmetric3D& A) cons
 /*!
  * \details Substraction of symmetric 3D matrices
  * \param[in] A     symmetric matrix to be substracted
- * \return Result of the substraction 
+ * \return Result of the substraction
  */
 MatrixSymmetric3D MatrixSymmetric3D::operator -(const MatrixSymmetric3D& A) const
         {
@@ -121,7 +121,7 @@ MatrixSymmetric3D MatrixSymmetric3D::operator -(const Mdouble a) const
 }
 
 /*!
- * \details Multiplication of a symmetric 3D matrix with a vector (global operator, 
+ * \details Multiplication of a symmetric 3D matrix with a vector (global operator,
  * friend of this class)
  * \param[in] A     the matrix
  * \param[in] b     the vector
@@ -169,7 +169,7 @@ std::ostream& operator<<(std::ostream& os, const MatrixSymmetric3D& A)
 
 /*!
  * \details Reads the elements of a symmetric 3D matrix from an istream
- * \param[in,out] is    input stream, 
+ * \param[in,out] is    input stream,
  * \param[out] A        the matrix
  * \return (reference to) input stream from with matrix elements were read
  */
@@ -263,7 +263,7 @@ MatrixSymmetric3D MatrixSymmetric3D::selfDyadic(const Vec3D& a)
 
 /*!
  * \details Calculates the dyadic product of two 3D vectors, and 'symmetrises'  the
- * resulting matrix by taking the average of each pair of opposing non-diagonal 
+ * resulting matrix by taking the average of each pair of opposing non-diagonal
  * elements.
  * NB: this is a STATIC function!
  * \param[in] a     the first 3D vector
@@ -276,21 +276,31 @@ MatrixSymmetric3D MatrixSymmetric3D::symmetrisedDyadic(const Vec3D& a, const Vec
 }
 
 /*!
- * \details Used for inverting matrices like the inertia tensor. 
+ * \details Used for inverting matrices like the inertia tensor.
  * \param[in] A Matrix that should be inverted.
  * \return Inverse of matrix A.
  */
 MatrixSymmetric3D MatrixSymmetric3D::inverse (const MatrixSymmetric3D& A)
 {
+    return A.inverse();
+}
+
+/*!
+ * \details Used for inverting matrices like the inertia tensor.
+ * \param[in] A Matrix that should be inverted.
+ * \return Inverse of matrix A.
+ */
+MatrixSymmetric3D MatrixSymmetric3D::inverse () const
+{
     MatrixSymmetric3D result;
-    Mdouble det = MatrixSymmetric3D::determinant(A);
+    Mdouble det = MatrixSymmetric3D::determinant(*this);
     logger.assert(det!=0,"determinant is not zero"); //should be replaced by the condition number or sth. like fabs(det)>1e-5*norm.
-    result.XX =   ( A.YY * A.ZZ - A.YZ * A.YZ ) * det;
-    result.XY = - ( A.XY * A.ZZ - A.XZ * A.YZ ) * det;
-    result.XZ =   ( A.XY * A.YZ - A.XZ * A.YY ) * det;
-    result.YY =   ( A.XX * A.ZZ - A.XZ * A.XZ ) * det;
-    result.YZ = - ( A.XX * A.YZ - A.XZ * A.XY ) * det;
-    result.ZZ =   ( A.XX * A.YY - A.XY * A.XY ) * det;
+    result.XX =   ( YY * ZZ - YZ * YZ ) * det;
+    result.XY = - ( XY * ZZ - XZ * YZ ) * det;
+    result.XZ =   ( XY * YZ - XZ * YY ) * det;
+    result.YY =   ( XX * ZZ - XZ * XZ ) * det;
+    result.YZ = - ( XX * YZ - XZ * XY ) * det;
+    result.ZZ =   ( XX * YY - XY * XY ) * det;
     return result;
 }
 

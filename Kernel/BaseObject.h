@@ -115,12 +115,12 @@ public:
     /*!
      * \brief Returns the index of the object in the handler.
      */
-    unsigned int getIndex() const;
+    unsigned int getIndex() const { return index_; };
 
     /*!
      * \brief Returns the unique identifier of any particular object.
      */
-    unsigned int getId() const;
+    unsigned int getId() const { return id_; }
 
 private:
     /*!

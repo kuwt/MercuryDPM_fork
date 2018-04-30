@@ -30,6 +30,7 @@
 #include "BaseObject.h"
 #include "Math/Vector.h"
 #include "Math/Matrix.h"
+#include "Logger.h"
 
 class InteractionHandler;
 class BaseParticle;
@@ -189,27 +190,27 @@ public:
     /*!
      * \brief Gets the current force (vector) between the two interacting objects.
      */
-    const Vec3D& getForce() const;
+    const Vec3D& getForce() const {return force_;}
 
     /*!
      * \brief Gets the current torque (vector) between the two interacting objects.
      */
-    const Vec3D& getTorque() const;
+    const Vec3D& getTorque() const {return torque_;}
 
     /*!
      * \brief Gets the normal vector between the two interacting objects.
      */
-    const Vec3D& getNormal() const;
+    const Vec3D& getNormal() const {return normal_;}
 
     /*!
      * \brief Gets constant reference to contact point (vector).
      */
-    const Vec3D& getContactPoint() const;
+    const Vec3D& getContactPoint() const { return contactPoint_; }
 
     /*!
      * \brief Returns a Mdouble with the current overlap between the two interacting objects.
      */
-    Mdouble getOverlap() const;
+    Mdouble getOverlap() const {return overlap_;}
 
     /*!
      * \brief Returns a Mdouble with the current contact between the two interacting objects.
@@ -235,28 +236,40 @@ public:
     /*!
      * \brief Returns a pointer to first object involved in the interaction (normally a particle).
      */
-    BaseInteractable* getP();
+    BaseInteractable* getP() {
+        logger.assert(P_ != nullptr, "First particle in interaction % is nullptr", getId());
+        return P_;
+    }
 
     /*
      * \brief Returns a pointer to the second object involved in the interaction (often a wall or a particle). 
      */
-    BaseInteractable* getI();
+    BaseInteractable* getI() {
+        logger.assert(I_ != nullptr, "Second particle in interaction % is nullptr", getId());
+        return I_;
+    }
 
     /*
      * \brief Returns a constant pointer to the first object involved in the interaction.
-     * See https://www.gamedev.net/forums/topic/550112-c-non-const-getter-in-terms-of-const-getter/
+     * Why implement const and non-const setters and getters? See https://www.gamedev.net/forums/topic/550112-c-non-const-getter-in-terms-of-const-getter/
      */
-    const BaseInteractable* getP() const;
+    const BaseInteractable* getP() const {
+        logger.assert(P_ != nullptr, "First particle in interaction % is nullptr", getId());
+        return P_;
+    }
 
     /*!
      * \brief Returns a constant pointer to the second object involved in the interaction.
      */
-    const BaseInteractable* getI() const;
+    const BaseInteractable* getI() const {
+        logger.assert(I_ != nullptr, "Second particle in interaction % is nullptr", getId());
+        return I_;
+    }
 
     /*!
      * \brief Returns an Mdouble which is the time stamp of the interaction. 
      */
-    Mdouble getTimeStamp() const;
+    Mdouble getTimeStamp() const { return timeStamp_; }
 
     /*!
      * \brief integrates variables of the interaction which need to be integrate e.g. the tangential overlap.

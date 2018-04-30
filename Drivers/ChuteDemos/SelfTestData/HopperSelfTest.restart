@@ -399,6 +399,6 @@ LinearViscoelasticSlidingFrictionInteraction particleIds 181 348 timeStamp 1251 
 LinearViscoelasticSlidingFrictionInteraction particleIds 199 339 timeStamp 1251 force -4.26985009951447e-06 -2.00201677212612e-06 6.30629938513997e-06 torque 0 0 0 slidingSpring 0 0 0
 LinearViscoelasticSlidingFrictionInteraction particleWallIds 359 0 timeStamp 1251 force -0 5.16608718925508e-05 0 torque 0 0 0 slidingSpring 0 0 0
 LinearViscoelasticSlidingFrictionInteraction particleIds 173 334 timeStamp 1251 force -2.2227458983722e-05 -2.14304030096314e-05 4.31887582518051e-05 torque 0 0 0 slidingSpring 0 0 0
-NUM_BUCKETS 146 hGridMaxLevels 3 cellOverSizeRatio 1
+hGrid method TOPDOWN distribution EXPONENTIAL cellOverSizeRatio 1 numberOfBuckets 1460 cellSizes 0.000692919531081431 0.000744408685235213 0.000799723872393627 gridNeedsUpdate 0 updateEachTimeStep 1 currentMaxRelativeDisplacement 0 totalCurrentMaxRelativeDisplacement 0
 FixedParticleRadius 0.00036 MinInflowParticleRadius 0.00032 MaxInflowParticleRadius 0.0004 RoughBottomType 0 ChuteAngle 0.174532925199433 MaxFailed 1 NumCreated 265 InflowVelocity 0.1 InflowVelocityVariance 0 InflowHeight 0.02
 0.01 0.01 0.04 1.0471975511966 0.0241139 0.0189594510866257 

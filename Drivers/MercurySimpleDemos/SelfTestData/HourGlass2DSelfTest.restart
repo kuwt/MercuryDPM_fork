@@ -13,8 +13,8 @@ LinearViscoelasticFrictionSpecies id 0 density 2000 stiffness 100000 dissipation
 Walls 5
 InfiniteWall id 0 indSpecies 0 position 0 0 0 orientation 0 0 1 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0
 InfiniteWall id 1 indSpecies 0 position 0.1 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0
-IntersectionOfWalls id 2 indSpecies 0 position 0 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 numIntersectionOfWalls 2 position 0 0 0.35 orientation 0.229752920547361 0 0.97324898946773 0 position 0.0250000000000001 0 0.3 orientation 0.229752920547361 0 -0.97324898946773 0
-IntersectionOfWalls id 3 indSpecies 0 position 0 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 numIntersectionOfWalls 2 position 0.1 0 0.35 orientation 0.97324898946773 0 0.229752920547361 0 position 0.0750000000000003 0 0.300000000000001 orientation 0.97324898946773 0 -0.229752920547361 0
+IntersectionOfWalls id 2 indSpecies 0 position 0 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 numIntersectionOfWalls 2 position 0 0 0.35 orientation 0.229752920547361 0 0.97324898946773 0 position 0.025 0 0.3 orientation 0.229752920547361 0 -0.97324898946773 0
+IntersectionOfWalls id 3 indSpecies 0 position 0 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 numIntersectionOfWalls 2 position 0.1 0 0.35 orientation 0.97324898946773 0 0.229752920547361 0 position 0.075 0 0.3 orientation 0.97324898946773 0 -0.229752920547361 0
 InfiniteWall id 4 indSpecies 0 position 0 0 0 orientation 0.707106781186547 0 0.707106781186547 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0
 Boundaries 0
 Particles 105
@@ -124,4 +124,4 @@ BaseParticle id 102 indSpecies 0 position 0.04998 0 0.757455582229853 orientatio
 BaseParticle id 103 indSpecies 0 position 0.06997 0 0.758376470123923 orientation 1 0 0 0 velocity 0 0 -0.0980418135942547 angularVelocity 0 0 0 force 0 0 -0.0572345668431528 torque 0 0 0 radius 0.00886688834906845 invMass 171.225197298272
 BaseParticle id 104 indSpecies 0 position 0.08996 0 0.757365978787237 orientation 1 0 0 0 velocity 0 0 -0.0980418135942547 angularVelocity 0 0 0 force 0 0 -0.0398120871523702 torque 0 0 0 radius 0.00785639701238238 invMass 246.156398746268
 Interactions 0
-NUM_BUCKETS 105 hGridMaxLevels 3 cellOverSizeRatio 1
+hGrid method TOPDOWN distribution EXPONENTIAL cellOverSizeRatio 1 numberOfBuckets 1050 cellSizes 0.0143970382128743 0.0169209527403502 0.0198873294220424 gridNeedsUpdate 0 updateEachTimeStep 1 currentMaxRelativeDisplacement 0 totalCurrentMaxRelativeDisplacement 0

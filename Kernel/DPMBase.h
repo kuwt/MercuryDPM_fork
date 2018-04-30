@@ -493,12 +493,12 @@ public:
      * \brief Sets whether particle rotation
      is enabled or disabled.
      */
-    void setRotation(bool newRotFlag);
+    void setRotation(bool rotation) {rotation_ = rotation;}
 
     /*!
      * \brief Indicates whether particle rotation is enabled or disabled.
      */
-    bool getRotation() const;
+    bool getRotation() const {return rotation_;}
 
     /*!
      * \brief Sets whether walls are written in a VTK file.
@@ -1135,6 +1135,8 @@ private:
 
     /*!
      * \brief A flag to turn on/off particle rotation.
+     * <tt>true</tt> will enable particle rotation.
+     * <tt>false</tt> will disable particle rotation.
      */
     bool rotation_;
 

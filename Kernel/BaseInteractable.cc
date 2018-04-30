@@ -100,40 +100,6 @@ BaseInteractable::~BaseInteractable()
 }
 
 /*!
- * \details Returns the unsigned int to the index of the species associated with
- *          the interactable object.
- * \return  Unsigned int which is the unique index of the species 
- */
-unsigned int BaseInteractable::getIndSpecies() const
-{
-    return indSpecies_;
-}
-
-/*!
- * \details This set the species associated with this interactable. 
- *          This function should not be used and BaseInteractable::setSpecies
- *          should be used instead.
- *          See also BaseInteractable::setSpecies
- */
-void BaseInteractable::setIndSpecies(unsigned int indSpecies)
-{
-    indSpecies_ = indSpecies;
-}
-
-/*!
- * \details This function return a ParticleSpecies* for the current interacable.
- *          Please note, this is a ParticleSpecies; not, a BaseSpecies as 
- *          interactables must have physically properties as well.
- * \return  constant ParticleSpecies* pointer to the species storing the physical
- *          properties of this interactable. 
- */
-const ParticleSpecies* BaseInteractable::getSpecies() const
-{
-    logger.assert(species_,"Species of % % has to be defined",getName(),getIndex());
-    return species_;
-}
-
-/*!
  *  \details This function sets the species associated with this interactable 
  *           object. Again this must be a ParticleSpecies. Note, it also 
  *           automatically sets the index on the indSpecies_ by working up the 
@@ -143,126 +109,9 @@ const ParticleSpecies* BaseInteractable::getSpecies() const
  */
 void BaseInteractable::setSpecies(const ParticleSpecies* species)
 {
-    if (species->getHandler() == nullptr)
-    {
-        logger(ERROR, "Error: Species is not part of any handler yet");
-    }
-    
+    logger.assert(species->getHandler(), "Error: Species is not part of any handler yet");
     species_ = species;
     indSpecies_ = species->getIndex();
-}
-
-/*!
- * \details Return the current force being to the BaseInteractable.
- *          Note, the code works by first computing the forces of each
- *          interaction and then it loops over all BaseInteracables applying
- *          forces to them from the interactions they are involved in.
- * \return  const Vec3D reference that is the total force applied to this 
- *          interactable.
- */
-const Vec3D& BaseInteractable::getForce() const
-{
-    return force_;
-}
-
-/*!
- * \details Return the current torque being to the BaseInteractable.
- *          Note, the code works by first computing the forces of each
- *          interaction and then it loops over all BaseInteracables applying
- *          forces to them from the interactions they are involved in.
- * \return  const Vec3D reference that is the total force applied to this 
- *          interactable.
- */
-const Vec3D& BaseInteractable::getTorque() const
-{
-    return torque_;
-}
-
-/*!
- * \details This sets the force being applied to this interactable.
- *          Note, first the code computes all forces in the interactions and 
- *          then loops over all interactable objects applying the forces from
- *          the interactions to the interactables involved in the interaction.
- * \param[in]   force   Vec3D which is the force to be applied.
- */
-void BaseInteractable::setForce(const Vec3D& force)
-{
-    force_ = force;
-}
-
-/*!
- * \details This sets the torque being applied to this interactable.
- *          Note, first the code computes all force/torques in the interactions
- *          and then loops over all interactable objects applying the torques 
- *          from the interactions to the interactables involved in the 
- *          interaction.
- * \param[in]   torque   Vec3D which is the force to be applied.
- */
-void BaseInteractable::setTorque(const Vec3D& torque)
-{
-    torque_ = torque;
-}
-
-/*!
- * \details Incremental version of BaseInteractable::setForce. 
- *          Also see BaseInteraction::setForce for were this is used.
- * \param[in]   addForce    Vec3D incremental force which is added to the total
- *              force of the interactable.
- */
-void BaseInteractable::addForce(const Vec3D& addForce)
-{
-    force_ += addForce;    
-}
-
-/*!
- * \details Incremental version of BaseInteractable::setTorque. 
- *          Also see BaseInteraction::setTorque for were this is used.
- * \param[in]   addTorque    Vec3D incremental force which is added to the total
- *              torque of the interactable.
- */
-void BaseInteractable::addTorque(const Vec3D& addTorque)
-{
-    torque_ += addTorque;
-}
-
-/*!
- * \details Returns the reference to a Vec3D which contains the position of the
- *          interactionable.
- *          Please note the interpretation of this depends on which 
- *          interactable. For particles this is the centre of the particle;
- *          where for walls it is one point of the wall given \f$r.n=p\f$
- * \return  Returns a reference to a Vec3D returns the position of the 
- *          interactable.
- */
-const Vec3D& BaseInteractable::getPosition() const
-{
-    return position_;
-}
-
-/*!
- * \details Returns the reference to a Vec3D which contains the orientation of 
- *          the
- *          interactionable.
- *          Please note the interpretation of this depends on which 
- *          interactable. Please see derived objects for details.
- *          \todo This is not full implemented and is related to quaterians.
- * \return  Returns a reference to a Vec3D returns the position of the 
- *          interactable.
- */
-const Quaternion& BaseInteractable::getOrientation() const
-{
-    return orientation_;
-}
-
-/*!
- * \details Sets the positions of the interactable. 
- *          interpretation depends on which interactable is being considered
- *          See also BaseInteractable::getPosistion.
- * \param[in] position  Reference to Vec3D storing the position of the particle.
- */
-void BaseInteractable::setPosition(const Vec3D& position)
-{
-    position_ = position;
 }
 
 /*!
@@ -278,19 +127,6 @@ void BaseInteractable::setOrientationViaNormal(const Vec3D normal)
     Quaternion q;
     q.setOrientationViaNormal(normal);
     setOrientation(q);
-}
-
-/*!
- * \details Sets the orientation of the interactable. 
- *          interpretation depends on which interactable is being considered
- *          See also BaseInteractable::getOrientation.
- *
- * \param[in] orientation  Reference to Vec3D storing the orientation
- *            of the particle.
- */
-void BaseInteractable::setOrientation(const Quaternion& orientation)
-{
-    orientation_ = orientation;
 }
 
 /*!
@@ -370,16 +206,6 @@ void BaseInteractable::write(std::ostream& os) const
 }
 
 /*!
- * \details Returns a list of interactions which belong to this interactable.
- * \return  Returns an std::list of pointers to all the interactions which this
- *          interacable is involved in.
- */
-const std::vector<BaseInteraction*>& BaseInteractable::getInteractions() const
-{
-    return interactions_;
-}
-
-/*!
  * \details Added a new interactions to the current interactable. 
  * \param[in] I Pointer to the new interaction which is to be added to the list
  *            of interactions of this interactable.
@@ -455,16 +281,6 @@ void BaseInteractable::setVelocity(const Vec3D& velocity)
 void BaseInteractable::setAngularVelocity(const Vec3D& angularVelocity)
 {
     angularVelocity_ = angularVelocity;
-}
-
-/*!
- * \details See also BaseInteractable::setVelocity
- * \param[in] velocity Vec3D containing the velocity increment which to increase
- *            the velocity by.
- */
-void BaseInteractable::addVelocity(const Vec3D& velocity)
-{
-    velocity_ += velocity;
 }
 
 /*!

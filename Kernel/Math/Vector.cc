@@ -26,27 +26,6 @@
 #include <Logger.h>
 
 /*!
- * \details Default constructor
- */
-Vec3D::Vec3D()
-{
-    setZero();
-}
-
-/*!
- * \details Alternative constructor, lets you define all three elements.
- * \param[in] x     the x-component
- * \param[in] y     the y-component
- * \param[in] z     the z-component
- */
-Vec3D::Vec3D(const Mdouble x, const Mdouble y, const Mdouble z)
-{
-    X = x;
-    Y = y;
-    Z = z;
-}
-
-/*!
  * \details Sets each element to zero.
  */
 void Vec3D::setZero()
@@ -95,26 +74,6 @@ Vec3D Vec3D::operator+(const Vec3D& a) const
 }
 
 /*!
- * \details Subtracts vector from itself
- * \param[in] a     vector to be subtracted
- * \return          resulting vector
- */
-Vec3D Vec3D::operator-(const Vec3D& a) const
-{
-    return Vec3D(X - a.X, Y - a.Y, Z - a.Z);
-}
-
-/*!
- * \details Multiplies each element with a scalar
- * \param[in] a     the scalar to be multiplied with
- * \return          the resulting vector
- */
-Vec3D Vec3D::operator*(const Mdouble a) const
-        {
-    return Vec3D(X * a, Y * a, Z * a);
-}
-
-/*!
  * \details Divides each element by a scalar
  * \param[in] a     the scalar to be divided by
  * \return          resulting vector
@@ -122,19 +81,6 @@ Vec3D Vec3D::operator*(const Mdouble a) const
 Vec3D Vec3D::operator/(const Mdouble a) const
         {
     return Vec3D(X / a, Y / a, Z / a);
-}
-
-/*!
- * \details Adds a vector to itself
- * \param[in] a     vector to be added
- * \return          (reference to) itself, i.e. resulting vector
- */
-Vec3D& Vec3D::operator+=(const Vec3D& a)
-{
-    X += a.X;
-    Y += a.Y;
-    Z += a.Z;
-    return *this;
 }
 
 /*!
@@ -298,17 +244,6 @@ Mdouble Vec3D::getDistance(const Vec3D& a, const Vec3D& b)
 Mdouble Vec3D::getDistanceSquared(const Vec3D& a, const Vec3D& b)
 {
     return getLengthSquared(a-b);
-}
-
-/*!
- * \details Calculates the square of the length of a given vector.
- * NB: this is a STATIC function!
- * \param[in] a     the vector.
- * \return          the square of the length of the argument.
- */
-Mdouble Vec3D::getLengthSquared(const Vec3D& a)
-{
-    return (a.X * a.X + a.Y * a.Y + a.Z * a.Z);
 }
 
 /*!

@@ -81,7 +81,7 @@ public:
     /*!
      * \brief Is fixed Particle function. It returns whether a Particle is fixed or not, by checking its inverse Mass.
      */
-    bool isFixed() const override;
+    bool isFixed() const override {return (invMass_ == 0.0);}
 
     /*!
      * \brief Indicates if this particle is a ghost in the MPI domain
@@ -223,17 +223,17 @@ public:
     /*!
      * \brief Returns particle's HGrid level
      */
-    unsigned int getHGridLevel() const;
+    unsigned int getHGridLevel() const { return hGridCell.getHGridLevel(); }
 
     /*!
      * \brief Returns pointer to next object in particle's HGrid level & cell
      */
-    BaseParticle* getHGridNextObject() const;
+    BaseParticle* getHGridNextObject() const  { return hGridNextObject_; }
 
     /*!
      * \brief Returns pointer to previous object in particle's HGrid level & cell
      */
-    BaseParticle* getHGridPrevObject() const;
+    BaseParticle* getHGridPrevObject() const   { return hGridPrevObject_; }
 
 #ifdef CONTACT_LIST_HGRID
 
@@ -246,27 +246,27 @@ public:
     /*!
      * \brief Returns particle's HGrid cell X-coordinate
      */
-    int getHGridX() const;
+    int getHGridX() const {return hGridCell.getHGridX();}
 
     /*!
      * \brief Returns particle's HGrid cell Y-coordinate
      */
-    int getHGridY() const;
+    int getHGridY() const {return hGridCell.getHGridY();}
 
     /*!
      * \brief Returns particle's HGrid cell Z-coordinate
      */
-    int getHGridZ() const;
+    int getHGridZ() const {return hGridCell.getHGridZ();}
 
     /*!
      * \brief Returns the particle's invInertia_
      */
-    MatrixSymmetric3D getInvInertia() const;
+    MatrixSymmetric3D getInvInertia() const {return invInertia_;}
 
     /*!
      * \brief Returns the particle's invMass_
      */
-    Mdouble getInvMass() const;
+    Mdouble getInvMass() const {return invMass_;}
 
     /*!
      * \brief Calculates the particle's kinetic energy
@@ -280,41 +280,51 @@ public:
     /*!
      * \brief Returns the particle's mass_
      */
-    Mdouble getMass() const;
+    Mdouble getMass() const {return 1.0/invMass_;}
 
-    MatrixSymmetric3D getInertia() const;
+    MatrixSymmetric3D getInertia() const {return invInertia_.inverse();}
 
     /*!
      * \brief Returns the 'original' particle this one's a periodic copy of
      */
-    BaseParticle* getPeriodicFromParticle() const;
+    BaseParticle* getPeriodicFromParticle() const {return periodicFromParticle_;}
 
     /*!
      * \brief Returns the particle's radius_
      */
-    Mdouble getRadius() const;
+    Mdouble getRadius() const {return radius_;}
 
     /*!
      * \brief Returns the particle's interaction radius, which might be different
      * from radius_ (e.g., when dealing with wet particles)
+     * \details Calculates the interaction radius of the particle (when it comes to
+     * interaction with other particles), including the effect of a possible additional
+     * 'interaction distance' besides the 'normal' radius. The interaction radius
+     * differs from the radius_, for example, when dealing with wet particles (i.e.
+     * particles with an additional liquid layer, which is dealt with in the particle's
+     * species).
+     * \return the particle's interaction radius for particle-particle interaction
      */
-    virtual Mdouble getInteractionRadius() const;
+    virtual Mdouble getInteractionRadius() const {return radius_ + getSpecies()->getInteractionDistance() * 0.5;}
 
     /*!
      * \brief Returns the interaction radius for interaction with walls. See also
      * BaseParticle::getInteractionRadius().
+     * \details The interaction radius of the particle (when it comes to interaction
+     * with walls). See also BaseParticle::getInteractionRadius().
+     * \return the particle's interaction radius for particle-wall interaction
      */
-    Mdouble getWallInteractionRadius() const;
+    Mdouble getWallInteractionRadius() const {return getInteractionRadius() + getSpecies()->getInteractionDistance() * 0.5;}
 
     /*!
      * \brief Returns the particle's displacement relative to the previous time step
      */
-    const Vec3D& getDisplacement() const;
+    const Vec3D& getDisplacement() const {return displacement_;}
 
     /*!
      * \brief Returns the particle's position in the previous time step
      */
-    const Vec3D& getPreviousPosition() const;
+    const Vec3D& getPreviousPosition() const {return previousPosition_;}
 
     /*!
      * \brief 
@@ -348,39 +358,39 @@ public:
      * \brief Assigns the pointer to the 'original' particle this one's a 
      * periodic copy of.
      */
-    void setPeriodicFromParticle(BaseParticle* p);
+    void setPeriodicFromParticle(BaseParticle* p) {periodicFromParticle_ = p;};
 
     /*!
      * \brief Sets the particle's HGrid cell X-coordinate
      */
-    void setHGridX(const int x);
+    void setHGridX(const int x) {hGridCell.setHGridX(x);}
 
     /*!
      * \brief Sets the particle's HGrid cell Y-coordinate
      */
-    void setHGridY(const int y);
+    void setHGridY(const int y) {hGridCell.setHGridY(y);}
 
     /*!
      * \brief Sets the particle's HGrid cell Z-coordinate
      */
-    void setHGridZ(const int z);
+    void setHGridZ(const int z) {hGridCell.setHGridZ(z);}
 
     /*!
      * \brief Sets the particle's HGrid level
      */
-    void setHGridLevel(const unsigned int level);
+    void setHGridLevel(const unsigned int level) {hGridCell.setHGridLevel(level);}
 
     /*!
      * \brief Sets the pointer to the next object in the particle's HGrid cell
      * & level.
      */
-    void setHGridNextObject(BaseParticle* p);
+    void setHGridNextObject(BaseParticle* p) {hGridNextObject_ = p;}
 
     /*!
      * \brief Sets the pointer to the previous object in the particle's HGrid cell
      * & level.
      */
-    void setHGridPrevObject(BaseParticle* p);
+    void setHGridPrevObject(BaseParticle* p) {hGridPrevObject_ = p;}
 
 #ifdef CONTACT_LIST_HGRID
     /*!
@@ -519,7 +529,8 @@ public:
 
     virtual std::vector<Mdouble> getFieldVTK(unsigned i) const;
 
-    const HGridCell& getHGridCell() const;
+    //const HGridCell& getHGridCell() const;
+    const HGridCell& getHGridCell() const { return hGridCell; }
 
 private:
 

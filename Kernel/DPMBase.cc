@@ -773,25 +773,6 @@ PossibleContactList& DPMBase::getPossibleContactList()
 
 /*!
  * \details
- * Passing <tt>true</tt> will enable particle rotation.
- * Passing <tt>false</tt> will disable particle rotation.
- * \param[in] newRotFlag
- */
-void DPMBase::setRotation(bool newRotFlag)
-{
-    rotation_ = newRotFlag;
-}
-
-/*!
- * \returns <tt>true</tt> if particle rotation is enabled; <tt>false</tt> if particle rotation is disabled.
- */
-bool DPMBase::getRotation() const
-{
-    return rotation_;
-}
-
-/*!
- * \details
  * The VTK file is used for visualisation in Paraview.
  * \todo Move this (and the get) to WallHandler.
  * \param[in] writeWallsVTK
@@ -1869,14 +1850,15 @@ void DPMBase::writeEneHeader(std::ostream& os) const
     /// \todo{Why is there a +6 here? TW: to get the numbers and title aligned}
     /// \todo Add number of particles to this file (change from Jonny to be added later)
     long width = os.precision() + 6;
-    os << std::setw(width) << "time" << " " << std::setw(width)
-       << "gravitEnergy" << " " << std::setw(width) //gravitational potential energy
-       << "traKineticEnergy" << " " << std::setw(width) //translational kinetic energy
-       << "rotKineticEnergy" << " " << std::setw(width) //rotational kE
-       << "elasticEnergy" << " " << std::setw(width)
-       << "centerOfMassX" << " " << std::setw(width)
-       << "centerOfMassY" << " " << std::setw(width)
-       << "centerOfMassZ" << std::endl;os.flush();
+    os << std::setw(width)
+       << "time " << std::setw(width)
+       << "gravitEnergy " << std::setw(width) //gravitational potential energy
+       << "traKineticEnergy " << std::setw(width) //translational kinetic energy
+       << "rotKineticEnergy " << std::setw(width) //rotational kE
+       << "elasticEnergy " << std::setw(width)
+       << "centerOfMassX " << std::setw(width)
+       << "centerOfMassY " << std::setw(width)
+       << "centerOfMassZ\n";
 }
 
 /*!

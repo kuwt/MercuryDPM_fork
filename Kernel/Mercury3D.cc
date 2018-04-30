@@ -114,12 +114,9 @@ void Mercury3D::hGridFindContactsWithinTargetCell(int x, int y, int z, unsigned 
  */
 void Mercury3D::hGridFindContactsWithTargetCell(int x, int y, int z, unsigned int l, BaseParticle* const obj)
 {
-    
     //Check if the object is not in the same cell as being checked, CheckCell_current should handle these cases.
-    if (obj->getHGridCell().equals(x,y,z,l))
-    {
-        return;
-    }
+    //TW a speedcheck revealed that this check costs a 10% performance decrease; it's only a safety check, so I made it an assert.
+    logger.assert(!obj->getHGridCell().equals(x,y,z,l),"hGridFindContactsWithTargetCell should not be called if object is in the same cell");
 
     HGrid* const hgrid = getHGrid();
 
@@ -127,16 +124,15 @@ void Mercury3D::hGridFindContactsWithTargetCell(int x, int y, int z, unsigned in
     const unsigned int bucket = hgrid->computeHashBucketIndex(x, y, z, l);
 
     // Loop through all objects in the bucket to find nearby objects
-    BaseParticle* p = hgrid->getFirstBaseParticleInBucket(bucket);
-    while (p != nullptr)
+    for (BaseParticle* p = hgrid->getFirstBaseParticleInBucket(bucket); p != nullptr; p = p->getHGridNextObject())
     {
         //This is the most-expensive function in most codes (the two checks in this function slows down granular jet by 15%). It is neccesary, for example: If two cells hash to the same bucket and a particle in one of these cells check for collisions with the other cell. Then due to the hashing collision it also gets all particles in it's own cell and thus generating false collisions.
         //Check if the BaseParticle *p really is in the target cell (i.e. no hashing error has occurred)
+        //TW speedcheck revealed that this pre-check is cheaper than allowing computeInternalForces to sort out mismatches; even if a large number of hash cells (10*Np) is used.
         if (p->getHGridCell().equals(x,y,z,l))
         {
             computeInternalForces(obj, p);
         }
-        p = p->getHGridNextObject();
     }
 }
 
@@ -210,129 +206,113 @@ void Mercury3D::hGridFindOneSidedContacts(BaseParticle* obj)
     HGrid* const hgrid = getHGrid();
     const unsigned int startLevel = obj->getHGridLevel();
 
-    switch (getHGridMethod())
-    {
-        case BOTTOMUP:
-            {
-            int occupiedLevelsMask = hgrid->getOccupiedLevelsMask() >> obj->getHGridLevel();
-            for (unsigned int level = startLevel; level < hgrid->getNumberOfLevels(); occupiedLevelsMask >>= 1, level++)
-            {
-                // If no objects in rest of grid, stop now
-                if (occupiedLevelsMask == 0)
-                {
-                    break;
-                }
-                
-                // If no objects at this level, go on to the next level
-                if ((occupiedLevelsMask & 1) == 0)
-                {
-                    continue;
-                }
-                
-                if (level == startLevel)
-                {
-                    const int x = obj->getHGridX();
-                    const int y = obj->getHGridY();
-                    const int z = obj->getHGridZ();
-                    
-                    hGridFindContactsWithinTargetCell(x, y, z, level);
-                    hGridFindContactsWithTargetCell(x + 1, y - 1, z, level, obj);
-                    hGridFindContactsWithTargetCell(x + 1, y, z, level, obj);
-                    hGridFindContactsWithTargetCell(x + 1, y + 1, z, level, obj);
-                    hGridFindContactsWithTargetCell(x + 1, y - 1, z + 1, level, obj);
-                    hGridFindContactsWithTargetCell(x + 1, y, z + 1, level, obj);
-                    hGridFindContactsWithTargetCell(x + 1, y + 1, z + 1, level, obj);
-                    hGridFindContactsWithTargetCell(x + 1, y - 1, z - 1, level, obj);
-                    hGridFindContactsWithTargetCell(x + 1, y, z - 1, level, obj);
-                    hGridFindContactsWithTargetCell(x + 1, y + 1, z - 1, level, obj);
-                    hGridFindContactsWithTargetCell(x, y + 1, z, level, obj);
-                    hGridFindContactsWithTargetCell(x, y, z - 1, level, obj);
-                    hGridFindContactsWithTargetCell(x, y + 1, z - 1, level, obj);
-                    hGridFindContactsWithTargetCell(x, y + 1, z + 1, level, obj);
-                }
-                else
-                {
-                    const Mdouble inv_size = hgrid->getInvCellSize(level);
-                    const int xs = static_cast<int>(std::floor((obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
-                    const int xe = static_cast<int>(std::floor((obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
-                    const int ys = static_cast<int>(std::floor((obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
-                    const int ye = static_cast<int>(std::floor((obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
-                    const int zs = static_cast<int>(std::floor((obj->getPosition().Z - obj->getInteractionRadius()) * inv_size - 0.5));
-                    const int ze = static_cast<int>(std::floor((obj->getPosition().Z + obj->getInteractionRadius()) * inv_size + 0.5));
-                    for (int x = xs; x <= xe; ++x)
-                    {
-                        for (int y = ys; y <= ye; ++y)
-                        {
-                            for (int z = zs; z <= ze; ++z)
-                            {
-                                hGridFindContactsWithTargetCell(x, y, z, level, obj);
-                            }
+    if (getHGridMethod()==TOPDOWN) {
+        int occupiedLevelsMask = hgrid->getOccupiedLevelsMask();
+        for (unsigned int level = 0; level <= startLevel && occupiedLevelsMask != 0; occupiedLevelsMask >>= 1, level++) {
+            // If no objects at this level, go on to the next level
+            if ((occupiedLevelsMask & 1) == 0) {
+                continue;
+            }
+
+            if (level == startLevel) {
+                const int x = obj->getHGridX();
+                const int y = obj->getHGridY();
+                const int z = obj->getHGridZ();
+
+                hGridFindContactsWithinTargetCell(x, y, z, level);
+                hGridFindContactsWithTargetCell(x + 1, y - 1, z, level, obj);
+                hGridFindContactsWithTargetCell(x + 1, y, z, level, obj);
+                hGridFindContactsWithTargetCell(x + 1, y + 1, z, level, obj);
+                hGridFindContactsWithTargetCell(x + 1, y - 1, z + 1, level, obj);
+                hGridFindContactsWithTargetCell(x + 1, y, z + 1, level, obj);
+                hGridFindContactsWithTargetCell(x + 1, y + 1, z + 1, level, obj);
+                hGridFindContactsWithTargetCell(x + 1, y - 1, z - 1, level, obj);
+                hGridFindContactsWithTargetCell(x + 1, y, z - 1, level, obj);
+                hGridFindContactsWithTargetCell(x + 1, y + 1, z - 1, level, obj);
+                hGridFindContactsWithTargetCell(x, y + 1, z, level, obj);
+                hGridFindContactsWithTargetCell(x, y, z - 1, level, obj);
+                hGridFindContactsWithTargetCell(x, y + 1, z - 1, level, obj);
+                hGridFindContactsWithTargetCell(x, y + 1, z + 1, level, obj);
+            } else {
+                const Mdouble inv_size = getHGrid()->getInvCellSize(level);
+                const int xs = static_cast<int>(std::floor(
+                        (obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
+                const int xe = static_cast<int>(std::floor(
+                        (obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
+                const int ys = static_cast<int>(std::floor(
+                        (obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
+                const int ye = static_cast<int>(std::floor(
+                        (obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
+                const int zs = static_cast<int>(std::floor(
+                        (obj->getPosition().Z - obj->getInteractionRadius()) * inv_size - 0.5));
+                const int ze = static_cast<int>(std::floor(
+                        (obj->getPosition().Z + obj->getInteractionRadius()) * inv_size + 0.5));
+                for (int x = xs; x <= xe; ++x) {
+                    for (int y = ys; y <= ye; ++y) {
+                        for (int z = zs; z <= ze; ++z) {
+                            hGridFindContactsWithTargetCell(x, y, z, level, obj);
                         }
                     }
                 }
             }
-            break;
         }
-        case TOPDOWN:
+    } else {
+        int occupiedLevelsMask = hgrid->getOccupiedLevelsMask() >> obj->getHGridLevel();
+        for (unsigned int level = startLevel; level < hgrid->getNumberOfLevels(); occupiedLevelsMask >>= 1, level++)
+        {
+            // If no objects in rest of grid, stop now
+            if (occupiedLevelsMask == 0)
             {
-            int occupiedLevelsMask = hgrid->getOccupiedLevelsMask();
-            for (unsigned int level = 0; level <= startLevel; occupiedLevelsMask >>= 1, level++)
+                break;
+            }
+
+            // If no objects at this level, go on to the next level
+            if ((occupiedLevelsMask & 1) == 0)
             {
-                // If no objects in rest of grid, stop now
-                if (occupiedLevelsMask == 0)
+                continue;
+            }
+
+            if (level == startLevel)
+            {
+                const int x = obj->getHGridX();
+                const int y = obj->getHGridY();
+                const int z = obj->getHGridZ();
+
+                hGridFindContactsWithinTargetCell(x, y, z, level);
+                hGridFindContactsWithTargetCell(x + 1, y - 1, z, level, obj);
+                hGridFindContactsWithTargetCell(x + 1, y, z, level, obj);
+                hGridFindContactsWithTargetCell(x + 1, y + 1, z, level, obj);
+                hGridFindContactsWithTargetCell(x + 1, y - 1, z + 1, level, obj);
+                hGridFindContactsWithTargetCell(x + 1, y, z + 1, level, obj);
+                hGridFindContactsWithTargetCell(x + 1, y + 1, z + 1, level, obj);
+                hGridFindContactsWithTargetCell(x + 1, y - 1, z - 1, level, obj);
+                hGridFindContactsWithTargetCell(x + 1, y, z - 1, level, obj);
+                hGridFindContactsWithTargetCell(x + 1, y + 1, z - 1, level, obj);
+                hGridFindContactsWithTargetCell(x, y + 1, z, level, obj);
+                hGridFindContactsWithTargetCell(x, y, z - 1, level, obj);
+                hGridFindContactsWithTargetCell(x, y + 1, z - 1, level, obj);
+                hGridFindContactsWithTargetCell(x, y + 1, z + 1, level, obj);
+            }
+            else
+            {
+                const Mdouble inv_size = hgrid->getInvCellSize(level);
+                const int xs = static_cast<int>(std::floor((obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
+                const int xe = static_cast<int>(std::floor((obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
+                const int ys = static_cast<int>(std::floor((obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
+                const int ye = static_cast<int>(std::floor((obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
+                const int zs = static_cast<int>(std::floor((obj->getPosition().Z - obj->getInteractionRadius()) * inv_size - 0.5));
+                const int ze = static_cast<int>(std::floor((obj->getPosition().Z + obj->getInteractionRadius()) * inv_size + 0.5));
+                for (int x = xs; x <= xe; ++x)
                 {
-                    break;
-                }
-                
-                // If no objects at this level, go on to the next level
-                if ((occupiedLevelsMask & 1) == 0)
-                {
-                    continue;
-                }
-                
-                if (level == startLevel)
-                {
-                    const int x = obj->getHGridX();
-                    const int y = obj->getHGridY();
-                    const int z = obj->getHGridZ();
-                    
-                    hGridFindContactsWithinTargetCell(x, y, z, level);
-                    hGridFindContactsWithTargetCell(x + 1, y - 1, z, level, obj);
-                    hGridFindContactsWithTargetCell(x + 1, y, z, level, obj);
-                    hGridFindContactsWithTargetCell(x + 1, y + 1, z, level, obj);
-                    hGridFindContactsWithTargetCell(x + 1, y - 1, z + 1, level, obj);
-                    hGridFindContactsWithTargetCell(x + 1, y, z + 1, level, obj);
-                    hGridFindContactsWithTargetCell(x + 1, y + 1, z + 1, level, obj);
-                    hGridFindContactsWithTargetCell(x + 1, y - 1, z - 1, level, obj);
-                    hGridFindContactsWithTargetCell(x + 1, y, z - 1, level, obj);
-                    hGridFindContactsWithTargetCell(x + 1, y + 1, z - 1, level, obj);
-                    hGridFindContactsWithTargetCell(x, y + 1, z, level, obj);
-                    hGridFindContactsWithTargetCell(x, y, z - 1, level, obj);
-                    hGridFindContactsWithTargetCell(x, y + 1, z - 1, level, obj);
-                    hGridFindContactsWithTargetCell(x, y + 1, z + 1, level, obj);
-                }
-                else
-                {
-                    const Mdouble inv_size = getHGrid()->getInvCellSize(level);
-                    const int xs = static_cast<int>(std::floor((obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
-                    const int xe = static_cast<int>(std::floor((obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
-                    const int ys = static_cast<int>(std::floor((obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
-                    const int ye = static_cast<int>(std::floor((obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
-                    const int zs = static_cast<int>(std::floor((obj->getPosition().Z - obj->getInteractionRadius()) * inv_size - 0.5));
-                    const int ze = static_cast<int>(std::floor((obj->getPosition().Z + obj->getInteractionRadius()) * inv_size + 0.5));
-                    for (int x = xs; x <= xe; ++x)
+                    for (int y = ys; y <= ye; ++y)
                     {
-                        for (int y = ys; y <= ye; ++y)
+                        for (int z = zs; z <= ze; ++z)
                         {
-                            for (int z = zs; z <= ze; ++z)
-                            {
-                                hGridFindContactsWithTargetCell(x, y, z, level, obj);
-                            }
+                            hGridFindContactsWithTargetCell(x, y, z, level, obj);
                         }
                     }
                 }
             }
-            break;
         }
     }
 }

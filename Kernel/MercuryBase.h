@@ -185,7 +185,7 @@ public:
     /*!
      * \brief Gets whether or not the HGrid is updated every time step.
      */
-    bool getHGridUpdateEachTimeStep() const override;
+    bool getHGridUpdateEachTimeStep() const final;
 
     /*!
      * \brief Sets the maximum number of levels of the HGrid in this MercuryBase.
@@ -200,7 +200,7 @@ public:
     /*!
      * \brief Gets whether the HGrid in this MercuryBase is BOTTOMUP or TOPDOWN.
      */
-    HGridMethod getHGridMethod() const;
+    HGridMethod getHGridMethod() const { return hGridMethod_; }
 
     /*!
      * \brief Sets the HGridMethod to either BOTTOMUP or TOPDOWN.
@@ -250,12 +250,12 @@ public:
     /*!
      * \brief Checks if given BaseParticle has an interaction with a BaseWall or other BaseParticle.
      */
-    bool checkParticleForInteraction(const BaseParticle& P) override;
+    bool checkParticleForInteraction(const BaseParticle& P) final;
    
     /*!
      * \brief Checks if the given BaseParticle has an interaction with a BaseWall or other BaseParticles in a local domain.
      */ 
-    bool checkParticleForInteractionLocal(const BaseParticle& P) override;
+    bool checkParticleForInteractionLocal(const BaseParticle& P) final;
 
     /*!
      * \brief Virtual function that enables inheriting classes to implement a function to let the user set the cell size of the HGrid.
@@ -272,7 +272,7 @@ protected:
     /*!
      * \brief Inserts a single Particle to current grid.
      */
-    void hGridInsertParticle(BaseParticle* obj) override;
+    void hGridInsertParticle(BaseParticle* obj) final;
 
     /*!
      * \brief This checks particles in the HGRID to see if for closer enough
@@ -282,7 +282,7 @@ protected:
     
     /*!
      * \brief This is a purely virtual function that checks if an object is in
-     *        the grid, this code is dimension dependent so purely virtual at 
+     *        the grid, this code is dimension dependent so purely virtual at
      *        this stage.
      */
     virtual void hGridFindOneSidedContacts(BaseParticle* obj) = 0;
@@ -297,7 +297,7 @@ protected:
      * \brief Computes the relative displacement of the given BaseParticle and 
      *        updates the currentMaxRelativeDisplacement_ accordingly. 
      */
-    void hGridUpdateMove(BaseParticle * iP, Mdouble move) override;
+    void hGridUpdateMove(BaseParticle * iP, Mdouble move) final;
 
     /*!
      * \brief Resets the currentMaxRelativeDisplacement_ to 0.
@@ -312,12 +312,12 @@ protected:
     /*!
      * \brief Gets the HGrid used by this problem.
      */
-    HGrid* getHGrid();
+    HGrid* getHGrid() { return grid; }
 
     /*!
      * \brief Gets the HGrid used by this problem, const version.
      */
-    const HGrid* getHGrid() const;
+    const HGrid* getHGrid() const { return grid; }
 
     /*!
      * \brief Reads the next command line argument.
@@ -328,7 +328,7 @@ public:
     /*!
      * \brief Writes the info of the HGrid to the screen in a nice format.
      */
-    void hGridInfo() const;
+    void hGridInfo(std::ostream& os = std::cout) const;
     
 private:
     /*!

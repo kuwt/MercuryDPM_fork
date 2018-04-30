@@ -315,57 +315,6 @@ void BaseInteraction::copySwitchPointer(const BaseInteractable* original, BaseIn
 }
 
 /*!
- * \details Return a reference to a Vec3D which contains the current value of
- *          the force associated with this interaction.
- * \return  A reference to a Vec3D containing the total force.
- */
-const Vec3D& BaseInteraction::getForce() const
-{
-    return force_;
-}
-
-/*!
- * \details Return a reference to a Vec3D which contains the current value of
- *          the torque associated with the interaction.
- * \return  A reference to a Vec3D containing the total torque.
- */
-const Vec3D& BaseInteraction::getTorque() const
-{
-    return torque_;
-}
-
-/*!
- * \details Returns a reference to a Vec3D which contains the current value of 
- *          the normal associated with the interactions.
- * \return  A reference to a Vec3D containing the current normal.
- */
-const Vec3D& BaseInteraction::getNormal() const
-{
-    return normal_;
-}
-
-/*!
- * \details Returns a reference to a Vec3D which contains the current value of
- *          the contact point for the particles in interaction. Normally, does
- *          not change about the interaction is created.
- * \return  A reference to a Vec3D containing the contact point.
- */
-const Vec3D& BaseInteraction::getContactPoint() const
-{
-    return contactPoint_;
-}
-
-/*!
- * \details Returns a Mdouble to the current overlap for the objects involved in
- *          the interaction.
- * \return Mdouble which is the value of the overlap.
- */
-Mdouble BaseInteraction::getOverlap() const
-{
-    return overlap_;
-}
-
-/*!
  * \details Returns a Mdouble to the current overlap for the objects involved in
  *          the interaction.
  * \return Mdouble which is the value of the overlap.
@@ -373,61 +322,6 @@ Mdouble BaseInteraction::getOverlap() const
 Mdouble BaseInteraction::getContactRadius() const
 {
     return sqrt(2.0*getEffectiveRadius()*getOverlap());
-}
-
-/*!
- * \details Returns a pointer to the first object in the interactions; normally
- *           the particle.
- * \return   Pointer to BaseInteraction but normally will be a BaseParticle.
- */
-BaseInteractable* BaseInteraction::getP()
-{
-    logger.assert(P_ != nullptr, "First particle in interaction % is nullptr", getId());
-    return P_;
-}
-
-/*!
- * \details Returns a pointer to the second object in the interaction; often 
- *          a particle or a wall i.e. a general interactale hence I.
- * \return  Pointer to BaseInteraction often a particle or a wall.
- */
-BaseInteractable* BaseInteraction::getI()
-{
-    logger.assert(I_ != nullptr, "Second particle in interaction % is nullptr", getId());
-    return I_;
-}
-
-/*!
- * \details Returns a constant pointer to the first object in the interactions; normally
- *           the particle.
- * \return   Constant pointer to BaseInteraction but normally will be a BaseParticle.
- */
-const BaseInteractable* BaseInteraction::getP() const
-{
-    logger.assert(P_ != nullptr, "First particle in interaction % is nullptr", getId());
-    return P_;
-}
-
-/*!
- * \details Returns a constant pointer to the second object in the interaction; often
- *          a particle or a wall i.e. a general interactale hence I.
- * \return  Constant pointer to BaseInteraction often a particle or a wall.
- */
-const BaseInteractable* BaseInteraction::getI() const
-{
-    logger.assert(I_ != nullptr, "Second particle in interaction % is nullptr", getId());
-    return I_;
-}
-
-/*!
- * \details Returns the current time stamp of interaction. This should be the
- *          last time the interaction was active and used to find the end of the
- *          interaction.
- * \return  Mdouble which is the last time the interaction was active.
- */
-Mdouble BaseInteraction::getTimeStamp() const
-{
-    return timeStamp_;
 }
 
 /*!

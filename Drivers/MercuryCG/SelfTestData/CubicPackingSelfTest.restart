@@ -270,4 +270,4 @@ LinearViscoelasticInteraction particleIds 108 109 timeStamp 1000 force 0 0 -1.19
 LinearViscoelasticInteraction particleIds 113 114 timeStamp 1000 force 0 0 -1.1948717385858 torque 0 0 0
 LinearViscoelasticInteraction particleIds 118 119 timeStamp 1000 force 0 0 -1.1948717385858 torque 0 0 0
 LinearViscoelasticInteraction particleIds 123 124 timeStamp 1000 force 0 0 -1.1948717385858 torque 0 0 0
-NUM_BUCKETS 125 hGridMaxLevels 3 cellOverSizeRatio 1
+hGrid method TOPDOWN distribution EXPONENTIAL cellOverSizeRatio 1 numberOfBuckets 1250 cellSizes 1 gridNeedsUpdate 0 updateEachTimeStep 1 currentMaxRelativeDisplacement 0 totalCurrentMaxRelativeDisplacement 0

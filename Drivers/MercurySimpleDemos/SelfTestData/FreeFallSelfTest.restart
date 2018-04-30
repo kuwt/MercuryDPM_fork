@@ -16,4 +16,4 @@ Boundaries 0
 Particles 1
 BaseParticle id 0 indSpecies 0 position 0.005 0.060162719426194 0 orientation 1 0 0 0 velocity 0 0.826766416424872 0 angularVelocity 0 0 0 force 0 -0.0102625360017267 0 torque 0 0 0 radius 0.005 invMass 954.929658551372
 Interactions 0
-NUM_BUCKETS 10 hGridMaxLevels 3 cellOverSizeRatio 1
+hGrid method TOPDOWN distribution EXPONENTIAL cellOverSizeRatio 1 numberOfBuckets 10 cellSizes 0.01 gridNeedsUpdate 0 updateEachTimeStep 1 currentMaxRelativeDisplacement 0 totalCurrentMaxRelativeDisplacement 0

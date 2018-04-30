@@ -128,31 +128,8 @@ void MercuryBase::read(std::istream& is)
  */
 void MercuryBase::write(std::ostream& os, bool writeAllParticles) const
 {
-DPMBase::write(os, writeAllParticles);
-#ifdef MERCURY_USE_MPI
-    MPIContainer& communicator = MPIContainer::Instance();
-    int numberOfProcessors = communicator.getNumberOfProcessors();
-#else
-    int numberOfProcessors = 1;
-#endif
-    if (numberOfProcessors > 1)
-    {
-              os << "NUM_BUCKETS " << 0.0 << " "
-                << "hGridMaxLevels " << getHGridMaxLevels() << " "
-                << "cellOverSizeRatio " << getHGridCellOverSizeRatio() << std::endl;
-    }
-    else if (grid == nullptr)
-    {
-              os << "NUM_BUCKETS " << 0.0 << " "
-                << "hGridMaxLevels " << getHGridMaxLevels() << " "
-                << "cellOverSizeRatio " << getHGridCellOverSizeRatio() << std::endl;
-    }
-    else
-    {
-        os << "NUM_BUCKETS " << grid->getNumberOfBuckets() << " "
-                << "hGridMaxLevels " << getHGridMaxLevels() << " "
-                << "cellOverSizeRatio " << getHGridCellOverSizeRatio() << std::endl;
-    }
+    DPMBase::write(os, writeAllParticles);
+    hGridInfo(os);
 }
 
 /*!
@@ -381,22 +358,6 @@ void MercuryBase::hGridActionsAfterIntegration()
 }
 
 /*!
- * \return A pointer to the HGrid associated with this MercuryBase.
- */
-HGrid* MercuryBase::getHGrid()
-{
-    return grid;
-}
-
-/*!
- * \return A pointer to the (constant) HGrid associated with this MercuryBase.
- */
-const HGrid* MercuryBase::getHGrid() const
-{
-    return grid;
-}
-
-/*!
  * \param[in] level The level of the cell we want to know the size set by the user for.
  * \return The size of the cells at the given level.
  */
@@ -430,13 +391,6 @@ bool MercuryBase::readNextArgument(int& i, int argc, char *argv[])
     return true; //returns true if argv[i] is found
 }
 
-/*!
- * \return The HGridMethod used by this MercuryBase.
- */
-HGridMethod MercuryBase::getHGridMethod() const
-{
-    return hGridMethod_;
-}
 
 /*!
  * \param[in] hGridMethod The HGridMethod that will be used in this MercuryBase.
@@ -557,7 +511,8 @@ unsigned int MercuryBase::getHGridTargetNumberOfBuckets() const
     unsigned int nParticles = particleHandler.getSize();
     if (nParticles > 10)
     {
-        return nParticles;
+        ///\todo TW SpeedCheckThomas revealed that adding a factor 10 here improved performance by 20% for monodisperse particles, 45% for highly polydisperse (this seems true for particle numbers 1e3 - 1e6); a larger factor seems to little extra effect; the memory cost is small compared to the number of particles, so I added the factor permanently. @Irana please check this is ok to do.
+        return 10*nParticles;
     }
     else
     {
@@ -666,27 +621,28 @@ bool MercuryBase::checkParticleForInteractionLocal(const BaseParticle& p)
 }
 
 
-void MercuryBase::hGridInfo() const
+void MercuryBase::hGridInfo(std::ostream& os) const
 {
-    logger(INFO,"hGrid parameters:" );
-    logger(INFO, "  method %", hGridMethod_);
-    logger(INFO, "  distribution %", hGridDistribution_);
-    logger(VERBOSE, "Mdouble currentMaxRelativeDisplacement_=%", currentMaxRelativeDisplacement_);
-    logger(VERBOSE, "Mdouble totalCurrentMaxRelativeDisplacement_=%", totalCurrentMaxRelativeDisplacement_);
-    ///\todo IFCD: I don't know how to apply std::boolalpha to needsUpdate and updateEachTimeStep
-    logger(INFO,"  needsUpdate %", gridNeedsUpdate_);
-    logger(INFO,"  updateEachTimeStep %", updateEachTimeStep_);
-    logger(INFO, "  maxLevels %", hGridMaxLevels_);
-    logger(INFO, "  cellOverSizeRatio %", hGridCellOverSizeRatio_);
-    std::cout << "hGrid parameters:" << std::endl;
-    std::cout << "  method " << hGridMethod_ << std::endl; 
-    std::cout << "  distribution " << hGridDistribution_ << std::endl;
-    if (grid != nullptr) 
+    #ifdef MERCURY_USE_MPI
+        MPIContainer& communicator = MPIContainer::Instance();
+        int numberOfProcessors = communicator.getNumberOfProcessors();
+    #else
+        int numberOfProcessors = 1;
+    #endif
+    os << "hGrid"
+       << " method " << hGridMethod_
+       << " distribution " << hGridDistribution_
+       << " cellOverSizeRatio " << hGridCellOverSizeRatio_;
+       //<< " maxLevels " << hGridMaxLevels_;
+    if (numberOfProcessors == 1 && grid != nullptr)
     {
-        grid->info();
+        os << " numberOfBuckets " << grid->getNumberOfBuckets()
+           << " cellSizes";
+        for (const auto p: grid->getCellSizes()) os << " " << p;
     }
-    else
-    {
-        logger(INFO,"  grid does not exist yet");
-    }
+    os << " gridNeedsUpdate " << gridNeedsUpdate_
+       << " updateEachTimeStep " << updateEachTimeStep_
+       << " currentMaxRelativeDisplacement " << currentMaxRelativeDisplacement_
+       << " totalCurrentMaxRelativeDisplacement " << totalCurrentMaxRelativeDisplacement_
+       << std::endl;
 }

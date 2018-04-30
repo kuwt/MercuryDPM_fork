@@ -136,33 +136,10 @@ unsigned int HGrid::computeHashBucketIndex(int x, int y, unsigned int l) const
     return static_cast<unsigned int>(n);
 }
 
-/*!
- * \return The number of buckets in this HGrid.
- */
-unsigned int HGrid::getNumberOfBuckets() const
-{
-    return numberOfBuckets_;
-}
 
 void HGrid::clearBucketIsChecked()
 {
     std::fill(bucketIsChecked_.begin(), bucketIsChecked_.end(), false);
-}
-
-/*!
- * \return A vector with the sizes of the cells of different levels.
- */
-const std::vector<double>& HGrid::getCellSizes() const
-{
-    return cellSizes_;
-}
-
-/*!
- * \return A vector with the inverse sizes (1/size) of the cells of different levels.
- */
-const std::vector<double>& HGrid::getInvCellSizes() const
-{
-    return invCellSizes_;
 }
 
 void HGrid::clearFirstBaseParticleInBucket()
@@ -170,119 +147,10 @@ void HGrid::clearFirstBaseParticleInBucket()
     std::fill(firstBaseParticleInBucket_.begin(), firstBaseParticleInBucket_.end(), nullptr);
 }
 
-/*!
- * \param[in] i The ordinal number of the bucket we want to know for whether or not it has been checked.
- * \return A boolean which is true if the bucket is checked and false otherwise.
- */
-bool HGrid::getBucketIsChecked(unsigned int i) const
-{
-    return bucketIsChecked_[i];
-}
-
-/*!
- * \param[in] i The ordinal number of the bucket for which we want to get the first particle of.
- * \return A pointer to the (constant) BaseParticle which is the first Baseparticle in the given bucket.
- */
-const BaseParticle* HGrid::getFirstBaseParticleInBucket(unsigned int i) const
-{
-    return firstBaseParticleInBucket_[i];
-}
-
-/*!
- * \param[in] i The ordinal number of the bucket for which we want to get the first particle of.
- * \return A pointer to the BaseParticle which is the first Baseparticle in the given bucket.
- */
-BaseParticle* HGrid::getFirstBaseParticleInBucket(unsigned int i)
-{
-    return firstBaseParticleInBucket_[i];
-}
-
-/*!
- * \param[in] i The ordinal number of the bucket we want to mark as checked.
- */
-void HGrid::setBucketIsChecked(unsigned int i)
-{
-    bucketIsChecked_[i] = true;
-}
-
-/*!
- * \return The number of levels in this HGrid.
- */
-unsigned int HGrid::getNumberOfLevels() const
-{
-    return cellSizes_.size();
-}
-
-/*!
- * \param[in] i The ordinal number of the bucket we want to set the first BaseParticle for.
- * \param[in] p A pointer to the BaseParticle we want to place in the given bucket.
- */
-void HGrid::setFirstBaseParticleInBucket(unsigned int i, BaseParticle* p)
-{
-    firstBaseParticleInBucket_[i] = p;
-}
-
-/*!
- * \param[in] i The level we want to know the cell size of.
- * \return The size of the cells at the given level.
- */
-double HGrid::getCellSize(unsigned int i) const
-{
-    return cellSizes_[i];
-}
-
-/*!
- * \param[in] i The level we want to know the inverse cell size of.
- * \return The inverse size, i.e. 1/size, of the cells at the given level.
- */
-double HGrid::getInvCellSize(unsigned int i) const
-{
-    return invCellSizes_[i];
-}
-
-/*!
- * \return A boolean which indicates whether or not the HGrid needs rebuilding.
- */
-bool HGrid::getNeedsRebuilding() const
-{
-    return needsRebuilding_;
-}
-
-/*!
- * \return The ratio between the size of the smallest cell and the smallest BaseParticle.
- */
-Mdouble HGrid::getCellOverSizeRatio() const
-{
-    return cellOverSizeRatio_;
-}
-
-/*!
- * \return The integer that represents the bit-vector that indicates which levels have at least one particle.
- */
-int HGrid::getOccupiedLevelsMask() const
-{
-    return occupiedLevelsMask_;
-}
-
 ///\todo use logger everywhere
 void HGrid::info() const
 {
-    //std::cout << "  needsRebuilding " << std::boolalpha << needsRebuilding_ << std::endl; 
     logger(INFO,"  numberOfBuckets %", numberOfBuckets_);
     logger(INFO, "  cellOverSizeRatio %", cellOverSizeRatio_);
-    //std::cout << "  occupiedLevelsMask " << std::bitset<8>(occupiedLevelsMask_) << std::endl; 
-    logger(INFO, "  cellSizes");
-    for (auto p: cellSizes_)
-    {
-        std::cout << " " << p;
-    } std::cout << std::endl;
-    // std::cout << "std::vector<double> invCellSizes_[" << invCellSizes_.size() << "]="; 
-    // for (auto p: invCellSizes_) std::cout << p << " "; 
-    // std::cout << std::endl; 
-    // std::cout << "std::vector<BaseParticle> firstBaseParticleInBucket_[" << firstBaseParticleInBucket_.size() << "]=... (not shown)"; 
-    // //for (auto p: firstBaseParticleInBucket_) std::cout << p << " "; 
-    // std::cout << std::endl; 
-    // std::cout << "std::vector<bool> bucketIsChecked_[" << bucketIsChecked_.size() << "]=... (not shown)"; 
-    // //for (auto p: bucketIsChecked_) std::cout << p << " "; 
-    // std::cout << std::endl; 
+    std::cout << "  cellSizes"; for (auto p: cellSizes_) std::cout << " " << p; std::cout << '\n';
 }

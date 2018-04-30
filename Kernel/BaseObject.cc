@@ -103,22 +103,6 @@ void BaseObject::setId(const unsigned int id)
 }
 
 /*!
- * \return index_
- */
-unsigned int BaseObject::getIndex() const
-{
-    return index_;
-}
-
-/*!
- * \return id number of the current object
- */
-unsigned int BaseObject::getId() const
-{
-    return id_;
-}
-
-/*!
  * \param[in] is stream object from which data is read
  */
 void BaseObject::read(std::istream& is)

@@ -36,4 +36,4 @@ BaseParticle id 169582 indSpecies 0 position 6.0000122255027 0 0 orientation 1 0
 BaseParticle id 173864 indSpecies 0 position 6.63926836474172 0 12 orientation 1 0 0 0 velocity 1.91010177914983 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 0.125
 BaseParticle id 196895 indSpecies 0 position 5.12499398907057 0 9 orientation 1 0 0 0 velocity 1.77206019083336 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 0.125
 Interactions 0
-NUM_BUCKETS 17 hGridMaxLevels 3 cellOverSizeRatio 1
+hGrid method TOPDOWN distribution EXPONENTIAL cellOverSizeRatio 1 numberOfBuckets 170 cellSizes 2 gridNeedsUpdate 0 updateEachTimeStep 1 currentMaxRelativeDisplacement 0 totalCurrentMaxRelativeDisplacement 0

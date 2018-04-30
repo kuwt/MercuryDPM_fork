@@ -26,4 +26,4 @@ Interactions 3
 LinearViscoelasticFrictionLiquidMigrationWilletInteraction particleIds 0 1 timeStamp 35000 force 0.00248419889946227 -2.50435515250913e-05 0 torque 0 0 0 slidingSpring 0 0 0 rollingSpring 0 0 0 torsionSpring 0 0 0 wasInContact 1 liquidBridgeVolume 3.12e-12
 LinearViscoelasticFrictionLiquidMigrationWilletInteraction particleIds 3 4 timeStamp 35000 force -0.00177299652727974 -0.00184446376155389 0 torque 0 0 0 slidingSpring 0 0 0 rollingSpring 0 0 0 torsionSpring 0 0 0 wasInContact 1 liquidBridgeVolume 4e-12
 LinearViscoelasticFrictionLiquidMigrationWilletInteraction particleIds 2 4 timeStamp 35000 force 0.000762063695216964 0.00278466778249772 0 torque 0 0 0 slidingSpring 0 0 0 rollingSpring 0 0 0 torsionSpring 0 0 0 wasInContact 1 liquidBridgeVolume 2.4e-12
-NUM_BUCKETS 10 hGridMaxLevels 3 cellOverSizeRatio 1
+hGrid method TOPDOWN distribution EXPONENTIAL cellOverSizeRatio 1 numberOfBuckets 10 cellSizes 0.00120084230506709 gridNeedsUpdate 0 updateEachTimeStep 1 currentMaxRelativeDisplacement 0 totalCurrentMaxRelativeDisplacement 0

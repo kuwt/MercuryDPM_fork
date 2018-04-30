@@ -114,26 +114,22 @@ void Mercury2D::hGridFindContactsWithinTargetCell(int x, int y, unsigned int l)
 void Mercury2D::hGridFindContactsWithTargetCell(int x, int y, unsigned int l, BaseParticle* obj)
 {
     //Check if the object is not in the same cell as being checked, CheckCell_current should handle these cases.
-    if (obj->getHGridCell().equals(x,y,l))
-    {
-        return;
-    }
+    logger.assert(!obj->getHGridCell().equals(x,y,l),"hGridFindContactsWithTargetCell should not be called if object is in the same cell");
+    //if (obj->getHGridCell().equals(x,y,l)) return;
 
-    HGrid* hgrid = getHGrid();
+    HGrid* const hgrid = getHGrid();
 
     // Calculate the bucket
-    unsigned int bucket = hgrid->computeHashBucketIndex(x, y, l);
+    const unsigned int bucket = hgrid->computeHashBucketIndex(x, y, l);
 
     // Loop through all objects in the bucket to find nearby objects
-    BaseParticle *p = hgrid->getFirstBaseParticleInBucket(bucket);
-    while (p != nullptr)
+    for (BaseParticle* p = hgrid->getFirstBaseParticleInBucket(bucket); p != nullptr; p = p->getHGridNextObject())
     {
         //Check if the BaseParticle *p really is in the target cell (i.e. no hashing error has occurred)
         if (p->getHGridCell().equals(x,y,l))
         {
             computeInternalForces(obj, p);
         }
-        p = p->getHGridNextObject();
     }
 }
 

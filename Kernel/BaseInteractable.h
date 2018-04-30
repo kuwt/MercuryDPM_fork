@@ -81,17 +81,20 @@ public:
     /*!
      * \brief Returns the index of the Species of this BaseInteractable.
      */
-    unsigned int getIndSpecies() const;
+    unsigned int getIndSpecies() const {return indSpecies_;}
 
     /*!
      * \brief Sets the index of the Species of this BaseInteractable.
      */
-    virtual void setIndSpecies(unsigned int indSpecies);
+    virtual void setIndSpecies(unsigned int indSpecies) {indSpecies_ = indSpecies;}
 
     /*!
      * \brief Returns a pointer to the species of this BaseInteractable.
      */
-    const ParticleSpecies* getSpecies() const;
+    const ParticleSpecies* getSpecies() const {
+        logger.assert(species_,"Species of % % has to be defined",getName(),getIndex());
+        return species_;
+    }
 
     /*!
      * \brief Sets the species of this BaseInteractable.
@@ -101,47 +104,55 @@ public:
     /*!
      * \brief Returns the force on this BaseInteractable.
      */
-    const Vec3D& getForce() const;
+    const Vec3D& getForce() const {return force_;}
 
     /*!
      * \brief Returns the torque on this BaseInteractable.
      */
-    const Vec3D& getTorque() const;
+    const Vec3D& getTorque() const {return torque_;}
 
     /*!
      * \brief Sets the force on this BaseInteractable.
      */
-    void setForce(const Vec3D& force);
+    void setForce(const Vec3D& force) {force_ = force;}
 
     /*!
      * \brief Sets the torque on this BaseInteractable.
      */
-    void setTorque(const Vec3D& torque);
+    void setTorque(const Vec3D& torque) {torque_ = torque;}
 
     /*!
      * \brief Adds an amount to the force on this BaseInteractable.
      */
-    void addForce(const Vec3D& addForce);
+    void addForce(const Vec3D& addForce) {force_ += addForce;}
 
     /*!
      * \brief Adds an amount to the torque on this BaseInteractable.
      */
-    void addTorque(const Vec3D& addTorque);
+    void addTorque(const Vec3D& addTorque) {torque_ += addTorque;}
 
     /*!
      * \brief Returns the position of this BaseInteractable.
+     * \details Returns the reference to a Vec3D which contains the position of the
+     *          interactionable.
+     *          Please note the interpretation of this depends on which
+     *          interactable. For particles this is the centre of the particle;
+     *          where for walls it is one point of the wall given \f$r.n=p\f$
+     * \return  Returns a reference to a Vec3D returns the position of the
+     *          interactable.
      */
-    const Vec3D& getPosition() const;
+    const Vec3D& getPosition() const { return position_; }
 
     /*!
      * \brief Returns the orientation of this BaseInteractable.
      */
-    const Quaternion& getOrientation() const;
+    const Quaternion& getOrientation() const {return orientation_;}
 
     /*!
      * \brief Sets the position of this BaseInteractable.
-     */
-    void setPosition(const Vec3D& position);
+     * \param[in] position  Reference to Vec3D storing the position of the particle.
+    */
+    void setPosition(const Vec3D& position) {position_ = position;}
 
     /*!
      * \brief Sets the orientation of this BaseInteractable by defining the vector that results from the rotation of the (1,0,0) vector.
@@ -151,7 +162,7 @@ public:
     /*!
      * \brief Sets the orientation of this BaseInteractable.
      */
-    void setOrientation(const Quaternion& orientation);
+    void setOrientation(const Quaternion& orientation) {orientation_ = orientation;}
 
     /*!
      * \brief Moves this BaseInteractable by adding an amount to the position.
@@ -166,7 +177,7 @@ public:
     /*!
      * \brief Returns a reference to the list of interactions in this BaseInteractable.
      */
-    const std::vector<BaseInteraction*>& getInteractions() const;
+    const std::vector<BaseInteraction*>& getInteractions() const {return interactions_;}
 
     /*!
      * \brief Adds an interaction to this BaseInteractable.
@@ -197,7 +208,7 @@ public:
     /*!
      * \brief adds an increment to the velocity.
      */
-    void addVelocity(const Vec3D& velocity);
+    void addVelocity(const Vec3D& velocity) {velocity_ += velocity;}
 
     /*!
      * \brief add an increment to the angular velocity.

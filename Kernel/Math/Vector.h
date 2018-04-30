@@ -60,12 +60,12 @@ public:
     /*!
      * \brief constructor
      */
-    Vec3D();
+    Vec3D() {setZero();}
     
     /*!
      * \brief Alternative constructor, taking the three elements as arguments
      */
-    Vec3D(const Mdouble x, const Mdouble y, const Mdouble z);
+    Vec3D(const Mdouble x, const Mdouble y, const Mdouble z) { X = x; Y = y; Z = z; }
     
     /*!
      * \brief Sets all elements to zero
@@ -94,23 +94,23 @@ public:
 
     /*!
      * \brief Subtracts another vector
+     * \details Subtracts vector from itself
+     * \param[in] a     vector to be subtracted
+     * \return          resulting vector
      */
-    Vec3D operator-(const Vec3D& a) const;
-
-//    /*!
-//     * \brief Adds a scalar
-//     */
-//    Vec3D operator+(const Mdouble a) const;
-//
-//    /*!
-//     * \brief Subtracts a scalar
-//     */
-//    Vec3D operator-(const Mdouble a) const;
+    Vec3D operator-(const Vec3D& a) const {
+        return Vec3D(X - a.X, Y - a.Y, Z - a.Z);
+    };
 
     /*!
      * \brief Multiplies by a scalar
+     * \details Multiplies each element with a scalar
+     * \param[in] a     the scalar to be multiplied with
+     * \return          the resulting vector
      */
-    Vec3D operator*(const Mdouble a) const;
+    Vec3D operator*(const Mdouble a) const {
+        return Vec3D(X * a, Y * a, Z * a);
+    }
 
     /*!
      * \brief Divides by a scalar
@@ -119,8 +119,16 @@ public:
     
     /*!
      * \brief Adds another vector
+     * \details Adds a vector to itself
+     * \param[in] a     vector to be added
+     * \return          (reference to) itself, i.e. resulting vector
      */
-    Vec3D& operator+=(const Vec3D& a);
+    Vec3D& operator+=(const Vec3D& a) {
+        X += a.X;
+        Y += a.Y;
+        Z += a.Z;
+        return *this;
+    }
     
     /*!
      * \brief Subtracts another vector
@@ -194,8 +202,14 @@ public:
 
     /*!
      * \brief Calculates the squared length of a Vec3D: \f$ a\cdot a \f$
+     * \details Calculates the square of the length of a given vector.
+     * NB: this is a STATIC function!
+     * \param[in] a     the vector.
+     * \return          the square of the length of the argument.
      */
-    static Mdouble getLengthSquared(const Vec3D& a);
+    static Mdouble getLengthSquared(const Vec3D& a) {
+        return (a.X * a.X + a.Y * a.Y + a.Z * a.Z);
+    }
     
     /*!
      * \brief Calculates the length of this Vec3D: \f$ \sqrt{a\cdot a} \f$
@@ -300,17 +314,6 @@ public:
      */
     friend std::istream& operator>>(std::istream& is, Vec3D& a);
 
-    //what a stupid idea! don't implement that!
-//    /*!
-//     * \brief Adds a scalar to a vector
-//     */
-//    friend Vec3D operator+(const Mdouble a, const Vec3D& b);
-//
-//    /*!
-//     * \brief Subtracts the elements of a vector from a scalar
-//     */
-//    friend Vec3D operator-(const Mdouble a, const Vec3D& b);
-//
     /*!
      * \brief Subtracts a vector 
      */

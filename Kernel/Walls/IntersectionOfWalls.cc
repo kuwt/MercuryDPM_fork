@@ -547,19 +547,14 @@ bool IntersectionOfWalls::getDistanceAndNormal(const BaseParticle& p, Mdouble& d
  * \param[out] normal_return If there was an interaction, the normal vector to
  * this wall will be placed here.
  * \return A boolean which says whether or not there was an interaction.
- * \details This function computes whether or not there is an interaction between
- * an object at the given distance and this IntersectionOfWalls. If there is an interaction, this
- * function also computes the distance between the BaseParticle and IntersectionOfWalls
- * and the normal of the IntersectionOfWalls at the intersection point.
- * First check if the distance between the object at position and the
- * IntersectionOfWalls is smaller or greater than the wallInteractionRadius. If
- * there is no interaction, return false, the output parameters then have no meaning.
- * If there is an interaction, find out which (one or more) of the InfiniteWall
- * there is an interaction with. Then compute the distance between the particle
- * and InfiniteWall and the normal to the interaction point.
- * Since this function should be called before calculating any
- * Particle-Wall interactions, it can also be used to set the normal vector in
- * case of curved walls.
+ *
+ * \details This function computes whether a particle at the given position (position) and radius (wallInteractionRadius) overlaps with the IntersectionOfWalls.
+ * - First, the distances to each InfiniteWall is computed, and the three walls with the largest distances (smallest overlaps) are identified (distance, distance2, distance3, id, id2, id3).
+ *
+ * - If the largest distance is bigger than the wallInteractionRadius, there is no contact. This, if any distance>wallInteractionRadius is detected we return false.
+ * - If the second-largest distance is bigger than the wallInteractionRadius, it is a face contact (contact with a single wall.
+ * - Otherwise, we need to determine if it is a edge or vertex contact.
+ * In the latter two cases, the function returns true, and the distance and normal vector is returned.
  */
 bool IntersectionOfWalls::getDistanceAndNormal(const Vec3D& position, Mdouble wallInteractionRadius, Mdouble& distance,
                                                Vec3D& normal_return) const
@@ -578,7 +573,8 @@ bool IntersectionOfWalls::getDistanceAndNormal(const Vec3D& position, Mdouble wa
     unsigned int id2 = 0;
     unsigned int id3 = 0;
 
-    //The object has to touch each wall  each wall (distanceCurrent) and keep the minimum distance (distance) and wall index (id)
+    //For each wall we calculate the distance (distanceCurrent). To compute The walls with the minimal overlap
+    //The object has to touch each wall  each wall (distanceCurrent) and keep the minimum distance (distance) and wall index (id
     for (unsigned int i = 0; i < wallObjects_.size(); i++)
     {
         // Calculate distance to each wall (distanceCurrent);

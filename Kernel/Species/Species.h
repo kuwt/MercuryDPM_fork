@@ -124,7 +124,7 @@ class BaseInteraction;
  * Also requires read, write, getBaseName, mix.
  */
 template<class NormalForceSpecies, class FrictionForceSpecies = EmptyFrictionSpecies, class AdhesiveForceSpecies = EmptyAdhesiveSpecies>
-class Species : public ParticleSpecies, public NormalForceSpecies, public FrictionForceSpecies, public AdhesiveForceSpecies
+class Species final: public ParticleSpecies, public NormalForceSpecies, public FrictionForceSpecies, public AdhesiveForceSpecies
 {
 public:
     ///\brief The correct MixedSpecies type for this Species

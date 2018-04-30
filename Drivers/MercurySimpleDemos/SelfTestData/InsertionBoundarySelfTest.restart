@@ -574,4 +574,4 @@ BaseParticle id 556 indSpecies 0 position 0.984691001583088 0.535523104907414 0.
 BaseParticle id 557 indSpecies 0 position 0.937924077715415 0.691234300192174 0.726068541662383 orientation 1 0 0 0 velocity 1 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.0327413263424552 invMass 3.40089003242349
 BaseParticle id 558 indSpecies 0 position 0.723525963736162 0.93287336646384 0.764344940180638 orientation 1 0 0 0 velocity 1 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.0365699462252553 invMass 2.44066644206295
 Interactions 0
-NUM_BUCKETS 229 hGridMaxLevels 2 cellOverSizeRatio 1
+hGrid method TOPDOWN distribution EXPONENTIAL cellOverSizeRatio 1 numberOfBuckets 2290 cellSizes 0.0709074344102945 0.0999970184173464 gridNeedsUpdate 0 updateEachTimeStep 1 currentMaxRelativeDisplacement 0 totalCurrentMaxRelativeDisplacement 0

@@ -182,15 +182,6 @@ void BaseParticle::fixParticle()
         getHandler()->addedFixedParticle();
 }
 
-/*!
- * \details Checks whether a BaseParticle is fixed or not, by checking its inverse Mass.
- * \return TRUE if particle is fixed, i.e. if the inverse mass (invMass_) is 0.
- */
-bool BaseParticle::isFixed() const
-{
-    return (invMass_ == 0.0);
-}
-
 bool BaseParticle::isMPIParticle() const
 {
     //make mpi-dependent so the compiler can optimise
@@ -265,6 +256,7 @@ int BaseParticle::getPeriodicComplexity(int index)
     //hack: generally you'd add particles after declaring the boundaries
     //but no official programming guildelines rules have been setup for that
     //So incase that doesnt happen we need to resize this periodicComplexity
+    ///\todo TW @Marnix, this is indeed a hack; you should call a setter every time you add a value to the periodic boundary handler (this function takes 0.5% cpu time in the speedtest)
     if (periodicComplexity_.size() == 0)
     {
         int numberOfPeriodicBoundaries = getHandler()->getDPMBase()->periodicBoundaryHandler.getSize();
@@ -444,34 +436,6 @@ void BaseParticle::printHGrid(std::ostream& os) const
         << ")";
 }
 
-/*!
- * \details Returns the particle's HGridLevel_
- * \return the HGridLevel_
- */
-unsigned int BaseParticle::getHGridLevel() const
-{
-    return hGridCell.getHGridLevel();
-}
-
-/*!
- * \details Returns the next object in the particle's HGrid cell
- * \return pointer to the next object in the particle's HGrid cell
- */
-BaseParticle* BaseParticle::getHGridNextObject() const
-{
-    return hGridNextObject_;
-}
-
-/*!
- * \details Returns the previous object in the particle's HGrid cell
- * \return pointer to the previous object in the particle's HGrid
- * cell
- */
-BaseParticle* BaseParticle::getHGridPrevObject() const
-{
-    return hGridPrevObject_;
-}
-
 #ifdef CONTACT_LIST_HGRID
 
 /*!
@@ -482,51 +446,6 @@ PossibleContact* BaseParticle::getFirstPossibleContact() const
     return firstPossibleContact;
 }
 #endif
-
-/*!
- * \details Get the particle's HGrid cell's X-coordinate
- * \return the particle's HGrid cell's X-coordinate
- */
-int BaseParticle::getHGridX() const
-{
-    return hGridCell.getHGridX();
-}
-
-/*!
- * \details Get the particle's HGrid cell's Y-coordinate
- * \return the particle's HGrid cell's Y-coordinate
- */
-int BaseParticle::getHGridY() const
-{
-    return hGridCell.getHGridY();
-}
-
-/*!
- * \details Get the particle's HGrid cell's Z-coordinate
- * \return the particle's HGrid cell's Z-coordinate
- */
-int BaseParticle::getHGridZ() const
-{
-    return hGridCell.getHGridZ();
-}
-
-/*!
- * \details Returns the particle's inverse inertia
- * \return the particles invInertia_
- */
-MatrixSymmetric3D BaseParticle::getInvInertia() const
-{
-    return invInertia_;
-}
-
-/*!
- * \details Returns the particle's inverse mass
- * \return the particle's invMass_
- */
-Mdouble BaseParticle::getInvMass() const
-{
-    return invMass_;
-}
 
 /*!
  * \details Calculates the particle's kinetic energy
@@ -546,82 +465,6 @@ Mdouble BaseParticle::getRotationalEnergy() const
         return 0.0;
     else
         return 0.5 * Vec3D::dot(getAngularVelocity(),getInertia() * getAngularVelocity());
-}
-
-/*!
- * \details Returns the mass of the particle
- * \return the mass of the particle
- */
-Mdouble BaseParticle::getMass() const
-{
-    return 1.0/invMass_;
-}
-
-MatrixSymmetric3D BaseParticle::getInertia() const
-{
-    return MatrixSymmetric3D::inverse(invInertia_);
-}
-
-/*!
- * \details Returns a pointer to the 'original' particle if the current one is
- * a 'periodic copy' used for a periodic boundary implementation.
- * \return pointer to original particle
- */
-BaseParticle* BaseParticle::getPeriodicFromParticle() const
-{
-    return periodicFromParticle_;
-}
-
-/*!
- * \details Returns the particle's radius
- * \return particle's radius
- */
-Mdouble BaseParticle::getRadius() const
-{
-    return radius_;
-}
-
-/*!
- * \details Calculates the interaction radius of the particle (when it comes to 
- * interaction with other particles), including the effect of a possible additional
- * 'interaction distance' besides the 'normal' radius. The interaction radius
- * differs from the radius_, for example, when dealing with wet particles (i.e. 
- * particles with an additional liquid layer, which is dealt with in the particle's 
- * species).
- * \return the particle's interaction radius for particle-particle interaction
- */
-Mdouble BaseParticle::getInteractionRadius() const
-{
-    return radius_ + getSpecies()->getInteractionDistance() * 0.5;
-}
-
-/*!
- * \details The interaction radius of the particle (when it comes to interaction
- * with walls). See also BaseParticle::getInteractionRadius().
- * \return the particle's interaction radius for particle-wall interaction
- */
-Mdouble BaseParticle::getWallInteractionRadius() const
-{
-    return getInteractionRadius() + getSpecies()->getInteractionDistance() * 0.5;
-}
-
-/*!
- * \details Returns the particle's displacement_, which is the difference between
- * the current particle's position and its position in the previous time step.
- * \return (reference to) the particle displacement vector
- */
-const Vec3D& BaseParticle::getDisplacement() const
-{
-    return displacement_;
-}
-
-/*!
- * \details Returns the particle's position in the previous time step.
- * \return (reference to) the previous position of the particle
- */
-const Vec3D& BaseParticle::getPreviousPosition() const
-{
-    return previousPosition_;
 }
 
 /*!
@@ -686,71 +529,6 @@ void BaseParticle::setInfiniteInertia()
 {
     invInertia_.setZero();
 } //> i.e. no rotations
-
-/*!
- * \details Lets you set which particle this one is actually a periodic copy of
- * (used in periodic boundary condition implementations). 
- * \param[in] p  pointer to the 'original' particle this one is a periodic 
- * copy of.
- */
-void BaseParticle::setPeriodicFromParticle(BaseParticle* p)
-{
-    periodicFromParticle_ = p;
-}
-
-/*!
- * \details Set the x-index of the particle's HGrid cell position
- * \param[in] x  x-index of particle's HGrid cell
- */
-void BaseParticle::setHGridX(const int x)
-{
-    hGridCell.setHGridX(x);
-}
-
-/*!
- * \details Set the y-index of the particle's HGrid cell position
- * \param[in] y  y-index of particle's HGrid cell
- */
-void BaseParticle::setHGridY(const int y)
-{
-    hGridCell.setHGridY(y);
-}
-
-/*!
- * \details Set the z-index of the particle's HGrid cell position
- * \param[in] z  z-index of particle's HGrid cell
- */
-void BaseParticle::setHGridZ(const int z)
-{
-    hGridCell.setHGridZ(z);
-}
-
-/*!
- * \details Sets the particle's HGridLevel_
- * \param[in] level  the particle's HGridLevel_
- */
-void BaseParticle::setHGridLevel(const unsigned int level)
-{
-    hGridCell.setHGridLevel(level);
-}
-
-/*!
- * \details Sets the pointer to the next object in the particle's HGrid cell
- * \param[in] p     pointer to the next object
- */
-void BaseParticle::setHGridNextObject(BaseParticle* p)
-{
-    hGridNextObject_ = p;
-}
-
-/*!
- * \details Sets the pointer to the previous object in the particle's HGrid cell
- * \param[in] p     pointer to the previous object
- */
-void BaseParticle::setHGridPrevObject(BaseParticle* p)
-{
-    hGridPrevObject_ = p;
-}
 
 /*!
  * \details 
@@ -948,8 +726,10 @@ void BaseParticle::integrateBeforeForceComputation(double time, double timeStep)
         setPreviousPosition(getPosition());
 #endif
         accelerate(getForce() * getInvMass() * 0.5 * timeStep);
+        ///\todo TW why do we store displacement? replace by temporary variable?
         setDisplacement(getVelocity() * timeStep);
         move(getDisplacement());
+        ///\todo TW getLength is very expensive (SpeedTestThomas: 0.2% of simulation time is spent here); can we store the old location and compute the difference to check hGrid updates instead of updating the displacement?
         getHandler()->getDPMBase()->hGridUpdateMove(this, getDisplacement().getLength());
         if (getHandler()->getDPMBase()->getRotation())
         {
@@ -1071,7 +851,7 @@ bool BaseParticle::isInContactWith(const BaseParticle* const P) const
     return P->isInContactWith(this);
 }
 
-const HGridCell& BaseParticle::getHGridCell() const
-{
-    return hGridCell;
-}
+//const HGridCell& BaseParticle::getHGridCell() const
+//{
+//    return hGridCell;
+//}

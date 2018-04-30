@@ -150,7 +150,12 @@ public:
      * \brief Computes the inverse of a matrix; exits if the inverse doesn't exist. 
      */
     static MatrixSymmetric3D inverse(const MatrixSymmetric3D& A);
-    
+
+    /*!
+     * \brief Computes the inverse of a matrix; exits if the inverse doesn't exist.
+     */
+    MatrixSymmetric3D inverse() const;
+
     /*!
      * \brief Computes the determinant of a matrix. 
      */
