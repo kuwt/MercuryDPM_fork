@@ -65,27 +65,27 @@ public:
         //create periodic boundaries around the domain
         if (getName() == "MovingWallsInfiniteWall") {
             InfiniteWall w;
+            w.setSpecies(speciesHandler.getObject(0));
             w.set(Vec3D(0,0,1),position);
 
             w.setAngularVelocity(Vec3D(0,.1,0));
-            w.setSpecies(speciesHandler.getObject(0));
             wallHandler.copyAndAddObject(w);
         } else if (getName() == "MovingWallsIntersectionOfWalls") {
             IntersectionOfWalls w;
+            w.setSpecies(speciesHandler.getObject(0));
             w.setPosition(position);
             w.addObject(Vec3D(0,0,1),Vec3D(0,0,0));
 
             w.setAngularVelocity(Vec3D(0,.1,0));
-            w.setSpecies(speciesHandler.getObject(0));
             wallHandler.copyAndAddObject(w);
         } else if (getName() == "MovingWallsAxisymmetricIntersectionOfWalls") {
             AxisymmetricIntersectionOfWalls w;
+            w.setSpecies(speciesHandler.getObject(0));
             w.setPosition(position);
             w.setOrientationViaNormal(Vec3D(0,0,1));
             w.addObject(Vec3D(0,0,1),Vec3D(0,0,0));
 
             w.setAngularVelocity(Vec3D(0,.1,0));
-            w.setSpecies(speciesHandler.getObject(0));
             wallHandler.copyAndAddObject(w);
         } else {
             logger(ERROR,"WallType not recognized");

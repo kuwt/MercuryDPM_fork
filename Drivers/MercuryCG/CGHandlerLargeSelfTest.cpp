@@ -52,6 +52,7 @@ public:
         setZMin(0);
 
         BaseParticle P0;
+        P0.setSpecies(speciesHandler.getLastObject());
         for (int i = 0; i < N; i++)
             for (int j = 0; j < N; j++)
                 for (int k = 0; k < N; k++)
@@ -64,6 +65,7 @@ public:
 
         //set walls
         InfiniteWall w0;
+        w0.setSpecies(speciesHandler.getLastObject());
         w0.set(Vec3D(-1, 0, 0), Vec3D(getXMin(), 0, 0));
         wallHandler.copyAndAddObject(w0);
         w0.set(Vec3D(+1, 0, 0), Vec3D(getXMax(), 0, 0));

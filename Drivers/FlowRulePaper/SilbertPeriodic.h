@@ -296,6 +296,7 @@ public:
         ///todo{I(Dinant) had to clear the WallHandler to prevent it from inserting the same wall twice, why?}
 		wallHandler.clear();
 		InfiniteWall w0;
+		w0.setSpecies(speciesHandler.getObject(0));
 		if (getFixedParticleRadius()) {
 			w0.set(Vec3D(0,0,-1), Vec3D(0,0,-3.4* getMaxInflowParticleRadius()));
 		} else {

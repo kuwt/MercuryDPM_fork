@@ -13,6 +13,7 @@
 #include "Math/RNG.h"
 #include "Math/ExtendedMath.h"
 #include "File.h"
+#include <map>
 
 class BrokenMaserMinimalExample : public Mercury2D {
     public:

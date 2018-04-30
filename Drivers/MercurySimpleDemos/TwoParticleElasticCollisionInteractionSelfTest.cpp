@@ -40,6 +40,8 @@ class TwoParticleElasticCollisionInteraction : public Mercury2D {
 		setGravity({0.0,-9.8,0.0});
 
 		BaseParticle P0,P1;
+		P0.setSpecies(speciesHandler.getObject(0));
+		P1.setSpecies(speciesHandler.getObject(0));
 		P0.setPosition(Vec3D(0.006,0.005,0.0));
 		P1.setPosition(Vec3D(0.004,0.005,0.0));
 	
@@ -53,6 +55,7 @@ class TwoParticleElasticCollisionInteraction : public Mercury2D {
 		
 		wallHandler.clear();
 		InfiniteWall w0;
+		w0.setSpecies(speciesHandler.getObject(0));
 		w0.set(Vec3D(-1, 0, 0), getMin());
 		wallHandler.copyAndAddObject(w0);
 		w0.set(Vec3D( 1, 0, 0), getMax());

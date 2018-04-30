@@ -102,11 +102,12 @@ private:
         
         //! [CST:coil]
         // creation of the coil and setting of its properties
-        coil = wallHandler.copyAndAddObject(Coil());
-        coil->setSpecies(speciesHandler.getObject(0));
+        Coil coil;
+        coil.setSpecies(speciesHandler.getObject(0));
         // the syntax to set the coil geometry is as follows:
         // set(Start position, Length, Radius, Number of turns, Rotation speed, Thickness)
-        coil->set(Vec3D(0, 0, 0), 1.0, 1.0 - particleRadius, 2.0, -1.0, 0.5 * particleRadius);
+        coil.set(Vec3D(0, 0, 0), 1.0, 1.0 - particleRadius, 2.0, -1.0, 0.5 * particleRadius);
+        auto pCoil = wallHandler.copyAndAddObject(coil);
         //! [CST:coil]
         
         //! [CST:particle]
@@ -149,7 +150,7 @@ private:
                     p0.setPosition(Vec3D(getXMin() + (getXMax() - getXMin()) * (0.5 + i) / Nx,
                                          getYMin() + (getYMax() - getYMin()) * (0.5 + j) / Ny,
                                          getZMin() + (getZMax() - getZMin()) * (0.5 + k) / Nz));
-                    if (!coil->getDistanceAndNormal(p0, distance, normal)) //if there is no collision with the coil
+                    if (!pCoil->getDistanceAndNormal(p0, distance, normal)) //if there is no collision with the coil
                     {
                         particleHandler.copyAndAddObject(p0);
                     }

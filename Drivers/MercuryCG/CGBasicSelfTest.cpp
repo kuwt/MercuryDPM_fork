@@ -103,6 +103,7 @@ public:
 
         //define the three particles stacked in Z-direction
         BaseParticle P0;
+        P0.setSpecies(speciesHandler.getLastObject());
         P0.setRadius(0.5 * sqrt(1.01));
         P0.setVelocity(Vec3D(0.0, 0.0, 0.0));
         P0.setPosition(Vec3D(0.5, 0.5, 0.5));

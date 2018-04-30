@@ -39,10 +39,12 @@ public:
 	void setupInitialConditions()
 	{
 		InfiniteWall w0;
+		w0.setSpecies(speciesHandler.getLastObject());
 		w0.set(Vec3D(0,-1,0), getMin());
 		wallHandler.copyAndAddObject(w0);
 		
 		BaseParticle p0;
+		p0.setSpecies(speciesHandler.getLastObject());
 		p0.setPosition(Vec3D(getXMax()/2,getYMax()*0.95,0.0));
 		p0.setVelocity(Vec3D(0.0,0.0,0.0));
 		p0.setRadius(0.005);
