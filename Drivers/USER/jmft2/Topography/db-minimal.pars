@@ -1,15 +1,17 @@
 timeStep          1e-4
-timeMax          2
-saveEvery         10
+timeMax          300
+saveEvery        250
 xmin           -0.5
 xmax            0.5
 
 reservoirLength 1
-reservoirHeight 1.25
+reservoirHeight 1.4
 
-particleRadius 2e-2
+particleRadius 5e-2
 
 beta     0.0
 betaroll 0.0
 collisionTime  4e-3
 restitutionCoefficient 0.10
+
+randomSeed 1

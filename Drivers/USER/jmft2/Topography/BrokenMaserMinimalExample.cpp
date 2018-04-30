@@ -5,8 +5,8 @@
  */
 #include "Mercury2D.h"
 #include "Particles/BaseParticle.h"
+#include "Walls/InfiniteWall.h"
 #include "Boundaries/CubeInsertionBoundary.h"
-#include "Boundaries/PeriodicBoundary.h"
 #include "Boundaries/SubcriticalMaserBoundaryTEST.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include <iostream>
@@ -89,6 +89,15 @@ class BrokenMaserMinimalExample : public Mercury2D {
             /* Gravity. While filling up, let gravity point straight down. */
             setGravity(Vec3D(0, -1, 0));
 
+            /* Walls */
+
+            // The base
+            auto base = new InfiniteWall();
+            base->setSpecies(spec_particles);
+            // base->setSpecies(spec_base);
+            base->set(Vec3D(0, -1, 0), Vec3D(0, 0, 0));
+            base = wallHandler.copyAndAddObject(base);
+
             /* CubeInsertionBoundary for introducing new particles */
             auto generandum = new BaseParticle;
             generandum->setSpecies(spec_particles);
@@ -101,8 +110,8 @@ class BrokenMaserMinimalExample : public Mercury2D {
                           0, 0),
                     Vec3D(pars.at("xmin"), 
                           pars.at("reservoirHeight"), 0),
-                    Vec3D(2, - sqrt(pars.at("reservoirHeight")), 0),
-                    Vec3D(2, - sqrt(pars.at("reservoirHeight")), 0),
+                    Vec3D(1, - sqrt(pars.at("reservoirHeight")), 0),
+                    Vec3D(1, - sqrt(pars.at("reservoirHeight")), 0),
                     pars.at("particleRadius"),
                     pars.at("particleRadius")
                 );
@@ -110,13 +119,26 @@ class BrokenMaserMinimalExample : public Mercury2D {
             insb->checkBoundaryBeforeTimeStep(this);
 
             stillFillingUp = true;
+
+            restartFile.setFileType(FileType::ONE_FILE);
+        }
+
+        void actionsOnRestart()
+        {
+        }
+
+        void printTime() const override
+        {
+            Mercury2D::printTime();
+            logger(INFO, "t %, np local %", 
+                    getTime(), particleHandler.getNumberOfRealObjectsLocal());
         }
 
         void actionsAfterTimeStep() 
         {
             // logger(INFO, "In actionsAfterTimeStep()");
 
-            logger(INFO, "t = %, np = %", getTime(), particleHandler.getNumberOfRealObjectsLocal());
+            // logger(INFO, "t = %, np = %", getTime(), particleHandler.getNumberOfRealObjectsLocal());
             /* Are we still filling up? If not, no need to do anything here. */
             if (!stillFillingUp) 
                 return;
@@ -139,16 +161,6 @@ class BrokenMaserMinimalExample : public Mercury2D {
                 masb->activateMaser();
                 logger(INFO, "Have activated masb");
 
-                /* Nothing goes wrong if we use a PeriodicBoundary instead */
-                /*
-                auto perb = new PeriodicBoundary();
-                perb->set(Vec3D(1.0, 0.0, 0.0), 
-                        pars.at("xmin") - pars.at("reservoirLength") + pars.at("particleRadius"), 
-                        pars.at("xmin"));
-                logger(INFO, "About to put in perb");
-                perb = boundaryHandler.copyAndAddObject(perb);
-                logger(INFO, "Have put in the perb");
-                */
 
                 stillFillingUp = false;
 
@@ -182,5 +194,3 @@ int main(const int argc, char* argv[]) {
         exit(-1);
     }
 }
-
-
