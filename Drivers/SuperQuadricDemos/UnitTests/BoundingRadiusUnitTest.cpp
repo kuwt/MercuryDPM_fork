@@ -28,6 +28,9 @@
 #include "Mercury3D.h"
 
 ///tests whether the radius of the bounding sphere for superquadrics is computed correctly
+/// At the moment it only checks for ellipsoids and spheres using simplified expressions in the SuperQuadric::getInteractionRadius() function.
+/// Definitely needs generalisation for complex shapes.
+
 class BoundingRadiusTester : public Mercury3D
 {
 public:
@@ -37,26 +40,32 @@ public:
         auto species = new LinearViscoelasticSpecies();
         speciesHandler.addObject(species);
         p.setSpecies(species);
+
         //spheres and ellipsoids
+
         p.setAxesAndExponents(1, 1, 1, 1, 1);
         logger.assert_always(mathsFunc::isEqual(p.getInteractionRadius(), 1, 1e-5),
                              "interaction radius of sphere");
+
         p.setAxesAndExponents(2, 2, 2, 1, 1);
         logger.assert_always(mathsFunc::isEqual(p.getInteractionRadius(), 2, 1e-5),
                              "interaction radius of sphere");
+
+        //ellipsoids
         p.setAxesAndExponents(2, 1, 1, 1, 1);
         logger.assert_always(mathsFunc::isEqual(p.getInteractionRadius(), 2, 1e-5),
                              "interaction radius of ellipsoid");
+
         p.setAxesAndExponents(0.5, .2, .1, 1, 1);
         logger.assert_always(mathsFunc::isEqual(p.getInteractionRadius(), 0.5, 1e-5),
                              "interaction radius of ellipsoid");
     
-        //other epsilon1, epsilon2
+        //same axes but other epsilon1, epsilon2
         p.setAxesAndExponents(1, 1, 1, 1, 0.5);
         logger.assert_always(mathsFunc::isEqual(p.getInteractionRadius(), 1.1892, 1e-2),
                              "interaction radius of epsilon2=0.5, equal axes. "
                                      "Expected % got %", 1.1892, p.getInteractionRadius());
-    
+        //
         p.setAxesAndExponents(3, 2, 1, 1, 0.125);
         logger.assert_always(mathsFunc::isEqual(p.getInteractionRadius(), 3.4711, 1e-2),
                              "interaction radius of epsilon2=0.125, unequal axes. "

@@ -85,6 +85,14 @@ public:
      * \return A boolean which indicates if there is a collision between the BaseParticle and the wall.
      */
     virtual bool getDistanceAndNormal(const BaseParticle& P, Mdouble& distance, Vec3D& normal_return) const = 0;
+    
+    
+    virtual bool getDistanceNormalOverlap(const BaseParticle& P, Mdouble& distance, Vec3D& normal_return, Mdouble& overlap) const;
+    
+    virtual bool getDistanceNormalOverlapSuperquadric(const SuperQuadric& p, Mdouble& distance, Vec3D& normal_return,
+                                                          Mdouble& overlap) const;
+    
+    virtual Vec3D getFurthestPointSuperQuadric(const Vec3D& normalBodyFixed, const Vec3D& axes) const;
 
     /*!
      * \brief A function which sets the WallHandler for this BaseWall.

@@ -29,6 +29,7 @@
 #include <cmath>
 #include <sstream>
 #include "Vector.h"
+#include "SmallMatrix.h"
 
 /*!
  * \brief Implementation of a 3D matrix.
@@ -50,6 +51,11 @@ public:
      * \brief Alternative constructor, which let you define all elements
      */    
     Matrix3D(const Mdouble xx, const Mdouble xy, const Mdouble xz, const Mdouble yx, const Mdouble yy, const Mdouble yz, const Mdouble zx, const Mdouble zy, const Mdouble zz);
+    
+    /*!
+     * \brief Alternative constructor, which takes a matrix of the same size
+     */
+    Matrix3D(const SmallMatrix<3,3>& matrix);
     
     /*!
      * \brief Sets all elements to zero.

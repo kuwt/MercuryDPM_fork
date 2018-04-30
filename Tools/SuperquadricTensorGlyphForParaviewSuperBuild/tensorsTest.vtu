@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="4" NumberOfCells="0">
+<Points>
+  <DataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii">
+	0.5 0 0
+  3.5 0 0
+  6.5 0 0 
+  10 0 0
+  </DataArray>
+</Points>
+<PointData>
+  <DataArray type="Float32" Name="speciesType" NumberOfComponents="1" format="ascii">
+  1
+  1
+  1
+  1
+  </DataArray>
+  <DataArray type="Float32" Name="phiAndTheta" NumberOfComponents="2" format="ascii">
+  1 1
+  1 1
+  1 1
+  1 1
+  </DataArray>
+  <DataArray type="Float32" Name="axesScales" NumberOfComponents="3" format="ascii">
+  1 2 3
+  1 2 3
+  1 2 3
+  1 2 3
+  </DataArray>
+  <DataArray type="Float32" Name="orientationTensor" NumberOfComponents="9" format="ascii">
+  1 0 0 0 1 0 0 0 1
+  0.707107 0.707107 0 -0.707107 0.707107 0 0 0 1
+  0 1 0 -1 0 0 0 0 1
+  -0.5 0.866025 0 -0.866025 -0.5 0 0 0 1
+  </DataArray>
+</PointData>
+<Cells>
+  <DataArray type="Int32" Name="connectivity" format="ascii">
+  </DataArray>
+  <DataArray type="Int32" Name="offsets" format="ascii">
+  </DataArray>
+  <DataArray type="UInt8"  Name="types" format="ascii">
+  </DataArray>
+</Cells>
+</Piece>
+</UnstructuredGrid>
+</VTKFile>

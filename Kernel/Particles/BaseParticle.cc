@@ -566,12 +566,9 @@ void BaseParticle::setMass(const Mdouble mass)
     logger(WARN, "WARNING: Do not use particle->setMass, instead use "
            "particleSpecies->computeMass, since this function can cause "
            "inconsistencies between the mass, density and radius of this particle!");
-    if (mass > 0.0 && !isFixed())
-    {
+    logger.assert_always(mass > 0.0 && !isFixed(), "Error in BaseParticle::setMass, the given mass to be set must be positive.");
+
         invMass_ = 1.0 / mass;
-    } else {
-        logger(ERROR, "Error in BaseParticle::setMass, the given mass to be set must be positive.");
-    }
 }
 
 /*!
@@ -835,11 +832,11 @@ std::vector<Mdouble> BaseParticle::getFieldVTK(unsigned i) const {
     return std::vector<Mdouble>();
 }
 
-Vec3D BaseParticle::getAxes() {return Vec3D(0,0,0);}
+Vec3D BaseParticle::getAxes() const {return Vec3D(0,0,0);}
 
-double BaseParticle::getExponentEps1() {return 0;}
+double BaseParticle::getExponentEps1() const {return 0;}
 
-double BaseParticle::getExponentEps2() {return 0;}
+double BaseParticle::getExponentEps2() const {return 0;}
 
 bool BaseParticle::isInContactWith(const BaseParticle* const P) const
 {

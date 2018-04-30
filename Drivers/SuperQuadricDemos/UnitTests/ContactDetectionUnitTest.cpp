@@ -60,30 +60,31 @@ private:
         p1->setVelocity(Vec3D(0.0, 0.0, 0.0));
         p0->setOrientationViaNormal({1.0, 0.0, 0.0});
         p1->setOrientationViaNormal({1.0, 0.0, 0.0});
-        particleHandler.copyAndAddObject(p0);
-        particleHandler.copyAndAddObject(p1);
+        particleHandler.addObject(p0);
+        particleHandler.addObject(p1);
+        p1;
     }
     
     ///\todo For each contact, check position, overlap and normal
     void testSpheresContact()
     {
         setupParticles();
-        auto C = p0->getInteractionWith(p1, 0.0, &interactionHandler);
+        auto C = p0->getInteractionWith(p1, 0, &interactionHandler);
         logger.assert_always(C.size() == 0, "Spheres far away should not touch");
         p1->setPosition({1.99, 0, 0});
-        C = p0->getInteractionWith(p1, 0.0, &interactionHandler);
+        C = p0->getInteractionWith(p1, 0, &interactionHandler);
         logger.assert_always(C.size() != 0, "Spheres close together should touch");
         p1->setOrientationViaNormal({0, 1.0, 0});
-        C = p0->getInteractionWith(p1, 0.0, &interactionHandler);
+        C = p0->getInteractionWith(p1, 0, &interactionHandler);
         logger.assert_always(C.size() != 0, "Rotated spheres close together should touch");
         p1->setPosition({3.0, 0, 0});
-        C = p0->getInteractionWith(p1, 0.0, &interactionHandler);
+        C = p0->getInteractionWith(p1, 0, &interactionHandler);
         logger.assert_always(C.size() == 0, "Rotated spheres far away should not touch");
         p1->setVelocity({-3.0, 0, 0});
-        C = p0->getInteractionWith(p1, 0.0, &interactionHandler);
+        C = p0->getInteractionWith(p1, 0, &interactionHandler);
         logger.assert_always(C.size() == 0, "Moving spheres far away should not touch");
         p1->setPosition({1.99, 0, 0});
-        C = p0->getInteractionWith(p1, 0.0, &interactionHandler);
+        C = p0->getInteractionWith(p1, 0, &interactionHandler);
         logger.assert_always(C.size() != 0, "Moving spheres close together should touch");
         cleanup();
     }
@@ -95,36 +96,36 @@ private:
         p0->setAxes(2, 1, 1);
         p1->setAxes(2, 1, 1);
     
-        auto C = p0->getInteractionWith(p1, 0.0, &interactionHandler);
+        auto C = p0->getInteractionWith(p1, 0, &interactionHandler);
         logger.assert_always(C.size() == 0, "Ellipsoids far away should not touch");
         logger.assert_always(!p0->isInContactWith(p1), "isInContactWith: Ellipsoids far away");
         p1->setPosition({3.99, 0, 0});
-        C = p0->getInteractionWith(p1, 0.0, &interactionHandler);
+        C = p0->getInteractionWith(p1, 0, &interactionHandler);
         logger.assert_always(C.size() != 0, "Ellipsoids close together should touch");
         logger.assert_always(p0->isInContactWith(p1), " isInContactWith: Ellipsoids close together should touch");
         p1->setOrientationViaNormal({0,1,0});
-        C = p0->getInteractionWith(p1, 0.0, &interactionHandler);
+        C = p0->getInteractionWith(p1, 0, &interactionHandler);
         logger.assert_always(C.size() == 0, "Rotated ellipsoid with normal ellipsoid far away should not touch");
         p1->setPosition({2.99, 0, 0});
-        C = p0->getInteractionWith(p1, 0.0, &interactionHandler);
+        C = p0->getInteractionWith(p1, 0, &interactionHandler);
         logger.assert_always(C.size() != 0, "One rotated ellipsoid with normal ellipsoid close together should touch");
         p0->setOrientationViaNormal({0, 0, 1});
-        C = p0->getInteractionWith(p1, 0.0, &interactionHandler);
+        C = p0->getInteractionWith(p1, 0, &interactionHandler);
         logger.assert_always(C.size() == 0, "Rotated ellipsoids  far away should not touch");
         p1->setPosition({1.99, 0, 0});
-        C = p0->getInteractionWith(p1, 0.0, &interactionHandler);
+        C = p0->getInteractionWith(p1, 0, &interactionHandler);
         logger.assert_always(C.size() != 0, "Rotated ellipsoids close together should touch");
         p0->setOrientationViaNormal({1,0,0});
         p1->setPosition({1.99, -1.99, 0});
-        C = p0->getInteractionWith(p1, 0.0, &interactionHandler);
+        C = p0->getInteractionWith(p1, 0, &interactionHandler);
         logger.assert_always(C.size() != 0, "One rotated ellipsoid with normal ellipsoid close together should touch");
         cleanup();
     }
     
     void cleanup()
     {
-        delete p0;
-        delete p1;
+        particleHandler.removeObject(1);
+        particleHandler.removeObject(0);
     }
     
     SuperQuadric* p0;

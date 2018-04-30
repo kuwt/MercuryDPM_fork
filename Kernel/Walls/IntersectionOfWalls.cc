@@ -39,7 +39,7 @@ IntersectionOfWalls::IntersectionOfWalls()
  * \param[in] other The IntersectionOfWalls that must be copied.
  */
 IntersectionOfWalls::IntersectionOfWalls(const IntersectionOfWalls& other)
-: BaseWall(other)
+        : BaseWall(other)
 {
     wallObjects_ = other.wallObjects_;
     for (auto& wall : wallObjects_)
@@ -137,7 +137,7 @@ unsigned int IntersectionOfWalls::getNumberOfObjects(void)
 void IntersectionOfWalls::addObject(Vec3D normal, Vec3D point)
 {
     normal.normalize();
-
+    
     //n is the index of the new wall
     std::size_t n = wallObjects_.size();
     InfiniteWall w;
@@ -159,18 +159,19 @@ void IntersectionOfWalls::add3PointObject(Vec3D PointA, Vec3D PointB, Vec3D Poin
 {
     Vec3D SubtB = PointA - PointB;
     Vec3D SubtC = PointA - PointC;
-
+    
     Vec3D WallNormal = Vec3D::cross(SubtB, SubtC);
     //Check if walls coordinates  inline, if true Do not build wall and give error message.
     if (WallNormal.getLengthSquared() == 0.0)
     {
         logger(ERROR,
                "Error Building IntersectionOfWalls::add3PointObject out of 3 coordinates. Coordinates are in line, Wall not constructed.");
-    } else
+    }
+    else
     {
         addObject(WallNormal, PointA);
     }
-
+    
 }
 
 
@@ -194,24 +195,25 @@ void IntersectionOfWalls::addTetraSTL(Vec3D PointA, Vec3D PointB, Vec3D PointC, 
     {
         std::cout << "Error Building Plate number " << wallidentifier
                   << "out of 3 coordinates. Coordinates are in line, Wall not constructed." << std::endl;
-    } else
+    }
+    else
     {
         //do a check whether the normal follows the RHR (Right Hand Rule) or not
         //todo: Bert Use this check a lot, possibly make a function of this
         Vec3D SubtB = PointA - PointB;
         Vec3D SubtC = PointA - PointC;
-
+        
         Vec3D WallNormalRHR = Vec3D::cross(SubtB, SubtC);
-
+        
         //normalise for easy check
         WallNormalRHR.normalize();
         WallNormal.normalize();
-
+        
         //if RHRchecl is 1, wall normal and RHR normal are in same direction, if -1 theyre not, then point B and C need to be swapped
-        Mdouble RHRcheck=Vec3D::dot(WallNormalRHR,WallNormal);
+        Mdouble RHRcheck = Vec3D::dot(WallNormalRHR, WallNormal);
         //todo: Bert Officially need to check for other answers than 1, however, it will either be -1 or 1 in ideal case
-
-        if (RHRcheck==1)
+        
+        if (RHRcheck == 1)
         {
             //calculate centroid
             Vec3D mid = (PointA + PointB + PointC) / 3.0;
@@ -220,11 +222,11 @@ void IntersectionOfWalls::addTetraSTL(Vec3D PointA, Vec3D PointB, Vec3D PointC, 
             Vec3D midT = mid - WallNormalRHR * Thickness;
             //generate the base wall first through the input coordinates
             add3PointObject(PointA, PointC, PointB);
-
+            
             //add sidewalls
-            add3PointObject(PointA,midT, PointC);
-            add3PointObject(PointC,midT, PointB);
-            add3PointObject(PointB,midT, PointA);
+            add3PointObject(PointA, midT, PointC);
+            add3PointObject(PointC, midT, PointB);
+            add3PointObject(PointB, midT, PointA);
         }
         else
         {
@@ -235,13 +237,13 @@ void IntersectionOfWalls::addTetraSTL(Vec3D PointA, Vec3D PointB, Vec3D PointC, 
             Vec3D midT = mid + WallNormalRHR * Thickness;
             //generate the base wall first through the input coordinates
             add3PointObject(PointA, PointB, PointC);
-
+            
             //add sidewalls
-            add3PointObject(PointA,midT, PointB);
-            add3PointObject(PointB,midT, PointC);
-            add3PointObject(PointC,midT, PointA);
+            add3PointObject(PointA, midT, PointB);
+            add3PointObject(PointB, midT, PointC);
+            add3PointObject(PointC, midT, PointA);
         }
-
+        
     }
 }
 
@@ -256,21 +258,22 @@ void IntersectionOfWalls::addTetraSTL(Vec3D PointA, Vec3D PointB, Vec3D PointC, 
  */
 void IntersectionOfWalls::addTetra(const Vec3D& PointA, const Vec3D& PointB, const Vec3D& PointC, Mdouble& Thickness)
 {
-
+    
     //generate other coordinate by finding the centre and shift it the distance thickness in the normal direction
     //calculate normal
     Vec3D SubtB = PointA - PointB;
     Vec3D SubtC = PointA - PointC;
-
+    
     Vec3D WallNormal = Vec3D::cross(SubtB, SubtC);
-
+    
     //Check if walls coordinates  inline, if true Do not build wall and give error message.
     if (WallNormal.getLengthSquared() == 0.0)
     {
         logger(ERROR,
                "Error Building IntersectionOfWalls::addTetra out of 3 coordinates. "
-               "Coordinates are in line, Wall not constructed.");
-    } else
+                       "Coordinates are in line, Wall not constructed.");
+    }
+    else
     {
         //calculate centroid
         Vec3D mid = (PointA + PointB + PointC) / 3.0;
@@ -278,7 +281,7 @@ void IntersectionOfWalls::addTetra(const Vec3D& PointA, const Vec3D& PointB, con
         Vec3D midT = mid + WallNormal * Thickness;
         //generate the base wall first through the input coordinates
         add3PointObject(PointC, PointB, PointA);
-
+        
         //add sidewalls
         add3PointObject(PointA, midT, PointB);
         add3PointObject(PointB, midT, PointC);
@@ -293,34 +296,35 @@ void
 IntersectionOfWalls::addPlate(const Vec3D& PointA, const Vec3D& PointB, const Vec3D& PointC, const Vec3D& WallNormal,
                               const Mdouble& Thickness, int wallidentifier)
 {
-
+    
     //Check if walls coordinates  inline, if true Do not build wall and give error message. But keep continuing
     if (WallNormal.getLengthSquared() == 0.0)
     {
         std::cout << "Error Building Plate number " << wallidentifier
                   << "out of 3 coordinates. Coordinates are in line, Wall not constructed." << std::endl;
-    } else
+    }
+    else
     {
         Vec3D PointAT = PointA - WallNormal * Thickness;
         Vec3D PointBT = PointB - WallNormal * Thickness;
         Vec3D PointCT = PointC - WallNormal * Thickness;
-
+        
         //generate the base wall first through the input coordinates
         add3PointObject(PointC, PointB, PointA);
-
+        
         //add sidewalls
         add3PointObject(PointA, PointB, PointAT);
         add3PointObject(PointB, PointC, PointBT);
         add3PointObject(PointC, PointA, PointCT);
-
-
+        
+        
         //add opposite wall
         add3PointObject(PointAT, PointBT, PointCT);
-
-
+        
+        
     }
-
-
+    
+    
 }
 
 /*!
@@ -363,7 +367,7 @@ void IntersectionOfWalls::setPointsAndLines(unsigned int n)
                                                                    wallObjects_[m].getNormal().Z * AB_[id].X)
                                 + wallObjects_[n].getNormal().Z * (wallObjects_[m].getNormal().X * AB_[id].Y -
                                                                    wallObjects_[m].getNormal().Y * AB_[id].X));
-
+        
         A_[id] = Vec3D(+(wallObjects_[m].getNormal().Y * AB_[id].Z - AB_[id].Y * wallObjects_[m].getNormal().Z) *
                        Vec3D::dot(wallObjects_[n].getPosition(), wallObjects_[n].getNormal())
                        - (wallObjects_[n].getNormal().Y * AB_[id].Z - wallObjects_[n].getNormal().Z * AB_[id].Y) *
@@ -383,7 +387,7 @@ void IntersectionOfWalls::setPointsAndLines(unsigned int n)
                        + (wallObjects_[n].getNormal().X * wallObjects_[m].getNormal().Y -
                           wallObjects_[m].getNormal().X * wallObjects_[n].getNormal().Y) * 0.0) * invdet;
     }
-
+    
     // C[(n-2)*(n-1)*n/6+(m-1)*m/2+l] is a point intersecting walls l, m and n, l<m<n
     C_.resize((n - 1) * n * (n + 1) / 6);
     for (std::size_t m = 0; m < n; m++)
@@ -429,7 +433,7 @@ void IntersectionOfWalls::setPointsAndLines(unsigned int n)
                              Vec3D::dot(wallObjects_[l].getPosition(), wallObjects_[l].getNormal())) * invdet;
         }
     }
-
+    
     logger(VERBOSE, "%", *this);
     for (InfiniteWall w : wallObjects_)
         logger(VERBOSE, "wallObject %, %", w.getNormal(), w.getPosition());
@@ -490,8 +494,8 @@ void IntersectionOfWalls::createPrism(std::vector<Vec3D> points, Vec3D prismAxis
 void IntersectionOfWalls::createOpenPrism(std::vector<Vec3D> points)
 {
     Vec3D prismAxis = Vec3D::cross(
-    Vec3D::getUnitVector(points[1] - points[0]),
-    Vec3D::getUnitVector(points[2] - points[0]));
+            Vec3D::getUnitVector(points[1] - points[0]),
+            Vec3D::getUnitVector(points[2] - points[0]));
     createOpenPrism(points, prismAxis);
 }
 
@@ -505,8 +509,8 @@ void IntersectionOfWalls::createOpenPrism(std::vector<Vec3D> points)
 void IntersectionOfWalls::createPrism(std::vector<Vec3D> points)
 {
     Vec3D prismAxis = Vec3D::cross(
-    Vec3D::getUnitVector(points[1] - points[0]),
-    Vec3D::getUnitVector(points[2] - points[0]));
+            Vec3D::getUnitVector(points[1] - points[0]),
+            Vec3D::getUnitVector(points[2] - points[0]));
     createPrism(points, prismAxis);
 }
 
@@ -530,11 +534,14 @@ bool IntersectionOfWalls::getDistanceAndNormal(const BaseParticle& p, Mdouble& d
     Vec3D position = p.getPosition() - getPosition();
     getOrientation().rotateBack(position);
     ///\todo do this for all walls
-    BaseSpecies* s = getHandler()->getDPMBase()->speciesHandler.getMixedObject(p.getSpecies(),getSpecies());
-    if (getDistanceAndNormal(position, p.getRadius()+s->getInteractionDistance(), distance, normal_return)) {
+    BaseSpecies* s = getHandler()->getDPMBase()->speciesHandler.getMixedObject(p.getSpecies(), getSpecies());
+    if (getDistanceAndNormal(position, p.getRadius() + s->getInteractionDistance(), distance, normal_return))
+    {
         getOrientation().rotate(normal_return);
         return true;
-    } else {
+    }
+    else
+    {
         return false;
     }
 }
@@ -564,7 +571,7 @@ bool IntersectionOfWalls::getDistanceAndNormal(const Vec3D& position, Mdouble wa
         logger(DEBUG, "Empty IntersectionOfWalls");
         return false;
     }
-
+    
     distance = -1e20;
     Mdouble distance2 = -1e20;
     Mdouble distance3 = -1e20;
@@ -572,7 +579,7 @@ bool IntersectionOfWalls::getDistanceAndNormal(const Vec3D& position, Mdouble wa
     unsigned int id = 0;
     unsigned int id2 = 0;
     unsigned int id3 = 0;
-
+    
     //For each wall we calculate the distance (distanceCurrent). To compute The walls with the minimal overlap
     //The object has to touch each wall  each wall (distanceCurrent) and keep the minimum distance (distance) and wall index (id
     for (unsigned int i = 0; i < wallObjects_.size(); i++)
@@ -583,12 +590,15 @@ bool IntersectionOfWalls::getDistanceAndNormal(const Vec3D& position, Mdouble wa
         // This means that for each InfiniteWall in wallObjects_, the particle is either "inside"
         // the wall or touching it. If not, there is no interaction.
         if (distanceCurrent >= wallInteractionRadius)
+        {
             return false;
+        }
         // Find out which of the InfiniteWalls is interacting with the particle.
         // Keep the minimum distance (distance) and wall index (id)
         // and store up to two walls (id2, id3) and their distances (distance2, distance3),
         // if the possible contact point is near the intersection between id and id2 (and id3)
-        if (distanceCurrent > distance) {
+        if (distanceCurrent > distance)
+        {
             if (distance > -wallInteractionRadius) //if distance was set previously
             {
                 if (distance2 > -wallInteractionRadius) //if distance2 was set previously
@@ -601,9 +611,12 @@ bool IntersectionOfWalls::getDistanceAndNormal(const Vec3D& position, Mdouble wa
             }
             distance = distanceCurrent;
             id = i;
-        } else if (distanceCurrent < -wallInteractionRadius) {
+        }
+        else if (distanceCurrent < -wallInteractionRadius)
+        {
             continue;
-        } else if (distanceCurrent > distance2)
+        }
+        else if (distanceCurrent > distance2)
         {
             if (distance2 > -wallInteractionRadius) //if distance2 was set previously
             {
@@ -612,13 +625,14 @@ bool IntersectionOfWalls::getDistanceAndNormal(const Vec3D& position, Mdouble wa
             }
             distance2 = distanceCurrent;
             id2 = i;
-        } else if (distanceCurrent > distance3)
+        }
+        else if (distanceCurrent > distance3)
         {
             distance3 = distanceCurrent;
             id3 = i;
         }
     }
-
+    
     //If we are here, the closest wall is id;
     //if distance2>-P.Radius (and distance3>-P.Radius), the possible contact point
     // is near the intersection between id and id2 (and id3)
@@ -628,14 +642,14 @@ bool IntersectionOfWalls::getDistanceAndNormal(const Vec3D& position, Mdouble wa
         Vec3D D = position + wallObjects_[id].getNormal() * distance;
         //If the distance of D to id2 is positive, the contact is with the intersection
         bool intersection_with_id2 = (wallObjects_[id2].getDistance(D) > 0.0);
-
+        
         if (distance3 > -wallInteractionRadius && (wallObjects_[id3].getDistance(D) > 0.0))
         {
-            //D is the point on wall id closest to P
+            //E is the point on wall id2 closest to P
             Vec3D E = position + wallObjects_[id2].getNormal() * distance2;
             //If the distance of D to id2 is positive, the contact is with the intersection
             bool intersection_with_id3 = (wallObjects_[id3].getDistance(E) > 0.0);
-
+            
             if (intersection_with_id2)
             {
                 if (intersection_with_id3)
@@ -649,9 +663,9 @@ bool IntersectionOfWalls::getDistanceAndNormal(const Vec3D& position, Mdouble wa
                         id3 = id;
                     }
                     unsigned int index =
-                    (id < id2) ? ((id3 - 2) * (id3 - 1) * id3 / 6 + (id2 - 1) * id2 / 2 + id) :
-                    (id < id3) ? ((id3 - 2) * (id3 - 1) * id3 / 6 + (id - 1) * id / 2 + id2) :
-                    ((id - 2) * (id - 1) * id / 6 + (id3 - 1) * id3 / 2 + id2);
+                            (id < id2) ? ((id3 - 2) * (id3 - 1) * id3 / 6 + (id2 - 1) * id2 / 2 + id) :
+                            (id < id3) ? ((id3 - 2) * (id3 - 1) * id3 / 6 + (id - 1) * id / 2 + id2) :
+                            ((id - 2) * (id - 1) * id / 6 + (id3 - 1) * id3 / 2 + id2);
                     normal_return = position - C_[index];
                     distance = sqrt(normal_return.getLengthSquared());
                     if (distance <= wallInteractionRadius) //note what if nan?
@@ -673,7 +687,7 @@ bool IntersectionOfWalls::getDistanceAndNormal(const Vec3D& position, Mdouble wa
                 id2 = id3;
             }
         }
-
+        
         if (intersection_with_id2)
         { //possible contact is with intersection of id,id2
             unsigned int index = (id > id2) ? ((id - 1) * id / 2 + id2) : ((id2 - 1) * id2 / 2 + id);
@@ -684,8 +698,10 @@ bool IntersectionOfWalls::getDistanceAndNormal(const Vec3D& position, Mdouble wa
             {
                 normal_return /= -distance;
                 return true; //contact with id,id2,id3
-            } else {
-                if (distance==distance)
+            }
+            else
+            {
+                if (distance == distance)
                     return false;
             }
         }
@@ -732,7 +748,7 @@ void IntersectionOfWalls::read(std::istream& is)
     std::string dummy;
     int n;
     is >> dummy >> n;
-
+    
     Vec3D normal;
     Vec3D position;
     for (int i = 0; i < n; i++)
@@ -743,7 +759,8 @@ void IntersectionOfWalls::read(std::istream& is)
             Quaternion orientation;
             is >> position >> dummy >> orientation;
             addObject(orientation, position);
-        } else
+        }
+        else
         {
             is >> normal >> dummy >> position;
             addObject(normal, position);
@@ -773,15 +790,15 @@ std::string IntersectionOfWalls::getName() const
     return "IntersectionOfWalls";
 }
 
-void IntersectionOfWalls::writeVTK (VTKContainer& vtk) const
+void IntersectionOfWalls::writeVTK(VTKContainer& vtk) const
 {
     Vec3D max = getHandler()->getDPMBase()->getMax();
     Vec3D min = getHandler()->getDPMBase()->getMin();
     for (auto wall = wallObjects_.begin(); wall != wallObjects_.end(); wall++)
     {
         std::vector<Vec3D> points;
-        wall->createVTK (points, min, max);
-        for (auto other=wallObjects_.begin(); other!=wallObjects_.end(); other++)
+        wall->createVTK(points, min, max);
+        for (auto other = wallObjects_.begin(); other != wallObjects_.end(); other++)
         {
             if (other != wall)
             {
@@ -789,11 +806,12 @@ void IntersectionOfWalls::writeVTK (VTKContainer& vtk) const
             }
         }
         //rotate into real frame
-        for (auto& p : points) {
+        for (auto& p : points)
+        {
             getOrientation().rotate(p);
             p += getPosition();
         }
-        wall->addToVTK (points, vtk);
+        wall->addToVTK(points, vtk);
     }
 }
 

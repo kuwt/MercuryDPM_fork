@@ -1,0 +1,86 @@
+Version 3.0.1
+=============
+
+  * Fixed segfault if source contained only tensors with negative tensor
+    eigenvalues
+  * Fixed small memory leak
+  * Added separate filter submenu
+  * Removed own, bugfixed copy of vtkSuperquadricSource.cxx given that
+    http://www.paraview.org/Bug/view.php?id=12179 got fixed
+  * Updated to compile against ParaView trunk (option GUI_RESOURCE_FILES is deprecated)
+
+
+Version 3.0
+=============
+
+  * Updated to compile with ParaView 3.98.0, and sped up combining
+    separate quadrics step from order n squared time to order n time
+    (Joseph Hennessey)
+
+
+Version 2.0.2
+=============
+
+  * Fixed orientation inversion causing flipped surface normals
+  * Fixed broken rendering of glyphs in multi-core mode
+    (Both patches provided by Burlen Loring <bloring@lbl.gov>,
+     see http://www.paraview.org/Bug/view.php?id=12179)
+  * Don't apply Superquadric Glyph to points with negative tensor
+    eigenvalues
+
+
+Version 2.0.1
+=============
+
+  * Fixed compile errors with Visual Studio 2008 SP1
+
+
+Version 2.0
+============
+
+  * Added ability to vary roundness settings per tensor.
+
+    Version 1.0 of the filter lacked the ability to reproduce the
+    novelty of the paper
+
+       Gordon L. Kindlmann, Superquadric Tensor Glyph
+       IEEE TVCG/EG Symposium on Visualization 2004
+
+    i.e. to have different roundness settings per tensor, based on its
+    eigenvalues.
+
+    A checkbox now optionally enables roundness-per-tensor. Setting it
+    automatically disables the widgets to enter Theta and Phi
+    Roundness manually.
+
+  * If ColorGlyphs checkbox is checked and ColorMode is set to
+    eigenvalues, eigenvalues are provided as an additional data
+    array. This information can subsequently be used for thresholding
+    or coloring.
+
+  * Provide an option to limit the scaling by eigenvalues. This helps
+    when dealing with data that features tensors with very large
+    eigenvalues.
+
+  * The VTK implementation of superquadric yields a wrong orientation. It
+    claims to offer z as axis of symmetry, but does not. Additionally,
+    it is not possible to set the axis to anything else which is
+    necessary for a correct implementation of the Kindlmann paper.
+
+    See http://www.paraview.org/Bug/view.php?id=11231
+
+    Use my own, corrected implementation for SuperquadricTensorGlyphs
+    from now on.
+
+  * Provide the mentioned correct implementation of a superquadric as
+    a new source
+
+
+Version 1.0
+============
+
+  * Initial version. Use a superquadric tensor glyph to visualize
+    tensors by scaling each glyph according to a tensor's eigenvalues
+    or the norms of an individual tensor's columns. Positive-definite
+    tensors are assumed, i.e. tensors that have only real, positive
+    eigenvalues.

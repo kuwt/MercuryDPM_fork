@@ -27,7 +27,9 @@
 #include "Particles/SuperQuadric.h"
 #include "Species/LinearViscoelasticSpecies.h"
 
-class SphericalSuperQuadricCollision : public Mercury3D
+///Small system to check if your paraview-visualisation works.
+///For more shapes, see VariousShapesDemo.
+class VisualisationTest : public Mercury3D
 {
     void setupInitialConditions() override
     {
@@ -63,8 +65,10 @@ class SphericalSuperQuadricCollision : public Mercury3D
 
 int main(int argc, char* argv[])
 {
-    SphericalSuperQuadricCollision problem;
+    VisualisationTest problem;
     problem.setName("EllipsoidForVisualisation");
+    
+    problem.setSuperquadricParticlesWriteVTK(true);
     problem.solve();
     return 0;
 }

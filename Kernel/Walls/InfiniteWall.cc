@@ -272,73 +272,71 @@ void InfiniteWall::writeVTK (VTKContainer& vtk) const
     addToVTK (points, vtk);
 }
 
-///\todo Work-in-progress. Please do not replace with more general form without supplying many (working) tests at
-/// the same time
-///\todo Fix vector properly.
-std::vector<BaseInteraction*>
-InfiniteWall::getInteractionWithSuperQuad(SuperQuadric* p, unsigned timeStamp, InteractionHandler* interactionHandler)
-{
-    Vec3D normalBodyFixed = getNormal();
-    p->getOrientation().rotateBack(normalBodyFixed);
-    Vec3D xWallBodyFixed = getPosition() - p->getPosition();
-    p->getOrientation().rotateBack(xWallBodyFixed);
-    Vec3D axes = p->getAxes();
-    Mdouble eps1 = p->getExponentEps1();
-    Mdouble eps2 = p->getExponentEps2();
 
+bool
+InfiniteWall::getDistanceNormalOverlapSuperquadric(const SuperQuadric& p, Mdouble& distance, Vec3D& normal_return,
+                                                   Mdouble& overlap) const
+{
+    //first check: if the bounding sphere does not touch the wall, there is no contact.
+    if(getDistance(p.getPosition()) >= p.getWallInteractionRadius())
+    {
+        return false;
+    }
+    Vec3D normalBodyFixed = getOrientation().getAxis();
+    p.getOrientation().rotateBack(normalBodyFixed);
+    Vec3D xWallBodyFixed = getPosition() - p.getPosition();
+    p.getOrientation().rotateBack(xWallBodyFixed);
+    Vec3D axes = p.getAxes();
+    Mdouble eps1 = p.getExponentEps1();
+    Mdouble eps2 = p.getExponentEps2();
+    
     //ellipsoids:
     if (mathsFunc::isEqual(eps1, 1, 1e-5) && mathsFunc::isEqual(eps2, 1, 1e-5))
     {
-        Vec3D furthestPoint;
-        if (std::abs(normalBodyFixed.X) > 1e-10)
-        {
-            Mdouble alpha = std::abs(normalBodyFixed.Y * axes.Y / normalBodyFixed.X / axes.X );
-            Mdouble beta = std::abs(normalBodyFixed.Z * axes.Z / normalBodyFixed.X / axes.X );
-            furthestPoint.X = axes.X * mathsFunc::sign(normalBodyFixed.X)/ std::sqrt(1 + alpha * alpha + beta * beta);
-            furthestPoint.Y = axes.Y * alpha * std::abs(furthestPoint.X) * mathsFunc::sign(normalBodyFixed.Y) / axes.X;
-            furthestPoint.Z = axes.Z * beta * std::abs(furthestPoint.X) * mathsFunc::sign(normalBodyFixed.Z) / axes.X;
-        }
-        else if (std::abs(normalBodyFixed.Y) > 1e-10)
-        {
-            Mdouble alpha = std::abs(normalBodyFixed.Z * axes.Z / normalBodyFixed.Y / axes.Y );
-            furthestPoint.Y = axes.Y * mathsFunc::sign(normalBodyFixed.Y) / std::sqrt(1 + alpha * alpha);
-            furthestPoint.Z = axes.Z * std::abs(furthestPoint.Y) * alpha * mathsFunc::sign(normalBodyFixed.Z) / axes.Y;
-        }
-        else
-        {
-            furthestPoint.Z = axes.Z * mathsFunc::sign(normalBodyFixed.Z);
-        }
-        Mdouble overlap = Vec3D::dot(xWallBodyFixed - furthestPoint, normalBodyFixed);
-        if (overlap < 0)
+        Vec3D furthestPoint = getFurthestPointSuperQuadric(normalBodyFixed, axes);
+        overlap = Vec3D::dot(xWallBodyFixed - furthestPoint, -normalBodyFixed);
+        if (overlap > 0)
         {
             Vec3D overlapBody = overlap * normalBodyFixed;
-            Vec3D contactPoint = furthestPoint + overlapBody/2;
-            BaseInteraction* c = interactionHandler->getInteraction(p, this, timeStamp);
-            p->getOrientation().rotate(contactPoint);
-            contactPoint += p->getPosition();
-            SmallVector<3> gradOther = p->computeShapeGradientLocal(contactPoint);
-            p->getOrientation().rotate(gradOther);
-            //set the new contact point:
-            Vec3D normalToParticle;
-            normalToParticle.X = gradOther[0];
-            normalToParticle.Y = gradOther[1];
-            normalToParticle.Z = gradOther[2];
-            normalToParticle.normalize();
-
-            c->setContactPoint(contactPoint);
-            c->setNormal(-normalToParticle);
-            c->setOverlap(-overlap);
-            c->setDistance((contactPoint + overlapBody/2 - p->getPosition()).getLength());
-            return {c};
+            Vec3D contactPoint = furthestPoint - overlapBody/2;
+            p.getOrientation().rotate(contactPoint);
+            contactPoint += p.getPosition();
+            distance = (contactPoint - overlapBody/2 - p.getPosition()).getLength();
+            normal_return = getOrientation().getAxis();
+            return true;
         }
         else
         {
-            return {};
+            return false;
         }
     }
     else
     {
         logger(ERROR, "Particle-wall detection not implemented for non-ellipsoid superquadrics.");
     }
-    return {};
+    return false;
+}
+
+Vec3D InfiniteWall::getFurthestPointSuperQuadric(const Vec3D& normalBodyFixed, const Vec3D& axes) const
+{
+    Vec3D furthestPoint;
+    if (std::abs(normalBodyFixed.X) > 1e-10)
+        {
+            Mdouble alpha = std::abs(normalBodyFixed.Y * axes.Y / normalBodyFixed.X / axes.X );
+            Mdouble beta = std::abs(normalBodyFixed.Z * axes.Z / normalBodyFixed.X / axes.X );
+            furthestPoint.X = axes.X * mathsFunc::sign(normalBodyFixed.X) / sqrt(1 + alpha * alpha + beta * beta);
+            furthestPoint.Y = axes.Y * alpha * std::abs(furthestPoint.X) * mathsFunc::sign(normalBodyFixed.Y) / axes.X;
+            furthestPoint.Z = axes.Z * beta * std::abs(furthestPoint.X) * mathsFunc::sign(normalBodyFixed.Z) / axes.X;
+        }
+        else if (std::abs(normalBodyFixed.Y) > 1e-10)
+        {
+            Mdouble alpha = std::abs(normalBodyFixed.Z * axes.Z / normalBodyFixed.Y / axes.Y );
+            furthestPoint.Y = axes.Y * mathsFunc::sign(normalBodyFixed.Y) / sqrt(1 + alpha * alpha);
+            furthestPoint.Z = axes.Z * std::abs(furthestPoint.Y) * alpha * mathsFunc::sign(normalBodyFixed.Z) / axes.Y;
+        }
+        else
+        {
+            furthestPoint.Z = axes.Z * mathsFunc::sign(normalBodyFixed.Z);
+        }
+    return furthestPoint;
 }

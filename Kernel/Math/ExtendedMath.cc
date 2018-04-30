@@ -253,6 +253,18 @@ bool mathsFunc::isEqual(Vec3D v1, Vec3D v2, Mdouble absError)
     return isEqual(v1.X,v2.X,absError)&&isEqual(v1.Y,v2.Y,absError)&&isEqual(v1.Z,v2.Z,absError);
 }
 
+bool mathsFunc::isEqual(Matrix3D m1, Matrix3D m2, Mdouble absError)
+{
+    return (isEqual(m1.XX, m2.XX, absError)
+            && isEqual(m1.XY, m2.XY, absError)
+            && isEqual(m1.XZ, m2.XZ, absError)
+            && isEqual(m1.YX, m2.YX, absError)
+            && isEqual(m1.YY, m2.YY, absError)
+            && isEqual(m1.YZ, m2.YZ, absError)
+            && isEqual(m1.ZX, m2.ZX, absError)
+            && isEqual(m1.ZY, m2.ZY, absError)
+            && isEqual(m1.ZZ, m2.ZZ, absError));
+}
 
 bool mathsFunc::isEqual(Quaternion v1, Quaternion v2, double absError)
 {

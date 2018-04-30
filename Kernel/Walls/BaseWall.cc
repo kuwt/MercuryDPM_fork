@@ -179,8 +179,9 @@ bool BaseWall::getLinePlaneIntersect(Vec3D& intersect, const Vec3D& p0, const Ve
 }
 
 //checks if point is in wall (if close to the wall, the point is assumed out of the wall)
-bool BaseWall::isInsideWallVTK (const Vec3D& point, const Vec3D& normal, const Vec3D& position) const {
-    return Vec3D::dot(position-point,normal)<-1e-12;
+bool BaseWall::isInsideWallVTK(const Vec3D& point, const Vec3D& normal, const Vec3D& position) const
+{
+    return Vec3D::dot(position - point, normal) < -1e-12;
 }
 
 /*!
@@ -189,17 +190,17 @@ bool BaseWall::isInsideWallVTK (const Vec3D& point, const Vec3D& normal, const V
  * => (position-point[i]-t*(point[i-1]-point[i]))*normal_=0
  * t=(position-point[i]))*normal_ / (point[i-1]-point[i]))*normal_
  */
-void BaseWall::projectOntoWallVTK (Vec3D& point0, const Vec3D& point1, const Vec3D& normal, const Vec3D& position) const
+void BaseWall::projectOntoWallVTK(Vec3D& point0, const Vec3D& point1, const Vec3D& normal, const Vec3D& position) const
 {
     Vec3D dPoint = point1 - point0;
-    point0 += Vec3D::dot(position - point0, normal) / Vec3D::dot(dPoint,normal)*dPoint;
+    point0 += Vec3D::dot(position - point0, normal) / Vec3D::dot(dPoint, normal) * dPoint;
 }
 
 /*!
  * Checks if a set of VTK points is inside a half-space defined by position and normal; all points outside the half-space are projected onto the half-space boundary.
  * Thus, if the old set of points represented a wall object, the new set of points is represents the intersection of the wall with the half-space.
  */
-void BaseWall::intersectVTK (std::vector<Vec3D>& points, const Vec3D normal, const Vec3D position)const
+void BaseWall::intersectVTK(std::vector<Vec3D>& points, const Vec3D normal, const Vec3D position) const
 {
     // find first point in Wall
     std::vector<Vec3D>::iterator firstIn = points.begin();
@@ -211,14 +212,14 @@ void BaseWall::intersectVTK (std::vector<Vec3D>& points, const Vec3D normal, con
             break;
         }
     }
-
+    
     //if all points are out of the wall
     if (firstIn == points.end())
     {
         logger(DEBUG, "BaseWall::intersectVTK: all points out of wall");
         return;
     }
-
+    
     // find first point out of the wall after firstIn
     std::vector<Vec3D>::iterator firstOut = firstIn + 1;
     for (; firstOut != points.end(); firstOut++)
@@ -228,7 +229,7 @@ void BaseWall::intersectVTK (std::vector<Vec3D>& points, const Vec3D normal, con
             break;
         }
     }
-
+    
     //if all points are in the wall
     if (firstOut == points.end() && firstIn == points.begin())
     {
@@ -263,9 +264,9 @@ void BaseWall::intersectVTK (std::vector<Vec3D>& points, const Vec3D normal, con
             firstIn = points.begin() + in;//necessary, unless capacity is set right
             firstOut = firstIn + 2;
         }
-
+        
         // three cases remain: ooiioo, ooii, iioo
-
+        
         //move both points onto the surface of the wall
         if (firstIn != points.begin())
         {
@@ -304,7 +305,7 @@ void BaseWall::intersectVTK (std::vector<Vec3D>& points, const Vec3D normal, con
                 break;
             }
         }
-
+        
         // remove unnessesary points in the wall 
         // iiiooiii -> iooi
         points.erase(firstIn + 1, points.end());
@@ -329,45 +330,58 @@ BaseWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHan
 {
     Mdouble distance;
     Vec3D normal;
+    Mdouble overlap;
     std::vector<BaseInteraction*> interactions;
-
-    if (getDistanceAndNormal(*p, distance, normal))
+    
+    if (getDistanceNormalOverlap(*p, distance, normal, overlap))
     {
-        if(p->getName() == "SuperQuadric")
-        {
-            /// \todo change interaction with superquad to vector
-            return {getInteractionWithSuperQuad(dynamic_cast<SuperQuadric*>(p), timeStamp, interactionHandler)};
-        }
         BaseInteraction* c = interactionHandler->getInteraction(p, this, timeStamp);
         c->setNormal(-normal);
         c->setDistance(distance);
-        c->setOverlap(p->getRadius() - distance);
-        ///\todo{DK: What is the contact point for interactions with walls}
-        c->setContactPoint(p->getPosition() - (p->getRadius() - 0.5 * c->getOverlap()) * c->getNormal());//logger(ERROR,"contact at %",c->getContactPoint());
+        c->setOverlap(overlap);
+        if(dynamic_cast<SuperQuadric*>(p) == nullptr)
+        {
+            ///\todo{DK: What is the contact point for interactions with walls}
+            c->setContactPoint(p->getPosition() - (p->getRadius() - 0.5 * c->getOverlap()) * c->getNormal());
+        }
+        else
+        {
+            Vec3D normalBodyFixed = normal;
+            p->getOrientation().rotateBack(normalBodyFixed);
+            auto furthestPoint = getFurthestPointSuperQuadric(normalBodyFixed, p->getAxes());
+            Vec3D overlapBody = overlap * normalBodyFixed;
+            Vec3D contactPoint = furthestPoint - overlapBody/2;
+            p->getOrientation().rotate(contactPoint);
+            contactPoint += p->getPosition();
+            c->setContactPoint(contactPoint);
+        }
+        logger(VERBOSE, "contact at %", c->getContactPoint());
         interactions.push_back(c);
     }
     return interactions;
 }
 
-void BaseWall::writeVTK (VTKContainer &vtk) const
+void BaseWall::writeVTK(VTKContainer& vtk) const
 {
-    logger(WARN,"Wall % (%) cannot has no vtk writer defined",getIndex(),getName());
+    logger(WARN, "Wall % (%) cannot has no vtk writer defined", getIndex(), getName());
 }
 
-void BaseWall::addToVTK (const std::vector<Vec3D>& points, VTKContainer& vtk)
+void BaseWall::addToVTK(const std::vector<Vec3D>& points, VTKContainer& vtk)
 {
-    if (points.size()!=0) {
+    if (points.size() != 0)
+    {
         //all all values in myPoints to points
         vtk.points.insert(vtk.points.end(), points.begin(), points.end());
-
+        
         // create one cell object containing all indices of the added points (created a triangle strip connecting these points)
         std::vector<double> cell;
-        cell.reserve(vtk.points.size()+1);
-        cell.push_back(vtk.points.size()-1);
-        for (unsigned i=vtk.points.size()-points.size(); i<vtk.points.size(); i++) {
-            cell.push_back(i);
+        cell.reserve(vtk.points.size() + 1);
+        cell.push_back(vtk.points.size() - 1);
+        for (unsigned i = vtk.points.size() - points.size(); i < vtk.points.size(); i++)
+        {
+            cell.push_back((double) i);
         }
-
+        
         //add this triangle strip to the vtk file
         vtk.triangleStrips.push_back(cell);
     }
@@ -376,7 +390,7 @@ void BaseWall::addToVTK (const std::vector<Vec3D>& points, VTKContainer& vtk)
 
 ///\todo make it work with screw, coil and other weird walls
 std::vector<BaseInteraction*> BaseWall::getInteractionWithSuperQuad(SuperQuadric* p, unsigned timeStamp,
-                                                       InteractionHandler* interactionHandler)
+                                                                    InteractionHandler* interactionHandler)
 {
     logger(ERROR, "Generic wall-superquad interactions not implemented yet.");
     return {};
@@ -386,11 +400,11 @@ std::vector<BaseInteraction*> BaseWall::getInteractionWithSuperQuad(SuperQuadric
 /// \return A Vec3D which is the axis of the wall
 const Vec3D BaseWall::getAxis() const
 {
-    Quaternion Q=getOrientation();
+    Quaternion Q = getOrientation();
     Vec3D axis;
-    axis.X=Q.q1;
-    axis.Y=Q.q2;
-    axis.Z=Q.q3;
+    axis.X = Q.q1;
+    axis.Y = Q.q2;
+    axis.Z = Q.q3;
     return axis;
 }
 
@@ -402,4 +416,34 @@ bool BaseWall::getVTKVisibility() const
 void BaseWall::setVTKVisibility(const bool vtkVisibility)
 {
     vtkVisibility_ = vtkVisibility;
+}
+
+bool BaseWall::getDistanceNormalOverlap(const BaseParticle& P, Mdouble& distance, Vec3D& normal_return,
+                                        Mdouble& overlap) const
+{
+    auto superQuadric = dynamic_cast<const SuperQuadric*>(&P);
+    if (superQuadric == nullptr)
+    {
+        bool isInContact = getDistanceAndNormal(P, distance, normal_return);
+        overlap = P.getRadius() - distance;
+        return isInContact;
+    }
+    else
+    {
+        return getDistanceNormalOverlapSuperquadric(*superQuadric, distance, normal_return, overlap);
+    }
+}
+
+bool
+BaseWall::getDistanceNormalOverlapSuperquadric(const SuperQuadric& p, Mdouble& distance, Vec3D& normal_return,
+                                               Mdouble& overlap) const
+{
+    logger(ERROR, "Generic wall-superquadric interactions not implemented yet.");
+    return false;
+}
+
+Vec3D BaseWall::getFurthestPointSuperQuadric(const Vec3D& normalBodyFixed, const Vec3D& axes) const
+{
+    logger(ERROR, "Generic wall-superquadric interactions not implemented yet.");
+    return Vec3D();
 }

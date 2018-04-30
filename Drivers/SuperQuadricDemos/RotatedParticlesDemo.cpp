@@ -34,19 +34,21 @@ class EllipticalSuperQuadricCollision : public Mercury3D
     {
         
         HertzianViscoelasticMindlinSpecies species;
-        species.setElasticModulusAndRestitutionCoefficient(20000, 0.8);
+        species.setElasticModulusAndRestitutionCoefficient(2e5, 0.7);
+        species.setShearModulus(100000.0);
         species.setDensity(constants::pi / 6);
+        //species.setSlidingFrictionCoefficient(0.5);
         speciesHandler.copyAndAddObject(species);
-        setMax(8.5, 8.5, 8.5);
+        setMax(8.0, 8.0, 20);
         setMin(1.5, 1.5, 1.5);
-        setGravity({0,0,0});
+        setGravity({0,0,-1});
         
         SuperQuadric p0;
         p0.setSpecies(speciesHandler.getObject(0));
-        p0.setAxesAndExponents(1.4,1.0,1.0,1.0,1.0);
+        p0.setAxesAndExponents(2.0,2.0,0.25,1.0,1.0);
         p0.setInertia();
         
-        unsigned int numberOfParticles = 20;
+        unsigned int numberOfParticles = 50;
         unsigned int failed = 0;
         while (numberOfParticles > 0 && failed < 100)
         {
@@ -79,8 +81,6 @@ class EllipticalSuperQuadricCollision : public Mercury3D
         w0.setSpecies(speciesHandler.getObject(0));
         w0.set(Vec3D(0.0,0.0,-1.0),Vec3D(0.0,0.0,0.0));
         wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0,0.0, 1.0),Vec3D(0.0,0.0,10.0));
-        wallHandler.copyAndAddObject(w0);
         w0.set(Vec3D(0.0,-1.0,0.0),Vec3D(0.0,0.0,0.0));
         wallHandler.copyAndAddObject(w0);
         w0.set(Vec3D(0.0,1.0,0.0),Vec3D(0.0,10.0,0.0));
@@ -93,19 +93,8 @@ class EllipticalSuperQuadricCollision : public Mercury3D
            
         setTimeStep(species.getCollisionTime(1, 1, constants::pi/6) / 100);
         logger(INFO, "time step %", getTimeStep());
-        setTimeMax(9);
+        setTimeMax(10);
         write(std::cout, true);
-    }
-    
-    //check contact time
-    void actionsAfterTimeStep() override
-    {
-        std::vector<BaseInteraction*> interaction = particleHandler.getObject(0)->getInteractionWith(particleHandler.getObject(1), getTimeStep(), &interactionHandler);
-        if ( interaction.size() != 0)
-        {
-            /// \todo merge problem please fix
-            const Vec3D contactPoint = interaction[0]->getContactPoint();
-        }
     }
     
     void actionsAfterSolve() override
@@ -122,7 +111,7 @@ int main(int argc, char* argv[])
 {
     EllipticalSuperQuadricCollision problem;
     problem.setName("EllipticalSuperQuadricCollision");
-    problem.setSaveCount(50);
+    problem.setSaveCount(500);
     problem.setSuperquadricParticlesWriteVTK(true);
     problem.setWallsWriteVTK(FileType::ONE_FILE);
     problem.solve();

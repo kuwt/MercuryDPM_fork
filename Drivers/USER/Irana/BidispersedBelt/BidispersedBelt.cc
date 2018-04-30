@@ -38,7 +38,7 @@ void BidispersedBelt::prescribeBeltParticleVelocity()
     {
         if (p->isFixed())
         {
-            p->setPrescribedVelocity([this](double time){return Vec3D({this->getBeltSpeed(), 0, 0});});
+            p->setPrescribedVelocity([this](Mdouble time){return Vec3D(this->getBeltSpeed(), 0, 0);});
         }
     }
 }

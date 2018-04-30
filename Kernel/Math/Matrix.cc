@@ -54,6 +54,19 @@ Matrix3D::Matrix3D(const Mdouble xx, const Mdouble xy, const Mdouble xz, const M
     ZZ = zz;
 }
 
+Matrix3D::Matrix3D(const SmallMatrix<3,3>& matrix)
+{
+    XX = matrix(0,0);
+    XY = matrix(0,1);
+    XZ = matrix(0,2);
+    YX = matrix(1,0);
+    YY = matrix(1,1);
+    YZ = matrix(1,2);
+    ZX = matrix(2,0);
+    ZY = matrix(2,1);
+    ZZ = matrix(2,2);
+}
+
 /*!
  *  \details Sets all elements to zero. 
  */

@@ -112,6 +112,12 @@ public:
      * \brief Compute the distance from the wall for a given BaseParticle and return if there is a collision. If there is a collision, also return the normal vector.
      */
     bool getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const override;
+    
+    /*!
+    * \brief Compute the distance from the wall for a given BaseParticle and return if there is a collision. If there is a collision, also return the normal vector.
+    */
+    bool getDistanceNormalOverlapSuperquadric(const SuperQuadric& p, Mdouble& distance, Vec3D& normal_return,
+                                              Mdouble& overlap) const override;
 
     /*!
      * \brief Reads InfiniteWall from a restart file.
@@ -153,7 +159,7 @@ public:
      */
     void writeVTK (VTKContainer& vtk) const override;
     
-    std::vector<BaseInteraction*> getInteractionWithSuperQuad(SuperQuadric* p, unsigned timeStamp, InteractionHandler* interactionHandler) override;
+    Vec3D getFurthestPointSuperQuadric(const Vec3D& normalBodyFixed, const Vec3D& axes) const;
 };
 
 #endif

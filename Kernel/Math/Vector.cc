@@ -22,8 +22,20 @@
 //ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 #include "Vector.h"
-#include <Logger.h>
+#include "SmallVector.h"
+
+/*!
+ * \details Alternative constructor, that constructs a Vec3D from a SmallVector size 3
+ * \param[in] vector Small vector that should be copied
+ */
+Vec3D::Vec3D(const SmallVector<3>& vector)
+{
+    X = vector[0];
+    Y = vector[1];
+    Z = vector[2];
+}
 
 /*!
  * \details Sets each element to zero.

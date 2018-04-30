@@ -34,104 +34,252 @@ typedef Vec3D LabFixedCoordinates;
 
 /*!
  * \class SuperQuad
- * \brief Class that implements superquadric particles, which are non-spherical
+ * \brief Class that implements superquadric particles, which are non-spherical.
+ *
+ * \details We use the super-ellipsoid definition stated in Chapter 2 of the book "Segmentation and recovery of
+ * superquadrics" by Jaklic et al. This class contains the geometrical information of the particles, i.e. the length of
+ * the principal axes and the "blockiness" parameters.
+ *
+ * This class computes the volume and inertia tensor of the particle, and also the contact-point between two
+ * superquadrics, or a normal particle and superquadric. It also computes its interaction-radius and curvature at a
+ * certain position. It should be noted that two coordinate systems are used in the methods of this class: the
+ * lab-fixed coordinates, which are points in physical space as seen by an outside observer, and the body-fixed
+ * coordinates, which are points in space relative to the (not-oriented) superquadric particle.
+ *
+ * Most of the contact-detection algorithm is based on Comp. Part. Mech. (2017) 4 : 101-118, "Efficient implementation
+ * of superquadric particles in Discrete element Method within an open-source framework" by Podlozhnyuk, Pirker and
+ * Kloss.
  */
 class SuperQuadric final : public BaseParticle
 {
 public:
     /*!
-     * \brief Basic Particle constructor, creates an Particle at (0,0,0) with radius, mass and inertia equal to 1
+     * \brief Basic Particle constructor, creates a superquadric with axes (1,1,1) and exponents (2,2), so it creates a
+     * sphere with radius 1.
      */
     SuperQuadric();
-
+    
     /*!
-     * \brief Particle copy constructor, which accepts as input a reference to a Particle. It creates a copy of this Particle and all it's information. Usually it is better to use the copy() function for polymorfism.
+     * \brief Copy constructor, which accepts as input a reference to a Superquadric.
+     * It creates a copy of this Particle and all it's information.
+     * Usually it is better to use the copy() function for polymorphism.
      */
     SuperQuadric(const SuperQuadric& p);
-
+    
     /*!
-     * \brief Particle destructor, needs to be implemented and checked if it removes tangential spring information
+     * \brief Destructor, needs to be implemented and checked to see if it is the largest or smallest particle currently
+     * in its particleHandler
      */
     ~SuperQuadric() override;
-
+    
     /*!
-     * \brief Particle copy method. It calls to copy constructor of this Particle, useful for polymorfism
+     * \brief Copy method. It calls to copy constructor of this superquadric, useful for polymorphism
      */
     SuperQuadric* copy() const override;
     
+    /*!
+     * \brief Write function: write this superquadric to the given output-stream, for example a restart-file
+     */
     void write(std::ostream& os) const override;
-	
+    
+    /*!
+     * \brief Read function: read in the information for this superquadric from the given input-stream, for example a
+     * restart file
+     */
     void read(std::istream& is) override;
     
     /*!
-     * \brief Returns the name of the object
+     * \brief Returns the name of the class, here "SuperQuadric"
      */
     std::string getName() const override;
-
+    
     /*!
-     * \brief We consider the superellipsoid definition stated in Chapter 2 of the book segmentation and recovery of superquadrics by Jaklic and co.
+     * \brief Set the geometrical properties of the superquadrics, namely the axes-lengths a1, a2 and a3, and the
+     * exponents epsilon1 and epsilon2.
+     * We use the super-ellipsoid definition stated in Chapter 2 of the book "Segmentation and recovery of
+     * superquadrics" by Jaklic et al.
      */
-
-    void setAxesAndExponents(const Mdouble& a1, const Mdouble& a2, const Mdouble& a3, const Mdouble& eps1, const Mdouble& eps2);
+    void setAxesAndExponents(const Mdouble& a1, const Mdouble& a2, const Mdouble& a3, const Mdouble& eps1,
+                             const Mdouble& eps2);
     
+    /*!
+     * \brief Set the geometrical properties of the superquadrics, namely the axes-lengths axes, and the
+     * exponents epsilon1 and epsilon2.
+     * We use the super-ellipsoid definition stated in Chapter 2 of the book "Segmentation and recovery of
+     * superquadrics" by Jaklic et al.
+     */
     void setAxesAndExponents(const Vec3D& axes, const Mdouble& eps1, const Mdouble& eps2);
-
-    void setAxes(const Mdouble& a1, const Mdouble& a2, const Mdouble& a3);
-
-    void setAxes(const Vec3D& axes);
-
-    void setExponents(const Mdouble& eps1, const Mdouble& eps2);
-
-    ///\todo TW we could remove this function from the BaseParticle and use a dynamic_cast instead
-    Vec3D getAxes() override;
-
-    Mdouble getExponentEps1() override;
-
-    Mdouble getExponentEps2() override;
     
+    /*!
+     * \brief Set the axes-lengths to a1, a2 and a3 for this superquadric.
+     * We use the super-ellipsoid definition stated in Chapter 2 of the book "Segmentation and recovery of
+     * superquadrics" by Jaklic et al.
+     */
+    void setAxes(const Mdouble& a1, const Mdouble& a2, const Mdouble& a3);
+    
+    /*!
+     * \brief Set the axes-lengths to axes for this superquadric.
+     * We use the super-ellipsoid definition stated in Chapter 2 of the book "Segmentation and recovery of
+     * superquadrics" by Jaklic et al.
+     */
+    void setAxes(const Vec3D& axes);
+    
+    /*!
+     * \brief Set the exponents to eps1 and eps2 for this superquadric.
+     * We use the super-ellipsoid definition stated in Chapter 2 of the book "Segmentation and recovery of
+     * superquadrics" by Jaklic et al.
+     */
+    void setExponents(const Mdouble& eps1, const Mdouble& eps2);
+    
+    ///\todo TW we could remove this function from the BaseParticle and use a dynamic_cast instead
+    ///\todo ID Middle-term plan is to template the BaseParticle on shape-type, so that we won't have to cast etc.
+    /*!
+     * \brief Get the axes-lengths of this superquadric.
+     * We use the super-ellipsoid definition stated in Chapter 2 of the book "Segmentation and recovery of
+     * superquadrics" by Jaklic et al.
+     */
+    Vec3D getAxes() const override;
+    
+    /*!
+ * \brief Get the first exponent of this superquadric.
+     * We use the super-ellipsoid definition stated in Chapter 2 of the book "Segmentation and recovery of
+     * superquadrics" by Jaklic et al.
+ */
+    Mdouble getExponentEps1() const override;
+    
+    /*!
+ * \brief Get the second exponent of this superquadric.
+     * We use the super-ellipsoid definition stated in Chapter 2 of the book "Segmentation and recovery of
+     * superquadrics" by Jaklic et al.
+ */
+    Mdouble getExponentEps2() const override;
+    
+    /*!
+     * Get the volume of this superquadric.
+     */
     Mdouble getVolume() const override;
     
+    /*!
+     * \brief Compute and set the inertia-tensor for this superquadric. For internal use only.
+     */
     void setInertia() override;
     
-    ///\brief return the radius of the sphere that fits precisely around the particle. Currently only implemented for
-    ///ellipsoids
+    /*!\brief Get the radius of the sphere that fits precisely around the particle.
+     * \todo Currently only implemented for ellipsoids
+     */
     Mdouble getInteractionRadius() const override;
     
-    std::vector<BaseInteraction *> getInteractionWith(BaseParticle *const P,
-                                                                                         const unsigned timeStamp,
-                                                                                         InteractionHandler *const interactionHandler) override;
+    /*!
+     * \brief Checks if this superquadric is in interaction with the given particle, and if
+     * so, returns vector of pointer to the associated BaseInteraction object (else returns empty vector).
+     */
+    std::vector<BaseInteraction*> getInteractionWith(BaseParticle* const P, const unsigned timeStamp,
+                                                     InteractionHandler* const interactionHandler) override;
     
-    Mdouble getCurvature(const LabFixedCoordinates& xGlobal) const;
+    /*!
+     * \brief Get the mean curvature of this superquadric at the given (lab-fixed) position, see Podlozhyuk et al.
+     * (2017) eq (39)
+     */
+    Mdouble getCurvature(const LabFixedCoordinates& labFixedCoordinates) const;
     
+    /*!
+     * \brief Get whether or not this superquadric is in contact with the given particle.
+     */
     bool isInContactWith(const BaseParticle* const p) const override;
     
-    SmallVector<3> computeShapeGradientLocal(const LabFixedCoordinates& xGlobal) const;
-    
-private:
-    
-    ///returns the interaction between two superquads: if they do not touch, it returns nullptr, otherwise it returns the
-    ///pointer to the interaction between this particle and the given pQuad.
-    std::vector<BaseInteraction*> getInteractionWithSuperQuad(SuperQuadric* const pQuad, const unsigned timeStamp,
-                                                 InteractionHandler* const interactionHandler);
+    /*!
+     * \brief Compute and get the gradient of the shape-function at the given (lab-fixed) position.
+     */
+    SmallVector<3> computeShapeGradientLabFixed(const LabFixedCoordinates& labFixedCoordinates) const;
     
     
-    SmallMatrix<3,3> computeHessian(const LabFixedCoordinates& xGlobal) const;
+    /*!
+     * \brief Checks if this superquadric is in interaction with the given superquadric, and if
+     * so, returns vector of pointer to the associated BaseInteraction object (else returns empty vector).
+     */
+    std::vector<BaseInteraction*> getInteractionWithSuperQuad(SuperQuadric* const p, const unsigned timeStamp,
+                                                              InteractionHandler* const interactionHandler);
     
-    Mdouble computeShape(const LabFixedCoordinates& xGlobal) const;
+    /*!
+     * \brief Compute and get the hessian ("second derivative") of the shape-function at the given (lab-fixed) position.
+     */
+    SmallMatrix<3, 3> computeHessianLabFixed(const LabFixedCoordinates& labFixedCoordinates) const;
     
-    SmallVector<4> functionThatShouldBecomeZeroForContactDetection(const SmallVector<4>& approximateContact,
-                                                                       const SuperQuadric* const pQuad) const;
+    /*!
+     * \brief Compute and get the shape-functiion at the given (lab-fixed) position.
+     */
+    Mdouble computeShape(const LabFixedCoordinates& labFixedCoordinates) const;
     
-    SmallMatrix<4, 4> computeJacobian(const SmallVector<4>& approximateContact, const SuperQuadric* const pQuad) const;
+    /*!
+     * \brief Objective function for contact detection between the two given superquadrics. See  Podlozhyuk et al.
+     * (2017) eq (22).
+     */
+    SmallVector<4> computeResidualContactDetection(const SmallVector<4>& position,
+                                                   const SuperQuadric* const p1,
+                                                   const SuperQuadric* const p2) const;
+
+    /*!
+     * \brief Compute and return the derivative of functionThatShouldBecomeZeroForContactDetection, both to the position
+     * and the Lagrange multiplier, and evaluated at the contact point.
+     */
+    SmallMatrix<4, 4> getJacobianOfContactDetectionObjective(const SmallVector<4>& contactPoint,
+                                                             const SuperQuadric* const p1,
+                                                             const SuperQuadric* const p2) const;
     
+    /*!
+     * \brief Get an initial guess for the contact-point between this particle and the given particle.
+     */
     SmallVector<4> getInitialGuessForContact(const SuperQuadric* pQuad, BaseInteraction* const C) const;
     
+    /*!
+     * \brief Compute the distance between the contact-point and surface of this superquadric particle.
+     */
     Mdouble computeOverlapAlpha(const LabFixedCoordinates& contactPoint, const LabFixedCoordinates& normal) const;
     
-    SmallVector<4> getContactPoint(const SuperQuadric* const pQuad, BaseInteraction* C) const;
+    /*!
+     * \brief Compute the contact point between this and the given superquadric particle.
+     */
+    SmallVector<4> getContactPoint(const SuperQuadric* const p, BaseInteraction* C) const;
     
-    Mdouble eps1_,eps2_;
+    /*!
+     * \brief If the "normal" procedure fails to find a contact point, use an alternative approach that involves
+     * starting with two spheres to compute the interaction, and becoming less and less spherical.
+     */
+    SmallVector<4> getContactPointPlanB(const SuperQuadric* const pOther, unsigned numberOfSteps) const;
     
-    Vec3D axes_; /// the three major or minor axes (a1,a2,a3)
+    /*!
+     * \brief Perform the actual Newton-iterations to find the contact point. Note, that it is given back as a
+     * parameter.
+     */
+    bool computeContactPoint(SmallVector<4>& contactPoint, const SuperQuadric* const p1,
+                             const SuperQuadric* const p2) const;
+    
+    
+    void writeDebugMessageStep1(const SuperQuadric* pQuad, const SmallVector<4>& contactPointPlanB) const;
+    
+    void writeDebugMessageStep2(const SuperQuadric* pQuad, const Vec3D& dAxesThis, const Mdouble& dn11,
+                                const Mdouble& dn12, const Vec3D& dAxesOther, const Mdouble& dn21,
+                                const Mdouble& dn22) const;
+    
+    void writeDebugMessageStep3(const Vec3D& axesThis, const Mdouble& n11, const Mdouble& n12, const Vec3D& axesOther,
+                                const Mdouble& n21, const Mdouble& n22) const;
+    
+    void
+    writeDebugMessageMiddleOfLoop(const SuperQuadric& p1, const SuperQuadric& p2, SmallVector<4>& contactPointPlanB,
+                                  const unsigned int& counter) const;
+
+private:
+    /*!
+     * \brief Blockiness parameters
+     * \details Blockiness parameters should be in the range (0,1], where a sphere or ellipsoid is represented by
+     * eps1_ = eps2_ = 1.
+     */
+    Mdouble eps1_, eps2_;
+    
+    /*!
+     * \brief Lengths of principal axes (a1, a2, a3).
+     */
+    Vec3D axes_;
 };
+
 #endif

@@ -412,17 +412,17 @@ public:
     /*!
      * \brief Only ustilised in case of superquadric particles. Had to create a virtual function to allow function access in writeVTK function in the particle handler.
      */
-    virtual Vec3D getAxes();
+    virtual Vec3D getAxes() const;
 
     /*!
      * \brief Only ustilised in case of superquadric particles. Had to create a virtual function to allow function access in writeVTK function in the particle handler.
      */
-    virtual double getExponentEps1();
+    virtual double getExponentEps1() const;
 
     /*!
      * \brief Only ustilised in case of superquadric particles. Had to create a virtual function to allow function access in writeVTK function in the particle handler.
      */
-    virtual double getExponentEps2();
+    virtual double getExponentEps2() const;
 
     //
     /*!
@@ -483,10 +483,13 @@ public:
 
     /*!
      * \brief Checks if particle is in interaction with given particle P, and if 
-     * so, returns pointer to the associated BaseInteraction object (else returns 0).
+     * so, returns vector of pointer to the associated BaseInteraction object (else returns empty vector).
      */
     virtual std::vector<BaseInteraction*> getInteractionWith(BaseParticle* const P, const unsigned timeStamp, InteractionHandler* const interactionHandler) override;
-
+    
+    /*!
+     * \brief Get whether or not this particle is in contact with the given particle.
+     */
     virtual bool isInContactWith(const BaseParticle* const P) const;
 
     /*!

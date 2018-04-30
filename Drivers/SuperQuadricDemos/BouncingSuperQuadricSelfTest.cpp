@@ -47,7 +47,7 @@ public:
         
         p0.setPosition(Vec3D(0.0, 0.0, 2.0));
         p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
-        p0.setOrientationViaNormal(Vec3D({0.0,1.0,1.0}));
+        p0.setOrientationViaNormal(Vec3D(0.0,1.0,1.0));
         particleHandler.copyAndAddObject(p0);
         logger.assert_always(mathsFunc::isEqual(p0.getInteractionRadius(), 1.0, 1e-10),
                              "interaction radius p0 equals % but should be 1.0", p0.getInteractionRadius());
@@ -93,8 +93,6 @@ public:
         solve();
     }
 
-private:
-    bool contactHasOccured;
 };
 
 int main(int argc, char* argv[])

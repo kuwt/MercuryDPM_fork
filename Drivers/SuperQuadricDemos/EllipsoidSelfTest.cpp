@@ -45,9 +45,9 @@ class EllipticalSuperQuadricCollision : public Mercury3D
         SuperQuadric p1 = *(p0.copy());
         
         p0.setPosition(Vec3D(0, 0.0, 0.0));
-        p1.setPosition(Vec3D(5, 0.0, 0.0));
-        p0.setVelocity(Vec3D(1, 0.0, 0.0));
-        p1.setVelocity(Vec3D(-1, 0.0, 0.0));
+        p1.setPosition(Vec3D(2.5, 2.5, 0.0));
+        p0.setVelocity(Vec3D(1, 1.0, 0.0));
+        p1.setVelocity(Vec3D(-1, -1.0, 0.0));
         p0.setOrientationViaNormal({0, 0, 1});
         p1.setOrientationViaNormal({0,0,1});
         logger(INFO, "Euler angles p1: %",p1.getOrientation().getEuler());
@@ -57,7 +57,7 @@ class EllipticalSuperQuadricCollision : public Mercury3D
         
         
         setTimeStep(species.getCollisionTime(1) / 50);
-        setTimeMax(.5);
+        setTimeMax(0.6);
         setMin(-10, -1, -1);
         setMax(10, 1, 1);
     }
@@ -83,6 +83,7 @@ int main(int argc, char* argv[])
     EllipticalSuperQuadricCollision problem;
     problem.setName("EllipticalSuperQuadricCollision");
     problem.setSaveCount(50);
+    problem.setSuperquadricParticlesWriteVTK(true);
     problem.solve();
     return 0;
 }

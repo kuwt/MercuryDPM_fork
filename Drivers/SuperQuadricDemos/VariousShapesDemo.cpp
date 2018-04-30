@@ -29,6 +29,10 @@
 #include "Mercury3D.h"
 #include "Species/LinearViscoelasticSpecies.h"
 
+/*!
+ * Small class that shows the influence of varying the geometrical parameters
+ * To test if your visualisation is working, you can first try the minimal example in VisualisationTest.
+ */
 class ShapesDemo : public Mercury3D
 {
     void setupInitialConditions() override
@@ -41,27 +45,33 @@ class ShapesDemo : public Mercury3D
         speciesHandler.copyAndAddObject(species);
         
         SuperQuadric p;
+        //standard: sphere
         p.setSpecies(speciesHandler.getLastObject());
         p.setPosition({0,0,0});
         particleHandler.copyAndAddObject(p);
         
+        //ellipsoid
         p.setAxes({1,1,2});
         p.setPosition({4, 0, 0});
         particleHandler.copyAndAddObject(p);
         
+        //rounded beam
         p.setExponents(0.5, 0.5);
         p.setPosition({8, 0, 0});
         particleHandler.copyAndAddObject(p);
         
+        //cushion
         p.setAxes({1,1,1});
         p.setExponents(0.5, 1);
         p.setPosition({0, 0, -5});
         particleHandler.copyAndAddObject(p);
         
+        //sharper-edged cushion
         p.setExponents(0.01, 1);
         p.setPosition({4,0,-5});
         particleHandler.copyAndAddObject(p);
         
+        //cube
         p.setExponents(0.01, 0.01);
         p.setPosition({8, 0, -5});
         particleHandler.copyAndAddObject(p);
@@ -82,7 +92,7 @@ int main(int argc, char* argv[])
 {
     ShapesDemo problem;
     problem.setName("ShapesDemo");
-    //problem.setSuperquadricParticlesWriteVTK(true);
+    problem.setSuperquadricParticlesWriteVTK(true);
     //problem.setWallsWriteVTK(FileType::ONE_FILE);
     problem.solve();
     return 0;

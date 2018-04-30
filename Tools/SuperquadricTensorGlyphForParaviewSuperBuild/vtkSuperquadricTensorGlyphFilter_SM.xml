@@ -1,0 +1,220 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy name="SuperquadricTensorGlyphFilter" class="vtkSuperquadricTensorGlyphFilter" label="Superquadric Tensor Glyphs">
+
+      <Documentation
+	 long_help="This filter generates a superquadric glyph at each point of the input data set. The glyphs are shaped, oriented and scaled according to eigenvalues and eigenvectors of tensors of the input data set."
+	 short_help="Generate a superquadric glyph symbol at each point of the input data set according to tensor eigenvalues and eigenvectors.">
+	The Superquadric Tensor Glyph filter generates a superquadric glyph at every point in the input data set. The glyphs are oriented and scaled according to eigenvalues and eigenvectors of point tensor data of the input data set. If ExtractEigenvalues is false, the entries of the 3x3 matrix are interpreted as principal axes of the superquadric and their norm as the length of these axes.
+	By default a different glyph is used per tensor, based on its eigenvalues, to distinguish tensors easily for all view angles reducing visual ambiguity (from certain viewpoints, e.g. ellipsoids poorly convey tensor shape). The gamma roundness parameter allows the user to control the visual prominence of orientation information at low anisotropy levels (low differences in eigenvalues). Use values between 1.5 and 3. High values (above about 4) turn the superquadrics back into cuboid glyphs which misleadingly depict under-constrained orientation (problem of eigenvalue indeterminacy).
+	The behavior of a standard Tensor Glyph filter can be achieved by setting FixedThetaPhiRoundness to true and choosing fixed theta and phi roundness values for all tensors. Set theta and phi roundness to 0.0 to get rectangular glyphs, set them to 1.0 to get ellipsoidal glyphs, set theta roundness to 1.0 and phi roundness to 0.0 to get cylindrical glyphs.
+	The Superquadric Tensor Glyph filter operates on any type of data set, but assumes positive-definite tensors, negative and vanishing eigenvalues are ignored. Its output is polygonal.
+      </Documentation>
+
+      <InputProperty
+         name="Input"
+         command="SetInputConnection">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkDataSet"/>
+        </DataTypeDomain>
+	<InputArrayDomain name="input_array1" attribute_type="point"
+			  number_of_components="9" />
+	<InputArrayDomain name="input_array2" attribute_type="point"
+			  number_of_components="1" optional="1" />
+        <Documentation>
+          This property specifies the input to the Glyph filter.
+        </Documentation>
+      </InputProperty>
+
+      <StringVectorProperty
+         name="SelectInputTensors"
+         command="SetInputArrayToProcess"
+         number_of_elements="5"
+         element_types="0 0 0 0 2"
+         label="Tensors">
+        <ArrayListDomain name="array_list" attribute_type="Tensors"
+			 input_domain_name="input_array1">
+          <RequiredProperties>
+            <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </ArrayListDomain>
+        <Documentation>
+          This property indicates the name of the tensor array on which to operate. The indicated array's eigenvalues and eigenvectors are used for shaping, scaling and orienting the glyphs.
+        </Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty
+         name="ThetaResolution"
+         command="SetThetaResolution"
+         number_of_elements="1"
+         animateable="1"
+         default_values="16" >
+        <IntRangeDomain name="range" min="8" max="1024" />
+        <Documentation>
+          The value of this property represents the number of divisions in the theta (longitudinal) direction.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="PhiResolution"
+         command="SetPhiResolution"
+         number_of_elements="1"
+         animateable="1"
+         default_values="16">
+        <IntRangeDomain name="range" min="4" max="1024" />
+        <Documentation>
+          The value of this property represents the number of divisions in the phi (latitudinal) direction.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty name="FixedThetaPhiRoundness"
+                         command="SetFixedThetaPhiRoundness"
+                         number_of_elements="1"
+                         animateable="0"
+                         default_values="0"
+			 label="Use fixed roundness for all tensors">
+        <BooleanDomain name="bool" />
+        <Documentation>
+	  Toggle whether to vary roundness values per tensor or to use fixed theta and phi roundness settings for all tensors.
+        </Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="GammaRoundness"
+         command="SetGamma"
+         number_of_elements="1"
+         animateable="1"
+         default_values="1.5">
+        <DoubleRangeDomain name="range" min="0.0" max="10.0" />
+        <Documentation>
+          This property defines the roundness of the superquadric if FixedThetaPhiRoundness is false. A value of 0 recovers pure ellipsoids.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="ThetaRoundness"
+         command="SetThetaRoundness"
+         number_of_elements="1"
+         animateable="1"
+         default_values="0.3">
+        <DoubleRangeDomain name="range" min="0.01" />
+        <Documentation>
+          This property defines the roundness of the superquadric in the theta (longitudinal) direction. A value of 0 represents a rectangular shape, a value of 1 represents a circular shape, and values greater than 1 produce higher order shapes. For rectangular glyphs set theta = phi = 0, for ellipsoidal glyphs theta = phi = 1 and for cylindrical glyphs theta = 1, phi = 0.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="PhiRoundness"
+         command="SetPhiRoundness"
+         number_of_elements="1"
+         animateable="1"
+         default_values="0.3">
+        <DoubleRangeDomain name="range" min="0.01" />
+        <Documentation>
+          This property defines the roundness in the phi (latitudinal) direction. A value of 0 represents a rectangular shape, a value of 1 represents a circular shape, and values greater than 1 produce higher order shapes. For rectangular glyphs set theta = phi = 0, for ellipsoidal glyphs theta = phi = 1 and for cylindrical glyphs theta = 1, phi = 0.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty name="ExtractEigenvalues"
+                         command="SetExtractEigenvalues"
+                         number_of_elements="1"
+                         animateable="0"
+                         default_values="1"
+			 label="Extract Eigenvalues">
+        <BooleanDomain name="bool" />
+        <Documentation>
+	  Toggle whether to extract eigenvalues from tensor. If false, eigenvalues/eigenvectors are not extracted and the columns of the tensor are taken as the eigenvectors (the norm of column, always positive, is the eigenvalue). If true, the glyph is scaled and oriented according to eigenvalues and eigenvectors; additionally, eigenvalues are provided as new data array.
+        </Documentation>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+	  name="ColorGlyphs"
+	  command="SetColorGlyphs"
+	  number_of_elements="1"
+	  default_values="1">
+	<BooleanDomain name="bool" />
+	<Documentation>
+	  This property determines whether or not to color the glyphes.
+	</Documentation>
+      </IntVectorProperty>
+
+      <StringVectorProperty
+	  name="SelectInputScalars"
+	  command="SetInputArrayToProcess"
+	  number_of_elements="5"
+	  element_types="0 0 0 0 2"
+	  default_values="1"
+	  label="Scalars"><!-- default_values=1 is important to set here and not in Tensors
+			       previously. Omitting the setting here would mess up changed
+			       tensor input being recognized as tensor input and not as
+			       scalar input and vice versa. -->
+	<ArrayListDomain name="array_list" attribute_type="Scalars"
+			 input_domain_name="input_array2">
+	  <RequiredProperties>
+	    <Property name="Input" function="Input" />
+	  </RequiredProperties>
+	</ArrayListDomain>
+	<Documentation>
+	  This property indicates the name of the scalar array to use for coloring
+	</Documentation>
+      </StringVectorProperty>
+
+      <IntVectorProperty
+	  name="ColorMode"
+	  command="SetColorMode"
+	  number_of_elements="1"
+	  default_values="0"
+	  label="Color by">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="input scalars" />
+          <Entry value="1" text="eigenvalues" />
+        </EnumerationDomain>
+	<Documentation>
+	  This property determines whether input scalars or computed eigenvalues at the point should be used to color the glyphs. If ThreeGlyphs is set and the eigenvalues are chosen for coloring then each glyph is colored by the corresponding eigenvalue and if not set the color corresponding to the largest eigenvalue is chosen.
+	</Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="ScaleFactor"
+         command="SetScaleFactor"
+         number_of_elements="1"
+         animateable="1"
+         default_values="1.0">
+        <Documentation>
+	  This property specifies the scale factor to scale every glyph by.
+        </Documentation>
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+	  name="LimitScalingByEigenvalues"
+	  command="SetClampScaling"
+	  number_of_elements="1"
+	  default_values="0">
+	<BooleanDomain name="bool" />
+	<Documentation>
+	  This property determines whether scaling of glyphs by ScaleFactor times eigenvalue should be limited. This is useful to prevent uncontrolled scaling near singularities.
+	</Documentation>
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+	  name="MaxScaleFactor"
+	  command="SetMaxScaleFactor"
+	  number_of_elements="1"
+	  default_values="10">
+	<Documentation>
+          If scaling by eigenvalues should be limited, this value sets an upper limit for scale factor times eigenvalue.
+	</Documentation>
+      </DoubleVectorProperty>
+
+      <Hints>
+	<ShowInMenu category="Tensor Analysis" />
+      </Hints>
+
+    </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

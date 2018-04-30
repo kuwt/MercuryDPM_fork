@@ -37,6 +37,10 @@
 #include <stdlib.h> 
 
 #include "GeneralDefine.h"
+#include "Logger.h"
+
+template <unsigned int N>
+class SmallVector;
 
 /*!
  * \class Vec3D
@@ -61,6 +65,8 @@ public:
      * \brief constructor
      */
     Vec3D() {setZero();}
+    
+    Vec3D(const SmallVector<3>& vector);
     
     /*!
      * \brief Alternative constructor, taking the three elements as arguments

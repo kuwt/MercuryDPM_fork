@@ -127,6 +127,15 @@ namespace mathsFunc
      * \return true if the two Vec3D are equal
      */
     bool isEqual(Vec3D v1, Vec3D v2, Mdouble absError);
+    
+    /*!
+    * \brief Compares the difference of two Vec3D with an absolute error, useful in UnitTests
+    * \param[in] m1 The first Vec3D
+    * \param[in] m2 The second Vec3D
+    * \param[in] absError The allowed maximum absolute error
+    * \return true if the two Vec3D are equal
+    */
+    bool isEqual(Matrix3D m1, Matrix3D m2, Mdouble absError);
     bool isEqual(Quaternion v1, Quaternion v2, double absError);
 
     /*!
