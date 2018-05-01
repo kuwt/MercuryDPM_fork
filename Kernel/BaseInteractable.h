@@ -101,7 +101,7 @@ public:
      * properties of this interactable.
      */
     const ParticleSpecies* getSpecies() const {
-        logger.assert(species_,"Species of % % has to be defined",getName(),getIndex());
+        //logger.assert(species_,"Species of % % has to be defined",getName(),getIndex());
         return species_;
     }
 
