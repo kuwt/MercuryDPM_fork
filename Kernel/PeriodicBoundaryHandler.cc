@@ -1276,7 +1276,6 @@ void PeriodicBoundaryHandler::findNewParticle(BaseParticle* particle)
             std::vector<std::vector<int> > list(0);
             if (totalPeriodicComplexity > 0)
             {
-                logger(VERBOSE,"complexity maser: %",particle->getPeriodicComplexity()[1]);
                 periodicComplexity = particle->getPeriodicComplexity();
             
                 //Generating all possible complexities.
