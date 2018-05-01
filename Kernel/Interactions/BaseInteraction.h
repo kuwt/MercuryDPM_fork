@@ -189,21 +189,29 @@ public:
 
     /*!
      * \brief Gets the current force (vector) between the two interacting objects.
+     * \details Return a reference to a Vec3D which contains the current value of  the force associated with this interaction.
+     * \return  A reference to a Vec3D containing the total force.
      */
     const Vec3D& getForce() const {return force_;}
 
     /*!
-     * \brief Gets the current torque (vector) between the two interacting objects.
+     * \brief Gets the current torque (vector) between the two interacting objects
+     * \details Return a reference to a Vec3D which contains the current value of the torque associated with the interaction.
+     * \return  A reference to a Vec3D containing the total torque.
      */
     const Vec3D& getTorque() const {return torque_;}
 
     /*!
      * \brief Gets the normal vector between the two interacting objects.
+     * \details Returns a reference to a Vec3D which contains the current value of the normal associated with the interactions.
+     * \return  A reference to a Vec3D containing the current normal.
      */
     const Vec3D& getNormal() const {return normal_;}
 
     /*!
      * \brief Gets constant reference to contact point (vector).
+     * \details Returns a reference to a Vec3D which contains the current value of the contact point for the particles in interaction. Normally, does not change about the interaction is created.
+     * \return  A reference to a Vec3D containing the contact point.
      */
     const Vec3D& getContactPoint() const { return contactPoint_; }
 
@@ -235,23 +243,29 @@ public:
 
     /*!
      * \brief Returns a pointer to first object involved in the interaction (normally a particle).
+     * \details Returns a pointer to the first object in the interactions; normally the particle.
+     * \return   Pointer to BaseInteraction but normally will be a BaseParticle.
      */
     BaseInteractable* getP() {
         logger.assert(P_ != nullptr, "First particle in interaction % is nullptr", getId());
         return P_;
     }
 
-    /*
-     * \brief Returns a pointer to the second object involved in the interaction (often a wall or a particle). 
+    /*!
+     * \brief Returns a pointer to the second object involved in the interaction (often a wall or a particle).
+     * \details Returns a pointer to the second object in the interaction; often a particle or a wall i.e. a general interactale hence I.
+     * \return  Pointer to BaseInteraction often a particle or a wall.
      */
     BaseInteractable* getI() {
         logger.assert(I_ != nullptr, "Second particle in interaction % is nullptr", getId());
         return I_;
     }
 
-    /*
+    /*!
      * \brief Returns a constant pointer to the first object involved in the interaction.
+     * \details Returns a constant pointer to the first object in the interactions; normally the particle.
      * Why implement const and non-const setters and getters? See https://www.gamedev.net/forums/topic/550112-c-non-const-getter-in-terms-of-const-getter/
+     * \return   Constant pointer to BaseInteraction but normally will be a BaseParticle.
      */
     const BaseInteractable* getP() const {
         logger.assert(P_ != nullptr, "First particle in interaction % is nullptr", getId());
@@ -260,6 +274,8 @@ public:
 
     /*!
      * \brief Returns a constant pointer to the second object involved in the interaction.
+     * \details Returns a constant pointer to the second object in the interaction; often a particle or a wall i.e. a general interactale hence I.
+     * \return  Constant pointer to BaseInteraction often a particle or a wall.
      */
     const BaseInteractable* getI() const {
         logger.assert(I_ != nullptr, "Second particle in interaction % is nullptr", getId());
@@ -267,7 +283,9 @@ public:
     }
 
     /*!
-     * \brief Returns an Mdouble which is the time stamp of the interaction. 
+     * \brief Returns an Mdouble which is the time stamp of the interaction.
+     * \details Returns the current time stamp of interaction. This should be the last time the interaction was active and used to find the end of the interaction.
+     * \return  Mdouble which is the last time the interaction was active.
      */
     Mdouble getTimeStamp() const { return timeStamp_; }
 

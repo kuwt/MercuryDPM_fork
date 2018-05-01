@@ -199,11 +199,13 @@ public:
 
     /*!
      * \brief Gets whether the HGrid in this MercuryBase is BOTTOMUP or TOPDOWN.
+     * \return The HGridMethod used by this MercuryBase.
      */
     HGridMethod getHGridMethod() const { return hGridMethod_; }
 
     /*!
      * \brief Sets the HGridMethod to either BOTTOMUP or TOPDOWN.
+     * \param[in] hGridMethod The HGridMethod that will be used in this MercuryBase.
      */
     void setHGridMethod(HGridMethod hGridMethod);
 
@@ -311,11 +313,13 @@ protected:
     
     /*!
      * \brief Gets the HGrid used by this problem.
+     * \return A pointer to the HGrid associated with this MercuryBase.
      */
     HGrid* getHGrid() { return grid; }
 
     /*!
      * \brief Gets the HGrid used by this problem, const version.
+     * \return A pointer to the HGrid associated with this MercuryBase.
      */
     const HGrid* getHGrid() const { return grid; }
 

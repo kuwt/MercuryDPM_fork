@@ -109,7 +109,7 @@ BaseInteractable::~BaseInteractable()
  */
 void BaseInteractable::setSpecies(const ParticleSpecies* species)
 {
-    logger.assert(species->getHandler(), "Error: Species is not part of any handler yet");
+    logger.assert(species->getHandler()!= nullptr, "Error: Species is not part of any handler yet");
     species_ = species;
     indSpecies_ = species->getIndex();
 }

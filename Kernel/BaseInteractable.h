@@ -79,17 +79,26 @@ public:
     virtual void write(std::ostream& os) const override;
 
     /*!
-     * \brief Returns the index of the Species of this BaseInteractable.
+     * \brief Returns the index of the species associated with the interactable object.
+     * \return  Unsigned int which is the unique index of the species
      */
     unsigned int getIndSpecies() const {return indSpecies_;}
 
     /*!
      * \brief Sets the index of the Species of this BaseInteractable.
+     * \details This set the species associated with this interactable.
+     * This function should not be used and BaseInteractable::setSpecies
+     * should be used instead.
+     * See also BaseInteractable::setSpecies
      */
     virtual void setIndSpecies(unsigned int indSpecies) {indSpecies_ = indSpecies;}
 
     /*!
      * \brief Returns a pointer to the species of this BaseInteractable.
+     * \details This function return a ParticleSpecies* for the current interacable.
+     * Please note, this is a ParticleSpecies; not, a BaseSpecies as interactables must have physically properties as well.
+     * \return  constant ParticleSpecies* pointer to the species storing the physical
+     * properties of this interactable.
      */
     const ParticleSpecies* getSpecies() const {
         logger.assert(species_,"Species of % % has to be defined",getName(),getIndex());
@@ -103,31 +112,61 @@ public:
 
     /*!
      * \brief Returns the force on this BaseInteractable.
+     * \details Return the current force being to the BaseInteractable.
+     * Note, the code works by first computing the forces of each
+     * interaction and then it loops over all BaseInteracables applying
+     * forces to them from the interactions they are involved in.
+     * \return  const Vec3D reference that is the total force applied to this         interactable.
      */
     const Vec3D& getForce() const {return force_;}
 
     /*!
      * \brief Returns the torque on this BaseInteractable.
+     * \details Return the current torque being to the BaseInteractable.
+     * Note, the code works by first computing the forces of each
+     * interaction and then it loops over all BaseInteracables applying
+     * forces to them from the interactions they are involved in.
+     * \return  const Vec3D reference that is the total force applied to this
+     * interactable.
      */
     const Vec3D& getTorque() const {return torque_;}
 
     /*!
      * \brief Sets the force on this BaseInteractable.
+     * \details This sets the force being applied to this interactable.
+     * Note, first the code computes all forces in the interactions and
+     * then loops over all interactable objects applying the forces from
+     * the interactions to the interactables involved in the interaction.
+     * \param[in]   force   Vec3D which is the force to be applied.
      */
     void setForce(const Vec3D& force) {force_ = force;}
 
     /*!
      * \brief Sets the torque on this BaseInteractable.
+     * \details This sets the torque being applied to this interactable.
+     * Note, first the code computes all force/torques in the interactions
+     * and then loops over all interactable objects applying the torques
+     * from the interactions to the interactables involved in the
+     * interaction.
+     * \param[in]   torque   Vec3D which is the force to be applied.
      */
     void setTorque(const Vec3D& torque) {torque_ = torque;}
 
     /*!
      * \brief Adds an amount to the force on this BaseInteractable.
+     * \details Incremental version of BaseInteractable::setForce.
+     * Also see BaseInteraction::setForce for were this is used.
+     * \param[in]   addForce    Vec3D incremental force which is added to the total
+     * force of the interactable.
      */
     void addForce(const Vec3D& addForce) {force_ += addForce;}
 
     /*!
      * \brief Adds an amount to the torque on this BaseInteractable.
+     * \details Incremental version of BaseInteractable::setTorque.
+     * Also see BaseInteraction::setTorque for were this is used.
+     * \param[in]   addTorque    Vec3D incremental force which is added to the total
+     * torque of the interactable.
      */
     void addTorque(const Vec3D& addTorque) {torque_ += addTorque;}
 
@@ -145,11 +184,19 @@ public:
 
     /*!
      * \brief Returns the orientation of this BaseInteractable.
+     * \details Returns the reference to a Vec3D which contains the orientation of the
+     * interactionable.
+     * Please note the interpretation of this depends on which
+     * interactable. Please see derived objects for details.
+     * \return  Returns a reference to a Vec3D returns the position of the
+     * interactable.
      */
     const Quaternion& getOrientation() const {return orientation_;}
 
     /*!
      * \brief Sets the position of this BaseInteractable.
+     * \details Interpretation depends on which interactable is being considered
+     * See also BaseInteractable::getPosistion.
      * \param[in] position  Reference to Vec3D storing the position of the particle.
     */
     void setPosition(const Vec3D& position) {position_ = position;}
@@ -161,6 +208,11 @@ public:
 
     /*!
      * \brief Sets the orientation of this BaseInteractable.
+     * \details Interpretation depends on which interactable is being considered
+     * See also BaseInteractable::getOrientation.
+     *
+     * \param[in] orientation  Reference to Vec3D storing the orientation
+     * of the particle.
      */
     void setOrientation(const Quaternion& orientation) {orientation_ = orientation;}
 
@@ -175,7 +227,8 @@ public:
     virtual void rotate(const Vec3D& angularVelocityDt);
 
     /*!
-     * \brief Returns a reference to the list of interactions in this BaseInteractable.
+     * \brief Returns a list of interactions which belong to this interactable.
+     * \return  An list of pointers to all the interactions which this interacable is involved in.
      */
     const std::vector<BaseInteraction*>& getInteractions() const {return interactions_;}
 
@@ -207,6 +260,9 @@ public:
 
     /*!
      * \brief adds an increment to the velocity.
+     * \details See also BaseInteractable::setVelocity
+     * \param[in] velocity Vec3D containing the velocity increment which to increase
+     * the velocity by.
      */
     void addVelocity(const Vec3D& velocity) {velocity_ += velocity;}
 

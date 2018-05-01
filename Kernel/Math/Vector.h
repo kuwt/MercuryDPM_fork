@@ -70,6 +70,10 @@ public:
     
     /*!
      * \brief Alternative constructor, taking the three elements as arguments
+     * \details Alternative constructor, lets you define all three elements.
+     * \param[in] x     the x-component
+     * \param[in] y     the y-component
+     * \param[in] z     the z-component
      */
     Vec3D(const Mdouble x, const Mdouble y, const Mdouble z) { X = x; Y = y; Z = z; }
     

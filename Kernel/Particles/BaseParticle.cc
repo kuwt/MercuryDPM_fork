@@ -847,8 +847,3 @@ bool BaseParticle::isInContactWith(const BaseParticle* const P) const
     }
     return P->isInContactWith(this);
 }
-
-//const HGridCell& BaseParticle::getHGridCell() const
-//{
-//    return hGridCell;
-//}

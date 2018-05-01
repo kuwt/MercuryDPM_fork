@@ -490,13 +490,16 @@ public:
      */
 
     /*!
-     * \brief Sets whether particle rotation
-     is enabled or disabled.
+     * \brief Sets whether particle rotation is enabled or disabled.
+     * \details * Passing <tt>true</tt> will enable particle rotation.
+     * Passing <tt>false</tt> will disable particle rotation.
+     * \param[in] newRotFlag
      */
     void setRotation(bool rotation) {rotation_ = rotation;}
 
     /*!
      * \brief Indicates whether particle rotation is enabled or disabled.
+     * \returns <tt>true</tt> if particle rotation is enabled; <tt>false</tt> if particle rotation is disabled.
      */
     bool getRotation() const {return rotation_;}
 

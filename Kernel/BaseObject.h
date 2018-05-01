@@ -119,6 +119,7 @@ public:
 
     /*!
      * \brief Returns the unique identifier of any particular object.
+     * \return id number of the current object
      */
     unsigned int getId() const { return id_; }
 

@@ -80,6 +80,8 @@ public:
 
     /*!
      * \brief Is fixed Particle function. It returns whether a Particle is fixed or not, by checking its inverse Mass.
+     * \details Checks whether a BaseParticle is fixed or not, by checking its inverse Mass.
+     * \return TRUE if particle is fixed, i.e. if the inverse mass (invMass_) is 0.
      */
     bool isFixed() const override {return (invMass_ == 0.0);}
 
@@ -227,11 +229,15 @@ public:
 
     /*!
      * \brief Returns pointer to next object in particle's HGrid level & cell
+     * \details Returns the next object in the particle's HGrid cell
+     * \return pointer to the next object in the particle's HGrid cell
      */
     BaseParticle* getHGridNextObject() const  { return hGridNextObject_; }
 
     /*!
      * \brief Returns pointer to previous object in particle's HGrid level & cell
+     * \details Returns the previous object in the particle's HGrid cell
+     * \return pointer to the previous object in the particle's HGrid cell
      */
     BaseParticle* getHGridPrevObject() const   { return hGridPrevObject_; }
 
@@ -245,40 +251,56 @@ public:
 
     /*!
      * \brief Returns particle's HGrid cell X-coordinate
+     * \return the particle's HGrid cell's X-coordinate
      */
     int getHGridX() const {return hGridCell.getHGridX();}
 
     /*!
      * \brief Returns particle's HGrid cell Y-coordinate
+     * \return the particle's HGrid cell's Y-coordinate
      */
     int getHGridY() const {return hGridCell.getHGridY();}
 
     /*!
      * \brief Returns particle's HGrid cell Z-coordinate
+     * \return the particle's HGrid cell's Z-coordinate
      */
     int getHGridZ() const {return hGridCell.getHGridZ();}
 
     /*!
-     * \brief Returns the particle's invInertia_
+     * \brief Returns the inverse of the particle's inertia tensor
+     * \return the inverse of the particle's inertia tensor
      */
     MatrixSymmetric3D getInvInertia() const {return invInertia_;}
 
     /*!
-     * \brief Returns the particle's invMass_
+     * \brief Returns the inverse of the particle's mass
+     * \return the inverse of the particle's mass
      */
     Mdouble getInvMass() const {return invMass_;}
 
     /*!
-     * \brief Calculates the particle's kinetic energy
+     * \brief Calculates the particle's translational kinetic energy
+     * \return the particle's translational kinetic energy
      */
     Mdouble getKineticEnergy() const;
 
+    /*!
+     * \brief Calculates the particle's rotational kinetic energy
+     * \return the particle's rotational kinetic energy
+     */
     Mdouble getRotationalEnergy() const;
 
+    /*!
+     * \brief Calculates the particle's gravitational energy
+     * \details Gravitational energy is the potential energy stored in teh particles position due to the gravity field. This is a relative term, so we need to define what zero energy means: The gravitational energy of a particle is zero when its center of mass is at the origin.
+     * \return the particle's gravitational energy
+     */
     Mdouble getGravitationalEnergy() const;
 
     /*!
-     * \brief Returns the particle's mass_
+     * \brief Returns the particle's mass
+     * \return the mass of the particle
      */
     Mdouble getMass() const {return 1.0/invMass_;}
 
@@ -286,11 +308,14 @@ public:
 
     /*!
      * \brief Returns the 'original' particle this one's a periodic copy of
+     * \details Returns a pointer to the 'original' particle if the current one is a 'periodic copy' used for a periodic boundary implementation.
+     \return pointer to original particle
      */
     BaseParticle* getPeriodicFromParticle() const {return periodicFromParticle_;}
 
     /*!
-     * \brief Returns the particle's radius_
+     * \brief Returns the particle's radius
+     * \return the particle's radius
      */
     Mdouble getRadius() const {return radius_;}
 
@@ -318,11 +343,15 @@ public:
 
     /*!
      * \brief Returns the particle's displacement relative to the previous time step
+     * \details Returns the particle's displacement_, which is the difference between the current particle's position and its position in the previous time step.
+     * \return (reference to) the particle displacement vector
      */
     const Vec3D& getDisplacement() const {return displacement_;}
 
     /*!
      * \brief Returns the particle's position in the previous time step
+     * \details Returns the particle's position in the previous time step.
+     * \return (reference to) the previous position of the particle
      */
     const Vec3D& getPreviousPosition() const {return previousPosition_;}
 
@@ -356,39 +385,50 @@ public:
 
     /*!
      * \brief Assigns the pointer to the 'original' particle this one's a 
-     * periodic copy of.
+     * periodic copy of (used in periodic boundary condition implementations).
+     * \param[in] p  pointer to the 'original' particle this one is a periodic copy of.
+     *
      */
     void setPeriodicFromParticle(BaseParticle* p) {periodicFromParticle_ = p;};
 
     /*!
      * \brief Sets the particle's HGrid cell X-coordinate
+     * \details Set the x-index of the particle's hGrid cell position
+     * \param[in] x  x-index of particle's HGrid cell
      */
     void setHGridX(const int x) {hGridCell.setHGridX(x);}
 
     /*!
      * \brief Sets the particle's HGrid cell Y-coordinate
+     * \details Set the y-index of the particle's hGrid cell position
+     * \param[in] y  y-index of particle's HGrid cell
      */
     void setHGridY(const int y) {hGridCell.setHGridY(y);}
 
     /*!
      * \brief Sets the particle's HGrid cell Z-coordinate
+     * \details Set the y-index of the particle's hGrid cell position
+     * \param[in] z  z-index of particle's HGrid cell
      */
     void setHGridZ(const int z) {hGridCell.setHGridZ(z);}
 
     /*!
      * \brief Sets the particle's HGrid level
+     * \param[in] level  the particle's HGrid level
      */
     void setHGridLevel(const unsigned int level) {hGridCell.setHGridLevel(level);}
 
     /*!
      * \brief Sets the pointer to the next object in the particle's HGrid cell
      * & level.
+     * \param[in] p     pointer to the next object
      */
     void setHGridNextObject(BaseParticle* p) {hGridNextObject_ = p;}
 
     /*!
      * \brief Sets the pointer to the previous object in the particle's HGrid cell
      * & level.
+     * \param[in] p     pointer to the previous object
      */
     void setHGridPrevObject(BaseParticle* p) {hGridPrevObject_ = p;}
 

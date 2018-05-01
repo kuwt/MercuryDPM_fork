@@ -131,7 +131,7 @@ void CG<Coordinates, BaseFunction, Fields>::createMesh()
     nZ_ = coordinateDirections[2] ? nZ_ : 1;
     if (!coordinateDirections[0] || !coordinateDirections[1] || !coordinateDirections[2])
     {
-        logger(INFO, "In CG, setting number of evaluation points to %, %, % in X, Y and Z directions respectively",
+        logger(INFO, "In CG, setting number of evaluation points to %, %, % in X, Y and Z dimensions respectively",
                nX_, nY_, nZ_);
     }
 }
