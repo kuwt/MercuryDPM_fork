@@ -4663,4 +4663,54 @@ void DPMBase::hGridGetInteractingParticleList(BaseParticle* obj, std::vector<Bas
 {
 }
 
+
+
+/**\brief Injects desired kinetic energy and mean velocity into the system.
+ * \details The function first generates random velocities for every particle in the system and then
+ * injects the desired kinetic energy and sets the desired mean velocity in the system.
+ * \param[in] V_mean_goal The mean velocity you want to set after injecting energy
+ * \param[in] Ek_goal  The kinetic energy you want to inject into the system
+ */
+void DPMBase::setMeanVelocityAndKineticEnergy(Vec3D V_mean_goal, Mdouble Ek_goal)
+{
+    Vec3D V_mean;
+    Mdouble Ek_mean_goal = 0 , Ek_fluct_factor = 0;
+    RNG rng;
+
+    //assign random velocity to each particle
+    for (auto& p : particleHandler) {
+        p->setVelocity(Vec3D(rng.getRandomNumber(-1,1),rng.getRandomNumber(-1,1),rng.getRandomNumber(-1,1)));
+    }
+
+    //calculate the mean velocity in the system now
+    Ek_mean_goal = 0.5*DPMBase::getTotalMass()*V_mean_goal.getLengthSquared();
+    V_mean = DPMBase::getTotalMomentum()/ DPMBase::getTotalMass();
+
+    //check if the user input mean kinetic energy is larger than the total kinetic energy input, then return error
+    logger.assert_always(0.5*DPMBase::getTotalMass()*V_mean_goal.getLengthSquared() < Ek_goal,
+                         "Too large mean velocity input, Kinetic energy from mean velocity part is larger than the total kinetic energy you want to set");
+
+    //correct the mean velocity to zero
+    for (auto& p : particleHandler) {
+        p->addVelocity(-V_mean);
+    }
+
+    //set the new fluctuating velocity based on the goal fluctuating kinetic energy
+    Ek_fluct_factor = std::sqrt((Ek_goal - Ek_mean_goal)/DPMBase::getKineticEnergy());
+    for (auto& p : particleHandler) {
+        p->setVelocity(Ek_fluct_factor*p->getVelocity());
+    }
+
+    //correct the mean velocity finally to the user set values
+    V_mean = DPMBase::getTotalMomentum()/ DPMBase::getTotalMass();
+    for (auto& p : particleHandler) {
+        p->addVelocity(V_mean_goal-V_mean);
+    }
+
+    //check the final mean velocity and kinetic energy
+    std::cout << "V_mean_final " << DPMBase::getTotalMomentum()/ DPMBase::getTotalMass() << std::endl;
+    std::cout << "Ek_final " << DPMBase::getKineticEnergy() << std::endl;
+}
+
+
 ///\todo When restarting the indexMax should be reset

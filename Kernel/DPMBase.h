@@ -850,6 +850,12 @@ public:
      */
     virtual void hGridGetInteractingParticleList(BaseParticle* obj, std::vector<BaseParticle*>& list);
 
+    /**
+     * \brief This function will help you set a fixed kinetic energy and mean velocity in your system.
+     **/
+    void setMeanVelocityAndKineticEnergy(Vec3D V_mean_goal, Mdouble Ek_goal);
+
+
 //functions that should only be used in the class definitions
 protected:
     

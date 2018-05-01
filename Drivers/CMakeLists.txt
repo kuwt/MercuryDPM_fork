@@ -23,20 +23,8 @@ add_subdirectory(SpeedTest)
 add_subdirectory(ParallelDrum)
 
 
-# JMFT (2017-05-09): It is wrong to include the USER directories twice.
-#IFCD: If you want a folder of the USER directory to be built, mark it so in your ccmake or cmake-gui
+#IFCD: If you want (a folder of) the USER directory to be built, mark it so in your ccmake or cmake-gui
 
-#add_subdirectory(USER/SinteringITO)
-##add_subdirectory(USER/ADS)
-#add_subdirectory(USER/ThomasTrunk)
-#add_subdirectory(USER/CuriousU)
-#add_subdirectory(USER/ShearCell)
-#add_subdirectory(USER/Irana)
-#add_subdirectory(USER/jmft2)
-#add_subdirectory(USER/Kit)
-#add_subdirectory(USER/MercuryLab)
-#add_subdirectory(USER/Trioliet)
-#add_subdirectory(USER/MergeVTKtest)
 if (Mercury_BUILD_USER_DIR)
     add_subdirectory(USER)
 endif()

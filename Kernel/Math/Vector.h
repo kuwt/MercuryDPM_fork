@@ -58,6 +58,8 @@ public:
      * These should be private so we can implement things like a cvec etc.
      * Use getters / setters.
      */
+    Vec3D(int i);
+
     // private:
     Mdouble X, Y, Z;
 

@@ -479,3 +479,7 @@ Vec3D operator*(const Mdouble a, const Vec3D& b)
 {
     return Vec3D(b.X * a, b.Y * a, b.Z * a);
 }
+
+Vec3D::Vec3D(int i) {
+
+}
