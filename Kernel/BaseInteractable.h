@@ -100,8 +100,8 @@ public:
      * \return  constant ParticleSpecies* pointer to the species storing the physical
      * properties of this interactable.
      */
-    const ParticleSpecies* getSpecies() const {
-        //logger.assert(species_,"Species of % % has to be defined",getName(),getIndex());
+    const ParticleSpecies* getSpecies() const
+    {
         return species_;
     }
 
@@ -431,7 +431,5 @@ private:
      */
     std::vector<BaseInteraction*> interactions_;
 };
-
-#include <SpeciesHandler.h>
 #endif
 

@@ -30,6 +30,7 @@
 #include "Math/Vector.h"
 #include "BaseInteractable.h"
 #include "HGridCell.h"
+#include "Species/ParticleSpecies.h"
 
 class ParticleHandler;
 class SpeciesHandler;
