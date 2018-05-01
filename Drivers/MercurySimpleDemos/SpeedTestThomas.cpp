@@ -23,11 +23,9 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-///todo{This code is not working as is wanted}
 #include<iostream>
-#include <Species/LinearViscoelasticSpecies.h>
-#include <Particles/SphericalParticle.h>
-
+#include "Species/LinearViscoelasticSpecies.h"
+#include "Particles/SphericalParticle.h"
 #include "Mercury3D.h"
 #include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
@@ -42,12 +40,16 @@ class Contact : public Mercury3D
 
 public:
 	
-	Contact (ParticleSpecies* s, Mdouble polydispersity) 
+	Contact (Mdouble polydispersity)
 	{
-		polydispersity_=polydispersity;
+		LinearViscoelasticSpecies s;
+		s.setDensity(2000);
+		s.setStiffness(1e3);
 		speciesHandler.copyAndAddObject(s);
+
+		polydispersity_=polydispersity;
 		setTimeStep(5e-5);
-	    setTimeMax(0.18);
+	    setTimeMax(0.39);
     	setName("SpeedTest_P"+helpers::to_string(polydispersity,2));
 		setFileType(FileType::NO_FILE);
 	}
@@ -103,6 +105,13 @@ public:
 
 };
 
+template <typename T, class S>
+T assert_cast (S* obj, std::string message = "assert_cast has failed to convert the variable")
+{
+	logger.assert_always(dynamic_cast<T>(obj)!= nullptr,message);
+	return dynamic_cast<T>(obj);
+}
+
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
 	std::cout <<
@@ -113,44 +122,25 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 	
     Time time;
 
- 	LinearViscoelasticSpecies s;
-	s.setDensity(2000);
-    s.setStiffness(1e3);
-	//s.setDissipation(0.005);
-
     time.tic();
- 	Contact mono(&s,1.0);
+ 	Contact mono(1.0);
 	mono.solve();
     std::cout << "Total time to run monodisperse simulation: " << time.toc() << "s (Expected: 3s)" << std::endl;
     //expected time was measured on Thomas' pc 26-Apr-2018 (r2816, Release)
 
     time.tic();
- 	Contact poly(&s,2.0);
-	poly.setTimeMax(0.37*poly.getTimeMax());
+ 	Contact poly(2.0);
+	poly.setTimeMax(0.51*poly.getTimeMax());
 	poly.solve();
     std::cout << "Total time to run polydisperse simulation: " << time.toc() << "s (Expected: 3s)" << std::endl;
 
     time.tic();
- 	Contact highPoly(&s,5.0);
- 	highPoly.setTimeMax(0.29*highPoly.getTimeMax());
+ 	Contact highPoly(5.0);
+ 	highPoly.setTimeMax(0.44*highPoly.getTimeMax());
 	highPoly.solve();
     std::cout << "Total time to run highly polydisperse simulation: " << time.toc() << "s (Expected: 3s)" << std::endl;
 
-//	Contact mono(&s,1.0);
-//	mono.setTimeMax(1e-6);
-//	mono.solve();
-//	BaseParticle* p = mono.particleHandler.getLastObject();
-//	int i = 0;
-//	time.tic();
-//	for (int i=0;i<4e8;++i) {
-//		if(p->getHGridCell().getHGridLevel()) std::cout << i;
-//	}
-//	std::cout << "Total time: " << time.toc() << std::endl;
-//	time.tic();
-//	for (int i=0;i<4e8;++i) {
-//		if(p->getHGridCell2().getHGridLevel()) std::cout << i;
-//	}
-//	std::cout << "Total time: " << time.toc() << "inline" << std::endl;
+	return 0;
 }
 
 // create gperftools profile:
