@@ -3585,7 +3585,14 @@ void DPMBase::checkSettings()
     //check for Species parameters
     logger.assert_always(speciesHandler.getNumberOfObjects() > 0,
                          "No species defined: use speciesHandler.copyAndAddObject()");
-    //\todo add check for individual species
+    for (BaseParticle* p : particleHandler)
+    {
+        logger.assert_always(p->getSpecies() != nullptr, "particle % has no species", p->getId());
+    }
+    for (BaseWall* w : wallHandler)
+    {
+        logger.assert_always(w->getSpecies() != nullptr, "% with index % has no species", w->getName(), w->getId());
+    }
 }
 
 void DPMBase::forceWriteOutputFiles()
@@ -3868,7 +3875,7 @@ void DPMBase::computeOneTimeStep()
 
     /// \todo MX: this is not true anymore. all boundaries are handled here.
     /// particles have received a position update, so here the deletion boundary deletes particles
-    //TODO add particles need a periodic check
+    ///\TODO add particles need a periodic check
 
     logger(DEBUG, "about to call checkInteractionWithBoundaries()");
     checkInteractionWithBoundaries(); // INSERTION boundaries handled
