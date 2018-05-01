@@ -67,7 +67,12 @@ protected:
     virtual void hGridFindContactsWithTargetCell(int x, int y, unsigned int l, BaseParticle* obj);
     
     /// \todo: MX: generalise this
-    virtual void hGridFindParticlesWithTargetCell(int x, int y, int z, unsigned int l, BaseParticle* obj, std::vector<BaseParticle*>& list);
+    virtual void hGridFindParticlesWithTargetCell(int x, int y, unsigned int l, BaseParticle* obj, std::vector<BaseParticle*>& list);
+
+    /*!
+     * \brief Obtains all neighbour particles of a given object, obtained from the hgrid
+     */
+    void hGridGetInteractingParticleList(BaseParticle* obj, std::vector<BaseParticle*>& list) override;
 
     /*!
      * \brief Finds contacts with the BaseParticle; avoids multiple checks.

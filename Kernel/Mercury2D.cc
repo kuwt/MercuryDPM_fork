@@ -132,10 +132,59 @@ void Mercury2D::hGridFindContactsWithTargetCell(int x, int y, unsigned int l, Ba
 }
 
 /// \todo: MX: generalise this
-void Mercury2D::hGridFindParticlesWithTargetCell(int x, int y, int z, unsigned int l, BaseParticle* obj, std::vector<BaseParticle*>& list)
+void Mercury2D::hGridFindParticlesWithTargetCell(int x, int y, unsigned int l, BaseParticle* obj, std::vector<BaseParticle*>& list)
 {
-    logger(ERROR,"This function has not been implemented yet, contact a developer");
+    HGrid* const hgrid=getHGrid();
+
+    // Calculate the bucket
+    const unsigned int bucket = hgrid->computeHashBucketIndex(x, y, l);
+
+    // Loop through all objects in the bucket to find nearby objects
+    BaseParticle* p = hgrid->getFirstBaseParticleInBucket(bucket);
+    while (p != nullptr)
+    {
+        if (p->getHGridCell().equals(x,y,l))
+        {
+            list.push_back(p);
+        }
+        p = p->getHGridNextObject();
+    }
 }
+
+//TODO what about
+void Mercury2D::hGridGetInteractingParticleList(BaseParticle* obj, std::vector<BaseParticle*>& list)
+{
+    HGrid* const hgrid = getHGrid();
+    int occupiedLevelsMask = hgrid->getOccupiedLevelsMask() >> obj->getHGridLevel();
+    for (unsigned int level = 0; level < hgrid->getNumberOfLevels(); level++)
+    {
+        // If no objects in rest of grid, stop now
+        if (occupiedLevelsMask == 0)
+        {
+            break;
+        }
+
+        // If no objects at this level, go on to the next level
+        if ((occupiedLevelsMask & 1) == 0)
+        {
+            continue;
+        }
+
+        const Mdouble inv_size = hgrid->getInvCellSize(level);
+        const int xs = static_cast<int>(std::floor((obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
+        const int xe = static_cast<int>(std::floor((obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
+        const int ys = static_cast<int>(std::floor((obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
+        const int ye = static_cast<int>(std::floor((obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
+        for (int x = xs; x <= xe; ++x)
+        {
+            for (int y = ys; y <= ye; ++y)
+            {
+                hGridFindParticlesWithTargetCell(x, y, level, obj, list);
+            }
+        }
+    }
+}
+
 
 /*!
  * \param[in] obj The BaseParticle we want to check for collisions in the HGrid.
