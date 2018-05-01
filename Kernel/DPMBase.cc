@@ -2765,7 +2765,7 @@ bool DPMBase::readRestartFile()
     {
         //reads the input stream line-by-line
         read(restartFile.getFstream());
-        logger(INFO,"loaded restart file %", restartFile.getFullName());
+        logger(INFO,"Loaded restart file %", restartFile.getFullName());
         restartFile.close();
         //sets the flag such that other functions can tell that the file has been restarted
         //e.g. does not run "setUpInitialConditions" or add headers to the .ene files etc.
@@ -3335,8 +3335,9 @@ void DPMBase::read(std::istream& is)
             if (slash != std::string::npos) {
                 path = restartFile.getName().substr(0, slash+1);
             }
-            logger(INFO,"Adding path information to output file names: %",path);
-
+            if (!path.empty()) {
+                logger(INFO, "Adding path information (%) to file names", path);
+            }
 
             //line 1
             helpers::getLineFromStringStream(is, line);

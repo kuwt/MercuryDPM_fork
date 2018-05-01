@@ -119,7 +119,8 @@ BaseCG *addObject(CGHandler &cg, std::string type, std::string coordinate, std::
  *
  * Third, all other command line arguments are read and passed into the CG object.
  */
-void commandLineCG(Mercury3D &dpm, int argc, char **argv) {
+void commandLineCG(Mercury3D &dpm, int argc, char **argv)
+{
     //change options to lower case
     for (unsigned i = 2; i < argc; i++) {
         if (argv[i][0] == '-')
@@ -181,7 +182,9 @@ void commandLineCG(Mercury3D &dpm, int argc, char **argv) {
     for (unsigned i = 1; i < argc; i++)
         if (!strcmp(argv[i], "-timeaverage")) {
             type = "TimeAveragedCG";
-            logger(INFO, "Activating time averaging");
+            logger(INFO, "Creating time-averaged CG");
+        } else if (!strcmp(argv[i], "-timeaveraging")) {
+            logger(ERROR, "% is not a valid argument; use -timeaverage instead",argv[i]);
         }
     for (unsigned i = 1; i < argc; i++)
         if (!strcmp(argv[i], "-timesmooth")) {
@@ -192,14 +195,13 @@ void commandLineCG(Mercury3D &dpm, int argc, char **argv) {
     //Now create the right CG object and a pointer to it
     BaseCG *cg = addObject(dpm.cgHandler, type, coordinate, function, fields);
 
-    //name
-    //Stores the name of the file to be restarted.
+    //Reads the name of the file name to be restarted.
     //This variable needs to be specified as the second argument ("./MercuryCG name ...")
     //If unspecified, it is set to default value "Chain".
     std::string name = "";
     if (argc > 1 && argv[1][0] != '-') {
         name = argv[1];
-        logger(INFO, "Set name to %", name);
+        //logger(INFO, "Evaluating files %.*", name);
     }
     if (name.empty()) {
         logger(ERROR, "Please enter a base name base name of the files to be analysed.\n"
@@ -273,9 +275,13 @@ void commandLineCG(Mercury3D &dpm, int argc, char **argv) {
         } else if (!strcmp(argv[i], "-tmin")) {
             cg->setTimeMin(atof(argv[i + 1]));
             logger(INFO, "Set tMin to %", argv[i + 1]);
+        } else if (!strcmp(argv[i], "-timemin")) {
+            logger(ERROR, "% is not a valid argument; use -tMin instead",argv[i]);
         } else if (!strcmp(argv[i], "-tmax")) {
             cg->setTimeMax(atof(argv[i + 1]));
             logger(INFO, "Set tMax to %", argv[i + 1]);
+        } else if (!strcmp(argv[i], "-timemax")) {
+            logger(ERROR, "% is not a valid argument; use -tMax instead",argv[i]);
         } else if (!strcmp(argv[i], "-o")) {
             cg->statFile.setName(argv[i + 1]);
             logger(INFO, "Set output file name to %", argv[i + 1]);

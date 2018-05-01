@@ -522,7 +522,7 @@ unsigned int MercuryBase::getHGridTargetNumberOfBuckets() const
 
 /*!
  * \return The interaction radius of the smallest particle multiplied by the maximum
- *         ratio between the cell size and particle size.
+ *         ratio between the cell size and p article size.
  */
 Mdouble MercuryBase::getHGridTargetMinInteractionRadius() const
 {

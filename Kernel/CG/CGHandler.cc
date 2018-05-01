@@ -269,49 +269,41 @@ bool CGHandler::evaluateRestartFiles()
     }
 #endif
     // reset counters so reading begins with the first data/fstat file
-    DPMBase* dpm = getDPMBase();
-    //dpm->interactionHandler.clear();
-    //dpm->dataFile.setCounter(0);
-    //dpm->fStatFile.setCounter(0);
-    //dpm->restartFile.setCounter(0);
+    DPMBase* const dpm = getDPMBase();
 
+    //define and check time limits
+    Mdouble timeMin = getTimeMin();
+    Mdouble timeMax = getTimeMax();
+    if (getDPMBase()->getTime()>timeMax) {
+        logger(ERROR,"initial restart file (t=%) is beyond the maximum cg time (tMax=%)",dpm->getTime(), timeMax);
+    } else while (getDPMBase()->getTime()<timeMin) {
+        cgLogger(INFO,"Skipped %, t = %, because time is below tMin = %",dpm->restartFile.getFullName(),dpm->getTime(), timeMin);
+        //the particle and wall handler is cleared here, because  BaseSpecies doesn't delete particles belonging to it
+        dpm->particleHandler.clear();
+        dpm->wallHandler.clear();
+        dpm->readRestartFile();
+    }
+
+    //call initialise to set up mesh, stat files, etc
     initialise();
 
     // evaluate restart files, including the one already read
     do
     {
+        cgLogger(INFO, "Read %, t=%, Np=%, Nc=%", dpm->restartFile.getFullName(), dpm->getTime(),
+                 dpm->particleHandler.getSize(), dpm->interactionHandler.getNumberOfObjects());
+
         //recompute contact point (necessary for old restart files)
         computeContactPoints();
 
-        cgLogger(INFO, "Successfully read %, t=%, Np=%, Nc=%", dpm->restartFile.getFullName(), dpm->getTime(),
-                 dpm->particleHandler.getSize(), dpm->interactionHandler.getNumberOfObjects());
-
-        // Check if we still need to evaluate data files
-        bool unfinished = true;
-        for (BaseCG* it : *this)
-        {
-            //if we are below timeMax and the next time step should be written
-            if (it->getTimeMax() < getDPMBase()->getTime())
-            {
-                std::cout << "cg time max: " << it->getTimeMax() << std::endl;
-                std::cout << "dpm time max: " << dpm->getTime() << std::endl;
-                unfinished = false;
-            }
-        }
-        if (unfinished)
-        {
-            evaluate();
-        } else
-        {
-            cgLogger(INFO, "Final time has been reached");
-            break;
-        }
+        evaluate();
 
         //the particle and wall handler is cleared here, because  BaseSpecies doesn't delete particles belonging to it
         dpm->particleHandler.clear();
         dpm->wallHandler.clear();
 
-    } while (dpm->readRestartFile());
+        //continue if the next restart file can be read and the max time has not been reached
+    } while (dpm->readRestartFile() && getDPMBase()->getTime()<timeMax);
     cgLogger(INFO, "Finished reading from %", dpm->dataFile.getFullName());
 
     finish();
@@ -340,7 +332,7 @@ bool CGHandler::evaluateDataFiles(bool evaluateFStatFiles)
     }
 #endif
     // reset counters so reading begins with the first data/fstat file
-    DPMBase* dpm = getDPMBase();
+    DPMBase* const dpm = getDPMBase();
     //dpm->interactionHandler.clear();
     dpm->dataFile.setCounter(0);
     dpm->fStatFile.setCounter(0);
@@ -350,39 +342,46 @@ bool CGHandler::evaluateDataFiles(bool evaluateFStatFiles)
     // return false if no data file can be read
     if (!dpm->readNextDataFile()) return false;
 
+    //define and check time limits
+    const Mdouble timeMin = getTimeMin();
+    const Mdouble timeMax = getTimeMax();
+    if (dpm->getTime()>timeMax) {
+        logger(ERROR,"Time stamp of initial data file (%) is beyond the maximum cg time (tMax=%)",dpm->getTime(), timeMax);
+    } else while (dpm->getTime()<timeMin) {
+        if (evaluateFStatFiles) dpm->readNextFStatFile();
+        cgLogger(INFO,"Skipped %, t = %, because time is below tMin = %",dpm->dataFile.getFullName(),dpm->getTime(), timeMin);
+        dpm->readNextDataFile();
+    }
+
     // read data file
     do
     {
         if (evaluateFStatFiles) dpm->readNextFStatFile();
-        cgLogger(INFO, "Successfully read %, t=%, Np=%, Nc=%", dpm->dataFile.getFullName(), dpm->getTime(),
+
+        cgLogger(INFO, "Read %, t=%, Np=%, Nc=%", dpm->dataFile.getFullName(), dpm->getTime(),
                  dpm->particleHandler.getSize(), dpm->interactionHandler.getNumberOfObjects());
-        //cgLogger(INFO,"Successfully read %, t=%",dpm->fStatFile.getName(), dpm->getTime());
 
-        // Check if we still need to evaluate data files
-        bool unfinished = true;
-        for (BaseCG* it : *this)
-        {
-            //if we are below timeMax and the next time step should be written
-            if (it->getTimeMax() < getDPMBase()->getTime())
-            {
-                std::cout << "cg time max: " << it->getTimeMax() << std::endl;
-                std::cout << "dpm time max: " << getDPMBase()->getTime() << std::endl;
-                unfinished = false;
-            }
-        }
-        if (unfinished)
-        {
-            evaluate();
-        } else
-        {
-            cgLogger(INFO, "Final time has been reached");
-            break;
-        }
-
-    } while (dpm->readNextDataFile());
+        evaluate();
+    } while (dpm->readNextDataFile() && getDPMBase()->getTime()<=timeMax);
     cgLogger(INFO, "Finished reading from %", dpm->dataFile.getFullName());
 
     finish();
     dpm->dataFile.close();
     return true;
+}
+
+Mdouble CGHandler::getTimeMin() {
+    Mdouble time  = inf;
+    for (BaseCG *it : *this) {
+        time  = std::min(time, it->getTimeMin());
+    }
+    return time;
+}
+
+Mdouble CGHandler::getTimeMax() {
+    Mdouble time  = -inf;
+    for (BaseCG *it : *this) {
+        time  = std::max(time, it->getTimeMax());
+    }
+    return time;
 }

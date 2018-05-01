@@ -134,6 +134,9 @@ public:
 
     void computeContactPoints();
 
+    Mdouble getTimeMin();
+
+    Mdouble getTimeMax();
 };
 
 #endif
