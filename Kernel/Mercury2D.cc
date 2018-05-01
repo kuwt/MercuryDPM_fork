@@ -125,10 +125,9 @@ void Mercury2D::hGridFindContactsWithTargetCell(int x, int y, unsigned int l, Ba
     for (BaseParticle* p = hgrid->getFirstBaseParticleInBucket(bucket); p != nullptr; p = p->getHGridNextObject())
     {
         //Check if the BaseParticle *p really is in the target cell (i.e. no hashing error has occurred)
-        if (p->getHGridCell().equals(x,y,l))
-        {
+        if (p->getHGridCell().equals(x,y,l)) {
             computeInternalForces(obj, p);
-
+        }
     }
 }
 
