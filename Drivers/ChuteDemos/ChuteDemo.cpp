@@ -39,6 +39,7 @@ int main()
     Chute problem;
     
     problem.setName("ChuteDemo");   // data output file name
+    problem.setGravity({0,-1,0});
     problem.setSaveCount(102);      // number of time steps skipped between saves
     Mdouble tc = 2.5e-3;            // collision time
     problem.setTimeStep(0.02 * tc); // actual time step

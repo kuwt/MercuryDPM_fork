@@ -724,11 +724,14 @@ void BaseParticle::integrateBeforeForceComputation(double time, double timeStep)
 #endif
         accelerate(getForce() * getInvMass() * 0.5 * timeStep);
         ///\todo TW why do we store displacement? replace by temporary variable?
-        setDisplacement(getVelocity() * timeStep);
-        move(getDisplacement());
+        const Vec3D displacement = getVelocity() * timeStep;
+        move(displacement);
         ///\todo TW getLength is very expensive (SpeedTestThomas: 0.2% of simulation time is spent here); can we store the old location and compute the difference to check hGrid updates instead of updating the displacement?
-        getHandler()->getDPMBase()->hGridUpdateMove(this, getDisplacement().getLength());
-        if (getHandler()->getDPMBase()->getRotation())
+        DPMBase* const dpm = getHandler()->getDPMBase();
+        if (!dpm->getHGridUpdateEachTimeStep()) {
+            dpm->hGridUpdateMove(this, displacement.getLengthSquared());
+        }
+        if (dpm->getRotation())
         {
             angularAccelerate(getOrientation().rotateInverseInertiaTensor(getInvInertia())* getTorque() * 0.5 * timeStep);
             //apply to rotation quaternion q: q = normalise(q + \tilde{C}\omega*timeStep) (see Wouter's notes)

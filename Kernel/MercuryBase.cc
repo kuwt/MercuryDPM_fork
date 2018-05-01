@@ -83,6 +83,8 @@ void MercuryBase::constructor()
     updateEachTimeStep_ = true;
     hGridDistribution_ = EXPONENTIAL;
     hGridMethod_ = TOPDOWN;
+    currentMaxRelativeDisplacement_ = 0.0;
+    totalCurrentMaxRelativeDisplacement_ = inf;
 }
 
 /*!
@@ -225,7 +227,7 @@ void MercuryBase::hGridRebuild()
         {
             const Mdouble minCellSize = nextafter(2.0 * minParticleInteractionRadius * getHGridCellOverSizeRatio(), 0.0);
             const Mdouble maxCellSize = nextafter(2.0 * maxParticleInteractionRadius * getHGridCellOverSizeRatio(), std::numeric_limits<Mdouble>::max());
-            //std::cout << "HGrid: using an exponential cell size distribution from " << minCellSize << " to " << maxCellSize << " over " << getHGridMaxLevels() << " levels" << std::endl;
+            std::cout << "HGrid: using an exponential cell size distribution from " << minCellSize << " to " << maxCellSize << " over " << getHGridMaxLevels() << " levels" << std::endl;
             for(unsigned int i = 0; i + 1 < getHGridMaxLevels(); i++)
             {
                 cellSizes.push_back(minCellSize 
@@ -309,7 +311,7 @@ void MercuryBase::hGridActionsBeforeTimeStep()
 {
     if (hGridNeedsRebuilding())
     {
-        logger(VERBOSE, "HGrid needs rebuilding for void HGRID_base::hGridActionsBeforeTimeStep()");
+        //logger(INFO, "HGrid needs rebuilding at nt=%",getNtimeSteps());
         hGridRebuild();
     }
     else
@@ -322,39 +324,48 @@ void MercuryBase::hGridActionsBeforeTimeStep()
 #ifndef CONTACT_LIST_HGRID
             getHGrid()->clearFirstBaseParticleInBucket();
 #endif
-            totalCurrentMaxRelativeDisplacement_ = 0;
+            //logger(INFO, "HGrid needs updating at nt=%",getNtimeSteps());
             for (BaseParticle* const p : particleHandler)
             {
                 hGridUpdateParticle(p);
             }
+            totalCurrentMaxRelativeDisplacement_ = 0;
         }
     }
-    totalCurrentMaxRelativeDisplacement_ = 0;
 }
 
 /*!
+ * \details
+ * (the factor 2.0 is because the displacement is applied after and before the force computation in velocity verlet)
  * \param[in] iP    A pointer to the BaseParticle for which we want to compare 
  *                  the relative speed to the currentMaxRelativeDisplacement_ to.
- * \param[in] move  An Mdouble that represents the distance the BaseParticle has
+ * \param[in] move  An Mdouble that represents the square of the distance the BaseParticle has
  *                  moved.    
  */
 void MercuryBase::hGridUpdateMove(BaseParticle* iP, Mdouble move)
 {
-    const Mdouble currentRelativeDisplacement = move / (getHGrid()->getCellSize(iP->getHGridLevel()));
+    const Mdouble currentRelativeDisplacement = move / mathsFunc::square(getHGrid()->getCellSize(iP->getHGridLevel()));
     if (currentRelativeDisplacement > currentMaxRelativeDisplacement_)
     {
         currentMaxRelativeDisplacement_ = currentRelativeDisplacement;
     }
 }
 
+/**
+ * \details Sets the currentMaxRelativeDisplacement to zero
+ */
 void MercuryBase::hGridActionsBeforeIntegration()
 {
     currentMaxRelativeDisplacement_ = 0.0;
 }
 
+/**
+ * \details Sets the totalCurrentMaxRelativeDisplacement
+ */
 void MercuryBase::hGridActionsAfterIntegration()
 {
-    totalCurrentMaxRelativeDisplacement_ += 2.0 * currentMaxRelativeDisplacement_;
+    currentMaxRelativeDisplacement_ = 2.0 * std::sqrt(currentMaxRelativeDisplacement_)*getHGridCellOverSizeRatio();
+    totalCurrentMaxRelativeDisplacement_ += currentMaxRelativeDisplacement_;
 }
 
 /*!
@@ -438,7 +449,7 @@ Mdouble MercuryBase::getHGridCellOverSizeRatio() const
 void MercuryBase::setHGridCellOverSizeRatio(Mdouble hGridCellOverSizeRatio)
 {
     //If the hGridCellOverSizeRatio changes significantly, assign the given parameter.
-    if (mathsFunc::isEqual(hGridCellOverSizeRatio_, hGridCellOverSizeRatio, 1e-10))
+    if (!mathsFunc::isEqual(hGridCellOverSizeRatio_, hGridCellOverSizeRatio, 1e-10))
     {
         gridNeedsUpdate_ = true;
         hGridCellOverSizeRatio_ = hGridCellOverSizeRatio;
@@ -532,7 +543,7 @@ Mdouble MercuryBase::getHGridTargetMinInteractionRadius() const
     }
     else
     {   
-        return particleHandler.getSmallestInteractionRadiusLocal() * getHGridCellOverSizeRatio();
+        return particleHandler.getSmallestInteractionRadiusLocal();
     }
 }
 
@@ -548,7 +559,7 @@ Mdouble MercuryBase::getHGridTargetMaxInteractionRadius() const
     }
     else
     {
-        return particleHandler.getLargestInteractionRadiusLocal() * getHGridCellOverSizeRatio();
+        return particleHandler.getLargestInteractionRadiusLocal();
     }
 }
 

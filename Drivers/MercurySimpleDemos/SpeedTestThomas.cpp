@@ -105,14 +105,7 @@ public:
 
 };
 
-template <typename T, class S>
-T assert_cast (S* obj, std::string message = "assert_cast has failed to convert the variable")
-{
-	logger.assert_always(dynamic_cast<T>(obj)!= nullptr,message);
-	return dynamic_cast<T>(obj);
-}
-
-int main(int argc UNUSED, char *argv[] UNUSED)
+int main()
 {
 	std::cout <<
 	"A gas of non-dissipative particles are simulated, colliding at a constant rate.\n"

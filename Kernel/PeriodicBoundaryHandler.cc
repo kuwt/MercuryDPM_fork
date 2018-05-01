@@ -951,7 +951,7 @@ void PeriodicBoundaryHandler::updateParticles()
 
                 //Update hGrid
                 Vec3D displacement = pGhost->getPreviousPosition() - pGhost->getPosition();
-                getDPMBase()->hGridUpdateMove(pGhost, displacement.getLength());
+                getDPMBase()->hGridUpdateMove(pGhost, displacement.getLengthSquared());
 
                 //Do some book keeping
                 periodicGhostList_[i][p]->realPeriodicComplexity = realPeriodicComplexity;

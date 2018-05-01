@@ -3910,16 +3910,9 @@ void DPMBase::computeOneTimeStep()
     logger(DEBUG, "about to call actionsAfterTimeStep()");
     actionsAfterTimeStep();
 
-    // Loop over all particles doing the time integration step
-    logger(DEBUG, "about to call hGridActionsBeforeIntegration()");
-    hGridActionsBeforeIntegration();
-    
     //Computes new velocities and updates the particles accordingly
     logger(DEBUG, "about to call integrateAfterForceComputation()");
     integrateAfterForceComputation();
-
-    logger(DEBUG, "about to call hGridActionsAfterIntegration()");
-    hGridActionsAfterIntegration();
 
     //erase interactions that have not been used during the last timestep
     logger(DEBUG, "about to call interactionHandler.eraseOldInteractions(getNtimeSteps())");

@@ -1378,7 +1378,7 @@ void Domain::updateParticlePosition(int localIndex)
         
         //Update hGrid
         Vec3D displacement = particle->getPreviousPosition() - particle->getPosition();
-        getHandler()->getDPMBase()->hGridUpdateMove(particle, displacement.getLength());
+        getHandler()->getDPMBase()->hGridUpdateMove(particle, displacement.getLengthSquared());
 
         index++;
     }

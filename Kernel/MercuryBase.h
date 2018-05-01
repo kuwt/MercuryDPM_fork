@@ -302,12 +302,12 @@ protected:
     void hGridUpdateMove(BaseParticle * iP, Mdouble move) final;
 
     /*!
-     * \brief Resets the currentMaxRelativeDisplacement_ to 0.
+     * \brief Resets the currentMaxRelativeDisplacement_ to 0
      */
     void hGridActionsBeforeIntegration() override;
 
     /*!
-     * \brief Sets the totalCurrentMaxRelativeDisplacement_ as 2*currentMaxRelativeDisplacement_.
+     * \brief This function has to be called before integrateBeforeForceComputation.
      */
     void hGridActionsAfterIntegration() override;
     
@@ -359,19 +359,19 @@ private:
     HGridDistribution hGridDistribution_;
     
     /*!
-     * \brief   Mdouble that denotes the maximum of the displacement of a 
-     *          particle divided by the cell size of the level of that particle 
-     *          at the current time step. This is useful to see whether a 
+     * \brief   Mdouble that denotes the maximum of the displacement of a
+     *          particle divided by the cell size of the level of that particle
+     *          at the current time step. This is useful to see whether a
      *          particle could have moved more than one cell.
      */
     Mdouble currentMaxRelativeDisplacement_;
-    
+
     /*!
-     * \brief After each time step, this Mdouble is increased by 
+     * \brief After each time step, this Mdouble is increased by
      *        2*currentMaxRelativeDisplacement_.
      */
     Mdouble totalCurrentMaxRelativeDisplacement_;
-   
+
     /*!
      * \brief   Boolean that indicates whether or not the grid needs to be updated.
      * \details The grid needs to be updated before the HGrid is constructed and

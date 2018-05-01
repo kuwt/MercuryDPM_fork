@@ -850,13 +850,18 @@ public:
      */
     virtual void hGridGetInteractingParticleList(BaseParticle* obj, std::vector<BaseParticle*>& list);
 
+    /*!
+     * \brief
+     */
+    virtual bool getHGridUpdateEachTimeStep() const;
+
+
     /**
      * \brief This function will help you set a fixed kinetic energy and mean velocity in your system.
      **/
     void setMeanVelocityAndKineticEnergy(Vec3D V_mean_goal, Mdouble Ek_goal);
 
-
-//functions that should only be used in the class definitions
+    //functions that should only be used in the class definitions
 protected:
     
     /*!
@@ -910,11 +915,6 @@ protected:
      *        operations before every simulation time step.
      */
     virtual void hGridActionsBeforeTimeStep();
-    
-    /*!
-     * \brief 
-     */
-    virtual bool getHGridUpdateEachTimeStep() const;
 
     /*!
      * \brief A virtual function which allows to define operations to be executed before
@@ -1010,12 +1010,12 @@ protected:
     virtual void checkInteractionWithBoundaries();
 
     /*!
-     * \brief
+     * \brief This function has to be called before integrateBeforeForceComputation.
      */
     virtual void hGridActionsBeforeIntegration();
 
     /*!
-     * \brief
+     * \brief This function has to be called after integrateBeforeForceComputation.
      */
     virtual void hGridActionsAfterIntegration();
 
