@@ -36,30 +36,9 @@ TimeSmoothedCG<Coordinates, BaseFunction, Fields>::TimeSmoothedCG()
     cutoffTime_ = 3.0;
     nextTime_ = 0.0;
     timeStep_ = 1.0;
+    //averages empty vector
 #ifdef DEBUG_CONSTRUCTOR
     std::cerr << "TimeSmoothedCG::TimeSmoothedCG() finished" << std::endl;
-#endif
-}
-
-template<class Coordinates, template<class> class BaseFunction, class Fields>
-TimeSmoothedCG<Coordinates, BaseFunction, Fields>::TimeSmoothedCG(const TimeSmoothedCG& c)
-        : CG<Coordinates, BaseFunction, Fields>(c)
-{
-    widthTime_ = c.widthTime_;
-    cutoffTime_ = c.cutoffTime_;
-    averages_ = c.averages_;
-    nextTime_ = c.nextTime_;
-    timeStep_ = c.timeStep_;
-#ifdef DEBUG_CONSTRUCTOR
-    std::cerr << "TimeSmoothedCG::copy() finished" << std::endl;
-#endif
-}
-
-template<class Coordinates, template<class> class BaseFunction, class Fields>
-TimeSmoothedCG<Coordinates, BaseFunction, Fields>::~TimeSmoothedCG()
-{
-#ifdef DEBUG_DESTRUCTOR
-    std::cerr << "TimeSmoothedCG::~TimeSmoothedCG() finished" << std::endl;
 #endif
 }
 

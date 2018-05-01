@@ -92,12 +92,12 @@ public:
      * \brief Copy constructor. It copies all objects the class contains.
      * \param[in] p the class that has to be copied
      */
-    Polynomial(const Polynomial& p);
+    Polynomial(const Polynomial& p) = default;
 
     /*!
      * \brief Destructor, it simply destructs the PolynomialCoordinates and all the objects it contains.
      */
-    ~Polynomial();
+    ~Polynomial() = default;
 
     /*!
      * \brief Writes class content into an output stream, usually a stat file

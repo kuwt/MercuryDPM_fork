@@ -69,12 +69,12 @@ public:
      * \brief Copy constructor. It copies the TimeAveragedCGFunction and all objects it contains.
      * \param[in] p the TimeAveragedCGFunction that has to be copied
      */
-    TimeAveragedCG(const TimeAveragedCG& p);
+    TimeAveragedCG(const TimeAveragedCG& p) = default;
 
     /*!
      * \brief Destructor, it simply destructs the TimeAveragedCGFunction and all the objects it contains.
      */
-    virtual ~TimeAveragedCG();
+    virtual ~TimeAveragedCG() = default;
 
     /*!
      * \brief

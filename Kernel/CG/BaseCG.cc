@@ -43,30 +43,6 @@ BaseCG::BaseCG()
     logger(DEBUG,"BaseCG::BaseCG() finished");
 }
 
-BaseCG::BaseCG(const BaseCG& p) : BaseObject(p)
-{
-    handler_ = p.handler_;
-    statFile = p.statFile;
-    nX_ = p.getNX();
-    nY_ = p.getNY();
-    nZ_ = p.getNZ();
-    timeMin_ = p.timeMin_;
-    timeMax_ = p.timeMax_;
-    min_ = p.min_;
-    max_ = p.max_;
-    selectedParticle_ = p.selectedParticle_;
-#ifdef DEBUG_CONSTRUCTOR
-    std::cout << "BaseCG::BaseCG(const BaseCG &p) finished" << std::endl;
-#endif
-}
-
-BaseCG::~BaseCG()
-{
-#ifdef DEBUG_CONSTRUCTOR
-    std::cout << "BaseCG::~BaseCG() finished" << std::endl;
-#endif
-}
-
 void BaseCG::clear()
 {
     std::cout << "BaseCG::clear(), this function shouldn't be called" << std::endl;

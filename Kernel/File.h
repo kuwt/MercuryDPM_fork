@@ -87,9 +87,9 @@ public:
     File();
 
     /*!
-     * \brief Copy assignment operator.
+     * \brief default copy constructor
      */
-    File& operator=(const File& f);
+    File(const File&);
 
     /*!
      * \brief destructor

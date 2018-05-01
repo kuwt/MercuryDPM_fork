@@ -59,13 +59,13 @@ public:
     /*!
      * \brief Default copy constructor, copies the values of all fields.
      */
-    StandardFields(const StandardFields& P);
+    StandardFields(const StandardFields& P) = default;
 
     /*!
      * \brief Destructor, it simply destructs the StandardFields and all the objects
      * it contains.
      */
-    ~StandardFields();
+    ~StandardFields() = default;
 
     static void writeNames(std::ostream& os, const unsigned countVariables);
 

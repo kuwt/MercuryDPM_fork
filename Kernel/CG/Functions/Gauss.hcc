@@ -45,32 +45,6 @@ Gauss<Coordinates>::Gauss()
 }
 
 /*!
- * \param[in] c the object that is copied
- */
-template<class Coordinates>
-Gauss<Coordinates>::Gauss(const Gauss& c)
-        : Coordinates(c)
-{
-    width_ = c.width_;
-    eps_ = c.eps_;
-    prefactor_ = c.prefactor_;
-    cutoff_ = c.cutoff_;
-    integralPrefactor_ = c.integralPrefactor_;
-    currentInteraction_ = c.currentInteraction_;
-#ifdef DEBUG_CONSTRUCTOR
-    std::cerr << "Gauss::copy() finished" << std::endl;
-#endif
-}
-
-template<class Coordinates>
-Gauss<Coordinates>::~Gauss()
-{
-#ifdef DEBUG_DESTRUCTOR
-    std::cerr << "Gauss::~Gauss() finished" << std::endl;
-#endif
-}
-
-/*!
  * \param[out] os output stream
  */
 template<class Coordinates>

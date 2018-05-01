@@ -89,28 +89,6 @@ Polynomial<Coordinates>::Polynomial()
 }
 
 template<class Coordinates>
-Polynomial<Coordinates>::Polynomial(const Polynomial& c)
-        : Coordinates(c)
-{
-    coefficients_ = c.coefficients_;
-    polynomialType_ = c.polynomialType_;
-    cutoff_ = c.cutoff_;
-    eps_ = c.eps_;
-    currentInteraction_ = c.currentInteraction_;
-#ifdef DEBUG_CONSTRUCTOR
-    std::cerr << "Polynomial::copy() finished" << std::endl;
-#endif
-}
-
-template<class Coordinates>
-Polynomial<Coordinates>::~Polynomial()
-{
-#ifdef DEBUG_DESTRUCTOR
-    std::cerr << "Polynomial::~Polynomial() finished" << std::endl;
-#endif
-}
-
-template<class Coordinates>
 void Polynomial<Coordinates>::write(std::ostream& os) const
 {
     os << polynomialType_;

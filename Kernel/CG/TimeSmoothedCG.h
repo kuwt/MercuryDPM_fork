@@ -71,12 +71,12 @@ public:
      * \brief Copy constructor. It copies the TimeSmoothedCGFunction and all objects it contains.
      * \param[in] p the TimeSmoothedCGFunction that has to be copied
      */
-    TimeSmoothedCG(const TimeSmoothedCG& p);
+    TimeSmoothedCG(const TimeSmoothedCG& p) = default;
 
     /*!
      * \brief Destructor, it simply destructs the TimeSmoothedCGFunction and all the objects it contains.
      */
-    virtual ~TimeSmoothedCG();
+    virtual ~TimeSmoothedCG() = default;
 
     /*!
      * \brief

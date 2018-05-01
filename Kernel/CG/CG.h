@@ -88,7 +88,7 @@ public:
      * \brief Default constructor; does nothing, i.e. no points are created
      * initially.
      */
-    CG();
+    CG() = default;
 
     /*!
      * \brief
@@ -98,12 +98,12 @@ public:
     /*!
      * \brief Default copy Constructor; copies all member variables.
      */
-    CG(const CG& p);
+    CG(const CG& p) = default;
 
     /*!
      * \brief Default destructor; does nothing
      */
-    virtual ~CG();
+    virtual ~CG() = default;
 
     /*!
      * \brief Copy operator; creates a new'ed CG object.

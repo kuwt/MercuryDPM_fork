@@ -38,30 +38,6 @@ StandardFields::StandardFields()
 }
 
 /*!
- * \param[in] P the object that has to be copied.
- */
-StandardFields::StandardFields(const StandardFields& P)
-{
-    volumeFraction_ = P.volumeFraction_;
-    density_ = P.density_;
-    momentum_ = P.momentum_;
-    momentumFlux_ = P.momentumFlux_;
-    contactStress_ = P.contactStress_;
-    interactionForceDensity_ = P.interactionForceDensity_;
-    particleSizeDensity_ = P.particleSizeDensity_;
-#ifdef DEBUG_CONSTRUCTOR
-    std::cerr << "StandardFields::copy() finished" << std::endl;
-#endif
-}
-
-StandardFields::~StandardFields()
-{
-#ifdef DEBUG_DESTRUCTOR
-    std::cerr << "StandardFields::~StandardFields() finished" << std::endl;
-#endif
-}
-
-/*!
  * \param[in,out] os the ostream into which the data is written.
  * \param[in] countVariables The number of variables in the field (including time), e.g. 1 for O, 4 for XYZ
  */

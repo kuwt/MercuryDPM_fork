@@ -58,19 +58,19 @@ class BaseCG : public BaseObject
 public:
 
     /*!
-     * \brief
+     * \brief Simple constructor, sets default values
      */
     BaseCG();
 
      /*!
-     * \brief
+     * \brief Default copy constructor, copies all values
      */
-    BaseCG(const BaseCG& p);
+    BaseCG(const BaseCG& p) = default;
 
     /*!
-     * \brief
+     * \brief Default destructor, does nothing
      */
-    virtual ~BaseCG();
+    virtual ~BaseCG() = default;
 
     /*!
      * \brief Currently, no read functions are implemented for the CGHandler, 
@@ -276,7 +276,7 @@ public:
      */
     virtual void setRadius (Mdouble radius) = 0;
 
-    protected:
+protected:
 
     /*!
      * the pointer to the CGHandler, used to get data from the CGHandler.

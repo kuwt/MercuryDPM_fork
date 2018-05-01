@@ -45,38 +45,25 @@ public:
 
     typedef Coordinates CoordinatesType;
 
-    CGPoint();
+    CGPoint() = default;
 
-    CGPoint(const CGPoint& orig);
+    CGPoint(const CGPoint& orig) = default;
 
-    virtual ~CGPoint();
+    virtual ~CGPoint() = default;
 
     /*!
-     * \brief Combines the write functions of the two base classes, StandardFields and
-     * CGFunctions.
+     * \brief Combines the write functions of the two base classes Coordinates and Fields.
      */
-    void write(std::ostream& os) const;
-
-//    /*!
-//     * \brief Evaluates the cg function \f$\phi(\vec r,\vec r_i)\f$, then adds 
-//     * to the fields that are defined by a sum over all particles (e.g. density, 
-//     * momentum)
-//     */
-//    void evaluateParticle(const BaseParticle& p);
-//
-//    /*!
-//     * \brief Evaluates the cg function \f$\phi(\vec r,\vec r_i)\f$, then adds 
-//     * to the fields that are defined by a sum over all contacts (e.g. stress)
-//     */
-//    void evaluateContact(const BaseInteraction& i);
+    void write(std::ostream& os) const {
+        coordinates.write(os);
+        Fields::write(os);
+    }
 
 public:
 
     Coordinates coordinates;
 
 };
-
-#include "CG/CGPoint.hcc"
 
 #endif
 

@@ -59,13 +59,13 @@ public:
     /*!
      * \brief Default copy constructor, copies the values of all fields.
      */
-    LiquidMigrationFields(const LiquidMigrationFields& P);
+    LiquidMigrationFields(const LiquidMigrationFields& P) = default;
 
     /*!
      * \brief Destructor, it simply destructs the LiquidMigrationFields and all the objects
      * it contains.
      */
-    ~LiquidMigrationFields();
+    ~LiquidMigrationFields() = default;
 
     static void writeNames(std::ostream& os, const unsigned countVariables);
 

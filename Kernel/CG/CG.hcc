@@ -31,39 +31,12 @@
 #include "CG.h"
 
 template<class Coordinates, template<class> class BaseFunction, class Fields>
-CG<Coordinates, BaseFunction, Fields>::CG()
-{
-#ifdef DEBUG_CONSTRUCTOR
-    std::cout << "CG<Coordinates, BaseFunction, Fields>::CG() finished" << std::endl;
-#endif
-}
-
-template<class Coordinates, template<class> class BaseFunction, class Fields>
 CG<Coordinates, BaseFunction, Fields>::CG(Mdouble width, unsigned n)
 {
     function_.setWidth(width);
     setN(n);
 #ifdef DEBUG_CONSTRUCTOR
-    std::cout << "CG<Coordinates, BaseFunction, Fields>::CG() finished" << std::endl;
-#endif
-}
-
-template<class Coordinates, template<class> class BaseFunction, class Fields>
-CG<Coordinates, BaseFunction, Fields>::CG(const CG& p)
-        : BaseCG(p)
-{
-    points_ = p.points_;
-    function_ = p.function_;
-#ifdef DEBUG_CONSTRUCTOR
-    std::cout << "CG<Coordinates, BaseFunction, Fields>::CG(const CG &p) finished" << std::endl;
-#endif
-}
-
-template<class Coordinates, template<class> class BaseFunction, class Fields>
-CG<Coordinates, BaseFunction, Fields>::~CG()
-{
-#ifdef DEBUG_CONSTRUCTOR
-    std::cout << "CG<Coordinates, BaseFunction, Fields>::~CG() finished" << std::endl;
+    std::cout << "CG<Coordinates, BaseFunction, Fields>::CG(w,n) finished" << std::endl;
 #endif
 }
 

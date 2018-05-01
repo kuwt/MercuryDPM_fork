@@ -38,12 +38,12 @@ public:
      * \brief Default constructor. Only sets the evaluation functions,
         no points are created initially.
      */
-    TimeAveragedLebedevCG();
+    TimeAveragedLebedevCG() = default;
 
     /*!
      * \brief Default copy Constructor; copies all the member variables.
      */
-    TimeAveragedLebedevCG(const TimeAveragedLebedevCG &p);
+    TimeAveragedLebedevCG(const TimeAveragedLebedevCG &p) = default;
 
     /*!
      * \brief Default destructor; does nothing

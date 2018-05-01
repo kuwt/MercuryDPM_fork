@@ -38,27 +38,6 @@ GradVelocityField::GradVelocityField()
 }
 
 /*!
- * \param[in] P the object that has to be copied.
- */
-GradVelocityField::GradVelocityField(const GradVelocityField& P)
-{
-    density_ = P.density_;
-    momentum_ = P.momentum_;
-    ddensity_ = P.ddensity_;
-    dmomentum_ = P.dmomentum_;
-#ifdef DEBUG_CONSTRUCTOR
-    std::cerr << "GradVelocityField::copy() finished" << std::endl;
-#endif
-}
-
-GradVelocityField::~GradVelocityField()
-{
-#ifdef DEBUG_DESTRUCTOR
-    std::cerr << "GradVelocityField::~GradVelocityField() finished" << std::endl;
-#endif
-}
-
-/*!
  * \param[out] os the ostream into which the data is written.
  */
 void GradVelocityField::writeNames(std::ostream& os, const unsigned countVariables)

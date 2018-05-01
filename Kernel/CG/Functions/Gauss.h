@@ -90,12 +90,12 @@ public:
     /*!
      * \brief Copy constructor. It copies the GaussCoordinates and all objects it contains.
      */
-    Gauss(const Gauss& c);
+    Gauss(const Gauss& c) = default;
 
     /*!
      * \brief Destructor, does nothing, as no new'ed objects are used.
      */
-    ~Gauss();
+    ~Gauss() = default;
 
     /*!
      * \brief Writes class content into an output stream, usually a stat file

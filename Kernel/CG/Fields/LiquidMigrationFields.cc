@@ -40,25 +40,6 @@ LiquidMigrationFields::LiquidMigrationFields()
 }
 
 /*!
- * \param[in] P the object that has to be copied.
- */
-LiquidMigrationFields::LiquidMigrationFields(const LiquidMigrationFields& P)
-{
-    liquidBridgeVolume_ = P.liquidBridgeVolume_;
-    liquidFilmVolume_ = P.liquidFilmVolume_;
-#ifdef DEBUG_CONSTRUCTOR
-    std::cerr << "LiquidMigrationFields::copy() finished" << std::endl;
-#endif
-}
-
-LiquidMigrationFields::~LiquidMigrationFields()
-{
-#ifdef DEBUG_DESTRUCTOR
-    std::cerr << "LiquidMigrationFields::~LiquidMigrationFields() finished" << std::endl;
-#endif
-}
-
-/*!
  * \param[out] os the ostream into which the data is written.
  */
 void LiquidMigrationFields::writeNames(std::ostream& os, const unsigned countVariables)

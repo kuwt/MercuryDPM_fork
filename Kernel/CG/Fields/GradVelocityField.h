@@ -48,13 +48,13 @@ public:
     /*!
      * \brief Default copy constructor, copies the values of all fields.
      */
-    GradVelocityField(const GradVelocityField& P);
+    GradVelocityField(const GradVelocityField& P)  = default;
 
     /*!
      * \brief Destructor, it simply destructs the GradVelocityField and all the objects
      * it contains.
      */
-    ~GradVelocityField();
+    ~GradVelocityField() = default;
 
     static void writeNames(std::ostream& os, const unsigned countVariables);
 

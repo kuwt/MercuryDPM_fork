@@ -123,10 +123,10 @@ File::File()
 }
 
 /*!
- * \details Copy everything but the fstream object.
+ * \details Copy everything but the fstream object (which cannot be copied).
  * \param[in] f the file object that is to be copied.
  */
-File& File::operator=(const File& f)
+File::File(const File& f)
 {
     saveCount_ = f.saveCount_;
     name_ = f.name_;
@@ -134,7 +134,6 @@ File& File::operator=(const File& f)
     counter_ = f.counter_;
     lastSavedTimeStep_ = f.lastSavedTimeStep_;
     openMode_ = f.openMode_;
-    return *this;
 }
 
 /*!

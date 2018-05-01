@@ -37,27 +37,6 @@ TimeAveragedLebedevCG<BaseFunction, Fields>::TimeAveragedLebedevCG() : TimeAvera
 #endif
 }
 
-template<template<class> class BaseFunction, class Fields>
-TimeAveragedLebedevCG<BaseFunction, Fields>::TimeAveragedLebedevCG(const TimeAveragedLebedevCG &p)
-: TimeAveragedCGXYZ<BaseFunction, Fields>(p)
-{   
-    radiusInner_ = p.radiusInner_;
-    radiusOuter_ = p.radiusOuter_;
-    nR_ = p.nR_;
-#ifdef DEBUG_CONSTRUCTOR
-    std::cout << "TimeAveragedLebedevCG<BaseFunction, Fields>::TimeAveragedLebedevCG(const TimeAveragedLebedevCG &p) finished" << std::endl;
-#endif
-}
-
-template<template<class> class BaseFunction, class Fields>
-TimeAveragedLebedevCG<BaseFunction, Fields>::~TimeAveragedLebedevCG()
-{
-#ifdef DEBUG_CONSTRUCTOR
-    std::cout << "TimeAveragedLebedevCG<, BaseFunction, Fields>::~TimeAveragedLebedevCG() finished" << std::endl;
-#endif
-}
-
-
 template< template<class> class BaseFunction, class Fields>
 TimeAveragedLebedevCG<BaseFunction, Fields>* TimeAveragedLebedevCG<BaseFunction, Fields>::copy() const
 {

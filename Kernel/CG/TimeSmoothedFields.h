@@ -53,19 +53,19 @@ class TimeSmoothedFields
 public:
 
     /*!
-     * \brief Constructor; sets time_ and number of fields and sets fields_ and sumWeights to zero. 
+     * \brief Constructor; sets the size of the fields_ vector and time_; sets sumWeights_ to zero.
      */
-    TimeSmoothedFields(std::size_t n, Mdouble time);
+    TimeSmoothedFields(std::size_t n, Mdouble time) : time_(time), sumWeights_(0), fields_(n) {}
 
     /*!
      * \brief Default copy Constructor; copies all member variables.
      */
-    TimeSmoothedFields(const TimeSmoothedFields& a);
+    TimeSmoothedFields(const TimeSmoothedFields& a) = default;
 
     /*!
      * \brief Default destructor; does nothing
      */
-    ~TimeSmoothedFields();
+    ~TimeSmoothedFields() = default;
 
     /*!
      * A vector of StandardFields values whose length is equal to the number of CGPoints.
@@ -83,7 +83,5 @@ public:
      */
     Mdouble sumWeights_;
 };
-
-#include "TimeSmoothedFields.hcc"
 
 #endif
