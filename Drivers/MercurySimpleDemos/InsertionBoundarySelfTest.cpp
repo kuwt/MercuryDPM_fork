@@ -60,7 +60,6 @@ public:
 
         CubeInsertionBoundary insertionBoundary;
         insertionBoundary.set(&insertionBoundaryParticle,1,getMin(),getMax(),Vec3D(1,0,0),Vec3D(1,0,0),0.025,0.05);
-        //insertionBoundary.checkBoundaryBeforeTimeStep(this);
         boundaryHandler.copyAndAddObject(insertionBoundary);
 
     }
