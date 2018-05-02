@@ -1,20 +1,37 @@
 include_directories(${Mercury_SOURCE_DIR}/Kernel
                     ${Mercury_BINARY_DIR}/Kernel)
 
-
+#Define a function to extract the number of required processors
+function(get_number_of_cores EXECNAME NUMCORES)
+  string(FIND ${EXECNAME} "MPI" POS1)
+  string(FIND ${EXECNAME} "Test" POS2)
+  math(EXPR START "${POS1} + 3")
+  math(EXPR LENGTH "${POS2} - ${START}") 
+  if (${LENGTH} STREQUAL 0)
+    message(FATAL_ERROR "No number of cores specified for ${EXECNAME}. Format is *MPI<number_of_cores>Test.cpp")
+  endif()
+  string(SUBSTRING ${EXECNAME} ${START} ${LENGTH} NUMCORES )
+  set(NUMCORES ${NUMCORES} PARENT_SCOPE)
+endfunction()
 
 #Part 2 : Make run test for each of the demo files
 ##################################################
 
 file(GLOB SELFTESTS "*SelfTest.cpp")
 file(GLOB UNITTESTS "*UnitTest.cpp")
-file(GLOB MPITESTS  "*MPITest.cpp")
+file(GLOB MPITESTS  "*MPI*Test.cpp")
 #for each demo add a test with the same name
 if (Mercury_USE_MPI)
-	foreach (TEST ${UNITTESTS} ${SELFTESTS} ${MPITESTS})
+	foreach (TEST ${UNITTESTS} ${SELFTESTS})
         	get_filename_component(EXECNAME ${TEST} NAME_WE)
         	add_test(${EXECNAME} ${EXECNAME})
 	endforeach()
+	foreach (TEST ${MPITESTS})
+        	get_filename_component(EXECNAME ${TEST} NAME_WE)
+            get_number_of_cores(${EXECNAME} NUMCORES)
+        	add_test(${EXECNAME} mpiexec -n ${NUMCORES} ./${EXECNAME})
+	endforeach()
+
 else()
 	foreach (TEST ${UNITTESTS} ${SELFTESTS})
 		get_filename_component(EXECNAME ${TEST} NAME_WE)
