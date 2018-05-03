@@ -133,7 +133,6 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
     // Keep count of how many successive times we have failed to place a new
     // particle. 
     unsigned int failed = 0;
-
     while (failed <= maxFailed_) // 'generating' loop
     {
         /* Generate random *intrinsic* properties for the new particle. */
@@ -171,17 +170,18 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
                 }
             } 
 #endif
-                p0->setHandler(&md->particleHandler);
+            p0->setHandler(&md->particleHandler);
             /* Check whether the particle has any interactions. */
             if (md->checkParticleForInteraction(*p0))
             {
+                //Note: in parallel only one of the domains will actually add the particle
                 md->particleHandler.copyAndAddObject(p0);
                 failed = 0;
 
                 ++numberOfParticlesInserted_;
                 massInserted_ += p0->getMass();
                 volumeInserted_ += p0->getVolume();
-                logger(VERBOSE, "successfully placed a particle %", p0);
+                logger(VERBOSE, "successfully placed a particle %, with position: % after % fails.", p0, p0->getPosition(),failed);
 
                 /* JMFT: The generateParticle() routine allocates memory, so we should
                  * free it here. (Don't worry, the particle will have been copied to the
