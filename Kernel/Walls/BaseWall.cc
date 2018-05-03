@@ -355,7 +355,7 @@ BaseWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHan
             contactPoint += p->getPosition();
             c->setContactPoint(contactPoint);
         }
-        logger(VERBOSE, "contact at %", c->getContactPoint());
+        logger(DEBUG, "Particle contact with wall at %", c->getContactPoint());
         interactions.push_back(c);
     }
     return interactions;
