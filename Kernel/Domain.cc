@@ -1017,7 +1017,7 @@ void Domain::processReceivedInteractionData(const unsigned localIndex, std::vect
                     break;
                 }
             }
-    
+   
             logger.assert(pGhost!= nullptr, "pGhost in Domain::processReceivedInteractionData is nullptr, "
                     "identificationI = %, identificationP = %", identificationI, identificationP);
             logger.assert(otherParticle != nullptr,
@@ -1270,19 +1270,6 @@ void Domain::updateParticles(std::set<BaseParticle*>& ghostParticlesToBeDeleted)
                 ghostParticlesToBeDeleted.insert(particle);
                 boundaryParticleList_[localIndex][p] = nullptr;
             }
-
-            //Mixed particles: When a PM-particle turns into a PGM-particle, the P boundaries will remove it.
-            //Make sure that they will be removed from the list before that happens. 
-            if (particle->isInPeriodicDomain() && !particle->isPeriodicGhostParticle())
-            {
-                PeriodicBoundaryHandler* pbh = &getHandler()->getDPMBase()->periodicBoundaryHandler;
-                std::vector<int> periodicComplexity = pbh->computePeriodicComplexity(particle->getPosition());
-                if (!pbh->checkIsReal(periodicComplexity))
-                {
-                    logger(VERBOSE,"PM to PGM: Flush from communication lists. Particle position: %",particle->getPosition());
-                    boundaryParticleList_[localIndex][p] = nullptr;
-                }
-            }
         }
     
         //Step 1B: Remove the particles from the boundaryParticleListNeightbour_ which require re-assignment 
@@ -1331,30 +1318,8 @@ void Domain::updateParticles(std::set<BaseParticle*>& ghostParticlesToBeDeleted)
                     boundaryParticleListNeighbour_[localIndex][p] = nullptr;
                 }
             }
-
-            //Mixed particles 
-            if (particle->isInPeriodicDomain())
-            {
-                PeriodicBoundaryHandler* pbh = &getHandler()->getDPMBase()->periodicBoundaryHandler;
-                //When a PMG-particle turns into a PGMG-particle, the P boundaries will remove it. Remove from list.
-                //Note that this is a real particle in P and hence no shift is required to compute the actual position
-                //We can therefore just update by computing the new periodic complexity.
-                if (!particle->isPeriodicGhostParticle())
-                {
-                    //Make sure the particle is not real
-                    std::vector<int> periodicComplexity = pbh->computePeriodicComplexity(particle->getPosition());
-                    if (!pbh->checkIsReal(periodicComplexity))
-                    {
-                        logger(VERBOSE,"PMG to PGMG: Flush from communication lists. Particle position: %",particle->getPosition());
-                        boundaryParticleListNeighbour_[localIndex][p] = nullptr;
-                    }
-                }
-            }
         }
     }
-
-    //Remove all nullptrs from the communication lists
-    cleanCommunicationLists();
 }
 
 /*!
@@ -1655,42 +1620,23 @@ void Domain::flushParticles(std::set<BaseParticle*>& toBeFlushedList)
 
 void Domain::flushParticlesFromList(std::vector<BaseParticle*>& list, std::set<BaseParticle*>& toBeFlushedList)
 {
-    int particleIndex;
     //Firstly: turn all particles that need to be flushed into nullptrs
-    particleIndex = 0;
-    for(BaseParticle* particle1 : list)
+    for(int p = 0; p < list.size(); p++)
     {
-        for(BaseParticle* particle2 : toBeFlushedList)
+        if  (list[p] != nullptr)
         {
-            //If the particle was found in the list, make a nullptr
-            if(particle1->getId() == particle2->getId())
+            BaseParticle* particle1 = list[p];
+            for(BaseParticle* particle2 : toBeFlushedList)
             {
-                logger(VERBOSE,"Removing particle from mpi domain at: %",particle1->getPosition());
-                list[particleIndex] = nullptr;
+                //If the particle was found in the list, make a nullptr
+                if(particle1 == particle2)
+                {
+                    logger(VERBOSE,"Removing particle from mpi domain at: %",particle1->getPosition());
+                    list[p] = nullptr;
+                }
             }
         }
-        particleIndex++;
     }
-
-    //Secondly: we remove all nullptr's from the list
-    cleanCommunicationList(list);
-    
-/*
-    //TODO replace with function
-    particleIndex = 0;
-    for(auto particle_it = list.begin(); particle_it != list.end(); particle_it++)
-    {
-        //Particle was deleted -> remove it from the list
-        if ((*particle_it)==nullptr)
-        {
-            list[particleIndex] =  list.back();
-            list.pop_back();
-            particle_it--;
-            particleIndex--;
-        }
-        particleIndex++;
-    }
-*/
 }
 
 /*!

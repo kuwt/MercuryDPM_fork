@@ -144,8 +144,6 @@ public:
 
     void addNewParticles();
     
-    void flushParticle(BaseParticle* particle);
-
     void initialise();
 
 private:

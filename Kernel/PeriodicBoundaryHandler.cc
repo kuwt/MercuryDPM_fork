@@ -1203,9 +1203,6 @@ void PeriodicBoundaryHandler::updateParticleStatus(std::set<BaseParticle*>& part
             }
         }
 
-        //Flush nullptrs
-        cleanCommunicationList(periodicParticleList_[i]);
-        cleanCommunicationList(periodicGhostList_[i]);
     }
 
     //Delete IDs 
@@ -1693,10 +1690,13 @@ void PeriodicBoundaryHandler::flushParticles(std::set<BaseParticle*>& particlesT
         {
             for (int p = 0; p < periodicParticleList_[i].size(); p++)
             {
-                if ((*p_it) == periodicParticleList_[i][p]->particle)
+                if (periodicParticleList_[i][p] != nullptr)
                 {
-                    toBeDeleted.insert(periodicParticleList_[i][p]); 
-                    periodicParticleList_[i][p] = nullptr;
+                    if ((*p_it) == periodicParticleList_[i][p]->particle)
+                    {
+                        toBeDeleted.insert(periodicParticleList_[i][p]); 
+                        periodicParticleList_[i][p] = nullptr;
+                    }
                 }
             }
         }
@@ -1705,10 +1705,13 @@ void PeriodicBoundaryHandler::flushParticles(std::set<BaseParticle*>& particlesT
         {
             for (int p = 0; p < periodicGhostList_[i].size(); p++)
             {
-                if ((*p_it) == periodicGhostList_[i][p]->particle)
+                if (periodicGhostList_[i][p] != nullptr)
                 {
-                    toBeDeleted.insert(periodicGhostList_[i][p]); 
-                    periodicGhostList_[i][p] = nullptr;
+                    if ((*p_it) == periodicGhostList_[i][p]->particle)
+                    {
+                        toBeDeleted.insert(periodicGhostList_[i][p]); 
+                        periodicGhostList_[i][p] = nullptr;
+                    }
                 }
             }
         }
@@ -1720,14 +1723,7 @@ void PeriodicBoundaryHandler::flushParticles(std::set<BaseParticle*>& particlesT
        delete (*id_it); 
     }
 
-    //Clean list
-    for (int i = 0; i < NUMBER_OF_PROCESSORS; i++)
-    {
-        cleanCommunicationList(periodicParticleList_[i]);
-        cleanCommunicationList(periodicGhostList_[i]);
-    }
 }
-
 
 /*!
  * \details When a particle is deleted the ID is also removed, but to ensure everything happens in
@@ -1745,6 +1741,15 @@ void PeriodicBoundaryHandler::cleanCommunicationList(std::vector<MpiPeriodicPart
             list.pop_back();
             i--;
         }
+    }
+}
+
+void PeriodicBoundaryHandler::cleanCommunicationLists()
+{
+    for (int i = 0; i < NUMBER_OF_PROCESSORS; i++)
+    {
+        cleanCommunicationList(periodicParticleList_[i]);
+        cleanCommunicationList(periodicGhostList_[i]);
     }
 }
 
@@ -1812,8 +1817,9 @@ void PeriodicBoundaryHandler::clearCommunicationLists()
             particle->setInPeriodicDomain(false);
         }
     
-        //Flush from mpi boundary
+        //Flush from mpi boundary and clean the lists
         getDPMBase()->getCurrentDomain()->flushParticles(toBeDeleted);
+        getDPMBase()->getCurrentDomain()->cleanCommunicationLists();
     
         //Delete particles
         int index = 0;

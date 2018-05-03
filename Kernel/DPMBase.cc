@@ -3026,7 +3026,9 @@ void DPMBase::checkInteractionWithBoundaries()
         {
             //Flush deleted particles from mpi communication zones
             getCurrentDomain()->flushParticles(b->getParticlesToBeDeleted());
+            getCurrentDomain()->cleanCommunicationLists();
             periodicBoundaryHandler.flushParticles(b->getParticlesToBeDeleted());
+            periodicBoundaryHandler.cleanCommunicationLists();
         }
 
         //Delete particles that were in communication zone
@@ -4546,20 +4548,39 @@ void DPMBase::performGhostParticleUpdate()
     domainHandler.updateStatus(particlesToBeDeleted);
     periodicBoundaryHandler.updateStatus(particlesToBeDeleted);
 
-    //Delete ghost particles
-    for (auto particle_it = particlesToBeDeleted.begin(); particle_it != particlesToBeDeleted.end(); particle_it++)
-    {
-        particleHandler.removeGhostObject((*particle_it)->getIndex());
-    }
+    //Delete particles
+    deleteGhostParticles(particlesToBeDeleted);
 
     //Add new particles
     domainHandler.addNewParticles();
     periodicBoundaryHandler.addNewParticles();
-
-//TODO when the user, or a boundary is adding new particles, make sure the check works for periodic particles as well (!!!)
-
 #endif
 }
+
+/*!
+ * \todo: doc
+ */
+void DPMBase::deleteGhostParticles(std::set<BaseParticle*>& particlesToBeDeleted)
+{
+    //Flush mixed particles from lists (MP particles are located in both structures)
+    if (periodicBoundaryHandler.getSize() > 0)
+    {
+        //Flush particles from boundaries
+        domainHandler.getCurrentDomain()->flushParticles(particlesToBeDeleted);
+        periodicBoundaryHandler.flushParticles(particlesToBeDeleted);
+    }
+
+    //Clean communication lists
+    domainHandler.getCurrentDomain()->cleanCommunicationLists();
+    periodicBoundaryHandler.cleanCommunicationLists();
+
+    //Delete the particles
+    for (auto particle_it = particlesToBeDeleted.begin(); particle_it != particlesToBeDeleted.end(); particle_it++)
+    {
+        particleHandler.removeGhostObject((*particle_it)->getIndex());
+    }
+}
+
 
 //This function takes a base particle and then copies all the particle information from the root particle to the other particles
 // on neighbouring domains.

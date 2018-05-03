@@ -271,7 +271,9 @@ public:
      * \brief Removes the nullptr's from a communication list
      */
     void cleanCommunicationList(std::vector<MpiPeriodicParticleIDBase*>& list);
-   
+  
+    void cleanCommunicationLists();
+ 
     /*!
      * \brief Removes all ghost particles and bookkeeping for a fresh start
      */ 

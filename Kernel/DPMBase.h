@@ -1069,6 +1069,8 @@ protected:
      */
     void performGhostParticleUpdate();
 
+    void deleteGhostParticles(std::set<BaseParticle*>& particlesToBeDeleted);
+
     void synchroniseParticle(BaseParticle*, unsigned fromProcessor = 0);
 
     /*!
