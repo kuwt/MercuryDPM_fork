@@ -1,29 +1,18 @@
-/* DragBlasius - As with ConstantMassFlowMaserBoundary, but now the
- * particles inside the Maser experience an additional drag force that is
- * proportional to their velocity, hopefully letting them move at a
- * controlled velocity. */
+/* DragBlasius - As with MaserBlasius, but now the particles inside the Maser
+ * experience an additional drag force that is proportional to their velocity,
+ * hopefully letting them move at a controlled velocity. */
 #include "Mercury2D.h"
 #include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
-#include "Walls/IntersectionOfWalls.h"
 #include "Boundaries/CubeInsertionBoundary.h"
 #include "Boundaries/DeletionBoundary.h"
-#include "Boundaries/ConstantMassFlowMaserBoundary.h"
+#include "Boundaries/SubcriticalMaserBoundary.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include <iostream>
-#include <cassert>
-#include <cstdlib>
-#include <cstring>
 #include "Math/RNG.h"
 #include "Math/ExtendedMath.h"
 #include "File.h"
-
-void terminationUncaughtException()
-{
-    std::cout << "Uncaught exception!" << std::endl;
-    std::cout << "Perhaps your configuration file doesn't specify all the parameters?" << std::endl;
-    exit(1);
-}
+#include <map>
 
 class DragBlasius : public Mercury2D {
     public:
@@ -40,7 +29,13 @@ class DragBlasius : public Mercury2D {
 
 
             /* The slope angle is specified in degrees, not radians. */
-            pars.at("theta") = M_PI * pars.at("theta") / 180.;
+            if (pars.find("theta") != pars.end())
+                pars.at("theta") = M_PI * pars.at("theta") / 180.;
+            else
+            {
+                pars["theta"] = 0;
+                logger(INFO, "slope theta not specified, setting to zero");
+            }
 
             /* Initialisation */
             setName(parsfile.erase(parsfile.find_last_of('.')));
@@ -52,15 +47,38 @@ class DragBlasius : public Mercury2D {
             else
             {
                 random.randomise();
-                logger(INFO, "Random seed not specified, randomising.");
+                logger(INFO, "randomSeed not specified, randomising.");
+            }
+
+            /* roughBaseType:   0 for sudden 'step function', 
+             *                  1 for mollified 'rising tanh' (default), 
+             *                  2 for bubble 'expanding tanh'
+             * transitionLengthscale
+             */
+            if (pars.find("roughBaseType") == pars.end())
+            {
+                pars["roughBaseType"] = 1; 
+                logger(INFO, "roughBaseType not specified, setting to 1 (for a rising tanh)");
+            }
+            else
+                logger(INFO, "roughBaseType is set to %", pars.at("roughBaseType"));
+
+            /* We want to use a switch, so we need to switch over an int,, not a
+             * double. */
+            roughBaseType = (int) pars.at("roughBaseType");
+
+            if (pars.find("transitionLengthscale") == pars.end())
+            {
+                pars["transitionLengthscale"] = 0;
+                logger(INFO, "transitionLengthscale not specified, setting to 0");
             }
 
             /* Initially, we don't want to write .data. or .fstat. files, while
              * we are filling up the Maser. Later we will. */
-            // dataFile.setFileType(FileType::NO_FILE);
-            dataFile.setFileType(FileType::MULTIPLE_FILES);
+            dataFile.setFileType(FileType::NO_FILE);
+            // dataFile.setFileType(FileType::MULTIPLE_FILES);
             fStatFile.setFileType(FileType::NO_FILE);
-            // eneFile.setFileType(FileType::NO_FILE);
+            eneFile.setFileType(FileType::NO_FILE);
 
             setXMin(pars.at("xmin"));
             setXMax(pars.at("xmax"));
@@ -68,13 +86,10 @@ class DragBlasius : public Mercury2D {
             setYMax(pars.at("reservoirHeight"));
             setZMin(0);
             setZMax(1);
-            // setNumberOfDomains(2,2,2);
 
             /* Species */
             /* JMFT: We must set up species in the constructor, or in any case before
              * we call setupInitialConditions(), if we want to use MPI. 
-             * However, this can cause problems when restarting...
-             * TODO: Talk to Marnix about this.
              */
 
             spec_particles = new LinearViscoelasticFrictionSpecies();
@@ -93,32 +108,10 @@ class DragBlasius : public Mercury2D {
             spec_particles->setRollingDissipation(2.0/5.0 * spec_particles->getDissipation());
             spec_particles = speciesHandler.copyAndAddObject(spec_particles);
 
-            /*
-            spec_base = new LinearViscoelasticFrictionSpecies();
-            spec_base->setDensity(pars.at("rho"));
-            spec_base->setCollisionTimeAndRestitutionCoefficient(
-                    pars.at("collisionTime"), 
-                    pars.at("restitutionCoefficient"),
-                    constants::pi*pow(pars.at("baseRadius"),2)*pars.at("rho") // note - mass per unit _area_
-                    );
-
-            spec_base->setSlidingFrictionCoefficient(tan( pars.at("beta") * M_PI / 180. ));
-            spec_base->setSlidingStiffness(2.0/7.0 * spec_base->getStiffness());
-            spec_base->setSlidingDissipation(2.0/7.0 * spec_base->getDissipation());
-            spec_base->setRollingFrictionCoefficient(tan( pars.at("betaroll") * M_PI / 180. ));
-            spec_base->setRollingStiffness(2.0/5.0 * spec_base->getStiffness());
-            spec_base->setRollingDissipation(2.0/5.0 * spec_base->getDissipation());
-            spec_base = speciesHandler.copyAndAddObject(spec_base);
-            */
-
             /* Prototypical particles */
-            particlePrototype = new BaseParticle();
+            auto particlePrototype = new BaseParticle();
             particlePrototype->setSpecies(spec_particles);
             particlePrototype->setRadius(pars.at("particleRadius"));
-            basePrototype = new BaseParticle();
-            // basePrototype->setSpecies(spec_base);
-            basePrototype->setSpecies(spec_particles);
-            basePrototype->setRadius(pars.at("baseRadius"));
 
             logger(INFO, "Maximum collision speed %",
                     spec_particles->getMaximumVelocity(
@@ -127,12 +120,9 @@ class DragBlasius : public Mercury2D {
 
             logger(INFO, "Constructor completed.");
 
-
         }
 
         ~DragBlasius(void) {
-            delete particlePrototype;
-            delete basePrototype;
         }
 
         void setupInitialConditions() 
@@ -142,96 +132,108 @@ class DragBlasius : public Mercury2D {
             setSaveCount(pars.at("saveEvery"));
 
             /* Gravity. While filling up, let gravity point straight down. */
-            setGravity(Vec3D(0,-pars.at("g"), 0));
+            setGravity(Vec3D(0, -pars.at("g"), 0));
 
             /* Walls */
-            // We should not have, or need, a back wall if we are using a Maser.
 
             // The base
-            IntersectionOfWalls base;
-            base.setSpecies(spec_particles);
-            // base.setSpecies(spec_base);
-            base.addObject(Vec3D(0, -1, 0), Vec3D(0,0,0));
-            base.addObject(Vec3D(-1, 0, 0), Vec3D(pars.at("xmax"), 0,0));
-            wallHandler.copyAndAddObject(base);
+            auto base = new InfiniteWall;
+            base->setSpecies(spec_particles);
+            base->set(Vec3D(0, -1, 0), Vec3D(0, 0, 0));
+            base = wallHandler.copyAndAddObject(base);
 
-            // A dam that will be lifted after the Maser is filled
-            /*
-            dam = new IntersectionOfWalls();
-            // dam->setSpecies(spec_base);
-            dam->setSpecies(spec_particles);
-            // dam->addObject(Vec3D(+1, 0, 0), Vec3D(pars.at("xmin") - 7*pars.at("particleRadius"), 0, 0));
-            dam->addObject(Vec3D(+1, 0, 0), 
-                    Vec3D(pars.at("xmin") - 0.5*pars.at("reservoirLength") - pars.at("particleRadius"), 0, 0));
-            // dam->addObject(Vec3D(-1, 0, 0), Vec3D(pars.at("xmin") - 9*pars.at("particleRadius"), 0, 0));
-            dam->addObject(Vec3D(-1, 0, 0), 
-                    Vec3D(pars.at("xmin") - 0.5*pars.at("reservoirLength") + pars.at("particleRadius"), 0, 0));
-            dam = wallHandler.copyAndAddObject(dam);
-            */
-            lid = new IntersectionOfWalls();
-            // lid->setSpecies(spec_base);
+            lid = new InfiniteWall();
             lid->setSpecies(spec_particles);
-            lid->addObject(Vec3D(0, +1, 0), Vec3D(0, pars.at("reservoirHeight"), 0));
+            lid->set(Vec3D(0, +1, 0), Vec3D(0, pars.at("reservoirHeight"), 0));
             lid = wallHandler.copyAndAddObject(lid);
-            back = new InfiniteWall();
-            // back->setSpecies(spec_base);
+
+            auto back = new InfiniteWall();
             back->setSpecies(spec_particles);
             back->set(Vec3D(-1, 0, 0), 
-                      Vec3D(pars.at("xmin") - pars.at("reservoirLength") - 6.2*pars.at("particleRadius")*(1+pars.at("dispersity")), 0, 0)
+                      Vec3D(pars.at("xmin") - pars.at("reservoirLength"), 0, 0)
                      );
             back = wallHandler.copyAndAddObject(back);
 
-            /* Rough base in reservoir */
-            /*
-            for (double xpos = pars.at("xmin"); 
-                    xpos >= pars.at("xmin") - pars.at("reservoirLength"); 
-                    xpos -= 4*pars.at("baseRadius") / pars.at("baseConc"))
-            {
-                double ypos = 0;
-                BaseParticle rbParticle;
-                // rbParticle.setSpecies(spec_base);
-                rbParticle.setSpecies(spec_particles);
-                rbParticle.setRadius(pars.at("baseRadius")  *
-                        (1 + pars.at("baseDispersity") * random.getRandomNumber(-1,1)));
-                rbParticle.setPosition(Vec3D(xpos, ypos, 0));
-                rbParticle.setVelocity(Vec3D(0,0,0));
-                rbParticle.fixParticle();
-
-                particleHandler.copyAndAddObject(rbParticle);
-            }
-            */
-
-            /* Rough base for x > 0 */
+            /* Rough base. The type of rough base is determined by the parameter
+             * roughBaseType: 
+             *      0 - sudden step transition 
+             *      1 - mollified 'rising tanh' transition (default)
+             *      2 - 'growing bubble' transition
+             */
+            BaseParticle rbParticle;
+            rbParticle.setSpecies(spec_particles);
             if (pars.at("baseConc") > 0)
-                for (double xpos = 0; 
+                for (double xpos = pars.at("xmin"); 
                         xpos <= pars.at("xmax"); 
                         xpos += 4*pars.at("baseRadius") / pars.at("baseConc"))
                 {
-                    double ypos = 0;
-                    BaseParticle rbParticle;
-                    // rbParticle.setSpecies(spec_base);
-                    rbParticle.setSpecies(spec_particles);
+                    if (pars.at("transitionLengthscale") == 0 && xpos < 0)
+                        continue;
+
+                    double ypos;
+                    double radius;
+                    bool toInsert = false;
+                    switch (roughBaseType)
+                    {
+                        case 0:
+                            ypos = 0;
+                            radius = pars.at("baseRadius")
+                                        * (1 + pars.at("baseDispersity") * random.getRandomNumber(-1,1));
+                            toInsert = (xpos >= 0);
+                            break;
+
+                        case 1:
+                            ypos = ((pars.at("transitionLengthscale") == 0) 
+                                    ? 0 
+                                    : 0.5 * pars.at("baseRadius") * (
+                                            (tanh(xpos / pars.at("transitionLengthscale")) - 1) 
+                                          )
+                                   );
+                            radius = pars.at("baseRadius")
+                                        * (1 + pars.at("baseDispersity") * random.getRandomNumber(-1,1));
+                            toInsert = true;
+                            break;
+
+                        case 2:
+                            ypos = 0;
+                            double scaleFactor;
+                            scaleFactor = ( (pars.at("transitionLengthscale") == 0) 
+                                            ? 1 : tanh(xpos / pars.at("transitionLengthscale"))
+                                          );
+                            radius = scaleFactor * pars.at("baseRadius")
+                                        * (1 + pars.at("baseDispersity") * random.getRandomNumber(-1,1));
+                            toInsert = (xpos > 0);
+                            break;
+
+                        default:
+                            logger(ERROR, "roughBaseType should be one of 0, 1, 2");
+                            break;
+                    }
+
                     rbParticle.setRadius(pars.at("baseRadius")  *
                             (1 + pars.at("baseDispersity") * random.getRandomNumber(-1,1)));
+
+                    rbParticle.setRadius(radius);
                     rbParticle.setPosition(Vec3D(xpos, ypos, 0));
                     rbParticle.setVelocity(Vec3D(0,0,0));
                     rbParticle.fixParticle();
 
-                    particleHandler.copyAndAddObject(rbParticle);
+                    if (toInsert)
+                        particleHandler.copyAndAddObject(rbParticle);
                 }
 
             /* CubeInsertionBoundary for introducing new particles */
-            BaseParticle* generandum = new BaseParticle;
+            auto generandum = new BaseParticle;
             generandum->setSpecies(spec_particles);
             generandum->setRadius(pars.at("particleRadius"));
             double velvar = 0;
             insb = new CubeInsertionBoundary();
             insb->set(
                 generandum, 0, 
-                    Vec3D(pars.at("xmin") - pars.at("reservoirLength"), // + 6*pars.at("particleRadius"), 
+                    Vec3D(pars.at("xmin") - pars.at("reservoirLength"), 
                           // pars.at("reservoirHeight") - 8*pars.at("particleRadius"), 
                           0, 0),
-                    Vec3D(pars.at("xmin"), // - 6*pars.at("particleRadius"), 
+                    Vec3D(pars.at("xmin"), 
                           pars.at("reservoirHeight"), 0),
 //                    Vec3D(pars.at("reservoirVel") - velvar, -velvar, 0),
 //                    Vec3D(pars.at("reservoirVel") + velvar, +velvar, 0),
@@ -242,8 +244,9 @@ class DragBlasius : public Mercury2D {
                 );
             insb = boundaryHandler.copyAndAddObject(insb);
             insb->checkBoundaryBeforeTimeStep(this);
+
             stillFillingUp = true;
-            
+
             // dataFile.setFileType(FileType::MULTIPLE_FILES);
             // fStatFile.setFileType(FileType::MULTIPLE_FILES);
             restartFile.setFileType(FileType::ONE_FILE);
@@ -254,19 +257,16 @@ class DragBlasius : public Mercury2D {
          * This is a little messy but it must be done. */
         void actionsOnRestart()
         {
-            if (wallHandler.getNumberOfObjects() == 4)
+            if (wallHandler.getNumberOfObjects() == 3)
             {
-                // dam = (IntersectionOfWalls*) wallHandler.getObjectById(1);
-                lid = (IntersectionOfWalls*) wallHandler.getObjectById(1);
-                back = (InfiniteWall*) wallHandler.getObjectById(2);
+                lid = (InfiniteWall*) wallHandler.getObjectById(1);
 
                 insb = (CubeInsertionBoundary*) boundaryHandler.getObjectById(0);
-                // masb = (MaserBoundary*) boundaryHandler.getObjectById(6);
                 stillFillingUp = true;
             }
             else
             {
-                delb = (DeletionBoundary*) boundaryHandler.getObjectById(2);
+                masb = (SubcriticalMaserBoundary*) boundaryHandler.getObjectById(1);
                 stillFillingUp = false;
             }
 
@@ -275,10 +275,6 @@ class DragBlasius : public Mercury2D {
         void printTime() const override
         {
             Mercury2D::printTime();
-
-            /* Are we still filling up? If not, no need to do anything here. */
-//            if (!stillFillingUp) 
-//                return;
 
             Mdouble volfracThreshold = pars.at("volfracThreshold");
             // Volume fraction in the reservoir
@@ -302,16 +298,11 @@ class DragBlasius : public Mercury2D {
                 computeForcesDueToWalls(CI);
 
                 // Force controller if inside Maser
+                // if (masb != nullptr && CI->isMaserParticle())
                 if (masb != nullptr && masb->isMaserParticle(CI))
                     CI->addForce(Vec3D(
                             - CI->getMass() * getGravity().X * CI->getVelocity().X / pars.at("reservoirVel"), 
                         0, 0));
-                    /*
-                    CI->addForce(Vec3D(
-                                CI->getMass() * sqrt(pars.at("g") / pars.at("reservoirHeight")) 
-                                    * (CI->getVelocity().X - pars.at("reservoirVel")),
-                                0, 0));
-                    */
             }
         }
 
@@ -324,13 +315,11 @@ class DragBlasius : public Mercury2D {
 
             /* Have we filled the reservoir up enough already? */
 
-            Mdouble volfracThreshold = pars.at("volfracThreshold");
             // Volume fraction in the reservoir
-            Mdouble volfrac = particleHandler.getVolume() 
+            Mdouble volfrac = particleHandler.getVolume()
                 / ( pars.at("reservoirLength") * pars.at("reservoirHeight") );
 
-            
-            if (volfrac > volfracThreshold)
+            if (volfrac > pars.at("volfracThreshold"))
             {
                 /* We have introduced enough particles. Get rid of the
                  * InsertionBoundary, and put in all the other boundaries
@@ -339,39 +328,22 @@ class DragBlasius : public Mercury2D {
                     logger(ERROR, "boundaryHandler should have 1 object, but has %",
                             boundaryHandler.getNumberOfObjects());
                 else 
-                    boundaryHandler.clear();
+                    boundaryHandler.removeObject(insb->getId());
 
-                /* The deletion boundary below the chute takes away any particles
-                 * that have left the chute. */
-                delb = new DeletionBoundary;
+                /* Deletion boundary */
+                auto delb = new DeletionBoundary;
                 delb->set(Vec3D(1,0,0), pars.at("xmax"));
                 delb = boundaryHandler.copyAndAddObject(delb);
 
                 /* MaserBoundary */
                 /* If restarting from a system that already has a Maser, we will
                  * never actually reach this. */
-                masb = new ConstantMassFlowMaserBoundary();
+                masb = new SubcriticalMaserBoundary();
                 masb->set(Vec3D(1.0, 0.0, 0.0), 
                         pars.at("xmin") - pars.at("reservoirLength") + pars.at("particleRadius"), 
                         pars.at("xmin"));
                 masb = boundaryHandler.copyAndAddObject(masb);
                 masb->activateMaser();
-
-                /* Lift the gate. We need to shift all three parts of the dam
-                 * leftwards in order to follow the
-                 * ConstantMassFlowMaserBoundary. */
-                /*
-                dam->clear();
-                dam->addObject(Vec3D(+1, 0, 0), 
-                        Vec3D(pars.at("xmin") - 0.5*pars.at("reservoirLength") - pars.at("particleRadius") - masb->getGapSize(), 0, 0));
-                // dam->addObject(Vec3D(-1, 0, 0), Vec3D(pars.at("xmin") - 9*pars.at("particleRadius"), 0, 0));
-                dam->addObject(Vec3D(-1, 0, 0), 
-                    Vec3D(pars.at("xmin") - 0.5*pars.at("reservoirLength") + pars.at("particleRadius") - masb->getGapSize(), 0, 0));
-                dam->addObject(Vec3D(0, +1, 0), 
-                        Vec3D(pars.at("xmin") + pars.at("particleRadius"), 
-                            pars.at("gateHeight"), 0));
-                // wallHandler.removeObject(back->getIndex());
-                */
 
                 /* Get rid of the lid */
                 wallHandler.removeObject(lid->getIndex());
@@ -380,6 +352,11 @@ class DragBlasius : public Mercury2D {
                 for (BaseParticle* const p : particleHandler)
                     if (! p->isFixed())
                         p->setVelocity(p->getVelocity() + Vec3D(pars.at("reservoirVel"), 0, 0));
+
+                /* Give a label to their initial y-position (I dunno why, might
+                 * be useful for studying mixing) */
+                for (BaseParticle* const p : particleHandler)
+                    p->setInfo(p->getPosition().Y);
 
                 /* Turn on gravity */
                 setGravity(Vec3D(
@@ -426,20 +403,18 @@ class DragBlasius : public Mercury2D {
         std::map<std::string,double> pars;
         bool stillFillingUp;
 
+        int roughBaseType; 
 
         CubeInsertionBoundary* insb;
-        IntersectionOfWalls* dam;
-        IntersectionOfWalls* lid;
-        InfiniteWall* back;
-        ConstantMassFlowMaserBoundary* masb;
-        DeletionBoundary* delb;
-        LinearViscoelasticFrictionSpecies *spec_particles, *spec_base;
-        BaseParticle *particlePrototype, *basePrototype;
+        LinearViscoelasticFrictionSpecies *spec_particles;
+        // LinearViscoelasticFrictionSpecies *spec_base;
+        SubcriticalMaserBoundary* masb;
+        InfiniteWall* lid;
+
 
 };
 
 int main(const int argc, char* argv[]) {
-    // std::set_terminate(terminationUncaughtException);
     if (argc > 1)
     {
         DragBlasius* problem = new DragBlasius(argv[1]);
@@ -455,4 +430,3 @@ int main(const int argc, char* argv[]) {
         exit(-1);
     }
 }
-
