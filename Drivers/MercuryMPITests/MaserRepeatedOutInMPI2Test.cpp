@@ -31,13 +31,13 @@
 #include "Species/LinearViscoelasticSpecies.h"
 
 
-class MaserRepeatedOutInUnitTest : public DPMBase
+class MaserRepeatedOutInMPI2Test : public DPMBase
 {
 public:
     
-    MaserRepeatedOutInUnitTest()
+    MaserRepeatedOutInMPI2Test()
     {
-        setName("MaserRepeatedOutInUnitTest");
+        setName("MaserRepeatedOutInMPI2Test");
     
         //set species properties: some standard values
         LinearViscoelasticSpecies species;
@@ -105,7 +105,7 @@ public:
 
 int main()
 {
-    MaserRepeatedOutInUnitTest maserTest;
+    MaserRepeatedOutInMPI2Test maserTest;
     maserTest.setNumberOfDomains({2,1,1});
     maserTest.solve();
 }
