@@ -35,29 +35,32 @@ class MaserRepeatedOutInUnitTest : public DPMBase
 {
 public:
     
-    void setupInitialConditions()
+    MaserRepeatedOutInUnitTest()
     {
         setName("MaserRepeatedOutInUnitTest");
-        
+    
         //set species properties: some standard values
         LinearViscoelasticSpecies species;
         species.setDensity(6.0 / constants::pi);
         species.setCollisionTimeAndRestitutionCoefficient(0.005, 0.95, 1);
         speciesHandler.copyAndAddObject(species);
-        
+    
         //set time and file properties
         setTimeStep(species.getCollisionTime(1) / 50.0);
-        setTimeMax(20.0);
+        setTimeMax(7.5);
         setSaveCount(1000);
         setParticlesWriteVTK(true);
-        
+    
         //set domain size
         setMin({0,-1,-1});
         setMax({50, 1, 1});
-        
+    
         //for testing purposes, just set the gravity to 0.
         setGravity({0,0,0});
-        
+    }
+    
+    void setupInitialConditions()
+    {
         //Check if particle is copied correctly when moving
         BaseParticle p0;
         p0.setSpecies(speciesHandler.getLastObject());
@@ -69,7 +72,10 @@ public:
         //set the maser boundary
         SubcriticalMaserBoundaryTEST* b0 = boundaryHandler.copyAndAddObject(SubcriticalMaserBoundaryTEST());
         b0->set(Vec3D(1.0, 0.0, 0.0), 0.0, 20.0);
-        b0->activateMaser();
+        b0->setActivationTime(0);
+        
+        //PeriodicBoundary b;
+        //b.set(Vec3D(0,1,0), -.1, 1);
         
         InfiniteWall w;
         w.setSpecies(speciesHandler.getObject(0));
@@ -87,10 +93,19 @@ public:
         setWallsWriteVTK(FileType::ONE_FILE);
     }
     
+    void actionsAfterTimeStep() override
+    {
+        if (getTime() > 15)
+        {
+            wallHandler.clear();
+        }
+    }
+    
 };
 
 int main()
 {
     MaserRepeatedOutInUnitTest maserTest;
+    maserTest.setNumberOfDomains({2,1,1});
     maserTest.solve();
 }
