@@ -4,6 +4,7 @@ add_library(Screw STATIC
 		ScrewRectangularSectionClean.cc
 		ScrewRoundEdgesClean.cc
 		ScrewTriangularSectionClean.cc
+		../Helicoid05.cc
 )
 
 
@@ -20,6 +21,6 @@ foreach(CPPFILE ${CPPFILES})
 	#Make the exe
 	add_executable(${EXECNAME} ${FILENAME})
 	#All cpp folder and linked agaist DPMBase
-	target_link_libraries(Luca MercuryBase)
+	target_link_libraries(Screw MercuryBase)
 	target_link_libraries(${EXECNAME}  Screw)
 endforeach()

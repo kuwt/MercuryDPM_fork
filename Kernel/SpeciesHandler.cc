@@ -64,6 +64,9 @@
 #include "Species/LinearViscoelasticFrictionLiquidBridgeWilletSpecies.h"
 #include "Species/LinearViscoelasticFrictionLiquidMigrationWilletSpecies.h"
 #include "Species/HertzianViscoelasticSlidingFrictionParhamiMcMeekingSinterSpecies.h"
+
+#include "Species/NormalForceSpecies/ThermalSpecies.h"
+
 /*!
  * \details Constructor of the SpeciesHandler class. It creates an empty SpeciesHandler.
  */
@@ -343,6 +346,18 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
         is >> species;
         copyAndAddObject(species);
     }
+    else if (type == "ThermalSinterSlidingFrictionSpecies")
+    {
+        Species<ThermalSpecies<SinterNormalSpecies>, SlidingFrictionSpecies> species;
+        is >> species;
+        copyAndAddObject(species);
+    }
+    else if (type == "ThermalSinterFrictionSpecies")
+    {
+        Species<ThermalSpecies<SinterNormalSpecies>, FrictionSpecies> species;
+        is >> species;
+        copyAndAddObject(species);
+    }
     else if (type == "k") //for backwards compatibility
     {
         addObject(readOldObject(is));
@@ -562,6 +577,16 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
             LinearViscoelasticFrictionChargedBondedMixedSpecies species;
             is >> species;
             mixedObjects_.push_back(species.copy());
+        }
+        else if (type == "ThermalSinterSlidingFrictionMixedSpecies")
+        {
+            MixedSpecies<ThermalSpecies<SinterNormalSpecies>, SlidingFrictionSpecies> species;
+            is >> species;
+        }
+        else if (type == "ThermalSinterFrictionMixedSpecies")
+        {
+            MixedSpecies<ThermalSpecies<SinterNormalSpecies>, FrictionSpecies> species;
+            is >> species;
         }
         else if (type == "k") //for backwards compatibility
         {

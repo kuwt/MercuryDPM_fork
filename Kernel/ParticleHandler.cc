@@ -27,6 +27,7 @@
 #include <limits>
 #include <Math/Helpers.h>
 #include <Particles/SphericalParticle.h>
+#include <Particles/ThermalParticle.h>
 #include "ParticleHandler.h"
 #include "DPMBase.h"
 #include "SpeciesHandler.h"
@@ -110,16 +111,16 @@ ParticleHandler::~ParticleHandler()
 }
 
 /*!
- * \param[in] P A pointer to the BaseParticle that has to be added. 
+ * \param[in] P A pointer to the BaseParticle that has to be added.
  * \details To add a BaseParticle to the ParticleHandler, first check if it has
  *          a species, since it is as common bug to use a BaseParticle without
  *          species, which leads to a segmentation fault. To help the user with
  *          debugging, a warning is given if a particle without species is added.
  *          After that, the actions for adding the particle to the BaseHandler
- *          are taken, which include adding it to the vector of pointers to all 
- *          BaseParticle and assigning the correct id and index. Then the 
+ *          are taken, which include adding it to the vector of pointers to all
+ *          BaseParticle and assigning the correct id and index. Then the
  *          particle is added to the HGrid, the particle is told that this is its
- *          handler, its mass is computed and finally it is checked if this is 
+ *          handler, its mass is computed and finally it is checked if this is
  *          the smallest or largest particle in this ParticleHandler.
  *          The particle exists, in other words: it has been made before.
  *          This implies it already got an id Attached to it and hence we don't want
@@ -1288,7 +1289,7 @@ Mdouble ParticleHandler::getVolume() const
 #ifdef MERCURY_USE_MPI
     Mdouble volumeLocal = getVolumeLocal();
     Mdouble volumeGlobal = 0.0;
-    
+
     // sum up over all domains
     MPIContainer& communicator = MPIContainer::Instance();
     communicator.allReduce(volumeLocal, volumeGlobal, MPI_SUM);

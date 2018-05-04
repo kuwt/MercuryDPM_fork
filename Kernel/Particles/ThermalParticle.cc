@@ -124,3 +124,8 @@ void ThermalParticle::addTemperature(Mdouble temperature)
 {
     temperature_+=temperature;
 }
+
+//void ThermalParticle::addThermalEnergy(Mdouble energy)
+//{
+//    temperature_+=energy/getMass()/getSpecies();
+//}

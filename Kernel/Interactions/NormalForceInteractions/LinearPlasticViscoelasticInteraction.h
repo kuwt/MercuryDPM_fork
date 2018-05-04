@@ -37,6 +37,10 @@ class LinearPlasticViscoelasticInteraction : public virtual BaseInteraction
 {
 public:
     /*!
+     * \brief An alias for the species (needed for e.g. ThermalSpecies)
+     */
+    typedef LinearPlasticViscoelasticNormalSpecies SpeciesType;
+    /*!
      * \brief Constructor.
      */
     LinearPlasticViscoelasticInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp);

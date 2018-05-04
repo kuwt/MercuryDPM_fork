@@ -27,6 +27,8 @@
 #define THERMALINTERACTION_H
 
 #include "Interactions/BaseInteraction.h"
+#include "Particles/ThermalParticle.h"
+
 template<class NormalForceSpecies>
 class ThermalSpecies;
 
@@ -84,7 +86,7 @@ void ThermalInteraction<NormalForceInteraction>::computeNormalForce()
 {
     NormalForceInteraction::computeNormalForce();
     Mdouble radius = 2.0*NormalForceInteraction::getEffectiveRadius();
-    Mdouble contactArea = constants::pi*radius * NormalForceInteraction::getOverlap();
+    Mdouble contactArea = constants::pi*radius*NormalForceInteraction::getOverlap();
     const SpeciesType* species = dynamic_cast<const SpeciesType*>(NormalForceInteraction::getBaseSpecies());
     ThermalParticle* pParticle = dynamic_cast<ThermalParticle*>(NormalForceInteraction::getP());
     ThermalParticle* iParticle = dynamic_cast<ThermalParticle*>(NormalForceInteraction::getI());

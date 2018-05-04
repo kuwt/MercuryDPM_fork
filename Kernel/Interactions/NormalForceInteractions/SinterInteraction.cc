@@ -29,6 +29,7 @@
 #include "Particles/BaseParticle.h"
 #include "DPMBase.h"
 #include <Species/NormalForceSpecies/SinterNormalSpecies.h>
+#include <Particles/ThermalParticle.h>
 
 /*!
  * \param[in] P
@@ -163,13 +164,20 @@ void SinterInteraction::computeNormalForce()
         if (species->getSinterType()==SINTERTYPE::PARHAMI_MCKEEPING) {
             rateOverlap = normalForce*species->getSinterRate()/
              (0.375*species->getSinterAdhesion()*mathsFunc::square(getOverlap()/effectiveDiameter)); ///\todo adhesive force only, or add normalForce?
+            if (species->getSinterRate()==0) rateOverlap = 0;
         } else if (species->getSinterType()==SINTERTYPE::CONSTANT_RATE) {
             rateOverlap = 2.0*normalForce*species->getSinterRate()/species->getSinterAdhesion();
+            if (species->getSinterRate()==0) rateOverlap = 0;
+        } else if (species->getSinterType()==SINTERTYPE::TEMPERATURE_DEPENDENT_FRENKEL) {
+            ThermalParticle* tp = dynamic_cast<ThermalParticle*>(getP());
+            ThermalParticle* ti = dynamic_cast<ThermalParticle*>(getI());
+            logger.assert(tp && ti,"warning contact partners have to be ThermalParticle's if this sinter species is used");
+            double temperature = 2.0*tp->getTemperature()*ti->getTemperature()/(tp->getTemperature()+ti->getTemperature());
+            rateOverlap = 2.0*normalForce*species->getTemperatureDependentSinterRate(temperature)/species->getSinterAdhesion();
         } else {
             //missing: add the sintering model 'modified Frenkel' of the Pokula paper
         }
         plasticOverlap_ = std::max(0.0,std::min(deltaStar,plasticOverlap_+rateOverlap*dpmBase->getTimeStep()));
-
 
         /*//change particle radius by dr
         Mdouble dr;

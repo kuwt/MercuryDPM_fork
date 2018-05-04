@@ -111,8 +111,8 @@ void ThermalSpecies<NormalForceSpecies>::read(std::istream& is)
 {
     std::string dummy;
     NormalForceSpecies::read(is);
-    is >> heatCapacity_ >> dummy;
-    is >> thermalConductivity_ >> dummy;
+    is >> dummy >> heatCapacity_;
+    is >> dummy >> thermalConductivity_;
 }
 
 template<class NormalForceSpecies>

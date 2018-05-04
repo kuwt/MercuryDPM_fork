@@ -37,6 +37,10 @@ class SinterInteraction : public virtual BaseInteraction
 {
 public:
     /*!
+     * \brief An alias for the corresponding species
+     */
+    typedef SinterNormalSpecies SpeciesType;
+    /*!
      * \brief Constructor.
      */
     SinterInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp);

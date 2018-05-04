@@ -85,7 +85,7 @@ void SinterNormalSpecies::write(std::ostream& os) const
     os  << " sinterAdhesion " << sinterAdhesion_;
     os  << " inverseSinterViscosity " << inverseSinterViscosity_;
     os  << " sinterRate_ " << sinterRate_;
-    os  << " sinterType " << (sinterType_==SINTERTYPE::PARHAMI_MCKEEPING?'0':'1');
+    os  << " sinterType " << (unsigned) sinterType_;
 }
 
 /*!
@@ -102,12 +102,9 @@ void SinterNormalSpecies::read(std::istream& is)
     is >> dummy >> sinterAdhesion_;
     is >> dummy >> inverseSinterViscosity_;
     is >> dummy >> sinterRate_;
-    unsigned char type;
+    unsigned type;
     is >> dummy >> type;
-    if (type==0)
-        sinterType_ = SINTERTYPE::PARHAMI_MCKEEPING;
-    else
-        sinterType_ = SINTERTYPE::CONSTANT_RATE;
+    sinterType_ = (SINTERTYPE) type;
 }
 
 /*!
@@ -267,7 +264,6 @@ void SinterNormalSpecies::setSinterRate(Mdouble sinterRate)
     {
         logger(ERROR,"setSinterRate(%)",sinterRate);
     }
-    //setSinterType(SINTERTYPE::CONSTANT_RATE);
     sinterRate_ = sinterRate;
 }
 
@@ -282,6 +278,8 @@ void SinterNormalSpecies::setSinterType(SINTERTYPE sinterType)
         logger(INFO, "Sintertype set to CONSTANT_RATE");
     else if (sinterType_==SINTERTYPE::PARHAMI_MCKEEPING)
         logger(INFO, "Sintertype set to PARHAMI_MCKEEPING");
+    else if (sinterType_==SINTERTYPE::TEMPERATURE_DEPENDENT_FRENKEL)
+        logger(INFO, "Sintertype set to TEMPERATURE_DEPENDENT_FRENKEL");
     else
         logger(ERROR, "Sintertype not understood");
 }
@@ -372,6 +370,22 @@ SINTERTYPE SinterNormalSpecies::getSinterType() const
 {
     return sinterType_;
 }
+
+double SinterNormalSpecies::getTemperatureDependentSinterRate(double temperature) const
+{
+    return temperatureDependentSinterRate_(temperature);
+}
+
+std::function<double(double temperature)> SinterNormalSpecies::getTemperatureDependentSinterRate() const
+{
+    return temperatureDependentSinterRate_;
+}
+
+void SinterNormalSpecies::setTemperatureDependentSinterRate(std::function<double(double temperature)> temperatureDependentSinterRate)
+{
+    temperatureDependentSinterRate_ = temperatureDependentSinterRate;
+}
+
 
 /*!
  * \details Sets k, disp such that it matches a given tc and eps for a collision of two copies of equal mass m

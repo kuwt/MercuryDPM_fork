@@ -1,6 +1,5 @@
 include_directories(${Mercury_SOURCE_DIR}/Kernel
 	                    ${Mercury_BINARY_DIR}/Kernel)
-add_subdirectory(ARS2017)
 
 
 #Part 1 : All cpp files will be made to exec files

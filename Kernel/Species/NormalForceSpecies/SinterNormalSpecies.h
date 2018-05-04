@@ -31,7 +31,8 @@
 
 enum class SINTERTYPE : unsigned char {
     PARHAMI_MCKEEPING = 0,
-    CONSTANT_RATE = 1
+    CONSTANT_RATE = 1,
+    TEMPERATURE_DEPENDENT_FRENKEL = 2
 };
 
 /*!
@@ -193,6 +194,12 @@ public:
 
     SINTERTYPE getSinterType() const;
 
+    std::function<double(double temperature)> getTemperatureDependentSinterRate() const;
+
+    double getTemperatureDependentSinterRate(double temperature) const;
+
+    void setTemperatureDependentSinterRate(std::function<double(double temperature)> temperatureDependentSinterRate);
+
 
 private:
     ///(normal) spring constant (k_1)
@@ -231,5 +238,10 @@ private:
      * CONSTANT_RATE: sinter rate given by sinterRate
     */
     SINTERTYPE  sinterType_;
+
+    /*!
+     *
+     */
+    std::function<double(double temperature)> temperatureDependentSinterRate_ = [this] (double temperature) {return sinterRate_;};
 };
 #endif

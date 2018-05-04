@@ -83,9 +83,9 @@ private:
     Mdouble thickness_;
     // The half-thickness of the screw.
     Mdouble delta_;
-    // The pitch length of the screw (l_/n_).
+    // The pitch length of the screw (screwLength_/n_).
     Mdouble pitch_;
-    // The rescaled length of the screw (l_/2*pi*n_).
+    // The rescaled length of the screw (screwLength_/2*pi*n_).
     Mdouble h_;
 };
 
