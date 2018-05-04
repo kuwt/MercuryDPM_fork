@@ -951,8 +951,6 @@ void Domain::processSentBoundaryParticles(const unsigned index)
 void Domain::processReceivedInteractionData(const unsigned localIndex, std::vector<BaseParticle*>& newParticles)
 {
     InteractionHandler& iH = getHandler()->getDPMBase()->interactionHandler;
-    logger(VERBOSE, "number of interactions received from boundary % to processor %: %", localIndex, getId(),
-           numNewInteractionsReceive_[localIndex]);
     for (unsigned int l = 0; l < numNewInteractionsReceive_[localIndex]; l++)
     {
         unsigned int identificationP;
