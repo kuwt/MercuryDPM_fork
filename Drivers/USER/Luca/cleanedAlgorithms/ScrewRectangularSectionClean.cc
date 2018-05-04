@@ -518,7 +518,7 @@ std::string ScrewRectangularSectionClean::getName() const
 
 // Checks for the interaction between a particle p at a time timeStamp
 // In case of interaction returns a pointer to the BaseInteraction happened between the Screw and the BaseParticle at time timeStamp
-std::vector<BaseInteraction*> ScrewRectangularSectionClean::getInteractionWith(BaseParticle* p, Mdouble timeStamp,
+std::vector<BaseInteraction*> ScrewRectangularSectionClean::getInteractionWith(BaseParticle* p, unsigned timeStamp,
                                                                                InteractionHandler* interactionHandler)
 {
     Mdouble distance;
