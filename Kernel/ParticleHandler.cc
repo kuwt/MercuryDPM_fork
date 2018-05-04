@@ -1314,9 +1314,6 @@ unsigned int ParticleHandler::getNumberOfRealObjectsLocal() const
         numberOfFakeParticles += getDPMBase()->domainHandler.getCurrentDomain()->getNumberOfTrueMPIParticles();
         numberOfFakeParticles += getDPMBase()->periodicBoundaryHandler.getNumberOfPeriodicGhostParticles();
         logger.assert(numberOfFakeParticles <= getSize(), "More fake particles than getSize()");
-        logger(VERBOSE, "getNumberOfTrueMPIParticles: %, getNumberOfPeriodicGhostParticles: %, getSize: %",
-               getDPMBase()->domainHandler.getCurrentDomain()->getNumberOfTrueMPIParticles(),
-        getDPMBase()->periodicBoundaryHandler.getNumberOfPeriodicGhostParticles(), getSize());
         return (getSize() - numberOfFakeParticles);
     }
     else
