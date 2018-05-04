@@ -1075,7 +1075,6 @@ void PeriodicBoundaryHandler::updateParticleStatus(std::set<BaseParticle*>& part
                 {
                     //Oh noes, the particle became a ghost. Kill it with balefire!!... if it is necessary
                     logger(VERBOSE,"Real particle % changed to ghost at: %", particle->getId(), particle->getPosition());
-                    while(true){}
                     particlesToBeDeleted.insert(particle);
                 }
 
