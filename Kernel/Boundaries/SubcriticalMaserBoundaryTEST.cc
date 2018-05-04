@@ -308,24 +308,36 @@ Mdouble SubcriticalMaserBoundaryTEST::getDistanceFromRight(const Vec3D& position
  * \param[in] position The position of the given periodic complexity
  * \param[in] The index in the complexity vector that this boundary corresponds to
  */
-void SubcriticalMaserBoundaryTEST::modifyPeriodicComplexity(std::vector<int>& complexity, Vec3D& position, int i) const
+void SubcriticalMaserBoundaryTEST::modifyPeriodicComplexity(std::vector<int>& complexity, int& totalPeriodicComplexity,
+                                                            BaseParticle* particle, int i) const
 {
     if (maserIsActivated_)
     {
-        //Check if this particle is flagged periodic in this boundary
-        if (complexity[i] < 0)
+        if (particle->isMaserParticle())
         {
-            //Make sure that only a ghost close to the right boundary is flagged as real in this boundary
-            if (getDistanceFromRight(position) < 0)
+            //Check if this particle is flagged periodic in this boundary
+            if (complexity[i] < 0)
             {
-                complexity[i] = 3;
+                //Make sure that only a ghost close to the right boundary is flagged as real in this boundary
+                if (getDistanceFromRight(particle->getPosition()) < 0)
+                {
+                    complexity[i] = 3;
+                }
+                
             }
-            
+            if (complexity[i] == -3)
+            {
+                logger(INFO, "Something went wrong in SubcriticalMaserBoundaryTEST::modifyPeriodicComplexity, "
+                        "complexity[%] = -3", i);
+            }
         }
-        if (complexity[i] == -3)
+        else
         {
-            logger(INFO, "Something went wrong in SubcriticalMaserBoundaryTEST::modifyPeriodicComplexity, "
-                    "complexity[%] = -3", i);
+            if (complexity[i] == 1)
+            {
+                totalPeriodicComplexity--;
+            }
+            complexity[i] = 2;
         }
     }
 }
@@ -440,16 +452,3 @@ void SubcriticalMaserBoundaryTEST::extendBottom() const
 #endif
 }
 
-
-bool SubcriticalMaserBoundaryTEST::ignoreBoundary(BaseParticle* particle)
-{
-    if (maserIsActivated_)
-    {
-        if(!particle->isMaserParticle())
-        {
-            //logger(INFO,"particle position: %",particle->getPosition());
-            return true;
-        }
-    }
-    return false;
-}

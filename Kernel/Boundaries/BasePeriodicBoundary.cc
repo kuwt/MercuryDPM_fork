@@ -164,17 +164,13 @@ void BasePeriodicBoundary::createPeriodicParticles(ParticleHandler& pH)
 }
 
 //TODO documentation
-void BasePeriodicBoundary::modifyPeriodicComplexity(std::vector<int>& complexity, Vec3D& position, int i) const
+void BasePeriodicBoundary::modifyPeriodicComplexity(std::vector<int>& complexity, int& totalPeriodicComplexity,
+                                                            BaseParticle* particle, int i) const
 {
 }
 
 //TODO documentation
 void BasePeriodicBoundary::performActionsBeforeAddingParticles()
 {
-}
-
-bool BasePeriodicBoundary::ignoreBoundary(BaseParticle* particle)
-{
-    return false;
 }
 

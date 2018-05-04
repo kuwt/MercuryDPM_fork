@@ -114,14 +114,14 @@ public:
     /*!
      * \brief Modifies periodic complexity of a particle if necessary (i.e. maser boundary)
      */
-    virtual void modifyPeriodicComplexity(std::vector<int>& complexity, Vec3D& position, int i) const;
+    virtual void modifyPeriodicComplexity(std::vector<int>& complexity, int& totalPeriodicComplexity,
+                                                            BaseParticle* particle, int i) const;
 
     /*!
      * \brief Actions that need to be performed before adding new ghost particles
      */
     virtual void performActionsBeforeAddingParticles();
 
-    virtual bool ignoreBoundary(BaseParticle* particle);
 private:
     /*!
      * \brief pointer to the periodic boundary handler

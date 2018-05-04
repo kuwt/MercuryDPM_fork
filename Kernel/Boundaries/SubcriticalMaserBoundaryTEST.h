@@ -108,7 +108,8 @@ public:
     /*!
      * \brief modifies the periodic complexity to support a maser boundary
      */
-    void modifyPeriodicComplexity(std::vector<int>& complexity, Vec3D& position, int i) const override;
+    void modifyPeriodicComplexity(std::vector<int>& complexity, int& totalPeriodicComplexity,
+                                                            BaseParticle* particle, int i) const override;
 
     /*!
      * \brief Checks before adding particles if the maser needs to be activated
@@ -116,11 +117,6 @@ public:
     void performActionsBeforeAddingParticles() override;
     
     void extendBottom() const;
-
-    /*!
-     * \brief Particles that are not maser particles should be ignored
-     */
-    bool ignoreBoundary(BaseParticle* particle) override;
 
 private:
     /*!

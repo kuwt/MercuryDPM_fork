@@ -256,13 +256,13 @@ void PeriodicBoundaryHandler::computePeriodicComplexity(std::vector<int>& period
         }
         index++;
     }
-
+/*
     //Modify periodic complexity in case of maser
     for (int b = 0; b < getSize(); b++)
     {
         objects_[b]->modifyPeriodicComplexity(periodicComplexity, position, b);
     }
-    
+*/  
 }
 
 /*!
@@ -967,7 +967,15 @@ void PeriodicBoundaryHandler::updateParticles()
         {
             //Update the periodicComplexity of the real particles
             particle->setPreviousPeriodicComplexity(particle->getPeriodicComplexity());
-            particle->setPeriodicComplexity(computePeriodicComplexity(particle->getPosition())); 
+            std::vector<int> periodicComplexity;
+            int totalPeriodicComplexity;
+            computePeriodicComplexity(periodicComplexity,totalPeriodicComplexity, particle->getPosition());
+            //Modify periodic complexity tailored to specific boundary requirements
+            for (int b = 0; b < getSize(); b++)
+            {
+                objects_[b]->modifyPeriodicComplexity(periodicComplexity, totalPeriodicComplexity, particle, b);
+            }
+            particle->setPeriodicComplexity(periodicComplexity); 
         }
     }
 }
@@ -1067,6 +1075,7 @@ void PeriodicBoundaryHandler::updateParticleStatus(std::set<BaseParticle*>& part
                 {
                     //Oh noes, the particle became a ghost. Kill it with balefire!!... if it is necessary
                     logger(VERBOSE,"Real particle % changed to ghost at: %", particle->getId(), particle->getPosition());
+                    while(true){}
                     particlesToBeDeleted.insert(particle);
                 }
 
@@ -1266,6 +1275,13 @@ void PeriodicBoundaryHandler::findNewParticle(BaseParticle* particle)
             int totalPeriodicComplexity;
             std::vector<int> periodicComplexity;
             computePeriodicComplexity(periodicComplexity,totalPeriodicComplexity, particle->getPosition());
+
+            //Modify periodic complexity tailored to specific boundary requirements
+            for (int b = 0; b < getSize(); b++)
+            {
+                objects_[b]->modifyPeriodicComplexity(periodicComplexity, totalPeriodicComplexity, particle, b);
+            }
+
             //Set periodicComplexity
             particle->setPeriodicComplexity(periodicComplexity);
 
@@ -1855,7 +1871,6 @@ void PeriodicBoundaryHandler::updateMaserParticle(BaseParticle* const particle)
                           << std::endl;
                 particle->setId(newID);
                 getDPMBase()->particleHandler.increaseId();
-                
             }
         }
     }
