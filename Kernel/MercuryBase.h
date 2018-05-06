@@ -264,6 +264,11 @@ public:
      */
     virtual Mdouble userHGridCellSize(unsigned int level);
 
+    /*!
+     * \brief Purely virtual function that returns all particles that have a contact with a given particle.
+     */
+    virtual std::vector<BaseParticle*> hGridFindParticleContacts(const BaseParticle* obj)=0;
+
 protected:
     
     /*!

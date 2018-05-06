@@ -55,6 +55,7 @@ SinterInteraction::SinterInteraction(const SinterInteraction &p)
     std::cout<<"SinterInteraction::SinterInteraction(const SinterInteraction &p finished"<<std::endl;
 #endif
 }
+
 SinterInteraction::SinterInteraction()
 {
 }

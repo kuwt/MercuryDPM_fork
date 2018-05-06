@@ -209,4 +209,3 @@ std::string CubeInsertionBoundary::getName() const
 {
     return "CubeInsertionBoundary";
 }
-

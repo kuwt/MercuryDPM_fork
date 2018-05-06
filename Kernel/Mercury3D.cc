@@ -496,6 +496,71 @@ bool Mercury3D::hGridHasParticleContacts(const BaseParticle* obj)
     return false;
 }
 
+std::vector<BaseParticle*> Mercury3D::hGridFindParticleContacts(const BaseParticle* obj)
+{
+    if (getHGrid() == nullptr || getHGrid()->getNeedsRebuilding())
+    {
+        logger(INFO, "HGrid needs rebuilding for \"bool Mercury3D::hGridHasParticleContacts(BaseParticle *obj)\"");
+        hGridRebuild();
+    }
+
+    int occupiedLevelsMask = getHGrid()->getOccupiedLevelsMask();
+
+    std::vector<BaseParticle*> particlesInContact;
+
+    for (unsigned int level = 0; level < getHGrid()->getNumberOfLevels(); occupiedLevelsMask >>= 1, level++)
+    {
+        // If no objects in rest of grid, stop now
+        if (occupiedLevelsMask == 0)
+        {
+            logger(VERBOSE, "Level % and higher levels are empty", level);
+            break;
+        }
+
+        // If no objects at this level, go on to the next level
+        if ((occupiedLevelsMask & 1) == 0)
+        {
+            logger(VERBOSE, "Level % is empty", level);
+            continue;
+        }
+
+        const Mdouble inv_size = getHGrid()->getInvCellSize(level);
+        const int xs = static_cast<int>(std::floor((obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
+        const int xe = static_cast<int>(std::floor((obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
+        const int ys = static_cast<int>(std::floor((obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
+        const int ye = static_cast<int>(std::floor((obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
+        const int zs = static_cast<int>(std::floor((obj->getPosition().Z - obj->getInteractionRadius()) * inv_size - 0.5));
+        const int ze = static_cast<int>(std::floor((obj->getPosition().Z + obj->getInteractionRadius()) * inv_size + 0.5));
+
+        logger(VERBOSE, "Level = % grid cells [%,%] x [%,%] x [%,%]", level, xs, xe, ys, ye, zs, ze);
+        for (int x = xs; x <= xe; ++x)
+        {
+            for (int y = ys; y <= ye; ++y)
+            {
+                for (int z = zs; z <= ze; ++z)
+                {
+                    // Loop through all objects in the bucket to find nearby objects
+                    const unsigned int bucket = getHGrid()->computeHashBucketIndex(x, y, z, level);
+                    BaseParticle* p = getHGrid()->getFirstBaseParticleInBucket(bucket);
+                    while (p != nullptr)
+                    {
+                        if (p->getHGridCell().equals(x,y,z,level))
+                        {
+                            if (areInContact(obj, p))
+                            {
+                                particlesInContact.push_back(p);
+                            }
+                        }
+                        p = p->getHGridNextObject();
+                    }
+                }
+            }
+        }
+    } //end for level
+
+    return particlesInContact;
+}
+
 #ifdef CONTACT_LIST_HGRID
 /*!
  * \param[in] x     The x coordinate of the cell for which possible contacts are requested.

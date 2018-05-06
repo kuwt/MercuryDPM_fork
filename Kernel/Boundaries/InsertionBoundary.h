@@ -132,7 +132,12 @@ public:
    */
     void write(std::ostream& os) const override;
 
-//private:
+    Mdouble getVolumeFlowRate() const;
+
+    void setVolumeFlowRate(Mdouble volumeFlowRate_);
+
+protected:
+
   /*!
    * \brief Particle that will be inserted through the insertion boundary.
    */
@@ -164,6 +169,11 @@ public:
    * for trying to maintain a certain insertion rate).
    */
     bool isActivated_;
+
+    /*!
+     * \brief defines a maximum flow rate beyond which no particles are inserted.
+     */
+    Mdouble volumeFlowRate_;
 };
 
 #endif

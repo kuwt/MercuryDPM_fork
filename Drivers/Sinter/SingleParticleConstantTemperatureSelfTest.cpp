@@ -53,7 +53,7 @@ public:
         //restartFile.setFileType(FileType::NO_FILE);
         setXBallsAdditionalArguments(" -v0 -solidf -noborder 4 -p 1");
         setTimeMax(0);
-        restartFile.setSaveCount(4294967295);
+        restartFile.setSaveCount(intMax);
 
         //set gravity and density
         //setGravity(Vec3D(0, 0, -1e-6*238.732414637843e12));
@@ -160,7 +160,7 @@ public:
         logger(INFO,"Scaling density, inverse gravity, square of timestep, and square of diss. coeff. up by a factor %",scale);
         species->setDensity(scale * species->getDensity());
         setGravity(getGravity()/scale);
-        setTimeStep(sqrt(scale) * getTimeStep());
+        //setTimeStep(sqrt(scale) * getTimeStep());
         species->setDissipation(sqrt(scale) * species->getDissipation());
     }
 

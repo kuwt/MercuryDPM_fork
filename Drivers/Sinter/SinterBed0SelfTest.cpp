@@ -200,7 +200,7 @@ public:
         logger(INFO,"Scaling density, inverse gravity, square of timestep, and square of diss. coeff. up by a factor %",scale);
         species->setDensity(scale * species->getDensity());
         setGravity(getGravity()/scale);
-        setTimeStep(sqrt(scale) * getTimeStep());
+        //setTimeStep(sqrt(scale) * getTimeStep());
         species->setDissipation(sqrt(scale) * species->getDissipation());
     }
 
@@ -212,7 +212,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     const Mdouble radius = readFromFile("in","radius",6e-6);
     const Mdouble domainRadius = readFromFile("in","domainDiameterOverParticleDiameter",5.0) * radius;
     const Mdouble domainHeight = readFromFile("in","domainHeightOverParticleDiameter",5.0) * 2.0 * radius;
-    const unsigned dimensions = readFromFile("in","dimensions",1);
+    const unsigned dimensions = readFromFile("in","dimensions",2);
 
     InitialConditions<SinterFrictionSpecies> ic(radius, domainRadius, domainHeight,dimensions);
     const unsigned long int random = readFromFile("in","random",0);

@@ -710,6 +710,14 @@ Mdouble DPMBase::getTime() const
 }
 
 /*!
+ * \return time_
+ */
+Mdouble DPMBase::getNextTime() const
+{
+    return time_+timeStep_;
+}
+
+/*!
  * \return ntimeSteps_
  */
 unsigned int DPMBase::getNtimeSteps() const
@@ -3575,12 +3583,12 @@ void DPMBase::checkSettings()
     //check for DPMBase parameters
     logger.assert_always(getTimeStep() != 0,
                          "Time step undefined: use setTimeStep() ");
-    logger.assert_always(getXMax() > getXMin(),
+    logger.assert_always(getXMax() >= getXMin(),
                          "Domain size not set: use setXMin() and setXMax()");
-    logger.assert_always(getYMax() > getYMin(),
+    logger.assert_always(getYMax() >= getYMin(),
                          "Domain size not set: use setYMin() and setYMax()");
-    logger.assert_always(systemDimensions_<3 || getZMax() > getZMin(),
-                         "Domain size not set: % use setZMin() and setZMax()",systemDimensions_);
+    logger.assert_always(systemDimensions_<3 || getZMax() >= getZMin(),
+                         "Domain size not set: use setZMin() and setZMax()",systemDimensions_);
     logger.assert_always(getName().compare("")!=0,
                          "File name not set: % Use setName()",getName());
 
@@ -3634,7 +3642,7 @@ void DPMBase::writeOutputFiles()
     if (dataFile.saveCurrentTimestep(nTimeSteps_))
     {
         printTime();
-        if ((getRestarted() || dataFile.getCounter() == 1) && dataFile.getFileType() != FileType::NO_FILE)
+        if ((getRestarted() || dataFile.getCounter() == 0) && dataFile.getFileType() != FileType::NO_FILE)
             writeXBallsScript();
         writeVTKFiles();
         writeDataFile();

@@ -452,6 +452,11 @@ public:
     Mdouble getTime() const;
 
     /*!
+     * \brief Returns the current simulation time.
+     */
+    Mdouble getNextTime() const;
+
+    /*!
      * \brief Returns the current counter of time-steps, i.e. the number of time-steps that the
      * simulation has undergone so far.
      */

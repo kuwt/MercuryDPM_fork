@@ -42,6 +42,7 @@ InsertionBoundary::InsertionBoundary()
     particleToCopy_ = nullptr;
     maxFailed_ = 0;
     isActivated_ = true;
+    volumeFlowRate_ = inf;
 }
 
 /*!
@@ -54,6 +55,7 @@ InsertionBoundary::InsertionBoundary(const InsertionBoundary& other)
     volumeInserted_ = other.volumeInserted_;
     maxFailed_ = other.maxFailed_;
     isActivated_ = other.isActivated_;
+    volumeFlowRate_ = other.volumeFlowRate_;
 
     if (other.particleToCopy_!=nullptr) {
         particleToCopy_ = other.particleToCopy_->copy();
@@ -133,7 +135,7 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
     // Keep count of how many successive times we have failed to place a new
     // particle. 
     unsigned int failed = 0;
-    while (failed <= maxFailed_) // 'generating' loop
+    while (failed <= maxFailed_ && (volumeInserted_<=getVolumeFlowRate()*md->getNextTime())) // 'generating' loop
     {
         /* Generate random *intrinsic* properties for the new particle. */
         logger(VERBOSE, "about to call generateParticle\n");
@@ -326,3 +328,10 @@ void InsertionBoundary::write(std::ostream& os) const
     //os << " particleToCopy " << particleToCopy_;
 }
 
+Mdouble InsertionBoundary::getVolumeFlowRate() const {
+    return volumeFlowRate_;
+}
+
+void InsertionBoundary::setVolumeFlowRate(Mdouble volumeFlowRate) {
+    volumeFlowRate_ = volumeFlowRate;
+}

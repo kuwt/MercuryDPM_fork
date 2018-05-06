@@ -55,6 +55,11 @@ public:
      */
     void constructor();
 
+    /*!
+     * \brief Returns all particles that have a contact with a given particle.
+     */
+    std::vector<BaseParticle*> hGridFindParticleContacts(const BaseParticle* obj) override;
+
 protected:
     /*!
      * \brief Finds contacts between particles the in the target cell.
