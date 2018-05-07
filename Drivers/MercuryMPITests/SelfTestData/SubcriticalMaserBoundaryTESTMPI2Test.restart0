@@ -1,0 +1,35 @@
+restart_version 1.0 name SubcriticalMaserBoundaryTESTMPI2Test
+dataFile    fileType ONE_FILE saveCount 2000 counter 52 lastSavedTimeStep 100001
+fStatFile   fileType ONE_FILE saveCount 2000 counter 52 lastSavedTimeStep 100001
+eneFile     fileType ONE_FILE saveCount 2000 counter 52 lastSavedTimeStep 100001
+restartFile fileType ONE_FILE saveCount 2000 counter 52 lastSavedTimeStep 100001
+statFile    fileType ONE_FILE saveCount 2000 counter 0
+interactionFile fileType NO_FILE saveCount 0 counter 0
+xMin 0 xMax 20 yMin 0 yMax 2 zMin 0 zMax 50
+timeStep 0.0001 time 10.00009999999 ntimeSteps 100001 timeMax 10
+systemDimensions 3 particleDimensions 3 gravity 0 0 0 writeVTK 1 NO_FILE NO_FILE random  0 1103515245 12345 1073741824 607 273 784607267 numberOfProcessors 2 numberOfDomains 2 1 1
+Species 1
+LinearViscoelasticSpecies id 0 density 1.90985931710274 stiffness 197718.915439219 dissipation 25.5666743019774
+Walls 0
+Boundaries 1
+SubcriticalMaserBoundaryTEST id 0 normal 1 0 0 scaleFactor 1 distanceLeft 0 distanceRight 5 shift 5 0 0 maserIsActivated 1 activationTime nan
+Particles 17
+BaseParticle id 6 indSpecies 0 position 1.01582737650441 0 12 orientation 1 0 0 0 velocity 1.90296786226569 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 0.125
+BaseParticle id 1 indSpecies 0 position -9.00009999999227 0 3 orientation 1 0 0 0 velocity -1 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 0.125
+BaseParticle id 2 indSpecies 0 position -4.00010000000337 0 6 orientation 1 0 0 0 velocity -1 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 0.125
+BaseParticle id 25 indSpecies 0 position 6.01582737648535 0 12 orientation 1 0 0 0 velocity 1.90296786224657 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 0.125
+BaseParticle id 0 indSpecies 0 position 1.00010000000337 0 0 orientation 1 0 0 0 velocity 1 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 0.125
+BaseParticle id 22 indSpecies 0 position 7.76980274096487 0 9 orientation 1 0 0 0 velocity 1.7293424847744 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 0.125
+BaseParticle id 7 indSpecies 0 position 6.28454689726381 0 15 orientation 1 0 0 0 velocity -0.0219680653078771 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 0.125
+BaseParticle id 8 indSpecies 0 position -4.78464689723838 0 15 orientation 1 0 0 0 velocity -0.978031934692122 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 0.125
+BaseParticle id 23 indSpecies 0 position 8.13454148541073 0 12 orientation 1 0 0 0 velocity 2.58696788567714 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 0.125
+BaseParticle id 10 indSpecies 0 position 3.71835146682588 0 18 orientation 1 0 0 0 velocity 0.0222736074788119 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 0.125
+BaseParticle id 11 indSpecies 0 position 5.5 0 21 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 0.125
+BaseParticle id 12 indSpecies 0 position -8.00009999999449 0 21 orientation 1 0 0 0 velocity -1 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 0.125
+BaseParticle id 20 indSpecies 0 position 9.92681663792032 0 9 orientation 1 0 0 0 velocity 2.40771540037687 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 0.125
+BaseParticle id 5 indSpecies 0 position 3.1345414854111 0 12 orientation 1 0 0 0 velocity 2.58696788566746 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 0.125
+BaseParticle id 24 indSpecies 0 position 6.00010000000113 0 0 orientation 1 0 0 0 velocity 1 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 0.125
+BaseParticle id 3 indSpecies 0 position 2.68844283013473 0 9 orientation 1 0 0 0 velocity 1.04741947278347 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 0.125
+BaseParticle id 4 indSpecies 0 position 4.78542740743236 0 9 orientation 1 0 0 0 velocity 1.71507099710668 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 0.125
+Interactions 0
+hGrid method TOPDOWN distribution EXPONENTIAL cellOverSizeRatio 1 gridNeedsUpdate 0 updateEachTimeStep 1 currentMaxRelativeDisplacement 0.000258696788566937 totalCurrentMaxRelativeDisplacement 0
