@@ -159,7 +159,15 @@ void Mercury3D::hGridFindParticlesWithTargetCell(int x, int y, int z, unsigned i
 
 void Mercury3D::hGridGetInteractingParticleList(BaseParticle* obj, std::vector<BaseParticle*>& list)
 {
-    HGrid* const hgrid = getHGrid();
+    HGrid* hgrid = getHGrid();
+    
+    ///\bug find out why this is necessary; if this is not there, the code sometimes segfaults.
+    if (hGridNeedsRebuilding())
+    {
+        hGridRebuild();
+        hgrid = getHGrid();
+    }
+    logger(DEBUG, "hgrid %, object %", hgrid, obj);
     int occupiedLevelsMask = hgrid->getOccupiedLevelsMask() >> obj->getHGridLevel();
     for (unsigned int level = 0; level < hgrid->getNumberOfLevels(); level++)
     {

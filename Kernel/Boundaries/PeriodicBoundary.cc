@@ -337,6 +337,7 @@ void PeriodicBoundary::createGhostParticle(BaseParticle *pReal)
     while (from->getPeriodicFromParticle() != nullptr)
         from = from->getPeriodicFromParticle();
     pGhost->setPeriodicFromParticle(from);
+    pGhost->setPeriodicGhostParticle(true);
 
     pH.addObject(pGhost);
 }

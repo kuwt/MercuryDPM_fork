@@ -1866,8 +1866,7 @@ void PeriodicBoundaryHandler::updateMaserParticle(BaseParticle* const particle)
                 logger(VERBOSE, "particle % with position % goes into outflow domain, new ID = %", particle->getId(),
                        particle->getPosition(), getDPMBase()->particleHandler.getNextId());
                 const unsigned int newID = getDPMBase()->particleHandler.getNextId();
-                std::cout << "new id " << newID << " position X " <<  std::setprecision(10) << particle->getPosition().X
-                          << std::endl;
+                logger(VERBOSE, "new id % position X %", newID, particle->getPosition().X);
                 particle->setId(newID);
                 getDPMBase()->particleHandler.increaseId();
             }
