@@ -6,8 +6,9 @@
 #include "Walls/InfiniteWall.h"
 #include "Boundaries/CubeInsertionBoundary.h"
 #include "Boundaries/DeletionBoundary.h"
-#include "Boundaries/SubcriticalMaserBoundary.h"
+#include "Boundaries/ConstantMassFlowMaserBoundary.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
+#include "Species/HertzianViscoelasticFrictionSpecies.h"
 #include <iostream>
 #include "Math/RNG.h"
 #include "Math/ExtendedMath.h"
@@ -150,7 +151,7 @@ class DragBlasius : public Mercury2D {
             auto back = new InfiniteWall();
             back->setSpecies(spec_particles);
             back->set(Vec3D(-1, 0, 0), 
-                      Vec3D(pars.at("xmin") - pars.at("reservoirLength"), 0, 0)
+                      Vec3D(pars.at("xmin") - pars.at("reservoirLength") - 7*pars.at("particleRadius"), 0, 0)
                      );
             back = wallHandler.copyAndAddObject(back);
 
@@ -244,7 +245,6 @@ class DragBlasius : public Mercury2D {
                 );
             insb = boundaryHandler.copyAndAddObject(insb);
             insb->checkBoundaryBeforeTimeStep(this);
-
             stillFillingUp = true;
 
             // dataFile.setFileType(FileType::MULTIPLE_FILES);
@@ -266,7 +266,7 @@ class DragBlasius : public Mercury2D {
             }
             else
             {
-                masb = (SubcriticalMaserBoundary*) boundaryHandler.getObjectById(1);
+                masb = (ConstantMassFlowMaserBoundary*) boundaryHandler.getObjectById(1);
                 stillFillingUp = false;
             }
 
@@ -300,9 +300,13 @@ class DragBlasius : public Mercury2D {
                 // Force controller if inside Maser
                 // if (masb != nullptr && CI->isMaserParticle())
                 if (masb != nullptr && masb->isMaserParticle(CI))
+                {
+                    // logger(INFO, "applying a drag force to particle id % at position % velocity %",
+                    //        CI->getId(), CI->getPosition(), CI->getVelocity());
                     CI->addForce(Vec3D(
                             - CI->getMass() * getGravity().X * CI->getVelocity().X / pars.at("reservoirVel"), 
                         0, 0));
+                }
             }
         }
 
@@ -338,7 +342,7 @@ class DragBlasius : public Mercury2D {
                 /* MaserBoundary */
                 /* If restarting from a system that already has a Maser, we will
                  * never actually reach this. */
-                masb = new SubcriticalMaserBoundary();
+                masb = new ConstantMassFlowMaserBoundary();
                 masb->set(Vec3D(1.0, 0.0, 0.0), 
                         pars.at("xmin") - pars.at("reservoirLength") + pars.at("particleRadius"), 
                         pars.at("xmin"));
@@ -408,7 +412,7 @@ class DragBlasius : public Mercury2D {
         CubeInsertionBoundary* insb;
         LinearViscoelasticFrictionSpecies *spec_particles;
         // LinearViscoelasticFrictionSpecies *spec_base;
-        SubcriticalMaserBoundary* masb;
+        ConstantMassFlowMaserBoundary* masb;
         InfiniteWall* lid;
 
 

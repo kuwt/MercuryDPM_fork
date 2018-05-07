@@ -7,6 +7,7 @@
 #include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "Boundaries/CubeInsertionBoundary.h"
+#include "Boundaries/DeletionBoundary.h"
 #include "Boundaries/SubcriticalMaserBoundaryTEST.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include <iostream>
@@ -29,6 +30,15 @@ class BrokenMaserMinimalExample : public Mercury2D {
                 pars[name] = var;
 
 
+            /* The slope angle is specified in degrees, not radians. */
+            if (pars.find("theta") != pars.end())
+                pars.at("theta") = M_PI * pars.at("theta") / 180.;
+            else
+            {
+                pars["theta"] = 0;
+                logger(INFO, "slope theta not specified, setting to zero");
+            }
+
             /* Initialisation */
             setName(parsfile.erase(parsfile.find_last_of('.')));
             if (pars.find("randomSeed") != pars.end())
@@ -42,8 +52,9 @@ class BrokenMaserMinimalExample : public Mercury2D {
                 logger(INFO, "Random seed not specified, randomising.");
             }
 
-            dataFile.setFileType(FileType::MULTIPLE_FILES);
+            dataFile.setFileType(FileType::NO_FILE);
             fStatFile.setFileType(FileType::NO_FILE);
+            eneFile.setFileType(FileType::NO_FILE);
 
             setXMin(pars.at("xmin"));
             setXMax(pars.at("xmax"));
@@ -74,6 +85,16 @@ class BrokenMaserMinimalExample : public Mercury2D {
             spec_particles->setRollingDissipation(2.0/5.0 * spec_particles->getDissipation());
             spec_particles = speciesHandler.copyAndAddObject(spec_particles);
 
+            /* Prototypical particles */
+            auto particlePrototype = new BaseParticle();
+            particlePrototype->setSpecies(spec_particles);
+            particlePrototype->setRadius(pars.at("particleRadius"));
+
+            logger(INFO, "Maximum collision speed %",
+                    spec_particles->getMaximumVelocity(
+                        particlePrototype->getRadius(), particlePrototype->getMass()
+                    ));
+
             logger(INFO, "Constructor completed.");
 
         }
@@ -93,11 +114,44 @@ class BrokenMaserMinimalExample : public Mercury2D {
             /* Walls */
 
             // The base
-            auto base = new InfiniteWall();
+            auto base = new InfiniteWall;
             base->setSpecies(spec_particles);
             // base->setSpecies(spec_base);
             base->set(Vec3D(0, -1, 0), Vec3D(0, 0, 0));
             base = wallHandler.copyAndAddObject(base);
+
+            lid = new InfiniteWall();
+            // lid->setSpecies(spec_base);
+            lid->setSpecies(spec_particles);
+            lid->set(Vec3D(0, +1, 0), Vec3D(0, pars.at("reservoirHeight"), 0));
+            lid = wallHandler.copyAndAddObject(lid);
+
+            auto back = new InfiniteWall();
+            // back->setSpecies(spec_base);
+            back->setSpecies(spec_particles);
+            back->set(Vec3D(-1, 0, 0), 
+                      Vec3D(pars.at("xmin") - 2*pars.at("particleRadius"), 0, 0)
+                     );
+            back = wallHandler.copyAndAddObject(back);
+                for (double xpos = pars.at("xmin"); 
+                        xpos <= pars.at("xmax"); 
+                        xpos += 4*pars.at("particleRadius"))
+                {
+                    if (xpos < 0)
+                        continue;
+
+                    double ypos = 0;
+                    BaseParticle rbParticle;
+                    // rbParticle.setSpecies(spec_base);
+                    rbParticle.setSpecies(spec_particles);
+                    rbParticle.setRadius(pars.at("particleRadius"));
+
+                    rbParticle.setPosition(Vec3D(xpos, ypos, 0));
+                    rbParticle.setVelocity(Vec3D(0,0,0));
+                    rbParticle.fixParticle();
+
+                    particleHandler.copyAndAddObject(rbParticle);
+                }
 
             /* CubeInsertionBoundary for introducing new particles */
             auto generandum = new BaseParticle;
@@ -111,8 +165,8 @@ class BrokenMaserMinimalExample : public Mercury2D {
                           0, 0),
                     Vec3D(pars.at("xmin"), 
                           pars.at("reservoirHeight"), 0),
-                    Vec3D(1, - sqrt(pars.at("reservoirHeight")), 0),
-                    Vec3D(1, - sqrt(pars.at("reservoirHeight")), 0),
+                    Vec3D(0, - sqrt(pars.at("reservoirHeight")), 0),
+                    Vec3D(0, - sqrt(pars.at("reservoirHeight")), 0),
                     pars.at("particleRadius"),
                     pars.at("particleRadius")
                 );
@@ -135,6 +189,25 @@ class BrokenMaserMinimalExample : public Mercury2D {
                     getTime(), particleHandler.getNumberOfRealObjectsLocal());
         }
 
+        void computeExternalForces(BaseParticle* CI) override
+        {
+            if (!CI->isFixed())
+            {
+                // Applying the force due to gravity
+                CI->addForce(getGravity() * CI->getMass());
+
+                // Wall forces
+                computeForcesDueToWalls(CI);
+
+                // Force controller if inside Maser
+                // if (masb != nullptr && masb->isMaserParticle(CI))
+                if (masb != nullptr && CI->isMaserParticle())
+                    CI->addForce(Vec3D(
+                            - CI->getMass() * getGravity().X * CI->getVelocity().X / pars.at("reservoirVel"), 
+                        0, 0));
+            }
+        }
+
         void actionsAfterTimeStep() 
         {
             // logger(INFO, "In actionsAfterTimeStep()");
@@ -146,12 +219,24 @@ class BrokenMaserMinimalExample : public Mercury2D {
 
             /* Have we filled the reservoir up enough already? */
 
-            if (getTime() > 20*getTimeStep())
+            // Volume fraction in the reservoir
+            Mdouble volfrac = particleHandler.getVolume()
+                / ( pars.at("reservoirLength") * pars.at("reservoirHeight") );
+
+            if (volfrac > 0.8)
             {
+                /* We have introduced enough particles. Get rid of the
+                 * InsertionBoundary, and put in all the other boundaries
+                 * (maser and deletion) */
                 boundaryHandler.removeObject(insb->getId());
 
+                /* Deletion boundary */
+                auto delb = new DeletionBoundary;
+                delb->set(Vec3D(1,0,0), pars.at("xmax"));
+                delb = boundaryHandler.copyAndAddObject(delb);
+
                 /* MaserBoundary */
-                auto masb = new SubcriticalMaserBoundaryTEST();
+                masb = new SubcriticalMaserBoundaryTEST();
                 masb->set(Vec3D(1.0, 0.0, 0.0), 
                         pars.at("xmin") - pars.at("reservoirLength") + pars.at("particleRadius"), 
                         pars.at("xmin"));
@@ -162,9 +247,24 @@ class BrokenMaserMinimalExample : public Mercury2D {
                 masb->activateMaser();
                 logger(INFO, "Have activated masb");
 
+                /* Get rid of the lid */
+                wallHandler.removeObject(lid->getIndex());
+
+                /* Give an impulse to all the particles in the Maser. */
+                for (BaseParticle* const p : particleHandler)
+                    if (! p->isFixed())
+                        p->setVelocity(p->getVelocity() + Vec3D(pars.at("reservoirVel"), 0, 0));
+
+                /* Turn on gravity */
+                setGravity(Vec3D(
+                            sin(pars.at("theta")),
+                            -cos(pars.at("theta")), 
+                            0));
 
                 stillFillingUp = false;
 
+                dataFile.setFileType(FileType::MULTIPLE_FILES);
+                forceWriteOutputFiles();
             }
             // logger(INFO, "Have completed actionsAfterTimeStep");
         }
@@ -176,13 +276,15 @@ class BrokenMaserMinimalExample : public Mercury2D {
 
         CubeInsertionBoundary* insb;
         LinearViscoelasticFrictionSpecies *spec_particles;
+        SubcriticalMaserBoundaryTEST* masb;
+        InfiniteWall* lid;
 
 };
 
 int main(const int argc, char* argv[]) {
     if (argc > 1)
     {
-        BrokenMaserMinimalExample* problem = new BrokenMaserMinimalExample(argv[1]);
+        auto problem = new BrokenMaserMinimalExample(argv[1]);
         argv[1] = argv[0];
         problem->solve(argc-1, argv+1);
         delete problem;

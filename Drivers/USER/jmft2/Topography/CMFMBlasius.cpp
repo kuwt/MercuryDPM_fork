@@ -240,8 +240,6 @@ class CMFMBlasius : public Mercury2D {
             insb = boundaryHandler.copyAndAddObject(insb);
             insb->checkBoundaryBeforeTimeStep(this);
             stillFillingUp = true;
-            
-
 
             // dataFile.setFileType(FileType::MULTIPLE_FILES);
             // fStatFile.setFileType(FileType::MULTIPLE_FILES);
