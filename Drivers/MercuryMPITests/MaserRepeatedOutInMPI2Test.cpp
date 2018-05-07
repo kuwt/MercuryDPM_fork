@@ -24,10 +24,10 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-#include <Walls/IntersectionOfWalls.h>
 #include "DPMBase.h"
 #include "Boundaries/SubcriticalMaserBoundaryTEST.h"
 #include "Walls/InfiniteWall.h"
+#include "Walls/IntersectionOfWalls.h"
 #include "Species/LinearViscoelasticSpecies.h"
 
 
@@ -39,7 +39,7 @@ public:
     {
         setName("MaserRepeatedOutInMPI2Test");
     
-        //set species properties: some standard values
+        //set species properties: make the restitution coefficient very high so that it bounces back with enough energy
         LinearViscoelasticSpecies species;
         species.setDensity(6.0 / constants::pi);
         species.setCollisionTimeAndRestitutionCoefficient(0.005, 0.95, 1);
@@ -47,9 +47,10 @@ public:
     
         //set time and file properties
         setTimeStep(species.getCollisionTime(1) / 50.0);
-        setTimeMax(7.5);
-        setSaveCount(1000);
+        setTimeMax(15);
+        setSaveCount(5000);
         setParticlesWriteVTK(true);
+        setWallsWriteVTK(FileType::ONE_FILE);
     
         //set domain size
         setMin({0,-1,-1});
@@ -61,11 +62,11 @@ public:
     
     void setupInitialConditions()
     {
-        //Check if particle is copied correctly when moving
+        //Start with just one particle, which moves out, in, out of maser-boundary
         BaseParticle p0;
         p0.setSpecies(speciesHandler.getLastObject());
-        p0.setPosition({19,0,0});
-        p0.setVelocity({1,0,0});
+        p0.setPosition({19,3,0});
+        p0.setVelocity({1,1,0});
         p0.setRadius(0.5);
         particleHandler.copyAndAddObject(p0);
         
@@ -74,9 +75,12 @@ public:
         b0->set(Vec3D(1.0, 0.0, 0.0), 0.0, 20.0);
         b0->setActivationTime(0);
         
-        //PeriodicBoundary b;
-        //b.set(Vec3D(0,1,0), -.1, 1);
+        PeriodicBoundary b;
+        b.set(Vec3D(0,1,0), 0, 5);
+        boundaryHandler.copyAndAddObject(b);
         
+        //add two walls for the particle to bounce back from: an infinite wall on the right side, and a "double wall" in
+        //the middle of the maser domain.
         InfiniteWall w;
         w.setSpecies(speciesHandler.getObject(0));
         w.setPosition(Vec3D(22, 0, 0));
@@ -88,16 +92,28 @@ public:
         w1.addObject(Vec3D(0, 1, 0), Vec3D(0,-1,0));
         w1.addObject(Vec3D(-1, 0, 0), Vec3D(18, 0, 0));
         wallHandler.copyAndAddObject(w1);
-        
-        setParticlesWriteVTK(true);
-        setWallsWriteVTK(FileType::ONE_FILE);
     }
     
     void actionsAfterTimeStep() override
     {
-        if (getTime() > 15)
+        ///remove the walls to check if the new particles flow out & copy correctly
+        if (getTime() > 7.5)
         {
             wallHandler.clear();
+        }
+    }
+    
+    void actionsAfterSolve() override
+    {
+        if (PROCESSOR_ID == 0)
+        {
+            logger(INFO, "I'm processor 0");
+            logger(INFO, "Number of particles on processor 0: %", particleHandler.getNumberOfRealObjectsLocal());
+        }
+        if (PROCESSOR_ID == 1)
+        {
+            logger(INFO, "I'm processor 1");
+            logger(INFO, "Number of particles on processor 1: %", particleHandler.getNumberOfRealObjectsLocal());
         }
     }
     
