@@ -111,6 +111,9 @@ public:
     void modifyPeriodicComplexity(std::vector<int>& complexity, int& totalPeriodicComplexity,
                                                             BaseParticle* particle, int i) const override;
 
+    void modifyGhostAfterCreation(BaseParticle* particle, int i) override;
+
+
     /*!
      * \brief Checks before adding particles if the maser needs to be activated
      */

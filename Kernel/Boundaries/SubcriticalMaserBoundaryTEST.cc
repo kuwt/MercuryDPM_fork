@@ -337,10 +337,24 @@ void SubcriticalMaserBoundaryTEST::modifyPeriodicComplexity(std::vector<int>& co
             {
                 totalPeriodicComplexity--;
             }
-            complexity[i] = 2;
+            complexity[i] = 3;
         }
     }
 }
+
+void SubcriticalMaserBoundaryTEST::modifyGhostAfterCreation(BaseParticle* particle, int i)
+{
+    if (maserIsActivated_)
+    {
+        if (!particle->isMaserParticle())
+        {
+            std::vector<int> periodicComplexity = particle->getPeriodicComplexity();
+            periodicComplexity[i] = 3;
+            particle->setPeriodicComplexity(periodicComplexity);
+        }
+    }
+}
+
 
 /*!
  * \details Before adding particles a check is made to see if the maser needs to be activated or not

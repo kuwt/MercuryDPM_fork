@@ -114,6 +114,11 @@ void BaseBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
 {
 }
 
+void BaseBoundary::modifyGhostAfterCreation(BaseParticle* particle, int i)
+{
+}
+
+
 /*!
  * \details Can be used to perform actions before the time loop, but after setupInitialConditions.
  */

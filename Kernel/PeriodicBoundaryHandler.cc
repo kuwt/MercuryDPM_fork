@@ -281,6 +281,7 @@ std::vector<int> PeriodicBoundaryHandler::computePeriodicComplexity(Vec3D positi
     int totalPeriodicComplexity;
 
     computePeriodicComplexity(periodicComplexity, totalPeriodicComplexity, position);
+
     return periodicComplexity;
 }
 
@@ -572,7 +573,6 @@ void PeriodicBoundaryHandler::processReceivedGhostParticleData(int targetIndex, 
 
         //Shift the ghost particle to it's correct positions and velocities
         shiftParticle(&particle, ghostPeriodicComplexity);
-
 
         //Add particle to simulation
         logger(VERBOSE,"Adding a ghost at position %",particle.getPosition());
@@ -941,9 +941,14 @@ void PeriodicBoundaryHandler::updateParticles()
                         {
                             periodicComplexity[b] = 1;
                         }
+                    
                 }
                 pGhost->setPeriodicComplexity(periodicComplexity);
 
+                for (int b = 0; b < getSize(); b++)
+                {
+                    objects_[b]->modifyGhostAfterCreation(pGhost, b);
+                }
                 //Shift the particle to correct position
                 //Note: If the real particle changed complexity this position will be calculated incorrectly
                 //Hence the previous complexity is used.
@@ -1174,7 +1179,13 @@ void PeriodicBoundaryHandler::updateParticleStatus(std::set<BaseParticle*>& part
                 if (isReal)
                 {
                     //Check if the complexity of the particle is truely real based on it's current position
-                    if(!checkIsReal(computePeriodicComplexity(pGhost->getPosition())))
+                    std::vector<int> pc = computePeriodicComplexity(pGhost->getPosition());
+                    int tpc = 0;
+                    for (int b = 0; b < getSize(); b++)
+                    {
+                        objects_[b]->modifyPeriodicComplexity(pc,tpc, pGhost, b);
+                    }
+                    if(!checkIsReal(pc))
                     {
                         logger(ERROR,"Round-off error detected.");
                         //logger(WARN,"Round-off error corrected, phew!");

@@ -45,6 +45,7 @@ public:
     Vec3D velocity;
     Quaternion orientation;
     unsigned communicationComplexity;
+    bool isMaser; //TODO 
     bool isFixed;
 };
 
@@ -112,20 +113,20 @@ class Empty
 class MpiPeriodicParticleIDBase
 {
 public:
-    BaseParticle* particle;
-    BaseParticle* otherParticle;
-    int currentProcessor;
-    int otherProcessor;
-    int targetProcessor;
-    int targetID;
-    int periodicBoundaryIndex;
-    std::vector<int> previousPeriodicComplexity;
-    std::vector<int> currentPeriodicComplexity;
-    std::vector<int> periodicComplexity;
-    std::vector<int> targetPeriodicComplexity;
-    std::vector<int> realPeriodicComplexity;
-    std::vector<int> previousRealPeriodicComplexity;
-    Vec3D targetPosition;
+    BaseParticle* particle; //Used to store the pointer of the current particle (ghost or periodic) located on the same domain
+    BaseParticle* otherParticle; //Used to store the pointer of the other particle (ghost or periodic) located on the same domain
+    //int currentProcessor;
+    //int otherProcessor;
+    int targetProcessor; //Stores the target processor where the ghost or periodic is located
+    //int targetID;
+    //int periodicBoundaryIndex;
+    //std::vector<int> previousPeriodicComplexity;
+    //std::vector<int> currentPeriodicComplexity;
+    std::vector<int> periodicComplexity; //Not sure if this is required
+    std::vector<int> targetPeriodicComplexity; //ppid uses this to store the ghost periodic complexity when adding
+    std::vector<int> realPeriodicComplexity; //gpid uses this to store the realPeriodicComplexity of the real particle
+    //std::vector<int> previousRealPeriodicComplexity;
+    //Vec3D targetPosition;
 };
 
 typedef MpiPeriodicParticleIDBase MpiPeriodicParticleID;

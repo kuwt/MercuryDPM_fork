@@ -102,7 +102,9 @@ public:
      * \brief Virtual function that does something after DPMBase::setupInitialConditions but before the first timestep. 
      */
     virtual void actionsBeforeTimeLoop();
-    
+   
+    virtual void modifyGhostAfterCreation(BaseParticle* particle, int i);
+ 
     /*!
      * \brief Sets the boundary's BoundaryHandler
      */

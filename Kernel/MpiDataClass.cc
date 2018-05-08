@@ -47,6 +47,7 @@ MPIParticle copyDataFromParticleToMPIParticle(BaseParticle* p)
     bP.orientation	    	    = p->getOrientation();
     bP.HGridLevel		        = p->getHGridLevel();
     bP.communicationComplexity	= p->getCommunicationComplexity();
+    bP.isMaser                  = p->isMaserParticle();
     bP.isFixed                  = p->isFixed();
     return bP;
 }
@@ -82,6 +83,16 @@ void copyDataFromMPIParticleToParticle(MPIParticle *bP, BaseParticle* p)
 	//This is not a periodic particle
 	p->setPeriodicFromParticle(nullptr);
     p->setInPeriodicDomain(false);
+
+    //Fix maser if it is maser
+    if (bP->isMaser)
+    {
+        p->setMaserParticle(true);
+    }
+    else
+    {
+        p->setMaserParticle(false);
+    }
 
     //Fixed particles need to be fixed again
     if (bP->isFixed)
