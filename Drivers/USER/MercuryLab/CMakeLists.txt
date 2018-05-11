@@ -1,7 +1,0 @@
-FILE(GLOB ALL_FILES *)
-FOREACH(FILE ${ALL_FILES})
-  IF(EXISTS "${FILE}/CMakeLists.txt")
-    #MESSAGE(STATUS "add_sub(${FILE})")
-    add_subdirectory(${FILE})
-  ENDIF()
-ENDFOREACH()
