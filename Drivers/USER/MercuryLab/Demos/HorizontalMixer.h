@@ -1,6 +1,6 @@
 #include "Mercury3D.h"
-#include "../../Trioliet/TriolietScrew.h"
-#include "../../Trioliet/TriolietBaseScrew.h"
+#include "../Trioliet/TriolietScrew.h"
+#include "../Trioliet/TriolietBaseScrew.h"
 #include "Species/LinearViscoelasticSlidingFrictionSpecies.h"
 #include "Walls/RestrictedWall.h"
 #include "Walls/InfiniteWall.h"
