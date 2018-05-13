@@ -104,16 +104,25 @@ void HertzianViscoelasticNormalSpecies::setElasticModulusAndRestitutionCoefficie
     // Here is a very nice paper describing contact modelling
     // http://people.ds.cam.ac.uk/jae1001/CUS/research/pfizer/Antypov_Elliott_EPL_2011.pdf
     // see also: https://answers.launchpad.net/yade/+question/235934
-    if (elasticModulus >= 0.0 && rest > 0.0 && rest <= 1.0)
-    {
-        elasticModulus_ = elasticModulus;
-        Mdouble logRestSquared = log(rest)*log(rest);
-        dissipation_ = sqrt(5.0 * logRestSquared / (logRestSquared + constants::sqr_pi));
-        logger(INFO,"Dissipation % set to match restitution coefficient % logE % sqrPi %",dissipation_,rest,log(rest),constants::sqr_pi);
-    }
+    if (elasticModulus < 0.0)
+        logger(ERROR, "[HertzianViscoelasticNormalSpecies::setElasticModulusAndRestitutionCoefficient] elasticModulus % should be nonnegative",
+                elasticModulus);
+
+    else if (rest < 0.0 || rest > 1.0)
+        logger(ERROR, "[HertzianViscoelasticNormalSpecies::setElasticModulusAndRestitutionCoefficient] rest % should be between 0 and 1 (inclusive)", rest);
+
     else
     {
-        logger(ERROR,"Error in setElasticModulusAndRestitutionCoefficient");
+        elasticModulus_ = elasticModulus;
+        if (rest > 0.0)
+        {
+            Mdouble logRestSquared = log(rest)*log(rest);
+            dissipation_ = sqrt(5.0 * logRestSquared / (logRestSquared + constants::sqr_pi));
+        }
+        else
+            dissipation_ = sqrt(5.0);
+
+        logger(INFO,"Dissipation % set to match restitution coefficient % logE % sqrPi %",dissipation_,rest,log(rest),constants::sqr_pi);
     }
 }
 

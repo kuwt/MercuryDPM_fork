@@ -768,9 +768,26 @@ Mdouble BaseInteraction::getEffectiveMass() const
     }
     else
     {
+        /* Particle-to-particle collision */
+
+        /* JMFT: The following doesn't work when fixed particles, with infinite
+         * mass, are involved. */
+        /*
         Mdouble massP = PParticle->getMass();
         Mdouble massI = IParticle->getMass();
         return massP * massI / (massP + massI);
+        */
+
+        /* Instead, work based on their inverse masses. In an interaction, we
+         * can assume that at least one of the particles is not fixed. */
+        Mdouble invMassP = PParticle->getInvMass();
+        Mdouble invMassI = IParticle->getInvMass();
+
+        if (invMassP + invMassI > 0)
+            return 1.0/(invMassP + invMassI);
+        else
+            logger(ERROR, "[BaseInteraction::getEffectiveMass()] interaction % at % has infinte effective mass.",
+                    getId(), getContactPoint());
     }
 }
 
