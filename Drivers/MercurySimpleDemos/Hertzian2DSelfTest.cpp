@@ -11,6 +11,7 @@ class Hertzian2DUnitTest : public Mercury2D
         {
 
             setName("Hertzian2DSelfTest");
+            setDomain({-1,-1,-1},{1,1,1});
             setTimeMax(4);
             setTimeStep(5e-5);
             setSaveCount(200);

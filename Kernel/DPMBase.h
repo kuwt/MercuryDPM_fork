@@ -853,7 +853,9 @@ public:
     /*!
      * \brief Creates a list of neighbour particles obtained from the hgrid
      */
-    virtual void hGridGetInteractingParticleList(BaseParticle* obj, std::vector<BaseParticle*>& list);
+    virtual void hGridGetInteractingParticleList(BaseParticle* obj, std::vector<BaseParticle*>& list) {};
+
+    virtual void computeWallForces(BaseWall* const w);
 
     /*!
      * \brief
@@ -895,8 +897,8 @@ protected:
     /*!
      * \brief Computes the forces on the particles due to the walls (normals are outward normals)
      */
-    virtual void computeForcesDueToWalls(BaseParticle* PI);
-    
+    void computeForcesDueToWalls(BaseParticle* PI, BaseWall* w);
+
     /*!
      * \brief A virtual function where the users can add extra code which is executed
      *  only when the code is restarted.

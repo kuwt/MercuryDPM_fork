@@ -295,7 +295,7 @@ class DragBlasius : public Mercury2D {
                 CI->addForce(getGravity() * CI->getMass());
 
                 // Wall forces
-                computeForcesDueToWalls(CI);
+                //computeForcesDueToWalls(CI);
 
                 // Force controller if inside Maser
                 // if (masb != nullptr && CI->isMaserParticle())

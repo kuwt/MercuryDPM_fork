@@ -75,7 +75,7 @@ public:
             Vec3D normal = p->getPosition() / Vec3D::getLength(p->getPosition());
             p->addForce(-normal * p->getMass());
             // Still calls this in compute External Forces.
-            computeForcesDueToWalls(p);
+            //computeForcesDueToWalls(p);
         }
     }
 

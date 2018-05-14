@@ -107,7 +107,7 @@ public:
 			/// Now add on gravity
 			CI->addForce(getGravity() * CI->getMass());
 			///Finally walls
-			computeForcesDueToWalls(CI);
+			//computeForcesDueToWalls(CI);
 			//add spherical indenter as wall (quicker due to hGrid problems)
 			if (IndenterType==Spherical)
 				computeInternalForces(CI, &SphericalIndenter);

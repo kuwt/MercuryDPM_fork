@@ -44,7 +44,7 @@ class rain : public Mercury2D
 		/// Now add on gravity
 		CI->addForce(getGravity() * CI->getMass());
 		///Finally walls
-		computeForcesDueToWalls(CI);
+		//computeForcesDueToWalls(CI);
 		///Background friction
         CI->addForce (-CI->getVelocity()*0.1* species->getDissipation());
 	}

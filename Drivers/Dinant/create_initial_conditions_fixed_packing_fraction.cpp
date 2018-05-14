@@ -47,7 +47,7 @@ template <StatType T> class create_initial_conditions_fixed_packing_fraction : p
 		/// Now add on gravity
 		CI->addForce(getGravity() * CI->getMass());
 		///Finally walls
-		computeForcesDueToWalls(CI);
+		//computeForcesDueToWalls(CI);
 		///Background friction
         CI->addForce (-CI->getVelocity()*0.1* species->getDissipation());
 //        CI->add_Torque(-CI->get_AngularVelocity()*0.1*getSlidingDissipation(CI->get_IndSpecies()));	

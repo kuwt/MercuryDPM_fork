@@ -26,6 +26,7 @@
 
 #include <Math/Helpers.h>
 #include <Walls/BasicIntersectionOfWalls.h>
+#include <Walls/TriangleWall.h>
 #include "WallHandler.h"
 #include "Walls/BaseWall.h"
 #include "Walls/CylindricalWall.h"
@@ -306,4 +307,49 @@ void WallHandler::writeVTKBoundingBox() const
     file.close();
 }
 
+void WallHandler::readTriangleWall(std::string filename, ParticleSpecies *s, Mdouble scaleFactor) 
+{
+    //try open the input file
+    std::fstream file;
+    file.open(filename.c_str(), std::ios::in);
+    logger.assert_always(file.is_open(), "File opening failed: %",filename);
+
+    //skip the header lines
+    std::string dummy;
+    getline(file, dummy);
+    getline(file, dummy);
+    getline(file, dummy);
+    getline(file, dummy);
+    
+    //read vertices, apply scaling
+    unsigned num;
+    file >> dummy >> num >> dummy;
+    std::vector<Vec3D> vertex;
+    vertex.reserve(num);
+    Vec3D v;
+    for (unsigned i = 0; i < num; i++)
+    {
+        file >> v.X >> v.Y >> v.Z;
+        v *= scaleFactor;
+        vertex.push_back(v);
+    }
+
+    //read faces
+    unsigned n = getSize();
+    file >> dummy >> num >> dummy;
+    TriangleWall triangleWall;
+    triangleWall.setSpecies(s);
+    unsigned id0, id1, id2;
+    for (unsigned i = 0; i < num; i++)
+    {
+        file >> dummy >> id0 >> id1 >> id2;
+        triangleWall.setVertices(vertex[id0],vertex[id1],vertex[id2]);
+        copyAndAddObject(triangleWall);
+    }
+
+    //close file
+    file.close();
+    
+    logger(INFO,"Read in % walls",getSize()-n);
+}
 

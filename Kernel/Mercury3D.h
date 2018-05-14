@@ -63,18 +63,22 @@ protected:
     /*!
      * \brief Finds contacts between particles in the target cell.
      */
-    virtual void hGridFindContactsWithinTargetCell(int x, int y, int z, unsigned int l);
+    void hGridFindContactsWithinTargetCell(int x, int y, int z, unsigned int l);
 
     /*!
      * \brief Finds contacts between the BaseParticle and the target cell.
      */
-    virtual void hGridFindContactsWithTargetCell(int x, int y, int z, unsigned int l, BaseParticle* const obj);
-    
+    void hGridFindContactsWithTargetCell(int x, int y, int z, unsigned int l, BaseParticle* const obj);
+
+    /*!
+     * \brief Compute contacts with a wall.
+     */
+    void computeWallForces(BaseWall* const w) override;
 
     /*!
      * \brief Finds particles within target cell and stores them in a list
      */
-    virtual void hGridFindParticlesWithTargetCell(int x, int y, int z, unsigned int l, BaseParticle* obj, std::vector<BaseParticle*>& list);
+    void hGridFindParticlesWithTargetCell(int x, int y, int z, unsigned int l, BaseParticle* obj, std::vector<BaseParticle*>& list);
 
     /*!
      * \brief Obtains all neighbour particles of a given object, obtained from the hgrid

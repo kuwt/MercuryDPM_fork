@@ -46,7 +46,7 @@ class dinant_growparticles : public DPMBase
 		/// Now add on gravity
 		CI->addForce(getGravity() * CI->getMass());
 		///Finally walls
-		computeForcesDueToWalls(CI);
+		//computeForcesDueToWalls(CI);
 		///Background friction
         CI->addForce (-CI->getVelocity()*0.1* species->getDissipation());
 	}

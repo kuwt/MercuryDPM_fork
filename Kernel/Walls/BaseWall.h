@@ -122,6 +122,11 @@ public:
      */
     bool isFixed() const override;
 
+    /*!
+     * if isLocal returns true and the DPM class derived from MercuryBase, the hGrid will be used to find wall-particle contacts, using min/max.
+     */
+    virtual bool isLocal(Vec3D& min, Vec3D& max) const {return false;}
+
     // returns the point intersecting a wall (x-p).n=0 and a line x=p0+t(p1-p0)
     bool getLinePlaneIntersect (Vec3D& intersect, const Vec3D& p0, const Vec3D& p1, const Vec3D& n, const Vec3D& p);
 
@@ -178,7 +183,7 @@ public:
      */
     std::vector<BaseWall*> renderedWalls_;
 
-    public:
+public:
 
     //todo how do i write a copy and add function?
     void addRenderedWall(BaseWall* w) {

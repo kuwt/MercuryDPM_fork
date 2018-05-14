@@ -18,6 +18,7 @@ public:
     {
         setMin({-10, -10, 0});
         setMax({10, 10, 10});
+        setName("ScrewRectangularSelfTest");
     }
     
     void setupInitialConditions()

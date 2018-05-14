@@ -35,12 +35,12 @@ class PeriodicWalls : public Mercury2D
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     ///This is were the walls are implemented
     /////////////////////////////////////////////////////////////////////////////////////////////////////
-    void computeExternalForces(BaseParticle* CI)
+    void computeExternalForces(BaseParticle* CI) override
     {
-        computeForcesDueToWalls(CI);
+//        computeForcesDueToWalls(CI);
     }
 
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         setMax({0.01,0.01,0.0});
         setGravity({0.0,-9.8,0.0});

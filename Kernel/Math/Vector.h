@@ -55,6 +55,7 @@ public:
      */
     /*
      * \todo: Make these private.
+     * \todo what is the idea of this constructor?
      * These should be private so we can implement things like a cvec etc.
      * Use getters / setters.
      */
@@ -92,7 +93,7 @@ public:
     /*!
      * \brief Checks if ALL elements are zero
      */
-    bool isZero() const;
+    bool isZero() const {return X == 0.0 && Y == 0.0 && Z == 0.0;}
 
     /*!
      * \brief Checks if ALL elements are zero

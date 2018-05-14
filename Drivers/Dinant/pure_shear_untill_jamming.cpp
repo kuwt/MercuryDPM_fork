@@ -47,7 +47,7 @@ public:
         /// Now add on gravity
         CI->addForce(getGravity() * CI->getMass());
         ///Finally walls
-        computeForcesDueToWalls(CI);
+        //computeForcesDueToWalls(CI);
         ///Background friction
         CI->addForce(-CI->getVelocity() * 0.1 * species->getDissipation());
         CI->addTorque(-CI->getAngularVelocity() * 0.1 * species->getSlidingDissipation());

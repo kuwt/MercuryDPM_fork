@@ -102,8 +102,13 @@ public:
 
     /*!
      * \brief Checks if the quaternion value is (1,0,0,0) 
-     */
-    bool isUnity() const;
+     * \details Checks if ALL elements are zero
+     * \return          TRUE if q0 equals one and ALL other elements are zero
+     * \bug use isEqual instead of ==
+    */
+    bool isUnity() const {
+        return q0 == 1.0 && q1 == 0.0 && q2 == 0.0 && q3 == 0.0;
+    };
 
     /*!
      * \brief Adds another quaternion and returns the result.

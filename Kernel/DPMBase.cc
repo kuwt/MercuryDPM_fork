@@ -209,7 +209,7 @@ void DPMBase::constructor()
     statFile.getFstream().precision(10);
     statFile.getFstream().setf(std::ios::left);
     interactionFile.getFstream().precision(10);
-    name_ = "out";
+    name_ = ""; // needs to be user-specified, otherwise checkSettings throws error
     //by default, the fileType of all files is ONE_FILE. However, by default we don't want an interaction file since it
     // is very large.
     interactionFile.setFileType(FileType::NO_FILE);
@@ -2926,7 +2926,7 @@ void DPMBase::computeExternalForces(BaseParticle* CI)
         // Applying the force due to gravity (F = m.g)
         CI->addForce(getGravity() * CI->getMass());
         // Still calls this in compute External Forces.
-        computeForcesDueToWalls(CI);
+        // computeForcesDueToWalls(CI);
     }
 }
 
@@ -2937,36 +2937,32 @@ void DPMBase::computeExternalForces(BaseParticle* CI)
  * torques and forces to both particle and wall(s).
  * \param[in] pI The BaseParticle object to which the wall forces are applied.
  */
-void DPMBase::computeForcesDueToWalls(BaseParticle* pI)
+void DPMBase::computeForcesDueToWalls(BaseParticle* pI, BaseWall* w)
 {
     //No need to compute interactions between periodic particle images and walls
     if (pI->getPeriodicFromParticle() != nullptr)
         return;
 
-    //Checking for all system walls
-    for (BaseWall* w : wallHandler)
+    //Checks if the particle is interacting with the current wall
+    std::vector<BaseInteraction*> interactions = w->getInteractionWith(pI, getNtimeSteps()+1,
+                                                                       &interactionHandler);
+
+    for (auto i : interactions)
     {
-        //Checks if the particle is interacting with the current wall
-        std::vector<BaseInteraction*> interactions = w->getInteractionWith(pI, getNtimeSteps()+1,
-                                                                           &interactionHandler);
+        //...calculates the forces between the two objects...
+        i->computeForce();
 
-        for (auto i : interactions)
+        //...and applies them to each of the two objects (wall and particle).
+        pI->addForce(i->getForce());
+        w->addForce(-i->getForce());
+
+        //If the rotation flag is on, also applies the relevant torques
+        //(getRotation() returns a boolean).
+        if (getRotation()) // getRotation() returns a boolean.
         {
-            //...calculates the forces between the two objects...
-            i->computeForce();
-
-            //...and applies them to each of the two objects (wall and particle).
-            pI->addForce(i->getForce());
-            w->addForce(-i->getForce());
-
-            //If the rotation flag is on, also applies the relevant torques
-            //(getRotation() returns a boolean).
-            if (getRotation()) // getRotation() returns a boolean.
-            {
-                pI->addTorque(i->getTorque() - Vec3D::cross(pI->getPosition() - i->getContactPoint(), i->getForce()));
-                ///\todo TW: I think this torque has the wrong sign
-                w->addTorque(-i->getTorque() + Vec3D::cross(w->getPosition() - i->getContactPoint(), i->getForce()));
-            }
+            pI->addTorque(i->getTorque() - Vec3D::cross(pI->getPosition() - i->getContactPoint(), i->getForce()));
+            ///\todo TW: I think this torque has the wrong sign
+            w->addTorque(-i->getTorque() + Vec3D::cross(w->getPosition() - i->getContactPoint(), i->getForce()));
         }
     }
 }
@@ -3164,7 +3160,13 @@ void DPMBase::computeAllForces()
         //(compute internal forces compares the current particle p
         //with all others in the handler!)
         computeInternalForces(p);
+        // body forces
         computeExternalForces(p);
+    }
+
+    // wall-forces
+    for (BaseWall* w : wallHandler) {
+        computeWallForces(w);
     }
 
 #ifdef CONTACT_LIST_HGRID
@@ -3580,19 +3582,21 @@ void DPMBase::readOld(std::istream& is)
  */
 void DPMBase::checkSettings()
 {
-    //check for DPMBase parameters
-    logger.assert_always(getTimeStep() != 0,
-                         "Time step undefined: use setTimeStep() ");
-    logger.assert_always(getXMax() >= getXMin(),
-                         "Domain size not set: use setXMin() and setXMax()");
-    logger.assert_always(getYMax() >= getYMin(),
-                         "Domain size not set: use setYMin() and setYMax()");
-    logger.assert_always(systemDimensions_<3 || getZMax() >= getZMin(),
-                         "Domain size not set: use setZMin() and setZMax()",systemDimensions_);
-    logger.assert_always(getName().compare("")!=0,
+    //check if name is set
+    logger.assert_always(getName().compare("") != 0,
                          "File name not set: % Use setName()",getName());
+    //check if time step is set
+    logger.assert_always(getTimeStep() != 0,
+                         "Time step undefined: use setTimeStep()");
+    //check if domain is set
+    logger.assert_always(getXMax() > getXMin(),
+                         "Domain size not set: use setXMin() and setXMax()");
+    logger.assert_always(getYMax() > getYMin(),
+                         "Domain size not set: use setYMin() and setYMax()");
+    logger.assert_always(systemDimensions_==3?(getZMax() > getZMin()):(getZMax() >= getZMin()) ,
+                         "Domain size not set: use setZMin() and setZMax()",systemDimensions_);
 
-    //check for Species parameters
+    //check for species parameters
     logger.assert_always(speciesHandler.getNumberOfObjects() > 0,
                          "No species defined: use speciesHandler.copyAndAddObject()");
     for (BaseParticle* p : particleHandler)
@@ -4688,10 +4692,6 @@ ParticleVtkWriter* DPMBase::getVtkWriter() const
     return vtkWriter_;
 }
 
-void DPMBase::hGridGetInteractingParticleList(BaseParticle* obj, std::vector<BaseParticle*>& list)
-{
-}
-
 
 
 /**\brief Injects desired kinetic energy and mean velocity into the system.
@@ -4739,6 +4739,16 @@ void DPMBase::setMeanVelocityAndKineticEnergy(Vec3D V_mean_goal, Mdouble Ek_goal
     //check the final mean velocity and kinetic energy
     std::cout << "V_mean_final " << DPMBase::getTotalMomentum()/ DPMBase::getTotalMass() << std::endl;
     std::cout << "Ek_final " << DPMBase::getKineticEnergy() << std::endl;
+}
+
+void DPMBase::computeWallForces(BaseWall *const w) {
+    //compute forces for all particles that are neither fixed or ghosts
+    for (auto p : particleHandler) {
+        if (!p->isFixed() && p->getPeriodicFromParticle() == nullptr) {
+            //w->computeForces(p);
+            computeForcesDueToWalls(p,w);
+        }
+    }
 }
 
 

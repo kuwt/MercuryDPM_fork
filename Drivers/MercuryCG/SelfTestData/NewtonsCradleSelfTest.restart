@@ -14,14 +14,14 @@ Walls 1
 InfiniteWall id 0 indSpecies 0 position 0 0 0 orientation 0.707106781186548 0 0.707106781186548 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 -2.8 torque 0 0 0
 Boundaries 0
 Particles 5
-BaseParticle id 0 indSpecies 0 position 0.5 0.5 0.499963088692133 orientation 1 0 0 0 velocity 0 0 2.72375255850057e-13 angularVelocity 0 0 0 force 0 0 -4.44089209850063e-16 torque 0 0 0 radius 0.5 invMass 1
-BaseParticle id 1 indSpecies 0 position 0.5 0.5 1.44993935999422 orientation 1 0 0 0 velocity 0 0 1.08232213089151e-12 angularVelocity 0 0 0 force 0 0 4.44089209850063e-16 torque 0 0 0 radius 0.45 invMass 1.37174211248285
-BaseParticle id 2 indSpecies 0 position 0.5 0.5 2.29992524141896 orientation 1 0 0 0 velocity 0 0 1.23323118084567e-12 angularVelocity 0 0 0 force 0 0 -2.22044604925031e-16 torque 0 0 0 radius 0.4 invMass 1.953125
-BaseParticle id 3 indSpecies 0 position 0.5 0.5 3.04991787233999 orientation 1 0 0 0 velocity 0 0 1.13912463803362e-12 angularVelocity 0 0 0 force 0 0 8.32667268468867e-17 torque 0 0 0 radius 0.35 invMass 2.91545189504373
-BaseParticle id 4 indSpecies 0 position 0.5 0.5 3.69991502489624 orientation 1 0 0 0 velocity 0 0 1.57281535306213e-12 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.3 invMass 4.62962962962963
+BaseParticle id 0 indSpecies 0 position 0.5 0.5 0.499963088692133 orientation 1 0 0 0 velocity 0 0 2.723733472393e-13 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.5 invMass 1
+BaseParticle id 1 indSpecies 0 position 0.5 0.5 1.44993935999422 orientation 1 0 0 0 velocity 0 0 1.08232019205495e-12 angularVelocity 0 0 0 force 0 0 -2.22044604925031e-16 torque 0 0 0 radius 0.45 invMass 1.37174211248285
+BaseParticle id 2 indSpecies 0 position 0.5 0.5 2.29992524141896 orientation 1 0 0 0 velocity 0 0 1.23322924867673e-12 angularVelocity 0 0 0 force 0 0 1.11022302462516e-16 torque 0 0 0 radius 0.4 invMass 1.953125
+BaseParticle id 3 indSpecies 0 position 0.5 0.5 3.04991787233999 orientation 1 0 0 0 velocity 0 0 1.13912270945575e-12 angularVelocity 0 0 0 force 0 0 -2.77555756156289e-17 torque 0 0 0 radius 0.35 invMass 2.91545189504373
+BaseParticle id 4 indSpecies 0 position 0.5 0.5 3.69991502489624 orientation 1 0 0 0 velocity 0 0 1.5728134004057e-12 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.3 invMass 4.62962962962963
 Interactions 5
-LinearViscoelasticInteraction particleWallIds 0 0 timeStamp 80001 force -0 -0 2.8 torque 0 0 0
 LinearViscoelasticInteraction particleIds 1 2 timeStamp 80001 force 0 0 -1.071 torque 0 0 0
+LinearViscoelasticInteraction particleWallIds 0 0 timeStamp 80001 force -0 -0 2.8 torque 0 0 0
 LinearViscoelasticInteraction particleIds 0 1 timeStamp 80001 force 0 0 -1.8 torque 0 0 0
 LinearViscoelasticInteraction particleIds 2 3 timeStamp 80001 force 0 0 -0.559 torque 0 0 0
 LinearViscoelasticInteraction particleIds 3 4 timeStamp 80001 force 0 0 -0.216 torque 0 0 0

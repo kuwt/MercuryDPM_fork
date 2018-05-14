@@ -59,16 +59,6 @@ void Quaternion::setUnity()
 }
 
 /*!
- * \details Checks if ALL elements are zero 
- * \return          TRUE if q0 equals one and ALL other elements are zero
- * \bug use isEqual instead of ==
- */
-bool Quaternion::isUnity() const
-{
-    return q0 == 1.0 && q1 == 0.0 && q2 == 0.0 && q3 == 0.0;
-}
-
-/*!
  * \details Adds quaternion to itself
  * \param[in] a     quaternion to be added
  * \return          resulting 3D quaternion
@@ -490,7 +480,7 @@ Vec3D Quaternion::getAxis() const
 //retrieves the rotation matrix, often called A in literature.
 void Quaternion::getRotationMatrix(SmallMatrix<3, 3>& A) const
 {
-    
+
     Mdouble q00 = q0*q0;
     Mdouble q01 = 2*q0*q1;
     Mdouble q02 = 2*q0*q2;
@@ -518,7 +508,7 @@ void Quaternion::getRotationMatrix(SmallMatrix<3, 3>& A) const
  */
 void Quaternion::setOrientationViaNormal(Vec3D normal)
 {
-    if (normal.getLength() < 1e-10)
+    if (normal.getLengthSquared() < 1e-20)
     {
         setUnity();
         return;

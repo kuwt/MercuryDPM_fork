@@ -58,15 +58,6 @@ void Vec3D::setNaN()
 }
 
 /*!
- * \details Checks if ALL elements are zero 
- * \return          TRUE if ALL elements are zero
- */
-bool Vec3D::isZero() const
-{
-    return X == 0.0 && Y == 0.0 && Z == 0.0;
-}
-
-/*!
  * \details Checks if ALL elements are zero
  * \return          TRUE if ALL elements are zero
  */
@@ -190,12 +181,12 @@ Vec3D Vec3D::square(const Vec3D& a)
  */
 void Vec3D::normalize()
 {
-    Mdouble length = this->getLength();
-    if (length==0)
+    Mdouble length2 = this->getLengthSquared();
+    if (length2==0)
     {
         logger(ERROR, "Normalizing a vector of length 0");
     }
-    *this /= length;
+    *this /= std::sqrt(length2);
 }
 
 /*!
@@ -370,7 +361,7 @@ Vec3D Vec3D::getFromCylindricalCoordinates() const
  *                      given tolerance.
  */
 bool Vec3D::isEqualTo(const Vec3D& other, const double tol) const
-        {
+{
     if ((Vec3D::getLengthSquared(*this - other)) <= tol * tol)
     {
         return true;
