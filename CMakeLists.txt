@@ -63,9 +63,9 @@ add_custom_target(fullTest
 #############################################
 
 configure_file(Configuration/CMakeDefinitions.cc
-		${PROJECT_BINARY_DIR}/Kernel/CMakeDefinitions.cc)
+	${PROJECT_SOURCE_DIR}/Kernel/CMakeDefinitions.cc)
 configure_file(Configuration/CMakeDefinitions.h
-		${PROJECT_BINARY_DIR}/Kernel/CMakeDefinitions.h)
+	${PROJECT_SOURCE_DIR}/Kernel/CMakeDefinitions.h)
 
 
 #This section is about the build of documentation#
