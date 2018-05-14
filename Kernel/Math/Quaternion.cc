@@ -160,7 +160,11 @@ Quaternion& Quaternion::operator/=(const Mdouble a)
  */
 void Quaternion::normalise()
 {
-    *this /= this->getLength();
+    const Mdouble length2 = getLengthSquared();
+    if (length2==0) {
+        logger(ERROR, "Normalizing a quaternion of length 0");
+    }
+    *this /= sqrt(length2);
 }
 
 /*!
@@ -418,12 +422,12 @@ Quaternion Quaternion::angularDisplacementTimeDerivative(Vec3D v) const
          q2*v.X-q1*v.Y+q0*v.Z);
 }
 
-Quaternion Quaternion::updateAngularDisplacement(Vec3D angularVelocityDt) const
+void Quaternion::updateAngularDisplacement(Vec3D angularVelocityDt)
 {
-    Quaternion val;
-    val = *this + angularDisplacementTimeDerivative(angularVelocityDt);
-    val.normalise();
-    return val;
+    *this += angularDisplacementTimeDerivative(angularVelocityDt);
+    //const Quaternion q = *this;
+    normalise();
+    //logger(INFO,"%|%",q,*this);
 }
 
 
@@ -508,13 +512,14 @@ void Quaternion::getRotationMatrix(SmallMatrix<3, 3>& A) const
  */
 void Quaternion::setOrientationViaNormal(Vec3D normal)
 {
-    if (normal.getLengthSquared() < 1e-20)
-    {
-        setUnity();
-        return;
-    }
-    //setToRotationBetween(Vec3D(1,0,0), normal);
-    normal.normalize();
+    //if the normal vector cannot be read properly
+//    if (normal.getLengthSquared() < 1e-20)
+//    {
+//        setUnity();
+//        return;
+//    }
+
+    normal.normalise();
 
     if (normal.X <= -1+1e-14)
     {
@@ -522,14 +527,13 @@ void Quaternion::setOrientationViaNormal(Vec3D normal)
         return;
     }
 
-    Vec3D u = Vec3D(1,0,0);
-    Vec3D half = u + normal;
-    half.normalize();
+    Vec3D half = Vec3D(1,0,0) + normal;
     q0=half.X;
     q1=0;
     q2=-half.Z;
     q3=half.Y;
-    //logger(INFO,"% q %",normal,*this);
+    normalise();
+    //note, it can technically happen that normalising a normalised vector slightly changes the result.
 }
 
 //Euler rodriguez

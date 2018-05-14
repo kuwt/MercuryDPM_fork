@@ -204,7 +204,7 @@ public:
      */
     Quaternion angularDisplacementTimeDerivative(Vec3D v) const;
 
-    Quaternion updateAngularDisplacement(Vec3D angularVelocityDt) const;
+    void updateAngularDisplacement(Vec3D angularVelocityDt);
 
     /*!
      * \brief Converts quaternion rate of change into an angular momentum omega

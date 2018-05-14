@@ -240,7 +240,7 @@ bool Screw::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wallInter
     ContactPoint.Z = start_.Z + r * sin(2.0 * constants::pi * (offset_ + n_ * q));
     ContactPoint.X = start_.X + q * l_;
     normal_return = (ContactPoint - position);
-    normal_return.normalize();
+    normal_return.normalise();
     return true;
 }
 

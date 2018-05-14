@@ -411,7 +411,9 @@ void BaseParticle::oldRead(std::istream& is)
     is >> indSpecies;
     setPosition(position);
     setVelocity(velocity);
-    setOrientation(Quaternion(orientation));
+    Quaternion q;
+    q.setEuler(orientation);
+    setOrientation(q);
     setAngularVelocity(angularVelocity);
     invInertia_.XX = invInertiaScalar;
     invInertia_.YY = invInertiaScalar;

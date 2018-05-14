@@ -123,10 +123,7 @@ void BaseInteractable::setSpecies(const ParticleSpecies* species)
  */
 void BaseInteractable::setOrientationViaNormal(const Vec3D normal)
 {
-    //the computation here could be written in one line  as orientation_.setAxis(axis); however, some walls (IntersectionOfWalls) overwrite the setOrientation function.
-    Quaternion q;
-    q.setOrientationViaNormal(normal);
-    setOrientation(q);
+    orientation_.setOrientationViaNormal(normal);
 }
 
 /*!
@@ -152,8 +149,8 @@ void BaseInteractable::move(const Vec3D& move)
  */
 void BaseInteractable::rotate(const Vec3D& angularVelocityDt)
 {
-    //if (!angularVelocityDt.isZero()) {
-        setOrientation(orientation_.updateAngularDisplacement(angularVelocityDt));
+    //if (!svn angularVelocityDt.isZero()) {
+        orientation_.updateAngularDisplacement(angularVelocityDt);
     //}
 }
 

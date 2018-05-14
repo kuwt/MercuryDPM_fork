@@ -181,7 +181,7 @@ public:
     /*!
      * \brief Makes this Vec3D unit length
      */
-    void normalize();
+    void normalise();
     
     /*!
      * \brief Make this Vec3D a certain length 

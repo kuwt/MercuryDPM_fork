@@ -321,7 +321,7 @@ c               write(*,*) is,wt(is),wtsum
              wwt=wtsum/(NS+1)
 c            write(*,*) is,wt(is),wtsum
 c
-c ... normalize
+c ... normalise
              wt(0)=wt(0)/wwt
              wtsum=wt(0)
              write(*,*) 0,wt(0)

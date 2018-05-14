@@ -124,9 +124,7 @@ void InfiniteWall::set(Vec3D normal, Vec3D point)
  */
 void InfiniteWall::setNormal(const Vec3D normal)
 {
-    Quaternion q;
-    q.setOrientationViaNormal(normal);
-    setOrientation(q);
+    setOrientationViaNormal(normal);
 }
 
 /*!

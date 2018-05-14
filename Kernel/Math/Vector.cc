@@ -179,7 +179,7 @@ Vec3D Vec3D::square(const Vec3D& a)
  * \details Normalises the vector, i.e. divides all elements by the vectors length
  * (resulting in a vector in the same direction, but with unit length).
  */
-void Vec3D::normalize()
+void Vec3D::normalise()
 {
     Mdouble length2 = this->getLengthSquared();
     if (length2==0)
@@ -196,7 +196,7 @@ void Vec3D::normalize()
  */
 void Vec3D::setLength(Mdouble length)
 {
-    this->normalize();
+    this->normalise();
     *this *= length;
 }
 

@@ -136,7 +136,7 @@ unsigned int IntersectionOfWalls::getNumberOfObjects(void)
  */
 void IntersectionOfWalls::addObject(Vec3D normal, Vec3D point)
 {
-    normal.normalize();
+    normal.normalise();
     
     //n is the index of the new wall
     std::size_t n = wallObjects_.size();
@@ -206,8 +206,8 @@ void IntersectionOfWalls::addTetraSTL(Vec3D PointA, Vec3D PointB, Vec3D PointC, 
         Vec3D WallNormalRHR = Vec3D::cross(SubtB, SubtC);
         
         //normalise for easy check
-        WallNormalRHR.normalize();
-        WallNormal.normalize();
+        WallNormalRHR.normalise();
+        WallNormal.normalise();
         
         //if RHRchecl is 1, wall normal and RHR normal are in same direction, if -1 theyre not, then point B and C need to be swapped
         Mdouble RHRcheck = Vec3D::dot(WallNormalRHR, WallNormal);

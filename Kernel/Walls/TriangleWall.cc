@@ -186,12 +186,12 @@ void TriangleWall::updateVertexAndNormal() {
 
     edge_ = {vertex_[1]-vertex_[0],vertex_[2]-vertex_[1],vertex_[0]-vertex_[2]};
     faceNormal_ = Vec3D::cross(edge_[0],edge_[1]);
-    faceNormal_.normalize();
+    faceNormal_.normalise();
 
     for (int i=0; i<3; i++) {
         edgeNormal_[i] = Vec3D::cross(edge_[i],faceNormal_);
-        edge_[i].normalize();
-        edgeNormal_[i].normalize();
+        edge_[i].normalise();
+        edgeNormal_[i].normalise();
     }
     //logger(INFO,"vertex %,%,% edge %,%,% face %",vertex_[0],vertex_[1],vertex_[2],edgeNormal_[0],edgeNormal_[1],edgeNormal_[2],faceNormal_);
 }
