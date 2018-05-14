@@ -63,6 +63,7 @@ add_library(DPMBase STATIC
         WallHandler.cc
         DomainHandler.cc
         Domain.cc
+        BinaryReader.cc
 
         ${Interactions_SRC}
         ${InteractionsN_SRC}
@@ -77,7 +78,7 @@ add_library(DPMBase STATIC
         ${Nurbs_SRC}
 
         ${Mercury_BINARY_DIR}/Kernel/CMakeDefinitions.cc
-)
+        STLTriangle.h STLReader.h)
 
 target_link_libraries(DPMBase LinearAlgebra)
 

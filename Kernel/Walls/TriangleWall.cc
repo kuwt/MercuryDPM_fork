@@ -147,7 +147,7 @@ void TriangleWall::write(std::ostream& os) const
 {
     BaseWall::write(os);
     for (int i=0; i<3; i++) {
-        os << "Vertex" << i << ' ' << vertex_[i];
+        os << " vertex" << i << ' ' << vertex_[i];
     }
 }
 

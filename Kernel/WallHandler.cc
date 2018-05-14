@@ -38,6 +38,8 @@
 #include "Walls/Coil.h"
 #include "DPMBase.h"
 #include "Walls/VChute.h"
+#include "BinaryReader.h"
+#include "STLTriangle.h"
 
 /*!
  * Constructor of the WallHandler class. It creates an empty WallHandler.
@@ -307,49 +309,97 @@ void WallHandler::writeVTKBoundingBox() const
     file.close();
 }
 
-void WallHandler::readTriangleWall(std::string filename, ParticleSpecies *s, Mdouble scaleFactor) 
+void WallHandler::readTriangleWall(std::string filename, ParticleSpecies *species, Mdouble scaleFactor)
 {
-    //try open the input file
-    std::fstream file;
-    file.open(filename.c_str(), std::ios::in);
-    logger.assert_always(file.is_open(), "File opening failed: %",filename);
+    std::string fileType = filename.substr(filename.find_last_of('.')+1);
 
-    //skip the header lines
-    std::string dummy;
-    getline(file, dummy);
-    getline(file, dummy);
-    getline(file, dummy);
-    getline(file, dummy);
-    
-    //read vertices, apply scaling
-    unsigned num;
-    file >> dummy >> num >> dummy;
-    std::vector<Vec3D> vertex;
-    vertex.reserve(num);
-    Vec3D v;
-    for (unsigned i = 0; i < num; i++)
-    {
-        file >> v.X >> v.Y >> v.Z;
-        v *= scaleFactor;
-        vertex.push_back(v);
+    if (!fileType.compare("vtk")) {
+        //try open the input file
+        std::fstream file;
+        file.open(filename.c_str(), std::ios::in);
+        logger.assert_always(file.is_open(), "File opening failed: %", filename);
+
+        //skip the header lines
+        std::string dummy;
+        getline(file, dummy);
+        getline(file, dummy);
+        getline(file, dummy);
+        getline(file, dummy);
+
+        //read vertices, apply scaling
+        unsigned num;
+        file >> dummy >> num >> dummy;
+        std::vector<Vec3D> vertex;
+        vertex.reserve(num);
+        Vec3D v;
+        for (unsigned i = 0; i < num; i++) {
+            file >> v.X >> v.Y >> v.Z;
+            v *= scaleFactor;
+            vertex.push_back(v);
+        }
+
+        //read faces
+        unsigned n = getSize();
+        file >> dummy >> num >> dummy;
+        TriangleWall triangleWall;
+        triangleWall.setSpecies(species);
+        unsigned id0, id1, id2;
+        for (unsigned i = 0; i < num; i++) {
+            file >> dummy >> id0 >> id1 >> id2;
+            triangleWall.setVertices(vertex[id0], vertex[id1], vertex[id2]);
+            copyAndAddObject(triangleWall);
+        }
+
+        //close file
+        file.close();
+
+        logger(INFO, "Read in % walls", getSize() - n);
+
+    } else if (!fileType.compare("stl")) {
+
+        BinaryReader file(filename);
+
+        STLTriangle triangle;
+        TriangleWall triangleWall;
+        triangleWall.setSpecies(species);
+
+        std::string header = file.readString(80);
+        unsigned numTriangles = file.readUnsignedInt(4);
+
+        for (unsigned i = 0; i < numTriangles; i++) {
+            triangle.normal.x() = file.readFloat(4);
+            triangle.normal.y() = file.readFloat(4);
+            triangle.normal.z() = file.readFloat(4);
+
+
+            triangle.vertex1.x() = file.readFloat(4);
+            triangle.vertex1.y() = file.readFloat(4);
+            triangle.vertex1.z() = file.readFloat(4);
+
+            triangle.vertex2.x() = file.readFloat(4);
+            triangle.vertex2.y() = file.readFloat(4);
+            triangle.vertex2.z() = file.readFloat(4);
+
+
+            triangle.vertex3.x() = file.readFloat(4);
+            triangle.vertex3.y() = file.readFloat(4);
+            triangle.vertex3.z() = file.readFloat(4);
+
+            //add to triangle wall
+            triangleWall.setVertices(triangle.vertex1, triangle.vertex2, triangle.vertex3);
+            copyAndAddObject(triangleWall);
+
+            //Now ignore (read) the two dummy characters
+            file.ignoreChar(2);
+
+        }
+
+        logger(INFO, "Read in % walls", numTriangles);
+
+    } else {
+
+        logger(ERROR,"File type of % must be vtk or stl");
+
     }
-
-    //read faces
-    unsigned n = getSize();
-    file >> dummy >> num >> dummy;
-    TriangleWall triangleWall;
-    triangleWall.setSpecies(s);
-    unsigned id0, id1, id2;
-    for (unsigned i = 0; i < num; i++)
-    {
-        file >> dummy >> id0 >> id1 >> id2;
-        triangleWall.setVertices(vertex[id0],vertex[id1],vertex[id2]);
-        copyAndAddObject(triangleWall);
-    }
-
-    //close file
-    file.close();
-    
-    logger(INFO,"Read in % walls",getSize()-n);
 }
 

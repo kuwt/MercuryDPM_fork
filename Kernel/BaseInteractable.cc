@@ -149,7 +149,7 @@ void BaseInteractable::move(const Vec3D& move)
  */
 void BaseInteractable::rotate(const Vec3D& angularVelocityDt)
 {
-    //if (!svn angularVelocityDt.isZero()) {
+    //if (!angularVelocityDt.isZero()) {
         orientation_.updateAngularDisplacement(angularVelocityDt);
     //}
 }
