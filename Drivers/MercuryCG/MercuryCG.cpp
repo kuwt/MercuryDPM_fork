@@ -211,6 +211,10 @@ void commandLineCG(Mercury3D &dpm, int argc, char **argv)
     //restarting from file
     dpm.cgHandler.restart(name);
 
+    //make sure no data is written; if data is written (e.g. using the -writedata option, the files will be overwritten, not appended)
+    dpm.setFileType(FileType::NO_FILE);
+    dpm.setAppend(false);
+
     //set a default stat file name
     cg->statFile.setName(dpm.getName() + ".stat");
 
@@ -226,67 +230,98 @@ void commandLineCG(Mercury3D &dpm, int argc, char **argv)
     // interpret arguments
     for (; i < argc; i += 2) {
         if (!strcmp(argv[i], "-w") || !strcmp(argv[i], "-width")) {
+            logger.assert_always(i+1<argc,"% requires argument",argv[i]);
             cg->setWidth(atof(argv[i + 1]));
             logger(INFO, "Set cg width to %", cg->getWidth());
         } else if (!strcmp(argv[i], "-std")) {
+            logger.assert_always(i+1<argc,"% requires argument",argv[i]);
             cg->setStandardDeviation(atof(argv[i + 1]));
             logger(INFO, "Set cg width to % (std %)", cg->getWidth(),atof(argv[i + 1]));
         } else if (!strcmp(argv[i], "-n")) {
+            logger.assert_always(i+1<argc,"% requires argument",argv[i]);
             cg->setN(atoi(argv[i + 1]));
             logger(INFO, "Set n to %", argv[i + 1]);
         } else if (!strcmp(argv[i], "-nx")) {
+            logger.assert_always(i+1<argc,"% requires argument",argv[i]);
             cg->setNX(atoi(argv[i + 1]));
             logger(INFO, "Set nx to %", argv[i + 1]);
         } else if (!strcmp(argv[i], "-ny")) {
+            logger.assert_always(i+1<argc,"% requires argument",argv[i]);
             cg->setNY(atoi(argv[i + 1]));
             logger(INFO, "Set ny to %", argv[i + 1]);
         } else if (!strcmp(argv[i], "-nz")) {
+            logger.assert_always(i+1<argc,"% requires argument",argv[i]);
             cg->setNZ(atoi(argv[i + 1]));
             logger(INFO, "Set nz to %", argv[i + 1]);
         } else if (!strcmp(argv[i], "-h")) {
+            logger.assert_always(i+1<argc,"% requires argument",argv[i]);
             cg->setH(atof(argv[i + 1]));
             logger(INFO, "Set n to %x%x% for h=%", cg->getNX(), cg->getNY(), cg->getNZ(), argv[i + 1]);
         } else if (!strcmp(argv[i], "-hx")) {
+            logger.assert_always(i+1<argc,"% requires argument",argv[i]);
             cg->setHX(atof(argv[i + 1]));
             logger(INFO, "Set nx to % to satisfy hx=%", cg->getNX(), argv[i + 1]);
         } else if (!strcmp(argv[i], "-hy")) {
+            logger.assert_always(i+1<argc,"% requires argument",argv[i]);
             cg->setHY(atof(argv[i + 1]));
             logger(INFO, "Set ny to % to satisfy hy=%", cg->getNY(), argv[i + 1]);
         } else if (!strcmp(argv[i], "-hz")) {
+            logger.assert_always(i+1<argc,"% requires argument",argv[i]);
             cg->setHZ(atof(argv[i + 1]));
             logger(INFO, "Set nz to % to satisfy hz=%", cg->getNZ(), argv[i + 1]);
         } else if (!strcmp(argv[i], "-x")) {
+            logger.assert(i+2<argc,"% requires two arguments",argv[i]);
             cg->setX(atof(argv[i + 1]), atof(argv[i + 2]));
             logger(INFO, "Set x to (%,%)", argv[i + 1], argv[i + 2]);
             ++i;
         } else if (!strcmp(argv[i], "-y")) {
+            logger.assert(i+2<argc,"% requires two arguments",argv[i]);
             cg->setY(atof(argv[i + 1]), atof(argv[i + 2]));
             logger(INFO, "Set y to (%,%)", argv[i + 1], argv[i + 2]);
             ++i;
         } else if (!strcmp(argv[i], "-z")) {
+            logger.assert(i+2<argc,"% requires two arguments",argv[i]);
             cg->setZ(atof(argv[i + 1]), atof(argv[i + 2]));
             logger(INFO, "Set z to (%,%)", argv[i + 1], argv[i + 2]);
             ++i;
         } else if (!strcmp(argv[i], "-t")) {
+            logger.assert(i+2<argc,"% requires two arguments",argv[i]);
             cg->setTimeMin(atof(argv[i + 1]));
             cg->setTimeMax(atof(argv[i + 2]));
             logger(INFO, "Set t to (%,%)", argv[i + 1], argv[i + 2]);
             i++;
+        } else if (!strcmp(argv[i], "-savecount")) {
+            logger.assert_always(i+1<argc,"% requires argument",argv[i]);
+            cg->statFile.setSaveCount(atof(argv[i + 1]));
+            logger(INFO, "Set savecount to %", argv[i + 1]);
+        } else if (!strcmp(argv[i], "-writedata")) {
+            dpm.dataFile.setFileType(FileType::ONE_FILE);
+            logger(INFO, "Turn on data file output. Execute %.xballs to visualise output", dpm.getName());
+            --i;
         } else if (!strcmp(argv[i], "-tmin")) {
+            logger.assert_always(i+1<argc,"% requires argument",argv[i]);
             cg->setTimeMin(atof(argv[i + 1]));
             logger(INFO, "Set tMin to %", argv[i + 1]);
         } else if (!strcmp(argv[i], "-timemin")) {
             logger(ERROR, "% is not a valid argument; use -tMin instead",argv[i]);
         } else if (!strcmp(argv[i], "-tmax")) {
+            logger.assert_always(i+1<argc,"% requires argument",argv[i]);
             cg->setTimeMax(atof(argv[i + 1]));
             logger(INFO, "Set tMax to %", argv[i + 1]);
+        } else if (!strcmp(argv[i], "-dt")) {
+            logger.assert_always(i+1<argc,"% requires argument",argv[i]);
+            dpm.setTimeMax(dpm.getTime()+atof(argv[i + 1]));
+            logger(INFO, "Set evaluation time interval to %", argv[i + 1]);
         } else if (!strcmp(argv[i], "-timemax")) {
             logger(ERROR, "% is not a valid argument; use -tMax instead",argv[i]);
         } else if (!strcmp(argv[i], "-o")) {
+            logger.assert_always(i+1<argc,"% requires argument",argv[i]);
             cg->statFile.setName(argv[i + 1]);
             logger(INFO, "Set output file name to %", argv[i + 1]);
-        } else if (!strcmp(argv[i], "-coordinates") || !strcmp(argv[i], "-function") || !strcmp(argv[i], "-fields")) {
-        } else if (!strcmp(argv[i], "-help") || !strcmp(argv[i], "-restart") || !strcmp(argv[i], "-timeaverage") || !strcmp(argv[i], "-timesmooth")) {
+        } else if (!strcmp(argv[i], "-coordinates") || !strcmp(argv[i], "-function") || !strcmp(argv[i], "-fields") || !strcmp(argv[i], "-restartandanalyse")) {
+            //these are commands with one argument that should be ignored here because they are read somewhere else
+        } else if (!strcmp(argv[i], "-help") || !strcmp(argv[i], "-readfromrestart") || !strcmp(argv[i], "-timeaverage") || !strcmp(argv[i], "-timesmooth")) {
+            //these are commands with no argument that should be ignored here because they are read somewhere else
             --i;
         } else {
             logger(ERROR, "Could not read argument %", argv[i]);
@@ -295,25 +330,44 @@ void commandLineCG(Mercury3D &dpm, int argc, char **argv)
 
     logger(INFO, "Created object of type %", cg->getName());
 
-    bool useDataFiles = true;
-    for (unsigned i = 1; i < argc; i++)
-        if (!strcmp(argv[i], "-restart")) {
-            useDataFiles = false;
-            logger(INFO, "Using restart files instead of data files");
+    //Determine what kind of input to read from (data files, restart files, or live cg)
+    //Variable that stores the type of data source
+    enum class DataSource {
+        readFromData,
+        readFromRestart,
+        restartAndAnalyse
+    } dataSource = DataSource::readFromData;
+    //read command line arguments to determine dataSource
+    for (unsigned i = 1; i < argc; i++) {
+        if (!strcmp(argv[i], "-readfromrestart")) {
+            dataSource = DataSource::readFromRestart;
+        } else if (!strcmp(argv[i], "-restartandanalyse")) {
+            dataSource = DataSource::restartAndAnalyse;
+            dpm.setTimeMax(dpm.getTime()+atof(argv[i+1]));
         }
-    if (useDataFiles) {
+    }
+    //Evaluate based on dataSource
+    if (dataSource == DataSource::readFromData) {
+        logger(INFO, "Reading from data files.");
         if (!dpm.cgHandler.evaluateDataFiles()) {
             logger(ERROR,"Evaluation of data files has failed. Check input files.");
         }
-    } else {
-        if (dpm.restartFile.getFileType()==FileType::ONE_FILE) {
-            logger(ERROR,"Evaluation of restart files has failed. Check input files.");
+    } else if (dataSource == DataSource::readFromRestart){
+        logger(INFO, "Reading from restart files.");
+        if (dpm.restartFile.getFileType()!=FileType::MULTIPLE_FILES &&
+            dpm.restartFile.getFileType()!=FileType::MULTIPLE_FILES_PADDED) {
+            logger(ERROR,"Evaluation of restart files requires multiple restart files. Check input.");
         }
         dpm.cgHandler.evaluateRestartFiles();
+    } else {
+        logger(INFO,"Restarting simulation for live analysis");
+        //dpm.write(std::cout,false);
+        //dpm.setSaveCount(25);
+        dpm.solve();
     }
     logger(INFO, "\n"
                  "MercuryCG has finished.\n"
-                 "Coarse-grained output is written to %.\n"
+                 "Coarse-grained output is written to %\n"
                  "To load output into Matlab, use data=readMercuryCG('%')",
            dpm.cgHandler.getLastObject()->statFile.getName(), dpm.cgHandler.getLastObject()->statFile.getName());
 }

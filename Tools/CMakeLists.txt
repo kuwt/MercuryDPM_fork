@@ -5,6 +5,9 @@ include(${CMAKE_SOURCE_DIR}/Configuration/MasterMake.cmake)
 add_executable( data2pvd data2pvd.cpp )
 target_link_libraries( data2pvd MercuryBase )
 
+add_executable( ParticleAnalytics2Mercury ParticleAnalytics2Mercury.cpp )
+target_link_libraries( ParticleAnalytics2Mercury MercuryBase )
+
 add_executable( RestartToData RestartToData.cpp )
 target_link_libraries( RestartToData MercuryBase )
 

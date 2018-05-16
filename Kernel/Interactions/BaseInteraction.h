@@ -349,6 +349,11 @@ public:
 
     virtual std::vector<Mdouble> getFieldVTK(unsigned i) const;
 
+    /*!
+     * \brief set total force (this is used by the normal force, tangential forces are added use addForce)
+     */
+    void setForce(Vec3D force);
+
 protected:
 
     /*!
@@ -383,11 +388,6 @@ protected:
     void addTorque(Vec3D torque);
 
     //these functions are only used for normal forces and should be made private by the normal forces:
-
-    /*!
-     * \brief set total force (this is used by the normal force, tangential forces are added use addForce)
-     */
-    void setForce(Vec3D force);
 
     /*!
      * \brief set the total force (this is used by the normal force, tangential torques are added use addTorque)

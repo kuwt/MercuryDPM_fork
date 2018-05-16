@@ -397,6 +397,8 @@ void DPMBase::setSaveCount(unsigned int saveCount)
     restartFile.setSaveCount(saveCount);
     statFile.setSaveCount(saveCount);
     eneFile.setSaveCount(saveCount);
+    for (auto cg : cgHandler)
+        cg->statFile.setSaveCount(saveCount);
 }
 /*!
  * \param[in] name
