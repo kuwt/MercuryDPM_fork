@@ -180,8 +180,6 @@ public:
 
     //Vec3D getCurrentPeriodicPosition();   
 
-    
- 
     /*!
      * \brief Unfix Particle function, which required a reference to the Species vector. It unfixes a Particle by computing the Particles mass and inertia
      */
@@ -573,8 +571,14 @@ public:
 
     virtual std::vector<Mdouble> getFieldVTK(unsigned i) const;
 
+    virtual void actionsAfterTimeStep() {};
+
     //const HGridCell& getHGridCell() const;
     const HGridCell& getHGridCell() const { return hGridCell; }
+
+protected:
+
+    Mdouble radius_; ///Particle radius_
 
 private:
 
@@ -600,7 +604,6 @@ private:
     ///Particle attributes
     Mdouble invMass_; ///Inverse Particle mass (for computation optimization)
     MatrixSymmetric3D invInertia_; ///Inverse Particle inverse inertia (for computation optimization)
-    Mdouble radius_; ///Particle radius_ 
     BaseParticle * periodicFromParticle_; ///Pointer to originating Particle
 
     //MPI particle attributes

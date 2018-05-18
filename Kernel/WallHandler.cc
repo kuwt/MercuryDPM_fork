@@ -385,6 +385,10 @@ void WallHandler::readTriangleWall(std::string filename, ParticleSpecies *specie
             triangle.vertex3.y() = file.readFloat(4);
             triangle.vertex3.z() = file.readFloat(4);
 
+            triangle.vertex1 *= scaleFactor;
+            triangle.vertex2 *= scaleFactor;
+            triangle.vertex3 *= scaleFactor;
+
             //add to triangle wall
             triangleWall.setVertices(triangle.vertex1, triangle.vertex2, triangle.vertex3);
             copyAndAddObject(triangleWall);

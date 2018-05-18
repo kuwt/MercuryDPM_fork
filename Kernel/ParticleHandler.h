@@ -438,6 +438,8 @@ public:
      */
     unsigned int getNumberOfRealObjectsLocal() const;
 
+    void actionsAfterTimeStep();
+
 private:
 
 

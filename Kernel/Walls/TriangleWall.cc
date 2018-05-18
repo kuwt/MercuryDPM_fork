@@ -181,8 +181,8 @@ void TriangleWall::updateVertexAndNormal() {
         vertex_ = vertexInLabFrame_;
         getOrientation().rotate(vertex_[i]);
     }
-    vertexMin_ = std::min(std::min(vertex_[0].X,vertex_[1].X),vertex_[2].X);
-    vertexMax_ = std::max(std::max(vertex_[0].X,vertex_[1].X),vertex_[2].X);
+    vertexMin_ = Vec3D::min(Vec3D::min(vertex_[0],vertex_[1]),vertex_[2]);
+    vertexMax_= Vec3D::max(Vec3D::max(vertex_[0],vertex_[1]),vertex_[2]);
 
     edge_ = {vertex_[1]-vertex_[0],vertex_[2]-vertex_[1],vertex_[0]-vertex_[2]};
     faceNormal_ = Vec3D::cross(edge_[0],edge_[1]);

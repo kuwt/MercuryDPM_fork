@@ -1066,6 +1066,10 @@ BaseParticle* ParticleHandler::createObject(const std::string& type)
     {
         return new SuperQuadric;
     }
+    else if (type == "ThermalParticle")
+    {
+        return new ThermalParticle;
+    }
     else 
     {
         logger(ERROR, "Particle type % not understood in restart file. Particle will not be read.", type);
@@ -1391,4 +1395,12 @@ unsigned int ParticleHandler::getNumberOfFixedObjects() const
 #else
     return getNumberOfFixedObjectsLocal();
 #endif
+}
+
+void ParticleHandler::actionsAfterTimeStep()
+{
+    for (auto i: *this)
+    {
+        i->actionsAfterTimeStep();
+    }
 }

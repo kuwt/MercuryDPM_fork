@@ -51,9 +51,9 @@ public:
             for (unsigned j = 0; j < ny; j++)
                 for (unsigned i = 0; i < nx; i++)
                 {
-                    ParticleToCopy->setPosition(Vec3D(getXMin() + dx * i, //(i+random.getRandomNumber(-.5,.5)),
-                                                      getYMin() + dy * j, //(j+random.getRandomNumber(-.5,.5)),
-                                                      getZMin() + dz * k));
+                    ParticleToCopy->setPosition(Vec3D(getXMin() + dx * (i+0.5), //(i+random.getRandomNumber(-.5,.5)),
+                                                      getYMin() + dy * (j+0.5), //(j+random.getRandomNumber(-.5,.5)),
+                                                      getZMin() + dz * (k+0.5)));
                     ParticleToCopy->setOrientationViaNormal(Vec3D(random.getRandomNumber(-1.0, 1.0),
                                                                   random.getRandomNumber(-1.0, 1.0),
                                                                   random.getRandomNumber(-1.0, 1.0)));

@@ -38,6 +38,7 @@
 ThermalParticle::ThermalParticle()
 {
     temperature_ = 0;
+    //temperatureDependentDensity_
 }
 
 /*!
@@ -52,6 +53,7 @@ ThermalParticle::ThermalParticle(const ThermalParticle &p)
         : BaseParticle(p)
 {
     temperature_ = p.temperature_;
+    timeDependentTemperature_ = p.timeDependentTemperature_;
 }
 
 /*!
@@ -125,7 +127,27 @@ void ThermalParticle::addTemperature(Mdouble temperature)
     temperature_+=temperature;
 }
 
-//void ThermalParticle::addThermalEnergy(Mdouble energy)
-//{
-//    temperature_+=energy/getMass()/getSpecies();
-//}
+void ThermalParticle::actionsAfterTimeStep()
+{
+    if (timeDependentTemperature_) {
+        temperature_ = timeDependentTemperature_(getHandler()->getDPMBase()->getTime());
+        //logger(INFO,"T %",temperature_);
+    }
+    if (getSpecies()->getTemperatureDependentDensity()) {
+        const Mdouble density = getSpecies()->getTemperatureDependentDensity()(temperature_);
+        const Mdouble m = getMass();
+        radius_ = getRadius()*cbrt(getMass()/(getVolume()*density));
+        //setRadius(1.001*getRadius());
+        //logger(INFO,"F % R % t % % %",cbrt(getMass()/(getVolume()*density)),radius_,getHandler()->getDPMBase()->getNtimeSteps());
+    }
+}
+
+const std::function<double(double)> &ThermalParticle::getTimeDependentTemperature() const {
+    return timeDependentTemperature_;
+}
+
+void ThermalParticle::setTimeDependentTemperature(const std::function<double(double)> &timeDependentTemperature) {
+    timeDependentTemperature_ = timeDependentTemperature;
+    temperature_ = timeDependentTemperature(0);
+    logger(INFO,"Setting initial temperature to %",temperature_);
+}

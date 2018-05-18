@@ -3935,6 +3935,7 @@ void DPMBase::computeOneTimeStep()
     interactionHandler.eraseOldInteractions(getNtimeSteps());
     logger(DEBUG, "about to call interactionHandler.actionsAfterTimeStep()");
     interactionHandler.actionsAfterTimeStep();
+    particleHandler.actionsAfterTimeStep();
 
     time_ += timeStep_;
     nTimeSteps_++;

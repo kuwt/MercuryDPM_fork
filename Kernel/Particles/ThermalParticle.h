@@ -67,7 +67,22 @@ public:
 
     void addTemperature(Mdouble temperature);
 
+	void setTemperatureDependentDensity(const std::function<double(double)> &temperatureDependentDensity);
+
+	const std::function<double(double)> &getTemperatureDependentDensity() const;
+
+	const std::function<double(double)> &getTimeDependentTemperature() const;
+
+	void setTimeDependentTemperature(const std::function<double(double)> &timeDependentTemperature);
+
+	void actionsAfterTimeStep();
+
 private:
+
+	/*!
+	 * Change this function to let the temperature be time-dependent.
+	 */
+	std::function<double(double temperature)> timeDependentTemperature_;
 
 	Mdouble temperature_;
 };

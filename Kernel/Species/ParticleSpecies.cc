@@ -46,6 +46,7 @@ ParticleSpecies::ParticleSpecies()
 ParticleSpecies::ParticleSpecies(const ParticleSpecies &p)
 {
     density_=p.density_;
+    temperatureDependentDensity_ = p.temperatureDependentDensity_;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"ParticleSpecies::ParticleSpecies(const ParticleSpecies &p) finished"<<std::endl;
 #endif
@@ -204,3 +205,15 @@ void ParticleSpecies::computeMass(BaseParticle* p) const
     }
 }
 
+const std::function<double(double)> &ParticleSpecies::getTemperatureDependentDensity() const
+{
+    return temperatureDependentDensity_;
+}
+
+void ParticleSpecies::setTemperatureDependentDensity(
+        const std::function<double(double)> &temperatureDependentDensity)
+{
+    temperatureDependentDensity_ = temperatureDependentDensity;
+//    density_ = temperatureDependentDensity_(0);
+//    logger(INFO,"Setting initial density to %",temperature_);
+}

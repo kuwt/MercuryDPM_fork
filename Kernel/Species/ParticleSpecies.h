@@ -87,10 +87,21 @@ public:
      */
     void computeMass(BaseParticle* p) const;
 
+    void setTemperatureDependentDensity(const std::function<double(double)> &temperatureDependentDensity);
+
+    const std::function<double(double)> &getTemperatureDependentDensity() const;
+
 private:
     /*!
      * \brief The mass density.
      */
     Mdouble density_;
+
+    /*!
+     * Change this function to let the particles expand due to temperature.
+     * The default value (empty) stands for constant density.
+     */
+    std::function<double(double temperature)> temperatureDependentDensity_;
+
 };
 #endif
