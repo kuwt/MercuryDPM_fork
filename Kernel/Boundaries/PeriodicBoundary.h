@@ -151,7 +151,7 @@ public:
     /*!
      * \brief Returns the name of the object
      */
-    virtual std::string getName() const override;
+    std::string getName() const override;
     
     /*!   
      * \brief Checks distance of particle to closest wall and creates periodic 

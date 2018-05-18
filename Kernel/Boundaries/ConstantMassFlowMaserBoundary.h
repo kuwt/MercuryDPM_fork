@@ -82,7 +82,7 @@ public:
     /*!
      * \brief Maserboundary constructor that takes a periodic boundary, and converts it to a maser boundary
      */
-    ConstantMassFlowMaserBoundary(const PeriodicBoundary& periodicBoundary);
+    explicit ConstantMassFlowMaserBoundary(const PeriodicBoundary& periodicBoundary);
 
     /*!
      * \brief Creates a copy of this maser on the heap.

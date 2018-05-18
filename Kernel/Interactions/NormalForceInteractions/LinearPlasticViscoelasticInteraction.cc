@@ -170,10 +170,7 @@ void LinearPlasticViscoelasticInteraction::computeNormalForce()
  */
 Mdouble LinearPlasticViscoelasticInteraction::getElasticEnergy() const
 {
-   if (getOverlap() > 0)
-        return 0.5 * (getSpecies()->getLoadingStiffness() * mathsFunc::square(getOverlap()));
-    else
-        return 0.0;
+    return getOverlap() > 0 ? 0.5 * (getSpecies()->getLoadingStiffness() * mathsFunc::square(getOverlap())) : 0.0;
   ///\todo TW this is not correct; we should count the return energy
 }
 /*!

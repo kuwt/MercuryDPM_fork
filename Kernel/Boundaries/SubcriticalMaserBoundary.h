@@ -78,7 +78,7 @@ public:
     /*!
      * \brief Maserboundary constructor that takes a periodic boundary, and converts it to a maser boundary
      */
-    SubcriticalMaserBoundary(const PeriodicBoundary& periodicBoundary);
+    explicit SubcriticalMaserBoundary(const PeriodicBoundary& periodicBoundary);
 
     /*!
      * \brief Creates a copy of this maser on the heap.

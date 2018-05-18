@@ -70,7 +70,7 @@ public:
     void actionsAfterTimeStep() override
     {
         std::vector<BaseInteraction*> interaction = particleHandler.getObject(0)->getInteractionWith(particleHandler.getObject(1), getTimeStep(), &interactionHandler);
-        if ( interaction.size() != 0)
+        if (!interaction.empty())
         {
             logger.assert_always(getTime() > 0.49 && getTime() < 0.6, "Contact is at the wrong time (time=%)", getTime());
             /// \todo merge hack please fix

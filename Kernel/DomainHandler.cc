@@ -26,7 +26,7 @@
 
 #include <iostream>
 #include <string>
-#include <stdlib.h>
+#include <cstdlib>
 #include <Math/Helpers.h>
 #include "DomainHandler.h"
 #include "Boundaries/BaseBoundary.h"
@@ -162,8 +162,8 @@ void DomainHandler::createDomains(std::vector<Mdouble> domainMin, std::vector<Md
     	//Create a new domain
 	Domain domain(globalMeshIndex);
     	domain.setHandler(this);
-    	std::vector<double> domainBoundMin = domainMin;
-	std::vector<double> domainBoundMax = domainMax;
+        const std::vector<double> &domainBoundMin = domainMin;
+        const std::vector<double> &domainBoundMax = domainMax;
 	domain.setBounds(domainBoundMin, domainBoundMax, true);
 	this->copyAndAddObject(domain);
     }

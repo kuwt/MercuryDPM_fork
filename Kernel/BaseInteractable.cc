@@ -169,7 +169,7 @@ void BaseInteractable::read(std::istream& is)
     is >> dummy >> position_;
     is >> dummy;
     //this if-statement is added to read Kasper van der Vaart's data files, which contain an additional variable named positionAbsolute
-    if (dummy.compare("positionAbsolute") == 0)
+    if (dummy == "positionAbsolute")
     {
         is >> dummy >> dummy >> dummy  >> dummy;
     }
@@ -177,7 +177,7 @@ void BaseInteractable::read(std::istream& is)
     is >> dummy >> velocity_;
     is >> dummy >> angularVelocity_;
     is >> dummy;
-    if (dummy.compare("0")==0)
+    if (dummy == "0")
         is >> dummy;
     is >> force_;
     is >> dummy >> torque_;

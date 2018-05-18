@@ -48,8 +48,7 @@ class Hertzian2DUnitTest : public Mercury2D
 
         }
 
-        ~Hertzian2DUnitTest() override {
-        }
+        ~Hertzian2DUnitTest() override = default;
 };
 
 int main() 

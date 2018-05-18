@@ -70,17 +70,17 @@ public:
     /*!
      * \brief Copy constructor, converts an existing DPMBase problem into a Chute problem
      */
-    Chute(const DPMBase& other);
+    explicit Chute(const DPMBase& other);
 
     /*!
      * \brief Copy constructor, converts an existing MercuryBase problem into a Chute problem
-     */  
-    Chute(const MercuryBase& other);
+     */
+    explicit Chute(const MercuryBase& other);
 
     /*!
      * \brief Copy constructor, converts an existing Mercury3D problem into a Chute problem
-     */   
-    Chute(const Mercury3D& other);
+     */
+    explicit Chute(const Mercury3D& other);
     
     /*!
      * \brief Default copy constructor

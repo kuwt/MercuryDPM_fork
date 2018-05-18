@@ -193,7 +193,7 @@ void LevelSetWall::createVTKSphere()
 
     for (unsigned j=0; j<nz; ++j) {
         for (unsigned i=0; i<nr; ++i) {
-            vtkLabFrame_.points.push_back(Vec3D(r[j]*s[i],r[j]*c[i],h[j]));
+            vtkLabFrame_.points.emplace_back(r[j]*s[i],r[j]*c[i],h[j]);
         }
     }
 

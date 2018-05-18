@@ -192,7 +192,7 @@ public:
 
     void renderWall (VTKContainer& vtk) {
         if (getVTKVisibility()) {
-            if (renderedWalls_.size()==0) {
+            if (renderedWalls_.empty()) {
                 writeVTK(vtk);
             } else {
                 for (const auto& r: renderedWalls_)

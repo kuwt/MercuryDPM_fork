@@ -25,7 +25,7 @@
 
 #include "DPMBase.h"
 #include <Species/LinearViscoelasticSlidingFrictionBondedSpecies.h>
-#include <assert.h>
+#include <cassert>
 
 class SlidingFrictionUnitTest : public DPMBase {
 

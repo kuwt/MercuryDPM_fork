@@ -29,7 +29,7 @@
 #include "Particles/BaseParticle.h"
 #include "InteractionHandler.h"
 #include <iomanip>
-#include <assert.h>
+#include <cassert>
 
 ///\todo Clean up this file by using the logger instead of cout, //cout, cerr and assert, and by motivating why the commented out code needs to be here.
 ///\todo Complete the documentation of these methods

@@ -112,7 +112,7 @@ void SlidingFrictionInteraction::computeFrictionForce()
         if (species->getSlidingStiffness() != 0.0)
         {
             //used to Integrate the spring
-            if (dynamic_cast<BaseParticle*>(getI())==0)  //if particle-wall
+            if (dynamic_cast<BaseParticle*>(getI())== nullptr)  //if particle-wall
                 slidingSpringVelocity_= tangentialRelativeVelocity;
             else //if particle-particle
                 slidingSpringVelocity_= (tangentialRelativeVelocity - Vec3D::dot(slidingSpring_, getP()->getVelocity() - getI()->getVelocity()) * getNormal() / getDistance());

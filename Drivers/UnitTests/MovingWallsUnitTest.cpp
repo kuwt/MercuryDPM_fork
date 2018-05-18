@@ -33,7 +33,7 @@
 class MovingWalls : public DPMBase
 {
 public:
-    MovingWalls (std::string name) {
+    explicit MovingWalls (std::string name) {
         setName("MovingWalls" + name);
         solve();
         logger(INFO,"%", *wallHandler.getLastObject());

@@ -77,10 +77,9 @@ class FluxAndPeriodicBoundarySelfTest : public Mercury2D
             setGravity(Vec3D(1, 0, 0));
         }
 
-        ~FluxAndPeriodicBoundarySelfTest() override {
-        }
+        ~FluxAndPeriodicBoundarySelfTest() override = default;
 
-        void actionsAfterTimeStep() override {
+    void actionsAfterTimeStep() override {
             fprintf(flux_f, "%f %f %d %f %f %d %f %f\n", 
                     getTime(),
                     particleHandler.getMass(),

@@ -24,7 +24,7 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <limits>
-#include <string.h>
+#include <cstring>
 
 #include "MercuryBase.h"
 
@@ -260,10 +260,9 @@ void MercuryBase::hGridRebuild()
         }
     }
 
-    if(grid != nullptr)
-    {
-        delete grid;
-    }
+
+    delete grid;
+
 
     grid = new HGrid(getHGridTargetNumberOfBuckets(), getHGridCellOverSizeRatio(), cellSizes);
 

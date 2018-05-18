@@ -24,7 +24,7 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iomanip>
-#include <string.h>
+#include <cstring>
 
 #include "SilbertPeriodic.h"
 
@@ -48,7 +48,7 @@ public:
 		<< "P" << getPolydispersity()
 		<< "D" << getDensityVariation()
 		<< "N" << NumberFraction;
-		dataFile.setName(name.str().c_str());
+		dataFile.setName(name.str());
 	}
 	
 	void run(int argc, char *argv[])

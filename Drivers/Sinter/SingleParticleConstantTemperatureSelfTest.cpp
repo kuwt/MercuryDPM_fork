@@ -43,7 +43,7 @@ public:
      * Default constructor; creates (empty) species, particle, and geometry sets output details
      * @return
      */
-    SingleParticle(Mdouble radius=1e-6) {
+    explicit SingleParticle(Mdouble radius=1e-6) {
         //create empty species
         species = speciesHandler.copyAndAddObject(SpeciesType());
 

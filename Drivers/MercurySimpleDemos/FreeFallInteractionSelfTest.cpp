@@ -36,8 +36,7 @@ class FreeFallInteractionSelfTest : public Mercury2D
 {
 public:
 	
-	void setupInitialConditions()
-	{
+	void setupInitialConditions() override {
 		InfiniteWall w0;
 		w0.setSpecies(speciesHandler.getLastObject());
 		w0.set(Vec3D(0,-1,0), getMin());

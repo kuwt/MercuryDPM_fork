@@ -49,7 +49,7 @@ int main()
     BinaryReader STLReader(directory+"/Drivers/ImportTools/ExampleSTLFiles/SimpleTrianlge.stl");
     
     //First read the 80 character header
-    std::string header("");
+    std::string header;
     header=STLReader.readString(80);
     //logger(INFO, "Header : %" ,header);
    

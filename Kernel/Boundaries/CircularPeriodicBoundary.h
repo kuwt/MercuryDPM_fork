@@ -45,8 +45,8 @@ public:
 
     /*!
      * \brief Constructor
-     */    
-    CircularPeriodicBoundary(double innerRadius);
+     */
+    explicit CircularPeriodicBoundary(double innerRadius);
     
     /*!
      * \brief destructor

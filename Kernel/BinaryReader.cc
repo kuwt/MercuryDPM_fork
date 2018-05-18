@@ -134,7 +134,6 @@ void BinaryReader::ignoreChar(unsigned int size)
 {
     char tempRead[size];
     binaryFile_.read(tempRead,size);
-    return;
 }
                
 #endif

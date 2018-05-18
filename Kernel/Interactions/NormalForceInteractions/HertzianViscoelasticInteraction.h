@@ -64,7 +64,7 @@ public:
      */
     void computeNormalForce();
 
-    HertzianViscoelasticInteraction(const BaseInteraction &p) : BaseInteraction(p)
+    explicit HertzianViscoelasticInteraction(const BaseInteraction &p) : BaseInteraction(p)
     {
 
     }

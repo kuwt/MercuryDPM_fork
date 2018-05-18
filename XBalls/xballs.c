@@ -56,7 +56,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile);
 void  Draw_Contacts( float xy0, int h_offset, int v_offset,
                      float xskal, float yskal, float xleft, 
                      float xright, float xbottom, float xtop,
-                     int NK, float *px, float *pz, float *prad );
+                     int NK, float *px, const float *pz, const float *prad );
 
 void  Draw_Walls( float xy0, int h_offset, int v_offset,
                   float xskal, float yskal, float xleft, 
@@ -180,8 +180,8 @@ int main(argc, argv)
             {
 				 sprintf(csystem,"more %s.txt",argv[0]);
 				 //sprintf(csystem,"more %s/xballs.txt",XBPATH);
-                 if (system(csystem));
-                 exit(0);
+                 if (system(csystem))
+                     exit(0);
                  /* return; */
             }
 	else if ((strcmp("-f", argv[count]) == 0) && (count + 1 <= argc))
@@ -696,7 +696,7 @@ XtTimerCallbackProc Cycle()
 void Draw_Contacts( float xy0, int h_offset, int v_offset,
                     float xskal, float yskal, float xleft, 
                     float xright, float xbottom, float xtop,
-                    int NK, float *px, float *pz, float *prad )
+                    int NK, float *px, const float *pz, const float *prad )
 {
   FILE *fpw;
   int ierr, icolor;
@@ -1342,7 +1342,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
         /* draw walls */
                v_offset = offset;
                h_offset = hoffset;
-               if( strcmp(wallfile, "-") )
+               if( strcmp(wallfile, "-") != 0)
                  Draw_Walls( xy0, h_offset, v_offset, xskal, yskal,
                              xleft, xright, xbottom, xtop );
 
@@ -1991,7 +1991,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                      distxz=eyepos-x12[i];
                      dist= sqrtf(x1[i]*x1[i]+x2[i]*x2[i]+distxz*distxz);
                      if(dist>1.e-12*unidist) 
-                        unif[i]=unidist/xrad[i]*tan(asinf(xrad[i]/dist));
+                        unif[i]=unidist/xrad[i]* tanf(asinf(xrad[i]/dist));
                      else
                         unif[i]=1;
                      unig[i]=1;
@@ -2838,7 +2838,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                }
 
         /* draw contacts */
-               if( strcmp(drfile, "-") )
+               if( strcmp(drfile, "-") != 0)
                {
                  /* clear graphics-windows */
                  if( noddel > 0 )
@@ -2893,8 +2893,8 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                 if( ifilm == 2 )
                   sprintf(csystem,"import +screen -window %lu -border -scene %d %6.6d.%s \n",eng,icount,icount,coutfile); 
                 printf(csystem,"%s");
-                if (system(csystem));
-                icount++;
+                if (system(csystem))
+                    icount++;
                }
 
         /* make loop for pause between frames */
@@ -3310,8 +3310,8 @@ int read_line( int inread, FILE *fp,
 
 while( icomp == 0 )
 {
-  if(fgets( cline, clength, fp ));
-  if( (icomp = strncmp( "#", cline, 1 )) != 0 )
+  if(fgets( cline, clength, fp ))
+      if( (icomp = strncmp( "#", cline, 1 )) != 0 )
   {
     if( inread == 6 )
     {
@@ -3382,8 +3382,8 @@ int read_header( int inread, FILE *fp,
  
 while( icomp == 0 )
 {
-  if(fgets( cline, clength, fp ));
-  if( (icomp = strncmp( "#", cline, 1 )) != 0 )
+  if(fgets( cline, clength, fp ))
+      if( (icomp = strncmp( "#", cline, 1 )) != 0 )
   {
     if(( inread == 3 ) || ( inread == 7 ) || ( inread == 14 ))
     {

@@ -66,7 +66,7 @@ ParticleHandler::ParticleHandler(const ParticleHandler& PH)
     largestParticle_ = nullptr;
     smallestParticle_ = nullptr;
     copyContentsFromOtherHandler(PH);
-    if (objects_.size() != 0)
+    if (!objects_.empty())
     {
         computeLargestParticle();
         computeSmallestParticle();
@@ -88,7 +88,7 @@ ParticleHandler& ParticleHandler::operator =(const ParticleHandler& rhs)
         largestParticle_ = nullptr;
         smallestParticle_ = nullptr;
         copyContentsFromOtherHandler(rhs);
-        if (objects_.size() != 0)
+        if (!objects_.empty())
         {
             computeLargestParticle();
             computeSmallestParticle();

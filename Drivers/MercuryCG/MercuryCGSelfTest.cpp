@@ -43,7 +43,7 @@ using mathsFunc::cubic;
 
 struct MercuryCGSelfTest : public Mercury3D
 {
-    MercuryCGSelfTest(const unsigned n=5)
+    explicit MercuryCGSelfTest(const unsigned n=5)
     {
         setMin({0,0,0});
         setMax(Vec3D(n,1,1));

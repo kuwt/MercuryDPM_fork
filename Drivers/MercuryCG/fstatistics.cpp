@@ -26,8 +26,8 @@
 #include "Statistics.h"
 #include <iostream>  // ostream
 #include <iomanip>   // setw
-#include <string.h>
-#include <stdlib.h>
+#include <cstring>
+#include <cstdlib>
 #include <sstream>
 /**
  * \brief fstatistics is the postprocessing tool for analysing particle data; see \ref fstatistics for details.

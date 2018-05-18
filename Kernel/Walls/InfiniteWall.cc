@@ -177,7 +177,7 @@ void InfiniteWall::read(std::istream& is)
     BaseWall::read(is);
     std::string dummy;
     is >> dummy;
-    if (dummy.compare("normal")==0)
+    if (dummy == "normal")
     {
         Vec3D normal;
         is >> normal;
@@ -238,26 +238,26 @@ void InfiniteWall::createVTK (std::vector<Vec3D>& myPoints, const Vec3D min, con
         // If the wall normal has a nonzero x-component,
         // We first find four intersection points with the four domain edges pointing in x-direction.
         // Because these points might be outside the domain in x-direction, we use the intersection function have points in the domain
-        myPoints.push_back(Vec3D(p.X-((min.Y-p.Y)*n.Y+(min.Z-p.Z)*n.Z)/n.X,min.Y,min.Z));
-        myPoints.push_back(Vec3D(p.X-((min.Y-p.Y)*n.Y+(max.Z-p.Z)*n.Z)/n.X,min.Y,max.Z));
-        myPoints.push_back(Vec3D(p.X-((max.Y-p.Y)*n.Y+(max.Z-p.Z)*n.Z)/n.X,max.Y,max.Z));
-        myPoints.push_back(Vec3D(p.X-((max.Y-p.Y)*n.Y+(min.Z-p.Z)*n.Z)/n.X,max.Y,min.Z));
+        myPoints.emplace_back(p.X-((min.Y-p.Y)*n.Y+(min.Z-p.Z)*n.Z)/n.X,min.Y,min.Z);
+        myPoints.emplace_back(p.X-((min.Y-p.Y)*n.Y+(max.Z-p.Z)*n.Z)/n.X,min.Y,max.Z);
+        myPoints.emplace_back(p.X-((max.Y-p.Y)*n.Y+(max.Z-p.Z)*n.Z)/n.X,max.Y,max.Z);
+        myPoints.emplace_back(p.X-((max.Y-p.Y)*n.Y+(min.Z-p.Z)*n.Z)/n.X,max.Y,min.Z);
         intersectVTK(myPoints, Vec3D(+1, 0, 0), Vec3D(max.X, 0, 0));
         intersectVTK(myPoints, Vec3D(-1, 0, 0), Vec3D(min.X, 0, 0));
     } else if (fabs(n.Y)>0.5) {
         // Else, if the wall normal has a nonzero y-component ...
-        myPoints.push_back(Vec3D(min.X,p.Y-((min.X-p.X)*n.X+(min.Z-p.Z)*n.Z)/n.Y,min.Z));
-        myPoints.push_back(Vec3D(min.X,p.Y-((min.X-p.X)*n.X+(max.Z-p.Z)*n.Z)/n.Y,max.Z));
-        myPoints.push_back(Vec3D(max.X,p.Y-((max.X-p.X)*n.X+(max.Z-p.Z)*n.Z)/n.Y,max.Z));
-        myPoints.push_back(Vec3D(max.X,p.Y-((max.X-p.X)*n.X+(min.Z-p.Z)*n.Z)/n.Y,min.Z));
+        myPoints.emplace_back(min.X,p.Y-((min.X-p.X)*n.X+(min.Z-p.Z)*n.Z)/n.Y,min.Z);
+        myPoints.emplace_back(min.X,p.Y-((min.X-p.X)*n.X+(max.Z-p.Z)*n.Z)/n.Y,max.Z);
+        myPoints.emplace_back(max.X,p.Y-((max.X-p.X)*n.X+(max.Z-p.Z)*n.Z)/n.Y,max.Z);
+        myPoints.emplace_back(max.X,p.Y-((max.X-p.X)*n.X+(min.Z-p.Z)*n.Z)/n.Y,min.Z);
         intersectVTK(myPoints, Vec3D(0, +1, 0), Vec3D(0, max.Y, 0));
         intersectVTK(myPoints, Vec3D(0, -1, 0), Vec3D(0, min.Y, 0));
     } else {
         // Else, the wall normal has to have a a nonzero z-component ...
-        myPoints.push_back(Vec3D(min.X,min.Y,p.Z-((min.Y-p.Y)*n.Y+(min.X-p.X)*n.X)/n.Z));
-        myPoints.push_back(Vec3D(min.X,max.Y,p.Z-((max.Y-p.Y)*n.Y+(min.X-p.X)*n.X)/n.Z));
-        myPoints.push_back(Vec3D(max.X,max.Y,p.Z-((max.Y-p.Y)*n.Y+(max.X-p.X)*n.X)/n.Z));
-        myPoints.push_back(Vec3D(max.X,min.Y,p.Z-((min.Y-p.Y)*n.Y+(max.X-p.X)*n.X)/n.Z));
+        myPoints.emplace_back(min.X,min.Y,p.Z-((min.Y-p.Y)*n.Y+(min.X-p.X)*n.X)/n.Z);
+        myPoints.emplace_back(min.X,max.Y,p.Z-((max.Y-p.Y)*n.Y+(min.X-p.X)*n.X)/n.Z);
+        myPoints.emplace_back(max.X,max.Y,p.Z-((max.Y-p.Y)*n.Y+(max.X-p.X)*n.X)/n.Z);
+        myPoints.emplace_back(max.X,min.Y,p.Z-((min.Y-p.Y)*n.Y+(max.X-p.X)*n.X)/n.Z);
         intersectVTK(myPoints, Vec3D(0, 0, +1), Vec3D(0, 0, max.Z));
         intersectVTK(myPoints, Vec3D(0, 0, -1), Vec3D(0, 0, min.Z));
     }

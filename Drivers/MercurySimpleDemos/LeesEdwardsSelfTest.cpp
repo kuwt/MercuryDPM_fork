@@ -31,8 +31,7 @@ class LeesEdwards : public Mercury2D
 {
 public:
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         //set parameters to define the species properties
         const Mdouble particleRadius=0.5; // such that diameter is one
         const Mdouble collisionTime = 0.05; //relatively stiff particles

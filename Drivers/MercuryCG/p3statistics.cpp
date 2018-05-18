@@ -25,8 +25,8 @@
 
 #include <iostream>  // ostream
 #include <iomanip>   // setw
-#include <string.h>
-#include <stdlib.h>
+#include <cstring>
+#include <cstdlib>
 #include <sstream>
 #include "StatisticsVector.h"
 
@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
     }
     else {
         // if you don't use the -help argument and if at least one argument is given
-        if (strcmp(argv[1],"-help"))
+        if (strcmp(argv[1],"-help") != 0)
             logger(INFO,"Getting statistics from %.p3* (or .p4*) files ...",argv[1]);
     }
 

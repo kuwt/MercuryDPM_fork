@@ -43,7 +43,7 @@ public:
     /*!
      * \brief Default constuction, requires to users to prove the name of the file that will be opened.
      */
-    FileReader(std::string name) {
+    explicit FileReader(std::string name) {
         pFile_.open(name+".p3p");
         if (pFile_) {
             version_ = Version::P3;
@@ -174,7 +174,7 @@ public:
             BaseParticle* p = dpm.particleHandler.getObjectById(id);
             logger.assert(p!=nullptr,"Particle % does not exist",id);
             std::vector<BaseInteraction*> c = w->getInteractionWith(p,time,&dpm.interactionHandler);
-            logger.assert(c.size()>0 && c[0],"Interaction % does not exist",c.size());
+            logger.assert(!c.empty() && c[0],"Interaction % does not exist",c.size());
             c[0]->setContactPoint(p->getPosition()-PC);
             c[0]->setDistance(PC.getLength());
             c[0]->setNormal(PC/c[0]->getDistance());

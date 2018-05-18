@@ -219,7 +219,7 @@ void BaseParticle::setPeriodicComplexity(int index, int value)
     //hack: generally you'd add particles after declaring the boundaries
     //but no official programming guildelines rules have been setup for that
     //So incase that doesnt happen we need to resize this periodicComplexity
-    if (periodicComplexity_.size() == 0)
+    if (periodicComplexity_.empty())
     {
         int numberOfPeriodicBoundaries = getHandler()->getDPMBase()->periodicBoundaryHandler.getSize();
         if (numberOfPeriodicBoundaries > 0 )
@@ -239,7 +239,7 @@ const std::vector<int>& BaseParticle::getPeriodicComplexity()
     //hack: generally you'd add particles after declaring the boundaries
     //but no official programming guildelines rules have been setup for that
     //So incase that doesnt happen we need to resize this periodicComplexity
-    if (periodicComplexity_.size() == 0)
+    if (periodicComplexity_.empty())
     {
         const unsigned numberOfPeriodicBoundaries = getHandler()->getDPMBase()->periodicBoundaryHandler.getSize();
         if (numberOfPeriodicBoundaries > 0 )
@@ -257,7 +257,7 @@ int BaseParticle::getPeriodicComplexity(int index)
     //but no official programming guildelines rules have been setup for that
     //So incase that doesnt happen we need to resize this periodicComplexity
     ///\todo TW @Marnix, this is indeed a hack; you should call a setter every time you add a value to the periodic boundary handler (this function takes 0.5% cpu time in the speedtest)
-    if (periodicComplexity_.size() == 0)
+    if (periodicComplexity_.empty())
     {
         const unsigned numberOfPeriodicBoundaries = getHandler()->getDPMBase()->periodicBoundaryHandler.getSize();
         if (numberOfPeriodicBoundaries > 0 )

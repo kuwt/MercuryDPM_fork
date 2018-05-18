@@ -35,8 +35,7 @@
  */
 class TwoBondedParticleElasticCollision : public Mercury3D {
 
-	void setupInitialConditions()
-	{
+	void setupInitialConditions() override {
 		//set system dimension
 		setMax(Vec3D(1,1,1)*0.01);
 		setMin(Vec3D(0,0,0));

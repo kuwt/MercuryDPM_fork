@@ -39,8 +39,8 @@ class Contact : public Mercury3D
 	Mdouble polydispersity_;
 
 public:
-	
-	Contact (Mdouble polydispersity)
+
+    explicit Contact (Mdouble polydispersity)
 	{
 		LinearViscoelasticSpecies s;
 		s.setDensity(2000);

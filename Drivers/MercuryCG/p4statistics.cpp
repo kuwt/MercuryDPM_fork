@@ -25,8 +25,8 @@
 
 #include <iostream>  // ostream
 #include <iomanip>   // setw
-#include <string.h>
-#include <stdlib.h>
+#include <cstring>
+#include <cstdlib>
 #include <sstream>
 #include "StatisticsVector.h"
 
@@ -34,7 +34,7 @@
 ///It is a modified version of fstatistics.cpp
 int main(int argc, char *argv[]) {	
 	
-	if (argc>1&&strcmp(argv[1],"-help"))
+	if (argc>1&&strcmp(argv[1],"-help") != 0)
 		logger(INFO, "Get statistics from %.* files", argv[1]);
 
 	//check for '-stattype' option

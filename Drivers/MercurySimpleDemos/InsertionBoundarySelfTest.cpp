@@ -36,8 +36,7 @@ class InsertionBoundarySelfTest : public Mercury3D
 {
 public:
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         setName("InsertionBoundarySelfTest");
         setSystemDimensions(3);
         setGravity(Vec3D(0, 0, 0));

@@ -2805,10 +2805,10 @@ int DPMBase::readRestartFile(std::string fileName)
 
     //If padded or numbered files are used, we need to extract the counter and remove it from the filename
     //First find the last point in the restart name
-    unsigned int pos = fileName.find(".");
-    while(fileName.find(".",pos+1) != std::string::npos)
+    unsigned int pos = fileName.find('.');
+    while(fileName.find('.',pos+1) != std::string::npos)
     {
-        pos = fileName.find(".",pos+1);
+        pos = fileName.find('.',pos+1);
     }
     //If the next char after the last . is a digit we are using numbered files 
     if (isdigit(fileName[pos+1]))
@@ -3326,7 +3326,7 @@ void DPMBase::read(std::istream& is)
     //compare the string read in to the phrase "restart_version" to see if the stream corresponds
     //to a restart file (all restart files begin with this phrase)
     //if both strings match, strcmp(dummy.c_str(), "restart_version") returns 0 (here read as "false")
-    if (strcmp(dummy.c_str(), "restart_version"))
+    if (strcmp(dummy.c_str(), "restart_version") != 0)
     {
         //If the strings do not match, if statement is fulfilled  and the error logged
         //Note: only very old files did not have a restart_version
@@ -3584,7 +3584,7 @@ void DPMBase::readOld(std::istream& is)
 void DPMBase::checkSettings()
 {
     //check if name is set
-    logger.assert_always(getName().compare("") != 0,
+    logger.assert_always(getName() != "",
                          "File name not set: % Use setName()",getName());
     //check if time step is set
     logger.assert_always(getTimeStep() != 0,
@@ -3988,11 +3988,10 @@ bool DPMBase::readArguments(int argc, char* argv[])
 void DPMBase::removeOldFiles () const {
     std::ostringstream filename;
     std::vector<std::string> ext{".restart", ".stat", ".fstat", ".data", ".ene", ".xballs"};
-    for (unsigned int j = 0; j < ext.size(); j++)
-    {
+    for (const auto &j : ext) {
         // remove files with given extension for FileType::ONE_FILE
         filename.str("");
-        filename << getName() << ext[j];
+        filename << getName() << j;
         if (!remove(filename.str().c_str()))
         {
             std::cout << "  File " << filename.str() << " successfully deleted" << std::endl;
@@ -4000,31 +3999,30 @@ void DPMBase::removeOldFiles () const {
         // remove files with given extension for FileType::MULTIPLE_FILES
         unsigned k = 0;
         filename.str("");
-        filename << getName() << ext[j] << '.' << k;
+        filename << getName() << j << '.' << k;
         while (!remove(filename.str().c_str()))
         {
             std::cout << "  File " << filename.str() << " successfully deleted" << std::endl;
             filename.clear();
-            filename << getName() << ext[j] << '.' << ++k;
+            filename << getName() << j << '.' << ++k;
         }
         // remove files with given extension for FileType::MULTIPLE_FILES_PADDED
         k = 0;
         filename.str("");
-        filename << getName() << ext[j] << '.' << to_string_padded(k);
+        filename << getName() << j << '.' << to_string_padded(k);
         while (!remove(filename.str().c_str()))
         {
             std::cout << "  File " << filename.str() << " successfully deleted" << std::endl;
             filename.clear();
-            filename << getName() << ext[j] << '.' << to_string_padded(++k);
+            filename << getName() << j << '.' << to_string_padded(++k);
         }
     }
     // remove vtk files
     ext = {"Wall_", "Particle_", "Interaction_"};
-    for (unsigned int j = 0; j < ext.size(); j++)
-    {
+    for (const auto &j : ext) {
         // remove files with given extension for FileType::ONE_FILE
         filename.str("");
-        filename << getName() << ext[j] << ".vtu";
+        filename << getName() << j << ".vtu";
         if (!remove(filename.str().c_str()))
         {
             std::cout << "  File " << filename.str() << " successfully deleted" << std::endl;
@@ -4032,12 +4030,12 @@ void DPMBase::removeOldFiles () const {
         // remove files with given extension for FileType::MULTIPLE_FILES
         unsigned k = 0;
         filename.str("");
-        filename << getName() << ext[j] << k << ".vtu";
+        filename << getName() << j << k << ".vtu";
         while (!remove(filename.str().c_str()))
         {
             std::cout << "  File " << filename.str() << " successfully deleted" << std::endl;
             filename.str("");
-            filename << getName() << ext[j] << ++k << ".vtu";
+            filename << getName() << j << ++k << ".vtu";
         }
         //std::cout << "  File " << filename.str() << " not found" << std::endl;
     }
@@ -4231,7 +4229,7 @@ bool DPMBase::readNextArgument(int& i, int argc, char* argv[])
     else if (!strcmp(argv[i], "-data"))
     {
         std::string filename = argv[i + 1];
-        readDataFile(filename.c_str());
+        readDataFile(filename);
     }
     else if (!strcmp(argv[i], "-readSpeciesFromDataFile"))
     {
@@ -4516,7 +4514,7 @@ void DPMBase::removeDuplicatePeriodicParticles()
     for (unsigned int i = particleHandler.getSize();
          i >= 1 && particleHandler.getObject(i - 1)->getPeriodicFromParticle() != nullptr; i--)
     {
-        while (particleHandler.getObject(i - 1)->getInteractions().size() > 0)
+        while (!particleHandler.getObject(i - 1)->getInteractions().empty())
         {
             interactionHandler.removeObjectKeepingPeriodics(
                     particleHandler.getObject(i - 1)->getInteractions().front()->getIndex());
@@ -4589,9 +4587,8 @@ void DPMBase::deleteGhostParticles(std::set<BaseParticle*>& particlesToBeDeleted
     periodicBoundaryHandler.cleanCommunicationLists();
 
     //Delete the particles
-    for (auto particle_it = particlesToBeDeleted.begin(); particle_it != particlesToBeDeleted.end(); particle_it++)
-    {
-        particleHandler.removeGhostObject((*particle_it)->getIndex());
+    for (auto particle_it : particlesToBeDeleted) {
+        particleHandler.removeGhostObject(particle_it->getIndex());
     }
 }
 

@@ -335,7 +335,7 @@ public:
      * \brief constructor
      * \arg name The name in this module used in output messages.
      */
-    Logger(const std::string name)
+    explicit Logger(const std::string name)
             : module(name)
     {
     }

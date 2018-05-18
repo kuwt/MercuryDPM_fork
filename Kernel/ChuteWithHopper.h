@@ -43,22 +43,22 @@ public:
      * \brief This is a copy constructor for Chute problems 
      * \bug This copy construct is untested
      */
-    ChuteWithHopper(const Chute& other);
+    explicit ChuteWithHopper(const Chute& other);
 
     /*!
      * \brief Copy constructor, converts an existing Mercury3D object into a ChuteWithHopper object
      */
-    ChuteWithHopper(const Mercury3D& other);
+    explicit ChuteWithHopper(const Mercury3D& other);
 
     /*!
      * \brief Copy constructor, converts an existing MercuryBase object into a ChuteWithHopper object
      */
-    ChuteWithHopper(const MercuryBase& other);
+    explicit ChuteWithHopper(const MercuryBase& other);
 
     /*!
      * \brief Copy constructor, converts an existing DPMBase object into a ChuteWithHopper object
      */
-    ChuteWithHopper(const DPMBase& other);
+    explicit ChuteWithHopper(const DPMBase& other);
 
     /*!
      * \brief This is the default constructor

@@ -57,8 +57,8 @@ SinterInteraction::SinterInteraction(const SinterInteraction &p)
 }
 
 SinterInteraction::SinterInteraction()
-{
-}
+= default;
+
 /*!
  *
  */

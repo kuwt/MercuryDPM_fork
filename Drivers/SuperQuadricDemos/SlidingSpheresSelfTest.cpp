@@ -91,7 +91,7 @@ public:
         ///\todo should getTimeStep be getNTimeStep?
         std::vector<BaseInteraction*> interaction = particleHandler.getObject(0)->
                 getInteractionWith(particleHandler.getObject(1), getTimeStep(), &interactionHandler);
-        if ( interaction.size() != 0)
+        if (!interaction.empty())
         {
             contactHasOccured = true;
         }

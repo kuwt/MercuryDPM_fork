@@ -98,10 +98,9 @@ class FluxBoundarySelfTest : public Mercury2D
             setGravity(Vec3D(0, 0, 0));
         }
 
-        ~FluxBoundarySelfTest() override {
-        }
+        ~FluxBoundarySelfTest() override = default;
 
-        void actionsAfterTimeStep() override
+    void actionsAfterTimeStep() override
         {
             fprintf(flux_f, "%f %f %d %f %f %d %f %f %d %f %f %d %f %f\n", 
                     getTime(),

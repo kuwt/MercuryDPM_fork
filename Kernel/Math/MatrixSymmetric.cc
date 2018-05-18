@@ -33,15 +33,14 @@
  */
 MatrixSymmetric3D::operator Matrix3D() const
 {
-    return Matrix3D(XX, XY, XZ, XY, YY, YZ, XZ, YZ, ZZ);
+    return {XX, XY, XZ, XY, YY, YZ, XZ, YZ, ZZ};
 }
 
 /*!
  * \details Default constructor
  */
 MatrixSymmetric3D::MatrixSymmetric3D()
-{
-}
+= default;
 
 /*!
  * \details Alternative constructor, lets you define all (6) elements

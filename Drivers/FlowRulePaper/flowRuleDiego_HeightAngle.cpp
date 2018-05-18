@@ -24,7 +24,7 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iomanip>
-#include <string.h>
+#include <cstring>
 
 #include "Chute.h"
 #include "Boundaries/PeriodicBoundary.h"
@@ -192,7 +192,7 @@ public:
         for (unsigned int i = particleHandler.getNumberOfObjects(); i >= 1; i--)
         if (particleHandler.getObject(i - 1)->getPeriodicFromParticle() != nullptr)
         {
-            while (particleHandler.getObject(i - 1)->getInteractions().size() > 0)
+            while (!particleHandler.getObject(i - 1)->getInteractions().empty())
             {
                 interactionHandler.removeObjectKeepingPeriodics(particleHandler.getObject(i - 1)->getInteractions().front()->getIndex());
             }

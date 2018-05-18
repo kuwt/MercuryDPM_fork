@@ -31,8 +31,8 @@
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h> 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 
 class CFile {
@@ -40,7 +40,7 @@ class CFile {
 public:
 
 	///Constructor
-	CFile(std::string name) {
+	explicit CFile(std::string name) {
 		//set file names
 		data_filename.str("");
 		data_filename << name << ".data";

@@ -56,11 +56,10 @@ HGrid::HGrid(unsigned int num_buckets, double cellOverSizeRatio, std::vector<dou
     bucketIsChecked_.resize(numberOfBuckets_, false);
 
     //std::cout<<"Creating HGrid "<<cellSizes.size()<<" levels:"<<std::endl;
-    for (unsigned int i = 0; i < cellSizes.size(); i++)
-    {
+    for (double cellSize : cellSizes) {
         //std::cout<<"Level="<<i<<" size="<<cellSizes[i]<<std::endl;
-    	cellSizes_.push_back(cellSizes[i]);
-        invCellSizes_.push_back(1.0 / cellSizes[i]);
+    	cellSizes_.push_back(cellSize);
+        invCellSizes_.push_back(1.0 / cellSize);
     }
     logger(DEBUG, "HGrid::HGrid(unsigned int, double, vector<double>&) constructor finished.");
     /*  std::cout << "HGrid::HGrid(" << num_buckets << ", " << cellOverSizeRatio << ", [";

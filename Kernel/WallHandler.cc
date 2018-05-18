@@ -279,13 +279,10 @@ void WallHandler::writeVTKBoundingBox() const
     file << "<Points>\n";
     file << "  <DataArray type=\"Float32\" Name=\"Position\" NumberOfComponents=\"3\" format=\"ascii\">\n";
     Vec3D P[2] = {getDPMBase()->getMax(), getDPMBase()->getMin()};
-    for (unsigned i = 0; i < 2; i++)
-    {
-        for (unsigned j = 0; j < 2; j++)
-        {
-            for (unsigned k = 0; k < 2; k++)
-            {
-                Vec3D p = Vec3D(P[i].X, P[j].Y, P[k].Z);
+    for (auto &i : P) {
+        for (auto &j : P) {
+            for (auto &k : P) {
+                Vec3D p = Vec3D(i.X, j.Y, k.Z);
                 file << '\t' << p << '\n';
             }
         }

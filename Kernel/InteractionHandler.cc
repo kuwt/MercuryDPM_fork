@@ -25,7 +25,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
-#include <stdlib.h>
+#include <cstdlib>
 #include "Particles/BaseParticle.h"
 #include "InteractionHandler.h"
 #include "SpeciesHandler.h"
@@ -471,7 +471,7 @@ void InteractionHandler::readAndAddObject(std::istream& is)
         }
     }
 #else
-    if (idType.compare("particleIds") == 0)
+    if (idType == "particleIds")
         C = getInteraction(getDPMBase()->particleHandler.getObjectById(id0),
                            getDPMBase()->particleHandler.getObjectById(id1), timeStamp);
     else

@@ -33,7 +33,7 @@ using std::endl;
 class SinterPair : public Mercury3D
 {
 public:
-    SinterPair (Mdouble radius)
+    explicit SinterPair (Mdouble radius)
     {
         std::string r = helpers::to_string(radius);
         setName("SinterPair"+r);

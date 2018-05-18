@@ -100,7 +100,7 @@ void BasicIntersectionOfWalls::add(BaseWall& wall)
  */
 bool BasicIntersectionOfWalls::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal) const
 {
-    if (walls_.size() == 0)
+    if (walls_.empty())
     {
         logger(DEBUG, "Empty BasicIntersectionOfWalls");
         return false;

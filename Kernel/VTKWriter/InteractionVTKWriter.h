@@ -38,7 +38,7 @@ public:
     /**
      * \brief Non-default constructor; sets the handler and fileCounter
      */
-    InteractionVTKWriter(InteractionHandler& interactionHandler) : BaseVTKWriter(interactionHandler) { }
+    explicit InteractionVTKWriter(InteractionHandler& interactionHandler) : BaseVTKWriter(interactionHandler) { }
 
     /**
      * \brief Default copy constructor

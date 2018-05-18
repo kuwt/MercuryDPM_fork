@@ -48,8 +48,7 @@ class SubcriticalMaserBoundarySelfTest : public Mercury3D
 {
 public:
     
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         setName("SubcriticalMaserBoundarySelfTest");
         
         //set species properties: some standard values

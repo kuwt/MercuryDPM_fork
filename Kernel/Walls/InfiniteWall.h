@@ -61,7 +61,7 @@ public:
     /*!
      * \brief Constructor setting species.
      */
-    InfiniteWall(const ParticleSpecies* species);
+    explicit InfiniteWall(const ParticleSpecies* species);
 
     /*!
      * \brief Constructor setting values.

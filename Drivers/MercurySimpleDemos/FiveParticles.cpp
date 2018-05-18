@@ -30,8 +30,7 @@
 class FiveParticles : public Mercury3D
 {
 public:
-	void setupInitialConditions()
-	{
+	void setupInitialConditions() override {
 		//set parameters to define the species properties
 		const Mdouble particleRadius=0.5; // such that diameter is one
 		const Mdouble collisionTime = 0.005; //relatively stiff particles

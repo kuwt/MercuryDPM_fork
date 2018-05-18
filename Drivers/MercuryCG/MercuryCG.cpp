@@ -199,7 +199,7 @@ void commandLineCG(Mercury3D &dpm, int argc, char **argv)
     //Reads the name of the file name to be restarted.
     //This variable needs to be specified as the second argument ("./MercuryCG name ...")
     //If unspecified, it is set to default value "Chain".
-    std::string name = "";
+    std::string name;
     if (argc > 1 && argv[1][0] != '-') {
         name = argv[1];
         //logger(INFO, "Evaluating files %.*", name);

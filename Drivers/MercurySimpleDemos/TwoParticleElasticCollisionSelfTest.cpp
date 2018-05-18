@@ -35,8 +35,7 @@ class TwoParticleElasticCollision : public Mercury2D
 {
 
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         setMax({0.01,0.01,0.0});
         setGravity({0.0,-9.8,0.0});
 

@@ -159,7 +159,7 @@ void LiquidMigrationWilletInteraction::form()
     const LiquidMigrationWilletSpecies* species = getSpecies();
     LiquidFilmParticle* IParticle = dynamic_cast<LiquidFilmParticle*>(getI());
     LiquidFilmParticle* PParticle = dynamic_cast<LiquidFilmParticle*>(getP());
-    if (IParticle == 0) //if I is a wall
+    if (IParticle == nullptr) //if I is a wall
     {
         //consider max bridge volume and add the rest to particles
         if (PParticle->getLiquidVolume() <= species->getLiquidBridgeVolumeMax())
@@ -173,7 +173,7 @@ void LiquidMigrationWilletInteraction::form()
             PParticle->setLiquidVolume(PParticle->getLiquidVolume() - species->getLiquidBridgeVolumeMax());
         }
     }
-    else if (PParticle == 0) //if P is a wall
+    else if (PParticle == nullptr) //if P is a wall
     {
         //consider max bridge volume and add the rest to particles
         if (IParticle->getLiquidVolume() <= species->getLiquidBridgeVolumeMax())
@@ -258,7 +258,7 @@ void LiquidMigrationWilletInteraction::rupture()
     const LiquidMigrationWilletSpecies* species = getSpecies();
     LiquidFilmParticle* IParticle = dynamic_cast<LiquidFilmParticle*>(getI());
     LiquidFilmParticle* PParticle = dynamic_cast<LiquidFilmParticle*>(getP());
-    if (IParticle == 0) //if I is a wall
+    if (IParticle == nullptr) //if I is a wall
     {
         int numContactsP = 0;
         for (auto i : getP()->getInteractions())
@@ -315,7 +315,7 @@ void LiquidMigrationWilletInteraction::rupture()
             LiquidFilmParticle* j = dynamic_cast<LiquidFilmParticle*>(i);
         }
     }
-    else if (PParticle == 0) //if P is a wall
+    else if (PParticle == nullptr) //if P is a wall
     {
         int numContactsI = 0;
         for (auto i : getI()->getInteractions())

@@ -149,7 +149,7 @@ BaseBoundary* BoundaryHandler::createObject(const std::string &type)
     {
         return new SubcriticalMaserBoundaryTEST;
     }
-    else if (type.compare("LeesEdwardsBoundary") == 0)
+    else if (type == "LeesEdwardsBoundary")
     {
         return new LeesEdwardsBoundary;
     }
@@ -157,11 +157,11 @@ BaseBoundary* BoundaryHandler::createObject(const std::string &type)
     {
         return new PeriodicBoundary;
     }    
-    else if (type.compare("FluxBoundary") == 0)
+    else if (type == "FluxBoundary")
     {
         return new FluxBoundary;
     }
-    else if (type.compare("HeaterBoundary") == 0)
+    else if (type == "HeaterBoundary")
     {
         return new HeaterBoundary;
     }

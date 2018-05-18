@@ -67,7 +67,7 @@ public:
     /*!
      * \brief Default constructor, creates an empty CGHandler.
      */
-    CGHandler();
+    CGHandler() = default;;
 
     /*!
      * \brief Copy constructor, copies the CGHandler and all BaseCGPoint's it contains.
@@ -82,7 +82,7 @@ public:
     /*!
      * \brief Destructor, destructs the CGHandler and all BaseCGPoint's it contains.
      */
-    ~CGHandler() final;
+    ~CGHandler() final = default;
 
     void addObject(BaseCG* cg) final;
 

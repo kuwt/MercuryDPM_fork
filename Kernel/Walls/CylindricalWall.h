@@ -48,8 +48,8 @@ public:
     
    /*!
     * \brief
-    */    
-    CylindricalWall(double radius);
+    */
+   explicit CylindricalWall(double radius);
     
    /*!
     * \brief Wall copy method. It calls the copy contrustor of this Wall, usefull for polymorfism

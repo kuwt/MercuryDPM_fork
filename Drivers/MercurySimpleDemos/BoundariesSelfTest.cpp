@@ -92,10 +92,9 @@ class BoundariesSelfTest : public Mercury2D
             setGravity(Vec3D(g, 0, 0));
         }
 
-        ~BoundariesSelfTest() override {
-        }
+        ~BoundariesSelfTest() override = default;
 
-        void actionsAfterTimeStep() override {
+    void actionsAfterTimeStep() override {
             if (not_yet_deleted_insb)
             {
                 num_inserted = insb->getNumberOfParticlesInserted();

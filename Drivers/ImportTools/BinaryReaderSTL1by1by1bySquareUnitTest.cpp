@@ -160,29 +160,29 @@ int main()
     std::vector<STLTriangle> answer;
     
     
-    answer.push_back(STLTriangle(Vec3D(0,1,0),Vec3D(1.60291, 1.36214, 1e-06),Vec3D(0.602907, 1.36214, 1e-06),Vec3D(1.60291, 1.36214, 1)));
+    answer.emplace_back(Vec3D(0,1,0),Vec3D(1.60291, 1.36214, 1e-06),Vec3D(0.602907, 1.36214, 1e-06),Vec3D(1.60291, 1.36214, 1));
     
-    answer.push_back(STLTriangle(Vec3D(0, 1, -0),Vec3D(1.60291, 1.36214, 1),Vec3D(0.602907, 1.36214, 1e-06),Vec3D(0.602907, 1.36214, 1)));
+    answer.emplace_back(Vec3D(0, 1, -0),Vec3D(1.60291, 1.36214, 1),Vec3D(0.602907, 1.36214, 1e-06),Vec3D(0.602907, 1.36214, 1));
     
-    answer.push_back(STLTriangle(Vec3D(1, 0, -0),Vec3D(1.60291, 0.362136, 1e-06),Vec3D(1.60291, 1.36214, 1e-06), Vec3D(1.60291, 0.362136, 1)));
+    answer.emplace_back(Vec3D(1, 0, -0),Vec3D(1.60291, 0.362136, 1e-06),Vec3D(1.60291, 1.36214, 1e-06), Vec3D(1.60291, 0.362136, 1));
     
-    answer.push_back(STLTriangle(Vec3D(1, -0, 0),Vec3D(1.60291, 0.362136, 1),Vec3D(1.60291, 1.36214, 1e-06),Vec3D(1.60291, 1.36214, 1)));
+    answer.emplace_back(Vec3D(1, -0, 0),Vec3D(1.60291, 0.362136, 1),Vec3D(1.60291, 1.36214, 1e-06),Vec3D(1.60291, 1.36214, 1));
     
-    answer.push_back(STLTriangle(Vec3D(0, -1, 0),Vec3D(0.602907, 0.362136, 1e-06),Vec3D(1.60291, 0.362136, 1e-06),Vec3D(0.602907, 0.362136, 1)));
+    answer.emplace_back(Vec3D(0, -1, 0),Vec3D(0.602907, 0.362136, 1e-06),Vec3D(1.60291, 0.362136, 1e-06),Vec3D(0.602907, 0.362136, 1));
     
-    answer.push_back(STLTriangle(Vec3D(0, -1, 0),Vec3D(0.602907, 0.362136, 1),Vec3D(1.60291, 0.362136, 1e-06),Vec3D(1.60291, 0.362136, 1)));
+    answer.emplace_back(Vec3D(0, -1, 0),Vec3D(0.602907, 0.362136, 1),Vec3D(1.60291, 0.362136, 1e-06),Vec3D(1.60291, 0.362136, 1));
     
-    answer.push_back(STLTriangle(Vec3D(-1, 1.11022e-16, 0),Vec3D(0.602907, 1.36214, 1e-06),Vec3D(0.602907, 0.362136, 1e-06),Vec3D(0.602907, 1.36214, 1)));
+    answer.emplace_back(Vec3D(-1, 1.11022e-16, 0),Vec3D(0.602907, 1.36214, 1e-06),Vec3D(0.602907, 0.362136, 1e-06),Vec3D(0.602907, 1.36214, 1));
     
-    answer.push_back(STLTriangle(Vec3D(-1, 1.11022e-16, 0),Vec3D(0.602907, 1.36214, 1),Vec3D(0.602907, 0.362136, 1e-06),Vec3D(0.602907, 0.362136, 1)));
+    answer.emplace_back(Vec3D(-1, 1.11022e-16, 0),Vec3D(0.602907, 1.36214, 1),Vec3D(0.602907, 0.362136, 1e-06),Vec3D(0.602907, 0.362136, 1));
     
-    answer.push_back(STLTriangle(Vec3D(0, -0, 1),Vec3D(0.602907, 0.362136, 1),Vec3D(1.60291, 0.362136, 1),Vec3D(0.602907, 1.36214, 1)));
+    answer.emplace_back(Vec3D(0, -0, 1),Vec3D(0.602907, 0.362136, 1),Vec3D(1.60291, 0.362136, 1),Vec3D(0.602907, 1.36214, 1));
     
-    answer.push_back(STLTriangle(Vec3D(-0, 0, 1),Vec3D(0.602907, 1.36214, 1),Vec3D(1.60291, 0.362136, 1),Vec3D(1.60291, 1.36214, 1)));
+    answer.emplace_back(Vec3D(-0, 0, 1),Vec3D(0.602907, 1.36214, 1),Vec3D(1.60291, 0.362136, 1),Vec3D(1.60291, 1.36214, 1));
     
-    answer.push_back(STLTriangle(Vec3D(0, -0, -1),Vec3D(0.602907, 1.36214, 1e-06),Vec3D(1.60291, 1.36214, 1e-06),Vec3D(0.602907, 0.362136, 1e-06)));
+    answer.emplace_back(Vec3D(0, -0, -1),Vec3D(0.602907, 1.36214, 1e-06),Vec3D(1.60291, 1.36214, 1e-06),Vec3D(0.602907, 0.362136, 1e-06));
     
-    answer.push_back(STLTriangle(Vec3D(0, 0, -1),Vec3D(0.602907, 0.362136, 1e-06),Vec3D(1.602907, 1.362136, 1e-06),Vec3D(1.60291, 0.362136, 1e-06)));
+    answer.emplace_back(Vec3D(0, 0, -1),Vec3D(0.602907, 0.362136, 1e-06),Vec3D(1.602907, 1.362136, 1e-06),Vec3D(1.60291, 0.362136, 1e-06));
     
   
 

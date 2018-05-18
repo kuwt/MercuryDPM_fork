@@ -49,22 +49,22 @@ public:
     /*!    
      * \brief Copy constructor, converts an existing DPMBase object into a ChuteBottom object
      */
-    ChuteBottom(const DPMBase& other);
+    explicit ChuteBottom(const DPMBase& other);
 
     /*!
      * \brief Copy constructor, converts an existing MercuryBase object into a ChuteBottom object
      */
-    ChuteBottom(const MercuryBase& other);
+    explicit ChuteBottom(const MercuryBase& other);
 
     /*!
      * \brief Copy constructor, converts an existing Mercury3D object into a ChuteBottom object
      */
-    ChuteBottom(const Mercury3D& other);
+    explicit ChuteBottom(const Mercury3D& other);
 
     /*!
      * \brief Copy constructor, converts an existing Chute object into a ChuteBottom object
      */
-    ChuteBottom(const Chute& other);
+    explicit ChuteBottom(const Chute& other);
     
     /*!
      * \brief Default copy constructor

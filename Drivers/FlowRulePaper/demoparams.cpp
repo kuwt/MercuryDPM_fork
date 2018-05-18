@@ -24,7 +24,7 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <sstream>
-#include <stdlib.h>
+#include <cstdlib>
 
 int main()
 {

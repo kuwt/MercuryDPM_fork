@@ -65,7 +65,7 @@ public:
     /*!
      * \brief
      */
-    Domain(std::vector<unsigned> globalMeshIndex);
+    explicit Domain(std::vector<unsigned> globalMeshIndex);
     
     /*!
      * \brief Constructor that copies the domain range and rank from a 

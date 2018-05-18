@@ -353,9 +353,8 @@ void PeriodicBoundaryHandler::addNewParticle(BaseParticle* particle)
 unsigned int PeriodicBoundaryHandler::getNumberOfPeriodicGhostParticles()
 {
     unsigned int sum = 0;
-    for (int index = 0; index < periodicGhostList_.size(); index++)
-    {
-        sum += periodicGhostList_[index].size();
+    for (auto &index : periodicGhostList_) {
+        sum += index.size();
     }
     return sum;
 }
@@ -369,17 +368,16 @@ unsigned int PeriodicBoundaryHandler::getNumberOfPeriodicGhostParticles()
 Mdouble PeriodicBoundaryHandler::getNumberOfTruePeriodicGhostParticles()
 {
     int sum = 0;
-    for (int index = 0; index < periodicGhostList_.size(); index++)
-    {
+    for (auto &index : periodicGhostList_) {
         int numberOfMPIParticles = 0;
-        for (int pIndex = 0; pIndex < periodicGhostList_[index].size(); pIndex++)
+        for (int pIndex = 0; pIndex < index.size(); pIndex++)
         {
-            if (periodicGhostList_[index][pIndex]->particle->isMPIParticle() == true)
+            if (index[pIndex]->particle->isMPIParticle() == true)
             {
                 numberOfMPIParticles++;
             }
         }
-        sum += (periodicGhostList_[index].size() - numberOfMPIParticles);
+        sum += (index.size() - numberOfMPIParticles);
     }
     return sum;
 }
@@ -647,7 +645,7 @@ void PeriodicBoundaryHandler::processReceivedInteractionData(int targetIndex, st
             BaseInteractable* I = getDPMBase()->wallHandler.getObjectById(identificationI);
             //Create interactions
             std::vector<BaseInteraction*> interactions = I->getInteractionWith(pGhost, timeStamp, &iH);
-            if (interactions.size() > 0)
+            if (!interactions.empty())
             {
                 interactions[0]->setMPIInteraction(interactionDataReceive_[targetIndex],l,false);
             }
@@ -671,7 +669,7 @@ void PeriodicBoundaryHandler::processReceivedInteractionData(int targetIndex, st
 
             //Add the interaction
             std::vector<BaseInteraction*> particleInteractions = pGhost->getInteractionWith(otherParticle, timeStamp, &iH);
-            if (particleInteractions.size() > 0)
+            if (!particleInteractions.empty())
             {
                 particleInteractions[0]->setMPIInteraction(interactionDataReceive_[targetIndex],l,false);
             }
@@ -733,7 +731,7 @@ void PeriodicBoundaryHandler::processLocalInteractionData(std::vector<BasePartic
                     BaseWall* I = getDPMBase()->wallHandler.getObjectById(identificationI);
                     //Create interactions
                     std::vector<BaseInteraction*> interactions = I->getInteractionWith(pGhost, timeStamp, &iH);
-                    if (interactions.size() > 0)
+                    if (!interactions.empty())
                     {   
                         interactions[0]->setMPIInteraction(interactionDataSend_[i],l,false);
                     }
@@ -745,7 +743,7 @@ void PeriodicBoundaryHandler::processLocalInteractionData(std::vector<BasePartic
                     std::vector<BaseParticle*> interactingParticleList;
                     getDPMBase()->hGridGetInteractingParticleList(pGhost, interactingParticleList);
 
-                    if (interactingParticleList.size() == 0)
+                    if (interactingParticleList.empty())
                     {
                         logger(VERBOSE,"Failed in creating an interaction :(");
                     }
@@ -768,7 +766,7 @@ void PeriodicBoundaryHandler::processLocalInteractionData(std::vector<BasePartic
 
                     //Add the interaction
                     std::vector<BaseInteraction*> particleInteractions = pGhost->getInteractionWith(otherParticle, timeStamp, &iH);
-                    if (particleInteractions.size() > 0)
+                    if (!particleInteractions.empty())
                     {   
                         particleInteractions[0]->setMPIInteraction(interactionDataSend_[i],l,false);
                         logger(VERBOSE,"Interaction succesfully added!" );
@@ -787,16 +785,15 @@ void PeriodicBoundaryHandler::processLocalInteractionData(std::vector<BasePartic
  */
 void PeriodicBoundaryHandler::processPeriodicParticles() 
 {
-    for (int i = 0; i < sendTargetList_.size(); i++)
-    {
-        for (int j = 0; j < newPeriodicParticleList_[sendTargetList_[i]].size(); j++)
+    for (int i : sendTargetList_) {
+        for (int j = 0; j < newPeriodicParticleList_[i].size(); j++)
         {
             //Update the particle status
-            MpiPeriodicParticleID* ppid = newPeriodicParticleList_[sendTargetList_[i]][j];
+            MpiPeriodicParticleID* ppid = newPeriodicParticleList_[i][j];
             ppid->particle->setInPeriodicDomain(true);
 
             //make new entry in the list
-            periodicParticleList_[sendTargetList_[i]].push_back(ppid);
+            periodicParticleList_[i].push_back(ppid);
         }
     }
 }
@@ -1225,14 +1222,12 @@ void PeriodicBoundaryHandler::updateParticleStatus(std::set<BaseParticle*>& part
     }
 
     //Delete IDs 
-    for (auto ppid_it = deletePeriodicIDList.begin(); ppid_it != deletePeriodicIDList.end(); ppid_it++)
-    {
-        delete (*ppid_it); 
+    for (auto ppid_it : deletePeriodicIDList) {
+        delete ppid_it;
     }
 
-    for (auto pgid_it = deletePeriodicGhostIDList.begin(); pgid_it != deletePeriodicGhostIDList.end(); pgid_it++)
-    {
-        delete (*pgid_it);
+    for (auto pgid_it : deletePeriodicGhostIDList) {
+        delete pgid_it;
     }
     unsigned int nextId = getDPMBase()->particleHandler.getNextId();
     communicator.broadcast(nextId);
@@ -1618,13 +1613,11 @@ void PeriodicBoundaryHandler::finaliseNewParticleTransmission()
     interactionDataSend_.clear();
     interactionDataReceive_.clear();
     newInteractionList_.clear();
-    for (int i = 0; i < newPeriodicParticleList_.size(); i++)
-    {
-        newPeriodicParticleList_[i].clear();
+    for (auto &i : newPeriodicParticleList_) {
+        i.clear();
     }
-    for (int i = 0; i < newPeriodicParticleList_.size(); i++)
-    {
-        newPeriodicParticleList_[i].clear();
+    for (auto &i : newPeriodicParticleList_) {
+        i.clear();
     }
 }
 
@@ -1641,8 +1634,8 @@ void PeriodicBoundaryHandler::preparePositionAndVelocityUpdate()
         if (numberOfParticles > 0 && i != processorID)
         { 
             //Increase the vector size;
-            updatePositionDataSend_.push_back(std::vector<MPIParticlePosition>(0));
-            updateVelocityDataSend_.push_back(std::vector<MPIParticleVelocity>(0));
+            updatePositionDataSend_.emplace_back(0);
+            updateVelocityDataSend_.emplace_back(0);
             
             //Collect the data
             for (unsigned int p = 0; p < numberOfParticles; p++)
@@ -1671,8 +1664,8 @@ void PeriodicBoundaryHandler::preparePositionAndVelocityUpdate()
         if (numberOfParticles > 0 && i != processorID)
         {
             //Increase the vector size
-            updatePositionDataReceive_.push_back(std::vector<MPIParticlePosition>(numberOfParticles));
-            updateVelocityDataReceive_.push_back(std::vector<MPIParticleVelocity>(numberOfParticles));
+            updatePositionDataReceive_.emplace_back(numberOfParticles);
+            updateVelocityDataReceive_.emplace_back(numberOfParticles);
            
             //Receive position data
             int count = numberOfParticles;
@@ -1710,18 +1703,16 @@ void PeriodicBoundaryHandler::flushParticles(std::set<BaseParticle*>& particlesT
      * can be done in a smarter way if profiling shows that this is a bottleneck.
      */ 
     std::set<MpiPeriodicParticleIDBase*> toBeDeleted;
-    for (auto p_it = particlesToBeFlushed.begin(); p_it != particlesToBeFlushed.end(); p_it++)
-    {
+    for (auto p_it : particlesToBeFlushed) {
         for (int i = 0; i < NUMBER_OF_PROCESSORS; i++)
         {
-            for (int p = 0; p < periodicParticleList_[i].size(); p++)
-            {
-                if (periodicParticleList_[i][p] != nullptr)
+            for (auto &p : periodicParticleList_[i]) {
+                if (p != nullptr)
                 {
-                    if ((*p_it) == periodicParticleList_[i][p]->particle)
+                    if (p_it == p->particle)
                     {
-                        toBeDeleted.insert(periodicParticleList_[i][p]); 
-                        periodicParticleList_[i][p] = nullptr;
+                        toBeDeleted.insert(p);
+                        p = nullptr;
                     }
                 }
             }
@@ -1729,14 +1720,13 @@ void PeriodicBoundaryHandler::flushParticles(std::set<BaseParticle*>& particlesT
     
         for (int i = 0; i < NUMBER_OF_PROCESSORS; i++)  
         {
-            for (int p = 0; p < periodicGhostList_[i].size(); p++)
-            {
-                if (periodicGhostList_[i][p] != nullptr)
+            for (auto &p : periodicGhostList_[i]) {
+                if (p != nullptr)
                 {
-                    if ((*p_it) == periodicGhostList_[i][p]->particle)
+                    if (p_it == p->particle)
                     {
-                        toBeDeleted.insert(periodicGhostList_[i][p]); 
-                        periodicGhostList_[i][p] = nullptr;
+                        toBeDeleted.insert(p);
+                        p = nullptr;
                     }
                 }
             }
@@ -1744,9 +1734,8 @@ void PeriodicBoundaryHandler::flushParticles(std::set<BaseParticle*>& particlesT
     }
 
     //Delete ID's
-    for (auto id_it = toBeDeleted.begin(); id_it != toBeDeleted.end(); id_it++)
-    {
-       delete (*id_it); 
+    for (auto id_it : toBeDeleted) {
+       delete id_it;
     }
 
 }
@@ -1810,23 +1799,21 @@ void PeriodicBoundaryHandler::clearCommunicationLists()
     if (NUMBER_OF_PROCESSORS > 1)
     {
         //Clear ID lists
-        for (int i = 0; i < periodicParticleList_.size(); i++)
-        {
+        for (auto &i : periodicParticleList_) {
             //logger(INFO,"Size: %",periodicParticleList_[i].size());
-            for (int j = 0; j < periodicParticleList_[i].size(); j++)
+            for (int j = 0; j < i.size(); j++)
             {
-                delete periodicParticleList_[i][j];
+                delete i[j];
             }
-            periodicParticleList_[i].clear();
+            i.clear();
         }
     
-        for (int i = 0; i < periodicGhostList_.size(); i++)
-        {
-            for (int j = 0; j < periodicGhostList_[i].size(); j++)
+        for (auto &i : periodicGhostList_) {
+            for (int j = 0; j < i.size(); j++)
             {
-                delete periodicGhostList_[i][j];
+                delete i[j];
             }
-            periodicGhostList_[i].clear();
+            i.clear();
         }
     
         //Collect all ghost particles and unflag

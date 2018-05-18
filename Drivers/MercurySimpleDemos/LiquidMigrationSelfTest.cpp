@@ -36,8 +36,7 @@
 class LiquidMigrationSelfTest : public Mercury2D
 {
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         LiquidFilmParticle P0, P1, P2, P3, P4;
         P0.setSpecies(speciesHandler.getObject(0));
         P1.setSpecies(speciesHandler.getObject(0));

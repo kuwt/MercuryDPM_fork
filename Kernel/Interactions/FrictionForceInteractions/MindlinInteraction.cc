@@ -80,7 +80,7 @@ MindlinInteraction::MindlinInteraction(BaseInteractable* P, BaseInteractable* I,
     //k_edit
     //setting the priorLoadingFlag to zero as, when an interaction is created for the first time,
     //there will, by definition, have been no prior loading
-    priorLoadingFlag_ = 0;
+    priorLoadingFlag_ = false;
     //ensuring that the initial tangential velocity of a new interaction is zero until updated
     initialTangentialVelocity_.setZero();
 
@@ -275,7 +275,7 @@ void MindlinInteraction::computeFrictionForce() {
             // *************************************************************************************************************************
             //used to Integrate the spring
             //if particle-wall
-            if (dynamic_cast<BaseParticle *>(getI()) == 0) {
+            if (dynamic_cast<BaseParticle *>(getI()) == nullptr) {
                 slidingSpringVelocity_ = tangentialRelativeVelocity;
             }
                 //if particle-particle
@@ -344,7 +344,7 @@ Mdouble MindlinInteraction::getTangentialOverlap() const
     //k_edit Indeed it should - todo done :)
     //k_edit
     //Updating sliding spring to give positive / negative values dependent on the direction of the extension
-    return slidingSpring_.getLength() * slidingSpring_.dot(slidingSpring_.getUnitVector(slidingSpring_),Vec3D(1.0,1.0,1.0));
+    return slidingSpring_.getLength() * Vec3D::dot(Vec3D::getUnitVector(slidingSpring_),Vec3D(1.0,1.0,1.0));
 }
 
 /*!

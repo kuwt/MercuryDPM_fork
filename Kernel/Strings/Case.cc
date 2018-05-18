@@ -1,14 +1,14 @@
-#include<stdio.h>
-#include<string.h>
-#include<ctype.h>
-#include<stdlib.h>
+#include<cstdio>
+#include<cstring>
+#include<cctype>
+#include<cstdlib>
 
 /*!
  * \details The original string is overwritten.
  * \param[in] str A C-string (char*), that will be overwritten.
  * \return str
  */
-char* strtolower(char* str) 
+char* strtolower(char* str)
 {
     for (int i = 0; i < strlen(str); i++)
         str[i] = tolower(str[i]);

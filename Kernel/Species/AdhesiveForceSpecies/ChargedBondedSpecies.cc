@@ -69,13 +69,6 @@ ChargedBondedSpecies::ChargedBondedSpecies(const ChargedBondedSpecies &s)
 #endif
 }
 
-ChargedBondedSpecies::~ChargedBondedSpecies()
-{
-#ifdef DEBUG_DESTRUCTOR
-    std::cout<<"ChargedBondedSpecies::~ChargedBondedSpecies() finished"<<std::endl;
-#endif   
-}
-
 /*!
  * \param[out] os output stream (typically the restart file)
  */

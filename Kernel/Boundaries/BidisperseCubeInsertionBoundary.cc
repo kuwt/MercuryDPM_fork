@@ -2,8 +2,8 @@
 
 BidisperseCubeInsertionBoundary::BidisperseCubeInsertionBoundary()
 {
-    particleToCopyA_ = NULL;
-    particleToCopyB_ = NULL;
+    particleToCopyA_ = nullptr;
+    particleToCopyB_ = nullptr;
     probA_ = 0;
 }
 

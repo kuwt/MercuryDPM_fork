@@ -26,7 +26,7 @@
 #include <iostream>
 #include <iomanip>  
 #include <limits> 
-#include <math.h> 
+#include <cmath>
 #include "HGridOptimiser.h"
 #include "Particles/BaseParticle.h"
 
@@ -37,9 +37,8 @@ void HGridOptimiser::initialise(const MercuryBase& problem, unsigned int numberO
     cellCheckOverContactCheckRatio_ = 0.2;
     
     cellN_.resize(numCells_);
-    for(std::vector<double>::iterator it = cellN_.begin(); it != cellN_.end(); ++it)
-    {
-        *it = 0.0;
+    for (double &it : cellN_) {
+        it = 0.0;
     }
 
     //Set the minimum and maximum radius of the particles.
@@ -57,9 +56,8 @@ void HGridOptimiser::initialise(const MercuryBase& problem, unsigned int numberO
     unsigned int numParticles = problem.particleHandler.getSize();
 
     intCellN.push_back(1.5 * cellN_[0] - 0.5 * cellN_[1]);
-    for(std::vector<double>::iterator it = cellN_.begin(); it != cellN_.end(); ++it)
-    {
-        intCellN.push_back(*it);
+    for (double &it : cellN_) {
+        intCellN.push_back(it);
     }
     intCellN.push_back(1.5 * cellN_[numCells_ - 1] - 0.5 * cellN_[numCells_ - 2]);
 
@@ -104,9 +102,8 @@ void HGridOptimiser::initialisePolyFunc(double omega, std::vector<double>& coeff
     numCells_ = numberOfCells;
     cellCheckOverContactCheckRatio_ = 0.2;
     cellN_.resize(numCells_);
-    for(std::vector<double>::iterator it = cellN_.begin(); it != cellN_.end(); ++it)
-    {
-        *it = 0;
+    for (double &it : cellN_) {
+        it = 0;
     }
 
     rMin_ = nextafter(1, 0.0);
@@ -122,9 +119,8 @@ void HGridOptimiser::initialisePolyFunc(double omega, std::vector<double>& coeff
     }
 
     intCellN.push_back(1.5 * cellN_[0] - 0.5 * cellN_[1]);
-    for(std::vector<double>::iterator it = cellN_.begin(); it != cellN_.end(); ++it)
-    {
-        intCellN.push_back(*it);
+    for (double &it : cellN_) {
+        intCellN.push_back(it);
     }
     intCellN.push_back(1.5 * cellN_[numCells_ - 1] - 0.5 * cellN_[numCells_ - 2]);
 
@@ -556,9 +552,8 @@ void HGridOptimiser::calculateDiffWork(std::vector<double>& hGridCellSizes, std:
     if(verbosity > 0)
     {
         std::cout << "Particles per cell: ";
-        for(unsigned int i = 0; i < particlesPerCell.size(); i++)
-        {
-            std::cout << " " << particlesPerCell[i];
+        for (double i : particlesPerCell) {
+            std::cout << " " << i;
         }
         std::cout << std::endl;
     }
@@ -747,9 +742,8 @@ double HGridOptimiser::calculateWork(std::vector<double>& hGridCellSizes, HGridM
     if(verbosity > 1)
     {
         std::cout << "Particles per cell:" << std::endl;
-        for(unsigned int i = 0; i < particlesPerCell.size(); i++)
-        {
-            std::cout << std::setw(10) << particlesPerCell[i] << " ";
+        for (double i : particlesPerCell) {
+            std::cout << std::setw(10) << i << " ";
         }
         std::cout << std::endl;
     }
@@ -1039,9 +1033,8 @@ void HGridOptimiser::getOptimalDistribution(std::vector<double>& hGridCellSizes,
     {
         std::cout << "Work=" << W << std::endl;
         std::cout << "Optimal cell sizes:";
-        for(unsigned int i = 0; i < hGridCellSizes.size(); i++)
-        {
-            std::cout << " " << hGridCellSizes[i];
+        for (double hGridCellSize : hGridCellSizes) {
+            std::cout << " " << hGridCellSize;
         }
         std::cout << std::endl;
     }

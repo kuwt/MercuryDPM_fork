@@ -17,8 +17,7 @@ public:
         speciesHandler.addObject(species);
     }
     
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         // [GranularCollapse : initial]
         setSystemDimensions(3);
         setGravity(Vec3D(0., 0., -9.8)); //body forces

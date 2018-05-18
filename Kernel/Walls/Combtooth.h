@@ -3,7 +3,7 @@
 
 #include "BaseWall.h"
 #include "Math/Vector.h"
-#include <math.h>
+#include <cmath>
 
 class Combtooth : public BaseWall
 {

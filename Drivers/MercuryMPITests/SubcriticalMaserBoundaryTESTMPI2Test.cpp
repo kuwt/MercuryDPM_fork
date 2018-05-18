@@ -67,8 +67,7 @@ public:
         setGravity({0,0,0});
     }
     
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         //Check if particle is copied correctly when moving
         BaseParticle p0;
         p0.setSpecies(speciesHandler.getLastObject());

@@ -46,7 +46,7 @@ public:
     ChargedBondedSpecies(const ChargedBondedSpecies &s);
 
     ///\brief The default constructor.
-    ~ChargedBondedSpecies() override;
+    ~ChargedBondedSpecies() override = default;
 
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;

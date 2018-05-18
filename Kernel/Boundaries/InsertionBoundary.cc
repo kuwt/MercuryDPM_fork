@@ -71,8 +71,8 @@ InsertionBoundary::InsertionBoundary(const InsertionBoundary& other)
  */
 InsertionBoundary::~InsertionBoundary()
 {
-    if (particleToCopy_!=nullptr)
-        delete particleToCopy_;
+
+    delete particleToCopy_;
 }
 
 /*!
@@ -301,8 +301,8 @@ void InsertionBoundary::read(std::istream& is)
     is >> dummy >> maxFailed_;
     is >> dummy >> numberOfParticlesInserted_;
     is >> dummy;
-    if (particleToCopy_!=nullptr)
-        delete particleToCopy_;
+
+    delete particleToCopy_;
     particleToCopy_ = getHandler()->getDPMBase()->particleHandler.readAndCreateObject(is);
 
     // The .restart file records the index of the particle's species, but

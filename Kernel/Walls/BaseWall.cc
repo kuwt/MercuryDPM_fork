@@ -368,7 +368,7 @@ void BaseWall::writeVTK(VTKContainer& vtk) const
 
 void BaseWall::addToVTK(const std::vector<Vec3D>& points, VTKContainer& vtk)
 {
-    if (points.size() != 0)
+    if (!points.empty())
     {
         //all all values in myPoints to points
         vtk.points.insert(vtk.points.end(), points.begin(), points.end());
@@ -445,5 +445,5 @@ BaseWall::getDistanceNormalOverlapSuperquadric(const SuperQuadric& p, Mdouble& d
 Vec3D BaseWall::getFurthestPointSuperQuadric(const Vec3D& normalBodyFixed, const Vec3D& axes) const
 {
     logger(ERROR, "Generic wall-superquadric interactions not implemented yet.");
-    return Vec3D();
+    return {};
 }

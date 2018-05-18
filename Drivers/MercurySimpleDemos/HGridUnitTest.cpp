@@ -154,7 +154,7 @@ public:
 class HGrid_demo : public Mercury3D
 {
 public:
-    HGrid_demo(DPMBase& other)
+    explicit HGrid_demo(DPMBase& other)
             : DPMBase(other)
     {
     }

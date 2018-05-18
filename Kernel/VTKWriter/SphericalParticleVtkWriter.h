@@ -35,8 +35,8 @@ class SphericalParticleVtkWriter final
 {
 
 public:
-    
-    SphericalParticleVtkWriter(ParticleHandler& particleHandler) : ParticleVtkWriter(particleHandler)
+
+    explicit SphericalParticleVtkWriter(ParticleHandler& particleHandler) : ParticleVtkWriter(particleHandler)
     {}
 
     ~SphericalParticleVtkWriter() override = default;

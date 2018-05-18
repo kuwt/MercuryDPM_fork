@@ -14,7 +14,7 @@ PolydisperseInsertionBoundary::PolydisperseInsertionBoundary()
 
 /* Copy constructor */
 PolydisperseInsertionBoundary::PolydisperseInsertionBoundary(const PolydisperseInsertionBoundary& other)
-{
+        : InsertionBoundary(other) {
     /* The new PolydisperseInsertionBoundary's generanda_ vector should point to
      * its own copies of each of the generanda_, so we need to copy those
      * across. */
@@ -37,8 +37,8 @@ PolydisperseInsertionBoundary::~PolydisperseInsertionBoundary()
 {
     // JMFT: Do we need to delete the elements of generanda_?
     for (auto p : generanda_)
-        if (p !=nullptr)
-            delete p;
+
+        delete p;
 }
 
 PolydisperseInsertionBoundary* PolydisperseInsertionBoundary::copy() const

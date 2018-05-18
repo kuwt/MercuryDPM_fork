@@ -98,7 +98,7 @@ public:
 class ScalingTestInitialConditionsEquilibrize : public Mercury3D
 {
 public:
-    ScalingTestInitialConditionsEquilibrize(Mercury3D& other)
+    explicit ScalingTestInitialConditionsEquilibrize(Mercury3D& other)
             : DPMBase(other), Mercury3D(other)
     {
         
@@ -108,7 +108,7 @@ public:
 class ScalingTestRun : public Mercury3D
 {
 public:
-    ScalingTestRun(Mercury3D& other)
+    explicit ScalingTestRun(Mercury3D& other)
             : DPMBase(other), Mercury3D(other)
     {
         multiplicationFactor_ = 1;

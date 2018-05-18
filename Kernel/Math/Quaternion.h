@@ -34,7 +34,7 @@
 #include <cmath>
 #include <sstream>
 #include <iostream>
-#include <stdlib.h> 
+#include <cstdlib>
 #include "Math/Vector.h"
 #include "Math/MatrixSymmetric.h"
 
@@ -90,7 +90,7 @@ public:
      */
     Quaternion(Mdouble q0, Mdouble q1, Mdouble q2, Mdouble q3);
 
-    Quaternion(Vec3D normal)
+    explicit Quaternion(Vec3D normal)
     {
         setOrientationViaNormal(normal);
     }

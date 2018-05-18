@@ -34,8 +34,7 @@ class MpiPeriodicBoundaryUnitTest : public Mercury3D
 {
 public:
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         //Add a particle
         BaseParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));

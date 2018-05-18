@@ -60,8 +60,7 @@ public:
         setGravity({0,0,0});
     }
     
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         //Start with just one particle, which moves out, in, out of maser-boundary
         BaseParticle p0;
         p0.setSpecies(speciesHandler.getLastObject());

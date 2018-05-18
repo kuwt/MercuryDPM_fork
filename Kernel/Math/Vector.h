@@ -34,7 +34,7 @@
 #include <cmath>
 #include <sstream>
 #include <iostream>
-#include <stdlib.h> 
+#include <cstdlib>
 
 #include "GeneralDefine.h"
 #include "Logger.h"
@@ -68,8 +68,8 @@ public:
      * \brief constructor
      */
     Vec3D() {setZero();}
-    
-    Vec3D(const SmallVector<3>& vector);
+
+    explicit Vec3D(const SmallVector<3>& vector);
     
     /*!
      * \brief Alternative constructor, taking the three elements as arguments

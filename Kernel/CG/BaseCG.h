@@ -70,7 +70,7 @@ public:
     /*!
      * \brief Default destructor, does nothing
      */
-    virtual ~BaseCG() = default;
+    ~BaseCG() override = default;
 
     /*!
      * \brief Currently, no read functions are implemented for the CGHandler, 

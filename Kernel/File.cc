@@ -190,7 +190,7 @@ const std::string File::getFullName(unsigned counter) const
  */
 void File::setName(const std::string& name)
 {
-    logger.assert_always(getName().size()>0, "Error: Name cannot be empty");
+    logger.assert_always(!getName().empty(), "Error: Name cannot be empty");
     this->name_ = name;
 }
 /*! 

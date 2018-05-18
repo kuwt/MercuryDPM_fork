@@ -44,7 +44,7 @@ public:
     /*!
      * \brief Casting operator; casts MatrixSymmetric3D to Matrix3D
      */
-    operator Matrix3D() const;
+    explicit operator Matrix3D() const;
 
     /*!
      * \brief Default constructor

@@ -28,7 +28,8 @@
 #include "Interactions/NormalForceInteractions/HertzianSinterInteraction.h"
 #include "BaseHandler.h"
 #include "Species/ParticleSpecies.h"
-#include <assert.h>
+#include <cassert>
+
 class BaseParticle;
 class BaseInteractable;
 

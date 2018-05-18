@@ -33,7 +33,7 @@
 
 /*! \brief Templated version to automatically generate VTK output files. */
 template<std::size_t NDIMS>
-int transformMercuryToVTK(MercuryDataFile& file, std::string prefix);
+int transformMercuryToVTK(MercuryDataFile& infile, std::string prefix);
 
 /*
 * This program converts Mercury .data files to ParaView

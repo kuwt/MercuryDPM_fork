@@ -28,23 +28,13 @@
 #include "DPMBase.h"
 #include "Walls/InfiniteWall.h"
 
-CGHandler::CGHandler()
-{
-#ifdef DEBUG_CONSTRUCTOR
-    std::cerr << "CGHandler::CGHandler() finished" << std::endl;
-#endif
-}
-
 /*!
  * \param[in] ch The CGHandler that has to be copied.
  */
 CGHandler::CGHandler(const CGHandler& ch)
-{
+        : BaseHandler(ch) {
     setDPMBase(ch.getDPMBase());
     //copyContentsFromOtherHandler(ch);
-#ifdef DEBUG_CONSTRUCTOR
-    std::cerr << "CGHandler::CGHandler(const CGHandler&) finished" << std::endl;
-#endif
 }
 
 /*!
@@ -64,13 +54,6 @@ CGHandler& CGHandler::operator=(const CGHandler& rhs)
     return *this;
 #ifdef DEBUG_CONSTRUCTOR
     std::cerr << "CGHandler::operator =(const CGHandler&) finished" << std::endl;
-#endif
-}
-
-CGHandler::~CGHandler()
-{
-#ifdef DEBUG_CONSTRUCTOR
-    std::cout << "CGHandler::~CGHandler() finished" << std::endl;
 #endif
 }
 

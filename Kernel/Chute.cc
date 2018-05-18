@@ -30,7 +30,7 @@
 #include "Boundaries/PeriodicBoundary.h"
 #include "Walls/InfiniteWall.h"
 #include <string>
-#include <string.h>
+#include <cstring>
 #include <iomanip>
 #include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
 

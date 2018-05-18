@@ -120,7 +120,7 @@ void FrictionInteraction::computeFrictionForce()
             Vec3D rollingRelativeVelocity = -effectiveDiameter *
              Vec3D::cross(getNormal(), getP()->getAngularVelocity() - getI()->getAngularVelocity());
 
-            if (dynamic_cast<BaseParticle*>(getI())==0)  //if particle-wall
+            if (dynamic_cast<BaseParticle*>(getI())== nullptr)  //if particle-wall
                 rollingSpringVelocity_= rollingRelativeVelocity;
             else //if particle-particle
             {

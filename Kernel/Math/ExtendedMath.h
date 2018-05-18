@@ -136,6 +136,7 @@ namespace mathsFunc
     * \return true if the two Vec3D are equal
     */
     bool isEqual(Matrix3D m1, Matrix3D m2, Mdouble absError);
+    bool isEqual(MatrixSymmetric3D m1, MatrixSymmetric3D m2, Mdouble absError);
     bool isEqual(Quaternion v1, Quaternion v2, double absError);
 
     /*!

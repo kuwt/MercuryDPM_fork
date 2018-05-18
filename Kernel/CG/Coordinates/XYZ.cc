@@ -183,8 +183,8 @@ void XYZ::normalisePolynomialCoefficients(std::vector<Mdouble>& coefficients, Md
     for (std::size_t i = 0; i < coefficients.size(); i++)
         volume += coefficients[i] / static_cast<Mdouble>(i + 3);
     volume *= 4.0 * constants::pi * mathsFunc::cubic(cutoff);
-    for (std::size_t i = 0; i < coefficients.size(); i++)
-        coefficients[i] /= volume;
+    for (double &coefficient : coefficients)
+        coefficient /= volume;
 }
 
 const unsigned XYZ::countVariables()

@@ -57,7 +57,8 @@ public:
      * \brief Particle copy constructor, which accepts as input a reference to a Particle. It creates a copy of this Particle and all it's information. Usually it is better to use the copy() function for polymorfism.
      */
     BaseParticle(const BaseParticle &p);
-    BaseParticle(const ParticleSpecies* s);
+
+    explicit BaseParticle(const ParticleSpecies* s);
 
     /*!
      * \brief Particle destructor, needs to be implemented and checked if it removes tangential spring information

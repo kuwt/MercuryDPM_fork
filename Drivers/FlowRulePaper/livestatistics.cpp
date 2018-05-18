@@ -37,9 +37,9 @@ template <StatType T> class CLiveStatistics : public StatisticsVector<T>, public
 		
 		}
 
-	void actionsBeforeTimeStep(){};
+	void actionsBeforeTimeStep() override {};
 		
-	void setupInitialConditions() {StatisticsVector<T>::printStat();
+	void setupInitialConditions() override {StatisticsVector<T>::printStat();
 		write(std::cout,false);
 	};
 	
@@ -75,7 +75,7 @@ template <StatType T> class CLiveStatistics : public StatisticsVector<T>, public
 
 int main(int argc, char *argv[]) {	
 	
-  if (argc>1&&strcmp(argv[1],"-help")) std::cout << std::endl << "Get statistics for " << argv[1] << std::endl;
+  if (argc>1&&strcmp(argv[1],"-help") != 0) std::cout << std::endl << "Get statistics for " << argv[1] << std::endl;
 
 	//check for '-stattype' option
 	StatType T = XYZ;

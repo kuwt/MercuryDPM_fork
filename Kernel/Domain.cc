@@ -34,7 +34,8 @@
 #include "DomainHandler.h"
 #include "Math/Vector.h"
 #include <limits>
-#include <utility> #include <vector>
+#include <utility>
+#include <vector>
 #include <set>
 
 /*!
@@ -994,7 +995,7 @@ void Domain::processReceivedInteractionData(const unsigned localIndex, std::vect
             BaseInteractable* I = getHandler()->getDPMBase()->wallHandler.getObjectById(identificationI);
             //Create interactions
             std::vector<BaseInteraction*> interactions = I->getInteractionWith(pGhost, timeStamp, &iH);
-            if (interactions.size() > 0)
+            if (!interactions.empty())
             {
                 interactions[0]->setMPIInteraction(interactionDataReceive_[localIndex], l, false);
             }
@@ -1025,7 +1026,7 @@ void Domain::processReceivedInteractionData(const unsigned localIndex, std::vect
             //Add the interaction
             std::vector<BaseInteraction*> particleInteractions = pGhost->getInteractionWith(otherParticle, timeStamp,
                                                                                             &iH);
-            if (particleInteractions.size() > 0)
+            if (!particleInteractions.empty())
             {
                 particleInteractions[0]->setMPIInteraction(interactionDataReceive_[localIndex], l, false);
             }
@@ -1575,9 +1576,8 @@ void Domain::updateVelocity()
 unsigned int Domain::getNumberOfMPIParticles()
 {
     unsigned int count = 0;
-    for (unsigned int index = 0; index < boundaryParticleListNeighbour_.size(); index++)
-    {
-        count += boundaryParticleListNeighbour_[index].size();
+    for (auto &index : boundaryParticleListNeighbour_) {
+        count += index.size();
     }
     return count;
 }
@@ -1590,11 +1590,9 @@ unsigned int Domain::getNumberOfMPIParticles()
 unsigned int Domain::getNumberOfTrueMPIParticles()
 {
     unsigned int count = 0;
-    for (unsigned int index = 0; index < boundaryParticleListNeighbour_.size(); index++)
-    {
-        for (unsigned int p = 0; p < boundaryParticleListNeighbour_[index].size(); p++)
-        {
-            if (!boundaryParticleListNeighbour_[index][p]->isPeriodicGhostParticle())
+    for (auto &index : boundaryParticleListNeighbour_) {
+        for (auto &p : index) {
+            if (!p->isPeriodicGhostParticle())
             {
                 count++;
             }
@@ -1619,18 +1617,17 @@ void Domain::flushParticles(std::set<BaseParticle*>& toBeFlushedList)
 void Domain::flushParticlesFromList(std::vector<BaseParticle*>& list, std::set<BaseParticle*>& toBeFlushedList)
 {
     //Firstly: turn all particles that need to be flushed into nullptrs
-    for(int p = 0; p < list.size(); p++)
-    {
-        if  (list[p] != nullptr)
+    for (auto &p : list) {
+        if  (p != nullptr)
         {
-            BaseParticle* particle1 = list[p];
+            BaseParticle* particle1 = p;
             for(BaseParticle* particle2 : toBeFlushedList)
             {
                 //If the particle was found in the list, make a nullptr
                 if(particle1 == particle2)
                 {
                     logger(VERBOSE,"Removing particle from mpi domain at: %",particle1->getPosition());
-                    list[p] = nullptr;
+                    p = nullptr;
                 }
             }
         }

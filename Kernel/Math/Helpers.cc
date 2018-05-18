@@ -34,7 +34,7 @@
 #include <Walls/InfiniteWall.h>
 #include <Particles/BaseParticle.h>
 #include <Species/BaseSpecies.h>
-#include <assert.h>
+#include <cassert>
 #include "Math/ExtendedMath.h"
 #include <numeric>
 #include <chrono>
@@ -810,7 +810,7 @@ bool helpers::compare(std::istream& is,std::string s)
     int len = is.tellg();
     std::string dummy;
     is >> dummy;
-    if (dummy.compare(s) != 0)
+    if (dummy != s)
     {
         is.seekg(len, std::ios_base::beg);
         return false;

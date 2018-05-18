@@ -21,7 +21,8 @@
 #include <Walls/InfiniteWall.h>
 #include <Walls/AxisymmetricIntersectionOfWalls.h>
 #include <iomanip>
-#include <assert.h>
+#include <cassert>
+
 using helpers::to_string;
 using helpers::writeToFile;
 using helpers::readFromFile;

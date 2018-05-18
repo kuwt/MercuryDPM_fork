@@ -34,8 +34,8 @@ class ParticleVtkWriter : public BaseVTKWriter<ParticleHandler>
 {
 
 public:
-    
-    ParticleVtkWriter(ParticleHandler& particleHandler) : BaseVTKWriter(particleHandler) { }
+
+    explicit ParticleVtkWriter(ParticleHandler& particleHandler) : BaseVTKWriter(particleHandler) { }
 
     virtual ~ParticleVtkWriter() = default;
 

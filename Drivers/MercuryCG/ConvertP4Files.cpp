@@ -31,8 +31,8 @@
 #include <fstream>
 #include <sstream>
 #include <sys/stat.h> 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <vector>
 #include "Math/ExtendedMath.h"
 #include "Math/Helpers.h"
@@ -43,7 +43,7 @@ class CFile {
 public:
 
 	///Constructor
-	CFile(std::string name) : name_(name){
+    explicit CFile(std::string name) : name_(name){
 
 		//set file names
         std::string p4pName(name+".p4p");

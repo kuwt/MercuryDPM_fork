@@ -93,7 +93,7 @@ class statistics_while_running : public StatisticsVector<T>, public Chute
 
 	void actionsBeforeTimeStep() override {};
 		
-	void setupInitialConditions() {
+	void setupInitialConditions() override {
 		write(std::cout,false);
 		StatisticsVector<T>::printStat();
 		//~ for (unsigned int i=0; i<particleHandler.getNumberOfObjects(); i++) {
@@ -128,8 +128,7 @@ class statistics_while_running : public StatisticsVector<T>, public Chute
 	Mdouble TimeAverageBase2;
 	int nTimeAvg;
 
-	void initialiseStatistics()
-	{
+	void initialiseStatistics() override {
 		StatisticsVector<T>::initialiseStatistics();
 		TimeAverageSurface = 0.0;
 		TimeAverageSurface2 = 0.0;
@@ -138,8 +137,7 @@ class statistics_while_running : public StatisticsVector<T>, public Chute
 		nTimeAvg = 0;
 	}
 
-	void finishStatistics()
-	{
+	void finishStatistics() override {
 		StatisticsVector<T>::finishStatistics();
 		TimeAverageSurface /= nTimeAvg;
 		TimeAverageSurface2 /= nTimeAvg;

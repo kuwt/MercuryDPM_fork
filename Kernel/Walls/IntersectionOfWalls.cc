@@ -110,9 +110,9 @@ void IntersectionOfWalls::clear()
 void IntersectionOfWalls::setHandler(WallHandler* wallHandler)
 {
     BaseWall::setHandler(wallHandler);
-    for (InfiniteWall w : wallObjects_)
+    for (InfiniteWall &w : wallObjects_)
     {
-        BaseWall::setHandler(wallHandler);
+        w.setHandler(wallHandler);
     }
 }
 
@@ -435,7 +435,7 @@ void IntersectionOfWalls::setPointsAndLines(unsigned int n)
     }
     
     logger(VERBOSE, "%", *this);
-    for (InfiniteWall w : wallObjects_)
+    for (const InfiniteWall &w : wallObjects_)
         logger(VERBOSE, "wallObject %, %", w.getNormal(), w.getPosition());
     for (Vec3D v : A_)
         logger(VERBOSE, "A %", v);
@@ -566,7 +566,7 @@ bool IntersectionOfWalls::getDistanceAndNormal(const BaseParticle& p, Mdouble& d
 bool IntersectionOfWalls::getDistanceAndNormal(const Vec3D& position, Mdouble wallInteractionRadius, Mdouble& distance,
                                                Vec3D& normal_return) const
 {
-    if (wallObjects_.size() == 0)
+    if (wallObjects_.empty())
     {
         logger(DEBUG, "Empty IntersectionOfWalls");
         return false;
@@ -754,7 +754,7 @@ void IntersectionOfWalls::read(std::istream& is)
     for (int i = 0; i < n; i++)
     {
         is >> dummy;
-        if (dummy.compare("normal") != 0)
+        if (dummy != "normal")
         {
             Quaternion orientation;
             is >> position >> dummy >> orientation;
@@ -776,9 +776,8 @@ void IntersectionOfWalls::write(std::ostream& os) const
 {
     BaseWall::write(os);
     os << " numIntersectionOfWalls " << wallObjects_.size();
-    for (std::vector<InfiniteWall>::const_iterator it = wallObjects_.begin(); it != wallObjects_.end(); ++it)
-    {
-        os << " position " << it->getPosition() << " orientation " << it->getOrientation();
+    for (const auto &wallObject : wallObjects_) {
+        os << " position " << wallObject.getPosition() << " orientation " << wallObject.getOrientation();
     }
 }
 

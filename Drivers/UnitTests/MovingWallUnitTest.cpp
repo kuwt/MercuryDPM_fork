@@ -158,8 +158,7 @@ public:
 /// In the reference case the particle just moves two times as fast
 class MovingWallTangentialReference : public MovingWallTangential
 {
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         MovingWallTangential::setupInitialConditions();
         particle->setVelocity(Vec3D(-1.0, 0.0, 0.0));
         wall->setPosition(Vec3D(0.0, 0.0, 0.0));

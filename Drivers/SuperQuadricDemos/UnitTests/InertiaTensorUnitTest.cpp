@@ -41,7 +41,7 @@ public:
         //spheres and ellipsoids
         p.setAxesAndExponents(1, 1, 1, 1, 1);
         particleHandler.copyAndAddObject(p);
-        Matrix3D inertia;
+        MatrixSymmetric3D inertia;
         inertia.XX = 8 * constants::pi / 15;
         inertia.YY = 8 * constants::pi / 15;
         inertia.ZZ = 8 * constants::pi / 15;

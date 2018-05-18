@@ -38,7 +38,7 @@ public:
     /**
      * Non-default constructor; sets the handler and fileCounter
      */
-    WallVTKWriter(WallHandler& wallHandler) : BaseVTKWriter(wallHandler) { }
+    explicit WallVTKWriter(WallHandler& wallHandler) : BaseVTKWriter(wallHandler) { }
 
     /**
      * Default copy constructor
