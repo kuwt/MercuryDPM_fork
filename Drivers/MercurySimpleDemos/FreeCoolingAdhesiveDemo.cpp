@@ -39,16 +39,15 @@
 class my_problem_HGRID : public Mercury2D{
 public:
     
-	void setupInitialConditions()
-	{
+	void setupInitialConditions() override {
 		int N1=static_cast<int>(ceil(sqrt(N)));
 		BaseParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setRadius(0.0001);
 		for (int i=0;i<N;i++)
 		{
-            int ix=static_cast<int>(i%N1);
-			int iy=static_cast<int>(i/N1);
+            int ix= i % N1;
+			int iy= i / N1;
             
 			double x=(getXMax()-getXMin())*(ix+1)/(N1+1);
 			double y=(getYMax()-getYMin())*(iy+1)/(N1+1);

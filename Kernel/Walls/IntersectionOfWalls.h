@@ -80,7 +80,7 @@ public:
     /*!
      * \brief Destructor.
      */
-    virtual ~IntersectionOfWalls();
+    ~IntersectionOfWalls() override;
     
     /*!
      * Copy assignment operator.
@@ -105,7 +105,7 @@ public:
     /*! 
      * \brief Returns the number of objects 
      */
-    unsigned int getNumberOfObjects(void);
+    unsigned int getNumberOfObjects();
     
     /*!
      * \brief Adds a wall to the set of infinite walls, given an outward normal vector s.t. normal*x=normal*point

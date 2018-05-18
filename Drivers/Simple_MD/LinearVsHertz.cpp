@@ -225,10 +225,10 @@ void Hertz::computeInternalForces(int P1, int P2)
 		Particles[PJreal].Force-=force;
 
 		// output for ene and stat files:
-		if (getEneFile().getSaveCurrentTimestep()) {
+		if (eneFile.getSaveCurrentTimestep()) {
 			addElasticEnergy(0.5 * (pSpecies->k  * sqrt(deltan) * mathsFunc::square(deltan) + pSpecies->kt * deltat.getLengthSquared()));
 		}
-		if (getFStatFile().getSaveCurrentTimestep()||getStatFile().getSaveCurrentTimestep()||getDoCGAlways()) {			
+		if (fStatFile.getSaveCurrentTimestep()||getStatFile().getSaveCurrentTimestep()||getDoCGAlways()) {
 			double fdott = forcet.getLength();
 			double deltat_norm = -deltat.getLength();
 			
@@ -377,10 +377,10 @@ void Hertz::computeWalls(int PI)
 			// Add force due to contact
 			Particles[PI].Force += force;
 			
-			if (getEneFile().getSaveCurrentTimestep()) {
+			if (eneFile.getSaveCurrentTimestep()) {
 				addElasticEnergy(0.5 * (pSpecies->k * sqrt(deltan) * mathsFunc::square(deltan) + pSpecies->kt * deltat.getLengthSquared()));
 			}
-			if (getFStatFile().getSaveCurrentTimestep()||getStatFile().getSaveCurrentTimestep()||getDoCGAlways()) {			
+			if (fStatFile.getSaveCurrentTimestep()||getStatFile().getSaveCurrentTimestep()||getDoCGAlways()) {
 				double fdott = forcet.getLength();
 				double deltat_norm = deltat.getLengthSquared();
 

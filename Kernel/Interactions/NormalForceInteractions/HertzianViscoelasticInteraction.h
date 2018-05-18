@@ -55,7 +55,7 @@ public:
     /*!
      * \brief Destructor.
      */
-    virtual ~HertzianViscoelasticInteraction();
+    ~HertzianViscoelasticInteraction() override;
     //
     //    HertzianViscoelasticInteraction* copy() const;
     //

@@ -46,9 +46,9 @@ public:
 
 		//time stepping
 		setTimeMax(1.15*LoopTime);
-		setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(4000,getTimeMax(),getTimeStep()));
-		//getEneFile().setSaveCount(1000000000);
-		//getDataFile().setSaveCount(1000000000);
+		setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(4000,getTimeMax(),getTimeStep()));
+		//eneFile.setSaveCount(1000000000);
+		//dataFile.setSaveCount(1000000000);
 		write(std::cout,true);
 		
 		//set wall
@@ -86,7 +86,7 @@ public:
 		}
 	}
 
-	void writeEneTimestep(std::ostream& os) const{
+	void writeEneTimeStep(std::ostream& os) const{
 		//MD::writeToEne();
 		os
 		<< " " << std::setw(12) << particleHandler.getObject(0)->getForce().X

@@ -76,7 +76,7 @@ public:
         std::cout << "used time step for creating initial conditions: " << getTimeStep() << std::endl;
         std::cout << "used dissipation for creating initial conditions: " << species->getDissipation() << std::endl;
 
-        //set timestep
+        //set time step
         setTimeMax(1e20);
         setSaveCount(2000);
 

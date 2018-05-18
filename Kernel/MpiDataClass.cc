@@ -24,6 +24,7 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "MpiDataClass.h"
+#include "DPMBase.h"
 
 /*!
  * \brief Copies data from a BaseParticle to an MPIParticle class and returns this
@@ -112,8 +113,10 @@ void copyDataFromMPIParticleToParticle(MPIParticle *bP, BaseParticle* p, Particl
 {  
 	//Set the species of the particle, but before we can do that we have to set the handler
 	p->setHandler(particleHandler);
-	p->setIndSpecies(bP->indSpecies);
-    copyDataFromMPIParticleToParticle(bP,p);	
+	//p->setIndSpecies(bP->indSpecies);
+    const ParticleSpecies* species = p->getHandler()->getDPMBase()->speciesHandler.getObject(bP->indSpecies);
+    p->setSpecies(species);
+    copyDataFromMPIParticleToParticle(bP,p);
 }
 
 /*!

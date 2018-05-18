@@ -124,7 +124,7 @@ public:
 
     /*!
      * \brief Sets width_, the coarse-graining width.
-     * \todo shoud be standard deviation, but is currently cutoff.
+     * \todo should be standard deviation, but is currently cutoff.
      */
     virtual void setWidth(Mdouble width)=0;
 
@@ -336,7 +336,7 @@ protected:
     /*!
      * A function returning true for each particle that should be included in the statistics (all by default).
      */
-    std::function<const bool(const BaseInteractable*)> selectedParticle_;
+    std::function<bool(const BaseInteractable*)> selectedParticle_;
 
 public:
     /*!

@@ -113,18 +113,9 @@ StandardFields StandardFields::getSquared() const
  * \return the CGField into which the values are copied
  */
 StandardFields& StandardFields::operator=(const StandardFields& P)
-{
-    volumeFraction_ = P.volumeFraction_;
-    density_ = P.density_;
-    momentum_ = P.momentum_;
-    momentumFlux_ = P.momentumFlux_;
-    contactStress_ = P.contactStress_;
-    interactionForceDensity_ = P.interactionForceDensity_;
-    particleSizeDensity_ = P.particleSizeDensity_;
-    return *this;
-}
+    = default;
 
-/*!
+    /*!
  * \param[in] P the CGField that has to be added
  * \return the CGField to which the values are added
  */

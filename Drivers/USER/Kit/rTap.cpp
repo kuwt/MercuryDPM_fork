@@ -42,7 +42,7 @@ public:
     //Setup properties of the light particles.
 
 
-    light->setStiffnessAndDissipation(helpers::computeKAndDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(tc, r_particle11, particle_mass1));
+    light->setCollisionTimeAndRestitutionCoefficient(tc, r_particle11, particle_mass1);
 
     light->setSlidingDissipation(light->getDissipation()*2./7.);
     light->setSlidingStiffness(light->getStiffness()*2./7.);
@@ -55,7 +55,7 @@ public:
     //Setup properties of the heavy particles.
     heavy->setDensity(particle_density2);
 
-    heavy->setStiffnessAndDissipation(helpers::computeKAndDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(tc, r_particle22, particle_mass2));
+    heavy->setCollisionTimeAndRestitutionCoefficient(tc, r_particle22, particle_mass2);
 
     heavy->setSlidingDissipation(heavy->getDissipation()*2./7.);
     heavy->setSlidingStiffness(heavy->getStiffness()*2./7.);
@@ -92,7 +92,7 @@ public:
     backWall = new InfiniteWall;
     baseWall = new InfiniteWall;
 
-    leftWall->set(Vec3D(-1.0, 0.0, 0.0),-getXMin());
+    leftWall->set(Vec3D(-1.0, 0.0, 0.0),getMin());
     leftWall->setSpecies(walls);
     leftWall->setPrescribedPosition([this] (double time)
 				    {
@@ -109,7 +109,7 @@ public:
     wallHandler.addObject(leftWall);
 
 
-    rightWall->set(Vec3D(+1.0, 0.0, 0.0),+getXMax());
+    rightWall->set(Vec3D(+1.0, 0.0, 0.0),getMax());
     rightWall->setSpecies(walls);
     rightWall->setPrescribedPosition([this] (double time)
 				     {
@@ -123,7 +123,7 @@ public:
 				     });
     wallHandler.addObject(rightWall);
 
-    frontWall->set(Vec3D( 0.0,-1.0, 0.0),-getYMin());
+    frontWall->set(Vec3D( 0.0,-1.0, 0.0),getMin());
     frontWall->setSpecies(walls);
     frontWall->setPrescribedPosition([this] (double time)
 				     {
@@ -137,7 +137,7 @@ public:
 				     });
     wallHandler.addObject(frontWall);
 
-    backWall->set(Vec3D( 0.0,+1.0, 0.0),+getYMax());
+    backWall->set(Vec3D( 0.0,+1.0, 0.0),getMax());
     backWall->setSpecies(walls);
     backWall->setPrescribedPosition([this] (double time)
 				    {
@@ -153,7 +153,7 @@ public:
 				    });
     wallHandler.addObject(backWall);
 
-    baseWall->set(Vec3D( 0.0, 0.0,-1.0),-getZMin());
+    baseWall->set(Vec3D( 0.0, 0.0,-1.0),getMin());
     baseWall->setSpecies(baseWallSpecies);
     //TAP - SETTING THE VIBRATION TO GIVE A SINGLE, HALF-SINE TAP!
     baseWall->setPrescribedPosition([this] (double time)

@@ -46,13 +46,13 @@ public:
     ParticleSpecies(const ParticleSpecies &p);
 
     ///\brief The default destructor.
-    virtual ~ParticleSpecies();
+    ~ParticleSpecies() override;
     
     /*!
      * \brief Creates a deep copy of the object from which it is called.
      * \details See BaseSpecies::copy for details
      */
-    virtual ParticleSpecies* copy() const override = 0;
+    ParticleSpecies* copy() const override = 0;
 
     /*!
      * \brief Creates a new MixedSpecies with the same force properties as the 
@@ -75,9 +75,9 @@ public:
 
     ///\todo TW: should getMassFromRadius be removed? IFCD: it is used in at 
     /// least one driver (AxisymmetricHopper).
-    Mdouble getMassFromRadius(const Mdouble radius) const;
+    Mdouble getMassFromRadius(Mdouble radius) const;
 
-    Mdouble getVolumeFromRadius(const Mdouble radius) const;
+    Mdouble getVolumeFromRadius(Mdouble radius) const;
 
     ///Allows density_ to be accessed
     Mdouble getDensity() const;

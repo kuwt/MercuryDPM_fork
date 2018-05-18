@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
 	problem.readRestartFile();//load_restart_data();
 	problem.setFixedParticleRadius(problem.particleHandler.getObject(0)->getRadius());
 	problem.setInflowParticleRadius(problem.particleHandler.getObject(0)->getRadius());
-	problem.getRestartFile().setFileType(FileType::ONE_FILE); //problem.getRestartFile().setFileType(FileType::ONE_FILE);
+	problem.restartFile.setFileType(FileType::ONE_FILE); //problem.restartFile.setFileType(FileType::ONE_FILE);
 	problem.writeRestartFile();
 	problem.auto_set_domain();
 	//keep file name but create files in the local directory, i.e. remove folder
@@ -94,10 +94,10 @@ int main(int argc, char *argv[])
 	problem.setName(name.substr(found+1).c_str());
 	if (verbose) std::cout << "new name: " << problem.getName() << std::endl;
 	//set output to minimum
-	problem.getDataFile().setFileType(FileType::NO_FILE);
-	problem.getRestartFile().setFileType(FileType::NO_FILE);
-	problem.getFStatFile().setFileType(FileType::NO_FILE);
-	problem.getEneFile().setFileType(FileType::ONE_FILE);
+	problem.dataFile.setFileType(FileType::NO_FILE);
+	problem.restartFile.setFileType(FileType::NO_FILE);
+	problem.fStatFile.setFileType(FileType::NO_FILE);
+	problem.eneFile.setFileType(FileType::ONE_FILE);
 	//set statistical parameters
         problem.setDoPeriodicWalls(false);
  	problem.setN(50);
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 	//~ problemZ.load_restart_data();
 	//~ problemZ.setFixedParticleRadius(problemZ.getObjects()[0].Radius);
 	//~ problemZ.setInflowParticleRadius(problemZ.getObjects()[0].Radius);
-	//~ problemZ.getRestartFile().setFileType(FileType::ONE_FILE);
+	//~ problemZ.restartFile.setFileType(FileType::ONE_FILE);
 	//~ problemZ.writeRestartFile();
 	//~ problemZ.auto_set_domain();
 	//~ //keep file name but create files in the local directory, i.e. remove folder
@@ -126,10 +126,10 @@ int main(int argc, char *argv[])
 	//~ problemZ.set_name(ss.str().c_str());
 	//~ cout << "new name: " << problemZ.get_name() << endl;
 	//~ //set output to minimum
-	//~ problemZ.getDataFile().setFileType(FileType::NO_FILE);
-	//~ problemZ.getRestartFile().setFileType(FileType::ONE_FILE);
-	//~ problemZ.getFStatFile().setFileType(FileType::NO_FILE);
-	//~ problemZ.getEneFile().setFileType(FileType::ONE_FILE);
+	//~ problemZ.dataFile.setFileType(FileType::NO_FILE);
+	//~ problemZ.restartFile.setFileType(FileType::ONE_FILE);
+	//~ problemZ.fStatFile.setFileType(FileType::NO_FILE);
+	//~ problemZ.eneFile.setFileType(FileType::ONE_FILE);
 	//~ //set statistical parameters
     //~ problemZ.setDoPeriodicWalls(false);
  	//~ problemZ.setN(50);

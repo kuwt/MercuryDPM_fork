@@ -52,10 +52,10 @@ public:
 		setChuteAngle(study_num[2]);
 		set_study(study_num[0]);
 		//
-		getRestartFile().setFileType(FileType::ONE_FILE);//getRestartFile().setFileType(FileType::ONE_FILE);
-		getDataFile().setFileType(FileType::ONE_FILE);
-		getFStatFile().setFileType(FileType::ONE_FILE);
-		getEneFile().setFileType(FileType::ONE_FILE);
+		restartFile.setFileType(FileType::ONE_FILE);//restartFile.setFileType(FileType::ONE_FILE);
+		dataFile.setFileType(FileType::ONE_FILE);
+		fStatFile.setFileType(FileType::ONE_FILE);
+		eneFile.setFileType(FileType::ONE_FILE);
 		readArguments(argc, argv);
 		//set_study();	
 		
@@ -129,9 +129,9 @@ public:
 int main(int argc, char *argv[])
 {
 	FlowRule problem;
-	problem.getRestartFile().setFileType(FileType::MULTIPLE_FILES);//getRestartFile().setFileType(FileType::MULTIPLE_FILES_PADDED);
+	problem.restartFile.setFileType(FileType::MULTIPLE_FILES);//restartFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
 	problem.setSaveCount(1e4);
-	problem.getRestartFile().setSaveCount(100.0*problem.getRestartFile().getSaveCount());
+	problem.restartFile.setSaveCount(100.0*problem.restartFile.getSaveCount());
 	problem.setTimeMax(2000);
 	//~ problem.setRoughBottomType(MONOLAYER_DISORDERED);
 

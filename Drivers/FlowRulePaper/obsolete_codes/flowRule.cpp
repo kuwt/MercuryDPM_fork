@@ -101,7 +101,7 @@ public:
 int main(int argc, char *argv[])
 {
 	FlowRule problem;
-	problem.getRestartFile().setFileType(FileType::MULTIPLE_FILES_PADDED);
+	problem.restartFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
 	//~ problem.setRoughBottomType(MONOLAYER_DISORDERED);
 	//~ problem.setTimeMax(1e-1);
 	//problem.readArguments(argc, argv);

@@ -136,7 +136,7 @@ DPMBase::DPMBase(const DPMBase& other)  : wallVTKWriter_(other.wallVTKWriter_), 
     numberOfDomains_ = other.numberOfDomains_;
     time_ = other.time_;
     timeStep_ = other.timeStep_;
-    nTimeSteps_ = other.nTimeSteps_;
+    numberOfTimeSteps_ = other.numberOfTimeSteps_;
     timeMax_ = other.timeMax_;
     restartVersion_ = other.restartVersion_; //to read new and old restart data
     restarted_ = other.restarted_; //to see if it was restarted or not
@@ -244,7 +244,7 @@ void DPMBase::constructor()
 
     //This is the parameter of the numerical part
     setTime(0);
-    nTimeSteps_ = 0;
+    numberOfTimeSteps_ = 0;
     setTimeMax(0);
     timeStep_ = 0; // needs to be user-specified, otherwise checkSettings throws error
     setSaveCount(20);
@@ -720,17 +720,17 @@ Mdouble DPMBase::getNextTime() const
 }
 
 /*!
- * \return ntimeSteps_
+ * \return numberOfTimeSteps_
  */
-unsigned int DPMBase::getNtimeSteps() const
+unsigned int DPMBase::getNumberOfTimeSteps() const
 {
-    return nTimeSteps_;
+    return numberOfTimeSteps_;
 }
 
 /*!
  * \details This may be useful in codes where some initial set-up is required e.g. if a system of particles
  * is first prepared and then exposed to excitation.
- * In this situation, <TT>getNtimeSteps()</TT> may be used to reset the time to zero at the point at which excitation
+ * In this situation, <TT>getNumberOfTimeSteps()</TT> may be used to reset the time to zero at the point at which excitation
  * begins to be applied.
  * \param[in] time
  */
@@ -1084,9 +1084,9 @@ void DPMBase::setZMax(Mdouble newZMax)
 }
 
 /*!
- * \details A sanity check is performed to ensure that the timestep must be positive.
+ * \details A sanity check is performed to ensure that the time step must be positive.
  * \param[in] timeStep
- * The (Mdouble) value of the desired new timestep
+ * The (Mdouble) value of the desired new time step
  */
 void DPMBase::setTimeStep(Mdouble timeStep)
 {
@@ -1102,7 +1102,7 @@ void DPMBase::setTimeStep(Mdouble timeStep)
 
 /*!
  * \return timeStep_
- * The current (Mdouble) value of the simulation timestep.
+ * The current (Mdouble) value of the simulation time step.
  */
 Mdouble DPMBase::getTimeStep() const
 {
@@ -1820,7 +1820,7 @@ void DPMBase::printTime() const
 
 /*!
  * \details Used within the main loop of the 'solve()' routine to let the code know whether or
- * not the timestep should continue to be advanced, i.e. whether the simulation should be continued.
+ * not the time step should continue to be advanced, i.e. whether the simulation should be continued.
  * By default this is always <tt>true</tt> but the user may redefine it to return <tt>false</tt>
  * under certain desired circumstances.
  * \return bool (True or False)
@@ -1932,13 +1932,13 @@ void DPMBase::writeFstatHeader(std::ostream& os) const
 /*!
  * \details The function cycles over all particles within the system (or rather, the particleHandler), creating sums of the relevant energies and
  * "mass lengths" (m.x, m.y, m.z) from which the system's centre of mass can also be calculated. The summed energy values and calculated centre of
- * mass values are then output to the file corresponding to "os" alongside the current timestep.
+ * mass values are then output to the file corresponding to "os" alongside the current time step.
  * \n \n
  * A check is performed - <TT>if (!p->isFixed())</TT> - to ensure that calculations are not performed on fixed particles, as these are assigned an effectively infinite mass
  * and would hence cause compiler issues.
  * \param[in] os The output stream to which the data will be written
  */
-void DPMBase::writeEneTimestep(std::ostream& os) const
+void DPMBase::writeEneTimeStep(std::ostream& os) const
 {
     if (eneFile.getCounter() == 1 || eneFile.getFileType() == FileType::MULTIPLE_FILES ||
         eneFile.getFileType() == FileType::MULTIPLE_FILES_PADDED)
@@ -2037,7 +2037,7 @@ void DPMBase::writePythonFileForVTKVisualisation() const
                   "\t\tmaxTime = int(tokens2[-1])\n"
                   "print str(maxTime)\n"
                   "\n"
-                  "#Create correct order of timesteps\n"
+                  "#Create correct order of time steps\n"
                   "DataSorted = []\n"
                   "for x in range(0,maxTime+1):\n";
 #ifdef MERCURY_USE_MPI  
@@ -2181,6 +2181,7 @@ void DPMBase::outputXBallsData(std::ostream& os) const
  *          This code saves in format_ 8 for 2D and format_ 14 for 3D.
  *          So if no extra parameters are specified it will assume many parameters,
  *          like density cannot be set using the data file.
+ * use of string instead of string& b/c this function is often used with a string literal
  * \param[in] fileName
  * \param[in] format (format for specifying if its for 2D or 3D data)
  * \return bool (True or False)
@@ -2215,6 +2216,7 @@ bool DPMBase::readDataFile(std::string fileName, unsigned int format)
 }
 
 /*!
+ * use of string instead of string& b/c this function is often used with a string literal
  * \param[in] fileName
  * \return bool (True or False)
  */
@@ -2396,7 +2398,7 @@ bool DPMBase::readParAndIniFiles(const std::string fileName)
  * When a data file that satisfies t > tMin is found and successfully opened, the function returns true.
  * \n \n
  * Useful when fileType is chosen as \ref MULTIPLE_FILES or \ref MULTIPLE_FILES_PADDED, which write
- * data corresponding to each timestep as a separate, consecutively numbered file (see \ref FileType).
+ * data corresponding to each time step as a separate, consecutively numbered file (see \ref FileType).
  * \param[in] tMin Compared with the t value belonging to the file being checked to see if it is viable.
  * \param[in] verbose Allows the function to give output to the screen if desired.
  * \return bool - true if the next file is found, false if not.
@@ -2660,9 +2662,8 @@ void DPMBase::readNextFStatFile()
     getline(in, line);
     getline(in, line);
     Mdouble time;
-    unsigned overlap, tangentialOverlap, scalarNormalForce, scalarTangentialForce;
-    int indexP, indexI;
-    Vec3D centre, normal, tangential;
+    unsigned int indexP;
+    int indexI; //could be negative
     unsigned counter = 0;
     interactionHandler.clear();
     while ((in.peek() != -1) && (in.peek() != '#')) {
@@ -2680,7 +2681,6 @@ void DPMBase::readNextFStatFile()
          # 14-16: tangential unit vector tx, ty, tz
          */
         in >> time >> indexP >> indexI;
-        Vec3D force = scalarNormalForce * normal + scalarTangentialForce * tangential;
         BaseParticle* P = particleHandler.getObject(indexP);
         BaseInteraction* C;
         if (indexI >= 0)
@@ -2689,8 +2689,8 @@ void DPMBase::readNextFStatFile()
             if (indexI >= indexP)
             {
                 // particle pair contact
-                BaseParticle *I = particleHandler.getObject(indexI);
-                C = interactionHandler.addInteraction(P, I, getNtimeSteps()+1);
+                BaseParticle *I = particleHandler.getObject(static_cast<const unsigned int>(indexI));
+                C = interactionHandler.addInteraction(P, I, getNumberOfTimeSteps()+1);
                 C->setFStatData(in, P, I);
                 // skip next line
                 //in.ignore(256, '\n');
@@ -2703,8 +2703,8 @@ void DPMBase::readNextFStatFile()
                 wallHandler.copyAndAddObject(InfiniteWall(speciesHandler.getLastObject()));
                 logger(WARN,"Added new wall because .fstat file indicates contact with wall % that doesn't exist",-indexI-1);
             }
-            BaseWall* I = wallHandler.getObject(-indexI-1);
-            C = interactionHandler.addInteraction(P, I, getNtimeSteps()+1);
+            BaseWall* I = wallHandler.getObject(static_cast<const unsigned int>(-indexI - 1));
+            C = interactionHandler.addInteraction(P, I, getNumberOfTimeSteps()+1);
             C->setFStatData(in, P, I);
         }
         counter++;
@@ -2726,8 +2726,8 @@ void DPMBase::readNextFStatFile()
  */
 void DPMBase::writeRestartFile()
 {
-    if (restartFile.openWriteNoAppend(getNtimeSteps())) {
-        //logger(DEBUG, "Writing restart file %th time step",getNtimeSteps());
+    if (restartFile.openWriteNoAppend(getNumberOfTimeSteps())) {
+        //logger(DEBUG, "Writing restart file %th time step",getNumberOfTimeSteps());
         write(restartFile.getFstream());
         restartFile.close();
     }
@@ -2735,7 +2735,7 @@ void DPMBase::writeRestartFile()
 
 void DPMBase::writeDataFile()
 {
-    if (dataFile.openWrite(getNtimeSteps())) {
+    if (dataFile.openWrite(getNumberOfTimeSteps())) {
         outputXBallsData(dataFile.getFstream());
         dataFile.close();
     }
@@ -2743,16 +2743,16 @@ void DPMBase::writeDataFile()
 
 void DPMBase::writeEneFile()
 {
-    if (eneFile.openWrite(getNtimeSteps())) {
-        //If the file type is "multiple files, writes a header for each individual files. If not, only writes for the first timestep
-        writeEneTimestep(eneFile.getFstream());
+    if (eneFile.openWrite(getNumberOfTimeSteps())) {
+        //If the file type is "multiple files, writes a header for each individual files. If not, only writes for the first time step
+        writeEneTimeStep(eneFile.getFstream());
         eneFile.close();
     }
 }
 
 void DPMBase::writeFStatFile()
 {
-    if (fStatFile.openWrite(getNtimeSteps())) {
+    if (fStatFile.openWrite(getNumberOfTimeSteps())) {
         writeFstatHeader(fStatFile.getFstream());
         //fStatFile.getFstream().ignore(2000,'\t');
         fStatFile.close();
@@ -2805,8 +2805,7 @@ int DPMBase::readRestartFile(std::string fileName)
 
     //If padded or numbered files are used, we need to extract the counter and remove it from the filename
     //First find the last point in the restart name
-    int pos = fileName.find(".");
-    int pos_new;
+    unsigned int pos = fileName.find(".");
     while(fileName.find(".",pos+1) != std::string::npos)
     {
         pos = fileName.find(".",pos+1);
@@ -2892,7 +2891,7 @@ void DPMBase::computeInternalForces(BaseParticle* const P1, BaseParticle* const 
     //("getInteractionWith" returns the relevant pointer if PI and PJ are interacting,
     //zero if not)
     //if statement above ensures that the PI has the lower id than PJ
-    std::vector<BaseInteraction* > interactions = PJ->getInteractionWith(PI, getNtimeSteps()+1,
+    std::vector<BaseInteraction* > interactions = PJ->getInteractionWith(PI, getNumberOfTimeSteps()+1,
                                                                         &interactionHandler);
     for (auto i : interactions)
     {
@@ -2946,7 +2945,7 @@ void DPMBase::computeForcesDueToWalls(BaseParticle* pI, BaseWall* w)
         return;
 
     //Checks if the particle is interacting with the current wall
-    std::vector<BaseInteraction*> interactions = w->getInteractionWith(pI, getNtimeSteps()+1,
+    std::vector<BaseInteraction*> interactions = w->getInteractionWith(pI, getNumberOfTimeSteps()+1,
                                                                        &interactionHandler);
 
     for (auto i : interactions)
@@ -2975,7 +2974,7 @@ void DPMBase::computeForcesDueToWalls(BaseParticle* pI, BaseWall* w)
  * particles and walls within the system (i.e. in the particleHandler and wallHandler). Integration is performed
  * using the \ref BaseParticle::integrateBeforeForceComputation() function.
  * \n \n
- * The velocity Verlet algorithm requires us to integrate twice each timestep: both before and after
+ * The velocity Verlet algorithm requires us to integrate twice each time step: both before and after
  * the force computation. This method is therefore used in conjunction with \ref
  * DPMBase::integrateAfterForceComputation().
  * See http://en.wikipedia.org/wiki/Verlet_integration#Velocity_Verlet for details.
@@ -3052,7 +3051,7 @@ void DPMBase::checkInteractionWithBoundaries()
  * particles and walls within the system (i.e. in the particleHandler and wallHandler). Integration is performed
  * using the \ref BaseParticle::integrateBeforeForceComputation() function.
  * \n \n
- * The velocity Verlet algorithm requires us to integrate twice each timestep: both before and after
+ * The velocity Verlet algorithm requires us to integrate twice each time step: both before and after
  * the force computation. This method is therefore used in conjunction with \ref
  * DPMBase::integrateAfterForceComputation().
  * See http://en.wikipedia.org/wiki/Verlet_integration#Velocity_Verlet for details.
@@ -3115,14 +3114,14 @@ void DPMBase::integrateAfterForceComputation()
 //        actionsBeforeTimeStep();
 //        checkAndDuplicatePeriodicParticles();
 //        hGridActionsBeforeTimeStep();
-////        dataFile.setSaveCurrentTimestep(true);
-////        eneFile.setSaveCurrentTimestep(true);
-////        statFile.setSaveCurrentTimestep(true);
-////        fStatFile.setSaveCurrentTimestep(true);
+////        dataFile.setSaveCurrentTimeStep(true);
+////        eneFile.setSaveCurrentTimeStep(true);
+////        statFile.setSaveCurrentTimeStep(true);
+////        fStatFile.setSaveCurrentTimeStep(true);
 //        computeAllForces();
 //        removeDuplicatePeriodicParticles();
 //        actionsAfterTimeStep();
-//        writeEneTimestep(eneFile.getFstream());
+//        writeEneTimeStep(eneFile.getFstream());
 //        std::cout << std::setprecision(6) << getTime() << std::endl;
 //    }
 //
@@ -3228,7 +3227,7 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
        << " zMax " << getZMax() << std::endl
        << "timeStep " << getTimeStep()
        << " time " << getTime()
-       << " ntimeSteps " << nTimeSteps_
+       << " ntimeSteps " << numberOfTimeSteps_
        << " timeMax " << getTimeMax() << std::endl
        << "systemDimensions " << getSystemDimensions()
        << " particleDimensions " << getParticleDimensions()
@@ -3341,7 +3340,7 @@ void DPMBase::read(std::istream& is)
         //accordingly
         if (!restartVersion_.compare("1.0")) {
             //reads in and saves the relevant values from the data file to the current instance of DPMBase
-            std::stringstream line(std::stringstream::in | std::stringstream::out);
+            std::stringstream line;
 
             // Store path (if restart file is nonlocal)
             auto slash = restartFile.getName().rfind('/');
@@ -3405,7 +3404,7 @@ void DPMBase::read(std::istream& is)
             helpers::getLineFromStringStream(is, line);
             line >> dummy >> timeStep_
                >> dummy >> time_
-               >> dummy >> nTimeSteps_
+               >> dummy >> numberOfTimeSteps_
                >> dummy >> timeMax_;
 
             helpers::getLineFromStringStream(is, line);
@@ -3623,9 +3622,9 @@ void DPMBase::forceWriteOutputFiles()
  * the functions to write the headers and main data are separate. Note that the interaction file is not written here: it
  * is written with the start and end of each interaction.
  *
- * The function [X].saveCurrentTimestep(ntimeSteps_) returns <tt>true</tt> if:
+ * The function [X].saveCurrentTimeStep(numberOfTimeSteps_) returns <tt>true</tt> if:
  *
- * a) The current timestep is greater than or equal to the time step at which the next write or read operation is supposed to happen.
+ * a) The current time step is greater than or equal to the time step at which the next write or read operation is supposed to happen.
  *
  * b) The \ref FileType is <B>not</B> "NO_FILE".
  *
@@ -3634,18 +3633,18 @@ void DPMBase::forceWriteOutputFiles()
  */
 void DPMBase::writeOutputFiles()
 {
-    //writing fstat data if .saveCurrentTimestep(nTimeSteps_) is true
-    if (fStatFile.saveCurrentTimestep(nTimeSteps_)) {
+    //writing fstat data if .saveCurrentTimeStep(numberOfTimeSteps_) is true
+    if (fStatFile.saveCurrentTimeStep(numberOfTimeSteps_)) {
         writeFStatFile();
     }
 
-    //writing .ene data if .saveCurrentTimestep(nTimeSteps_) is true
-    if (eneFile.saveCurrentTimestep(nTimeSteps_))
+    //writing .ene data if .saveCurrentTimeStep(numberOfTimeSteps_) is true
+    if (eneFile.saveCurrentTimeStep(numberOfTimeSteps_))
     {
         writeEneFile();
     }
-    //writing .data data if .saveCurrentTimestep(nTimeSteps_) is true
-    if (dataFile.saveCurrentTimestep(nTimeSteps_))
+    //writing .data data if .saveCurrentTimeStep(numberOfTimeSteps_) is true
+    if (dataFile.saveCurrentTimeStep(numberOfTimeSteps_))
     {
         printTime();
         if ((getRestarted() || dataFile.getCounter() == 0) && dataFile.getFileType() != FileType::NO_FILE)
@@ -3658,7 +3657,7 @@ void DPMBase::writeOutputFiles()
 
 
     //write restart file last, otherwise the output counters are wrong
-    if (restartFile.saveCurrentTimestep(nTimeSteps_))
+    if (restartFile.saveCurrentTimeStep(numberOfTimeSteps_))
     {
         writeRestartFile();
     }
@@ -3727,7 +3726,7 @@ void DPMBase::decompose()
     //Define the mpi transfer types, which requires a definition of the species already
     ///\TODO update this function for Jonny
     logger.assert_always(speciesHandler.getNumberOfObjects() > 0, "Please create a particle species before calling solve()");
-    MPIContainer::Instance().initialiseMercuryMPITypes(speciesHandler);
+    MPIContainer::Instance().initialiseMercuryMPITypes();
 
     //Make sure all processors are done with decomposition before proceeding
     logger(VERBOSE,"processor %: #real particles: %, #total particles: %", PROCESSOR_ID, particleHandler.getNumberOfRealObjects(), particleHandler.getSize());
@@ -3746,7 +3745,7 @@ void DPMBase::decompose()
  *          -  And many more vital operations.
  *
  * Further details are included in the body of the code, below.
- * \todo Is it neccesarry to reset initial conditions here and in setTimeStepByParticle
+ * \todo Is it necessary to reset initial conditions here and in setTimeStepByParticle
  *       (i.e. should it be in constructor) Thomas: I agree, setTimeStepByParticle should be 
  *       rewritten to work without calling setupInitialConditions
  */
@@ -3759,7 +3758,7 @@ void DPMBase::solve()
     
     /// Initialise the time and
     /// sets up the initial conditions for the simulation
-    ///\todo Is it neccesarry to reset initial conditions here and in setTimeStepByParticle (i.e. should it be in constructor)?
+    ///\todo Is it necessary to reset initial conditions here and in setTimeStepByParticle (i.e. should it be in constructor)?
     ///Thomas: I agree, setTimeStepByParticle should be rewritten to work without calling setupInitialConditions
     if (!getRestarted())
     {
@@ -3768,7 +3767,7 @@ void DPMBase::solve()
         // - reset the file counter etc.
         // - decompose the domain based on XMin, XMax, ....
         // - run user-defined setupInitialConditions
-        nTimeSteps_ = 0;
+        numberOfTimeSteps_ = 0;
         setTime(0.0);
         resetFileCounter();
         decompose();
@@ -3788,7 +3787,7 @@ void DPMBase::solve()
     }
 
     // Check that the code has been correctly set up,
-    // i.e. system dimensions, particles and timesteps are sensibly implemented
+    // i.e. system dimensions, particles and time steps are sensibly implemented
     checkSettings();
 
     // If the simulation is "new" and the runNumber is used, append the run number to the problem name
@@ -3876,12 +3875,12 @@ void DPMBase::computeOneTimeStep()
     logger(DEBUG, "starting computeOneTimeStep()");
 
     logger(DEBUG, "about to call writeOutputFiles()");
-    writeOutputFiles(); //everything is written at the beginning of the timestep!
+    writeOutputFiles(); //everything is written at the beginning of the time step!
 
     logger(DEBUG, "about to call hGridActionsBeforeIntegration()");
     hGridActionsBeforeIntegration();
     
-    //Computes the half-timestep velocity and full timestep position and updates the particles accordingly
+    //Computes the half-time step velocity and full time step position and updates the particles accordingly
     logger(DEBUG, "about to call integrateBeforeForceComputation()");
     integrateBeforeForceComputation();
 
@@ -3900,7 +3899,7 @@ void DPMBase::computeOneTimeStep()
     hGridActionsAfterIntegration();
 
     // Compute forces
-    ///\bug{In chute particles are added in actions_before_time_set(), however they are not written to the xballs data yet, but can have a collison and be written to the fstat data}
+    ///\bug{In chute particles are added in actions_before_time_set(), however they are not written to the xballs data yet, but can have a collision and be written to the fstat data}
     // INSERTION/DELETION boundary flag change
     for (BaseBoundary* b : boundaryHandler)
     {
@@ -3930,15 +3929,15 @@ void DPMBase::computeOneTimeStep()
     logger(DEBUG, "about to call integrateAfterForceComputation()");
     integrateAfterForceComputation();
 
-    //erase interactions that have not been used during the last timestep
-    logger(DEBUG, "about to call interactionHandler.eraseOldInteractions(getNtimeSteps())");
-    interactionHandler.eraseOldInteractions(getNtimeSteps());
+    //erase interactions that have not been used during the last time step
+    logger(DEBUG, "about to call interactionHandler.eraseOldInteractions(getNumberOfTimeSteps())");
+    interactionHandler.eraseOldInteractions(getNumberOfTimeSteps());
     logger(DEBUG, "about to call interactionHandler.actionsAfterTimeStep()");
     interactionHandler.actionsAfterTimeStep();
     particleHandler.actionsAfterTimeStep();
 
     time_ += timeStep_;
-    nTimeSteps_++;
+    numberOfTimeSteps_++;
 
     logger(DEBUG, "finished computeOneTimeStep()");
 }
@@ -4753,6 +4752,5 @@ void DPMBase::computeWallForces(BaseWall *const w) {
         }
     }
 }
-
 
 ///\todo When restarting the indexMax should be reset

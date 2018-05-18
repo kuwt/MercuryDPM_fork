@@ -38,10 +38,10 @@ strength_(strength)
 
 void Dipole::computeMultipoleExpansion()
 {
-	int nTerms = 0.5*(p_+1)*(2*p_+2);
+	size_t nTerms = (p_ + 1) * (p_ + 1);
 	NumericalVector<std::complex<Mdouble>> multipoleExpansionCoefficients(nTerms);
 
- 	//Calculate dipole coefficents for spherical harmonics
+ 	//Calculate dipole coefficients for spherical harmonics
 	Mdouble s1 = strength_*velocity_.getComponent(1);
 	Mdouble s2 = strength_*velocity_.getComponent(2);
 	Mdouble s3 = strength_*velocity_.getComponent(3);

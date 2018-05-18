@@ -38,8 +38,7 @@
 class DrivenParticleClass : public DPMBase
 {
 public:
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
         
         BaseParticle p0;
@@ -63,8 +62,7 @@ public:
         setZMax(1.0);
     }
     
-    void actionsAfterTimeStep()
-    {
+    void actionsAfterTimeStep() override {
         Vec3D pos = particleHandler.getObject(0)->getPosition();
         //check if the particle is still on the unit circle in the (x,z)-plane
         if (std::abs(pos.getLength() - 1) > 1e-6 )

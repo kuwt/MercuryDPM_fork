@@ -76,7 +76,7 @@ public:
     /*!
      * \brief Default destructor.
      */
-    virtual ~InfiniteWall();
+    ~InfiniteWall() override;
 
     /*!
      * \brief Wall copy method. It calls the copy constructor of this Wall, useful for polymorphism
@@ -91,7 +91,7 @@ public:
     /*!
      * \brief Changes the normal of the InfiniteWall.
      */
-    void setNormal(const Vec3D normal);
+    void setNormal(Vec3D normal);
 
     /*!
      * \brief Defines a standard wall by computing normal*position = point and using the overloaded function set(Vec3D, vec3D).
@@ -152,14 +152,14 @@ public:
     /*!
      * Same as createVTK(), but with a self-defined domain size (useful for plotting AxisymmetricWall's).
      */
-    void createVTK (std::vector<Vec3D>& myPoints, const Vec3D max, const Vec3D min) const;
+    void createVTK (std::vector<Vec3D>& myPoints, Vec3D max, Vec3D min) const;
 
     /*!
      * Adds the vtk wall representation to the VTK container
      */
     void writeVTK (VTKContainer& vtk) const override;
     
-    Vec3D getFurthestPointSuperQuadric(const Vec3D& normalBodyFixed, const Vec3D& axes) const;
+    Vec3D getFurthestPointSuperQuadric(const Vec3D& normalBodyFixed, const Vec3D& axes) const override;
 };
 
 #endif

@@ -7,8 +7,7 @@
 class MercuryLogo : public Mercury3D
 {
 public:
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         logger(INFO, "Setting up a simulation around the Mercury logo");
 
         const double rho = constants::pi;

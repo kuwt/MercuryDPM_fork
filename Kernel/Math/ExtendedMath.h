@@ -69,12 +69,12 @@ namespace mathsFunc
     /*!
      * \brief This is a chi_squared function return the value x and degrees of freedom k
      */
-    Mdouble chi_squared(const Mdouble x, const unsigned int k);
+    Mdouble chi_squared(Mdouble x, unsigned int k);
     
     /*!
      * \brief This is the function which actually gives the probability back using a chi squared test
      */
-    Mdouble chi_squared_prob(const Mdouble x, const unsigned int k);
+    Mdouble chi_squared_prob(Mdouble x, unsigned int k);
     
     /*!
      * \brief This function performs a golden section search to find the location of the minimum of a function

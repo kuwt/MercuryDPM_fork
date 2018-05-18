@@ -43,7 +43,7 @@ public:
     /*!
      * \brief destructor
      */
-    ~SubcriticalMaserBoundaryTEST();
+    ~SubcriticalMaserBoundaryTEST() override;
     
     /*!
      * \brief Creates a copy of this maser on the heap.

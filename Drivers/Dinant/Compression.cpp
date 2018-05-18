@@ -65,10 +65,10 @@ public:
         setTimeMax(tmax);
         
         setTimeStep(0.02*tc);
-        getDataFile().setSaveCount(5000);
-        getFStatFile().setFileType(FileType::NO_FILE);
-        getEneFile().setSaveCount(500);
-        getRestartFile().setSaveCount(5000);
+        dataFile.setSaveCount(5000);
+        fStatFile.setFileType(FileType::NO_FILE);
+        eneFile.setSaveCount(500);
+        restartFile.setSaveCount(5000);
         getStatFile().setSaveCount(500);
         
         setHGridMaxLevels(1);

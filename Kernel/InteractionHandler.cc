@@ -426,7 +426,7 @@ void InteractionHandler::readAndAddObject(std::istream& is)
     Mdouble doubleTimeStamp;
     unsigned timeStamp;
 
-    std::stringstream line(std::stringstream::in | std::stringstream::out);
+    std::stringstream line;
     /// \todo Ant This is a tmp fix as in some cases the line before has not be finished reading. This should be looked at again at a later date.
     is >> type;
     logger(DEBUG, "InteractionHandler::readAndAddObject(is): reading type %.", type);

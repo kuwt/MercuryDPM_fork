@@ -43,10 +43,10 @@ public:
 
     void actionsBeforeTimeStep() override
     {
-        if (getNtimeSteps()==18) {
+        if (getNumberOfTimeSteps()==18) {
             logger(INFO,"changing savecount to 5 at time %",getTime());
             setSaveCount(5);
-        } else if (getNtimeSteps()==33) {
+        } else if (getNumberOfTimeSteps()==33) {
             logger(INFO,"changing savecount to 2 at time %",getTime());
             setSaveCount(2);
         }

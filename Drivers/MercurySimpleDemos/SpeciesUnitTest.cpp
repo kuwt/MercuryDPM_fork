@@ -31,12 +31,10 @@
 class SpeciesTest : public Mercury3D
 {
 public:
-    virtual void printTime() const
-    {
+    void printTime() const override {
     }
     
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         auto species0 = new LinearViscoelasticSpecies;
         speciesHandler.addObject(species0);
         species0->setDensity(6. / constants::pi);
@@ -45,7 +43,7 @@ public:
         const double r = 0.4;
         const double m = 1;
         //sets k and dissipation_ based on the collision time and restitution coefficient for a collision with effective mass m
-        //species0->setStiffnessAndDissipation(helpers::computeKAndDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(tc, r, m));
+        //species0->setCollisionTimeAndRestitutionCoefficient(tc, r, m));
         //setCollisionTimeAndRestitutionCoefficient(tc,r, 1.0,1.0);
         species0->setCollisionTimeAndRestitutionCoefficient(tc, r, m);
         
@@ -109,8 +107,7 @@ public:
         
     }
     
-    void actionsAfterSolve()
-    {
+    void actionsAfterSolve() override {
         for (unsigned int i = 0; i < 5; i += 2)
         {
             const double r = particleHandler.getObject(i + 1)->getVelocity().X - particleHandler.getObject(i)->getVelocity().X;

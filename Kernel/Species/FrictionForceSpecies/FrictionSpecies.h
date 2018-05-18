@@ -47,7 +47,7 @@ public:
     FrictionSpecies(const FrictionSpecies &s);
 
     ///\brief The default destructor.
-    virtual ~FrictionSpecies();
+    ~FrictionSpecies() override;
 
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
@@ -64,7 +64,7 @@ public:
     bool getUseAngularDOFs() const override;
 
     ///\brief creates default values for mixed species
-    void mix(FrictionSpecies* const S, FrictionSpecies* const T);
+    void mix(FrictionSpecies*S, FrictionSpecies*T);
 
 //setters and getters
 

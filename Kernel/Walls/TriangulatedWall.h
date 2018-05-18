@@ -94,7 +94,7 @@ public:
     /*!
      * \brief Destructor.
      */
-    virtual ~TriangulatedWall();
+    ~TriangulatedWall() override;
 
     /*!
      * Copy assignment operator.

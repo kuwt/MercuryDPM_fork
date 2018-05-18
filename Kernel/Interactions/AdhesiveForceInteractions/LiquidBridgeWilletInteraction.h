@@ -58,7 +58,7 @@ public:
     /*!
      * \brief Destructor.
      */
-    virtual ~LiquidBridgeWilletInteraction();
+    ~LiquidBridgeWilletInteraction() override;
     /*!
      * \brief Computes the adhesive forces for liquid bridge Willet type of interaction.
      */

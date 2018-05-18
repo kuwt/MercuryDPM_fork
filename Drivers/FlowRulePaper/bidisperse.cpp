@@ -54,7 +54,7 @@ public:
 	void run(int argc, char *argv[])
 	{
 		//Set up a parameter study
-		setSaveCount(1e4);
+		setSaveCount(10000);
 		setTimeMax(2000);
 		restartFile.setFileType(FileType::MULTIPLE_FILES);
 		dataFile.setFileType(FileType::NO_FILE);
@@ -92,9 +92,9 @@ public:
 	void create_inflow_particle()
 	{
 	  if (random.getRandomNumber(0,1)<NumberFraction)
-	    inflowParticle_.setIndSpecies(1);
+	    inflowParticle_.setSpecies(speciesHandler.getObject(1));
 	  else
-	    inflowParticle_.setIndSpecies(0);
+	    inflowParticle_.setSpecies(speciesHandler.getObject(0));
 	  if (inflowParticle_.getIndSpecies()==0)
 	    inflowParticle_.setRadius(getMinInflowParticleRadius());
 	  else
@@ -146,7 +146,7 @@ public:
 private:
 
 	/// allows input from the command line      
-	bool readNextArgument(int& i, int argc, char *argv[]) {
+	bool readNextArgument(int& i, int argc, char *argv[]) override {
 		if (!strcmp(argv[i],"-polydispersity")) {
 			setPolydispersity(atof(argv[i+1]));
 		} else if (!strcmp(argv[i],"-densityvariation")) {

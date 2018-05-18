@@ -315,14 +315,14 @@ class DragBlasiusHertzian : public Mercury2D {
                 CI->addForce(getGravity() * CI->getMass());
 
                 // Wall forces
-                computeForcesDueToWalls(CI);
+                //computeForcesDueToWalls(CI);
 
                 // Force controller if inside Maser
                 if (CI->isMaserParticle())
                 {
                     Mdouble dragForce = - CI->getMass() * getGravity().X * CI->getVelocity().X / pars.at("reservoirVel"); 
                     /*
-                    if (getNtimeSteps() % 2000 == 0)
+                    if (getNumberOfTimeSteps() % 2000 == 0)
                     {
                         logger(INFO, "applying a drag force % to particle mass % at position % velocity %, gx = %",
                                 dragForce, CI->getMass(), 
@@ -335,7 +335,7 @@ class DragBlasiusHertzian : public Mercury2D {
             }
         }
 
-        void actionsAfterTimeStep() 
+        void actionsAfterTimeStep() override
         {
 
             /* Are we still filling up? If not, no need to do anything here. */

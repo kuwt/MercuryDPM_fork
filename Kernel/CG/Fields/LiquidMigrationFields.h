@@ -67,7 +67,7 @@ public:
      */
     ~LiquidMigrationFields() = default;
 
-    static void writeNames(std::ostream& os, const unsigned countVariables);
+    static void writeNames(std::ostream& os, unsigned countVariables);
 
     /*!
      * \brief Writes class content into an output stream, typically a stat file.
@@ -107,13 +107,13 @@ public:
     /*!
      * \brief Divides the field values on the LHS by the RHS of the equation.
      */
-    LiquidMigrationFields& operator/=(const Mdouble a);
+    LiquidMigrationFields& operator/=(Mdouble a);
 
     /*!
      * \brief Multiplies the field values on the left of the '*' by the
      * scalar value on the right of the '*' and returns the answer.
      */
-    LiquidMigrationFields operator*(const Mdouble a) const;
+    LiquidMigrationFields operator*(Mdouble a) const;
 
     /*!
      * \brief This function should be called from within a loop over all

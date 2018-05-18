@@ -14,7 +14,7 @@ class RNG;
 /*!
  * \class HeaterBoundary
  * \brief Supplies a 'constant heat flux' to a cuboidal region (specified by two
- * corner points) by adding a random velocity at each timestep to each particle
+ * corner points) by adding a random velocity at each time step to each particle
  * therein, increasing the granular temperature (velocity variance). 
  */
 
@@ -23,8 +23,9 @@ class HeaterBoundary : public BaseBoundary
     public:
         HeaterBoundary();
         HeaterBoundary(const HeaterBoundary& other);
-        ~HeaterBoundary();
-        virtual HeaterBoundary* copy() const override;
+        ~HeaterBoundary() override;
+
+    HeaterBoundary* copy() const override;
 
         void set(Vec3D posMin, Vec3D posMax, Vec3D specificHeatStrength);
         void set2D(Vec3D posMin, Vec3D posMax, Mdouble specificHeatStrength);
@@ -46,7 +47,7 @@ class HeaterBoundary : public BaseBoundary
         Mdouble getDistance(const Vec3D &position) const;
 
         /*!
-         * \brief Runs at the end of each timestep.
+         * \brief Runs at the end of each time step.
          */
         void checkBoundaryAfterParticlesMove(ParticleHandler& pH) override;
 
@@ -66,7 +67,7 @@ class HeaterBoundary : public BaseBoundary
          */
         void write(std::ostream& os) const override;
 
-        virtual std::string getName() const override;
+    std::string getName() const override;
 
     private:
         Vec3D posMin_, posMax_;

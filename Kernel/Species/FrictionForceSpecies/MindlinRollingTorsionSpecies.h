@@ -47,7 +47,7 @@ public:
     MindlinRollingTorsionSpecies(const MindlinRollingTorsionSpecies &s);
 
     ///\brief The default destructor.
-    virtual ~MindlinRollingTorsionSpecies();
+    ~MindlinRollingTorsionSpecies() override;
 
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
@@ -64,7 +64,7 @@ public:
     bool getUseAngularDOFs() const override;
 
     ///\brief creates default values for mixed species
-    void mix(MindlinRollingTorsionSpecies* const S, MindlinRollingTorsionSpecies* const T);
+    void mix(MindlinRollingTorsionSpecies*S, MindlinRollingTorsionSpecies*T);
 
 //setters and getters
 

@@ -207,7 +207,7 @@ public:
     ///Defines a division operator needed to average values (\f$ \bar{v} = (\sum_{i=1}^n v_i)/n \f$ )
     inline StatisticsPoint<T>& operator/=(const Mdouble a);
 
-    ///Defines a division operator needed to time-average values (because the displacement does not have a value at the first timestep, this is slightly different than /=)
+    ///Defines a division operator needed to time-average values (because the displacement does not have a value at the first time step, this is slightly different than /=)
     inline void firstTimeAverage(const int n);
 
     ///returns the coarse graining distance in the coordinates that are not averaged about

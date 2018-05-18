@@ -67,8 +67,7 @@ public:
 
     //computes body force
 
-    void computeExternalForces(BaseParticle* p)
-    {
+    void computeExternalForces(BaseParticle* p) override {
         if (!p->isFixed())
         {
             // Gravitational force
@@ -81,8 +80,7 @@ public:
 
     //sets initial particle positions
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         //centrifugal acc. a=v^2/R;
         Mdouble velocity = 2.0;
         Mdouble R = 4.0;

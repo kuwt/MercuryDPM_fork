@@ -168,7 +168,7 @@ elseif (doGradient&&length(index_time)==4)
     data.grady = rawdata.data(index_time(2)+1:index_time(3)-1,4:end);
     data.gradz = rawdata.data(index_time(3)+1:index_time(4)-1,4:end);
 % The following cases have all multiple time step, thus the data output is a cell array.
-% First case: multiple timesteps, no gradient data
+% First case: multiple time steps, no gradient data
 elseif ~doGradient
     dataTemplate = data;
     data = cell(1,length(index_time)-1);
@@ -179,8 +179,8 @@ elseif ~doGradient
         data{i}.time = rawdata.data(index_time(i-1),1:2)';
         data{i}.variables = rawdata.data(index_time(i-1)+1:index_time(i)-1,4:end);
     end
-    disp(['multiple timesteps (' num2str(length(index_time)-1) '); creating cell output'])
-% Second case: multiple timesteps with gradient data
+    disp(['multiple time steps (' num2str(length(index_time)-1) '); creating cell output'])
+% Second case: multiple time steps with gradient data
 else
     dataTemplate = data;
     data = cell(1,length(index_time)/4);
@@ -197,8 +197,8 @@ else
         data{i/4}.grady = rawdata.data(index_time(i-2)+1:index_time(i-1)-1,4:end);
         data{i/4}.gradz = rawdata.data(index_time(i-1)+1:index_time(i  )-1,4:end);
     end
-    disp(['multiple timesteps (' num2str(length(index_time)/4) '); creating cell output'])
-% \todo the case multiple timesteps with variance data is never considered
+    disp(['multiple time steps (' num2str(length(index_time)/4) '); creating cell output'])
+% \todo the case multiple time steps with variance data is never considered
 end
 return
 

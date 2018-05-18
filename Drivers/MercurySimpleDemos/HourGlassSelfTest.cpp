@@ -30,10 +30,10 @@
 int main(int argc, char *argv[])
 {
     logger(INFO, "2D Running Hourglass Simulation until t=0.01");
-    system("./HourGlass2DDemo -tmax 0.01 -name HourGlass2DSelfTest");
+    if (system("./HourGlass2DDemo -tmax 0.01 -name HourGlass2DSelfTest"));
 
     logger(INFO, "3D Running Hourglass Simulation until t=0.01");
-    system("./HourGlass3DDemo -tmax 0.01 -name HourGlass3DSelfTest");
+    if (system("./HourGlass3DDemo -tmax 0.01 -name HourGlass3DSelfTest"));
     return 0;
 }
 

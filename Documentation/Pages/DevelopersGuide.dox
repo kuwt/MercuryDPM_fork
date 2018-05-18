@@ -73,7 +73,7 @@ There are additional global parameters that can be set here, such as
   \code{.cpp}
   problem.setGravity(Vec3D(0.0, 0.0, -9.8)); //sets gravity
   \endcode
- - the amount of timesteps between each write command
+ - the amount of time steps between each write command
   \code{.cpp}
   problem.setSaveCount(50); //writes every 50th time step
   \endcode
@@ -353,10 +353,10 @@ Another example is to add additional output to the Example.ene file, in this cas
         DPMBase::writeEneHeader(os);
     }
 
-    void writeEneTimestep(std::ostream& os) const override
+    void writeEneTimeStep(std::ostream& os) const override
     {
         os << setw(8) << particleHandler.getNumberOfObjects();
-        DPMBase::writeEneTimestep(os);
+        DPMBase::writeEneTimeStep(os);
         
     }
     \endcode

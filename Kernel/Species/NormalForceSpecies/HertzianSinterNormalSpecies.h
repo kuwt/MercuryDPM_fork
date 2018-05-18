@@ -46,7 +46,7 @@ public:
     HertzianSinterNormalSpecies(const HertzianSinterNormalSpecies &p);
 
     ///\brief The default destructor.
-    virtual ~HertzianSinterNormalSpecies();
+    ~HertzianSinterNormalSpecies() override;
 
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
@@ -60,7 +60,7 @@ public:
 // Species-specific functions
 
     ///\brief creates default values for mixed species
-    void mix(HertzianSinterNormalSpecies* const S, HertzianSinterNormalSpecies* const T);
+    void mix(HertzianSinterNormalSpecies*S, HertzianSinterNormalSpecies*T);
 
 
 //setters and getters

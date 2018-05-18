@@ -76,8 +76,7 @@ class CGHandlerSelfTest : public Mercury3D
 {
 public:
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         setName("CGHandlerRadialSelfTest");
 
         //species properties

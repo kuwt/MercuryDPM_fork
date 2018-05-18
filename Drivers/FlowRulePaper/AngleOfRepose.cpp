@@ -34,8 +34,7 @@
 
 class AngleOfRepose : public ChuteWithHopper {
 public:
-	void setupInitialConditions()
-	{
+	void setupInitialConditions() override {
 		createBottom();
 
 		//set_NWallPeriodic(0);
@@ -55,7 +54,7 @@ public:
 		}
 		
 		
-		particleHandler.setStorageCapacity((int)std::min(getXMax()*getYMax()*getZMax()/mathsFunc::cubic(2.0*getInflowParticleRadius()),1e6));
+		particleHandler.setStorageCapacity(static_cast<unsigned>(std::min(getXMax()*getYMax()*getZMax()/mathsFunc::cubic(2.0*getInflowParticleRadius()),1e6)));
 		//setHGridNumberOfBucketsToPower(particleHandler.getStorageCapacity());
 		write(std::cout,false);
 		nCreated_=0;
@@ -75,8 +74,7 @@ public:
 		//~ cout << P0.getPosition() << endl;
 	}
 
-	void actionsBeforeTimeStep() 
-	{
+	void actionsBeforeTimeStep() override {
 		if (getTime()<getTimeMax()*0.7) {
 			//~ InflowRadius = .6*getChuteLength()*std::max(0.0,0.5-t/tmax);
 			InflowRadius = 5.*getInflowParticleRadius();
@@ -128,7 +126,7 @@ public:
 		setTimeMax(2000);
 
 		//output parameters
-		setSaveCount(50e1);
+		setSaveCount(500);
 	 
 		//particle radii
 		setInflowParticleRadius(.5);
@@ -194,7 +192,7 @@ public:
 			dataFile.setFileType(FileType::ONE_FILE);
 			fStatFile.setFileType(FileType::ONE_FILE);
 			eneFile.setFileType(FileType::ONE_FILE);
-			setSaveCount(1e4);
+			setSaveCount(10000);
 			solve();
 
 			com.str("");
@@ -213,7 +211,7 @@ public:
 			 << "L" << round(100.*getFixedParticleRadius()*2.)/100.
 		     << "M" << species->getSlidingFrictionCoefficient()
 			 << "B" << getSlidingFrictionCoefficientBottom();
-		dataFile.setName(name.str().c_str());
+		dataFile.setName(name.str());
 		//set_data_filename();
 	}
 
@@ -259,7 +257,8 @@ public:
 			auto species1 = speciesHandler.copyAndAddObject(species);
             baseSpecies = speciesHandler.getMixedObject(species, species1);
 			for (unsigned int i=0; i<particleHandler.getNumberOfObjects(); i++) {
-				if (particleHandler.getObject(i)->isFixed()) particleHandler.getObject(i)->setIndSpecies(1);
+				if (particleHandler.getObject(i)->isFixed())
+					particleHandler.getObject(i)->setSpecies(speciesHandler.getObject(1));
 			}
 		}
 	}

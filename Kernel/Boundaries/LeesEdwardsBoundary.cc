@@ -36,7 +36,7 @@
  * \param[in] down      The (signed) distance between the origin and the top wall
  * \param[in] up        The (signed) distance between the origin and the bottom wall
  */
-void LeesEdwardsBoundary::set(std::function<double (double)> shift, std::function<double (double)> velocity, Mdouble left, Mdouble right, Mdouble down, Mdouble up)
+void LeesEdwardsBoundary::set(std::function<Mdouble (Mdouble)> shift, std::function<Mdouble (Mdouble)> velocity, Mdouble left, Mdouble right, Mdouble down, Mdouble up)
 {
     shift_ = shift;
     velocity_ = velocity;
@@ -57,8 +57,8 @@ void LeesEdwardsBoundary::read(std::istream& is)
     Mdouble shift;
     Mdouble velocity;
     is>>dummy>>left_>>dummy>>right_>>dummy>>down_>>dummy>>up_>>dummy>>shift>>dummy>>velocity;
-    shift_=[shift,velocity] (double time UNUSED) { return shift+velocity*time;};
-    velocity_=[velocity] (double time UNUSED) {return velocity;};
+    shift_=[shift,velocity] (Mdouble time UNUSED) { return shift+velocity*time;};
+    velocity_=[velocity] (Mdouble time UNUSED) {return velocity;};
 }
 
 /*!
@@ -303,12 +303,12 @@ Mdouble LeesEdwardsBoundary::getCurrentVelocity()
 	return velocity_(time);
 }
 
-void LeesEdwardsBoundary::setShift(std::function<double (double)> shift)
+void LeesEdwardsBoundary::setShift(std::function<Mdouble (Mdouble)> shift)
 {
 	shift_ = shift;
 }
 
-void LeesEdwardsBoundary::setVelocity(std::function<double (double)> velocity)
+void LeesEdwardsBoundary::setVelocity(std::function<Mdouble (Mdouble)> velocity)
 {
 	velocity_ = velocity;
 }

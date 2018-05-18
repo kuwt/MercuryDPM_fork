@@ -42,7 +42,7 @@ public:
     /*!
      * \brief Copy-constructor for creates an Mercury3D problem from an existing MD problem.
      */
-    Mercury3D(const DPMBase& other);
+    explicit Mercury3D(const DPMBase& other);
 
     /*!
      * \brief Copy-constructor.
@@ -68,12 +68,12 @@ protected:
     /*!
      * \brief Finds contacts between the BaseParticle and the target cell.
      */
-    void hGridFindContactsWithTargetCell(int x, int y, int z, unsigned int l, BaseParticle* const obj);
+    void hGridFindContactsWithTargetCell(int x, int y, int z, unsigned int l, BaseParticle* obj);
 
     /*!
      * \brief Compute contacts with a wall.
      */
-    void computeWallForces(BaseWall* const w) override;
+    void computeWallForces(BaseWall* w) override;
 
     /*!
      * \brief Finds particles within target cell and stores them in a list

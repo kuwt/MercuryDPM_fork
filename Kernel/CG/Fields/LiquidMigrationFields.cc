@@ -88,13 +88,9 @@ LiquidMigrationFields LiquidMigrationFields::getSquared() const
  * \return the CGField into which the values are copied
  */
 LiquidMigrationFields& LiquidMigrationFields::operator=(const LiquidMigrationFields& P)
-{
-    liquidBridgeVolume_ = P.liquidBridgeVolume_;
-    liquidFilmVolume_ = P.liquidFilmVolume_;
-    return *this;
-}
+    = default;
 
-/*!
+    /*!
  * \param[in] P the CGField that has to be added
  * \return the CGField to which the values are added
  */

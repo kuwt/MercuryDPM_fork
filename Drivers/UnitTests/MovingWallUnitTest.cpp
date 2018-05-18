@@ -52,8 +52,7 @@ public:
         wall = wallHandler.copyAndAddObject(w);
     }
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         setParticleDimensions(3);
         setXMax(2);
         setYMax(2);
@@ -64,7 +63,7 @@ public:
         species->setCollisionTimeAndRestitutionCoefficient(0.01, 1.0, 1.0);
         setTimeStep(0.0002);
         setTimeMax(1.0);
-        setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(20, getTimeMax(), getTimeStep()));
+        setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(20, getTimeMax(), getTimeStep()));
 
         //set particles
         particle->setRadius(0.5);
@@ -85,8 +84,7 @@ protected:
 /// In the reference case the particle just moves two times as fast
 class MovingWallReference : public MovingWall
 {
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         MovingWall::setupInitialConditions();
         particle->setVelocity(Vec3D(0.0, 0.0, -2.0));
         wall->setPosition(Vec3D(0.0, 0.0, 0.0));
@@ -96,8 +94,7 @@ class MovingWallReference : public MovingWall
 
 class MovingWallSimpleIntegration : public MovingWall
 {
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         MovingWall::setupInitialConditions();
         wall->setPosition(Vec3D(0.0, 0.0, 0.0));
         wall->setVelocity(Vec3D(0.0, 0.0, 1.0));
@@ -106,8 +103,7 @@ class MovingWallSimpleIntegration : public MovingWall
 
 class MovingWallPrescribedPosition : public MovingWall
 {
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         MovingWall::setupInitialConditions();
         wall->setPrescribedPosition([] (double time)
         {
@@ -118,8 +114,7 @@ class MovingWallPrescribedPosition : public MovingWall
 
 class MovingWallPrescribedVelocity : public MovingWall
 {
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         MovingWall::setupInitialConditions();
         wall->setPosition(Vec3D(0.0, 0.0, 0.0));
         wall->setPrescribedVelocity([] (double time UNUSED)
@@ -132,8 +127,7 @@ class MovingWallPrescribedVelocity : public MovingWall
 
 class MovingWallPrescribedPositionPrescribedVelocity : public MovingWall
 {
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         MovingWall::setupInitialConditions();
         wall->setPrescribedPosition([] (double time)
         {
@@ -149,8 +143,7 @@ class MovingWallPrescribedPositionPrescribedVelocity : public MovingWall
 class MovingWallTangential : public MovingWall
 {
 public:
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         MovingWall::setupInitialConditions();
         setGravity(Vec3D(0,0,-1));
         species->setCollisionTimeAndRestitutionCoefficient(0.01, 0.5, 1);
@@ -176,8 +169,7 @@ class MovingWallTangentialReference : public MovingWallTangential
 
 class MovingWallTangentialSimpleIntegration : public MovingWallTangential
 {
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         MovingWallTangential::setupInitialConditions();
         wall->setPosition(Vec3D(0.0, 0.0, 0.0));
         wall->setVelocity(Vec3D(1.0, 0.0, 0.0));
@@ -186,8 +178,7 @@ class MovingWallTangentialSimpleIntegration : public MovingWallTangential
 
 class MovingWallTangentialPrescribedPosition : public MovingWallTangential
 {
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         MovingWallTangential::setupInitialConditions();
         wall->setPrescribedPosition([] (double time)
         {
@@ -198,8 +189,7 @@ class MovingWallTangentialPrescribedPosition : public MovingWallTangential
 
 class MovingWallTangentialPrescribedVelocity : public MovingWallTangential
 {
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         MovingWallTangential::setupInitialConditions();
         wall->setPosition(Vec3D(0.0, 0.0, 0.0));
         wall->setPrescribedVelocity([] (double time UNUSED)
@@ -212,8 +202,7 @@ class MovingWallTangentialPrescribedVelocity : public MovingWallTangential
 
 class MovingWallTangentialPrescribedPositionPrescribedVelocity : public MovingWallTangential
 {
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         MovingWallTangential::setupInitialConditions();
         wall->setPrescribedPosition([] (double time)
         {

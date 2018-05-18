@@ -65,18 +65,18 @@ public:
      * \brief Destructor, it simply destructs the BaseInteractable and all the 
      *        objects it contains.
      */
-    virtual ~BaseInteractable();
+    ~BaseInteractable() override;
 
     /*!
      * \brief Reads a BaseInteractable from an input stream.
      */
-    virtual void read(std::istream& is) override;
+    void read(std::istream& is) override;
 
     /*!
      * \brief Write a BaseInteractable to an output stream.
      * \param[in] os The output stream to which the BaseInteractable is written.
      */
-    virtual void write(std::ostream& os) const override;
+    void write(std::ostream& os) const override;
 
     /*!
      * \brief Returns the index of the species associated with the interactable object.
@@ -204,7 +204,7 @@ public:
     /*!
      * \brief Sets the orientation of this BaseInteractable by defining the vector that results from the rotation of the (1,0,0) vector.
      */
-    void setOrientationViaNormal(const Vec3D normal);
+    void setOrientationViaNormal(Vec3D normal);
 
     /*!
      * \brief Sets the orientation of this BaseInteractable.
@@ -309,7 +309,7 @@ public:
      * \brief Allows the orientation of the infinite mass interactbale to be
      *        prescribed. 
      */
-    void setPrescribedOrientation(std::function<Quaternion (double)> prescribedOrientation);
+    void setPrescribedOrientation(std::function<Quaternion (double)>& prescribedOrientation);
 
     /*!
      * \brief Computes the orientation from the user defined prescribed 

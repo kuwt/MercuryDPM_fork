@@ -30,8 +30,8 @@ using namespace std;
 
 class Mercury3DRestart : public Mercury3D
 {
-	void actionsBeforeTimeStep(){};
-	void setupInitialConditions(){setTime(time);}
+	void actionsBeforeTimeStep() override {};
+	void setupInitialConditions() override {setTime(time);}
 public:
 	double time;
 };

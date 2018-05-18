@@ -42,7 +42,7 @@ public:
 		createBottom();
 	}	
 
-	///sets parameters of particles and timestepping to the L3 type used in Silbert's papers
+	///sets parameters of particles and time stepping to the L3 type used in Silbert's papers
 	void set_silbert_parameters() {
 		setInflowParticleRadius(.5);
 		setFixedParticleRadius(.5);

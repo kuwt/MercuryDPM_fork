@@ -288,7 +288,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 	//cout << "Maximum possible speed of particles: " << problem.getMaximumVelocityInducedByGravity() << endl; 
 	problem.setTimeStep(4e-4/50.0);
 	problem.DPMBase::setTimeStep(problem.getTimeStep()*5.0);
-	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(100,problem.getTimeMax(),problem.getTimeStep()));
+	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(100,problem.getTimeMax(),problem.getTimeStep()));
 	//problem.setSaveCount(1);
 	cout << "dt=" << problem.getTimeStep() << endl;
 	problem.solve();

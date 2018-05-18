@@ -79,14 +79,14 @@ int main(int argc, char* argv[])
 	problem.setStiffnessAndRestitutionCoefficient(10000,0.8,problem.get_mass_from_Radius(0.0037));		
 	problem.speciesHandler.getObject(0)->setSlidingFrictionCoefficient(0.5);
 	problem.speciesHandler.getObject(0)->setSlidingStiffness(problem.speciesHandler.getObject(0)->getStiffness());
-	problem.getDataFile().setFileType(FileType::ONE_FILE);
-	problem.getFStatFile().setFileType(FileType::ONE_FILE);
+	problem.dataFile.setFileType(FileType::ONE_FILE);
+	problem.fStatFile.setFileType(FileType::ONE_FILE);
 	
 	problem.setTimeMax(0.01);
 	problem.setGravity(Vec3D(0,0,0));
 	
 	problem.setTimeStep();
-	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(3,problem.getTimeMax(),problem.getTimeStep()));
+	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(3,problem.getTimeMax(),problem.getTimeStep()));
 	problem.setName("statistics_while_running");		
 	problem.write(std::cout,false);
 	

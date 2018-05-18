@@ -38,7 +38,7 @@ public:
     /*!
      * \brief Default constuction, requires to users to prove the name of the file that will be opened.
      */
-    BinaryReader(std::string);
+    explicit BinaryReader(std::string);
     
     /*!
      * \brief Destructor, simple closes the file

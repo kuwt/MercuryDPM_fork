@@ -220,17 +220,17 @@ void BaseCG::setH(Mdouble h) {
 }
 
 void BaseCG::setHX(Mdouble h) {
-    setNX(std::ceil((max_.X-min_.X)/h));
+    setNX(static_cast<size_t>(std::ceil((max_.X - min_.X) / h)));
     logger.assert_always(h>0 && getNX()>0,"setHX(%) generated nX=% for %<x<%",h,getNX(),min_.X,max_.X);
 }
 
 void BaseCG::setHY(Mdouble h) {
-    setNY(std::ceil((max_.Y-min_.Y)/h));
+    setNY(static_cast<size_t>(std::ceil((max_.Y - min_.Y) / h)));
     logger.assert_always(h>0 && getNY()>0,"setHY(%) generated nY=% for %<y<%",h,getNY(),min_.Y,max_.Y);
 }
 
 void BaseCG::setHZ(Mdouble h) {
-    setNZ(std::ceil((max_.Z-min_.Z)/h));
+    setNZ(static_cast<size_t>(std::ceil((max_.Z - min_.Z) / h)));
     logger.assert_always(h>0 && getNZ()>0,"setHZ(%) generated nZ=% for %<z<%",h,getNZ(),min_.Z,max_.Z);
 }
 

@@ -46,7 +46,7 @@ public:
     LiquidMigrationWilletSpecies(const LiquidMigrationWilletSpecies &s);
 
     ///\brief The default destructor.
-    virtual ~LiquidMigrationWilletSpecies();
+    ~LiquidMigrationWilletSpecies() override;
 
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
@@ -58,7 +58,7 @@ public:
     std::string getBaseName() const;
 
     ///\brief creates default values for mixed species
-    void mix(LiquidMigrationWilletSpecies* const S, LiquidMigrationWilletSpecies* const T);
+    void mix(LiquidMigrationWilletSpecies*S, LiquidMigrationWilletSpecies*T);
 
 //adhesion-specific functions
 

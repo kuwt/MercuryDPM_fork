@@ -39,8 +39,7 @@ class NewtonsCradleSelftest : public Mercury3D
 
 public:
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         double Radius = .5;
 
         setXMin(0);
@@ -101,7 +100,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     problem.solve();
 
     StatisticsVector<Z> stats("CubicPackingSelfTest");
-    double n = 500;
+    int n = 500;
     stats.setN(n);
     stats.setCGWidth(.1);
     stats.setSuperExact(false);

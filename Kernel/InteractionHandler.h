@@ -56,7 +56,7 @@ public:
     /*!
      * \brief Destructor, it destructs the InteractionHandler and all BaseInteraction it contains.
      */
-    ~InteractionHandler();
+    ~InteractionHandler() override;
 
     /*!
      * \brief Adds an Interaction to the InteractionHandler.
@@ -72,14 +72,14 @@ public:
      * \brief Returns the Interaction between the BaseInteractable's P and I if 
      * it exists, otherwise returns a null pointer.
      */
-    BaseInteraction* getExistingInteraction(const BaseInteractable* const P, const BaseInteractable* const I) const;
+    BaseInteraction* getExistingInteraction(const BaseInteractable*P, const BaseInteractable*I) const;
 
     BaseInteraction* addInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp);
 
         /*!
          * \brief Returns the Interaction between the BaseInteractable's P and I.
          */
-    BaseInteraction* getInteraction(BaseInteractable* const P, BaseInteractable* const I, const unsigned timeStamp);
+    BaseInteraction* getInteraction(BaseInteractable*P, BaseInteractable*I, unsigned timeStamp);
 
     /*!
      * \brief Creates an empty interaction
@@ -118,7 +118,7 @@ public:
      * \brief Removes interactions of periodic particles when the periodic 
      * particles get deleted (see DPMBase::removeDuplicatePeriodicParticles) 
      */
-    void removeObjectKeepingPeriodics(const unsigned  int id);
+    void removeObjectKeepingPeriodics(unsigned  int id);
     
     /*!
      * \brief erases interactions which have an old timestamp.

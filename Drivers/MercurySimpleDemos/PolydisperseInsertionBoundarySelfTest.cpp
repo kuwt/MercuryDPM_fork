@@ -35,8 +35,7 @@ class PolydisperseInsertionBoundarySelfTest : public Mercury3D
 {
 public:
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         setName("PolydisperseInsertionBoundarySelfTest");
         setSystemDimensions(2);
         setGravity(Vec3D(0.0,0.0,0.0));
@@ -108,8 +107,7 @@ public:
                 );
     }
 
-    void actionsAfterTimeStep()
-    {
+    void actionsAfterTimeStep() override {
         if (particleHandler.getSize() > 300 && boundaryHandler.getSize() > 0)
         {
             logger(INFO, "particleHandler.getSize() = %, boundaryHandler.getSize() = %",

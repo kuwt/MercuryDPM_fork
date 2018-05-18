@@ -46,96 +46,96 @@ namespace helpers
         Mdouble disp;
     };
 
-    /*!
-     * \brief Set disp and k such that is matches a given collision time tc and restitution coefficient r
-     * for a collision of effective/reduced mass m.
-     * \deprecated use species->setCollisionTimeAndRestitutionCoefficient
-     *   (collisionTime, dissipationTimeScale, 2.0*effectiveMass) instead
-     */
-    MERCURY_DEPRECATED
-    KAndDisp computeKAndDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass);
-
-    /*!
-     * \brief Calculates the collision time for a given stiffness, dissipation, and effective mass
-     * \deprecated use species->computeCollisionTime(2.0*effectiveMass) instead
-     * \todo This does not result in the same value as the given alternative.
-     */
-    MERCURY_DEPRECATED
-    Mdouble computeCollisionTimeFromKAndDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass);
-
-    /*!
-     * \brief Calculates the restitution coefficient time for a given stiffness, dissipation, and effective mass
-     * \deprecated use species->computeRestitutionCoefficient(2.0*effectiveMass) instead
-     */
-    MERCURY_DEPRECATED
-    Mdouble computeRestitutionCoefficientFromKAndDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass);
-
-    /*!
-     * \brief Calculates the dissipation for a given stiffness, restitution coefficient, and effective mass
-     */
-    MERCURY_DEPRECATED
-    Mdouble computeDispFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass);
-
-    /*!
-     * \brief Calculates the collision time for a given stiffness, restitution coefficient, and effective mass
-     * \deprecated use species->computeCollisionTime(2.0*effectiveMass) instead
-     */
-    MERCURY_DEPRECATED
-    Mdouble computeCollisionTimeFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass);
-
-    /*!
-     * \brief Calculates the dissipation for a given stiffness, collision time, and effective mass
-     * \deprecated use species->setStiffnessAndRestitutionCoefficient(2.0*effectiveMass) instead
-     */
-    MERCURY_DEPRECATED
-    Mdouble computeDispFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass);
-
-    /*!
-     * \brief Calculates the restitution coefficient for a given stiffness, collision time, and effective mass
-     * \deprecated use species->computeRestitutionCoefficient(2.0*effectiveMass) instead
-     */
-    MERCURY_DEPRECATED
-    Mdouble computeRestitutionCoefficientFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass);
-
-    /*!
-     * \brief Calculates the dissipation for a given collision time, restitution coefficient, and effective mass
-     * \deprecated use species->setCollisionTimeAndRestitutionCoefficient(2.0*effectiveMass) instead
-     */
-    MERCURY_DEPRECATED
-    Mdouble computeDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass);
-
-    /*!
-     * \brief Calculates the stiffness for a given collision time, restitution coefficient, and effective mass
-     * \deprecated use species->setCollisionTimeAndRestitutionCoefficient(2.0*effectiveMass) instead
-     */
-    MERCURY_DEPRECATED
-    Mdouble computeKFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass);
-
-    /*!
-     * \brief Calculates the stiffness for a given collision time, dissipation, and effective mass
-     */
-    MERCURY_DEPRECATED
-    Mdouble computeKFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass);
-
-    /*!
-     * \brief Calculates the resitution coefficient for a given collision time, dissipation, and effective mass
-     * \deprecated use species->computeRestitutionCoefficient(2.0*effectiveMass) instead
-     */
-    MERCURY_DEPRECATED
-    Mdouble computeRestitutionCoefficientFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass);
-
-    /*!
-     * \brief Calculates the stiffness for a given dissipation, restitution coefficient, and effective mass
-     */
-    MERCURY_DEPRECATED
-    Mdouble computeKFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass);
-
-    /*!
-     * \brief Calculates the collision time for a given dissipation, restitution coefficient, and effective mass
-     * \deprecated use species->computeCollisionTime(2.0*effectiveMass) instead
-     */
-    MERCURY_DEPRECATED
-    Mdouble computeCollisionTimeFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass);
+//    /*!
+//     * \brief Set disp and k such that is matches a given collision time tc and restitution coefficient r
+//     * for a collision of effective/reduced mass m.
+//     * \deprecated use species->setCollisionTimeAndRestitutionCoefficient
+//     *   (collisionTime, dissipationTimeScale, 2.0*effectiveMass) instead
+//     */
+//    MERCURY_DEPRECATED
+//    KAndDisp computeKAndDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass);
+//
+//    /*!
+//     * \brief Calculates the collision time for a given stiffness, dissipation, and effective mass
+//     * \deprecated use species->computeCollisionTime(2.0*effectiveMass) instead
+//     * \todo This does not result in the same value as the given alternative.
+//     */
+//    MERCURY_DEPRECATED
+//    Mdouble computeCollisionTimeFromKAndDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass);
+//
+//    /*!
+//     * \brief Calculates the restitution coefficient time for a given stiffness, dissipation, and effective mass
+//     * \deprecated use species->computeRestitutionCoefficient(2.0*effectiveMass) instead
+//     */
+//    MERCURY_DEPRECATED
+//    Mdouble computeRestitutionCoefficientFromKAndDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass);
+//
+//    /*!
+//     * \brief Calculates the dissipation for a given stiffness, restitution coefficient, and effective mass
+//     */
+//    MERCURY_DEPRECATED
+//    Mdouble computeDispFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass);
+//
+//    /*!
+//     * \brief Calculates the collision time for a given stiffness, restitution coefficient, and effective mass
+//     * \deprecated use species->computeCollisionTime(2.0*effectiveMass) instead
+//     */
+//    MERCURY_DEPRECATED
+//    Mdouble computeCollisionTimeFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass);
+//
+//    /*!
+//     * \brief Calculates the dissipation for a given stiffness, collision time, and effective mass
+//     * \deprecated use species->setStiffnessAndRestitutionCoefficient(2.0*effectiveMass) instead
+//     */
+//    MERCURY_DEPRECATED
+//    Mdouble computeDispFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass);
+//
+//    /*!
+//     * \brief Calculates the restitution coefficient for a given stiffness, collision time, and effective mass
+//     * \deprecated use species->computeRestitutionCoefficient(2.0*effectiveMass) instead
+//     */
+//    MERCURY_DEPRECATED
+//    Mdouble computeRestitutionCoefficientFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass);
+//
+//    /*!
+//     * \brief Calculates the dissipation for a given collision time, restitution coefficient, and effective mass
+//     * \deprecated use species->setCollisionTimeAndRestitutionCoefficient(2.0*effectiveMass) instead
+//     */
+//    MERCURY_DEPRECATED
+//    Mdouble computeDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass);
+//
+//    /*!
+//     * \brief Calculates the stiffness for a given collision time, restitution coefficient, and effective mass
+//     * \deprecated use species->setCollisionTimeAndRestitutionCoefficient(2.0*effectiveMass) instead
+//     */
+//    MERCURY_DEPRECATED
+//    Mdouble computeKFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass);
+//
+//    /*!
+//     * \brief Calculates the stiffness for a given collision time, dissipation, and effective mass
+//     */
+//    MERCURY_DEPRECATED
+//    Mdouble computeKFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass);
+//
+//    /*!
+//     * \brief Calculates the resitution coefficient for a given collision time, dissipation, and effective mass
+//     * \deprecated use species->computeRestitutionCoefficient(2.0*effectiveMass) instead
+//     */
+//    MERCURY_DEPRECATED
+//    Mdouble computeRestitutionCoefficientFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass);
+//
+//    /*!
+//     * \brief Calculates the stiffness for a given dissipation, restitution coefficient, and effective mass
+//     */
+//    MERCURY_DEPRECATED
+//    Mdouble computeKFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass);
+//
+//    /*!
+//     * \brief Calculates the collision time for a given dissipation, restitution coefficient, and effective mass
+//     * \deprecated use species->computeCollisionTime(2.0*effectiveMass) instead
+//     */
+//    MERCURY_DEPRECATED
+//    Mdouble computeCollisionTimeFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass);
 
     ///return type specifically for fuctions returning k, disp, kt, dispt at once
 
@@ -171,8 +171,8 @@ namespace helpers
     /*!
      * \brief Returns the correct saveCount if the total number of saves, the final time and the time step is known
      */
-    unsigned int getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(unsigned int numberOfSaves, Mdouble timeMax,
-                                                                    Mdouble timestep);
+    unsigned int getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(unsigned int numberOfSaves, Mdouble timeMax,
+                                                                    Mdouble timeStep);
 
     /*!
      * \brief Reads a line from one stringstream into another, and prepares the latter for reading in. 
@@ -220,12 +220,12 @@ namespace helpers
         return stm.str() ;
     }
 
-    std::string to_string(const Mdouble value, unsigned precision);
+    std::string to_string(Mdouble value, unsigned precision);
 
     //reads optional variables in the restart file
     // (a variable is optional, if it may or may not be defined in the restart file)
     template < typename T >
-    void readOptionalVariable(std::istream& is,std::string name, T& variable) {
+    void readOptionalVariable(std::istream& is,const std::string& name, T& variable) {
         ///\todo checkAndRead should check if the next variable in the ifstream is equal to the string nam, and
         /// only read in this case; otherwise continue, but I don't know how to put the location in the ifstream back.
         if (is.peek() == name.c_str()[0]) 

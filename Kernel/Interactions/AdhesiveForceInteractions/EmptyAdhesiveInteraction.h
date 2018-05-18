@@ -58,7 +58,7 @@ public:
     /*!
      * \brief Destructor.
      */
-    virtual ~EmptyAdhesiveInteraction();
+    ~EmptyAdhesiveInteraction() override;
     /*!
      * \brief Computes nothing as it is an Empty Adhesive interaction.
      */

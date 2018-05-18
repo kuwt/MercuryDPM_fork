@@ -47,12 +47,12 @@ public:
     /*!
      * \brief Particle destructor, needs to be implemented and checked if it removes tangential spring information
      */
-    virtual ~ThermalParticle();
+    ~ThermalParticle() override;
 
     /*!
      * \brief Particle copy method. It calls to copy constructor of this Particle, useful for polymorfism
      */
-    virtual ThermalParticle* copy() const override;
+    ThermalParticle* copy() const override;
     
     
 	void write(std::ostream& os) const override;
@@ -75,7 +75,7 @@ public:
 
 	void setTimeDependentTemperature(const std::function<double(double)> &timeDependentTemperature);
 
-	void actionsAfterTimeStep();
+	void actionsAfterTimeStep() override;
 
 private:
 

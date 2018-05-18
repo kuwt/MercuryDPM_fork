@@ -128,7 +128,7 @@ int main()
 	//solve
 	//std::cout << "Maximum allowed speed of particles: " << problem.particleHandler.getSmallestParticle()->calculateMaximumVelocity() << std::endl; // speed allowed before particles move through each other!
     problem.setTimeStep(0.02 * helpers::computeCollisionTimeFromKAndDispAndEffectiveMass(species->getStiffness(),species->getDissipation(),0.5*species->getMassFromRadius(0.5 * (problem.getMinInflowParticleRadius() + problem.getMaxInflowParticleRadius()))));
-    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(25, problem.getTimeMax(),problem.getTimeStep()));
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(25, problem.getTimeMax(),problem.getTimeStep()));
 
     std::cout << "dt=" << problem.getTimeStep() << std::endl;
 	

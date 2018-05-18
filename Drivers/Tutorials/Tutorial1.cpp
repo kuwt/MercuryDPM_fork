@@ -45,8 +45,7 @@ class Tutorial1 : public Mercury3D
 
 public:
     
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
 //! [T1:createParticle]
         BaseParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));

@@ -55,8 +55,8 @@ public:
     ParhamiMcMeekingSinterInteraction();
     /*!
      * \brief Destructor.
-     */        
-    virtual ~ParhamiMcMeekingSinterInteraction();
+     */
+    ~ParhamiMcMeekingSinterInteraction() override;
     /*!
      * \brief Computes the adhesive forces
      */    

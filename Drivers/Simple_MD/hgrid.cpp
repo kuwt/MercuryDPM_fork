@@ -85,7 +85,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 	problem.setupInitialConditions();
 	problem.setTimeStep();
 	problem.setTimeMax(problem.getTimeStep()*100.0);
-	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(0,getTimeMax(),getTimeStep()));
+	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(0,getTimeMax(),getTimeStep()));
 	problem.solve();
 	//problem.writeRestartFile();
 	//std::cout << problem;

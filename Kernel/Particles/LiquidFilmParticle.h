@@ -47,12 +47,12 @@ public:
     /*!
      * \brief Particle destructor, needs to be implemented and checked if it removes tangential spring information
      */
-    virtual ~LiquidFilmParticle();
+    ~LiquidFilmParticle() override;
 
     /*!
      * \brief Particle copy method. It calls to copy constructor of this Particle, useful for polymorfism
      */
-    virtual LiquidFilmParticle* copy() const override;
+    LiquidFilmParticle* copy() const override;
     
     
 	void write(std::ostream& os) const override;

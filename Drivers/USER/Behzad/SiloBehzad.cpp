@@ -30,6 +30,7 @@
 #include <Walls/IntersectionOfWalls.h>
 #include <Boundaries/InsertionBoundary.h>
 #include <Boundaries/CubeDeletionBoundary.h>
+#include <cstring>
 
 //scale up factor (set to one for real simulations, set higher for running a demonstration)
 Mdouble scaleup = 1;
@@ -105,7 +106,7 @@ public:
  * - in setupInitialConditions, the initial walls (side, base) and boundary conditions (periodicity, insertion) are set;
  * - in actionsBeforeTimeStep, two changes to the setup are made, (1) after filling and (2) after settling of the particles.
  */
-class Silo : public Mercury3D
+class Silo final : public Mercury3D
 {
     //this radius is used to set the dimensions of the silo (height, width, length) and orifice (width), as well as the restitution coefficient
     const Mdouble radius_ = 1.5e-3;

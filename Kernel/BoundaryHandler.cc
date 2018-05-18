@@ -211,7 +211,7 @@ void BoundaryHandler::readAndAddObject(std::istream& is)
 void BoundaryHandler::readOldObject(std::istream& is)
 {
     //read in next line
-    std::stringstream line(std::stringstream::in | std::stringstream::out);
+    std::stringstream line;
     helpers::getLineFromStringStream(is, line);
 
     std::string dummy;

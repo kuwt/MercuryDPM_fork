@@ -67,7 +67,7 @@ public:
      */
     ~StandardFields() = default;
 
-    static void writeNames(std::ostream& os, const unsigned countVariables);
+    static void writeNames(std::ostream& os, unsigned countVariables);
 
     /*!
      * \brief Writes class content into an output stream, typically a stat file.
@@ -107,7 +107,7 @@ public:
     /*!
      * \brief Divides the field values on the LHS by the RHS of the equation.
      */
-    StandardFields& operator/=(const Mdouble a);
+    StandardFields& operator/=(Mdouble a);
 
     /*!
      * \brief Multiplies the field values on the left of the '*' by the

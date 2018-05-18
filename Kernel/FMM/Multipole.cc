@@ -38,8 +38,7 @@ location_(location)
 }
 
 Multipole::~Multipole()
-{
-}
+= default;
 
 void Multipole::computeMultipoleExpansion()
 {
@@ -80,7 +79,7 @@ NumericalVector<std::complex<Mdouble>> Multipole::TranslateMultipoleExpansionTo(
 	{
 		for (int k = -j; k <= j; k++)
 		{
-			std::complex<Mdouble> result = 0;
+			std::complex<Mdouble> result = 0.0;
 			int location = j*j + (k+j);
 			for (int n = 0; n <=j; n++)
 			{
@@ -133,6 +132,7 @@ NumericalVector<std::complex<Mdouble>> Multipole::convertMultipoleToLocal(Vec3D 
 					 int location_Y = location_A3;
 					 int location_O = location_A1;
 					 std::complex<Mdouble> J = std::pow(constants::i,std::abs(k-m) - std::abs(k) - std::abs(m));
+					 //\todo TW note: a warning says += cannot be done here
 	                result += multipoleExpansionCoefficients_[location_O]*J*(*squaredFactorials_)(location_A1)*(*squaredFactorials_)(location_A2)*sphericalHarmonics[location_Y]/((*squaredFactorials_)(location_A3)*std::pow(rho,(j+n+1)));
 
 				}

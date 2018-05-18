@@ -91,7 +91,7 @@ class statistics_while_running : public StatisticsVector<T>, public Chute
 	}
 
 
-	void actionsBeforeTimeStep(){};
+	void actionsBeforeTimeStep() override {};
 		
 	void setupInitialConditions() {
 		write(std::cout,false);
@@ -101,7 +101,7 @@ class statistics_while_running : public StatisticsVector<T>, public Chute
 		//~ }
 	};
 	
-	void printTime() const {
+	void printTime() const override {
 		if (this->getVerbosityLevel()<1) return;
 		static Mdouble tint = getTimeMax()-getTime();
 		std::cout << "\r" << std::setprecision(2) << std::setw(5) << (int)100.*(1-(getTimeMax()-getTime())/tint) << "%\r";

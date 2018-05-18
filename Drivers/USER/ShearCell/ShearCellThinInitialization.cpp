@@ -52,7 +52,7 @@ public:
         species->setDissipation(2e-3);
         species->setSlidingDissipation(0.5e-3);
         
-        //set timestep
+        //set time step
         setTimeMax(100.0); //150 is the time of the loaded data file
         setTimeStep(5e-6);
         setSaveCount(2e4);
@@ -99,7 +99,7 @@ public:
         Vec3D PrismAxis(0.,-1.,0.);
         w1.setPosition(PointOnAxis);
         w1.setOrientation(AxisDirection);
-        //w1.setIndSpecies(0);
+        //w1.setSpecies(speciesHandler.getObject(0));
         
         //add points in anti-clockwise direction around the prism axis
         //inner side wall

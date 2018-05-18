@@ -132,7 +132,7 @@ public:
 
     void actionsBeforeTimeStep() override
     {
-        if (getNtimeSteps()%100!=0) return;
+        if (getNumberOfTimeSteps()%100!=0) return;
 
         const Mdouble ene =  getKineticEnergy();
         if (ene<1.0) {

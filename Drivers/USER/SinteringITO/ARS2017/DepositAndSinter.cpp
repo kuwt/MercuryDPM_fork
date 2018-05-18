@@ -158,7 +158,7 @@ public:
         //stores if we are in the relaxation or in the sintering phase
         static bool relaxation = true;
 
-        //the next two lines are to execute the following code every 50th timestep
+        //the next two lines are to execute the following code every 50th time step
         static unsigned counter = 0;
         if (++counter < 50) return; else counter = 0;
 

@@ -136,7 +136,7 @@ void RNG::randomise()
 
 void RNG::setRandomNumberGenerator(RNGType type)
 {
-    type=type_;
+    type_=type;
 }
 
 Mdouble RNG::getRandomNumber()

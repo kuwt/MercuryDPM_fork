@@ -104,7 +104,7 @@ public:
                 if (particleHandler.getObject(i)->isFixed() | FillChute)
                 {
                     particleHandler.addObject(particleHandler.getObject(i)->copy());
-                    particleHandler.getLastObject()->setIndSpecies(1);
+                    particleHandler.getLastObject()->setSpecies(speciesHandler.getObject(1));
                     particleHandler.getLastObject()->move(Vec3D(Gap + lengthPeriodicChute * j, 0., 0.));
                 }
             }
@@ -146,7 +146,7 @@ public:
     ///Remove particles if they fall below a certain height (allows them to become supercritical)
     void cleanChute()
     {
-        //clean outflow every 100 timesteps
+        //clean outflow every 100 time steps
         static int count = 0, maxcount = 100;
         if (count > maxcount)
         {
@@ -190,7 +190,8 @@ public:
                     if (particleHandler.getStorageCapacity() <= particleHandler.getNumberOfObjects())
                         particleHandler.setStorageCapacity(particleHandler.getStorageCapacity() + 10000);
                     particleHandler.addObject((*it)->copy());
-                    particleHandler.getLastObject()->setIndSpecies(particleHandler.getLastObject()->getIndSpecies() + get_PeriodicBoxNSpecies());
+                    const ParticleSpecies* species = speciesHandler.getObject(particleHandler.getLastObject()->getIndSpecies() + get_PeriodicBoxNSpecies());
+                    particleHandler.getLastObject()->setSpecies(species);
                     perw->shiftPosition((*it));
                     if (!getHGridUpdateEachTimeStep())
                     {
@@ -202,7 +203,7 @@ public:
                 {
                     static int count = -1;
                     count++;
-                    if (!(count % getDataFile().getSaveCount()))
+                    if (!(count % dataFile.getSaveCount()))
 
                         std::cout << "Warning: Particle " << (*it)->getIndex() << " is left of xmin: x="
                                 << (*it)->getPosition().X << ", v_x=" << (*it)->getVelocity().X << std::endl;
@@ -705,14 +706,14 @@ public:
             //END:CHANGE
             
             // output for ene and stat files:
-            if (getEneFile().getSaveCurrentTimestep())
+            if (eneFile.getSaveCurrentTimeStep())
             {
                 if (!isPeriodic)
                     addElasticEnergy(0.5 * (pSpecies->getStiffness() * mathsFunc::square(deltan) + (TangentialSpring ? (pSpecies->getSlidingStiffness() * TangentialSpring->delta.getLengthSquared() + pSpecies->getRollingStiffness() * TangentialSpring->RollingSpring.getLengthSquared() + pSpecies->getTorsionStiffness() * TangentialSpring->TorsionSpring.getLengthSquared()) : 0.0)));
                 else
                     addElasticEnergy(0.25 * (pSpecies->getStiffness() * mathsFunc::square(deltan) + (TangentialSpring ? (pSpecies->getSlidingStiffness() * TangentialSpring->delta.getLengthSquared() + pSpecies->getRollingStiffness() * TangentialSpring->RollingSpring.getLengthSquared() + pSpecies->getTorsionStiffness() * TangentialSpring->TorsionSpring.getLengthSquared()) : 0.0)));
             }
-            if (getFStatFile().getSaveCurrentTimestep() || getStatFile().getSaveCurrentTimestep() || getDoCGAlways())
+            if (fStatFile.getSaveCurrentTimeStep() || getStatFile().getSaveCurrentTimeStep() || getDoCGAlways())
             {
 
                 Mdouble fdott = forcet.getLength();
@@ -728,17 +729,17 @@ public:
 
                 if (!PI->isFixed())
                 {
-                    if (getStatFile().getSaveCurrentTimestep() || getDoCGAlways())
+                    if (getStatFile().getSaveCurrentTimeStep() || getDoCGAlways())
                         gatherContactStatistics(PJreal->getIndex(), PI->getIndex(), centre, deltan, deltat_norm, fdotn, fdott, -normal, -(fdott ? forcet / fdott : forcet));
-                    if (getFStatFile().getSaveCurrentTimestep())
-                        getFStatFile().getFstream() << getTime() << " " << PJreal->getIndex() << " " << PI->getIndex() << " " << centre << " " << radii_sum - dist << " " << deltat_norm << " " << fdotn << " " << fdott << " " << -normal << " " << -(fdott ? forcet / fdott : forcet) << std::endl;
+                    if (fStatFile.getSaveCurrentTimeStep())
+                        fStatFile.getFstream() << getTime() << " " << PJreal->getIndex() << " " << PI->getIndex() << " " << centre << " " << radii_sum - dist << " " << deltat_norm << " " << fdotn << " " << fdott << " " << -normal << " " << -(fdott ? forcet / fdott : forcet) << std::endl;
                 }
                 if (!PJreal->isFixed() && !isPeriodic)
                 {
-                    if (getStatFile().getSaveCurrentTimestep() || getDoCGAlways())
+                    if (getStatFile().getSaveCurrentTimeStep() || getDoCGAlways())
                         gatherContactStatistics(PI->getIndex(), PJreal->getIndex(), centre, deltan, deltat_norm, fdotn, fdott, normal, (fdott ? forcet / fdott : forcet));
-                    if (getFStatFile().getSaveCurrentTimestep())
-                        getFStatFile().getFstream() << getTime() << " " << PI->getIndex() << " " << PJreal->getIndex() << " " << centre << " " << radii_sum - dist << " " << deltat_norm << " " << fdotn << " " << fdott << " " << normal << " " << (fdott ? forcet / fdott : forcet) << std::endl;
+                    if (fStatFile.getSaveCurrentTimeStep())
+                        fStatFile.getFstream() << getTime() << " " << PI->getIndex() << " " << PJreal->getIndex() << " " << centre << " " << radii_sum - dist << " " << deltat_norm << " " << fdotn << " " << fdott << " " << normal << " " << (fdott ? forcet / fdott : forcet) << std::endl;
                 }
             }
         } // end if particle i and j are overlapping
@@ -825,7 +826,7 @@ public:
         }
 
         script_file << "../xballs -format " << format
-                << " -f " << getDataFile().getFullName()
+                << " -f " << dataFile.getFullName()
                 << " -s " << scale
                 << " -w " << width + 140
                 << " -h " << height + 140

@@ -33,8 +33,8 @@ int main(int, char**)
 	problem.setSaveCount(10);
 	problem.setXBallsAdditionalArguments("-v0 -solidf");
 	problem.write(std::cout,false);
-	problem.getRestartFile().setFileType(FileType::NO_FILE);
-	problem.getDataFile().setFileType(FileType::ONE_FILE);
-	problem.getFStatFile().setFileType(FileType::ONE_FILE);
+	problem.restartFile.setFileType(FileType::NO_FILE);
+	problem.dataFile.setFileType(FileType::ONE_FILE);
+	problem.fStatFile.setFileType(FileType::ONE_FILE);
 	problem.solve();
 }

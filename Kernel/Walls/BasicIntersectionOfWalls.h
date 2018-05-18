@@ -56,7 +56,7 @@ public:
     /*!
      * \brief Default destructor.
      */
-    virtual ~BasicIntersectionOfWalls();
+    ~BasicIntersectionOfWalls() override;
 
     /*!
      * \brief Wall copy method. It calls the copy constructor of this Wall, useful for polymorphism
@@ -66,7 +66,7 @@ public:
     /*! 
      * \brief Returns the number of objects 
      */
-    unsigned int getNumberOfObjects(void);
+    unsigned long getNumberOfObjects();
 
     /*!
      * \brief Defines a standard wall, given an outward normal vector s.t. normal*x=normal*point for all x of the wall.
@@ -99,7 +99,7 @@ public:
     std::string getName() const override;
 
     /*!
-     * \todo check if this must be writeVTK
+     * \todo change getVTK to writeVTK
      * @param points
      * @param triangleStrips
      */

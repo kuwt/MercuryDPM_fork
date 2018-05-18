@@ -99,7 +99,7 @@ private:
                 nLB++;
         }
         std::cout
-        << "t=" << std::setprecision(6) << std::left << std::setw(6) << getNtimeSteps()
+        << "t=" << std::setprecision(6) << std::left << std::setw(6) << getNumberOfTimeSteps()
         << ", Vol="  << std::setprecision(8) << std::left << std::setw(6) << volTotP+volTotI
         << "(" << std::setprecision(6) << std::left << std::setw(6) << volTotP
         << " in particle)," << "(" << std::setprecision(6) << std::left << std::setw(6) << volTotI

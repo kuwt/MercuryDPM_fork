@@ -137,13 +137,13 @@ int main(int /*argc*/, char **/*argv[]*/)
     //problem.setStiffnessAndRestitutionCoefficient(1e4,0.8,problem.getDensity()*constants::pi*pow(0.0037,2));
     problem.species->setSlidingFrictionCoefficient(0.5);
 
-    problem.getDataFile().setFileType(FileType::ONE_FILE);
-    problem.getFStatFile().setFileType(FileType::ONE_FILE);
+    problem.dataFile.setFileType(FileType::ONE_FILE);
+    problem.fStatFile.setFileType(FileType::ONE_FILE);
     problem.setGravity(Vec3D(0, 0, 0));
 
     problem.setTimeMax(10000.0);
     problem.setTimeStep(0.02 * helpers::computeCollisionTimeFromKAndDispAndEffectiveMass(problem.species->getStiffness(), problem.species->getDissipation(), 0.5 * mass));
-    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(10000, problem.getTimeMax(), problem.getTimeStep()));
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(10000, problem.getTimeMax(), problem.getTimeStep()));
     //problem.set_number_of_saves(10000);
     problem.getStatFile().setSaveCount(1);
     problem.setName("pure_shear_untill_jamming");

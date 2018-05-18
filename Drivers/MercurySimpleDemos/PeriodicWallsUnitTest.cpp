@@ -144,7 +144,7 @@ int main(int argc UNUSED, char* argv[] UNUSED)
 
     problem.setTimeMax(0.11);
     problem.setTimeStep(1.1e-05);
-    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(20, problem.getTimeMax(),
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(20, problem.getTimeMax(),
                                                                                      problem.getTimeStep()));
     problem.setName("PeriodicWallsUnitTest");
 

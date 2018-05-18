@@ -37,8 +37,7 @@ public:
     /**
      * Defines the problem setup
      */
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         //define a particle species
         LinearViscoelasticSpecies species;
         species.setDensity(6.0 / constants::pi);

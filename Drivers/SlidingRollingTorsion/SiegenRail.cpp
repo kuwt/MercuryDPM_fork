@@ -45,11 +45,11 @@ public:
 
 		//time stepping
 		//setTimeMax(1.3*LoopTime);
-		//setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(2000,getTimeMax(),getTimeStep()));
+		//setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(2000,getTimeMax(),getTimeStep()));
 		setTimeMax(0.24*LoopTime);
-        setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(8, getTimeMax(), getTimeStep()));
-		//getEneFile().setSaveCount(1000000000);
-		//getDataFile().setSaveCount(1000000000);
+        setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(8, getTimeMax(), getTimeStep()));
+		//eneFile.setSaveCount(1000000000);
+		//dataFile.setSaveCount(1000000000);
 		//write(std::cout,true);
 		
 		//set wall
@@ -126,7 +126,7 @@ public:
 // 		}
 	}
 
-	void writeEneTimestep(std::ostream& os) const{
+	void writeEneTimeStep(std::ostream& os) const{
 		//MD::writeToEne();
 		os
 		<< " " << std::setw(12) << wallHandler.getObject(0)->getForce().X

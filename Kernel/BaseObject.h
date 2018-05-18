@@ -99,18 +99,18 @@ public:
     /*!
      * \brief Except that it is virtual, it does the same thing as setIndex() does.
      */
-    virtual void moveInHandler(const unsigned int index);
+    virtual void moveInHandler(unsigned int index);
 
     /*!
      * \brief Allows one to assign an index to an object in the handler/container.
      */
-    void setIndex(const unsigned int index);
+    void setIndex(unsigned int index);
 
     /*!
      * \brief Assigns a unique identifier to each object in the handler (container) which remains
      * constant even after the object is deleted from the container/handler.
      */
-    void setId(const unsigned int id);
+    void setId(unsigned long id);
 
     /*!
      * \brief Returns the index of the object in the handler.

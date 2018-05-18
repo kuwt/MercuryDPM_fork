@@ -35,7 +35,7 @@ class Dipole : public Multipole {
 public:
 	Dipole(int p, NumericalVector<> *squaredFactorials, Vec3D location, Vec3D velocity, Mdouble strength);
 
-	void computeMultipoleExpansion() override final;
+	void computeMultipoleExpansion() final;
 
 	Vec3D getLocation()
 	{

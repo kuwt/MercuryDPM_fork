@@ -46,7 +46,7 @@ public:
     SlidingFrictionSpecies(const SlidingFrictionSpecies &s);
 
     ///\brief The default destructor.
-    virtual ~SlidingFrictionSpecies();
+    ~SlidingFrictionSpecies() override;
 
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
@@ -89,7 +89,7 @@ public:
     bool getUseAngularDOFs() const override;
 
     ///\brief creates default values for mixed species
-    void mix(SlidingFrictionSpecies* const S, SlidingFrictionSpecies* const T);
+    void mix(SlidingFrictionSpecies*S, SlidingFrictionSpecies*T);
 
     ///Sets k, disp, kt, dispt such that it matches a given tc and eps for a collision of two particles of masses m0,m1
     void setCollisionTimeAndNormalAndTangentialRestitutionCoefficient(Mdouble tc, Mdouble eps, Mdouble beta, Mdouble mass);

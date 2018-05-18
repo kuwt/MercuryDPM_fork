@@ -21,8 +21,6 @@ ArcWall::ArcWall(const ArcWall& other) : BaseWall(other)
     semiangle_ = other.semiangle_;
 }
 
-ArcWall::~ArcWall() {}
-
 void ArcWall::set(Vec3D axis, Vec3D pos, Mdouble radius, Vec3D centreline, Mdouble semiangle)
 {
     axis_ = axis;

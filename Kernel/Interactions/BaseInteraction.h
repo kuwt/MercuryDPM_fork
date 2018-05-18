@@ -69,7 +69,7 @@ public:
 
     ///\brief The destructor. It removes this interactions from the objects that were interacting, and writes the time
     ///to a file when needed.
-    virtual ~BaseInteraction();
+    ~BaseInteraction() override;
 
 	/*!\brief If an interaction needs to do something before it gets erased, add it here. 
 	 * E.g. Liquid bridges rupture at the end of their lifetime, and 
@@ -87,12 +87,12 @@ public:
     /*!
      * \brief Interaction read function, which accepts an std::istream as input.
      */
-    virtual void read(std::istream& is) override;
+    void read(std::istream& is) override;
 
     /*!
      * \brief Interaction print function, which accepts an std::ostream as input.
      */
-    virtual void write(std::ostream& os) const override;
+    void write(std::ostream& os) const override;
 
     /*!
      * \brief Writes forces data to the FStat file.
@@ -102,7 +102,7 @@ public:
     /*!
      * \brief Virtual function which allows interactions to be named.
      */
-    virtual std::string getName() const override;
+    std::string getName() const override;
 
     /*!
      * \brief Returns a Mdouble which is the current about of Elastic energy in the interaction.
@@ -130,14 +130,14 @@ public:
     void setContactPoint(Vec3D contactPoint);
 
     /*!
-     * \brief Updates the time step of the interacting. Note, timesteps used to find completed interactions.
+     * \brief Updates the time step of the interacting. Note, time steps used to find completed interactions.
      */
     void setTimeStamp(unsigned timeStamp);
 
     /*!
      * \brief Set the Species of the interaction; note this can either be a Species or MixedSpecies.
      */
-    void setSpecies(const BaseSpecies* const species);
+    void setSpecies(const BaseSpecies*species);
 
     /*!
      * \brief Sets the first object involved in the interaction (normally a particle).
@@ -446,8 +446,9 @@ public:
 
 
     //Sets the interactionData from the MPI class into the current thingy
-    virtual void setMPIInteraction(void *interactionDataArray, unsigned int index, const bool resetPointers);
-    void setBasicMPIInteractionValues(int P, int I, unsigned timeStamp, Vec3D force, Vec3D torque, bool isWallInteraction, const bool resetPointers);
+    virtual void setMPIInteraction(void *interactionDataArray, unsigned int index, bool resetPointers);
+    void setBasicMPIInteractionValues(int P, int I, unsigned timeStamp, Vec3D force, Vec3D torque, bool isWallInteraction,
+                                      bool resetPointers);
     void setIdentificationP(unsigned int identification);
     void setIdentificationI(int identification);
     void setWallInteraction(bool flag);
@@ -517,7 +518,7 @@ private:
     /*!
      * Mdouble which store the last timeStamp the interaction was active.
      */
-    ///\todo TW it would be safer to use the integer timestep here, instead of the double
+    ///\todo TW it would be safer to use the integer time step here, instead of the double
     unsigned timeStamp_;
 
     /*!

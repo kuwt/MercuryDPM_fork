@@ -32,6 +32,7 @@
 #include <CG/Fields/LiquidMigrationFields.h>
 #include <algorithm>
 #include <Interactions/AdhesiveForceInteractions/LiquidMigrationWilletInteraction.h>
+#include <cstring>
 
 template<template<class, template<class> class, class> class CGType,
         template<class> class BaseFunction, class Fields>

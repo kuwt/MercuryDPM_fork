@@ -58,11 +58,6 @@ public:
     ~HGrid();
     
     /*!
-     * \todo TW: Where is this function defined??
-     */
-    void Initialize_inv_size();
-    
-    /*!
      * \brief Inserts the given BaseParticle in to the HGrid.
      */
     void insertParticleToHgrid(BaseParticle* obj);
@@ -196,7 +191,7 @@ public:
      * \brief Gets the number of levels of this HGrid.
      * \return The number of levels in this HGrid.
      */
-    unsigned int getNumberOfLevels() const {return cellSizes_.size();}
+    unsigned long getNumberOfLevels() const {return cellSizes_.size();}
     
     /*!
      * \brief Gets the integer that represents which levels are occupied.

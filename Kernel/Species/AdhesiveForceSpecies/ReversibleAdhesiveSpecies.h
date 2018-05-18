@@ -46,7 +46,7 @@ public:
     ReversibleAdhesiveSpecies(const ReversibleAdhesiveSpecies &s);
 
     ///\brief The default constructor.
-    virtual ~ReversibleAdhesiveSpecies();
+    ~ReversibleAdhesiveSpecies() override;
 
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
@@ -58,7 +58,7 @@ public:
     std::string getBaseName() const;
 
     ///\brief creates default values for mixed species
-    void mix(ReversibleAdhesiveSpecies* const S, ReversibleAdhesiveSpecies* const T);
+    void mix(ReversibleAdhesiveSpecies*S, ReversibleAdhesiveSpecies*T);
 
 //adhesion-specific functions
 

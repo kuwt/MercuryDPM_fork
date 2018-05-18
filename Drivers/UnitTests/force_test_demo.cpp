@@ -41,9 +41,8 @@ public:
 
 		species = speciesHandler.copyAndAddObject(LinearViscoelasticSlidingFrictionSpecies());
     }
-    
-	virtual void setupInitialConditions()
-	{
+
+    void setupInitialConditions() override {
 		static int count = -1;
 		count++;
 
@@ -123,8 +122,7 @@ public:
 class wall_particle_collision : public particle_particle_collision{
 public:
 	
-	void setupInitialConditions()
-	{
+	void setupInitialConditions() override {
         static int count = -1;
 		count++;
 		

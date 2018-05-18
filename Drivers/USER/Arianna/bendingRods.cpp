@@ -79,7 +79,7 @@ public:
             )->bond();
         }
 
-        //set the timestep according to the species properties
+        //set the time step according to the species properties
         Mdouble mass = species->getMassFromRadius(p.getRadius());
         Mdouble tc = species->getCollisionTime(mass);
         Mdouble r = species->getRestitutionCoefficient(mass);
@@ -124,7 +124,7 @@ public:
     }
 
     // write some outout to the ene file to test the behaviour of the tangential springs
-    void writeEneTimestep(std::ostream& os) const override
+    void writeEneTimeStep(std::ostream& os) const override
     {
         auto i = dynamic_cast<const FrictionInteraction*>(interactionHandler.getObject(0));
         auto p = particleHandler.getObject(1);

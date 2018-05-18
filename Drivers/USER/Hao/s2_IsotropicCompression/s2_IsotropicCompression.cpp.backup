@@ -141,7 +141,7 @@ public:
         setZMax(getZMax()+0.5*Lz*dot_strain_zz*getTimeStep());
         setZMin(getZMin()-0.5*Lz*dot_strain_zz*getTimeStep());
         
-        //!  Give the strain-rate for all particles and move them to next timestep before integration
+        //!  Give the strain-rate for all particles and move them to next time step before integration
         N = particleHandler.getNumberOfObjects();
         for (int i=0; i < N; i++) {
 			Xp = particleHandler.getObject(i)-> getPosition().X - Px;

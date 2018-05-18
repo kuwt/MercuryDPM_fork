@@ -53,7 +53,7 @@ public:
 				for (int i=0; i<N; i++) {
 					if (particleHandler.getObject(i)->isFixed()) {
 						particleHandler.addObject(particleHandler.getObject(i)->copy());
-						particleHandler.getLastObject()->setIndSpecies(1);
+						particleHandler.getLastObject()->setSpecies(speciesHandler.getObject(1));
 						particleHandler.getLastObject()->move(Vec3D(lengthPeriodicChute*j,0.0,0.0));
 						particleHandler.getLastObject()->move(Vec3D(0.0,widthPeriodicChute*k,0.0));
 					}
@@ -143,20 +143,20 @@ int main(int argc, char* argv[])
 	problem.autoNumber();	
 	//set end time of simulation
 	problem.setTimeMax(1e4);
-	//set after how many timesteps data is saved
+	//set after how many time steps data is saved
 	problem.setSaveCount(5e3);
 	//for better output
 	problem.setXBallsAdditionalArguments("-v0 -solidf -h 600 -w 1400 ");
 	//determines which data are created
-	problem.getDataFile().setFileType(FileType::ONE_FILE);
-	problem.getEneFile().setFileType(FileType::ONE_FILE);
-	problem.getRestartFile().setFileType(FileType::ONE_FILE);
-	problem.getFStatFile().setFileType(FileType::ONE_FILE);
+	problem.dataFile.setFileType(FileType::ONE_FILE);
+	problem.eneFile.setFileType(FileType::ONE_FILE);
+	problem.restartFile.setFileType(FileType::ONE_FILE);
+	problem.fStatFile.setFileType(FileType::ONE_FILE);
 	// previously
-	//problem.getRestartFile().setFileType(FileType::ONE_FILE);
-	//problem.getDataFile().setFileType(FileType::ONE_FILE);
-	//problem.getFStatFile().setFileType(FileType::NO_FILE);
-	//problem.getEneFile().setFileType(FileType::ONE_FILE);
+	//problem.restartFile.setFileType(FileType::ONE_FILE);
+	//problem.dataFile.setFileType(FileType::ONE_FILE);
+	//problem.fStatFile.setFileType(FileType::NO_FILE);
+	//problem.eneFile.setFileType(FileType::ONE_FILE);
 	
 	//run the simulation
 	problem.solve(argc, argv);

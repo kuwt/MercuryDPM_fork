@@ -30,7 +30,7 @@
 
 // A value of File::lastSavedTimeStep_ = NEVER indicates a file was never been written
 ///\todo IFCD: can we make this an int instead of unsigned int, as -1 as an unsigned is not good style?
-const unsigned NEVER = -1;
+const unsigned NEVER = static_cast<const unsigned int>(-1);
 
 /*!
  * \brief With FileType options, one is able to choose if data is to be read/written from/into no or single or multiple files.
@@ -122,7 +122,7 @@ public:
      * \brief Sets the file name, e.g. "Name.data". 
      * \details Note the file name is usually set by MD::setName(), which sets names for all file types (data, restart, fstat, stat, ene)
      */
-    void setName(const std::string name);
+    void setName(const std::string& name);
 
     /*!
      * \brief Gets the file type e.g. NOFILE, ONEFILE and MULTIPLE FILES. File::fileType_
@@ -175,9 +175,9 @@ public:
     void setLastSavedTimeStep(unsigned int lastSavedTimeStep);
 
     /*!
-     * \brief determined if this timestep has to be written; if so, opens the output file
+     * \brief determined if this time step has to be written; if so, opens the output file
      */
-    bool saveCurrentTimestep(unsigned int ntimeSteps);
+    bool saveCurrentTimeStep(unsigned int ntimeSteps);
 
     /*!
      * \brief read function, which accepts an input stream <a href="http://en.cppreference.com/w/cpp/io/basic_istreams.html">std::istream</a>. 
@@ -253,7 +253,7 @@ private:
     std::fstream::openmode openMode_;
 
     /*!
-     * \brief Allows one to define the number of timesteps to be skipped to make a snap shot. E.g. TMax = 100, saveCount_ = 10, timeStep = 1; It stores data at t={0,10,20,30,40...100}.
+     * \brief Allows one to define the number of time steps to be skipped to make a snap shot. E.g. TMax = 100, saveCount_ = 10, timeStep = 1; It stores data at t={0,10,20,30,40...100}.
      * And if TMax =101, it stores data at t={0,10,20,30,...100,101}
      */
     unsigned int saveCount_;
@@ -261,7 +261,7 @@ private:
     /*!
      * \brief the time step at which the next write or read operation has to happen.
      */
-    int lastSavedTimeStep_;
+    unsigned int lastSavedTimeStep_;
 };
 
 #endif /* FILE_H */

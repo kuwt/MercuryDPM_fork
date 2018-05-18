@@ -43,7 +43,7 @@ public:
     /*!
      * \brief Copy-constructor for creates an Mercury2D problem from an existing MD problem.
      */
-    Mercury2D(const DPMBase& other);
+    explicit Mercury2D(const DPMBase& other);
 
     /*!
      * \brief Copy-constructor.

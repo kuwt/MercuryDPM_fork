@@ -802,7 +802,7 @@ int main(int argc, char *argv[])
     
     problem.setPackingFraction(true, packingFraction);   // if true forces the second value to be the packing fraction after the casing insertion
     
-//    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(2000, problem.getTimeMax(), problem.getTimeStep()));
+//    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(2000, problem.getTimeMax(), problem.getTimeStep()));
     problem.setSaveCount(0.01/problem.getTimeStep());
     
     problem.setParticleRadiusAndDispersity((.015-.005)/radiusRatio,0.1);

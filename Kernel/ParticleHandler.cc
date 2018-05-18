@@ -1086,7 +1086,7 @@ BaseParticle* ParticleHandler::readAndCreateObject(std::istream& is)
     BaseParticle* particle = nullptr;
     if (getStorageCapacity() > 0)
     {
-        std::stringstream line(std::stringstream::in | std::stringstream::out);
+        std::stringstream line;
         helpers::getLineFromStringStream(is, line);
         logger(DEBUG, "particle line: %", line.str());
         std::stringstream lineCopy(line.str());
@@ -1138,7 +1138,7 @@ void ParticleHandler::readAndAddObject(std::istream& is)
 //void ParticleHandler::readAndCreateOldObject(std::istream& is, const std::string& type)
 //{
 //    //read in next line
-//    std::stringstream line(std::stringstream::in | std::stringstream::out);
+//    std::stringstream line;
 //    helpers::getLineFromStringStream(is, line);
 //    logger(VERBOSE, line.str());
 //    //std::cout << line.str() << std::endl;

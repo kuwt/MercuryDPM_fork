@@ -133,7 +133,7 @@ int main()
 	highPoly.solve();
     std::cout << "Total time to run highly polydisperse simulation: " << time.toc() << "s (Expected: 3s)" << std::endl;
 
-    highPoly.write(std::cout,false);
+    highPoly.write(std::cout);
 	return 0;
 }
 

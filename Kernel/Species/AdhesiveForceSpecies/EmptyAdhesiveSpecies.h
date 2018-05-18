@@ -45,7 +45,7 @@ public:
     EmptyAdhesiveSpecies(const EmptyAdhesiveSpecies &s UNUSED);
 
     ///\brief The default destructor.
-    virtual ~EmptyAdhesiveSpecies();
+    ~EmptyAdhesiveSpecies() override;
 
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
@@ -57,7 +57,7 @@ public:
     std::string getBaseName() const;
 
     ///\brief creates default values for mixed species
-    void mix(EmptyAdhesiveSpecies* const S, EmptyAdhesiveSpecies* const T);
+    void mix(EmptyAdhesiveSpecies*S, EmptyAdhesiveSpecies*T);
 
     //adhesion-specific functions
 

@@ -46,7 +46,7 @@ public:
     LiquidBridgeWilletSpecies(const LiquidBridgeWilletSpecies &s);
 
     ///\brief The default destructor.
-    virtual ~LiquidBridgeWilletSpecies();
+    ~LiquidBridgeWilletSpecies() override;
 
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
@@ -58,7 +58,7 @@ public:
     std::string getBaseName() const;
 
     ///\brief creates default values for mixed species
-    void mix(LiquidBridgeWilletSpecies* const S, LiquidBridgeWilletSpecies* const T);
+    void mix(LiquidBridgeWilletSpecies*S, LiquidBridgeWilletSpecies*T);
 
 //adhesion-specific functions
 

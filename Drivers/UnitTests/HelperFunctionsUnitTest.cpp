@@ -34,8 +34,8 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 {
     std::cout << "Running HelperFunctionsUnitTest" << std::endl;
 
-    std::cout << "  Testing getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep" << std::endl;
-    unsigned int saveCount = helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(21, 10, 0.001);
+    std::cout << "  Testing getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep" << std::endl;
+    unsigned int saveCount = helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(21, 10, 0.001);
     if (saveCount != 501)
     {
         logger(ERROR, "save count is %, but should be %", saveCount, 501);
@@ -43,7 +43,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 
     std::cout << "  Testing getLineFromStringStream" << std::endl;
     std::stringstream is("1.0\n2.000000000000001\n3.0");
-    std::stringstream line(std::stringstream::in | std::stringstream::out);
+    std::stringstream line;
     helpers::getLineFromStringStream(is, line);
     Mdouble value;
     line >> value >> value; //the second value is not reading from the second line

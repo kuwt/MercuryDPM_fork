@@ -78,11 +78,11 @@ class pure_shear :  public Mercury2D
             InfiniteWall w0;
             w0.set(Vec3D( 0.0, 1.0, 0.0), getYMax());
             wallHandler.copyAndAddObject(w0);
-            w0.set(Vec3D( 0.0,-1.0, 0.0),-getYMin());
+            w0.set(Vec3D( 0.0,-1.0, 0.0),getMin());
             wallHandler.copyAndAddObject(w0);
             w0.set(Vec3D( 1.0, 0.0, 0.0), getXMax());
             wallHandler.copyAndAddObject(w0);
-            w0.set(Vec3D(-1.0, 0.0, 0.0),-getXMin());
+            w0.set(Vec3D(-1.0, 0.0, 0.0),getMin());
             wallHandler.copyAndAddObject(w0);
         }
         		

@@ -121,7 +121,7 @@ void IntersectionOfWalls::setHandler(WallHandler* wallHandler)
  * certain time or condition is met. Checking the number of objects is useful
  * for checking if this has happened yet, when restarting. 
  */
-unsigned int IntersectionOfWalls::getNumberOfObjects(void)
+unsigned int IntersectionOfWalls::getNumberOfObjects()
 {
     return wallObjects_.size();
 }

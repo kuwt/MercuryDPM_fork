@@ -21,7 +21,7 @@ class ParabolaChute : public BaseWall {
          * \brief Constructor in which all parameters are set.
          */
         ParabolaChute(Mdouble length, Mdouble widthscale);
-        ~ParabolaChute();
+        ~ParabolaChute() override;
         void set(Mdouble length, Mdouble widthscale);
         ParabolaChute* copy() const override;
         bool getDistanceAndNormal(const BaseParticle& P, Mdouble& distance, Vec3D& normal_return) const override;

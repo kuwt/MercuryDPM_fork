@@ -61,8 +61,8 @@ int main(int argc UNUSED, char *argv[] UNUSED)
  	md.setXBallsAdditionalArguments("-v0 -solidf");
  	md.setTimeMax(0.25*md.getTimeMax());
  	md.setSaveCount(md.getTimeMax()/ md.getTimeStep()/100);
- 	md.getRestartFile().setFileType(FileType::MULTIPLE_FILES);
- 	md.getFStatFile().setFileType(FileType::ONE_FILE);
+ 	md.restartFile.setFileType(FileType::MULTIPLE_FILES);
+ 	md.fStatFile.setFileType(FileType::ONE_FILE);
     md.solve();
 }
 //to see how much it melted:

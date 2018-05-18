@@ -43,7 +43,7 @@ public:
 
 		//time stepping
 		setTimeMax(LoopTime);
-		setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(200, getTimeMax(), getTimeStep()));
+		setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(200, getTimeMax(), getTimeStep()));
 
         //set wall
 		InfiniteWall w;

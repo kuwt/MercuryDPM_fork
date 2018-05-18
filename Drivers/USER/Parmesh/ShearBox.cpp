@@ -402,7 +402,7 @@ public:
         {
             //If you do not want saving set the counter to 2. So it will only save the very first step.
             //Note, you cannot set this to 0 or 1; this seems to be a MecuryDPM bug
-            setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(2, getTimeMax(), getTimeStep()));
+            setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(2, getTimeMax(), getTimeStep()));
         }
         
         //This does one set of filling. Note, this is done everytime step as well so this is not really required.
@@ -772,7 +772,7 @@ public:
                             //Set up the number of saves. The users sets the number of saves per time period
                             /// \bug This does seem to drift slightly. But the time shots in teh file seem right so it may be a rounding issues but some more investigation is required
                             int numberOfSaves=round(getTimeMax()/shearBoxTimePeriod*saveCountPerCycle);
-                            setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(numberOfSaves+1, getTimeMax(), getTimeStep())-1);
+                            setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(numberOfSaves+1, getTimeMax(), getTimeStep())-1);
                             
                             //Report we have moved on to step 5.
                             std::cout << "\n \n \n";

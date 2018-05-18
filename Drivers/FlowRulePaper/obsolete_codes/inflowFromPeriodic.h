@@ -79,7 +79,7 @@ public:
 	void actionsBeforeTimeStep(){cleanChute();};
 
 	void cleanChute() {
-		//clean outflow every 100 timesteps
+		//clean outflow every 100 time steps
 		static int count = 0, maxcount = 100;
 		if (count>maxcount)
 		{

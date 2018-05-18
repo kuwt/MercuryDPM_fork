@@ -73,7 +73,7 @@ public:
         std::cout << "time step use for creating initial conditions: " 
             << getTimeStep() << std::endl;
  
-        //set timestep
+        //set time step
         setTimeMax(1e20);
         setSaveCount(2000);
 

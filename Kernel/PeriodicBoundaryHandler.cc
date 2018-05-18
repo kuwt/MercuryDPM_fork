@@ -492,7 +492,7 @@ void PeriodicBoundaryHandler::generateGhosts(std::vector<std::vector<int> >& lis
 void PeriodicBoundaryHandler::collectGhostParticleData()
 {
     //For all new target lists
-    int numberOfTargets = sendTargetList_.size();
+    unsigned long numberOfTargets = sendTargetList_.size();
     periodicGhostParticleSend_.resize(numberOfTargets);
     periodicGhostComplexitySend_.resize(numberOfTargets);
     for (int i = 0; i < numberOfTargets; i++)
@@ -524,7 +524,7 @@ void PeriodicBoundaryHandler::collectInteractionData()
 {
     //For all send target lists
     InteractionHandler& iH = getDPMBase()->interactionHandler;
-    int numberOfTargets = sendTargetList_.size();
+    unsigned long numberOfTargets = sendTargetList_.size();
     interactionDataSend_.resize(numberOfTargets);
     for (int i = 0; i < numberOfTargets; i++)
     {

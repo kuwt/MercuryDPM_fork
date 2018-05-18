@@ -86,7 +86,7 @@ public:
 		P0.Velocity = Vec3D(0.0,0.0,0.0);
 	}
 
-	///sets parameters of particles and timestepping to the L3 type used in Silbert's papers
+	///sets parameters of particles and time stepping to the L3 type used in Silbert's papers
 	void set_silbert_parameters() {
 		//time stepping
 		setTimeStep(1e-4*10);

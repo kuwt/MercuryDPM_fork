@@ -34,7 +34,7 @@ class SlidingFrictionUnitTest : public DPMBase {
 		os << "time slidingSpringX slidingSpringY slidingSpringZ\n";
 	}
 
-	void writeEneTimestep(std::ostream& os) const override
+	void writeEneTimeStep(std::ostream& os) const override
 	{
 		auto i = dynamic_cast<const LinearViscoelasticSlidingFrictionBondedSpecies::InteractionType*>(interactionHandler.getLastObject());
 		assert(i);

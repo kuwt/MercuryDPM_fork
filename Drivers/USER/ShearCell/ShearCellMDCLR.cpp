@@ -54,7 +54,7 @@ public:
         species->setDissipation(2e-3);
         species->setSlidingDissipation(0.5e-3);
 
-        //set timestep
+        //set time step
             // echo 11 1 -9.81       >  par.ini
             // echo 250.00 5e-6      >> par.ini
             // echo 0.01  0.1        >> par.ini

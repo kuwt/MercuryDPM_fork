@@ -383,7 +383,7 @@ int main(int argc, char *argv[])
     //************************************************************************************************************************************************
     problem.setName("RodsEF_2D");
     
-    double timestepReduction = 0.1; //e.g. 0.1 will reduce the time step tenfold!
+    double timeStepReduction = 0.1; //e.g. 0.1 will reduce the time step tenfold!
     problem.setGravity(Vec3D(0,0,-0.0));
     problem.setTimeMax(100.0);
     problem.epsilonX = 1e-1;
@@ -553,7 +553,7 @@ int main(int argc, char *argv[])
     //Calculating particle mass and collision time (tc) from the parameters manually provided by the user.
     double mass = species1->getMassFromRadius(problem.getSubParticleRadius());
     double tc = species1->getCollisionTime(mass);
-    problem.setTimeStep(0.02*tc*timestepReduction);
+    problem.setTimeStep(0.02*tc*timeStepReduction);
     problem.setSaveCount(100);
 
     //setting parameters for visualisation using the xballs software package

@@ -23,12 +23,11 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef DPMBASE_H
-#define DPMBASE_H
+#ifndef DPMBase_H
+#define DPMBase_H
 
 //so that the user doesn't have to include string/io manipulations:
 #include <string>
-#include <string.h>
 #include <iomanip>
 //The vector class contains a 3D vector class.
 #include "Math/Vector.h"
@@ -92,7 +91,6 @@ public:
      */
     virtual ~DPMBase();
 
-
     /*!
      * \brief Increment the run Number (counter value) stored in the file_counter (COUNTER_DONOTDEL) by 1 and store the new value
      * in the counter file
@@ -136,7 +134,7 @@ public:
     /*!
      * \brief Sends particles from processorId to the root processor
      */
-    void sendParticlesToRoot(unsigned int &numberOfLocalParticles, unsigned int processorId, ParticleHandler &tempParticleHandler) const;
+//    void sendParticlesToRoot(unsigned int &numberOfLocalParticles, unsigned int processorId, ParticleHandler &tempParticleHandler) const;
 
     /*!
      * \brief Decomposes the simulation domain in a structured cube mesh of domains for parallel processing
@@ -162,7 +160,7 @@ public:
     void checkSettings();
 
     /*!
-     * \brief Writes output files immediately, even if the current timestep was
+     * \brief Writes output files immediately, even if the current time step was
      * not meant to be written. Also resets the last saved time step. */
     void forceWriteOutputFiles();
 
@@ -185,7 +183,7 @@ public:
      *       especially when using copy-constructors. This is a major change and will break other codes,
      *       so therefore has to be done carefully.
      * \details This sets up the particles initial conditions it is as you expect the user to override
-     *          this. By default the particles are randomly disibuted
+     *          this. By default the particles are randomly distributed
      */
     virtual void setupInitialConditions();
 
@@ -204,7 +202,7 @@ public:
 
     /*!
      * \brief Stores all the particle data for current save time step to a "restart" file, which is a file
-     * simply intended to store all the information necessary to "restart" a simulation from a given timestep
+     * simply intended to store all the information necessary to "restart" a simulation from a given time step
      * (see also <A HREF=http://mercurydpm.org/assets/downloads/MercuryLesson/MercuryDPMLessonSlides.pdf> MercuryDPM.org</A> for
      * more information on restart files).
      *
@@ -229,7 +227,7 @@ public:
     int readRestartFile(std::string fileName);
 
 //    /*!
-//     * \brief Loads all MD data and plots statistics for all timesteps in the .data file
+//     * \brief Loads all MD data and plots statistics for all time steps in the .data file
 //     */
 //    void statisticsFromRestartData(const char *name);
 ///\todo what to do with statisticsFromRestartData?
@@ -245,7 +243,10 @@ public:
      */
     virtual void read(std::istream& is);
 
-    virtual bool readUserDefinedWall(std::string type, std::istream& is) { return false;}
+    /*!
+     * \brief Allows you to read in a wall defined in a Driver directory; see USER/Luca/ScrewFiller
+     */
+    virtual BaseWall* readUserDefinedWall(const std::string& type) const {return nullptr;}
 
     /*!
      * \brief Reads all data from a restart file, e.g. domain data and particle data; old version
@@ -261,7 +262,7 @@ public:
     /*!
      * \brief Allows the user to read par.ini files (useful to read files produced by the MDCLR simulation code - external to MercuryDPM)
      */
-    bool readParAndIniFiles(const std::string fileName);
+    bool readParAndIniFiles(std::string fileName);
 
     /*!
      * \brief Reads the next data file with default format=0. However, one can
@@ -279,11 +280,6 @@ public:
      * \brief Finds and opens the next data file, if such a file exists.
      */
     bool findNextExistingDataFile(Mdouble tMin, bool verbose = true);
-
-    /*!
-     * \brief operator overloading of DPMBase class, writes the StatType to the given ostream
-     */
-    friend inline std::ostream& operator<<(std::ostream& os, const DPMBase &md);
 
     /*!
      * \brief Can interpret main function input arguments that are passed by the
@@ -460,7 +456,7 @@ public:
      * \brief Returns the current counter of time-steps, i.e. the number of time-steps that the
      * simulation has undergone so far.
      */
-    unsigned int getNtimeSteps() const;
+    unsigned int getNumberOfTimeSteps() const;
 
     /*!
      * \brief Sets a new value for the current simulation time.
@@ -483,12 +479,6 @@ public:
      */
         PossibleContactList& getPossibleContactList();
     #endif
-
-    /*!
-     * \brief
-     * \todo This method is not implemented
-     */
-    void setDoCGAlways(bool newDoCGFlag);
 
     /*!
      * \todo{these functions should also update the mixed species}
@@ -573,37 +563,37 @@ public:
 
     /*!
      * \deprecated
-     * \brief Sets the value of XMin, the lower bound of the problem domain in thex-direction
+     * \brief Sets the value of XMin, the lower bound of the problem domain in the x-direction
      */
     void setXMin(Mdouble newXMin);
 
     /*!
      * \deprecated
-     * \brief Sets the value of YMin, the lower bound of the problem domain in they-direction
+     * \brief Sets the value of YMin, the lower bound of the problem domain in the y-direction
      */
     void setYMin(Mdouble newYMin);
 
     /*!
      * \deprecated
-     * \brief Sets the value of ZMin, the lower bound of the problem domain in thez-direction
+     * \brief Sets the value of ZMin, the lower bound of the problem domain in the z-direction
      */
     void setZMin(Mdouble newZMin);
 
     /*!
      * \deprecated
-     * \brief Sets the value of XMax, the upper bound of the problem domain in thex-direction
+     * \brief Sets the value of XMax, the upper bound of the problem domain in the x-direction
      */
     void setXMax(Mdouble newXMax);
 
     /*!
      * \deprecated
-     * \brief Sets the value of YMax, the upper bound of the problem domain in they-direction
+     * \brief Sets the value of YMax, the upper bound of the problem domain in the y-direction
      */
     void setYMax(Mdouble newYMax);
 
     /*!
      * \deprecated
-     * \brief Sets the value of ZMax, the upper bound of the problem domain in thez-direction
+     * \brief Sets the value of ZMax, the upper bound of the problem domain in the z-direction
      */
     void setZMax(Mdouble newZMax);
 
@@ -614,7 +604,7 @@ public:
     /*!
      * \brief Sets the maximum coordinates of the problem domain.
      */
-    void setMax(const Mdouble,const Mdouble,const Mdouble);
+    void setMax(Mdouble, Mdouble, Mdouble);
 
     /*!
      * \brief Sets the minimum coordinates of the problem domain.
@@ -628,17 +618,17 @@ public:
     /*!
      * \brief Sets the minimum coordinates of the problem domain.
      */
-    void setMin(const Mdouble,const Mdouble,const Mdouble);
+    void setMin(Mdouble, Mdouble, Mdouble);
 
 
 
     /*!
-     * \brief Sets a new value for the simulation timestep.
+     * \brief Sets a new value for the simulation time step.
      */
     void setTimeStep(Mdouble newDt);
 
     /*!
-     * \brief Returns the simulation timestep.
+     * \brief Returns the simulation time step.
      */
     Mdouble getTimeStep() const;
 
@@ -831,7 +821,7 @@ public:
      * \brief
      * //Not unsigned index because of possible wall collisions.
      */
-    virtual void gatherContactStatistics(unsigned int index1 UNUSED, int index2 UNUSED, Vec3D Contact UNUSED, Mdouble delta UNUSED, Mdouble ctheta UNUSED, Mdouble fdotn UNUSED, Mdouble fdott UNUSED, Vec3D P1_P2_normal_ UNUSED, Vec3D P1_P2_tangential UNUSED);
+    virtual void gatherContactStatistics(unsigned int index1, int index2, Vec3D Contact, Mdouble delta, Mdouble ctheta, Mdouble fdotn, Mdouble fdott, Vec3D P1_P2_normal_, Vec3D P1_P2_tangential);
 
     /*!
      * \brief Sets the number of domains in x-,y- and z-direction. Required for parallel computations
@@ -844,7 +834,7 @@ public:
     std::vector<unsigned> getNumberOfDomains();
 
     /*!
-     * \brief Function that returns a pointer to the domain correseponding to the processor
+     * \brief Function that returns a pointer to the domain corresponding to the processor
      */
     Domain* getCurrentDomain();
 
@@ -855,7 +845,7 @@ public:
      */
     virtual void hGridGetInteractingParticleList(BaseParticle* obj, std::vector<BaseParticle*>& list) {};
 
-    virtual void computeWallForces(BaseWall* const w);
+    virtual void computeWallForces(BaseWall* w);
 
     /*!
      * \brief
@@ -953,7 +943,7 @@ protected:
      * \brief This function writes out the particle locations into an output stream in a 
      *        format the XBalls program can read. For more information on the XBalls program, see \ref xballs.
      */
-    virtual void outputXBallsDataParticle(const unsigned int i,const unsigned int format, std::ostream& os) const;
+    virtual void outputXBallsDataParticle(unsigned int i, unsigned int format, std::ostream& os) const;
 
     /*!
      * \brief Writes a header with a certain format for ENE file.
@@ -968,7 +958,7 @@ protected:
     /*!
      * \brief Write the global kinetic, potential energy, etc. in the system.
      */
-    virtual void writeEneTimestep(std::ostream& os) const;
+    virtual void writeEneTimeStep(std::ostream& os) const;
     
      // Functions for statistics
     /*!
@@ -989,7 +979,7 @@ protected:
     /*!
      * \brief
      */
-    virtual void processStatistics(bool usethese UNUSED);
+    virtual void processStatistics(bool);
 
     /*!
      * \brief
@@ -1070,7 +1060,7 @@ protected:
     void checkAndDuplicatePeriodicParticles();
 
     /*!
-     * \brief When the verlet scheme updates the positions andn velocities of particles, 
+     * \brief When the Verlet scheme updates the positions and velocities of particles,
      * ghost particles will need an update as wel. Their status will also be updated
      * accordingly.
      */
@@ -1121,7 +1111,7 @@ private:
     /*!
      * \brief Stores the number of time steps
      */
-    unsigned int nTimeSteps_;
+    unsigned int numberOfTimeSteps_;
 
     /*!
      * \brief Stores the simulation time step
@@ -1179,7 +1169,7 @@ private:
     //This is the private data that is only used by the xballs output
 
     /*!
-     * \brief XBalls is a package to view the particle data. As an alternative MercuryDPM also supports Paraview.
+     * \brief XBalls is a package to view the particle data. As an alternative MercuryDPM also supports ParaView.
      * The below variable is used to set the argument cmode in xballs script (see XBalls/xballs.txt)
      */
     int xBallsColourMode_; 
@@ -1209,7 +1199,7 @@ private:
      */
     std::string name_;
 
-    // defines a Macro for creating an instance of class PossibleContactList. See PossbileContactList.h     
+    // defines a Macro for creating an instance of class PossibleContactList. See PossibleContactList.h
 #ifdef CONTACT_LIST_HGRID
         PossibleContactList possibleContactList;
 #endif
@@ -1222,7 +1212,7 @@ private:
 
 public:
     /*!
-     * \brief A handler to that stores the species type i.e. elastic, linear visco-elastic... et cetera.
+     * \brief A handler to that stores the species type i.e. LinearViscoelasticSpecies, etc.
      */
     SpeciesHandler speciesHandler;
 
@@ -1252,7 +1242,7 @@ public:
     PeriodicBoundaryHandler periodicBoundaryHandler;
 
     /*!
-     * \brief An object of theh class DomainHandler which deals with parallel code
+     * \brief An object of the class DomainHandler which deals with parallel code
      */
     DomainHandler domainHandler;
 
@@ -1293,7 +1283,7 @@ public:
     File statFile;
 
     /*!
-     * \brief File class to hanle in- and output into .interactions file. This file hold
+     * \brief File class to handle in- and output into .interactions file. This file hold
      * information about interactions.
      */
     File interactionFile;

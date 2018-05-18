@@ -121,7 +121,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 	problem.ParticleRadius=0.2;	
 	problem.speciesHandler.getObject(0)->setCollisionTimeAndRestitutionCoefficient(0.05,0.8, pow(problem.ParticleRadius,3)*constants::pi*4.0/3.0*1000);
     problem.setTimeStep(0.02*0.05);
-	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(1000,problem.getTimeMax(),problem.getTimeStep()));
+	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(1000,problem.getTimeMax(),problem.getTimeStep()));
 	problem.write(std::cout,false);
 	problem.solve();
 }

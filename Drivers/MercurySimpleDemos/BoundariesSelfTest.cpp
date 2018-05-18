@@ -92,12 +92,10 @@ class BoundariesSelfTest : public Mercury2D
             setGravity(Vec3D(g, 0, 0));
         }
 
-        ~BoundariesSelfTest()
-        {
+        ~BoundariesSelfTest() override {
         }
 
-        void actionsAfterTimeStep()
-        {
+        void actionsAfterTimeStep() override {
             if (not_yet_deleted_insb)
             {
                 num_inserted = insb->getNumberOfParticlesInserted();
@@ -138,7 +136,7 @@ int main(int argc, char *argv[])
 {
     flux_f = fopen("BoundariesSelfTest.flux", "w");
     fprintf(flux_f, "time mass insb_num insb_mass insb_vol fluxb_num fluxb_mass fluxb_vol delb_num delb_mass delb_vol\n");
-    setbuf(flux_f, NULL);
+    setbuf(flux_f, nullptr);
     BoundariesSelfTest problem;
     problem.setName("BoundariesSelfTest");
     fprintf(stdout, "Initialising the problem\n");

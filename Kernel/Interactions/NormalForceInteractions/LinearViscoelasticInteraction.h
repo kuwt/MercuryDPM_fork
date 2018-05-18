@@ -55,7 +55,7 @@ public:
     /*!
      * \brief Destructor.
      */
-    virtual ~LinearViscoelasticInteraction();
+    ~LinearViscoelasticInteraction() override;
     /*!
      * \brief Creates a copy of an object of this class. (Deep copy)
      */

@@ -88,14 +88,14 @@ void Box::downwardPass()
 
  		}
 
- 		std::cout << "Translating local expansions to childeren" << std::endl;
+ 		std::cout << "Translating local expansions to children" << std::endl;
  		for (Panel *panel : levels_[iL])
  		{
  			panel->translateLocalExpansion();
  		}
  	}
 
- 	// Compute local expansions for the remaining  interactionlist on the finest level
+ 	// Compute local expansions for the remaining  interaction list on the finest level
  	std::cout << "Computing nearby local expansions on finest level " << std::endl;
  	for (Panel *panel : levels_[maxLevel_])
  	{
@@ -167,7 +167,7 @@ void Box::computeFlow(int k)
 					}
 				}
 				// Compute multipole
-				int nTerms = 0.5*(p_+1)*(2*p_+2);
+				size_t nTerms = (p_ + 1) * (p_ + 1);
 				NumericalVector<std::complex<Mdouble>> multipoleExpansionCoefficients(nTerms);
 				for (int n = 0; n <= p_; n++)
 				{

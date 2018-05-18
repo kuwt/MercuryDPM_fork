@@ -720,7 +720,7 @@ int main(int argc, char *argv[])
     ctSettle.setSystemDimensions(3);
     ctSettle.setVerbose(true);
     
-    // sets the number of saved timesteps such that the output is printed every 0.01s
+    // sets the number of saved time steps such that the output is printed every 0.01s
     ctSettle.setSaveCount(0.01/ctSettle.getTimeStep());
     
     // sets the particle intrinsic properties

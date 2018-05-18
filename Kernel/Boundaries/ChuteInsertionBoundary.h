@@ -51,7 +51,7 @@ public:
     /*!
      * \brief Copy method; creates a copy on the heap.
      */
-    virtual ChuteInsertionBoundary* copy() const override;
+    ChuteInsertionBoundary* copy() const override;
     
     /*!
      * \brief Sets all boundary properties at once.
@@ -61,9 +61,9 @@ public:
     /*!
      * \brief Generates a random particle
      */
-    virtual BaseParticle* generateParticle(RNG &random) override;
+    BaseParticle* generateParticle(RNG &random) override;
 
-    virtual void placeParticle(BaseParticle* p, RNG &random) override;
+    void placeParticle(BaseParticle* p, RNG &random) override;
     
     /*!
      * \brief reads boundary properties from istream
@@ -84,7 +84,7 @@ public:
     /*!
      * \brief Returns the name of the object
      */
-    virtual std::string getName() const override;
+    std::string getName() const override;
     
 private:
     
@@ -100,7 +100,7 @@ private:
 
     /*!
      * \brief radius of the fixed bottom particles, mean particle velocity in 
-     * X-direction, and allowed maximum randomly added/substracted velocities in all three
+     * X-direction, and allowed maximum randomly added/subtracted velocities in all three
      * directions while generating particles (expressed as \% of inflowVelocity_).
      * NB: see also documentation of ChuteInsertionBoundary::generateParticle().
      */

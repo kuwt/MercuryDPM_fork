@@ -44,12 +44,12 @@ public:
     /*!
      * \brief destructor
      */    
-    ~CubeDeletionBoundary();
+    ~CubeDeletionBoundary() override;
 
     /*!
      * \brief Copy method; creates copy on the heap and returns a pointer to it.
-     */    
-    virtual CubeDeletionBoundary* copy() const override;
+     */
+    CubeDeletionBoundary* copy() const override;
 
     /*!
      * \brief Sets boundary position based on two opposite corners.
@@ -74,7 +74,7 @@ public:
     /*!
      * \brief Returns the name of the object
      */
-    virtual std::string getName() const override;
+    std::string getName() const override;
 
 private:
 

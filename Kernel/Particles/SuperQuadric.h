@@ -173,8 +173,8 @@ public:
      * \brief Checks if this superquadric is in interaction with the given particle, and if
      * so, returns vector of pointer to the associated BaseInteraction object (else returns empty vector).
      */
-    std::vector<BaseInteraction*> getInteractionWith(BaseParticle* const P, const unsigned timeStamp,
-                                                     InteractionHandler* const interactionHandler) override;
+    std::vector<BaseInteraction*> getInteractionWith(BaseParticle*P, unsigned timeStamp,
+                                                     InteractionHandler*interactionHandler) override;
     
     /*!
      * \brief Get the mean curvature of this superquadric at the given (lab-fixed) position, see Podlozhyuk et al.
@@ -185,7 +185,7 @@ public:
     /*!
      * \brief Get whether or not this superquadric is in contact with the given particle.
      */
-    bool isInContactWith(const BaseParticle* const p) const override;
+    bool isInContactWith(const BaseParticle*p) const override;
     
     /*!
      * \brief Compute and get the gradient of the shape-function at the given (lab-fixed) position.
@@ -197,8 +197,8 @@ public:
      * \brief Checks if this superquadric is in interaction with the given superquadric, and if
      * so, returns vector of pointer to the associated BaseInteraction object (else returns empty vector).
      */
-    std::vector<BaseInteraction*> getInteractionWithSuperQuad(SuperQuadric* const p, const unsigned timeStamp,
-                                                              InteractionHandler* const interactionHandler);
+    std::vector<BaseInteraction*> getInteractionWithSuperQuad(SuperQuadric*p, unsigned timeStamp,
+                                                              InteractionHandler*interactionHandler);
     
     /*!
      * \brief Compute and get the hessian ("second derivative") of the shape-function at the given (lab-fixed) position.
@@ -215,21 +215,21 @@ public:
      * (2017) eq (22).
      */
     SmallVector<4> computeResidualContactDetection(const SmallVector<4>& position,
-                                                   const SuperQuadric* const p1,
-                                                   const SuperQuadric* const p2) const;
+                                                   const SuperQuadric*p1,
+                                                   const SuperQuadric*p2) const;
 
     /*!
      * \brief Compute and return the derivative of functionThatShouldBecomeZeroForContactDetection, both to the position
      * and the Lagrange multiplier, and evaluated at the contact point.
      */
     SmallMatrix<4, 4> getJacobianOfContactDetectionObjective(const SmallVector<4>& contactPoint,
-                                                             const SuperQuadric* const p1,
-                                                             const SuperQuadric* const p2) const;
+                                                             const SuperQuadric*p1,
+                                                             const SuperQuadric*p2) const;
     
     /*!
      * \brief Get an initial guess for the contact-point between this particle and the given particle.
      */
-    SmallVector<4> getInitialGuessForContact(const SuperQuadric* pQuad, BaseInteraction* const C) const;
+    SmallVector<4> getInitialGuessForContact(const SuperQuadric* pQuad, BaseInteraction*C) const;
     
     /*!
      * \brief Compute the distance between the contact-point and surface of this superquadric particle.
@@ -239,20 +239,20 @@ public:
     /*!
      * \brief Compute the contact point between this and the given superquadric particle.
      */
-    SmallVector<4> getContactPoint(const SuperQuadric* const p, BaseInteraction* C) const;
+    SmallVector<4> getContactPoint(const SuperQuadric*p, BaseInteraction* C) const;
     
     /*!
      * \brief If the "normal" procedure fails to find a contact point, use an alternative approach that involves
      * starting with two spheres to compute the interaction, and becoming less and less spherical.
      */
-    SmallVector<4> getContactPointPlanB(const SuperQuadric* const pOther, unsigned numberOfSteps) const;
+    SmallVector<4> getContactPointPlanB(const SuperQuadric*pOther, unsigned numberOfSteps) const;
     
     /*!
      * \brief Perform the actual Newton-iterations to find the contact point. Note, that it is given back as a
      * parameter.
      */
-    bool computeContactPoint(SmallVector<4>& contactPoint, const SuperQuadric* const p1,
-                             const SuperQuadric* const p2) const;
+    bool computeContactPoint(SmallVector<4>& contactPoint, const SuperQuadric*p1,
+                             const SuperQuadric*p2) const;
     
     
     void writeDebugMessageStep1(const SuperQuadric* pQuad, const SmallVector<4>& contactPointPlanB) const;

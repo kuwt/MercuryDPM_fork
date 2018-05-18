@@ -92,7 +92,7 @@ MatrixSymmetric3D MatrixSymmetric3D::operator +(const MatrixSymmetric3D& A) cons
 
 /*!
  * \details Substraction of symmetric 3D matrices
- * \param[in] A     symmetric matrix to be substracted
+ * \param[in] A     symmetric matrix to be subtracted
  * \return Result of the substraction
  */
 MatrixSymmetric3D MatrixSymmetric3D::operator -(const MatrixSymmetric3D& A) const
@@ -112,7 +112,7 @@ MatrixSymmetric3D MatrixSymmetric3D::operator +(const Mdouble a) const
 
 /*!
  * \details Substraction of a scalar
- * \param[in] a     scalar to be substracted
+ * \param[in] a     scalar to be subtracted
  * \return Result of the substraction
  */
 MatrixSymmetric3D MatrixSymmetric3D::operator -(const Mdouble a) const
@@ -197,7 +197,7 @@ MatrixSymmetric3D& MatrixSymmetric3D::operator+=(const MatrixSymmetric3D& A)
 
 /*!
  * \details Matrix substraction
- * \param[in] A     the matrix to be substracted
+ * \param[in] A     the matrix to be subtracted
  * \return (reference to) this matrix, which is the result of the substraction
  */
 MatrixSymmetric3D& MatrixSymmetric3D::operator-=(const MatrixSymmetric3D& A)
@@ -312,19 +312,20 @@ Mdouble MatrixSymmetric3D::determinant (const MatrixSymmetric3D& A)
 }
 
 /*!
+ * \todo implement MatrixSymmetric3D::getCylindricalTensorField
  * \details Transforms the (Cartesian) vector to cylindrical coordinates.
  * See https://en.wikipedia.org/wiki/Vector_fields_in_cylindrical_and_spherical_coordinates
  * \return              Transformed vector
  */
 MatrixSymmetric3D MatrixSymmetric3D::getCylindricalTensorField(const Vec3D& p) const
 {
-    //define sin(A)=y/r, cos(A)=x/r
-    Mdouble r = std::sqrt(p.X*p.X+p.Y*p.Y);
-    Mdouble s = p.Y/r;
-    Mdouble c = p.X/r;
-    if (r==0) {
-        s=0;
-        c=1;
-    }
+//    //define sin(A)=y/r, cos(A)=x/r
+//    Mdouble r = std::sqrt(p.X*p.X+p.Y*p.Y);
+//    Mdouble s = p.Y/r;
+//    Mdouble c = p.X/r;
+//    if (r==0) {
+//        s=0;
+//        c=1;
+//    }
     return *this;
 }

@@ -55,7 +55,7 @@ public:
 		if (kineticEnergy/getElasticEnergy()<1e-5 && getTime()>10) pointIsAboveCurve=false;
 	}
 
-	bool continueSolve() const {
+	bool continueSolve() const override {
 		if (ceil(getTime())!=ceil(getTime()+getTimeStep())) printTime();
 		if (pointIsAboveCurve) return true;
 		else return false;

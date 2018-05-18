@@ -73,7 +73,7 @@ public:
 		
 		wallHandler.clear();
 		InfiniteWall w;
-		w.set(Vec3D(0, 0, -1), -getZMin()+getFixedParticleRadius());
+		w.set(Vec3D(0, 0, -1), Vec3D(0,0,getZMin()-getFixedParticleRadius()));
 		wallHandler.copyAndAddObject(w);
 		
 		boundaryHandler.clear();
@@ -120,7 +120,7 @@ public:
 	//defines type of flow particles	
 	void create_inflow_particle()
 	{
-		P0.setIndSpecies(1);
+		P0.setSpecies(speciesHandler.getObject(1));
 		P0.setRadius(random.getRandomNumber(getMinInflowParticleRadius(), getMaxInflowParticleRadius()));
 		//P0.computeMass();
 		
@@ -172,7 +172,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 	md.setInflowParticleRadius(0.96*R,R);
     md.setRoughBottomType(MONOLAYER_DISORDERED);
 	md.setXBallsAdditionalArguments("-v0 -solidf");
- 	md.getFStatFile().setFileType(FileType::NO_FILE);
+ 	md.fStatFile.setFileType(FileType::NO_FILE);
  	md.setHGridMaxLevels(1);
     if (argc>=2)
 		md.M = atoi(argv[1]);

@@ -28,7 +28,7 @@ CinderDriver()
 	{
 	verif_file.open("verification_file.dat");
 	NumEjected=0;                                           // Number of particles ejected
-	count=0;                                                // counts nuber of timesteps to determine when to delete 'landed' particles
+	count=0;                                                // counts nuber of time steps to determine when to delete 'landed' particles
 	nburst=0;                                               // initial number of bursts that have ejected
 	
 	// set seed for RNG
@@ -183,7 +183,7 @@ void setupInitialConditions(){
 		{
 			
 			
-		// every 1000 timesteps, delete particles that fall below the vent elevation //(should be landing surface, problem with walls) 
+		// every 1000 time steps, delete particles that fall below the vent elevation //(should be landing surface, problem with walls)
 		// save particle positions to file CinderColumn.X.fpos
 		double MaxN = getMaxNburst()*getBurstTime()*getEjectionRate();
 		count=count+1;

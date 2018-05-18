@@ -49,7 +49,7 @@ BaseInteraction::BaseInteraction(BaseInteractable* P, BaseInteractable* I, unsig
     overlap_ = 0;
     timeStamp_ = timeStamp;
     /// \bug Why is the species set to zero here and not the correct mixed type.
-    species_ = 0;
+    species_ = nullptr;
     force_.setZero();
     torque_.setZero();
     if (P->getSpecies()->getHandler()->getDPMBase()->getInteractionFile().getFileType() == FileType::ONE_FILE)
@@ -72,7 +72,7 @@ BaseInteraction::BaseInteraction()
     normal_.setZero();
     overlap_ = 0;
     timeStamp_ = 0;
-    species_ = 0;
+    species_ = nullptr;
     force_.setZero();
     torque_.setZero();
     lagrangeMultiplier_ = 0;
@@ -405,8 +405,8 @@ Vec3D BaseInteraction::getCP() const
 void BaseInteraction::writeToFStat(std::ostream& os, Mdouble time) const
 {
     ///\todo MX The documentation mentions that the first variable is the time - this is incorrect, is is the timeStamp the interaction started
-    BaseParticle* IParticle = dynamic_cast<BaseParticle*>(I_);
-    BaseParticle* PParticle = dynamic_cast<BaseParticle*>(P_);
+    auto * IParticle = dynamic_cast<BaseParticle*>(I_);
+    auto * PParticle = dynamic_cast<BaseParticle*>(P_);
 
     Vec3D tangentialForce = getTangentialForce();
     Mdouble tangentialOverlap = getTangentialOverlap();
@@ -419,7 +419,7 @@ void BaseInteraction::writeToFStat(std::ostream& os, Mdouble time) const
     else
         tangential = Vec3D(0.0,0.0,0.0);
 
-    if (PParticle!=0 && !PParticle->isFixed())
+    if (PParticle!= nullptr && !PParticle->isFixed())
     {
         os << time << " " << P_->getIndex()
             << " " << static_cast<int>((IParticle==nullptr?(-I_->getIndex()-1):I_->getIndex()))
@@ -428,8 +428,8 @@ void BaseInteraction::writeToFStat(std::ostream& os, Mdouble time) const
             << " " << tangentialOverlap
             << " " << scalarNormalForce
             << " " << scalarTangentialForce
-            << " " << (IParticle==0?-normal_:normal_)
-            << " " << (IParticle==0?-tangential:tangential) << std::endl;
+            << " " << (IParticle== nullptr ?-normal_:normal_)
+            << " " << (IParticle== nullptr ?-tangential:tangential) << std::endl;
         ///\todo the flip in normal/tangential direction for walls should not be done; this is an old bug
     }
     if (IParticle!=nullptr && !IParticle->isFixed() && IParticle->getPeriodicFromParticle()==nullptr)
@@ -708,7 +708,7 @@ void BaseInteraction::rotateHistory(Matrix3D& rotationMatrix)
 Mdouble BaseInteraction::getEffectiveRadius() const
 {
     const BaseParticle* PParticle = dynamic_cast<const BaseParticle*>(getP());
-    const BaseParticle* IParticle = dynamic_cast<const BaseParticle*>(getI());
+    const auto * IParticle = dynamic_cast<const BaseParticle*>(getI());
     if (PParticle==nullptr)
     {
         std::cerr << "BaseInteraction::getEffectiveCorrectedRadius(): first interactable P is not a particle" << std::endl;
@@ -755,7 +755,7 @@ Mdouble BaseInteraction::getEffectiveRadius() const
 Mdouble BaseInteraction::getEffectiveMass() const
 {
     const BaseParticle* PParticle = dynamic_cast<const BaseParticle*>(getP());
-    const BaseParticle* IParticle = dynamic_cast<const BaseParticle*>(getI());
+    const auto * IParticle = dynamic_cast<const BaseParticle*>(getI());
     if (PParticle==nullptr)
     {
         std::cerr << "BaseInteraction::getEffectiveCorrectedRadius(): first interactable P is not a particle" << std::endl;
@@ -803,7 +803,7 @@ Mdouble BaseInteraction::getEffectiveMass() const
 Mdouble BaseInteraction::getEffectiveCorrectedRadius()
 {
     BaseParticle* PParticle = dynamic_cast<BaseParticle*>(getP());
-    BaseParticle* IParticle = dynamic_cast<BaseParticle*>(getI());
+    auto * IParticle = dynamic_cast<BaseParticle*>(getI());
     if (PParticle==nullptr)
     {
         std::cerr << "BaseInteraction::getEffectiveCorrectedRadius(): first interactable P is not a particle" << std::endl;
@@ -831,8 +831,8 @@ void BaseInteraction::actionsAfterTimeStep()
  */
 void BaseInteraction::gatherContactStatistics()
 {
-    BaseParticle* IParticle = dynamic_cast<BaseParticle*>(I_);
-    BaseParticle* PParticle = dynamic_cast<BaseParticle*>(P_);
+    auto * IParticle = dynamic_cast<BaseParticle*>(I_);
+    auto * PParticle = dynamic_cast<BaseParticle*>(P_);
 
     Vec3D tangentialForce = getTangentialForce();
     Mdouble tangentialOverlap = getTangentialOverlap();
@@ -857,16 +857,16 @@ void BaseInteraction::gatherContactStatistics()
     {
         getHandler()->getDPMBase()->gatherContactStatistics(
             P_->getIndex(),
-            static_cast<int>((IParticle==0?(-I_->getIndex()-1):I_->getIndex())),
+            static_cast<int>((IParticle== nullptr ?(-I_->getIndex()-1):I_->getIndex())),
             centre,
             getOverlap(),
             tangentialOverlap,
             scalarNormalForce,
             scalarTangentialForce,
-            (IParticle==0?-normal_:normal_),
-            (IParticle==0?-tangential:tangential));
+            (IParticle== nullptr ?-normal_:normal_),
+            (IParticle== nullptr ?-tangential:tangential));
     }
-    if (IParticle!= nullptr && !IParticle->isFixed() && IParticle->getPeriodicFromParticle()==0)
+    if (IParticle!= nullptr && !IParticle->isFixed() && IParticle->getPeriodicFromParticle()== nullptr)
     {
         getHandler()->getDPMBase()->gatherContactStatistics(
             I_->getIndex(),
@@ -959,6 +959,7 @@ bool BaseInteraction::isWallInteraction()
     return isWallInteraction_;
 }
 
+///\todo TW should P, I be of type unsigned?
 void BaseInteraction::setBasicMPIInteractionValues(int P, int I, unsigned timeStamp, Vec3D force, Vec3D torque, bool isWallInteraction, const bool resetPointers)
 {
   this->setIdentificationP(P);

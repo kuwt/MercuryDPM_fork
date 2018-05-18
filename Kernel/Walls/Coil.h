@@ -58,7 +58,7 @@ public:
     /*!
      * \brief Default destructor.
      */
-    ~Coil();
+    ~Coil() override;
     
     /*!
      * \brief Set all parameters of this Coil.

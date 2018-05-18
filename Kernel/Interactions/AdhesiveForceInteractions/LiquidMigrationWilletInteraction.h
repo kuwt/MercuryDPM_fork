@@ -60,9 +60,9 @@ public:
     /*!
      * \brief Destructor.
      */
-    virtual ~LiquidMigrationWilletInteraction();
-    
-    virtual void actionsOnErase() override;
+    ~LiquidMigrationWilletInteraction() override;
+
+    void actionsOnErase() override;
 	
     void actionsAfterTimeStep() override;
     

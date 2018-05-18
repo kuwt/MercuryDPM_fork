@@ -61,10 +61,10 @@ public:
 		set_study(study_num[0]);
 		setInflowHeight(study_num[1]);
 		setChuteAngle(study_num[2]);
-		getRestartFile().setFileType(FileType::MULTIPLE_FILES_PADDED);
-		getDataFile().setFileType(FileType::NO_FILE);
-		getFStatFile().setFileType(FileType::NO_FILE);
-		getEneFile().setFileType(FileType::ONE_FILE);
+		restartFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
+		dataFile.setFileType(FileType::NO_FILE);
+		fStatFile.setFileType(FileType::NO_FILE);
+		eneFile.setFileType(FileType::ONE_FILE);
 		readArguments(argc, argv);
 		set_study();	
 		
@@ -116,7 +116,7 @@ public:
 int main(int argc, char *argv[])
 {
 	FlowRule problem;
-	problem.getRestartFile().setFileType(FileType::MULTIPLE_FILES_PADDED);
+	problem.restartFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
 	problem.setSaveCount(1e4);
 	//~ problem.setRoughBottomType(MONOLAYER_DISORDERED);
 	problem.setTimeMax(2000); //to create initial conditions

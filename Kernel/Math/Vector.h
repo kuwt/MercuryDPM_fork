@@ -128,7 +128,7 @@ public:
     /*!
      * \brief Divides by a scalar
      */
-    Vec3D operator/(const Mdouble a) const;
+    Vec3D operator/(Mdouble a) const;
     
     /*!
      * \brief Adds another vector
@@ -151,12 +151,12 @@ public:
     /*!
      * \brief Multiplies by a scalar
      */
-    Vec3D& operator*=(const Mdouble a);
+    Vec3D& operator*=(Mdouble a);
     
     /*!
      * \brief Divides by a scalar
      */
-    Vec3D& operator/=(const Mdouble a);
+    Vec3D& operator/=(Mdouble a);
     
     /*!
      * \brief Calculates the dot product of two Vec3D: \f$ a \cdot b\f$
@@ -237,12 +237,12 @@ public:
     /*!
      * \brief Returns the requested component of this Vec3D
      */
-    Mdouble getComponent(const int index) const;
+    Mdouble getComponent(int index) const;
     
     /*!
      * \brief Sets the requested component of this Vec3D to the requested value
      */
-    void setComponent(const int index, const double val);
+    void setComponent(int index, double val);
     
     /*!
      * \brief RW reference to X
@@ -310,7 +310,7 @@ public:
     /*!
      * \brief Checks if the length this Vec3D is equal the length of other with a certain tolerance
      */
-    bool isEqualTo(const Vec3D& other, const double tol) const;
+    bool isEqualTo(const Vec3D& other, double tol) const;
 
     /*!
      * \brief Returns a unit Vec3D based on a.
@@ -335,7 +335,7 @@ public:
     /*!
      * \brief Multiplies all elements by a scalar
      */
-    friend Vec3D operator*(const Mdouble a, const Vec3D& b);    
+    friend Vec3D operator*(Mdouble a, const Vec3D& b);
     
     
 };

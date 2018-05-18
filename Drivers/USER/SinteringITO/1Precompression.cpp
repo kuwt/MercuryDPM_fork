@@ -42,7 +42,7 @@ public:
         setName("Precompression");
     }
 
-    //set slave variables (i.e. compute stiffness, dissipation, timestep, wall and particle positions)
+    //set slave variables (i.e. compute stiffness, dissipation, time step, wall and particle positions)
     void setupInitialConditions() override
 	{
         // the walls are set based on xMin, xMax, ..., zMax

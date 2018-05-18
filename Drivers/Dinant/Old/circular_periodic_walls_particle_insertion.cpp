@@ -119,7 +119,7 @@ int main(int /*argc*/, char **/*argv[]*/)
 	problem.setGravity(Vec3D(0.0,0.0,-10.0));
 	problem.setTimeMax(2.5);
 	problem.setTimeStep();
-	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(1000,problem.getTimeMax(),problem.getTimeStep()));
+	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(1000,problem.getTimeMax(),problem.getTimeStep()));
 	problem.write(std::cout,false);
 	problem.solve();	
 }

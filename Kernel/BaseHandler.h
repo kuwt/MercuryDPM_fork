@@ -322,7 +322,7 @@ BaseHandler<T>::BaseHandler()
 {
     DPMBase_ = nullptr;
     clear();
-    logger(DEBUG, "Basehandler<T>::BaseHandler() finished");
+    logger(DEBUG, "BaseHandler<T>::BaseHandler() finished");
 }
 
 /*!
@@ -422,7 +422,7 @@ template<class T> void BaseHandler<T>::addObject(T* object)
 	nextId_++;
 }
 
-/// \todo mx: type the stuff here: keeps the id unique mkay
+/// \todo mx: type the stuff here: keeps the id unique key
 template<class T> void BaseHandler<T>::addGhostObject(T* O)
 {
     objects_.push_back(O);
@@ -452,7 +452,7 @@ template<typename T>
 void BaseHandler<T>::removeObject(const unsigned int index)
 {
     logger.assert(index < getSize(),
-                         "In: void %::removeOject(const unsigned int index) const, "
+                         "In: void %::removeObject(const unsigned int index) const, "
                          "no object exists with index %, number of objects is %",
                          getName(), index, getSize());
     
@@ -526,7 +526,7 @@ void BaseHandler<T>::read(std::istream& is)
     unsigned int N;
     std::string dummy;
     is >> dummy;
-    std::stringstream line(std::stringstream::in | std::stringstream::out);
+    std::stringstream line;
 	helpers::getLineFromStringStream(is, line);
     line >> N;
     logger(VERBOSE, "In %::read(is): reading in % objects.", getName(), N);
@@ -545,7 +545,7 @@ template<typename T>
 T* BaseHandler<T>::getObjectById(const unsigned int id)
 {
     // Usually, the id and the index into the backing storage matches
-    // So check this postion first!
+    // So check this position first!
     // dducks: Can't we guarantee more? That should speed up searches. 
     if (id < objects_.size() && objects_[id]->getId() == id)
     {

@@ -120,7 +120,7 @@ HopperInsertionBoundary* HopperInsertionBoundary::copy() const
  *                              reaches from the top of the hopper down to 
  *                              {fillPercent * (top - 'position A')}. 
  */
-void HopperInsertionBoundary::set(BaseParticle* particleToCopy, int maxFailed, double yMin, 
+void HopperInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, double yMin,
         double yMax, double radMin, double radMax, double chuteAngle, double fixedParticleRadius, 
         bool isHopperCentred_, int hopperDim, double hopperAngle, double hopperLength, 
         double hopperExitLength, double hopperHeight, double lift, double fillPercent)

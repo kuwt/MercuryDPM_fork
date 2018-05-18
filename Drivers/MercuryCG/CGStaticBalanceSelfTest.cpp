@@ -85,8 +85,7 @@ class CGStaticBalanceSelfTest : public Mercury3D
 {
 public:
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         //set gravity vector
         setGravity(Vec3D(0., 0., -1.));
 
@@ -97,7 +96,7 @@ public:
 
         //accordingly, set the time step, final time, and save count
         setTimeStep(.0002);
-        setTimeMax(1.0); //a total of 5000 timesteps, steady after t=0.6
+        setTimeMax(1.0); //a total of 5000 time steps, steady after t=0.6
         setSaveCount(20);
 
         //define particle size

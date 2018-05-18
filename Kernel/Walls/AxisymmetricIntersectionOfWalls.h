@@ -78,7 +78,7 @@ public:
     /*!
      * \brief Destructor.
      */
-    ~AxisymmetricIntersectionOfWalls();
+    ~AxisymmetricIntersectionOfWalls() override;
 
     /*!
      * \brief Copy assignment operator.

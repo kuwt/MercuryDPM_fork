@@ -40,7 +40,7 @@ class Mercury3DRestarter : public Mercury3DRestart
 //            << "Time" << getTime() 
 //            << " sc"<< restartFile.getSaveCount() 
 //            << " nst"<< restartFile.getNextSavedTimeStep() 
-//            << " t"<< getNtimeSteps() << std::endl;
+//            << " t"<< getNumberOfTimeSteps() << std::endl;
 //    }
 
     

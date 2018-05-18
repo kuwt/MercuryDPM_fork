@@ -75,7 +75,7 @@ CGHandler::~CGHandler()
 }
 
 /*!
- * \param[in] cg A pointer to the CG opject that has to be added to the handler.
+ * \param[in] cg A pointer to the CG object that has to be added to the handler.
  */
 void CGHandler::addObject(BaseCG* cg)
 {
@@ -117,10 +117,10 @@ void CGHandler::evaluate()
     {
         //if we are below timeMax and the next time step should be written
         if (it->getTimeMin() <= getDPMBase()->getTime() && it->getTimeMax() > getDPMBase()->getTime()
-            && it->statFile.saveCurrentTimestep(getDPMBase()->getNtimeSteps()))
+            && it->statFile.saveCurrentTimeStep(getDPMBase()->getNumberOfTimeSteps()))
         {
-            //logger(INFO,"evaluate %, nt=%",it->statFile.getName(), getDPMBase()->getNtimeSteps());
-            it->statFile.setLastSavedTimeStep(getDPMBase()->getNtimeSteps());
+            //logger(INFO,"evaluate %, nt=%",it->statFile.getName(), getDPMBase()->getNumberOfTimeSteps());
+            it->statFile.setLastSavedTimeStep(getDPMBase()->getNumberOfTimeSteps());
             it->evaluate();
         }
     }

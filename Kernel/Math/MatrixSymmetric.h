@@ -54,7 +54,7 @@ public:
     /*!
      * \brief Alternative constructor, with all (6) elements as arguments
      */
-    MatrixSymmetric3D(const Mdouble xx, const Mdouble xy, const Mdouble xz, const Mdouble yy, const Mdouble yz, const Mdouble zz);
+    MatrixSymmetric3D(Mdouble xx, Mdouble xy, Mdouble xz, Mdouble yy, Mdouble yz, Mdouble zz);
 
     /*!
      * \brief Sets all elements to zero.
@@ -79,12 +79,12 @@ public:
     /*!
      * \brief Scalar addition.
      */
-    MatrixSymmetric3D operator+(const Mdouble a) const;
+    MatrixSymmetric3D operator+(Mdouble a) const;
 
     /*!
      * \brief Scalar substraction.
      */
-    MatrixSymmetric3D operator-(const Mdouble a) const;
+    MatrixSymmetric3D operator-(Mdouble a) const;
 
     /*!
      * \brief Vector multiplication.
@@ -94,12 +94,12 @@ public:
     /*!
      * \brief Scalar multiplication.
      */
-    MatrixSymmetric3D operator*(const Mdouble a) const;
+    MatrixSymmetric3D operator*(Mdouble a) const;
 
     /*!
      * \brief Scalar division.
      */
-    MatrixSymmetric3D operator/(const Mdouble a) const;
+    MatrixSymmetric3D operator/(Mdouble a) const;
 
     /*!
      * \brief Add elements to an ostream.
@@ -124,7 +124,7 @@ public:
     /*!
      * \brief Scalar division
      */
-    MatrixSymmetric3D& operator/=(const Mdouble a);
+    MatrixSymmetric3D& operator/=(Mdouble a);
 
     /*!
      * \brief Calculates the pointwise square 

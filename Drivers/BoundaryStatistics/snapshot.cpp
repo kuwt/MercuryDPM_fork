@@ -35,10 +35,10 @@ public:
 	{
 		setTime(getTimeStep());
 		setTimeMax(getTimeStep());
-                getDataFile().setFileType(FileType::ONE_FILE);
-                getRestartFile().setFileType(FileType::NO_FILE);
-                getEneFile().setFileType(FileType::NO_FILE);
-                getFStatFile().setFileType(FileType::NO_FILE);
+                dataFile.setFileType(FileType::ONE_FILE);
+                restartFile.setFileType(FileType::NO_FILE);
+                eneFile.setFileType(FileType::NO_FILE);
+                fStatFile.setFileType(FileType::NO_FILE);
                 write(std::cout,false);
 	}
 

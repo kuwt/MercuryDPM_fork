@@ -20,8 +20,8 @@ for k=1:length(filename)
   numvar = round((size(stat.data,2)-1)/ntotal);
   t = stat.data(:,1);
 
-  % average data over N_avg timesteps
-  disp(['... average data over N_avg timesteps (creating N_avg, N_total, prefactor, stat.avg)']);
+  % average data over N_avg time steps
+  disp(['... average data over N_avg time steps (creating N_avg, N_total, prefactor, stat.avg)']);
   N_total = size(stat.data,1);
   N_avg = 1;%ceil(.1*N_total);
   stat.avg = stat.data(:,2:end);

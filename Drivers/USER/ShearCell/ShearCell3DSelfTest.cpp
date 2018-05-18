@@ -83,7 +83,7 @@ public:
         particleWallSpecies->setRollingDissipation(0.4* particleSpecies->getDissipation());
         particleWallSpecies->setRollingFrictionCoefficient(1.0);
 
-        //set timestep
+        //set time step
         setTimeMax(10.0);
         setTimeStep(5e-3);
         setSaveCount(200);

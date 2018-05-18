@@ -120,7 +120,7 @@ public:
     /*!
      * \brief Creates the MPI types required for communication of Mercury data through the MPI interface
      */
-    void initialiseMercuryMPITypes(SpeciesHandler speciesHandler);
+    void initialiseMercuryMPITypes();
     
     /*! 
      * \brief Process all pending asynchronous communication requests before continuing
@@ -556,17 +556,18 @@ public:
 #endif
     }
 
+    /*!
+    * \brief Copy constructor is disabled, to enforce a singleton pattern
+    */
+    MPIContainer(const MPIContainer& orig) = delete;
+
 private:
+
     /*!
      * \brief Constructor
      */
     MPIContainer();
     
-     /*!
-     * \brief Copy constructor is disabled, to enforce a singleton pattern
-     */
-    MPIContainer(const MPIContainer& orig) = delete;
-
     /*!
      * \brief The ID of the processor this class is running on
      */

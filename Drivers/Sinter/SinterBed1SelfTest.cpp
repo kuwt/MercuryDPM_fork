@@ -49,7 +49,7 @@ public:
         static int counter = 0;
         if (++counter == 1)
             writeEneHeader(std::cout);
-        writeEneTimestep(std::cout);
+        writeEneTimeStep(std::cout);
     }
 
     /** creates custom ene header */
@@ -64,7 +64,7 @@ public:
         for (BaseInteraction* const p : interactionHandler)
         {
             auto q = dynamic_cast<SinterInteraction*>(p);
-            logger.assert_always(q,"no SinterInteraction type");
+            logger.assert_always(q!= nullptr,"no SinterInteraction type");
             sum += q->getPlasticOverlap();
         }
         return sum / interactionHandler.getNumberOfObjects();
@@ -79,7 +79,7 @@ public:
     }
 
     /** creates custom ene output */
-    void writeEneTimestep(std::ostream &os) const override
+    void writeEneTimeStep(std::ostream &os) const override
     {
         os << std::setw(12) << getTime()
            << "\t" << std::setw(12) << getMeanRelativeContactRadius()

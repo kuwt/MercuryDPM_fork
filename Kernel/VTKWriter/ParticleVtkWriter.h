@@ -37,7 +37,7 @@ public:
     
     ParticleVtkWriter(ParticleHandler& particleHandler) : BaseVTKWriter(particleHandler) { }
 
-    virtual ~ParticleVtkWriter() { }
+    virtual ~ParticleVtkWriter() = default;
 
     virtual std::string getName() const = 0;
 

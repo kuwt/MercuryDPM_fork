@@ -119,7 +119,7 @@ public:
 		}
 	}
 
-	void writeEneTimestep(std::ostream& os) const
+	void writeEneTimeStep(std::ostream& os) const
 	{
 		Mdouble ene_kin = 0, ene_rot = 0, ene_gra = 0, mass_sum= 0, x_masslength=0, y_masslength=0, z_masslength=0;
 
@@ -210,9 +210,9 @@ int main(int argc, char *argv[])
 	md.autoNumber();
 	md.setTimeMax(1000);
 	md.setSaveCount(1e4);
-	md.getEneFile().setSaveCount(1e2);
-	md.getRestartFile().setFileType(FileType::ONE_FILE);//getRestartFile().setFileType(FileType::ONE_FILE);
-	md.getDataFile().setFileType(FileType::ONE_FILE);//getDataFile().setFileType(FileType::ONE_FILE);
+	md.eneFile.setSaveCount(1e2);
+	md.restartFile.setFileType(FileType::ONE_FILE);//restartFile.setFileType(FileType::ONE_FILE);
+	md.dataFile.setFileType(FileType::ONE_FILE);//dataFile.setFileType(FileType::ONE_FILE);
 	md.solve(argc,argv);
 	md.writeRestartFile();
 }

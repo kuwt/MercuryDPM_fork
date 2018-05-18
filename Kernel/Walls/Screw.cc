@@ -321,9 +321,9 @@ std::string Screw::getName() const
 
 void Screw::writeVTK (VTKContainer &vtk) const {
     unsigned nr = 10;
-    unsigned nz = 60*abs(n_);
+    unsigned nz = static_cast<unsigned int>(60 * abs(n_));
 
-    unsigned nPoints = vtk.points.size();
+    unsigned long nPoints = vtk.points.size();
     vtk.points.reserve(nPoints+nr*nz);
     Vec3D contactPoint;
     for (unsigned iz=0; iz<nz; iz++) {
@@ -339,7 +339,7 @@ void Screw::writeVTK (VTKContainer &vtk) const {
         }
     }
 
-    unsigned nCells = vtk.triangleStrips.size();
+    unsigned long nCells = vtk.triangleStrips.size();
     vtk.triangleStrips.reserve(nCells+(nz-1));
     for (unsigned iz=0; iz<nz-1; iz++) {
         std::vector<double> cell;

@@ -339,7 +339,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     problem.collisionTime = 0.002;
     problem.setTimeStep(0.002/50.0*2.5);
     problem.setTimeMax(10.0);
-    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(1000, problem.getTimeMax(), problem.getTimeStep()));
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(1000, problem.getTimeMax(), problem.getTimeStep()));
     
     problem.particleDensity = 2000.0;
     

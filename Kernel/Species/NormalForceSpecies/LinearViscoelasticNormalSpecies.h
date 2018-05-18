@@ -46,7 +46,7 @@ public:
     LinearViscoelasticNormalSpecies(const LinearViscoelasticNormalSpecies &p);
 
     ///\brief The default destructor.
-    virtual ~LinearViscoelasticNormalSpecies();
+    ~LinearViscoelasticNormalSpecies() override;
 
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
@@ -87,7 +87,7 @@ public:
     Mdouble getRestitutionCoefficient(Mdouble mass) const;
 
     ///\brief creates default values for mixed species
-    void mix(LinearViscoelasticNormalSpecies* const SBase, LinearViscoelasticNormalSpecies* const TBase);
+    void mix(LinearViscoelasticNormalSpecies*SBase, LinearViscoelasticNormalSpecies*TBase);
 
 //setters and getters
 

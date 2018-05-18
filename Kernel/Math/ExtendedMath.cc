@@ -174,11 +174,11 @@ Mdouble mathsFunc::chi_squared(const Mdouble x, const unsigned int k)
     
 }
 
-/**This calulates the probabity based on a chi squared test
- * First we calculated the  cummelative chi_squared function. 
+/**This calculates the probability based on a chi squared test
+ * First we calculated the  cumulative chi_squared function.
  * This is the function which actually gives the probability back
- * It is calculated by calling the normal chi_squated function and using the trapezoidal rule.
- * The final results is 1-the cummulative chi_squared function
+ * It is calculated by calling the normal chi_squared function and using the trapezoidal rule.
+ * The final results is 1-the cumulative chi_squared function
  */
 Mdouble mathsFunc::chi_squared_prob(const Mdouble x_max, const unsigned int k)
 {
@@ -295,7 +295,7 @@ Mdouble mathsFunc::chebyshev(Mdouble x, const Mdouble coef[], int N)
 
 Mdouble mathsFunc::I0_exp(Mdouble x)
 {
-    // Cooefficients for [0..8]
+    // Coefficients for [0..8]
     const Mdouble A[] =
             {
                     -4.415341646479339379501E-18,
@@ -330,7 +330,7 @@ Mdouble mathsFunc::I0_exp(Mdouble x)
                     6.767952744094760849951E-1
             };
     
-    // Cooefficients for [8..infinity]
+    // Coefficients for [8..infinity]
     const Mdouble B[] =
             {
                     -7.233180487874753954561E-18,
@@ -390,8 +390,8 @@ NumericalVector<> sphericalHarmonics::associatedLegendrePolynomials(int n, Mdoub
 	std::size_t nTerms = 0.5*(n+1)*(n+2);
 	NumericalVector<> polynomials(nTerms);
 
-	int location_current;
-	int location_previous;
+	size_t location_current;
+    size_t location_previous;
 	Mdouble temp;
 
 	polynomials(0) = 1; //P_0^0 = 1;
@@ -437,8 +437,8 @@ NumericalVector<std::complex<Mdouble>> sphericalHarmonics::sphericalHarmonics(in
 		{
 			Mdouble m = mt;
 			Mdouble m_abs = std::abs(mt);
-			int location_current = n*n + (m+n); //n^2 is begin of Y_n^-n
-			int location_polynomial = 0.5*n*(n+1) + m_abs;
+            std::size_t location_current = n*n + (m+n); //n^2 is begin of Y_n^-n
+            std::size_t location_polynomial = 0.5*n*(n+1) + m_abs;
 			int fact1 = mathsFunc::factorial(n - m_abs);
 			int fact2 = mathsFunc::factorial(n + m_abs);
 			Mdouble fact = 1.0*fact1/fact2;

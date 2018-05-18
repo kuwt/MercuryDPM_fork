@@ -47,7 +47,7 @@ public:
     IrreversibleAdhesiveSpecies(const IrreversibleAdhesiveSpecies &s);
 
     ///\brief The default destructor.
-    virtual ~IrreversibleAdhesiveSpecies();
+    ~IrreversibleAdhesiveSpecies() override;
 
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;

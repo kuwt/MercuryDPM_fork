@@ -61,7 +61,7 @@ DomainHandler::DomainHandler(const DomainHandler &DH)
  * \details This is not a copy assignment operator! It copies the DPMBase and all 
  *          Domain, and sets the other variables to 0.
  */
-DomainHandler DomainHandler::operator =(const DomainHandler& rhs)
+DomainHandler& DomainHandler::operator =(const DomainHandler& rhs)
 {
     if (this != &rhs)
     {

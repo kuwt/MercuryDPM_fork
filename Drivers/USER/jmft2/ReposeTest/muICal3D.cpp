@@ -157,7 +157,7 @@ class muICal3D : public Mercury3D
         void setupInitialConditions()
         {
             /* A CubeInsertionBoundary for introducing the particles. We will
-             * remove this after a few (arbitrary number of) timesteps. If the
+             * remove this after a few (arbitrary number of) time steps. If the
              * InsertionBoundary is doing its job properly then it will stop
              * introducing particles after a while anyway. */
             BaseParticle* p0 = new BaseParticle;
@@ -190,9 +190,9 @@ class muICal3D : public Mercury3D
         void actionsAfterTimeStep()
         {
             /* We remove the CubeInsertionBoundary so that it doesn't keep
-             * giving new particles. After a few timesteps, it should have
+             * giving new particles. After a few time steps, it should have
              * saturated the system. */
-            if (getNtimeSteps() >= pars.at("saveEvery")/2 && not_yet_removed_insb
+            if (getNumberOfTimeSteps() >= pars.at("saveEvery")/2 && not_yet_removed_insb
                     && getKineticEnergy() < getTotalMass()*1e-4) 
             {
                 boundaryHandler.removeObject(insb->getIndex());
@@ -215,7 +215,7 @@ class muICal3D : public Mercury3D
             }
 
             if (!not_yet_removed_insb 
-                    && getNtimeSteps() % dataFile.getSaveCount() == 0)
+                    && getNumberOfTimeSteps() % dataFile.getSaveCount() == 0)
                 fprintf(muICal3D_f, "%g %g %g %g %g %g\n",
                         getTime(), pars.at("theta"),
                         2*getCentreOfMass().Z,

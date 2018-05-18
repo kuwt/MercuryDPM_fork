@@ -62,7 +62,7 @@ public:
 				for (int i=0; i<N; i++) {
 					if (inflowParticle_.isFixed()) {
 					  particleHandler.addObject(particleHandler.getObject(i));//Particles.push_back(Particles[i]);
-					  particleHandler.getLastObject()->setIndSpecies(1);
+					  particleHandler.getLastObject()->setSpecies(speciesHandler.getObject(1));
 					  particleHandler.getLastObject()->move(Vec3D(lengthPeriodicChute*j,0.,0.));//Particles.back().Position.X+=lengthPeriodicChute*j;
 					  particleHandler.getLastObject()->move(Vec3D(0.,widthPeriodicChute*k,0.));//Particles.back().Position.Y+=widthPeriodicChute*k;
 					}
@@ -142,13 +142,13 @@ int main(int argc, char* argv[])
 	problem.setSaveCount(5e3);
 	problem.setXBallsAdditionalArguments("-v0 -solidf -h 600 -w 1400 ");
 	//
-	problem.getDataFile().setFileType(FileType::ONE_FILE);
-	problem.getRestartFile().setFileType(FileType::ONE_FILE);
-	problem.getFStatFile().setFileType(FileType::ONE_FILE);
-	problem.getEneFile().setFileType(FileType::ONE_FILE);
-	//problem.getRestartFile().setFileType(FileType::ONE_FILE);
-	//problem.getDataFile().setFileType(FileType::ONE_FILE);
-	//problem.getFStatFile().setFileType(FileType::NO_FILE);
-	//problem.getEneFile().setFileType(FileType::ONE_FILE);
+	problem.dataFile.setFileType(FileType::ONE_FILE);
+	problem.restartFile.setFileType(FileType::ONE_FILE);
+	problem.fStatFile.setFileType(FileType::ONE_FILE);
+	problem.eneFile.setFileType(FileType::ONE_FILE);
+	//problem.restartFile.setFileType(FileType::ONE_FILE);
+	//problem.dataFile.setFileType(FileType::ONE_FILE);
+	//problem.fStatFile.setFileType(FileType::NO_FILE);
+	//problem.eneFile.setFileType(FileType::ONE_FILE);
 	problem.solve(argc, argv);
 }

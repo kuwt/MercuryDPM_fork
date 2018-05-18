@@ -601,10 +601,10 @@ int main(int argc, char *argv[])
     //************************************************************************************************************************************************
     //Giving a name for the output file
     chargedParticleForceUnitTestProblem.setName("ClayParticles");
-    //this parameter can be used to manually adjust the timestep in order to find a balance between anccuracy and efficiency
+    //this parameter can be used to manually adjust the time step in order to find a balance between anccuracy and efficiency
     //NOTE: should never be higher than unity!
     //This may be necessary to correctly resolve the high stiffness and short range associated with the van der Waals force.
-    double timestepReduction = 1; //e.g. 0.1 will reduce the time step tenfold!
+    double timeStepReduction = 1; //e.g. 0.1 will reduce the time step tenfold!
     //Setting the desired gravitational acceleration (or lack thereof!)
     chargedParticleForceUnitTestProblem.setGravity(Vec3D(0,0,-0));
     //setting the duration of the simulation in "simulation seconds" (determined by
@@ -747,7 +747,7 @@ int main(int argc, char *argv[])
     //Calculating particle mass and collision time (tc) from the parameters manually provided by the user.
     double mass = species1->getMassFromRadius(chargedParticleForceUnitTestProblem.getSubParticleRadius());
     double tc = species1->getCollisionTime(mass);
-    chargedParticleForceUnitTestProblem.setTimeStep(0.02*tc*timestepReduction);
+    chargedParticleForceUnitTestProblem.setTimeStep(0.02*tc*timeStepReduction);
 
     //setting parameters for visualisation using the xballs software package
     chargedParticleForceUnitTestProblem.setXBallsAdditionalArguments("-cmode 8 -solidf -v0");

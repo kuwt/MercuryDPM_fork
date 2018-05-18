@@ -364,7 +364,7 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
     }
     else
     {        
-        std::stringstream line(std::stringstream::in | std::stringstream::out);
+        std::stringstream line;
         helpers::getLineFromStringStream(is, line);
         logger(ERROR, "Species type % not understood in restart file: You need to add this species to SpeciesHandler::readObject.", type);
     }
@@ -610,7 +610,7 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
 ParticleSpecies* SpeciesHandler::readOldObject(std::istream& is)
 {
     //read in next line
-    std::stringstream line(std::stringstream::in | std::stringstream::out);
+    std::stringstream line;
     helpers::getLineFromStringStream(is, line);
 
     //read each property

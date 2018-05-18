@@ -145,7 +145,7 @@ class IncidentOntoRoughness : public Mercury2D {
 
         void actionsAfterTimeStep() 
         {
-            if (getNtimeSteps() % pars.saveEvery == 0)
+            if (getNumberOfTimeSteps() % pars.saveEvery == 0)
             {
                 fprintf(flux_f, "%f %f %f %f %f %f %f\n",
                         getTime(), 

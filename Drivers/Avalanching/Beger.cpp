@@ -48,7 +48,7 @@ public:
         setChuteAngle(getChuteAngleDegrees() - Angle);
     };
 
-    void writeEneTimestep(std::ostream &os) const override {
+    void writeEneTimeStep(std::ostream &os) const override {
         Mdouble m = particleHandler.getMass();
         Vec3D mom = particleHandler.getMomentum();
         static int width = (int) (os.precision() + 6);

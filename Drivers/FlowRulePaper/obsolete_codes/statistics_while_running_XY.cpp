@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
  	problem.setName(name.c_str());
 	problem.load_restart_data();
 	//problem.setRestarted(false);
-	problem.getRestartFile().setFileType(FileType::ONE_FILE);
+	problem.restartFile.setFileType(FileType::ONE_FILE);
 	problem.writeRestartFile();
 	//problem.auto_set_z();
 	//keep file name but create files in the local directory, i.e. remove folder
@@ -96,10 +96,10 @@ int main(int argc, char *argv[])
 	problem.setName(name.substr(found+1).c_str());
 	cout << "new name: " << problem.getName() << endl;
 	//set output to minimum
-	problem.getDataFile().setFileType(FileType::NO_FILE);
-	problem.getRestartFile().setFileType(FileType::NO_FILE);
-	problem.getFStatFile().setFileType(FileType::NO_FILE);
-	problem.getEneFile().setFileType(FileType::ONE_FILE);
+	problem.dataFile.setFileType(FileType::NO_FILE);
+	problem.restartFile.setFileType(FileType::NO_FILE);
+	problem.fStatFile.setFileType(FileType::NO_FILE);
+	problem.eneFile.setFileType(FileType::ONE_FILE);
 	//set statistical parameters
     problem.setDoPeriodicWalls(false);
  	//~ problem.setZMinStat(-1);

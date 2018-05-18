@@ -100,9 +100,9 @@ std::istream& operator>>(std::istream&is, FileType&fileType)
  */
 File::File()
 {
-    //sets the default for the number of timesteps to be skipped
+    //sets the default for the number of time steps to be skipped
     //in between each saved "snapshot" of the system to zero
-    //(i.e. records every timestep by default)
+    //(i.e. records every time step by default)
     saveCount_ = 0;
 
     // file name has to be set by the user
@@ -140,8 +140,7 @@ File::File(const File& f)
  * \details Destructor
  */
 File::~File()
-{
-}
+= default;
 
 /*!
  * \details Returns fstream (file stream) of any file for input and output tasks.
@@ -189,7 +188,7 @@ const std::string File::getFullName(unsigned counter) const
 /*!
  * \param[in] name (Takes in the to be name of the File)
  */
-void File::setName(const std::string name)
+void File::setName(const std::string& name)
 {
     logger.assert_always(getName().size()>0, "Error: Name cannot be empty");
     this->name_ = name;
@@ -279,10 +278,10 @@ void File::setLastSavedTimeStep(unsigned int lastSavedTimeStep)
  * \param[in] ntimeSteps
  * \return True or False (a bool)
  */
-bool File::saveCurrentTimestep(unsigned int ntimeSteps)
+bool File::saveCurrentTimeStep(unsigned int ntimeSteps)
 {
     /* check:
-     * - if this timestep should be written
+     * - if this time step should be written
      * - if the file type is not NO_FILE
      * - if file can be opened
      * in that case, change lastSavedTimeStep and return true;

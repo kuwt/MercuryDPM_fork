@@ -115,16 +115,15 @@ void bsplineBasis(int deg, int span, const std::vector<double> &knots, double u,
     std::vector<double> left, right;
     left.resize(deg + 1, 0.0);
     right.resize(deg + 1, 0.0);
-    double saved = 0.0, temp = 0.0;
 
     N[0] = 1.0;
 
     for (int j = 1; j <= deg; j++) {
         left[j] = (u - knots[span + 1 - j]);
         right[j] = knots[span + j] - u;
-        saved = 0.0;
+        Mdouble saved = 0.0;
         for (int r = 0; r < j; r++) {
-            temp = N[r] / (right[r + 1] + left[j - r]);
+            const Mdouble temp = N[r] / (right[r + 1] + left[j - r]);
             N[r] = saved + right[r + 1] * temp;
             saved = left[j - r] * temp;
         }

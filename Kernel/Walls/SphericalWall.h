@@ -67,7 +67,7 @@ public:
     /*!
      * \brief Default destructor.
      */
-    virtual ~SphericalWall();
+    ~SphericalWall() override;
 
     /*!
      * \brief Wall copy method. It calls the copy constructor of this Wall, useful for polymorphism

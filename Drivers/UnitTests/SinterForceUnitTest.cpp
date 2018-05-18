@@ -35,8 +35,7 @@
 class SinterForceUnitTest : public DPMBase{
 public:
 
-	void setupInitialConditions()
-	{
+	void setupInitialConditions() override {
 		setXMax(2.0*radius);
 		setYMax(radius);
 		setZMax(radius);

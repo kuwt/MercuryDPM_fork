@@ -55,7 +55,7 @@ public:
     /*!
      * \brief Destructor.
      */
-    virtual ~LinearPlasticViscoelasticInteraction();
+    ~LinearPlasticViscoelasticInteraction() override;
     /*!
      * \brief Creates a copy of an object of this class. (Deep copy)
      */
@@ -70,12 +70,12 @@ public:
     void computeNormalForce();
     /*!
      * \brief Interaction read function, which accepts an std::istream as input.
-     */    
-    virtual void read(std::istream& is) override;
+     */
+    void read(std::istream& is) override;
     /*!
      * \brief Interaction write function, which accepts an std::ostream as input.
-     */    
-    virtual void write(std::ostream& os) const override;
+     */
+    void write(std::ostream& os) const override;
     /*!
      * \brief Returns the name of the interaction.
      */
@@ -95,7 +95,7 @@ public:
     /*!
      * \brief
      */
-    void setMaxOverlap(const Mdouble maxOverlap);
+    void setMaxOverlap(Mdouble maxOverlap);
     /*!
      * \brief
      */

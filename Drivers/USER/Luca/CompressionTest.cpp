@@ -1270,7 +1270,7 @@ int main(int argc, char *argv[])
     cTest.setSystemDimensions(3);
     cTest.setVerbose(true);
     
-    // sets the number of saved timesteps such that the output is printed every 0.01s
+    // sets the number of saved time steps such that the output is printed every 0.01s
     cTest.setSaveCount(0.01/cTest.getTimeStep());
     
     // sets the particle intrinsic properties

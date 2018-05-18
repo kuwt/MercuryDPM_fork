@@ -52,7 +52,7 @@ public:
     BaseSpecies(const BaseSpecies& p);
 
     ///\brief The default destructor.
-    virtual ~BaseSpecies();
+    ~BaseSpecies() override;
 
     /*!
      * \brief Creates a deep copy of the object from which it is called.
@@ -76,7 +76,7 @@ public:
     virtual void copyInto(BaseSpecies* s) const =0;
 
     ///\brief Sets the pointer to the handler to which this species belongs.
-    void setHandler(SpeciesHandler* const handler);
+    void setHandler(SpeciesHandler*handler);
 
     ///\brief Returns the pointer to the handler to which this species belongs.
     SpeciesHandler* getHandler() const;
@@ -93,7 +93,7 @@ public:
      * to be called from a BaseSpecies pointer (which is the kind of pointer 
      * used for MixedSpecies).
      */
-    virtual void mixAll(BaseSpecies * const S, BaseSpecies * const T) = 0;
+    virtual void mixAll(BaseSpecies *S, BaseSpecies *T) = 0;
 
     ///\brief returns the largest separation distance at which adhesive short-range forces can occur.
     /*!
@@ -128,7 +128,7 @@ public:
      * to be called from a BaseSpecies pointer (which is the kind of pointer 
      * used for MixedSpecies).
      */
-    virtual BaseInteraction* getNewInteraction(BaseInteractable* const P, BaseInteractable*  const I, unsigned timeStamp) const = 0;
+    virtual BaseInteraction* getNewInteraction(BaseInteractable*P, BaseInteractable*I, unsigned timeStamp) const = 0;
    
     //TODO add documentation 
     virtual BaseInteraction* getEmptyInteraction() const = 0;

@@ -57,7 +57,8 @@ HertzianSinterInteraction::HertzianSinterInteraction(const HertzianSinterInterac
     std::cout<<"HertzianSinterInteraction::HertzianSinterInteraction(const HertzianSinterInteraction &p finished"<<std::endl;
 #endif
 }
-HertzianSinterInteraction::HertzianSinterInteraction(){}
+HertzianSinterInteraction::HertzianSinterInteraction() = default;
+
 /*!
  *
  */

@@ -154,8 +154,6 @@ BaseWall* WallHandler::createObject(const std::string& type) {
     {
         return new BasicIntersectionOfWalls;
     }
-        /// \todo Review this line. Problem came up in merging.
-   // else if (!getDPMBase()->readUserDefinedWall(type,is))
     else
     {
         logger(WARN, "Wall type: % not understood in restart file", type);
@@ -177,6 +175,11 @@ BaseWall* WallHandler::readAndCreateObject(std::istream &is)
     else
     {
         BaseWall* wall = createObject(type);
+        //check if wall is user-defined
+        if (wall == nullptr) {
+            wall = getDPMBase()->readUserDefinedWall(type);
+        }
+        //throw warning if wall could not be found
         if (wall== nullptr)
         {
             std::string line;
@@ -204,7 +207,7 @@ BaseWall* WallHandler::readAndCreateObject(std::istream &is)
 BaseWall* WallHandler::readAndCreateOldObject(std::istream &is)
 {
     //read in next line
-    std::stringstream line(std::stringstream::in | std::stringstream::out);
+    std::stringstream line;
     helpers::getLineFromStringStream(is, line);
     logger(VERBOSE, line.str());
 

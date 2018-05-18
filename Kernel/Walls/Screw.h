@@ -57,7 +57,7 @@ public:
     /*!
      * \brief Default destructor.
      */
-    ~Screw();
+    ~Screw() override;
 
     /*!
      * \brief Copy this screw and return a pointer to the copy.

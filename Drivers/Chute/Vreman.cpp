@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
 	problem.set_HGRID_max_levels(1);
 	problem.setXBallsAdditionalArguments("-v0 -solidf -sort");
 	problem.setTimeStep(problem.getCollisionTime()/50);
-	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(2000,problem.getTimeMax(),problem.getTimeStep()));
+	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(2000,problem.getTimeMax(),problem.getTimeStep()));
 	problem.setTimeMax(20);
 	problem.readArguments(argc, argv);
 	problem.solve();

@@ -2,7 +2,7 @@
 #define ARCWALL_H
 
 #include "Walls/BaseWall.h"
-#include <math.h>
+#include <cmath>
 
 class WallHandler;
 class BaseParticle;
@@ -33,7 +33,7 @@ class ArcWall : public BaseWall
         /*!
          * \brief Default destructor
          */
-        virtual ~ArcWall();
+        ~ArcWall() override = default;
 
         /*!
          * \brief Set 

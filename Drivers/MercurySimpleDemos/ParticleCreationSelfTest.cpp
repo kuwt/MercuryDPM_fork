@@ -66,7 +66,7 @@ public:
         logger(INFO, "time step used %", getTimeStep());
 
         ///\todo is this intended? currently , this comment is misleading
-        //set timestep
+        //set time step
         setTimeMax(getTimeStep());
 
         //set walls
@@ -86,8 +86,7 @@ public:
         wallHandler.copyAndAddObject(w);
     }
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         //number of particles to be inserted
         const unsigned int n = static_cast<unsigned int>((getXMax() - getXMin()) * (getYMax() - getYMin()) *
                                                    (getZMax() - getZMin()));

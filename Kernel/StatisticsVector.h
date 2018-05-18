@@ -1006,7 +1006,7 @@ protected:
     bool doTimeAverage;
 
     /*!
-     * \brief Determines after how many timesteps the time average is reset
+     * \brief Determines after how many time steps the time average is reset
      */
     int nTimeAverageReset;
 
@@ -1119,7 +1119,7 @@ protected:
     /*!
      * \brief Determines how much is outputted to the terminal
      * \details 0 no output\n
-     * 1 basic output (timesteps)\n
+     * 1 basic output (time steps)\n
      * 2 full output (number of forces and particles, md and stat parameters)\n
      */
     int verbosity; 

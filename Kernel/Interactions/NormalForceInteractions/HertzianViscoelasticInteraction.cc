@@ -52,7 +52,8 @@ HertzianViscoelasticInteraction::HertzianViscoelasticInteraction(const HertzianV
     std::cout<<"HertzianViscoelasticInteraction::HertzianViscoelasticInteraction(const HertzianViscoelasticInteraction& p) finished"<<std::endl;
 #endif
 }
-HertzianViscoelasticInteraction::HertzianViscoelasticInteraction(){}
+HertzianViscoelasticInteraction::HertzianViscoelasticInteraction() = default;
+
 /*!
  *
  */

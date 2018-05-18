@@ -144,7 +144,7 @@ void Chute::read(std::istream& is)
     std::string line_string;
     std::getline(is, line_string);
     std::cout << "Chuteline=" << line_string << std::endl;
-    std::stringstream line(std::stringstream::in | std::stringstream::out);
+    std::stringstream line;
     line << line_string;
     
     if (getRestartVersion() != "1") //Other versions..
@@ -467,7 +467,7 @@ void Chute::createBottom()
  */
 void Chute::cleanChute()
 {
-    //clean outflow every 100 timesteps
+    //clean outflow every 100 time steps
     static int count = 0, maxcount = 100; // please note: static variables are only initialised once, and their values
                                           // are stored even after the method returns. I.e., next time the method is 
                                           // called, the initialisation is ignored and the previously assigned value is used.

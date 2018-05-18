@@ -34,8 +34,8 @@ public:
     Mdouble Lx, Ly, Lz, Cx, Cy, Cz, rpx, rpy, rpz; // Box length in x-y-z, center position of the box and particle position relative to the center of box
     Mdouble dot_strain_xx, dot_strain_yy, dot_strain_zz, dot_strain_xy; // strainrate tensor with four components
     Mdouble gx, gy, gz, velocity_xy, velocity_yy; // shear strain rate variables
-    Mdouble gain_xx, gain_yy, gain_zz, gain_xy, Volume; // Stress control gain factors, which will be multiplied by timestep dt
-    Mdouble dStrain_xx, dStrain_yy, dStrain_zz, dStrain_xy; // Stress control strainrate tensor change per timestep
+    Mdouble gain_xx, gain_yy, gain_zz, gain_xy, Volume; // Stress control gain factors, which will be multiplied by time step dt
+    Mdouble dStrain_xx, dStrain_yy, dStrain_zz, dStrain_xy; // Stress control strainrate tensor change per time step
     Mdouble stressXXGoal,stressYYGoal,stressZZGoal,stressXYGoal;// Stress control constants
     Mdouble stressXX,stressXX_static, stressXX_kinetic, stressYY,stressYY_static, stressYY_kinetic;
     Mdouble stressZZ,stressZZ_static, stressZZ_kinetic, stressXY,stressXY_static, stressXY_kinetic; // stress components calculation variables
@@ -292,7 +292,7 @@ public:
         normWall = dynamic_cast<PeriodicBoundary*>(boundaryHandler.getObject(2));
         normWall->set(Vec3D(0.0, 0.0, 1.0), getZMin(),getZMax());
 		
-		//   Give the strain-rate for all particles and move them to next timestep before integration
+		//   Give the strain-rate for all particles and move them to next time step before integration
         double N = particleHandler.getNumberOfObjects();
         for (int i=0; i < N; i++) {
 			rpx = particleHandler.getObject(i)-> getPosition().X - Cx;
@@ -412,7 +412,7 @@ public:
 				[velocity_xy] (double time UNUSED) { return 0; },
 				getXMin(),getXMax(),getYMin(),getYMax());
 				
-			//   Give the strain-rate for all particles and move them to next timestep before integration
+			//   Give the strain-rate for all particles and move them to next time step before integration
 			double N = particleHandler.getNumberOfObjects();
 			for (int i=0; i < N; i++) {
 			rpx = particleHandler.getObject(i)-> getPosition().X - Cx;

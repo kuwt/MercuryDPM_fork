@@ -32,7 +32,7 @@
 
 /// This case does a single elastic particle falling on an infinite plane.
 /// The k is chosen so that the maximum overlap with the wall is around 2% of the particles diameter;
-/// whereas, the timestep must be taken to ensure 50 steps with a collision.
+/// whereas, the time step must be taken to ensure 50 steps with a collision.
 class FreeFallSelfTest : public Mercury2D
 {
 public:

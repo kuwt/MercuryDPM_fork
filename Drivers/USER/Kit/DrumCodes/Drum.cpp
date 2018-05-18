@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
     //problem.setRoughBottomType(MONOLAYER_ORDERED);
 
     
-    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(2000, problem.getTimeMax(), problem.getTimeStep()));
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(2000, problem.getTimeMax(), problem.getTimeStep()));
     //Colour of mass
     //problem.setXBallsAdditionalArguments("-cmode 8");
     //Color on size

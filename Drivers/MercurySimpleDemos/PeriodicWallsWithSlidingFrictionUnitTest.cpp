@@ -36,8 +36,7 @@
 
 class PeriodicWallsWithSlidingFrictionUnitTest : public Mercury2D
 {
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         LinearViscoelasticFrictionSpecies species;
         const double stiffness = 1e5;
         species.setDensity(constants::pi / 6.0);
@@ -125,8 +124,7 @@ class PeriodicWallsWithSlidingFrictionUnitTest : public Mercury2D
 
 protected:
 
-    void actionsBeforeTimeStep()
-    {
+    void actionsBeforeTimeStep() override {
         static bool FirstParticleRemoved = false;
         static bool SecondParticlRemoved = false;
         if (getTime() > 3.5e-2 && !FirstParticleRemoved)
@@ -185,8 +183,7 @@ protected:
         }
     }
 
-    void printTime() const
-    {
+    void printTime() const override {
     }
 };
 

@@ -109,13 +109,13 @@ public:
             << " particles" << std::endl;
 
         //save data and restart file of first time step
-        getDataFile().open();
-        outputXBallsData(getDataFile().getFstream());
-        getDataFile().close();
+        dataFile.open();
+        outputXBallsData(dataFile.getFstream());
+        dataFile.close();
         
-        getRestartFile().open();
+        restartFile.open();
         writeRestartFile();
-        getRestartFile().close();
+        restartFile.close();
     }
 
     ParticleSpecies* species;

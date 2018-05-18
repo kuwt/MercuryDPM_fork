@@ -53,9 +53,9 @@ template <StatType T> class CLiveStatistics : public StatisticsVector<T>, public
 	void getLiveStatistics() {
 		load_restart_data();
 		//set output to minimum
-		getDataFile().setFileType(FileType::NO_FILE);
-		getRestartFile().setFileType(FileType::ONE_FILE);
-		getFStatFile().setFileType(FileType::NO_FILE);
+		dataFile.setFileType(FileType::NO_FILE);
+		restartFile.setFileType(FileType::ONE_FILE);
+		fStatFile.setFileType(FileType::NO_FILE);
 		//set statistical parameters
 		//~ setDoPeriodicWalls(false);
 		//~ setZMinStat(-1);

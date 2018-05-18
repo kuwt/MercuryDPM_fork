@@ -181,10 +181,10 @@ public:
 				 << study_num << ", name " 
 				 << getName() << endl;
 
-			getRestartFile().setFileType(FileType::ONE_FILE);
-			getDataFile().setFileType(FileType::ONE_FILE);
-			getFStatFile().setFileType(FileType::NO_FILE);
-			getEneFile().setFileType(FileType::ONE_FILE);
+			restartFile.setFileType(FileType::ONE_FILE);
+			dataFile.setFileType(FileType::ONE_FILE);
+			fStatFile.setFileType(FileType::NO_FILE);
+			eneFile.setFileType(FileType::ONE_FILE);
 			setSaveCount(1e4);
 			solve();
 
@@ -244,7 +244,7 @@ public:
 		if (!created) {
 			speciesHandler.copyAndAddObject(speciesHandler.getObject(0));
 			for (unsigned int i=0; i<particleHandler.getNumberOfObjects(); i++) {
-				if (particleHandler.getObject(i)->isFixed()) particleHandler.getObject(i)->setIndSpecies(1);
+				if (particleHandler.getObject(i)->isFixed()) particleHandler.getObject(i)->setSpecies(speciesHandler.getObject(1));
 			}
 		}
 	}

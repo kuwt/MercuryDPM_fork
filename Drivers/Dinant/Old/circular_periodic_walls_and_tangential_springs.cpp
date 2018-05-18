@@ -134,7 +134,7 @@ int main(int /*argc*/, char **/*argv[]*/)
 	problem.setGravity(Vec3D(0.0,0.0,0.0));
 	problem.setTimeMax(0.14);
 	problem.setTimeStep();
-	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(200,getTimeMax(),getTimeStep()));
+	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(200,getTimeMax(),getTimeStep()));
 	problem.write(std::cout,false);
 	problem.solve();	
 }

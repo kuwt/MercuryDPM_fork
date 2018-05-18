@@ -200,7 +200,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 	cout << "Maximum allowed speed of particles: " << problem.getMaximumVelocity() << endl; // speed allowed before particles move through each other!
 	problem.setTimeStep(); 
 	//This is based on the fact in general you get too much data, so prob at worst you want to turn it into a 20 at 60fps (which is its self overkill)
-	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(20*60,getTimeMax(),getTimeStep()));
+	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(20*60,getTimeMax(),getTimeStep()));
 	//problem.setSaveCount(1);
 	cout << "dt=" << problem.getTimeStep() << endl;
 	

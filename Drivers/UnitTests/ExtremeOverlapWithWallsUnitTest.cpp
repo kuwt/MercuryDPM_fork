@@ -56,8 +56,7 @@ and walls.ini
 class ExtremeOverlapWithWallsUnitTest : public DPMBase{
 public:
 	
-	void setupInitialConditions()
-	{
+	void setupInitialConditions() override {
 		Mdouble r0=0.004, r1=0.001;
 
 		setZMax(2.0*(r0+r1));

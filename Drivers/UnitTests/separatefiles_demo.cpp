@@ -31,8 +31,7 @@
 class SeparateFilesSelfTest : public DPMBase{
 public:
 
-	void setupInitialConditions()
-	{
+	void setupInitialConditions() override {
         setXMax(1.0);
         setYMax(1.0);
         setZMax(2.0);
@@ -60,7 +59,7 @@ public:
         
         setTimeStep(1e-5);
 		setTimeMax(6e-3);
-        setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(2, getTimeMax(), getTimeStep()));
+        setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(2, getTimeMax(), getTimeStep()));
 	}
 
 };

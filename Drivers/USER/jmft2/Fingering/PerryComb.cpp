@@ -222,7 +222,7 @@ class PerryComb : public Mercury3D {
 
     void actionsAfterTimeStep() {
       /* Remove initial confinement after the partciles come to rest */
-      if (initialWall && getNtimeSteps() % 100 == 0 && getTime()>=0.5 &&
+      if (initialWall && getNumberOfTimeSteps() % 100 == 0 && getTime()>=0.5 &&
             getKineticEnergy() < kineticEnergyThreshold_) {
         frontWall->addObject(Vec3D(-1,1,0),Vec3D(
           pars["length"],

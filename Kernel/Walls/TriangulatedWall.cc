@@ -294,17 +294,13 @@ std::vector<BaseInteraction*> TriangulatedWall::getInteractionWith(BaseParticle 
 {
     Mdouble distance;
     Vec3D normal;
-    Face* neighbor;
-    //write(std::cout);
     std::vector<BaseInteraction*> interactions;
     for (const auto& face : face_)
     {
         if (face.getDistanceAndNormal(*p, distance, normal))
         {
             normal = -normal;
-            //logger(INFO,"t=% n=% f=%(%) c=%", timeStamp,normal,&face,&face-&face_[0],p->getPosition() - distance * normal);
             BaseInteraction* const c = interactionHandler->getInteraction(p, this, timeStamp, normal);
-            //logger.assert(c,"BaseInteraction not set");
             c->setNormal(normal);
             c->setDistance(distance);
             c->setOverlap(p->getRadius() - distance);

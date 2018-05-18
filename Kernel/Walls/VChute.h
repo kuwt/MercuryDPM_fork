@@ -11,7 +11,7 @@ class VChute : public BaseWall {
         VChute();
         VChute(const VChute& other);
         VChute(Mdouble length, Mdouble width, Mdouble alpha);
-        ~VChute();
+        ~VChute() override;
 
         void set(Mdouble length, Mdouble width, Mdouble alpha);
         VChute* copy() const override;

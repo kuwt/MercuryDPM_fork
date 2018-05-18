@@ -187,7 +187,7 @@ public:
             if (i % 2 == 0)
             {
                 p0.setRadius(particle_radius1);
-                p0.setIndSpecies(1);
+                p0.setSpecies(speciesHandler.getObject(1));
             }
             else
             {

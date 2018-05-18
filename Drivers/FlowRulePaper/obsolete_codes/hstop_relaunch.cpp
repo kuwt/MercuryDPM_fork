@@ -39,8 +39,8 @@ public:
 		//~ setTimeStep(getTimeStep()/3.);
 		setSaveCount(1/getTimeStep()); 
 		setTimeMax(500);
-		getFStatFile().setFileType(FileType::NO_FILE);
-		getDataFile().setFileType(FileType::NO_FILE);
+		fStatFile.setFileType(FileType::NO_FILE);
+		dataFile.setFileType(FileType::NO_FILE);
 	}
 
 	Mdouble pointIsAboveCurve;
@@ -61,8 +61,8 @@ public:
 		} //end for loop over Particles
 
 		///todo{Why is there a +6 here?}
-		static int width = getEneFile().getFstream().precision() + 6;
-		getEneFile().getFstream()  << setw(width) << getTime() 
+		static int width = eneFile.getFstream().precision() + 6;
+		eneFile.getFstream()  << setw(width) << getTime()
 			<< " " << setw(width) << ene_gra
 			<< " " << setw(width) << ene_kin
 			<< " " << setw(width) << ene_rot

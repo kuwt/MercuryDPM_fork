@@ -38,12 +38,11 @@ location_(location)
 }
 
 LocalExpansion::~LocalExpansion()
-{
-}
+= default;
 
 void LocalExpansion::initialiseLocalExpansion()
 {
-	int nTerms = 0.5*(p_+1)*(2*p_+2);
+	size_t nTerms = 0.5 * (p_ + 1) * (2 * p_ + 2);
 	localExpansionCoefficients_(nTerms);
 }
 
@@ -54,7 +53,7 @@ NumericalVector<std::complex<Mdouble>> LocalExpansion::translateLocalExpansion(V
 	//std::cout << "size: " << nTerms << std::endl;
 
 	//compute angles and distance in new framework
-	//todo: fix this rubble with quarternions
+	//todo: fix this rubble with quaternions
 	Mdouble rho = 1.0;
 	Mdouble alpha = 1.0;
 	Mdouble beta = 1.0;
@@ -85,7 +84,7 @@ NumericalVector<std::complex<Mdouble>> LocalExpansion::translateLocalExpansion(V
 					std::cout << "A2: " << (*squaredFactorials_)(location_A2) << std::endl;
 					std::cout << "A3: " << (*squaredFactorials_)(location_A3) << std::endl;
 					std::cout << "Spherical: " << sphericalHarmonics[location_Y] << std::endl;*/
-
+					//\todo TW note: a warning says += cannot be done here
 					result += localExpansionCoefficients_[location_O]*J*(*squaredFactorials_)(location_A1)*(*squaredFactorials_)(location_A2)*sphericalHarmonics[location_Y]*std::pow(rho,n-j)/(std::pow(-1,n+j)*(*squaredFactorials_)(location_A3));
 				}
 			}

@@ -91,7 +91,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
   problem.set_name("finite_walls_hopper");
   problem.setTimeMax(.2);
   problem.setTimeStep(5e-6);
-  //problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(1000,problem.getTimeMax(),problem.getTimeStep()));
+  //problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(1000,problem.getTimeMax(),problem.getTimeStep()));
   problem.setSaveCount(25);
 	
   

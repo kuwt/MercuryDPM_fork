@@ -516,7 +516,7 @@ int main(int argc, char *argv[])
 
         unsigned int periodic = 0;
         if (argc>10) {
-            periodic = atoi(argv[10]);
+            periodic = static_cast<unsigned int>(atoi(argv[10]));
             std::cout << "periodic " << periodic << std::endl;
         }
 

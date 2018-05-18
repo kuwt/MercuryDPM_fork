@@ -40,8 +40,7 @@ class CGHandlerSelfTest : public Mercury3D
 {
 public:
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         double Radius = .5;
 
         setXMax(5);

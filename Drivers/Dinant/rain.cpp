@@ -70,11 +70,11 @@ class rain : public Mercury2D
         InfiniteWall w0;
         w0.set(Vec3D( 0.0, 1.0, 0.0), getYMax());
         wallHandler.copyAndAddObject(w0);
-		w0.set(Vec3D( 0.0,-1.0, 0.0),-getYMin());
+		w0.set(Vec3D( 0.0,-1.0, 0.0),getMin());
 		wallHandler.copyAndAddObject(w0);
         w0.set(Vec3D( 1.0, 0.0, 0.0), getXMax());
 		wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(-1.0, 0.0, 0.0),-getXMin());
+        w0.set(Vec3D(-1.0, 0.0, 0.0),getMin());
         wallHandler.copyAndAddObject(w0);
 	}
 
@@ -107,7 +107,7 @@ int main(int /*argc*/, char **/*argv[]*/)
     problem.setGravity(Vec3D(0,-9.81,0));
 
     problem.setTimeStep(0.02*helpers::computeCollisionTimeFromKAndDispAndEffectiveMass(problem.species->getStiffness(), problem.species->getDissipation(), 0.5*mass));
-    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(100, problem.getTimeMax(), problem.getTimeStep()));
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(100, problem.getTimeMax(), problem.getTimeStep()));
     //problem.set_number_of_saves(100);
     problem.setName("rain");		
     problem.setHGridMaxLevels(1);

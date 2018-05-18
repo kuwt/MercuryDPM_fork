@@ -37,7 +37,7 @@ class my_problem : public Mercury3D{
     //Setup properties of the light particles.
     light->setDensity(particle_density1);
  
-    light->setStiffnessAndDissipation(helpers::computeKAndDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(tc, r_particle11, particle_mass1));
+    light->setCollisionTimeAndRestitutionCoefficient(tc, r_particle11, particle_mass1);
         
     speciesHandler.getMixedObject(walls, light)->setCollisionTimeAndRestitutionCoefficient(tc, r_wall, 0.5, 8.0);
         
@@ -47,7 +47,7 @@ class my_problem : public Mercury3D{
     //Setup properties of the medium particles.
     medium->setDensity(particle_density2);
         
-    medium->setStiffnessAndDissipation(helpers::computeKAndDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(tc, r_particle22, particle_mass2));
+    medium->setCollisionTimeAndRestitutionCoefficient(tc, r_particle22, particle_mass2);
         
     speciesHandler.getMixedObject(medium, walls)->setCollisionTimeAndRestitutionCoefficient(tc,r_wall,0.5, 2*particle_mass2); //note: here, tangential cor is set to 1 (i.e. no tangential friction). Can alternatively set to r_wall, for instance.
     
@@ -69,7 +69,7 @@ class my_problem : public Mercury3D{
 	
     heavy->setDensity(particle_density4);
     
-    heavy->setStiffnessAndDissipation(helpers::computeKAndDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(tc, r_particle44, particle_mass4));
+    heavy->setCollisionTimeAndRestitutionCoefficient(tc, r_particle44, particle_mass4);
         
     speciesHandler.getMixedObject(heavy, walls)->setCollisionTimeAndRestitutionCoefficient(tc,r_wall,0.5, 2*particle_mass4);
     
@@ -91,7 +91,7 @@ class my_problem : public Mercury3D{
     backWall = new InfiniteWall;
     baseWall = new InfiniteWall;
      
-    leftWall->set(Vec3D(-1.0, 0.0, 0.0),-getXMin());
+    leftWall->set(Vec3D(-1.0, 0.0, 0.0),getMin());
     leftWall->setSpecies(walls);
     leftWall->setPrescribedPosition([this] (double time)
     {
@@ -108,7 +108,7 @@ class my_problem : public Mercury3D{
     wallHandler.addObject(leftWall);
 
         
-    rightWall->set(Vec3D(+1.0, 0.0, 0.0),+getXMax());
+    rightWall->set(Vec3D(+1.0, 0.0, 0.0),getMax());
     rightWall->setSpecies(walls);
     rightWall->setPrescribedPosition([this] (double time)
     {
@@ -122,7 +122,7 @@ class my_problem : public Mercury3D{
     });
     wallHandler.addObject(rightWall);
         
-    frontWall->set(Vec3D( 0.0,-1.0, 0.0),-getYMin());
+    frontWall->set(Vec3D( 0.0,-1.0, 0.0),getMin());
     frontWall->setSpecies(walls);
     frontWall->setPrescribedPosition([this] (double time)
     {
@@ -136,7 +136,7 @@ class my_problem : public Mercury3D{
     });
     wallHandler.addObject(frontWall);
         
-    backWall->set(Vec3D( 0.0,+1.0, 0.0),+getYMax());
+    backWall->set(Vec3D( 0.0,+1.0, 0.0),getMax());
     backWall->setSpecies(walls);
     backWall->setPrescribedPosition([this] (double time)
     {
@@ -150,7 +150,7 @@ class my_problem : public Mercury3D{
     });
     wallHandler.addObject(backWall);
         
-    baseWall->set(Vec3D( 0.0, 0.0,-1.0),-getZMin());
+    baseWall->set(Vec3D( 0.0, 0.0,-1.0),getMin());
     baseWall->setSpecies(baseWallSpecies);
     baseWall->setPrescribedPosition([this] (double time)
     {

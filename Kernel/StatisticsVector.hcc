@@ -553,7 +553,7 @@ void StatisticsVector<T>::readStatArguments(int argc, char *argv[])
         else if (!strcicmp(argv[i], "-tint"))
         {
             setCGTimeAveragingInterval(atof(argv[i + 1]));
-            //~ } else if (!strcicmp(argv[i],"-timesteps")) {
+            //~ } else if (!strcicmp(argv[i],"-time steps")) {
             //~ setCGTimeAveragingInterval(atof(argv[i+1])*getTimeStep());
         }
         else if (!strcicmp(argv[i], "-stepsize"))
@@ -711,7 +711,7 @@ void StatisticsVector<T>::print_help()
             << "Setting tint sets tmin to tmax-tint." << std::endl << std::endl
 
             << "-stepsize [uint]: " << std::endl
-            << "To skip some timesteps. Default: 1 (i.e. not skip any)" << std::endl << std::endl
+            << "To skip some time steps. Default: 1 (i.e. not skip any)" << std::endl << std::endl
 
             << "-statfilename [std::string]: " << std::endl
             << "to change the name of the output file" << std::endl << std::endl
@@ -941,7 +941,7 @@ void StatisticsVector<T>::initialiseStatistics()
     }
 
     if (statFile.open(std::fstream::out)) {
-        statFile.setLastSavedTimeStep(getNtimeSteps());
+        statFile.setLastSavedTimeStep(getNumberOfTimeSteps());
         statFile.getFstream() << Points.begin()->write_variable_names() << std::endl;
         statFile.getFstream() << print_CG() << std::endl;
     }
@@ -981,7 +981,7 @@ template<StatType T>
 void StatisticsVector<T>::write_statistics()
 {
     std::cout << "writing statistics for t=" << getTime() << std::endl;
-    statFile.setLastSavedTimeStep(getNtimeSteps());
+    statFile.setLastSavedTimeStep(getNumberOfTimeSteps());
 
     // write to .stat file
     statFile.getFstream() << std::left << std::setprecision(8) << std::setw(6) << getTime() << std::endl;
@@ -1071,14 +1071,14 @@ void StatisticsVector<T>::processStatistics(bool usethese)
 template<StatType T>
 void StatisticsVector<T>::write_time_average_statistics()
 {
-    statFile.setLastSavedTimeStep(getNtimeSteps());
+    statFile.setLastSavedTimeStep(getNumberOfTimeSteps());
     static bool first = true;
     
     if (verbosity)
-        std::cout << std::endl << "averaging " << nTimeAverage << " timesteps " << std::endl;
+        std::cout << std::endl << "averaging " << nTimeAverage << " time steps " << std::endl;
     if (nTimeAverage == 0)
     {
-        fprintf(stderr, "\n\n\tERROR :: Can not do TimeAverage of 0 timesteps\n\n");
+        fprintf(stderr, "\n\n\tERROR :: Can not do TimeAverage of 0 time steps\n\n");
         //exit(-1);
         return;
     }
@@ -1170,7 +1170,7 @@ void StatisticsVector<T>::statistics_from_fstat_and_data()
         fStatFile.open(std::fstream::in);
 
 
-    //load first set of timesteps to obtain xdim, ydim, zdim
+    //load first set of time steps to obtain xdim, ydim, zdim
     
     //try to read data files; if data.0000 does not exist, try the next, up to .9999
     for (int i = 1; i < 10000; i++)
@@ -1420,7 +1420,7 @@ bool StatisticsVector<T>::read_next_from_p3p_file()
             species = 0;
         }
         //set species/group
-        p->setIndSpecies(species);
+        p->setSpecies(speciesHandler.getObject(species));
 
         //set radius
         p->setRadius(pow(volume / (4. / 3. * constants::pi), 1. / 3.));
@@ -2075,7 +2075,7 @@ void StatisticsVector<T>::jump_fstat()
         getline(fStatFile.getFstream(), dummy);
         getline(fStatFile.getFstream(), dummy);
         getline(fStatFile.getFstream(), dummy);
-        //read in all lines belonging to this timestep
+        //read in all lines belonging to this time step
         while ((fStatFile.getFstream().peek() != -1) && (fStatFile.getFstream().peek() != '#'))
             getline(fStatFile.getFstream(), dummy);
     }
@@ -2804,7 +2804,7 @@ template<> double StatisticsVector<O>::setInfinitelyLongDistance()
 template<StatType T>
 void StatisticsVector<T>::writeOutputFiles()
 {
-    if (statFile.saveCurrentTimestep(getNtimeSteps()))
+    if (statFile.saveCurrentTimeStep(getNumberOfTimeSteps()))
     {
         outputStatistics();
         DPMBase::gatherContactStatistics();

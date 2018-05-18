@@ -39,8 +39,7 @@ public:
         speciesHandler.addObject(species);
     }
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         if (particleHandler.getNumberOfObjects() != N)
         {
             particleHandler.clear();

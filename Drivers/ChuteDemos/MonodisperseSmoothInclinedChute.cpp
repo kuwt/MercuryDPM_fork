@@ -37,8 +37,7 @@ class SmoothChute : public Chute
 {
 public:
 
-    void actionsBeforeTimeStep()
-    {
+    void actionsBeforeTimeStep() override {
         Chute::cleanChute();
         if (getTime() < insertTime && getTime() + getTimeStep() > insertTime)
         {
@@ -73,8 +72,7 @@ public:
         }
     }
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         //Rectangular Chute geometry
         setXMax(300 * 0.006);
         setXMin(0.0);

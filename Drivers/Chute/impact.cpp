@@ -96,7 +96,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 	//solve
 	cout << "Maximum allowed speed of particles: " << problem.getMaximumVelocity() << endl; // speed allowed before particles move through each other!
 	problem.setTimeStep();
-	//problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(100,problem.getTimeMax(),problem.getTimeStep()));
+	//problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(100,problem.getTimeMax(),problem.getTimeStep()));
 	problem.setSaveCount(500);
 	cout << "dt=" << problem.getTimeStep() << endl;
 	

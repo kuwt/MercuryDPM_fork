@@ -91,7 +91,7 @@ public:
 			speciesHandler.copyAndAddObject(speciesHandler.getObject(0));
 			created = true;
 			for (unsigned int i=0; i<particleHandler.getNumberOfObjects(); i++) {
-				if (particleHandler.getObject(i)->isFixed()) particleHandler.getObject(i)->setIndSpecies(1);
+				if (particleHandler.getObject(i)->isFixed()) particleHandler.getObject(i)->setSpecies(speciesHandler.getObject(1));
 			}
 		}
 	}
@@ -206,7 +206,7 @@ public:
 		if (Species.size()>1) {
 			for (unsigned int i=0; i<particleHandler.getNumberOfObjects(); i++)
 				if (particleHandler.getObject(i)->isFixed()) 
-					particleHandler.getObject(i)->setIndSpecies(1);
+					particleHandler.getObject(i)->setSpecies(speciesHandler.getObject(1));
 		}
 
 		set_NWall(1);

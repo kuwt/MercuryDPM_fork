@@ -140,13 +140,9 @@ public:
             std::getline(cFile_, line);
             BaseParticle* p1 = dpm.particleHandler.getObjectById(id1);
             BaseParticle* p2 = dpm.particleHandler.getObjectById(id2);
-            logger.assert(p1,"Particle % does not exist",id1);
-            logger.assert(p2,"Particle % does not exist",id1);
-//            std::vector<BaseInteraction*> c = p1->getInteractionWith(p2,time,&dpm.interactionHandler);
-//            logger.assert(c.size()>0 && c[0],"Interaction % does not exist",c.size());
-//            c[0]->setForce(force);
+            logger.assert(p1!=nullptr,"Particle % does not exist",id1);
+            logger.assert(p2!=nullptr,"Particle % does not exist",id1);
         }
-        //logger(INFO,"Read %",dpm.interactionHandler.getNumberOfObjects());
 
         //read first line p3w
         std::getline(wFile_, line);
@@ -176,7 +172,7 @@ public:
             wFile_ >> id >> force >> PC;
             std::getline(wFile_, line);
             BaseParticle* p = dpm.particleHandler.getObjectById(id);
-            logger.assert(p,"Particle % does not exist",id);
+            logger.assert(p!=nullptr,"Particle % does not exist",id);
             std::vector<BaseInteraction*> c = w->getInteractionWith(p,time,&dpm.interactionHandler);
             logger.assert(c.size()>0 && c[0],"Interaction % does not exist",c.size());
             c[0]->setContactPoint(p->getPosition()-PC);

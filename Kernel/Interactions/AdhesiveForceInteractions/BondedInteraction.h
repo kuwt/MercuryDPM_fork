@@ -56,7 +56,7 @@ public:
     /*!
      * \brief Destructor.
      */
-    virtual ~BondedInteraction();
+    ~BondedInteraction() override;
     
     /*!
      * \brief Computes the Adhesive force.

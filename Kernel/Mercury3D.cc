@@ -626,7 +626,7 @@ void Mercury3D::computeWallForces(BaseWall *const w) {
                     {
                         if (!p->isFixed() && p->getPeriodicFromParticle() == nullptr && p->getHGridCell().equals(x,y,z,level))
                         {
-                            //logger(INFO, "t % p % Size % level % cells % % %", getNtimeSteps(), p->getIndex(), hGrid->getCellSize(level), level, x,y,z);
+                            //logger(INFO, "t % p % Size % level % cells % % %", getNumberOfTimeSteps(), p->getIndex(), hGrid->getCellSize(level), level, x,y,z);
                             computeForcesDueToWalls(p,w);
                             //w->computeForces(p);
                         }

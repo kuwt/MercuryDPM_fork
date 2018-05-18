@@ -36,8 +36,7 @@ class MpiPeriodicBoundaryUnitTest : public Mercury3D
 {
 public:
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         //Define wall
         InfiniteWall w0;
         w0.setSpecies(speciesHandler.getObject(0));
@@ -87,8 +86,7 @@ public:
         logger(INFO,"Number of particles: %",particleHandler.getSize());
   }
 
-    void actionsAfterTimeStep()
-    {
+    void actionsAfterTimeStep() override {
     }       
  
 };

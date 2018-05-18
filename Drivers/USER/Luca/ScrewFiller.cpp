@@ -177,17 +177,9 @@ private:
     }
     //! [CST:beforetime]
 
-    bool readUserDefinedWall(std::string type, std::istream& is) override
+    BaseWall* readUserDefinedWall(const std::string& type) const override
     {
-        if (type == "Helicoid")
-        {
-            Helicoid wall;
-            is >> wall;
-            wall.setSpecies(speciesHandler.getObject(wall.getIndSpecies()));
-            wallHandler.addObject(wall.copy());
-            return true;
-        }
-        return false;
+        return new Helicoid();
     }
 
 
@@ -218,7 +210,7 @@ int main(int argc, char *argv[]) {
     problem.setSystemDimensions(3);
     problem.setTimeStep(0.004/50.0/10.0);
     problem.setTimeMax(10.0);
-    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(1000, problem.getTimeMax(), problem.getTimeStep()));
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(1000, problem.getTimeMax(), problem.getTimeStep()));
     
     // actually solving the problem
     problem.solve(argc,argv);

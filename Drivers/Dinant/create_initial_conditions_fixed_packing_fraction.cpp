@@ -96,11 +96,11 @@ template <StatType T> class create_initial_conditions_fixed_packing_fraction : p
             InfiniteWall w0;
             w0.set(Vec3D( 0.0, 1.0, 0.0), getYMax());
             wallHandler.copyAndAddObject(w0);
-            w0.set(Vec3D( 0.0,-1.0, 0.0),-getYMin());
+            w0.set(Vec3D( 0.0,-1.0, 0.0),getMin());
             wallHandler.copyAndAddObject(w0);
             w0.set(Vec3D( 1.0, 0.0, 0.0), getXMax());
             wallHandler.copyAndAddObject(w0);
-            w0.set(Vec3D(-1.0, 0.0, 0.0),-getXMin());
+            w0.set(Vec3D(-1.0, 0.0, 0.0),getMin());
             wallHandler.copyAndAddObject(w0);
         }
 	}
@@ -137,8 +137,8 @@ int main(int /*argc*/, char **/*argv[]*/)
 	problem.species->setDensity(5);
 	Mdouble mass = problem.species->getMassFromRadius(0.0064);
 	problem.species->setStiffnessAndRestitutionCoefficient(10000,0.8,mass);
-	problem.getDataFile().setFileType(FileType::ONE_FILE);
-	problem.getFStatFile().setFileType(FileType::ONE_FILE);
+	problem.dataFile.setFileType(FileType::ONE_FILE);
+	problem.fStatFile.setFileType(FileType::ONE_FILE);
 	
 
 	problem.setGravity(Vec3D(0,0,0));
@@ -146,7 +146,7 @@ int main(int /*argc*/, char **/*argv[]*/)
     problem.setTimeStep(0.02*helpers::computeCollisionTimeFromKAndDispAndEffectiveMass(problem.species->getStiffness(), problem.species->getDissipation(), 0.5*mass));
 	problem.setTimeMax(1e4* problem.getTimeStep());
 	//cout<<"dt:"<<problem.getTimeStep()<<" tmax:"<<problem.getTimeMax()<<endl;
-    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(100, problem.getTimeMax(), problem.getTimeStep()));
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(100, problem.getTimeMax(), problem.getTimeStep()));
     //problem.set_number_of_saves(100);
 	problem.setName("create_initial_conditions_fixed_packing_fraction");		
 	problem.write(std::cout,false);

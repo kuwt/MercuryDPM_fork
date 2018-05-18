@@ -65,7 +65,7 @@ MPIContainer::MPIContainer()
  * Currently it is only possible to have one type of interaction in the MPI (and that should be sufficient)
  * \param[in] speciesHandler Handles all the species, required to create a prototype interaction
  */
-void MPIContainer::initialiseMercuryMPITypes(SpeciesHandler speciesHandler)
+void MPIContainer::initialiseMercuryMPITypes()
 {
 #ifdef MERCURY_USE_MPI
     //Note: Important that the MPI type creation is done in the order given by the enum

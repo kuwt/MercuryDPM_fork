@@ -63,7 +63,7 @@ public:
         double mass = rhop*constants::pi*mathsFunc::cubic(particleDiameter)/6.0;
         double tc = std::sqrt( mass/2.0/K1*( mathsFunc::square(constants::pi) + mathsFunc::square(log(en) ) ));
        
-       //  set the timestep tc for integration and tmax for total simulation time
+       //  set the time step tc for integration and tmax for total simulation time
         setTimeStep(tc/50);
         //setTimeStep(0.004);
 		setTimeMax(tmax);
@@ -194,7 +194,7 @@ public:
         normWall = dynamic_cast<PeriodicBoundary*>(boundaryHandler.getObject(2));
         normWall->set(Vec3D(0.0, 0.0, 1.0), getZMin(),getZMax());
 		
-		//   Give the strain-rate for all particles and move them to next timestep before integration
+		//   Give the strain-rate for all particles and move them to next time step before integration
         N = particleHandler.getNumberOfObjects();
         for (int i=0; i < N; i++) {
 			Xp = particleHandler.getObject(i)-> getPosition().X - Px;

@@ -88,7 +88,7 @@ public:
     /*!
      * \brief Alternative constructor. Sets quaternion value to (q0,q1,q2,q3)
      */
-    Quaternion(const Mdouble q0, const Mdouble q1, const Mdouble q2, const Mdouble q3);
+    Quaternion(Mdouble q0, Mdouble q1, Mdouble q2, Mdouble q3);
 
     Quaternion(Vec3D normal)
     {
@@ -123,12 +123,12 @@ public:
     /*!
      * \brief Multiplies by a scalar
      */
-    Quaternion operator*(const Mdouble a) const;
+    Quaternion operator*(Mdouble a) const;
 
     /*!
      * \brief Divides by a scalar.
      */
-    Quaternion operator/(const Mdouble a) const;
+    Quaternion operator/(Mdouble a) const;
 
     /*!
      * \brief Adds another quaternion
@@ -143,12 +143,12 @@ public:
     /*!
      * \brief Multiplies *this by a scalar
      */
-    Quaternion& operator*=(const Mdouble a);
+    Quaternion& operator*=(Mdouble a);
 
     /*!
      * \brief Divides by a scalar
      */
-    Quaternion& operator/=(const Mdouble a);
+    Quaternion& operator/=(Mdouble a);
 
     /*!
      * \brief Makes this Quaternion unit length |q|=1
@@ -193,7 +193,7 @@ public:
     /*!
      * \brief Returns the requested component of this Quaternion
      */
-    Mdouble getComponent(const int index) const;
+    Mdouble getComponent(int index) const;
 
     ///\todo should the arguments be passed by reference?
     Quaternion angularVelocityBodyFixedFrameToAngularDisplacement(Vec3D v) const;
@@ -214,12 +214,12 @@ public:
     /*!
      * \brief Sets the requested component of this Quaternion to the requested value
      */
-    void setComponent(const int index, const double val);
+    void setComponent(int index, double val);
 
     /*!
      * \brief Checks if the length this Quaternion is equal the length of other with a certain tolerance
      */
-    bool isEqualTo(const Quaternion& other, const double tol) const;
+    bool isEqualTo(const Quaternion& other, double tol) const;
 
     /*!
      * \brief Returns a unit Quaternion based on a.
@@ -239,12 +239,12 @@ public:
     /*!
      * \brief Adds a scalar to a quaternion
      */
-    friend Quaternion operator+(const Mdouble a, const Quaternion& b);
+    friend Quaternion operator+(Mdouble a, const Quaternion& b);
 
     /*!
      * \brief Subtracts the elements of a quaternion from a scalar
      */
-    friend Quaternion operator-(const Mdouble a, const Quaternion& b);
+    friend Quaternion operator-(Mdouble a, const Quaternion& b);
 
     /*!
      * \brief Subtracts a quaternion 
@@ -254,7 +254,7 @@ public:
     /*!
      * \brief Multiplies all elements by a scalar
      */
-    friend Quaternion operator*(const Mdouble a, const Quaternion& b);
+    friend Quaternion operator*(Mdouble a, const Quaternion& b);
 
     /*!
      * \brief Convert a quaternion to Euler angles.
@@ -325,7 +325,7 @@ public:
     /**
      * Calculates the distance from a wall through p0 whose normal is the vector (1,0,0). Used for the calculation of the distance in InfiniteWalls
      */
-    Mdouble getDistance(const Vec3D p, const Vec3D p0) const;
+    Mdouble getDistance(Vec3D p, Vec3D p0) const;
 };
 
 #endif

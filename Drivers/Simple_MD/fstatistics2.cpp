@@ -169,8 +169,8 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 	
 	///Start off by solving the default problem
 	myproblem problem;
-	problem.getFStatFile().setFileType(FileType::MULTIPLE_FILES_PADDED);
-	problem.getDataFile().setFileType(FileType::MULTIPLE_FILES_PADDED);
+	problem.fStatFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
+	problem.dataFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
 	problem.getStatFile().setFileType(FileType::MULTIPLE_FILES_PADDED);
 	problem.set_name("elastic_collision");
 	problem.setTimeStep(1e-10);

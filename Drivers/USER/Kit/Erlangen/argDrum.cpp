@@ -614,7 +614,7 @@ int main(int argc, char *argv[])
 	//setting the time to give a set number of revolutions
 	coDrum.setTimeMax((20.0*60.0 / rotRate)+5.0);
 	coDrum.setFileType(FileType::ONE_FILE);
-	//Setting to record a fixed number (5000) of individual timesteps - 1000 per complete rotation
+	//Setting to record a fixed number (5000) of individual time steps - 1000 per complete rotation
 	coDrum.setSaveCount(coDrum.getTimeMax() / (5000 * coDrum.getTimeStep()));	
 	coDrum.setXBallsAdditionalArguments("-cmode 0 -solidf -v0");
 	coDrum.solve();

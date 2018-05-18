@@ -46,7 +46,7 @@ public:
     ChargedBondedSpecies(const ChargedBondedSpecies &s);
 
     ///\brief The default constructor.
-    virtual ~ChargedBondedSpecies();
+    ~ChargedBondedSpecies() override;
 
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
@@ -58,7 +58,7 @@ public:
     std::string getBaseName() const;
 
     ///\brief creates default values for mixed species
-    void mix(ChargedBondedSpecies* const S, ChargedBondedSpecies* const T);
+    void mix(ChargedBondedSpecies*S, ChargedBondedSpecies*T);
 
 //adhesion-specific functions
 

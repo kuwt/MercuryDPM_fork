@@ -176,12 +176,12 @@ private:
     /*!
      * \brief Shifts the particle to its 'periodic' position
      */
-    void shiftPosition(BaseParticle* const p) const;
+    void shiftPosition(BaseParticle*p) const;
 
     /*!
      * \brief Creates a copy of the input particle, that gets removed again in DPMBase::removeDuplicatePeriodicParticles
      */
-    BaseParticle* createGhostCopy(BaseParticle* const p) const;
+    BaseParticle* createGhostCopy(BaseParticle*p) const;
 
     /*!
      * \brief Returns whether the given particle is closer to the right boundary of the periodic part.

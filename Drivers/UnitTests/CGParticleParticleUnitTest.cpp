@@ -32,8 +32,7 @@ using namespace constants;
 class TwoParticles : public Mercury3D
 {
 public:
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         //define a particle species
         auto species = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
         species->setDensity(0.75 / constants::pi); // such that mass = 1

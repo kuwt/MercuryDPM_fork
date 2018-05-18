@@ -37,8 +37,7 @@ class NewtonsCradleSelfTest : public DPMBase {
 	
 public:
 	
-	void setupInitialConditions()
-	{
+	void setupInitialConditions() override {
 		// make sure the number of particles is right
 		logger(INFO,"Creating a cubic packing of %^3 particles",N);
 		//set_N(mathsFunc::cubic(N));

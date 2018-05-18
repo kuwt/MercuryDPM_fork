@@ -46,7 +46,7 @@ public:
         restitutionCoefficient = std::numeric_limits<double>::quiet_NaN();
     }
 
-    //set slave variables (i.e. compute stiffness, dissipation, timestep, wall and particle positions)
+    //set slave variables (i.e. compute stiffness, dissipation, time step, wall and particle positions)
     void setupInitialConditions() override
 	{
         //set contact properties:

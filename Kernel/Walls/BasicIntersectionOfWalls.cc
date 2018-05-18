@@ -72,7 +72,7 @@ BasicIntersectionOfWalls* BasicIntersectionOfWalls::copy() const
  * certain time or condition is met. Checking the number of objects is useful
  * for checking if this has happened yet, when restarting. 
  */
-unsigned int BasicIntersectionOfWalls::getNumberOfObjects(void)
+unsigned long BasicIntersectionOfWalls::getNumberOfObjects()
 {
     return walls_.size();
 }
@@ -113,9 +113,9 @@ bool BasicIntersectionOfWalls::getDistanceAndNormal(const BaseParticle& p, Mdoub
     Vec3D normal2; //normal of the second-closest wall
     Vec3D normal3; //normal of the third-closest wall
     Vec3D normalCurrent; //normal of the current wall
-    unsigned int id = -1; //id of the closest wall
-    unsigned int id2 = -1; //id of the second-closest wall
-    unsigned int id3 = -1; //id of the third-closest wall
+    unsigned int id = static_cast<unsigned int>(-1); //id of the closest wall
+    unsigned int id2 = static_cast<unsigned int>(-1); //id of the second-closest wall
+    unsigned int id3 = static_cast<unsigned int>(-1); //id of the third-closest wall
     Mdouble wallInteractionRadius = p.getWallInteractionRadius();
     Vec3D position = p.getPosition(); //- getPosition();
     getOrientation().rotateBack(position);
@@ -293,7 +293,7 @@ void BasicIntersectionOfWalls::getVTK(std::vector<Vec3D> &points, std::vector<st
 //    }
     //writes points and strips for all walls; points are added to the global point vector, but the strips are held back
     std::vector<std::vector<double>> myTriangleStrips;
-    unsigned n = points.size();
+    unsigned long n = points.size();
     for (auto w : walls_) {
         w->getVTK (points, myTriangleStrips);
     }

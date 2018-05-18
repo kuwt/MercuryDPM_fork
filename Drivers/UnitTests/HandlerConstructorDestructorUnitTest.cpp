@@ -37,8 +37,7 @@ class my_problem : public DPMBase
 {
 public:
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
 
         BaseParticle p0;

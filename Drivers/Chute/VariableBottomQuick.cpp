@@ -48,7 +48,7 @@ public:
 
 	void cleanChute() 
 	{
-		//clean outflow every 100 timesteps
+		//clean outflow every 100 time steps
 		static int count = 0, maxcount = 100;
 		if (count>maxcount)
 		{
@@ -69,7 +69,7 @@ public:
 	}
 
 
-	///sets parameters of particles and timestepping to the L3 type used in Silbert's papers
+	///sets parameters of particles and time stepping to the L3 type used in Silbert's papers
 	void set_silbert_parameters() {
 		//time stepping
 		if (true) {

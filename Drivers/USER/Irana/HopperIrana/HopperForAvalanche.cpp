@@ -54,7 +54,7 @@ public:
     
         for (BaseWall* wall : wallHandler)
         {
-            wall->setIndSpecies(0);
+            wall->setSpecies(speciesHandler.getObject(0));
         }
     
         BaseParticle p0;

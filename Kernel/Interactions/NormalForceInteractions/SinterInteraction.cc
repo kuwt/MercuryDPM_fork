@@ -176,6 +176,7 @@ void SinterInteraction::computeNormalForce()
             double temperature = 2.0*tp->getTemperature()*ti->getTemperature()/(tp->getTemperature()+ti->getTemperature());
             rateOverlap = 2.0*normalForce*species->getTemperatureDependentSinterRate(temperature)/species->getSinterAdhesion();
         } else {
+            rateOverlap = 0;
             //missing: add the sintering model 'modified Frenkel' of the Pokula paper
         }
         plasticOverlap_ = std::max(0.0,std::min(deltaStar,plasticOverlap_+rateOverlap*dpmBase->getTimeStep()));

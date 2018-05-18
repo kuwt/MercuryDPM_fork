@@ -65,8 +65,8 @@ int main(int argc, char** argv) {
     species->setDissipation(0.0);// sets the dissipation
     
     //p.setSaveCount(10);
-    p.getDataFile().setFileType(FileType::ONE_FILE);
-    p.getRestartFile().setFileType(FileType::ONE_FILE);
+    p.dataFile.setFileType(FileType::ONE_FILE);
+    p.restartFile.setFileType(FileType::ONE_FILE);
     
     p.setXBallsAdditionalArguments("-solidf -v0");
     

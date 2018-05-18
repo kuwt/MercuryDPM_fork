@@ -37,8 +37,7 @@ class SquarePacking : public StatisticsVector<O> {
 
 public:
 
-	void setupInitialConditions()
-	{
+	void setupInitialConditions() override {
 		// make sure the number of particles is right
 		std::cout << "Creating a cubic packing of " << N << "^3 particles" << std::endl;
 		double Radius = .5;

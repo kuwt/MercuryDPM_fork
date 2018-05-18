@@ -270,7 +270,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     problem.collisionTime = 0.001;
     problem.setTimeStep(0.001/50.0);
     problem.setTimeMax(11*problem.frictionObservationTime + 2.0);   // 10 friction increments: from 0.0 t0 2.0 included
-    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(10000, problem.getTimeMax(), problem.getTimeStep()));
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(10000, problem.getTimeMax(), problem.getTimeStep()));
     
 //    problem.particleRadius = 0.015;
     problem.particleDensity = 2000.0;
@@ -309,7 +309,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 //        // set some basic problem properties
 //        problem.setName(oss.str());
 //        
-//        problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(1000, problem.getTimeMax(), problem.getTimeStep()));
+//        problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(1000, problem.getTimeMax(), problem.getTimeStep()));
 //        
 //        
 //        // actually solving the problem

@@ -62,7 +62,7 @@ public:
     /*!
      * \brief Particle destructor, needs to be implemented and checked if it removes tangential spring information
      */
-    virtual ~BaseParticle();
+    ~BaseParticle() override;
 
     /*!
      * \brief Particle copy method. It calls to copy constructor of this Particle, useful for polymorfism
@@ -188,7 +188,7 @@ public:
     /*!
      * \brief Particle read function, which accepts an std::istream as input.
      */
-    virtual void read(std::istream& is) override;
+    void read(std::istream& is) override;
 
     /*!
      * Should NOT BE USED by any user, only used to read old restart files!
@@ -199,12 +199,12 @@ public:
     /*!
      * \brief Particle print function, which accepts an std::ostream as input.
      */
-    virtual void write(std::ostream& os) const override;
+    void write(std::ostream& os) const override;
 
     /*!
      * \brief Returns the name of the object
      */
-    virtual std::string getName() const override;
+    std::string getName() const override;
 
     /*!
      * \brief Sets some user-defined information about this object (by default, species ID). 
@@ -369,12 +369,12 @@ public:
     /*!
      * \brief Sets the particle's inertia_ (and adjusts invInertia_ accordingly)
      */
-    void setInertia(const MatrixSymmetric3D inertia);
+    void setInertia(MatrixSymmetric3D inertia);
 
     /*!
      * \brief Sets the particle's inertia_ (and adjusts invInertia_ accordingly)
      */
-    void setInverseInertia(const MatrixSymmetric3D inverseInertia);
+    void setInverseInertia(MatrixSymmetric3D inverseInertia);
 
     /*!
      * \brief Sets the particle's inertia_ to 'infinite' (1e20) and its invInertia_
@@ -442,7 +442,7 @@ public:
      * \brief Sets the particle's radius_ (and adjusts the mass_ accordingly, 
      * based on the particle's species)
      */
-    void setRadius(const Mdouble radius);
+    void setRadius(Mdouble radius);
 
     /*
      * The below 6 functions had to be declared virtual here in order to allow access of these functions in ParticleHandler class in the function writeVTK.
@@ -470,14 +470,14 @@ public:
      * ParticleSpecies->computeMass instead. That makes sure 
      */
     MERCURY_DEPRECATED
-    void setMass(const Mdouble mass);
+    void setMass(Mdouble mass);
 
     /*!
      * \brief Sets the particle's mass
      * This function should not be used, but is necessary to extend the CG 
      * toolbox to non-spherical particles.
      */    
-    void setMassForP3Statistics(const Mdouble mass);
+    void setMassForP3Statistics(Mdouble mass);
 
     /*!
      * \brief Sets the particle's displacement (= difference between current 
@@ -524,12 +524,12 @@ public:
      * \brief Checks if particle is in interaction with given particle P, and if 
      * so, returns vector of pointer to the associated BaseInteraction object (else returns empty vector).
      */
-    virtual std::vector<BaseInteraction*> getInteractionWith(BaseParticle* const P, const unsigned timeStamp, InteractionHandler* const interactionHandler) override;
+    std::vector<BaseInteraction*> getInteractionWith(BaseParticle*P, unsigned timeStamp, InteractionHandler*interactionHandler) override;
     
     /*!
      * \brief Get whether or not this particle is in contact with the given particle.
      */
-    virtual bool isInContactWith(const BaseParticle* const P) const;
+    virtual bool isInContactWith(const BaseParticle*P) const;
 
     /*!
      * \brief First step of <a href="http://en.wikipedia.org/wiki/Verlet_integration#Velocity_Verlet">Velocity Verlet</a> 
@@ -614,8 +614,8 @@ private:
     //Periodic boundary particle attributes
     bool isInPeriodicDomain_; /// bool that indicates if a particle is in the periodic domain of any boundary
     bool isPeriodicGhostParticle_; /// Indicates if the particle is a ghost particle of a periodic particle
-    std::vector<int> previousPeriodicComplexity_; /// Indicates the periodic complexity at previous timestep
-    std::vector<int> periodicComplexity_;  /// Indicates the periodic complexity at current timestep. Used to update periodic status 
+    std::vector<int> previousPeriodicComplexity_; /// Indicates the periodic complexity at previous time step
+    std::vector<int> periodicComplexity_;  /// Indicates the periodic complexity at current time step. Used to update periodic status
     bool isMaserParticle_; ///Indicates if this particle belongs to the maser boundary or is released into the wide open world.
 
     Vec3D displacement_; ///Displacement (only used in StatisticsVector, StatisticsPoint)

@@ -43,7 +43,7 @@ template <StatType T> class CLiveStatistics : public StatisticsVector<T>, public
 		write(std::cout,false);
 	};
 	
-	void printTime() const {
+	void printTime() const override {
 		static double tint = getTimeMax()-getTime();
 		std::cout << "\r" << std::setprecision(2) << (int)100.*(1-(getTimeMax()-getTime())/tint) << "%\r";
 		std::cout.flush();

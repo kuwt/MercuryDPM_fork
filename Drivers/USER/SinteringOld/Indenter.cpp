@@ -115,8 +115,8 @@ public:
 		Mdouble dtDown = IndentationDepth/IndenterVelocity;
 		setTimeMax(NumSteps*dtDown);
 	 	setSaveCount(getTimeMax()/ getTimeStep()/200.0);
-	 	getDataFile().setFileType(FileType::ONE_FILE);
-	 	getRestartFile().setFileType(FileType::MULTIPLE_FILES);
+	 	dataFile.setFileType(FileType::ONE_FILE);
+	 	restartFile.setFileType(FileType::MULTIPLE_FILES);
 		setXBallsAdditionalArguments("-v0 -solidf");// -moh 250 -s 0.2 -oh 1300");
 		write(std::cout,false);
 	}
@@ -182,7 +182,7 @@ public:
 		<< std::endl;
 	}
 
-	void writeEneTimestep(std::ostream& os) const
+	void writeEneTimeStep(std::ostream& os) const
 	{
 		Mdouble ene_kin = 0, ene_rot = 0, ene_gra = 0, mass_sum= 0, x_masslength=0, y_masslength=0, z_masslength=0;
 

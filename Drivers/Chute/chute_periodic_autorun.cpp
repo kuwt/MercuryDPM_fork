@@ -91,7 +91,7 @@ void setup() {
 	
 	cout << "Maximum allowed speed of particles: " << getMaximumVelocity() << endl; 
 	setTimeStep(); 
-	setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(150,getTimeMax(),getTimeStep()));
+	setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(150,getTimeMax(),getTimeStep()));
 	cout << "dt=" << getTimeStep() << endl;
 	
 	//This set to colouring based of size and small vectors

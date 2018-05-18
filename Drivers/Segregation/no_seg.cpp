@@ -67,10 +67,10 @@ int main(int argc, char *argv[])
     problem.setInflowVelocityVariance(0.02);
     
     // Output properties
-    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(1, problem.getTimeMax(), problem.getTimeStep()));
-    problem.getDataFile().setSaveCount(100*problem.getRestartFile().getSaveCount());
-    problem.getEneFile().setSaveCount(100*problem.getRestartFile().getSaveCount());
-//    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(1,problem.getTimeMax(),problem.getTimeStep())); //minimize output to the last timestep
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(1, problem.getTimeMax(), problem.getTimeStep()));
+    problem.dataFile.setSaveCount(100*problem.restartFile.getSaveCount());
+    problem.eneFile.setSaveCount(100*problem.restartFile.getSaveCount());
+//    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(1,problem.getTimeMax(),problem.getTimeStep())); //minimize output to the last time step
 //    problem.set_number_of_saves_data(100); //allow enough data output so the evolution can be viewed in xballs
 //    problem.set_number_of_saves_ene(100);
 

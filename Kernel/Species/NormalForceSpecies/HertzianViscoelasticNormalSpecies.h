@@ -46,7 +46,7 @@ public:
     HertzianViscoelasticNormalSpecies(const HertzianViscoelasticNormalSpecies &p);
 
     ///\brief The default destructor.
-    virtual ~HertzianViscoelasticNormalSpecies();
+    ~HertzianViscoelasticNormalSpecies() override;
 
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
@@ -87,7 +87,7 @@ public:
 //    Mdouble getRestitutionCoefficient(Mdouble mass);
 
     ///\brief creates default values for mixed species
-    void mix(HertzianViscoelasticNormalSpecies* const SBase, HertzianViscoelasticNormalSpecies* const TBase);
+    void mix(HertzianViscoelasticNormalSpecies*SBase, HertzianViscoelasticNormalSpecies*TBase);
 
 //setters and getters
 

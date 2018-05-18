@@ -57,7 +57,7 @@ public:
     /*!
      * \brief destructor
      */
-    virtual ~BaseBoundary();
+    ~BaseBoundary() override;
     
     /*!
      * \brief Used to create a copy of the object
@@ -69,13 +69,13 @@ public:
      * \brief Reads the object's id_ from given istream
      * NB: purely virtual function, overriding the version of BaseObject
      */
-    void read(std::istream& is) = 0;
+    void read(std::istream& is) override = 0;
     
     /*!
      * \brief Adds object's id_ to given ostream
      * NB: purely virtual function, overriding the version of BaseObject
      */
-    void write(std::ostream& os) const = 0;
+    void write(std::ostream& os) const override = 0;
     
     
     /*!
@@ -89,17 +89,17 @@ public:
     virtual void createPeriodicParticles(ParticleHandler& pH UNUSED);
     
     /*!
-     * \brief Virtual function that does things to particles, each timestep after particles have moved.
+     * \brief Virtual function that does things to particles, each time step after particles have moved.
      */
     virtual void checkBoundaryAfterParticlesMove(ParticleHandler& pH);
     
     /*!
-     * \brief Virtual function that does things before each timestep.
+     * \brief Virtual function that does things before each time step.
      */
     virtual void checkBoundaryBeforeTimeStep(DPMBase* md);
     
     /*!
-     * \brief Virtual function that does something after DPMBase::setupInitialConditions but before the first timestep. 
+     * \brief Virtual function that does something after DPMBase::setupInitialConditions but before the first time step.
      */
     virtual void actionsBeforeTimeLoop();
    

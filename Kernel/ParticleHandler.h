@@ -61,7 +61,7 @@ public:
     /*!
      * \brief Destructor, it destructs the ParticleHandler and all BaseParticle it contains.
      */
-    ~ParticleHandler();
+    ~ParticleHandler() override;
 
     /*!
      * \brief Adds a BaseParticle to the ParticleHandler.
@@ -91,13 +91,13 @@ public:
     /*!
      * \brief Removes a BaseParticle from the ParticleHandler. 
      */
-    void removeObject(const unsigned int index) override;
+    void removeObject(unsigned int index) override;
 
     /*!
      * \brief Removes a BaseParticle from the ParticleHandler without a global check, this is only to be done for mpi routines
      * 
      */
-    void removeGhostObject(const unsigned int index);
+    void removeGhostObject(unsigned int index);
 
     /*!
      * \brief Removes the last BaseParticle from the ParticleHandler.
@@ -182,42 +182,42 @@ public:
     /*!
      * \brief Gets a pointer to the particle with the lowest coordinates in direction i in this ParticleHandler.
      */
-    BaseParticle* getLowestPositionComponentParticleLocal(const int i) const;
+    BaseParticle* getLowestPositionComponentParticleLocal(int i) const;
 
     /*!
      * \brief Gets a pointer to the particle with the lowest coordinates in direction i in this ParticleHandler.
      */
-    BaseParticle* getLowestPositionComponentParticle(const int i) const;
+    BaseParticle* getLowestPositionComponentParticle(int i) const;
 
     /*!
      * \brief Gets a pointer to the particle with the highest coordinates in direction i in this ParticleHandler.
      */
-    BaseParticle* getHighestPositionComponentParticleLocal(const int i) const;
+    BaseParticle* getHighestPositionComponentParticleLocal(int i) const;
 
     /*!
      * \brief Gets a pointer to the particle with the highest coordinates in direction i in this ParticleHandler. 
      */
-    BaseParticle* getHighestPositionComponentParticle(const int i) const;
+    BaseParticle* getHighestPositionComponentParticle(int i) const;
 
     /*!
      * \brief Gets a pointer to the particle with the lowest velocity in direction i in this ParticleHandler.
      */
-    BaseParticle* getLowestVelocityComponentParticleLocal(const int i) const;
+    BaseParticle* getLowestVelocityComponentParticleLocal(int i) const;
 
     /*!
      * \brief Gets a pointer to the particle with the lowest velocity in direction i in this ParticleHandler. 
      */
-    BaseParticle* getLowestVelocityComponentParticle(const int i) const;
+    BaseParticle* getLowestVelocityComponentParticle(int i) const;
 
     /*!
      * \brief Gets a pointer to the particle with the highest velocity in direction i in this ParticleHandler.
      */
-    BaseParticle* getHighestVelocityComponentParticleLocal(const int i) const;
+    BaseParticle* getHighestVelocityComponentParticleLocal(int i) const;
 
     /*!
      * \brief Gets a pointer to the particle with the highest velocity in direction i in this ParticleHandler. 
      */
-    BaseParticle* getHighestVelocityComponentParticle(const int i) const;
+    BaseParticle* getHighestVelocityComponentParticle(int i) const;
 
     /*!
      * \brief Gets a pointer to the lightest BaseParticle (by mass) in this ParticleHandler.

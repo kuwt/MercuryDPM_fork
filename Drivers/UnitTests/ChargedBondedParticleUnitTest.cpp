@@ -34,8 +34,7 @@
 class ChargedBondedParticleUnitTest : public DPMBase
 {
 public:
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         setXMax(4);
         setYMax(1);
         setZMax(10);
@@ -103,7 +102,7 @@ int main(int argc, char* argv[])
     
     //Giving a name for the output file
     dpm.setName("ChargedBondedParticleUnitTest");
-    //setting the timestep of the problem
+    //setting the time step of the problem
     dpm.setTimeStep(3e-3);
     dpm.setSaveCount(30);
     //setting gravity to zero to ensure only forces acting are inter-particle forces!

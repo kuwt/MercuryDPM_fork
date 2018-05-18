@@ -92,7 +92,7 @@ BaseInteractable::BaseInteractable(const BaseInteractable &p)
 BaseInteractable::~BaseInteractable()
 {
     logger(VERBOSE, "Deleting BaseInteractable with index= % and id = %, size = %", getIndex(),getId(),interactions_.size());
-    while (interactions_.size() > 0)
+    while (!interactions_.empty())
     {
         interactions_.front()->removeFromHandler();
     }
@@ -390,7 +390,7 @@ void BaseInteractable::applyPrescribedVelocity(double time)
  *            takes a double the time and returns a Vec 3D which is the orientation 
  *            of the interactable for that time.
  */
-void BaseInteractable::setPrescribedOrientation(std::function<Quaternion (double)> prescribedOrientation)
+void BaseInteractable::setPrescribedOrientation(std::function<Quaternion (double)>& prescribedOrientation)
 {
     prescribedOrientation_ = prescribedOrientation;
 }

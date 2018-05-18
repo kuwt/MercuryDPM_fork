@@ -92,7 +92,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 	problem.speciesHandler.getObject(0)->setSlidingDissipation(5e-7);
 	//problem.speciesHandler.getObject(0)->setSlidingFrictionCoefficient(0.0);
 	problem.speciesHandler.getObject(0)->setStiffness(1e2);
-	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(1000,problem.getTimeMax(),problem.getTimeStep()));
+	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(1000,problem.getTimeMax(),problem.getTimeStep()));
 	problem.solve();
 	std::cout << problem;
 	// std::cout << problem;

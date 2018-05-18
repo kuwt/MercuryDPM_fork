@@ -39,8 +39,7 @@
 class WallSpecies : public DPMBase {
 public:
 
-	void setupInitialConditions()
-	{
+	void setupInitialConditions() override {
 		setXMax(20);
 		setYMax(20);
 		setZMax(20);
@@ -80,8 +79,7 @@ public:
  	}
 
     //Write the speed of the particles as the info line.
-    double getInfo(const BaseParticle& P0) const
-    {
+    double getInfo(const BaseParticle& P0) const override {
         return sqrt(mathsFunc::square(P0.getVelocity().X)+mathsFunc::square(P0.getVelocity().Z));
     }
 };

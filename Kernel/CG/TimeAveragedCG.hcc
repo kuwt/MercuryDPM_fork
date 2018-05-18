@@ -70,7 +70,7 @@ void TimeAveragedCG<Coordinates, BaseFunction, Fields>::initialise()
 
 /*!
  * \details computes the fields for the current time step and adds it to the
- * previously computed timesteps; also adds one to nTime_.
+ * previously computed time steps; also adds one to nTime_.
  * 
  * Thus, at the end of evaluate, the fields contain the sum over the field 
  * values of all time steps that have been computed so far, and nTime_ contains 

@@ -70,7 +70,7 @@ public:
     /*!
      * \brief Destructor.
      */
-    virtual ~TriangleWall() = default;
+    ~TriangleWall() override = default;
     
     /*!
      * \brief Wall copy method. It calls the copy constructor of this Wall, useful for polymorphism
@@ -95,7 +95,7 @@ public:
     /*!
      * \brief Writes an TriangleWall to an output stream, for example a restart file.
      */
-    void setVertices(const Vec3D A, const Vec3D B, const Vec3D C);
+    void setVertices(Vec3D A, Vec3D B, Vec3D C);
 
 
     void writeVTK(VTKContainer& vtk) const override;

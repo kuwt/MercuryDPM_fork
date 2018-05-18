@@ -34,7 +34,7 @@
 #include "DomainHandler.h"
 #include "Math/Vector.h"
 #include <limits>
-#include <vector>
+#include <utility> #include <vector>
 #include <set>
 
 /*!
@@ -57,7 +57,7 @@ Domain::Domain()
  * infinite bounds and no processor or domainHandler assigned to it
  * and initialises all communication lists
  */
-Domain::Domain(std::vector<unsigned> globalMeshIndex) : globalMeshIndex_(globalMeshIndex) 
+Domain::Domain(std::vector<unsigned> globalMeshIndex) : globalMeshIndex_(std::move(globalMeshIndex))
 {
     constructor();
 #ifdef DEBUG_CONSTRUCTOR
@@ -82,7 +82,7 @@ Domain::Domain(const Domain &b)
     middle_ = b.middle_;
     
     //A cube has 3^3=27 neighbours
-    int numberOfNeighbours = 27;
+    unsigned long numberOfNeighbours = 27;
 
     //Create all lists
     localIndexToGlobalIndexTable_ = std::vector<int>(numberOfNeighbours);

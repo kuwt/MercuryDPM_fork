@@ -84,7 +84,7 @@ void BasePeriodicBoundary::write(std::ostream& os) const
 
 
 /*!
- * \details Sets the pointer to the BounadaryHandler the boundary belongs to
+ * \details Sets the pointer to the BoundaryHandler the boundary belongs to
  * \param[in] handler   pointer to the boundary handler
  */
 void BasePeriodicBoundary::setPeriodicHandler(PeriodicBoundaryHandler* periodicHandler)
@@ -103,11 +103,11 @@ PeriodicBoundaryHandler* BasePeriodicBoundary::getPeriodicHandler() const
 
 /*!
  * \details Shifts the position of a particle to the other boundary.
- * Note: In some cases it doesnt only shift the positoin, but also other quantities such
+ * Note: In some cases it doesnt only shift the position, but also other quantities such
  * as velocity
  * \param[in] particle Pointer to the particle that will shift position
  */
-void BasePeriodicBoundary::shiftPosition(BaseParticle* particle) const 
+void BasePeriodicBoundary::shiftPosition(BaseParticle* particle UNUSED) const
 {
 }
 
@@ -152,7 +152,7 @@ void BasePeriodicBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
  * walls, and creates a periodic copy of the particle if needed (i.e. if the particle
  * is closer to the periodic wall than the radius of the largest particle in the
  * system).
- * NOTE: This is only for a serial build - periodic particles work different in paralel
+ * NOTE: This is only for a serial build - periodic particles work different in parallel
  * \param[in,out] pH    System's ParticleHandler, (1) from which the interaction radius
  *                      of its largest particle is retrieved to determine the maximum 
  *                      distance from the wall at which a particle should still have
@@ -165,7 +165,7 @@ void BasePeriodicBoundary::createPeriodicParticles(ParticleHandler& pH)
 
 //TODO documentation
 void BasePeriodicBoundary::modifyPeriodicComplexity(std::vector<int>& complexity, int& totalPeriodicComplexity,
-                                                            BaseParticle* particle, int i) const
+                                                            BaseParticle* particle UNUSED, int i UNUSED) const
 {
 }
 

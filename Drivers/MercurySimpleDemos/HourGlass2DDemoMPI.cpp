@@ -38,8 +38,7 @@ class HourGlass2D : public Mercury3D
 {
 public:
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         //define side walls
         InfiniteWall w0;
         w0.setSpecies(speciesHandler.getObject(0));
@@ -89,8 +88,7 @@ public:
         }
     }
 
-    void actionsAfterTimeStep()
-    {
+    void actionsAfterTimeStep() override {
         //if (getTime()<0.9 && getTime()+getTimeStep()>0.9)
         {
             //std::cout<<"Shifting bottom wall downward"<<getTime()<<std::endl;

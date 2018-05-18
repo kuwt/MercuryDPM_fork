@@ -46,7 +46,7 @@ public:
     LinearPlasticViscoelasticNormalSpecies(const LinearPlasticViscoelasticNormalSpecies &p);
 
     ///\brief The default destructor.
-    virtual ~LinearPlasticViscoelasticNormalSpecies();
+    ~LinearPlasticViscoelasticNormalSpecies() override;
 
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
@@ -60,7 +60,7 @@ public:
 // Species-specific functions
 
     ///\brief creates default values for mixed species
-    void mix(LinearPlasticViscoelasticNormalSpecies* const S, LinearPlasticViscoelasticNormalSpecies* const T);
+    void mix(LinearPlasticViscoelasticNormalSpecies*S, LinearPlasticViscoelasticNormalSpecies*T);
 
     ///Set k, disp such that is matches a given tc and eps for a collision of two different masses.
     ///Recall the resitution constant is a function of k, disp and the mass of each particle in the collision

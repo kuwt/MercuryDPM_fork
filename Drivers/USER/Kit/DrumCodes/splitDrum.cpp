@@ -171,9 +171,9 @@ public:
         
         //Now add two extra solid walls at the end
         InfiniteWall w0;
-        w0.set(Vec3D(0.0, -1.0, 0.0), -getYMin() - 2 * getFixedParticleRadius());
+        w0.set(Vec3D(0.0, -1.0, 0.0), getMin() + Vec3D(0,2 * getFixedParticleRadius(),0));
         wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0, 1.0, 0.0), getYMax() - 2 * getFixedParticleRadius());
+        w0.set(Vec3D(0.0, 1.0, 0.0), getMax() - Vec3D(0,2 * getFixedParticleRadius(),0));
         wallHandler.copyAndAddObject(w0);
         
         
@@ -773,7 +773,7 @@ int main(int argc, char *argv[])
     //problem.setRoughBottomType(MONOLAYER_ORDERED);
 
     
-    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(2000, problem.getTimeMax(), problem.getTimeStep()));
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(2000, problem.getTimeMax(), problem.getTimeStep()));
     problem.setXBallsAdditionalArguments("-cmode 8");
     problem.readArguments(argc, argv);
     

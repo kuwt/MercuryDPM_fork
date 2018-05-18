@@ -38,8 +38,8 @@ public:
     
     void writeVTK() const override;
 
-    virtual ~SuperQuadricParticleVtkWriter(){ }
-    
+    ~SuperQuadricParticleVtkWriter() override = default;
+
     std::string getName() const override
     {
         return "SuperQuadricParticleVtkWriter";

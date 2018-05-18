@@ -46,7 +46,7 @@ public:
     MindlinSpecies(const MindlinSpecies &s);
 
     ///\brief The default destructor.
-    virtual ~MindlinSpecies();
+    ~MindlinSpecies() override;
 
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
@@ -91,7 +91,7 @@ public:
     bool getUseAngularDOFs() const override;
 
     ///\brief creates default values for mixed species
-    void mix(MindlinSpecies* const S, MindlinSpecies* const T);
+    void mix(MindlinSpecies*S, MindlinSpecies*T);
 
 private:
 

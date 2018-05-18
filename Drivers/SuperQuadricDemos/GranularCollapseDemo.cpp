@@ -79,8 +79,7 @@ public:
         // [GranularCollapse : walls]
     }
     
-    void actionsAfterTimeStep()
-    {
+    void actionsAfterTimeStep() override {
         if (problemtype != 0 && problemtype != 3)
         {
             if (((getTime() < stopInsert && getTime() + getTimeStep() > stopInsert) ||

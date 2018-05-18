@@ -53,7 +53,7 @@ public:
     /*!
      * \brief destructor
      */
-    virtual ~BasePeriodicBoundary();
+    ~BasePeriodicBoundary() override;
 
     /*!
      * \brief Reads the object's id_ from given istream
@@ -69,7 +69,7 @@ public:
      * \brief Used to create a copy of the object
      * NB: purely virtual function
      */
-    virtual BasePeriodicBoundary* copy() const = 0;
+    BasePeriodicBoundary* copy() const override = 0;
 
     /*!
      * \brief Sets the periodicBoundaryHandler, required for parallel periodic boundaries
@@ -104,12 +104,12 @@ public:
     /*!
      * \brief Creates periodic ocpies of given particle in case of periodic boundaries in serial build
      */
-    void createPeriodicParticles(ParticleHandler& pH);
+    void createPeriodicParticles(ParticleHandler& pH) override;
 
     /*!
-     * \brief Virtual function that does things to particles, each timestep after particles have moved.
+     * \brief Virtual function that does things to particles, each time step after particles have moved.
      */
-    virtual void checkBoundaryAfterParticlesMove(ParticleHandler& pH);
+    void checkBoundaryAfterParticlesMove(ParticleHandler& pH) override;
 
     /*!
      * \brief Modifies periodic complexity of a particle if necessary (i.e. maser boundary)

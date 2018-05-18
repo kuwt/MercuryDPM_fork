@@ -35,7 +35,7 @@ public:
         Mdouble liquidFilmVolume = 0;
         for (auto& p : particleHandler) {
             auto l = dynamic_cast<LiquidFilmParticle*>(p);
-            logger.assert_always(l,"Error in printTime");
+            logger.assert_always(l!= nullptr,"Error in printTime");
             liquidFilmVolume += l->getLiquidVolume();
         }
         return liquidFilmVolume;
@@ -45,7 +45,7 @@ public:
         Mdouble liquidBridgeVolume = 0;
         for (auto& i : interactionHandler) {
             LiquidMigrationWilletInteraction* l = dynamic_cast<LiquidMigrationWilletInteraction*>(i);
-            logger.assert_always(l,"Error in printTime");
+            logger.assert_always(l!= nullptr,"Error in printTime");
             liquidBridgeVolume += l->getLiquidBridgeVolume();
             //logger(INFO,"o %",l->getOverlap());
         }
@@ -57,7 +57,7 @@ public:
     };
 
     void printTime() const override {
-        logger(INFO,"t % LF % LB % T %",getNtimeSteps(),getLiquidFilmVolume(), getLiquidBridgeVolume(), getLiquidVolume());
+        logger(INFO,"t % LF % LB % T %",getNumberOfTimeSteps(),getLiquidFilmVolume(), getLiquidBridgeVolume(), getLiquidVolume());
     };
 };
 

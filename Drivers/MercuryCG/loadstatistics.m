@@ -133,7 +133,7 @@ elseif ~doGradient
         data{i}.time = rawdata.data(index_time(i-1),1:2)';
         data{i}.variables = rawdata.data(index_time(i-1)+1:index_time(i)-1,4:end);
     end
-    disp(['multiple timesteps (' VolumeFractionm2str(length(index_time)-1) '); creating cell output'])
+    disp(['multiple time steps (' VolumeFractionm2str(length(index_time)-1) '); creating cell output'])
 else
     dataTemplate = data;
     data = cell(1,length(index_time)/4);
@@ -150,7 +150,7 @@ else
         data{i/4}.grady = rawdata.data(index_time(i-2)+1:index_time(i-1)-1,4:end);
         data{i/4}.gradz = rawdata.data(index_time(i-1)+1:index_time(i  )-1,4:end);
     end
-    disp(['multiple timesteps (' VolumeFractionm2str(length(index_time)/4) '); creating cell output'])
+    disp(['multiple time steps (' VolumeFractionm2str(length(index_time)/4) '); creating cell output'])
 end
 
 % \todo{why is this needed?}

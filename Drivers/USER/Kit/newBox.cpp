@@ -400,7 +400,7 @@ int main()
 	Box2DPartTeeth.setSaveCount(1000);
 
 	double tmax = 500.0; // Set run time for simulation
-	double timestep = 1.0 / (50.0 * 800.0); // Set number of time steps
+	double timeStep = 1.0 / (50.0 * 800.0); // Set number of time steps
 
 	Box2DPartTeeth.B = poly;
 
@@ -473,7 +473,7 @@ int main()
 	Box2DPartTeeth.setYMin(0.0);
 	Box2DPartTeeth.setZMin(0.0);
 	Box2DPartTeeth.setTimeMax(tmax);
-	Box2DPartTeeth.setTimeStep(timestep);
+	Box2DPartTeeth.setTimeStep(timeStep);
 	
 	Box2DPartTeeth.toothRestitution = eTeeth;
 	

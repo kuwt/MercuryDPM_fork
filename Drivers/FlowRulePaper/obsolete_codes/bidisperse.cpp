@@ -55,10 +55,10 @@ public:
 		//Set up a parameter study
 		setSaveCount(1e4);
 		setTimeMax(2000);
-		getRestartFile().setFileType(FileType::MULTIPLE_FILES_PADDED);
-		getDataFile().setFileType(FileType::NO_FILE);
-		getFStatFile().setFileType(FileType::NO_FILE);
-		getEneFile().setFileType(FileType::ONE_FILE);
+		restartFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
+		dataFile.setFileType(FileType::NO_FILE);
+		fStatFile.setFileType(FileType::NO_FILE);
+		eneFile.setFileType(FileType::ONE_FILE);
 
 		//1 is the base species
 		NumberFraction = 0.5;

@@ -54,17 +54,17 @@ public:
     /*!
      * \brief Destructor: default destructor.
      */
-    ~CubeInsertionBoundary();
+    ~CubeInsertionBoundary() override;
 
     /*!
      * \brief Creates a copy on the heap and returns a pointer.
      */
-    virtual CubeInsertionBoundary* copy() const override;
+    CubeInsertionBoundary* copy() const override;
 
     /*!
      * \brief Sets the properties of the CubeInsertionBoundary
      */
-    void set(BaseParticle* particleToCopy, int maxFailed,Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax, double radMin, double radMax);
+    void set(BaseParticle* particleToCopy, unsigned int maxFailed,Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax, double radMin, double radMax);
 
     /*!
      * \brief Sets the range of particle radii that may be generated.
@@ -80,12 +80,12 @@ public:
     /*!
      * \brief Generates a particle with random radius
      */
-    virtual BaseParticle* generateParticle(RNG &random) override;
+    BaseParticle* generateParticle(RNG &random) override;
 
     /*!
      * \brief Generates a random position, velocity for the particle p
      */
-    virtual void placeParticle(BaseParticle* p, RNG& random) override;
+    void placeParticle(BaseParticle* p, RNG& random) override;
 
     /*!
      * \brief reads boundary properties from istream
@@ -109,7 +109,7 @@ private:
     /*!
      * \brief Returns the name of the object
      */
-    virtual std::string getName() const override;
+    std::string getName() const override;
 
 protected:
 

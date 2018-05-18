@@ -36,7 +36,7 @@ public:
     {
         Mdouble timeMax = getTimeMax();
         setName("CSCInit");
-        std::cout << "Reading file " << getRestartFile().getName() << std::endl;
+        std::cout << "Reading file " << restartFile.getName() << std::endl;
         readRestartFile();
         //setRunNumber(0); //restart doesn't work with autonumbered init files
         setTimeMax(timeMax);
@@ -46,7 +46,7 @@ public:
         writeXBallsScript();
         setXBallsAdditionalArguments("-v0 -solidf -3dturn 1");
         setFileType(FileType::ONE_FILE);
-        //getRestartFile().setFileType(FileType::MULTIPLE_FILES_PADDED);
+        //restartFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
         std::cout << "loaded " << particleHandler.getNumberOfObjects() <<
             " fixed particles" << std::endl;
 
@@ -63,7 +63,7 @@ public:
         
         //set save count such that wall particles move 1/4 part. diam. per saved time step
         setSaveCount(0.25 / shearVelocity_ / getTimeStep());
-        //std::cout << "Saving every " << getDataFile().getSaveCount() * getTimeStep()
+        //std::cout << "Saving every " << dataFile.getSaveCount() * getTimeStep()
         //    << " time units" << std::endl;
     }
 

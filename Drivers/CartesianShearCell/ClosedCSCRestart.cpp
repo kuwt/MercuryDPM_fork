@@ -41,9 +41,9 @@ public:
         initialTime = get_wall_time();
         maxWallTime = 20*3600; //kill after 20 hours
          setName("ClosedCSCRun");
-        std::cout << "Reading file " << getRestartFile().getName() << std::endl;
+        std::cout << "Reading file " << restartFile.getName() << std::endl;
         readRestartFile();
-        getRestartFile().getFstream().precision(18);
+        restartFile.getFstream().precision(18);
         setAppend(true);
 
         std::cout << "loaded " << particleHandler.getNumberOfObjects() << 

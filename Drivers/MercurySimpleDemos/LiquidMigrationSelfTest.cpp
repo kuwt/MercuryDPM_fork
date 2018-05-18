@@ -90,8 +90,7 @@ class LiquidMigrationSelfTest : public Mercury2D
         wallHandler.copyAndAddObject(w0);
     }
 
-    void outputXBallsData(std::ostream& os) const
-    {
+    void outputXBallsData(std::ostream& os) const override {
         os << particleHandler.getNumberOfObjects() * 2.0 + interactionHandler.getNumberOfObjects()
            << " " << getTime()
            << " " << getXMin()
@@ -132,8 +131,7 @@ class LiquidMigrationSelfTest : public Mercury2D
         logger(DEBUG, "Have output the properties of the problem to disk ");
     }
 
-    void printTime() const
-    {
+    void printTime() const override {
         Mdouble volTotP = 0.0;
         unsigned int nLB = 0;
         for (BaseParticle* const p : particleHandler)

@@ -56,7 +56,7 @@ public:
      */
     ~GradVelocityField() = default;
 
-    static void writeNames(std::ostream& os, const unsigned countVariables);
+    static void writeNames(std::ostream& os, unsigned countVariables);
 
     /*!
      * \brief Writes class content into an output stream, typically a stat file.
@@ -96,13 +96,13 @@ public:
     /*!
      * \brief Divides the field values on the LHS by the RHS of the equation.
      */
-    GradVelocityField& operator/=(const Mdouble a);
+    GradVelocityField& operator/=(Mdouble a);
 
     /*!
      * \brief Multiplies the field values on the left of the '*' by the
      * scalar value on the right of the '*' and returns the answer.
      */
-    GradVelocityField operator*(const Mdouble a) const;
+    GradVelocityField operator*(Mdouble a) const;
 
     /*!
      * \brief This function should be called from within a loop over all

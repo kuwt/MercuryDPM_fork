@@ -177,7 +177,7 @@ int main(int /*argc*/, char **/*argv[]*/)
     problem.setPackingFraction2(0.6);
     problem.setPackingFraction3(1.0);
     
-    //Set the number of timesteps each stage of the simulation takes
+    //Set the number of time steps each stage of the simulation takes
     problem.setTimeSteps1 (1e3);
     problem.setTimeSteps12(1e4);
     problem.setTimeSteps2 (1e4);

@@ -46,10 +46,10 @@ public:
     SpeciesHandler& operator=(const SpeciesHandler& rhs);
     
     /// \brief Destructor, it destructs the SpeciesHandler and all ParticleSpecies it contains.
-    ~SpeciesHandler();
+    ~SpeciesHandler() override;
 
     /// \brief Adds a new ParticleSpecies to the SpeciesHandler.
-    void addObject(ParticleSpecies* const S) override;
+    void addObject(ParticleSpecies*S) override;
     
     void clear() override
     {
@@ -58,7 +58,7 @@ public:
     }
 
     ///\brief Remove the ParticleSpecies with given id.
-    void removeObject(unsigned const int index) override;
+    void removeObject(unsigned int index) override;
 
     /// \brief Reads Species data into the SpeciesHandler from restart file.
     void readAndAddObject(std::istream& is) override;
@@ -67,7 +67,7 @@ public:
     ParticleSpecies* readOldObject(std::istream& is);
 
     /// \brief Gets the Id of the behaviour between two given species.
-    unsigned int getMixedId(const unsigned int id1, const unsigned int id2) const;
+    unsigned int getMixedId(unsigned int id1, unsigned int id2) const;
 
     template<typename U>
     typename std::enable_if<!std::is_pointer<typename U::MixedSpeciesType>::value,typename U::MixedSpeciesType*>::type
@@ -77,7 +77,7 @@ public:
     }
 
     /// \brief Gets the mixed object that is constructed from two given species.
-    BaseSpecies* getMixedObject(const unsigned int id1, const unsigned int id2);
+    BaseSpecies* getMixedObject(unsigned int id1, unsigned int id2);
 
     /// \brief Returns a pointer to the vector of all mixed objects.
     const std::vector<BaseSpecies*>& getMixedObjects() const;

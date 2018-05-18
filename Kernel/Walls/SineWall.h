@@ -27,7 +27,7 @@ class SineWall : public BaseWall {
          * \brief Constructor in which all parameters are set.
          */
         SineWall(Mdouble length, Mdouble sw_wavn, Mdouble sw_phshift, Mdouble sw_amp);
-        ~SineWall();
+        ~SineWall() override;
         void set(Mdouble length, Mdouble sw_wavn, Mdouble sw_phshift, Mdouble sw_amp);
         SineWall* copy() const override;
         bool getDistanceAndNormal(const BaseParticle& P, Mdouble& distance, Vec3D& normal_return) const override;

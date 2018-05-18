@@ -50,10 +50,10 @@ int main(int argc, char *argv[])
  	Restart problem;
     problem.readRestartFile(argv[1]);
 	problem.setRestarted(false);
-	problem.getRestartFile().setFileType(FileType::NO_FILE);
-	problem.getEneFile().setFileType(FileType::NO_FILE);
-	problem.getDataFile().setFileType(FileType::MULTIPLE_FILES);
-	problem.getFStatFile().setFileType(FileType::MULTIPLE_FILES);
+	problem.restartFile.setFileType(FileType::NO_FILE);
+	problem.eneFile.setFileType(FileType::NO_FILE);
+	problem.dataFile.setFileType(FileType::MULTIPLE_FILES);
+	problem.fStatFile.setFileType(FileType::MULTIPLE_FILES);
 	problem.time = problem.getTime();
 	problem.setTimeMax(problem.getTime());
 	problem.write(std::cout,false);

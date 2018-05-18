@@ -22,7 +22,7 @@ public:
     /*!
      * \brief destructor
      */    
-    ~FluxBoundary();
+    ~FluxBoundary() override;
     /*!
      * \brief Copy method; creates copy on the heap and returns a pointer to it.
      */    
@@ -49,7 +49,7 @@ public:
     Mdouble getDistance(const Vec3D &position) const;
 
     /*!
-     * \brief Runs at the end of each timestep.
+     * \brief Runs at the end of each time step.
      */
     void checkBoundaryAfterParticlesMove(ParticleHandler& pH) override;
     
@@ -91,7 +91,7 @@ public:
     /*!
      * \brief Returns the name of the object
      */
-    virtual std::string getName() const override;
+    std::string getName() const override;
     
 private:
     /*!

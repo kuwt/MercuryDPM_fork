@@ -59,12 +59,12 @@ public:
     /*!
      * \brief Assignment operator. 
      */
-    DomainHandler operator=(const DomainHandler& rhs);
+    DomainHandler& operator=(const DomainHandler& rhs);
     
     /*!
      * \brief Destructor, it destructs the DomainHandler and all Domain it contains.
      */
-    ~DomainHandler();
+    ~DomainHandler() final;
 
     /*!
      * \brief Creates a Cartesian square mesh in 3D
@@ -79,12 +79,12 @@ public:
     /*!
      * \brief Adds a Domain to the DomainHandler. 
      */
-    void addObject(Domain* D) override;
+    void addObject(Domain* D) final;
    
     /*!
      * \brief \todo Still has to be implemented 
      */
-    void readAndAddObject(std::istream& is) override;
+    void readAndAddObject(std::istream& is) final;
 
     /*!
      * \brief \todo Still has to be implemented 
@@ -94,7 +94,7 @@ public:
     /*!
      * \brief \todo Still has to be implemented 
      */
-    std::string getName() const override;
+    std::string getName() const final;
     
     /*!
      * \brief This sets a domain to the processor
@@ -132,10 +132,13 @@ public:
     Mdouble getInteractionDistance();
 
     /// \todo MX: function under construction
+    ///\todo TW@Marnix should this be unsigned int?
     int getParticleDomainGlobalIndex(BaseParticle* particle);
 
+    ///\todo TW@Marnix should this be unsigned int?
     int getParticleProcessor(int globalIndex);
 
+    ///\todo TW@Marnix should this be unsigned int?
     Domain* getParticleDomain(int globalIndex);
 
     void updateStatus(std::set<BaseParticle*>& particlesToBeDeleted);

@@ -57,8 +57,8 @@ public:
     ReversibleAdhesiveInteraction(const ReversibleAdhesiveInteraction &p);
     /*!
      * \brief Destructor.
-     */        
-    virtual ~ReversibleAdhesiveInteraction();
+     */
+    ~ReversibleAdhesiveInteraction() override;
     /*!
      * \brief Computes the adhesive forces
      */    

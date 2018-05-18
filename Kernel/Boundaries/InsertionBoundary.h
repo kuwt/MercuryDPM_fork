@@ -51,8 +51,8 @@ public:
     
   /*!
    * \brief Destructor: delete the particle that has to be copied at every insertion.
-   */    
-    virtual ~InsertionBoundary();
+   */
+  ~InsertionBoundary() override;
     
   /*!
    * \brief Sets the particle that will be inserted and the maximum number of times for which insertion may fail.
@@ -79,7 +79,7 @@ public:
   /*!
    * \brief Fills the boundary with particles.
    */
-    virtual void checkBoundaryBeforeTimeStep(DPMBase* md) override;
+  void checkBoundaryBeforeTimeStep(DPMBase* md) override;
 
   /*!
    * \brief Gets the number of particles inserted by the boundary.

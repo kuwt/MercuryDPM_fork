@@ -58,7 +58,7 @@ public:
     /*!
      * \brief Destructor.
      */
-    virtual ~IrreversibleAdhesiveInteraction();
+    ~IrreversibleAdhesiveInteraction() override;
     
     /*!
      * \brief Computes the Adhesive force.

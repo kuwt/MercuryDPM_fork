@@ -137,7 +137,7 @@ public:
         os << "time\tene\tdisp\tforce\n";
     }
 
-    void writeEneTimestep(std::ostream& os) const override
+    void writeEneTimeStep(std::ostream& os) const override
     {
         os  << getTime() << '\t'
             << getKineticEnergy() / getElasticEnergy() << '\t'

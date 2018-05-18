@@ -51,8 +51,7 @@ public:
         solve();
 	}
     
-    void actionsAfterTimeStep()
-    {
+    void actionsAfterTimeStep() override {
         Vec3D velocity = getPrescribedVelocity();
         for (BaseParticle* p : particleHandler)
             if (p->isFixed())
@@ -82,7 +81,7 @@ public:
         amplitude_ = amplitude;
     }
 
-    void printTime() const {
+    void printTime() const override {
         std::cout << "t=" << std::setprecision(3) << std::left << std::setw(6) << getTime()
             << ", tmax="  << std::setprecision(3) << std::left << std::setw(6) << getTimeMax()
             << ", N="     << std::setprecision(3) << std::left << std::setw(6) << particleHandler.getNumberOfObjects()

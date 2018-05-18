@@ -70,7 +70,7 @@ public:
 
 //    void actionsBeforeTimeStep()
 //    {
-//        std::cout << std::endl << "actionsBeforeTimeStep time " << getNtimeSteps() << std::endl;
+//        std::cout << std::endl << "actionsBeforeTimeStep time " << getNumberOfTimeSteps() << std::endl;
 //        particleHandler.write(std::cout);
 //        interactionHandler.write(std::cout);
 //    }
@@ -79,14 +79,13 @@ public:
 //    void computeAllForces()
 //    {
 //        DPMBase::computeAllForces();
-//        std::cout << std::endl << "computeAllForces time " << getNtimeSteps() << std::endl;
+//        std::cout << std::endl << "computeAllForces time " << getNumberOfTimeSteps() << std::endl;
 //        particleHandler.write(std::cout);
 //        interactionHandler.write(std::cout);
 //    }
 
     //sets initial particle positions
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         //centrifugal acc. a=v^2/R;
         Mdouble R = 4.0;
         BaseParticle p;

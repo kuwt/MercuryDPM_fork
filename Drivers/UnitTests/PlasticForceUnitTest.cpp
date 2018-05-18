@@ -40,8 +40,7 @@ public:
         species = speciesHandler.copyAndAddObject(LinearPlasticViscoelasticSpecies());
     }
 
-	void setupInitialConditions()
-	{
+	void setupInitialConditions() override {
 		setXMax(3.0);
 		setYMax(2.0);
 		setZMax(2.0);

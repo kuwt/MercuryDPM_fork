@@ -60,12 +60,12 @@ public:
   /*!
    * \brief Destructor, it destructs the WallHandler and all BaseWall it contains.
    */
-    ~WallHandler();
+    ~WallHandler() final;
 
   /*!
    * \brief Adds a BaseWall to the WallHandler.
    */
-    void addObject(BaseWall* W) override;
+    void addObject(BaseWall* W) final;
 
     /*!
      * \brief Create a new wall, with the type given as a string (required for restarting).
@@ -80,12 +80,12 @@ public:
     /*!
      * \brief Create a new wall in the WallHandler, based on the information provided in a restart file.
      */
-    void readAndAddObject(std::istream& is) override;
+    void readAndAddObject(std::istream& is) final;
 
     /*!
      * \brief Returns the name of the handler, namely the string "WallHandler".
      */
-    std::string getName() const override;
+    std::string getName() const final;
 
     /**
      * \brief Reads triangulated wall from vtk file, and converts it into a set of TriangleWalls

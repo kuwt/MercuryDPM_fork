@@ -182,7 +182,7 @@ public:
     /*!
      * \brief Sets up the initial conditions for the problem
      */
-    virtual void setupInitialConditions() override;
+    void setupInitialConditions() override;
 
     /*!
      * \brief Sets the hopper's geometrical properties
@@ -202,7 +202,7 @@ public:
     /*!
      * \brief Reads setup properties from an istream
      */
-    virtual void read(std::istream& is) override;
+    void read(std::istream& is) override;
 
     /*!
      * \brief Writes setup properties to an ostream

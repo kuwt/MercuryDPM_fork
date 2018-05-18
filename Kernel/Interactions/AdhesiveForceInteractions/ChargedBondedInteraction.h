@@ -55,8 +55,8 @@ public:
     ChargedBondedInteraction();
     /*!
      * \brief Destructor.
-     */        
-    virtual ~ChargedBondedInteraction();
+     */
+    ~ChargedBondedInteraction() override;
     /*!
      * \brief Computes the adhesive forces
      */    

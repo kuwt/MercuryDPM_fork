@@ -32,8 +32,7 @@
 /// In this file, the rolling behaviour of the tangential spring is tested. This is done by placing one normal partilce on top of a fixed partilce and letting graviry roll it over the other particle until it losses contact.
 class TangentialSpringUnitTest : public DPMBase {
 public:
-    void setupInitialConditions()
-	{
+    void setupInitialConditions() override {
 		setXMax(1);
 		setYMax(1);
 		setZMax(1);

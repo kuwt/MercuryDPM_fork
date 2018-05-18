@@ -149,7 +149,7 @@ public:
         species->setRollingFrictionCoefficient(mu_r);
         species->setRollingDissipation(species->getDissipation()*2./7.);
 
-	//for safety, setting collision time, and hence timestep, according to smallest particles present
+	//for safety, setting collision time, and hence time step, according to smallest particles present
         setTimeStep(0.02 * species->getCollisionTime(species->getMassFromRadius(radMin)));
         logger(INFO, "time step used %", getTimeStep());
 
@@ -312,7 +312,7 @@ int main(int argc, char* argv[])
     MoonBase MB(width,depth,height,inletWidth,inletDepth,inletX,inletY,r,sizeDistribution,N,g,
 		mu_s,mu_r,tMax,inletVolumeRatio,rho,k,e);
     MB.setName("Test1");
-    MB.setSaveCount(50); //records every Nth calculated timestep
+    MB.setSaveCount(50); //records every Nth calculated time step
     MB.solve(argc, argv);
     return 0;
 }

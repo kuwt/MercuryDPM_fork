@@ -108,7 +108,7 @@ public:
     /*!
      * \brief This functions set the parameters for the LCG random number generator. It goes multiplier, addition, mod.
      */
-    void setLinearCongruentialGeneratorParmeters(unsigned const int a, unsigned const int c, unsigned const int m);
+    void setLinearCongruentialGeneratorParmeters(unsigned int a, unsigned int c, unsigned int m);
     
     /*!
      * \brief sets the random variables such that they differ for each run
@@ -118,7 +118,7 @@ public:
     /*!
      * \brief This function sets the parameters for the LFG random number generator
      */
-    void setLaggedFibonacciGeneratorParameters(const unsigned int p, const unsigned int q);
+    void setLaggedFibonacciGeneratorParameters(unsigned int p, unsigned int q);
 
     /*!
      * \brief Allows the user to set which random number generator is used

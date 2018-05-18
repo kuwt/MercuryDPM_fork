@@ -751,11 +751,11 @@ bool ChuteWithHopper::readNextArgument(int& i, int argc, char *argv[])
     }
     else if (!strcmp(argv[i], "-isHopperCentred"))
     {
-        isHopperCentred_ = (atoi(argv[i + 1]));
+        isHopperCentred_ = static_cast<bool>(atoi(argv[i + 1]));
     }
     else if (!strcmp(argv[i], "-alignBase"))
     {
-        isHopperAlignedWithBottom_ = (atoi(argv[i + 1]));
+        isHopperAlignedWithBottom_ = static_cast<bool>(atoi(argv[i + 1]));
     }
     else if (!strcmp(argv[i], "-shift"))
     {

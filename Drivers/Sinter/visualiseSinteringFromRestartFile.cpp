@@ -84,8 +84,9 @@ int main(int argc, char *argv[])
         const Vec3D t = Vec3D(n.Z,0,-n.X);
         const Mdouble& po = 0.5*c->getPlasticOverlap()*1e6;
         const Mdouble& o = 0.5*c->getOverlap()*1e6;
-        logger.assert_always(dynamic_cast<BaseParticle*>(c->getP()),"not particle");
-        const Mdouble& r = dynamic_cast<BaseParticle*>(c->getP())->getRadius()*1e6;
+        const BaseParticle* p = dynamic_cast<BaseParticle*>(c->getP());
+        logger.assert_always(p!= nullptr,"not particle");
+        const Mdouble& r = p->getRadius()*1e6;
         const Mdouble x = sqrt(2.0*po*r);
         const Vec3D a0 = cp+x*t+(o-po)*n, a1 = cp+x*t+0.5*r*n, a2 = cp-x*t+0.5*r*n, a3 = cp-x*t+(o-po)*n;
         os << "\\draw[pf] ("+ std::to_string(a0.X) +","+ std::to_string(a0.Z)

@@ -59,8 +59,7 @@ LiquidFilmParticle::LiquidFilmParticle(const LiquidFilmParticle &p)
  *          smallest or largest particle and adjust itself accordingly.
  */
 LiquidFilmParticle::~LiquidFilmParticle()
-{
-}
+= default;
 
 /*!
  * \details Copy method. Uses copy constructor to create a copy on the heap. 

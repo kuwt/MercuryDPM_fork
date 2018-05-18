@@ -52,8 +52,7 @@ public:
         speciesHandler.copyAndAddObject(species);
     }
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         setName("InsertionBoundarySelfTestMPI");
         setSystemDimensions(3);
         setGravity(Vec3D(0.0,0.0,0.0));

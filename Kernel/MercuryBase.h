@@ -133,7 +133,7 @@ public:
     /*!
      * \brief This is the default destructor.
      */
-    ~MercuryBase();
+    ~MercuryBase() override;
 
     /*!
      * \brief Copy-constructor.
@@ -387,7 +387,7 @@ private:
     
     /*!
      * \brief Boolean which indicates whether or not the cell in which a 
-     *        particle is must be updated every timestep.
+     *        particle is must be updated every time step.
      */
     bool updateEachTimeStep_;
     

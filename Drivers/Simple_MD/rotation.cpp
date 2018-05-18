@@ -73,7 +73,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 	problem.speciesHandler.getObject(0)->setStiffness(1e2);
 	problem.setTimeStep(0.02*helpers::getCollisionTimeFromKAndDispAndEffectiveMass(problem.getSpecies(0)->getStiffness(), problem.getSpecies(0)->getDissipation(), 0.5*problem.getSpecies(0)->getMassFromRadius(0.0004)));
 	problem.setGravity(Vec3D(0.01,-1.0,0.0));
-	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(100,problem.getTimeMax(),problem.getTimeStep()));
+	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(100,problem.getTimeMax(),problem.getTimeStep()));
 	problem.solve();
 	std::cout << problem;
 	// std::cout << problem;

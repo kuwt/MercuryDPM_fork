@@ -61,8 +61,7 @@ ThermalParticle::ThermalParticle(const ThermalParticle &p)
  *          smallest or largest particle and adjust itself accordingly.
  */
 ThermalParticle::~ThermalParticle()
-{
-}
+= default;
 
 /*!
  * \details Copy method. Uses copy constructor to create a copy on the heap. 
@@ -131,14 +130,10 @@ void ThermalParticle::actionsAfterTimeStep()
 {
     if (timeDependentTemperature_) {
         temperature_ = timeDependentTemperature_(getHandler()->getDPMBase()->getTime());
-        //logger(INFO,"T %",temperature_);
     }
     if (getSpecies()->getTemperatureDependentDensity()) {
         const Mdouble density = getSpecies()->getTemperatureDependentDensity()(temperature_);
-        const Mdouble m = getMass();
         radius_ = getRadius()*cbrt(getMass()/(getVolume()*density));
-        //setRadius(1.001*getRadius());
-        //logger(INFO,"F % R % t % % %",cbrt(getMass()/(getVolume()*density)),radius_,getHandler()->getDPMBase()->getNtimeSteps());
     }
 }
 

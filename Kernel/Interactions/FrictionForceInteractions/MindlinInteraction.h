@@ -58,7 +58,7 @@ public:
     /*!
      * \brief Destructor.
      */
-    virtual ~MindlinInteraction();
+    ~MindlinInteraction() override;
     /*!
      * \brief Computes the tangential force generated due to compression in the sliding spring.
      *        Does take into account if the interaction is between particle-particle or particle-wall.
@@ -148,19 +148,19 @@ public:
     //A way to easily update K_t for all possible cases,
     //i.e. initial loading (under constant normal force)...
     void updateTangentialStiffnessInitial(Mdouble fric);
-    void updateTangentialStiffnessInitial2(const Mdouble fric, const Vec3D direction);
+    void updateTangentialStiffnessInitial2(Mdouble fric, Vec3D direction);
     //...unloading (under constant normal force)...
-    void updateTangentialStiffnessUnloading(const Mdouble fric, const Vec3D direction);
+    void updateTangentialStiffnessUnloading(Mdouble fric, Vec3D direction);
     //...reloading (under constant normal force)...
-    void updateTangentialStiffnessReloading(const Mdouble fric, const Vec3D direction);
+    void updateTangentialStiffnessReloading(Mdouble fric, Vec3D direction);
     //...reloading (i.e. tangential force increasing) and normal force varying (moving from state 1 to 2)...
-    void updateTangentialStiffnessReloadingTanUp(const Mdouble fric, const Vec3D direction);
+    void updateTangentialStiffnessReloadingTanUp(Mdouble fric, Vec3D direction);
     //...and with increasing normal force and decreasing tangential...
-    void updateTangentialStiffnessUnloadingTanDown(const Mdouble fric, const Vec3D direction) ;
+    void updateTangentialStiffnessUnloadingTanDown(Mdouble fric, Vec3D direction) ;
 
 
     //k_new
-    void updateK_t(const Mdouble fric, const Vec3D direction,const bool useTurningPoint, const bool isLoading);
+    void updateK_t(Mdouble fric, Vec3D direction, bool useTurningPoint, bool isLoading);
 
 protected:
     /*!
@@ -169,7 +169,7 @@ protected:
      */    
     Vec3D slidingSpring_;
     //k_edit
-    //Introducing a parameter to store the value of "slidingSpring_" (i.e. delta_t) for a previous timestep
+    //Introducing a parameter to store the value of "slidingSpring_" (i.e. delta_t) for a previous time step
     Vec3D slidingSpringPrevious_;
     /*!
      * \brief Stores the rate at which the sliding spring compressed or relaxed. Set in the member function
@@ -181,7 +181,7 @@ protected:
      */
     Vec3D tangentialForce_;
     //k_edit
-    //adding a parameter to store the tangential force from a previous timestep
+    //adding a parameter to store the tangential force from a previous time step
     Vec3D tangentialForcePrevious_;
     //a parameter to give the (scalar) DIRECTION of the force, i.e. "with" or "against" the tangential motion!
     Mdouble tangentialForceDirection_;
@@ -205,7 +205,7 @@ protected:
     // the constant K_t0 used to calculate the tangential stiffness (K_t) for the
     //Mindlin model (see, for example, Di Renzo and Di Maio, 2004)
     Mdouble tangentialStiffnessZero_;
-    //...and a variable to save its value from the previous timestep
+    //...and a variable to save its value from the previous time step
     Mdouble tangentialStiffnessZeroPrevious_;
     // the constant K_t as used in Di Maio and Di Renzo
     Mdouble tangentialStiffness_;

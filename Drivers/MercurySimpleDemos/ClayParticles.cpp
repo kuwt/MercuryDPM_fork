@@ -75,7 +75,7 @@ public:
         Vec3D vInitial(2.,0.0,-2.0);
 
         //creating a counter variable to keep track of the objects being created
-        int ob = 0;
+        unsigned int ob = 0;
 
         //a simple example loop to build rod-like particles with positively
         //charged 'ends' and negatively charged 'bodies'
@@ -332,7 +332,7 @@ int main(int argc, char *argv[])
     //*************************************ASSIGNING GENERAL SIMULATION PARAMETERS******************************************
     //Giving a name for the output file
     chargedParticleForceUnitTestProblem.setName("ClayParticles");
-    //setting the timestep of the problem
+    //setting the time step of the problem
     double radius = 0.25;
     double mass = species1->getMassFromRadius(radius);
     double tc = species1->getCollisionTime(mass);

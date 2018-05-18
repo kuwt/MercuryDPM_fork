@@ -91,8 +91,7 @@ public:
         setSaveCount(10);
     }
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         //define the domain
         setXMax(1.1);
         setYMax(1);
@@ -121,10 +120,10 @@ int main(int argc, char *argv[])
 {
     //declare the DPM problem and set the name
     CGBasicSelfTest problem;
-    problem.setTimeMax(0.21); //a total of 5000 timesteps
+    problem.setTimeMax(0.21); //a total of 5000 time steps
 
     //int n1 = 1000, n2 = 100, n3=20;
-    int n1 = 1000, n2 = 33, n3=10;
+    size_t n1 = 1000, n2 = 33, n3=10;
     //define different coarse-graining objects (which should all result in the same mean values)
     auto cg0 = problem.cgHandler.copyAndAddObject(CG<CGCoordinates::O>());
     cg0->setTimeMin(0.21);

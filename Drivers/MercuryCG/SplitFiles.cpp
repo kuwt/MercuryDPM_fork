@@ -104,7 +104,7 @@ public:
 			output_file.close();
 			data_file >> N;
 
-			//step over some timesteps
+			//step over some time steps
 			for(unsigned int j=1; j<stepsize; j++) {
 				for (unsigned int i=0; i<N+1; i++) getline(data_file,line);
 				data_file >> N;
@@ -145,7 +145,7 @@ public:
 			}
 			output_file.close();
 
-			//step over some timesteps
+			//step over some time steps
 			for(unsigned int j=1; j<stepsize; j++) {
 				getline(fstat_file,line); 
 				getline(fstat_file,line); 
@@ -179,11 +179,11 @@ int main(int argc, char *argv[])
 	std::cout << "Name: " << name << std::endl;
 	
 	unsigned int stepsize = 1;
-	if (argc>2) stepsize = atoi(argv[2]);
+	if (argc>2) stepsize = static_cast<unsigned int>(atoi(argv[2]));
 	
 	//defines the initial counter
 	unsigned int counter = 0;
-	if (argc>3) counter = atoi(argv[3]);
+	if (argc>3) counter = static_cast<unsigned int>(atoi(argv[3]));
 
 	CFile files(name);
 	files.copy(stepsize,counter);

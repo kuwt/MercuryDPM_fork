@@ -32,8 +32,7 @@
 class incl_plane : public DPMBase {
 public:
 	
-	void setupInitialConditions()
-	{
+	void setupInitialConditions() override {
 		InfiniteWall w0;
         w0.setSpecies(speciesHandler.getObject(0));
 		w0.set(Vec3D(0,-1,0),Vec3D(0, getYMin(), 0));

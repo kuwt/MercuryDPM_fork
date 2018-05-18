@@ -694,7 +694,7 @@ int main(int argc, char *argv[])
     problem.setTimeStep(0.00001);
     problem.setTimeMax(20.0);
     
-    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(1000, problem.getTimeMax(), problem.getTimeStep()));
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(1000, problem.getTimeMax(), problem.getTimeStep()));
     
     problem.setParticleRadiusAndDispersity(0.009,0.1);
     problem.setParticleDensity(2000.);

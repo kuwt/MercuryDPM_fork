@@ -108,7 +108,7 @@ Matrix3D Matrix3D::operator +(const Matrix3D& A) const
 
 /*!
  * \details Substraction of given matrix from this one
- * \param[in] A     Matrix to be substracted
+ * \param[in] A     Matrix to be subtracted
  * \return resulting matrix
  * 
  */
@@ -133,7 +133,7 @@ Matrix3D Matrix3D::operator +(const Mdouble a)const
 
 /*!
  * \details Substraction of scalar
- * \param[in] a     Scalar to be substracted
+ * \param[in] a     Scalar to be subtracted
  * \return resulting matrix
  */
 Matrix3D Matrix3D::operator -(const Mdouble a)const
@@ -240,7 +240,7 @@ Matrix3D& Matrix3D::operator +=(const Matrix3D& A)
 
 /*!
  * \details Substract all elements of a given matrix from its own
- * \param[in] A     3D matrix to be substracted
+ * \param[in] A     3D matrix to be subtracted
  * \return (reference to) resulting (this) matrix
  */
 Matrix3D& Matrix3D::operator -=(const Matrix3D& A)

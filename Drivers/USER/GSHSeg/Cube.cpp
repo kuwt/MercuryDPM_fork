@@ -339,7 +339,7 @@ void setRightAmplitude(double amp)
   ////////////////////////////////////////////////////////////////////////////
 
   //a function to 'get' tc such that we can have an adaptive
-  //timestep
+  //time step
   double getContactTime() 
   {
     return tc;
@@ -514,7 +514,7 @@ int main()
   problem.setGravity(Vec3D(0.0,0.0,0.0));
   //***ASK ANT FOR CLARIFICATION***
   problem.setSaveCount(100);
-  //setting the duration of a timestep
+  //setting the duration of a time step
   problem.setTimeStep( ( problem.getContactTime() / 50.0 ) );
     
     

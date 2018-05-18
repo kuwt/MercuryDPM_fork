@@ -164,8 +164,8 @@ class MercuryDataFile;
 template<std::size_t NDIMS>
 class MercuryTimeStepIterator;
 /*!
- *  Full timestep in the Mercury 3D .data format.
- *  This holds all the particles used in this timestep.
+ *  Full time step in the Mercury 3D .data format.
+ *  This holds all the particles used in this time step.
  * \author dducks
  */
 template<std::size_t NDIMS>
@@ -173,7 +173,7 @@ class MercuryTimeStep
 {
   public:
     /*!
-    * \brief Gets the time associated with this timestep
+    * \brief Gets the time associated with this time step
     * \return the time
     */
     double getTime() const
@@ -182,10 +182,10 @@ class MercuryTimeStep
     }
     
     /*!
-    * \brief Gets the timestep ID
-    * Returns the timestep ID, which is a consecutively ascending
-    * number unique for the timestep.
-    * \return a unique ID for this timestep
+    * \brief Gets the time step ID
+    * Returns the time step ID, which is a consecutively ascending
+    * number unique for the time step.
+    * \return a unique ID for this time step
     */
     std::size_t getTimeStepID() const
     {
@@ -193,7 +193,7 @@ class MercuryTimeStep
     }
     
     /*!
-    * \brief Gets the number of particles recorded in this timestep
+    * \brief Gets the number of particles recorded in this time step
     * \return the number of particles
     * \sa size()
     */
@@ -203,7 +203,7 @@ class MercuryTimeStep
     }
     
     /*!
-    * \brief Gets the number of particles recorded in this timestep
+    * \brief Gets the number of particles recorded in this time step
     * \return the number of particles
     * \sa getNumberOfParticles()
     */
@@ -271,7 +271,7 @@ class MercuryTimeStep
     
   private:
     /*!
-    * \brief Constructor used by the MercuryTimeStepIterator, to flag a functional timestep
+    * \brief Constructor used by the MercuryTimeStepIterator, to flag a functional time step
     * \param[in] id The unique ID given to this particle
     * \param[in,out] pData A pointer to the MercuryDataFile, which contains the backing std::ifstream
     */
@@ -281,7 +281,7 @@ class MercuryTimeStep
     }
     
     /*!
-    * \brief EOF-Timestep constructor used by MercuryTimeStepIterator (and MercuryDataFile::isMercury3DDataFile())
+    * \brief EOF-TimeStep constructor used by MercuryTimeStepIterator (and MercuryDataFile::isMercury3DDataFile())
     */
     MercuryTimeStep()
     : time_(0), ID_(0), numParticles_(0), dataFile_(nullptr)
@@ -312,7 +312,7 @@ class MercuryTimeStep
     MercuryDataFile *dataFile_;
     
     /*!
-    * Backing storage vector used for the particles in this timestep
+    * Backing storage vector used for the particles in this time step
     */
     std::vector< MercuryParticle<NDIMS> > storage_;
     
@@ -325,7 +325,7 @@ class MercuryTimeStep
 };
 
 /*!
-* Reads the timestep header into the ts
+* Reads the time step header into the ts
 * \param[in,out] in The istream where we read from
 * \param[out] step The timestream read into
 * \return in for chaining.
@@ -346,8 +346,8 @@ std::istream& operator>>(std::istream& in, MercuryTimeStep<NDIMS>& step)
 }
 
 /*!
- * Lazy timestep iterator
- * Only loads the current timestep and discards this as soon as
+ * Lazy time step iterator
+ * Only loads the current time step and discards this as soon as
  * it is incremented.
  * This is a ForwardIterator as described by the C++11 standard
  * This iterator invalidates any references to its dereferenced value
@@ -384,7 +384,7 @@ class MercuryTimeStepIterator
     
     /*!
      * \brief Pre-increment operator, as defined for ForwardIterators
-     * This method populates the timestep, including all the particles
+     * This method populates the time step, including all the particles
      * in there. It also resizes the backing storage mechanism.
      */
     void operator++();
@@ -410,7 +410,7 @@ class MercuryTimeStepIterator
     }
   
     /*!
-     * The complete last read timestep, used for caching
+     * The complete last read time step, used for caching
      */
     MercuryTimeStep<NDIMS> lastReadTimeStep_;
     /*!
@@ -529,8 +529,8 @@ class MercuryDataFile
     };
     
     /*!
-     * \brief Returns a forwarditerator to the timesteps
-     * Returns a forwarditerator to the timesteps,
+     * \brief Returns a forwarditerator to the time steps
+     * Returns a forwarditerator to the time steps,
      * invalidating any other valid iterators in the process
      * (since this is a lazy loader and does not actually
      * load the entire file in memory). End iterators do not
@@ -545,7 +545,7 @@ class MercuryDataFile
     }
     
     /*!
-     * \brief Returns a forwarditerator one past the last timestep.
+     * \brief Returns a forwarditerator one past the last time step.
      */
     template<std::size_t NDIMS>
     MercuryTimeStepIterator<NDIMS> end() const
@@ -579,7 +579,7 @@ void MercuryTimeStepIterator<NDIMS>::operator++()
   //I hope we didn't went beyond end of file...
   if (lineStream.eof())
   {
-//   logger(WARN, "The timestep header detected an EOF.. Usually this"
+//   logger(WARN, "The time step header detected an EOF.. Usually this"
 //                " means that the format was not what it appeared to be."
 //                "\nproceed with caution!");
   }

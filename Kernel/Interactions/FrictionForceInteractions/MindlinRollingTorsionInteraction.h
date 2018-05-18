@@ -60,7 +60,7 @@ public:
     /*!
      * \brief Destructor.
      */
-    virtual ~MindlinRollingTorsionInteraction();
+    ~MindlinRollingTorsionInteraction() override;
     /*!
      * \brief Computes the forces arising due to all three types of friction, i.e.,
      *        sliding, rolling and torsional.

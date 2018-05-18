@@ -61,21 +61,21 @@ public:
   /*!
    * \brief copy method, returns a pointer to a copy.
    */
-    virtual HopperInsertionBoundary* copy() const override;
+  HopperInsertionBoundary* copy() const override;
 
     /*!
      * \brief Sets all boundary properties at once.
      */
-    void set(BaseParticle* particleToCopy, int maxFailed, double yMin, double yMax, double radMin, double radMax,
+    void set(BaseParticle* particleToCopy, unsigned int maxFailed, double yMin, double yMax, double radMin, double radMax,
             double chuteAngle, double fixedParticleRadius, bool isHopperCentred_, int hopperDim, double hopperAngle, double hopperLength, double hopperExitLength,
             double hopperHeight, double lift, double fillPercent);
 
   /*!
    * \brief This creates an inflow particle in the top 50% of the hopper i.e. between gamma=0.5 and gamma=1.0
    */
-    virtual BaseParticle* generateParticle(RNG &random) override;
+  BaseParticle* generateParticle(RNG &random) override;
 
-    virtual void placeParticle(BaseParticle* p, RNG &random) override;
+    void placeParticle(BaseParticle* p, RNG &random) override;
 
     /*!
      * \brief reads boundary properties from istream
@@ -96,7 +96,7 @@ public:
     /*!
      * \brief Returns the name of the object
      */
-    virtual std::string getName() const override;
+    std::string getName() const override;
 
     
     /*!

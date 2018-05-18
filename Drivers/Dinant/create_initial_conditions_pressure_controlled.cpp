@@ -83,11 +83,11 @@ template <StatType T> class create_initial_conditions : public StatisticsVector<
             InfiniteWall w0;
             w0.set(Vec3D( 0.0, 1.0, 0.0), getYMax());
             wallHandler.copyAndAddObject(w0);
-            w0.set(Vec3D( 0.0,-1.0, 0.0),-getYMin());
+            w0.set(Vec3D( 0.0,-1.0, 0.0),getMin());
             wallHandler.copyAndAddObject(w0);
             w0.set(Vec3D( 1.0, 0.0, 0.0), getXMax());
             wallHandler.copyAndAddObject(w0);
-            w0.set(Vec3D(-1.0, 0.0, 0.0),-getXMin());
+            w0.set(Vec3D(-1.0, 0.0, 0.0),getMin());
             wallHandler.copyAndAddObject(w0);
         }
 	}
@@ -135,14 +135,14 @@ int main(int /*argc*/, char **/*argv[]*/)
 	//problem.setSlidingFrictionCoefficient(0.5);
 	//problem.setSlidingStiffness(problem.getStiffness()*2/7);
 	//problem.setSlidingDissipation(problem.getDissipation());
-	problem.getDataFile().setFileType(FileType::ONE_FILE);
-	problem.getFStatFile().setFileType(FileType::ONE_FILE);
+	problem.dataFile.setFileType(FileType::ONE_FILE);
+	problem.fStatFile.setFileType(FileType::ONE_FILE);
 	problem.setGravity(Vec3D(0,0,0));
 
     problem.setTimeStep(0.02*helpers::computeCollisionTimeFromKAndDispAndEffectiveMass(problem.species->getStiffness(), problem.species->getDissipation(), 0.5*mass));
     problem.setTimeMax(11);
     //problem.setTimeMax(1e5*problem.getTimeStep());
-    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(1000, problem.getTimeMax(), problem.getTimeStep()));
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(1000, problem.getTimeMax(), problem.getTimeStep()));
     //problem.set_number_of_saves(1000);
 	problem.getStatFile().setSaveCount(1);
 	problem.setName("create_initial_conditions_pressure_controlled");		

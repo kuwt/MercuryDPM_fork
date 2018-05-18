@@ -50,7 +50,10 @@ public:
     /*!
      * \brief Alternative constructor, which let you define all elements
      */    
-    Matrix3D(const Mdouble xx, const Mdouble xy, const Mdouble xz, const Mdouble yx, const Mdouble yy, const Mdouble yz, const Mdouble zx, const Mdouble zy, const Mdouble zz);
+    Matrix3D(Mdouble xx, Mdouble xy, Mdouble xz, Mdouble yx, Mdouble yy, Mdouble yz,
+             Mdouble zx,
+             Mdouble zy,
+             Mdouble zz);
     
     /*!
      * \brief Alternative constructor, which takes a matrix of the same size
@@ -85,17 +88,17 @@ public:
     /*!
      * \brief Scalar addition
      */
-    Matrix3D operator+(const Mdouble a) const;
+    Matrix3D operator+(Mdouble a) const;
     
     /*!
      * \brief Scalar subtraction
      */
-    Matrix3D operator-(const Mdouble a) const;
+    Matrix3D operator-(Mdouble a) const;
     
     /*!
      * \brief Scalar multiplication
      */
-    Matrix3D operator*(const Mdouble a) const;
+    Matrix3D operator*(Mdouble a) const;
     
     /*!
      * \brief Vector multiplication
@@ -110,7 +113,7 @@ public:
     /*!
      * \brief Scalar division
      */
-    Matrix3D operator/(const Mdouble a) const;
+    Matrix3D operator/(Mdouble a) const;
     
     /*!
      * \brief Add elements to ostream
@@ -135,7 +138,7 @@ public:
     /*!
      * \brief Scalar division
      */
-    Matrix3D& operator/=(const Mdouble a);
+    Matrix3D& operator/=(Mdouble a);
     
     /*!
      * \brief Calculates the pointwise square 

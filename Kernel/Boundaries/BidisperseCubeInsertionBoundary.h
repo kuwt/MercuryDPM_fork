@@ -28,12 +28,12 @@ public:
     /*!
      * \brief Destructor: default destructor.
      */
-    ~BidisperseCubeInsertionBoundary();
+    ~BidisperseCubeInsertionBoundary() override;
     
     /*!
      * \brief Creates a copy on the heap and returns a pointer.
      */
-    virtual BidisperseCubeInsertionBoundary* copy() const override;
+    BidisperseCubeInsertionBoundary* copy() const override;
     
     /*!
      * \brief Sets the properties of this bidisperse cuboidal insertion boundary
@@ -49,7 +49,7 @@ public:
     /*!
      * \brief Generates a particle with random position, radius and velocity 
      */
-    virtual BaseParticle* generateParticle(RNG &random) override;
+    BaseParticle* generateParticle(RNG &random) override;
     
     /*!
      * \brief reads boundary properties from istream
@@ -64,7 +64,7 @@ public:
     /*!
      * \brief Returns the name of the object
      */
-    virtual std::string getName() const override;
+    std::string getName() const override;
     
 private:
     BaseParticle* particleToCopyA_;

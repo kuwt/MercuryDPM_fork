@@ -36,8 +36,7 @@
 class FreeCoolingDemoProblem : public Mercury2D{
 public:
     
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         auto species = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
         species->setDensity(2000);
         species->setDissipation(0.005);
@@ -48,8 +47,8 @@ public:
         p0.setSpecies(speciesHandler.getObject(0));
         for (int i=0;i<N;i++)
         {
-            int ix=static_cast<int>(i%N1);
-            int iy=static_cast<int>(i/N1);
+            int ix= i % N1;
+            int iy= i / N1;
             
             double x=(getXMax()-getXMin())*(ix+1)/(N1+1);
             double y=(getYMax()-getYMin())*(iy+1)/(N1+1);

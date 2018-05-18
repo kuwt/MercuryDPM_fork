@@ -56,19 +56,19 @@ public:
     /*!
      * \brief Destructor, it destructs the BoundaryHandler and all BaseBoundary it contains.
      */
-    ~BoundaryHandler();
+    ~BoundaryHandler() final;
 
     /*!
      * \brief Adds a BaseBoundary to the BoundaryHandler. 
      */
-    void addObject(BaseBoundary* P) override;
+    void addObject(BaseBoundary* P) final;
 
     static BaseBoundary* createObject(const std::string& type);
 
     /*!
      * \brief Reads BaseBoundary into the BoundaryHandler from restart data. 
      */
-    void readAndAddObject(std::istream& is) override;
+    void readAndAddObject(std::istream& is) final;
 
     /*!
      *  \brief Reads a periodic boundary from old-style restart data.    
@@ -78,7 +78,7 @@ public:
     /*!
      *  \brief Returns the name of the handler, namely the string "BoundaryHandler".
      */
-    std::string getName() const override;
+    std::string getName() const final;
     
     void boundaryActionsBeforeTimeLoop();
 };

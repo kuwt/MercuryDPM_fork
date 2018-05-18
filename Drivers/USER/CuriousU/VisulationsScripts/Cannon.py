@@ -63,7 +63,7 @@ cannonParticle_.PointArrayStatus = ['Velocity', 'Diameter', 'SpeciesType']
 # get animation scene
 animationScene1 = GetAnimationScene()
 
-# update animation scene based on data timesteps
+# update animation scene based on data time steps
 animationScene1.UpdateAnimationUsingDataTimeSteps()
 
 # set active source

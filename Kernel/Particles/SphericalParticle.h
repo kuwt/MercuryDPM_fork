@@ -41,12 +41,13 @@ public:
     SphericalParticle() = default;
     SphericalParticle(const SphericalParticle &p) = default;
     explicit SphericalParticle(const ParticleSpecies* s) : BaseParticle(s) {};
-    virtual ~SphericalParticle() = default;
+
+    ~SphericalParticle() override = default;
 
     /*!
      * \brief Particle copy method. Calls copy constructor of this class (useful for polymorphism)
      */
-    SphericalParticle* copy() const;
+    SphericalParticle* copy() const override;
 
     /*!
      * \brief Returns the name of the object

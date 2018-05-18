@@ -45,7 +45,7 @@ public:
 
 	//Do not add or remove particles
 	//Initially tile by 30 degrees
-	void actionsBeforeTimeStep(){
+	void actionsBeforeTimeStep() override {
 		static double ChuteAngle = getChuteAngleDegrees();
 		if (getTime()<75) {
 			setChuteAngle(30);
@@ -64,7 +64,7 @@ public:
 		if (kineticEnergy/getElasticEnergy()<1e-5 && getTime()>10) pointIsAboveCurve=false;
 	}
 
-	bool continueSolve() const {
+	bool continueSolve() const override {
 		if (ceil(getTime())!=ceil(getTime()+getTimeStep())) printTime();
 		if (pointIsAboveCurve) return true;
 		else return false;

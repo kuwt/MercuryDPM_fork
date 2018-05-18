@@ -45,7 +45,7 @@ public:
 				count++;
 			}
 		}
-		//set timestep to an eigth
+		//set time step to an eigth
 		setTimeStep(getTimeStep()/8);
 		//save every .2 time units
 		setSaveCount(floor(0.25/getTimeStep()));

@@ -47,7 +47,7 @@ public:
     BondedSpecies(const BondedSpecies &s);
 
     ///\brief The default destructor.
-    virtual ~BondedSpecies();
+    ~BondedSpecies() override;
 
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
@@ -59,7 +59,7 @@ public:
     std::string getBaseName() const;
     
     ///\brief creates default values for mixed species
-    void mix(BondedSpecies* const S, BondedSpecies* const T);
+    void mix(BondedSpecies*S, BondedSpecies*T);
 
 //setters and getters
     ///\brief Allows the spring constant to be changed

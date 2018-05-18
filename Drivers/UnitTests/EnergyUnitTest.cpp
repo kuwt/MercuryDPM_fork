@@ -39,8 +39,7 @@ class EnergyUnitTest : public DPMBase
 {
 public:
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         setFileType(FileType::NO_FILE);
         //to see the behaviour of elastic and kinetic energy, comment the line above and plot in gnuplot
         //p 'ReversibleAdhesiveEnergyUnitTest.ene' u 1:3 w lp, 'ReversibleAdhesiveEnergyUnitTest.ene' u 1:5 w lp, 'ReversibleAdhesiveEnergyUnitTest.ene' u 1:($3+$5) w lp
@@ -113,7 +112,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
      * \todo TW The inaccuracy of the calculation is much worse for the 
      * irreversible force model, as there is a jump in force at zero overlap; 
      * we should correct for that in the time stepping algorithm 
-     * (i.e. find out what the mean force was over the duration of the timestep,
+     * (i.e. find out what the mean force was over the duration of the time step,
      * not using a left Riemann sum.
      */
     if (!mathsFunc::isEqual(lostEnergy, 0.5, 1e-4))

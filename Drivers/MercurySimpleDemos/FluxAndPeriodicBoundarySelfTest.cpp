@@ -77,12 +77,10 @@ class FluxAndPeriodicBoundarySelfTest : public Mercury2D
             setGravity(Vec3D(1, 0, 0));
         }
 
-        ~FluxAndPeriodicBoundarySelfTest()
-        {
+        ~FluxAndPeriodicBoundarySelfTest() override {
         }
 
-        void actionsAfterTimeStep()
-        {
+        void actionsAfterTimeStep() override {
             fprintf(flux_f, "%f %f %d %f %f %d %f %f\n", 
                     getTime(),
                     particleHandler.getMass(),
@@ -103,7 +101,7 @@ int main(int argc, char *argv[])
 {
     flux_f = fopen("FluxAndPeriodicBoundarySelfTest.flux", "w");
     fprintf(flux_f, "time mass flux_num_forw flux_mass_forw flux_vol_forw flux_num_back flux_mass_back flux_vol_back\n");
-    setbuf(flux_f, NULL);
+    setbuf(flux_f, nullptr);
     FluxAndPeriodicBoundarySelfTest problem;
     problem.setName("FluxAndPeriodicBoundarySelfTest");
     fprintf(stdout, "Initialising the problem\n");

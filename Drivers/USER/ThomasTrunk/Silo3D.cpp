@@ -31,6 +31,8 @@
 #include "Species/LinearViscoelasticSlidingFrictionSpecies.h"
 #include <string>
 #include <sstream>
+#include <cstring>
+
 using mathsFunc::cubic;
 using mathsFunc::square;
 using constants::pi;

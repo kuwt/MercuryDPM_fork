@@ -20,7 +20,7 @@ Combtooth::Combtooth(const Combtooth& other) : BaseWall(other)
     axis_ /= axis_.getLength();
 }
 
-Combtooth::~Combtooth() {}
+Combtooth::~Combtooth() = default;
 
 void Combtooth::set(Vec3D axis, Vec3D position, Mdouble radius)
 {

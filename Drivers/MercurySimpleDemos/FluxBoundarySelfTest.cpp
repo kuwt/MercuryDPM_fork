@@ -98,8 +98,7 @@ class FluxBoundarySelfTest : public Mercury2D
             setGravity(Vec3D(0, 0, 0));
         }
 
-        ~FluxBoundarySelfTest()
-        {
+        ~FluxBoundarySelfTest() override {
         }
 
         void actionsAfterTimeStep() override
@@ -134,7 +133,7 @@ int main(int argc, char *argv[])
     flux_f = fopen("FluxBoundarySelfTest.flux", "w");
     fprintf(flux_f, "time mass insbA_num insbA_mass insbA_vol insbB_num insbB_mass insbB_vol ");
     fprintf(flux_f, "flux_num_forw flux_mass_forw flux_vol_forw flux_num_back flux_mass_back flux_vol_back\n");
-    setbuf(flux_f, NULL);
+    setbuf(flux_f, nullptr);
     FluxBoundarySelfTest problem;
     problem.setName("FluxBoundarySelfTest");
     fprintf(stdout, "Initialising the problem\n");

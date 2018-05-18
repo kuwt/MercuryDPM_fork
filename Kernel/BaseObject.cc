@@ -96,7 +96,7 @@ void BaseObject::setIndex(const unsigned int index)
 /*!
  * \param[in] id id number of the current object
  */
-void BaseObject::setId(const unsigned int id)
+void BaseObject::setId(unsigned long id)
 {
     id_ = id;
     ///\todo TW: here we should update BaseHandler::nextId_

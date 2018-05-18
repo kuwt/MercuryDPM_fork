@@ -51,7 +51,7 @@ public:
     /*!
      * \brief destructor
      */
-    ~CircularPeriodicBoundary();
+    ~CircularPeriodicBoundary() override;
     
     /*!
      * \brief
@@ -99,7 +99,7 @@ public:
      * \brief Returns the name of the object
      * \return string type
      */
-    virtual std::string getName() const override;
+    std::string getName() const override;
     
 private:
     

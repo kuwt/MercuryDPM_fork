@@ -57,7 +57,7 @@ public:
     /*!
      * \brief Sets all boundary properties
      */
-    void set(std::function<double (double)> shift, std::function<double (double)> velocity, Mdouble left, Mdouble right, Mdouble down, Mdouble up);  
+    void set(std::function<Mdouble (Mdouble)> shift, std::function<Mdouble (Mdouble)> velocity, Mdouble left, Mdouble right, Mdouble down, Mdouble up);  
     
     /*!
      * \brief Reads all boundary properties from a stream
@@ -130,16 +130,16 @@ public:
     
     Mdouble getCurrentVelocity();
     
-    void setShift(std::function<double (double)>);
+    void setShift(std::function<Mdouble (Mdouble)>);
     
-    void setVelocity(std::function<double (double)>);
+    void setVelocity(std::function<Mdouble (Mdouble)>);
     
 private:
     Mdouble left_;      ///(signed) Horizontal distance between the left wall and the origin
     Mdouble right_;     ///(signed) Horizontal distance between the right wall and the origin
     Mdouble down_;      ///(signed) Vertical distance between the bottom wall and the origin
     Mdouble up_;        ///(signed) Vertical distance between the top wall and the origin
-    std::function<double (double)> shift_;
-    std::function<double (double)> velocity_;  ///Velocity difference between the top and bottom wall
+    std::function<Mdouble (Mdouble)> shift_;
+    std::function<Mdouble (Mdouble)> velocity_;  ///Velocity difference between the top and bottom wall
 };
 #endif

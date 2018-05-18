@@ -237,7 +237,7 @@ int main()
   problem.setTimeMax(50.0);
   //***ASK ANT FOR CLARIFICATION***
   problem.setSaveCount(100);
-  //setting the duration of a timestep
+  //setting the duration of a time step
   problem.setTimeStep(1e-5);
   //choosing the duration over which each
   //simulation runs

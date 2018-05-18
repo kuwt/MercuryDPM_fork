@@ -31,13 +31,13 @@ public:
     CSCStats ()
     {
         setName("CSCRun");
-        //getRestartFile().setFileType(FileType::MULTIPLE_FILES_PADDED);
-        std::cout << "Reading file " << getRestartFile().getFullName() << std::endl;
+        //restartFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
+        std::cout << "Reading file " << restartFile.getFullName() << std::endl;
         readRestartFile();
         setRestarted(false);
         setName("CSCStats");
         setFileType(FileType::NO_FILE);
-        getRestartFile().setFileType(FileType::ONE_FILE);
+        restartFile.setFileType(FileType::ONE_FILE);
         getStatFile().setFileType(FileType::ONE_FILE);
         
         setNTimeAverageReset(100);
@@ -61,7 +61,7 @@ public:
     {
         std::string filename;
         filename = getName() 
-            + "SC" + std::to_string(getRestartFile().getSaveCount())
+            + "SC" + std::to_string(restartFile.getSaveCount())
             + "N" + std::to_string(getNX())
             + "T" + std::to_string(static_cast<int>(round(getTimeMax())));
         setName(filename);

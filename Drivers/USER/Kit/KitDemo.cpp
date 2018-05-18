@@ -22,19 +22,19 @@ public:
     auto species10 = speciesHandler.getMixedObject(species1, species0);
 
     InfiniteWall w0;
-    w0.set(Vec3D(-1.0, 0.0, 0.0),-getXMin());
+    w0.set(Vec3D(-1.0, 0.0, 0.0),getMin());
     wallHandler.copyAndAddObject(w0);
 
-    w0.set(Vec3D(+1.0, 0.0, 0.0),+getXMax());
+    w0.set(Vec3D(+1.0, 0.0, 0.0),getMax());
     wallHandler.copyAndAddObject(w0);
 
-    w0.set(Vec3D( 0.0,-1.0, 0.0),-getYMin());
+    w0.set(Vec3D( 0.0,-1.0, 0.0),getMin());
     wallHandler.copyAndAddObject(w0);
 
-    w0.set(Vec3D( 0.0,+1.0, 0.0),+getYMax());
+    w0.set(Vec3D( 0.0,+1.0, 0.0),getMax());
     wallHandler.copyAndAddObject(w0);
 
-    w0.set(Vec3D( 0.0, 0.0,-1.0),-getZMin());
+    w0.set(Vec3D( 0.0, 0.0,-1.0),getMin());
     w0.setPrescribedPosition([this] (double time)
         {
             double t = getTime()-1.0;
@@ -73,9 +73,9 @@ public:
 			p0.setPosition(Vec3D(x,y,z));
 			p0.setVelocity(Vec3D(random.getRandomNumber(0.0,0.1),random.getRandomNumber(0.0,0.1),random.getRandomNumber(0.0,0.1)));
 			p0.setRadius(particle_radius);
-			p0.setIndSpecies(1);
+			p0.setSpecies(speciesHandler.getObject(1));
 			speciesHandler.getObject(1)->setDensity(particle_density);
-			p0.setMass(0.163/1000);
+			p0.setMassForP3Statistics(0.163/1000);
 			particleHandler.copyAndAddObject(p0);
 		}
 		setGravity(Vec3D(0.0,0.0,-9.81));

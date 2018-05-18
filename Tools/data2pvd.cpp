@@ -31,17 +31,17 @@
 #include "MercuryData.h"
 #include "VTKData.h"
 
-/*! \brief Templated version to automagically generate VTK output files. */
+/*! \brief Templated version to automatically generate VTK output files. */
 template<std::size_t NDIMS>
 int transformMercuryToVTK(MercuryDataFile& file, std::string prefix);
 
 /*
 * This program converts Mercury .data files to ParaView
-* .pvd and VTK .vtu XML-files. Every timestep is written to
+* .pvd and VTK .vtu XML-files. Every time step is written to
 * an independent .vtu Unstructured Grid file.
 *
 * Because of ParaView limitations, the actual time information
-* is discarded; Using the timestep attribute of the DataSet
+* is discarded; Using the time step attribute of the DataSet
 * element in the main .pvd file does not produce desired
 * results.
 *
@@ -66,7 +66,7 @@ int main(int argc, char** argv)
                  "       - prefix_1.vtu\n"
                  "           ( ... )\n"
                  "       - prefix_987654321.vtu\n"
-                 "     depending on the amount of timesteps.", argv[0]);
+                 "     depending on the amount of time steps.", argv[0]);
   }
   
   // Open our Mercury 3D data file.
@@ -95,7 +95,7 @@ int main(int argc, char** argv)
   {
     logger(VERBOSE, "Assuming 2D data format.");
     return transformMercuryToVTK<2>(infile, argv[2]);
-  }//halp...
+  }//help...
   else
   {
     logger(ERROR, "The file '%' does not seem to be a Mercury .data file.\n"
@@ -133,16 +133,16 @@ int transformMercuryToVTK(MercuryDataFile& infile, std::string prefix)
     logger( FATAL, "Could not open '%.pvd' for output.\n"
                    "Please make sure you have the appropriate permissions and try again.", prefix);
   
-  std::size_t timestepCount = 0;
+  std::size_t timeStepCount = 0;
   
-  //Now, read all the timesteps as if they were NDIMS long.
+  //Now, read all the time steps as if they were NDIMS long.
   for (const MercuryTimeStep<NDIMS> & ts : infile.as<NDIMS>())
   {
     //Generate the filename for the individual data files.
     std::ostringstream filename;
     filename << prefix << '_' << ts.getTimeStepID() << ".vtu";
     
-    //We'll set up a datafile containing the individual timestep.
+    //We'll set up a datafile containing the individual time step.
     VTKUnstructuredGrid< MercuryParticle<NDIMS> > timeStepFile(filename.str(), &descriptor);
     if (!timeStepFile) //but not after we've done some sanity checking!
     {
@@ -165,10 +165,10 @@ int transformMercuryToVTK(MercuryDataFile& infile, std::string prefix)
     
     //So, a user may give an output path which is in a different directory. 
     // However, since the index files resides in the same output directory
-    // as the timestep files, we need to specify relative paths.
+    // as the time step files, we need to specify relative paths.
     std::string strippedPath = filename.str();
     //so, we try to find the last / - because to hell with everybody with other
-    //path seperators...
+    //path separators...
     std::string::size_type slashPosition = strippedPath.rfind('/');
     //and take only the last part. It's not the last character, trust me.
     //we checked for that in main().
@@ -177,10 +177,10 @@ int transformMercuryToVTK(MercuryDataFile& infile, std::string prefix)
     //And now put the relative path in the listing file
     collection.append(strippedPath);
     
-    timestepCount++;
+    timeStepCount++;
   }
   
-  logger(INFO, "Written % timesteps in a %D system.", timestepCount, NDIMS);
+  logger(INFO, "Written % time steps in a %D system.", timeStepCount, NDIMS);
   
   return exitCode;
 }

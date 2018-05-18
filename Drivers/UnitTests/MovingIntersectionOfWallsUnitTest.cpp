@@ -47,8 +47,7 @@ public:
 
     }
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         setParticleDimensions(2);
         setSystemDimensions(2);
         setXMin(-2.0);
@@ -60,7 +59,7 @@ public:
         species->setCollisionTimeAndRestitutionCoefficient(0.01, 1.0, 1.0);
         setTimeStep(0.0002);
         setTimeMax(1.0);
-        setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(20, getTimeMax(), getTimeStep()));
+        setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(20, getTimeMax(), getTimeStep()));
 
         BaseParticle p;
         p.setSpecies(speciesHandler.getObject(0));   
@@ -112,8 +111,7 @@ private:
 class MovingIntersectionOfWallsUnitTest_MovingReferenceFrame : public MovingIntersectionOfWallsUnitTest_Basic
 {
 public:
-	void setupInitialConditions()
-	{
+	void setupInitialConditions() override {
 		MovingIntersectionOfWallsUnitTest_Basic::setupInitialConditions();
 		triangle->setVelocity(velocity);
 		p1f->accelerate(velocity);

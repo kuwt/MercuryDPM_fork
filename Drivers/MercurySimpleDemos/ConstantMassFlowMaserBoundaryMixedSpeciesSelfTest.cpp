@@ -45,13 +45,11 @@ class ConstantMassFlowMaserBoundaryMixedSpeciesSelfTest : public Mercury3D
 {
 public:
     
-    void printTime() const
-    {
+    void printTime() const override {
         logger(INFO, "t = %, tmax = %", getTime(), getTimeMax());
     }
     
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         setName("ConstantMassFlowMaserBoundaryMixedSpeciesSelfTest");
         
         //set species properties: a particle with diameter 1 should have mass 1

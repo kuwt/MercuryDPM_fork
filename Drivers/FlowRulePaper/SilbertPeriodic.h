@@ -106,7 +106,8 @@ public:
             auto species1 = speciesHandler.copyAndAddObject(species);
             baseSpecies = speciesHandler.getMixedObject(species, species1);
             for (unsigned int i=0; i<particleHandler.getNumberOfObjects(); i++) {
-                if (particleHandler.getObject(i)->isFixed()) particleHandler.getObject(i)->setIndSpecies(1);
+                if (particleHandler.getObject(i)->isFixed())
+                	particleHandler.getObject(i)->setSpecies(speciesHandler.getObject(1));
             }
         }
     }
@@ -290,7 +291,7 @@ public:
 		if (speciesHandler.getNumberOfObjects()>1) {
 			for (unsigned int i=0; i<particleHandler.getNumberOfObjects(); i++)
 				if (particleHandler.getObject(i)->isFixed()) 
-					particleHandler.getObject(i)->setIndSpecies(1);
+					particleHandler.getObject(i)->setSpecies(speciesHandler.getObject(1));
 		}
 
         ///todo{I(Dinant) had to clear the WallHandler to prevent it from inserting the same wall twice, why?}
@@ -386,7 +387,7 @@ public:
 		inflowParticle_.setVelocity(Vec3D(getInflowVelocity(),0.0,0.0));
 		if (randomiseSpecies) {
 			int indSpecies = floor(random.getRandomNumber(0,speciesHandler.getNumberOfObjects()-1e-200));
-			inflowParticle_.setIndSpecies(indSpecies);
+			inflowParticle_.setSpecies(speciesHandler.getObject(indSpecies));
 		}
 	}
 

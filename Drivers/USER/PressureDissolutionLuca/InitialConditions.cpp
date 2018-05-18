@@ -34,7 +34,7 @@
 class InitialConditions : public Mercury3D{
 public:
 
-    //set slave variables (i.e. compute stiffness, dissipation, timestep, wall and particle positions)
+    //set slave variables (i.e. compute stiffness, dissipation, time step, wall and particle positions)
     void setupInitialConditions() override
 	{
         //creating pointers to species for particle-particle interactions and particle-wall interactions

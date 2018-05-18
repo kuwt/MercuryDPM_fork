@@ -179,7 +179,7 @@ public:
 
         if (heatedParticle == nullptr)
         {
-            // Functions after this statement only get executed every 100th timestep (if counter==100)
+            // Functions after this statement only get executed every 100th time step (if counter==100)
             static unsigned counter = 0;
             if (++counter != 100) return;
             else counter = 0;

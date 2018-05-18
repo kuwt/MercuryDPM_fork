@@ -58,7 +58,7 @@ public:
     /*!
      * \brief Destructor.
      */
-    virtual ~SlidingFrictionInteraction();
+    ~SlidingFrictionInteraction() override;
     /*!
      * \brief Computes the tangential force generated due to compression in the sliding spring.
      *        Does take into account if the interaction is between particle-particle or particle-wall.
@@ -89,7 +89,7 @@ public:
      */
     std::string getBaseName() const;
 
-    void setSlidingSpring(const Vec3D slidingSpring);
+    void setSlidingSpring(Vec3D slidingSpring);
 
     Vec3D getSlidingSpring() const;
 
@@ -111,7 +111,7 @@ public:
 
     void rotateHistory(Matrix3D& rotationMatrix) override;
 
-    void moveSlidingSpring(const Vec3D displacement);
+    void moveSlidingSpring(Vec3D displacement);
 
 private:
     /*!

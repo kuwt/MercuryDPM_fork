@@ -21,7 +21,7 @@ class Combtooth : public BaseWall
         /*!
          * \brief Default destructor
          */
-        virtual ~Combtooth();
+        ~Combtooth() override;
 
         /*!
          * \brief Set 

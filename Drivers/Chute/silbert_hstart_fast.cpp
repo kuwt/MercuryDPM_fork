@@ -48,7 +48,7 @@ public:
 		write(std::cout,false);
 	}
 	
-	void writeEneTimestep(std::ostream& os) const {
+	void writeEneTimeStep(std::ostream& os) const {
 		double ene_kin = 0, ene_rot = 0, ene_gra = 0;
 
 		for (unsigned int i=0;i<Particles.size();i++) if (!Particles[i].is_fixed())

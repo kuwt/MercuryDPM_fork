@@ -150,7 +150,7 @@ public:
     /** creates custom console output */
     void printTime() const override
     {
-        //writeEneTimestep(std::cout);
+        //writeEneTimeStep(std::cout);
         std::cout << std::setw(11) << getTime()
             << "\t" << std::setw(11)<< getIndenterHeight()
             << "\t" << std::setw(11) << getForceOnIndenter() / indentationForce_
@@ -166,7 +166,7 @@ public:
     }
 
     /** creates custom ene output */
-    void writeEneTimestep(std::ostream& os) const override
+    void writeEneTimeStep(std::ostream& os) const override
     {
         os << std::setw(12) << getTime()
             << "\t" << std::setw(12)<< getIndenterHeight()

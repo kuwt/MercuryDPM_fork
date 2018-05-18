@@ -30,7 +30,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 //icc means included cc file
 
-void DPMBase::outputXBallsDataParticle(const unsigned int i, const unsigned int format, std::ostream& os) const
+void DPMBase::outputXBallsDataParticle(unsigned int i, unsigned int format, std::ostream& os) const
 {
     //dataFile.precision(14);
     ///\todo{changes in *.icc files are not immediately regognized by the makefile!}

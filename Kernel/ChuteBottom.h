@@ -102,12 +102,12 @@ public:
     /*!
      * \brief Sets up initial conditions before running a chute simulation
      */
-    void setupInitialConditions();
+    void setupInitialConditions() override;
 
     /*!
      * \brief Performs all necessary actions before the start of a time step (none in this case)
      */
-    void actionsBeforeTimeStep();
+    void actionsBeforeTimeStep() override;
 
 private:
     /*!

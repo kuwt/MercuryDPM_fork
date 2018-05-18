@@ -180,7 +180,7 @@ int main(argc, argv)
             {
 				 sprintf(csystem,"more %s.txt",argv[0]);
 				 //sprintf(csystem,"more %s/xballs.txt",XBPATH);
-                 system(csystem);
+                 if (system(csystem));
                  exit(0);
                  /* return; */
             }
@@ -749,7 +749,7 @@ void Draw_Contacts( float xy0, int h_offset, int v_offset,
                    */
 
                    muf0=drft/(drfn-drf0);
-                   p12dist=sqrt((px[ip2]-px[ip1])*(px[ip2]-px[ip1])+(pz[ip2]-pz[ip1])*(pz[ip2]-pz[ip1]));
+                   p12dist= sqrtf((px[ip2]-px[ip1])*(px[ip2]-px[ip1])+(pz[ip2]-pz[ip1])*(pz[ip2]-pz[ip1]));
                    linex1 = 1+(int)(xskal*p12dist*muf0);
                    linez1 = 1+(int)(yskal*p12dist*muf0);
 
@@ -862,7 +862,7 @@ void Draw_Walls( float xy0, int h_offset, int v_offset,
                        therefore don't draw it */
       if( xwtyp != 2 )
       {
-       an = sqrt(nx*nx+ny*ny+nz*nz);
+       an = sqrtf(nx*nx+ny*ny+nz*nz);
        anx = nx/an;
        any = ny/an;
        anz = nz/an;
@@ -1644,7 +1644,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                   {
                    xhcm = xhcm + x2[i];
                    if( ivmode == 0 )
-                      vabs[i] = sqrt(x3[i]*x3[i]+x4[i]*x4[i])-coffset;
+                      vabs[i] = sqrtf(x3[i]*x3[i]+x4[i]*x4[i])-coffset;
                    else if(ivmode == 1 )
                       vabs[i] = x1[i]-coffset;
                    else if(ivmode == 2 )
@@ -1667,11 +1667,11 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                    else if(ivmode == 9 )
                       vabs[i] = x1[i]+x2[i]-coffset;
                    else if(ivmode == 10 )
-                      vabs[i] = sqrt(x3[i]*x3[i]+x4[i]*x4[i])-coffset;
+                      vabs[i] = sqrtf(x3[i]*x3[i]+x4[i]*x4[i])-coffset;
                    else if(ivmode == 11 )
                       vabs[i] = (xrad[i]*x7[i])-coffset;
                    else if(ivmode == 12 )
-                      vabs[i] = sqrt(x1[i]*x1[i]+x2[i]*x2[i]);
+                      vabs[i] = sqrtf(x1[i]*x1[i]+x2[i]*x2[i]);
                    else if(ivmode == 17 )
                       vabs[i] = xrad[i]*xrad[i]*x7[i]*x7[i]-coffset;
                    else if(ivmode == 20 )
@@ -1681,7 +1681,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                   {
                    xhcm = xhcm + x3[i];
                    if( ivmode == 0 )
-                      vabs[i] = sqrt(x3[i]*x3[i]+x32[i]*x32[i]+x4[i]*x4[i])-coffset;
+                      vabs[i] = sqrtf(x3[i]*x3[i]+x32[i]*x32[i]+x4[i]*x4[i])-coffset;
                    else if(ivmode == 1 )
                       vabs[i] = (x1[i])-coffset;
                    else if(ivmode == 2 )
@@ -1736,7 +1736,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                    else if(ivmode == -8 )
                    {
                       vabs[i] = ix[i]+inputmass12*
-                                sqrt(x3[i]*x3[i]+x4[i]*x4[i])-coffset;
+                                              sqrtf(x3[i]*x3[i]+x4[i]*x4[i])-coffset;
                    }
                    else if(ivmode == 8 )
                       { 
@@ -1746,12 +1746,12 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                    else if(ivmode == 9 )
                       vabs[i] = x1[i]+x12[i]+x2[i]-coffset;
                    else if(ivmode == 10 )
-                      vabs[i] = sqrt(x3[i]*x3[i]+x32[i]*x32[i]+x4[i]*x4[i])-coffset;
+                      vabs[i] = sqrtf(x3[i]*x3[i]+x32[i]*x32[i]+x4[i]*x4[i])-coffset;
                    else if(ivmode == 12 )
-                      vabs[i] = sqrt(x1[i]*x1[i]+x12[i]*x12[i]+x2[i]*x2[i]);
+                      vabs[i] = sqrtf(x1[i]*x1[i]+x12[i]*x12[i]+x2[i]*x2[i]);
                    else if(ivmode == 13 )
                      {
-                      xdummy = sqrt(x1[i]*x1[i]+x12[i]*x12[i]);
+                      xdummy = sqrtf(x1[i]*x1[i]+x12[i]*x12[i]);
                       if(xdummy != 0 ) vabs[i] = ( x2[i]/xdummy );
                       else             vabs[i] = 0;
                       if( vabs[i] < 0 ) vabs[i] = -vabs[i];
@@ -1765,7 +1765,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                      }
                    else if(ivmode == 15 )
                      {
-                      xdummy = sqrt(x1[i]*x1[i]+x12[i]*x12[i]+x2[i]*x2[i]);
+                      xdummy = sqrtf(x1[i]*x1[i]+x12[i]*x12[i]+x2[i]*x2[i]);
                       if(xdummy != 0)
                         vabs[i]=-(-x2[i]/xdummy*x3[i]+x1[i]/xdummy*x4[i]);
                       else
@@ -1773,7 +1773,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                      }
                    else if(ivmode == 16 )
                      {
-                      xdummy = sqrt(x1[i]*x1[i]+x12[i]*x12[i]+x2[i]*x2[i]);
+                      xdummy = sqrtf(x1[i]*x1[i]+x12[i]*x12[i]+x2[i]*x2[i]);
                       if(xdummy != 0)
                         vabs[i]=+(-x2[i]/xdummy*x3[i]+x1[i]/xdummy*x4[i]);
                       else
@@ -1781,7 +1781,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                      }
                    else if(ivmode == 17 )
                      {
-                      xdummy = sqrt(x1[i]*x1[i]+x12[i]*x12[i]+x2[i]*x2[i]);
+                      xdummy = sqrtf(x1[i]*x1[i]+x12[i]*x12[i]+x2[i]*x2[i]);
                       if(xdummy != 0)
                       {
                         vabs[i]=(-x2[i]/xdummy*x3[i]+x1[i]/xdummy*x4[i]);
@@ -1792,7 +1792,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                      }
                    else if(ivmode == 18 )
                      {
-                      vabs[i] = sqrt(x1[i]*x1[i]+x12[i]*x12[i]);
+                      vabs[i] = sqrtf(x1[i]*x1[i]+x12[i]*x12[i]);
                      }
                    else if(ivmode == 20 )
                       vabs[i] = i;
@@ -1801,7 +1801,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                   ccode[i]=vabs[i];
 
                   if(( vpower >= 1.0001 ) || ( vpower <= 0.9999 ))
-                      vabs[i] = pow( vabs[i], vpower );
+                      vabs[i] = powf( vabs[i], vpower );
 
                   if((i >= incmin ) && (i <= incmax)) 
                   {
@@ -1815,7 +1815,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
 
                   if( inread == 8 )
                   {
-                      wabs[i] = sqrt(xrad[i]*x7[i]*xrad[i]*x7[i]);
+                      wabs[i] = sqrtf(xrad[i]*x7[i]*xrad[i]*x7[i]);
                   }
                   else
                   {
@@ -1886,7 +1886,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                                 xx12=x12[i]-x12[j];
                              else
                                 xx12=0.;
-                             xd=sqrt(xx1*xx1+xx2*xx2+xx12*xx12);
+                             xd= sqrtf(xx1*xx1+xx2*xx2+xx12*xx12);
                              if ( xd < (float) (ilines)*(xrad[i]+xrad[j])/1000. )
                              {
                                vabs000=xd/(xrad[i]+xrad[j])/ilines*1000.;
@@ -1937,8 +1937,8 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                     0 * 64, 360 * 64);
                   dx=(x1[i]-x10[i])*(ivskal/100.);
                   dy=(x2[i]-x20[i])*(ivskal/100.);
-                  if(( fabs(x1[i]-x10[i]) < (xright-xleft)/2. ) &&
-                     ( fabs(x2[i]-x20[i]) < (xtop-xbottom)/2. ))
+                  if((fabsf(x1[i]-x10[i]) < (xright-xleft)/2. ) &&
+                     (fabsf(x2[i]-x20[i]) < (xtop-xbottom)/2. ))
                      XDrawLine(dpy, vandy, gcMap[icolor],
                       (int) ( xy0+x1[i]*xskal ) - h_offset, height -v_offset - (int) ( xy0+x2[i]*yskal ),
                       (int) ( xy0+(x1[i]-dx)*xskal ) - h_offset, height -v_offset - (int) ( xy0+(x2[i]-dy)*yskal ));
@@ -1962,18 +1962,18 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                 {
                     /* Apply the rotation matrix */
               /* printf("Start rotating ... \n"); */
-                 R11=rotr*cos(rotphi)*cos(rottheta);
-                 R22=rotr*cos(rottheta);
-                 R33=rotr*cos(rotphi);
+                 R11=rotr* cosf(rotphi)* cosf(rottheta);
+                 R22=rotr* cosf(rottheta);
+                 R33=rotr* cosf(rotphi);
 
-                 R12=rotr*cos(rotphi)*sin(rottheta);
-                 R21=-rotr*sin(rottheta);
+                 R12=rotr* cosf(rotphi)* sinf(rottheta);
+                 R21=-rotr* sinf(rottheta);
 
-                 R13=-rotr*sin(rotphi);
-                 R31=rotr*sin(rotphi)*cos(rottheta);
+                 R13=-rotr* sinf(rotphi);
+                 R31=rotr* sinf(rotphi)* cosf(rottheta);
 
                  R23=0.0;
-                 R32=rotr*sin(rotphi)*sin(rottheta);
+                 R32=rotr* sinf(rotphi)* sinf(rottheta);
                  /* printf(" %f %f %f \n", R11, R12, R13 );
                     printf(" %f %f %f \n", R21, R22, R23 );
                     printf(" %f %f %f \n", R31, R32, R33 ); */
@@ -1989,9 +1989,9 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                    if( unidist != 0.0 )
                    {
                      distxz=eyepos-x12[i];
-                     dist=sqrt(x1[i]*x1[i]+x2[i]*x2[i]+distxz*distxz);
+                     dist= sqrtf(x1[i]*x1[i]+x2[i]*x2[i]+distxz*distxz);
                      if(dist>1.e-12*unidist) 
-                        unif[i]=unidist/xrad[i]*tan(asin(xrad[i]/dist));
+                        unif[i]=unidist/xrad[i]*tan(asinf(xrad[i]/dist));
                      else
                         unif[i]=1;
                      unig[i]=1;
@@ -2228,8 +2228,8 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
             /* Draw an ellipse instead of a circle */
                        if(( xellipse > 0 ) && ( i>NK ))
                        {
-                          srp=sin(rotphi0);
-                          crp=cos(rottheta0);
+                          srp= sinf(rotphi0);
+                          crp= cosf(rottheta0);
                           if( srp < 0 ) srp=-srp;
                           if( crp < 0 ) crp=-crp;
                           ixrad = (int)(2.*xrad[i] * xskal *unif[i] *srp);
@@ -2261,7 +2261,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                            gcColor=gcMap[icolor];
                         else
                         {  /* set greyscales on the color as function of distance from the viewer */
-                           ix12=(int)(25.0+5.*ifog*pow((x12max-x12[i])/(x12max-x12min),fpower));
+                           ix12=(int)(25.0+5.*ifog* powf((x12max-x12[i])/(x12max-x12min),fpower));
                            if( ix12 < 0 )  ix12=0;
                            if( ix12 > 99 ) ix12=99;
                            gcColor=gcMapGrey[icolor][ix12];
@@ -2320,7 +2320,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                       isqcolor=1;
                       if(isq==1) 
                       {
-                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal*log10(x6[i])));
+                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal* log10f(x6[i])));
                         if( isqcolor < 2 ) isqcolor = 2;
                         if( isqcolor > mmax101 ) isqcolor = mmax101+1;
                       }
@@ -2328,7 +2328,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                       {
                         if( x7[i] < 0. ) x7[i]=-x7[i];
                         if( x7[i] == 0. ) x7[i]=1.e-20;
-                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal*log10(x7[i])));
+                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal* log10f(x7[i])));
                         if( isqcolor < 2 ) isqcolor = 2;
                         if( isqcolor > mmax101 ) isqcolor = mmax101+1;
                       }
@@ -2336,7 +2336,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                       {
                         if( ix[i] < 0. ) ix[i]=-ix[i];
                         if( ix[i] == 0. ) ix[i]=1.e-20;
-                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal*log10(ix[i])));
+                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal* log10f(ix[i])));
                         if( isqcolor < 2 ) isqcolor = 2;
                         if( isqcolor > mmax101 ) isqcolor = mmax101+1;
                       }
@@ -2345,7 +2345,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                         tempx=x6[i]-x3[i]*x3[i];
                         if( tempx < 0. ) tempx=-tempx;
                         if( tempx == 0. ) tempx=1.e-20;
-                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal*log10(tempx)));
+                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal* log10f(tempx)));
                         if( isqcolor < 2 ) isqcolor = 2;
                         if( isqcolor > mmax101 ) isqcolor = mmax101+1;
                       }
@@ -2354,7 +2354,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                         tempx=x7[i]-x4[i]*x4[i];
                         if( tempx < 0. ) tempx=-tempx;
                         if( tempx == 0. ) tempx=1.e-20;
-                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal*log10(tempx)));
+                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal* log10f(tempx)));
                         if( isqcolor < 2 ) isqcolor = 2;
                         if( isqcolor > mmax101 ) isqcolor = mmax101+1;
                       }
@@ -2363,14 +2363,14 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                         tempx=x6[i]-x3[i]*x3[i]+x7[i]-x4[i]*x4[i];
                         if( tempx < 0. ) tempx=-tempx;
                         if( tempx == 0. ) tempx=1.e-20;
-                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal*log10(tempx)));
+                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal* log10f(tempx)));
                         if( isqcolor < 2 ) isqcolor = 2;
                         if( isqcolor > mmax101 ) isqcolor = mmax101+1;
                       }
                       else
                       {
                         if( vabs[i] == 0. ) vabs[i]=1.e-20;
-                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal*log10(vabs[i])));
+                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal* log10f(vabs[i])));
                         if( isqcolor < 2 ) isqcolor = 2;
                         if( isqcolor > mmax101 ) isqcolor = mmax101+1;
                       }
@@ -2893,7 +2893,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                 if( ifilm == 2 )
                   sprintf(csystem,"import +screen -window %lu -border -scene %d %6.6d.%s \n",eng,icount,icount,coutfile); 
                 printf(csystem,"%s");
-                system(csystem); 
+                if (system(csystem));
                 icount++;
                }
 
@@ -3227,18 +3227,18 @@ void fill_dens( ixcenter, ixradius, dens )
    float xtmp1, xtmp2, xx0;
    int   j, jj;
 
-   xx0 = sqrt((float)(ixradius*ixradius))+
-         sqrt((float)(ixradius*ixradius - 1));
+   xx0 = sqrtf((float)(ixradius*ixradius))+
+           sqrtf((float)(ixradius*ixradius - 1));
 
    for ( j=ixcenter-ixradius; j<ixcenter+ixradius; j++ )
    {
       jj = j;
       if( jj > NFIELD-1 ) jj = 0;
       if( jj < 1 ) jj = 0;
-      xtmp1 = sqrt((float)(ixradius*ixradius - (j-ixcenter)*(j-ixcenter)));
+      xtmp1 = sqrtf((float)(ixradius*ixradius - (j-ixcenter)*(j-ixcenter)));
       if( jj > 0 )
       {
-         xtmp2 = sqrt((float)(ixradius*ixradius - (j+1-ixcenter)*(j+1-ixcenter)));
+         xtmp2 = sqrtf((float)(ixradius*ixradius - (j+1-ixcenter)*(j+1-ixcenter)));
          dens[jj] = dens[jj] + (xtmp1 + xtmp2)/xx0;
          xtmp1 = xtmp2;
       }
@@ -3253,18 +3253,18 @@ void fill_velo( ixcenter, ixradius, vdens, vaver )
    float xtmp1, xtmp2, xx0;
    int   j, jj;
 
-   xx0 = sqrt((float)(ixradius*ixradius))+
-         sqrt((float)(ixradius*ixradius - 1));
+   xx0 = sqrtf((float)(ixradius*ixradius))+
+           sqrtf((float)(ixradius*ixradius - 1));
 
    for ( j=ixcenter-ixradius; j<ixcenter+ixradius; j++ )
    {
       jj = j;
       if( jj > NFIELD-1 ) jj = 0;
       if( jj < 1 ) jj = 0;
-      xtmp1 = sqrt((float)(ixradius*ixradius - (j-ixcenter)*(j-ixcenter)));
+      xtmp1 = sqrtf((float)(ixradius*ixradius - (j-ixcenter)*(j-ixcenter)));
       if( jj > 0 )
       {
-         xtmp2 = sqrt((float)(ixradius*ixradius - (j+1-ixcenter)*(j+1-ixcenter)));
+         xtmp2 = sqrtf((float)(ixradius*ixradius - (j+1-ixcenter)*(j+1-ixcenter)));
          vdens[jj] = vdens[jj] + vaver*(xtmp1 + xtmp2)/xx0;
          xtmp1 = xtmp2;
       }
@@ -3279,18 +3279,18 @@ void fill_wrad( ixcenter, ixradius, vdens, vaver )
    float xtmp1, xtmp2, xx0;
    int   j, jj;
 
-   xx0 = sqrt((float)(ixradius*ixradius))+
-         sqrt((float)(ixradius*ixradius - 1));
+   xx0 = sqrtf((float)(ixradius*ixradius))+
+           sqrtf((float)(ixradius*ixradius - 1));
 
    for ( j=ixcenter-ixradius; j<ixcenter+ixradius; j++ )
    {
       jj = j;
       if( jj > NFIELD-1 ) jj = 0;
       if( jj < 1 ) jj = 0;
-      xtmp1 = sqrt((float)(ixradius*ixradius - (j-ixcenter)*(j-ixcenter)));
+      xtmp1 = sqrtf((float)(ixradius*ixradius - (j-ixcenter)*(j-ixcenter)));
       if( jj > 0 )
       {
-         xtmp2 = sqrt((float)(ixradius*ixradius - (j+1-ixcenter)*(j+1-ixcenter)));
+         xtmp2 = sqrtf((float)(ixradius*ixradius - (j+1-ixcenter)*(j+1-ixcenter)));
          vdens[jj] = vdens[jj] + vaver*(xtmp1 + xtmp2)/xx0;
          xtmp1 = xtmp2;
       }
@@ -3310,7 +3310,7 @@ int read_line( int inread, FILE *fp,
 
 while( icomp == 0 )
 {
-  fgets( cline, clength, fp );
+  if(fgets( cline, clength, fp ));
   if( (icomp = strncmp( "#", cline, 1 )) != 0 )
   {
     if( inread == 6 )
@@ -3382,7 +3382,7 @@ int read_header( int inread, FILE *fp,
  
 while( icomp == 0 )
 {
-  fgets( cline, clength, fp );
+  if(fgets( cline, clength, fp ));
   if( (icomp = strncmp( "#", cline, 1 )) != 0 )
   {
     if(( inread == 3 ) || ( inread == 7 ) || ( inread == 14 ))

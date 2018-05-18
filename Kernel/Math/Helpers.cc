@@ -47,274 +47,274 @@
 #define GetCurrentDir getcwd
 #endif
 
-helpers::KAndDisp helpers::computeKAndDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass)
-{
-    helpers::KAndDisp ans;
-    ans.k = computeKFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(tc, r, mass);
-    ans.disp = computeDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(tc, r, mass);
-    return ans;
-}
-
-Mdouble helpers::computeCollisionTimeFromKAndDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass)
-{
-    if (k <= 0)
-    {
-        std::cerr << "Error in helpers::computeCollisionTimeFromKandDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass) stiffness is not set or has an unexpected value, (stiffness=" << k << ")" << std::endl;
-        exit(-1);
-    }
-    if (disp < 0)
-    {
-        std::cerr << "Error in helpers::computeCollisionTimeFromKandDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass) dissipation is not set or has an unexpected value, (dissipation=" << disp << ")" << std::endl;
-        exit(-1);
-    }
-    if (mass <= 0)
-    {
-        std::cerr << "Error in helpers::computeCollisionTimeFromKandDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
-        exit(-1);
-    }
-    if (4.0 * k / mass - mathsFunc::square(disp / mass) < 0)
-    {
-        std::cerr << "Error in helpers::computeCollisionTimeFromKandDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass) values for stiffness, dissipation and mass lead to an overdamped system (stiffness=" << k << " dissipation=" << disp << " mass=" << mass << ")" << std::endl;
-        exit(-1);
-    }
-    return 2.0 * constants::pi / std::sqrt(4.0 * k / mass - mathsFunc::square(disp / mass));
-}
-
-Mdouble helpers::computeRestitutionCoefficientFromKAndDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass)
-{
-    if (k <= 0)
-    {
-        std::cerr << "Error in helpers::computeRestitutionCoefficientFromKandDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass) stiffness is not set or has an unexpected value, (stiffness=" << k << ")" << std::endl;
-        exit(-1);
-    }
-    if (disp < 0)
-    {
-        std::cerr << "Error in helpers::computeRestitutionCoefficientFromKandDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass) dissipation is not set or has an unexpected value, (dissipation=" << disp << ")" << std::endl;
-        exit(-1);
-    }
-    if (mass <= 0)
-    {
-        std::cerr << "Error in helpers::computeRestitutionCoefficientFromKandDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
-        exit(-1);
-    }
-    if (4.0 * mass * k - mathsFunc::square(disp) < 0)
-    {
-        std::cerr << "Error in helpers::computeRestitutionCoefficientFromKandDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass) values for stiffness, dissipation and mass lead to an overdamped system (stiffness=" << k << " dissipation=" << disp << " mass=" << mass << ")" << std::endl;
-        exit(-1);
-    }
-    return std::exp(-disp * constants::pi / std::sqrt(4.0 * mass * k - mathsFunc::square(disp)));
-}
-
-Mdouble helpers::computeDispFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass)
-{
-    if (k <= 0)
-    {
-        std::cerr << "Error in helpers::computeDispFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass) stiffness is not set or has an unexpected value, (stiffness=" << k << ")" << std::endl;
-        exit(-1);
-    }
-    if (r < 0)
-    {
-        std::cerr << "Error in helpers::computeDispFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass) restitution coefficient is not set or has an unexpected value, (restitution coefficient=" << r << ")" << std::endl;
-        exit(-1);
-    }
-    if (mass <= 0)
-    {
-        std::cerr << "Error in helpers::computeDispFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
-        exit(-1);
-    }
-    return -2.0 * sqrt(mass * k / (constants::sqr_pi + mathsFunc::square(std::log(r)))) * std::log(r);
-}
-
-Mdouble helpers::computeCollisionTimeFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass)
-{
-    if (k <= 0)
-    {
-        std::cerr << "Error in helpers::computeCollisionTimeFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass) stiffness is not set or has an unexpected value, (stiffness=" << k << ")" << std::endl;
-        exit(-1);
-    }
-    if (r < 0)
-    {
-        std::cerr << "Error in helpers::computeCollisionTimeFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass) restitution coefficient is not set or has an unexpected value, (restitution coefficient=" << r << ")" << std::endl;
-        exit(-1);
-    }
-    if (mass <= 0)
-    {
-        std::cerr << "Error in helpers::computeCollisionTimeFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
-        exit(-1);
-    }
-    return sqrt(mass / k * (constants::sqr_pi + mathsFunc::square(std::log(r))));
-}
-
-Mdouble helpers::computeDispFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass)
-{
-    if (k <= 0)
-    {
-        std::cerr << "Error in helpers::computeDispFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass) stiffness is not set or has an unexpected value, (stiffness=" << k << ")" << std::endl;
-        exit(-1);
-    }
-    if (tc <= 0)
-    {
-        std::cerr << "Error in helpers::computeDispFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass) collision time is not set or has an unexpected value, (collision time=" << tc << ")" << std::endl;
-        exit(-1);
-    }
-    if (mass <= 0)
-    {
-        std::cerr << "Error in helpers::computeDispFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
-        exit(-1);
-    }
-    if (mass * k - constants::sqr_pi * mathsFunc::square(mass / tc) < 0)
-    {
-        std::cerr << "Error in helpers::computeDispFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass) values for stiffness, collision time and mass lead to an overdamped system (stiffness=" << k << " collision time=" << tc << " mass=" << mass << ")" << std::endl;
-        exit(-1);
-    }
-    return 2.0 * std::sqrt(mass * k - constants::sqr_pi * mathsFunc::square(mass / tc));
-}
-
-Mdouble helpers::computeRestitutionCoefficientFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass)
-{
-    if (k <= 0)
-    {
-        std::cerr << "Error in helpers::computeRestitutionCoefficientFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass) stiffness is not set or has an unexpected value, (stiffness=" << k << ")" << std::endl;
-        exit(-1);
-    }
-    if (tc <= 0)
-    {
-        std::cerr << "Error in helpers::computeRestitutionCoefficientFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass) collision time is not set or has an unexpected value, (collision time=" << tc << ")" << std::endl;
-        exit(-1);
-    }
-    if (mass <= 0)
-    {
-        std::cerr << "Error in helpers::computeRestitutionCoefficientFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
-        exit(-1);
-    }
-    if (k / mass * mathsFunc::square(tc) - constants::sqr_pi < 0)
-    {
-        std::cerr << "Error in helpers::computeRestitutionCoefficientFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass) values for stiffness, collision time and mass lead to an overdamped system (stiffness=" << k << " collision time=" << tc << " mass=" << mass << ")" << std::endl;
-        exit(-1);
-    }
-    return std::exp(-std::sqrt(k / mass * mathsFunc::square(tc) - constants::sqr_pi));
-}
-
-Mdouble helpers::computeDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass)
-{
-    if (tc <= 0)
-    {
-        std::cerr << "Error in helpers::computeDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass) collision time is not set or has an unexpected value, (collision time=" << tc << ")" << std::endl;
-        exit(-1);
-    }
-    if (r < 0)
-    {
-        std::cerr << "Error in helpers::computeDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass) restitution coefficient not set or has an unexpected value, (restitution coefficient=" << r << ")" << std::endl;
-        exit(-1);
-    }
-    if (mass <= 0)
-    {
-        std::cerr << "Error in helpers::computeDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
-        exit(-1);
-    }
-    return -2.0 * mass * std::log(r) / tc;
-}
-
-Mdouble helpers::computeKFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass)
-{
-    if (tc <= 0)
-    {
-        std::cerr << "Error in helpers::computeKFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass) collision time is not set or has an unexpected value, (collision time=" << tc << ")" << std::endl;
-        exit(-1);
-    }
-    if (r < 0)
-    {
-        std::cerr << "Error in helpers::computeKFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass) restitution coefficient not set or has an unexpected value, (restitution coefficient=" << r << ")" << std::endl;
-        exit(-1);
-    }
-    if (mass <= 0)
-    {
-        std::cerr << "Error in helpers::computeKFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
-        exit(-1);
-    }
-    return mass * (mathsFunc::square(constants::pi / tc) + mathsFunc::square(-std::log(r) / tc));
-}
-
-Mdouble helpers::computeKFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass)
-{
-    if (tc <= 0)
-    {
-        std::cerr << "Error in helpers::computeKFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass) collision time is not set or has an unexpected value, (collision time=" << tc << ")" << std::endl;
-        exit(-1);
-    }
-    if (disp < 0)
-    {
-        std::cerr << "Error in helpers::computeKFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass) dissipation not set or has an unexpected value, (dissipation=" << disp << ")" << std::endl;
-        exit(-1);
-    }
-    if (mass <= 0)
-    {
-        std::cerr << "Error in helpers::computeKFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
-        exit(-1);
-    }
-    return 0.25 * mathsFunc::square(disp) / mass + constants::sqr_pi * mass / mathsFunc::square(tc);
-}
-
-Mdouble helpers::computeRestitutionCoefficientFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass)
-{
-    if (tc <= 0)
-    {
-        std::cerr << "Error in helpers::computeRestitutionCoefficientFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass) collision time is not set or has an unexpected value, (collision time=" << tc << ")" << std::endl;
-        exit(-1);
-    }
-    if (disp < 0)
-    {
-        std::cerr << "Error in helpers::computeRestitutionCoefficientFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass) dissipation not set or has an unexpected value, (dissipation=" << disp << ")" << std::endl;
-        exit(-1);
-    }
-    if (mass <= 0)
-    {
-        std::cerr << "Error in helpers::computeRestitutionCoefficientFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
-        exit(-1);
-    }
-    return std::exp(-0.5 * disp * tc / mass);
-}
-
-Mdouble helpers::computeKFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass)
-{
-    if (disp <= 0)
-    {
-        std::cerr << "Error in helpers::computeKFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass) dissipation is not set or has an unexpected value, (dissipation time=" << disp << ")" << std::endl;
-        exit(-1);
-    }
-    if (r < 0)
-    {
-        std::cerr << "Error in helpers::computeKFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass) restitution coefficient not set or has an unexpected value, (restitution coefficient=" << r << ")" << std::endl;
-        exit(-1);
-    }
-    if (mass <= 0)
-    {
-        std::cerr << "Error in helpers::computeKFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
-        exit(-1);
-    }
-    return 0.25 * mathsFunc::square(disp)*(constants::sqr_pi / (mathsFunc::square(std::log(r))) + 1.0) / mass;
-}
-
-Mdouble helpers::computeCollisionTimeFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass)
-{
-    if (disp <= 0)
-    {
-        std::cerr << "Error in helpers::computeCollisionTimeFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass) dissipation is not set or has an unexpected value, (dissipation time=" << disp << ")" << std::endl;
-        exit(-1);
-    }
-    if (r < 0)
-    {
-        std::cerr << "Error in helpers::computeCollisionTimeFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass) restitution coefficient not set or has an unexpected value, (restitution coefficient=" << r << ")" << std::endl;
-        exit(-1);
-    }
-    if (mass <= 0)
-    {
-        std::cerr << "Error in helpers::computeCollisionTimeFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
-        exit(-1);
-    }
-    return -2.0 * mass * std::log(r) / disp;
-}
-///from Deen...Kuipers2006, eq. 43 and 30
+//helpers::KAndDisp helpers::computeKAndDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass)
+//{
+//    helpers::KAndDisp ans;
+//    ans.k = computeKFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(tc, r, mass);
+//    ans.disp = computeDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(tc, r, mass);
+//    return ans;
+//}
+//
+//Mdouble helpers::computeCollisionTimeFromKAndDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass)
+//{
+//    if (k <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeCollisionTimeFromKandDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass) stiffness is not set or has an unexpected value, (stiffness=" << k << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (disp < 0)
+//    {
+//        std::cerr << "Error in helpers::computeCollisionTimeFromKandDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass) dissipation is not set or has an unexpected value, (dissipation=" << disp << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (mass <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeCollisionTimeFromKandDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (4.0 * k / mass - mathsFunc::square(disp / mass) < 0)
+//    {
+//        std::cerr << "Error in helpers::computeCollisionTimeFromKandDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass) values for stiffness, dissipation and mass lead to an overdamped system (stiffness=" << k << " dissipation=" << disp << " mass=" << mass << ")" << std::endl;
+//        exit(-1);
+//    }
+//    return 2.0 * constants::pi / std::sqrt(4.0 * k / mass - mathsFunc::square(disp / mass));
+//}
+//
+//Mdouble helpers::computeRestitutionCoefficientFromKAndDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass)
+//{
+//    if (k <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeRestitutionCoefficientFromKandDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass) stiffness is not set or has an unexpected value, (stiffness=" << k << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (disp < 0)
+//    {
+//        std::cerr << "Error in helpers::computeRestitutionCoefficientFromKandDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass) dissipation is not set or has an unexpected value, (dissipation=" << disp << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (mass <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeRestitutionCoefficientFromKandDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (4.0 * mass * k - mathsFunc::square(disp) < 0)
+//    {
+//        std::cerr << "Error in helpers::computeRestitutionCoefficientFromKandDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass) values for stiffness, dissipation and mass lead to an overdamped system (stiffness=" << k << " dissipation=" << disp << " mass=" << mass << ")" << std::endl;
+//        exit(-1);
+//    }
+//    return std::exp(-disp * constants::pi / std::sqrt(4.0 * mass * k - mathsFunc::square(disp)));
+//}
+//
+//Mdouble helpers::computeDispFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass)
+//{
+//    if (k <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeDispFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass) stiffness is not set or has an unexpected value, (stiffness=" << k << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (r < 0)
+//    {
+//        std::cerr << "Error in helpers::computeDispFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass) restitution coefficient is not set or has an unexpected value, (restitution coefficient=" << r << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (mass <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeDispFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
+//        exit(-1);
+//    }
+//    return -2.0 * sqrt(mass * k / (constants::sqr_pi + mathsFunc::square(std::log(r)))) * std::log(r);
+//}
+//
+//Mdouble helpers::computeCollisionTimeFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass)
+//{
+//    if (k <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeCollisionTimeFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass) stiffness is not set or has an unexpected value, (stiffness=" << k << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (r < 0)
+//    {
+//        std::cerr << "Error in helpers::computeCollisionTimeFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass) restitution coefficient is not set or has an unexpected value, (restitution coefficient=" << r << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (mass <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeCollisionTimeFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
+//        exit(-1);
+//    }
+//    return sqrt(mass / k * (constants::sqr_pi + mathsFunc::square(std::log(r))));
+//}
+//
+//Mdouble helpers::computeDispFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass)
+//{
+//    if (k <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeDispFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass) stiffness is not set or has an unexpected value, (stiffness=" << k << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (tc <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeDispFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass) collision time is not set or has an unexpected value, (collision time=" << tc << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (mass <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeDispFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (mass * k - constants::sqr_pi * mathsFunc::square(mass / tc) < 0)
+//    {
+//        std::cerr << "Error in helpers::computeDispFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass) values for stiffness, collision time and mass lead to an overdamped system (stiffness=" << k << " collision time=" << tc << " mass=" << mass << ")" << std::endl;
+//        exit(-1);
+//    }
+//    return 2.0 * std::sqrt(mass * k - constants::sqr_pi * mathsFunc::square(mass / tc));
+//}
+//
+//Mdouble helpers::computeRestitutionCoefficientFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass)
+//{
+//    if (k <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeRestitutionCoefficientFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass) stiffness is not set or has an unexpected value, (stiffness=" << k << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (tc <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeRestitutionCoefficientFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass) collision time is not set or has an unexpected value, (collision time=" << tc << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (mass <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeRestitutionCoefficientFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (k / mass * mathsFunc::square(tc) - constants::sqr_pi < 0)
+//    {
+//        std::cerr << "Error in helpers::computeRestitutionCoefficientFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass) values for stiffness, collision time and mass lead to an overdamped system (stiffness=" << k << " collision time=" << tc << " mass=" << mass << ")" << std::endl;
+//        exit(-1);
+//    }
+//    return std::exp(-std::sqrt(k / mass * mathsFunc::square(tc) - constants::sqr_pi));
+//}
+//
+//Mdouble helpers::computeDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass)
+//{
+//    if (tc <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass) collision time is not set or has an unexpected value, (collision time=" << tc << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (r < 0)
+//    {
+//        std::cerr << "Error in helpers::computeDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass) restitution coefficient not set or has an unexpected value, (restitution coefficient=" << r << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (mass <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
+//        exit(-1);
+//    }
+//    return -2.0 * mass * std::log(r) / tc;
+//}
+//
+//Mdouble helpers::computeKFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass)
+//{
+//    if (tc <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeKFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass) collision time is not set or has an unexpected value, (collision time=" << tc << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (r < 0)
+//    {
+//        std::cerr << "Error in helpers::computeKFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass) restitution coefficient not set or has an unexpected value, (restitution coefficient=" << r << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (mass <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeKFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
+//        exit(-1);
+//    }
+//    return mass * (mathsFunc::square(constants::pi / tc) + mathsFunc::square(-std::log(r) / tc));
+//}
+//
+//Mdouble helpers::computeKFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass)
+//{
+//    if (tc <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeKFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass) collision time is not set or has an unexpected value, (collision time=" << tc << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (disp < 0)
+//    {
+//        std::cerr << "Error in helpers::computeKFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass) dissipation not set or has an unexpected value, (dissipation=" << disp << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (mass <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeKFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
+//        exit(-1);
+//    }
+//    return 0.25 * mathsFunc::square(disp) / mass + constants::sqr_pi * mass / mathsFunc::square(tc);
+//}
+//
+//Mdouble helpers::computeRestitutionCoefficientFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass)
+//{
+//    if (tc <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeRestitutionCoefficientFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass) collision time is not set or has an unexpected value, (collision time=" << tc << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (disp < 0)
+//    {
+//        std::cerr << "Error in helpers::computeRestitutionCoefficientFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass) dissipation not set or has an unexpected value, (dissipation=" << disp << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (mass <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeRestitutionCoefficientFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
+//        exit(-1);
+//    }
+//    return std::exp(-0.5 * disp * tc / mass);
+//}
+//
+//Mdouble helpers::computeKFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass)
+//{
+//    if (disp <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeKFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass) dissipation is not set or has an unexpected value, (dissipation time=" << disp << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (r < 0)
+//    {
+//        std::cerr << "Error in helpers::computeKFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass) restitution coefficient not set or has an unexpected value, (restitution coefficient=" << r << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (mass <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeKFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
+//        exit(-1);
+//    }
+//    return 0.25 * mathsFunc::square(disp)*(constants::sqr_pi / (mathsFunc::square(std::log(r))) + 1.0) / mass;
+//}
+//
+//Mdouble helpers::computeCollisionTimeFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass)
+//{
+//    if (disp <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeCollisionTimeFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass) dissipation is not set or has an unexpected value, (dissipation time=" << disp << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (r < 0)
+//    {
+//        std::cerr << "Error in helpers::computeCollisionTimeFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass) restitution coefficient not set or has an unexpected value, (restitution coefficient=" << r << ")" << std::endl;
+//        exit(-1);
+//    }
+//    if (mass <= 0)
+//    {
+//        std::cerr << "Error in helpers::computeCollisionTimeFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass) mass is not set or has an unexpected value (mass=" << mass << ")" << std::endl;
+//        exit(-1);
+//    }
+//    return -2.0 * mass * std::log(r) / disp;
+//}
+/////from Deen...Kuipers2006, eq. 43 and 30
 
 helpers::KAndDispAndKtAndDispt helpers::computeDisptFromCollisionTimeAndRestitutionCoefficientAndTangentialRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble beta, Mdouble mass)
 {
@@ -350,37 +350,37 @@ Mdouble helpers::getMaximumVelocity(Mdouble k, Mdouble disp, Mdouble radius, Mdo
  * final time and the mean time step is known.
  * 
  * Example of use:
- * > setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(numberOfSaves, getTimeMax(), getTimeStep()));
+ * > setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(numberOfSaves, getTimeMax(), getTimeStep()));
  * 
  * \param[in] numberOfSaves the total number of output files the user wants at the end of the simulation.
  * \param[in] timeMax       the final time of the simulation
- * \param[in] timestep      the mean time step used during the simulation
+ * \param[in] time step      the mean time step used during the simulation
  * \return the saveCount value that should be used to get the desired number of saves.
  */
-unsigned int helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(unsigned int numberOfSaves, Mdouble timeMax, Mdouble timestep)
+unsigned int helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(unsigned int numberOfSaves, Mdouble timeMax, Mdouble timeStep)
 {
-    if (numberOfSaves > 0 && timeMax > 0 && timestep > 0)
+    if (numberOfSaves > 0 && timeMax > 0 && timeStep > 0)
     {
-        return static_cast<unsigned int>(ceil((timeMax + timestep) / timestep / static_cast<double>(numberOfSaves - 1)));
+        return static_cast<unsigned int>(ceil((timeMax + timeStep) / timeStep / static_cast<double>(numberOfSaves - 1)));
     }
     else
     {
-        logger(ERROR, "[Helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep()] numberOfSaves: %, timeMax: %, timestep: %", numberOfSaves, timeMax, timestep);
+        logger(ERROR, "[Helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep()] numberOfSaves: %, timeMax: %, timestep: %", numberOfSaves, timeMax, timeStep);
         logger(ERROR, " Arguments need to be positive");
         exit(-1);
     }
 }
 
 //seems to be unused, consider taking out \author weinhartt
-//unsigned int helpers::getSaveCountFromNumberOfSavesPerTimeUnitAndTimestep(unsigned int numberOfSaves, Mdouble timestep)
+//unsigned int helpers::getSaveCountFromNumberOfSavesPerTimeUnitAndTimeStep(unsigned int numberOfSaves, Mdouble time step)
 //{
-//    if (numberOfSaves > 1 && timestep > 0)
+//    if (numberOfSaves > 1 && time step > 0)
 //    {
-//        return static_cast<unsigned int>(ceil(1.0 / timestep / static_cast<double>(numberOfSaves - 1)));
+//        return static_cast<unsigned int>(ceil(1.0 / time step / static_cast<double>(numberOfSaves - 1)));
 //    }
 //    else
 //    {
-//        std::cerr << "Error in getSaveCountFromNumberOfSavesPerTimeUnitAndTimestep (" << numberOfSaves << "," << timestep << ")" << std::endl;
+//        std::cerr << "Error in getSaveCountFromNumberOfSavesPerTimeUnitAndTimeStep (" << numberOfSaves << "," << time step << ")" << std::endl;
 //        std::cerr << "Arguments need to be positive" << std::endl;
 //        exit(-1);
 //    }
@@ -394,7 +394,7 @@ unsigned int helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(unsigne
  * line, but correctly reads the next line.
  * 
  * Example of usage:
- * > std::stringstream line(std::stringstream::in | std::stringstream::out);
+ * > std::stringstream line;
  * > std::stringstream is = restartFile.getFStream();
  * > helpers::getLineFromStringStream(is, line);
  * > std::string dummy; 

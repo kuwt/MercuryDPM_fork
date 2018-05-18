@@ -76,7 +76,7 @@ public:
     /*!
      * \brief Destructor, destroys the domain.
      */
-    virtual ~Domain();
+    ~Domain() override;
 
     /*!
      * \brief contructor of a domain
@@ -102,7 +102,7 @@ public:
     /*!
      * \brief Returns the name of the object
      */
-    virtual std::string getName() const override;
+    std::string getName() const override;
 
     /*!
      * \brief Sets the domain range in a given direction
@@ -208,7 +208,7 @@ public:
     /*!
      * \brief return the local index of a doman given the localMeshIndex vector
      */
-    int getLocalIndex(const std::vector<int> localMeshIndex);
+    int getLocalIndex(std::vector<int> localMeshIndex);
    
     /*! 
      * \brief Searches for a particle with a specific id in a list of particles
@@ -253,17 +253,17 @@ public:
     /*!
      * \brief Function that copies the mpi data format of a base particle to a real particle and adds it to the particleHandler
      */
-    void processReceivedBoundaryParticleData(const unsigned index, std::vector<BaseParticle*>& newParticles);
+    void processReceivedBoundaryParticleData(unsigned index, std::vector<BaseParticle*>& newParticles);
    
     /*!
      * \brief Bookkeep the newly send particles
      */ 
-    void processSentBoundaryParticles(const unsigned index);
+    void processSentBoundaryParticles(unsigned index);
 
     /*!
      * \brief Processes the received interactions from newly added mpi particles    
      */
-    void processReceivedInteractionData(const unsigned index, std::vector<BaseParticle*>& newParticles);
+    void processReceivedInteractionData(unsigned index, std::vector<BaseParticle*>& newParticles);
    
     /*!
      * \brief A symmetric communication between two domains exchanging a send/recieve count
@@ -449,11 +449,13 @@ private:
 
     /*!
      * \brief look-up table to get the global index given a local domain index
+     * \todo TW@Marnix should this be unsigned int
      */
     std::vector<int> localIndexToGlobalIndexTable_;
     
     /*!
      * \brief look-up table to get the processor of the domain given a local domain index
+     * \todo TW@Marnix should this be unsigned int
      */
     std::vector<int> localIndexToProcessorList_;
 
@@ -464,6 +466,7 @@ private:
 
     /*!
      * \brief A list of indices of all the active boundaries
+     * \todo TW@Marnix should this be unsigned int
      */
     std::vector<int> boundaryList_;	
     

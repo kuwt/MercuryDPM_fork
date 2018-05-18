@@ -58,7 +58,7 @@ public:
     /*!
      * \brief Default destructor. 
      */
-    virtual ~BaseWall();
+    ~BaseWall() override;
     
     /*!
      * \brief Pure virtual function that can be overwritten in inherited classes in order to copy a BaseWall.
@@ -143,7 +143,7 @@ public:
      * Intersects a of set VTK points representing a wall with a half-space defined by position and normal;
      * This is used in createVTK to restrict the VTK points representing a wall to the inside of the domain.
 */
-    void intersectVTK (std::vector<Vec3D>& points, const Vec3D normal, const Vec3D position)const;
+    void intersectVTK (std::vector<Vec3D>& points, Vec3D normal, Vec3D position)const;
 
 
     virtual std::vector<BaseInteraction*> getInteractionWithSuperQuad(SuperQuadric* p, unsigned timeStamp, InteractionHandler* interactionHandler);
@@ -161,11 +161,11 @@ public:
     const Vec3D getAxis() const;
 
     ///\brief Returns the interaction between this wall and a given particle, nullptr if there is no interaction.
-    virtual std::vector<BaseInteraction*> getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler) override;
+    std::vector<BaseInteraction*> getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler) override;
 
     bool getVTKVisibility () const;
 
-    void setVTKVisibility (const bool vtkVisibility);
+    void setVTKVisibility (bool vtkVisibility);
 
     /*!
      * Takes the points provided and adds a triangle strip connecting these points to the vtk container

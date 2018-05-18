@@ -88,6 +88,7 @@ public:
     //check contact time
     void actionsAfterTimeStep() override
     {
+        ///\todo should getTimeStep be getNTimeStep?
         std::vector<BaseInteraction*> interaction = particleHandler.getObject(0)->
                 getInteractionWith(particleHandler.getObject(1), getTimeStep(), &interactionHandler);
         if ( interaction.size() != 0)

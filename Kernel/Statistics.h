@@ -34,7 +34,7 @@
  * picks the correct StatType template from the user-specified flag. The other
  * flags are processed by StatisticsVector.
  */
-void Statistics(unsigned int argc, char *argv[])
+void Statistics(int argc, char *argv[])
 {
     if (argc > 1 && strcmp(argv[1], "-help"))
         std::cout << std::endl << "Get statistics for " << argv[1] << std::endl;

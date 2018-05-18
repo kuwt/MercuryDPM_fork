@@ -195,7 +195,7 @@ int main(int argc UNUSED, char* argv[] UNUSED)
     problem.setSystemDimensions(3);
     problem.setTimeStep(0.02 * 0.05);
     problem.setTimeMax(0.5);
-    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(1000, problem.getTimeMax(),
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(1000, problem.getTimeMax(),
                                                                                      problem.getTimeStep()));
 
     // actually solving the problem

@@ -249,7 +249,7 @@ extern LL<Log::FATAL> FATAL;
  * Error, as in, the program has found a severe problem which it cannot resolve
  * any further. It does not know how to recover in a sane way.
  *
- * Example: Negative timestep, Infinite end time and no override of the
+ * Example: Negative time step, Infinite end time and no override of the
  * continuation function.
  *
  * Default behaviour: log to std::cerr, followed by std::exit().
@@ -343,9 +343,8 @@ public:
      * \brief destructor
      */
     ~Logger()
-    {
-    }
-    
+    = default;
+
     /*
      *
      * \brief Log implementation of this function

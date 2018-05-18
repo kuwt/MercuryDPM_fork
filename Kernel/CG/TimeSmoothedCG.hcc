@@ -158,7 +158,7 @@ void TimeSmoothedCG<Coordinates, BaseFunction, Fields>::evaluate()
                 averageVariable /= average.sumWeights_;
             }
             //logger(INFO,"Writing completed time-smoothed Field for t=% at t=%",average.time_, currentTime);
-            if (CG<Coordinates, BaseFunction, Fields>::statFile.openWrite(dpm->getNtimeSteps()))
+            if (CG<Coordinates, BaseFunction, Fields>::statFile.openWrite(dpm->getNumberOfTimeSteps()))
             {
                 writeAll(CG<Coordinates, BaseFunction, Fields>::statFile.getFstream(), average);
                 CG<Coordinates, BaseFunction, Fields>::statFile.close();
@@ -215,7 +215,7 @@ void TimeSmoothedCG<Coordinates, BaseFunction, Fields>::finish()
         {
             averageVariable /= next->sumWeights_;
         }
-        if (CG<Coordinates, BaseFunction, Fields>::statFile.openWrite(this->getHandler()->getDPMBase()->getNtimeSteps()))
+        if (CG<Coordinates, BaseFunction, Fields>::statFile.openWrite(this->getHandler()->getDPMBase()->getNumberOfTimeSteps()))
         {
             //write and delete
             writeAll(CG<Coordinates, BaseFunction, Fields>::statFile.getFstream(), *next);

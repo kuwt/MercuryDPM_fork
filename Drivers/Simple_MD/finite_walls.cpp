@@ -70,7 +70,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 	problem.set_name("finite_walls");
 	problem.setTimeMax(2e-4);
 	problem.setTimeStep(1e-4);
-	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(1000,problem.getTimeMax(),problem.getTimeStep()));
+	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(1000,problem.getTimeMax(),problem.getTimeStep()));
 	//problem.setSaveCount(1);
 	problem.speciesHandler.getObject(0)->setCollisionTimeAndRestitutionCoefficient(5e-3,1.0,0.157);
 	problem.setXMax(0.2);

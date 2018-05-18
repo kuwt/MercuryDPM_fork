@@ -39,7 +39,7 @@ public:
         writeXBallsScript();
         setXBallsAdditionalArguments("-v0 -solidf -3dturn 0");
         setFileType(FileType::ONE_FILE);
-        //getRestartFile().setFileType(FileType::MULTIPLE_FILES_PADDED);
+        //restartFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
         std::cout << "loaded " << particleHandler.getNumberOfObjects() << 
             " fixed particles" << std::endl;
 
@@ -61,7 +61,7 @@ public:
         }
         std::cout << "shear velocity " << shearVelocity << std::endl;
         setSaveCount(0.25/shearVelocity/getTimeStep());
-        std::cout << "saving every " << getDataFile().getSaveCount()*getTimeStep() 
+        std::cout << "saving every " << dataFile.getSaveCount()*getTimeStep()
             << " time units" << std::endl;
     }
 

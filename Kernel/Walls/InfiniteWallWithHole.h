@@ -113,7 +113,7 @@ public:
     /*!
      * \brief Returns the name of the object
      */
-    virtual std::string getName() const override;
+    std::string getName() const override;
     
     /*!
      * \brief access function for normal

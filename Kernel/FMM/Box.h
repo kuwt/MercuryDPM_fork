@@ -41,6 +41,7 @@ public:
 		return maxLevel_;
 	}
 
+	///\todo some ints here should be unsigned long
 	int getNrPanelsOnLevel(int level)
 	{
 		return levels_[level].size();

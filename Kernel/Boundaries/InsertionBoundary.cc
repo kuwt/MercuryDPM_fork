@@ -112,7 +112,7 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
     if (!isActivated_)
         return;
 
-    /* Each timestep, the InsertionBoundary attempts to fill up a region with
+    /* Each time step, the InsertionBoundary attempts to fill up a region with
      * particles.
      *
      * It first calls generateParticle() to get a randomised particle, subject
@@ -129,7 +129,7 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
      *   * the failure counter is reset, and
      * the processes is repeated with a new generateParticle().
      *
-     * Otherwise, the processes terminates for this timestep. 
+     * Otherwise, the processes terminates for this time step.
      * */
 
     // Keep count of how many successive times we have failed to place a new

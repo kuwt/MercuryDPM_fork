@@ -41,8 +41,7 @@ public:
      * period that particles should be inserted. If so, insert 11 x 26
      * particles at the various positions in the chute.
      */
-    void actionsBeforeTimeStep()
-    {
+    void actionsBeforeTimeStep() override {
         Chute::cleanChute();
         if (getTime() < insertTime && getTime() + getTimeStep() > insertTime)
         {
@@ -81,8 +80,7 @@ public:
      * computational domain, setup the side walls and add some initial
      * particles.
      */
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         //Rectangular Chute geometry
         setXMax(1.0);
         setXMin(0.0);

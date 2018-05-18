@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
     problem.speciesHandler.getObject(0)->setSlidingFrictionCoefficient(0.5);
     problem.setFixedParticleRadius(problem.getInflowParticleRadius());
     problem.setRoughBottomType(MULTILAYER);
-    problem.setTimeStep(); //sets timestep to 1/50th of the collision time
+    problem.setTimeStep(); //sets time step to 1/50th of the collision time
     cout << "Maximum allowed speed of particles: " << problem.getMaximumVelocity() << endl; 
     
     // Chute properties
@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
     problem.makeChutePeriodic();
     
     // Output properties
-    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(1,problem.getTimeMax(),problem.getTimeStep())); //minimize output to the last timestep
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(1,problem.getTimeMax(),problem.getTimeStep())); //minimize output to the last time step
     problem.set_number_of_saves_data(100); //allow enough data output so the evolution can be viewed in xballs
     problem.set_number_of_saves_ene(100);
     problem.setXBallsAdditionalArguments("-sort -v0 -solidf");

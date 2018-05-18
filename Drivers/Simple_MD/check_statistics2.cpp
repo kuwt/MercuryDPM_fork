@@ -48,7 +48,7 @@ class myproblem : public DPMBase {
 		setSlidingFrictionCoefficient(0);
 		setTimeStep(1e-2);
 		setTimeMax(1);
-		setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(3,getTimeMax(),getTimeStep()));
+		setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(3,getTimeMax(),getTimeStep()));
 	
 		//Create the particles	
 		BaseParticle p0;

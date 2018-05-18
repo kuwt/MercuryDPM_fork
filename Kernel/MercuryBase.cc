@@ -105,7 +105,7 @@ void MercuryBase::read(std::istream& is)
 {
     DPMBase::read(is);
     
-    std::stringstream line(std::stringstream::in | std::stringstream::out);
+    std::stringstream line;
     helpers::getLineFromStringStream(is, line);
     
     std::string dummy;
@@ -311,7 +311,7 @@ void MercuryBase::hGridActionsBeforeTimeStep()
 {
     if (hGridNeedsRebuilding())
     {
-        //logger(INFO, "HGrid needs rebuilding at nt=%",getNtimeSteps());
+        //logger(INFO, "HGrid needs rebuilding at nt=%",getNumberOfTimeSteps());
         hGridRebuild();
     }
     else
@@ -324,7 +324,7 @@ void MercuryBase::hGridActionsBeforeTimeStep()
 #ifndef CONTACT_LIST_HGRID
             getHGrid()->clearFirstBaseParticleInBucket();
 #endif
-            //logger(INFO, "HGrid needs updating at nt=%",getNtimeSteps());
+            //logger(INFO, "HGrid needs updating at nt=%",getNumberOfTimeSteps());
             for (BaseParticle* const p : particleHandler)
             {
                 hGridUpdateParticle(p);

@@ -85,8 +85,7 @@ class CGHandlerSelfTest : public Mercury3D
 {
 public:
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         //define the domain
         Mdouble d = 1.0;
         setXMax(d);
@@ -127,7 +126,7 @@ int main(int argc, char *argv[])
 
     //accordingly, set the time step, final time, and save count
     problem.setTimeStep(.0002);
-    problem.setTimeMax(0.5); //a total of 5000 timesteps
+    problem.setTimeMax(0.5); //a total of 5000 time steps
     problem.setSaveCount(20);
 
     //define the different coarse-graining objects

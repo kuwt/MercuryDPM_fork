@@ -23,7 +23,7 @@ VChute::VChute(Mdouble length, Mdouble width, Mdouble alpha) {
     alpha_ = alpha;
 }
 
-VChute::~VChute() {}
+VChute::~VChute() = default;
 
 void VChute::set(Mdouble length, Mdouble width, Mdouble alpha) {
     l_ = length;

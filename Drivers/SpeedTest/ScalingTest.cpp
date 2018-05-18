@@ -37,8 +37,7 @@ class ScalingTestInitialConditionsRelax : public Mercury3D
 {
 public:
     
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         BaseParticle p0;
         p0.setRadius(particleRadius);
         
@@ -73,8 +72,7 @@ public:
         boundaryHandler.copyAndAddObject(b0);
     }
     
-    bool continueSolve() const
-    {
+    bool continueSolve() const override {
         Mdouble kineticEnergy = 0;
         
         for (std::vector<BaseParticle*>::const_iterator it = particleHandler.begin(); it != particleHandler.end(); ++it)
@@ -121,8 +119,7 @@ public:
         multiplicationFactor_ = multiplicationFactor;
     }
     
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         for (int j = 0; j < multiplicationFactor_ - 1; j++)
         {
             if (j % 3 == 0)

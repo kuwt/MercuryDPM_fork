@@ -114,10 +114,10 @@ public:
 		} else {
 			readRestartFile("/storage/usr/people/weinhartt/DRIVERS/FlowRulePaper/run/full_runs/restart_flowrule/H10A24L1M0.5B0.5.restart"); 
 			setName("static3d"); 
-                   	getDataFile().setFileType(FileType::ONE_FILE);
-                       	getRestartFile().setFileType(FileType::ONE_FILE);
-                	getFStatFile().setFileType(FileType::ONE_FILE);
-	                getEneFile().setFileType(FileType::ONE_FILE);
+                   	dataFile.setFileType(FileType::ONE_FILE);
+                       	restartFile.setFileType(FileType::ONE_FILE);
+                	fStatFile.setFileType(FileType::ONE_FILE);
+	                eneFile.setFileType(FileType::ONE_FILE);
                                    
 			setTime(0.);
 			setTimeMax(.5);

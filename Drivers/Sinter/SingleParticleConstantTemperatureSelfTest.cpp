@@ -87,10 +87,10 @@ public:
         setZMax(radius);
     }
 
-    /** set timestep */
+    /** set time step */
     void setupInitialConditions() override
     {
-        //set timestep
+        //set time step
         Mdouble mass = species->getMassFromRadius(particleHandler.getSmallestParticle()->getRadius());
         setTimeStep(species->computeTimeStep(mass));
         logger(INFO,"Collision time: %, time step: %", 50.*getTimeStep(), getTimeStep());
@@ -116,7 +116,7 @@ public:
         static int counter = 0;
         if (!counter) writeEneHeader(std::cout);
         counter++;
-        writeEneTimestep(std::cout);
+        writeEneTimeStep(std::cout);
     }
 
     /** creates custom ene header */
@@ -126,11 +126,11 @@ public:
     }
 
     /** creates custom ene output */
-    void writeEneTimestep(std::ostream& os) const override
+    void writeEneTimeStep(std::ostream& os) const override
     {
         if (interactionHandler.getNumberOfObjects() == 0)
         {
-            if (getTime()>0) logger(INFO, "writeEneTimestep: No interaction found at time %",getTime());
+            if (getTime()>0) logger(INFO, "writeEneTimeStep: No interaction found at time %",getTime());
             return;
         }
 

@@ -139,14 +139,14 @@ public:
 
     }
 
-    /** set timestep */
+    /** set time step */
     void setupInitialConditions() override
     {
 //        //set species of outer wall to non-sintering
 //        auto wallSpecies = speciesHandler.copyAndAddObject(species);
 //        wallHandler.getLastObject()->setSpecies(wallSpecies);
 
-        //set timestep
+        //set time step
         Mdouble mass = species->getMassFromRadius(particleHandler.getSmallestParticle()->getRadius());
         setTimeStep(4.0*species->computeTimeStep(mass));
         Mdouble oldGravity = getGravity().Z;
@@ -212,7 +212,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     const Mdouble radius = readFromFile("in","radius",6e-6);
     const Mdouble domainRadius = readFromFile("in","domainDiameterOverParticleDiameter",5.0) * radius;
     const Mdouble domainHeight = readFromFile("in","domainHeightOverParticleDiameter",5.0) * 2.0 * radius;
-    const unsigned dimensions = readFromFile("in","dimensions",2);
+    const unsigned dimensions = static_cast<const unsigned int>(readFromFile("in", "dimensions", 2));
 
     InitialConditions<SinterFrictionSpecies> ic(radius, domainRadius, domainHeight,dimensions);
     const unsigned long int random = readFromFile("in","random",0);

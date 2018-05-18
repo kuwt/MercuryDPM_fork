@@ -66,11 +66,11 @@ template <StatType T> class cyclic_simple_shear : public StatisticsVector<T>, pu
         InfiniteWall w0;
         w0.set(Vec3D( 0.0, 1.0, 0.0), getYMax());
         wallHandler.copyAndAddObject(w0);
-		w0.set(Vec3D( 0.0,-1.0, 0.0),-getYMin());
+		w0.set(Vec3D( 0.0,-1.0, 0.0),getMin());
 		wallHandler.copyAndAddObject(w0);
         w0.set(Vec3D( 1.0, 0.0, 0.0), getXMax());
 		wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(-1.0, 0.0, 0.0),-getXMin());
+        w0.set(Vec3D(-1.0, 0.0, 0.0),getMin());
         wallHandler.copyAndAddObject(w0);
 	}
     
@@ -108,15 +108,15 @@ int main(int /*argc*/, char **/*argv[]*/)
     //problem.species->setStiffnessAndRestitutionCoefficient(1e4,0.8,problem.getDensity()*constants::pi*pow(0.0037,2));
 	problem.species->setSlidingFrictionCoefficient(0.5);
 	problem.species->setSlidingStiffness(problem.species->getStiffness()*2/7);
-	problem.getDataFile().setFileType(FileType::ONE_FILE);
-	problem.getFStatFile().setFileType(FileType::ONE_FILE);
+	problem.dataFile.setFileType(FileType::ONE_FILE);
+	problem.fStatFile.setFileType(FileType::ONE_FILE);
 	problem.setGravity(Vec3D(0,0,0));
 
     problem.setTimeStep(1e-6);
     //problem.setTimeStepByParticle(0.02*constants::pi/sqrt(2*problem.getStiffness()/problem.particleHandler.get_LightestParticle()->getMass()));
 	problem.setTimeMax(problem.cycles*1e6* problem.getTimeStep()); //1e6 seem quite good
-    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(problem.cycles*10+1, problem.getTimeMax(), problem.getTimeStep()));
-    problem.getEneFile().setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(problem.cycles*400+1, problem.getTimeMax(), problem.getTimeStep()));
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(problem.cycles*10+1, problem.getTimeMax(), problem.getTimeStep()));
+    problem.eneFile.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(problem.cycles*400+1, problem.getTimeMax(), problem.getTimeStep()));
 	//problem.set_number_of_saves(problem.cycles*10+1);
 	//problem.set_number_of_saves_ene(problem.cycles*400+1);
 	problem.setName("cyclic_simple_shear");		

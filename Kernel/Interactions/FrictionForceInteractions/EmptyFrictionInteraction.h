@@ -59,8 +59,8 @@ public:
     EmptyFrictionInteraction(const EmptyFrictionInteraction &p);
     /*!
      * \brief Destructor.
-     */    
-    virtual ~EmptyFrictionInteraction();
+     */
+    ~EmptyFrictionInteraction() override;
     /*!
      * \brief Computes nothing, it is an empty function.
      */

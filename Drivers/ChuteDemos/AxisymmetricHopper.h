@@ -56,7 +56,7 @@ public:
 
     void setupInitialConditions()
     {
-        //do not write first timestep, as there are zero particles in it
+        //do not write first time step, as there are zero particles in it
         setLastSavedTimeStep(1);
     
         //Rudi's chute: rmin=H=12.5, rmax=34, dndt=95 500/s= 747 /sqrt(d/g)
@@ -82,10 +82,10 @@ public:
 
         auto species = speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());        
         species->setDensity(6.0 / constants::pi);
-        //species->setStiffnessAndDissipation(helpers::computeKAndDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(tc, 2.0 / 3.0, 0.5 * species->getMassFromRadius(0.5 * (getMinInflowParticleRadius() + getMaxInflowParticleRadius()))));
+        //species->setCollisionTimeAndRestitutionCoefficient(tc, 2.0 / 3.0, 0.5 * species->getMassFromRadius(0.5 * (getMinInflowParticleRadius() + getMaxInflowParticleRadius()))));
         species->setCollisionTimeAndRestitutionCoefficient(tc, 2.0 / 3.0, species->getMassFromRadius(0.5 * (getMinInflowParticleRadius() + getMaxInflowParticleRadius())));
         setTimeStep(tc / 10.);
-        setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(50, getTimeMax(), getTimeStep()));
+        setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(50, getTimeMax(), getTimeStep()));
         species->setSlidingStiffness(2. / 7. * species->getStiffness());
         species->setSlidingDissipation(2. / 7. * species->getDissipation());
         species->setSlidingFrictionCoefficient(0.4);
@@ -159,7 +159,7 @@ public:
 
     virtual void cleanChute()
     {
-        //clean outflow every 100 timesteps
+        //clean outflow every 100 time steps
         static int count = 0, maxcount = 100;
         if (count > maxcount)
         {

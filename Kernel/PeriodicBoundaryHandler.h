@@ -63,7 +63,7 @@ public:
     /*!
      * \brief Destructor, it destructs the PeriodicBoundaryHandler and all BasePeriodicBoundary it contains.
      */
-    ~PeriodicBoundaryHandler();
+    ~PeriodicBoundaryHandler() override;
 
     /*!
      * \brief Adds a BasePeriodicBoundary to the PeriodicBoundaryHandler. 
@@ -147,7 +147,7 @@ public:
     /*!
      * \brief generates a list of periodic complexities corresponding to a give real particle.
      */
-    void generateGhosts(std::vector<std::vector<int> >& list, const std::vector<int> periodicComplexity,
+    void generateGhosts(std::vector<std::vector<int> >& list, std::vector<int> periodicComplexity,
                                                                 std::vector<int>& complexity, int level);
 
     /*!
@@ -193,12 +193,12 @@ public:
     /*!
      * \brief checks if a periodic complexity is real
      */
-    bool checkIsReal(const std::vector<int> complexity);
+    bool checkIsReal(std::vector<int> complexity);
 
     /*!
      * \brief checks of two periodic complexities differ
      */
-    bool checkChanged(const std::vector<int> previousComplexity, const std::vector<int> complexity);
+    bool checkChanged(std::vector<int> previousComplexity, std::vector<int> complexity);
 
     /*!
      * \brief Updates the status of periodic particles and ghost particles
@@ -297,7 +297,7 @@ public:
     /*!
      * \brief Updates the maser flag of particles leaving the maser
      */
-    void updateMaserParticle(BaseParticle* const particle);
+    void updateMaserParticle(BaseParticle*particle);
 
     /*!
      * \brief Disables boundaries that need to be ignored (i.e. a non-maser particle needs to ignore the maser boundary)

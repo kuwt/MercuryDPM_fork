@@ -41,8 +41,7 @@ class FreeFall : public DPMBase
 {
 public:
     
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         InfiniteWall w0;
         w0.setSpecies(speciesHandler.getObject(0));
         w0.set(Vec3D(-1, 0, 0), Vec3D(getXMin(), 0, 0));
@@ -63,8 +62,7 @@ public:
         
     }
     
-    void actionsOnRestart()
-    {
+    void actionsOnRestart() override {
         
         std::cout << "In this function you can add code that is run on restart" << std::endl;
     }

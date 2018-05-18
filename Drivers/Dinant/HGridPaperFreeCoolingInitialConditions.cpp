@@ -50,19 +50,19 @@ public:
         Mdouble collisionTime = 1e-4;
         Mdouble restitutionCoefficient = 0.8;
 
-        getFStatFile().setFileType(FileType::NO_FILE);
+        fStatFile.setFileType(FileType::NO_FILE);
         getStatFile().setFileType(FileType::NO_FILE);
 
-        //getDataFile().setFileType(FileType::NO_FILE);
-        //getRestartFile().setFileType(FileType::NO_FILE);
-        //getEneFile().setFileType(FileType::NO_FILE);
+        //dataFile.setFileType(FileType::NO_FILE);
+        //restartFile.setFileType(FileType::NO_FILE);
+        //eneFile.setFileType(FileType::NO_FILE);
 
-        getDataFile().setFileType(FileType::ONE_FILE);
-        getRestartFile().setFileType(FileType::ONE_FILE);
-        getEneFile().setFileType(FileType::ONE_FILE);
-        getDataFile().setSaveCount(1000);
-        getRestartFile().setSaveCount(1000);
-        getEneFile().setSaveCount(100);
+        dataFile.setFileType(FileType::ONE_FILE);
+        restartFile.setFileType(FileType::ONE_FILE);
+        eneFile.setFileType(FileType::ONE_FILE);
+        dataFile.setSaveCount(1000);
+        restartFile.setSaveCount(1000);
+        eneFile.setSaveCount(100);
 
         setSystemDimensions(dimensions);
         setParticleDimensions(dimensions);

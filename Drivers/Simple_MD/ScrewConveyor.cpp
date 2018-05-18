@@ -122,7 +122,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 	problem.setGravity(Vec3D(0,-7,-7));
 	//problem.speciesHandler.getObject(0)->setCollisionTimeAndRestitutionCoefficient(0.0001,0.4, pow(problem.ParticleRadius,3)*constants::pi*4.0/3.0*1000);
 	problem.setTimeStep();
-	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(1001,getTimeMax(),getTimeStep()));
+	problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(1001,getTimeMax(),getTimeStep()));
 	problem.set_HGRID_max_levels(1);
 	problem.set_HGRID_sphere_to_cell_ratio(1.1);
 	problem.set_UpdateEachTimeStep(false);

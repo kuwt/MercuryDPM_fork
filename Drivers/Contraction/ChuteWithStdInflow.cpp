@@ -251,7 +251,7 @@ public:
     ///Remove particles if they fall below a certain height (allows them to become supercritical)
     void cleanChute()
     {
-        //clean outflow every 100 timesteps
+        //clean outflow every 100 time steps
         static int count = 0, maxcount = 100;
         if (count > maxcount)
         {
@@ -323,9 +323,9 @@ int main(int argc, char* argv[])
     //problem.setSaveCount(1./problem.getTimeStep());
     problem.setSaveCount(500);
     problem.setXBallsAdditionalArguments("-v0 -solidf -h 600 -w 1400 ");
-    problem.getDataFile().setFileType(FileType::ONE_FILE);
-    problem.getEneFile().setFileType(FileType::ONE_FILE);
-    problem.getRestartFile().setFileType(FileType::ONE_FILE);
-    problem.getFStatFile().setFileType(FileType::ONE_FILE);
+    problem.dataFile.setFileType(FileType::ONE_FILE);
+    problem.eneFile.setFileType(FileType::ONE_FILE);
+    problem.restartFile.setFileType(FileType::ONE_FILE);
+    problem.fStatFile.setFileType(FileType::ONE_FILE);
     problem.solve(argc, argv);
 }

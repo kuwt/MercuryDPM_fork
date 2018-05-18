@@ -34,8 +34,7 @@ using namespace constants;
 class TwoParticles : public Mercury3D
 {
 public:
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         setName("CGLiquidsUnitTest");
         setTimeStep(1e-4);
         setFileType(FileType::NO_FILE);

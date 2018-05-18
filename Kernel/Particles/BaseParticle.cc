@@ -241,7 +241,7 @@ const std::vector<int>& BaseParticle::getPeriodicComplexity()
     //So incase that doesnt happen we need to resize this periodicComplexity
     if (periodicComplexity_.size() == 0)
     {
-        int numberOfPeriodicBoundaries = getHandler()->getDPMBase()->periodicBoundaryHandler.getSize();
+        const unsigned numberOfPeriodicBoundaries = getHandler()->getDPMBase()->periodicBoundaryHandler.getSize();
         if (numberOfPeriodicBoundaries > 0 )
         {
             periodicComplexity_.resize(numberOfPeriodicBoundaries,0);
@@ -259,7 +259,7 @@ int BaseParticle::getPeriodicComplexity(int index)
     ///\todo TW @Marnix, this is indeed a hack; you should call a setter every time you add a value to the periodic boundary handler (this function takes 0.5% cpu time in the speedtest)
     if (periodicComplexity_.size() == 0)
     {
-        int numberOfPeriodicBoundaries = getHandler()->getDPMBase()->periodicBoundaryHandler.getSize();
+        const unsigned numberOfPeriodicBoundaries = getHandler()->getDPMBase()->periodicBoundaryHandler.getSize();
         if (numberOfPeriodicBoundaries > 0 )
         {
             periodicComplexity_.resize(numberOfPeriodicBoundaries,0);
@@ -783,7 +783,7 @@ void BaseParticle::setIndSpecies(unsigned int indSpecies)
 {
     if (handler_ != nullptr)
     {
-        BaseInteractable::setIndSpecies(indSpecies);
+        //BaseInteractable::setIndSpecies(indSpecies);
 	setSpecies(handler_->getDPMBase()->speciesHandler.getObject(indSpecies));
         ///\todo TW do we have to update the species stored in the interactions here?
     }

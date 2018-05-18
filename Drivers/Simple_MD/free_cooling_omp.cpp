@@ -39,7 +39,7 @@ public:
 	setCollisionTimeAndRestitutionCoefficient(1,1,1);
 	setTimeStep(.02);
  	setTimeMax(.5);
-	setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(10,getTimeMax(),getTimeStep()));
+	setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(10,getTimeMax(),getTimeStep()));
 	
 	int N=mathsFunc::square(30);
 	int N1=static_cast<int>(sqrt(N))+1;

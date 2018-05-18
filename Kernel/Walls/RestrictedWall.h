@@ -62,7 +62,7 @@ public:
     /*!
      * \brief Default destructor.
      */
-    virtual ~RestrictedWall();
+    ~RestrictedWall() override;
 
     /*!
      * \brief Wall copy method. It calls the copy constructor of this Wall, useful for polymorphism

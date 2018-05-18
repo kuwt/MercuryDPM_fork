@@ -19,8 +19,7 @@ class RotatingDrum : public Mercury3D
 		fractionalPolydispersity = 0.0;
 	}
 
-	void setupInitialConditions()
-	{
+	void setupInitialConditions() override {
 
 		radiusS2 = sizeRatio*radiusS1;
 		
@@ -307,8 +306,7 @@ class RotatingDrum : public Mercury3D
 		}		
 	}
 
-	void actionsBeforeTimeStep()
-	{
+	void actionsBeforeTimeStep() override {
 
 		if (step==2)
 		{

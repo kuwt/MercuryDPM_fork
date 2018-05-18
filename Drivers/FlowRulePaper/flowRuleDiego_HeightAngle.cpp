@@ -93,7 +93,7 @@ public:
             auto species1 = speciesHandler.copyAndAddObject(species);
             baseSpecies = speciesHandler.getMixedObject(species, species1);
             for (unsigned int i=0; i<particleHandler.getNumberOfObjects(); i++) {
-                if (particleHandler.getObject(i)->isFixed()) particleHandler.getObject(i)->setIndSpecies(1);
+                if (particleHandler.getObject(i)->isFixed()) particleHandler.getObject(i)->setSpecies(speciesHandler.getObject(1));
             }
         }
     }
@@ -110,11 +110,10 @@ public:
 	}
 
 	//Do not add or remove particles
-	virtual void actionsBeforeTimeStep(){ };
+	void actionsBeforeTimeStep() override { };
 		
 	//Set up periodic walls, rough bottom, add flow particles
-	void setupInitialConditions()
-	{
+	void setupInitialConditions() override {
         //fix_hgrid();
 		particleHandler.setStorageCapacity(particleHandler.getNumberOfObjects()+getChuteLength()*getChuteWidth()*getZMax());//why is this line needed?
 		
@@ -124,7 +123,7 @@ public:
 		if (speciesHandler.getNumberOfObjects()>1) {
 			for (unsigned int i=0; i<particleHandler.getNumberOfObjects(); i++)
 				if (particleHandler.getObject(i)->isFixed()) 
-					particleHandler.getObject(i)->setIndSpecies(1);
+					particleHandler.getObject(i)->setSpecies(speciesHandler.getObject(1));
 		}
 
         ///todo{I(Dinant) had to clear the WallHandler to prevent it from inserting the same wall twice, why?}
@@ -218,8 +217,8 @@ public:
         inflowParticle_.setPosition(position);
 		inflowParticle_.setVelocity(Vec3D(getInflowVelocity(),0.0,0.0));
 		if (randomiseSpecies) {
-			int indSpecies = floor(random.getRandomNumber(0,speciesHandler.getNumberOfObjects()-1e-200));
-			inflowParticle_.setIndSpecies(indSpecies);
+			const unsigned int indSpecies = floor(random.getRandomNumber(0, speciesHandler.getNumberOfObjects() - 1e-200));
+			inflowParticle_.setSpecies(speciesHandler.getObject(indSpecies));
 		}
 	}
 
@@ -227,7 +226,7 @@ public:
 	void set_H(Mdouble new_) {setInflowHeight(new_); setZMax(getInflowHeight());}
 	Mdouble get_H() {return getInflowHeight();}
 
-	void printTime() const {
+	void printTime() const override {
 	  std::cout << "t=" << std::setprecision(3) << std::left << std::setw(6) << getTime() 
 		    << ", tmax=" << std::setprecision(3) << std::left << std::setw(6) << getTimeMax()
 		    << ", N=" << std::setprecision(3) << std::left << std::setw(6) << particleHandler.getNumberOfObjects()

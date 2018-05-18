@@ -59,8 +59,7 @@ CubeInsertionBoundary::CubeInsertionBoundary(const CubeInsertionBoundary& other)
  *          need for any actions here.
  */
 CubeInsertionBoundary::~CubeInsertionBoundary()
-{
-}
+= default;
 
 /*!
  * \details Copy method; creates a copy on the heap and returns its pointer. 
@@ -90,7 +89,7 @@ CubeInsertionBoundary* CubeInsertionBoundary::copy() const
  * \param[in] radMin            Minimum radius of inserted particles
  * \param[in] radMax            Maximum radius of inserted particles
  */
-void CubeInsertionBoundary::set(BaseParticle* particleToCopy, int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax, double radMin, double radMax)
+void CubeInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax, double radMin, double radMax)
 {
     setParticleToCopy(particleToCopy);
     setRadiusRange(radMin, radMax);
@@ -174,7 +173,7 @@ void CubeInsertionBoundary::read(std::istream& is)
  */
 void CubeInsertionBoundary::oldRead(std::istream& is)
 {
-    int maxFailed;
+    unsigned int maxFailed;
     std::string dummy;
     is >> dummy >> maxFailed
             >> dummy >> posMin_

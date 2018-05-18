@@ -34,12 +34,12 @@ public:
     /*!
      * \brief Destructor: default destructor.
      */
-    ~PolydisperseInsertionBoundary();
+    ~PolydisperseInsertionBoundary() override;
 
     /*!
      * \brief Creates a copy on the heap and returns a pointer.
      */
-    virtual PolydisperseInsertionBoundary* copy() const override;
+    PolydisperseInsertionBoundary* copy() const override;
 
     /*!
      * \brief Set position and velocity of inserted particles.
@@ -64,12 +64,12 @@ public:
     /*!
      * \brief Generates a particle from the possible species
      */
-    virtual BaseParticle* generateParticle(RNG &random) override;
+    BaseParticle* generateParticle(RNG &random) override;
 
     /*!
      * \brief Places the particle in a random position with a random velocity
      */
-    virtual void placeParticle(BaseParticle* p, RNG &random) override;
+    void placeParticle(BaseParticle* p, RNG &random) override;
     
     /*!
      * \brief reads boundary properties from istream
@@ -84,7 +84,7 @@ public:
     /*!
      * \brief Returns the name of the object
      */
-    virtual std::string getName() const override;
+    std::string getName() const override;
     
 // private:
 

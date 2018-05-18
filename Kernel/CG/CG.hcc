@@ -214,7 +214,7 @@ template<class Coordinates, template<class> class BaseFunction, class Fields>
 void CG<Coordinates, BaseFunction, Fields>::writeVariables()
 {
     // write the data of each time step
-    if (statFile.openWrite(getHandler()->getDPMBase()->getNtimeSteps()))
+    if (statFile.openWrite(getHandler()->getDPMBase()->getNumberOfTimeSteps()))
     {
         writeAll(statFile.getFstream());
         statFile.close();

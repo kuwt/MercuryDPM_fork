@@ -53,7 +53,7 @@ public:
     /*!
      * \brief Destructor.
      */
-    virtual ~SinterInteraction();
+    ~SinterInteraction() override;
     /*!
      * \brief Creates a copy of an object of this class. (Deep copy)
      */
@@ -64,12 +64,12 @@ public:
     void computeNormalForce();
     /*!
      * \brief Interaction read function, which accepts an std::istream as input.
-     */    
-    virtual void read(std::istream& is) override;
+     */
+    void read(std::istream& is) override;
     /*!
      * \brief Interaction write function, which accepts an std::ostream as input.
-     */    
-    virtual void write(std::ostream& os) const override;
+     */
+    void write(std::ostream& os) const override;
     /*!
      * \brief Returns the name of the interaction.
      */
@@ -89,7 +89,7 @@ public:
     /*!
      * \brief
      */
-    void setPlasticOverlap(const Mdouble plasticOverlap);
+    void setPlasticOverlap(Mdouble plasticOverlap);
     /*!
      * \brief
      */

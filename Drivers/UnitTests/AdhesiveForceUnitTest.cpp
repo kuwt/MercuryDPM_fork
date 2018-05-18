@@ -49,8 +49,7 @@ public:
         speciesHandler.addObject(species);
     }
 
-	void setupInitialConditions()
-	{
+	void setupInitialConditions() override {
         relVelocity_ = 1e-1;
         setName("AdhesiveForceUnitTest_ParticleParticleInteraction");
 
@@ -106,8 +105,7 @@ public:
         speciesHandler.addObject(species);
     }
 
-    void setupInitialConditions()
-	{
+    void setupInitialConditions() override {
         relVelocity_ = 1e-1;
         setSystemDimensions(3);
         setParticleDimensions(3);
@@ -166,8 +164,7 @@ public:
     }
 
 protected:
-	void setupInitialConditions()
-	{
+	void setupInitialConditions() override {
         relVelocity_ = 1e-1;
         setName("AdhesiveForceUnitTest_ParticleWallInteractionWithPlasticForces");
 

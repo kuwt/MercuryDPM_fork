@@ -196,7 +196,7 @@ void AxisymmetricIntersectionOfWalls::writeVTK (VTKContainer& vtk) const
                 rzVec.push_back(p);
             }
         }
-        if (rzVec.size()==0)
+        if (rzVec.empty())
             return;
         
         //create points on the unit circle
@@ -213,9 +213,9 @@ void AxisymmetricIntersectionOfWalls::writeVTK (VTKContainer& vtk) const
         
         //now create rings of points on the axisym. shape
         ///\bug once the quaternions are implemented, we can orient these walls properly
-        unsigned nPoints = vtk.points.size();
+        unsigned long nPoints = vtk.points.size();
         Vec3D p;
-        Vec3D o = getOrientation().getAxis();
+        //Vec3D o = getOrientation().getAxis();
         for (auto rz : rzVec)
         {
             for (auto xy : xyVec)
@@ -228,8 +228,8 @@ void AxisymmetricIntersectionOfWalls::writeVTK (VTKContainer& vtk) const
         }
 
         //finally create the connectivity matri to plot shell-like triangle strips.
-        unsigned nz = rzVec.size();
-        unsigned nCells = vtk.triangleStrips.size();
+        unsigned long nz = rzVec.size();
+        unsigned long nCells = vtk.triangleStrips.size();
         vtk.triangleStrips.reserve(nCells+(nz-1));
         for (unsigned iz=0; iz<nz-1; iz++) {
             std::vector<double> cell;

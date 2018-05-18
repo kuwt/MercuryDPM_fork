@@ -50,7 +50,7 @@ public:
     /*!
      * \brief destructor
      */
-    ~PeriodicBoundary();
+    ~PeriodicBoundary() override;
     
     /*!
      * \brief copy method
@@ -102,18 +102,18 @@ public:
     /*!
      * \brief Returns the distance of the wall to the particle
      */
-    Mdouble getDistance(const BaseParticle& p) const;
+    Mdouble getDistance(const BaseParticle& p) const override;
     
     /*!
      * \brief Returns the distance of the wall to the position
      */
-    Mdouble getDistance(const Vec3D &position) const;
+    Mdouble getDistance(const Vec3D &position) const override;
     
     /*!
      * \brief shifts the particle 
      * \param[in] p A pointer to the particle which will be shifted.
      */
-    virtual void shiftPosition(BaseParticle* p) const;
+    void shiftPosition(BaseParticle* p) const override;
     
     /*!
      * \brief shifts two positions
@@ -130,12 +130,12 @@ public:
      * \details Returns TRUE if position checked is closest to the 'left'
      * wall, and FALSE if it is closest to the 'right' wall.
      */
-    virtual bool isClosestToLeftBoundary(const Vec3D& p) const;
+    bool isClosestToLeftBoundary(const Vec3D& p) const override;
 
     /*!
      * \brief reads boundary properties from istream
      */
-    virtual void read(std::istream& is) override;
+    void read(std::istream& is) override;
    
     /*!
      * \brief deprecated version of CubeInsertionBoundary::read().
@@ -146,7 +146,7 @@ public:
     /*!
      * \brief writes boundary properties to ostream
      */
-    virtual void write(std::ostream& os) const override;
+    void write(std::ostream& os) const override;
     
     /*!
      * \brief Returns the name of the object
@@ -157,7 +157,7 @@ public:
      * \brief Checks distance of particle to closest wall and creates periodic 
      * copy if necessary
      */
-    virtual void createPeriodicParticles(ParticleHandler &pH) override;
+    void createPeriodicParticles(ParticleHandler &pH) override;
 
     /*!
      * \brief Creates and adds a ghost particle from a give real particle
@@ -173,7 +173,7 @@ public:
      * \brief Checks if particle has crossed either boundary wall, and applies a shift
      * if that is the case.
      */
-    virtual void checkBoundaryAfterParticlesMove(ParticleHandler& pH);
+    void checkBoundaryAfterParticlesMove(ParticleHandler& pH) override;
  
 protected:
   /*!

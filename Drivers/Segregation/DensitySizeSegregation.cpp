@@ -82,7 +82,7 @@ void setupInitialConditions()
 {
 	
 	//Check if the run has been done before. If yes, skip and start next run
-	      if (helpers::fileExists(getDataFile().getName()))
+	      if (helpers::fileExists(dataFile.getName()))
 		{
 			//If it has move on to teh next run immedently
 			cout << "This run has been done " << endl;
@@ -304,7 +304,7 @@ void setupInitialConditions()
 			{
 			//Generate a small particle: set radius to small radius subtract one off the list of small particles to be generated
 			  inflowParticle_.setRadius(radius_1);
-			  inflowParticle_.setIndSpecies(1);
+			  inflowParticle_.setSpecies(speciesHandler.getObject(1));
 			  N1--;
 			}
 		else
@@ -389,8 +389,8 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 	//std::cout << "Maximum allowed speed of particles: " << problem.particleHandler.getSmallestParticle()->calculateMaximumVelocity() << std::endl; // speed allowed before particles move through each other!
     problem.setTimeStep(5.e-3 / 50.0);//initially it was auto-set
 	//This is based on the fact in general you get too much data, so prob at worst you want to turn it into a 20 at 60fps (which is its self overkill)
-    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(20*60, problem.getTimeMax(), problem.getTimeStep()));
-	//problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(20*60,getTimeMax(),getTimeStep()));
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(20*60, problem.getTimeMax(), problem.getTimeStep()));
+	//problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(20*60,getTimeMax(),getTimeStep()));
 	//problem.setSaveCount(1);
 	cout << "dt=" << problem.getTimeStep() << endl;
 	

@@ -64,19 +64,19 @@ public:
     species2->setDensity(particle_density2);
     
     InfiniteWall w0;
-    w0.set(Vec3D(-1.0, 0.0, 0.0),-getXMin());
+    w0.set(Vec3D(-1.0, 0.0, 0.0),getMin());
     wallHandler.copyAndAddObject(w0);
     
-    w0.set(Vec3D(+1.0, 0.0, 0.0),+getXMax());
+    w0.set(Vec3D(+1.0, 0.0, 0.0),getMax());
     wallHandler.copyAndAddObject(w0);
     
-    w0.set(Vec3D( 0.0,-1.0, 0.0),-getYMin());
+    w0.set(Vec3D( 0.0,-1.0, 0.0),getMin());
     wallHandler.copyAndAddObject(w0);
     
-    w0.set(Vec3D( 0.0,+1.0, 0.0),+getYMax());
+    w0.set(Vec3D( 0.0,+1.0, 0.0),getMax());
     wallHandler.copyAndAddObject(w0);
     
-    w0.set(Vec3D( 0.0, 0.0,-1.0),-getZMin());
+    w0.set(Vec3D( 0.0, 0.0,-1.0),getMin());
     w0.setPrescribedPosition([this] (double time)
     {
         double t = getTime()-1.0;
@@ -116,7 +116,7 @@ public:
 			p0.setVelocity(Vec3D(drand48()*0.01,drand48()*0.01,drand48()*0.01));
 			if (i<N/2) {
 				p0.setRadius(particle_radius);
-				p0.setIndSpecies(1);
+				p0.setSpecies(speciesHandler.getObject(1));
 			} else {
 				p0.setRadius(particle_radius);
 				p0.setIndSpecies(2);

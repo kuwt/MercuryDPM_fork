@@ -43,8 +43,7 @@ class FreeCooling3DDemoProblem : public Mercury3D
 {
 public:
 
-    void setupInitialConditions()
-    {
+    void setupInitialConditions() override {
         const unsigned int N1 = static_cast<unsigned int>(pow(N, 0.33)) + 1;
         BaseParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));

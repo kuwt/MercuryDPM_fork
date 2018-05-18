@@ -55,7 +55,7 @@ class statistics_while_running : public StatisticsVector<T>, public Chute
 			load_restart_data();
 		}
 		//save restart data
-		//getRestartFile().setFileType(FileType::ONE_FILE);
+		//restartFile.setFileType(FileType::ONE_FILE);
 		//writeRestartFile();
 		//automatic depth range detection
 		auto_set_z();
@@ -65,13 +65,13 @@ class statistics_while_running : public StatisticsVector<T>, public Chute
 		setName(name.substr(found+1).c_str());
 		cout << " to " << getName() << endl;
 		//save restart data
-		//getRestartFile().setFileType(FileType::ONE_FILE);
+		//restartFile.setFileType(FileType::ONE_FILE);
 		//writeRestartFile();
 		//set output to minimum
-		getDataFile().setFileType(FileType::NO_FILE);
-		getRestartFile().setFileType(FileType::NO_FILE);
-		getFStatFile().setFileType(FileType::NO_FILE);
-		getEneFile().setFileType(FileType::NO_FILE);
+		dataFile.setFileType(FileType::NO_FILE);
+		restartFile.setFileType(FileType::NO_FILE);
+		fStatFile.setFileType(FileType::NO_FILE);
+		eneFile.setFileType(FileType::NO_FILE);
 		//automatic depth range decection
 		auto_set_z();
 		//set statistical parameters
