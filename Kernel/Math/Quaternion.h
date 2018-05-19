@@ -90,7 +90,11 @@ public:
      */
     Quaternion(Mdouble q0, Mdouble q1, Mdouble q2, Mdouble q3);
 
-    explicit Quaternion(Vec3D normal)
+    /**
+     * \todo should be explicit as teh conversion is not unique
+     * @param normal
+     */
+    Quaternion(Vec3D normal)
     {
         setOrientationViaNormal(normal);
     }

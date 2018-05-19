@@ -69,7 +69,7 @@ public:
      */
     Vec3D() {setZero();}
 
-    explicit Vec3D(const SmallVector<3>& vector);
+    Vec3D(const SmallVector<3>& vector);
     
     /*!
      * \brief Alternative constructor, taking the three elements as arguments
