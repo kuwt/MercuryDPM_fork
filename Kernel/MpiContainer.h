@@ -120,7 +120,7 @@ public:
     /*!
      * \brief Creates the MPI types required for communication of Mercury data through the MPI interface
      */
-    void initialiseMercuryMPITypes();
+    void initialiseMercuryMPITypes(const SpeciesHandler& speciesHandler);
     
     /*! 
      * \brief Process all pending asynchronous communication requests before continuing

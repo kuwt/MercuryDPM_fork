@@ -3726,7 +3726,7 @@ void DPMBase::decompose()
     //Define the mpi transfer types, which requires a definition of the species already
     ///\TODO update this function for Jonny
     logger.assert_always(speciesHandler.getNumberOfObjects() > 0, "Please create a particle species before calling solve()");
-    MPIContainer::Instance().initialiseMercuryMPITypes();
+    MPIContainer::Instance().initialiseMercuryMPITypes(speciesHandler);
 
     //Make sure all processors are done with decomposition before proceeding
     logger(VERBOSE,"processor %: #real particles: %, #total particles: %", PROCESSOR_ID, particleHandler.getNumberOfRealObjects(), particleHandler.getSize());

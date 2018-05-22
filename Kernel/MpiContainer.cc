@@ -65,7 +65,7 @@ MPIContainer::MPIContainer()
  * Currently it is only possible to have one type of interaction in the MPI (and that should be sufficient)
  * \param[in] speciesHandler Handles all the species, required to create a prototype interaction
  */
-void MPIContainer::initialiseMercuryMPITypes()
+void MPIContainer::initialiseMercuryMPITypes(const SpeciesHandler& speciesHandler)
 {
 #ifdef MERCURY_USE_MPI
     //Note: Important that the MPI type creation is done in the order given by the enum
@@ -83,7 +83,7 @@ void MPIContainer::initialiseMercuryMPITypes()
     if (dataTypes_.size() == 4)
     {
         //Create a dummy interaction to get a grip on the size of the MPI interaction class
-        BaseSpecies* species = speciesHandler.getObject(0);
+        const BaseSpecies* species = speciesHandler.getObject(0);
         BaseInteraction* emptyInteraction = species->getEmptyInteraction();
         emptyInteraction->createMPIType();
         species->deleteEmptyInteraction(emptyInteraction);
