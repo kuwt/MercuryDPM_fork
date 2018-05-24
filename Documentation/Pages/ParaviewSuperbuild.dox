@@ -1,0 +1,94 @@
+/*! \page ParaViewSuperbuild Visualising Superquadrics in Paraview
+
+MercuryDPM includes a paraview plugin to visualise superquadrics. Unfortunately, this requires you to build paraview-suberbuild from scratch. Below you find the installation instructions:
+
+# Installation instructions paraview-superbuild with superquadrics plugin
+
+Tested on Xubuntu 16.04.3 LTS (Oracle VM VirtualBox) and Windows 10.1 (Developer mode using the Ubuntu shell
+
+-# Update apt
+\code{.sh}
+$ sudo apt update
+# sudo apt upgrade
+\endcode
+
+-# You need gcc version 6 or higher (type <tt>gcc -v</tt> to see the version number).
+If you have an old version, you need to install gcc-6:
+\code{.sh}
+$ sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+$ sudo apt install gcc-6
+\endcode
+
+-# You need cmake version 3.10 or higher (type <tt>cmake --version</tt>).
+If you have an old version: (https://github.com/ruslo/hunter/issues/328#issuecomment-198672048)
+<br>Remove cmake, cmake-curses-gui, cmake-qt-gui, curl
+\code{.sh}
+$ sudo apt remove cmake curl
+\endcode
+Install necessary packages:
+\code{.sh}
+$ sudo apt install zlib1g zlib1g-dev libssl-dev
+\endcode
+Download and install curl: https://curl.haxx.se/download.html
+\code{.sh}
+$ wget https://curl.haxx.se/download/curl-7.56.1.tar.bz2
+$ tar xf curl-7.56.1.tar.bz2
+$ cd curl-7.56.1
+$ ./configure --with--ssl && make && sudo make install
+$ cd .. # you can now remove the folder curl-7.56.1
+$ curl --version # check curl is installed
+\endcode
+Install qt5
+\code{.sh}
+$ sudo apt install qt5-default
+$ sudo apt install libncurses5-dev (ccmake command will also be created)
+\endcode
+Download and install cmake: https://cmake.org/download
+\code{.sh}
+$ wget https://cmake.org/files/v3.10/cmake-3.10.0.tar.gz #Download cmake: https://cmake.org/download
+$ tar xf cmake-3.10.0.tar.gz
+$ cd cmake-3.10.0
+$ ./bootstrap --qt-gui --system-curl && make && sudo make install
+$ bash # restart bash such that it doesn't look for cmake in the old location
+\endcode
+
+-# Get paraview-superbuild
+\code{.sh}
+$ sudo apt install git pkg-config #needed to make paraview
+$ mkdir ParaViewSuperBuild
+$ cd ParaViewSuperBuild
+$ git clone --recursive https://gitlab.kitware.com/paraview/paraview-superbuild.git Source
+$ cd Source
+$ git fetch origin
+$ git checkout v5.4.1
+$ git submodule update
+$ cd ../
+\endcode
+Install paraview-superbuild
+\code{.sh}
+$ mkdir Build
+$ cd Build
+$ cmake ../Source -DENABLE_qt5=TRUE # use cmake-gui to debug if you encounter errors
+$ make && sudo make install #or make -j4 && sudo make install
+$ paraview & # check
+$ vi ~/ParaViewSuperBuild/Build/superbuild/paraview/build/ParaViewConfig.cmake
+\endcode
+Turn PARAVIEW_BUILD_QT_GUI, PARAVIEW_ENABLE_QT_SUPPORT, paraview_build_qt_gui from “ON” to “OFF”, and save.
+
+-# Download and install SuperquadricTensorGlyph
+\code{.sh}
+$ svn co https://svn.mercurydpm.org/SourceCode/Trunk/Tools/SuperquadricTensorGlyphForParaviewSuperBuild SuperquadricTensorGlyph
+$ cd SuperquadricTensorGlyph
+$ mkdir Build
+$ cd Build
+$ cmake .. -DParaView_DIR=~/ParaViewSuperBuild/Build/superbuild/paraview/build
+$ make
+\endcode
+
+-# Load plugin
+<br>In ParaView, go to Tools > Manage Plugins… Do Load New and select ~/SuperquadricTensorGlyph/Build/libSuperquadricTensorGlyphFilter.so. Click “OK”. Then the filter should appear on the Local plugins list, click on it and select "Auto Load", then close.
+
+-# Apply plugin
+<br>When opening a *.vtu file with superquadric features, do "Apply" then go to Filters > Tensor Analysis > Superquadric Tensor Glyphs. Finally, do "Apply" again.
+
+*/

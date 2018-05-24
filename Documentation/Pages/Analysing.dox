@@ -4,6 +4,7 @@
 Having explained in the previous section the how to run a Mercury driver code, we next explain the form of the data output, and describe how relevant information may be extracted from this data. Mercury produces data regarding a wide range of system parameters and, as such, there exist a variety of manners in which this data may be obtained and processed. This page is divided in two parts:
 - \ref UnderstandingTheOutputFiles
 - \ref VisualisingDataInParaview
+- \subpage ParaViewSuperbuild
 - \subpage xballs
 
 \section UnderstandingTheOutputFiles Understanding the output files
