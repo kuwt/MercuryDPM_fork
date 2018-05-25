@@ -53,6 +53,7 @@
 
 #include "Logger.h"
 #include <vector>
+
 /// \class NumericalVector<T>
 /// \brief This is a vector of doubles
 ///
@@ -62,185 +63,185 @@ template<typename T = Mdouble>
 class NumericalVector
 {
 public:
-
-	    NumericalVector<T>()
-	            : data_()
-	    {
-	    }
-
-	    explicit NumericalVector<T>(std::size_t m)
-	            : data_(m)
-	    {
-	    }
-
-	    NumericalVector<T>(std::initializer_list<T> l)
-	            : data_(l)
-	    {
-	    }
-
-	    NumericalVector<T>(const NumericalVector& other)
-	            : data_(other.data_)
-	    {
-	    }
-
-	    NumericalVector<T>(NumericalVector&& other)
-	            : data_(std::move(other.data_))
-	    {
-	    }
-
-	    NumericalVector<T>(const T array[], std::size_t size)
-	            : data_(array, array + size)
-	    {
-	    }
-
-	    void resize(std::size_t size)
-	    {
-	        if (size != data_.size())
-	        {
-	            data_.resize(size);
-	        }
-	    }
-
-	    NumericalVector<T>& operator=(const NumericalVector<T>& right)
-	    {
-	        data_ = right.data_;
-	        return *this;
-	    }
-
-	    NumericalVector<T>& operator=(const std::initializer_list<T> l)
-	    {
-	    	data_ = l;
-	    	return *this;
-	    }
-
-	    NumericalVector<T> operator+(const NumericalVector<T>& right) const
-	    {
-	        NumericalVector<T> result(*this);
-	        logger.assert(data_.size() == right.data_.size(), "Vectors don't have the same size");
-	        for (std::size_t i = 0; i < data_.size(); i++)
-	            result.data_[i] += right.data_[i];
-	        return result;
-	    }
-
-	    NumericalVector<T> operator-(const NumericalVector<T>& right) const
-	    {
-	        NumericalVector<T> result(*this);
-	        logger.assert(data_.size() == right.data_.size(), "Vectors don't have the same size");
-	        for (std::size_t i = 0; i < data_.size(); i++)
-	            result.data_[i] -= right.data_[i];
-	        return result;
-	    }
-
-	    NumericalVector<T> operator*(const T& right) const
-	    {
-	        NumericalVector<T> result(*this);
-	        for (T& d : result.data_)
-	            d *= right;
-	        return result;
-	    }
-
-
-	    T operator*(const NumericalVector& right) const
-	    {
-	        logger.assert(data_.size() == right.data_.size(), "Vectors don't have equal length.");
-	        T sum = 0;
-	        for (std::size_t i = 0; i < data_.size(); i++)
-	            sum += data_[i] * right.data_[i];
-	        return sum;
-	    }
-
-	    NumericalVector<T>& operator/=(const T& right)
-	    {
-	        for (T& d : data_)
-	            d /= right;
-
-	        return *this;
-	    }
-
-	    NumericalVector<T> operator/(const T& right) const
-	    {
-	        NumericalVector<T> result(*this);
-	        return (result /= right);
-
-	    }
-
-	    NumericalVector<T>& operator+=(const NumericalVector<T>& right)
-	    {
-	        logger.assert(data_.size() == right.data_.size(), "Vectors don't have the same size");
-	        for (std::size_t i = 0; i < data_.size(); i++)
-	            data_[i] += right.data_[i];
-	        return *this;
-	    }
-
-
-	    NumericalVector<T>& operator-=(const NumericalVector<T>& right)
-	    {
-	        logger.assert(data_.size() == right.data_.size(), "Vectors don't have the same size");
-	        for (std::size_t i = 0; i < data_.size(); i++)
-	            data_[i] -= right.data_[i];
-	        return *this;
-	    }
-
-	    NumericalVector<T>& operator*=(const T& right)
-	    {
-	        for (T& d : data_)
-	            d *= right;
-	        return *this;
-	    }
-
-	    T& operator[](std::size_t n)
-	    {
-	        logger.assert(n < data_.size(), "Requested entry %, but there are only % entries", n, data_.size());
-	        return data_[n];
-	    }
-
-        const T& operator[](std::size_t n) const
+    
+    NumericalVector<T>()
+            : data_()
+    {
+    }
+    
+    explicit NumericalVector<T>(std::size_t m)
+            : data_(m)
+    {
+    }
+    
+    NumericalVector<T>(std::initializer_list<T> l)
+            : data_(l)
+    {
+    }
+    
+    NumericalVector<T>(const NumericalVector& other)
+            : data_(other.data_)
+    {
+    }
+    
+    NumericalVector<T>(NumericalVector&& other)
+            : data_(std::move(other.data_))
+    {
+    }
+    
+    NumericalVector<T>(const T array[], std::size_t size)
+            : data_(array, array + size)
+    {
+    }
+    
+    void resize(std::size_t size)
+    {
+        if (size != data_.size())
         {
-            logger.assert(n < data_.size(), "Requested entry %, but there are only % entries", n, data_.size());
-            return data_[n];
+            data_.resize(size);
         }
+    }
+    
+    NumericalVector<T>& operator=(const NumericalVector<T>& right)
+    {
+        data_ = right.data_;
+        return *this;
+    }
+    
+    NumericalVector<T>& operator=(const std::initializer_list<T> l)
+    {
+        data_ = l;
+        return *this;
+    }
+    
+    NumericalVector<T> operator+(const NumericalVector<T>& right) const
+    {
+        NumericalVector<T> result(*this);
+        logger.assert(data_.size() == right.data_.size(), "Vectors don't have the same size");
+        for (std::size_t i = 0; i < data_.size(); i++)
+            result.data_[i] += right.data_[i];
+        return result;
+    }
+    
+    NumericalVector<T> operator-(const NumericalVector<T>& right) const
+    {
+        NumericalVector<T> result(*this);
+        logger.assert(data_.size() == right.data_.size(), "Vectors don't have the same size");
+        for (std::size_t i = 0; i < data_.size(); i++)
+            result.data_[i] -= right.data_[i];
+        return result;
+    }
+    
+    NumericalVector<T> operator*(const T& right) const
+    {
+        NumericalVector<T> result(*this);
+        for (T& d : result.data_)
+            d *= right;
+        return result;
+    }
+    
+    
+    T operator*(const NumericalVector& right) const
+    {
+        logger.assert(data_.size() == right.data_.size(), "Vectors don't have equal length.");
+        T sum = 0;
+        for (std::size_t i = 0; i < data_.size(); i++)
+            sum += data_[i] * right.data_[i];
+        return sum;
+    }
+    
+    NumericalVector<T>& operator/=(const T& right)
+    {
+        for (T& d : data_)
+            d /= right;
+        
+        return *this;
+    }
+    
+    NumericalVector<T> operator/(const T& right) const
+    {
+        NumericalVector<T> result(*this);
+        return (result /= right);
+        
+    }
+    
+    NumericalVector<T>& operator+=(const NumericalVector<T>& right)
+    {
+        logger.assert(data_.size() == right.data_.size(), "Vectors don't have the same size");
+        for (std::size_t i = 0; i < data_.size(); i++)
+            data_[i] += right.data_[i];
+        return *this;
+    }
+    
+    
+    NumericalVector<T>& operator-=(const NumericalVector<T>& right)
+    {
+        logger.assert(data_.size() == right.data_.size(), "Vectors don't have the same size");
+        for (std::size_t i = 0; i < data_.size(); i++)
+            data_[i] -= right.data_[i];
+        return *this;
+    }
+    
+    NumericalVector<T>& operator*=(const T& right)
+    {
+        for (T& d : data_)
+            d *= right;
+        return *this;
+    }
+    
+    T& operator[](std::size_t n)
+    {
+        logger.assert(n < data_.size(), "Requested entry %, but there are only % entries", n, data_.size());
+        return data_[n];
+    }
+    
+    const T& operator[](std::size_t n) const
+    {
+        logger.assert(n < data_.size(), "Requested entry %, but there are only % entries", n, data_.size());
+        return data_[n];
+    }
+    
+    T& operator()(std::size_t n)
+    {
+        logger.assert(n < data_.size(), "Requested entry %, but there are only % entries", n, data_.size());
+        return data_[n];
+    }
+    
+    const T& operator()(std::size_t n) const
+    {
+        logger.assert(n < data_.size(), "Requested entry %, but there are only % entries", n, data_.size());
+        return data_[n];
+    }
+    
+    std::size_t size() const
+    {
+        return data_.size();
+    }
+    
+    const T* data() const
+    {
+        return data_.data();
+    }
+    
+    T* data()
+    {
+        return data_.data();
+    }
 
-        T& operator()(std::size_t n)
-        {
-            logger.assert(n < data_.size(), "Requested entry %, but there are only % entries", n, data_.size());
-            return data_[n];
-        }
-
-        const T& operator()(std::size_t n) const
-        {
-            logger.assert(n < data_.size(), "Requested entry %, but there are only % entries", n, data_.size());
-            return data_[n];
-        }
-
-        std::size_t size() const
-        {
-            return data_.size();
-        }
-
-        const T* data() const
-        {
-            return data_.data();
-        }
-
-        T* data()
-        {
-            return data_.data();
-        }
-
-    private:
+private:
     std::vector<T> data_;
+    
+    
+};
 
+template<typename T = Mdouble>
+NumericalVector<T> operator*(const T& left, const NumericalVector<T>& right);
 
-    };
+template<typename T = Mdouble>
+NumericalVector<T> operator-(const NumericalVector<T>& right);
 
-	template<typename T = Mdouble>
-    NumericalVector<T> operator*(const T& left, const NumericalVector<T>& right);
-
-	template<typename T = Mdouble>
-    NumericalVector<T> operator-(const NumericalVector<T>& right);
-
-	template<typename T = Mdouble>
-    std::ostream& operator<<(std::ostream& os, const NumericalVector<T>& A);
+template<typename T = Mdouble>
+std::ostream& operator<<(std::ostream& os, const NumericalVector<T>& A);
 
 
 #endif /* NumericalVector_H_ */

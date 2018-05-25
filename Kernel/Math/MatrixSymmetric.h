@@ -38,129 +38,129 @@ class MatrixSymmetric3D
 public:
     /*!
      * \brief The six distinctive matrix elements
-     */    
+     */
     Mdouble XX, XY, XZ, YY, YZ, ZZ;
-
+    
     /*!
      * \brief Casting operator; casts MatrixSymmetric3D to Matrix3D
      */
     explicit operator Matrix3D() const;
-
+    
     /*!
      * \brief Default constructor
      */
     MatrixSymmetric3D();
-
+    
     /*!
      * \brief Alternative constructor, with all (6) elements as arguments
      */
     MatrixSymmetric3D(Mdouble xx, Mdouble xy, Mdouble xz, Mdouble yy, Mdouble yz, Mdouble zz);
-
+    
     /*!
      * \brief Sets all elements to zero.
      */
     void setZero();
-
+    
     /*!
      * \brief Returns the MEAN of the diagonal elements (i.e. the trace divided by three).
      */
     Mdouble trace() const;
-
+    
     /*!
      * \brief Matrix addition.
      */
-    MatrixSymmetric3D operator+(const MatrixSymmetric3D &A) const;
-
+    MatrixSymmetric3D operator+(const MatrixSymmetric3D& A) const;
+    
     /*!
      * \brief Matrix substraction.
      */
-    MatrixSymmetric3D operator-(const MatrixSymmetric3D &A) const;
-
+    MatrixSymmetric3D operator-(const MatrixSymmetric3D& A) const;
+    
     /*!
      * \brief Scalar addition.
      */
     MatrixSymmetric3D operator+(Mdouble a) const;
-
+    
     /*!
      * \brief Scalar substraction.
      */
     MatrixSymmetric3D operator-(Mdouble a) const;
-
+    
     /*!
      * \brief Vector multiplication.
      */
     friend Vec3D operator*(const MatrixSymmetric3D& A, const Vec3D& b);
-
+    
     /*!
      * \brief Scalar multiplication.
      */
     MatrixSymmetric3D operator*(Mdouble a) const;
-
+    
     /*!
      * \brief Scalar division.
      */
     MatrixSymmetric3D operator/(Mdouble a) const;
-
+    
     /*!
      * \brief Add elements to an ostream.
      */
     friend std::ostream& operator<<(std::ostream& os, const MatrixSymmetric3D& A);
-
+    
     /*!
      * \brief Add elements to an istream
      */
     friend std::istream& operator>>(std::istream& is, MatrixSymmetric3D& A);
-
+    
     /*!
      * \brief Matrix addition
      */
     MatrixSymmetric3D& operator+=(const MatrixSymmetric3D& A);
-
+    
     /*!
      * \brief Matrix substraction
      */
     MatrixSymmetric3D& operator-=(const MatrixSymmetric3D& A);
-
+    
     /*!
      * \brief Scalar division
      */
     MatrixSymmetric3D& operator/=(Mdouble a);
-
+    
     /*!
      * \brief Calculates the pointwise square 
      */
     static MatrixSymmetric3D square(const MatrixSymmetric3D& A);
-
+    
     /*!
      * \brief Calculates the pointwise square root
      */
     static MatrixSymmetric3D sqrt(const MatrixSymmetric3D& A);
-
+    
     /*!
      * \brief Calculates the dyadic product of a Vec3D with itself: \f$a \otimes a\f$
      */
     static MatrixSymmetric3D selfDyadic(const Vec3D& a);
-
+    
     /*!
      * \brief Calculates the symmetrised dyadic product of two Vec3D: \f$ \frac{1}{2}(a \otimes b + b \otimes a) \f$
      */
-    static MatrixSymmetric3D symmetrisedDyadic(const Vec3D&  a, const Vec3D& b);
-
+    static MatrixSymmetric3D symmetrisedDyadic(const Vec3D& a, const Vec3D& b);
+    
     /*!
      * \brief Computes the inverse of a matrix; exits if the inverse doesn't exist. 
      */
     static MatrixSymmetric3D inverse(const MatrixSymmetric3D& A);
-
+    
     /*!
      * \brief Computes the inverse of a matrix; exits if the inverse doesn't exist.
      */
     MatrixSymmetric3D inverse() const;
-
+    
     /*!
      * \brief Computes the determinant of a matrix. 
      */
-    static Mdouble determinant (const MatrixSymmetric3D& A);
-
+    static Mdouble determinant(const MatrixSymmetric3D& A);
+    
     /*!
      * \brief Returns the matrix in cylindrical coordinates
      */

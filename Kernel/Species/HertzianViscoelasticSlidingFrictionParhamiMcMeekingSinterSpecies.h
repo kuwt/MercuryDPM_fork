@@ -31,8 +31,9 @@
 #include "NormalForceSpecies/HertzianViscoelasticNormalSpecies.h"
 #include "FrictionForceSpecies/EmptyFrictionSpecies.h"
 #include "AdhesiveForceSpecies/ParhamiMcMeekingSinterSpecies.h"
-typedef Species<HertzianViscoelasticNormalSpecies,EmptyFrictionSpecies,ParhamiMcMeekingSinterSpecies>
-	HertzianViscoelasticSlidingFrictionParhamiMcMeekingSinterSpecies;
-typedef MixedSpecies<HertzianViscoelasticNormalSpecies,EmptyFrictionSpecies,ParhamiMcMeekingSinterSpecies>
-	HertzianViscoelasticSlidingFrictionParhamiMcMeekingSinterMixedSpecies;
+
+typedef Species<HertzianViscoelasticNormalSpecies, EmptyFrictionSpecies, ParhamiMcMeekingSinterSpecies>
+        HertzianViscoelasticSlidingFrictionParhamiMcMeekingSinterSpecies;
+typedef MixedSpecies<HertzianViscoelasticNormalSpecies, EmptyFrictionSpecies, ParhamiMcMeekingSinterSpecies>
+        HertzianViscoelasticSlidingFrictionParhamiMcMeekingSinterMixedSpecies;
 #endif

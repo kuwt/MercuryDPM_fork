@@ -32,12 +32,12 @@
 
 class ParticleHandler;
 
-    /*!
-     * \brief Defines a pair of periodic walls. Inherits from BaseBoundary.
-     * \details The particles are in {x: position_left<=normal*x <position_right}, 
-     * with normal being the outward unit normal vector of the right wall. If a 
-     * particle moves outside these boundaries, it will be shifted.
-     */
+/*!
+ * \brief Defines a pair of periodic walls. Inherits from BaseBoundary.
+ * \details The particles are in {x: position_left<=normal*x <position_right},
+ * with normal being the outward unit normal vector of the right wall. If a
+ * particle moves outside these boundaries, it will be shifted.
+ */
 
 class PeriodicBoundary : public BasePeriodicBoundary
 {
@@ -61,9 +61,9 @@ public:
      * \brief Defines a periodic wall
      */
     void set(Vec3D normal, Mdouble distanceLeft, Mdouble distanceRight);
-
+    
     void set(Vec3D normal, Vec3D positionLeft, Vec3D positionRight);
-
+    
     /*!
    * \brief For general parallelogramic domains, the direction of the shift vector can to be set manually.
    */
@@ -107,7 +107,7 @@ public:
     /*!
      * \brief Returns the distance of the wall to the position
      */
-    Mdouble getDistance(const Vec3D &position) const override;
+    Mdouble getDistance(const Vec3D& position) const override;
     
     /*!
      * \brief shifts the particle 
@@ -118,25 +118,25 @@ public:
     /*!
      * \brief shifts two positions
      */
-    virtual void shiftPositions(Vec3D &postition1, Vec3D &postion2) const;
-
+    virtual void shiftPositions(Vec3D& postition1, Vec3D& postion2) const;
+    
     /*!
      * \brief Returns TRUE if particle checked is closest to the 'left' 
      * wall, and FALSE if it is closest to the 'right' wall
      */
     virtual bool isClosestToLeftBoundary(const BaseParticle& p) const;
-
+    
     /*
      * \details Returns TRUE if position checked is closest to the 'left'
      * wall, and FALSE if it is closest to the 'right' wall.
      */
     bool isClosestToLeftBoundary(const Vec3D& p) const override;
-
+    
     /*!
      * \brief reads boundary properties from istream
      */
     void read(std::istream& is) override;
-   
+    
     /*!
      * \brief deprecated version of CubeInsertionBoundary::read().
      */
@@ -157,45 +157,46 @@ public:
      * \brief Checks distance of particle to closest wall and creates periodic 
      * copy if necessary
      */
-    void createPeriodicParticles(ParticleHandler &pH) override;
-
+    void createPeriodicParticles(ParticleHandler& pH) override;
+    
     /*!
      * \brief Creates and adds a ghost particle from a give real particle
      */
-    void createGhostParticle(BaseParticle *pReal);
-
+    void createGhostParticle(BaseParticle* pReal);
+    
     /*!
      * \brief Creates a single periodic particle if required from a given particle
      */
-    void createPeriodicParticle(BaseParticle* p, ParticleHandler &pH) override;
-
+    void createPeriodicParticle(BaseParticle* p, ParticleHandler& pH) override;
+    
     /*!
      * \brief Checks if particle has crossed either boundary wall, and applies a shift
      * if that is the case.
      */
     void checkBoundaryAfterParticlesMove(ParticleHandler& pH) override;
- 
+
 protected:
-  /*!
-   * \brief outward unit normal vector for right wall
-   */
+    /*!
+     * \brief outward unit normal vector for right wall
+     */
     Vec3D normal_;
-  /*!
-   * \brief position of left wall, s.t. normal*x=position_left
-   */
+    /*!
+     * \brief position of left wall, s.t. normal*x=position_left
+     */
     Mdouble distanceLeft_;
-  /*!
-   * \brief position of right wall, s.t. normal*x=position_right
-   */
-    Mdouble distanceRight_; 
-  /*!
-   * \brief This is the normal to rescale the normal vector to a unit vectors.
-   */
-    Mdouble scaleFactor_;  
-  /*!
-   * \brief shift from left to right boundary
-   */
+    /*!
+     * \brief position of right wall, s.t. normal*x=position_right
+     */
+    Mdouble distanceRight_;
+    /*!
+     * \brief This is the normal to rescale the normal vector to a unit vectors.
+     */
+    Mdouble scaleFactor_;
+    /*!
+     * \brief shift from left to right boundary
+     */
     Vec3D shift_;
     
 };
+
 #endif

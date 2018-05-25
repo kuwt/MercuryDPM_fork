@@ -28,9 +28,13 @@
 
 #include "Interactions/BaseInteraction.h"
 #include "Math/Vector.h"
+
 class BaseParticle;
+
 class EmptyAdhesiveSpecies;
+
 class BaseInteractable;
+
 /*!
  * \class EmptyAdhesiveInteraction
  * \brief In case one doesn't want to have an adhesive (short range non contact) interaction between the interactables
@@ -44,6 +48,7 @@ public:
      * \brief An alias name for EmptyAdhesiveSpecies data type.
      */
     typedef EmptyAdhesiveSpecies SpeciesType;
+    
     /*!
      * \brief Constructor.
      */
@@ -51,41 +56,50 @@ public:
     
     //used for mpi    
     EmptyAdhesiveInteraction();
+    
     /*!
      * \brief copy constructor.
      */
-    EmptyAdhesiveInteraction(const EmptyAdhesiveInteraction &p);
+    EmptyAdhesiveInteraction(const EmptyAdhesiveInteraction& p);
+    
     /*!
      * \brief Destructor.
      */
     ~EmptyAdhesiveInteraction() override;
+    
     /*!
      * \brief Computes nothing as it is an Empty Adhesive interaction.
      */
     void computeAdhesionForce();
     
     void computeAdhesionInteraction();
+    
     /*!
      * \brief Interaction read function, which accepts an std::istream as input.
-     */    
+     */
     void read(std::istream& is) override;
+    
     /*!
      * \brief Interaction print function, which accepts an std::ostream as input.
      */
     void write(std::ostream& os) const override;
+    
     /*!
      * \brief Returns the amount of Elastic energy involved in an interaction. Basically
      *        used in case you want to write the elastic energy into an output file. 
      */
     Mdouble getElasticEnergy() const override;
+    
     /*!
      * \brief A dynamic_cast of BaseSpecies pointer type to a pointer to an object of 
      *        type EmptyAdhesiveSpecies.
      */
     const EmptyAdhesiveSpecies* getSpecies() const;
+    
     /*!
      * \brief Returns the name of the interaction, see Interaction.h.
      */
     std::string getBaseName() const;
 };
+
 #endif

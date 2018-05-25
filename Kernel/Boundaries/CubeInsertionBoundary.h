@@ -30,80 +30,83 @@
 #include "Math/Vector.h"
 
 class BaseParticle;
+
 class RNG;
 
-    /*!
-     * \class CubeInsertionBoundary
-     * \brief It's an insertion boundary which has cuboidal shape (yes, 'CuboidalInsertionBoundary' 
-     * would have been the correct name).
-     */
+/*!
+ * \class CubeInsertionBoundary
+ * \brief It's an insertion boundary which has cuboidal shape (yes, 'CuboidalInsertionBoundary'
+ * would have been the correct name).
+ */
 
-class  CubeInsertionBoundary : public InsertionBoundary
+class CubeInsertionBoundary : public InsertionBoundary
 {
 public:
     /*!
      * \brief Constructor; sets everything to 0.
      */
     CubeInsertionBoundary();
-
+    
     /*!
      * \brief Copy constructor with deep copy.
      */
     CubeInsertionBoundary(const CubeInsertionBoundary& other);
-
+    
     /*!
      * \brief Destructor: default destructor.
      */
     ~CubeInsertionBoundary() override;
-
+    
     /*!
      * \brief Creates a copy on the heap and returns a pointer.
      */
     CubeInsertionBoundary* copy() const override;
-
+    
     /*!
      * \brief Sets the properties of the CubeInsertionBoundary
      */
-    void set(BaseParticle* particleToCopy, unsigned int maxFailed,Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax, double radMin, double radMax);
-
+    void
+    set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax,
+        double radMin, double radMax);
+    
     /*!
      * \brief Sets the range of particle radii that may be generated.
      */
     void setRadiusRange(Mdouble radMin, Mdouble radMax);
-
+    
     /*!
      * \brief Sets the geometry (position and velocity distribution) of the
      * CubeInsertionBoundary
      */
-    void setGeometry(Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax); 
-
+    void setGeometry(Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax);
+    
     /*!
      * \brief Generates a particle with random radius
      */
-    BaseParticle* generateParticle(RNG &random) override;
-
+    BaseParticle* generateParticle(RNG& random) override;
+    
     /*!
      * \brief Generates a random position, velocity for the particle p
      */
     void placeParticle(BaseParticle* p, RNG& random) override;
-
+    
     /*!
      * \brief reads boundary properties from istream
      */
     void read(std::istream& is) override;
-
+    
     /*!
      * \brief deprecated version of CubeInsertionBoundary::read().
      */
     MERCURY_DEPRECATED
     void oldRead(std::istream& is);
-
+    
     /*!
      * \brief writes boundary properties to ostream
      */
     void write(std::ostream& os) const override;
 
-    
+
 private:
     
     /*!
@@ -112,7 +115,7 @@ private:
     std::string getName() const override;
 
 protected:
-
+    
     /*!
      * \brief Minimal and maximal positions defining the boundary's boundaries,
      * and minimum and maximum velocity of the particles to be inserted.

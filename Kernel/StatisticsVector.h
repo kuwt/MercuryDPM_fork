@@ -25,6 +25,7 @@
 
 #ifndef STATISTICSVECTOR_H
 #define STATISTICSVECTOR_H
+
 #include "DPMBase.h"
 #include "Math/Matrix.h"
 #include "Math/MatrixSymmetric.h"
@@ -32,6 +33,7 @@
 #include <fstream>
 #include <math.h>
 #include "Species/LinearViscoelasticSpecies.h"
+
 /*!
  *\brief Creates averaged statistics (only valid if density field is homogenous along averaged direction)
  */
@@ -63,12 +65,12 @@ public:
      * \brief this is the actual constructor, sets up all basic things
      */
     void constructor();
-
+    
     /*!
      * \brief 
      */
     void constructor(std::string name);
-
+    
     /*!
      * \brief Basic constructor only calls constructor()
      */
@@ -76,7 +78,7 @@ public:
     {
         constructor();
     }
-
+    
     /*!
      * \brief 
      */
@@ -89,35 +91,36 @@ public:
      * \brief Copy constructor
      */
     StatisticsVector(StatisticsVector& other);
-
+    
     /*!
      * \brief Advanced constructor that accepts arguments from the command line
      */
-    StatisticsVector(int argc, char *argv[]);
+    StatisticsVector(int argc, char* argv[]);
+    
     /*!
      * \brief 
      */
-    void readStatArguments(int argc, char *argv[]);
-
+    void readStatArguments(int argc, char* argv[]);
+    
     /*!
      * \brief Outputs member variable values to a std::string
      */
     std::string printStat();
-
+    
     /*!
      * \brief 
      */
     void set_statType();
-
+    
     void writeOutputFiles();
-
+    
     /*!
      * \brief 
      */
     void print_help();
-
+    
     //set functions should be called before executing the statistical routine 
-
+    
     /*!
      * \brief 
      */
@@ -125,7 +128,7 @@ public:
     {
         nx = new_;
     }
-
+    
     /*!
      * \brief 
      */
@@ -271,17 +274,17 @@ public:
         return (getTime() >= getCGTimeMin() && getTime() <= getTimeMaxStat() + getTimeStep());
     }
     
-
+    
     /*!
      * \brief 
      */
     void setCGShape(const char* new_);
-
+    
     /*!
      * \brief 
      */
     void setCGShape(CG_TYPE new_);
-
+    
     /*!
      * \brief 
      */
@@ -307,19 +310,19 @@ public:
         nz_ = nz;
     }
     
-
+    
     ///Set CG variables w2 and CG_invvolume
     void setCGWidth(Mdouble w)
     {
         setCGWidth2(mathsFunc::square(w));
     }
     
-
+    
     /*!
      * \brief Set CG variables w2 and CG_invvolume
      */
     void setCGWidth2(Mdouble new_);
-
+    
     /*!
      * \brief 
      */
@@ -352,7 +355,7 @@ public:
         return mathsFunc::square(cutoff);
     }
     
-
+    
     //~ bool get_boundedDomain() {return boundedDomain;};
     //~ void set_boundedDomain(bool new_) {boundedDomain=new_;};
     
@@ -360,32 +363,32 @@ public:
      * \brief Output coarse graining variables
      */
     std::string print_CG();
-
+    
     /*!
      * \brief Output average of statistical variables
      */
-    StatisticsPoint<T> average(std::vector<StatisticsPoint<T> > &P);
-
+    StatisticsPoint<T> average(std::vector<StatisticsPoint<T> >& P);
+    
     /*!
      * \brief Set all statistical variables to zero
      */
     virtual void reset_statistics();
-
+    
     /*!
      * \brief get StatisticsPoint
      */
     void statistics_from_fstat_and_data();
-
+    
     /*!
      * \brief 
      */
     void statistics_from_p3();
-
+    
     /*!
      * \brief 
      */
     void jump_p3c();
-
+    
     /*!
      * \brief 
      */
@@ -402,7 +405,7 @@ public:
         return doTimeAverage;
     }
     
-
+    
     /*!
      * \brief 
      */
@@ -419,7 +422,7 @@ public:
         return StressTypeForFixedParticles;
     }
     
-
+    
     // to keep compatible with older versions
     /*!
      * \brief 
@@ -429,7 +432,7 @@ public:
         StressTypeForFixedParticles = 2 + new_;
     }
     
-
+    
     /*!
      * \brief 
      */
@@ -446,7 +449,7 @@ public:
         return mirrorAtDomainBoundary;
     }
     
-
+    
     /*!
      * \brief 
      */
@@ -463,7 +466,7 @@ public:
         return doVariance;
     }
     
-
+    
     /*!
      * \brief 
      */
@@ -535,7 +538,7 @@ public:
     {
         return verbosity;
     }
-
+    
     /*!
      * \brief 
      */
@@ -551,7 +554,7 @@ public:
     {
         return walls;
     }
-
+    
     /*!
      * \brief 
      */
@@ -568,7 +571,7 @@ public:
         return periodicWalls;
     }
     
-
+    
     /*!
      * \brief 
      */
@@ -585,87 +588,88 @@ public:
         return w_over_rmax;
     }
     
-
+    
     /*!
      * \brief Set position of StatisticsPoint points and set variables to 0
      */
     void setPositions();
-
+    
     /*!
      * \brief 
      */
     bool readNextDataFile(unsigned int format);
-
+    
     /*!
      * \brief 
      */
     void gather_force_statistics_from_fstat_and_data();
-
+    
     /*!
      * \brief 
      */
     void gather_force_statistics_from_p3c(int version);
-
+    
     /*!
      * \brief 
      */
     void gather_force_statistics_from_p3w(int version, std::vector<int>& index);
-
+    
     /*!
      * \brief 
      */
     void evaluate_force_statistics(int wp = 0);
-
+    
     /*!
      * \brief 
      */
     void evaluate_wall_force_statistics(Vec3D P, int wp = 0);
-
+    
     /*!
      * \brief 
      */
     void jump_fstat();
-
+    
     /*!
      * \brief Initializes statistics, i.e. setting w2, setting the grid and writing the header lines in the .stat file
      */
     void initialiseStatistics();
-
+    
     /*!
      * \brief Calculates statistics for Particles (i.e. not collisions)
      */
     void outputStatistics();
-
+    
     /*!
      * \brief Calculates statistics for one collision (can be any kind of collision)
      */
-    void gatherContactStatistics(unsigned int index1, int index2, Vec3D Contact, Mdouble delta, Mdouble ctheta, Mdouble fdotn, Mdouble fdott, Vec3D P1_P2_normal_, Vec3D P1_P2_tangential);
-
+    void gatherContactStatistics(unsigned int index1, int index2, Vec3D Contact, Mdouble delta, Mdouble ctheta,
+                                 Mdouble fdotn, Mdouble fdott, Vec3D P1_P2_normal_, Vec3D P1_P2_tangential);
+    
     /*!
      * \brief Processes all gathered statistics and resets them afterwards. (Processing means either calculating time averages or writing out statistics)
      */
     void processStatistics(bool usethese);
-
+    
     /*!
      * \brief Finish all statistics (i.e. write out final data)
      */
     void finishStatistics();
-
+    
     /*!
      * \brief Writes regular statistics
      */
     void write_statistics();
-
+    
     /*!
      * \brief Writes out time averaged statistics
      */
     void write_time_average_statistics();
-
+    
     /*!
      * \brief Calculates statistics for a single Particle
      */
     void evaluate_particle_statistics(std::vector<BaseParticle*>::iterator P, int wp = 0);
-
+    
     /*!
      * \brief 
      */
@@ -673,7 +677,7 @@ public:
     {
         return Points;
     }
-
+    
     /*!
      * \brief Functions to acces and change the domain of statistics
      */
@@ -795,12 +799,12 @@ public:
     {
         return nTimeAverage;
     }
-
+    
     /*!
      * \brief 
      */
     Mdouble setInfinitelyLongDistance();
-
+    
     void set_Polynomial(std::vector<Mdouble> new_coefficients, unsigned int new_dim)
     {
         CGPolynomial.set_polynomial(new_coefficients, new_dim);
@@ -869,7 +873,7 @@ public:
     {
         rmin = new_;
     }
-
+    
     /*!
      * \brief 
      */
@@ -877,7 +881,7 @@ public:
     {
         rmax = new_;
     }
-
+    
     /*!
      * \brief 
      */
@@ -925,7 +929,7 @@ public:
     {
         stepSize_ = stepSize;
     }
-
+    
     /*!
      * \brief
      */
@@ -955,7 +959,7 @@ protected:
      * \brief extension of grid size from mirrored points
      */
     int nxMirrored, nyMirrored, nzMirrored;
-
+    
     //Storage of points and gradients
     /*!
      * \brief A vector that stores the values of the statistical variables at a given position.
@@ -973,58 +977,58 @@ protected:
      * \brief A vector that stores the gradient in z of all statistical variables at a given position.
      */
     std::vector<StatisticsPoint<T> > dz;
-
+    
     //For time averaging
     /*!
      * \brief A vector used to sum up all statistical values in #Points for time-averaging
      */
     std::vector<StatisticsPoint<T> > timeAverage;
-
+    
     /*!
      * \brief a vector used to sum up the variance in time of all statistical values
      */
     std::vector<StatisticsPoint<T> > timeVariance;
-
+    
     /*!
      * \brief a vector used to sum up all statistical gradients in #dx for time-averaging
      */
     std::vector<StatisticsPoint<T> > dxTimeAverage;
-
+    
     /*!
      * \brief a vector used to sum up all statistical gradients in #dy for time-averaging
      */
     std::vector<StatisticsPoint<T> > dyTimeAverage;
-
+    
     /*!
      * \brief a vector used to sum up all statistical gradients in #dz for time-averaging
      */
     std::vector<StatisticsPoint<T> > dzTimeAverage;
-
+    
     /*!
      * \brief Determines if output is averaged over time
      */
     bool doTimeAverage;
-
+    
     /*!
      * \brief Determines after how many time steps the time average is reset
      */
     int nTimeAverageReset;
-
+    
     /*!
      * \brief Determines if variance is outputted
      */
     bool doVariance;
-
+    
     /*!
      * \brief Determines if gradient is outputted
      */
     bool doGradient;
-
+    
     /*!
      * \brief A counter needed to average over time
      */
     int nTimeAverage;
-
+    
     //Coarse graining variables
     /*!
      * \brief coarse graining type (Gaussian, Heaviside, Polynomial)
@@ -1034,79 +1038,79 @@ protected:
      * \brief Stores the Polynomial, if the cg function is an axisymmetric function Polynomial in r.
      */
     NORMALIZED_POLYNOMIAL<T> CGPolynomial;
-
+    
     // ///<if true, then the course-graining function will be cut at the domain boundaries and resized to satisfy int(W) = 1
     // bool boundedDomain; 
-
+    
     /*!
      * \brief coarse graining width squared; for HeavisideSphere and Gaussian
      */
     Mdouble w2;
-
+    
     /*!
      * \brief The distance from the origin at which the cg function vanishes; cutoff=w for HeavisideSphere or Polynomial, 3*w for Gaussian
      */
     Mdouble cutoff, cutoff2;
-
+    
     /*!
      * \brief if w is not set manually then w will be set by multiplying this value by the largest particle radius at t=0
      */
     Mdouble w_over_rmax;
-
+    
     //Options that can be set before evaluation
     
     /*!
      * \brief Statistical output will only be created if t>tMinStat
      */
     Mdouble tMinStat;
-
+    
     /*!
      * \brief Statistical output will only be created if t<tMaxStat
      */
     Mdouble tMaxStat;
-
+    
     /*!
      * \brief Statistical output will only be created if tMaxStat-tIntStat< t< tMaxStat
      */
     Mdouble tIntStat;
-
+    
     /*!
      * \brief defines the species for which statistics are extracted (-1 for all species)
      */
     Mdouble indSpecies;
-
+    
     /*!
      * \brief defines the minimum radius of the particles for which statistics are extracted
      * \todo Thomas: maybe this fixed condition should be replaced by a condition function, bool include_statistics_if()
      */
     Mdouble rmin;
-
+    
     /*!
      * \brief defines the maximum radius of the particles for which statistics are extracted
      */
     Mdouble rmax;
-
+    
     /*!
      * \brief defines the maximum height of the particles for which statistics are extracted
      */
     Mdouble hmax;
-
+    
     /*!
      * \brief Turns off walls before evaluation
      */
     bool walls;
-
+    
     /*!
      * \brief Turns off periodic walls before evaluation (needed for averaging, because we do not yet check if particle is in domain)
      * \todo{Thomas: the case periodicWalls=true seems to mess up some statistics. Needs to be checked or removed}
      */
     bool periodicWalls;
-
+    
     /*!
      * \brief Determines if fixed particles contribute to particle statistics (density, ...)
      */
     bool ignoreFixedParticles;
-
+    
     /*!
      * \brief Stress type for fixed particles
      * \details 0 no Stress from fixed particles\n
@@ -1115,17 +1119,17 @@ protected:
      * 3 Stress from fixed particles extends from flowing particle to infinity
      */
     int StressTypeForFixedParticles;
-
+    
     /*!
      * \brief Determines how much is outputted to the terminal
      * \details 0 no output\n
      * 1 basic output (time steps)\n
      * 2 full output (number of forces and particles, md and stat parameters)\n
      */
-    int verbosity; 
-
+    int verbosity;
+    
     int format; ///< format of the data input file
-
+    
     /*!
      * \brief 0: Statistics near the wall are equal to statistics away from the wall; 1: Statistics are mirrored at the domain boundaries; up to a maximum depth specified by this number
      */
@@ -1135,15 +1139,15 @@ protected:
     bool isMDCLR;
     ///If true, cutoff radius for Gaussian is set to 5*w (from 3*w)
     bool superexact;
-
+    
     //uses close points to allow calculation of gradients
     bool doDoublePoints;
-
+    
     /*!
      * \brief
      */
     bool satisfiesInclusionCriteria(BaseParticle* P);
-
+    
     //Variables communicate values between member functions #evaluate_force_statistics and #gatherContactStatistics)used to communicate values between member functions evaluate_force_statistics and gather_force_statistics	
     ///Position of first contact point
     Vec3D P1;
@@ -1173,52 +1177,53 @@ protected:
     Mdouble P1_P2_Dissipation;
     ///not yet working
     Mdouble P1_P2_Potential;
-
+    
     /*!
      * \brief
      */
     bool loadVelocityProfile(const char* filename);
+    
     bool loadPositions(const char* filename);
-
+    
     /*!
      * \brief
      */
     Vec3D getVelocityProfile(Vec3D Position);
-
+    
     /*!
      * \brief
      */
     std::vector<Vec3D> VelocityProfile;
-
+    
     /*!
      * \brief
      */
     Vec3D VelocityProfile_Min;
-
+    
     /*!
      * \brief
      */
     Vec3D VelocityProfile_D;
-
+    
     std::fstream p3p_file;///
     std::fstream p3c_file;///
     std::fstream p3w_file;///
     bool p3Format = true;
-
+    
     /*!
      * \brief
      */
     bool read_next_from_p3p_file();
-
+    
     /*!
      * \brief
      */
     void autoSetSystemDimensions();
-
+    
     unsigned int stepSize_;///
-
+    
     std::vector<Vec3D> positions_;
-
+    
     bool centerPointInFStat_ = true;
 };
 

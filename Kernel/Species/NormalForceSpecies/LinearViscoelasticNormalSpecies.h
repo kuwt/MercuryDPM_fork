@@ -25,6 +25,7 @@
 
 #ifndef LinearViscoelasticNormalSpecies_H
 #define LinearViscoelasticNormalSpecies_H
+
 #include "Species/BaseSpecies.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/NormalForceInteractions/LinearViscoelasticInteraction.h"
@@ -38,76 +39,78 @@ class LinearViscoelasticNormalSpecies : public virtual BaseSpecies
 public:
     ///\brief The correct Interaction type for this FrictionForceSpecies
     typedef LinearViscoelasticInteraction InteractionType;
-
+    
     ///\brief The default constructor.
     LinearViscoelasticNormalSpecies();
-
+    
     ///\brief The default copy constructor.
-    LinearViscoelasticNormalSpecies(const LinearViscoelasticNormalSpecies &p);
-
+    LinearViscoelasticNormalSpecies(const LinearViscoelasticNormalSpecies& p);
+    
     ///\brief The default destructor.
     ~LinearViscoelasticNormalSpecies() override;
-
+    
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
-
+    
     /// \brief Writes the species properties to an output stream.
     void write(std::ostream& os) const override;
-
+    
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;
 
 // Species-specific functions
-
+    
     ///Calculates the maximum velocity allowed for a collision of two copies of P (for higher velocities particles could pass through each other)
     Mdouble getMaximumVelocity(Mdouble radius, Mdouble mass) const;
-
+    
     ///Sets k, disp such that it matches a given tc and eps for a collision of two copies of P
     void setStiffnessAndRestitutionCoefficient(Mdouble k_, Mdouble eps, Mdouble mass);
-
+    
     ///Sets k, disp such that it matches a given tc and eps for a collision of two copies of particle p
     void setCollisionTimeAndRestitutionCoefficient(Mdouble tc, Mdouble eps, BaseParticle* p);
-
+    
     ///Sets k, disp such that it matches a given tc and eps for a collision of two copies of equal mass m
     void setCollisionTimeAndRestitutionCoefficient(Mdouble tc, Mdouble eps, Mdouble mass);
-
+    
     ///Set k, disp such that is matches a given tc and eps for a collision of two different masses.
     ///Recall the resitution constant is a function of k, disp and the mass of each particle in the collision
     /// See also setCollisionTimeAndRestitutionCoefficient(Mdouble tc, Mdouble eps, Mdouble mass)
-    void setCollisionTimeAndRestitutionCoefficient(Mdouble collisionTime, Mdouble restitutionCoefficient, Mdouble mass1, Mdouble mass2);
-
+    void setCollisionTimeAndRestitutionCoefficient(Mdouble collisionTime, Mdouble restitutionCoefficient, Mdouble mass1,
+                                                   Mdouble mass2);
+    
     /*!
      * \brief Calculates collision time for two copies of a particle of given disp, k, mass
      */
     Mdouble getCollisionTime(Mdouble mass) const;
-
+    
     /*!
      * \brief Calculates restitution coefficient for two copies of given disp, k, mass
      */
     Mdouble getRestitutionCoefficient(Mdouble mass) const;
-
+    
     ///\brief creates default values for mixed species
-    void mix(LinearViscoelasticNormalSpecies*SBase, LinearViscoelasticNormalSpecies*TBase);
+    void mix(LinearViscoelasticNormalSpecies* SBase, LinearViscoelasticNormalSpecies* TBase);
 
 //setters and getters
-
+    
     ///Allows the spring constant to be changed
     void setStiffness(Mdouble new_k);
-
+    
     ///Allows the spring constant to be accessed
     Mdouble getStiffness() const;
-
+    
     void setDissipation(Mdouble dissipation);
-
+    
     ///Allows the normal dissipation to be accessed
     Mdouble getDissipation() const;
-
+    
     ///Allows the spring and dissipation constants to be changed simultaneously
-    MERCURY_DEPRECATED 
+    MERCURY_DEPRECATED
     void setStiffnessAndDissipation(helpers::KAndDisp new_);
 
 private:
     Mdouble stiffness_; ///<(normal) spring constant
     Mdouble dissipation_; ///<(normal) viscosity
 };
+
 #endif

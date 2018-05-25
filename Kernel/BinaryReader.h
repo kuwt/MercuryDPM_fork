@@ -34,7 +34,7 @@
 class BinaryReader
 {
 public:
-   
+    
     /*!
      * \brief Default constuction, requires to users to prove the name of the file that will be opened.
      */
@@ -69,7 +69,7 @@ public:
      * \brief read and ignore the next number of characters
      */
     void ignoreChar(unsigned int size);
-    
+
 private:
     
     /*!

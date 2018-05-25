@@ -76,9 +76,9 @@ WallHandler::WallHandler(const WallHandler& WH)
  *          DPMBase and the BaseWall in objects_, it sets the other data members
  *          to 0 or nullptr.
  */
-WallHandler& WallHandler::operator =(const WallHandler& rhs)
+WallHandler& WallHandler::operator=(const WallHandler& rhs)
 {
-    if(this != &rhs)
+    if (this != &rhs)
     {
         clear();
         setDPMBase(rhs.getDPMBase());
@@ -101,14 +101,14 @@ WallHandler::~WallHandler()
  * \param[in] W A pointer to the BaseWall (or derived class) that has to be added.
  * \details First the new BaseWall is added to the vector of BaseWall, then it is 
  * told that this is its handler.
- */ 
+ */
 void WallHandler::addObject(BaseWall* W)
 {
     if (W->getSpecies() == nullptr)
     {
         logger(WARN, "WARNING: The wall with ID % that is added in WallHandler::addObject "
-                "does not have a species yet. Please make sure that you have "
-                "set the species somewhere in the driver code.", W->getId());
+                     "does not have a species yet. Please make sure that you have "
+                     "set the species somewhere in the driver code.", W->getId());
     }
     //Puts the wall in the Wall list
     BaseHandler<BaseWall>::addObject(W);
@@ -116,7 +116,8 @@ void WallHandler::addObject(BaseWall* W)
     W->setHandler(this);
 }
 
-BaseWall* WallHandler::createObject(const std::string& type) {
+BaseWall* WallHandler::createObject(const std::string& type)
+{
     if (type == "CylindricalWall")
     {
         return new CylindricalWall;
@@ -149,7 +150,7 @@ BaseWall* WallHandler::createObject(const std::string& type) {
     {
         return new VChute;
     }
-    //for backward compatibility (before svnversion ~2360)
+        //for backward compatibility (before svnversion ~2360)
     else if (type == "numFiniteWalls")
     {
         return new BasicIntersectionOfWalls;
@@ -161,12 +162,12 @@ BaseWall* WallHandler::createObject(const std::string& type) {
     }
 }
 
-BaseWall* WallHandler::readAndCreateObject(std::istream &is)
+BaseWall* WallHandler::readAndCreateObject(std::istream& is)
 {
     std::string type;
     is >> type;
     logger(DEBUG, "WallHandler::readAndAddObject(is): reading type %.", type);
-
+    
     //for backward compatibility (before svnversion ~2360)
     if (type == "numFiniteWalls")
     {
@@ -176,15 +177,16 @@ BaseWall* WallHandler::readAndCreateObject(std::istream &is)
     {
         BaseWall* wall = createObject(type);
         //check if wall is user-defined
-        if (wall == nullptr) {
+        if (wall == nullptr)
+        {
             wall = getDPMBase()->readUserDefinedWall(type);
         }
         //throw warning if wall could not be found
-        if (wall== nullptr)
+        if (wall == nullptr)
         {
             std::string line;
-            getline(is,line);
-            logger(WARN,"This wall could not be read; dummy wall is inserted instead:\n%%",type,line);
+            getline(is, line);
+            logger(WARN, "This wall could not be read; dummy wall is inserted instead:\n%%", type, line);
             BaseWall* wall = new InfiniteWall;
             wall->setHandler(this);
             wall->setSpecies(getDPMBase()->speciesHandler.getObject(0));
@@ -204,25 +206,25 @@ BaseWall* WallHandler::readAndCreateObject(std::istream &is)
  * an IntersectionOfWalls from it, which can then be added to the handler.
  * \param[in,out] is The input stream from which the information is read.
  */
-BaseWall* WallHandler::readAndCreateOldObject(std::istream &is)
+BaseWall* WallHandler::readAndCreateOldObject(std::istream& is)
 {
     //read in next line
     std::stringstream line;
     helpers::getLineFromStringStream(is, line);
     logger(VERBOSE, line.str());
-
+    
     std::string dummy;
     unsigned int numWalls;
     Mdouble position;
     Vec3D normal;
     line >> numWalls;
-
+    
     if (numWalls == 0)
     {
         InfiniteWall* wall = new InfiniteWall();
         wall->setSpecies(getDPMBase()->speciesHandler.getObject(0));
         line >> dummy >> normal >> dummy >> position;
-        wall->set(normal, position*normal);
+        wall->set(normal, position * normal);
         return wall;
     }
     else
@@ -232,7 +234,7 @@ BaseWall* WallHandler::readAndCreateOldObject(std::istream &is)
         for (unsigned int i = 0; i < numWalls; ++i)
         {
             line >> dummy >> normal >> dummy >> position;
-            wall->addObject(normal, position*normal);
+            wall->addObject(normal, position * normal);
         }
         return wall;
     }
@@ -279,9 +281,12 @@ void WallHandler::writeVTKBoundingBox() const
     file << "<Points>\n";
     file << "  <DataArray type=\"Float32\" Name=\"Position\" NumberOfComponents=\"3\" format=\"ascii\">\n";
     Vec3D P[2] = {getDPMBase()->getMax(), getDPMBase()->getMin()};
-    for (auto &i : P) {
-        for (auto &j : P) {
-            for (auto &k : P) {
+    for (auto& i : P)
+    {
+        for (auto& j : P)
+        {
+            for (auto& k : P)
+            {
                 Vec3D p = Vec3D(i.X, j.Y, k.Z);
                 file << '\t' << p << '\n';
             }
@@ -292,12 +297,12 @@ void WallHandler::writeVTKBoundingBox() const
     file << "</Points>\n";
     file << "<Cells>\n";
     file <<
-    "  <DataArray type=\"Int32\" Name=\"connectivity\" format=\"ascii\">\n";
+         "  <DataArray type=\"Int32\" Name=\"connectivity\" format=\"ascii\">\n";
     file << "\t0 1 3 2 0 4 5 1 5 7 3 7 6 2 6 4\n";
     file << "  </DataArray>\n";
     file << "  <DataArray type=\"Int32\" Name=\"offsets\" format=\"ascii\">\n";
     file <<
-    "\t16\n"; //offset into the connectivity array for the end of each cell.
+         "\t16\n"; //offset into the connectivity array for the end of each cell.
     file << "  </DataArray>\n";
     file << "  <DataArray type=\"UInt8\"  Name=\"types\" format=\"ascii\">\n";
     file << "\t4\n";
@@ -317,101 +322,109 @@ void WallHandler::writeVTKBoundingBox() const
  * \param[in] species pointer to a species in the species handler that will be assigned to the walls
  * \param[in] scaleFactor allows the vertex positions to be scaled (necessary if the vtk file is written in different units than the Mercury implementation, e.g. if the stl file is given in mm, but the Mercury implementation uses meters)
  */
-void WallHandler::readTriangleWall(std::string filename, ParticleSpecies *species, Mdouble scaleFactor)
+void WallHandler::readTriangleWall(std::string filename, ParticleSpecies* species, Mdouble scaleFactor)
 {
-    std::string fileType = filename.substr(filename.find_last_of('.')+1);
-
-    if (!fileType.compare("vtk")) {
+    std::string fileType = filename.substr(filename.find_last_of('.') + 1);
+    
+    if (!fileType.compare("vtk"))
+    {
         //try open the input file
         std::fstream file;
         file.open(filename.c_str(), std::ios::in);
         logger.assert_always(file.is_open(), "File opening failed: %", filename);
-
+        
         //skip the header lines
         std::string dummy;
         getline(file, dummy);
         getline(file, dummy);
         getline(file, dummy);
         getline(file, dummy);
-
+        
         //read vertices, apply scaling
         unsigned num;
         file >> dummy >> num >> dummy;
         std::vector<Vec3D> vertex;
         vertex.reserve(num);
         Vec3D v;
-        for (unsigned i = 0; i < num; i++) {
+        for (unsigned i = 0; i < num; i++)
+        {
             file >> v.X >> v.Y >> v.Z;
             v *= scaleFactor;
             vertex.push_back(v);
         }
-
+        
         //read faces
         unsigned n = getSize();
         file >> dummy >> num >> dummy;
         TriangleWall triangleWall;
         triangleWall.setSpecies(species);
         unsigned id0, id1, id2;
-        for (unsigned i = 0; i < num; i++) {
+        for (unsigned i = 0; i < num; i++)
+        {
             file >> dummy >> id0 >> id1 >> id2;
             triangleWall.setVertices(vertex[id0], vertex[id1], vertex[id2]);
             copyAndAddObject(triangleWall);
         }
-
+        
         //close file
         file.close();
-
+        
         logger(INFO, "Read in % walls", getSize() - n);
-
-    } else if (!fileType.compare("stl")) {
-
+        
+    }
+    else if (!fileType.compare("stl"))
+    {
+        
         BinaryReader file(filename);
-
+        
         STLTriangle triangle;
         TriangleWall triangleWall;
         triangleWall.setSpecies(species);
-
+        
         std::string header = file.readString(80);
         unsigned numTriangles = file.readUnsignedInt(4);
-
-        for (unsigned i = 0; i < numTriangles; i++) {
+        
+        for (unsigned i = 0; i < numTriangles; i++)
+        {
             triangle.normal.x() = file.readFloat(4);
             triangle.normal.y() = file.readFloat(4);
             triangle.normal.z() = file.readFloat(4);
-
-
+            
+            
             triangle.vertex1.x() = file.readFloat(4);
             triangle.vertex1.y() = file.readFloat(4);
             triangle.vertex1.z() = file.readFloat(4);
-
+            
             triangle.vertex2.x() = file.readFloat(4);
             triangle.vertex2.y() = file.readFloat(4);
             triangle.vertex2.z() = file.readFloat(4);
-
-
+            
+            
             triangle.vertex3.x() = file.readFloat(4);
             triangle.vertex3.y() = file.readFloat(4);
             triangle.vertex3.z() = file.readFloat(4);
-
+            
             triangle.vertex1 *= scaleFactor;
             triangle.vertex2 *= scaleFactor;
             triangle.vertex3 *= scaleFactor;
-
+            
             //add to triangle wall
             triangleWall.setVertices(triangle.vertex1, triangle.vertex2, triangle.vertex3);
             copyAndAddObject(triangleWall);
-
+            
             //Now ignore (read) the two dummy characters
             file.ignoreChar(2);
-
+            
         }
-
+        
         logger(INFO, "Read in % walls", numTriangles);
-
-    } else {
-
-        logger(ERROR,"File type of % must be vtk or stl");
-
+        
+    }
+    else
+    {
+        
+        logger(ERROR, "File type of % must be vtk or stl");
+        
     }
 }
 

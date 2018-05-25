@@ -25,6 +25,7 @@
 
 #include "Matrix.h"
 #include "ExtendedMath.h"
+
 using mathsFunc::square;
 
 /*!
@@ -41,7 +42,8 @@ Matrix3D::Matrix3D()
  *  \param[in] [all] xx/xy/xz /yx/yy/yz /zx/zy/zz are all nine elements (left-to-right,
  *   top-to-bottom) of the 3D matrix.
  */
-Matrix3D::Matrix3D(const Mdouble xx, const Mdouble xy, const Mdouble xz, const Mdouble yx, const Mdouble yy, const Mdouble yz, const Mdouble zx, const Mdouble zy, const Mdouble zz)
+Matrix3D::Matrix3D(const Mdouble xx, const Mdouble xy, const Mdouble xz, const Mdouble yx, const Mdouble yy,
+                   const Mdouble yz, const Mdouble zx, const Mdouble zy, const Mdouble zz)
 {
     XX = xx;
     XY = xy;
@@ -54,17 +56,17 @@ Matrix3D::Matrix3D(const Mdouble xx, const Mdouble xy, const Mdouble xz, const M
     ZZ = zz;
 }
 
-Matrix3D::Matrix3D(const SmallMatrix<3,3>& matrix)
+Matrix3D::Matrix3D(const SmallMatrix<3, 3>& matrix)
 {
-    XX = matrix(0,0);
-    XY = matrix(0,1);
-    XZ = matrix(0,2);
-    YX = matrix(1,0);
-    YY = matrix(1,1);
-    YZ = matrix(1,2);
-    ZX = matrix(2,0);
-    ZY = matrix(2,1);
-    ZZ = matrix(2,2);
+    XX = matrix(0, 0);
+    XY = matrix(0, 1);
+    XZ = matrix(0, 2);
+    YX = matrix(1, 0);
+    YY = matrix(1, 1);
+    YZ = matrix(1, 2);
+    ZX = matrix(2, 0);
+    ZY = matrix(2, 1);
+    ZZ = matrix(2, 2);
 }
 
 /*!
@@ -90,8 +92,9 @@ Mdouble Matrix3D::trace() const
  */
 Mdouble Matrix3D::deviator() const
 {
-    const Mdouble P = trace()/3.0;
-    return std::sqrt(0.5*(mathsFunc::square(XX-P)+mathsFunc::square(YY-P)+mathsFunc::square(ZZ-P)) + 0.25*(mathsFunc::square(XY+YX)+mathsFunc::square(XZ+ZX)+mathsFunc::square(YZ+ZY)));
+    const Mdouble P = trace() / 3.0;
+    return std::sqrt(0.5 * (mathsFunc::square(XX - P) + mathsFunc::square(YY - P) + mathsFunc::square(ZZ - P)) +
+                     0.25 * (mathsFunc::square(XY + YX) + mathsFunc::square(XZ + ZX) + mathsFunc::square(YZ + ZY)));
 }
 
 /*!
@@ -99,7 +102,7 @@ Mdouble Matrix3D::deviator() const
  * \param[in] A     Matrix to be added
  * \return resulting matrix
  */
-Matrix3D Matrix3D::operator +(const Matrix3D& A) const
+Matrix3D Matrix3D::operator+(const Matrix3D& A) const
 {
     return Matrix3D(XX + A.XX, XY + A.XY, XZ + A.XZ,
                     YX + A.YX, YY + A.YY, YZ + A.YZ,
@@ -112,7 +115,7 @@ Matrix3D Matrix3D::operator +(const Matrix3D& A) const
  * \return resulting matrix
  * 
  */
-Matrix3D Matrix3D::operator -(const Matrix3D& A) const
+Matrix3D Matrix3D::operator-(const Matrix3D& A) const
 {
     return Matrix3D(XX - A.XX, XY - A.XY, XZ - A.XZ,
                     YX - A.YX, YY - A.YY, YZ - A.YZ,
@@ -124,7 +127,7 @@ Matrix3D Matrix3D::operator -(const Matrix3D& A) const
  * \param[in] a     Scalar to be added
  * \return resulting matrix
  */
-Matrix3D Matrix3D::operator +(const Mdouble a)const
+Matrix3D Matrix3D::operator+(const Mdouble a) const
 {
     return Matrix3D(XX + a, XY + a, XZ + a,
                     YX + a, YY + a, YZ + a,
@@ -136,7 +139,7 @@ Matrix3D Matrix3D::operator +(const Mdouble a)const
  * \param[in] a     Scalar to be subtracted
  * \return resulting matrix
  */
-Matrix3D Matrix3D::operator -(const Mdouble a)const
+Matrix3D Matrix3D::operator-(const Mdouble a) const
 {
     return Matrix3D(XX - a, XY - a, XZ - a,
                     YX - a, YY - a, YZ - a,
@@ -148,7 +151,7 @@ Matrix3D Matrix3D::operator -(const Mdouble a)const
  * \param[in] a     Scalar to be multiplied with
  * \return resulting matrix
  */
-Matrix3D Matrix3D::operator *(const Mdouble a)const
+Matrix3D Matrix3D::operator*(const Mdouble a) const
 {
     return Matrix3D(XX * a, XY * a, XZ * a,
                     YX * a, YY * a, YZ * a,
@@ -160,14 +163,14 @@ Matrix3D Matrix3D::operator *(const Mdouble a)const
  * \param[in] a Vector to be multiplied with
  * \return Resulting vector
  */
-Vec3D Matrix3D::operator *(const Vec3D& a) const
+Vec3D Matrix3D::operator*(const Vec3D& a) const
 {
     return Vec3D(XX * a.X + XY * a.Y + XZ * a.Z,
                  YX * a.X + YY * a.Y + YZ * a.Z,
                  ZX * a.X + ZY * a.Y + ZZ * a.Z);
 }
 
-Matrix3D Matrix3D::operator *(const Matrix3D& a) const
+Matrix3D Matrix3D::operator*(const Matrix3D& a) const
 {
     return Matrix3D(XX * a.XX + XY * a.YX + XZ * a.ZX,
                     YX * a.XX + YY * a.YX + YZ * a.ZX,
@@ -178,7 +181,7 @@ Matrix3D Matrix3D::operator *(const Matrix3D& a) const
                     XX * a.XZ + XY * a.YZ + XZ * a.ZZ,
                     YX * a.XZ + YY * a.YZ + YZ * a.ZZ,
                     ZX * a.XZ + ZY * a.YZ + ZZ * a.ZZ
-                    );
+    );
 }
 
 /*!
@@ -186,7 +189,7 @@ Matrix3D Matrix3D::operator *(const Matrix3D& a) const
  * \param[in] a     scalar to be divided by
  * \return resulting matrix
  */
-Matrix3D Matrix3D::operator /(const Mdouble a)const
+Matrix3D Matrix3D::operator/(const Mdouble a) const
 {
     return Matrix3D(XX / a, XY / a, XZ / a,
                     YX / a, YY / a, YZ / a,
@@ -199,11 +202,11 @@ Matrix3D Matrix3D::operator /(const Mdouble a)const
  * \param[in] A     3D matrix
  * \return output stream with matrix elements added
  */
-std::ostream& operator <<(std::ostream& os, const Matrix3D& A)
+std::ostream& operator<<(std::ostream& os, const Matrix3D& A)
 {
     os << A.XX << ' ' << A.XY << ' ' << A.XZ << ' '
-        << A.YX << ' ' << A.YY << ' ' << A.YZ << ' '
-        << A.ZX << ' ' << A.ZY << ' ' << A.ZZ;
+       << A.YX << ' ' << A.YY << ' ' << A.YZ << ' '
+       << A.ZX << ' ' << A.ZY << ' ' << A.ZZ;
     return os;
 }
 
@@ -213,7 +216,7 @@ std::ostream& operator <<(std::ostream& os, const Matrix3D& A)
  * \param[out] A        3D matrix
  * \return is input stream after the read operation.
  */
-std::istream& operator >>(std::istream& is, Matrix3D& A)
+std::istream& operator>>(std::istream& is, Matrix3D& A)
 {
     is >> A.XX >> A.XY >> A.XZ >> A.YX >> A.YY >> A.YZ >> A.ZX >> A.ZY >> A.ZZ;
     return is;
@@ -224,7 +227,7 @@ std::istream& operator >>(std::istream& is, Matrix3D& A)
  * \param[in] A     3D matrix to be added
  * \return (reference to) resulting (this) matrix
  */
-Matrix3D& Matrix3D::operator +=(const Matrix3D& A)
+Matrix3D& Matrix3D::operator+=(const Matrix3D& A)
 {
     XX += A.XX;
     XY += A.XY;
@@ -243,7 +246,7 @@ Matrix3D& Matrix3D::operator +=(const Matrix3D& A)
  * \param[in] A     3D matrix to be subtracted
  * \return (reference to) resulting (this) matrix
  */
-Matrix3D& Matrix3D::operator -=(const Matrix3D& A)
+Matrix3D& Matrix3D::operator-=(const Matrix3D& A)
 {
     XX -= A.XX;
     XY -= A.XY;
@@ -262,7 +265,7 @@ Matrix3D& Matrix3D::operator -=(const Matrix3D& A)
  * \param[in] a     scalar to be divided by
  * \return (reference to) resulting (this) matrix
  */
-Matrix3D& Matrix3D::operator /=(const Mdouble a)
+Matrix3D& Matrix3D::operator/=(const Mdouble a)
 {
     XX /= a;
     XY /= a;
@@ -323,9 +326,9 @@ Matrix3D Matrix3D::dyadic(const Vec3D& a, const Vec3D& b)
 Matrix3D Matrix3D::cross(const Vec3D& a, const Matrix3D& B)
 {
     return Matrix3D(
-                    a.Y * B.ZX - a.Z * B.YX, a.Y * B.ZY - a.Z * B.YY, a.Y * B.ZZ - a.Z * B.YZ,
-                    a.Z * B.XX - a.X * B.ZX, a.Z * B.XY - a.X * B.ZY, a.Z * B.XZ - a.X * B.ZZ,
-                    a.X * B.YX - a.Y * B.XX, a.X * B.YY - a.Y * B.XY, a.X * B.YZ - a.Y * B.XZ);
+            a.Y * B.ZX - a.Z * B.YX, a.Y * B.ZY - a.Z * B.YY, a.Y * B.ZZ - a.Z * B.YZ,
+            a.Z * B.XX - a.X * B.ZX, a.Z * B.XY - a.X * B.ZY, a.Z * B.XZ - a.X * B.ZZ,
+            a.X * B.YX - a.Y * B.XX, a.X * B.YY - a.Y * B.XY, a.X * B.YZ - a.Y * B.XZ);
 }
 
 /*!
@@ -337,8 +340,8 @@ Matrix3D Matrix3D::inverse(const Matrix3D& A)
     Matrix3D result;
     Mdouble det;
     det = 1. / (A.XX * (A.YY * A.ZZ - A.YZ * A.ZY)
-        + A.XY * (A.YZ * A.ZX - A.YX * A.ZZ)
-        + A.XZ * (A.YX * A.ZY - A.YY * A.ZX));
+                + A.XY * (A.YZ * A.ZX - A.YX * A.ZZ)
+                + A.XZ * (A.YX * A.ZY - A.YY * A.ZX));
     result.XX = (A.YY * A.ZZ - A.YZ * A.ZY) * det;
     result.XY = -(A.XY * A.ZZ - A.XZ * A.ZY) * det;
     result.XZ = (A.XY * A.YZ - A.XZ * A.YY) * det;
@@ -359,15 +362,15 @@ Matrix3D Matrix3D::inverse(const Matrix3D& A)
 Vec3D Matrix3D::ldivide(const Vec3D& b)
 {
     Mdouble invdet = 1. / (XX * (YY * ZZ - YZ * ZY)
-                + XY * (YZ * ZX - YX * ZZ)
-                + XZ * (YX * ZY - YY * ZX));
-    return Vec3D(+ (XY * YZ - YY * XZ) * b.Z
+                           + XY * (YZ * ZX - YX * ZZ)
+                           + XZ * (YX * ZY - YY * ZX));
+    return Vec3D(+(XY * YZ - YY * XZ) * b.Z
                  - (ZY * YZ - ZZ * YY) * b.X
                  + (ZY * XZ - ZZ * XY) * b.Y,
-                 - (XX * YZ - XZ * YX) * b.Z
+                 -(XX * YZ - XZ * YX) * b.Z
                  + (ZX * YZ - ZZ * YX) * b.X
                  - (ZX * XZ - XX * ZZ) * b.Y,
-                 + (XX * YY - YX * XY) * b.Z
+                 +(XX * YY - YX * XY) * b.Z
                  - (ZX * YY - YX * ZY) * b.X
                  + (ZX * XY - XX * ZY) * b.Y) * invdet;
 }
@@ -380,17 +383,18 @@ Vec3D Matrix3D::ldivide(const Vec3D& b)
 Matrix3D Matrix3D::getCylindricalTensorField(const Vec3D& p) const
 {
     //define sin(A)=y/r, cos(A)=x/r
-    const Mdouble r = std::sqrt(p.X*p.X+p.Y*p.Y);
-    Mdouble s = p.Y/r;
-    Mdouble c = p.X/r;
-    if (r==0) {
-        s=0;
-        c=1;
+    const Mdouble r = std::sqrt(p.X * p.X + p.Y * p.Y);
+    Mdouble s = p.Y / r;
+    Mdouble c = p.X / r;
+    if (r == 0)
+    {
+        s = 0;
+        c = 1;
     }
-    const Matrix3D M = Matrix3D(XX*c+XY*s, -XX*s+XY*c, XZ,
-                                YX*c+YY*s, -YX*s+YY*c, YZ,
-                                ZX*c+ZY*s, -ZX*s+ZY*c, ZZ);
-    return Matrix3D(M.XX*c+M.YX*s, -M.XX*s+M.YX*c, M.ZX,
-                    M.XY*c+M.YY*s, -M.XY*s+M.YY*c, M.ZY,
-                    M.XZ*c+M.YZ*s, -M.XZ*s+M.YZ*c, M.ZZ);
+    const Matrix3D M = Matrix3D(XX * c + XY * s, -XX * s + XY * c, XZ,
+                                YX * c + YY * s, -YX * s + YY * c, YZ,
+                                ZX * c + ZY * s, -ZX * s + ZY * c, ZZ);
+    return Matrix3D(M.XX * c + M.YX * s, -M.XX * s + M.YX * c, M.ZX,
+                    M.XY * c + M.YY * s, -M.XY * s + M.YY * c, M.ZY,
+                    M.XZ * c + M.YZ * s, -M.XZ * s + M.YZ * c, M.ZZ);
 }

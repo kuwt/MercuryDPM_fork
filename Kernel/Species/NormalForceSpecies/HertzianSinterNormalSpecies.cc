@@ -31,6 +31,7 @@
 #include <cassert>
 
 class BaseParticle;
+
 class BaseInteractable;
 
 HertzianSinterNormalSpecies::HertzianSinterNormalSpecies()
@@ -49,7 +50,7 @@ HertzianSinterNormalSpecies::HertzianSinterNormalSpecies()
 /*!
  * \param[in] the species that is copied
  */
-HertzianSinterNormalSpecies::HertzianSinterNormalSpecies(const HertzianSinterNormalSpecies &p)
+HertzianSinterNormalSpecies::HertzianSinterNormalSpecies(const HertzianSinterNormalSpecies& p)
 {
     loadingModulus_ = p.loadingModulus_;
     unloadingModulusMax_ = p.unloadingModulusMax_;
@@ -66,7 +67,7 @@ HertzianSinterNormalSpecies::~HertzianSinterNormalSpecies()
 {
 #ifdef DEBUG_DESTRUCTOR
     std::cout<<"HertzianSinterNormalSpecies::~HertzianSinterNormalSpecies() finished"<<std::endl;
-#endif   
+#endif
 }
 
 /*!
@@ -74,12 +75,12 @@ HertzianSinterNormalSpecies::~HertzianSinterNormalSpecies()
  */
 void HertzianSinterNormalSpecies::write(std::ostream& os) const
 {
-    os  << " loadingModulus " << loadingModulus_;
-    os  << " maxUnloadingModulus " << unloadingModulusMax_;
-    os  << " cohesionModulus " << cohesionModulus_;
-    os  << " maxPenetration " << penetrationDepthMax_;
-    os  << " dissipation " << dissipation_;
-    os  << " sinterRate " << sinterRate_;
+    os << " loadingModulus " << loadingModulus_;
+    os << " maxUnloadingModulus " << unloadingModulusMax_;
+    os << " cohesionModulus " << cohesionModulus_;
+    os << " maxPenetration " << penetrationDepthMax_;
+    os << " dissipation " << dissipation_;
+    os << " sinterRate " << sinterRate_;
 }
 
 /*!
@@ -125,9 +126,11 @@ void HertzianSinterNormalSpecies::mix(HertzianSinterNormalSpecies* const S, Hert
  * \param[in] cohesionModulus     the cohesive stiffness of the linear plastic-viscoelastic normal force.
  * \param[in] penetrationDepthMax   the maximum penetration depth of the linear plastic-viscoelastic normal force.
  */
-void HertzianSinterNormalSpecies::setPlasticParameters (Mdouble loadingModulus, Mdouble unloadingModulusMax, Mdouble cohesionModulus, Mdouble penetrationDepthMax)
+void HertzianSinterNormalSpecies::setPlasticParameters(Mdouble loadingModulus, Mdouble unloadingModulusMax,
+                                                       Mdouble cohesionModulus, Mdouble penetrationDepthMax)
 {
-    if (loadingModulus <= 0 || unloadingModulusMax <= 1.000001*(loadingModulus+cohesionModulus) || cohesionModulus < 0 || penetrationDepthMax < 0)
+    if (loadingModulus <= 0 || unloadingModulusMax <= 1.000001 * (loadingModulus + cohesionModulus) ||
+        cohesionModulus < 0 || penetrationDepthMax < 0)
     {
         std::cerr << "Error: arguments of setPlasticParameters do not make sense" << std::endl;
         exit(-1);
@@ -212,11 +215,11 @@ Mdouble HertzianSinterNormalSpecies::computeTimeStep(Mdouble mass)
 //        std::cerr << "Dissipation too high; max. allowed " << sqrt(2.0 * stiffnessMax * mass) << std::endl;
 //        return 0.02 * constants::pi / std::sqrt(2.0*stiffnessMax / mass);
 //    } else {
-    std::cerr << "Warning: Dissipation is not taken into account when computing the time step"  << std::endl;
-    ParticleSpecies* p=dynamic_cast<ParticleSpecies*>(this);
+    std::cerr << "Warning: Dissipation is not taken into account when computing the time step" << std::endl;
+    ParticleSpecies* p = dynamic_cast<ParticleSpecies*>(this);
     assert(p);
-    Mdouble radius = cbrt(mass*3./(4.*constants::pi*p->getDensity()));
-    return 0.02 * constants::pi / std::sqrt(2.0*getUnloadingModulusMax()*getPenetrationDepthMax()*radius / mass);
+    Mdouble radius = cbrt(mass * 3. / (4. * constants::pi * p->getDensity()));
+    return 0.02 * constants::pi / std::sqrt(2.0 * getUnloadingModulusMax() * getPenetrationDepthMax() * radius / mass);
 }
 
 /*!

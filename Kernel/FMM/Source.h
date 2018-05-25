@@ -30,27 +30,28 @@
 #include <complex>
 #include <vector>
 
-class Source {
+class Source
+{
 public:
 public:
-	Source(Vec3D location, Mdouble strength, Mdouble c);
-
-	Mdouble evaluate(Mdouble x);
-
-	Vec3D getLocation()
-	{
-		return location_;
-	}
-
-	Mdouble getStrength()
-	{
-		return strength_;
-	}
+    Source(Vec3D location, Mdouble strength, Mdouble c);
+    
+    Mdouble evaluate(Mdouble x);
+    
+    Vec3D getLocation()
+    {
+        return location_;
+    }
+    
+    Mdouble getStrength()
+    {
+        return strength_;
+    }
 
 private:
-	Vec3D location_;
-	Mdouble strength_;
-	Mdouble c_;
+    Vec3D location_;
+    Mdouble strength_;
+    Mdouble c_;
 };
 
 

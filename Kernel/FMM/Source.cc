@@ -37,6 +37,6 @@ Source::Source(Vec3D location, Mdouble strength, Mdouble c) : location_(location
 
 Mdouble Source::evaluate(Mdouble x)
 {
-	//todo: fix this function
-	return 1.0;//strength_*std::sqrt( (x-location_)*(x-location_) + c_*c_);
+    //todo: fix this function
+    return 1.0;//strength_*std::sqrt( (x-location_)*(x-location_) + c_*c_);
 }

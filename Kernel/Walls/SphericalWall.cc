@@ -76,17 +76,17 @@ SphericalWall* SphericalWall::copy() const
  */
 void SphericalWall::setRadius(Mdouble radius)
 {
-    logger.assert(radius>=0,"radius=% cannot be negative",radius);
-    radius_=radius;
+    logger.assert(radius >= 0, "radius=% cannot be negative", radius);
+    radius_ = radius;
 }
 
 /*!
  * \param[in] otherPosition The position to which the distance must be computed to.
  * \return The distance of the wall to the particle.
- */ 
+ */
 Mdouble SphericalWall::getDistance(const Vec3D& otherPosition) const
 {
-    return Vec3D::getLength(getPosition()-otherPosition);
+    return Vec3D::getLength(getPosition() - otherPosition);
 }
 
 /*!
@@ -111,11 +111,11 @@ Mdouble SphericalWall::getRadius() const
  */
 bool SphericalWall::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const
 {
-    normal_return = p.getPosition()-getPosition();
-    distance = Vec3D::getLength(normal_return)-radius_;
+    normal_return = p.getPosition() - getPosition();
+    distance = Vec3D::getLength(normal_return) - radius_;
     if (distance >= p.getWallInteractionRadius())
         return false;
-    normal_return/=distance+radius_;
+    normal_return /= distance + radius_;
     //logger(WARN,"p% q% q% q% q%", getPosition(), p.getPosition(), normal_return, distance, p.getWallInteractionRadius());
     return true;
 }

@@ -102,10 +102,10 @@ void ChuteWithHopper::constructor()
     hopperShift_ = 0.0;
     hopperDimension_ = 1;
     isHopperAlignedWithBottom_ = true;
-
+    
     hopperFillingPercentage_ = 50.0;
     isHopperCentred_ = false;
-
+    
 }
 
 /*!
@@ -143,13 +143,13 @@ void ChuteWithHopper::setupInitialConditions()
     p1->setSpecies(speciesHandler.getObject(0));
     b1.set(p1, getMaxFailed(), getYMin(), getYMax(), getMinInflowParticleRadius(), getMaxInflowParticleRadius(),
            getChuteAngle(), getFixedParticleRadius(), isHopperCentred_, hopperDimension_, hopperAngle_, hopperLength_,
-           hopperExitLength_,hopperHeight_, hopperLift_, hopperFillingPercentage_);
+           hopperExitLength_, hopperHeight_, hopperLift_, hopperFillingPercentage_);
     boundaryHandler.copyAndAddObject(b1);
     setInsertionBoundary(dynamic_cast<InsertionBoundary*>(boundaryHandler.getLastObject()));
     
     // create the chute bottom
     createBottom();
-
+    
     // create the hopper
     addHopper();
 }
@@ -169,35 +169,36 @@ void ChuteWithHopper::addHopper()
     //    |   |
     //   C|   |
     //        |C
-
+    
     Vec3D A, B, C, temp, normal;
-
+    
     const Mdouble s = mathsFunc::sin(getChuteAngle());
     const Mdouble c = mathsFunc::cos(getChuteAngle());
     // height of the lowest part of the hopper (right C in diagram above) as compared to 
     // the vertical position of the start of the chute (left C in diagram above).
-    hopperLowestPoint_ = hopperExitHeight_ - hopperExitLength_ * s/c;
-
+    hopperLowestPoint_ = hopperExitHeight_ - hopperExitLength_ * s / c;
+    
     // "0.5*(hopperLength_+hopperExitLength_) / tan(hopperAngle_)" is the minimum heigth of the hopper, to make sure things should flow down and not to the sides.
     // hopperHeight_ is now an input variable
     // hopperHeight_ = hopperLowestPoint_ + 1.1 * 0.5*(hopperLength_+hopperExitLength_) / tan(hopperAngle_);
-
-    const Mdouble HopperCornerHeight = hopperHeight_ - 0.5 * (hopperLength_ - hopperExitLength_) / mathsFunc::tan(getChuteAngle());
+    
+    const Mdouble HopperCornerHeight =
+            hopperHeight_ - 0.5 * (hopperLength_ - hopperExitLength_) / mathsFunc::tan(getChuteAngle());
     /// \todo Waarom had ik deze ook al weer gecomment? IFCD: this was probably BvdH
     //if (HopperCornerHeight<=0.0) { hopperHeight_ += -HopperCornerHeight + P0.getRadius(); HopperCornerHeight = P0.getRadius(); }
-
+    
     // first we create the LEFT hopper wall
-
+    
     // coordinates of A,B,C in (vertical parallel to flow, vertical normal to flow, horizontal) direction
     A = Vec3D(-0.5 * (hopperLength_ - hopperExitLength_), 0.0, hopperHeight_);
     B = Vec3D(0.0, 0.0, HopperCornerHeight);
     C = Vec3D(0.0, 0.0, 0.0);
-
+    
     // now rotate the coordinates of A,B,C to be in (x,y,z) direction
     A = Vec3D(c * A.X - s * A.Z, 0.0, s * A.X + c * A.Z);
     B = Vec3D(c * B.X - s * B.Z, 0.0, s * B.X + c * B.Z);
     C = Vec3D(c * C.X - s * C.Z, 0.0, s * C.X + c * C.Z);
-
+    
     // the position of A determines hopper shift and zmax
     ///\todo Why shift A by arbitrary number of 40, when isHopperCentred_ = True?
     /// NB: this is probably the same shift of 40 as happens in HopperInsertionBoundary::generateParticle(RNG)
@@ -212,17 +213,17 @@ void ChuteWithHopper::addHopper()
     {
         setHopperShift(-A.X);
     }
-
+    
     setZMax(A.Z);
     A.X += hopperShift_;
     B.X += hopperShift_;
     C.X += hopperShift_;
-
+    
     //This lifts the hopper a distance above the chute
     A.Z += hopperLift_;
     B.Z += hopperLift_;
     C.Z += hopperLift_;
-
+    
     //create a finite wall from B to A and from C to B on the left hand side
     IntersectionOfWalls w_Left;
     w_Left.setSpecies(speciesHandler.getObject(0));
@@ -236,22 +237,24 @@ void ChuteWithHopper::addHopper()
     normal = Vec3D(temp.Z, 0.0, -temp.X) / std::sqrt(temp.getLengthSquared());
     w_Left.addObject(normal, C);
     wallHandler.copyAndAddObject(w_Left);
-
+    
     //next, do the same for the right wall
     A = Vec3D(hopperLength_ - 0.5 * (hopperLength_ - hopperExitLength_), 0.0, hopperHeight_);
-    B = Vec3D(0.5 * (hopperLength_ + hopperExitLength_) - 0.5 * (hopperLength_ - hopperExitLength_), 0.0, HopperCornerHeight);
-    C = Vec3D(0.5 * (hopperLength_ + hopperExitLength_) - 0.5 * (hopperLength_ - hopperExitLength_), 0.0, hopperLowestPoint_);
-
+    B = Vec3D(0.5 * (hopperLength_ + hopperExitLength_) - 0.5 * (hopperLength_ - hopperExitLength_), 0.0,
+              HopperCornerHeight);
+    C = Vec3D(0.5 * (hopperLength_ + hopperExitLength_) - 0.5 * (hopperLength_ - hopperExitLength_), 0.0,
+              hopperLowestPoint_);
+    
     //This rotates the right points
     A = Vec3D(c * A.X - s * A.Z + hopperShift_, 0.0, s * A.X + c * A.Z);
     B = Vec3D(c * B.X - s * B.Z + hopperShift_, 0.0, s * B.X + c * B.Z);
     C = Vec3D(c * C.X - s * C.Z + hopperShift_, 0.0, s * C.X + c * C.Z);
-
+    
     //This lifts the hopper a distance above the chute
     A.Z += hopperLift_;
     B.Z += hopperLift_;
     C.Z += hopperLift_;
-
+    
     //create a finite wall from B to A and from C to B on the right hand side
     IntersectionOfWalls w_Right;
     w_Right.setSpecies(speciesHandler.getObject(0));
@@ -265,9 +268,9 @@ void ChuteWithHopper::addHopper()
     normal = Vec3D(temp.Z, 0.0, -temp.X) / std::sqrt(temp.getLengthSquared());
     w_Right.addObject(normal, C);
     wallHandler.copyAndAddObject(w_Right);
-
+    
     setZMax(A.Z);
-
+    
     // if hopperDimension_ == 2, create inclined hopper walls (like in the X-direction) also in the Y-direction.
     // (Else, place vertical (possibly periodic) walls in Y-direction. -> not mentioned here, where is this arranged? (BvdH))
     if (hopperDimension_ == 2)
@@ -276,7 +279,7 @@ void ChuteWithHopper::addHopper()
         A = Vec3D(0.0, (getYMax() - getYMin() - hopperLength_) / 2.0, hopperHeight_);
         B = Vec3D(0.0, (getYMax() - getYMin() - hopperExitLength_) / 2.0, HopperCornerHeight);
         C = Vec3D(0.0, (getYMax() - getYMin() - hopperExitLength_) / 2.0, 0.0);
-
+        
         //now rotate the coordinates of A,B,C to be in (x,y,z) direction
         A = Vec3D(c * A.X - s * A.Z, A.Y, s * A.X + c * A.Z);
         B = Vec3D(c * B.X - s * B.Z, B.Y, s * B.X + c * B.Z);
@@ -285,12 +288,12 @@ void ChuteWithHopper::addHopper()
         A.X += hopperShift_;
         B.X += hopperShift_;
         C.X += hopperShift_;
-
+        
         //This lifts the hopper a distance above the chute
         A.Z += hopperLift_;
         B.Z += hopperLift_;
         C.Z += hopperLift_;
-
+        
         //create a finite wall from B to A and from C to B
         IntersectionOfWalls w_Back;
         temp = B - A;
@@ -306,12 +309,12 @@ void ChuteWithHopper::addHopper()
         normal = Vec3D::cross(Vec3D(-c, 0, -s), temp) / std::sqrt(temp.getLengthSquared());
         w_Back.addObject(normal, C);
         wallHandler.copyAndAddObject(w_Back);
-
+        
         //Now for the right y-wall
         A = Vec3D(0.0, (getYMax() - getYMin() + hopperLength_) / 2.0, hopperHeight_);
         B = Vec3D(0.0, (getYMax() - getYMin() + hopperExitLength_) / 2.0, HopperCornerHeight);
         C = Vec3D(0.0, (getYMax() - getYMin() + hopperExitLength_) / 2.0, 0.0);
-
+        
         //now rotate the coordinates of A,B,C to be in (x,y,z) direction
         A = Vec3D(c * A.X - s * A.Z, A.Y, s * A.X + c * A.Z);
         B = Vec3D(c * B.X - s * B.Z, B.Y, s * B.X + c * B.Z);
@@ -320,12 +323,12 @@ void ChuteWithHopper::addHopper()
         A.X += hopperShift_;
         B.X += hopperShift_;
         C.X += hopperShift_;
-
+        
         //This lifts the hopper a distance above the chute
         A.Z += hopperLift_;
         B.Z += hopperLift_;
         C.Z += hopperLift_;
-
+        
         //create a finite wall from B to A and from C to B
         IntersectionOfWalls w_Front;
         temp = A - B;
@@ -342,7 +345,7 @@ void ChuteWithHopper::addHopper()
         w_Front.addObject(normal, C);
         wallHandler.copyAndAddObject(w_Front);
     }
-
+    
     //now shift the chute as well, i.e. apply the shift to all the fixed particles
     // at the bottom of the chute
     for (BaseParticle* particle : particleHandler)
@@ -381,27 +384,29 @@ Mdouble ChuteWithHopper::getHopperLowestPoint() const
 void ChuteWithHopper::setHopper(Mdouble exitLength, Mdouble exitHeight, Mdouble angle, Mdouble length, Mdouble height)
 {
     // hopperCornerHeight: helper variable, just here to check some things
-    const Mdouble hopperCornerHeight = height - 0.5 * (length - exitLength) / mathsFunc::tan(angle * constants::pi / 180.0);
-
+    const Mdouble hopperCornerHeight =
+            height - 0.5 * (length - exitLength) / mathsFunc::tan(angle * constants::pi / 180.0);
+    
     if (exitLength >= 0.0)
     {
         hopperExitLength_ = exitLength;
     }
     else
     {
-        logger(ERROR,"[ChuteWithHopper::setHopper()] Hopper exit length must be greater than or equal to zero");
+        logger(ERROR, "[ChuteWithHopper::setHopper()] Hopper exit length must be greater than or equal to zero");
         exit(-1);
     }
-
+    
     // hopperExitHeight_
     if (exitHeight < 0.0)
     {
-        logger(ERROR,"[ChuteWithHopper::setHopper()] Hopper exit height must be greater than or equal to zero");
+        logger(ERROR, "[ChuteWithHopper::setHopper()] Hopper exit height must be greater than or equal to zero");
         exit(-1);
     }
-    else if(exitHeight > hopperCornerHeight + mathsFunc::tan(getChuteAngle()) * exitLength)
+    else if (exitHeight > hopperCornerHeight + mathsFunc::tan(getChuteAngle()) * exitLength)
     {
-        logger(ERROR, "[ChuteWithHopper::setHopper()] Hopper exit height (%) may not exceed height of hopper corner above chute bottom (%)",
+        logger(ERROR,
+               "[ChuteWithHopper::setHopper()] Hopper exit height (%) may not exceed height of hopper corner above chute bottom (%)",
                exitHeight, hopperCornerHeight + mathsFunc::tan(getChuteAngle()) * exitLength);
         exit(-1);
     }
@@ -409,41 +414,43 @@ void ChuteWithHopper::setHopper(Mdouble exitLength, Mdouble exitHeight, Mdouble 
     {
         hopperExitHeight_ = exitHeight;
     }
-
+    
     setHopperLowestPoint(hopperExitHeight_ - hopperExitLength_ * mathsFunc::tan(getChuteAngle()));
-
+    
     if (angle > 0.0 && angle < 90.0)
     {
         hopperAngle_ = angle * constants::pi / 180.0;
     }
     else
     {
-        logger(ERROR,"[ChuteWithHopper::setHopper()] Hopper angle must in (0,90)");
+        logger(ERROR, "[ChuteWithHopper::setHopper()] Hopper angle must in (0,90)");
         exit(-1);
     }
-
+    
     if (length > exitLength)
     {
         hopperLength_ = length;
     }
     else
     {
-        logger(ERROR,"[ChuteWithHopper::setHopper()] Hopper length must be greater than exit length");
+        logger(ERROR, "[ChuteWithHopper::setHopper()] Hopper length must be greater than exit length");
         exit(-1);
     }
-
+    
     // check hopper 'corner height', i.e. the vertical position of point 'B' as compared to the start of the hopper
     // Mdouble hopperCornerHeight = height - 0.5 * (length - exitLength) / std::tan(hopperAngle_ * constants::pi / 180.0);
     if (hopperCornerHeight <= 0.0)
     {
         // hopperHeight_ += -hopperCornerHeight + problem.getMaxInflowParticleRadius();
         // hopperCornerHeight = problem.getMaxInflowParticleRadius();
-        logger(ERROR, "[ChuteWithHopper::setHopper()] height of hopper corner (%) may not be below 0. Increase hopper height to fix.",
+        logger(ERROR,
+               "[ChuteWithHopper::setHopper()] height of hopper corner (%) may not be below 0. Increase hopper height to fix.",
                hopperCornerHeight);
         exit(-1);
     }
-    const Mdouble heightCompare = (getHopperLowestPoint() + 0.5 * (hopperLength_ + hopperExitLength_) / mathsFunc::tan(hopperAngle_));
-
+    const Mdouble heightCompare = (getHopperLowestPoint() +
+                                   0.5 * (hopperLength_ + hopperExitLength_) / mathsFunc::tan(hopperAngle_));
+    
     logger(VERBOSE, " ");
     logger(VERBOSE, "[ChuteWithHopper::setHopper()] Setting the following hopper geometrical properties:");
     logger(VERBOSE, " hopperLowestPoint_: %, ", getHopperLowestPoint());
@@ -453,7 +460,7 @@ void ChuteWithHopper::setHopper(Mdouble exitLength, Mdouble exitHeight, Mdouble 
     logger(VERBOSE, " height: %, ", height);
     logger(VERBOSE, " comparing height: % ", heightCompare);
     logger(VERBOSE, " ");
-
+    
     //This a semi-ugly fix to check whether height>=Heightcompare and does not take into account rounding errors
     if ((height - heightCompare) > -1e-6 * heightCompare)
     {
@@ -461,12 +468,13 @@ void ChuteWithHopper::setHopper(Mdouble exitLength, Mdouble exitHeight, Mdouble 
     }
     else
     {
-        logger(ERROR, "[ChuteWithHopper::setHopper()] For these settings, hopper height must be greater then or equal to %, see drawing",
+        logger(ERROR,
+               "[ChuteWithHopper::setHopper()] For these settings, hopper height must be greater then or equal to %, see drawing",
                heightCompare);
         exit(-1);
         ///\todo: check whether hopperCornerHeight >=0, if not change hopperangle, line 105, I do not yet understand what the criteria is...
     }
-
+    
     logger(VERBOSE, " ");
     logger(VERBOSE, "[ChuteWithHopper::setHopper()] Hopper geometry: ");
     logger(VERBOSE, "hopperHeight_: \t %", hopperHeight_);
@@ -475,7 +483,7 @@ void ChuteWithHopper::setHopper(Mdouble exitLength, Mdouble exitHeight, Mdouble 
     logger(VERBOSE, "hopperAngle_: \t %", hopperAngle_);
     logger(VERBOSE, "hopperLength_: \t %", hopperLength_);
     logger(VERBOSE, " ");
-
+    
 }
 
 /*!
@@ -486,7 +494,7 @@ void ChuteWithHopper::setHopper(Mdouble exitLength, Mdouble exitHeight, Mdouble 
 Mdouble ChuteWithHopper::getMaximumVelocityInducedByGravity() const
 {
     const Mdouble height = hopperHeight_ + (getXMax() - hopperShift_) * mathsFunc::sin(getChuteAngle());
-
+    
     return std::sqrt(2.0 * getGravity().getLength() * height);
 }
 
@@ -501,11 +509,13 @@ Mdouble ChuteWithHopper::getTimeStepRatio() const
 {
     const Mdouble dx = getTimeStep() * getMaximumVelocityInducedByGravity();
     const Mdouble rmin = getMinInflowParticleRadius();
-
-    if (rmin/dx < 10.)
-        logger(WARN,"[ChuteWithHopper::getTimeStepRatio()] ratio of minimum particle radius over max distance travelled per time step due to gravity is only %; consider reducing the time step size!",rmin/dx);
-
-    return rmin/dx;
+    
+    if (rmin / dx < 10.)
+        logger(WARN,
+               "[ChuteWithHopper::getTimeStepRatio()] ratio of minimum particle radius over max distance travelled per time step due to gravity is only %; consider reducing the time step size!",
+               rmin / dx);
+    
+    return rmin / dx;
 }
 
 /*!
@@ -532,7 +542,8 @@ void ChuteWithHopper::setChuteLength(Mdouble chuteLength)
     }
     else
     {
-        logger(WARN, "[ChuteWithHopper::setChuteLength()] Chute length unchanged, value must be greater than or equal to zero");
+        logger(WARN,
+               "[ChuteWithHopper::setChuteLength()] Chute length unchanged, value must be greater than or equal to zero");
     }
 }
 
@@ -570,7 +581,8 @@ void ChuteWithHopper::setHopperShift(Mdouble hopperShift)
     }
     else
     {
-        logger(WARN, "[ChuteWithHopper::setHopperShift()] Shift length unchanged, value must be greater than or equal to zero");
+        logger(WARN,
+               "[ChuteWithHopper::setHopperShift()] Shift length unchanged, value must be greater than or equal to zero");
     }
 }
 
@@ -582,7 +594,7 @@ void ChuteWithHopper::read(std::istream& is)
 {
     Chute::read(is);
     is >> hopperExitLength_ >> hopperExitHeight_ >> hopperLength_
-    >> hopperAngle_ >> hopperHeight_ >> hopperShift_;
+       >> hopperAngle_ >> hopperHeight_ >> hopperShift_;
 }
 
 
@@ -599,7 +611,7 @@ void ChuteWithHopper::write(std::ostream& os, bool writeAllParticles) const
 {
     Chute::write(os, writeAllParticles);
     os << hopperExitLength_ << " " << hopperExitHeight_ << " " << hopperLength_
-    << " " << hopperAngle_ << " " << hopperHeight_ << " " << hopperShift_ << " " << std::endl;
+       << " " << hopperAngle_ << " " << hopperHeight_ << " " << hopperShift_ << " " << std::endl;
 }
 
 /*!
@@ -723,7 +735,7 @@ void ChuteWithHopper::setIsHopperAlignedWithBottom(bool isHopperAlignedWithBotto
  * \param[in] argc      number of input parameters
  * \param[in] argv[]    pointer to the (first character of the) actual string
  */
-bool ChuteWithHopper::readNextArgument(int& i, int argc, char *argv[])
+bool ChuteWithHopper::readNextArgument(int& i, int argc, char* argv[])
 {
     if (!strcmp(argv[i], "-hopperLength"))
     {

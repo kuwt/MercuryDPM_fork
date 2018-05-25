@@ -36,14 +36,16 @@ AxisymmetricIntersectionOfWalls::AxisymmetricIntersectionOfWalls()
 /*!
  * \param[in] other The AxisymmetricIntersectionOfWalls that must be copied.
  */
-AxisymmetricIntersectionOfWalls::AxisymmetricIntersectionOfWalls(const AxisymmetricIntersectionOfWalls &other)
+AxisymmetricIntersectionOfWalls::AxisymmetricIntersectionOfWalls(const AxisymmetricIntersectionOfWalls& other)
         : IntersectionOfWalls(other)
 {
     logger(DEBUG, "AxisymmetricIntersectionOfWalls(const AxisymmetricIntersectionOfWalls &p) finished");
 }
 
-AxisymmetricIntersectionOfWalls::AxisymmetricIntersectionOfWalls(Vec3D position, Vec3D orientation, std::vector<AxisymmetricIntersectionOfWalls::normalAndPosition> walls, const ParticleSpecies* species)
-    : IntersectionOfWalls(walls, species)
+AxisymmetricIntersectionOfWalls::AxisymmetricIntersectionOfWalls(Vec3D position, Vec3D orientation,
+                                                                 std::vector<AxisymmetricIntersectionOfWalls::normalAndPosition> walls,
+                                                                 const ParticleSpecies* species)
+        : IntersectionOfWalls(walls, species)
 {
     setPosition(position);
     setOrientationViaNormal(orientation);
@@ -57,7 +59,8 @@ AxisymmetricIntersectionOfWalls::~AxisymmetricIntersectionOfWalls()
 /*!
  * \param[in] other The AxisymmetricIntersectionOfWalls that must be copied.
  */
-AxisymmetricIntersectionOfWalls& AxisymmetricIntersectionOfWalls::operator=(const AxisymmetricIntersectionOfWalls& other)
+AxisymmetricIntersectionOfWalls&
+AxisymmetricIntersectionOfWalls::operator=(const AxisymmetricIntersectionOfWalls& other)
 {
     if (this == &other)
     {
@@ -87,11 +90,12 @@ AxisymmetricIntersectionOfWalls* AxisymmetricIntersectionOfWalls::copy() const
  * 
  * See also AxisymmetricIntersectionOfWalls for details.
  */
-bool AxisymmetricIntersectionOfWalls::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normalReturn) const
+bool AxisymmetricIntersectionOfWalls::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance,
+                                                           Vec3D& normalReturn) const
 {
     //transform to axisymmetric coordinates
     //move the coordinate system to the axis origin, so pOrigin=(xhat,yhat,zhat)
-    Vec3D pOrigin = p.getPosition() -getPosition(); 
+    Vec3D pOrigin = p.getPosition() - getPosition();
     ///\todo check, maybe orientation has to be normalized differently for axisymmetric walls (or axis needs to be normalized)
     Vec3D axis = getOrientation().getAxis();
     Mdouble a = Vec3D::dot(pOrigin, axis);
@@ -109,7 +113,7 @@ bool AxisymmetricIntersectionOfWalls::getDistanceAndNormal(const BaseParticle& p
     else
     {
         //if in contact
-        if (r!=0)
+        if (r != 0)
             radialDirection /= r;
         else //in this case the tangential vector is irrelevant
             logger(WARN, "Warning: Particle % is exactly on the symmetry axis of wall %", p.getIndex(), getIndex());
@@ -150,22 +154,23 @@ void AxisymmetricIntersectionOfWalls::setAxis(Vec3D a)
     setOrientationViaNormal(a);
 }
 
-void AxisymmetricIntersectionOfWalls::convertLimits (Vec3D& min, Vec3D& max) const {
+void AxisymmetricIntersectionOfWalls::convertLimits(Vec3D& min, Vec3D& max) const
+{
     Quaternion q = getOrientation();
     Vec3D rMin = min - getPosition();
     q.rotateBack(rMin); //set min/max initial values to values of first corner point
     Vec3D rMax = max - getPosition();
     q.rotateBack(rMax); //set min/max initial values to values of first corner point
-
-    Mdouble r = std::sqrt(std::max(rMax.Y*rMax.Y+rMax.Z*rMax.Z,rMin.Y*rMin.Y+rMin.Z*rMin.Z));
-    max = Vec3D(r,0.001,rMax.X);
-    min = Vec3D(0,0,rMin.X);
+    
+    Mdouble r = std::sqrt(std::max(rMax.Y * rMax.Y + rMax.Z * rMax.Z, rMin.Y * rMin.Y + rMin.Z * rMin.Z));
+    max = Vec3D(r, 0.001, rMax.X);
+    min = Vec3D(0, 0, rMin.X);
     //std::cout << "r=" << r << std::endl;
 }
 
-void AxisymmetricIntersectionOfWalls::writeVTK (VTKContainer& vtk) const
+void AxisymmetricIntersectionOfWalls::writeVTK(VTKContainer& vtk) const
 {
-    for (auto wall=wallObjects_.begin(); wall!=wallObjects_.end(); wall++)
+    for (auto wall = wallObjects_.begin(); wall != wallObjects_.end(); wall++)
     {
         //plot each of the intersecting walls
         std::vector<Vec3D> myPoints;
@@ -174,24 +179,24 @@ void AxisymmetricIntersectionOfWalls::writeVTK (VTKContainer& vtk) const
         Vec3D min = getHandler()->getDPMBase()->getMin();
         Vec3D max = getHandler()->getDPMBase()->getMax();
         convertLimits(min, max);
-
+        
         //create the basic slice for the first wall using the InfiniteWall routine
-        wall->createVTK (myPoints,min,max);
-
+        wall->createVTK(myPoints, min, max);
+        
         //create intersections with the other walls, similar to the IntersectionOfWalls routine
-        for (auto other=wallObjects_.begin(); other!=wallObjects_.end(); other++)
+        for (auto other = wallObjects_.begin(); other != wallObjects_.end(); other++)
         {
-            if (other!=wall)
+            if (other != wall)
             {
                 intersectVTK(myPoints, -other->getNormal(), other->getPosition());
             }
         }
-
+        
         //only keep the y=0 values
         std::vector<Vec3D> rzVec;
         for (auto& p: myPoints)
-        {   
-            if (p.Y==0)
+        {
+            if (p.Y == 0)
             {
                 rzVec.push_back(p);
             }
@@ -201,14 +206,16 @@ void AxisymmetricIntersectionOfWalls::writeVTK (VTKContainer& vtk) const
         
         //create points on the unit circle
         unsigned nr = 180;
-        struct XY {
+        struct XY
+        {
             double X;
             double Y;
         };
         std::vector<XY> xyVec;
-        for (unsigned ir=0; ir<nr; ir++) {
-            Mdouble angle = 2.0 * constants::pi * ir/nr;
-            xyVec.push_back({cos(angle),sin(angle)});
+        for (unsigned ir = 0; ir < nr; ir++)
+        {
+            Mdouble angle = 2.0 * constants::pi * ir / nr;
+            xyVec.push_back({cos(angle), sin(angle)});
         }
         
         //now create rings of points on the axisym. shape
@@ -226,22 +233,24 @@ void AxisymmetricIntersectionOfWalls::writeVTK (VTKContainer& vtk) const
                 vtk.points.push_back(p);
             }
         }
-
+        
         //finally create the connectivity matri to plot shell-like triangle strips.
         unsigned long nz = rzVec.size();
         unsigned long nCells = vtk.triangleStrips.size();
-        vtk.triangleStrips.reserve(nCells+(nz-1));
-        for (unsigned iz=0; iz<nz-1; iz++) {
+        vtk.triangleStrips.reserve(nCells + (nz - 1));
+        for (unsigned iz = 0; iz < nz - 1; iz++)
+        {
             std::vector<double> cell;
-            cell.reserve(2*nr+2);
-            for (unsigned ir=0; ir<nr; ir++) {
-                cell.push_back(nPoints+ir+iz*nr);
-                cell.push_back(nPoints+ir+(iz+1)*nr);
+            cell.reserve(2 * nr + 2);
+            for (unsigned ir = 0; ir < nr; ir++)
+            {
+                cell.push_back(nPoints + ir + iz * nr);
+                cell.push_back(nPoints + ir + (iz + 1) * nr);
             }
-            cell.push_back(nPoints+iz*nr);
-            cell.push_back(nPoints+(iz+1)*nr);
+            cell.push_back(nPoints + iz * nr);
+            cell.push_back(nPoints + (iz + 1) * nr);
             vtk.triangleStrips.push_back(cell);
         }
     }
-
+    
 }

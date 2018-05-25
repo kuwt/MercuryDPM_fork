@@ -30,6 +30,7 @@
 #include "Species.h"
 #include "NormalForceSpecies/HertzianViscoelasticNormalSpecies.h"
 #include "FrictionForceSpecies/MindlinSpecies.h"
-typedef Species<HertzianViscoelasticNormalSpecies,MindlinSpecies> HertzianViscoelasticMindlinSpecies;
-typedef MixedSpecies<HertzianViscoelasticNormalSpecies,MindlinSpecies> HertzianViscoelasticMindlinMixedSpecies;
+
+typedef Species<HertzianViscoelasticNormalSpecies, MindlinSpecies> HertzianViscoelasticMindlinSpecies;
+typedef MixedSpecies<HertzianViscoelasticNormalSpecies, MindlinSpecies> HertzianViscoelasticMindlinMixedSpecies;
 #endif

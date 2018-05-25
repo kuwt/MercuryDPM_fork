@@ -40,7 +40,7 @@ BaseCG::BaseCG()
     min_ = Vec3D(-inf, -inf, -inf);
     max_ = Vec3D(inf, inf, inf);
     selectedParticle_ = [](const BaseInteractable* p) { return true; };
-    logger(DEBUG,"BaseCG::BaseCG() finished");
+    logger(DEBUG, "BaseCG::BaseCG() finished");
 }
 
 void BaseCG::clear()
@@ -202,7 +202,8 @@ void BaseCG::setZ(Mdouble min, Mdouble max)
 
 void BaseCG::selectSpecies(unsigned speciesIndex)
 {
-    selectedParticle_ = [speciesIndex](const BaseInteractable* p) {
+    selectedParticle_ = [speciesIndex](const BaseInteractable* p)
+    {
         return p->getIndSpecies() == speciesIndex;
     };
 }
@@ -212,25 +213,29 @@ void BaseCG::setSelectedParticle(const std::function<const bool(const BaseIntera
     selectedParticle_ = selectedParticle;
 }
 
-void BaseCG::setH(Mdouble h) {
+void BaseCG::setH(Mdouble h)
+{
     setHX(h);
     setHY(h);
     setHZ(h);
-    logger(INFO,"min % max % h % nz %",min_,max_,h,nZ_);
+    logger(INFO, "min % max % h % nz %", min_, max_, h, nZ_);
 }
 
-void BaseCG::setHX(Mdouble h) {
+void BaseCG::setHX(Mdouble h)
+{
     setNX(static_cast<size_t>(std::ceil((max_.X - min_.X) / h)));
-    logger.assert_always(h>0 && getNX()>0,"setHX(%) generated nX=% for %<x<%",h,getNX(),min_.X,max_.X);
+    logger.assert_always(h > 0 && getNX() > 0, "setHX(%) generated nX=% for %<x<%", h, getNX(), min_.X, max_.X);
 }
 
-void BaseCG::setHY(Mdouble h) {
+void BaseCG::setHY(Mdouble h)
+{
     setNY(static_cast<size_t>(std::ceil((max_.Y - min_.Y) / h)));
-    logger.assert_always(h>0 && getNY()>0,"setHY(%) generated nY=% for %<y<%",h,getNY(),min_.Y,max_.Y);
+    logger.assert_always(h > 0 && getNY() > 0, "setHY(%) generated nY=% for %<y<%", h, getNY(), min_.Y, max_.Y);
 }
 
-void BaseCG::setHZ(Mdouble h) {
+void BaseCG::setHZ(Mdouble h)
+{
     setNZ(static_cast<size_t>(std::ceil((max_.Z - min_.Z) / h)));
-    logger.assert_always(h>0 && getNZ()>0,"setHZ(%) generated nZ=% for %<z<%",h,getNZ(),min_.Z,max_.Z);
+    logger.assert_always(h > 0 && getNZ() > 0, "setHZ(%) generated nZ=% for %<z<%", h, getNZ(), min_.Z, max_.Z);
 }
 

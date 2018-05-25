@@ -35,7 +35,7 @@
 void SphericalParticleVtkWriter::writeVTK() const
 {
     std::fstream file = makeVTKFileWithHeader();
-    file << "<Piece NumberOfPoints=\"" << handler_.getDPMBase()->particleHandler.getNumberOfRealObjectsLocal() 
+    file << "<Piece NumberOfPoints=\"" << handler_.getDPMBase()->particleHandler.getNumberOfRealObjectsLocal()
          << "\" NumberOfCells=\"" << 0 << "\">\n";
     writeVTKPositions(file);
     file << "<PointData  Vectors=\"vector\">\n";
@@ -58,7 +58,7 @@ void SphericalParticleVtkWriter::writeVTKVelocity(std::fstream& file) const
         file << '\t' << p->getVelocity() << '\n';
       }
 #else
-      file << '\t' << p->getVelocity() << '\n';
+        file << '\t' << p->getVelocity() << '\n';
 #endif
     }
     file << "  </DataArray>\n";
@@ -76,7 +76,7 @@ void SphericalParticleVtkWriter::writeVTKRadius(std::fstream& file) const
         file << '\t' << p->getRadius() << '\n';
       }
 #else
-      file << '\t' << p->getRadius() << '\n';//Radius
+        file << '\t' << p->getRadius() << '\n';//Radius
 #endif
     }
     file << "  </DataArray>\n";

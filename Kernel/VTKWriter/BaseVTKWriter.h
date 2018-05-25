@@ -70,8 +70,8 @@ std::fstream BaseVTKWriter<T>::makeVTKFileWithHeader() const
 {
     std::string name = handler_.getName();
     name = name.substr(0, name.length() - 7);
-
-    std::string fileName; 
+    
+    std::string fileName;
 #ifdef MERCURY_USE_MPI
     if (NUMBER_OF_PROCESSORS > 1)
     {
@@ -86,8 +86,8 @@ std::fstream BaseVTKWriter<T>::makeVTKFileWithHeader() const
     }
 #else
     fileName = handler_.getDPMBase()->getName() +
-                                 name + '_' +
-                                 std::to_string(fileCounter++) + ".vtu";
+               name + '_' +
+               std::to_string(fileCounter++) + ".vtu";
 #endif
     
     std::fstream file;

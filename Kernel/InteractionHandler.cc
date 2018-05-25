@@ -54,8 +54,8 @@ InteractionHandler::InteractionHandler(const InteractionHandler& IH UNUSED)
     writeVTK_ = IH.writeVTK_;
     //By default interactions are not copied.
     logger(DEBUG, "InteractionHandler::InteractionHandler(const "
-            "InteractionHandler &IH) finished, please note that no interactions"
-            " have been copied.");
+                  "InteractionHandler &IH) finished, please note that no interactions"
+                  " have been copied.");
 }
 
 /*!
@@ -93,7 +93,8 @@ void InteractionHandler::addObject(BaseInteraction* I)
  * \param[in] I the first BaseInteractable by which the interaction is defined.
  * \return the Interaction between the BaseInteractable's P and I, if it exists.
  */
-BaseInteraction* InteractionHandler::getExistingInteraction(const BaseInteractable* const P, const BaseInteractable* const I) const
+BaseInteraction*
+InteractionHandler::getExistingInteraction(const BaseInteractable* const P, const BaseInteractable* const I) const
 {
     //for particle-particle collision it is assumed BaseInteractable P has a lower index then I, so we only have to check for I, not P
     for (BaseInteraction* const i : P->getInteractions())
@@ -106,7 +107,8 @@ BaseInteraction* InteractionHandler::getExistingInteraction(const BaseInteractab
     return nullptr;
 }
 
-BaseInteraction* InteractionHandler::addInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp) {
+BaseInteraction* InteractionHandler::addInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp)
+{
     BaseSpecies* species = getDPMBase()->speciesHandler.getMixedObject(P->getIndSpecies(), I->getIndSpecies());
     BaseInteraction* C = species->getNewInteraction(P, I, timeStamp);
     addObject(C);
@@ -121,10 +123,12 @@ BaseInteraction* InteractionHandler::addInteraction(BaseInteractable* P, BaseInt
  * \param[in] timeStamp the current value of DPMBase::time_.
  * \return the Interaction between the BaseInteractable's P and I
  */
-BaseInteraction* InteractionHandler::getInteraction(BaseInteractable* const P, BaseInteractable* const I, const unsigned timeStamp)
+BaseInteraction*
+InteractionHandler::getInteraction(BaseInteractable* const P, BaseInteractable* const I, const unsigned timeStamp)
 {
-    const BaseSpecies* const species = getDPMBase()->speciesHandler.getMixedObject(P->getIndSpecies(), I->getIndSpecies());
-
+    const BaseSpecies* const species = getDPMBase()->speciesHandler.getMixedObject(P->getIndSpecies(),
+                                                                                   I->getIndSpecies());
+    
     //std::cout << "Trying to reconnect to BaseInteraction between P=" << P->getId() << " and " << I->getId() << std::endl;
     BaseInteraction* C = getExistingInteraction(P, I);
     if (C == nullptr)
@@ -133,14 +137,14 @@ BaseInteraction* InteractionHandler::getInteraction(BaseInteractable* const P, B
         addObject(C);
         //std::cout << "Creating new interaction with index=" << getLastObject()->getIndex() << " id=" << getLastObject()->getId() << std::endl;
     }
-
+    
     //set timeStamp
     C->setTimeStamp(timeStamp);
-
+    
     ///\todo TW this can bet set earlier
     //set species of collision
     C->setSpecies(species);
-
+    
     return C;
 }
 
@@ -155,7 +159,7 @@ BaseInteraction* InteractionHandler::createEmptyInteraction() const
     //NOTE: assuming the interaction type of a species is the same for all species
     BaseSpecies* species = this->getDPMBase()->speciesHandler.getObject(0);
     BaseInteraction* emptyInteraction = species->getEmptyInteraction();
-
+    
     return emptyInteraction;
 }
 
@@ -185,7 +189,7 @@ void* InteractionHandler::createMPIInteractionDataArray(unsigned int numberOfInt
     //create a vector based on the first interaction. This is to avoid templating the whole class
     void* historyData = emptyInteraction->createMPIInteractionDataArray(numberOfInteractions);
     this->deleteEmptyInteraction(emptyInteraction);
-
+    
     return historyData;
 }
 
@@ -213,10 +217,13 @@ void InteractionHandler::deleteMPIInteractionDataArray(void* dataArray)
  * \param[out] isWallInteraction a bool that flags if the interaction is a wall interaction or not
  * \param[out] timeStamp reads the timestamp of the interaction
  */
-void InteractionHandler::getInteractionDetails(void* interactionData, unsigned int index, unsigned int &identificationP, unsigned int &identificationI, bool &isWallInteraction, unsigned &timeStamp)
+void InteractionHandler::getInteractionDetails(void* interactionData, unsigned int index, unsigned int& identificationP,
+                                               unsigned int& identificationI, bool& isWallInteraction,
+                                               unsigned& timeStamp)
 {
     BaseInteraction* emptyInteraction = this->createEmptyInteraction();
-    emptyInteraction->getInteractionDetails(interactionData, index, identificationP, identificationI, isWallInteraction, timeStamp);
+    emptyInteraction->getInteractionDetails(interactionData, index, identificationP, identificationI, isWallInteraction,
+                                            timeStamp);
     this->deleteEmptyInteraction(emptyInteraction);
 }
 
@@ -245,20 +252,21 @@ InteractionHandler::getInteraction(BaseInteractable* P, BaseInteractable* I, uns
             }
         }
     }
-
+    
     BaseSpecies* species = getDPMBase()->speciesHandler.getMixedObject(P->getIndSpecies(), I->getIndSpecies());
-
+    
     if (c)
     {
         c->setTimeStamp(timeStamp);
-    } else
+    }
+    else
     {
         c = species->getNewInteraction(P, I, timeStamp);
         c->setSpecies(species);
         addObject(c);
         //logger(INFO,"new interaction t=%: i=%, n=%",timeStamp,getNumberOfObjects(),normal);
     }
-
+    
     return c;
 }
 
@@ -283,7 +291,7 @@ InteractionHandler::getInteraction(BaseInteractable* P, BaseInteractable* I, uns
 void InteractionHandler::removeObjectKeepingPeriodics(const unsigned int id)
 {
     BaseInteraction* iMain = getObject(id);
-
+    
     BaseParticle* P = dynamic_cast<BaseParticle*>(iMain->getP());
     BaseParticle* I = dynamic_cast<BaseParticle*>(iMain->getI());
     if (P != nullptr && I != nullptr) //check that both P and I are particles (not walls)
@@ -308,8 +316,9 @@ void InteractionHandler::removeObjectKeepingPeriodics(const unsigned int id)
                     //It picks the one for which a collision has happened,
                     //i.e. the one with the newer timeStamp.
                     ///\todo this function will create an error if the timeStamp is in the future! This should not happen (ever), but who knows.
-                    if (iOther->getTimeStamp() < iMain->getTimeStamp()) //if the interaction has been active during the last computeForce routine, make this the new (real) interaction.
-
+                    if (iOther->getTimeStamp() <
+                        iMain->getTimeStamp()) //if the interaction has been active during the last computeForce routine, make this the new (real) interaction.
+                    
                     {
                         iMain->setI(realI);
                         removeObject(iOther->getIndex());
@@ -375,13 +384,13 @@ Mdouble InteractionHandler::getMeanOverlap() const
     Mdouble n = 0;
     for (BaseInteraction* const p : objects_)
     {
-        if (p->getOverlap()>0)
+        if (p->getOverlap() > 0)
         {
             sum += p->getOverlap();
             n++;
         }
     }
-    return sum/n;
+    return sum / n;
 }
 
 /*!
@@ -406,7 +415,7 @@ void InteractionHandler::write(std::ostream& os) const
     os << "Interactions " << totalNumberOfInteractions << std::endl;
     for (BaseInteraction* it : *this)
     {
-	os << (*it) << std::endl;
+    os << (*it) << std::endl;
     }
 #else
     os << "Interactions " << getNumberOfObjects() << std::endl;
@@ -425,7 +434,7 @@ void InteractionHandler::readAndAddObject(std::istream& is)
     unsigned int id0, id1;
     Mdouble doubleTimeStamp;
     unsigned timeStamp;
-
+    
     std::stringstream line;
     /// \todo Ant This is a tmp fix as in some cases the line before has not be finished reading. This should be looked at again at a later date.
     is >> type;
@@ -435,7 +444,7 @@ void InteractionHandler::readAndAddObject(std::istream& is)
     line >> idType >> id0 >> id1 >> dummy >> timeStampDouble;
     timeStamp = timeStampDouble; //in order to read old restart files
     logger(VERBOSE, "InteractionHandler::readObject(is): reading type % % %", type, id0, id1);
-
+    
     ///\todo TW: Change identifier in restart file from id to index; is there any reason the id should be kept after restarting, once this is done? (Note, the id is set to the old one in the particle handler because interactions store id, not indices; also note id's are slow
     BaseInteraction* C;
 
@@ -481,10 +490,12 @@ void InteractionHandler::readAndAddObject(std::istream& is)
 #endif
 }
 
-void InteractionHandler::setWriteVTK(FileType fileType) {
+void InteractionHandler::setWriteVTK(FileType fileType)
+{
     writeVTK_ = fileType;
 }
 
-FileType InteractionHandler::getWriteVTK() const {
+FileType InteractionHandler::getWriteVTK() const
+{
     return writeVTK_;
 }

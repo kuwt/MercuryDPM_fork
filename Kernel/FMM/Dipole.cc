@@ -29,27 +29,27 @@
 #include <complex>
 #include <vector>
 
-Dipole::Dipole(int p, NumericalVector<> *squaredFactorials, Vec3D location, Vec3D velocity, Mdouble strength) :
-Multipole(p, squaredFactorials, location),
-velocity_(velocity),
-strength_(strength)
+Dipole::Dipole(int p, NumericalVector<>* squaredFactorials, Vec3D location, Vec3D velocity, Mdouble strength) :
+        Multipole(p, squaredFactorials, location),
+        velocity_(velocity),
+        strength_(strength)
 {
 }
 
 void Dipole::computeMultipoleExpansion()
 {
-	size_t nTerms = (p_ + 1) * (p_ + 1);
-	NumericalVector<std::complex<Mdouble>> multipoleExpansionCoefficients(nTerms);
-
- 	//Calculate dipole coefficients for spherical harmonics
-	Mdouble s1 = strength_*velocity_.getComponent(1);
-	Mdouble s2 = strength_*velocity_.getComponent(2);
-	Mdouble s3 = strength_*velocity_.getComponent(3);
-
-	multipoleExpansionCoefficients[1] = 1.0/std::sqrt(2.0)*(-s1 + s2/constants::i);
-	multipoleExpansionCoefficients[2] = s3;
-	multipoleExpansionCoefficients[3] = -1.0/(sqrt(2.0))*(s1 + s2/constants::i);
-
-	multipoleExpansionCoefficients_ = multipoleExpansionCoefficients;
+    size_t nTerms = (p_ + 1) * (p_ + 1);
+    NumericalVector<std::complex<Mdouble>> multipoleExpansionCoefficients(nTerms);
+    
+    //Calculate dipole coefficients for spherical harmonics
+    Mdouble s1 = strength_ * velocity_.getComponent(1);
+    Mdouble s2 = strength_ * velocity_.getComponent(2);
+    Mdouble s3 = strength_ * velocity_.getComponent(3);
+    
+    multipoleExpansionCoefficients[1] = 1.0 / std::sqrt(2.0) * (-s1 + s2 / constants::i);
+    multipoleExpansionCoefficients[2] = s3;
+    multipoleExpansionCoefficients[3] = -1.0 / (sqrt(2.0)) * (s1 + s2 / constants::i);
+    
+    multipoleExpansionCoefficients_ = multipoleExpansionCoefficients;
 }
 

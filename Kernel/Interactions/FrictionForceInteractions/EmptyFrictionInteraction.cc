@@ -30,13 +30,14 @@
 #include "InteractionHandler.h"
 #include <iomanip>
 #include <fstream>
+
 /*!
  * \param[in] P
  * \param[in] I
  * \param[in] timeStamp
  */
 EmptyFrictionInteraction::EmptyFrictionInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp)
-    : BaseInteraction(P, I, timeStamp)
+        : BaseInteraction(P, I, timeStamp)
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"EmptyFrictionInteraction::EmptyFrictionInteraction() finished"<<std::endl;
@@ -45,7 +46,7 @@ EmptyFrictionInteraction::EmptyFrictionInteraction(BaseInteractable* P, BaseInte
 
 //used for mpi
 EmptyFrictionInteraction::EmptyFrictionInteraction()
-    : BaseInteraction()
+        : BaseInteraction()
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"EmptyFrictionInteraction::EmptyFrictionInteraction() finished"<<std::endl;
@@ -56,12 +57,13 @@ EmptyFrictionInteraction::EmptyFrictionInteraction()
  * \param[in] p
  */
 EmptyFrictionInteraction::EmptyFrictionInteraction(const EmptyFrictionInteraction& p)
-    : BaseInteraction(p)
+        : BaseInteraction(p)
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"EmptyFrictionInteraction::EmptyFrictionInteraction(const EmptyFrictionInteraction &p finished"<<std::endl;
 #endif
 }
+
 /*!
  *
  */
@@ -71,16 +73,19 @@ EmptyFrictionInteraction::~EmptyFrictionInteraction()
     std::cout<<"EmptyFrictionInteraction::~EmptyFrictionInteraction() finished"<<std::endl;
 #endif
 }
+
 /*!
  * \param[in,out] os
  */
 void EmptyFrictionInteraction::write(std::ostream& os UNUSED) const
 {}
+
 /*!
  * \param[in,out] is
  */
 void EmptyFrictionInteraction::read(std::istream& is UNUSED)
 {}
+
 /*!
  * 
  */
@@ -89,11 +94,13 @@ void EmptyFrictionInteraction::computeFrictionForce()
 
 void EmptyFrictionInteraction::computeFrictionInteraction()
 {}
+
 /*!
  * \param[in] timeStep
  */
 void EmptyFrictionInteraction::integrate(Mdouble timeStep UNUSED)
 {}
+
 /*!
  * \return Mdouble
  */
@@ -101,6 +108,7 @@ Mdouble EmptyFrictionInteraction::getElasticEnergy() const
 {
     return 0.0;
 }
+
 /*!
  * \return Mdouble
  */
@@ -108,20 +116,23 @@ Mdouble EmptyFrictionInteraction::getTangentialOverlap() const
 {
     return 0.0;
 }
+
 /*!
  *\return const Vec3D
  */
 const Vec3D EmptyFrictionInteraction::getTangentialForce() const
 {
-    return Vec3D(0.0,0.0,0.0);
+    return Vec3D(0.0, 0.0, 0.0);
 }
+
 /*!
  * \return const EmptyFrictionSpecies*
  */
 const EmptyFrictionSpecies* EmptyFrictionInteraction::getSpecies() const
 {
-    return dynamic_cast<const EmptyFrictionSpecies *>(getBaseSpecies());
+    return dynamic_cast<const EmptyFrictionSpecies*>(getBaseSpecies());
 }
+
 /*!
  * \return std::string
  */

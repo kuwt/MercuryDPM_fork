@@ -30,9 +30,11 @@
 #include "Particles/SuperQuadric.h"
 
 class WallHandler;
+
 class BaseParticle;
 
-struct VTKContainer {
+struct VTKContainer
+{
     std::vector<Vec3D> points;
     std::vector<std::vector<double>> triangleStrips;
 };
@@ -75,7 +77,7 @@ public:
      * \brief Function that writes a BaseWall to an output stream, usually a restart file.
      */
     void write(std::ostream& os) const override;
-
+    
     /*!
      * \brief Pure virtual function that computes the distance of a BaseParticle to this wall and returns the normal of this wall if there is a collision.
      * \details Beware, the distance and normal are output parameters, not return values!
@@ -87,114 +89,125 @@ public:
     virtual bool getDistanceAndNormal(const BaseParticle& P, Mdouble& distance, Vec3D& normal_return) const = 0;
     
     
-    virtual bool getDistanceNormalOverlap(const BaseParticle& P, Mdouble& distance, Vec3D& normal_return, Mdouble& overlap) const;
+    virtual bool
+    getDistanceNormalOverlap(const BaseParticle& P, Mdouble& distance, Vec3D& normal_return, Mdouble& overlap) const;
     
     virtual bool getDistanceNormalOverlapSuperquadric(const SuperQuadric& p, Mdouble& distance, Vec3D& normal_return,
-                                                          Mdouble& overlap) const;
+                                                      Mdouble& overlap) const;
     
     virtual Vec3D getFurthestPointSuperQuadric(const Vec3D& normalBodyFixed, const Vec3D& axes) const;
-
+    
     /*!
      * \brief A function which sets the WallHandler for this BaseWall.
      */
     virtual void setHandler(WallHandler* handler);
-
+    
     /*!
      * \brief A function which returns the WallHandler that handles this BaseWall.
      */
     WallHandler* getHandler() const;
-
+    
     /*!
      * \deprecated TW: this function should be taken out and replaced by setSpecies
      * \brief Define the species of this wall using the index of the species in the SpeciesHandler in this DPMBase.
      */
     void setIndSpecies(unsigned int indSpecies) override;
-
+    
     /*!
      * \brief Defines the species of the current wall.
      *
      */
     void setSpecies(const ParticleSpecies* species);
-
+    
     /*!
      * \details Sets all walls (unlike particles) to be inherently fixed - i.e. the bool "is fixed" will by definition
      * return "true" when called for a wall (i.e. any BaseWall tyope object).
      */
     bool isFixed() const override;
-
+    
     /*!
      * if isLocal returns true and the DPM class derived from MercuryBase, the hGrid will be used to find wall-particle contacts, using min/max.
      */
-    virtual bool isLocal(Vec3D& min, Vec3D& max) const {return false;}
-
+    virtual bool isLocal(Vec3D& min, Vec3D& max) const
+    { return false; }
+    
     // returns the point intersecting a wall (x-p).n=0 and a line x=p0+t(p1-p0)
-    bool getLinePlaneIntersect (Vec3D& intersect, const Vec3D& p0, const Vec3D& p1, const Vec3D& n, const Vec3D& p);
-
+    bool getLinePlaneIntersect(Vec3D& intersect, const Vec3D& p0, const Vec3D& p1, const Vec3D& n, const Vec3D& p);
+    
     /*!
      * Checks if point is in wall (if close to the wall, the point is assumed out of the wall)
-    */bool isInsideWallVTK (const Vec3D& point, const Vec3D& normal, const Vec3D& position)const;
-
+    */bool isInsideWallVTK(const Vec3D& point, const Vec3D& normal, const Vec3D& position) const;
+    
     /*!
      * Moves point0 onto the surface of the wallsuch that the direction of the edge from point0 to point1 is preserved.
     */
-    void projectOntoWallVTK (Vec3D& point0, const Vec3D& point1, const Vec3D& normal, const Vec3D& position)const;
-
+    void projectOntoWallVTK(Vec3D& point0, const Vec3D& point1, const Vec3D& normal, const Vec3D& position) const;
+    
     /*!
      * Intersects a of set VTK points representing a wall with a half-space defined by position and normal;
      * This is used in createVTK to restrict the VTK points representing a wall to the inside of the domain.
 */
-    void intersectVTK (std::vector<Vec3D>& points, Vec3D normal, Vec3D position)const;
-
-
-    virtual std::vector<BaseInteraction*> getInteractionWithSuperQuad(SuperQuadric* p, unsigned timeStamp, InteractionHandler* interactionHandler);
-
+    void intersectVTK(std::vector<Vec3D>& points, Vec3D normal, Vec3D position) const;
+    
+    
+    virtual std::vector<BaseInteraction*>
+    getInteractionWithSuperQuad(SuperQuadric* p, unsigned timeStamp, InteractionHandler* interactionHandler);
+    
     /*!
      * adds extra information to the points and triangleStrips vectors needed to plot the wall in vtk format
      * @param points Coordinates of the vertices of the triangulated surfaces (in the VTK file this is called POINTS)
      * @param triangleStrips Indices of three vertices forming one triangulated surface (in the VTK file this is called CELL)
      */
-    virtual void writeVTK (VTKContainer& vtk) const;
-
-    void getVTK (std::vector<Vec3D>& points, std::vector<std::vector<double>>& triangleStrips)
-    { }
-
+    virtual void writeVTK(VTKContainer& vtk) const;
+    
+    void getVTK(std::vector<Vec3D>& points, std::vector<std::vector<double>>& triangleStrips)
+    {}
+    
     const Vec3D getAxis() const;
-
+    
     ///\brief Returns the interaction between this wall and a given particle, nullptr if there is no interaction.
-    std::vector<BaseInteraction*> getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler) override;
-
-    bool getVTKVisibility () const;
-
-    void setVTKVisibility (bool vtkVisibility);
-
+    std::vector<BaseInteraction*>
+    getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler) override;
+    
+    bool getVTKVisibility() const;
+    
+    void setVTKVisibility(bool vtkVisibility);
+    
     /*!
      * Takes the points provided and adds a triangle strip connecting these points to the vtk container
      */
-    static void addToVTK (const std::vector<Vec3D>& points, VTKContainer& vtk);
+    static void addToVTK(const std::vector<Vec3D>& points, VTKContainer& vtk);
+    
     /*!
      * A pointer to the WallHandler that handles this BaseWall.
      */
     WallHandler* handler_; ///
-
+    
     bool vtkVisibility_ = true;
-
+    
     /*!
      * A vector of walls that gets rendered instead of the actual wall
      */
     std::vector<BaseWall*> renderedWalls_;
 
 public:
-
+    
     //todo how do i write a copy and add function?
-    void addRenderedWall(BaseWall* w) {
+    void addRenderedWall(BaseWall* w)
+    {
         renderedWalls_.push_back(w);
     }
-
-    void renderWall (VTKContainer& vtk) {
-        if (getVTKVisibility()) {
-            if (renderedWalls_.empty()) {
+    
+    void renderWall(VTKContainer& vtk)
+    {
+        if (getVTKVisibility())
+        {
+            if (renderedWalls_.empty())
+            {
                 writeVTK(vtk);
-            } else {
+            }
+            else
+            {
                 for (const auto& r: renderedWalls_)
                     r->writeVTK(vtk);
             }

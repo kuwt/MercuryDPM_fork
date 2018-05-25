@@ -36,7 +36,8 @@
  * \param[in] down      The (signed) distance between the origin and the top wall
  * \param[in] up        The (signed) distance between the origin and the bottom wall
  */
-void ShearBoxBoundary::set(std::function<double (double,double)> velocity, Mdouble left, Mdouble right, Mdouble down, Mdouble up)
+void ShearBoxBoundary::set(std::function<double(double, double)> velocity, Mdouble left, Mdouble right, Mdouble down,
+                           Mdouble up)
 {
     velocity_ = velocity;
     left_ = left;
@@ -51,10 +52,10 @@ void ShearBoxBoundary::set(std::function<double (double,double)> velocity, Mdoub
  */
 void ShearBoxBoundary::read(std::istream& is)
 {
-	std::string dummy;
+    std::string dummy;
     BaseBoundary::read(is);
-    is>>dummy>>left_>>dummy>>right_>>dummy>>down_>>dummy>>up_;
-    velocity_=[] (double time UNUSED,double velocity UNUSED) {return 0.0;};
+    is >> dummy >> left_ >> dummy >> right_ >> dummy >> down_ >> dummy >> up_;
+    velocity_ = [](double time UNUSED, double velocity UNUSED) { return 0.0; };
 }
 
 /*!
@@ -64,7 +65,7 @@ void ShearBoxBoundary::read(std::istream& is)
 void ShearBoxBoundary::write(std::ostream& os) const
 {
     BaseBoundary::write(os);
-    os<<" left "<<left_<<" right "<<right_<<" down "<<down_<<" up "<<up_;
+    os << " left " << left_ << " right " << right_ << " down " << down_ << " up " << up_;
 }
 
 /*!
@@ -98,7 +99,8 @@ Mdouble ShearBoxBoundary::getHorizontalDistance(BaseParticle& p, bool& positive)
     {
         positive = true;
         return left;
-    } else
+    }
+    else
     {
         positive = false;
         return right;
@@ -119,7 +121,8 @@ Mdouble ShearBoxBoundary::getVerticalDistance(BaseParticle& p, bool& positive)
     {
         positive = true;
         return down;
-    } else
+    }
+    else
     {
         positive = false;
         return up;
@@ -140,11 +143,12 @@ void ShearBoxBoundary::shiftHorizontalPosition(BaseParticle* p, bool positive)
     if (positive)
     {
         p->move(Vec3D(right_ - left_, 0.0, 0.0));
-        p->addVelocity(Vec3D(velocity_(time,z), 0.0, 0.0));
-    } else
+        p->addVelocity(Vec3D(velocity_(time, z), 0.0, 0.0));
+    }
+    else
     {
         p->move(Vec3D(left_ - right_, 0.0, 0.0));
-        p->addVelocity(Vec3D(velocity_(time,z), 0.0, 0.0));
+        p->addVelocity(Vec3D(velocity_(time, z), 0.0, 0.0));
     }
 }
 
@@ -160,7 +164,8 @@ void ShearBoxBoundary::shiftVerticalPosition(BaseParticle* p, bool positive)
     if (positive)
     {
         p->move(Vec3D(0.0, up_ - down_, 0.0));
-    } else
+    }
+    else
     {
         p->move(Vec3D(0.0, down_ - up_, 0.0));
     }
@@ -177,15 +182,16 @@ void ShearBoxBoundary::shiftVerticalPosition(BaseParticle* p, bool positive)
 void ShearBoxBoundary::createHorizontalPeriodicParticles(BaseParticle* p, ParticleHandler& pH)
 {
     bool positive;      // TRUE if the particle is closest to the left boundary 
-                        // wall (set by getVerticalDistance in the following if-statement)
+    // wall (set by getVerticalDistance in the following if-statement)
     // check if particle is close enough to either of the walls
-    if (getHorizontalDistance(*p, positive) < p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius())
+    if (getHorizontalDistance(*p, positive) <
+        p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius())
     {
         // create a periodic copy of the particle
         BaseParticle* F0 = p->copy();
         pH.addObject(F0);
         F0->copyInteractionsForPeriodicParticles(*p);
-
+        
         // If Particle is doubly shifted, get correct original particle
         BaseParticle* From = p;
         while (From->getPeriodicFromParticle() != nullptr)
@@ -212,15 +218,15 @@ void ShearBoxBoundary::createHorizontalPeriodicParticles(BaseParticle* p, Partic
 void ShearBoxBoundary::createVerticalPeriodicParticles(BaseParticle* p, ParticleHandler& pH)
 {
     bool positive;      // TRUE if the particle is closest to the bottom boundary 
-                        // wall (set by getVerticalDistance in the following if-statement)
+    // wall (set by getVerticalDistance in the following if-statement)
     // check if particle is close enough to either of the walls
     if (getVerticalDistance(*p, positive) < p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius())
-    {   
+    {
         // create a periodic copy of the particle
         BaseParticle* F0 = p->copy();
         pH.addObject(F0);
         F0->copyInteractionsForPeriodicParticles(*p);
-
+        
         // If Particle is doubly shifted, get correct original particle
         BaseParticle* From = p;
         while (From->getPeriodicFromParticle() != nullptr)
@@ -270,7 +276,7 @@ bool ShearBoxBoundary::checkBoundaryAfterParticleMoved(BaseParticle* p, Particle
     return false;
 }
 
-void ShearBoxBoundary::setVelocity(std::function<double (double,double)> velocity)
+void ShearBoxBoundary::setVelocity(std::function<double(double, double)> velocity)
 {
-	velocity_ = velocity;
+    velocity_ = velocity;
 }

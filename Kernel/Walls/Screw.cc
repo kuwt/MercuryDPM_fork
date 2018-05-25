@@ -30,7 +30,9 @@
 #include "DPMBase.h"
 #include "Math/ExtendedMath.h"
 #include "Particles/BaseParticle.h"
+
 using mathsFunc::square;
+
 /*!
  * \details Make a Screw which is centered in the origin, has a length of 1, one
  * revelation, a radius of 1, turns with 1 revelation per second, is infinitely thin
@@ -45,15 +47,15 @@ Screw::Screw()
     omega_ = 1.0;
     offset_ = 0.0;
     thickness_ = 0.0;
-    setOrientationViaNormal({0,0,1});//default screw is in z-direction
-    logger(DEBUG, "Screw() constructor finished.");              
+    setOrientationViaNormal({0, 0, 1});//default screw is in z-direction
+    logger(DEBUG, "Screw() constructor finished.");
 }
 
 /*!
  * \param[in] other The Screw that has to be copied.
  */
 Screw::Screw(const Screw& other)
-    : BaseWall(other)
+        : BaseWall(other)
 {
     start_ = other.start_;
     l_ = other.l_;
@@ -84,7 +86,7 @@ Screw::Screw(Vec3D start, Mdouble l, Mdouble r, Mdouble n, Mdouble omega, Mdoubl
     omega_ = omega;
     thickness_ = thickness;
     offset_ = 0.0;
-    logger(DEBUG, "Screw(Vec3D, Mdouble, Mdouble, Mdouble, Mdouble, Mdouble) constructor finished.");           
+    logger(DEBUG, "Screw(Vec3D, Mdouble, Mdouble, Mdouble, Mdouble, Mdouble) constructor finished.");
 }
 
 Screw::~Screw()
@@ -106,11 +108,15 @@ bool Screw::getDistanceAndNormal(const BaseParticle& P, Mdouble& distance, Vec3D
     Vec3D position = P.getPosition() - getPosition();
     getOrientation().rotateBack(position);
     ///\todo do this for all walls
-    BaseSpecies* s = getHandler()->getDPMBase()->speciesHandler.getMixedObject(P.getSpecies(),getSpecies());
-    if (getDistanceAndNormalLabCoordinates(position, P.getRadius()+s->getInteractionDistance(), distance, normal_return)) {
+    BaseSpecies* s = getHandler()->getDPMBase()->speciesHandler.getMixedObject(P.getSpecies(), getSpecies());
+    if (getDistanceAndNormalLabCoordinates(position, P.getRadius() + s->getInteractionDistance(), distance,
+                                           normal_return))
+    {
         getOrientation().rotate(normal_return);
         return true;
-    } else {
+    }
+    else
+    {
         return false;
     }
 }
@@ -126,26 +132,27 @@ bool Screw::getDistanceAndNormal(const BaseParticle& P, Mdouble& distance, Vec3D
  * and the normal of the IntersectionOfWalls at the intersection point. 
  * \todo Make this function readable and explain the steps in the details.
  */
-bool Screw::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wallInteractionRadius, Mdouble& distance, Vec3D& normal_return) const
+bool Screw::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wallInteractionRadius, Mdouble& distance,
+                                               Vec3D& normal_return) const
 {
     Mdouble RSquared = square(position.Y - start_.Y) + square(position.Z - start_.Z);
     Mdouble X = position.X - start_.X;
     //first do a simple check if particle is within the cylindrical hull of the screw
     if (RSquared > square(maxR_ + wallInteractionRadius + thickness_)
         || X > l_ + wallInteractionRadius + thickness_
-        || X < - wallInteractionRadius - thickness_)
+        || X < -wallInteractionRadius - thickness_)
     {
         //std::cout << "failed " << position << std::endl;
         return false;
     }
-
+    
     //else:
     Mdouble R = sqrt(RSquared);
     Mdouble A = atan2(position.Z - start_.Z, position.Y - start_.Y);
     
     //after subtracting the start position and transforming the particle position from (XYZ) into (RAZ) 
     //coordinates, we compute the distance to the wall at, located at (r,a,z)=(r,2*pi*(offset+N*q+k/2),q*L), 0<q<1.
-
+    
     //To find the contact point we have to minimize (with respect to r and q)
     //distance^2=(x-x0-r*cos(2*pi*(offset+N*q)))^2+(y-y0-r*sin(2*pi*(offset+N*q)))^2+(z-z0-q*L)^2
     //Using polar coordinates (i.e. x-x0=R*cos(A), y-y0=R*sin(A) and Z=z-z0)
@@ -170,7 +177,7 @@ bool Screw::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wallInter
     Mdouble dd; //Derivative at current guess
     Mdouble ddd; //Second derivative at current guess
     Mdouble q0 = X / l_; //assume closest point q0 is at same z-location as the particle
-            
+    
     //Set initial q to the closest position on the screw with the same angle as A
     //The initial guess will be in the minimum of the sin closest to q0
     //Minima of the sin are at
@@ -201,8 +208,10 @@ bool Screw::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wallInter
         //This case reduces to the coil problem
         do
         {
-            dd = -4.0 * R * r * constants::pi * n_ * sin(A - 2.0 * constants::pi * (n_ * q + offset_)) - 2.0 * l_ * (X - q * l_);
-            ddd = 8.0 * R * r * constants::sqr_pi * n_ * n_ * cos(A - 2.0 * constants::pi * (n_ * q + offset_)) + 2.0 * l_ * l_;
+            dd = -4.0 * R * r * constants::pi * n_ * sin(A - 2.0 * constants::pi * (n_ * q + offset_)) -
+                 2.0 * l_ * (X - q * l_);
+            ddd = 8.0 * R * r * constants::sqr_pi * n_ * n_ * cos(A - 2.0 * constants::pi * (n_ * q + offset_)) +
+                  2.0 * l_ * l_;
             q -= dd / ddd;
             steps++;
         } while (fabs(dd / ddd) > 1e-14);
@@ -256,7 +265,7 @@ void Screw::move_time(Mdouble dt)
  * \todo the move and rotate functions should only pass the time step, as teh velocity can be accessed directly by the object
  * \param angularVelocityDt
  */
-void Screw::rotate(const Vec3D &angularVelocityDt)
+void Screw::rotate(const Vec3D& angularVelocityDt)
 {
     BaseInteractable::rotate(angularVelocityDt);
     offset_ += omega_ * getHandler()->getDPMBase()->getTimeStep();
@@ -271,12 +280,12 @@ void Screw::read(std::istream& is)
     BaseWall::read(is);
     std::string dummy;
     is >> dummy >> start_
-            >> dummy >> l_
-            >> dummy >> maxR_
-            >> dummy >> n_
-            >> dummy >> omega_
-            >> dummy >> thickness_
-            >> dummy >> offset_;
+       >> dummy >> l_
+       >> dummy >> maxR_
+       >> dummy >> n_
+       >> dummy >> omega_
+       >> dummy >> thickness_
+       >> dummy >> offset_;
 }
 
 /*!
@@ -289,11 +298,11 @@ void Screw::oldRead(std::istream& is)
 {
     std::string dummy;
     is >> dummy >> start_
-            >> dummy >> l_
-            >> dummy >> maxR_
-            >> dummy >> n_
-            >> dummy >> omega_
-            >> dummy >> offset_;
+       >> dummy >> l_
+       >> dummy >> maxR_
+       >> dummy >> n_
+       >> dummy >> omega_
+       >> dummy >> offset_;
 }
 
 /*!
@@ -303,12 +312,12 @@ void Screw::write(std::ostream& os) const
 {
     BaseWall::write(os);
     os << " start " << start_
-            << " Length " << l_
-            << " Radius " << maxR_
-            << " Revolutions " << n_
-            << " Omega " << omega_
-            << " Thickness " << thickness_
-            << " Offset " << offset_;
+       << " Length " << l_
+       << " Radius " << maxR_
+       << " Revolutions " << n_
+       << " Omega " << omega_
+       << " Thickness " << thickness_
+       << " Offset " << offset_;
 }
 
 /*!
@@ -319,17 +328,20 @@ std::string Screw::getName() const
     return "Screw";
 }
 
-void Screw::writeVTK (VTKContainer &vtk) const {
+void Screw::writeVTK(VTKContainer& vtk) const
+{
     unsigned nr = 10;
     unsigned nz = static_cast<unsigned int>(60 * abs(n_));
-
+    
     unsigned long nPoints = vtk.points.size();
-    vtk.points.reserve(nPoints+nr*nz);
+    vtk.points.reserve(nPoints + nr * nz);
     Vec3D contactPoint;
-    for (unsigned iz=0; iz<nz; iz++) {
-        for (unsigned ir=0; ir<nr; ir++) {
-            double q = (double)iz/nz;
-            double r = (double)ir/nr*maxR_;
+    for (unsigned iz = 0; iz < nz; iz++)
+    {
+        for (unsigned ir = 0; ir < nr; ir++)
+        {
+            double q = (double) iz / nz;
+            double r = (double) ir / nr * maxR_;
             contactPoint.Y = start_.Y - r * cos(2.0 * constants::pi * (offset_ + n_ * q));
             contactPoint.Z = start_.Z - r * sin(2.0 * constants::pi * (offset_ + n_ * q));
             contactPoint.X = start_.X + q * l_;
@@ -338,38 +350,40 @@ void Screw::writeVTK (VTKContainer &vtk) const {
             vtk.points.push_back(contactPoint);
         }
     }
-
+    
     unsigned long nCells = vtk.triangleStrips.size();
-    vtk.triangleStrips.reserve(nCells+(nz-1));
-    for (unsigned iz=0; iz<nz-1; iz++) {
+    vtk.triangleStrips.reserve(nCells + (nz - 1));
+    for (unsigned iz = 0; iz < nz - 1; iz++)
+    {
         std::vector<double> cell;
-        cell.reserve(2*nr);
-        for (unsigned ir=0; ir<nr; ir++) {
-            cell.push_back(nPoints+ir+iz*nr);
-            cell.push_back(nPoints+ir+(iz+1)*nr);
+        cell.reserve(2 * nr);
+        for (unsigned ir = 0; ir < nr; ir++)
+        {
+            cell.push_back(nPoints + ir + iz * nr);
+            cell.push_back(nPoints + ir + (iz + 1) * nr);
         }
         vtk.triangleStrips.push_back(cell);
     }
 }
 
-void Screw::writeVTK (std::string filename) const
+void Screw::writeVTK(std::string filename) const
 {
     VTKContainer vtk;
     writeVTK(vtk);
-
+    
     std::stringstream file;
     file << "# vtk DataFile Version 2.0\n"
-     << getName() << "\n"
-     "ASCII\n"
-     "DATASET UNSTRUCTURED_GRID\n"
-     "POINTS " << vtk.points.size() << " double\n";
+         << getName() << "\n"
+                         "ASCII\n"
+                         "DATASET UNSTRUCTURED_GRID\n"
+                         "POINTS " << vtk.points.size() << " double\n";
     for (const auto& vertex : vtk.points)
         file << vertex << '\n';
-    file << "\nCELLS " << vtk.triangleStrips.size() << ' ' << 4*vtk.triangleStrips.size() << "\n";
+    file << "\nCELLS " << vtk.triangleStrips.size() << ' ' << 4 * vtk.triangleStrips.size() << "\n";
     for (const auto& face : vtk.triangleStrips)
         file << "3 " << face[0] << ' ' << face[1] << ' ' << face[2] << '\n';
     file << "\nCELL_TYPES " << vtk.triangleStrips.size() << "\n";
     for (const auto& face : vtk.triangleStrips)
         file << "5\n";
-    helpers::writeToFile(filename,file.str());
+    helpers::writeToFile(filename, file.str());
 }

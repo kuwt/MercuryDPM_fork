@@ -42,7 +42,7 @@ class Coil : public BaseWall
 public:
     /*!
      * \brief Default constructor, sets a coil with default parameters.
-     */    
+     */
     Coil();
     
     /*!
@@ -52,7 +52,7 @@ public:
     
     /*!
      * \brief Constructor in which all parameters are set.
-     */    
+     */
     Coil(Vec3D Start, Mdouble L, Mdouble r, Mdouble N, Mdouble omega, Mdouble thickness);
     
     /*!
@@ -63,18 +63,19 @@ public:
     /*!
      * \brief Set all parameters of this Coil.
      */
-    void set(Vec3D Start, Mdouble length, Mdouble radius, Mdouble numberOfRevelations, Mdouble omega, Mdouble thickness);
-
+    void
+    set(Vec3D Start, Mdouble length, Mdouble radius, Mdouble numberOfRevelations, Mdouble omega, Mdouble thickness);
+    
     /*!
      * \brief Copy this Coil and return a pointer to the copy, useful for polymorphism.
-     */    
+     */
     Coil* copy() const override;
     
     /*!
      * \brief Compute the distance from the Coil for a given BaseParticle and return if there is a collision. If there is a collision, also return the normal vector of the interaction point.
-     */   
+     */
     bool getDistanceAndNormal(const BaseParticle& P, Mdouble& distance, Vec3D& normal_return) const override;
-
+    
     /*!
      * \brief Rotate the Coil for a period dt, so that the offset_ changes with omega_*dt.
      */
@@ -89,18 +90,18 @@ public:
      * \brief Reads an old-style Coil from an input stream, for example an old restart file.
      * \deprecated If you have old restart files, please convert them to the current
      * version of the restart files and use read(std::istream&) instead of oldRead(std::istream&).
-     */    
+     */
     MERCURY_DEPRECATED
     void oldRead(std::istream& is);
     
-   /*!
-    * \brief Writes a Coil to an output stream, for example a restart file.
-    */
+    /*!
+     * \brief Writes a Coil to an output stream, for example a restart file.
+     */
     void write(std::ostream& os) const override;
     
-   /*!
-    * \brief Returns the name of the object, in this case the string "Coil".
-    */
+    /*!
+     * \brief Returns the name of the object, in this case the string "Coil".
+     */
     std::string getName() const override;
 
 private:
@@ -108,10 +109,10 @@ private:
      * \brief The centre of the lower end of the Coil.
      */
     Vec3D start_;///
-
-   /*!
-    * \brief The length of the Coil.
-    */    
+    
+    /*!
+     * \brief The length of the Coil.
+     */
     Mdouble l_;
     
     /*!

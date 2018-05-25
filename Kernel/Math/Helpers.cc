@@ -43,7 +43,9 @@
 #include <direct.h>
 #define GetCurrentDir _getcwd
 #else
+
 #include <unistd.h>
+
 #define GetCurrentDir getcwd
 #endif
 
@@ -316,14 +318,18 @@
 //}
 /////from Deen...Kuipers2006, eq. 43 and 30
 
-helpers::KAndDispAndKtAndDispt helpers::computeDisptFromCollisionTimeAndRestitutionCoefficientAndTangentialRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble beta, Mdouble mass)
+helpers::KAndDispAndKtAndDispt
+helpers::computeDisptFromCollisionTimeAndRestitutionCoefficientAndTangentialRestitutionCoefficientAndEffectiveMass(
+        Mdouble tc, Mdouble r, Mdouble beta, Mdouble mass)
 {
     helpers::KAndDispAndKtAndDispt ans;
     ans.disp = -2.0 * mass * log(r) / tc;
     ans.k = mass * (mathsFunc::square(constants::pi / tc) + mathsFunc::square(ans.disp / (2.0 * mass)));
-    ans.kt = 2.0 / 7.0 * ans.k * (mathsFunc::square(constants::pi) + mathsFunc::square(log(beta))) / (mathsFunc::square(constants::pi) + mathsFunc::square(log(r)));
+    ans.kt = 2.0 / 7.0 * ans.k * (mathsFunc::square(constants::pi) + mathsFunc::square(log(beta))) /
+             (mathsFunc::square(constants::pi) + mathsFunc::square(log(r)));
     if (beta != 0.0)
-        ans.dispt = -2 * log(beta) * sqrt(1.0 / 7.0 * mass * ans.kt / (mathsFunc::square(constants::pi) + mathsFunc::square(log(beta))));
+        ans.dispt = -2 * log(beta) *
+                    sqrt(1.0 / 7.0 * mass * ans.kt / (mathsFunc::square(constants::pi) + mathsFunc::square(log(beta))));
     else
         ans.dispt = 2. * sqrt(1.0 / 7.0 * mass * ans.kt);
     return ans;
@@ -334,7 +340,7 @@ Mdouble helpers::getMaximumVelocity(Mdouble k, Mdouble disp, Mdouble radius, Mdo
     // note: underestimate based on energy argument,
     // Ekin = 2*1/2*m*(v/2)^2 = 1/2*k*(2*r)^2, gives
     // return radius * sqrt(8.0*k/mass);
-
+    
     // with dissipation, see S. Luding, Collisions & Contacts between two particles, eq 34
     Mdouble w = sqrt(k / mass - mathsFunc::square(disp / (2.0 * mass)));
     Mdouble w0 = sqrt(k / mass);
@@ -357,15 +363,19 @@ Mdouble helpers::getMaximumVelocity(Mdouble k, Mdouble disp, Mdouble radius, Mdo
  * \param[in] time step      the mean time step used during the simulation
  * \return the saveCount value that should be used to get the desired number of saves.
  */
-unsigned int helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(unsigned int numberOfSaves, Mdouble timeMax, Mdouble timeStep)
+unsigned int helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(unsigned int numberOfSaves, Mdouble timeMax,
+                                                                         Mdouble timeStep)
 {
     if (numberOfSaves > 0 && timeMax > 0 && timeStep > 0)
     {
-        return static_cast<unsigned int>(ceil((timeMax + timeStep) / timeStep / static_cast<double>(numberOfSaves - 1)));
+        return static_cast<unsigned int>(ceil(
+                (timeMax + timeStep) / timeStep / static_cast<double>(numberOfSaves - 1)));
     }
     else
     {
-        logger(ERROR, "[Helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep()] numberOfSaves: %, timeMax: %, timestep: %", numberOfSaves, timeMax, timeStep);
+        logger(ERROR,
+               "[Helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep()] numberOfSaves: %, timeMax: %, timestep: %",
+               numberOfSaves, timeMax, timeStep);
         logger(ERROR, " Arguments need to be positive");
         exit(-1);
     }
@@ -431,7 +441,7 @@ bool helpers::writeToFile(std::string filename, std::string filecontent)
     file.open(filename.c_str(), std::ios::out);
     if (file.fail())
     {
-        logger(WARN,"Error in writeToFile: file could not be opened");
+        logger(WARN, "Error in writeToFile: file could not be opened");
         return false;
     }
     file << filecontent;
@@ -444,7 +454,7 @@ void helpers::gnuplot(std::string command)
 #ifdef __CYGWIN__
     logger(WARN, "[helpers::gnuplot] is not supported on Cygwin");
 #else
-    FILE *pipe = popen("gnuplot -persist", "w");
+    FILE* pipe = popen("gnuplot -persist", "w");
     fprintf(pipe, "%s", command.c_str());
     fflush(pipe);
 #endif
@@ -473,9 +483,9 @@ bool helpers::fileExists(std::string strFilename)
     struct stat stFileInfo;
     bool blnReturn;
     int intStat;
-
+    
     // Attempt to get the file attributes
-
+    
     intStat = stat(strFilename.c_str(), &stFileInfo);
     if (intStat == 0)
     {
@@ -493,7 +503,7 @@ bool helpers::fileExists(std::string strFilename)
         // more details on why stat failed.
         blnReturn = false;
     }
-
+    
     return blnReturn;
 }
 
@@ -538,7 +548,7 @@ std::vector<double> helpers::readArrayFromFile(std::string filename, int& n, int
     file >> n >> m;
     std::vector<double> v;
     Mdouble val;
-    for (int i=0; i<n*m; i++)
+    for (int i = 0; i < n * m; i++)
     {
         file >> val;
         v.push_back(val);
@@ -554,9 +564,9 @@ void helpers::more(std::string filename, unsigned nLines)
     std::fstream file;
     file.open(filename.c_str(), std::ios::in);
     if (file.fail())
-        logger(ERROR,"Error in readArrayFromFile: file could not be opened");
+        logger(ERROR, "Error in readArrayFromFile: file could not be opened");
     std::string line;
-    for (unsigned i=0; i<nLines; i++)
+    for (unsigned i = 0; i < nLines; i++)
     {
         if (file.eof()) break;
         getline(file, line);
@@ -569,9 +579,9 @@ std::string helpers::to_string(const Mdouble value, unsigned precision)
 {
     std::ostringstream stm;
     const Mdouble logValue = log10(value);
-    const int factor = std::pow(10,precision-std::ceil(logValue));
-    stm << std::round(value*factor)/factor;
-    return stm.str() ;
+    const int factor = std::pow(10, precision - std::ceil(logValue));
+    stm << std::round(value * factor) / factor;
+    return stm.str();
 }
 
 /**
@@ -580,65 +590,72 @@ std::string helpers::to_string(const Mdouble value, unsigned precision)
  * \param[in] displacement peak displacement before unloading
  * \param[in] velocity     loading/unloading velocity
  */
-void helpers::loadingTest(const ParticleSpecies* species, Mdouble displacement, Mdouble velocity, Mdouble radius, std::string name)
+void helpers::loadingTest(const ParticleSpecies* species, Mdouble displacement, Mdouble velocity, Mdouble radius,
+                          std::string name)
 {
-    class LoadingTest : public DPMBase {
+    class LoadingTest : public DPMBase
+    {
         const ParticleSpecies* species;
         Mdouble displacement;
         Mdouble velocity;
         Mdouble radius;
     public:
         //public variables
-        LoadingTest (const ParticleSpecies* species, Mdouble displacement, Mdouble velocity, Mdouble radius)
-        : species(species), displacement(displacement), velocity(velocity), radius(radius) {}
-
+        LoadingTest(const ParticleSpecies* species, Mdouble displacement, Mdouble velocity, Mdouble radius)
+                : species(species), displacement(displacement), velocity(velocity), radius(radius)
+        {}
+        
         void setupInitialConditions() override
         {
             //setName("LoadingTest"+species->getName());
-            setTimeMax(2.0*displacement/velocity);
-            setTimeStep(2e-3*getTimeMax());
+            setTimeMax(2.0 * displacement / velocity);
+            setTimeStep(2e-3 * getTimeMax());
             setSaveCount(1);
             setFileType(FileType::NO_FILE);
             fStatFile.setFileType(FileType::ONE_FILE);
-
-            setMax({radius,radius,radius+radius});
-            setMin({-radius,-radius,0});
+            
+            setMax({radius, radius, radius + radius});
+            setMin({-radius, -radius, 0});
             setSystemDimensions(3);
             setParticleDimensions(3);
-
+            
             speciesHandler.copyAndAddObject(*species);
-
+            
             BaseParticle p;
             p.setSpecies(speciesHandler.getObject(0));
             p.setRadius(radius);
-            p.setPosition({0,0,radius});
+            p.setPosition({0, 0, radius});
             particleHandler.copyAndAddObject(p);
-
+            
             InfiniteWall w;
             w.setSpecies(speciesHandler.getObject(0));
-            w.set(Vec3D(0,0,-1),Vec3D(0.0,0.0,0.0));
+            w.set(Vec3D(0, 0, -1), Vec3D(0.0, 0.0, 0.0));
             wallHandler.copyAndAddObject(w);
         }
-
-        void actionsBeforeTimeStep() override {
+        
+        void actionsBeforeTimeStep() override
+        {
             BaseParticle* p = particleHandler.getLastObject();
             assert(p);
-            p->setAngularVelocity({0,0,0});
-
+            p->setAngularVelocity({0, 0, 0});
+            
             //Moving particle normally into surface
-            if (getTime() <= displacement/velocity) {
-                p->setVelocity({0,0,velocity});
-                p->setPosition({0,0,radius-velocity*getTime()});
-            } else {
-                p->setVelocity({0,0,-velocity});
-                p->setPosition({0,0,radius-displacement-displacement+velocity*getTime()});
+            if (getTime() <= displacement / velocity)
+            {
+                p->setVelocity({0, 0, velocity});
+                p->setPosition({0, 0, radius - velocity * getTime()});
+            }
+            else
+            {
+                p->setVelocity({0, 0, -velocity});
+                p->setPosition({0, 0, radius - displacement - displacement + velocity * getTime()});
             }
         }
     } test(species, displacement, velocity, radius);
     test.setName(name);
     test.solve();
-    writeToFile(test.getName()+".gnu","plot '"+test.getName()+".fstat' u 7:9 w lp");
-    logger(INFO,"finished loading test: run 'gnuplot %.gnu' to view output",test.getName());
+    writeToFile(test.getName() + ".gnu", "plot '" + test.getName() + ".fstat' u 7:9 w lp");
+    logger(INFO, "finished loading test: run 'gnuplot %.gnu' to view output", test.getName());
 }
 
 /**
@@ -647,11 +664,12 @@ void helpers::loadingTest(const ParticleSpecies* species, Mdouble displacement, 
  * \param[in] displacement peak displacement before unloading
  * \param[in] velocity     loading/unloading velocity
  */
-void helpers::normalAndTangentialLoadingTest(const ParticleSpecies *species, Mdouble displacement,
+void helpers::normalAndTangentialLoadingTest(const ParticleSpecies* species, Mdouble displacement,
                                              Mdouble tangentialDisplacement, Mdouble velocity, Mdouble radius,
                                              std::string name)
 {
-    class LoadingTest : public DPMBase {
+    class LoadingTest : public DPMBase
+    {
         const ParticleSpecies* species;
         Mdouble displacement;
         Mdouble tangentialDisplacement;
@@ -659,65 +677,82 @@ void helpers::normalAndTangentialLoadingTest(const ParticleSpecies *species, Mdo
         Mdouble radius;
     public:
         //public variables
-        LoadingTest (const ParticleSpecies* species, Mdouble displacement, Mdouble tangentialDisplacement, Mdouble velocity, Mdouble radius)
-         : species(species), displacement(displacement), tangentialDisplacement(tangentialDisplacement), velocity(velocity), radius(radius) {}
-
+        LoadingTest(const ParticleSpecies* species, Mdouble displacement, Mdouble tangentialDisplacement,
+                    Mdouble velocity, Mdouble radius)
+                : species(species), displacement(displacement), tangentialDisplacement(tangentialDisplacement),
+                  velocity(velocity), radius(radius)
+        {}
+        
         void setupInitialConditions() override
         {
             //setName("TangentialLoadingTest"+species->getName());
-            setTimeMax(4.0*tangentialDisplacement/velocity);
-            setTimeStep(2e-5*getTimeMax());
+            setTimeMax(4.0 * tangentialDisplacement / velocity);
+            setTimeStep(2e-5 * getTimeMax());
             setSaveCount(1);
             setFileType(FileType::NO_FILE);
             fStatFile.setFileType(FileType::ONE_FILE);
-
-            setMax({radius,radius,radius+radius});
-            setMin({-radius,-radius,0});
+            
+            setMax({radius, radius, radius + radius});
+            setMin({-radius, -radius, 0});
             setSystemDimensions(3);
             setParticleDimensions(3);
-
+            
             speciesHandler.copyAndAddObject(*species);
-
+            
             BaseParticle p;
             p.setSpecies(speciesHandler.getObject(0));
             p.setRadius(radius);
-            p.setPosition({0,0,radius-displacement});
+            p.setPosition({0, 0, radius - displacement});
             particleHandler.copyAndAddObject(p);
-
+            
             InfiniteWall w;
             w.setSpecies(speciesHandler.getObject(0));
-            w.set(Vec3D(0,0,-1),Vec3D(0.0,0.0,0.0));
+            w.set(Vec3D(0, 0, -1), Vec3D(0.0, 0.0, 0.0));
             wallHandler.copyAndAddObject(w);
         }
-
-        void actionsBeforeTimeStep() override {
+        
+        void actionsBeforeTimeStep() override
+        {
             BaseParticle* p = particleHandler.getLastObject();
             assert(p);
-            p->setAngularVelocity({0,0,0});
-
+            p->setAngularVelocity({0, 0, 0});
+            
             //Moving particle normally into surface
-            Mdouble time = getTime() / (tangentialDisplacement/velocity);
-            if (time <= 1.0) {
-                p->setVelocity({velocity,0,0});
-                p->setPosition({velocity*getTime(),0,radius-displacement});
-            } else if (time <= 3.0) {
-                p->setVelocity({-velocity,0,0});
-                p->setPosition({2.0*tangentialDisplacement-velocity*getTime(),0,radius-displacement
-                                                                                + (0.0*tangentialDisplacement-velocity*(getTime()-(tangentialDisplacement/velocity)))});
-            } else {
-                p->setVelocity({velocity,0,0});
-                p->setPosition({-4.0*tangentialDisplacement+velocity*getTime(),0,radius-displacement
-                                                                                 - (4.0*tangentialDisplacement-velocity*(getTime()-(tangentialDisplacement/velocity)))});
-
+            Mdouble time = getTime() / (tangentialDisplacement / velocity);
+            if (time <= 1.0)
+            {
+                p->setVelocity({velocity, 0, 0});
+                p->setPosition({velocity * getTime(), 0, radius - displacement});
             }
-
+            else if (time <= 3.0)
+            {
+                p->setVelocity({-velocity, 0, 0});
+                p->setPosition({2.0 * tangentialDisplacement - velocity * getTime(), 0, radius - displacement
+                                                                                        +
+                                                                                        (0.0 * tangentialDisplacement -
+                                                                                         velocity * (getTime() -
+                                                                                                     (tangentialDisplacement /
+                                                                                                      velocity)))});
+            }
+            else
+            {
+                p->setVelocity({velocity, 0, 0});
+                p->setPosition({-4.0 * tangentialDisplacement + velocity * getTime(), 0, radius - displacement
+                                                                                         -
+                                                                                         (4.0 * tangentialDisplacement -
+                                                                                          velocity * (getTime() -
+                                                                                                      (tangentialDisplacement /
+                                                                                                       velocity)))});
+                
+            }
+            
         }
-
+        
     } test(species, displacement, tangentialDisplacement, velocity, radius);
     test.setName(name);
     test.solve();
-    writeToFile(test.getName()+".gnu","plot '"+test.getName()+".fstat' u 8:($10*$14) w lp");
-    logger(INFO,"finished tangential loading test: run 'gnuplot %.gnu' to view output",test.getName());
+    writeToFile(test.getName() + ".gnu", "plot '" + test.getName() + ".fstat' u 8:($10*$14) w lp");
+    logger(INFO, "finished tangential loading test: run 'gnuplot %.gnu' to view output", test.getName());
 }
 
 /**
@@ -726,9 +761,11 @@ void helpers::normalAndTangentialLoadingTest(const ParticleSpecies *species, Mdo
  * \param[in] displacement peak displacement before unloading
  * \param[in] velocity     loading/unloading velocity
  */
-void helpers::objectivenessTest(const ParticleSpecies* species, Mdouble displacement, Mdouble tangentialDisplacement, Mdouble velocity, Mdouble radius, std::string name)
+void helpers::objectivenessTest(const ParticleSpecies* species, Mdouble displacement, Mdouble tangentialDisplacement,
+                                Mdouble velocity, Mdouble radius, std::string name)
 {
-    class ObjectivenessTest : public DPMBase {
+    class ObjectivenessTest : public DPMBase
+    {
         const ParticleSpecies* species;
         Mdouble displacement;
         Mdouble tangentialDisplacement;
@@ -736,74 +773,81 @@ void helpers::objectivenessTest(const ParticleSpecies* species, Mdouble displace
         Mdouble radius;
     public:
         //public variables
-        ObjectivenessTest (const ParticleSpecies* species, Mdouble displacement, Mdouble tangentialDisplacement, Mdouble velocity, Mdouble radius)
-         : species(species), displacement(displacement), tangentialDisplacement(tangentialDisplacement), velocity(velocity), radius(radius) {}
-
+        ObjectivenessTest(const ParticleSpecies* species, Mdouble displacement, Mdouble tangentialDisplacement,
+                          Mdouble velocity, Mdouble radius)
+                : species(species), displacement(displacement), tangentialDisplacement(tangentialDisplacement),
+                  velocity(velocity), radius(radius)
+        {}
+        
         void setupInitialConditions() override
         {
             //setName("ObjectivenessTest"+species->getName());
-            setTimeMax((tangentialDisplacement+0.5*constants::pi*radius)/velocity);
-            setTimeStep(1e-4*getTimeMax());
+            setTimeMax((tangentialDisplacement + 0.5 * constants::pi * radius) / velocity);
+            setTimeStep(1e-4 * getTimeMax());
             setSaveCount(20);
             setFileType(FileType::NO_FILE);
             dataFile.setFileType(FileType::ONE_FILE);
             fStatFile.setFileType(FileType::ONE_FILE);
-
-            setMax(radius*Vec3D(2,2,2));
-            setMin(radius*Vec3D(-2,-2,-2));
+            
+            setMax(radius * Vec3D(2, 2, 2));
+            setMin(radius * Vec3D(-2, -2, -2));
             setSystemDimensions(2);
             setParticleDimensions(3);
-
+            
             speciesHandler.copyAndAddObject(*species);
-
+            
             BaseParticle p;
             p.setSpecies(speciesHandler.getObject(0));
             p.setRadius(radius);
-            p.setPosition({0,radius-displacement,0});
+            p.setPosition({0, radius - displacement, 0});
             particleHandler.copyAndAddObject(p);
-            p.setPosition({0,-radius+displacement,0});
+            p.setPosition({0, -radius + displacement, 0});
             particleHandler.copyAndAddObject(p);
         }
-
-        void actionsBeforeTimeStep() override {
+        
+        void actionsBeforeTimeStep() override
+        {
             BaseParticle* p = particleHandler.getObject(0);
             BaseParticle* q = particleHandler.getLastObject();
             assert(p);
             assert(q);
-
+            
             //Moving particle normally into surface
-            if (getTime() <= tangentialDisplacement/velocity) {
-                p->setAngularVelocity({0,0,0});
-                p->setVelocity({velocity,0,0});
-                p->setPosition({-tangentialDisplacement+velocity*getTime(),radius-displacement,0});
-                q->setAngularVelocity({0,0,0});
-                q->setVelocity({-velocity,0,0});
-                q->setPosition({tangentialDisplacement-velocity*getTime(),-radius+displacement,0});
-            } else {
-                Mdouble angle = velocity/(radius-displacement) * (getTime()-tangentialDisplacement/velocity);
+            if (getTime() <= tangentialDisplacement / velocity)
+            {
+                p->setAngularVelocity({0, 0, 0});
+                p->setVelocity({velocity, 0, 0});
+                p->setPosition({-tangentialDisplacement + velocity * getTime(), radius - displacement, 0});
+                q->setAngularVelocity({0, 0, 0});
+                q->setVelocity({-velocity, 0, 0});
+                q->setPosition({tangentialDisplacement - velocity * getTime(), -radius + displacement, 0});
+            }
+            else
+            {
+                Mdouble angle = velocity / (radius - displacement) * (getTime() - tangentialDisplacement / velocity);
                 Mdouble s = sin(angle);
                 Mdouble c = cos(angle);
-                p->setAngularVelocity(velocity/(radius-displacement)*Vec3D(0,0,-1));
+                p->setAngularVelocity(velocity / (radius - displacement) * Vec3D(0, 0, -1));
                 //p->setAngularVelocity(Vec3D(0,0,0));
-                p->setOrientation({1,0,0,0});
-                p->setVelocity(velocity*Vec3D(c,-s,0));
+                p->setOrientation({1, 0, 0, 0});
+                p->setVelocity(velocity * Vec3D(c, -s, 0));
                 //p->setVelocity(Vec3D(0,0,0));
-                p->setPosition((radius-displacement)*Vec3D(s,c,0));
+                p->setPosition((radius - displacement) * Vec3D(s, c, 0));
                 q->setAngularVelocity(-p->getAngularVelocity());
                 q->setOrientation(-p->getOrientation());
                 q->setVelocity(-p->getVelocity());
                 q->setPosition(-p->getPosition());
             }
         }
-
-    } test (species, displacement, tangentialDisplacement, velocity, radius);
+        
+    } test(species, displacement, tangentialDisplacement, velocity, radius);
     test.setName(name);
     test.solve();
-    writeToFile(test.getName()+".gnu","set size ratio -1; plot '"+test.getName()+".fstat' u 14:15 every 2 w lp");
-    logger(INFO,"finished objectiveness test: run 'gnuplot %.gnu' to view output",test.getName());
+    writeToFile(test.getName() + ".gnu", "set size ratio -1; plot '" + test.getName() + ".fstat' u 14:15 every 2 w lp");
+    logger(INFO, "finished objectiveness test: run 'gnuplot %.gnu' to view output", test.getName());
 }
 
-bool helpers::compare(std::istream& is,std::string s)
+bool helpers::compare(std::istream& is, std::string s)
 {
     // Get current position
     //check if the next line starts with 'interactionFile'; otherwise, skip interaction
@@ -814,38 +858,42 @@ bool helpers::compare(std::istream& is,std::string s)
     {
         is.seekg(len, std::ios_base::beg);
         return false;
-        logger(INFO, "helpers::compare: Next stream value (%) is not %", dummy,s);
+        logger(INFO, "helpers::compare: Next stream value (%) is not %", dummy, s);
     }
     return true;
 }
 
-void helpers::check(double real, double ideal, double error, std::string errorMessage) {
+void helpers::check(double real, double ideal, double error, std::string errorMessage)
+{
     logger.assert_always(mathsFunc::isEqual(real, ideal, error),
-                         errorMessage + ": % (should be %) ",real, ideal);
-    logger(INFO,errorMessage + ": % (correct)",real);
+                         errorMessage + ": % (should be %) ", real, ideal);
+    logger(INFO, errorMessage + ": % (correct)", real);
 }
 
-void helpers::check(Vec3D real, Vec3D ideal, double error, std::string errorMessage) {
+void helpers::check(Vec3D real, Vec3D ideal, double error, std::string errorMessage)
+{
     //std::numeric_limits<double>::epsilon()
     logger.assert_always(mathsFunc::isEqual(real.X, ideal.X, error),
-                         errorMessage + ": % (should be %) ",real, ideal);
+                         errorMessage + ": % (should be %) ", real, ideal);
     logger.assert_always(mathsFunc::isEqual(real.Y, ideal.Y, error),
-                         errorMessage + ": % (should be %) ",real, ideal);
+                         errorMessage + ": % (should be %) ", real, ideal);
     logger.assert_always(mathsFunc::isEqual(real.Z, ideal.Z, error),
-                         errorMessage + ": % (should be %) ",real, ideal);
-    logger(INFO,errorMessage + ": % (correct)",real);
+                         errorMessage + ": % (should be %) ", real, ideal);
+    logger(INFO, errorMessage + ": % (correct)", real);
 }
 
-std::string helpers::getPath() {
+std::string helpers::getPath()
+{
     char cCurrentPath[FILENAME_MAX];
     GetCurrentDir(cCurrentPath, sizeof(cCurrentPath));
     return std::string(cCurrentPath);
 }
 
-Mdouble helpers::getRealTime() {
+Mdouble helpers::getRealTime()
+{
     // record start time
     static auto start = std::chrono::steady_clock::now();
     auto end = std::chrono::steady_clock::now();
-    std::chrono::duration<double> diff = end-start;
+    std::chrono::duration<double> diff = end - start;
     return diff.count();
 }

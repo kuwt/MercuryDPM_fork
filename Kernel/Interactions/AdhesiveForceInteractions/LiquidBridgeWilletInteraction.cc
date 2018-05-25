@@ -36,10 +36,11 @@
  * \param[in] I
  * \param[in] timeStamp
  */
-LiquidBridgeWilletInteraction::LiquidBridgeWilletInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp)
-    : BaseInteraction(P, I, timeStamp)
+LiquidBridgeWilletInteraction::LiquidBridgeWilletInteraction(BaseInteractable* P, BaseInteractable* I,
+                                                             unsigned timeStamp)
+        : BaseInteraction(P, I, timeStamp)
 {
-    wasInContact_=false;
+    wasInContact_ = false;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"LiquidBridgeWilletInteraction::LiquidBridgeWilletInteraction() finished"<<std::endl;
 #endif
@@ -47,9 +48,9 @@ LiquidBridgeWilletInteraction::LiquidBridgeWilletInteraction(BaseInteractable* P
 
 //used for mpi
 LiquidBridgeWilletInteraction::LiquidBridgeWilletInteraction()
-    : BaseInteraction()
+        : BaseInteraction()
 {
-    wasInContact_=false;
+    wasInContact_ = false;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"LiquidBridgeWilletInteraction::LiquidBridgeWilletInteraction() finished"<<std::endl;
 #endif
@@ -58,14 +59,15 @@ LiquidBridgeWilletInteraction::LiquidBridgeWilletInteraction()
 /*!
  * \param[in] p
  */
-LiquidBridgeWilletInteraction::LiquidBridgeWilletInteraction(const LiquidBridgeWilletInteraction &p)
-    : BaseInteraction(p)
+LiquidBridgeWilletInteraction::LiquidBridgeWilletInteraction(const LiquidBridgeWilletInteraction& p)
+        : BaseInteraction(p)
 {
-    wasInContact_=p.wasInContact_;
+    wasInContact_ = p.wasInContact_;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"LiquidBridgeWilletInteraction::LiquidBridgeWilletInteraction(const LiquidBridgeWilletInteraction &p finished"<<std::endl;
 #endif
 }
+
 /*!
  * 
  */
@@ -75,13 +77,15 @@ LiquidBridgeWilletInteraction::~LiquidBridgeWilletInteraction()
     std::cout<<"LiquidBridgeWilletInteraction::~LiquidBridgeWilletInteraction() finished"<<std::endl;
 #endif
 }
+
 /*!
  * \param[in,out] os
  */
 void LiquidBridgeWilletInteraction::write(std::ostream& os) const
 {
-	os << " wasInContact " << wasInContact_;
+    os << " wasInContact " << wasInContact_;
 }
+
 /*!
  * \param[in,out] is
  */
@@ -91,28 +95,31 @@ void LiquidBridgeWilletInteraction::read(std::istream& is)
     std::string dummy;
     is >> dummy >> wasInContact_;
 }
+
 /*!
  * 
  */
 void LiquidBridgeWilletInteraction::computeAdhesionForce()
 {
     const LiquidBridgeWilletSpecies* species = getSpecies();
-    if (getOverlap()>=0)
+    if (getOverlap() >= 0)
     {
-        wasInContact_=true;
-		Mdouble effectiveRadius = 2.0*getEffectiveRadius();
-		Mdouble fdotn = -2.0*constants::pi*effectiveRadius*species->getSurfaceTension()*std::cos(species->getContactAngle());
+        wasInContact_ = true;
+        Mdouble effectiveRadius = 2.0 * getEffectiveRadius();
+        Mdouble fdotn = -2.0 * constants::pi * effectiveRadius * species->getSurfaceTension() *
+                        std::cos(species->getContactAngle());
         addForce(getNormal() * fdotn);
     }
     else if (wasInContact_)
     {
-		Mdouble effectiveRadius = 2.0*getEffectiveRadius();
-		Mdouble s_c = -getOverlap()*std::sqrt(effectiveRadius/species->getLiquidBridgeVolume());
-		Mdouble fdotn = -2.0*constants::pi*effectiveRadius*species->getSurfaceTension()
-			*std::cos(species->getContactAngle())/(1+(1.05+2.5*s_c)*s_c);
+        Mdouble effectiveRadius = 2.0 * getEffectiveRadius();
+        Mdouble s_c = -getOverlap() * std::sqrt(effectiveRadius / species->getLiquidBridgeVolume());
+        Mdouble fdotn = -2.0 * constants::pi * effectiveRadius * species->getSurfaceTension()
+                        * std::cos(species->getContactAngle()) / (1 + (1.05 + 2.5 * s_c) * s_c);
         addForce(getNormal() * fdotn);
     }
 }
+
 /*!
  * \return Mdouble
  */
@@ -121,13 +128,15 @@ Mdouble LiquidBridgeWilletInteraction::getElasticEnergy() const
     ///\todo TW
     return 0.0;
 }
+
 /*!
  * \return const LiquidBridgeWilletSpecies*
  */
 const LiquidBridgeWilletSpecies* LiquidBridgeWilletInteraction::getSpecies() const
 {
-    return dynamic_cast<const LiquidBridgeWilletSpecies *>(getBaseSpecies());
+    return dynamic_cast<const LiquidBridgeWilletSpecies*>(getBaseSpecies());
 }
+
 /*!
  * \return std::string
  */

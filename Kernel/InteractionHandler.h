@@ -24,10 +24,12 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef INTERACTIONHANDLER_H
 #define INTERACTIONHANDLER_H
+
 #include "BaseHandler.h"
 #include "Interactions/BaseInteraction.h"
 #include "File.h"
 #include "MpiContainer.h"
+
 class SpeciesHandler;
 
 /*!
@@ -42,12 +44,12 @@ public:
      * \brief Default constructor, it creates an empty InteractionHandler.
      */
     InteractionHandler();
-
+    
     /*!
      * \brief Copy constructor, but since interactions must not be copied, it creates an empty InteractionHandler.
      */
     InteractionHandler(const InteractionHandler& IH UNUSED);
-
+    
     /*!
      * \brief Assignment operator.
      */
@@ -57,104 +59,108 @@ public:
      * \brief Destructor, it destructs the InteractionHandler and all BaseInteraction it contains.
      */
     ~InteractionHandler() override;
-
+    
     /*!
      * \brief Adds an Interaction to the InteractionHandler.
      */
     void addObject(BaseInteraction* I) override;
-
+    
     /*!
      * \brief Reads an Interaction into the InteractionHandler from restart data.
      */
     void readAndAddObject(std::istream& is) override;
-
+    
     /*!
      * \brief Returns the Interaction between the BaseInteractable's P and I if 
      * it exists, otherwise returns a null pointer.
      */
-    BaseInteraction* getExistingInteraction(const BaseInteractable*P, const BaseInteractable*I) const;
-
+    BaseInteraction* getExistingInteraction(const BaseInteractable* P, const BaseInteractable* I) const;
+    
     BaseInteraction* addInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp);
-
-        /*!
-         * \brief Returns the Interaction between the BaseInteractable's P and I.
-         */
-    BaseInteraction* getInteraction(BaseInteractable*P, BaseInteractable*I, unsigned timeStamp);
-
+    
+    /*!
+     * \brief Returns the Interaction between the BaseInteractable's P and I.
+     */
+    BaseInteraction* getInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp);
+    
     /*!
      * \brief Creates an empty interaction
      */
     //BaseInteraction* getExistingInteraction(BaseInteractable* P, BaseInteractable* I) const;
-
+    
     /*!
      * \brief Returns the Interaction between the BaseInteractable's P and I.
      */
     BaseInteraction* createEmptyInteraction() const;
-
+    
     /*!
      * \brief Deletes an empty interaction
      */
     void deleteEmptyInteraction(BaseInteraction* interaction) const;
-
+    
     /*!
      * \brief creates an empty MPIInteractionDataArray
      */
     void* createMPIInteractionDataArray(unsigned int numberOfInteractions) const;
-
+    
     /*!
      * \brief deletes an MPIInteractionDataArray
      */
     void deleteMPIInteractionDataArray(void* dataArray);
-
+    
     /*!
      * \brief reads the basic interaction details from an MPIInteractionDataArray
      */
-    void getInteractionDetails(void* interactionData, unsigned int index, unsigned int &identificationP, unsigned int &identificationI, bool &isWallInteraction, unsigned &timeStamp);
+    void getInteractionDetails(void* interactionData, unsigned int index, unsigned int& identificationP,
+                               unsigned int& identificationI, bool& isWallInteraction, unsigned& timeStamp);
+
 /*!
      * \brief Returns the Interaction between the BaseInteractable's P and I closest to the contact point (should be used when multiple contacts are possible).
      */
     BaseInteraction* getInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp, const Vec3D& normal);
+    
     /*!
      * \brief Removes interactions of periodic particles when the periodic 
      * particles get deleted (see DPMBase::removeDuplicatePeriodicParticles) 
      */
-    void removeObjectKeepingPeriodics(unsigned  int id);
+    void removeObjectKeepingPeriodics(unsigned int id);
     
     /*!
      * \brief erases interactions which have an old timestamp.
      */
     void eraseOldInteractions(unsigned);
-
+    
     void actionsAfterTimeStep();
     
     /*!
     * \brief The mean overlap of all interactions
     */
     Mdouble getMeanOverlap() const;
-
+    
     /*!
      * \brief Writes the InteractionHandler to an output stream, for example a restart file.
      */
     void write(std::ostream& os) const;
-
+    
     /*!
      * \brief
      */
     void setWriteVTK(FileType f);
-
+    
     /*!
      * \brief
      */
     FileType getWriteVTK() const;
-
+    
     /*!
      * \brief Returns the name of the object
      */
     std::string getName() const override;
 
 private:
-
+    
     FileType writeVTK_;
 };
+
 #endif
 

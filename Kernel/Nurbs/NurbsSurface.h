@@ -41,8 +41,9 @@ public:
       @param controlPoints 2D vector of control points
     */
     NurbsSurface(const std::vector<double>& knotsU, const std::vector<double>& knotsV,
-                 const std::vector<std::vector<Vec3D>>& controlPoints, const std::vector<std::vector<double>>& weights);
-
+                 const std::vector <std::vector<Vec3D>>& controlPoints,
+                 const std::vector <std::vector<double>>& weights);
+    
     /**
     Evaluate point on a nonrational NURBS surface
     @param[in] u Parameter to evaluate the surface at.
@@ -62,9 +63,9 @@ private:
     ///mv knots
     std::vector<double> knotsV_;
     ///nu x nv control points
-    std::vector<std::vector<Vec3D>> controlPoints_;
+    std::vector <std::vector<Vec3D>> controlPoints_;
     ///nu x nv weights
-    std::vector<std::vector<double>> weights_;
+    std::vector <std::vector<double>> weights_;
     ///degree pu = mu-nu-1, pv = mv-nv-1
     unsigned int degreeU_, degreeV_;
 };

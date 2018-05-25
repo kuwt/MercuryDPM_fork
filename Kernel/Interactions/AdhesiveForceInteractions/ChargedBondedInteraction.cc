@@ -40,7 +40,7 @@
  * \param[in] timeStamp
  */
 ChargedBondedInteraction::ChargedBondedInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp)
-    : BaseInteraction(P, I, timeStamp)
+        : BaseInteraction(P, I, timeStamp)
 {
     //ensuring that, by default, particles are not 'bonded'
     //i.e. they will not unintentionally 'stick' to any overlapping particles!
@@ -53,8 +53,8 @@ ChargedBondedInteraction::ChargedBondedInteraction(BaseInteractable* P, BaseInte
 /*!
  * \param[in] p
  */
-ChargedBondedInteraction::ChargedBondedInteraction(const ChargedBondedInteraction &p)
-    : BaseInteraction(p)
+ChargedBondedInteraction::ChargedBondedInteraction(const ChargedBondedInteraction& p)
+        : BaseInteraction(p)
 {
     //carrying the history parameter over for copied particles to ensure that any bonded particles
     //remain bonded!
@@ -63,12 +63,14 @@ ChargedBondedInteraction::ChargedBondedInteraction(const ChargedBondedInteractio
     std::cout<<"ChargedBondedInteraction::ChargedBondedInteraction(const ChargedBondedInteraction &p finished"<<std::endl;
 #endif
 }
+
 ChargedBondedInteraction::ChargedBondedInteraction()
 {
 #ifdef MERCURY_USE_MPI
     logger(FATAL,"ChargedBondedInteractions are currently not implemented in parallel MercuryDPM");
-#endif 
+#endif
 }
+
 /*!
  *
  */
@@ -96,15 +98,16 @@ void ChargedBondedInteraction::read(std::istream& is  UNUSED)
     //logger(INFO,"ChargedBondedSpecies %",dummy);
     is >> dummy >> bonded_;
 }
+
 /*!
  *
  */
 void ChargedBondedInteraction::computeAdhesionForce()
 {
-
+    
     const ChargedBondedSpecies* species = getSpecies();
     //std::cout << getSpecies()->getCharge() << std::endl;
-
+    
     //creating local parameters to store the charges of both particles
     //involved in the interaction to allow for quick calculation
     const auto pSpecies = dynamic_cast<const ChargedBondedSpecies*>(getP()->getSpecies());
@@ -113,39 +116,39 @@ void ChargedBondedInteraction::computeAdhesionForce()
     assert(iSpecies);
     const int pCharge = pSpecies->getCharge();
     const int iCharge = iSpecies->getCharge();
-
-       //similarly, creating local parameters to store the relevant stiffness
+    
+    //similarly, creating local parameters to store the relevant stiffness
     //and max force values
     const Mdouble k = species->getAdhesionStiffness();
     const Mdouble fMax = species->getAdhesionForceMax();
-
-	const Mdouble kWaals = species->getVanDerWaalsStiffness();
+    
+    const Mdouble kWaals = species->getVanDerWaalsStiffness();
     const Mdouble fMaxWaals = species->getVanDerWaalsForceMax();
-	const Mdouble rWaals = fMaxWaals / kWaals;
-	
-
+    const Mdouble rWaals = fMaxWaals / kWaals;
+    
+    
     //First, adding bonded force if applicable
-    if (bonded_ && getOverlap()>=0)
+    if (bonded_ && getOverlap() >= 0)
     {
         addForce(getNormal() * (-species->getBondForceMax()
                                 - species->getBondDissipation() * getNormalRelativeVelocity()));
         return;
     }
-
-
+    
+    
     //determining which of the three possible cases for force based on charge -
     //repulsive (like charges), attractive (unlike charges) or none (1 or more uncharged) -
     //is relevant for the current combination of particle charges...
     //(Note that the charge set function contains a safety check that means charge can only be
     // +/- 1, i.e. the expressions used below should not produce errors!
-
+    
     //case 1 - 1 or more particles has no charge, i.e. no EM force between them
-    if ( (pCharge == 0) or (iCharge == 0) )
+    if ((pCharge == 0) or (iCharge == 0))
     {
         //No need to write anything here as nothing needs to be returned!
         //std::cout << "no charge" << std::endl;
     }
-    //case 2: unlike charges --> attractive force
+        //case 2: unlike charges --> attractive force
     else if (pCharge == -iCharge)
     {
         //std::cout << "dissimilar charge" << std::endl;
@@ -158,15 +161,15 @@ void ChargedBondedInteraction::computeAdhesionForce()
         }
         else if (getOverlap() >= -rWaals)
         {
-			addForce(getNormal() * (-kWaals * getOverlap() - fMaxWaals));
-			addForce( getNormal() * (-k * getOverlap() - fMax));
-		}
+            addForce(getNormal() * (-kWaals * getOverlap() - fMaxWaals));
+            addForce(getNormal() * (-k * getOverlap() - fMax));
+        }
         else
         {
-            addForce( getNormal() * (-k * getOverlap() - fMax));
+            addForce(getNormal() * (-k * getOverlap() - fMax));
         }
     }
-    //case 3: like charges --> repulsive force
+        //case 3: like charges --> repulsive force
     else if (pCharge == iCharge)
     {
         //std::cout << "similar charge" << std::endl;
@@ -180,10 +183,10 @@ void ChargedBondedInteraction::computeAdhesionForce()
         }
         else if (getOverlap() >= -rWaals)
         {
-			addForce(getNormal() * (-kWaals * getOverlap() - fMaxWaals));
-			addForce(getNormal() * (+k * getOverlap() + fMax));
-			//std::cout << "Waals = " << getNormal() * (-kWaals * getOverlap() - fMaxWaals) << std::endl;
-		}
+            addForce(getNormal() * (-kWaals * getOverlap() - fMaxWaals));
+            addForce(getNormal() * (+k * getOverlap() + fMax));
+            //std::cout << "Waals = " << getNormal() * (-kWaals * getOverlap() - fMaxWaals) << std::endl;
+        }
         else
         {
             addForce(getNormal() * (+k * getOverlap() + fMax));
@@ -211,26 +214,26 @@ Mdouble ChargedBondedInteraction::getElasticEnergy() const
     assert(iSpecies);
     const int pCharge = pSpecies->getCharge();
     const int iCharge = iSpecies->getCharge();
-
+    
     const Mdouble k = species->getAdhesionStiffness();
     const Mdouble fMax = species->getAdhesionForceMax();
     const Mdouble r = species->getInteractionDistance();
-
+    
     const Mdouble kWaals = species->getVanDerWaalsStiffness();
     const Mdouble fMaxWaals = species->getVanDerWaalsForceMax();
-    const Mdouble rWaals = (fMaxWaals==0)?0:(fMaxWaals/kWaals);
-
-
+    const Mdouble rWaals = (fMaxWaals == 0) ? 0 : (fMaxWaals / kWaals);
+    
+    
     //First, adding bonded force if applicable
-    if (bonded_ && getOverlap()>=0)
+    if (bonded_ && getOverlap() >= 0)
     {
         //comment to ignore BondForce
         Mdouble elasticEnergyAtEquilibrium = getElasticEnergyAtEquilibrium(species->getBondForceMax());
-        return -species->getBondForceMax()*getOverlap()+elasticEnergyAtEquilibrium;
+        return -species->getBondForceMax() * getOverlap() + elasticEnergyAtEquilibrium;
     }
-
+    
     Mdouble elasticEnergy = 0.0;
-    if ( (pCharge != 0) && (iCharge != 0) )
+    if ((pCharge != 0) && (iCharge != 0))
     {
         if (pCharge == -iCharge)
         {
@@ -269,18 +272,20 @@ Mdouble ChargedBondedInteraction::getElasticEnergy() const
         }
         else
         {
-            logger(ERROR,"Particle charge has erroneous value");
+            logger(ERROR, "Particle charge has erroneous value");
         }
     }
     return elasticEnergy;
 }
+
 /*!
  * \return a constant pointer to an instance of this class.
  */
 const ChargedBondedSpecies* ChargedBondedInteraction::getSpecies() const
 {
-    return dynamic_cast<const ChargedBondedSpecies *> (getBaseSpecies()); //downcast
+    return dynamic_cast<const ChargedBondedSpecies*> (getBaseSpecies()); //downcast
 }
+
 /*!
  * \return std::string
  */
@@ -295,7 +300,7 @@ std::string ChargedBondedInteraction::getBaseName() const
  */
 void ChargedBondedInteraction::bond()
 {
-    bonded_=true;
+    bonded_ = true;
 }
 
 /*!
@@ -305,5 +310,5 @@ void ChargedBondedInteraction::bond()
  */
 void ChargedBondedInteraction::unbond()
 {
-    bonded_=false;
+    bonded_ = false;
 }

@@ -42,7 +42,7 @@
 Chute::Chute()
 {
     constructor();
-    logger(DEBUG,"[Chute::Chute()] constructor finished");
+    logger(DEBUG, "[Chute::Chute()] constructor finished");
 }
 
 /*!
@@ -56,7 +56,7 @@ Chute::Chute(const DPMBase& other)
         : DPMBase(other), Mercury3D(other)
 {
     constructor();
-    logger(DEBUG,"[Chute::Chute(const DPMBase& other)] copy constructor finished");     
+    logger(DEBUG, "[Chute::Chute(const DPMBase& other)] copy constructor finished");
 }
 
 /*!
@@ -70,7 +70,7 @@ Chute::Chute(const MercuryBase& other)
         : DPMBase(other), Mercury3D(other)
 {
     constructor();
-    logger(DEBUG,"[Chute::Chute(const MercuryBase& other)] copy constructor finished");
+    logger(DEBUG, "[Chute::Chute(const MercuryBase& other)] copy constructor finished");
 }
 
 /*!
@@ -83,8 +83,8 @@ Chute::Chute(const MercuryBase& other)
 Chute::Chute(const Mercury3D& other)
         : DPMBase(other), Mercury3D(other)
 {
-        constructor();
-        logger(DEBUG,"[Chute::Chute(const Mercury3D& other) copy constructor finished"); 
+    constructor();
+    logger(DEBUG, "[Chute::Chute(const Mercury3D& other) copy constructor finished");
 }
 
 /*!
@@ -95,19 +95,19 @@ Chute::Chute(const Mercury3D& other)
  */
 Chute::Chute(const Chute& other)
         : DPMBase(other), Mercury3D(other),
-        chuteAngle_(other.chuteAngle_), 
-        fixedParticleRadius_(other.fixedParticleRadius_),
-        minInflowParticleRadius_(other.minInflowParticleRadius_), 
-        maxInflowParticleRadius_(other.maxInflowParticleRadius_),
-        inflowVelocity_(other.inflowVelocity_), 
-        inflowVelocityVariance_(other.inflowVelocityVariance_),
-        inflowHeight_(other.inflowHeight_), 
-        roughBottomType_(other.roughBottomType_),
-        maxFailed_(other.maxFailed_), 
-        insertionBoundary_(other.insertionBoundary_), 
-        isChutePeriodic_(other.isChutePeriodic_)    
+          chuteAngle_(other.chuteAngle_),
+          fixedParticleRadius_(other.fixedParticleRadius_),
+          minInflowParticleRadius_(other.minInflowParticleRadius_),
+          maxInflowParticleRadius_(other.maxInflowParticleRadius_),
+          inflowVelocity_(other.inflowVelocity_),
+          inflowVelocityVariance_(other.inflowVelocityVariance_),
+          inflowHeight_(other.inflowHeight_),
+          roughBottomType_(other.roughBottomType_),
+          maxFailed_(other.maxFailed_),
+          insertionBoundary_(other.insertionBoundary_),
+          isChutePeriodic_(other.isChutePeriodic_)
 {
-    logger(DEBUG,"[Chute::Chute(const Chute& other)] copy constructor finished");     
+    logger(DEBUG, "[Chute::Chute(const Chute& other)] copy constructor finished");
 }
 
 /*!
@@ -151,7 +151,7 @@ void Chute::read(std::istream& is)
     {
         std::string dummy;
         unsigned int roughBottomType;
-        line >> fixedParticleRadius_ 
+        line >> fixedParticleRadius_
              >> roughBottomType >> chuteAngle_
              >> minInflowParticleRadius_
              >> maxInflowParticleRadius_
@@ -162,8 +162,10 @@ void Chute::read(std::istream& is)
              >> inflowHeight_;
         setRoughBottomType(static_cast<RoughBottomType>(roughBottomType));
         //if the Chute Angle is given in degrees, move to radians;
-        if (chuteAngle_ > 1.0) {
-            logger(WARN, "Restartfile angle converted into radians from degrees! (% rad -> % deg)", chuteAngle_, chuteAngle_ * constants::pi / 180.);
+        if (chuteAngle_ > 1.0)
+        {
+            logger(WARN, "Restartfile angle converted into radians from degrees! (% rad -> % deg)", chuteAngle_,
+                   chuteAngle_ * constants::pi / 180.);
             chuteAngle_ *= constants::pi / 180.;
             
         }
@@ -172,15 +174,15 @@ void Chute::read(std::istream& is)
     {
         std::string dummy;
         unsigned int roughBottomType;
-        line >> dummy >> fixedParticleRadius_ 
-             >> dummy >> minInflowParticleRadius_ 
+        line >> dummy >> fixedParticleRadius_
+             >> dummy >> minInflowParticleRadius_
              >> dummy >> maxInflowParticleRadius_
-             >> dummy >> roughBottomType 
-             >> dummy >> chuteAngle_ 
-             >> dummy >> maxFailed_ 
+             >> dummy >> roughBottomType
+             >> dummy >> chuteAngle_
+             >> dummy >> maxFailed_
              >> dummy >> dummy
              >> dummy >> inflowVelocity_
-             >> dummy >> inflowVelocityVariance_ 
+             >> dummy >> inflowVelocityVariance_
              >> dummy >> inflowHeight_;
         setRoughBottomType(static_cast<RoughBottomType>(roughBottomType));
         //This version always writes radians
@@ -204,16 +206,16 @@ void Chute::read(std::istream& is)
 void Chute::write(std::ostream& os, bool writeAllParticles) const
 {
     MercuryBase::write(os, writeAllParticles);
-    os      << "FixedParticleRadius "      << fixedParticleRadius_
-            << " MinInflowParticleRadius " << minInflowParticleRadius_
-            << " MaxInflowParticleRadius " << maxInflowParticleRadius_
-            << " RoughBottomType "         << roughBottomType_ 
-            << " ChuteAngle "              << chuteAngle_ 
-            << " MaxFailed "               << maxFailed_ 
-            << " NumCreated "              << (insertionBoundary_ ? insertionBoundary_->getNumberOfParticlesInserted() : 0)
-            << " InflowVelocity "          << inflowVelocity_ 
-            << " InflowVelocityVariance "  << inflowVelocityVariance_ 
-            << " InflowHeight "            << inflowHeight_ << std::endl;
+    os << "FixedParticleRadius " << fixedParticleRadius_
+       << " MinInflowParticleRadius " << minInflowParticleRadius_
+       << " MaxInflowParticleRadius " << maxInflowParticleRadius_
+       << " RoughBottomType " << roughBottomType_
+       << " ChuteAngle " << chuteAngle_
+       << " MaxFailed " << maxFailed_
+       << " NumCreated " << (insertionBoundary_ ? insertionBoundary_->getNumberOfParticlesInserted() : 0)
+       << " InflowVelocity " << inflowVelocity_
+       << " InflowVelocityVariance " << inflowVelocityVariance_
+       << " InflowHeight " << inflowHeight_ << std::endl;
 }
 
 /*!
@@ -234,7 +236,7 @@ void Chute::printTime() const
 {
     std::cout << "\rt=" << std::setprecision(3) << std::left << std::setw(6)
               << getTime()
-              << ", tmax=" << std::setprecision(3) << std::left << std::setw                                                                                                                                                   (6) << getTimeMax()
+              << ", tmax=" << std::setprecision(3) << std::left << std::setw(6) << getTimeMax()
               << ", N=" << std::setprecision(3) << std::left << std::setw(6)
               << particleHandler.getNumberOfObjects()
               << std::endl;
@@ -249,7 +251,7 @@ void Chute::setupInitialConditions()
     if (speciesHandler.getNumberOfObjects() == 0)
     {
         logger(FATAL, "[Chute::setupInitialConditions()] Chute % cannot "
-                "complete because no species have been defined.", getName());
+                      "complete because no species have been defined.", getName());
     }
     
     // create the chute's side walls in Y-direction
@@ -258,31 +260,31 @@ void Chute::setupInitialConditions()
     
     // create a particle of which (altered) copies will fill the chute insertion
     // boundary
-
     
-
+    
+    
     BaseParticle* particleToInsert = new BaseParticle;
     // by default, insert particles of species 0
     particleToInsert->setSpecies(speciesHandler.getObject(0));
-    if(speciesHandler.getNumberOfObjects()>0)
+    if (speciesHandler.getNumberOfObjects() > 0)
     {
         particleToInsert->setSpecies(speciesHandler.getObject(0));
     }
     else
     {
-        std::cerr<<"There is not yet a species defined"<<std::endl;
+        std::cerr << "There is not yet a species defined" << std::endl;
     }
     
     // set up the insertion boundary and add to handler
     ChuteInsertionBoundary b1;
-    b1.set(particleToInsert, maxFailed_, 
-            Vec3D(getXMin(), getYMin(), getZMin()), 
-            Vec3D(getXMax(), getYMax(), getZMax()), 
-            minInflowParticleRadius_, maxInflowParticleRadius_, fixedParticleRadius_, 
-            inflowVelocity_, inflowVelocityVariance_
-        );
+    b1.set(particleToInsert, maxFailed_,
+           Vec3D(getXMin(), getYMin(), getZMin()),
+           Vec3D(getXMax(), getYMax(), getZMax()),
+           minInflowParticleRadius_, maxInflowParticleRadius_, fixedParticleRadius_,
+           inflowVelocity_, inflowVelocityVariance_
+    );
     insertionBoundary_ = boundaryHandler.copyAndAddObject(b1);
-
+    
     //creates the bottom of the chute
     createBottom();
 }
@@ -306,7 +308,7 @@ void Chute::setupSideWalls()
         // create two infinite solid walls; one at yMin_...
         InfiniteWall w0;
         w0.setSpecies(speciesHandler.getObject(0));
-        w0.set(Vec3D(0.0,-1.0, 0.0), Vec3D(0, getYMin(), 0));
+        w0.set(Vec3D(0.0, -1.0, 0.0), Vec3D(0, getYMin(), 0));
         wallHandler.copyAndAddObject(w0);
         // ... and one at yMax_.
         w0.set(Vec3D(0.0, 1.0, 0.0), Vec3D(0, getYMax(), 0));
@@ -332,7 +334,7 @@ void Chute::createBottom()
     if (fabs(getFixedParticleRadius()) < 1e-12 || roughBottomType_ == FLAT)
     {
         // flat wall as bottom
-        logger(INFO,"[Chute::createBottom()] create perfectly flat chute bottom");
+        logger(INFO, "[Chute::createBottom()] create perfectly flat chute bottom");
         
         //bottom wall 
         InfiniteWall w0;
@@ -358,15 +360,17 @@ void Chute::createBottom()
         if (roughBottomType_ == MONOLAYER_ORDERED)
         {
             // grid-like fixed-particle bottom
-            logger(INFO,"[Chute::createBottom()] create monolayered, ordered rough chute bottom");
+            logger(INFO, "[Chute::createBottom()] create monolayered, ordered rough chute bottom");
             
             // allowed space for each particle in each direction
             Mdouble dx = 2.0 * F0.getRadius();
             Mdouble dy = 2.0 * F0.getRadius();
             
             // number of particles that fit in each direction
-            unsigned int nx = static_cast<unsigned int>(std::max(1, static_cast<int>(std::floor((getXMax() - getXMin()) / dx))));
-            unsigned int ny = static_cast<unsigned int>(std::max(1, static_cast<int>(std::floor((getYMax() - getYMin()) / dy))));
+            unsigned int nx = static_cast<unsigned int>(std::max(1, static_cast<int>(std::floor(
+                    (getXMax() - getXMin()) / dx))));
+            unsigned int ny = static_cast<unsigned int>(std::max(1, static_cast<int>(std::floor(
+                    (getYMax() - getYMin()) / dy))));
             
             // adjust particle spacing (in case total space available in given direction
             // is not a multiple of 2*F0.getRadius() )
@@ -382,7 +386,7 @@ void Chute::createBottom()
                     particleHandler.copyAndAddObject(F0);
                 }
             }
-
+            
             //bottom wall, to make sure no particles will fall through the gaps
             InfiniteWall w0;
             w0.setSpecies(speciesHandler.getObject(0));
@@ -390,10 +394,10 @@ void Chute::createBottom()
             wallHandler.copyAndAddObject(w0);
         }
         else if (roughBottomType_ == MONOLAYER_DISORDERED)
-        { 
+        {
             // random fixed-particle bottom
-            logger(INFO,"[Chute::createBottom()] create monolayered disordered rough chute bottom");
-
+            logger(INFO, "[Chute::createBottom()] create monolayered disordered rough chute bottom");
+            
             Vec3D position;
             position.X = random.getRandomNumber(F0.getRadius(), getXMax() - F0.getRadius());
             position.Y = random.getRandomNumber(getYMin() + F0.getRadius(), getYMax() - F0.getRadius());
@@ -423,7 +427,7 @@ void Chute::createBottom()
                     failed++;
                 }
             }
-
+            
             //bottom wall (create after particle creation, as 
             //checkParticleForInteraction also checks against walls)
             InfiniteWall w0;
@@ -434,7 +438,7 @@ void Chute::createBottom()
         else //if (roughBottomType_ == MULTILAYER)
         {
             // multilayered particle bottom
-            logger(INFO,"[Chute::createBottom()] create multilayered rough chute bottom");
+            logger(INFO, "[Chute::createBottom()] create multilayered rough chute bottom");
             
             //'this' points to the current Chute object, the class of which is inherited
             // by the ChuteBottom class. I.e., the bottom is created with the particle 
@@ -444,7 +448,7 @@ void Chute::createBottom()
             ChuteBottom bottom(*this);
             bottom.setInflowParticleRadius(getFixedParticleRadius());
             bottom.makeRoughBottom(*this);
-
+            
             //bottom wall
             InfiniteWall w0;
             w0.setSpecies(speciesHandler.getObject(0));
@@ -469,8 +473,8 @@ void Chute::cleanChute()
 {
     //clean outflow every 100 time steps
     static int count = 0, maxcount = 100; // please note: static variables are only initialised once, and their values
-                                          // are stored even after the method returns. I.e., next time the method is 
-                                          // called, the initialisation is ignored and the previously assigned value is used.
+    // are stored even after the method returns. I.e., next time the method is
+    // called, the initialisation is ignored and the previously assigned value is used.
     if (count > maxcount)
     {
         // reset counter
@@ -480,10 +484,12 @@ void Chute::cleanChute()
         for (unsigned int i = 0; i < particleHandler.getNumberOfObjects();)
         {
             // check if particle is outside the problem window
-            if (particleHandler.getObject(i)->getPosition().X > getXMax() || particleHandler.getObject(i)->getPosition().X < getXMin()) //||particleHandler.getObject(i)->Position.Z+particleHandler.getObject(i)->Radius<zMin_)    
+            if (particleHandler.getObject(i)->getPosition().X > getXMax() ||
+                particleHandler.getObject(i)->getPosition().X <
+                getXMin()) //||particleHandler.getObject(i)->Position.Z+particleHandler.getObject(i)->Radius<zMin_)
             {
                 // if so, delete the particle
-                logger(DEBUG,"[Chute::cleanChute()] erased: %", particleHandler.getObject(i));
+                logger(DEBUG, "[Chute::cleanChute()] erased: %", particleHandler.getObject(i));
                 particleHandler.removeObject(i);
             }
             else
@@ -616,7 +622,7 @@ void Chute::setFixedParticleRadius(Mdouble fixedParticleRadius)
     else
     {
         logger(WARN, "[Chute::setFixedParticleRadius()] Fixed particle radius "
-                "must be greater than or equal to zero.");
+                     "must be greater than or equal to zero.");
     }
 }
 
@@ -695,7 +701,7 @@ RoughBottomType Chute::getRoughBottomType() const
  * \todo would a check on the angle be beneficial to check if it is indeed in degrees?
  */
 void Chute::setChuteAngle(Mdouble chuteAngle)
-{   
+{
     // retrieve the magnitude of gravity
     Mdouble gravity = getGravity().getLength();
     if (gravity == 0)
@@ -725,7 +731,7 @@ void Chute::setChuteAngleAndMagnitudeOfGravity(Mdouble chuteAngle, Mdouble gravi
     else
     {
         logger(WARN, "[Chute::setChuteAngleAndMagnitudeOfGravity()] Chute "
-                "angle must be within [-90,90]");
+                     "angle must be within [-90,90]");
     }
 }
 
@@ -829,8 +835,8 @@ void Chute::setMinInflowParticleRadius(Mdouble minInflowParticleRadius)
     }
     else
     {
-        logger(WARN,"[Chute::setMinInflowParticleRadius()] Min. inflow particle"
-                    " radius must be <= max. inflow particle radius");
+        logger(WARN, "[Chute::setMinInflowParticleRadius()] Min. inflow particle"
+                     " radius must be <= max. inflow particle radius");
     }
 }
 
@@ -846,8 +852,8 @@ void Chute::setMaxInflowParticleRadius(Mdouble maxInflowParticleRadius)
     }
     else
     {
-        logger(WARN,"[Chute::setMaxInflowParticleRadius()] Max. inflow particle"
-                    " radius must be >= min. inflow particle radius");
+        logger(WARN, "[Chute::setMaxInflowParticleRadius()] Max. inflow particle"
+                     " radius must be >= min. inflow particle radius");
     }
 }
 
@@ -917,8 +923,8 @@ void Chute::setInflowVelocity(Mdouble inflowVelocity)
     }
     else
     {
-        logger(WARN,"[Chute::setInflowVelocity()] Inflow velocity not changed, "
-                    "value must be greater than or equal to zero");
+        logger(WARN, "[Chute::setInflowVelocity()] Inflow velocity not changed, "
+                     "value must be greater than or equal to zero");
     }
 }
 

@@ -25,6 +25,7 @@
 
 #ifndef LiquidBridgeWilletSpecies_H
 #define LiquidBridgeWilletSpecies_H
+
 #include "Species/BaseSpecies.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/AdhesiveForceInteractions/LiquidBridgeWilletInteraction.h"
@@ -38,30 +39,30 @@ class LiquidBridgeWilletSpecies : public virtual BaseSpecies
 public:
     ///\brief The correct Interaction type for this AdhesiveForceSpecies
     typedef LiquidBridgeWilletInteraction InteractionType;
-
+    
     ///\brief The default constructor.
     LiquidBridgeWilletSpecies();
-
+    
     ///\brief The default copy constructor.
-    LiquidBridgeWilletSpecies(const LiquidBridgeWilletSpecies &s);
-
+    LiquidBridgeWilletSpecies(const LiquidBridgeWilletSpecies& s);
+    
     ///\brief The default destructor.
     ~LiquidBridgeWilletSpecies() override;
-
+    
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
-
+    
     /// \brief Writes the species properties to an output stream.
     void write(std::ostream& os) const override;
-
+    
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;
-
+    
     ///\brief creates default values for mixed species
-    void mix(LiquidBridgeWilletSpecies*S, LiquidBridgeWilletSpecies*T);
+    void mix(LiquidBridgeWilletSpecies* S, LiquidBridgeWilletSpecies* T);
 
 //adhesion-specific functions
-
+    
     ///\brief returns the largest separation distance at which adhesive short-range forces can occur.
     Mdouble getInteractionDistance() const override;
 
@@ -69,28 +70,28 @@ public:
     /*!
      * \brief used to set the Volume of the liquid bridge.
      */
-     void setLiquidBridgeVolume(Mdouble liquidBridgeVolume);
-
+    void setLiquidBridgeVolume(Mdouble liquidBridgeVolume);
+    
     /*!
      * \brief used to access the Volume of the liquid bridge.
      */
     Mdouble getLiquidBridgeVolume() const;
-
+    
     /*!
      * \brief used to set the surface tension of the liquid.
      */
     void setSurfaceTension(Mdouble surfaceTension);
-
+    
     /*!
      * \brief used to access the surface tension of the liquid.
      */
     Mdouble getSurfaceTension() const;
-
+    
     /*!
      * \brief used to set the contact angle between particle and liquid bridge surface.
      */
     void setContactAngle(Mdouble contactAngle);
-
+    
     /*!
      * \brief used to access the contact angle between particle and liquid bridge surface.
      */
@@ -103,7 +104,7 @@ private:
      * the same liquid bridge volume), but this should probably become a 
      * Particle or Interaction property.
      */
-    Mdouble liquidBridgeVolume_; 
+    Mdouble liquidBridgeVolume_;
     
     /*! 
      * \brief Cube root of the liquid bridge. 
@@ -111,17 +112,18 @@ private:
      * always set together) but is useful, because the cube root has to be 
      * calculated to obtain the liquid bridge adhesive force.
      */
-    Mdouble cbrtLiquidBridgeVolume_; 
+    Mdouble cbrtLiquidBridgeVolume_;
     
     /*! 
      * \brief contact angle between particle and liquid bridge surface
      */
-    Mdouble contactAngle_; 
+    Mdouble contactAngle_;
     
     /*! 
      * \brief surface tension of the liquid
      */
-    Mdouble surfaceTension_; 
+    Mdouble surfaceTension_;
     
 };
+
 #endif

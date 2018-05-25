@@ -33,7 +33,7 @@ class HGridCell
 {
 public:
     HGridCell() : hGridX_(0), hGridY_(0), hGridZ_(0), hGridLevel_(0)
-    { }
+    {}
     
     ///Checks if the given (x,y,z,level) is the same as the ones in this cell.
     inline bool equals(int x, int y, int z, unsigned int level) const

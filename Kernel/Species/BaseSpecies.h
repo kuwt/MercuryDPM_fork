@@ -25,6 +25,7 @@
 
 #ifndef BASESPECIES_H
 #define BASESPECIES_H
+
 #include "BaseObject.h"
 #include "Math/ExtendedMath.h"
 #include "Math/Helpers.h"
@@ -32,6 +33,7 @@
 class SpeciesHandler;// derived from BaseHandler<ParticleSpecies>
 //class BaseParticle; //
 class BaseInteractable;
+
 class BaseInteraction;
 
 /*!
@@ -44,16 +46,16 @@ class BaseInteraction;
 class BaseSpecies : public BaseObject
 {
 public:
-
+    
     ///\brief The default constructor.
     BaseSpecies();
-
+    
     ///\brief The copy constructor.
     BaseSpecies(const BaseSpecies& p);
-
+    
     ///\brief The default destructor.
     ~BaseSpecies() override;
-
+    
     /*!
      * \brief Creates a deep copy of the object from which it is called.
      * \details Creates a deep copy of the Species, or MixedSpecies from which 
@@ -69,21 +71,21 @@ public:
      * > ParticleSpecies* species->copy();
      */
     virtual BaseSpecies* copy() const = 0;
-
+    
     /*!
      * Copies the content of this into the species bs, if they are of the same type.
      */
     virtual void copyInto(BaseSpecies* s) const =0;
-
+    
     ///\brief Sets the pointer to the handler to which this species belongs.
-    void setHandler(SpeciesHandler*handler);
-
+    void setHandler(SpeciesHandler* handler);
+    
     ///\brief Returns the pointer to the handler to which this species belongs.
     SpeciesHandler* getHandler() const;
-
+    
     ///\brief defines the average of two variables by the harmonic mean.
     Mdouble average(Mdouble a, Mdouble b) const;
-
+    
     ///\brief creates default values for mixed species
     /*!
      * \details returns the largest separation distance (negative overlap) at which 
@@ -93,8 +95,8 @@ public:
      * to be called from a BaseSpecies pointer (which is the kind of pointer 
      * used for MixedSpecies).
      */
-    virtual void mixAll(BaseSpecies *S, BaseSpecies *T) = 0;
-
+    virtual void mixAll(BaseSpecies* S, BaseSpecies* T) = 0;
+    
     ///\brief returns the largest separation distance at which adhesive short-range forces can occur.
     /*!
      * \details returns the largest separation distance (negative overlap) at which 
@@ -107,7 +109,7 @@ public:
     virtual Mdouble getInteractionDistance() const = 0;
 
 //setters and getters
-
+    
     ///\brief Returns true if torques (i.e. angular degrees of freedom) have to be calculated.
     /*!
      * \details returns true if torques have to be calculated. This is currently 
@@ -119,7 +121,7 @@ public:
      * used for MixedSpecies).
      */
     virtual bool getUseAngularDOFs() const = 0;
-
+    
     ///\brief returns new Interaction object.
     /*!
      * \details As each Species has its own Interaction type, getNewInteraction 
@@ -128,8 +130,8 @@ public:
      * to be called from a BaseSpecies pointer (which is the kind of pointer 
      * used for MixedSpecies).
      */
-    virtual BaseInteraction* getNewInteraction(BaseInteractable*P, BaseInteractable*I, unsigned timeStamp) const = 0;
-   
+    virtual BaseInteraction* getNewInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp) const = 0;
+    
     //TODO add documentation 
     virtual BaseInteraction* getEmptyInteraction() const = 0;
     
@@ -143,4 +145,5 @@ private:
      */
     SpeciesHandler* handler_;
 };
+
 #endif

@@ -59,50 +59,50 @@ class TimeAveragedCG : public CG<Coordinates, BaseFunction, Fields>
 {
 public:
     typedef BaseFunction<Coordinates> Function;
-
+    
     /*!
      * \brief Default constructor. 
      */
     TimeAveragedCG();
-
+    
     /*!
      * \brief Copy constructor. It copies the TimeAveragedCGFunction and all objects it contains.
      * \param[in] p the TimeAveragedCGFunction that has to be copied
      */
     TimeAveragedCG(const TimeAveragedCG& p) = default;
-
+    
     /*!
      * \brief Destructor, it simply destructs the TimeAveragedCGFunction and all the objects it contains.
      */
     virtual ~TimeAveragedCG() = default;
-
+    
     /*!
      * \brief
      */
     TimeAveragedCG<Coordinates, BaseFunction, Fields>* copy() const override;
-
+    
     /*!
      * \brief
      */
     void write(std::ostream& os) const override;
-
+    
     /*!
      * \brief
      */
     std::string getName() const override;
-
+    
     /*!
      * \brief Called at the beginning of the DPM simulation to initialise the cg 
      * evaluation and to open the statFile.
      */
     void initialise() override;
-
+    
     /*!
      * \brief Called after a given number of time steps (statFile::saveCount_)
      * to evaluate the CG fields.
      */
     void evaluate() override;
-
+    
     /*!
      * \brief Called at the end of the DPM simulation to finish the cg 
      * evaluation and to close the statFile.
@@ -110,7 +110,7 @@ public:
     void finish() override;
 
 protected:
-
+    
     /*!
      * Stores the number of time steps over which the fields are averaged. 
      * Needed, as the average is computed by summing up all values, then 
@@ -124,7 +124,7 @@ protected:
 /*!
  * \brief Specialisation of TimeAveragedCG with coordinates XYZ used for LebedevCG
  */
-template< template<class> class BaseFunction, class Fields = CGFields::StandardFields>
+template<template<class> class BaseFunction, class Fields = CGFields::StandardFields>
 //class test : public TimeAveragedCG_Lebedev<CGCoordinates::XYZ, BaseFunction, Fields>
 class TimeAveragedCGXYZ : public TimeAveragedCG<CGCoordinates::XYZ, BaseFunction, Fields>
 {
@@ -133,23 +133,23 @@ public:
      * \brief Default constructor. 
      */
     TimeAveragedCGXYZ();
-
+    
     /*!
      * \brief Copy constructor. It copies the TimeAveragedCGFunction and all objects it contains.
      * \param[in] p the TimeAveragedCGFunction that has to be copied
      */
-    TimeAveragedCGXYZ(const TimeAveragedCGXYZ &p);
-
+    TimeAveragedCGXYZ(const TimeAveragedCGXYZ& p);
+    
     /*!
      * \brief Destructor, it simply destructs the TimeAveragedCGFunction and all the objects it contains.
      */
     virtual ~TimeAveragedCGXYZ();
-
+    
     /*!
      * \brief Copy
      */
     TimeAveragedCGXYZ<BaseFunction, Fields>* copy() const override;
-
+    
 };
 
 #include "TimeAveragedCG.hcc"

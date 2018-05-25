@@ -51,7 +51,7 @@
 class TriangulatedWall : public BaseWall
 {
 public:
-
+    
     /**
      * Struct used to store the properties of a face needed for contact detection.
      * <img src="triangulatedWall.png" height="250px">
@@ -59,95 +59,97 @@ public:
     struct Face
     {
         ///defines the three vertices (anticlockwise direction around the normal)
-        std::array<Vec3D*,3> vertex;
+        std::array<Vec3D*, 3> vertex;
         ///For each edge, stores the neighboring face (nullptr if none)
-        std::array<Face*,3> neighbor = {{nullptr}};
+        std::array<Face*, 3> neighbor = {{nullptr}};
         ///For each edge, stores the vector normal to the face normal and the edge direction (vector between the vertices).
-        std::array<Vec3D,3> edgeNormal;
+        std::array<Vec3D, 3> edgeNormal;
         ///face normal (vertices are ordered anticlockwise direction around the normal)
         Vec3D normal;
+        
         ///computes the signed distance to the face in normal direction
         Mdouble getDistance(const Vec3D& otherPosition) const;
+        
         ///Returns true if contact with the face exists, false if not. If contact exists, then the distance and normal is returned as well
-        bool getDistanceAndNormal(const BaseParticle &p, Mdouble &distance, Vec3D &normal_return) const;
+        bool getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const;
     };
-
+    
     /*!
      * \brief Default constructor.
      */
     TriangulatedWall();
-
+    
     /*!
      * \brief Copy constructor.
      */
-    TriangulatedWall(const TriangulatedWall &other);
-
+    TriangulatedWall(const TriangulatedWall& other);
+    
     /*!
      * \brief Constructor setting values.
      */
-    TriangulatedWall(std::string filename, const ParticleSpecies *species);
-
+    TriangulatedWall(std::string filename, const ParticleSpecies* species);
+    
     void readVTK(std::string filename);
-
-    void writeVTK (VTKContainer& vtk) const override;
-
+    
+    void writeVTK(VTKContainer& vtk) const override;
+    
     /*!
      * \brief Destructor.
      */
     ~TriangulatedWall() override;
-
+    
     /*!
      * Copy assignment operator.
      */
-    TriangulatedWall &operator=(const TriangulatedWall &other);
-
+    TriangulatedWall& operator=(const TriangulatedWall& other);
+    
     /*!
      * \brief Wall copy method. It calls the copy constructor of this Wall, useful for polymorphism
      */
-    TriangulatedWall *copy() const override;
-
+    TriangulatedWall* copy() const override;
+    
     /*!
      * \brief Compute the distance from the wall for a given BaseParticle and return if there is a collision. If there is a collision, also return the normal vector.
      */
-    bool getDistanceAndNormal(const BaseParticle &p, Mdouble &distance, Vec3D &normal_return) const override;
-
+    bool getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const override;
+    
     /*!
      * \brief Move the TriangulatedWall to a new position, which is a Vec3D from the old position.
      */
-    void move(const Vec3D &move) override;
-
+    void move(const Vec3D& move) override;
+    
     /*!
      * \brief Reads an TriangulatedWall from an input stream, for example a restart file.
      */
-    void read(std::istream &is) override;
-
+    void read(std::istream& is) override;
+    
     /*!
      * \brief Writes an TriangulatedWall to an output stream, for example a restart file.
      */
-    void write(std::ostream &os) const override;
-
+    void write(std::ostream& os) const override;
+    
     /*!
      * \brief Returns the name of the object, here the string "TriangulatedWall".
      */
     std::string getName() const override;
-
+    
     /*!
      * \brief Get the interaction between this TriangulatedWall and given BaseParticle at a given time.
      */
-    std::vector<BaseInteraction*> getInteractionWith(BaseParticle *p, unsigned timeStamp,
-                                        InteractionHandler *interactionHandler) override;
+    std::vector<BaseInteraction*> getInteractionWith(BaseParticle* p, unsigned timeStamp,
+                                                     InteractionHandler* interactionHandler) override;
 
 private:
     /*!
      * stores the vertex coordinates
      */
-    std::vector<Vec3D> vertex_;
-
+    std::vector <Vec3D> vertex_;
+    
     /*!
      * stores the face properties
      */
-    std::vector<Face> face_;
-
+    std::vector <Face> face_;
+    
 };
 
 

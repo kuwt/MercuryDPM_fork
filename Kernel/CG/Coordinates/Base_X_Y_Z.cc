@@ -58,7 +58,7 @@ void Base_X_Y_Z::normalisePolynomialCoefficients(std::vector<Mdouble>& coefficie
     for (std::size_t i = 0; i < coefficients.size(); i++)
         volume += coefficients[i] / static_cast<Mdouble>(i + 1);
     volume *= 2.0 * cutoff;
-    for (double &coefficient : coefficients)
+    for (double& coefficient : coefficients)
         coefficient /= volume;
     //logger(INFO,"Volume %",volume);
 }

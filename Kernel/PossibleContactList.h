@@ -63,7 +63,8 @@ public:
      */
     void add_PossibleContact(BaseParticle* P1, BaseParticle* P2)
     {
-		firstPossibleContact_ = new PossibleContact(P1, P2, firstPossibleContact_, P1->getFirstPossibleContact(), P2->getFirstPossibleContact());
+        firstPossibleContact_ = new PossibleContact(P1, P2, firstPossibleContact_, P1->getFirstPossibleContact(),
+                                                    P2->getFirstPossibleContact());
         P1->setFirstPossibleContact(firstPossibleContact_);
         P2->setFirstPossibleContact(firstPossibleContact_);
         if (firstPossibleContact_->getNext())
@@ -74,7 +75,7 @@ public:
             firstPossibleContact_->getNext2()->setPreviousPosition(P2, firstPossibleContact_);
         logger(VERBOSE, "Added new possible contact between particles % and % ", P1->getIndex(), P2->getIndex());
     }
-
+    
     /*!
      * \brief Remove all PossibleContact with given BaseParticle from the linked list.
      * \param[in] P A pointer to the BaseParticle we want to remove all PossibleContact for.
@@ -95,7 +96,8 @@ public:
         PossibleContact* Curr = P->getFirstPossibleContact();
         while (Curr != nullptr)
         {
-            logger(VERBOSE, "Removing possible contacts index = % between particles % and %.", Curr->getIndex(), Curr->getP1()->getIndex(), Curr->getP2()->getIndex());
+            logger(VERBOSE, "Removing possible contacts index = % between particles % and %.", Curr->getIndex(),
+                   Curr->getP1()->getIndex(), Curr->getP2()->getIndex());
             Next = Curr->getNext(P);
             O = Curr->getOtherParticle(P);
             //Set the pointers of the next global possible contact.
@@ -133,13 +135,13 @@ public:
     {
         os << "Possible contacts are: " << std::endl;
         PossibleContact* it = firstPossibleContact_;
-        while(it != nullptr)
+        while (it != nullptr)
         {
             os << *it << std::endl;
             it = it->getNext();
         }
     }
-
+    
     /*!
      * \brief Get the front of the linked list of PossibleContact.
      * \return A pointer to the first PossibleContact on the linked list.
@@ -148,7 +150,7 @@ public:
     {
         return firstPossibleContact_;
     }
-    
+
 private:
     /*!
      * \brief The pointer to the first PossibleContact on the linked list. 

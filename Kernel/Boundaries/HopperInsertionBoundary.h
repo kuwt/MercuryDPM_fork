@@ -29,6 +29,7 @@
 #include "InsertionBoundary.h"
 
 class BaseParticle;
+
 class RNG;
 
 /*! 
@@ -47,41 +48,43 @@ class RNG;
 class HopperInsertionBoundary : public InsertionBoundary
 {
 public:
-        
-  /*!
-   * \brief Default constructor. Sets all properties to 0.
-   */
+    
+    /*!
+     * \brief Default constructor. Sets all properties to 0.
+     */
     HopperInsertionBoundary();
     
-  /*!
-   * \brief Copy constructor
-   */
-    HopperInsertionBoundary(const HopperInsertionBoundary &other);
+    /*!
+     * \brief Copy constructor
+     */
+    HopperInsertionBoundary(const HopperInsertionBoundary& other);
     
-  /*!
-   * \brief copy method, returns a pointer to a copy.
-   */
-  HopperInsertionBoundary* copy() const override;
-
+    /*!
+     * \brief copy method, returns a pointer to a copy.
+     */
+    HopperInsertionBoundary* copy() const override;
+    
     /*!
      * \brief Sets all boundary properties at once.
      */
-    void set(BaseParticle* particleToCopy, unsigned int maxFailed, double yMin, double yMax, double radMin, double radMax,
-            double chuteAngle, double fixedParticleRadius, bool isHopperCentred_, int hopperDim, double hopperAngle, double hopperLength, double hopperExitLength,
-            double hopperHeight, double lift, double fillPercent);
-
-  /*!
-   * \brief This creates an inflow particle in the top 50% of the hopper i.e. between gamma=0.5 and gamma=1.0
-   */
-  BaseParticle* generateParticle(RNG &random) override;
-
-    void placeParticle(BaseParticle* p, RNG &random) override;
-
+    void
+    set(BaseParticle* particleToCopy, unsigned int maxFailed, double yMin, double yMax, double radMin, double radMax,
+        double chuteAngle, double fixedParticleRadius, bool isHopperCentred_, int hopperDim, double hopperAngle,
+        double hopperLength, double hopperExitLength,
+        double hopperHeight, double lift, double fillPercent);
+    
+    /*!
+     * \brief This creates an inflow particle in the top 50% of the hopper i.e. between gamma=0.5 and gamma=1.0
+     */
+    BaseParticle* generateParticle(RNG& random) override;
+    
+    void placeParticle(BaseParticle* p, RNG& random) override;
+    
     /*!
      * \brief reads boundary properties from istream
      */
     void read(std::istream& is) override;
- 
+    
     /*!
      * \brief deprecated version of CubeInsertionBoundary::read().
      */
@@ -97,7 +100,7 @@ public:
      * \brief Returns the name of the object
      */
     std::string getName() const override;
-
+    
     
     /*!
      * \brief  The minimum and maximum y-positions of the particle for a hopper 
@@ -106,15 +109,15 @@ public:
      * boundary is centered in the y-direction at (yMax_ - yMin_)/2 .
      */
     double yMin_, yMax_;
-
-  /*!
-   * \brief Minimum and maximum radii of the inserted particles
-   */
+    
+    /*!
+     * \brief Minimum and maximum radii of the inserted particles
+     */
     double radMin_, radMax_;
-  /*!
-   * \brief Angle of the chute as compared to the horizontal plane
-   */
-    double chuteAngle_; 
+    /*!
+     * \brief Angle of the chute as compared to the horizontal plane
+     */
+    double chuteAngle_;
     
     /*!
      * \brief Angle of the hopper as compared to the vertical plane
@@ -126,27 +129,27 @@ public:
      */
     double fixedParticleRadius_;
     
-  /*!
-   * \brief The horizontal (AB-direction) width at the top of the hopper
-   */
+    /*!
+     * \brief The horizontal (AB-direction) width at the top of the hopper
+     */
     double hopperLength_;
     
-  /*!
-   * \brief The horizontal (AB-direction) width at the square exit of the hopper
-   */
+    /*!
+     * \brief The horizontal (AB-direction) width at the square exit of the hopper
+     */
     double hopperExitLength_;
     
-  /*!
-   * \brief The vertical (AC-direction) height of the hopper, measured from the top of 
-   * the hopper to the start of the chute.
-   */
+    /*!
+     * \brief The vertical (AC-direction) height of the hopper, measured from the top of
+     * the hopper to the start of the chute.
+     */
     double hopperHeight_;
     
-  /*!
-   * \brief
-   */
+    /*!
+     * \brief
+     */
     bool isHopperCentred__;
-
+    
     /*!
      * \brief Percentage of the height of the insertion boundary up to which it should 
      * be filled. The part to be filled reaches from the top of the hopper down to 
@@ -154,11 +157,11 @@ public:
      */
     double fillPercent_;
     
-  /*!
-   * \brief
-   */
+    /*!
+     * \brief
+     */
     double lift_;
-
+    
     /*!
      * \brief Either 1 or 2. If 1, the insertion boundary has vertical walls in the 
      * y extrema. This is used e.g. for a hopper with periodic walls in the y-direction.

@@ -92,7 +92,8 @@ public:
             : data_()
     {
         logger.assert(entries.size() == numberOfColumns, "expected a matrix with % "
-                "columns, but got a matrix with % columns", numberOfColumns, entries.size());
+                                                         "columns, but got a matrix with % columns", numberOfColumns,
+                      entries.size());
         unsigned int column = 0;
         for (const SmallVector<numberOfRows>& entry : entries)
         {

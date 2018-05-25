@@ -92,6 +92,7 @@ Mdouble YZ::getTangentialSquared(const BaseInteraction& c, Mdouble pNormal) cons
            - mathsFunc::square(pNormal);
 }
 
-std::string YZ::getName() {
+std::string YZ::getName()
+{
     return "YZ";
 }

@@ -196,24 +196,24 @@ void SubcriticalMaserBoundaryTEST::checkBoundaryAfterParticlesMove(ParticleHandl
     if (NUMBER_OF_PROCESSORS == 1)
     {
 #endif
-        //Activate the maser at the given time
-        if (getHandler()->getDPMBase()->getTime() > activationTime_)
+    //Activate the maser at the given time
+    if (getHandler()->getDPMBase()->getTime() > activationTime_)
+    {
+        if (!maserIsActivated_)
         {
-            if (!maserIsActivated_)
-            {
-                logger(INFO, "Activating the maser at time: %", activationTime_);
-                activateMaser();
-            }
+            logger(INFO, "Activating the maser at time: %", activationTime_);
+            activateMaser();
         }
-        
-        //Update particles
-        for (BaseParticle* p : pH)
-        {
-            checkBoundaryAfterParticleMoved(p, pH);
-        }
-#ifdef MERCURY_USE_MPI
     }
     
+    //Update particles
+    for (BaseParticle* p : pH)
+    {
+        checkBoundaryAfterParticleMoved(p, pH);
+    }
+#ifdef MERCURY_USE_MPI
+    }
+
 #endif
 }
 
@@ -243,10 +243,10 @@ void SubcriticalMaserBoundaryTEST::activateMaser()
             particle->setMaserParticle(false);
         }
     }
-
+    
     //Flag that the maser is active!
     maserIsActivated_ = true;
-
+    
     extendBottom();
 
 #ifdef MERCURY_USE_MPI
@@ -328,7 +328,7 @@ void SubcriticalMaserBoundaryTEST::modifyPeriodicComplexity(std::vector<int>& co
             if (complexity[i] == -3)
             {
                 logger(INFO, "Something went wrong in SubcriticalMaserBoundaryTEST::modifyPeriodicComplexity, "
-                        "complexity[%] = -3", i);
+                             "complexity[%] = -3", i);
             }
         }
         else
@@ -388,81 +388,81 @@ void SubcriticalMaserBoundaryTEST::extendBottom() const
     if (PROCESSOR_ID == 0)
     {
 #endif
-        std::vector<BaseParticle*> fixedParticles;
-        std::vector<BaseParticle*> newParticles;
-        for (BaseParticle* p : getHandler()->getDPMBase()->particleHandler)
+    std::vector<BaseParticle*> fixedParticles;
+    std::vector<BaseParticle*> newParticles;
+    for (BaseParticle* p : getHandler()->getDPMBase()->particleHandler)
+    {
+        if (p->isFixed() && !(p->isPeriodicGhostParticle()) && !(p->isMPIParticle()))
         {
-            if (p->isFixed() && !(p->isPeriodicGhostParticle()) && !(p->isMPIParticle()))
-            {
-                fixedParticles.push_back(p);
-            }
+            fixedParticles.push_back(p);
         }
-        
-        for (BaseParticle* p : fixedParticles)
+    }
+    
+    for (BaseParticle* p : fixedParticles)
+    {
+        Vec3D newPosition = p->getPosition() + shift_;
+        Vec3D maxDomain = getHandler()->getDPMBase()->getMax();
+        Vec3D minDomain = getHandler()->getDPMBase()->getMin();
+        while (newPosition.X < maxDomain.X && newPosition.Y < maxDomain.Y && newPosition.Z < maxDomain.Z
+               && newPosition.X > minDomain.X && newPosition.Y > minDomain.Y && newPosition.Z > minDomain.Z)
         {
-            Vec3D newPosition = p->getPosition() + shift_;
-            Vec3D maxDomain = getHandler()->getDPMBase()->getMax();
-            Vec3D minDomain = getHandler()->getDPMBase()->getMin();
-            while (newPosition.X < maxDomain.X && newPosition.Y < maxDomain.Y && newPosition.Z < maxDomain.Z
-                   && newPosition.X > minDomain.X && newPosition.Y > minDomain.Y && newPosition.Z > minDomain.Z)
-            {
-                p = p->copy();
-                p->setPosition(newPosition);
-                newParticles.push_back(p);
-                newPosition += shift_;
-            }
+            p = p->copy();
+            p->setPosition(newPosition);
+            newParticles.push_back(p);
+            newPosition += shift_;
         }
+    }
 #ifndef MERCURY_USE_MPI
+    for (BaseParticle* p : newParticles)
+    {
+        getHandler()->getDPMBase()->particleHandler.addObject(p);
+    }
+#else
+    if (NUMBER_OF_PROCESSORS == 1)
+    {
         for (BaseParticle* p : newParticles)
         {
             getHandler()->getDPMBase()->particleHandler.addObject(p);
         }
-#else
-        if (NUMBER_OF_PROCESSORS == 1)
-        {
-            for (BaseParticle* p : newParticles)
-            {
-                getHandler()->getDPMBase()->particleHandler.addObject(p);
-            }
-        }
-        else
-        {
-            //count how many particles go to each core
-            for (BaseParticle* p : newParticles)
-            {
-                int targetGlobalIndex = getHandler()->getDPMBase()->domainHandler.getParticleDomainGlobalIndex(p);
-                int targetProcessor = getHandler()->getDPMBase()->domainHandler.getParticleProcessor(
-                        targetGlobalIndex);
-                particlesToCores[targetProcessor].push_back(p);
-            }
-            for (int i = 0; i < NUMBER_OF_PROCESSORS; ++i)
-            {
-                numberOfParticlesPerCore[i] = (particlesToCores[i].size());
-            }
-        }
     }
-    if (NUMBER_OF_PROCESSORS > 1)
+    else
     {
-        //broadcast numberOfParticlesPerCore to other processors
-        communicator.broadcast(numberOfParticlesPerCore.data(), NUMBER_OF_PROCESSORS, 0);
-        for (unsigned i = 0; i < numberOfParticlesPerCore.size(); ++i)
+        //count how many particles go to each core
+        for (BaseParticle* p : newParticles)
         {
-            for (unsigned p = 0; p < numberOfParticlesPerCore[i]; ++p)
-            {
-                BaseParticle* particle;
-                if (PROCESSOR_ID == 0)
-                {
-                    particle = particlesToCores[i][p];
-                }
-                else
-                {
-                    particle = new BaseParticle;
-                }
-    
-                getHandler()->getDPMBase()->particleHandler.addObject(0, particle);
-            }
+            int targetGlobalIndex = getHandler()->getDPMBase()->domainHandler.getParticleDomainGlobalIndex(p);
+            int targetProcessor = getHandler()->getDPMBase()->domainHandler.getParticleProcessor(
+                    targetGlobalIndex);
+            particlesToCores[targetProcessor].push_back(p);
+        }
+        for (int i = 0; i < NUMBER_OF_PROCESSORS; ++i)
+        {
+            numberOfParticlesPerCore[i] = (particlesToCores[i].size());
         }
     }
+}
+if (NUMBER_OF_PROCESSORS > 1)
+{
+    //broadcast numberOfParticlesPerCore to other processors
+    communicator.broadcast(numberOfParticlesPerCore.data(), NUMBER_OF_PROCESSORS, 0);
+    for (unsigned i = 0; i < numberOfParticlesPerCore.size(); ++i)
+    {
+        for (unsigned p = 0; p < numberOfParticlesPerCore[i]; ++p)
+        {
+            BaseParticle* particle;
+            if (PROCESSOR_ID == 0)
+            {
+                particle = particlesToCores[i][p];
+            }
+            else
+            {
+                particle = new BaseParticle;
+            }
+
+            getHandler()->getDPMBase()->particleHandler.addObject(0, particle);
+        }
+    }
+}
 #endif
 }
 

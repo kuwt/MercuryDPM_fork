@@ -29,6 +29,7 @@
 
 #include "Species.h"
 #include "NormalForceSpecies/HertzianViscoelasticNormalSpecies.h"
+
 typedef Species<HertzianViscoelasticNormalSpecies> HertzianViscoelasticSpecies;
 typedef MixedSpecies<HertzianViscoelasticNormalSpecies> MixedHertzianViscoelasticSpecies;
 #endif

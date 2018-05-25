@@ -25,6 +25,7 @@
 
 #include "BondedSpecies.h"
 #include <Logger.h>
+
 /*!
  * Default constructor for gluable species. Sets default values for all relevant parameters.
  * Note: if the stiffness of particles is left as zero, no force will be felt during interaction with
@@ -43,7 +44,7 @@ BondedSpecies::BondedSpecies()
 /*!
  * \param[in] the species that is copied
  */
-BondedSpecies::BondedSpecies(const BondedSpecies &s)
+BondedSpecies::BondedSpecies(const BondedSpecies& s)
 {
     bondForceMax_ = s.bondForceMax_;
     bondDissipation_ = s.bondDissipation_;
@@ -56,7 +57,7 @@ BondedSpecies::~BondedSpecies()
 {
 #ifdef DEBUG_DESTRUCTOR
     std::cout<<"BondedSpecies::~BondedSpecies() finished"<<std::endl;
-#endif   
+#endif
 }
 
 /*!
@@ -71,7 +72,7 @@ std::string BondedSpecies::getBaseName() const
  * \param[out] os output stream (typically the restart file)
  */
 void BondedSpecies::write(std::ostream& os) const
-        {
+{
     os << " bondForceMax " << bondForceMax_;
     os << " bondDissipation " << bondDissipation_;
 }

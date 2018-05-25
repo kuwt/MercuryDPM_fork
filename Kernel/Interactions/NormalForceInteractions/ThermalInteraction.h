@@ -42,18 +42,22 @@ public:
      * \brief Constructor.
      */
     ThermalInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp);
+
     /*!
      * \brief Default Constructor.
      */
     ThermalInteraction();
+
     /*!
      * \brief Copy constructor.
      */
-    ThermalInteraction(const ThermalInteraction &p);
+    ThermalInteraction(const ThermalInteraction& p);
+
     /*!
      * \brief Destructor.
      */
     virtual ~ThermalInteraction();
+
     /*!
      * \brief Computes the normal forces due to linear plastic visco elastic interaction.
      */
@@ -62,9 +66,9 @@ public:
 };
 
 template<class NormalForceInteraction>
-ThermalInteraction<NormalForceInteraction>::ThermalInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp)
- : BaseInteraction(P, I, timeStamp), NormalForceInteraction(P, I, timeStamp)
-
+ThermalInteraction<NormalForceInteraction>::ThermalInteraction(BaseInteractable* P, BaseInteractable* I,
+                                                               unsigned timeStamp)
+        : BaseInteraction(P, I, timeStamp), NormalForceInteraction(P, I, timeStamp)
 {}
 
 template<class NormalForceInteraction>
@@ -73,8 +77,8 @@ ThermalInteraction<NormalForceInteraction>::ThermalInteraction()
 {}
 
 template<class NormalForceInteraction>
-ThermalInteraction<NormalForceInteraction>::ThermalInteraction(const ThermalInteraction &p)
- : BaseInteraction(p), NormalForceInteraction(p)
+ThermalInteraction<NormalForceInteraction>::ThermalInteraction(const ThermalInteraction& p)
+        : BaseInteraction(p), NormalForceInteraction(p)
 {}
 
 template<class NormalForceInteraction>
@@ -85,22 +89,24 @@ template<class NormalForceInteraction>
 void ThermalInteraction<NormalForceInteraction>::computeNormalForce()
 {
     NormalForceInteraction::computeNormalForce();
-    Mdouble radius = 2.0*NormalForceInteraction::getEffectiveRadius();
-    Mdouble contactArea = constants::pi*radius*NormalForceInteraction::getOverlap();
+    Mdouble radius = 2.0 * NormalForceInteraction::getEffectiveRadius();
+    Mdouble contactArea = constants::pi * radius * NormalForceInteraction::getOverlap();
     const SpeciesType* species = dynamic_cast<const SpeciesType*>(NormalForceInteraction::getBaseSpecies());
     ThermalParticle* pParticle = dynamic_cast<ThermalParticle*>(NormalForceInteraction::getP());
     ThermalParticle* iParticle = dynamic_cast<ThermalParticle*>(NormalForceInteraction::getI());
     // if both p and i are particles
-    if (pParticle && iParticle) {
+    if (pParticle && iParticle)
+    {
         /* heat transfer rate Q=m*c*dT/dt */
         Mdouble heatTransfer = species->getThermalConductivity()
                                * (pParticle->getTemperature() - iParticle->getTemperature())
                                * contactArea / NormalForceInteraction::getDistance();
         /* m*dT = Q/c*dt */
         Mdouble mdT = heatTransfer / species->getHeatCapacity()
-                       * NormalForceInteraction::getHandler()->getDPMBase()->getTimeStep();
-        pParticle->addTemperature(-mdT*pParticle->getInvMass());
-        iParticle->addTemperature( mdT*iParticle->getInvMass());
+                      * NormalForceInteraction::getHandler()->getDPMBase()->getTimeStep();
+        pParticle->addTemperature(-mdT * pParticle->getInvMass());
+        iParticle->addTemperature(mdT * iParticle->getInvMass());
     }
 }
+
 #endif

@@ -27,6 +27,7 @@
 #include "DPMBase.h"
 #include "Particles/BaseParticle.h"
 #include<iostream>
+
 #ifdef MERCURY_USE_MPI
 #include "MpiDataClass.h"
 #endif
@@ -35,7 +36,7 @@
  * \details Default constructor, sets all data members to 0 or nullptr.
  */
 InsertionBoundary::InsertionBoundary()
-{   
+{
     numberOfParticlesInserted_ = 0;
     massInserted_ = 0;
     volumeInserted_ = 0;
@@ -48,7 +49,7 @@ InsertionBoundary::InsertionBoundary()
 /*!
  * \details Copy constructor
  */
-InsertionBoundary::InsertionBoundary(const InsertionBoundary& other) 
+InsertionBoundary::InsertionBoundary(const InsertionBoundary& other)
 {
     numberOfParticlesInserted_ = other.numberOfParticlesInserted_;
     massInserted_ = other.massInserted_;
@@ -56,13 +57,16 @@ InsertionBoundary::InsertionBoundary(const InsertionBoundary& other)
     maxFailed_ = other.maxFailed_;
     isActivated_ = other.isActivated_;
     volumeFlowRate_ = other.volumeFlowRate_;
-
-    if (other.particleToCopy_!=nullptr) {
+    
+    if (other.particleToCopy_ != nullptr)
+    {
         particleToCopy_ = other.particleToCopy_->copy();
-    } else {
+    }
+    else
+    {
         particleToCopy_ = nullptr;
     }
-
+    
 }
 
 /*!
@@ -71,7 +75,7 @@ InsertionBoundary::InsertionBoundary(const InsertionBoundary& other)
  */
 InsertionBoundary::~InsertionBoundary()
 {
-
+    
     delete particleToCopy_;
 }
 
@@ -83,7 +87,7 @@ InsertionBoundary::~InsertionBoundary()
  */
 void InsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed)
 {
-    if (particleToCopy!=nullptr)
+    if (particleToCopy != nullptr)
         particleToCopy_ = particleToCopy->copy();
     maxFailed_ = maxFailed;
 }
@@ -108,10 +112,10 @@ BaseParticle* InsertionBoundary::generateParticle(RNG& random)
 void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
 {
     logger(VERBOSE, "In InsertionBoundary::checkBoundaryBeforeTimeStep\n");
-
+    
     if (!isActivated_)
         return;
-
+    
     /* Each time step, the InsertionBoundary attempts to fill up a region with
      * particles.
      *
@@ -131,17 +135,17 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
      *
      * Otherwise, the processes terminates for this time step.
      * */
-
+    
     // Keep count of how many successive times we have failed to place a new
     // particle. 
     unsigned int failed = 0;
-    while (failed <= maxFailed_ && (volumeInserted_<=getVolumeFlowRate()*md->getNextTime())) // 'generating' loop
+    while (failed <= maxFailed_ && (volumeInserted_ <= getVolumeFlowRate() * md->getNextTime())) // 'generating' loop
     {
         /* Generate random *intrinsic* properties for the new particle. */
         logger(VERBOSE, "about to call generateParticle\n");
         auto p0 = generateParticle(md->random);
         logger(VERBOSE, "generated a particle with intrinsics %", p0);
-
+        
         while (true) // 'placing' loop
         {
             /* Generate extrinsic properties (position and velocity) for this
@@ -170,7 +174,7 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
                 {
                     copyDataFromMPIParticleToParticle(&particle, p0, &(md->particleHandler));
                 }
-            } 
+            }
 #endif
             p0->setHandler(&md->particleHandler);
             /* Check whether the particle has any interactions. */
@@ -179,17 +183,18 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
                 //Note: in parallel only one of the domains will actually add the particle
                 md->particleHandler.copyAndAddObject(p0);
                 failed = 0;
-
+                
                 ++numberOfParticlesInserted_;
                 massInserted_ += p0->getMass();
                 volumeInserted_ += p0->getVolume();
-                logger(VERBOSE, "successfully placed a particle %, with position: % after % fails.", p0, p0->getPosition(),failed);
-
+                logger(VERBOSE, "successfully placed a particle %, with position: % after % fails.", p0,
+                       p0->getPosition(), failed);
+                
                 /* JMFT: The generateParticle() routine allocates memory, so we should
                  * free it here. (Don't worry, the particle will have been copied to the
                  * particleHandler by this point iff we want it.) */
                 delete p0;
-
+                
                 break; // out of the 'placing' loop
             }
             else
@@ -197,8 +202,8 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
                 failed++;
                 logger(VERBOSE, "failed to place a particle; have failed % times", failed);
             }
-
-            if (failed > maxFailed_) 
+            
+            if (failed > maxFailed_)
             {
                 logger(VERBOSE, "failed too many times; giving up");
                 break; // out of the 'placing' loop (and will leave the 'generating' loop too
@@ -255,7 +260,7 @@ void InsertionBoundary::deactivate()
  */
 void InsertionBoundary::setMaxFailed(unsigned int maxFailed)
 {
-    maxFailed_=maxFailed;
+    maxFailed_ = maxFailed;
 }
 
 /*!
@@ -273,7 +278,7 @@ unsigned int InsertionBoundary::getMaxFailed() const
  */
 void InsertionBoundary::setParticleToCopy(BaseParticle* particleToCopy)
 {
-    if (particleToCopy!=nullptr)
+    if (particleToCopy != nullptr)
         particleToCopy_ = particleToCopy->copy();
     else
         logger(ERROR, "Setting particleToCopy to be a null pointer?");
@@ -301,17 +306,17 @@ void InsertionBoundary::read(std::istream& is)
     is >> dummy >> maxFailed_;
     is >> dummy >> numberOfParticlesInserted_;
     is >> dummy;
-
+    
     delete particleToCopy_;
     particleToCopy_ = getHandler()->getDPMBase()->particleHandler.readAndCreateObject(is);
-
+    
     // The .restart file records the index of the particle's species, but
     // doesn't record the pointer, i.e. the memory address of the species within
     // the speciesHandler. The latter needs to be reset now.
     particleToCopy_->setSpecies(getHandler()->getDPMBase()->speciesHandler.getObject(
-                    particleToCopy_->getIndSpecies() 
-                ));
-
+            particleToCopy_->getIndSpecies()
+    ));
+    
     logger(VERBOSE, "maxFailed_ = %d\n", maxFailed_);
 }
 
@@ -328,10 +333,12 @@ void InsertionBoundary::write(std::ostream& os) const
     //os << " particleToCopy " << particleToCopy_;
 }
 
-Mdouble InsertionBoundary::getVolumeFlowRate() const {
+Mdouble InsertionBoundary::getVolumeFlowRate() const
+{
     return volumeFlowRate_;
 }
 
-void InsertionBoundary::setVolumeFlowRate(Mdouble volumeFlowRate) {
+void InsertionBoundary::setVolumeFlowRate(Mdouble volumeFlowRate)
+{
     volumeFlowRate_ = volumeFlowRate;
 }

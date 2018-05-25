@@ -67,7 +67,7 @@ BaseInteractable::BaseInteractable() :
  * 
  * <B>Please use this copy with care</B>.
  */
-BaseInteractable::BaseInteractable(const BaseInteractable &p)
+BaseInteractable::BaseInteractable(const BaseInteractable& p)
         : BaseObject(p)
 {
     interactions_.clear();
@@ -83,7 +83,7 @@ BaseInteractable::BaseInteractable(const BaseInteractable &p)
     prescribedVelocity_ = p.prescribedVelocity_;
     prescribedOrientation_ = p.prescribedOrientation_;
     prescribedAngularVelocity_ = p.prescribedAngularVelocity_;
-    logger(DEBUG,"BaseInteractable::BaseInteractable(const BaseInteractable &p finished");
+    logger(DEBUG, "BaseInteractable::BaseInteractable(const BaseInteractable &p finished");
 }
 
 /*!
@@ -91,12 +91,13 @@ BaseInteractable::BaseInteractable(const BaseInteractable &p)
  */
 BaseInteractable::~BaseInteractable()
 {
-    logger(VERBOSE, "Deleting BaseInteractable with index= % and id = %, size = %", getIndex(),getId(),interactions_.size());
+    logger(VERBOSE, "Deleting BaseInteractable with index= % and id = %, size = %", getIndex(), getId(),
+           interactions_.size());
     while (!interactions_.empty())
     {
         interactions_.front()->removeFromHandler();
     }
-    logger(DEBUG,"BaseInteractable::~BaseInteractable() finished");
+    logger(DEBUG, "BaseInteractable::~BaseInteractable() finished");
 }
 
 /*!
@@ -109,7 +110,7 @@ BaseInteractable::~BaseInteractable()
  */
 void BaseInteractable::setSpecies(const ParticleSpecies* species)
 {
-    logger.assert(species->getHandler()!= nullptr, "Error: Species is not part of any handler yet");
+    logger.assert(species->getHandler() != nullptr, "Error: Species is not part of any handler yet");
     species_ = species;
     indSpecies_ = species->getIndex();
 }
@@ -150,7 +151,7 @@ void BaseInteractable::move(const Vec3D& move)
 void BaseInteractable::rotate(const Vec3D& angularVelocityDt)
 {
     //if (!angularVelocityDt.isZero()) {
-        orientation_.updateAngularDisplacement(angularVelocityDt);
+    orientation_.updateAngularDisplacement(angularVelocityDt);
     //}
 }
 
@@ -171,7 +172,7 @@ void BaseInteractable::read(std::istream& is)
     //this if-statement is added to read Kasper van der Vaart's data files, which contain an additional variable named positionAbsolute
     if (dummy == "positionAbsolute")
     {
-        is >> dummy >> dummy >> dummy  >> dummy;
+        is >> dummy >> dummy >> dummy >> dummy;
     }
     is >> orientation_;
     is >> dummy >> velocity_;
@@ -195,13 +196,13 @@ void BaseInteractable::write(std::ostream& os) const
 {
     BaseObject::write(os);
     os << " indSpecies " << indSpecies_
-            << " position " << position_
-            << " orientation " << orientation_
-            //<< " axis " << orientation_.getAxis()
-            << " velocity " << velocity_
-            << " angularVelocity " << angularVelocity_ ///\todo take the zero out
-            << " force " << force_
-            << " torque " << torque_;
+       << " position " << position_
+       << " orientation " << orientation_
+       //<< " axis " << orientation_.getAxis()
+       << " velocity " << velocity_
+       << " angularVelocity " << angularVelocity_ ///\todo take the zero out
+       << " force " << force_
+       << " torque " << torque_;
 }
 
 /*!
@@ -291,6 +292,7 @@ void BaseInteractable::addAngularVelocity(const Vec3D& angularVelocity)
 {
     angularVelocity_ += angularVelocity;
 }
+
 const Vec3D BaseInteractable::getVelocityAtContact(const Vec3D& contact) const
 {
     return getVelocity() - Vec3D::cross(contact - getPosition(), getAngularVelocity());
@@ -329,7 +331,7 @@ void BaseInteractable::copyInteractionsForPeriodicParticles(const BaseInteractab
  *          See also BaseInteractable::setPrescribedVelocity for more
  *          information.
  */
-void BaseInteractable::setPrescribedPosition(const std::function<Vec3D (double)>& prescribedPosition)
+void BaseInteractable::setPrescribedPosition(const std::function<Vec3D(double)>& prescribedPosition)
 {
     prescribedPosition_ = prescribedPosition;
 }
@@ -341,7 +343,7 @@ void BaseInteractable::setPrescribedPosition(const std::function<Vec3D (double)>
  */
 void BaseInteractable::applyPrescribedPosition(double time)
 {
-    if(prescribedPosition_)
+    if (prescribedPosition_)
     {
         setPosition(prescribedPosition_(time));
     }
@@ -360,7 +362,7 @@ void BaseInteractable::applyPrescribedPosition(double time)
  *            takes a double the time and returns a Vec 3D which is the 
  *            velocity of the intertable for that time.
  */
-void BaseInteractable::setPrescribedVelocity(const std::function<Vec3D (double)>& prescribedVelocity)
+void BaseInteractable::setPrescribedVelocity(const std::function<Vec3D(double)>& prescribedVelocity)
 {
     prescribedVelocity_ = prescribedVelocity;
 }
@@ -372,7 +374,7 @@ void BaseInteractable::setPrescribedVelocity(const std::function<Vec3D (double)>
  */
 void BaseInteractable::applyPrescribedVelocity(double time)
 {
-    if(prescribedVelocity_)
+    if (prescribedVelocity_)
     {
         setVelocity(prescribedVelocity_(time));
     }
@@ -390,7 +392,7 @@ void BaseInteractable::applyPrescribedVelocity(double time)
  *            takes a double the time and returns a Vec 3D which is the orientation 
  *            of the interactable for that time.
  */
-void BaseInteractable::setPrescribedOrientation(std::function<Quaternion (double)>& prescribedOrientation)
+void BaseInteractable::setPrescribedOrientation(std::function<Quaternion(double)>& prescribedOrientation)
 {
     prescribedOrientation_ = prescribedOrientation;
 }
@@ -403,7 +405,7 @@ void BaseInteractable::setPrescribedOrientation(std::function<Quaternion (double
  */
 void BaseInteractable::applyPrescribedOrientation(double time)
 {
-    if(prescribedOrientation_)
+    if (prescribedOrientation_)
     {
         setOrientation(prescribedOrientation_(time));
     }
@@ -417,7 +419,7 @@ void BaseInteractable::applyPrescribedOrientation(double time)
  *          Note this functions works the same way as 
  *          BaseInteractable::setPosition and BaseInteractable::setVeclocity.
  */
-void BaseInteractable::setPrescribedAngularVelocity(const std::function<Vec3D (double)>& prescribedAngularVelocity)
+void BaseInteractable::setPrescribedAngularVelocity(const std::function<Vec3D(double)>& prescribedAngularVelocity)
 {
     prescribedAngularVelocity_ = prescribedAngularVelocity;
 }
@@ -430,7 +432,7 @@ void BaseInteractable::setPrescribedAngularVelocity(const std::function<Vec3D (d
  */
 void BaseInteractable::applyPrescribedAngularVelocity(double time)
 {
-    if(prescribedAngularVelocity_)
+    if (prescribedAngularVelocity_)
     {
         setAngularVelocity(prescribedAngularVelocity_(time));
     }
@@ -456,9 +458,9 @@ void BaseInteractable::applyPrescribedAngularVelocity(double time)
  */
 void BaseInteractable::integrateBeforeForceComputation(double time, double timeStep)
 {
-    if (prescribedPosition_ )
+    if (prescribedPosition_)
     {
-        if (prescribedVelocity_ )
+        if (prescribedVelocity_)
         {
             //Both the velocity and position are defined; as we are using leap
             //frog method so the velocity is evaluated half a time later.
@@ -471,12 +473,13 @@ void BaseInteractable::integrateBeforeForceComputation(double time, double timeS
             //Velocity is evaluated from a finite different of the Position
             //Note, we use 0.5 +- 0.1 timeStep for the velocity eval.
             applyPrescribedPosition(time + timeStep);
-            setVelocity((prescribedPosition_(time + 0.6 * timeStep) - prescribedPosition_(time + 0.4 * timeStep)) / (0.2 * timeStep));
+            setVelocity((prescribedPosition_(time + 0.6 * timeStep) - prescribedPosition_(time + 0.4 * timeStep)) /
+                        (0.2 * timeStep));
         }
     }
     else
     {
-        if (prescribedVelocity_ )
+        if (prescribedVelocity_)
         {
             //Only the velocity is set. The position is calculated from the
             //the integral of velocity.
@@ -500,8 +503,9 @@ void BaseInteractable::integrateBeforeForceComputation(double time, double timeS
         {
             applyPrescribedOrientation(time + timeStep);
             setAngularVelocity(getOrientation().applyCInverse(
-                (prescribedOrientation_(time + 0.6 * timeStep) - prescribedOrientation_(time + 0.4 * timeStep)) / (0.2 * timeStep)
-                ));
+                    (prescribedOrientation_(time + 0.6 * timeStep) - prescribedOrientation_(time + 0.4 * timeStep)) /
+                    (0.2 * timeStep)
+            ));
         }
     }
     else
@@ -535,7 +539,8 @@ void BaseInteractable::integrateAfterForceComputation(double time, double timeSt
         }
         else
         {
-            setVelocity((prescribedPosition_(time + 1.1 * timeStep) - prescribedPosition_(time + 0.9 * timeStep)) / (0.2 * timeStep));
+            setVelocity((prescribedPosition_(time + 1.1 * timeStep) - prescribedPosition_(time + 0.9 * timeStep)) /
+                        (0.2 * timeStep));
         }
     }
     else
@@ -554,8 +559,9 @@ void BaseInteractable::integrateAfterForceComputation(double time, double timeSt
         else
         {
             setAngularVelocity(getOrientation().applyCInverse(
-                (prescribedOrientation_(time + 1.1 * timeStep) - prescribedOrientation_(time + 0.9 * timeStep)) / (0.2 * timeStep)
-                ));
+                    (prescribedOrientation_(time + 1.1 * timeStep) - prescribedOrientation_(time + 0.9 * timeStep)) /
+                    (0.2 * timeStep)
+            ));
         }
     }
     else

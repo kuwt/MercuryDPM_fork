@@ -35,6 +35,7 @@
 #include <functional>
 #include <vector>
 #include "Math/Vector.h"
+
 #ifdef MERCURY_USE_MPI
 #include <mpi.h>
 #endif
@@ -60,17 +61,31 @@ class SpeciesHandler;
  * \details MPI requires knowledge on the memory lay out of a data object that is being send.
  * Various types of data are being send in the parallel code, i.e. a whole particle or only the position.
  * This enum indicates what type is being send 
- */ 
-enum MercuryMPIType {PARTICLE = 0, POSITION = 1, VELOCITY = 2, FORCE = 3, INTERACTION = 4};
+ */
+enum MercuryMPIType
+{
+    PARTICLE = 0, POSITION = 1, VELOCITY = 2, FORCE = 3, INTERACTION = 4
+};
 
 /*!
  * \brief An enum that facilitates the creation of unique communication tags in the parallel code
  * \details The MercuryMPITag is the last digit of a communication tag in the parallel code. This ensures
  * that when various data types are queued simultationously, there is no communication confusion. Additionally
  * this is a useful feature for developers so they can trace back what message was being send if something went wrong. 
- */ 
-enum MercuryMPITag {PARTICLE_COUNT = 0, PARTICLE_DATA = 1, POSITION_DATA = 2, PERIODIC_POSITION_DATA = 3, VELOCITY_DATA = 4, INTERACTION_COUNT = 5, INTERACTION_DATA = 6, PERIODIC_COMPLEXITY = 7, PARTICLE_INDEX = 8};
- 
+ */
+enum MercuryMPITag
+{
+    PARTICLE_COUNT = 0,
+    PARTICLE_DATA = 1,
+    POSITION_DATA = 2,
+    PERIODIC_POSITION_DATA = 3,
+    VELOCITY_DATA = 4,
+    INTERACTION_COUNT = 5,
+    INTERACTION_DATA = 6,
+    PERIODIC_COMPLEXITY = 7,
+    PARTICLE_INDEX = 8
+};
+
 namespace Detail
 {
 #ifdef MERCURY_USE_MPI
@@ -116,7 +131,7 @@ public:
         static MPIContainer theInstance;
         return theInstance;
     }
-
+    
     /*!
      * \brief Creates the MPI types required for communication of Mercury data through the MPI interface
      */
@@ -151,7 +166,7 @@ public:
     send(T& t, int to, int tag)
     {
 #if MERCURY_ASSERTS
-        if(to == processorID_)
+        if (to == processorID_)
         {
             std::cout << "[MPI FATAL]: Sending data to self!" << std::endl;
             std::exit(-1);
@@ -168,13 +183,13 @@ public:
     send(T* t, int count, int to, int tag)
     {
 #if MERCURY_ASSERTS
-        if(to == processorID_)
+        if (to == processorID_)
         {
             std::cout << "[MPI FATAL]: Sending data to self!" << std::endl;
             std::exit(-1);
         }
-
-        if(count == 0)
+        
+        if (count == 0)
         {
             std::cout << "[MPI ERROR]: Sending zero data" << std::endl;
         }
@@ -183,7 +198,7 @@ public:
         pending_.push_back(communicator_.Isend(t, count, Detail::toMPIType(*t), to, tag ));
 #endif
     }
- 
+    
     /*! 
      * \brief asynchronously receive a scalar from some other processor.
      * \param[in,out] t the data
@@ -191,13 +206,13 @@ public:
      * \param[in] tag an identifier for this specific receive request. This must be unique among all receive requests between
      * the previous synchronisation step and the next one. Exactly one send request must also provide this tag and
      * it must be done on the process specified by the 'from' parameter
-     */ 
+     */
     template<typename T>
     typename std::enable_if<std::is_scalar<T>::value, void>::type
     receive(T& t, int from, int tag)
     {
 #if MERCURY_ASSERTS
-        if(from == processorID_)
+        if (from == processorID_)
         {
             std::cout << "[MPI FATAL]: Receiving data from self!" << std::endl;
             std::exit(-1);
@@ -205,8 +220,8 @@ public:
 #endif
 #ifdef MERCURY_USE_MPI
         pending_.push_back(communicator_.Irecv(&t, 1, Detail::toMPIType(t), from, tag ));
-#endif 
-    } 
+#endif
+    }
 
 /// \todo MX: type documentation. this is used to receive vectors of scalars accross   
     template<typename T>
@@ -214,13 +229,13 @@ public:
     receive(T* t, int count, int from, int tag)
     {
 #if MERCURY_ASSERTS
-        if(from == processorID_)
+        if (from == processorID_)
         {
             std::cout << "[MPI FATAL]: Receiving data fromself!" << std::endl;
             std::exit(-1);
         }
-
-        if(count == 0)
+        
+        if (count == 0)
         {
             std::cout << "[MPI ERROR]: Receiving zero data" << std::endl;
         }
@@ -229,8 +244,8 @@ public:
         pending_.push_back(communicator_.Irecv(t, count, Detail::toMPIType(*t), from, tag ));
 #endif
     }
-
- 
+    
+    
     /*!
      * \brief asynchronously send a list of MercuryMPITypes objects to some other processor.
      * \param[in,out] t the data, list of MPIType objects
@@ -241,16 +256,16 @@ public:
      */
     template<typename T>
     void send(T* t, MercuryMPIType type, int count, int to, int tag)
-    {   
+    {
         //std::cout << "[Process: " << processorID_ << "]: QUEUING SEND REQUEST with tag: " << tag << std::endl;
 #if MERCURY_ASSERTS
-        if(to == processorID_)
+        if (to == processorID_)
         {
             std::cout << "[MPI FATAL]: Sending data to self!" << std::endl;
             std::exit(-1);
         }
-
-        if(count == 0)
+        
+        if (count == 0)
         {
             std::cout << "[MPI ERROR]: Sending zero data" << std::endl;
         }
@@ -259,8 +274,8 @@ public:
         pending_.push_back(communicator_.Isend(t, count, dataTypes_[type], to, tag ));
 
 #endif
-    }   
-
+    }
+    
     /*!
      * \brief asynchronously receive a list of MercuryMPIType objects from some other processor.
      * \param[in,out] t the data, list of MercuryMPIType objects
@@ -268,19 +283,19 @@ public:
      * \param[in] count the number of objects that are being send
      * \param[in] from the processor that sends the information
      * \param[in] tag a unique identifier that corresponds with a send command by the sending processor
-     */    
-    template<typename T> 
+     */
+    template<typename T>
     void receive(T* t, MercuryMPIType type, int count, int from, int tag)
     {
         //std::cout << "[Process: " << processorID_ << "]: QUEUING RECEIVE REQUEST with tag: " << tag << std::endl;
 #if MERCURY_ASSERTS
-        if(from == processorID_)
+        if (from == processorID_)
         {
             std::cout << "[MPI FATAL]: Receiving data to self!" << std::endl;
             std::exit(-1);
         }
-
-        if(count == 0)
+        
+        if (count == 0)
         {
             std::cout << "[MPI ERROR]: Receiving zero data" << std::endl;
         }
@@ -301,36 +316,36 @@ public:
     template<typename T>
     typename std::enable_if<std::is_scalar<T>::value, void>::type
     directSend(T& t, int count, int to, int tag)
-    {  
+    {
 #if MERCURY_ASSERTS
-        if(to == processorID_)
+        if (to == processorID_)
         {
             std::cout << "[MPI FATAL]: Sending data to self!" << std::endl;
             std::exit(-1);
         }
-
-        if(count == 0)
+        
+        if (count == 0)
         {
             std::cout << "[MPI ERROR]: Sending zero data" << std::endl;
         }
 #endif
-#ifdef MERCURY_USE_MPI    
+#ifdef MERCURY_USE_MPI
         communicator_.Ssend(&t, count, Detail::toMPIType(t), to, tag);
 #endif
     }
-
-
+    
+    
     template<typename T>
     void directSend(T* t, MercuryMPIType type, int count, int to, int tag)
     {
 #if MERCURY_ASSERTS
-        if(to == processorID_)
+        if (to == processorID_)
         {
             std::cout << "[MPI FATAL]: Sending data to self!" << std::endl;
             std::exit(-1);
         }
-
-        if(count == 0)
+        
+        if (count == 0)
         {
             std::cout << "[MPI ERROR]: Sending zero data" << std::endl;
         }
@@ -339,7 +354,7 @@ public:
         communicator_.Ssend(t, count, dataTypes_[type], to, tag);
 #endif
     }
-
+    
     /*!
      * \brief synchronously receive a list of scalars from another processor.
      * if the send command has not been issued, this function will stall the program
@@ -347,48 +362,48 @@ public:
      * \param[in] count the number of scalars to be send
      * \param[in] from the processor that sends the information
      * \param[in] tag a unique identifier that corresponds with a send command by the sending processor
-     */  
+     */
     template<typename T>
     typename std::enable_if<std::is_scalar<T>::value, void>::type
     directReceive(T& t, int count, int from, int tag)
     {
 #if MERCURY_ASSERTS
-        if(from == processorID_)
+        if (from == processorID_)
         {
             std::cout << "[MPI FATAL]: Receiving data from self!" << std::endl;
             std::exit(-1);
         }
-
-        if(count == 0)
+        
+        if (count == 0)
         {
             std::cout << "[MPI ERROR]: Receiving zero data" << std::endl;
         }
 #endif
-#ifdef MERCURY_USE_MPI    
+#ifdef MERCURY_USE_MPI
         communicator_.Recv(&t, count, Detail::toMPIType(t), from, tag);
 #endif
-}
-
+    }
+    
     template<typename T>
     void directReceive(T* t, MercuryMPIType type, int count, int from, int tag)
     {
 #if MERCURY_ASSERTS
-        if(from == processorID_)
+        if (from == processorID_)
         {
             std::cout << "[MPI FATAL]: Receiving data to self!" << std::endl;
             std::exit(-1);
         }
-
-        if(count == 0)
+        
+        if (count == 0)
         {
             std::cout << "[MPI ERROR]: Receiving zero data" << std::endl;
         }
 #endif
-#ifdef MERCURY_USE_MPI    
+#ifdef MERCURY_USE_MPI
         communicator_.Recv(t, count, dataTypes_[type], from, tag);
 #endif
     }
-
+    
     /*!
      * \brief Gathers a scaler from all processors to a vector of scalars on the root
      * \details When a single processor needs to know a certain value on all processors, this
@@ -398,25 +413,25 @@ public:
      */
     template<typename T>
     void gather(T& send_t, T* receive_t)
-    {   
+    {
 #ifdef MERCURY_USE_MPI
         communicator_.Gather(&send_t, 1, Detail::toMPIType(send_t), receive_t, 1, Detail::toMPIType(send_t), 0);
 #endif
     }
-
+    
     /*!
      * \brief Broadcasts a scalar from the root to all other processors
      * \param[in,out] t scalar data that is being send by the root and received by the processors
      */
     template<typename T>
     typename std::enable_if<std::is_scalar<T>::value, void>::type
-    broadcast(T& t,int fromProcessor = 0)
+    broadcast(T& t, int fromProcessor = 0)
     {
 #ifdef MERCURY_USE_MPI
         communicator_.Bcast(&t,1,Detail::toMPIType(t),fromProcessor);
 #endif
     }
-
+    
     /*!
      * \brief Broadcasts a scalar from the root to all other processors
      * \param[in,out] t scalar data that is being send by the root and received by the processors
@@ -429,7 +444,7 @@ public:
         communicator_.Bcast((void *)t,size, Detail::toMPIType(t[0]),fromProcessor);
 #endif
     }
-
+    
     /*!
      * \brief Broadcasts an MercuryMPIType to all other processors
      * \param[in,out] t MercuryMPIType data that is being send by the root and received by the processors
@@ -441,7 +456,7 @@ public:
         communicator_.Bcast((void *)t,1,dataTypes_[type],fromProcessor);
 #endif
     }
-
+    
     /*!
      * \brief Reduces a scalar on all processors to one scalar on a target processor
      * \details A scalar defined on all processors is reduced to one number by an operation
@@ -468,7 +483,7 @@ public:
         }
     }
 #endif
-
+    
     /*!
      * \brief AllReduces a scalar on all processors by a given MPI operation
      * \details A local scalar on all processors is reduced to one scalar as output
@@ -485,7 +500,7 @@ public:
         communicator_.Allreduce(&send_t, &receive_t, 1, Detail::toMPIType(send_t), operation);  
     }
 #endif
-
+    
     /*!
      * \brief allGather takes a (different) scalar from all processors and returns a vector with all scalars
      * \details sometimes it is required to share a local scalar such as number of particles to all other processors.
@@ -504,24 +519,24 @@ public:
                                 receive_t.data(), receive_count, Detail::toMPIType(receive_t[0]));  
     }
 #endif
-
+    
     /*!
      * \brief Get the unique identifier associated with this processor.
      */
     std::size_t getProcessorID();
-
+    
     /*!
      * \brief Get the total number of processors participating in this simulation.
      */
     std::size_t getNumberOfProcessors() const;
-
+    
     /*!
      * \brief Get the communicator used for MPI commands.
      */
 #ifdef MERCURY_USE_MPI
     MPI::Intracomm& getComm();
 #endif
-
+    
     /*!
      * \brief Creates the MPI types telling the MPI interface how each data object looks like
      * \details NOTE: The current manner of creating MPI data types might not be compatible when computing
@@ -541,8 +556,8 @@ public:
         dataTypes_.push_back(MPIType);
 #endif
     }
-
-
+    
+    
     /*!
      * \brief Deletes the MercuryMPITypes
      */
@@ -555,14 +570,14 @@ public:
         }
 #endif
     }
-
+    
     /*!
     * \brief Copy constructor is disabled, to enforce a singleton pattern
     */
     MPIContainer(const MPIContainer& orig) = delete;
 
 private:
-
+    
     /*!
      * \brief Constructor
      */
@@ -572,12 +587,12 @@ private:
      * \brief The ID of the processor this class is running on
      */
     std::size_t processorID_;
-  
+    
     /*!
      * \brief The total number of processors in the communicator
      */
     std::size_t numberOfProcessors_;
-    
+
 #ifdef MERCURY_USE_MPI
     /*!
      * \brief List of send/receive requests that have not been resolved
@@ -593,7 +608,7 @@ private:
      * \brief vector that contains the MercuryMPIType MPIType objects
      */ 
     std::vector<MPI_Datatype> dataTypes_;
-    
+
 #endif
 
 };

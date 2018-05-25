@@ -44,7 +44,8 @@ BasicIntersectionOfWalls::BasicIntersectionOfWalls()
 BasicIntersectionOfWalls::BasicIntersectionOfWalls(const BasicIntersectionOfWalls& b)
         : BaseWall(b)
 {
-    for (auto& w : b.walls_) {
+    for (auto& w : b.walls_)
+    {
         walls_.push_back(w->copy());
     }
     logger(DEBUG, "BasicIntersectionOfWalls::BasicIntersectionOfWalls(const BasicIntersectionOfWalls &p) finished");
@@ -84,7 +85,7 @@ unsigned long BasicIntersectionOfWalls::getNumberOfObjects()
  * \details Sets the wall such that for all points x on the wall it holds that 
  * normal*x=normal*point.
  */
- ///\todo TW maybe the Restricted wall should be templated with the wall type such that we don't need to use new and delete.
+///\todo TW maybe the Restricted wall should be templated with the wall type such that we don't need to use new and delete.
 void BasicIntersectionOfWalls::add(BaseWall& wall)
 {
     walls_.push_back(wall.copy());
@@ -105,7 +106,7 @@ bool BasicIntersectionOfWalls::getDistanceAndNormal(const BaseParticle& p, Mdoub
         logger(DEBUG, "Empty BasicIntersectionOfWalls");
         return false;
     }
-
+    
     distance = -inf; //distance of the closest wall
     Mdouble distance2 = -inf; //distance of the second-closest wall
     Mdouble distance3 = -inf; //distance of the third-closest wall
@@ -123,7 +124,7 @@ bool BasicIntersectionOfWalls::getDistanceAndNormal(const BaseParticle& p, Mdoub
     shifted.setSpecies(p.getSpecies());
     shifted.setPosition(position);
     shifted.setRadius(p.getRadius());
-
+    
     //The object has to touch each wall each wall (distanceCurrent) and keep the minimum distance (distance) and wall index (id)
     for (unsigned int i = 0; i < walls_.size(); i++)
     {
@@ -172,8 +173,8 @@ bool BasicIntersectionOfWalls::getDistanceAndNormal(const BaseParticle& p, Mdoub
         }
     }
     //logger(INFO, "particle %: contact with % % %, n % % %", p.getId(), distance, distance2, distance3, normal, normal2, normal3);
-
-
+    
+    
     //If we are here, the closest wall is id;
     //if distance2>-P.Radius, it's a possible face or vertex contact
     //if distance3>-P.Radius, it's a possible vertex contact
@@ -184,20 +185,21 @@ bool BasicIntersectionOfWalls::getDistanceAndNormal(const BaseParticle& p, Mdoub
         contact.setSpecies(p.getSpecies());
         contact.setPosition(position + distance * normal);
         contact.setRadius(0);
-
+        
         //If the distance of D to id2 is positive, the contact is with the intersection
         bool contactPointOutsideID2 = !walls_[id2]->getDistanceAndNormal(contact, distanceCurrent, normalCurrent);
-
-        if (distance3 > -wallInteractionRadius && !walls_[id3]->getDistanceAndNormal(contact, distanceCurrent, normalCurrent))
+        
+        if (distance3 > -wallInteractionRadius &&
+            !walls_[id3]->getDistanceAndNormal(contact, distanceCurrent, normalCurrent))
         {
             if (contactPointOutsideID2)
             {
                 //possible contact is with intersection of id,id2,id3
                 //we know id2<id3
                 unsigned int index =
-                 (id < id2) ? ((id3 - 2) * (id3 - 1) * id3 / 6 + (id2 - 1) * id2 / 2 + id) :
-                 (id < id3) ? ((id3 - 2) * (id3 - 1) * id3 / 6 + (id - 1) * id / 2 + id2) :
-                 ((id - 2) * (id - 1) * id / 6 + (id3 - 1) * id3 / 2 + id2);
+                        (id < id2) ? ((id3 - 2) * (id3 - 1) * id3 / 6 + (id2 - 1) * id2 / 2 + id) :
+                        (id < id3) ? ((id3 - 2) * (id3 - 1) * id3 / 6 + (id - 1) * id / 2 + id2) :
+                        ((id - 2) * (id - 1) * id / 6 + (id3 - 1) * id3 / 2 + id2);
                 //find vertex C
                 Matrix3D N(normal.X, normal.Y, normal.Z, normal2.X, normal2.Y, normal2.Z, normal3.X, normal3.Y,
                            normal3.Z);
@@ -220,14 +222,15 @@ bool BasicIntersectionOfWalls::getDistanceAndNormal(const BaseParticle& p, Mdoub
                 id2 = id3;
             }
         }
-
+        
         if (contactPointOutsideID2)
         {
             //find contact point C
-            normal3 = Vec3D::cross(normal,normal2);
+            normal3 = Vec3D::cross(normal, normal2);
             Matrix3D N(normal.X, normal.Y, normal.Z, normal2.X, normal2.Y, normal2.Z, normal3.X, normal3.Y,
                        normal3.Z);
-            Vec3D P(Vec3D::dot(position, normal) + distance, Vec3D::dot(position, normal2) + distance2, Vec3D::dot(position, normal3));
+            Vec3D P(Vec3D::dot(position, normal) + distance, Vec3D::dot(position, normal2) + distance2,
+                    Vec3D::dot(position, normal3));
             Vec3D C = N.ldivide(P);
             normal = position - C;
             distance = sqrt(normal.getLengthSquared());
@@ -254,7 +257,8 @@ void BasicIntersectionOfWalls::read(std::istream& is)
     unsigned size;
     // read e.g. "numIntersectionOfWalls 2"
     is >> dummy >> size;
-    for (unsigned i=0; i<size; i++) {
+    for (unsigned i = 0; i < size; i++)
+    {
         std::string type;
         // read e.g. "IntersectionOfWalls"
         is >> type;
@@ -272,7 +276,8 @@ void BasicIntersectionOfWalls::write(std::ostream& os) const
 {
     BaseWall::write(os);
     os << " numIntersectionOfWalls " << walls_.size();
-    for (auto w : walls_) {
+    for (auto w : walls_)
+    {
         os << " ";
         w->write(os);
     }
@@ -286,7 +291,7 @@ std::string BasicIntersectionOfWalls::getName() const
     return "BasicIntersectionOfWalls";
 }
 
-void BasicIntersectionOfWalls::getVTK(std::vector<Vec3D> &points, std::vector<std::vector<double>> &triangleStrips)
+void BasicIntersectionOfWalls::getVTK(std::vector<Vec3D>& points, std::vector<std::vector<double>>& triangleStrips)
 {
 //    for (auto w : walls_) {
 //        w->writeVTK (points, triangleStrips);
@@ -294,8 +299,9 @@ void BasicIntersectionOfWalls::getVTK(std::vector<Vec3D> &points, std::vector<st
     //writes points and strips for all walls; points are added to the global point vector, but the strips are held back
     std::vector<std::vector<double>> myTriangleStrips;
     unsigned long n = points.size();
-    for (auto w : walls_) {
-        w->getVTK (points, myTriangleStrips);
+    for (auto w : walls_)
+    {
+        w->getVTK(points, myTriangleStrips);
     }
     //add position of the BasicIntersectionOfWalls to the point
     for (std::vector<Vec3D>::iterator p = points.begin() + n; p != points.end(); p++)
@@ -313,7 +319,7 @@ void BasicIntersectionOfWalls::getVTK(std::vector<Vec3D> &points, std::vector<st
     for (auto p : points)
     {
         particle.setPosition(p);
-        pointInWall.push_back(getDistanceAndNormal(particle,distance,normal));
+        pointInWall.push_back(getDistanceAndNormal(particle, distance, normal));
     }
     //now loop through myTriangleStrips to find the strip parts that are fully inside the wall
     std::vector<double> strip;
@@ -321,15 +327,18 @@ void BasicIntersectionOfWalls::getVTK(std::vector<Vec3D> &points, std::vector<st
     {
         for (unsigned i : t)
         {
-            if (pointInWall[i]==true) {
+            if (pointInWall[i] == true)
+            {
                 strip.push_back(i);
-            } else {
-                if (strip.size()>2)
+            }
+            else
+            {
+                if (strip.size() > 2)
                     triangleStrips.push_back(strip);
                 strip.clear();
             }
         }
-        if (strip.size()>2)
+        if (strip.size() > 2)
             triangleStrips.push_back(strip);
         strip.clear();
     }
@@ -338,6 +347,6 @@ void BasicIntersectionOfWalls::getVTK(std::vector<Vec3D> &points, std::vector<st
 
 BaseWall* BasicIntersectionOfWalls::getObject(unsigned i)
 {
-    logger.assert_always(walls_.size()>i,"Index % exceeds number of walls %",i,walls_.size());
+    logger.assert_always(walls_.size() > i, "Index % exceeds number of walls %", i, walls_.size());
     return walls_[i];
 }

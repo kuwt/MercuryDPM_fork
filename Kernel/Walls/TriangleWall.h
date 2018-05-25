@@ -56,7 +56,7 @@
 class TriangleWall : public BaseWall
 {
 public:
-
+    
     /*!
      * \brief Default constructor.
      */
@@ -66,7 +66,7 @@ public:
      * \brief Copy constructor.
      */
     TriangleWall(const TriangleWall& other) = default;
-
+    
     /*!
      * \brief Destructor.
      */
@@ -75,67 +75,74 @@ public:
     /*!
      * \brief Wall copy method. It calls the copy constructor of this Wall, useful for polymorphism
      */
-    TriangleWall* copy() const override {return new TriangleWall(*this);}
-
+    TriangleWall* copy() const override
+    { return new TriangleWall(*this); }
+    
     /*!
      * \brief Returns the name of the object, here the string "TriangleWall".
      */
-    std::string getName() const override {return "TriangleWall";}
-
+    std::string getName() const override
+    { return "TriangleWall"; }
+    
     /*!
      * \brief Reads an TriangleWall from an input stream, for example a restart file.
      */
     void read(std::istream& is) override;
-
+    
     /*!
      * \brief Writes an TriangleWall to an output stream, for example a restart file.
      */
     void write(std::ostream& os) const override;
-
+    
     /*!
      * \brief Writes an TriangleWall to an output stream, for example a restart file.
      */
     void setVertices(Vec3D A, Vec3D B, Vec3D C);
-
-
+    
+    
     void writeVTK(VTKContainer& vtk) const override;
-
+    
     /*!
      * \brief Compute the distance from the wall for a given BaseParticle and return if there is a collision.
      * If there is a collision, also return the normal vector.
      */
     bool getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const override;
-
+    
     void rotate(const Vec3D& angularVelocity) override;
-
-    bool isLocal(Vec3D& min, Vec3D& max) const override {min = vertexMin_; max = vertexMax_; return false;}
+    
+    bool isLocal(Vec3D& min, Vec3D& max) const override
+    {
+        min = vertexMin_;
+        max = vertexMax_;
+        return false;
+    }
 
 private:
-
+    
     void updateVertexAndNormal();
-
+    
     /*!
      * stores the position of the vertices relative to the position of the wall and rotated into the lab frame;
      */
-    std::array<Vec3D,3> vertexInLabFrame_;
+    std::array<Vec3D, 3> vertexInLabFrame_;
     /*!
      * stores the position of the vertices relative to the position of the wall but not rotated into the lab frame;
      * thus, if the wall rotates, these vertices have to be rotated as well
      */
-    std::array<Vec3D,3> vertex_;
-
+    std::array<Vec3D, 3> vertex_;
+    
     /*!
      * stores the min and max coordinate values of the vertices (needed for hGrid)
      */
     Vec3D vertexMin_;
     Vec3D vertexMax_;
-
+    
     /*!
      * stores the wall normal n in n.x=p
      */
-    std::array<Vec3D,3> edgeNormal_;
-    std::array<Vec3D,3> edge_;
-
+    std::array<Vec3D, 3> edgeNormal_;
+    std::array<Vec3D, 3> edge_;
+    
     /*!
      * stores the face normal, not rotated into the lab frame; thus, if the wall rotates, this normal has to be rotated as well
      */

@@ -28,35 +28,40 @@
 #include <vector>
 #include "Panel.h"
 
-class Box {
+class Box
+{
 public:
-	Box(int maxLevel, int nTerms);
-	void addPanel(int level, Panel *panel);
-	void upwardPass();
-	void downwardPass();
-	void computeFlow(int k);
-
-	int getMaxLevel()
-	{
-		return maxLevel_;
-	}
-
-	///\todo some ints here should be unsigned long
-	int getNrPanelsOnLevel(int level)
-	{
-		return levels_[level].size();
-	}
-
-	int getNumberOfTerms()
-	{
-		return p_;
-	}
+    Box(int maxLevel, int nTerms);
+    
+    void addPanel(int level, Panel* panel);
+    
+    void upwardPass();
+    
+    void downwardPass();
+    
+    void computeFlow(int k);
+    
+    int getMaxLevel()
+    {
+        return maxLevel_;
+    }
+    
+    ///\todo some ints here should be unsigned long
+    int getNrPanelsOnLevel(int level)
+    {
+        return levels_[level].size();
+    }
+    
+    int getNumberOfTerms()
+    {
+        return p_;
+    }
 
 private:
-	int maxLevel_;
-	int p_;	//The number of terms
-	std::vector<std::vector<Panel*>> levels_; // This is a vector containing the panels at level L
-	std::vector<Sphere*> spheres_; // This is a vector that contains all the spheres in the domain
+    int maxLevel_;
+    int p_;    //The number of terms
+    std::vector<std::vector<Panel*>> levels_; // This is a vector containing the panels at level L
+    std::vector<Sphere*> spheres_; // This is a vector that contains all the spheres in the domain
 };
 
 #endif /* BOX_H_ */

@@ -32,9 +32,9 @@
 InfiniteWallWithHole::InfiniteWallWithHole()
         : BaseWall()
 {
-    factor_=std::numeric_limits<double>::quiet_NaN();
-    position_=std::numeric_limits<double>::quiet_NaN();
-    holeRadius_=std::numeric_limits<double>::quiet_NaN();
+    factor_ = std::numeric_limits<double>::quiet_NaN();
+    position_ = std::numeric_limits<double>::quiet_NaN();
+    holeRadius_ = std::numeric_limits<double>::quiet_NaN();
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"InfiniteWall () finished"<<std::endl;
 #endif
@@ -49,7 +49,7 @@ InfiniteWallWithHole::InfiniteWallWithHole(Vec3D normal, Mdouble position, Mdoub
 #endif
 }
 
-InfiniteWallWithHole::InfiniteWallWithHole(const InfiniteWallWithHole &p)
+InfiniteWallWithHole::InfiniteWallWithHole(const InfiniteWallWithHole& p)
         : BaseWall(p)
 {
     normal_ = p.normal_;
@@ -100,18 +100,18 @@ void InfiniteWallWithHole::move_time(Mdouble dt)
 }
 
 ///Returns the distance of the wall to the particle. 
-Mdouble InfiniteWallWithHole::getWallDistance(const Vec3D &position) const
+Mdouble InfiniteWallWithHole::getWallDistance(const Vec3D& position) const
 {
     return position_ - Vec3D::dot(position, normal_);
 }
 
-Mdouble InfiniteWallWithHole::getHoleDistance(const Vec3D &position) const
+Mdouble InfiniteWallWithHole::getHoleDistance(const Vec3D& position) const
 {
     return holeRadius_ - sqrt(pow(position.X, 2) + pow(position.Y, 2));
 }
 
 ///Since this function should be called before calculating any Particle-Wall interactions, it can also be used to set the normal vector in case of curved walls.
-bool InfiniteWallWithHole::getDistanceAndNormal(const BaseParticle &P, Mdouble &distance, Vec3D &normal_return) const
+bool InfiniteWallWithHole::getDistanceAndNormal(const BaseParticle& P, Mdouble& distance, Vec3D& normal_return) const
 {
     double wallDistance = getWallDistance(P.getPosition());
     if (wallDistance >= P.getRadius())
@@ -158,9 +158,9 @@ void InfiniteWallWithHole::read(std::istream& is)
     BaseWall::read(is);
     std::string dummy;
     is >> dummy >> normal_
-            >> dummy >> factor_
-            >> dummy >> position_
-            >> dummy >> holeRadius_;
+       >> dummy >> factor_
+       >> dummy >> position_
+       >> dummy >> holeRadius_;
 }
 
 ///reads wall
@@ -174,12 +174,12 @@ void InfiniteWallWithHole::oldRead(std::istream& is)
 
 ///outputs wall
 void InfiniteWallWithHole::write(std::ostream& os) const
-        {
+{
     BaseWall::write(os);
     os << " normal " << normal_
-            << " factor " << factor_
-            << " position " << position_
-            << " holeRadius " << holeRadius_;
+       << " factor " << factor_
+       << " position " << position_
+       << " holeRadius " << holeRadius_;
 }
 
 std::string InfiniteWallWithHole::getName() const

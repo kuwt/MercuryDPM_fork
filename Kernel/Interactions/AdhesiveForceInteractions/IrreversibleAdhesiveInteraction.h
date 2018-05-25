@@ -30,7 +30,9 @@
 #include "Math/Vector.h"
 
 class BaseParticle;
+
 class IrreversibleAdhesiveSpecies;
+
 class BaseInteractable;
 
 /*!
@@ -43,6 +45,7 @@ public:
      * \brief An alias name for IrreversibleAdhesiveSpecies data type.
      */
     typedef IrreversibleAdhesiveSpecies SpeciesType;
+    
     /*!
      * \brief Constructor.
      */
@@ -54,7 +57,8 @@ public:
     /*!
      * \brief Copy constructor.
      */
-    IrreversibleAdhesiveInteraction(const IrreversibleAdhesiveInteraction &p);
+    IrreversibleAdhesiveInteraction(const IrreversibleAdhesiveInteraction& p);
+    
     /*!
      * \brief Destructor.
      */
@@ -64,26 +68,27 @@ public:
      * \brief Computes the Adhesive force.
      */
     void computeAdhesionForce();
-
+    
     /*!
      * \brief Interaction read function, which accepts an std::istream as input.
      */
     void read(std::istream& is) override;
-
+    
     /*!
      * \brief Interaction print function, which accepts an std::ostream as input.
      */
     void write(std::ostream& os) const override;
-
+    
     /*!
      * \brief A dynamic_cast of BaseSpecies type pointer to a pointer of type IrreversibleAdhesiveSpecies.
      */
     const IrreversibleAdhesiveSpecies* getSpecies() const;
+    
     /*!
      * \brief Returns the name of the interaction, see Interaction.h.
-     */  
+     */
     std::string getBaseName() const;
-
+    
     /*!
      * \brief Returns the elastic energy stored in the adhesive spring. 
      */
@@ -100,4 +105,5 @@ private:
      */
     bool wasInContact_;
 };
+
 #endif

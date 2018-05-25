@@ -39,9 +39,9 @@ ParhamiMcMeekingSinterSpecies::ParhamiMcMeekingSinterSpecies()
 /*!
  * \param[in] s the species that is copied
  */
-ParhamiMcMeekingSinterSpecies::ParhamiMcMeekingSinterSpecies(const ParhamiMcMeekingSinterSpecies &s)
+ParhamiMcMeekingSinterSpecies::ParhamiMcMeekingSinterSpecies(const ParhamiMcMeekingSinterSpecies& s)
 {
-    alpha_= s.alpha_;
+    alpha_ = s.alpha_;
     beta_ = s.beta_;
     atomicVolume_ = s.atomicVolume_; /*Omega*/
     surfaceEnergy_ = s.surfaceEnergy_; /*gamma_s*/
@@ -61,7 +61,7 @@ ParhamiMcMeekingSinterSpecies::~ParhamiMcMeekingSinterSpecies()
 {
 #ifdef DEBUG_DESTRUCTOR
     std::cout<<"ParhamiMcMeekingSinterSpecies::~ParhamiMcMeekingSinterSpecies() finished"<<std::endl;
-#endif   
+#endif
 }
 
 /*!

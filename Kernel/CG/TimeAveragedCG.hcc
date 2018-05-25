@@ -64,7 +64,7 @@ template<class Coordinates, template<class> class BaseFunction, class Fields>
 void TimeAveragedCG<Coordinates, BaseFunction, Fields>::initialise()
 {
     CG<Coordinates, BaseFunction, Fields>::initialise();
-
+    
     CG<Coordinates, BaseFunction, Fields>::resetVariables();
 };
 
@@ -95,21 +95,21 @@ void TimeAveragedCG<Coordinates, BaseFunction, Fields>::finish()
 {
     //divide by volume
     CG<Coordinates, BaseFunction, Fields>::volumeAverageVariables();
-
+    
     //time-average
     for (typename CG<Coordinates, BaseFunction, Fields>::Point& c : CG<Coordinates, BaseFunction, Fields>::points_)
     {
         c /= nTime_;
     }
-
+    
     CG<Coordinates, BaseFunction, Fields>::writeVariables();
-
+    
     CG<Coordinates, BaseFunction, Fields>::finish();
 }
 
 template<template<class> class BaseFunction, class Fields>
 TimeAveragedCGXYZ<BaseFunction, Fields>::TimeAveragedCGXYZ()
-: TimeAveragedCG<CGCoordinates::XYZ, BaseFunction, Fields>()
+        : TimeAveragedCG<CGCoordinates::XYZ, BaseFunction, Fields>()
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cerr << "TimeAveragedCGXYZ::TimeAveragedCGXYZ() finished" << std::endl;
@@ -118,7 +118,7 @@ TimeAveragedCGXYZ<BaseFunction, Fields>::TimeAveragedCGXYZ()
 
 template<template<class> class BaseFunction, class Fields>
 TimeAveragedCGXYZ<BaseFunction, Fields>::TimeAveragedCGXYZ(const TimeAveragedCGXYZ& c)
-: TimeAveragedCG<CGCoordinates::XYZ, BaseFunction, Fields>(c)
+        : TimeAveragedCG<CGCoordinates::XYZ, BaseFunction, Fields>(c)
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cerr << "TimeAveragedCGXYZ::copy() finished" << std::endl;

@@ -4,16 +4,16 @@
 
 HeaterBoundary::HeaterBoundary() : BaseBoundary()
 {
-    posMin_ = Vec3D(0,0,0);
-    posMax_ = Vec3D(0,0,0);
-    specificHeatStrength_ = Vec3D(0,0,0);
+    posMin_ = Vec3D(0, 0, 0);
+    posMax_ = Vec3D(0, 0, 0);
+    specificHeatStrength_ = Vec3D(0, 0, 0);
 }
 
 HeaterBoundary::HeaterBoundary(const HeaterBoundary& other) : BaseBoundary(other)
 {
-   posMin_ = other.posMin_;
-   posMax_ = other.posMax_;
-   specificHeatStrength_ = other.specificHeatStrength_;
+    posMin_ = other.posMin_;
+    posMax_ = other.posMax_;
+    specificHeatStrength_ = other.specificHeatStrength_;
 }
 
 HeaterBoundary::~HeaterBoundary()
@@ -50,7 +50,7 @@ void HeaterBoundary::set3D(Vec3D posMin, Vec3D posMax, Mdouble specificHeatStren
 
 void HeaterBoundary::setStrength(Vec3D specificHeatStrength)
 {
-    specificHeatStrength_ = specificHeatStrength; 
+    specificHeatStrength_ = specificHeatStrength;
 }
 
 void HeaterBoundary::setStrength2D(Mdouble specificHeatStrength)
@@ -67,9 +67,9 @@ void HeaterBoundary::setStrength3D(Mdouble specificHeatStrength)
     specificHeatStrength_.Z = specificHeatStrength / sqrt(3.);
 }
 
-inline Mdouble HeaterBoundary::getVolume() const 
+inline Mdouble HeaterBoundary::getVolume() const
 {
-    return ((posMax_.X - posMin_.X)*(posMax_.Y - posMin_.Y)*(posMax_.Z - posMin_.Z));
+    return ((posMax_.X - posMin_.X) * (posMax_.Y - posMin_.Y) * (posMax_.Z - posMin_.Z));
 }
 
 /*! 
@@ -78,7 +78,7 @@ inline Mdouble HeaterBoundary::getVolume() const
 Mdouble HeaterBoundary::getDistance(const Vec3D& position) const
 {
     // std::cerr << "Checking a particle position " << position << " against " << posMin_ << " and " << posMax_ << std::endl;
-    if (   posMin_.X <= position.X && position.X <= posMax_.X
+    if (posMin_.X <= position.X && position.X <= posMax_.X
         && posMin_.Y <= position.Y && position.Y <= posMax_.Y
         && posMin_.Z <= position.Z && position.Z <= posMax_.Z
             )
@@ -96,14 +96,14 @@ Mdouble HeaterBoundary::getDistance(const Vec3D& position) const
 void HeaterBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
 {
     for (auto p = pH.begin(); p != pH.end(); ++p)
-	    checkBoundaryAfterParticleMoved(*p,pH);
+        checkBoundaryAfterParticleMoved(*p, pH);
 }
 
 
 /*!
  * \todo JMFT: Make a 2D version of this 
  */
-bool HeaterBoundary::checkBoundaryAfterParticleMoved(BaseParticle *p, ParticleHandler &pH)
+bool HeaterBoundary::checkBoundaryAfterParticleMoved(BaseParticle* p, ParticleHandler& pH)
 {
     if (!(p->isFixed()) && (getDistance(p->getPosition()) < 0))
     {
@@ -111,15 +111,15 @@ bool HeaterBoundary::checkBoundaryAfterParticleMoved(BaseParticle *p, ParticleHa
         // Mdouble noise = heatStrength_ / p->getMass() * pow(pH.getDPMBase()->getTimeStep(),0.5) ;
         // We need a factor of sqrt(3) in front because we are generating random
         // numbers using a uniformly distributed random variable, not a normal one.
-        Mdouble noiseX = sqrt(2. * pH.getDPMBase()->getTimeStep() * specificHeatStrength_.X );
-        Mdouble noiseY = sqrt(2. * pH.getDPMBase()->getTimeStep() * specificHeatStrength_.Y );
-        Mdouble noiseZ = sqrt(2. * pH.getDPMBase()->getTimeStep() * specificHeatStrength_.Z );
-
+        Mdouble noiseX = sqrt(2. * pH.getDPMBase()->getTimeStep() * specificHeatStrength_.X);
+        Mdouble noiseY = sqrt(2. * pH.getDPMBase()->getTimeStep() * specificHeatStrength_.Y);
+        Mdouble noiseZ = sqrt(2. * pH.getDPMBase()->getTimeStep() * specificHeatStrength_.Z);
+        
         Vec3D brownianMotion = Vec3D(
-                noiseX * pH.getDPMBase()->random.getRandomNumber(-1,1),
-                noiseY * pH.getDPMBase()->random.getRandomNumber(-1,1),
-                noiseZ * pH.getDPMBase()->random.getRandomNumber(-1,1));
-        p->setVelocity( p->getVelocity() + brownianMotion );
+                noiseX * pH.getDPMBase()->random.getRandomNumber(-1, 1),
+                noiseY * pH.getDPMBase()->random.getRandomNumber(-1, 1),
+                noiseZ * pH.getDPMBase()->random.getRandomNumber(-1, 1));
+        p->setVelocity(p->getVelocity() + brownianMotion);
     }
     return true;
 }
@@ -133,8 +133,8 @@ void HeaterBoundary::read(std::istream& is)
     BaseBoundary::read(is);
     std::string dummy;
     is >> dummy >> posMin_
-            >> dummy >> posMax_
-            >> dummy >> specificHeatStrength_;
+       >> dummy >> posMax_
+       >> dummy >> specificHeatStrength_;
 }
 
 /*!
@@ -145,8 +145,8 @@ void HeaterBoundary::write(std::ostream& os) const
 {
     BaseBoundary::write(os);
     os << " posMin " << posMin_
-            << " posMax " << posMax_
-            << " specificHeatStrength " << specificHeatStrength_;
+       << " posMax " << posMax_
+       << " specificHeatStrength " << specificHeatStrength_;
 }
 
 /*!

@@ -30,6 +30,7 @@
 #include "Species.h"
 #include "NormalForceSpecies/SinterNormalSpecies.h"
 #include "AdhesiveForceSpecies/ReversibleAdhesiveSpecies.h"
-typedef Species<SinterNormalSpecies,EmptyFrictionSpecies,ReversibleAdhesiveSpecies> SinterReversibleAdhesiveSpecies;
-typedef MixedSpecies<SinterNormalSpecies,EmptyFrictionSpecies,ReversibleAdhesiveSpecies> SinterReversibleAdhesiveMixedSpecies;
+
+typedef Species<SinterNormalSpecies, EmptyFrictionSpecies, ReversibleAdhesiveSpecies> SinterReversibleAdhesiveSpecies;
+typedef MixedSpecies<SinterNormalSpecies, EmptyFrictionSpecies, ReversibleAdhesiveSpecies> SinterReversibleAdhesiveMixedSpecies;
 #endif

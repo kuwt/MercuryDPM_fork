@@ -41,7 +41,7 @@ Coil::Coil()
     omega_ = 1.0;
     offset_ = 0.0;
     thickness_ = 0.0;
-    logger(DEBUG, "Coil() constructor finished");              
+    logger(DEBUG, "Coil() constructor finished");
 }
 
 /*!
@@ -78,7 +78,7 @@ Coil::Coil(Vec3D start, Mdouble l, Mdouble r, Mdouble n, Mdouble omega, Mdouble 
     omega_ = omega;
     thickness_ = thickness;
     offset_ = 0.0;
-    logger(DEBUG, "Coil(params) constructor with parameters finished.");             
+    logger(DEBUG, "Coil(params) constructor with parameters finished.");
 }
 
 Coil::~Coil()
@@ -98,7 +98,8 @@ Coil::~Coil()
  * \param[in] thickness     The thickness of the "spiral" of the Coil, must be non-negative.
  * 
  */
-void Coil::set(Vec3D start, Mdouble length, Mdouble radius, Mdouble numberOfRevelations, Mdouble omega, Mdouble thickness)
+void
+Coil::set(Vec3D start, Mdouble length, Mdouble radius, Mdouble numberOfRevelations, Mdouble omega, Mdouble thickness)
 {
     start_ = start;
     l_ = length;
@@ -131,7 +132,10 @@ Coil* Coil::copy() const
 bool Coil::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const
 {
     Mdouble Rsqr = pow(p.getPosition().X - start_.X, 2) + pow(p.getPosition().Y - start_.Y, 2);
-    if (Rsqr > pow(r_ + p.getWallInteractionRadius() + thickness_, 2) || Rsqr < pow(r_ - p.getWallInteractionRadius() - thickness_, 2) || p.getPosition().Z > l_ + start_.Z + p.getWallInteractionRadius() + thickness_ || p.getPosition().Z < start_.Z - p.getWallInteractionRadius() - thickness_)
+    if (Rsqr > pow(r_ + p.getWallInteractionRadius() + thickness_, 2) ||
+        Rsqr < pow(r_ - p.getWallInteractionRadius() - thickness_, 2) ||
+        p.getPosition().Z > l_ + start_.Z + p.getWallInteractionRadius() + thickness_ ||
+        p.getPosition().Z < start_.Z - p.getWallInteractionRadius() - thickness_)
     {
         //std::cout<<"Particle is out of first bound checking"<<std::endl;
         //std::cout<<"Rule 1: "<<pow(r-P.getRadius()-thickness_,2)<<"<"<<Rsqr<<"<"<<pow(r+P.getRadius()+thickness_,2)<<std::endl;
@@ -155,7 +159,7 @@ bool Coil::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D&
     Mdouble dd; //Derivative at current guess
     Mdouble ddd; //Second derivative at current guess
     Mdouble q0 = dz / l_; //Minimum of the parabolic part
-            
+    
     //The initial guess will be in the maximum of the cos closest to the minimum of the parabolic part
     //Minima of the cos are at
     //alpha-2*Pi*(offset+N*q)=2*k*Pi (k=integer)
@@ -167,8 +171,10 @@ bool Coil::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D&
     //Now apply Newton's method
     do
     {
-        dd = -4.0 * R * r_ * constants::pi * n_ * sin(alpha - 2.0 * constants::pi * (n_ * q + offset_)) - 2.0 * l_ * (dz - q * l_);
-        ddd = 8.0 * R * r_ * constants::sqr_pi * n_ * n_ * cos(alpha - 2.0 * constants::pi * (n_ * q + offset_)) + 2.0 * l_ * l_;
+        dd = -4.0 * R * r_ * constants::pi * n_ * sin(alpha - 2.0 * constants::pi * (n_ * q + offset_)) -
+             2.0 * l_ * (dz - q * l_);
+        ddd = 8.0 * R * r_ * constants::sqr_pi * n_ * n_ * cos(alpha - 2.0 * constants::pi * (n_ * q + offset_)) +
+              2.0 * l_ * l_;
         q -= dd / ddd;
     } while (fabs(dd / ddd) > 1e-14);
     
@@ -182,7 +188,8 @@ bool Coil::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D&
         q = 1;
     }
     
-    Mdouble distanceSquared = R * R + r_ * r_ - 2 * R * r_ * cos(alpha - 2 * constants::pi * (offset_ + n_ * q)) + pow(dz - q * l_, 2);
+    Mdouble distanceSquared =
+            R * R + r_ * r_ - 2 * R * r_ * cos(alpha - 2 * constants::pi * (offset_ + n_ * q)) + pow(dz - q * l_, 2);
     //If distance is too large there is no contact
     if (distanceSquared >= (p.getWallInteractionRadius() + thickness_) * (p.getWallInteractionRadius() + thickness_))
     {
@@ -216,12 +223,12 @@ void Coil::read(std::istream& is)
     BaseWall::read(is);
     std::string dummy;
     is >> dummy >> start_
-            >> dummy >> l_
-            >> dummy >> r_
-            >> dummy >> n_
-            >> dummy >> omega_
-            >> dummy >> thickness_
-            >> dummy >> offset_;
+       >> dummy >> l_
+       >> dummy >> r_
+       >> dummy >> n_
+       >> dummy >> omega_
+       >> dummy >> thickness_
+       >> dummy >> offset_;
 }
 
 /*!
@@ -231,25 +238,25 @@ void Coil::oldRead(std::istream& is)
 {
     std::string dummy;
     is >> dummy >> start_
-            >> dummy >> l_
-            >> dummy >> r_ >> dummy >> n_
-            >> dummy >> omega_
-            >> dummy >> offset_;
+       >> dummy >> l_
+       >> dummy >> r_ >> dummy >> n_
+       >> dummy >> omega_
+       >> dummy >> offset_;
 }
 
 /*!
  * \param[in,out] os The outpus stream to which the Coil is written.
  */
 void Coil::write(std::ostream& os) const
-        {
+{
     BaseWall::write(os);
     os << " Start " << start_
-            << " Length " << l_
-            << " Radius " << r_
-            << " Revolutions " << n_
-            << " Omega " << omega_
-            << " Thickness " << thickness_
-            << " Offset " << offset_;
+       << " Length " << l_
+       << " Radius " << r_
+       << " Revolutions " << n_
+       << " Omega " << omega_
+       << " Thickness " << thickness_
+       << " Offset " << offset_;
 }
 
 /*!

@@ -64,7 +64,7 @@ BoundaryHandler::BoundaryHandler(const BoundaryHandler& BH)
  * \details This is not a copy assignment operator! It just copies all BaseBoundary
  *          from the other handler into this handler, and clears all other variables.
  */
-BoundaryHandler& BoundaryHandler::operator =(const BoundaryHandler& rhs)
+BoundaryHandler& BoundaryHandler::operator=(const BoundaryHandler& rhs)
 {
     if (this != &rhs)
     {
@@ -72,7 +72,7 @@ BoundaryHandler& BoundaryHandler::operator =(const BoundaryHandler& rhs)
         copyContentsFromOtherHandler(rhs);
     }
     logger(DEBUG, "BoundaryHandler BoundaryHandler::operator =(const BoundaryHandler& rhs)");
-   
+    
     return *this;
 }
 
@@ -102,7 +102,7 @@ void BoundaryHandler::addObject(BaseBoundary* P)
 
 }
 
-BaseBoundary* BoundaryHandler::createObject(const std::string &type)
+BaseBoundary* BoundaryHandler::createObject(const std::string& type)
 {
     //Note that compare returns 0 if the strings are the same.
     if (type == "AngledPeriodicBoundary")
@@ -141,11 +141,11 @@ BaseBoundary* BoundaryHandler::createObject(const std::string &type)
     {
         return new ConstantMassFlowMaserBoundary;
     }
-    else if(type == "SubcriticalMaserBoundary")
+    else if (type == "SubcriticalMaserBoundary")
     {
         return new SubcriticalMaserBoundary;
     }
-    else if(type == "SubcriticalMaserBoundaryTEST")
+    else if (type == "SubcriticalMaserBoundaryTEST")
     {
         return new SubcriticalMaserBoundaryTEST;
     }
@@ -156,7 +156,7 @@ BaseBoundary* BoundaryHandler::createObject(const std::string &type)
     else if (type == "MPIDomainBoundary")
     {
         return new PeriodicBoundary;
-    }    
+    }
     else if (type == "FluxBoundary")
     {
         return new FluxBoundary;
@@ -192,10 +192,11 @@ void BoundaryHandler::readAndAddObject(std::istream& is)
     else
     {
         BaseBoundary* boundary = createObject(type);
-        if (boundary== nullptr) {
+        if (boundary == nullptr)
+        {
             std::string line;
-            getline(is,line);
-            logger(WARN,"This boundary could not be read and is ignored:\n%%",type,line);
+            getline(is, line);
+            logger(WARN, "This boundary could not be read and is ignored:\n%%", type, line);
             return;
         }
         boundary->setHandler(this);
@@ -213,11 +214,11 @@ void BoundaryHandler::readOldObject(std::istream& is)
     //read in next line
     std::stringstream line;
     helpers::getLineFromStringStream(is, line);
-
+    
     std::string dummy;
     Vec3D normal;
     Mdouble positionLeft, positionRight;
-
+    
     PeriodicBoundary periodicBoundary;
     line >> normal >> dummy >> positionLeft >> dummy >> positionRight;
     periodicBoundary.set(normal, positionLeft, positionRight);

@@ -36,7 +36,7 @@ EmptyAdhesiveSpecies::EmptyAdhesiveSpecies()
 /*!
  * \param[in] the species that is copied
  */
-EmptyAdhesiveSpecies::EmptyAdhesiveSpecies(const EmptyAdhesiveSpecies &s UNUSED)
+EmptyAdhesiveSpecies::EmptyAdhesiveSpecies(const EmptyAdhesiveSpecies& s UNUSED)
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"EmptyAdhesiveSpecies::EmptyAdhesiveSpecies(const EmptyAdhesiveSpecies &p) finished"<<std::endl;
@@ -47,7 +47,7 @@ EmptyAdhesiveSpecies::~EmptyAdhesiveSpecies()
 {
 #ifdef DEBUG_DESTRUCTOR
     std::cout<<"EmptyAdhesiveSpecies::~EmptyAdhesiveSpecies() finished"<<std::endl;
-#endif   
+#endif
 }
 
 /*!

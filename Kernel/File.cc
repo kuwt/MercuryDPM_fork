@@ -52,7 +52,7 @@ std::string to_string_padded(unsigned int value)
  * \param[in] fileType the fileType that has to be written to the output stream
  * \return the output stream "os" that is returned after adding the fileType string
  */
-std::ostream& operator<<(std::ostream&os, FileType fileType)
+std::ostream& operator<<(std::ostream& os, FileType fileType)
 {
     if (fileType == FileType::NO_FILE)
         os << "NO_FILE";
@@ -75,7 +75,7 @@ std::ostream& operator<<(std::ostream&os, FileType fileType)
  * \param[in] fileType The fileType that has to be read from the input stream
  * \return the input stream "is" (that is returned after the fileType string is read out)
  */
-std::istream& operator>>(std::istream&is, FileType&fileType)
+std::istream& operator>>(std::istream& is, FileType& fileType)
 {
     std::string fileTypeString;
     is >> fileTypeString;
@@ -89,7 +89,7 @@ std::istream& operator>>(std::istream&is, FileType&fileType)
         fileType = FileType::MULTIPLE_FILES_PADDED;
     else
     {
-        logger(ERROR,"operator>>: FileType % not recognized", fileTypeString);
+        logger(ERROR, "operator>>: FileType % not recognized", fileTypeString);
     }
     return is;
 }
@@ -104,10 +104,10 @@ File::File()
     //in between each saved "snapshot" of the system to zero
     //(i.e. records every time step by default)
     saveCount_ = 0;
-
+    
     // file name has to be set by the user
     name_ = "out";
-       
+    
     // output into a single file by default
     fileType_ = FileType::ONE_FILE;
     
@@ -116,7 +116,7 @@ File::File()
     
     //stores the time step of the last write/read operation; NEVER by default
     lastSavedTimeStep_ = NEVER;
-
+    
     //sets the default openMode to "out"
     //i.e. files will by default be written to, not read from.
     openMode_ = std::fstream::out;
@@ -165,7 +165,7 @@ const std::string& File::getName() const
 
 const std::string File::getFullName() const
 {
-    return getFullName(getCounter()-1);
+    return getFullName(getCounter() - 1);
 }
 
 /*!
@@ -177,9 +177,12 @@ const std::string File::getFullName(unsigned counter) const
     //get the full file name
     std::stringstream lastName("");
     lastName << name_;
-    if (getFileType() == FileType::MULTIPLE_FILES) {
+    if (getFileType() == FileType::MULTIPLE_FILES)
+    {
         lastName << "." << counter;
-    } else if (getFileType() == FileType::MULTIPLE_FILES_PADDED) {
+    }
+    else if (getFileType() == FileType::MULTIPLE_FILES_PADDED)
+    {
         lastName << "." << to_string_padded(counter);
     }
     return lastName.str();
@@ -193,13 +196,15 @@ void File::setName(const std::string& name)
     logger.assert_always(!getName().empty(), "Error: Name cannot be empty");
     this->name_ = name;
 }
-/*! 
+
+/*!
  * \return Returns the FileType (File::fileType_)
  */
 FileType File::getFileType() const
 {
     return fileType_;
 }
+
 /*!
  * \param[in] fileType
  */
@@ -207,6 +212,7 @@ void File::setFileType(FileType fileType)
 {
     fileType_ = fileType;
 }
+
 /*!
  * \return unsigned int counter_
  */
@@ -214,6 +220,7 @@ unsigned int File::getCounter() const
 {
     return counter_;
 }
+
 /*!
  * \param[in] counter
  */
@@ -286,14 +293,17 @@ bool File::saveCurrentTimeStep(unsigned int ntimeSteps)
      * - if file can be opened
      * in that case, change lastSavedTimeStep and return true;
      */
-    if ((lastSavedTimeStep_==NEVER || ntimeSteps>=lastSavedTimeStep_+saveCount_)
-        && getFileType()!= FileType::NO_FILE)
+    if ((lastSavedTimeStep_ == NEVER || ntimeSteps >= lastSavedTimeStep_ + saveCount_)
+        && getFileType() != FileType::NO_FILE)
     {
         return true;
-    } else {
+    }
+    else
+    {
         return false;
     }
 }
+
 /*!
  * \details Returns a bool to check if the file is open or closed. It also increments the nextSavedTimeStep with the saveCount
  * \return bool (True or False)
@@ -302,19 +312,22 @@ bool File::saveCurrentTimeStep(unsigned int ntimeSteps)
 bool File::open()
 {
     //close old file if multi-file output
-    if (fileType_==FileType::MULTIPLE_FILES||fileType_==FileType::MULTIPLE_FILES_PADDED) {
+    if (fileType_ == FileType::MULTIPLE_FILES || fileType_ == FileType::MULTIPLE_FILES_PADDED)
+    {
         fstream_.close();
     }
-
+    
     counter_++;
-
-    if (!fstream_.is_open()) {
+    
+    if (!fstream_.is_open())
+    {
         fstream_.open(getFullName().c_str(), openMode_);
-        if (!fstream_.is_open()) {
+        if (!fstream_.is_open())
+        {
             return false;
         }
     }
-
+    
     return true;
 }
 
@@ -333,9 +346,12 @@ bool File::open(std::fstream::openmode openMode)
 bool File::openWrite(unsigned nTimeSteps)
 {
     setLastSavedTimeStep(nTimeSteps);
-    if (getFileType() == FileType::ONE_FILE && getCounter() != 0) {
+    if (getFileType() == FileType::ONE_FILE && getCounter() != 0)
+    {
         setOpenMode(std::fstream::out | std::fstream::app);
-    } else {
+    }
+    else
+    {
         setOpenMode(std::fstream::out);
     }
     return open();
@@ -357,6 +373,7 @@ void File::close()
 {
     fstream_.close();
 }
+
 /*!
  * \details Read function, which accepts an input stream object as input and assigns the member variables i.e. name_, fileType_,
  * saveCount_, counter_ and lastSavedTimeStep_
@@ -371,13 +388,17 @@ void File::read(std::istream& is)
     is >> fileType_;
     is >> dummy >> saveCount_;
     is >> dummy >> counter_;
-    if (counter_!=0) {
+    if (counter_ != 0)
+    {
         is >> dummy >> lastSavedTimeStep_;
-    } else {
+    }
+    else
+    {
         lastSavedTimeStep_ = NEVER;
     }
     //if (dummy != "lastSavedTimeStep") lastSavedTimeStep_=SAVE;
 }
+
 /*!
  * \details BaseParticle print function, which accepts an output stream object as input 
  *  and writes the info to the std::ostream
@@ -391,27 +412,30 @@ void File::write(std::ostream& os) const
     os << "fileType " << fileType_;
     os << " saveCount " << saveCount_;
     os << " counter " << counter_;
-    if (counter_!=0) {
+    if (counter_ != 0)
+    {
         os << " lastSavedTimeStep " << lastSavedTimeStep_;
     }
     ///\todo TW: openMode_ is not saved, maybe it should not even be stored but set every time you open a file
 }
+
 /*!
  * \param[in,out] os 
  * \param[in] o
  * \return std::ostream& os
  */
-std::ostream& operator <<(std::ostream& os, const File& o)
+std::ostream& operator<<(std::ostream& os, const File& o)
 {
     o.write(os);
     return os;
 }
+
 /*!
  * \param[in,out] is
  * \param[in] o
  * \return std::istream&
  */
-std::istream& operator >>(std::istream& is, File &o)
+std::istream& operator>>(std::istream& is, File& o)
 {
     o.read(is);
     return (is);

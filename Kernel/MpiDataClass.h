@@ -140,12 +140,12 @@ MPIParticle copyDataFromParticleToMPIParticle(BaseParticle* p);
 /*!
  * \brief Copies data from an MPIParticle class to a BaseParticle
  */
-void copyDataFromMPIParticleToParticle(MPIParticle *bP, BaseParticle* p);
+void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p);
 
 /*!
  * \brief Copies data from an MPIParticle class to a BaseParticle
  */
-void copyDataFromMPIParticleToParticle(MPIParticle *bP, BaseParticle* p, ParticleHandler* particleHandler);
+void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p, ParticleHandler* particleHandler);
 
 /*!
  * \brief Copies data from a BaseParticle to an MPIParticle class and returns this
@@ -155,7 +155,7 @@ MPIParticleForce copyForceFromParticleToMPIParticle(BaseParticle* p);
 /*!
  * \brief Copies data from an MPIParticle class to a BaseParticle
  */
-void copyForceFromMPIParticleToParticle(MPIParticleForce *bP, BaseParticle* p);
+void copyForceFromMPIParticleToParticle(MPIParticleForce* bP, BaseParticle* p);
 
 /*!
  * \brief Copies the position from a particle to an MPIParticlePosition class
@@ -166,4 +166,5 @@ MPIParticlePosition copyPositionFrom(BaseParticle* particle);
  * \brief Copies the velocity from a particle to an MPIParticleVelocity class
  */
 MPIParticleVelocity copyVelocityFrom(BaseParticle* particles);
+
 #endif  /* MPIDATACLASS_H_ */

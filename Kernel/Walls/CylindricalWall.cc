@@ -38,7 +38,7 @@ CylindricalWall::CylindricalWall()
 #endif
 }
 
-CylindricalWall::CylindricalWall(const CylindricalWall &p)
+CylindricalWall::CylindricalWall(const CylindricalWall& p)
         : BaseWall(p)
 {
     radius_ = p.radius_;
@@ -69,8 +69,8 @@ void CylindricalWall::set(Mdouble radius)
 }
 
 ///Since this function should be called before calculating any Particle-Wall interactions, it can also be used to set the normal vector in case of curved walls.
-bool CylindricalWall::getDistanceAndNormal(const BaseParticle &P, Mdouble &distance, Vec3D &normal_return) const
-        {
+bool CylindricalWall::getDistanceAndNormal(const BaseParticle& P, Mdouble& distance, Vec3D& normal_return) const
+{
     double R = sqrt(pow(P.getPosition().X, 2) + pow(P.getPosition().Y, 2));
     distance = radius_ - R;
     if (distance >= P.getRadius())
@@ -100,7 +100,7 @@ void CylindricalWall::oldRead(std::istream& is)
 
 ///outputs wall
 void CylindricalWall::write(std::ostream& os) const
-        {
+{
     BaseWall::write(os);
     os << "  radius " << radius_;
 }

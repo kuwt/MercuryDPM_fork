@@ -14,13 +14,14 @@ PolydisperseInsertionBoundary::PolydisperseInsertionBoundary()
 
 /* Copy constructor */
 PolydisperseInsertionBoundary::PolydisperseInsertionBoundary(const PolydisperseInsertionBoundary& other)
-        : InsertionBoundary(other) {
+        : InsertionBoundary(other)
+{
     /* The new PolydisperseInsertionBoundary's generanda_ vector should point to
      * its own copies of each of the generanda_, so we need to copy those
      * across. */
     for (int i = 0; i < generanda_.size(); i++)
         generanda_[i] = other.generanda_[i]->copy();
-
+    
     posMin_ = other.posMin_;
     posMax_ = other.posMax_;
     velMin_ = other.velMin_;
@@ -37,7 +38,7 @@ PolydisperseInsertionBoundary::~PolydisperseInsertionBoundary()
 {
     // JMFT: Do we need to delete the elements of generanda_?
     for (auto p : generanda_)
-
+        
         delete p;
 }
 
@@ -45,7 +46,7 @@ PolydisperseInsertionBoundary* PolydisperseInsertionBoundary::copy() const
 {
 #ifdef DEBUG_CONSTRUCTOR
     logger(INFO, "PolydisperseInsertionBoundary::copy() const finished");
-#endif		
+#endif
     return new PolydisperseInsertionBoundary(*this);
 }
 
@@ -61,83 +62,85 @@ void PolydisperseInsertionBoundary::setGeometry(int maxFailed, Vec3D posMin, Vec
 void PolydisperseInsertionBoundary::addGenerandum(BaseParticle* generandum, double probability, double sizeDispersity)
 {
     // Give the PolydisperseInsertionBoundary its own copy of the generandum.
-    generanda_.push_back( generandum->copy() );
+    generanda_.push_back(generandum->copy());
     probabilitates_.push_back(probability);
     sizeDispersities_.push_back(sizeDispersity);
     numbersInserted_.push_back(0);
     massesInserted_.push_back(0);
     volumesInserted_.push_back(0);
-    logger(INFO, "PolydisperseInsertionBoundary: added a new generandum, now have %. New generandum has weighting %", 
-            generanda_.size(), probability);
+    logger(INFO, "PolydisperseInsertionBoundary: added a new generandum, now have %. New generandum has weighting %",
+           generanda_.size(), probability);
 }
 
 
-void PolydisperseInsertionBoundary::setGenerandum(unsigned int spec, BaseParticle* generandum, double probability, double sizeDispersity)
+void PolydisperseInsertionBoundary::setGenerandum(unsigned int spec, BaseParticle* generandum, double probability,
+                                                  double sizeDispersity)
 {
     if (spec < generanda_.size())
         logger(INFO, "Setting the %-th species of a PolydisperseInsertionBoundary that so far has % species",
-                spec, generanda_.size());
+               spec, generanda_.size());
     else
-        logger(ERROR, "Setting the %-th species of a PolydiserseInsertionBoundary with only % species is illegal. Use addGenerandum instead.",
-                spec, generanda_.size());
+        logger(ERROR,
+               "Setting the %-th species of a PolydiserseInsertionBoundary with only % species is illegal. Use addGenerandum instead.",
+               spec, generanda_.size());
     
     if (probability == 0)
         logger(WARN, "PolydisperseInsertionBoundary: Are you sure you want to set the probability to be 0?");
-
+    
     generanda_[spec] = generandum->copy();
     probabilitates_[spec] = probability;
     sizeDispersities_[spec] = sizeDispersity;
-
+    
     // Reset the counters for number, mass and volume
     numbersInserted_[spec] = 0;
-    massesInserted_[spec]  = 0;
+    massesInserted_[spec] = 0;
     volumesInserted_[spec] = 0;
 }
 
-BaseParticle* PolydisperseInsertionBoundary::generateParticle(RNG &random)
+BaseParticle* PolydisperseInsertionBoundary::generateParticle(RNG& random)
 {
     /* First choose what particle species to generate. */
     Mdouble totalprob = 0;
     for (auto p : probabilitates_)
         totalprob += p;
-
+    
     Mdouble check = random.getRandomNumber(0, totalprob);
     unsigned int spec;
     logger(VERBOSE, "PolydisperseInsertionBoundary: check = % out of %",
-            check, totalprob);
+           check, totalprob);
     for (int i = 0; i < generanda_.size(); i++)
     {
         if (check >= probabilitates_[i])
-           check -= probabilitates_[i];
+            check -= probabilitates_[i];
         else
         {
             spec = i;
             break;
         }
     }
-
+    
     auto P = generanda_[spec]->copy();
-
+    
     /* The 'reference' particle for this species has a radius, but we allow some
      * sizeDispersity. */
-    double radius = P->getRadius() 
-        * random.getRandomNumber(1-sizeDispersities_[spec], 1+sizeDispersities_[spec]);
+    double radius = P->getRadius()
+                    * random.getRandomNumber(1 - sizeDispersities_[spec], 1 + sizeDispersities_[spec]);
     P->setRadius(radius);
-
+    
     /* JMFT: TODO: These do *not* give the correct values! 
      * They give the number &c. of each species that the
      * PolydisperseInsertionBoundary has _attempted_ to place, not the number
      * that have actually been placed successfully. */
-    numbersInserted_[spec] ++;
-    massesInserted_[spec]  += P->getMass();
+    numbersInserted_[spec]++;
+    massesInserted_[spec] += P->getMass();
     // volumesInserted_[spec] += P->getVolume();
-
+    
     return P;
 }
 
 /* JMFT: TODO: We should think how to recycle this code from
  * CubeInsertionBoundary more efficiently */
-void PolydisperseInsertionBoundary::placeParticle(BaseParticle* P, RNG &random) 
+void PolydisperseInsertionBoundary::placeParticle(BaseParticle* P, RNG& random)
 {
     Vec3D pos, vel;
     pos.X = random.getRandomNumber(posMin_.X, posMax_.X);
@@ -186,8 +189,8 @@ void PolydisperseInsertionBoundary::write(std::ostream& os) const
         generanda_[i]->write(os);
         os << " weight " << probabilitates_[i] << " sizeDispersity " << sizeDispersities_[i];
     }
-    os << " posMin " << posMin_ << " posMax " << posMax_ 
-       << " velMin " << velMin_ << " velMax " << velMax_ 
+    os << " posMin " << posMin_ << " posMax " << posMax_
+       << " velMin " << velMin_ << " velMax " << velMax_
        << " ";
 }
 

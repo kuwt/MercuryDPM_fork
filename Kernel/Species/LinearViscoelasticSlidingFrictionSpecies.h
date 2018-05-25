@@ -30,6 +30,7 @@
 #include "Species.h"
 #include "NormalForceSpecies/LinearViscoelasticNormalSpecies.h"
 #include "FrictionForceSpecies/SlidingFrictionSpecies.h"
-typedef Species<LinearViscoelasticNormalSpecies,SlidingFrictionSpecies> LinearViscoelasticSlidingFrictionSpecies;
-typedef MixedSpecies<LinearViscoelasticNormalSpecies,SlidingFrictionSpecies> LinearViscoelasticSlidingFrictionMixedSpecies;
+
+typedef Species<LinearViscoelasticNormalSpecies, SlidingFrictionSpecies> LinearViscoelasticSlidingFrictionSpecies;
+typedef MixedSpecies<LinearViscoelasticNormalSpecies, SlidingFrictionSpecies> LinearViscoelasticSlidingFrictionMixedSpecies;
 #endif

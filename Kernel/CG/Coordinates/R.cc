@@ -126,6 +126,7 @@ Mdouble R::getDomainVolume(const Vec3D& min, const Vec3D& max)
     return constants::pi * (max.X * max.X - min.X * min.X) * (max.Z - min.Z);
 }
 
-std::string R::getName() {
+std::string R::getName()
+{
     return "R";
 }

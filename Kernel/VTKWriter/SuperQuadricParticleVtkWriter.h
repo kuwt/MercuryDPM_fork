@@ -33,13 +33,14 @@
 class SuperQuadricParticleVtkWriter final : public ParticleVtkWriter
 {
 public:
-
-    explicit SuperQuadricParticleVtkWriter(ParticleHandler& particleHandler) : ParticleVtkWriter(particleHandler) { }
+    
+    explicit SuperQuadricParticleVtkWriter(ParticleHandler& particleHandler) : ParticleVtkWriter(particleHandler)
+    {}
     
     void writeVTK() const override;
-
+    
     ~SuperQuadricParticleVtkWriter() override = default;
-
+    
     std::string getName() const override
     {
         return "SuperQuadricParticleVtkWriter";

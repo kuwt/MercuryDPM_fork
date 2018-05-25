@@ -83,79 +83,79 @@ public:
      */
     typedef BaseFunction<Coordinates> Function;
     typedef CGPoint<Coordinates, Fields> Point;
-
+    
     /*!
      * \brief Default constructor; does nothing, i.e. no points are created
      * initially.
      */
     CG() = default;
-
+    
     /*!
      * \brief
      */
     CG(Mdouble width, unsigned n);
-
+    
     /*!
      * \brief Default copy Constructor; copies all member variables.
      */
     CG(const CG& p) = default;
-
+    
     /*!
      * \brief Default destructor; does nothing
      */
     virtual ~CG() = default;
-
+    
     /*!
      * \brief Copy operator; creates a new'ed CG object.
      */
     CG<Coordinates, BaseFunction, Fields>* copy() const override;
-
+    
     /*!
      * \brief Writes class content, except for the points, into an output stream.
      * \todo TW write should be renamed writeHeader, writeAll should be renamed write.
      */
     void write(std::ostream& os) const override;
-
+    
     /*!
      * \brief Writes class content, including the points_, into an output stream, 
      * usually a stat file.
      */
     void writeAll(std::ostream& os) const;
-
+    
     /*!
      * \brief returns the name of the class, which is required by write.
      */
     std::string getName() const override;
-
+    
     /*!
      * \brief Called at the beginning of the DPM simulation to initialise the cg 
      * evaluation and to open the statFile.
      */
     void initialise() override;
-
+    
     /*!
      * \brief Creates spatial mesh of CGPoints, the points where the CG-variables are evaluated
      */
     virtual void createMesh();
-
+    
     /*!
      * \brief Called after a given number of time steps (statFile::saveCount_)
      * to evaluate the CG fields.
      */
     void evaluate() override;
-
+    
     /*!
      * \brief Computes the spatially-averaged value for each field.
      */
     Point evaluateAverage();
-
+    
     /*!
      * \brief Computes the total value (integrated over space) for each field.
      */
     Point evaluateTotal();
-
+    
     void evaluateParticleAtPoint(Fields& currentInteraction, const BaseParticle& p, Point& r);
-
+    
     /*!
      * \brief Contains the basic for loop over all CGPoints, required to do
      * particle statistics.
@@ -163,7 +163,7 @@ public:
      * grid properties for smart neighborhood search.
      */
     void evaluateParticle(const BaseParticle& p);
-
+    
     /*!
      * \brief Contains the basic for loop over all CGPoints, required to do
      * contact statistics.
@@ -171,44 +171,50 @@ public:
      * particle.
      */
     void evaluateContact(const BaseInteraction& i);
-
+    
     IntegralType getIntegralType(const BaseInteraction& c);
-
+    
     /*!
      * \brief Called at the end of the DPM simulation to finish the cg
      * evaluation and to close the statFile.
      */
     void finish() override;
-
+    
     const Point& getPoint(size_t i) const
     {
         return points_[i];
     }
-
+    
     const std::vector<Point>& getPoints() const
     {
         return points_;
     }
-
+    
     Function& getFunction()
     {
         return function_;
     }
-
-    void setStandardDeviation (Mdouble std) {
+    
+    void setStandardDeviation(Mdouble std)
+    {
         function_.setStandardDeviation(std);
     }
-
-    void setRadius (Mdouble radius) {
-        if (std::is_base_of<CGCoordinates::Base_X_Y_Z, Coordinates>::value) {
-            function_.setStandardDeviation(radius*sqrt(.2));
-        } else if (std::is_base_of<CGCoordinates::Base_XY_XZ_YZ, Coordinates>::value) {
-            function_.setStandardDeviation(radius*sqrt(.4));
-        } else /*XYZ*/ {
-            function_.setStandardDeviation(radius*sqrt(.6));
+    
+    void setRadius(Mdouble radius)
+    {
+        if (std::is_base_of<CGCoordinates::Base_X_Y_Z, Coordinates>::value)
+        {
+            function_.setStandardDeviation(radius * sqrt(.2));
+        }
+        else if (std::is_base_of<CGCoordinates::Base_XY_XZ_YZ, Coordinates>::value)
+        {
+            function_.setStandardDeviation(radius * sqrt(.4));
+        }
+        else /*XYZ*/ {
+            function_.setStandardDeviation(radius * sqrt(.6));
         }
     }
-
+    
     /*!
      * \param[in] width of the cg function for all CGPoints
      */
@@ -216,7 +222,7 @@ public:
     {
         function_.setWidth(width);
     }
-
+    
     /*!
      * \return width of the cg function for all CGPoints
      */
@@ -224,44 +230,45 @@ public:
     {
         return function_.getWidth();
     }
-protected:
 
+protected:
+    
     /*!
      * \brief set all variables to zero
      */
     void resetVariables();
-
+    
     /*!
      * \brief divide each variable by the domain volume
      */
     void volumeAverageVariables();
-
+    
     /*!
      * \brief write variables to the stat file
      */
     void writeVariables();
-
+    
     /*!
      * \brief The part of evaluate that is used for CG, timeAveragedCG and timeSmoothedCG
      */
     void evaluateCommon();
-
+    
     /*!
      * \brief plot total to console
      */
     void outputSumOfVariables();
 
 protected:
-
+    
     /*!
      * \brief Contains the CGPoint's, i.e. the positions at which the StandardFields
      * are evaluated.
      */
     std::vector<Point> points_;
-
+    
     Function function_;
-
-
+    
+    
 };
 
 #include "CG/CG.hcc"

@@ -35,7 +35,7 @@ EmptyFrictionSpecies::EmptyFrictionSpecies()
 /*!
  * \param[in] the species that is copied
  */
-EmptyFrictionSpecies::EmptyFrictionSpecies(const EmptyFrictionSpecies &s UNUSED)
+EmptyFrictionSpecies::EmptyFrictionSpecies(const EmptyFrictionSpecies& s UNUSED)
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"EmptySpecies::EmptySpecies(const EmptySpecies &p) finished"<<std::endl;
@@ -46,7 +46,7 @@ EmptyFrictionSpecies::~EmptyFrictionSpecies()
 {
 #ifdef DEBUG_DESTRUCTOR
     std::cout<<"EmptySpecies::~EmptySpecies() finished"<<std::endl;
-#endif   
+#endif
 }
 
 /*!

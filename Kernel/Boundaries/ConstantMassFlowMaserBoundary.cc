@@ -47,7 +47,8 @@ ConstantMassFlowMaserBoundary::ConstantMassFlowMaserBoundary()
  *          then immediately opens the maser. Do not insert particles for the maser after this constructor.
  * \param[in] periodicBoundary The periodic boundary on which this maser boundary is based.
  */
-ConstantMassFlowMaserBoundary::ConstantMassFlowMaserBoundary(const PeriodicBoundary& periodicBoundary) : BaseBoundary(periodicBoundary)
+ConstantMassFlowMaserBoundary::ConstantMassFlowMaserBoundary(const PeriodicBoundary& periodicBoundary) : BaseBoundary(
+        periodicBoundary)
 {
     logger(INFO, "Constructor ConstantMassFlowMaserBoundary(const PeriodicBoundary&) started");
     distanceLeft_ = periodicBoundary.getDistanceLeft();
@@ -56,7 +57,7 @@ ConstantMassFlowMaserBoundary::ConstantMassFlowMaserBoundary(const PeriodicBound
     shift_ = periodicBoundary.getShift();
     gapSize_ = std::numeric_limits<double>::quiet_NaN();
     maserIsActivated_ = false;
-
+    
     logger(INFO, "going to activate the maser");
     //assume that the maser should be activated immediately when it gets constructed from a periodic boundary
     activateMaser();
@@ -115,7 +116,8 @@ void ConstantMassFlowMaserBoundary::read(std::istream& is)
         speciesConversionMaserToNormal_[speciesHandler.getObject(value)] = speciesHandler.getObject(key);
     }
     logger(DEBUG, "Finished reading ConstantMassFlowMaserBoundary. \nNormal: % \nDistanceLeft: % \nDistanceRight: % "
-            "\nGapsize: % \nMaserIsActivated: %", normal_, distanceLeft_, distanceRight_, gapSize_, maserIsActivated_);
+                  "\nGapsize: % \nMaserIsActivated: %", normal_, distanceLeft_, distanceRight_, gapSize_,
+           maserIsActivated_);
 }
 
 /*!
@@ -179,39 +181,39 @@ void ConstantMassFlowMaserBoundary::shiftPosition(BaseParticle* const p) const
 void ConstantMassFlowMaserBoundary::createPeriodicParticle(BaseParticle* p, ParticleHandler& pH)
 {
     if (isMaserParticle(p))
-   	{
-   	    // check if particle is near the boundaries of the maser domain
-   	    if (getDistance(p) < p->getInteractionRadius() + pH.getLargestParticleLocal()->getInteractionRadius())
-   	    {
-   		    BaseParticle* pGhost = createGhostCopy(p);
-
-   		    // shift to the periodic location
-   	        shiftPosition(pGhost);
-
-   	        // add the periodic particle to the handler
-   	        pH.addObject(pGhost);
-
+    {
+        // check if particle is near the boundaries of the maser domain
+        if (getDistance(p) < p->getInteractionRadius() + pH.getLargestParticleLocal()->getInteractionRadius())
+        {
+            BaseParticle* pGhost = createGhostCopy(p);
+            
+            // shift to the periodic location
+            shiftPosition(pGhost);
+            
+            // add the periodic particle to the handler
+            pH.addObject(pGhost);
+            
             //furthermore, if the particle is on the right it has to be copied over to the outflow domain
-   	        if (isClosestToRightBoundary(p) && maserIsActivated_)
-   	        {
-   		        // Copy the particle and its interactions if it is a maser particle
-   		        BaseParticle* pGhostOut = createGhostCopy(p);
-
-   		        // shift to the outflow location
-   		        pGhostOut->move(gapSize_ * normal_);
-   		        // add the periodic particle to the handler
-   		        pH.addObject(pGhostOut);
-   	        }
-   	    }
-   	}
+            if (isClosestToRightBoundary(p) && maserIsActivated_)
+            {
+                // Copy the particle and its interactions if it is a maser particle
+                BaseParticle* pGhostOut = createGhostCopy(p);
+                
+                // shift to the outflow location
+                pGhostOut->move(gapSize_ * normal_);
+                // add the periodic particle to the handler
+                pH.addObject(pGhostOut);
+            }
+        }
+    }
 }
 
 void ConstantMassFlowMaserBoundary::createPeriodicParticles(ParticleHandler& pH)
 {
     unsigned numberOfParticles = pH.getSize();
-    for(unsigned i = 0; i < numberOfParticles; i++)
+    for (unsigned i = 0; i < numberOfParticles; i++)
     {
-        createPeriodicParticle(pH.getObject(i),pH);
+        createPeriodicParticle(pH.getObject(i), pH);
     }
 }
 
@@ -226,7 +228,7 @@ BaseParticle* ConstantMassFlowMaserBoundary::createGhostCopy(BaseParticle* const
     // Copy the particle and its interactions
     BaseParticle* pGhost = p->copy();
     pGhost->copyInteractionsForPeriodicParticles(*p);
-
+    
     //Set the 'last' particle. If Particle is multiply shifted, get correct original particle
     BaseParticle* last = p;
     while (last->getPeriodicFromParticle() != nullptr)
@@ -249,7 +251,7 @@ BaseParticle* ConstantMassFlowMaserBoundary::createGhostCopy(BaseParticle* const
 bool ConstantMassFlowMaserBoundary::checkBoundaryAfterParticleMoved(BaseParticle* p, ParticleHandler& pH)
 {
     // check if particle passed either of the boundary walls
-    if ( isMaserParticle(p) && getDistance(p) < 0 )
+    if (isMaserParticle(p) && getDistance(p) < 0)
     {
         // Checks if the particle is closest to the right boundary.
         // If so, and if the Maser is turned on, then create a 'real'
@@ -261,7 +263,7 @@ bool ConstantMassFlowMaserBoundary::checkBoundaryAfterParticleMoved(BaseParticle
             pCopy->move(gapSize_ * normal_);
             pH.addObject(pCopy);
         }
-
+        
         // If the (original) particle has crossed a boundary wall (be it left or right),
         // then shift that particle periodically.
         shiftPosition(p);
@@ -283,7 +285,7 @@ void ConstantMassFlowMaserBoundary::checkBoundaryAfterParticlesMove(ParticleHand
     for (auto p = pH.begin(); p != pH.end(); ++p)
     {
         //If the particle has interacted with the boundary, change the iterator
-        if(checkBoundaryAfterParticleMoved(*p,pH))
+        if (checkBoundaryAfterParticleMoved(*p, pH))
         {
             p--;
         }
@@ -341,7 +343,7 @@ void ConstantMassFlowMaserBoundary::addParticleToMaser(BaseParticle* p)
                        *newMixed, *oldMixed);
             }
         }
-
+        
         // now the species IS added, so flag (convert) it!
         p->setSpecies(newSpecies);
     }
@@ -407,9 +409,8 @@ void ConstantMassFlowMaserBoundary::activateMaser()
                 addParticleToMaser(p);
             }
         }
-
-
-    
+        
+        
         distanceLeft_ -= gapSize_;
         distanceRight_ -= gapSize_;
         maserIsActivated_ = true;

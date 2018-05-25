@@ -41,7 +41,7 @@
 class Time
 {
 public:
-
+    
     /*!
      * \brief This is like a start button of a stopwatch. Assigns the variable
      *        start with the current number of clock ticks.
@@ -50,7 +50,7 @@ public:
     {
         start = clock(); //clock tics
     }
-
+    
     /*!
      * \brief This is like a stop button of a stopwatch. Assigns the variable finish
      *        to the current value of ticks returned by clock().
@@ -67,7 +67,7 @@ private:
      * \brief Stores the number of clock ticks, called by Time::tic().
      */
     clock_t start;
-
+    
     /*!
      * \brief Stores the number of clock ticks, called by Time::toc().
      */
@@ -89,7 +89,7 @@ private:
 class Time2Finish
 {
 public:
-
+    
     /*!
      * \brief Initialises the variable start with the current value of clock 
      *        ticks, the current time and the final time of the simulation.
@@ -102,7 +102,7 @@ public:
         time_ = t;
         timeMax_ = tMax;
     }
-
+    
     /*!
      * \brief Estimates the total time, in seconds, left to reach the end of any simulation.
      * After the class is initialized, an estimate of the total remaining time of the
@@ -120,7 +120,7 @@ public:
     {
         clock_t finish = clock();
         Mdouble elapsedTime = (Mdouble(finish) - Mdouble(startTime_)) / CLOCKS_PER_SEC;
-
+        
         if (fabs(time_ - t) < 1.e-9)
         {
             std::cout << "Choose an other value for t" << std::endl;
@@ -134,7 +134,7 @@ public:
             return time2Finish;
         }
     }
-
+    
     /*!
      * \brief Returns the estimated finish time based on the amount of time left to finish.
      * \param[in] t current simulation time
@@ -144,18 +144,18 @@ public:
     {
         // gets the estimated time left to finish.
         Mdouble time2Finish = getTime2Finish(t);
-
+        
         // adds to the estimated time to current time and also type-casting Mdouble to time_t.
         time_t finish = time(nullptr) + time2Finish;
-
+        
         std::stringstream ss;
-
+        
         //write estimated end time
         ss << ctime(&finish);
-
+        
         //decrement put pointer by one to avoid line break
         ss.seekp((long) ss.tellp() - 1);
-
+        
         //write time to finish
         ss << " (" << time2Finish / 3600 << "h)";
         return ss.str();
@@ -164,13 +164,13 @@ public:
 private:
     /// Stores the current number of clock ticks at the start.
     clock_t startTime_;
-
+    
     /// Stores the simulation time (DPM units)
     Mdouble time_;
-
+    
     /// Stores the total simulation time (DPM units)
     Mdouble timeMax_;
-
+    
 };
 
 #endif

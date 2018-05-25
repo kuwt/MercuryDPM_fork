@@ -30,8 +30,11 @@
 #include "Math/Vector.h"
 
 class BaseParticle;
+
 class LiquidBridgeWilletSpecies;
+
 class BaseInteractable;
+
 /*!
  * \class LiquidBridgeWilletInteraction
  * \brief Defines the liquid bridge willet interaction between two particles or walls.
@@ -43,6 +46,7 @@ public:
      * \brief An alias name for LiquidBridgeWilletSpecies data type.
      */
     typedef LiquidBridgeWilletSpecies SpeciesType;
+    
     /*!
      * \brief Constructor.
      */
@@ -54,46 +58,54 @@ public:
     /*!
      * \brief Copy constructor.
      */
-    LiquidBridgeWilletInteraction(const LiquidBridgeWilletInteraction &p);
+    LiquidBridgeWilletInteraction(const LiquidBridgeWilletInteraction& p);
+    
     /*!
      * \brief Destructor.
      */
     ~LiquidBridgeWilletInteraction() override;
+    
     /*!
      * \brief Computes the adhesive forces for liquid bridge Willet type of interaction.
      */
     void computeAdhesionForce();
+    
     /*!
      * \brief Interaction read function, which accepts an std::istream as input.
      */
     void read(std::istream& is) override;
+    
     /*!
      * \brief Interaction print function, which accepts an std::ostream as input.
      */
     void write(std::ostream& os) const override;
+    
     /*!
      * \brief Returns the amount of Elastic energy involved in an interaction. Basically
      *        used in case you want to write the elastic energy into an output file. 
-     */ 
+     */
     Mdouble getElasticEnergy() const override;
+    
     /*!
      * \brief A dynamic_cast of BaseSpecies type pointer to a pointer of type LiquidBridgeWilletSpecies.
      */
     const LiquidBridgeWilletSpecies* getSpecies() const;
+    
     /*!
      * \brief Returns the name of the interaction, see Interaction.h.
-     */  
+     */
     std::string getBaseName() const;
     
     bool getWasInContact() const;
     
     void setWasInContact(bool wasInContact);
-    
+
 private:
     /*!
      * \brief A history parameter to store if the particles were in contact or not. Useful
      *        to compute adhesive forces.
-     */    
+     */
     bool wasInContact_;
 };
+
 #endif

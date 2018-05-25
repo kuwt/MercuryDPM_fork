@@ -146,7 +146,7 @@ void ChuteBottom::makeRoughBottom(Chute& chute)
     // note: Changing the Inflow height was an attempt to make the bottom density homogeneous, but it did not have the desired effect
     setRoughBottomType(MONOLAYER_DISORDERED);
     setFixedParticleRadius(getInflowParticleRadius());
-
+    
     auto species = dynamic_cast<LinearViscoelasticNormalSpecies*>(speciesHandler.getObject(0));
     if (species != nullptr)
     {
@@ -175,7 +175,7 @@ void ChuteBottom::makeRoughBottom(Chute& chute)
     
     // run the simulation
     solve();
-
+    
     //Find the Z-position of the highest particle in the system
     Mdouble height = 0;
     for (BaseParticle* const p : particleHandler)
@@ -188,10 +188,11 @@ void ChuteBottom::makeRoughBottom(Chute& chute)
     // hmax - thickness_ * maxInflowParticleRadius_ <  Z-position  < hmax
     // note that hmax = height - rMax
     logger(INFO, "[ChuteBottom::makeRoughBottom()] Thickness: %", thickness_);
-
+    
     for (std::vector<BaseParticle*>::iterator it = particleHandler.begin(); it != particleHandler.end(); ++it)
     {
-        if ((*it)->getPosition().Z < height - (1.0 + thickness_) * getMaxInflowParticleRadius() || (*it)->getPosition().Z > height - getMaxInflowParticleRadius())
+        if ((*it)->getPosition().Z < height - (1.0 + thickness_) * getMaxInflowParticleRadius() ||
+            (*it)->getPosition().Z > height - getMaxInflowParticleRadius())
         {
             //delete particles outside the given range
             particleHandler.removeObject((*it)->getIndex());
@@ -206,12 +207,12 @@ void ChuteBottom::makeRoughBottom(Chute& chute)
         p->fixParticle();
         p->setSpecies(chute.speciesHandler.getObject(0));
     }
-
+    
     //copy the rough bottom over
     logger(INFO, "[ChuteBottom::makeRoughBottom()] Chute bottom finished, consisting of % particles",
            particleHandler.getNumberOfObjects());
     chute.particleHandler = particleHandler;
-
+    
 }
 
 /*!
@@ -220,11 +221,12 @@ void ChuteBottom::makeRoughBottom(Chute& chute)
  */
 void ChuteBottom::setupInitialConditions()
 {
-
-    particleHandler.setStorageCapacity(static_cast<unsigned int>(std::min(3.0 * getXMax() * getYMax() * getZMax() / mathsFunc::cubic(2.0 * getInflowParticleRadius()), 1e6)));
-
+    
+    particleHandler.setStorageCapacity(static_cast<unsigned int>(std::min(
+            3.0 * getXMax() * getYMax() * getZMax() / mathsFunc::cubic(2.0 * getInflowParticleRadius()), 1e6)));
+    
     createBottom();
-
+    
     /*!
      * \todo The createBottom() function also creates some walls and boundaries, 
      * but at slightly different locations. In this version they are removed and reset, 
@@ -259,7 +261,7 @@ void ChuteBottom::setupInitialConditions()
         w0.set(Vec3D(0.0, 1.0, 0.0), Vec3D(0, getYMax(), 0));
         wallHandler.copyAndAddObject(w0);
     }
-
+    
     // add particles
     /*!
      * \todo Particles are created without insertion boundary... this reeks of double work 
@@ -269,20 +271,20 @@ void ChuteBottom::setupInitialConditions()
     hGridActionsBeforeTimeLoop();
     unsigned int failed = 0;
     const unsigned int max_failed = 500;
-
+    
     BaseParticle inflowParticle_;
     inflowParticle_.setSpecies(speciesHandler.getObject(0));
     inflowParticle_.setHandler(&particleHandler);
-    inflowParticle_.setOrientation({1,0,0,0});
+    inflowParticle_.setOrientation({1, 0, 0, 0});
     inflowParticle_.setAngularVelocity(Vec3D(0.0, 0.0, 0.0));
-
+    
     // try max_failed times to find new insertable particle
     // every time an insertion succeeds the counter failed is set to 0 again.
     while (failed <= max_failed)
     {
         inflowParticle_.setRadius(getFixedParticleRadius());
         //inflowParticle_.computeMass();
-
+        
         // The position components are first stored in a Vec3D, because if you pass 
         // them directly into setPosition the compiler is allowed to change the order 
         // in which the numbers are generated
@@ -321,7 +323,7 @@ void ChuteBottom::setupInitialConditions()
     //optimize number of buckets
     //setHGridNumberOfBucketsToPower(particleHandler.getNumberOfObjects() * 1.5);
     //end: fix hgrid
-
+    
     //~ write(std::cout,false);
 }
 

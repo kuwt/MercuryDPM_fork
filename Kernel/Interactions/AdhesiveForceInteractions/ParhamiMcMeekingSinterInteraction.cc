@@ -36,8 +36,9 @@
  * \param[in] I
  * \param[in] timeStamp
  */
-ParhamiMcMeekingSinterInteraction::ParhamiMcMeekingSinterInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp)
-    : BaseInteraction(P, I, timeStamp)
+ParhamiMcMeekingSinterInteraction::ParhamiMcMeekingSinterInteraction(BaseInteractable* P, BaseInteractable* I,
+                                                                     unsigned timeStamp)
+        : BaseInteraction(P, I, timeStamp)
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"ParhamiMcMeekingSinterInteraction::ParhamiMcMeekingSinterInteraction() finished"<<std::endl;
@@ -47,20 +48,22 @@ ParhamiMcMeekingSinterInteraction::ParhamiMcMeekingSinterInteraction(BaseInterac
 /*!
  * \param[in] p
  */
-ParhamiMcMeekingSinterInteraction::ParhamiMcMeekingSinterInteraction(const ParhamiMcMeekingSinterInteraction &p)
-    : BaseInteraction(p)
+ParhamiMcMeekingSinterInteraction::ParhamiMcMeekingSinterInteraction(const ParhamiMcMeekingSinterInteraction& p)
+        : BaseInteraction(p)
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"ParhamiMcMeekingSinterInteraction::ParhamiMcMeekingSinterInteraction(const ParhamiMcMeekingSinterInteraction &p finished"<<std::endl;
 #endif
 }
+
 ParhamiMcMeekingSinterInteraction::ParhamiMcMeekingSinterInteraction()
 {
 #ifdef MERCURY_USE_MPI
     logger(FATAL,"ParhamiMcMeekingSinterInteractions are currently not implemented in parallel MercuryDPM");
 #endif
-  
+    
 }
+
 /*!
  *
  */
@@ -82,6 +85,7 @@ void ParhamiMcMeekingSinterInteraction::write(std::ostream& os  UNUSED) const
  */
 void ParhamiMcMeekingSinterInteraction::read(std::istream& is  UNUSED)
 {}
+
 /*!
  *
  */
@@ -89,18 +93,20 @@ void ParhamiMcMeekingSinterInteraction::computeAdhesionForce()
 {
     //std::cout << "ParhamiMcMeekingSinterInteraction::computeAdhesionForce" << std::endl;
     const SpeciesType* species = getSpecies();
-    Mdouble effectiveDiameter = 2.0*getEffectiveRadius(); // effectiveRadius = (r1*r2)/(r1+r2)
+    Mdouble effectiveDiameter = 2.0 * getEffectiveRadius(); // effectiveRadius = (r1*r2)/(r1+r2)
     Mdouble contactRadiusSquared = 2.0 * effectiveDiameter * getOverlap();
     Vec3D tangentialRelativeVelocity = getRelativeVelocity() - getNormal() * getNormalRelativeVelocity();
-
+    
     //viscous force is viscosityCoefficient_*contactRadius^4*normalRelativeVelocity
     //adhesion force is adhesionCoefficient_*radius
-    Mdouble normalForce = - species->getAdhesionCoefficient() * effectiveDiameter
-                          - species->getViscosityCoefficient()*contactRadiusSquared*contactRadiusSquared * getNormalRelativeVelocity();
+    Mdouble normalForce = -species->getAdhesionCoefficient() * effectiveDiameter
+                          - species->getViscosityCoefficient() * contactRadiusSquared * contactRadiusSquared *
+                            getNormalRelativeVelocity();
     //tangential force is slidingFrictionCoefficient_*contactRadius^2*radius*tangentialRelativeVelocity
-    Vec3D tangentialForce = - species->getSlidingFrictionCoefficient()*contactRadiusSquared*effectiveDiameter*tangentialRelativeVelocity;
+    Vec3D tangentialForce = -species->getSlidingFrictionCoefficient() * contactRadiusSquared * effectiveDiameter *
+                            tangentialRelativeVelocity;
     //std::cout << "P" << species->getAdhesionCoefficient() << species->getViscosityCoefficient() << species->getSlidingFrictionCoefficient() << std::endl;
-    Mdouble attractiveForce = - species->getAdhesionCoefficient() * effectiveDiameter;
+    Mdouble attractiveForce = -species->getAdhesionCoefficient() * effectiveDiameter;
     //std::cout << effectiveDiameter << "Fs=" << species->getAdhesionCoefficient() * effectiveDiameter
     //<< " Fv/del/del/del=" << 4.0*species->getViscosityCoefficient()*effectiveDiameter*effectiveDiameter << std::endl;
     //<< species->getViscosityCoefficient() << " d" <<contactRadiusSquared<< " d" <<getNormalRelativeVelocity() << std::endl;
@@ -115,6 +121,7 @@ Mdouble ParhamiMcMeekingSinterInteraction::getElasticEnergy() const
 {
     return 0.0;
 }
+
 /*!
  * \return a constant pointer to an instance of this class.
  */
@@ -122,6 +129,7 @@ const ParhamiMcMeekingSinterInteraction::SpeciesType* ParhamiMcMeekingSinterInte
 {
     return dynamic_cast<const SpeciesType*> (getBaseSpecies()); //downcast
 }
+
 /*!
  * \return std::string
  */

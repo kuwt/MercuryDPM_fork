@@ -49,7 +49,7 @@ ThermalParticle::ThermalParticle()
  *          that handles this particle. Use with care.
  * \param[in,out] p  Reference to the ThermalParticle this one should become a copy of.
  */
-ThermalParticle::ThermalParticle(const ThermalParticle &p)
+ThermalParticle::ThermalParticle(const ThermalParticle& p)
         : BaseParticle(p)
 {
     temperature_ = p.temperature_;
@@ -113,36 +113,40 @@ void ThermalParticle::read(std::istream& is)
 
 Mdouble ThermalParticle::getTemperature() const
 {
-	return temperature_;
+    return temperature_;
 }
-	
+
 void ThermalParticle::setTemperature(Mdouble temperature)
 {
-	temperature_=temperature;
+    temperature_ = temperature;
 }
 
 void ThermalParticle::addTemperature(Mdouble temperature)
 {
-    temperature_+=temperature;
+    temperature_ += temperature;
 }
 
 void ThermalParticle::actionsAfterTimeStep()
 {
-    if (timeDependentTemperature_) {
+    if (timeDependentTemperature_)
+    {
         temperature_ = timeDependentTemperature_(getHandler()->getDPMBase()->getTime());
     }
-    if (getSpecies()->getTemperatureDependentDensity()) {
+    if (getSpecies()->getTemperatureDependentDensity())
+    {
         const Mdouble density = getSpecies()->getTemperatureDependentDensity()(temperature_);
-        radius_ = getRadius()*cbrt(getMass()/(getVolume()*density));
+        radius_ = getRadius() * cbrt(getMass() / (getVolume() * density));
     }
 }
 
-const std::function<double(double)> &ThermalParticle::getTimeDependentTemperature() const {
+const std::function<double(double)>& ThermalParticle::getTimeDependentTemperature() const
+{
     return timeDependentTemperature_;
 }
 
-void ThermalParticle::setTimeDependentTemperature(const std::function<double(double)> &timeDependentTemperature) {
+void ThermalParticle::setTimeDependentTemperature(const std::function<double(double)>& timeDependentTemperature)
+{
     timeDependentTemperature_ = timeDependentTemperature;
     temperature_ = timeDependentTemperature(0);
-    logger(INFO,"Setting initial temperature to %",temperature_);
+    logger(INFO, "Setting initial temperature to %", temperature_);
 }

@@ -50,15 +50,16 @@ HGrid::HGrid(unsigned int num_buckets, double cellOverSizeRatio, std::vector<dou
     numberOfBuckets_ = num_buckets;
     cellOverSizeRatio_ = cellOverSizeRatio;
     occupiedLevelsMask_ = 0;
-    invCellSizes_ = std::vector<double>(0);   
- 
+    invCellSizes_ = std::vector<double>(0);
+    
     firstBaseParticleInBucket_.resize(numberOfBuckets_, nullptr);
     bucketIsChecked_.resize(numberOfBuckets_, false);
-
+    
     //std::cout<<"Creating HGrid "<<cellSizes.size()<<" levels:"<<std::endl;
-    for (double cellSize : cellSizes) {
+    for (double cellSize : cellSizes)
+    {
         //std::cout<<"Level="<<i<<" size="<<cellSizes[i]<<std::endl;
-    	cellSizes_.push_back(cellSize);
+        cellSizes_.push_back(cellSize);
         invCellSizes_.push_back(1.0 / cellSize);
     }
     logger(DEBUG, "HGrid::HGrid(unsigned int, double, vector<double>&) constructor finished.");
@@ -85,27 +86,27 @@ HGrid::~HGrid()
  *      been inserted. For now giving a warning, since code of users may rely on
  *      it that nothing happens.
  */
-void HGrid::insertParticleToHgrid(BaseParticle *obj)
+void HGrid::insertParticleToHgrid(BaseParticle* obj)
 {
-    if(!needsRebuilding_)
+    if (!needsRebuilding_)
     {
         // Find lowest level where object fully fits inside cell, taking cellOverSizeRatio_ into account
         Mdouble diameter = obj->getInteractionRadius() * 2.0;
         unsigned int level = 0;
-        while (level < (cellSizes_.size() - 1)  && cellSizes_[level] <= diameter * cellOverSizeRatio_)
+        while (level < (cellSizes_.size() - 1) && cellSizes_[level] <= diameter * cellOverSizeRatio_)
         {
             level++;
         }
-
+        
         //Check if the size of the particle is larger than the required grid
         if (level >= cellSizes_.size())
         {
             logger(WARN, "WARNING: object (id = %, index = %) is larger (d = %, cellOverSizeRatio = %) than largest "
-                    "grid cell (%) allows.",
+                         "grid cell (%) allows.",
                    obj->getId(), obj->getIndex(), diameter, cellOverSizeRatio_, cellSizes_.back());
-	        needsRebuilding_ = true;
+            needsRebuilding_ = true;
         }
-
+        
         obj->setHGridLevel(level);
         // indicate level is in use - not levels with no particles no collision detection is performed
         this->occupiedLevelsMask_ |= (1 << level);
@@ -149,7 +150,9 @@ void HGrid::clearFirstBaseParticleInBucket()
 ///\todo use logger everywhere
 void HGrid::info() const
 {
-    logger(INFO,"  numberOfBuckets %", numberOfBuckets_);
+    logger(INFO, "  numberOfBuckets %", numberOfBuckets_);
     logger(INFO, "  cellOverSizeRatio %", cellOverSizeRatio_);
-    std::cout << "  cellSizes"; for (auto p: cellSizes_) std::cout << " " << p; std::cout << '\n';
+    std::cout << "  cellSizes";
+    for (auto p: cellSizes_) std::cout << " " << p;
+    std::cout << '\n';
 }

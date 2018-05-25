@@ -25,44 +25,46 @@
 
 #ifndef THERMALSPECIES_H
 #define THERMALSPECIES_H
+
 #include "Interactions/NormalForceInteractions/ThermalInteraction.h"
+
 class BaseInteraction;
 
 template<class NormalForceSpecies>
 class ThermalSpecies : public NormalForceSpecies
 {
 public:
-
+    
     ///\brief The correct Interaction type for this FrictionForceSpecies
     typedef ThermalInteraction<typename NormalForceSpecies::InteractionType> InteractionType;
-
+    
     ///\brief The default constructor.
     ThermalSpecies();
-
+    
     ///\brief The default copy constructor.
-    ThermalSpecies(const ThermalSpecies &s);
-
+    ThermalSpecies(const ThermalSpecies& s);
+    
     ///\brief The default destructor.
     virtual ~ThermalSpecies();
-
+    
     /// \brief Writes the species properties to an output stream.
     void write(std::ostream& os) const override;
-
+    
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
-
+    
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;
-
+    
     ///Allows heatCapacity_ to be accessed
     Mdouble getHeatCapacity() const;
-
+    
     ///Allows heatCapacity_ to be changed
     void setHeatCapacity(Mdouble heatCapacity);
-
+    
     ///Allows heatCapacity_ to be accessed
     Mdouble getThermalConductivity() const;
-
+    
     ///Allows heatCapacity_ to be changed
     void setThermalConductivity(Mdouble thermalConductivity);
 
@@ -71,7 +73,7 @@ private:
      * \brief The heat capacity.
      */
     Mdouble heatCapacity_;
-
+    
     /*!
      * \brief The thermal conductivity.
      */
@@ -80,18 +82,18 @@ private:
 
 template<class NormalForceSpecies>
 ThermalSpecies<NormalForceSpecies>::ThermalSpecies()
- : NormalForceSpecies()
+        : NormalForceSpecies()
 {
     heatCapacity_ = 0.0;
     thermalConductivity_ = 0.0;
 }
 
 template<class NormalForceSpecies>
-ThermalSpecies<NormalForceSpecies>::ThermalSpecies(const ThermalSpecies &s)
- : NormalForceSpecies(s)
+ThermalSpecies<NormalForceSpecies>::ThermalSpecies(const ThermalSpecies& s)
+        : NormalForceSpecies(s)
 {
-    heatCapacity_=s.heatCapacity_;
-    thermalConductivity_=s.thermalConductivity_;
+    heatCapacity_ = s.heatCapacity_;
+    thermalConductivity_ = s.thermalConductivity_;
 }
 
 template<class NormalForceSpecies>
@@ -131,7 +133,7 @@ Mdouble ThermalSpecies<NormalForceSpecies>::getHeatCapacity() const
 template<class NormalForceSpecies>
 void ThermalSpecies<NormalForceSpecies>::setHeatCapacity(Mdouble heatCapacity)
 {
-    logger.assert_always(heatCapacity>0,
+    logger.assert_always(heatCapacity > 0,
                          "[ThermalSpecies<>::setHeatCapacity(%)] value has to be positive",
                          heatCapacity);
     heatCapacity_ = heatCapacity;
@@ -146,9 +148,10 @@ Mdouble ThermalSpecies<NormalForceSpecies>::getThermalConductivity() const
 template<class NormalForceSpecies>
 void ThermalSpecies<NormalForceSpecies>::setThermalConductivity(Mdouble thermalConductivity)
 {
-    logger.assert_always(thermalConductivity>=0,
+    logger.assert_always(thermalConductivity >= 0,
                          "[ThermalSpecies<>::setThermalConductivity(%)] value has to be positive",
                          thermalConductivity);
     thermalConductivity_ = thermalConductivity;
 }
+
 #endif

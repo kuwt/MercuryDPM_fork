@@ -25,8 +25,10 @@
 
 #ifndef EMPTYADHESIVESPECIES_H
 #define EMPTYADHESIVESPECIES_H
+
 #include "Species/BaseSpecies.h"
 #include "Math/ExtendedMath.h"
+
 class EmptyAdhesiveInteraction;
 
 /*!
@@ -37,31 +39,32 @@ class EmptyAdhesiveSpecies : public virtual BaseSpecies
 public:
     ///\brief The correct Interaction type for this AdhesiveForceSpecies
     typedef EmptyAdhesiveInteraction InteractionType;
-
+    
     ///\brief The default constructor.
     EmptyAdhesiveSpecies();
-
+    
     ///\brief The default copy constructor.
-    EmptyAdhesiveSpecies(const EmptyAdhesiveSpecies &s UNUSED);
-
+    EmptyAdhesiveSpecies(const EmptyAdhesiveSpecies& s UNUSED);
+    
     ///\brief The default destructor.
     ~EmptyAdhesiveSpecies() override;
-
+    
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
-
+    
     /// \brief Writes the species properties to an output stream.
     void write(std::ostream& os) const override;
-
+    
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;
-
+    
     ///\brief creates default values for mixed species
-    void mix(EmptyAdhesiveSpecies*S, EmptyAdhesiveSpecies*T);
-
+    void mix(EmptyAdhesiveSpecies* S, EmptyAdhesiveSpecies* T);
+    
     //adhesion-specific functions
-
+    
     ///\brief returns the largest separation distance at which adhesive short-range forces can occur (0.0 for the default EmptyAdhesiveSpecies).
     Mdouble getInteractionDistance() const override;
 };
+
 #endif

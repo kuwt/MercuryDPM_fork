@@ -35,18 +35,18 @@ namespace CGCoordinates
  * \details As X, Y, and Z share a lot of functionality, the shared functions 
  * are stored in this common base class.
  */
-class BaseCoordinates
-{
-public:
-
-    static Mdouble getDomainVolume(const Vec3D& min, const Vec3D& max);
-
-    /*!
-     * returns the weight function needed in getMean (required as functions cannot be )
-     * @return
-     */
-    virtual Mdouble getWeight();
-};
-
+    class BaseCoordinates
+    {
+    public:
+        
+        static Mdouble getDomainVolume(const Vec3D& min, const Vec3D& max);
+        
+        /*!
+         * returns the weight function needed in getMean (required as functions cannot be )
+         * @return
+         */
+        virtual Mdouble getWeight();
+    };
+    
 }
 #endif

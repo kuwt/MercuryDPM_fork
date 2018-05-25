@@ -33,7 +33,7 @@
  * \details Default constructor
  */
 BasePeriodicBoundary::BasePeriodicBoundary()
-: BaseBoundary()
+        : BaseBoundary()
 {
     periodicHandler_ = nullptr;
 #ifdef DEBUG_CONSTRUCTOR
@@ -45,7 +45,7 @@ BasePeriodicBoundary::BasePeriodicBoundary()
  * \details Copy constructor
  */
 ///Note: shallow copy! Otherwise the HGrid causes a stack overflow.
-BasePeriodicBoundary::BasePeriodicBoundary(const BasePeriodicBoundary &b)
+BasePeriodicBoundary::BasePeriodicBoundary(const BasePeriodicBoundary& b)
         : BaseBoundary(b)
 {
     periodicHandler_ = b.periodicHandler_;
@@ -61,7 +61,7 @@ BasePeriodicBoundary::~BasePeriodicBoundary()
 {
 #ifdef DEBUG_DESTRUCTOR
     std::cout << "BasePeriodicBoundary::~BasePeriodicBoundary() finished"<<std::endl;
-#endif 
+#endif
 }
 
 /*!
@@ -165,7 +165,7 @@ void BasePeriodicBoundary::createPeriodicParticles(ParticleHandler& pH)
 
 //TODO documentation
 void BasePeriodicBoundary::modifyPeriodicComplexity(std::vector<int>& complexity, int& totalPeriodicComplexity,
-                                                            BaseParticle* particle UNUSED, int i UNUSED) const
+                                                    BaseParticle* particle UNUSED, int i UNUSED) const
 {
 }
 

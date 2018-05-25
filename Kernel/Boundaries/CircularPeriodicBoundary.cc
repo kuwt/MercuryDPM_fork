@@ -33,7 +33,7 @@ CircularPeriodicBoundary::CircularPeriodicBoundary()
     innerRadius_ = 1.0;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout << "CircularPeriodicBoundary::CircularPeriodicBoundary() finished" << std::endl;
-#endif		
+#endif
 #ifdef MERCURY_USE_MPI
     MPIContainer& communicator = MPIContainer::Instance();
     if (communicator.getNumberOfProcessors() > 1)
@@ -49,25 +49,25 @@ CircularPeriodicBoundary::CircularPeriodicBoundary(double innerRadius)
     this->innerRadius_ = innerRadius;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout << "CircularPeriodicBoundary::CircularPeriodicBoundary(double innerRadius) finished" << std::endl;
-#endif				
+#endif
 }
 
 CircularPeriodicBoundary::~CircularPeriodicBoundary()
 {
-	#ifdef DEBUG_DESTRUCTOR
+#ifdef DEBUG_DESTRUCTOR
     std::cerr << "CircularPeriodicBoundary::~CircularPeriodicBoundary() finished" << std::endl;
-#endif	
+#endif
 }
 
 CircularPeriodicBoundary* CircularPeriodicBoundary::copy() const
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cerr << "CircularPeriodicBoundary::copy() const finished" << std::endl;
-#endif				
+#endif
     return new CircularPeriodicBoundary(*this);
 }
 
-void CircularPeriodicBoundary::rotateParticle(BaseParticle *P, double angle)
+void CircularPeriodicBoundary::rotateParticle(BaseParticle* P, double angle)
 {
     double R = sqrt(pow(P->getPosition().X, 2) + pow(P->getPosition().Y, 2));
     double alphaPos = atan2(P->getPosition().Y, P->getPosition().X);
@@ -81,46 +81,49 @@ void CircularPeriodicBoundary::rotateParticle(BaseParticle *P, double angle)
     ///todo{Do we need to update rotations and rotational velocitys?}
 }
 
-void CircularPeriodicBoundary::createPeriodicParticle(BaseParticle* p, ParticleHandler &pH)
+void CircularPeriodicBoundary::createPeriodicParticle(BaseParticle* p, ParticleHandler& pH)
 {
     double R = sqrt(pow(p->getPosition().X, 2) + pow(p->getPosition().Y, 2));
     double alpha = atan2(p->getPosition().Y, p->getPosition().X);
     unsigned int i = static_cast<unsigned int>(std::floor(std::log(R / innerRadius_) / std::log(2.0))) + 1;
     double pieSize = 2.0 / pow(2.0, i) * constants::pi;
     //std::cout<<"R="<<R<<" alpha="<<alpha<<" i="<<i<<" pieSize="<<pieSize<<std::endl;
-        
+    
     //Check if the particle is close to it's inner Radius or is is close to zero alpha (small y)
-    if (i > 0 && (R - (p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius()) < pow(2.0, i - 1) * innerRadius_ || p->getPosition().Y < (p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius())))
+    if (i > 0 && (R - (p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius()) <
+                  pow(2.0, i - 1) * innerRadius_ ||
+                  p->getPosition().Y < (p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius())))
     {
         //std::cout<<"Going to shift because "<<R-P->getRadius()<<"<"<<pow(2,i-1)*innerRadius<<" or "<<P->getPosition().Y<<"<"<<P->getRadius()<<std::endl;
         //std::cout<<*P<<" has been shifted"<<std::endl;
-         
+        
         BaseParticle* F0 = p->copy();
         rotateParticle(F0, pieSize);
-            
+        
         //If Particle is Mdouble shifted, get correct original particle			
         BaseParticle* From = p;
         while (From->getPeriodicFromParticle() != nullptr)
             From = From->getPeriodicFromParticle();
         F0->setPeriodicFromParticle(From);
-            
+        
         //std::cout<<*F0<<" is the result"<<std::endl;
         pH.addObject(F0);
     }
     //Check here only for i>0 becuase for i=1 they both give the same particle
-    if (i > 1 && R * R * (1 - pow(cos(alpha - pieSize), 2)) < p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius())
+    if (i > 1 && R * R * (1 - pow(cos(alpha - pieSize), 2)) <
+                 p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius())
     {
         //std::cout<<*P<<" has been shifted back"<<std::endl;
-            
+        
         BaseParticle* F0 = p->copy();
         rotateParticle(F0, -pieSize);
-            
+        
         //If Particle is Mdouble shifted, get correct original particle			
         BaseParticle* From = p;
         while (From->getPeriodicFromParticle() != nullptr)
             From = From->getPeriodicFromParticle();
         F0->setPeriodicFromParticle(From);
-            
+        
         //std::cout<<*F0<<" is the result"<<std::endl;
         pH.addObject(F0);
     }
@@ -129,20 +132,21 @@ void CircularPeriodicBoundary::createPeriodicParticle(BaseParticle* p, ParticleH
 void CircularPeriodicBoundary::createPeriodicParticles(ParticleHandler& pH)
 {
     unsigned numberOfParticles = pH.getSize();
-    for(unsigned i = 0; i < numberOfParticles; i++)
+    for (unsigned i = 0; i < numberOfParticles; i++)
     {
-        createPeriodicParticle(pH.getObject(i),pH);
+        createPeriodicParticle(pH.getObject(i), pH);
     }
 }
 
-bool CircularPeriodicBoundary::checkBoundaryAfterParticleMoved(BaseParticle *P, ParticleHandler &pH)
+bool CircularPeriodicBoundary::checkBoundaryAfterParticleMoved(BaseParticle* P, ParticleHandler& pH)
 {
     double R = sqrt(pow(P->getPosition().X, 2) + pow(P->getPosition().Y, 2));
     double alpha = atan2(P->getPosition().Y, P->getPosition().X);
     int i = static_cast<int>(std::floor(std::log(R / innerRadius_) / std::log(2.0))) + 1;
     double pieSize = 2.0 / pow(2.0, i) * constants::pi;
     
-    double oldR = sqrt(pow(P->getPosition().X - P->getDisplacement().X, 2) + pow(P->getPosition().Y - P->getDisplacement().Y, 2));
+    double oldR = sqrt(
+            pow(P->getPosition().X - P->getDisplacement().X, 2) + pow(P->getPosition().Y - P->getDisplacement().Y, 2));
     ///\todo TW: Dinant, please confirm that i and oldI should be integer
     int oldI = static_cast<int>(std::floor(std::log(oldR / innerRadius_) / std::log(2.0))) + 1;
     
@@ -211,10 +215,10 @@ void CircularPeriodicBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& 
 {
     for (auto p = pH.begin(); p != pH.end(); ++p)
     {
-	if(checkBoundaryAfterParticleMoved(*p,pH))
-	{
-	    p--;
-	}
+        if (checkBoundaryAfterParticleMoved(*p, pH))
+        {
+            p--;
+        }
     }
 }
 
@@ -232,7 +236,7 @@ void CircularPeriodicBoundary::oldRead(std::istream& is)
 }
 
 void CircularPeriodicBoundary::write(std::ostream& os) const
-        {
+{
     BaseBoundary::write(os);
     os << " innerRadius " << innerRadius_;
 }

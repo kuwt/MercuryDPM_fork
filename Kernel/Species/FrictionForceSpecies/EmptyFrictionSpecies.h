@@ -25,10 +25,14 @@
 
 #ifndef EMPTYTANGENTIALSPECIES_H
 #define EMPTYTANGENTIALSPECIES_H
+
 #include "Species/BaseSpecies.h"
 #include "Math/ExtendedMath.h"
+
 class BaseInteractable;
+
 class BaseInteraction;
+
 class EmptyFrictionInteraction;
 
 /*!
@@ -39,31 +43,32 @@ class EmptyFrictionSpecies : public virtual BaseSpecies
 public:
     ///\brief The correct Interaction type for this FrictionForceSpecies
     typedef EmptyFrictionInteraction InteractionType;
-
+    
     ///\brief The default constructor.
     EmptyFrictionSpecies();
-
+    
     ///\brief The default copy constructor.
-    EmptyFrictionSpecies(const EmptyFrictionSpecies &s UNUSED);
-
+    EmptyFrictionSpecies(const EmptyFrictionSpecies& s UNUSED);
+    
     ///\brief The default destructor.
     ~EmptyFrictionSpecies() override;
-
+    
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
-
+    
     /// \brief Writes the species properties to an output stream.
     void write(std::ostream& os) const override;
-
+    
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;
-
+    
     /*!
      * \brief Returns true if torques have to be calculated.
      */
     bool getUseAngularDOFs() const override;
-
+    
     ///\brief creates default values for mixed species
-    void mix(EmptyFrictionSpecies*S, EmptyFrictionSpecies*T);
+    void mix(EmptyFrictionSpecies* S, EmptyFrictionSpecies* T);
 };
+
 #endif

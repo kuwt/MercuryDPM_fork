@@ -39,17 +39,17 @@ class Matrix3D
 public:
     /*!
      * \brief all nine matrix elements
-     */    
+     */
     Mdouble XX, XY, XZ, YX, YY, YZ, ZX, ZY, ZZ;
-
+    
     /*!
      * \brief default constructor
      */
     Matrix3D();
-
+    
     /*!
      * \brief Alternative constructor, which let you define all elements
-     */    
+     */
     Matrix3D(Mdouble xx, Mdouble xy, Mdouble xz, Mdouble yx, Mdouble yy, Mdouble yz,
              Mdouble zx,
              Mdouble zy,
@@ -58,7 +58,7 @@ public:
     /*!
      * \brief Alternative constructor, which takes a matrix of the same size
      */
-    Matrix3D(const SmallMatrix<3,3>& matrix);
+    Matrix3D(const SmallMatrix<3, 3>& matrix);
     
     /*!
      * \brief Sets all elements to zero.
@@ -69,12 +69,12 @@ public:
      * \brief Sum of the diagonal elements
      */
     double trace() const;
-
+    
     /*!
      * \brief Deviator
      */
     double deviator() const;
-
+    
     /*!
      * \brief Matrix addition
      */
@@ -118,22 +118,22 @@ public:
     /*!
      * \brief Add elements to ostream
      */
-    friend std::ostream& operator<<(std::ostream& os, const Matrix3D &A);
+    friend std::ostream& operator<<(std::ostream& os, const Matrix3D& A);
     
     /*!
      * \brief Add elements to istream
      */
-    friend std::istream& operator>>(std::istream& is, Matrix3D &A);
+    friend std::istream& operator>>(std::istream& is, Matrix3D& A);
     
     /*!
      * \brief Matrix addition
      */
-    Matrix3D& operator+=(const Matrix3D &A);
+    Matrix3D& operator+=(const Matrix3D& A);
     
     /*!
      * \brief Matrix substraction
      */
-    Matrix3D& operator-=(const Matrix3D &A);
+    Matrix3D& operator-=(const Matrix3D& A);
     
     /*!
      * \brief Scalar division
@@ -143,18 +143,18 @@ public:
     /*!
      * \brief Calculates the pointwise square 
      */
-    static Matrix3D square(const Matrix3D &A);
+    static Matrix3D square(const Matrix3D& A);
     
     /*!
      * \brief Calculates the pointwise square root
      */
-    static Matrix3D sqrt(const Matrix3D &A);
+    static Matrix3D sqrt(const Matrix3D& A);
     
     /*!
      * \brief Calculates the dyadic product of a two Vec3D: \f$a \otimes b\f$
      */
     static Matrix3D dyadic(const Vec3D& a, const Vec3D& b);
-
+    
     /*!
      * \brief 'Special' cross product; CP of vector with each column of a matrix
      */
@@ -163,19 +163,18 @@ public:
     /*!
      * \brief Computes the inverse of a matrix.
      */
-    static Matrix3D inverse (const Matrix3D& A);
-
+    static Matrix3D inverse(const Matrix3D& A);
+    
     /*!
      * \brief A.ldivide(b) computes the solution x to A*x=b.
      */
     Vec3D ldivide(const Vec3D& b);
-
+    
     /*!
      * \brief Returns the matrix in cylindrical coordinates
      */
     Matrix3D getCylindricalTensorField(const Vec3D& p) const;
 };
-
 
 
 #endif

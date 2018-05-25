@@ -45,22 +45,22 @@ enum HGridMethod
     BOTTOMUP, TOPDOWN
 };
 
-inline std::ostream & operator<<(std::ostream & os, HGridMethod h)
+inline std::ostream& operator<<(std::ostream& os, HGridMethod h)
 {
-    if (h==BOTTOMUP)
+    if (h == BOTTOMUP)
         return os << "BOTTOMUP";
     else
         return os << "TOPDOWN";
 }
 
-inline std::istream & operator>>(std::istream & is, HGridMethod& h)
+inline std::istream& operator>>(std::istream& is, HGridMethod& h)
 {
     std::string s;
     is >> s;
-    if (s=="BOTTOMUP")
-        h=BOTTOMUP;
-    else if (s=="TOPDOWN")
-        h=TOPDOWN;
+    if (s == "BOTTOMUP")
+        h = BOTTOMUP;
+    else if (s == "TOPDOWN")
+        h = TOPDOWN;
     else
     {
         logger(ERROR, "HGridMethod could not be read: %", s);
@@ -85,33 +85,34 @@ enum HGridDistribution
     OLDHGRID, LINEAR, EXPONENTIAL, USER
 };
 
-inline std::ostream & operator<<(std::ostream & os, HGridDistribution h)
+inline std::ostream& operator<<(std::ostream& os, HGridDistribution h)
 {
-    if (h==OLDHGRID)
+    if (h == OLDHGRID)
         return os << "OLDHGRID";
-    else if (h==LINEAR)
+    else if (h == LINEAR)
         return os << "LINEAR";
-    else if (h==EXPONENTIAL)
+    else if (h == EXPONENTIAL)
         return os << "EXPONENTIAL";
     else
         return os << "USER";
 }
 
-inline std::istream & operator>>(std::istream & is, HGridDistribution& h)
+inline std::istream& operator>>(std::istream& is, HGridDistribution& h)
 {
     std::string s;
     is >> s;
-    if (s=="OLDHGRID")
-        h=OLDHGRID;
-    else if (s=="LINEAR")
-        h=LINEAR;
-    else if (s=="EXPONENTIAL")
-        h=EXPONENTIAL;
-    else if (s=="USER")
-        h=USER;
-    else {
+    if (s == "OLDHGRID")
+        h = OLDHGRID;
+    else if (s == "LINEAR")
+        h = LINEAR;
+    else if (s == "EXPONENTIAL")
+        h = EXPONENTIAL;
+    else if (s == "USER")
+        h = USER;
+    else
+    {
         std::cerr << "HGridMethod could not be read: " << s << std::endl;
-        exit(-1); 
+        exit(-1);
     }
     return is;
 }
@@ -124,111 +125,112 @@ inline std::istream & operator>>(std::istream & is, HGridDistribution& h)
  */
 class MercuryBase : public virtual DPMBase
 {
-public:   
+public:
     /*!
      * \brief This is the default constructor. It sets sensible defaults.
      */
     MercuryBase();
-
+    
     /*!
      * \brief This is the default destructor.
      */
     ~MercuryBase() override;
-
+    
     /*!
      * \brief Copy-constructor.
      */
     MercuryBase(const MercuryBase& mercuryBase);
-
+    
     /*!
      * \brief This is the actual constructor, it is called do both constructors above.
      */
     void constructor();
-
+    
     /*!
      * \brief This sets up the broad phase information, has to be done at this 
      *        stage because it requires the particle size.
      */
     void hGridActionsBeforeTimeLoop() override;
-
+    
     /*!
      * \brief Performs all necessary actions before a time-step, like updating 
      *        the particles and resetting all the bucket information, etc.
      */
     void hGridActionsBeforeTimeStep() override;
-
+    
     /*!
      * \brief Reads the MercuryBase from an input stream, for example a restart file.
      */
     void read(std::istream& is) override;
-
+    
     /*!
      * \brief Writes the MercuryBase to an output stream, for example a restart file.
      */
     void write(std::ostream& os, bool writeAllParticles = true) const override;
-
+    
     /*!
      * \brief Returns hGridCurrentMaxRelativeDisplacement_.
      */
     Mdouble getHGridCurrentMaxRelativeDisplacement() const;
-
+    
     /*!
      * \brief Returns hGridTotalCurrentMaxRelativeDisplacement_.
      */
     Mdouble getHGridTotalCurrentMaxRelativeDisplacement() const;
-
+    
     /*!
      * \brief Sets whether or not the HGrid must be updated every time step.
      */
     void setHGridUpdateEachTimeStep(bool updateEachTimeStep);
-
+    
     /*!
      * \brief Gets whether or not the HGrid is updated every time step.
      */
     bool getHGridUpdateEachTimeStep() const final;
-
+    
     /*!
      * \brief Sets the maximum number of levels of the HGrid in this MercuryBase.
      */
     void setHGridMaxLevels(unsigned int HGridMaxLevels);
-
+    
     /*!
      * \brief Gets the maximum number of levels of the HGrid in this MercuryBase.
      */
     unsigned int getHGridMaxLevels() const;
-
+    
     /*!
      * \brief Gets whether the HGrid in this MercuryBase is BOTTOMUP or TOPDOWN.
      * \return The HGridMethod used by this MercuryBase.
      */
-    HGridMethod getHGridMethod() const { return hGridMethod_; }
-
+    HGridMethod getHGridMethod() const
+    { return hGridMethod_; }
+    
     /*!
      * \brief Sets the HGridMethod to either BOTTOMUP or TOPDOWN.
      * \param[in] hGridMethod The HGridMethod that will be used in this MercuryBase.
      */
     void setHGridMethod(HGridMethod hGridMethod);
-
+    
     /*!
      * \brief Gets how the sizes of the cells of different levels are distributed.
      */
     HGridDistribution getHGridDistribution() const;
-
+    
     /*!
      * \brief Sets how the sizes of the cells of different levels are distributed.
      */
     void setHGridDistribution(HGridDistribution hGridDistribution);
-
+    
     /*!
      * \brief Gets the ratio of the smallest cell over the smallest particle.
      */
     Mdouble getHGridCellOverSizeRatio() const;
-
+    
     /*!
      * \brief Sets the ratio of the smallest cell over the smallest particle.
      */
     void setHGridCellOverSizeRatio(Mdouble cellOverSizeRatio);
-
+    
     /*!
      * \brief Gets if the HGrid needs rebuilding before anything else happens.
      */
@@ -253,17 +255,17 @@ public:
      * \brief Checks if given BaseParticle has an interaction with a BaseWall or other BaseParticle.
      */
     bool checkParticleForInteraction(const BaseParticle& P) final;
-   
+    
     /*!
      * \brief Checks if the given BaseParticle has an interaction with a BaseWall or other BaseParticles in a local domain.
-     */ 
+     */
     bool checkParticleForInteractionLocal(const BaseParticle& P) final;
-
+    
     /*!
      * \brief Virtual function that enables inheriting classes to implement a function to let the user set the cell size of the HGrid.
      */
     virtual Mdouble userHGridCellSize(unsigned int level);
-
+    
     /*!
      * \brief Purely virtual function that returns all particles that have a contact with a given particle.
      */
@@ -275,12 +277,12 @@ protected:
      * \brief This sets up the parameters required for the contact model.
      */
     void hGridRebuild();
-
+    
     /*!
      * \brief Inserts a single Particle to current grid.
      */
     void hGridInsertParticle(BaseParticle* obj) final;
-
+    
     /*!
      * \brief This checks particles in the HGRID to see if for closer enough
      *        for possible contact.
@@ -299,18 +301,18 @@ protected:
      *        possible contact with any other BaseParticle in the HGrid.
      */
     virtual bool hGridHasParticleContacts(const BaseParticle* obj)=0;
-
+    
     /*!
      * \brief Computes the relative displacement of the given BaseParticle and 
      *        updates the currentMaxRelativeDisplacement_ accordingly. 
      */
-    void hGridUpdateMove(BaseParticle * iP, Mdouble move) final;
-
+    void hGridUpdateMove(BaseParticle* iP, Mdouble move) final;
+    
     /*!
      * \brief Resets the currentMaxRelativeDisplacement_ to 0
      */
     void hGridActionsBeforeIntegration() override;
-
+    
     /*!
      * \brief This function has to be called before integrateBeforeForceComputation.
      */
@@ -320,25 +322,27 @@ protected:
      * \brief Gets the HGrid used by this problem.
      * \return A pointer to the HGrid associated with this MercuryBase.
      */
-    HGrid* getHGrid() { return grid; }
-
+    HGrid* getHGrid()
+    { return grid; }
+    
     /*!
      * \brief Gets the HGrid used by this problem, const version.
      * \return A pointer to the HGrid associated with this MercuryBase.
      */
-    const HGrid* getHGrid() const { return grid; }
-
+    const HGrid* getHGrid() const
+    { return grid; }
+    
     /*!
      * \brief Reads the next command line argument.
      */
-    bool readNextArgument(int& i, int argc, char *argv[]) override;
+    bool readNextArgument(int& i, int argc, char* argv[]) override;
 
 public:
     /*!
      * \brief Writes the info of the HGrid to the screen in a nice format.
      */
     void hGridInfo(std::ostream& os = std::cout) const;
-    
+
 private:
     /*!
      * \brief A pointer to the HGrid associated with this MercuryBase.
@@ -370,13 +374,13 @@ private:
      *          particle could have moved more than one cell.
      */
     Mdouble currentMaxRelativeDisplacement_;
-
+    
     /*!
      * \brief After each time step, this Mdouble is increased by
      *        2*currentMaxRelativeDisplacement_.
      */
     Mdouble totalCurrentMaxRelativeDisplacement_;
-
+    
     /*!
      * \brief   Boolean that indicates whether or not the grid needs to be updated.
      * \details The grid needs to be updated before the HGrid is constructed and

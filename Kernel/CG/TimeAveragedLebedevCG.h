@@ -25,77 +25,78 @@
 
 #ifndef TimeAveragedLebedevCG_H
 #define TimeAveragedLebedevCG_H
+
 #include <CG/TimeAveragedCG.h>
 
-template< template<class> class BaseFunction, class Fields = CGFields::StandardFields>
+template<template<class> class BaseFunction, class Fields = CGFields::StandardFields>
 class TimeAveragedLebedevCG : public TimeAveragedCGXYZ<BaseFunction, Fields>
 {
 public:
-
-    typedef CGPoint<CGCoordinates::XYZ, Fields> Point;
-
+    
+    typedef CGPoint <CGCoordinates::XYZ, Fields> Point;
+    
     /*!
      * \brief Default constructor. Only sets the evaluation functions,
         no points are created initially.
      */
     TimeAveragedLebedevCG() = default;
-
+    
     /*!
      * \brief Default copy Constructor; copies all the member variables.
      */
-    TimeAveragedLebedevCG(const TimeAveragedLebedevCG &p) = default;
-
+    TimeAveragedLebedevCG(const TimeAveragedLebedevCG& p) = default;
+    
     /*!
      * \brief Default destructor; does nothing
      */
     virtual ~TimeAveragedLebedevCG();
-
+    
     /*!
      * \brief Creates a mesh based on Lebedev quadrature points
      */
     void createMesh() override;
-
-
+    
+    
     /*!
      * \brief Creates a copy of the current instance 
      */
     TimeAveragedLebedevCG<BaseFunction, Fields>* copy() const;
-
+    
     /*!
      * \brief Returns the inner radius of the grid.
      */
     double getRadiusInner();
-
+    
     /*!
      * \brief Returns the outer radius of the grid.
-     */ 
+     */
     double getRadiusOuter();
-
+    
     /*!
      * \brief Returns the number of grid points in r-direction.
      */
     int getNR();
-
+    
     /*!
      * \brief Sets the inner and outer radius of the mesh
      */
     void setR(double radiusInner, double radiusOuter);
-
+    
     /*!
      * \brief Sets the number of mesh points in the r-direction.
      */
     void setNR(int nR);
-
+    
     /*!
      * \brief Evaluates CG fields
      */
     void evaluate();
-
+    
     /*!
      * \brief Evaluates the contributions of a particle.
      */
     void evaluateParticle(BaseParticle& p);
-
+    
     /*!
      * \brief Evaluates the contribution of an interaction.
      */
@@ -111,4 +112,5 @@ private:
 };
 
 #include "TimeAveragedLebedevCG.hcc"
+
 #endif

@@ -56,7 +56,8 @@ void TimeSmoothedCG<Coordinates, BaseFunction, Fields>::write(std::ostream& os) 
 
 template<class Coordinates, template<class> class BaseFunction, class Fields>
 void
-TimeSmoothedCG<Coordinates, BaseFunction, Fields>::writeAll(std::ostream& os, TimeSmoothedFields<Fields>& average) const
+TimeSmoothedCG<Coordinates, BaseFunction, Fields>::writeAll(std::ostream& os,
+                                                            TimeSmoothedFields <Fields>& average) const
 {
     auto itPoint = CG<Coordinates, BaseFunction, Fields>::points_.begin();
     for (auto averageVariable : average.fields_)
@@ -95,7 +96,7 @@ Mdouble TimeSmoothedCG<Coordinates, BaseFunction, Fields>::getTimeStep() const
 }
 
 template<class Coordinates, template<class> class BaseFunction, class Fields>
-TimeSmoothedCG<Coordinates, BaseFunction, Fields>* TimeSmoothedCG<Coordinates, BaseFunction, Fields>::copy() const
+TimeSmoothedCG <Coordinates, BaseFunction, Fields>* TimeSmoothedCG<Coordinates, BaseFunction, Fields>::copy() const
 {
     return new TimeSmoothedCG(*this);
 }
@@ -126,16 +127,16 @@ void TimeSmoothedCG<Coordinates, BaseFunction, Fields>::evaluate()
 {
     // set all variables to zero
     CG<Coordinates, BaseFunction, Fields>::resetVariables();
-
+    
     // evaluate particles and fields, then volume-average (common part for CG, timeAveragedCG and timeSmoothedCG)
     CG<Coordinates, BaseFunction, Fields>::evaluateCommon();
-
+    
     //divide by volume
     CG<Coordinates, BaseFunction, Fields>::volumeAverageVariables();
-
+    
     DPMBase* dpm = CG<Coordinates, BaseFunction, Fields>::getHandler()->getDPMBase();
     Mdouble currentTime = dpm->getTime();
-
+    
     // Create new set of values if currentTime+cutoff>=nextTime
     if (currentTime + cutoffTime_ >= nextTime_)
     {
@@ -147,7 +148,7 @@ void TimeSmoothedCG<Coordinates, BaseFunction, Fields>::evaluate()
         if (nextTime_ > CG<Coordinates, BaseFunction, Fields>::getTimeMax())
             nextTime_ = std::numeric_limits<Mdouble>::max();
     }
-
+    
     // Average, write and delete completed sets of values
     for (auto& average : averages_)
     {
@@ -167,7 +168,7 @@ void TimeSmoothedCG<Coordinates, BaseFunction, Fields>::evaluate()
             averages_.pop_back();
         }
     }
-
+    
     // Adding to existing set of values
     for (auto& average : averages_)
     {
@@ -181,7 +182,8 @@ void TimeSmoothedCG<Coordinates, BaseFunction, Fields>::evaluate()
                 ///\todo Make proper error messages
                 std::cerr << "Error" << std::endl;
                 exit(-1);
-            } else
+            }
+            else
             {
                 averageVariable += (*itPoint) * weight;
             }
@@ -204,7 +206,8 @@ void TimeSmoothedCG<Coordinates, BaseFunction, Fields>::finish()
     while (averages_.size() != 0)
     {
         // find the object with the smallest time value
-        typename std::vector<TimeSmoothedFields<Fields> >::iterator next = averages_.begin();
+        typename std::vector<TimeSmoothedFields < Fields> > ::iterator
+        next = averages_.begin();
         for (auto it = next + 1; it != averages_.end(); it++)
         {
             if (it->time_ < next->time_)
@@ -215,7 +218,8 @@ void TimeSmoothedCG<Coordinates, BaseFunction, Fields>::finish()
         {
             averageVariable /= next->sumWeights_;
         }
-        if (CG<Coordinates, BaseFunction, Fields>::statFile.openWrite(this->getHandler()->getDPMBase()->getNumberOfTimeSteps()))
+        if (CG<Coordinates, BaseFunction, Fields>::statFile.openWrite(
+                this->getHandler()->getDPMBase()->getNumberOfTimeSteps()))
         {
             //write and delete
             writeAll(CG<Coordinates, BaseFunction, Fields>::statFile.getFstream(), *next);
@@ -223,6 +227,6 @@ void TimeSmoothedCG<Coordinates, BaseFunction, Fields>::finish()
         *next = averages_.back();
         averages_.pop_back();
     }
-
+    
     CG<Coordinates, BaseFunction, Fields>::statFile.close();
 }

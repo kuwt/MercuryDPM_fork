@@ -37,7 +37,9 @@
 #include "Logger.h"
 
 class BaseInteractable;
-template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveForceSpecies> class Species;
+
+template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveForceSpecies>
+class Species;
 
 /*!
  * \class Interaction
@@ -113,73 +115,76 @@ template<class NormalForceInteraction, class FrictionForceInteraction=EmptyFrict
 class Interaction : public NormalForceInteraction, public FrictionForceInteraction, public AdhesiveForceInteraction
 {
 public:
-
+    
     ///\brief The default constructor.
     Interaction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp);
-
+    
     ///\brief Empty constructor
     Interaction();
-
+    
     ///\brief The default copy constructor.
-    Interaction(const Interaction &p);
-
+    Interaction(const Interaction& p);
+    
     ///\brief The default destructor.
     virtual ~Interaction();
-
+    
     ///\brief Creates a copy of this Interaction.
     Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>* copy() const final;
-
+    
     ///\brief Computes the normal, tangential, and adhesive forces.
     void computeForce() final;
-
+    
     ///\brief Computes the interaction parameters based on the forces and torques.
     void computeInteraction();
-
+    
     ///\brief Read Interaction properties from a file.
     void read(std::istream& is) final;
-
+    
     ///\brief Writes Interaction properties to a file.
     void write(std::ostream& os) const final;
-
+    
     ///\brief Returns the name of the Interaction.
     std::string getName() const final;
-
+    
     ///\brief Returns the elastic energy stored in the Interaction.
     Mdouble getElasticEnergy() const final;
-
+    
     ///\brief Integrates the time-dependent parameters of the contact force.
     void integrate(Mdouble timeStep) final;
-
+    
     ///\brief Reverses the parameters of the contact force.
     void reverseHistory() final;
     
     void rotateHistory(Matrix3D& rotationMatrix) final;
     
     void actionsAfterTimeStep();
-
+    
     /*!
      * \brief returns the overlap at which the repulsive elastic force equals a given adhesive force; to be implemented in the normal force
      */
     Mdouble getElasticEnergyAtEquilibrium(Mdouble adhesiveForce) const;
-
-    void getMPIInteraction(void *historyDataArray, unsigned int index) const final;
-
+    
+    void getMPIInteraction(void* historyDataArray, unsigned int index) const final;
+    
     //if resetPointers is true, then the pointers in the interaction will be set to nullptr, indicating it is a dummyInteraction
     //and that it is not actually linked to real particles (which might not be in the domain)
-    void setMPIInteraction(void *historyDataArray, unsigned int index, const bool resetPointers) final;
-
-    void getInteractionDetails(void* interactionDataArray, unsigned int index, unsigned int &identificationP, unsigned int &identificationI, bool &isWallInteraction, unsigned &timeStamp);
-
+    void setMPIInteraction(void* historyDataArray, unsigned int index, const bool resetPointers) final;
+    
+    void getInteractionDetails(void* interactionDataArray, unsigned int index, unsigned int& identificationP,
+                               unsigned int& identificationI, bool& isWallInteraction, unsigned& timeStamp);
+    
     void createMPIType() final;
-
+    
     void* createMPIInteractionDataArray(unsigned int numberOfInteractions) const final;
-
+    
     void deleteMPIInteractionDataArray(void* dataArray) final;
 };
 
 template<class NormalForceInteraction, class FrictionForceInteraction, class AdhesiveForceInteraction>
-Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::Interaction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp)
-: BaseInteraction(P, I, timeStamp), NormalForceInteraction(P, I, timeStamp), FrictionForceInteraction(P, I, timeStamp), AdhesiveForceInteraction(P, I, timeStamp)
+Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::Interaction(
+        BaseInteractable* P, BaseInteractable* I, unsigned timeStamp)
+        : BaseInteraction(P, I, timeStamp), NormalForceInteraction(P, I, timeStamp),
+          FrictionForceInteraction(P, I, timeStamp), AdhesiveForceInteraction(P, I, timeStamp)
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"Interaction::Interaction() finished"<<std::endl;
@@ -189,7 +194,7 @@ Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInter
 
 template<class NormalForceInteraction, class FrictionForceInteraction, class AdhesiveForceInteraction>
 Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::Interaction()
-: BaseInteraction(), NormalForceInteraction(), FrictionForceInteraction(), AdhesiveForceInteraction()
+        : BaseInteraction(), NormalForceInteraction(), FrictionForceInteraction(), AdhesiveForceInteraction()
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"Interaction::Interaction() finished"<<std::endl;
@@ -197,8 +202,9 @@ Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInter
 }
 
 template<class NormalForceInteraction, class FrictionForceInteraction, class AdhesiveForceInteraction>
-Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::Interaction(const Interaction &p)
-: BaseInteraction(p), NormalForceInteraction(p), FrictionForceInteraction(p), AdhesiveForceInteraction(p)
+Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::Interaction(
+        const Interaction& p)
+        : BaseInteraction(p), NormalForceInteraction(p), FrictionForceInteraction(p), AdhesiveForceInteraction(p)
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"Interaction::Interaction(const Interaction &p finished"<<std::endl;
@@ -215,9 +221,10 @@ Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInter
 
 /*! 
  * \details Useful for polymorphism as it can be called from a BaseInteraction* pointer.
- */ 
+ */
 template<class NormalForceInteraction, class FrictionForceInteraction, class AdhesiveForceInteraction>
-Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>* Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::copy() const
+Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>*
+Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::copy() const
 {
     return new Interaction(*this);
 }
@@ -227,12 +234,13 @@ Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInter
  * \param [out] os the ostream to which the data is written.
  */
 template<class NormalForceInteraction, class FrictionForceInteraction, class AdhesiveForceInteraction>
-void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::write(std::ostream& os) const
+void
+Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::write(std::ostream& os) const
 {
     NormalForceInteraction::write(os);
     FrictionForceInteraction::write(os);
     AdhesiveForceInteraction::write(os);
-
+    
 }
 
 /*!
@@ -261,7 +269,8 @@ void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForce
 }
 
 template<class NormalForceInteraction, class FrictionForceInteraction, class AdhesiveForceInteraction>
-void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::rotateHistory(Matrix3D& rotationMatrix)
+void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::rotateHistory(
+        Matrix3D& rotationMatrix)
 {
     NormalForceInteraction::rotateHistory(rotationMatrix);
     FrictionForceInteraction::rotateHistory(rotationMatrix);
@@ -275,7 +284,8 @@ void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForce
 template<class NormalForceInteraction, class FrictionForceInteraction, class AdhesiveForceInteraction>
 std::string Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::getName() const
 {
-    return NormalForceInteraction::getBaseName() + FrictionForceInteraction::getBaseName() + AdhesiveForceInteraction::getBaseName() + "Interaction";
+    return NormalForceInteraction::getBaseName() + FrictionForceInteraction::getBaseName() +
+           AdhesiveForceInteraction::getBaseName() + "Interaction";
 }
 
 /*!
@@ -284,7 +294,8 @@ std::string Interaction<NormalForceInteraction, FrictionForceInteraction, Adhesi
  * \param[in] the time step.
  */
 template<class NormalForceInteraction, class FrictionForceInteraction, class AdhesiveForceInteraction>
-void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::integrate(Mdouble timeStep)
+void
+Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::integrate(Mdouble timeStep)
 {
     FrictionForceInteraction::integrate(timeStep);
 }
@@ -312,13 +323,15 @@ void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForce
  * \return the computed elastic energy.
  */
 template<class NormalForceInteraction, class FrictionForceInteraction, class AdhesiveForceInteraction>
-Mdouble Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::getElasticEnergy() const
+Mdouble
+Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::getElasticEnergy() const
 {
-    return NormalForceInteraction::getElasticEnergy() + FrictionForceInteraction::getElasticEnergy() + AdhesiveForceInteraction::getElasticEnergy();
+    return NormalForceInteraction::getElasticEnergy() + FrictionForceInteraction::getElasticEnergy() +
+           AdhesiveForceInteraction::getElasticEnergy();
 }
 
 template<class NormalForceInteraction, class FrictionForceInteraction, class AdhesiveForceInteraction>
-void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>:: actionsAfterTimeStep() 
+void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::actionsAfterTimeStep()
 {
     AdhesiveForceInteraction::actionsAfterTimeStep();
 }
@@ -327,39 +340,45 @@ void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForce
  * \brief returns the overlap at which the repulsive elastic force equals a given adhesive force; to be implemented in the normal force
  */
 template<class NormalForceInteraction, class FrictionForceInteraction, class AdhesiveForceInteraction>
-Mdouble Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::getElasticEnergyAtEquilibrium(Mdouble adhesiveForce) const
+Mdouble
+Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::getElasticEnergyAtEquilibrium(
+        Mdouble adhesiveForce) const
 {
     return NormalForceInteraction::getElasticEnergyAtEquilibrium(adhesiveForce);
 };
 
 
 template<class NormalForceInteraction, class FrictionForceInteraction, class AdhesiveForceInteraction>
-void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::getMPIInteraction(void *interactionDataArray, unsigned int index) const
+void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::getMPIInteraction(
+        void* interactionDataArray, unsigned int index) const
 {
     MPIInteraction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction> interactionData;
-
+    
     interactionData.copyFromInteraction(this);
-
+    
     MPIInteraction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>* array = static_cast<MPIInteraction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>*>(interactionDataArray);
     array[index] = interactionData;
 }
 
 template<class NormalForceInteraction, class FrictionForceInteraction, class AdhesiveForceInteraction>
-void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::setMPIInteraction(void *interactionDataArray, unsigned int index, const bool resetPointers)
+void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::setMPIInteraction(
+        void* interactionDataArray, unsigned int index, const bool resetPointers)
 {
     MPIInteraction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>* array = static_cast<MPIInteraction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>*>(interactionDataArray);
     MPIInteraction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction> interactionData = array[index];
-
+    
     //Copy the interaction data into the interaction
     interactionData.copyToInteraction(this, resetPointers);
 }
 
 template<class NormalForceInteraction, class FrictionForceInteraction, class AdhesiveForceInteraction>
-void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::getInteractionDetails(void* interactionDataArray, unsigned int index, unsigned int &identificationP, unsigned int &identificationI, bool &isWallInteraction, unsigned &timeStamp)
+void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::getInteractionDetails(
+        void* interactionDataArray, unsigned int index, unsigned int& identificationP, unsigned int& identificationI,
+        bool& isWallInteraction, unsigned& timeStamp)
 {
     MPIInteraction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>* array = static_cast<MPIInteraction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>*>(interactionDataArray);
     MPIInteraction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction> interactionData = array[index];
-
+    
     identificationP = interactionData.P;
     identificationI = interactionData.I;
     isWallInteraction = interactionData.isWallInteraction;
@@ -368,17 +387,22 @@ void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForce
 
 
 template<class NormalForceInteraction, class FrictionForceInteraction, class AdhesiveForceInteraction>
-void* Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::createMPIInteractionDataArray(unsigned int numberOfInteractions) const
+void*
+Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::createMPIInteractionDataArray(
+        unsigned int numberOfInteractions) const
 {
     MPIInteraction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>* array = new MPIInteraction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>[numberOfInteractions];
     void* interactionArray = static_cast<void*>(array);
     return interactionArray;
 }
+
 template<class NormalForceInteraction, class FrictionForceInteraction, class AdhesiveForceInteraction>
-void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::deleteMPIInteractionDataArray(void* dataArray)
+void
+Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::deleteMPIInteractionDataArray(
+        void* dataArray)
 {
     MPIInteraction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>* array = static_cast<MPIInteraction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>*>(dataArray);
-    delete [] array;
+    delete[] array;
 }
 
 template<class NormalForceInteraction, class FrictionForceInteraction, class AdhesiveForceInteraction>
@@ -391,5 +415,6 @@ void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForce
     communicator.createMercuryMPIType(dummyHistoryInteraction, MercuryMPIType::INTERACTION);
 #endif
 }
+
 #endif
 

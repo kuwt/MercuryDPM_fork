@@ -41,7 +41,7 @@ LiquidMigrationWilletSpecies::LiquidMigrationWilletSpecies()
 /*!
  * \param[in] the species that is copied
  */
-LiquidMigrationWilletSpecies::LiquidMigrationWilletSpecies(const LiquidMigrationWilletSpecies &s)
+LiquidMigrationWilletSpecies::LiquidMigrationWilletSpecies(const LiquidMigrationWilletSpecies& s)
 {
     liquidBridgeVolumeMax_ = s.liquidBridgeVolumeMax_;
     distributionCoefficient_ = s.distributionCoefficient_;
@@ -57,14 +57,14 @@ LiquidMigrationWilletSpecies::~LiquidMigrationWilletSpecies()
 {
 #ifdef DEBUG_DESTRUCTOR
     std::cout<<"LiquidMigrationWilletSpecies::~LiquidMigrationWilletSpecies() finished"<<std::endl;
-#endif   
+#endif
 }
 
 /*!
  * \param[out] output stream (typically the restart file)
  */
 void LiquidMigrationWilletSpecies::write(std::ostream& os) const
-        {
+{
     os << " liquidBridgeVolume " << liquidBridgeVolumeMax_;
     os << " distributionCoefficient " << distributionCoefficient_;
     os << " surfaceTension " << surfaceTension_;
@@ -109,7 +109,7 @@ void LiquidMigrationWilletSpecies::mix(LiquidMigrationWilletSpecies* const S, Li
  */
 Mdouble LiquidMigrationWilletSpecies::getInteractionDistance() const
 {
-	return maxInteractionDistance_;
+    return maxInteractionDistance_;
 }
 
 /*!
@@ -117,10 +117,10 @@ Mdouble LiquidMigrationWilletSpecies::getInteractionDistance() const
  */
 void LiquidMigrationWilletSpecies::setLiquidBridgeVolumeMax(Mdouble liquidBridgeVolumeMax)
 {
-    if (liquidBridgeVolumeMax >= 0) 
+    if (liquidBridgeVolumeMax >= 0)
     {
         liquidBridgeVolumeMax_ = liquidBridgeVolumeMax;
-        maxInteractionDistance_ = (1.0+0.5*contactAngle_)*cbrt(liquidBridgeVolumeMax_);
+        maxInteractionDistance_ = (1.0 + 0.5 * contactAngle_) * cbrt(liquidBridgeVolumeMax_);
     }
     else
     {
@@ -190,8 +190,8 @@ void LiquidMigrationWilletSpecies::setContactAngle(Mdouble contactAngle)
     if (contactAngle >= 0)
     {
         contactAngle_ = contactAngle;
-        maxInteractionDistance_ = (1.0+0.5*contactAngle_)*cbrt(liquidBridgeVolumeMax_);
-	}
+        maxInteractionDistance_ = (1.0 + 0.5 * contactAngle_) * cbrt(liquidBridgeVolumeMax_);
+    }
     else
     {
         std::cerr << "Error in setContactAngle" << std::endl;

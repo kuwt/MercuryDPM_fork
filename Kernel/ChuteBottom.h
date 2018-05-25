@@ -39,28 +39,28 @@
 class ChuteBottom : public Chute
 {
 public:
-
+    
     //constructors
     /*! 
      * \brief This is the default constructor. All it does is set sensible defaults.
      */
     ChuteBottom();
-
+    
     /*!    
      * \brief Copy constructor, converts an existing DPMBase object into a ChuteBottom object
      */
     explicit ChuteBottom(const DPMBase& other);
-
+    
     /*!
      * \brief Copy constructor, converts an existing MercuryBase object into a ChuteBottom object
      */
     explicit ChuteBottom(const MercuryBase& other);
-
+    
     /*!
      * \brief Copy constructor, converts an existing Mercury3D object into a ChuteBottom object
      */
     explicit ChuteBottom(const Mercury3D& other);
-
+    
     /*!
      * \brief Copy constructor, converts an existing Chute object into a ChuteBottom object
      */
@@ -70,40 +70,40 @@ public:
      * \brief Default copy constructor
      */
     ChuteBottom(const ChuteBottom& other);
-
+    
     //setters and getters
     /*!
      * \brief Returns the thickness of the multilayer rough bottom
      */
     Mdouble getThickness() const;
-
+    
     /*!
      * \brief Sets the thickness of the multilayer rough bottom
      */
     void setThickness(Mdouble thickness);
-
+    
     /*!
      * \brief Returns TRUE if the bottom is periodic in Y
      */
     bool getIsBottomPeriodic() const;
-
+    
     /*!
      * \brief Sets whether the bottom should be periodic in Y
      */
     void setIsBottomPeriodic(bool isBottomPeriodic);
-
+    
     //other public member functions
-
+    
     /*!
      * \brief Makes a multilayered rough bottom with thickness thickness_
      */
-    void makeRoughBottom(Chute &chute);
-
+    void makeRoughBottom(Chute& chute);
+    
     /*!
      * \brief Sets up initial conditions before running a chute simulation
      */
     void setupInitialConditions() override;
-
+    
     /*!
      * \brief Performs all necessary actions before the start of a time step (none in this case)
      */
@@ -115,16 +115,17 @@ private:
      * (except the default copy constructor).
      */
     void constructor();
-
+    
     /*!
      * \brief Thickness of the multilayer chute rough bottom. See also documentation of 
      * ChuteBottom::makeRoughBottom().
      */
     Mdouble thickness_;
-
+    
     /*!
      * \brief TRUE if the bottom is periodic in Y.
      */
     bool isBottomPeriodic_;
 };
+
 #endif

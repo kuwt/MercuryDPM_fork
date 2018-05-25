@@ -31,20 +31,21 @@
 #include <complex>
 #include <vector>
 
-class Dipole : public Multipole {
+class Dipole : public Multipole
+{
 public:
-	Dipole(int p, NumericalVector<> *squaredFactorials, Vec3D location, Vec3D velocity, Mdouble strength);
-
-	void computeMultipoleExpansion() final;
-
-	Vec3D getLocation()
-	{
-		return location_;
-	}
+    Dipole(int p, NumericalVector<>* squaredFactorials, Vec3D location, Vec3D velocity, Mdouble strength);
+    
+    void computeMultipoleExpansion() final;
+    
+    Vec3D getLocation()
+    {
+        return location_;
+    }
 
 private:
-	Vec3D velocity_;
-	Mdouble strength_;
+    Vec3D velocity_;
+    Mdouble strength_;
 };
 
 #endif /* DIPOLE_H_ */

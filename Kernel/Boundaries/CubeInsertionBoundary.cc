@@ -30,7 +30,7 @@
 /*!
  * \details Default constructor; sets every data member to 0.
  */
-CubeInsertionBoundary::CubeInsertionBoundary(): InsertionBoundary()
+CubeInsertionBoundary::CubeInsertionBoundary() : InsertionBoundary()
 {
     posMin_ = Vec3D(0.0, 0.0, 0.0);
     posMax_ = Vec3D(0.0, 0.0, 0.0);
@@ -43,7 +43,7 @@ CubeInsertionBoundary::CubeInsertionBoundary(): InsertionBoundary()
 /*!
  * \details Copy constructor
  */
-CubeInsertionBoundary::CubeInsertionBoundary(const CubeInsertionBoundary& other) 
+CubeInsertionBoundary::CubeInsertionBoundary(const CubeInsertionBoundary& other)
         : InsertionBoundary(other)
 {
     posMin_ = other.posMin_;
@@ -69,7 +69,7 @@ CubeInsertionBoundary* CubeInsertionBoundary::copy() const
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout << "CubeInsertionBoundary::copy() const finished" << std::endl;
-#endif		
+#endif
     return new CubeInsertionBoundary(*this);
 }
 
@@ -89,11 +89,12 @@ CubeInsertionBoundary* CubeInsertionBoundary::copy() const
  * \param[in] radMin            Minimum radius of inserted particles
  * \param[in] radMax            Maximum radius of inserted particles
  */
-void CubeInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax, double radMin, double radMax)
+void CubeInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
+                                Vec3D velMin, Vec3D velMax, double radMin, double radMax)
 {
     setParticleToCopy(particleToCopy);
     setRadiusRange(radMin, radMax);
-
+    
     setMaxFailed(maxFailed);
     setGeometry(posMin, posMax, velMin, velMax);
 }
@@ -129,7 +130,7 @@ void CubeInsertionBoundary::setGeometry(Vec3D posMin, Vec3D posMax, Vec3D velMin
 // CubeInsertionBoundary. If the particle is wanted then it is copied into the
 // particleHandler.  In any case, the InsertionBoundary's version of the
 // particle (created here) gets deleted by the InsertionBoundary.
-BaseParticle* CubeInsertionBoundary::generateParticle(RNG& random) 
+BaseParticle* CubeInsertionBoundary::generateParticle(RNG& random)
 {
     BaseParticle* P = getParticleToCopy()->copy();
     double radius;
@@ -138,7 +139,7 @@ BaseParticle* CubeInsertionBoundary::generateParticle(RNG& random)
     return P;
 }
 
-void CubeInsertionBoundary::placeParticle(BaseParticle* p, RNG& random) 
+void CubeInsertionBoundary::placeParticle(BaseParticle* p, RNG& random)
 {
     Vec3D pos, vel;
     pos.X = random.getRandomNumber(posMin_.X, posMax_.X);
@@ -160,11 +161,11 @@ void CubeInsertionBoundary::read(std::istream& is)
     InsertionBoundary::read(is);
     std::string dummy;
     is >> dummy >> posMin_
-            >> dummy >> posMax_
-            >> dummy >> velMin_
-            >> dummy >> velMax_
-            >> dummy >> radMin_
-            >> dummy >> radMax_;
+       >> dummy >> posMax_
+       >> dummy >> velMin_
+       >> dummy >> velMax_
+       >> dummy >> radMin_
+       >> dummy >> radMax_;
 }
 
 /*!
@@ -176,12 +177,12 @@ void CubeInsertionBoundary::oldRead(std::istream& is)
     unsigned int maxFailed;
     std::string dummy;
     is >> dummy >> maxFailed
-            >> dummy >> posMin_
-            >> dummy >> posMax_
-            >> dummy >> velMin_
-            >> dummy >> velMax_
-            >> dummy >> radMin_
-            >> dummy >> radMax_;
+       >> dummy >> posMin_
+       >> dummy >> posMax_
+       >> dummy >> velMin_
+       >> dummy >> velMax_
+       >> dummy >> radMin_
+       >> dummy >> radMax_;
     setMaxFailed(maxFailed);
 }
 
@@ -193,11 +194,11 @@ void CubeInsertionBoundary::write(std::ostream& os) const
 {
     InsertionBoundary::write(os);
     os << " posMin " << posMin_
-            << " posMax " << posMax_
-            << " velMin " << velMin_
-            << " velMax " << velMax_
-            << " radMin " << radMin_
-            << " radMax " << radMax_;
+       << " posMax " << posMax_
+       << " velMin " << velMin_
+       << " velMax " << velMax_
+       << " radMin " << radMin_
+       << " radMax " << radMax_;
 }
 
 /*!

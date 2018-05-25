@@ -43,7 +43,7 @@ std::ostream& operator<<(std::ostream& os, const BaseObject& o)
  * \param[in,out] is
  * \return std::istream&
  */
-std::istream& operator>>(std::istream& is, BaseObject &o)
+std::istream& operator>>(std::istream& is, BaseObject& o)
 {
     o.read(is);
     return (is);
@@ -56,17 +56,17 @@ BaseObject::BaseObject()
 {
     index_ = 0;
     id_ = 0;
-    logger(DEBUG,"BaseObject::BaseObject() finished");
+    logger(DEBUG, "BaseObject::BaseObject() finished");
 }
 
 /*!
  * \param[in] p
  */
-BaseObject::BaseObject(const BaseObject &p)
+BaseObject::BaseObject(const BaseObject& p)
 {
     index_ = p.index_;
     id_ = p.id_;
-    logger(DEBUG,"BaseObject::BaseObject(const BaseObject &p) finished");
+    logger(DEBUG, "BaseObject::BaseObject(const BaseObject &p) finished");
 }
 
 /*!
@@ -74,7 +74,7 @@ BaseObject::BaseObject(const BaseObject &p)
  */
 BaseObject::~BaseObject()
 {
-    logger(DEBUG,"BaseObject::~BaseBoundary() finished");
+    logger(DEBUG, "BaseObject::~BaseBoundary() finished");
 }
 
 /*!

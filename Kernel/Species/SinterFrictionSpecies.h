@@ -30,6 +30,7 @@
 #include "Species.h"
 #include "NormalForceSpecies/SinterNormalSpecies.h"
 #include "FrictionForceSpecies/FrictionSpecies.h"
-typedef Species<SinterNormalSpecies,FrictionSpecies> SinterFrictionSpecies;
-typedef MixedSpecies<SinterNormalSpecies,FrictionSpecies> SinterFrictionMixedSpecies;
+
+typedef Species<SinterNormalSpecies, FrictionSpecies> SinterFrictionSpecies;
+typedef MixedSpecies<SinterNormalSpecies, FrictionSpecies> SinterFrictionMixedSpecies;
 #endif

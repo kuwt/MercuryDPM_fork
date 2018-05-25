@@ -110,7 +110,7 @@ void IntersectionOfWalls::clear()
 void IntersectionOfWalls::setHandler(WallHandler* wallHandler)
 {
     BaseWall::setHandler(wallHandler);
-    for (InfiniteWall &w : wallObjects_)
+    for (InfiniteWall& w : wallObjects_)
     {
         w.setHandler(wallHandler);
     }
@@ -271,7 +271,7 @@ void IntersectionOfWalls::addTetra(const Vec3D& PointA, const Vec3D& PointB, con
     {
         logger(ERROR,
                "Error Building IntersectionOfWalls::addTetra out of 3 coordinates. "
-                       "Coordinates are in line, Wall not constructed.");
+               "Coordinates are in line, Wall not constructed.");
     }
     else
     {
@@ -435,7 +435,7 @@ void IntersectionOfWalls::setPointsAndLines(unsigned int n)
     }
     
     logger(VERBOSE, "%", *this);
-    for (const InfiniteWall &w : wallObjects_)
+    for (const InfiniteWall& w : wallObjects_)
         logger(VERBOSE, "wallObject %, %", w.getNormal(), w.getPosition());
     for (Vec3D v : A_)
         logger(VERBOSE, "A %", v);
@@ -776,7 +776,8 @@ void IntersectionOfWalls::write(std::ostream& os) const
 {
     BaseWall::write(os);
     os << " numIntersectionOfWalls " << wallObjects_.size();
-    for (const auto &wallObject : wallObjects_) {
+    for (const auto& wallObject : wallObjects_)
+    {
         os << " position " << wallObject.getPosition() << " orientation " << wallObject.getOrientation();
     }
 }

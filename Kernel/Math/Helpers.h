@@ -31,11 +31,12 @@
 #include <fstream> //std::fstream
 #include <vector> //std::fstream
 #include <Logger.h>
+
 class ParticleSpecies;
 
 namespace helpers
 {
-
+    
     /*!
      * \brief return type specifically for fuctions returning k and disp at once
      */
@@ -136,9 +137,9 @@ namespace helpers
 //     */
 //    MERCURY_DEPRECATED
 //    Mdouble computeCollisionTimeFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass);
-
+    
     ///return type specifically for fuctions returning k, disp, kt, dispt at once
-
+    
     /*!
      * \brief return type specifically for fuctions returning k, disp, kt, dispt at once
      */
@@ -150,7 +151,7 @@ namespace helpers
         Mdouble kt;
         Mdouble dispt;
     };
-
+    
     /*!
      * \brief Set disp, k, dispt and kt such that is matches a given collision time tc and a normal and tangential
      * restitution coefficient r, beta for a collision of effective/reduced mass m. From Deen...Kuipers2006,
@@ -158,8 +159,10 @@ namespace helpers
      * \todo what should be used instead of this function?
      */
     MERCURY_DEPRECATED
-    KAndDispAndKtAndDispt computeDisptFromCollisionTimeAndRestitutionCoefficientAndTangentialRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble beta, Mdouble mass);
-
+    KAndDispAndKtAndDispt
+    computeDisptFromCollisionTimeAndRestitutionCoefficientAndTangentialRestitutionCoefficientAndEffectiveMass(
+            Mdouble tc, Mdouble r, Mdouble beta, Mdouble mass);
+    
     /*!
      * \brief Calculates the maximum relative velocity allowed for a normal collision of two particles of radius r and
      * particle mass m (for higher velocities particles could pass through each other)
@@ -167,99 +170,101 @@ namespace helpers
      */
     MERCURY_DEPRECATED
     Mdouble getMaximumVelocity(Mdouble k, Mdouble disp, Mdouble radius, Mdouble mass);
-
+    
     /*!
      * \brief Returns the correct saveCount if the total number of saves, the final time and the time step is known
      */
     unsigned int getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(unsigned int numberOfSaves, Mdouble timeMax,
                                                                     Mdouble timeStep);
-
+    
     /*!
      * \brief Reads a line from one stringstream into another, and prepares the latter for reading in. 
      */
     void getLineFromStringStream(std::istream& in, std::stringstream& out);
-
+    
     /*!
      * \brief Writes a string to a file.
      */
     bool writeToFile(std::string filename, std::string filecontent);
-
+    
     /*!
      * \brief Plots to a gnuplot window.
      */
     void gnuplot(std::string command);
-
+    
     /*!
      * \brief Adds a string to an existing file.
      */
     bool addToFile(std::string filename, std::string filecontent);
-
+    
     /*!
      * \brief Function to check if a file exists, is used to check if a run has already need done.
      */
     bool fileExists(std::string strFilename);
-
+    
     /*!
      * \brief Provides a simple interface for opening a file.
      */
     bool openFile(std::fstream& file, std::string filename, std::fstream::openmode mode);
-
+    
     /*!
      * \brief Calculates the effective mass of a particle pair, i.e. half the harmonic mean of two particle masses.
      */
     Mdouble getEffectiveMass(Mdouble mass0, Mdouble mass1);
-
+    
     std::vector<double> readArrayFromFile(std::string filename, int& n, int& m);
-
-    void more(std::string filename, unsigned nLines=unsignedMax);
-
-    template < typename T > std::string to_string( const T& n )
+    
+    void more(std::string filename, unsigned nLines = unsignedMax);
+    
+    template<typename T>
+    std::string to_string(const T& n)
     {
-        std::ostringstream stm ;
-        stm << n ;
-        return stm.str() ;
+        std::ostringstream stm;
+        stm << n;
+        return stm.str();
     }
-
+    
     std::string to_string(Mdouble value, unsigned precision);
-
+    
     //reads optional variables in the restart file
     // (a variable is optional, if it may or may not be defined in the restart file)
-    template < typename T >
-    void readOptionalVariable(std::istream& is,const std::string& name, T& variable) {
+    template<typename T>
+    void readOptionalVariable(std::istream& is, const std::string& name, T& variable)
+    {
         ///\todo checkAndRead should check if the next variable in the ifstream is equal to the string nam, and
         /// only read in this case; otherwise continue, but I don't know how to put the location in the ifstream back.
-        if (is.peek() == name.c_str()[0]) 
+        if (is.peek() == name.c_str()[0])
         {
             std::string dummy;
             is >> dummy >> variable;
         }
     }
-
+    
     /**
      * Used to test the loading/unloading properties of a contact law
      **/
     void loadingTest(const ParticleSpecies* species, Mdouble displacement, Mdouble velocity, Mdouble radius,
                      std::string name);
-
+    
     /**
      * Used to test the tangential loading/unloading/reloading properties of a frictional contact law
      **/
-    void normalAndTangentialLoadingTest(const ParticleSpecies *species, Mdouble displacement,
+    void normalAndTangentialLoadingTest(const ParticleSpecies* species, Mdouble displacement,
                                         Mdouble tangentialDisplacement, Mdouble velocity, Mdouble radius,
                                         std::string name);
-
+    
     /**
      * Used to test the tangential loading/unloading/reloading properties of a frictional contact law
      **/
     void objectivenessTest(const ParticleSpecies* species, Mdouble displacement, Mdouble tangentialDisplacement,
                            Mdouble velocity, Mdouble radius, std::string name);
-
+    
     /**
      * \brief Checks if the next argument in the input stream is a certain string
      */
-    bool compare(std::istream& is,std::string s);
-
-
+    bool compare(std::istream& is, std::string s);
+    
+    
     /**
      * Allows a quick read-in from a parameter file.
      *
@@ -281,37 +286,42 @@ namespace helpers
      * @param value    default value (used if the parameter could not be read)
      * @return         value of variable
      */
-    template < typename T >
-    T readFromFile(std::string fileName, std::string varName, T value) {
+    template<typename T>
+    T readFromFile(std::string fileName, std::string varName, T value)
+    {
         //open filestream
         std::ifstream is(fileName.c_str(), std::ios::in);
-        if (is.fail()) {
+        if (is.fail())
+        {
             logger(INFO, "readFromFile: file % could not be opened, variable % set to default value %",
                    fileName, varName, value);
             return value;
         }
-
+        
         //read in variables, until the right one is fount
         std::string s;
-        while(!is.eof()) {
+        while (!is.eof())
+        {
             is >> s;
-            if (!s.compare(varName)) {
+            if (!s.compare(varName))
+            {
                 is >> value;
-                logger(INFO,"readFromFile: variable % set to % ",varName,value);
+                logger(INFO, "readFromFile: variable % set to % ", varName, value);
                 return value;
             }
         }
-
+        
         //if the right variable is never found
-        logger(WARN,"readFromFile: variable % not set in file %, set to default value % ", varName, fileName, value);
+        logger(WARN, "readFromFile: variable % not set in file %, set to default value % ", varName, fileName, value);
         return value;
     }
-
-    void check (double real, double ideal, double error, std::string errorMessage);
+    
+    void check(double real, double ideal, double error, std::string errorMessage);
+    
     void check(Vec3D real, Vec3D ideal, double error, std::string errorMessage);
-
+    
     std::string getPath();
-
+    
     Mdouble getRealTime();
 }
 

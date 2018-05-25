@@ -26,6 +26,7 @@
 //based on /storage2/usr/people/sluding/MDCC/C3DshearXL30/MU0_LONG2
 #ifndef MERCURY3DRESTART_H
 #define MERCURY3DRESTART_H
+
 #include "Mercury3D.h"
 #include <sys/time.h>
 #include <string.h>
@@ -37,43 +38,43 @@
 class Mercury3DRestart : public Mercury3D
 {
 public:
-
+    
     Mercury3DRestart() //: Mercury3D()
     {
         initialWallTime_ = getWallTime();
         maxWallTime_ = 10;
         clusterCommand_ = "";
     }
-
+    
     void setClusterCommand(std::string clusterCommand)
     {
         clusterCommand_ = clusterCommand;
     }
-
+    
     std::string getClusterCommand() const
     {
         return clusterCommand_;
     }
-
+    
     void setMaxWallTime(Mdouble maxWallTime)
     {
         maxWallTime_ = maxWallTime;
     }
-
+    
     Mdouble getMaxWallTime() const
     {
         return maxWallTime_;
     }
-
+    
     Mdouble getInitialWallTime() const
     {
         return initialWallTime_;
     }
-
+    
     /** the -r option is used to restart the code; this should probably be moved 
      * to DPMBase
      */
-    bool readNextArgument(int& i, int argc, char *argv[])
+    bool readNextArgument(int& i, int argc, char* argv[])
     {
         if (!strcmp(argv[i], "-restart") || !strcmp(argv[i], "-r"))
         {
@@ -81,14 +82,17 @@ public:
             
             //if a restart file is given 
             std::size_t found = getName().find(".restart");
-            if (found==std::string::npos) {
+            if (found == std::string::npos)
+            {
                 std::cout << "Reading file " << restartFile.getName() << std::endl;
                 readRestartFile();
-            } else {
+            }
+            else
+            {
                 std::cout << "Reading file " << argv[i + 1] << std::endl;
                 readRestartFile(argv[i + 1]);
                 //setName(getName().substr(0,found));
-                std::cout << "Read file " << getName() << std::endl;                
+                std::cout << "Read file " << getName() << std::endl;
             }
             std::cout << "tmax= " << getTimeMax() << std::endl;
             //restartFile.getFstream().precision(18);
@@ -101,7 +105,7 @@ public:
         }
         return true;
     }
-
+    
     /** Returns wall time (uses sys command, thus might not work on Windows)
      */
     double getWallTime() const
@@ -116,7 +120,7 @@ public:
     }
 
 private:
-
+    
     /* writeOutputFiles is modified to force a restart when maxWallTime_ is 
      * reached. This is done by resetting the final simulation time to the 
      * current time.
@@ -124,31 +128,34 @@ private:
     void writeOutputFiles()
     {
         Mercury3D::writeOutputFiles();
-
+        
         if (getWallTime() - initialWallTime_ > maxWallTime_)
         {
-    		actionsAfterSolve();
-    		finishStatistics();
-    		closeFiles();
+            actionsAfterSolve();
+            finishStatistics();
+            closeFiles();
             std::cout << "Exiting for restarting after "
-                << getWallTime() - initialWallTime_ << "s" << std::endl;
+                      << getWallTime() - initialWallTime_ << "s" << std::endl;
             
             //set the restart command
             std::stringstream com("");
             //check if filename contaion a dot
             //this is so the code works for autonumbered files
             std::size_t found = getName().find('.');
-            if (found==std::string::npos) {
+            if (found == std::string::npos)
+            {
                 com << clusterCommand_ << " ./" << getName() << " -r " << getName();
-            } else {
-                com << clusterCommand_ << " ./" << getName().substr (0,found) << " -r " << getName();
+            }
+            else
+            {
+                com << clusterCommand_ << " ./" << getName().substr(0, found) << " -r " << getName();
             }
             //std::cout << com << std::endl;        
-            std::cout << "system output:" << system(com.str().c_str()) << std::endl;        
-	        exit(0);
-    	}
+            std::cout << "system output:" << system(com.str().c_str()) << std::endl;
+            exit(0);
+        }
     }
-
+    
     /** Command required to execute code on a cluster;
      * for einder, the command is ~/bin/sclusterscriptexecute
      */
@@ -165,4 +172,5 @@ private:
     double initialWallTime_;
     
 };
+
 #endif

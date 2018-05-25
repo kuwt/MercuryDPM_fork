@@ -42,69 +42,70 @@
 class RestrictedWall : public BaseWall
 {
 public:
-
+    
     /*!
      * \brief Default constructor, the normal is infinitely long.
      */
     RestrictedWall();
-
+    
     /*!
      * \brief Copy constructor, copy the given wall.
      */
     RestrictedWall(const RestrictedWall& w);
-
+    
     
     /*!
      * \brief Constructor setting values.
      */
     RestrictedWall(BaseWall* wall, InfiniteWall* restriction);
-
+    
     /*!
      * \brief Default destructor.
      */
     ~RestrictedWall() override;
-
+    
     /*!
      * \brief Wall copy method. It calls the copy constructor of this Wall, useful for polymorphism
      */
     RestrictedWall* copy() const override;
-
+    
     /*!
      * \brief Defines a standard wall, given an outward normal vector s.t. normal*x=normal*point for all x of the wall.
      */
     void set(BaseWall* wall, InfiniteWall* restriction);
-
+    
     /*!
      * \brief Compute the distance from the wall for a given BaseParticle and return if there is a collision. If there is a collision, also return the normal vector.
      */
     bool getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const override;
-
+    
     /*!
      * \brief Reads RestrictedWall from a restart file.
      */
     void read(std::istream& is) override;
-
+    
     /*!
      * \brief Reads RestrictedWall from an old-style restart file.
      */
     void oldRead(std::istream& is);
-
+    
     /*!
      * \brief Writes the RestrictedWall to an output stream, usually a restart file.
      */
     void write(std::ostream& os) const override;
-
+    
     /*!
      * \brief Returns the name of the object, in this case the string "RestrictedWall".
      */
     std::string getName() const override;
-
+    
     /*!
      * \brief Look up the interaction between this wall and a BaseParticle at a certain timeStamp.
      */
-    std::vector<BaseInteraction*> getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler) override;
-
-    void writeVTK (VTKContainer& vtk) const override;
+    std::vector<BaseInteraction*>
+    getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler) override;
+    
+    void writeVTK(VTKContainer& vtk) const override;
 
 private:
     /*!

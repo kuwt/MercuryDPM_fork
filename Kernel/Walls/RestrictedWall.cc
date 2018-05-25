@@ -61,14 +61,16 @@ RestrictedWall::RestrictedWall(BaseWall* wall, InfiniteWall* restriction)
 
 RestrictedWall::~RestrictedWall()
 {
-    if (wall_!=nullptr) {
-		delete wall_;
-		wall_ = nullptr;
-	}
-    if (restriction_!=nullptr) {
-		delete restriction_;
-		restriction_ = nullptr;
-	}
+    if (wall_ != nullptr)
+    {
+        delete wall_;
+        wall_ = nullptr;
+    }
+    if (restriction_ != nullptr)
+    {
+        delete restriction_;
+        restriction_ = nullptr;
+    }
     logger(DEBUG, "RestrictedWall::~RestrictedWall finished");
 }
 
@@ -86,22 +88,24 @@ RestrictedWall* RestrictedWall::copy() const
  * \details Sets the wall such that for all points x on the wall it holds that 
  * normal*x=normal*point.
  */
- ///\todo TW maybe the Restricted wall should be templated with the wall type such that we don't need to use new and delete.
+///\todo TW maybe the Restricted wall should be templated with the wall type such that we don't need to use new and delete.
 void RestrictedWall::set(BaseWall* wall, InfiniteWall* restriction)
 {
-    if (wall_!=nullptr) {
-		delete wall_;
-		wall_ = nullptr;
-	}
+    if (wall_ != nullptr)
+    {
+        delete wall_;
+        wall_ = nullptr;
+    }
     wall_ = wall->copy();
     setSpecies(wall_->getSpecies());
-
-    if (restriction_!=nullptr) {
-		delete restriction_;
-		restriction_ = nullptr;
-	}
+    
+    if (restriction_ != nullptr)
+    {
+        delete restriction_;
+        restriction_ = nullptr;
+    }
     restriction_ = restriction->copy();
-
+    
     // std::cout << *this << std::endl;
 }
 
@@ -162,54 +166,67 @@ std::string RestrictedWall::getName() const
  * and the BaseParticle at the timeStamp.
  */
 ///\todo Shouldn't this function be defined in BaseWall?
-std::vector<BaseInteraction*>  RestrictedWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler) {
-    if (restriction_->getDistance(p->getPosition()) < p->getWallInteractionRadius()) {
+std::vector<BaseInteraction*>
+RestrictedWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler)
+{
+    if (restriction_->getDistance(p->getPosition()) < p->getWallInteractionRadius())
+    {
         ///\todo{setting the index of the wall is necessary to get the right index reported in fstat; however, the better way would be to make setIndex virtual.}
         wall_->setIndex(getIndex());
         return wall_->getInteractionWith(p, timeStamp, interactionHandler);
-    } else {
+    }
+    else
+    {
         return std::vector<BaseInteraction*>();
     }
 }
 
-void RestrictedWall::writeVTK (VTKContainer& vtk) const
+void RestrictedWall::writeVTK(VTKContainer& vtk) const
 {
     const size_t size0 = vtk.triangleStrips.size();
     //write full BaseWall
     wall_->writeVTK(vtk);
-
+    
     //copy out the new triangle strips, so we can modify them
     std::vector<std::vector<double>> myTriangleStrips;
-    while (vtk.triangleStrips.size()>size0) {
+    while (vtk.triangleStrips.size() > size0)
+    {
         myTriangleStrips.push_back(vtk.triangleStrips.back());
         vtk.triangleStrips.pop_back();
     }
-
+    
     //now remove points that are in restricted area
-    for (const std::vector<double>& myTriangleStrip: myTriangleStrips) {
+    for (const std::vector<double>& myTriangleStrip: myTriangleStrips)
+    {
         unsigned counter = 0;
         std::vector<double> cell;
         //for each triangle
-        for (const double c: myTriangleStrip) {
+        for (const double c: myTriangleStrip)
+        {
             Mdouble distance = restriction_->getDistance(vtk.points[c]);
-            if (distance < 0) {
+            if (distance < 0)
+            {
                 //if the current point is inside the restricted volume, write it
                 cell.push_back(c);
-                counter=0;
-            } else {
-                if (counter>=2) {
+                counter = 0;
+            }
+            else
+            {
+                if (counter >= 2)
+                {
                     //if the current point is not in restriction, don't write it and flush the cell into the cells array
-                    if (cell.size()>2)
+                    if (cell.size() > 2)
                         vtk.triangleStrips.push_back(cell);
                     cell.clear();
-                    counter=0;
+                    counter = 0;
                 }
-                vtk.points[c] += distance*restriction_->getNormal();
+                vtk.points[c] += distance * restriction_->getNormal();
                 cell.push_back(c);
                 counter++;
             }
         }
-        if (cell.size()>2) {
+        if (cell.size() > 2)
+        {
             //if the current point is not in restriction, don't write it and flush the cell into the cells array
             vtk.triangleStrips.push_back(cell);
             cell.clear();

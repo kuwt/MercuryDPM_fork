@@ -42,7 +42,7 @@ ChargedBondedSpecies::ChargedBondedSpecies()
     bondForceMax_ = 0;
     //...and do not impart any excess dissipation!
     bondDissipation_ = 0;
-     //Setting also parameters corresponding to the van der Waals force to zero by default
+    //Setting also parameters corresponding to the van der Waals force to zero by default
     vanDerWaalsForceMax_ = 0;
     vanDerWaalsStiffness_ = 1;
     charge_ = 0;
@@ -55,7 +55,7 @@ ChargedBondedSpecies::ChargedBondedSpecies()
  * Copy constructor for charged species
  * \param[in] s the species that is copied
  */
-ChargedBondedSpecies::ChargedBondedSpecies(const ChargedBondedSpecies &s)
+ChargedBondedSpecies::ChargedBondedSpecies(const ChargedBondedSpecies& s)
 {
     adhesionForceMax_ = s.adhesionForceMax_;
     adhesionStiffness_ = s.adhesionStiffness_;
@@ -120,7 +120,7 @@ void ChargedBondedSpecies::mix(ChargedBondedSpecies* const S, ChargedBondedSpeci
     //'mixing' properties relating to the charged force interactions between particles
     adhesionForceMax_ = average(S->getAdhesionForceMax(), T->getAdhesionForceMax());
     adhesionStiffness_ = average(S->getAdhesionStiffness(), T->getAdhesionStiffness());
-
+    
     //ensuring that, in addition, bond properties are also 'mixed'
     bondForceMax_ = average(S->getBondForceMax(), T->getBondForceMax());
     bondDissipation_ = average(S->getBondDissipation(), T->getBondDissipation());
@@ -128,7 +128,7 @@ void ChargedBondedSpecies::mix(ChargedBondedSpecies* const S, ChargedBondedSpeci
     //and that the van der Waals force also is computed correctly
     vanDerWaalsForceMax_ = average(S->getVanDerWaalsForceMax(), T->getVanDerWaalsForceMax());
     vanDerWaalsStiffness_ = average(S->getVanDerWaalsStiffness(), T->getVanDerWaalsStiffness());
-
+    
     charge_ = 0; //note mixedSpecies dont need charge, it's a particle property.
 }
 
@@ -155,6 +155,7 @@ void ChargedBondedSpecies::setAdhesionStiffness(Mdouble new_k0)
         exit(-1);
     }
 }
+
 ///Allows the spring constant to be accessed
 Mdouble ChargedBondedSpecies::getAdhesionStiffness() const
 {
@@ -172,6 +173,7 @@ void ChargedBondedSpecies::setAdhesionForceMax(Mdouble new_f0)
         exit(-1);
     }
 }
+
 ///Allows the spring constant to be accessed
 Mdouble ChargedBondedSpecies::getAdhesionForceMax() const
 {
@@ -180,7 +182,8 @@ Mdouble ChargedBondedSpecies::getAdhesionForceMax() const
 
 //overwrites the baseSpecies version of this function, allowing particles' charges to be accessed from the
 //program running
-int ChargedBondedSpecies::getCharge() const {
+int ChargedBondedSpecies::getCharge() const
+{
     return charge_;
 }
 
@@ -205,11 +208,14 @@ void ChargedBondedSpecies::setCharge(int newCharge)
 ///\details Allows the spring constant to be changed
 ///This means that we can alter the strength with which particles are "bondd" together and, thus, the mean
 ///distance by which bondd particles overlap by. As such, we can alter the geometry of multi-particle structures formed.
-void ChargedBondedSpecies::setBondForceMax(Mdouble new_f0) {
-    if (new_f0 >= 0) {
+void ChargedBondedSpecies::setBondForceMax(Mdouble new_f0)
+{
+    if (new_f0 >= 0)
+    {
         bondForceMax_ = new_f0;
     }
-    else {
+    else
+    {
         std::cerr << "Error in setBondForceMax" << std::endl;
         exit(-1);
     }
@@ -234,6 +240,7 @@ void ChargedBondedSpecies::setBondDissipation(Mdouble disp)
         exit(-1);
     }
 }
+
 ///Allows the value of the dissipation between bondd particles to be accessed. This can be used to eliminate
 ///oscillations which may arise due to the forces holding the particles together competing with the usual
 ///forces which act to push particles in contact apart!
@@ -254,11 +261,13 @@ Mdouble ChargedBondedSpecies::getBondDissipation() const
 //a particle, as the net force must be attractive in order to correctly represent vand der Waals
 void ChargedBondedSpecies::setVanDerWaalsForceMax(Mdouble fMax)
 {
-    if ( fMax < 0 ) {
+    if (fMax < 0)
+    {
         std::cerr << "Error in setVanDerWaalsForceMax." << std::endl;
         exit(-1);
     }
-    else {
+    else
+    {
         vanDerWaalsForceMax_ = fMax;
     }
 }

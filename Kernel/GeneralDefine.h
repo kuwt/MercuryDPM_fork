@@ -25,11 +25,12 @@
 
 #ifndef GENERALDEFINE_H
 #define GENERALDEFINE_H
+
 #include <limits>
 
 #ifdef HIGH_PRECISION
 typedef long double Mdouble;
-#else 
+#else
 typedef double Mdouble;
 #endif
 
@@ -65,8 +66,10 @@ const unsigned unsignedMax = std::numeric_limits<unsigned>::max();
  * \brief An enum that indicates the direction in Cartesian coordinates
  * \details This is heavily used in the parallel code to avoid confusion with numbers 
  */
-enum Direction {XAXIS = 0, YAXIS = 1, ZAXIS = 2};
-
+enum Direction
+{
+    XAXIS = 0, YAXIS = 1, ZAXIS = 2
+};
 
 
 #endif

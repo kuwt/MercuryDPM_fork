@@ -39,7 +39,7 @@
 #include "GeneralDefine.h"
 #include "Logger.h"
 
-template <unsigned int N>
+template<unsigned int N>
 class SmallVector;
 
 /*!
@@ -60,15 +60,16 @@ public:
      * Use getters / setters.
      */
 //    Vec3D(int i);
-
+    
     // private:
     Mdouble X, Y, Z;
-
+    
     /*!
      * \brief constructor
      */
-    Vec3D() {setZero();}
-
+    Vec3D()
+    { setZero(); }
+    
     Vec3D(const SmallVector<3>& vector);
     
     /*!
@@ -78,53 +79,61 @@ public:
      * \param[in] y     the y-component
      * \param[in] z     the z-component
      */
-    Vec3D(const Mdouble x, const Mdouble y, const Mdouble z) { X = x; Y = y; Z = z; }
+    Vec3D(const Mdouble x, const Mdouble y, const Mdouble z)
+    {
+        X = x;
+        Y = y;
+        Z = z;
+    }
     
     /*!
      * \brief Sets all elements to zero
      */
     void setZero();
-
+    
     /*!
      * \brief Sets all elements to NaN
      */
     void setNaN();
-
+    
     /*!
      * \brief Checks if ALL elements are zero
      */
-    bool isZero() const {return X == 0.0 && Y == 0.0 && Z == 0.0;}
-
+    bool isZero() const
+    { return X == 0.0 && Y == 0.0 && Z == 0.0; }
+    
     /*!
      * \brief Checks if ALL elements are zero
      */
     bool isNaN() const;
-
+    
     /*!
      * \brief Adds another vector
      */
     Vec3D operator+(const Vec3D& a) const;
-
+    
     /*!
      * \brief Subtracts another vector
      * \details Subtracts vector from itself
      * \param[in] a     vector to be subtracted
      * \return          resulting vector
      */
-    Vec3D operator-(const Vec3D& a) const {
+    Vec3D operator-(const Vec3D& a) const
+    {
         return Vec3D(X - a.X, Y - a.Y, Z - a.Z);
     };
-
+    
     /*!
      * \brief Multiplies by a scalar
      * \details Multiplies each element with a scalar
      * \param[in] a     the scalar to be multiplied with
      * \return          the resulting vector
      */
-    Vec3D operator*(const Mdouble a) const {
+    Vec3D operator*(const Mdouble a) const
+    {
         return Vec3D(X * a, Y * a, Z * a);
     }
-
+    
     /*!
      * \brief Divides by a scalar
      */
@@ -136,7 +145,8 @@ public:
      * \param[in] a     vector to be added
      * \return          (reference to) itself, i.e. resulting vector
      */
-    Vec3D& operator+=(const Vec3D& a) {
+    Vec3D& operator+=(const Vec3D& a)
+    {
         X += a.X;
         Y += a.Y;
         Z += a.Z;
@@ -212,7 +222,7 @@ public:
      * \brief Calculates the length of a Vec3D: \f$ \sqrt{a\cdot a} \f$
      */
     static Mdouble getLength(const Vec3D& a);
-
+    
     /*!
      * \brief Calculates the squared length of a Vec3D: \f$ a\cdot a \f$
      * \details Calculates the square of the length of a given vector.
@@ -220,7 +230,8 @@ public:
      * \param[in] a     the vector.
      * \return          the square of the length of the argument.
      */
-    static Mdouble getLengthSquared(const Vec3D& a) {
+    static Mdouble getLengthSquared(const Vec3D& a)
+    {
         return (a.X * a.X + a.Y * a.Y + a.Z * a.Z);
     }
     
@@ -247,71 +258,94 @@ public:
     /*!
      * \brief RW reference to X
      */
-    inline Mdouble& x() { return X; }
+    inline Mdouble& x()
+    { return X; }
     
     /*!
      * \brief RO reference to X
      */
-    inline Mdouble x() const { return X; }
+    inline Mdouble x() const
+    { return X; }
     
     /*!
      * \brief RW reference to Y
      */
-    inline Mdouble& y() { return Y; }
+    inline Mdouble& y()
+    { return Y; }
     
     /*!
      * \brief RO reference to Y
      */
-    inline Mdouble y() const { return Y; }
+    inline Mdouble y() const
+    { return Y; }
     
     /*!
      * \brief RW reference to Z
      */
-    inline Mdouble& z() { return Z; }
+    inline Mdouble& z()
+    { return Z; }
     
     /*!
      * \brief RO reference to Z
      */
-    inline Mdouble z() const { return Z; }
+    inline Mdouble z() const
+    { return Z; }
     
-    inline void setX(Mdouble x) { X = x; }
-    inline void setY(Mdouble y) { Y = y; }
-    inline void setZ(Mdouble z) { Z = z; }
-    inline Mdouble getX() { return X; }
-    inline Mdouble getY() { return Y; }
-    inline Mdouble getZ() { return Z; }
-    inline void set(Mdouble x, Mdouble y, Mdouble z) { X = x; Y = y; Z = z; }
-
+    inline void setX(Mdouble x)
+    { X = x; }
+    
+    inline void setY(Mdouble y)
+    { Y = y; }
+    
+    inline void setZ(Mdouble z)
+    { Z = z; }
+    
+    inline Mdouble getX()
+    { return X; }
+    
+    inline Mdouble getY()
+    { return Y; }
+    
+    inline Mdouble getZ()
+    { return Z; }
+    
+    inline void set(Mdouble x, Mdouble y, Mdouble z)
+    {
+        X = x;
+        Y = y;
+        Z = z;
+    }
+    
     /*!
      * \brief Returns the square of the radial cylindrical coordinate, r^2=x^2+y^2.
      */
     Mdouble getRadialCoordinateSquared() const;
-
+    
     /*!
      * \brief Returns the square of the radial cylindrical coordinate, r=sqrt(x^2+y^2).
      */
     Mdouble getRadialCoordinate() const;
-
+    
     /*!
      * \brief Returns the representation of this Vec3D in cylindrical coordinates
      */
     Vec3D getCylindricalCoordinates() const;
-
+    
     /*!
      * \brief Returns the representation of this Vec3D in cylindrical coordinates
      */
     Vec3D getFromCylindricalCoordinates() const;
-
+    
     /*!
      * \brief Returns this vector field at point p to cylindrical coordinates
      */
     Vec3D getCylindricalTensorField(const Vec3D& position) const;
-
+    
     /*!
      * \brief Checks if the length this Vec3D is equal the length of other with a certain tolerance
      */
     bool isEqualTo(const Vec3D& other, double tol) const;
-
+    
     /*!
      * \brief Returns a unit Vec3D based on a.
      */
@@ -326,7 +360,7 @@ public:
      * \brief Adds elements to an input stream
      */
     friend std::istream& operator>>(std::istream& is, Vec3D& a);
-
+    
     /*!
      * \brief Subtracts a vector 
      */

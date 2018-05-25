@@ -25,11 +25,13 @@
 
 #ifndef SPECIES_H
 #define SPECIES_H
+
 #include "MixedSpecies.h"
 #include "ParticleSpecies.h"
 #include "Species/FrictionForceSpecies/EmptyFrictionSpecies.h"
 #include "Species/AdhesiveForceSpecies/EmptyAdhesiveSpecies.h"
 #include "Interactions/Interaction.h"
+
 class BaseInteraction;
 
 /*!
@@ -124,7 +126,8 @@ class BaseInteraction;
  * Also requires read, write, getBaseName, mix.
  */
 template<class NormalForceSpecies, class FrictionForceSpecies = EmptyFrictionSpecies, class AdhesiveForceSpecies = EmptyAdhesiveSpecies>
-class Species final: public ParticleSpecies, public NormalForceSpecies, public FrictionForceSpecies, public AdhesiveForceSpecies
+class Species final
+        : public ParticleSpecies, public NormalForceSpecies, public FrictionForceSpecies, public AdhesiveForceSpecies
 {
 public:
     ///\brief The correct MixedSpecies type for this Species
@@ -136,28 +139,28 @@ public:
      * To access this MixedSpecies type, you can use this typedef.
      */
     typedef MixedSpecies<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies> MixedSpeciesType;
-    typedef Interaction<typename NormalForceSpecies::InteractionType, typename FrictionForceSpecies::InteractionType, typename AdhesiveForceSpecies::InteractionType > InteractionType;
-
-
+    typedef Interaction<typename NormalForceSpecies::InteractionType, typename FrictionForceSpecies::InteractionType, typename AdhesiveForceSpecies::InteractionType> InteractionType;
+    
+    
     ///\brief The default constructor.
     Species();
-
+    
     ///\brief The default copy constructor.
-    Species(const Species &s);
-
+    Species(const Species& s);
+    
     ///\brief The default destructor.
     virtual ~Species();
-
+    
     /*!
      * \brief Creates a deep copy of the Species from which it is called.
      */
     Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>* copy() const final;
-
+    
     /*!
      * Copies the content of this into the species bs, if they are of the same type.
      */
     void copyInto(BaseSpecies* bs) const final;
-
+    
     /*!
      * \brief Creates a new MixedSpecies with the same force properties as the 
      * Species from which it is called.
@@ -166,53 +169,54 @@ public:
     
     /// Called by SpeciesHandler::readAndAddObject
     void read(std::istream& is) final;
-
+    
     /// \brief Writes the Species properties to an output stream.
     void write(std::ostream& os) const final;
-
+    
     ///\brief Returns the name of the Species as it is used in the restart file. 
     std::string getName() const final;
-
+    
     /*!
      * \brief When a contact between two particles is determined, an Interaction 
      * object is created, as the type of Interaction depends on the Species type.
      */
-    BaseInteraction* getNewInteraction(BaseInteractable* const P, BaseInteractable* const I, unsigned timeStamp) const final;
+    BaseInteraction*
+    getNewInteraction(BaseInteractable* const P, BaseInteractable* const I, unsigned timeStamp) const final;
     
     //used to create a dummy for MPI purposes (I need a prototype of the interaction)
     BaseInteraction* getEmptyInteraction() const final;
     
     void deleteEmptyInteraction(BaseInteraction* interaction) const final;
-
+    
     /*!
      * \brief Returns true if torques have to be calculated.
      */
     bool getUseAngularDOFs() const final;
-
+    
     /*!
      * \brief This function should not be called.
      */
-    void mixAll(BaseSpecies * const S, BaseSpecies * const T);
-
+    void mixAll(BaseSpecies* const S, BaseSpecies* const T);
+    
     ///Returns the particle distance below which adhesive forces can occur (needed for contact detection)
     Mdouble getInteractionDistance() const final;
 };
 
 template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveForceSpecies>
 Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::Species()
-: ParticleSpecies(), NormalForceSpecies(), FrictionForceSpecies(), AdhesiveForceSpecies()
+        : ParticleSpecies(), NormalForceSpecies(), FrictionForceSpecies(), AdhesiveForceSpecies()
 {
-    logger(DEBUG,"Species::Species() finished");
+    logger(DEBUG, "Species::Species() finished");
 }
 
 /*!
  * \param[in] s the species that is copied
  */
 template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveForceSpecies>
-Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::Species(const Species &s)
-: ParticleSpecies(s), NormalForceSpecies(s), FrictionForceSpecies(s), AdhesiveForceSpecies(s)
+Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::Species(const Species& s)
+        : ParticleSpecies(s), NormalForceSpecies(s), FrictionForceSpecies(s), AdhesiveForceSpecies(s)
 {
-    logger(DEBUG,"Species::Species(const Species &p) finished");
+    logger(DEBUG, "Species::Species(const Species &p) finished");
 }
 
 template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveForceSpecies>
@@ -229,7 +233,8 @@ Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::~Specie
  * > species->copy();
  */
 template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveForceSpecies>
-Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>* Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>
+Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>*
+Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>
 ::copy() const
 {
     return new Species(*this);
@@ -316,8 +321,8 @@ template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveFor
 std::string Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::getName() const
 {
     return NormalForceSpecies::getBaseName()
-        + FrictionForceSpecies::getBaseName()
-        + AdhesiveForceSpecies::getBaseName() + "Species";
+           + FrictionForceSpecies::getBaseName()
+           + AdhesiveForceSpecies::getBaseName() + "Species";
 }
 
 /*!
@@ -329,7 +334,10 @@ std::string Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpeci
  * \return pointer to the newly created Interaction.
  */
 template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveForceSpecies>
-BaseInteraction* Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::getNewInteraction(BaseInteractable* const P, BaseInteractable* const I, unsigned timeStamp) const
+BaseInteraction*
+Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::getNewInteraction(BaseInteractable* const P,
+                                                                                           BaseInteractable* const I,
+                                                                                           unsigned timeStamp) const
 {
     return new InteractionType(P, I, timeStamp);
 }
@@ -337,14 +345,15 @@ BaseInteraction* Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForce
 template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveForceSpecies>
 BaseInteraction* Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::getEmptyInteraction() const
 {
-    return new Interaction<typename NormalForceSpecies::InteractionType, typename FrictionForceSpecies::InteractionType, typename AdhesiveForceSpecies::InteractionType > ();
+    return new Interaction<typename NormalForceSpecies::InteractionType, typename FrictionForceSpecies::InteractionType, typename AdhesiveForceSpecies::InteractionType>();
 }
 
 template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveForceSpecies>
-void Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::deleteEmptyInteraction(BaseInteraction* interaction) const
+void Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::deleteEmptyInteraction(
+        BaseInteraction* interaction) const
 {
-    Interaction<typename NormalForceSpecies::InteractionType, typename FrictionForceSpecies::InteractionType, typename AdhesiveForceSpecies::InteractionType >* interactionDestroyer;
-    interactionDestroyer = dynamic_cast<Interaction<typename NormalForceSpecies::InteractionType, typename FrictionForceSpecies::InteractionType, typename AdhesiveForceSpecies::InteractionType >*>(interaction);
+    Interaction<typename NormalForceSpecies::InteractionType, typename FrictionForceSpecies::InteractionType, typename AdhesiveForceSpecies::InteractionType>* interactionDestroyer;
+    interactionDestroyer = dynamic_cast<Interaction<typename NormalForceSpecies::InteractionType, typename FrictionForceSpecies::InteractionType, typename AdhesiveForceSpecies::InteractionType>*>(interaction);
     delete interactionDestroyer;
 }
 
@@ -369,7 +378,8 @@ bool Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::ge
  * \param[in] T the second of the two species whose properties are mixed to create the new species
  */
 template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveForceSpecies>
-void Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::mixAll(BaseSpecies * const S UNUSED, BaseSpecies * const T UNUSED)
+void Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::mixAll(BaseSpecies* const S UNUSED,
+                                                                                     BaseSpecies* const T UNUSED)
 {
     logger(ERROR, "%::mix() This function should not be called", getName());
 }
@@ -380,4 +390,5 @@ Mdouble Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>:
 {
     return AdhesiveForceSpecies::getInteractionDistance();
 }
+
 #endif

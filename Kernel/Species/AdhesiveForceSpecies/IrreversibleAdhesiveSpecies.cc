@@ -27,7 +27,7 @@
 #include <Logger.h>
 
 IrreversibleAdhesiveSpecies::IrreversibleAdhesiveSpecies()
-    : ReversibleAdhesiveSpecies()
+        : ReversibleAdhesiveSpecies()
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"IrreversibleAdhesiveSpecies::IrreversibleAdhesiveSpecies() finished"<<std::endl;
@@ -37,8 +37,8 @@ IrreversibleAdhesiveSpecies::IrreversibleAdhesiveSpecies()
 /*!
  * \param[in] the species that is copied
  */
-IrreversibleAdhesiveSpecies::IrreversibleAdhesiveSpecies(const IrreversibleAdhesiveSpecies &s)
-    : ReversibleAdhesiveSpecies(s)
+IrreversibleAdhesiveSpecies::IrreversibleAdhesiveSpecies(const IrreversibleAdhesiveSpecies& s)
+        : ReversibleAdhesiveSpecies(s)
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"IrreversibleAdhesiveSpecies::IrreversibleAdhesiveSpecies(const IrreversibleAdhesiveSpecies &p) finished"<<std::endl;
@@ -49,7 +49,7 @@ IrreversibleAdhesiveSpecies::~IrreversibleAdhesiveSpecies()
 {
 #ifdef DEBUG_DESTRUCTOR
     std::cout<<"IrreversibleAdhesiveSpecies::~IrreversibleAdhesiveSpecies() finished"<<std::endl;
-#endif   
+#endif
 }
 
 /*!

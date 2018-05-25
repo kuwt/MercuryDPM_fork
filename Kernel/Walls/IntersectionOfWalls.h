@@ -101,7 +101,7 @@ public:
     void setSpecies(const ParticleSpecies* species);
     
     void setHandler(WallHandler* wallHandler) override;
-
+    
     /*! 
      * \brief Returns the number of objects 
      */
@@ -130,7 +130,7 @@ public:
     
     
     void addPlate(const Vec3D& PointA, const Vec3D& PointB, const Vec3D& PointC, const Vec3D& WallNormal,
-             const Mdouble& Thickness, int wallidentifier);
+                  const Mdouble& Thickness, int wallidentifier);
     
     /*!
      * \brief Adds a wall to the set of finite walls, given an outward normal vector s. t. normal*x=position

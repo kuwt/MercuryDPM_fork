@@ -28,19 +28,20 @@
 #include "Species/BaseSpecies.h"
 
 class BaseParticle;
+
 class BaseInteractable;
 
 MindlinRollingTorsionSpecies::MindlinRollingTorsionSpecies()
-    : MindlinSpecies()
+        : MindlinSpecies()
 {
-    rollingStiffness_=0.0;
-    rollingDissipation_=0.0;
-    rollingFrictionCoefficient_=0.0;
-    rollingFrictionCoefficientStatic_=0.0;
-    torsionStiffness_=0.0;
-    torsionDissipation_=0.0;
-    torsionFrictionCoefficient_=0.0;
-    torsionFrictionCoefficientStatic_=0.0;
+    rollingStiffness_ = 0.0;
+    rollingDissipation_ = 0.0;
+    rollingFrictionCoefficient_ = 0.0;
+    rollingFrictionCoefficientStatic_ = 0.0;
+    torsionStiffness_ = 0.0;
+    torsionDissipation_ = 0.0;
+    torsionFrictionCoefficient_ = 0.0;
+    torsionFrictionCoefficientStatic_ = 0.0;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"MindlinRollingTorsionSpecies::MindlinRollingTorsionSpecies() finished"<<std::endl;
 #endif
@@ -49,17 +50,17 @@ MindlinRollingTorsionSpecies::MindlinRollingTorsionSpecies()
 /*!
  * \param[in] s the species that is copied
  */
-MindlinRollingTorsionSpecies::MindlinRollingTorsionSpecies(const MindlinRollingTorsionSpecies &s)
-    : MindlinSpecies(s)
+MindlinRollingTorsionSpecies::MindlinRollingTorsionSpecies(const MindlinRollingTorsionSpecies& s)
+        : MindlinSpecies(s)
 {
-    rollingStiffness_=s.rollingStiffness_;
-    rollingDissipation_=s.rollingDissipation_;
-    rollingFrictionCoefficient_=s.rollingFrictionCoefficient_;
-    rollingFrictionCoefficientStatic_=s.rollingFrictionCoefficientStatic_;
-    torsionStiffness_=s.torsionStiffness_;
-    torsionDissipation_=s.torsionDissipation_;
-    torsionFrictionCoefficient_=s.torsionFrictionCoefficient_;
-    torsionFrictionCoefficientStatic_=s.torsionFrictionCoefficientStatic_;
+    rollingStiffness_ = s.rollingStiffness_;
+    rollingDissipation_ = s.rollingDissipation_;
+    rollingFrictionCoefficient_ = s.rollingFrictionCoefficient_;
+    rollingFrictionCoefficientStatic_ = s.rollingFrictionCoefficientStatic_;
+    torsionStiffness_ = s.torsionStiffness_;
+    torsionDissipation_ = s.torsionDissipation_;
+    torsionFrictionCoefficient_ = s.torsionFrictionCoefficient_;
+    torsionFrictionCoefficientStatic_ = s.torsionFrictionCoefficientStatic_;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"MindlinRollingTorsionSpecies::MindlinRollingTorsionSpecies(const MindlinRollingTorsionSpecies &p) finished"<<std::endl;
 #endif
@@ -69,7 +70,7 @@ MindlinRollingTorsionSpecies::~MindlinRollingTorsionSpecies()
 {
 #ifdef DEBUG_DESTRUCTOR
     std::cout<<"MindlinRollingTorsionSpecies::~MindlinRollingTorsionSpecies() finished"<<std::endl;
-#endif   
+#endif
 }
 
 /*!
@@ -78,14 +79,14 @@ MindlinRollingTorsionSpecies::~MindlinRollingTorsionSpecies()
 void MindlinRollingTorsionSpecies::write(std::ostream& os) const
 {
     MindlinSpecies::write(os);
-    os  << " rollingStiffness " << rollingStiffness_;
-    os  << " rollingDissipation " << rollingDissipation_;
-    os  << " rollingFrictionCoefficient " << rollingFrictionCoefficient_;
-    os  << " rollingFrictionCoefficientStatic " << rollingFrictionCoefficientStatic_;
-    os  << " torsionStiffness " << torsionStiffness_;
-    os  << " torsionDissipation " << torsionDissipation_;
-    os  << " torsionFrictionCoefficient " << torsionFrictionCoefficient_;
-    os  << " torsionFrictionCoefficientStatic " << torsionFrictionCoefficientStatic_;
+    os << " rollingStiffness " << rollingStiffness_;
+    os << " rollingDissipation " << rollingDissipation_;
+    os << " rollingFrictionCoefficient " << rollingFrictionCoefficient_;
+    os << " rollingFrictionCoefficientStatic " << rollingFrictionCoefficientStatic_;
+    os << " torsionStiffness " << torsionStiffness_;
+    os << " torsionDissipation " << torsionDissipation_;
+    os << " torsionFrictionCoefficient " << torsionFrictionCoefficient_;
+    os << " torsionFrictionCoefficientStatic " << torsionFrictionCoefficientStatic_;
 }
 
 /*!
@@ -132,13 +133,15 @@ bool MindlinRollingTorsionSpecies::getUseAngularDOFs() const
 void MindlinRollingTorsionSpecies::mix(MindlinRollingTorsionSpecies* const S, MindlinRollingTorsionSpecies* const T)
 {
     //rollingStiffness_= average(S->getRollingStiffness(), T->getRollingStiffness());
-    rollingDissipation_= average(S->getRollingDissipation(), T->getRollingDissipation());
-    rollingFrictionCoefficient_= average(S->getRollingFrictionCoefficient(), T->getRollingFrictionCoefficient());
-    rollingFrictionCoefficientStatic_= average(S->getRollingFrictionCoefficientStatic(), T->getRollingFrictionCoefficientStatic());
+    rollingDissipation_ = average(S->getRollingDissipation(), T->getRollingDissipation());
+    rollingFrictionCoefficient_ = average(S->getRollingFrictionCoefficient(), T->getRollingFrictionCoefficient());
+    rollingFrictionCoefficientStatic_ = average(S->getRollingFrictionCoefficientStatic(),
+                                                T->getRollingFrictionCoefficientStatic());
     //torsionStiffness_= average(S->getTorsionStiffness(), T->getTorsionStiffness());
-    torsionDissipation_= average(S->getTorsionDissipation(), T->getTorsionDissipation());
-    torsionFrictionCoefficient_= average(S->getTorsionFrictionCoefficient(), T->getTorsionFrictionCoefficient());
-    torsionFrictionCoefficientStatic_= average(S->getTorsionFrictionCoefficientStatic(), T->getTorsionFrictionCoefficientStatic());
+    torsionDissipation_ = average(S->getTorsionDissipation(), T->getTorsionDissipation());
+    torsionFrictionCoefficient_ = average(S->getTorsionFrictionCoefficient(), T->getTorsionFrictionCoefficient());
+    torsionFrictionCoefficientStatic_ = average(S->getTorsionFrictionCoefficientStatic(),
+                                                T->getTorsionFrictionCoefficientStatic());
 }
 
 /////Allows the spring constant to be changed
@@ -172,6 +175,7 @@ void MindlinRollingTorsionSpecies::setRollingDissipation(Mdouble new_dispt)
         exit(-1);
     }
 }
+
 ///Allows the tangential viscosity to be accessed
 Mdouble MindlinRollingTorsionSpecies::getRollingDissipation() const
 {
@@ -252,6 +256,7 @@ void MindlinRollingTorsionSpecies::setTorsionDissipation(Mdouble new_dispt)
         exit(-1);
     }
 }
+
 ///Allows the tangential viscosity to be accessed
 Mdouble MindlinRollingTorsionSpecies::getTorsionDissipation() const
 {

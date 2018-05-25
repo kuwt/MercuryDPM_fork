@@ -53,7 +53,7 @@ HopperInsertionBoundary::HopperInsertionBoundary() : InsertionBoundary()
  * \details Copy constructor. Calls InsertionBoundary parent copy constructor.
  */
 HopperInsertionBoundary::HopperInsertionBoundary(const HopperInsertionBoundary& other)
-            : InsertionBoundary(other)
+        : InsertionBoundary(other)
 {
     yMin_ = other.yMin_;
     yMax_ = other.yMax_;
@@ -79,7 +79,7 @@ HopperInsertionBoundary* HopperInsertionBoundary::copy() const
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout << "HopperInsertionBoundary::copy() const finished" << std::endl;
-#endif		
+#endif
     return new HopperInsertionBoundary(*this);
 }
 
@@ -121,9 +121,10 @@ HopperInsertionBoundary* HopperInsertionBoundary::copy() const
  *                              {fillPercent * (top - 'position A')}. 
  */
 void HopperInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, double yMin,
-        double yMax, double radMin, double radMax, double chuteAngle, double fixedParticleRadius, 
-        bool isHopperCentred_, int hopperDim, double hopperAngle, double hopperLength, 
-        double hopperExitLength, double hopperHeight, double lift, double fillPercent)
+                                  double yMax, double radMin, double radMax, double chuteAngle,
+                                  double fixedParticleRadius,
+                                  bool isHopperCentred_, int hopperDim, double hopperAngle, double hopperLength,
+                                  double hopperExitLength, double hopperHeight, double lift, double fillPercent)
 {
     setParticleToCopy(particleToCopy);
     setMaxFailed(maxFailed);
@@ -176,7 +177,7 @@ void HopperInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int max
  * \param[in] random    random number generator
  * \return              pointer to the particle generated
  */
-BaseParticle* HopperInsertionBoundary::generateParticle(RNG &random)
+BaseParticle* HopperInsertionBoundary::generateParticle(RNG& random)
 {
     // create particle and assign a random radius
     BaseParticle* P = getParticleToCopy()->copy();
@@ -187,17 +188,17 @@ BaseParticle* HopperInsertionBoundary::generateParticle(RNG &random)
     static Mdouble s = mathsFunc::sin(chuteAngle_);
     static Mdouble c = mathsFunc::cos(chuteAngle_);
     static Mdouble Hc = mathsFunc::cos(hopperAngle_);
-    static Mdouble Ht = mathsFunc::sin(hopperAngle_)/Hc; //tangent
+    static Mdouble Ht = mathsFunc::sin(hopperAngle_) / Hc; //tangent
     static Vec3D AB = Vec3D(c, 0.0, s);
     static Vec3D AC = Vec3D(-s, 0.0, c);
     static Vec3D AD = Vec3D(0.0, 1.0, 0.0);
     
     //Point A is located in the centre of the hopper.
     static Vec3D A = Vec3D(isHopperCentred__ ? 40 : 0.0,    /// Bram: Where does the '40' come from??
-            (yMax_ - yMin_) / 2.0,
-            s * (-0.5 * (hopperLength_ - hopperExitLength_)) + c * hopperHeight_)
-            + AB * 0.5 * hopperLength_
-            + AC * (-0.5 * hopperLength_ / Ht);
+                           (yMax_ - yMin_) / 2.0,
+                           s * (-0.5 * (hopperLength_ - hopperExitLength_)) + c * hopperHeight_)
+                     + AB * 0.5 * hopperLength_
+                     + AC * (-0.5 * hopperLength_ / Ht);
     
     Mdouble gamma = random.getRandomNumber((100.0 - fillPercent_) / 100.0, 1.0);
     //std::cout<<"gamma="<<gamma<<"fillPercent="<<fillPercent_<<std::endl;
@@ -212,7 +213,7 @@ BaseParticle* HopperInsertionBoundary::generateParticle(RNG &random)
          * 'delta' is the randomly generated Y-position of the particle and lies
          * between yMin_ and yMax_ (with a particle radius distance from the 
          * extrema on either side).
-        */ 
+        */
         /// \bug for periodic walls this should be only minus one particle radius, this should be fixed at some point.
         /// Thomas' response: using one particle radius gives problems when the wall is 
         /// not orthogonal to the y-direction; the distance has to be slightly higher than one; 
@@ -235,9 +236,9 @@ BaseParticle* HopperInsertionBoundary::generateParticle(RNG &random)
     }
     //std::cout<<A<<" "<<AC<<" "<<AB<<" "<<AD<<" "<<Hc<<" "<<Ht<<"gamma="<<gamma<<" "<<hopperLength_<<" "<<delta<<std::endl;
     P->setPosition(A
-            + AC * (gamma * 0.5 * hopperLength_ / Ht)
-            + AB * (random.getRandomNumber(-1.0, 1.0) * (0.5 * gamma * hopperLength_ - P->getRadius() / Hc))
-            + AD * delta);
+                   + AC * (gamma * 0.5 * hopperLength_ / Ht)
+                   + AB * (random.getRandomNumber(-1.0, 1.0) * (0.5 * gamma * hopperLength_ - P->getRadius() / Hc))
+                   + AD * delta);
     
     P->move(Vec3D(0.0, 0.0, lift_));
     P->setVelocity(Vec3D(0.0, 0.0, 0.0));
@@ -245,7 +246,7 @@ BaseParticle* HopperInsertionBoundary::generateParticle(RNG &random)
     return P;
 }
 
-void HopperInsertionBoundary::placeParticle(BaseParticle* p, RNG &random)
+void HopperInsertionBoundary::placeParticle(BaseParticle* p, RNG& random)
 {
 
 }
@@ -259,19 +260,19 @@ void HopperInsertionBoundary::read(std::istream& is)
     InsertionBoundary::read(is);
     std::string dummy;
     is >> dummy >> yMin_
-            >> dummy >> yMax_
-            >> dummy >> radMin_
-            >> dummy >> radMax_
-            >> dummy >> chuteAngle_
-            >> dummy >> fixedParticleRadius_
-            >> dummy >> isHopperCentred__
-            >> dummy >> hopperDim_
-            >> dummy >> hopperAngle_
-            >> dummy >> hopperLength_
-            >> dummy >> hopperExitLength_
-            >> dummy >> hopperHeight_
-            >> dummy >> lift_
-            >> dummy >> fillPercent_;
+       >> dummy >> yMax_
+       >> dummy >> radMin_
+       >> dummy >> radMax_
+       >> dummy >> chuteAngle_
+       >> dummy >> fixedParticleRadius_
+       >> dummy >> isHopperCentred__
+       >> dummy >> hopperDim_
+       >> dummy >> hopperAngle_
+       >> dummy >> hopperLength_
+       >> dummy >> hopperExitLength_
+       >> dummy >> hopperHeight_
+       >> dummy >> lift_
+       >> dummy >> fillPercent_;
 }
 
 /*!
@@ -283,20 +284,20 @@ void HopperInsertionBoundary::oldRead(std::istream& is)
     int maxFailed;
     std::string dummy;
     is >> dummy >> maxFailed
-            >> dummy >> yMin_
-            >> dummy >> yMax_
-            >> dummy >> radMin_
-            >> dummy >> radMax_
-            >> dummy >> chuteAngle_
-            >> dummy >> fixedParticleRadius_
-            >> dummy >> isHopperCentred__
-            >> dummy >> hopperDim_
-            >> dummy >> hopperAngle_
-            >> dummy >> hopperLength_
-            >> dummy >> hopperExitLength_
-            >> dummy >> hopperHeight_
-            >> dummy >> lift_
-            >> dummy >> fillPercent_;
+       >> dummy >> yMin_
+       >> dummy >> yMax_
+       >> dummy >> radMin_
+       >> dummy >> radMax_
+       >> dummy >> chuteAngle_
+       >> dummy >> fixedParticleRadius_
+       >> dummy >> isHopperCentred__
+       >> dummy >> hopperDim_
+       >> dummy >> hopperAngle_
+       >> dummy >> hopperLength_
+       >> dummy >> hopperExitLength_
+       >> dummy >> hopperHeight_
+       >> dummy >> lift_
+       >> dummy >> fillPercent_;
     setMaxFailed(maxFailed);
 }
 
@@ -305,22 +306,22 @@ void HopperInsertionBoundary::oldRead(std::istream& is)
  * \param[in] os    the ostream
  */
 void HopperInsertionBoundary::write(std::ostream& os) const
-        {
+{
     InsertionBoundary::write(os);
     os << " yMin " << yMin_
-            << " yMax " << yMax_
-            << " radMin " << radMin_
-            << " radMax " << radMax_
-            << " chuteAngle " << chuteAngle_
-            << " fixedParticleRadius " << fixedParticleRadius_
-            << " isHopperCentred_ " << isHopperCentred__
-            << " hopperDim " << hopperDim_
-            << " hopperAngle " << hopperAngle_
-            << " hopperLength " << hopperLength_
-            << " hopperExitLength " << hopperExitLength_
-            << " hopperHeight " << hopperHeight_
-            << " lift " << lift_
-            << " fillPercent " << fillPercent_;
+       << " yMax " << yMax_
+       << " radMin " << radMin_
+       << " radMax " << radMax_
+       << " chuteAngle " << chuteAngle_
+       << " fixedParticleRadius " << fixedParticleRadius_
+       << " isHopperCentred_ " << isHopperCentred__
+       << " hopperDim " << hopperDim_
+       << " hopperAngle " << hopperAngle_
+       << " hopperLength " << hopperLength_
+       << " hopperExitLength " << hopperExitLength_
+       << " hopperHeight " << hopperHeight_
+       << " lift " << lift_
+       << " fillPercent " << fillPercent_;
 }
 
 /*!

@@ -39,7 +39,7 @@ template<StatType T>
 struct StatisticsPoint;
 
 template<StatType T>
-std::ostream& operator<<(std::ostream& os, const StatisticsPoint<T> &stat);
+std::ostream& operator<<(std::ostream& os, const StatisticsPoint<T>& stat);
 
 ///This class stores statistical values for a given spatial position; to be used in combination with StatisticsVector
 template<StatType T>
@@ -58,7 +58,7 @@ public:
     }
     
     ///Copy constructor; simply copies everything
-    StatisticsPoint(const StatisticsPoint &other)
+    StatisticsPoint(const StatisticsPoint& other)
     {
         *this = other;
         mirrorParticle = -1;
@@ -70,86 +70,103 @@ public:
     {
         gb = new_gb;
     }
+    
     ///see StatisticsVector::setCGShape
     void setCGShape(const char* CG_type)
     {
         this->gb->setCGShape(CG_type);
     }
+    
     ///see StatisticsVector::getCGShape
     CG_TYPE getCGShape() const
     {
         return this->gb->getCGShape();
     }
+    
     ///see StatisticsVector::setCGWidth2
     void setCGWidth2(Mdouble new_)
     {
         this->gb->setCGWidth2(new_);
     }
+    
     ///see StatisticsVector::getCGWidthSquared
     Mdouble getCGWidthSquared() const
     {
         return this->gb->getCGWidthSquared();
     }
+    
     ///see StatisticsVector::getCGWidth
     Mdouble getCGWidth() const
     {
         return this->gb->getCGWidth();
     }
+    
     ///see StatisticsVector::getCutoff
     Mdouble getCutoff()
     {
         return this->gb->getCutoff();
     }
+    
     ///see StatisticsVector::getCutoff2
     Mdouble getCutoff2()
     {
         return this->gb->getCutoff2();
     }
+    
     ///see StatisticsVector::getXMaxStat
     Mdouble getXMaxStat()
     {
         return this->gb->getXMaxStat();
     }
+    
     ///see StatisticsVector::getYMaxStat
     Mdouble getYMaxStat()
     {
         return this->gb->getYMaxStat();
     }
+    
     ///see StatisticsVector::getZMaxStat
     Mdouble getZMaxStat()
     {
         return this->gb->getZMaxStat();
     }
+    
     ///see StatisticsVector::getXMinStat
     Mdouble getXMinStat()
     {
         return this->gb->getXMinStat();
     }
+    
     ///see StatisticsVector::getYMinStat
     Mdouble getYMinStat()
     {
         return this->gb->getYMinStat();
     }
+    
     ///see StatisticsVector::getZMinStat
     Mdouble getZMinStat()
     {
         return this->gb->getZMinStat();
     }
+    
     ///see StatisticsVector::get_n
     void getN(int& nx_, int& ny_, int& nz_)
     {
         this->gb->getN(nx_, ny_, nz_);
     }
+    
     ///see StatisticsVector::evaluatePolynomial
     Mdouble evaluatePolynomial(Mdouble r)
     {
         return gb->evaluatePolynomial(r);
     }
+    
     ///see StatisticsVector::evaluatePolynomialGradient
     Mdouble evaluatePolynomialGradient(Mdouble r)
     {
         return gb->evaluatePolynomialGradient(r);
     }
+    
     ///see StatisticsVector::evaluateIntegral
     Mdouble evaluateIntegral(Mdouble n1, Mdouble n2, Mdouble t)
     {
@@ -158,28 +175,35 @@ public:
     
     ///sets #CG_invvolume
     void setCGInverseVolume();
+    
     int nonaveragedDim();
+    
     double averagingVolume();
+    
     ///returns #CG_invvolume
     Mdouble getCGInverseVolume()
     {
         return this->CG_invvolume;
     }
+    
     ///sets #CG_invvolume if CG_type=Gaussian
     void set_Gaussian_invvolume(int dim);
+    
     ///computes #CG_invvolume if CG_type=Gaussian
     double compute_Gaussian_invvolume(int dim);
+    
     ///sets #CG_invvolume if CG_type=HeaviSideSphere
     void set_Heaviside_invvolume();
-
+    
     ///sets #CG_invvolume if CG_type=Polynomial
     void set_Polynomial_invvolume(int dim);
-
+    
     ///sets #Position
     void setPosition(Vec3D new_)
     {
         this->Position = new_;
     }
+    
     ///returns #Position
     Vec3D getPosition() const
     {
@@ -187,81 +211,85 @@ public:
     }
     
     ///Outputs statistical variables to ostream
-    friend std::ostream& operator<<<T>(std::ostream& os, const StatisticsPoint<T> &stat);
-
+    friend std::ostream& operator<<<T>(std::ostream& os, const StatisticsPoint<T>& stat);
+    
     ///Sets all statistical variables to zero
     void set_zero();
-
+    
     ///Squares all statistical variables; needed for variance
     StatisticsPoint<T> getSquared();
-
+    
     ///Defines a equal operator needed for copy constructor
-    inline StatisticsPoint<T>& operator=(const StatisticsPoint<T> &P);
-
+    inline StatisticsPoint<T>& operator=(const StatisticsPoint<T>& P);
+    
     ///Defines a plus operator needed to average values (\f$ \bar{v} = (\sum_{i=1}^n v_i)/n \f$ )
-    inline StatisticsPoint<T>& operator+=(const StatisticsPoint<T> &P);
-
+    inline StatisticsPoint<T>& operator+=(const StatisticsPoint<T>& P);
+    
     ///Defines a plus operator needed to calculate variance
-    inline StatisticsPoint<T>& operator-=(const StatisticsPoint<T> &P);
-
+    inline StatisticsPoint<T>& operator-=(const StatisticsPoint<T>& P);
+    
     ///Defines a division operator needed to average values (\f$ \bar{v} = (\sum_{i=1}^n v_i)/n \f$ )
     inline StatisticsPoint<T>& operator/=(const Mdouble a);
-
+    
     ///Defines a division operator needed to time-average values (because the displacement does not have a value at the first time step, this is slightly different than /=)
     inline void firstTimeAverage(const int n);
-
+    
     ///returns the coarse graining distance in the coordinates that are not averaged about
-    Mdouble getDistanceSquaredNonAveraged(const Vec3D &P);
-
+    Mdouble getDistanceSquaredNonAveraged(const Vec3D& P);
+    
     ///Returns the dot product of two vectors in the coordinates that are not averaged about
-    Mdouble dotNonAveraged(const Vec3D &P, const Vec3D &Q);
-
+    Mdouble dotNonAveraged(const Vec3D& P, const Vec3D& Q);
+    
     ///Returns a vector where the averaged directions are zero
     Vec3D clearAveragedDirections(Vec3D P);
-
+    
     ///Returns the cross product of two vectors in the coordinates that are not averaged about
-    Vec3D crossNonAveraged(Vec3D P, Vec3D &Q);
-
+    Vec3D crossNonAveraged(Vec3D P, Vec3D& Q);
+    
     ///Returns the cross product of two vectors in the coordinates that are not averaged about
-    Matrix3D matrixCrossNonAveraged(Vec3D P, Matrix3D &Q);
-
+    Matrix3D matrixCrossNonAveraged(Vec3D P, Matrix3D& Q);
+    
     ///Returns the value of the course graining function phi(P,PI)
-    Mdouble CG_function(const Vec3D &PI);
-
+    Mdouble CG_function(const Vec3D& PI);
+    
     ///returns the value of the course graining function phi(P,PI)
     ///averaged along a line
-    Mdouble CG_function_2D(const Vec3D &PI);
-
+    Mdouble CG_function_2D(const Vec3D& PI);
+    
     ///Returns the value of the course graining function phi(P,PI)
     ///averaged along a plane
-    Mdouble CG_function_1D(const Vec3D &PI);
-
+    Mdouble CG_function_1D(const Vec3D& PI);
+    
     ///gradient of phi 
     ///\todo{Only implemented for Gaussian}
-    Vec3D CG_gradient(const Vec3D &P, const Mdouble phi);
-
+    Vec3D CG_gradient(const Vec3D& P, const Mdouble phi);
+    
     ///gradient of phi 
     ///\todo{Only implemented for Gaussian and statavg Z}
-    Vec3D CG_integral_gradient(Vec3D &P1, Vec3D &P2, Vec3D &P1_P2_normal, Mdouble P1_P2_distance);
-    Mdouble CG_integral_gradient_1D(Vec3D &P1, Vec3D &P2, Vec3D &P1_P2_normal, Mdouble P1_P2_distance);
-
+    Vec3D CG_integral_gradient(Vec3D& P1, Vec3D& P2, Vec3D& P1_P2_normal, Mdouble P1_P2_distance);
+    
+    Mdouble CG_integral_gradient_1D(Vec3D& P1, Vec3D& P2, Vec3D& P1_P2_normal, Mdouble P1_P2_distance);
+    
     ///Returns the value of the coarse graining integral \f$ \psi(P,PI,PJ) = \int_0^1 \phi(P - PI + s PJ) ds \f$ 
-    Mdouble CG_integral(Vec3D &P1, Vec3D &P2, Vec3D &P1_P2_normal, Mdouble P1_P2_distance, Vec3D& rpsi);
-
+    Mdouble CG_integral(Vec3D& P1, Vec3D& P2, Vec3D& P1_P2_normal, Mdouble P1_P2_distance, Vec3D& rpsi);
+    
     ///Returns the value of the coarse graining integral \f$ \psi(P,PI,PJ) = \int_0^1 \phi(P - PI + s PJ) ds \f$ 
     ///averaged along a line
-    Mdouble CG_integral_2D(Vec3D &P1, Vec3D &P2, Vec3D &P1_P2_normal, Mdouble P1_P2_distance, Mdouble& rpsi_scalar);
-
+    Mdouble CG_integral_2D(Vec3D& P1, Vec3D& P2, Vec3D& P1_P2_normal, Mdouble P1_P2_distance, Mdouble& rpsi_scalar);
+    
     ///Returns the value of the coarse graining integral \f$ \psi(P,PI,PJ) = \int_0^1 \phi(P - PI + s PJ) ds \f$
     ///averaged along a plane
-    Mdouble CG_integral_1D(Vec3D &P1, Vec3D &P2, Vec3D &P1_P2_normal, Mdouble P1_P2_distance, Mdouble& rpsi_scalar);
-
+    Mdouble CG_integral_1D(Vec3D& P1, Vec3D& P2, Vec3D& P1_P2_normal, Mdouble P1_P2_distance, Mdouble& rpsi_scalar);
+    
     ///Outputs statistical variables in human-readable format
     std::string print() const;
+    
     ///Outputs root of statistical variables in human-readable format
     std::string print_sqrt() const;
+    
     ///Outputs names of statistical variables in computer-readable format
     std::string write_variable_names();
+    
     ///Outputs statistical variables in computer-readable format
     std::string write() const;
 
@@ -302,14 +330,14 @@ public:
     ///Elastic energy \f$2/4 \sum_{ij} (k \delta_{ij}^2 +k^t {\delta^t_{ij}}^2) \phi_i\f$
     ///\todo{Potential calculations have not been checked, only implemented; fstat file does not include the torsional and rolling spring and hence cannot account for their potential}
     Mdouble Potential;
-
+    
     Vec3D LocalAngularMomentum;
     Matrix3D LocalAngularMomentumFlux;
     Matrix3D ContactCoupleStress;
-
+    
     ///Prefactor of CG function which depends on $w
     Mdouble CG_invvolume;
-
+    
     ///indicates that a position is a (fake) particles used for periodic walls
     int mirrorParticle;
 
@@ -320,4 +348,5 @@ private:
     Vec3D Position;
     
 };
+
 #endif

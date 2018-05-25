@@ -30,7 +30,7 @@ FluxBoundary::~FluxBoundary()
 {
 #ifdef DEBUG_DESTRUCTOR
     std::cout<<"FluxBoundary::~FluxBoundary() finished"<<std::endl;
-#endif   
+#endif
 }
 
 /*!
@@ -99,7 +99,7 @@ Mdouble FluxBoundary::getDistance(const Vec3D& position) const
 void FluxBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
 {
     for (auto p = pH.begin(); p != pH.end(); ++p)
-	    checkBoundaryAfterParticleMoved(*p,pH);
+        checkBoundaryAfterParticleMoved(*p, pH);
 }
 
 
@@ -123,7 +123,7 @@ bool FluxBoundary::checkBoundaryAfterParticleMoved(BaseParticle* p, ParticleHand
         massCrossedBack_ += p->getMass();
         volumeCrossedBack_ += p->getVolume();
     }
-
+    
     return false;
 }
 
@@ -133,7 +133,7 @@ bool FluxBoundary::checkBoundaryAfterParticleMoved(BaseParticle* p, ParticleHand
  * DPMBase.cc calls DPMBase::checkInteractionWithBoundaries() TWICE in each time
  * step. (The intention is that the first round resolves InsertionBoundaries and
  * the second resolves DeletionBoundaries, but this means FluxBoundaries are
- * updated twice.) */ 
+ * updated twice.) */
 unsigned int FluxBoundary::getNumberOfParticlesCrossedForw() const
 {
     return numberOfParticlesCrossedForw_ / 2;
@@ -188,8 +188,8 @@ void FluxBoundary::read(std::istream& is)
     BaseBoundary::read(is);
     std::string dummy;
     is >> dummy >> normal_
-            >> dummy >> scaleFactor_
-            >> dummy >> distance_;
+       >> dummy >> scaleFactor_
+       >> dummy >> distance_;
 }
 
 /*!
@@ -211,8 +211,8 @@ void FluxBoundary::write(std::ostream& os) const
 {
     BaseBoundary::write(os);
     os << " normal " << normal_
-            << " scaleFactor " << scaleFactor_
-            << " distance " << distance_;
+       << " scaleFactor " << scaleFactor_
+       << " distance " << distance_;
 }
 
 /*!

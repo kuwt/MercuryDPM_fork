@@ -37,94 +37,95 @@ TimeAveragedLebedevCG<BaseFunction, Fields>::TimeAveragedLebedevCG() : TimeAvera
 #endif
 }
 
-template< template<class> class BaseFunction, class Fields>
-TimeAveragedLebedevCG<BaseFunction, Fields>* TimeAveragedLebedevCG<BaseFunction, Fields>::copy() const
+template<template<class> class BaseFunction, class Fields>
+TimeAveragedLebedevCG <BaseFunction, Fields>* TimeAveragedLebedevCG<BaseFunction, Fields>::copy() const
 {
     return new TimeAveragedLebedevCG(*this);
 }
 
-template< template<class> class BaseFunction, class Fields>
+template<template<class> class BaseFunction, class Fields>
 void TimeAveragedLebedevCG<BaseFunction, Fields>::createMesh()
 {
     //Open the file with the selected order.
     char filename[128];
-    std::sprintf(filename,"../../../analysis_tools/Quadrature_Rules/%s%s%s","./lebedev_","095",".txt");
+    std::sprintf(filename, "../../../analysis_tools/Quadrature_Rules/%s%s%s", "./lebedev_", "095", ".txt");
     std::ifstream Quadrature_file(filename);
-    if (Quadrature_file.fail()){
+    if (Quadrature_file.fail())
+    {
         std::cout << "Error: Quadrature rules \"" << filename << "\" not found" << std::endl;
         exit(-1);
     }
-
+    
     std::string line;
     double theta;
     double phi;
-
+    
     std::vector<double> x;
     std::vector<double> y;
     std::vector<double> z;
-
-    while(std::getline(Quadrature_file, line))
+    
+    while (std::getline(Quadrature_file, line))
     {
         // Extract values theta, phi, throw away w;
         std::istringstream ss(line);
         ss >> theta;
         ss >> phi;
-
+        
         //convert to radians
-        theta = theta/360*2*constants::pi;
-        phi = phi/360*2*constants::pi;
-
+        theta = theta / 360 * 2 * constants::pi;
+        phi = phi / 360 * 2 * constants::pi;
+        
         //Convert to cartesian values to improve speed when the actual integration takes place
         double radius;
         for (int i = 0; i < nR_; i++)
         {
-            radius = radiusInner_ + (radiusOuter_-radiusInner_)/(nR_-1)*i;
-            x.push_back(radius*std::cos(theta)*std::sin(phi));
-            y.push_back(radius*std::sin(theta)*std::sin(phi));
-            z.push_back(radius*std::cos(phi));
+            radius = radiusInner_ + (radiusOuter_ - radiusInner_) / (nR_ - 1) * i;
+            x.push_back(radius * std::cos(theta) * std::sin(phi));
+            y.push_back(radius * std::sin(theta) * std::sin(phi));
+            z.push_back(radius * std::cos(phi));
         }
     }
-
-
+    
+    
     //Now create the cg points
-    std::vector<Point>& points = CG<CGCoordinates::XYZ, BaseFunction, Fields>::points_;
+    std::vector <Point>& points = CG<CGCoordinates::XYZ, BaseFunction, Fields>::points_;
     points.resize(x.size());
     for (int i = 1; i < x.size(); i++)
     {
-        points[i].coordinates.setXYZ({x[i],y[i],z[i]});
+        points[i].coordinates.setXYZ({x[i], y[i], z[i]});
     }
 }
 
-template< template<class> class BaseFunction, class Fields>
+template<template<class> class BaseFunction, class Fields>
 double TimeAveragedLebedevCG<BaseFunction, Fields>::getRadiusInner()
 {
     return radiusInner_;
 }
 
-template< template<class> class BaseFunction, class Fields>
+template<template<class> class BaseFunction, class Fields>
 double TimeAveragedLebedevCG<BaseFunction, Fields>::getRadiusOuter()
 {
     return radiusOuter_;
 }
 
-template< template<class> class BaseFunction, class Fields>
+template<template<class> class BaseFunction, class Fields>
 int TimeAveragedLebedevCG<BaseFunction, Fields>::getNR()
 {
     return nR_;
 }
 
-template< template<class> class BaseFunction, class Fields>
+template<template<class> class BaseFunction, class Fields>
 void TimeAveragedLebedevCG<BaseFunction, Fields>::setR(double radiusInner, double radiusOuter)
 {
     if (radiusInner >= radiusOuter)
     {
-        logger(WARN,"Setting inner radius larger than outer radius");
+        logger(WARN, "Setting inner radius larger than outer radius");
     }
     radiusInner_ = radiusInner;
     radiusOuter_ = radiusOuter;
 }
 
-template< template<class> class BaseFunction, class Fields>
+template<template<class> class BaseFunction, class Fields>
 void TimeAveragedLebedevCG<BaseFunction, Fields>::setNR(int nR)
 {
     nR_ = nR;
@@ -142,7 +143,7 @@ template<template<class> class BaseFunction, class Fields>
 void TimeAveragedLebedevCG<BaseFunction, Fields>::evaluate()
 {
     this->nTime_++;
-
+    
     // get particle statistics
     for (BaseParticle* p : CG<CGCoordinates::XYZ, BaseFunction, Fields>::getHandler()->getDPMBase()->particleHandler)
     {
@@ -154,63 +155,63 @@ void TimeAveragedLebedevCG<BaseFunction, Fields>::evaluate()
             TimeAveragedLebedevCG<BaseFunction, Fields>::evaluateParticle(*p);
 #endif
     }
-
+    
     // get contact statistics
     if (Fields::doInteractionStatistics())
     {
-        for (BaseInteraction *i : CG<CGCoordinates::XYZ, BaseFunction, Fields>::getHandler()->getDPMBase()->interactionHandler)
+        for (BaseInteraction* i : CG<CGCoordinates::XYZ, BaseFunction, Fields>::getHandler()->getDPMBase()->interactionHandler)
         {
             TimeAveragedLebedevCG<BaseFunction, Fields>::evaluateContact(*i);
         }
     }
-
+    
 }
 
-template< template<class> class BaseFunction, class Fields>
+template<template<class> class BaseFunction, class Fields>
 void TimeAveragedLebedevCG<BaseFunction, Fields>::evaluateParticle(BaseParticle& p)
 {
     CGFields::StandardFields currentInteraction;
     currentInteraction.setFields(p);
-
-    const Mdouble distance_r = sqrt(p.getPosition().X*p.getPosition().X +
-                                    p.getPosition().Y*p.getPosition().Y +
-                                    p.getPosition().Z*p.getPosition().Z);
+    
+    const Mdouble distance_r = sqrt(p.getPosition().X * p.getPosition().X +
+                                    p.getPosition().Y * p.getPosition().Y +
+                                    p.getPosition().Z * p.getPosition().Z);
     if ((distance_r) < (radiusOuter_ + this->function_.getCutoff()))
-    {   
-        for ( Point& r : this->points_ )
+    {
+        for (Point& r : this->points_)
         {
             this->evaluateParticleAtPoint(currentInteraction, p, r);
         }
     }
 }
 
-template< template<class> class BaseFunction, class Fields>
+template<template<class> class BaseFunction, class Fields>
 void TimeAveragedLebedevCG<BaseFunction, Fields>::evaluateContact(BaseInteraction& c)
 {
     IntegralType it = this->getIntegralType(c);
-    if (it==IntegralType::NONE) return;
+    if (it == IntegralType::NONE) return;
     CGFields::StandardFields currentInteraction;
-    currentInteraction.setFields(c,it);
-
+    currentInteraction.setFields(c, it);
+    
     const Vec3D pos = c.getContactPoint();
-    const Mdouble distance_r = sqrt(pos.X*pos.X + pos.Y*pos.Y + pos.Z*pos.Z);
+    const Mdouble distance_r = sqrt(pos.X * pos.X + pos.Y * pos.Y + pos.Z * pos.Z);
     double particle_radius = 2.0;
     double spread = 0.5;
     double offset = 0.5;
     if ((distance_r) < (radiusOuter_ + this->function_.getCutoff()))
     {
-        for ( Point& r : this->points_ )
+        for (Point& r : this->points_)
         {
             Mdouble psi = this->function_.evaluateCGIntegral(c, r.coordinates, it);
             r.addInteractionStatistics(psi, currentInteraction);
-            if (it!=IntegralType::I_TO_P)
+            if (it != IntegralType::I_TO_P)
             {
                 Mdouble phi = this->function_.evaluateCGFunction(c.getContactPoint(), r.coordinates);
                 r.addContactPointStatistics(phi, currentInteraction);
             }
         }
     }
-
+    
 }
 
 

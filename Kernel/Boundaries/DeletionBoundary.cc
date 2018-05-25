@@ -40,7 +40,7 @@ DeletionBoundary::DeletionBoundary()
     distance_ = std::numeric_limits<double>::quiet_NaN();
     scaleFactor_ = std::numeric_limits<double>::quiet_NaN();
     isActivated_ = true;
-
+    
     logger(DEBUG, "DeletionBoundary::DeletionBoundary() finished");
 }
 
@@ -119,25 +119,25 @@ bool DeletionBoundary::checkBoundaryAfterParticleMoved(BaseParticle* p, Particle
 #ifdef MERCURY_USE_MPI
     if (getDistance(p->getPosition()) < 0)
     {
-	    //Check if the particle is in the mpi communication zone
-    	if(p->isInMPIDomain())
-	    {
-	        //Add the particle to a list so we can flush it later on
-    	    //The particles are not deleted yet. This is done in dpmBase after this function is called
-    	    particlesToBeDeleted_.insert(p);
-    	    return false;
-    	}
-    	else
-    	{
-    	    pH.removeGhostObject(p->getIndex());
-    	    return true;
-    	}
+        //Check if the particle is in the mpi communication zone
+        if(p->isInMPIDomain())
+        {
+            //Add the particle to a list so we can flush it later on
+            //The particles are not deleted yet. This is done in dpmBase after this function is called
+            particlesToBeDeleted_.insert(p);
+            return false;
+        }
+        else
+        {
+            pH.removeGhostObject(p->getIndex());
+            return true;
+        }
     }
     else
     {
-    	return false;
+        return false;
     }
-  
+
 #else
     if (getDistance(p->getPosition()) < 0)
     {
@@ -167,9 +167,9 @@ void DeletionBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
     for (unsigned int i = 0; i < pH.getSize(); i++)
     {
         //If the particle is deleted, change the iterator
-        if(checkBoundaryAfterParticleMoved(pH.getObject(i),pH))
+        if (checkBoundaryAfterParticleMoved(pH.getObject(i), pH))
         {
-          i--;
+            i--;
         }
     }
 }
@@ -240,10 +240,10 @@ std::string DeletionBoundary::getName() const
  * \details Returns the number of particles deleted by this boundary.
  * TODO For some reason, this causes a segfault --- DO NOT USE.
  * valgrind complains that 'numberOfParticlesDeleted_' is not initialised.
- */ 
+ */
 unsigned int DeletionBoundary::getNumberOfParticlesDeleted() const
 {
-    return numberOfParticlesDeleted_;    
+    return numberOfParticlesDeleted_;
 }
 
 void DeletionBoundary::activate()

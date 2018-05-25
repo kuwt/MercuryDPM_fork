@@ -40,7 +40,7 @@ LiquidBridgeWilletSpecies::LiquidBridgeWilletSpecies()
 /*!
  * \param[in] the species that is copied
  */
-LiquidBridgeWilletSpecies::LiquidBridgeWilletSpecies(const LiquidBridgeWilletSpecies &s)
+LiquidBridgeWilletSpecies::LiquidBridgeWilletSpecies(const LiquidBridgeWilletSpecies& s)
 {
     liquidBridgeVolume_ = s.liquidBridgeVolume_;
     cbrtLiquidBridgeVolume_ = s.cbrtLiquidBridgeVolume_;
@@ -55,14 +55,14 @@ LiquidBridgeWilletSpecies::~LiquidBridgeWilletSpecies()
 {
 #ifdef DEBUG_DESTRUCTOR
     std::cout<<"LiquidBridgeWilletSpecies::~LiquidBridgeWilletSpecies() finished"<<std::endl;
-#endif   
+#endif
 }
 
 /*!
  * \param[out] output stream (typically the restart file)
  */
 void LiquidBridgeWilletSpecies::write(std::ostream& os) const
-        {
+{
     os << " liquidBridgeVolume " << liquidBridgeVolume_;
     os << " surfaceTension " << surfaceTension_;
     os << " contactAngle " << contactAngle_;
@@ -104,7 +104,7 @@ void LiquidBridgeWilletSpecies::mix(LiquidBridgeWilletSpecies* const S, LiquidBr
  */
 Mdouble LiquidBridgeWilletSpecies::getInteractionDistance() const
 {
-	return (1.0+0.5*contactAngle_)*cbrtLiquidBridgeVolume_;	
+    return (1.0 + 0.5 * contactAngle_) * cbrtLiquidBridgeVolume_;
 }
 
 /*!
@@ -112,7 +112,7 @@ Mdouble LiquidBridgeWilletSpecies::getInteractionDistance() const
  */
 void LiquidBridgeWilletSpecies::setLiquidBridgeVolume(Mdouble liquidBridgeVolume)
 {
-    if (liquidBridgeVolume >= 0) 
+    if (liquidBridgeVolume >= 0)
     {
         liquidBridgeVolume_ = liquidBridgeVolume;
         cbrtLiquidBridgeVolume_ = cbrt(liquidBridgeVolume);

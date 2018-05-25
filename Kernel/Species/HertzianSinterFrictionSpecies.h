@@ -30,6 +30,7 @@
 #include "Species.h"
 #include "NormalForceSpecies/HertzianSinterNormalSpecies.h"
 #include "FrictionForceSpecies/FrictionSpecies.h"
-typedef Species<HertzianSinterNormalSpecies,FrictionSpecies> HertzianSinterFrictionSpecies;
-typedef MixedSpecies<HertzianSinterNormalSpecies,FrictionSpecies> HertzianSinterFrictionMixedSpecies;
+
+typedef Species<HertzianSinterNormalSpecies, FrictionSpecies> HertzianSinterFrictionSpecies;
+typedef MixedSpecies<HertzianSinterNormalSpecies, FrictionSpecies> HertzianSinterFrictionMixedSpecies;
 #endif

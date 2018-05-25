@@ -48,7 +48,7 @@ LiquidFilmParticle::LiquidFilmParticle()
  *          that handles this particle. Use with care.
  * \param[in,out] p  Reference to the LiquidFilmParticle this one should become a copy of.
  */
-LiquidFilmParticle::LiquidFilmParticle(const LiquidFilmParticle &p)
+LiquidFilmParticle::LiquidFilmParticle(const LiquidFilmParticle& p)
         : BaseParticle(p)
 {
     liquidVolume_ = p.liquidVolume_;
@@ -108,40 +108,45 @@ void LiquidFilmParticle::read(std::istream& is)
     std::string dummy;
     is >> dummy >> liquidVolume_;
     // a fix to allow reading of restart files pre-nonspherical
-    if (dummy == "invInertia") {
+    if (dummy == "invInertia")
+    {
         is >> dummy >> liquidVolume_;
     }
 }
 
 Mdouble LiquidFilmParticle::getLiquidVolume() const
 {
-	return liquidVolume_;
+    return liquidVolume_;
 }
-	
+
 void LiquidFilmParticle::setLiquidVolume(Mdouble liquidVolume)
 {
-	liquidVolume_=liquidVolume;
+    liquidVolume_ = liquidVolume;
 }
 
 void LiquidFilmParticle::addLiquidVolume(Mdouble liquidVolume)
 {
-    liquidVolume_+=liquidVolume;
+    liquidVolume_ += liquidVolume;
 }
 
 
-unsigned LiquidFilmParticle::getNumberOfFieldsVTK() const {
+unsigned LiquidFilmParticle::getNumberOfFieldsVTK() const
+{
     return 1;
 }
 
-std::string LiquidFilmParticle::getTypeVTK(unsigned i) const {
+std::string LiquidFilmParticle::getTypeVTK(unsigned i) const
+{
     return "Float32";
 }
 
-std::string LiquidFilmParticle::getNameVTK(unsigned i) const {
+std::string LiquidFilmParticle::getNameVTK(unsigned i) const
+{
     return "liquidVolume";
-
+    
 }
 
-std::vector<Mdouble> LiquidFilmParticle::getFieldVTK(unsigned i) const {
+std::vector<Mdouble> LiquidFilmParticle::getFieldVTK(unsigned i) const
+{
     return std::vector<Mdouble>(1, liquidVolume_);
 }

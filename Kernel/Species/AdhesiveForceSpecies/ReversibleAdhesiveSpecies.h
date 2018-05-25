@@ -25,6 +25,7 @@
 
 #ifndef LINEARREVERSIBLEADHESIVESPECIES_H
 #define LINEARREVERSIBLEADHESIVESPECIES_H
+
 #include "Species/BaseSpecies.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/AdhesiveForceInteractions/ReversibleAdhesiveInteraction.h"
@@ -38,51 +39,52 @@ class ReversibleAdhesiveSpecies : public virtual BaseSpecies
 public:
     ///\brief The correct Interaction type for this AdhesiveForceSpecies
     typedef ReversibleAdhesiveInteraction InteractionType;
-
+    
     ///\brief The default constructor.
     ReversibleAdhesiveSpecies();
-
+    
     ///\brief The default constructor.
-    ReversibleAdhesiveSpecies(const ReversibleAdhesiveSpecies &s);
-
+    ReversibleAdhesiveSpecies(const ReversibleAdhesiveSpecies& s);
+    
     ///\brief The default constructor.
     ~ReversibleAdhesiveSpecies() override;
-
+    
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
-
+    
     /// \brief Writes the species properties to an output stream.
     void write(std::ostream& os) const override;
-
+    
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;
-
+    
     ///\brief creates default values for mixed species
-    void mix(ReversibleAdhesiveSpecies*S, ReversibleAdhesiveSpecies*T);
+    void mix(ReversibleAdhesiveSpecies* S, ReversibleAdhesiveSpecies* T);
 
 //adhesion-specific functions
-
+    
     ///\brief returns the largest separation distance at which adhesive short-range forces can occur.
     Mdouble getInteractionDistance() const override;
 
 //setters and getters
     ///\brief Allows the spring constant to be changed
     void setAdhesionStiffness(Mdouble new_k0);
-
+    
     ///\brief Allows the spring constant to be accessed
     Mdouble getAdhesionStiffness() const;
-
+    
     ///\brief Allows the spring constant to be changed
     void setAdhesionForceMax(Mdouble new_f0);
-
+    
     ///\brief Allows the spring constant to be accessed
     Mdouble getAdhesionForceMax() const;
 
 private:
     ///\brief stiffness of linear adhesion force
-    Mdouble adhesionStiffness_; 
-
+    Mdouble adhesionStiffness_;
+    
     ///\brief adhesion force at zero overlap
-    Mdouble adhesionForceMax_;     
+    Mdouble adhesionForceMax_;
 };
+
 #endif

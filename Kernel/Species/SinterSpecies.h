@@ -29,6 +29,7 @@
 
 #include "Species.h"
 #include "NormalForceSpecies/SinterNormalSpecies.h"
+
 typedef Species<SinterNormalSpecies> SinterSpecies;
 typedef MixedSpecies<SinterNormalSpecies> SinterMixedSpecies;
 #endif

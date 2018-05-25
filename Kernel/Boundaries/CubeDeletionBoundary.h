@@ -31,6 +31,7 @@
 #include "Math/Vector.h"
 
 class ParticleHandler;
+
 class BaseParticle;
 
 class CubeDeletionBoundary : public DeletionBoundary
@@ -40,44 +41,44 @@ public:
      * \brief default constructor
      */
     CubeDeletionBoundary();
-
+    
     /*!
      * \brief destructor
-     */    
+     */
     ~CubeDeletionBoundary() override;
-
+    
     /*!
      * \brief Copy method; creates copy on the heap and returns a pointer to it.
      */
     CubeDeletionBoundary* copy() const override;
-
+    
     /*!
      * \brief Sets boundary position based on two opposite corners.
      */
     void set(Vec3D posMin, Vec3D posMax);
-
+    
     /*!
      * \brief Returns a negative value if and only if the particle is inside the boundary
      */
-    Mdouble getDistance(const Vec3D &position) const override;
-
+    Mdouble getDistance(const Vec3D& position) const override;
+    
     /*!
      * \brief reads boundary properties from istream
      */
     void read(std::istream& is) override;
-
+    
     /*!
      * \brief writes boundary properties to ostream
      */
     void write(std::ostream& os) const override;
-
+    
     /*!
      * \brief Returns the name of the object
      */
     std::string getName() const override;
 
 private:
-
+    
     /*!
      * \brief Minimal and maximal positions defining the boundary's boundaries.
      */

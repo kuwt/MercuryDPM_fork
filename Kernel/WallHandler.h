@@ -39,71 +39,71 @@ class BaseWall;
  * \details The WallHandler is a container to store all BaseWall. 
  * It is implemented by a vector of pointers to BaseWall.
  */
-class WallHandler final: public BaseHandler<BaseWall>
+class WallHandler final : public BaseHandler<BaseWall>
 {
 public:
-  /*!
-   * \brief Default constructor, it creates an empty WallHandler.
-   */
+    /*!
+     * \brief Default constructor, it creates an empty WallHandler.
+     */
     WallHandler();
-
-  /*!
-   * \brief Constructor that copies a pointer to the DPMBase and all BaseWall in the given WallHandler.
-   */
+    
+    /*!
+     * \brief Constructor that copies a pointer to the DPMBase and all BaseWall in the given WallHandler.
+     */
     WallHandler(const WallHandler& BH);
-
-  /*!
-   * \brief Assignment operator that copies the pointer to the DPMBase and all BaseWall in the given WallHandler.
-   */
+    
+    /*!
+     * \brief Assignment operator that copies the pointer to the DPMBase and all BaseWall in the given WallHandler.
+     */
     WallHandler& operator=(const WallHandler& rhs);
     
-  /*!
-   * \brief Destructor, it destructs the WallHandler and all BaseWall it contains.
-   */
+    /*!
+     * \brief Destructor, it destructs the WallHandler and all BaseWall it contains.
+     */
     ~WallHandler() final;
-
-  /*!
-   * \brief Adds a BaseWall to the WallHandler.
-   */
+    
+    /*!
+     * \brief Adds a BaseWall to the WallHandler.
+     */
     void addObject(BaseWall* W) final;
-
+    
     /*!
      * \brief Create a new wall, with the type given as a string (required for restarting).
      */
     static BaseWall* createObject(const std::string& type);
-
+    
     /*!
      * \brief Create a new wall, based on the information provided in a restart file.
      */
     BaseWall* readAndCreateObject(std::istream& is);
-
+    
     /*!
      * \brief Create a new wall in the WallHandler, based on the information provided in a restart file.
      */
     void readAndAddObject(std::istream& is) final;
-
+    
     /*!
      * \brief Returns the name of the handler, namely the string "WallHandler".
      */
     std::string getName() const final;
-
+    
     /**
      * \brief Reads triangulated walls from vtk or stl files, and converts them into a set of TriangleWalls
      */
-    void readTriangleWall(std::string filename, ParticleSpecies* species, Mdouble scaleFactor=1);
-    
-private:
+    void readTriangleWall(std::string filename, ParticleSpecies* species, Mdouble scaleFactor = 1);
 
+private:
+    
     /*!
      * \brief Create a new wall, based on the information from old-style restart data.
      */
-    BaseWall* readAndCreateOldObject(std::istream &is);
-
+    BaseWall* readAndCreateOldObject(std::istream& is);
+    
     /*!
      * \brief Writes a bounding box around the domain into a vtk file.
      */
     void writeVTKBoundingBox() const;
-
+    
 };
 
 #endif

@@ -30,6 +30,7 @@
 #include "Particles/SuperQuadric.h"
 
 class BaseParticle;
+
 class BaseInteractable;
 
 ParticleSpecies::ParticleSpecies()
@@ -43,9 +44,9 @@ ParticleSpecies::ParticleSpecies()
 /*!
  * \param[in] p the species that is copied
  */
-ParticleSpecies::ParticleSpecies(const ParticleSpecies &p)
+ParticleSpecies::ParticleSpecies(const ParticleSpecies& p)
 {
-    density_=p.density_;
+    density_ = p.density_;
     temperatureDependentDensity_ = p.temperatureDependentDensity_;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"ParticleSpecies::ParticleSpecies(const ParticleSpecies &p) finished"<<std::endl;
@@ -92,7 +93,7 @@ std::string ParticleSpecies::getBaseName() const
  */
 void ParticleSpecies::setDensity(Mdouble density)
 {
-    logger.assert_always(density>=0,"[ParticleSpecies::setDensity(%)] value cannot be negative",density);
+    logger.assert_always(density >= 0, "[ParticleSpecies::setDensity(%)] value cannot be negative", density);
     density_ = density;
     if (getHandler()) getHandler()->getDPMBase()->particleHandler.computeAllMasses(getIndex());
 }
@@ -107,7 +108,7 @@ Mdouble ParticleSpecies::getDensity() const
 
 Mdouble ParticleSpecies::getMassFromRadius(const Mdouble radius) const
 {
-    return getDensity()*getVolumeFromRadius(radius);
+    return getDensity() * getVolumeFromRadius(radius);
 }
 
 ///\todo this should depend on the particle shape; thus, it should be a static function of BaseParticle
@@ -115,7 +116,8 @@ Mdouble ParticleSpecies::getVolumeFromRadius(const Mdouble radius) const
 {
     if (getHandler() == nullptr)
     {
-        logger(ERROR, "[Species::VolumeFromRadius()] No handler has been set, therefore, I can't figure out the dimensions.");
+        logger(ERROR,
+               "[Species::VolumeFromRadius()] No handler has been set, therefore, I can't figure out the dimensions.");
         return 0;
     }
     
@@ -134,8 +136,9 @@ Mdouble ParticleSpecies::getVolumeFromRadius(const Mdouble radius) const
     }
     else
     {
-       logger(ERROR, "[Species::VolumeFromRadius()] the dimension of the particle is wrongly set to %",particleDimensions);
-       return 0.0;
+        logger(ERROR, "[Species::VolumeFromRadius()] the dimension of the particle is wrongly set to %",
+               particleDimensions);
+        return 0.0;
     }
 }
 
@@ -161,12 +164,12 @@ void ParticleSpecies::computeMass(BaseParticle* p) const
                     Mdouble eps1 = SE->getExponentEps1();
                     Mdouble eps2 = SE->getExponentEps2();
                     Mdouble volume = SE->getVolume();
-                
+                    
                     Mdouble help1 = mathsFunc::beta(1.5 * eps2, 0.5 * eps2);
                     Mdouble help2 = mathsFunc::beta(0.5 * eps1, 2.0 * eps1 + 1.0);
                     Mdouble help3 = mathsFunc::beta(0.5 * eps2, 0.5 * eps2 + 1);
                     Mdouble help4 = mathsFunc::beta(1.5 * eps1, eps1 + 1.0);
-                
+                    
                     p->invMass_ = 1.0 / (volume * getDensity());
                     p->invInertia_.XX = 1.0 / (getDensity() * (0.5 * axes.X * axes.Y * axes.Z * eps1 * eps2) *
                                                (axes.Y * axes.Y * help1 * help2
@@ -182,21 +185,22 @@ void ParticleSpecies::computeMass(BaseParticle* p) const
                 }
                 break;
             }
-
+            
             case 2:
             {
                 p->invMass_ = 1.0 / (constants::pi * p->getRadius() * p->getRadius() * getDensity());
-                p->invInertia_ = MatrixSymmetric3D(1,0,0,1,0,1) / (.5 * p->getMass() * mathsFunc::square(p->getRadius()));
+                p->invInertia_ =
+                        MatrixSymmetric3D(1, 0, 0, 1, 0, 1) / (.5 * p->getMass() * mathsFunc::square(p->getRadius()));
                 break;
             }
-
+            
             case 1:
             {
-                p->invMass_ = 1.0/(2.0 * p->getRadius() * getDensity());
-                p->invInertia_ = MatrixSymmetric3D(1,0,0,1,0,1) / std::numeric_limits<Mdouble>::quiet_NaN();
+                p->invMass_ = 1.0 / (2.0 * p->getRadius() * getDensity());
+                p->invInertia_ = MatrixSymmetric3D(1, 0, 0, 1, 0, 1) / std::numeric_limits<Mdouble>::quiet_NaN();
                 break;
             }
-
+            
             default:
             {
                 logger(ERROR, "ParticleSpecies::computeMass()] the dimension of the particle is not set");
@@ -205,13 +209,13 @@ void ParticleSpecies::computeMass(BaseParticle* p) const
     }
 }
 
-const std::function<double(double)> &ParticleSpecies::getTemperatureDependentDensity() const
+const std::function<double(double)>& ParticleSpecies::getTemperatureDependentDensity() const
 {
     return temperatureDependentDensity_;
 }
 
 void ParticleSpecies::setTemperatureDependentDensity(
-        const std::function<double(double)> &temperatureDependentDensity)
+        const std::function<double(double)>& temperatureDependentDensity)
 {
     temperatureDependentDensity_ = temperatureDependentDensity;
 //    density_ = temperatureDependentDensity_(0);

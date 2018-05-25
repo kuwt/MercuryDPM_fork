@@ -207,7 +207,7 @@ Mdouble SuperQuadric::getExponentEps2() const
 Mdouble SuperQuadric::getVolume() const
 {
     logger.assert(getHandler() != nullptr, "[SuperQuadric::getVolume] no particle handler specified");
-
+    
     /*
     logger(VERBOSE,"2*a1*a2*a3*eps1*eps2 = %",2.0 * axes_.X * axes_.Y * axes_.Z * eps1_ * eps2_);
     logger(VERBOSE,"beta(0.5 * eps1_ + 1.0, eps1_) = %",mathsFunc::beta(0.5 * eps1_ + 1.0, eps1_));
@@ -215,10 +215,10 @@ Mdouble SuperQuadric::getVolume() const
     logger(VERBOSE,"volume = %",(2.0 * axes_.X * axes_.Y * axes_.Z * eps1_ * eps2_) * mathsFunc::beta(0.5 * eps1_ + 1.0, eps1_) *
                              mathsFunc::beta(0.5 * eps2_, 0.5 * eps2_));
     */
-
+    
     return (2.0 * axes_.X * axes_.Y * axes_.Z * eps1_ * eps2_) * mathsFunc::beta(0.5 * eps1_ + 1.0, eps1_) *
            mathsFunc::beta(0.5 * eps2_, 0.5 * eps2_);
-
+    
 }
 
 /*!
@@ -266,10 +266,10 @@ Mdouble SuperQuadric::getInteractionRadius() const
     const Mdouble gamma = std::pow(1.0 + help1, eps2_ / eps1_ - 1.0);
     const Mdouble beta = std::pow(gamma * axes_.Z * axes_.Z / (axes_.X * axes_.X), 1.0 / (2.0 / eps1_ - 2.0));
     const Mdouble xTilde = std::pow(std::pow(1 + help1, eps2_ / eps1_) + std::pow(beta, 2.0 / eps1_),
-                                        -eps1_ / 2.0);
+                                    -eps1_ / 2.0);
     const Mdouble boundingRadius = std::sqrt(mathsFunc::square(axes_.X * xTilde)
-                                                 + mathsFunc::square(alpha * axes_.Y * xTilde)
-                                                 + mathsFunc::square(beta * axes_.Z * xTilde));
+                                             + mathsFunc::square(alpha * axes_.Y * xTilde)
+                                             + mathsFunc::square(beta * axes_.Z * xTilde));
     return boundingRadius + getSpecies()->getInteractionDistance() * 0.5;
     // For spheres and ellipsoids
     /*if (mathsFunc::isEqual(eps1_, 1, 1.e-16) && mathsFunc::isEqual(eps2_, 1, 1e-16))
@@ -302,7 +302,7 @@ Mdouble SuperQuadric::getInteractionRadius() const
     }
     else  // For other shapes
     {*/
-
+    
     //}
     
 }
@@ -838,7 +838,7 @@ SmallVector<4> SuperQuadric::getContactPointPlanB(const SuperQuadric* const pOth
         }
     }
     logger.assert(p1.getAxes().X == getAxes().X, "In getContactPointPlanB, final particle for contact-detection not "
-            "the same as original particle");
+                                                 "the same as original particle");
     
     logger(VERBOSE, "Plan B contact point: %", contactPointPlanB);
     

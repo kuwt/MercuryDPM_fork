@@ -28,9 +28,13 @@
 
 #include "Interactions/BaseInteraction.h"
 #include "Math/Vector.h"
+
 class BaseParticle;
+
 class EmptyFrictionSpecies;
+
 class BaseInteractable;
+
 /*!
  * \brief In case one wants to have a frictionless interaction between the interactables
  *        (particles or walls), the following class can be used. See Interaction.h, where
@@ -45,9 +49,10 @@ public:
      * \brief An alias name for EmptyFrictionSpecies.
      */
     typedef EmptyFrictionSpecies SpeciesType;
+    
     /*!
      * \brief Constructor.
-     */    
+     */
     EmptyFrictionInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp);
     
     //used for mpi
@@ -55,34 +60,41 @@ public:
     
     /*!
      * \brief Copy constructor.
-     */    
-    EmptyFrictionInteraction(const EmptyFrictionInteraction &p);
+     */
+    EmptyFrictionInteraction(const EmptyFrictionInteraction& p);
+    
     /*!
      * \brief Destructor.
      */
     ~EmptyFrictionInteraction() override;
+    
     /*!
      * \brief Computes nothing, it is an empty function.
      */
     void computeFrictionForce();
     
     void computeFrictionInteraction();
+    
     /*!
      * \brief Interaction read function, which accepts an std::istream as input.
      */
     void read(std::istream& is) override;
+    
     /*!
      * \brief Interaction write function, which accepts an std::ostream as input.
      */
     void write(std::ostream& os) const override;
+    
     /*!
      * \brief Returns zero as it is an frictionless interaction.
      */
     Mdouble getElasticEnergy() const override;
+    
     /*!
      * \brief Returns a const pointer of type EmptyFrictionSpecies*. 
      */
     const EmptyFrictionSpecies* getSpecies() const;
+    
     /*!
      * \brief Returns interaction name/type.
      */
@@ -91,15 +103,18 @@ public:
 // specific for tangential forces
     /*!
      * \brief Does nothing as there is no force.
-     */    
+     */
     void integrate(Mdouble timeStep) override;
+    
     /*!
      * \brief Returns zero overlap.
      */
     Mdouble getTangentialOverlap() const override;
+    
     /*!
      * \brief Returns zero tangential force. 
      */
     const Vec3D getTangentialForce() const override;
 };
+
 #endif

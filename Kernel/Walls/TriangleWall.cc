@@ -31,9 +31,10 @@
 //#include "Species/BaseSpecies.h"
 #include "Particles/BaseParticle.h"
 
-bool setDistance(Mdouble& distance, const Vec3D& branch, Mdouble distanceMax) {
+bool setDistance(Mdouble& distance, const Vec3D& branch, Mdouble distanceMax)
+{
     const Mdouble distance2 = branch.getLengthSquared();
-    if (distance2>distanceMax*distanceMax) return false;
+    if (distance2 > distanceMax * distanceMax) return false;
     distance = sqrt(distance2);
 }
 
@@ -52,75 +53,93 @@ bool setDistance(Mdouble& distance, const Vec3D& branch, Mdouble distanceMax) {
  * Particle-Wall interactions, it can also be used to set the normal vector in
  * case of curved walls.
  */
-bool TriangleWall::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal) const {
+bool TriangleWall::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal) const
+{
     const Vec3D position = p.getPosition() - getPosition();
     const Mdouble signedDistance = Vec3D::dot(position, faceNormal_);
     distance = fabs(signedDistance);
-    if (distance >= p.getWallInteractionRadius()) {
+    if (distance >= p.getWallInteractionRadius())
+    {
         return false;
     }
-
-    const Mdouble distanceMax2 = p.getWallInteractionRadius()*p.getWallInteractionRadius();
-    const Vec3D edgeBranch0 = position-vertex_[0];
-    const Vec3D edgeBranch1 = position-vertex_[1];
-    const Vec3D edgeBranch2 = position-vertex_[2];
+    
+    const Mdouble distanceMax2 = p.getWallInteractionRadius() * p.getWallInteractionRadius();
+    const Vec3D edgeBranch0 = position - vertex_[0];
+    const Vec3D edgeBranch1 = position - vertex_[1];
+    const Vec3D edgeBranch2 = position - vertex_[2];
     const Mdouble edgeDistance0 = Vec3D::dot(edgeBranch0, edgeNormal_[0]);
     const Mdouble edgeDistance1 = Vec3D::dot(edgeBranch1, edgeNormal_[1]);
     const Mdouble edgeDistance2 = Vec3D::dot(edgeBranch2, edgeNormal_[2]);
     //logger(INFO,"n % d % P % E % e % % %",-faceNormal_,signedDistance, position,edgeNormal_[0],edgeDistance0,edgeDistance1,edgeDistance2);
-    if (edgeDistance0>0) {
-        if (edgeDistance1>0) {
+    if (edgeDistance0 > 0)
+    {
+        if (edgeDistance1 > 0)
+        {
             //logger(INFO,"contact with vertex 1, dist % norm %");
             const Mdouble distance2 = edgeBranch1.getLengthSquared();
-            if (distance2>distanceMax2) return false;
+            if (distance2 > distanceMax2) return false;
             distance = sqrt(distance2);
-            normal = edgeBranch1/-distance;
-        } else if (edgeDistance2>0) {
+            normal = edgeBranch1 / -distance;
+        }
+        else if (edgeDistance2 > 0)
+        {
             //logger(INFO,"contact with vertex 0");
             const Mdouble distance2 = edgeBranch0.getLengthSquared();
-            if (distance2>distanceMax2) return false;
+            if (distance2 > distanceMax2) return false;
             distance = sqrt(distance2);
-            normal = edgeBranch0/-distance;
-        } else {
+            normal = edgeBranch0 / -distance;
+        }
+        else
+        {
             //logger(INFO,"contact with edge 0");
             normal = edge_[0] * Vec3D::dot(edgeBranch0, edge_[0]) - edgeBranch0;
             const Mdouble distance2 = normal.getLengthSquared();
-            if (distance2>distanceMax2) return false;
+            if (distance2 > distanceMax2) return false;
             distance = sqrt(distance2);
             normal /= distance;
         }
-    } else if (edgeDistance1>0) {
-        if (edgeDistance2 > 0) {
+    }
+    else if (edgeDistance1 > 0)
+    {
+        if (edgeDistance2 > 0)
+        {
             //logger(INFO,"contact with vertex 2");
             const Mdouble distance2 = edgeBranch2.getLengthSquared();
-            if (distance2>distanceMax2) return false;
+            if (distance2 > distanceMax2) return false;
             distance = sqrt(distance2);
-            normal = edgeBranch2/-distance;
-        } else {
+            normal = edgeBranch2 / -distance;
+        }
+        else
+        {
             //logger(INFO,"contact with edge 1");
             normal = edge_[1] * Vec3D::dot(edgeBranch1, edge_[1]) - edgeBranch1;
             const Mdouble distance2 = normal.getLengthSquared();
-            if (distance2>distanceMax2) return false;
+            if (distance2 > distanceMax2) return false;
             distance = sqrt(distance2);
             normal /= distance;
         }
-    } else if (edgeDistance2>0) {
+    }
+    else if (edgeDistance2 > 0)
+    {
         //logger(INFO,"contact with edge 2");
         normal = edge_[2] * Vec3D::dot(edgeBranch2, edge_[2]) - edgeBranch2;
         const Mdouble distance2 = normal.getLengthSquared();
-        if (distance2>distanceMax2) return false;
+        if (distance2 > distanceMax2) return false;
         distance = sqrt(distance2);
         normal /= distance;
-    } else {
+    }
+    else
+    {
         //logger(INFO,"contact with face");
-        normal = (signedDistance>=0)?-faceNormal_:faceNormal_;
+        normal = (signedDistance >= 0) ? -faceNormal_ : faceNormal_;
     }
     return true;
 }
 
 void TriangleWall::rotate(const Vec3D& angularVelocityDt)
 {
-    if (!angularVelocityDt.isZero()) {
+    if (!angularVelocityDt.isZero())
+    {
         BaseInteractable::rotate(angularVelocityDt);
         updateVertexAndNormal();
     }
@@ -133,7 +152,8 @@ void TriangleWall::read(std::istream& is)
 {
     BaseWall::read(is);
     std::string dummy;
-    for (int i=0; i<3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
         is >> dummy >> vertex_[i];
     }
     updateVertexAndNormal();
@@ -146,50 +166,56 @@ void TriangleWall::read(std::istream& is)
 void TriangleWall::write(std::ostream& os) const
 {
     BaseWall::write(os);
-    for (int i=0; i<3; i++) {
+    for (int i = 0; i < 3; i++)
+    {
         os << " vertex" << i << ' ' << vertex_[i];
     }
 }
 
-void TriangleWall::writeVTK (VTKContainer& vtk) const
+void TriangleWall::writeVTK(VTKContainer& vtk) const
 {
     const unsigned long s = vtk.points.size();
-    vtk.points.reserve(s+3);
-    for (auto v : vertex_) {
-        vtk.points.push_back(v+getPosition());
+    vtk.points.reserve(s + 3);
+    for (auto v : vertex_)
+    {
+        vtk.points.push_back(v + getPosition());
     }
     std::vector<double> cell;
     cell.reserve(3);
     cell.push_back(s);
-    cell.push_back(s+1);
-    cell.push_back(s+2);
+    cell.push_back(s + 1);
+    cell.push_back(s + 2);
     //cell.push_back(s);
     vtk.triangleStrips.push_back(cell);
 }
 
-void TriangleWall::setVertices(const Vec3D A, const Vec3D B, const Vec3D C) {
-    setPosition((A+B+C)/3);
-    setOrientation({1,0,0,0});
-    vertexInLabFrame_[0] = A-getPosition();
-    vertexInLabFrame_[1] = B-getPosition();
-    vertexInLabFrame_[2] = C-getPosition();
+void TriangleWall::setVertices(const Vec3D A, const Vec3D B, const Vec3D C)
+{
+    setPosition((A + B + C) / 3);
+    setOrientation({1, 0, 0, 0});
+    vertexInLabFrame_[0] = A - getPosition();
+    vertexInLabFrame_[1] = B - getPosition();
+    vertexInLabFrame_[2] = C - getPosition();
     updateVertexAndNormal();
 }
 
-void TriangleWall::updateVertexAndNormal() {
-    for (int i=0; i<3; i++) {
+void TriangleWall::updateVertexAndNormal()
+{
+    for (int i = 0; i < 3; i++)
+    {
         vertex_ = vertexInLabFrame_;
         getOrientation().rotate(vertex_[i]);
     }
-    vertexMin_ = Vec3D::min(Vec3D::min(vertex_[0],vertex_[1]),vertex_[2]);
-    vertexMax_= Vec3D::max(Vec3D::max(vertex_[0],vertex_[1]),vertex_[2]);
-
-    edge_ = {vertex_[1]-vertex_[0],vertex_[2]-vertex_[1],vertex_[0]-vertex_[2]};
-    faceNormal_ = Vec3D::cross(edge_[0],edge_[1]);
+    vertexMin_ = Vec3D::min(Vec3D::min(vertex_[0], vertex_[1]), vertex_[2]);
+    vertexMax_ = Vec3D::max(Vec3D::max(vertex_[0], vertex_[1]), vertex_[2]);
+    
+    edge_ = {vertex_[1] - vertex_[0], vertex_[2] - vertex_[1], vertex_[0] - vertex_[2]};
+    faceNormal_ = Vec3D::cross(edge_[0], edge_[1]);
     faceNormal_.normalise();
-
-    for (int i=0; i<3; i++) {
-        edgeNormal_[i] = Vec3D::cross(edge_[i],faceNormal_);
+    
+    for (int i = 0; i < 3; i++)
+    {
+        edgeNormal_[i] = Vec3D::cross(edge_[i], faceNormal_);
         edge_[i].normalise();
         edgeNormal_[i].normalise();
     }

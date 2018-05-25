@@ -25,6 +25,7 @@
 
 #ifndef PARHAMIMCMEEKINGSINTERSPECIES_H
 #define PARHAMIMCMEEKINGSINTERSPECIES_H
+
 #include "Species/BaseSpecies.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/AdhesiveForceInteractions/ParhamiMcMeekingSinterInteraction.h"
@@ -38,37 +39,38 @@ class ParhamiMcMeekingSinterSpecies : public virtual BaseSpecies
 public:
     ///\brief The correct Interaction type for this AdhesiveForceSpecies
     typedef ParhamiMcMeekingSinterInteraction InteractionType;
-
+    
     ///\brief The default constructor.
     ParhamiMcMeekingSinterSpecies();
-
+    
     ///\brief The default constructor.
-    ParhamiMcMeekingSinterSpecies(const ParhamiMcMeekingSinterSpecies &s);
-
+    ParhamiMcMeekingSinterSpecies(const ParhamiMcMeekingSinterSpecies& s);
+    
     ///\brief The default constructor.
     ~ParhamiMcMeekingSinterSpecies() override;
-
+    
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
-
+    
     /// \brief Writes the species properties to an output stream.
     void write(std::ostream& os) const override;
-
+    
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;
-
+    
     ///\brief creates default values for mixed species
-    void mix(ParhamiMcMeekingSinterSpecies*S, ParhamiMcMeekingSinterSpecies*T);
+    void mix(ParhamiMcMeekingSinterSpecies* S, ParhamiMcMeekingSinterSpecies* T);
 
 //adhesion-specific functions
-
+    
     ///\brief returns the largest separation distance at which adhesive short-range forces can occur.
     Mdouble getInteractionDistance() const override;
-
+    
     //setters and getters
     void set(Mdouble alpha, Mdouble beta, Mdouble atomicVolume /*Omega*/, Mdouble surfaceEnergy /*gamma_s*/,
              Mdouble thicknessDiffusion /*deltaB*D0B*/, Mdouble activationEnergy /*QB*/, Mdouble temperature /*T*/,
-             Mdouble pseudoSlidingFrictionCoefficient /*\etaPart*/) {
+             Mdouble pseudoSlidingFrictionCoefficient /*\etaPart*/)
+    {
         alpha_ = alpha;
         beta_ = beta;
         atomicVolume_ = atomicVolume;
@@ -77,23 +79,31 @@ public:
         activationEnergy_ = activationEnergy;
         temperature_ = temperature;
         pseudoSlidingFrictionCoefficient_ = pseudoSlidingFrictionCoefficient;
-
+        
         Mdouble boltzmannConstant /*k_B*/ = 1.38064852e-23;
         Mdouble gasConstant /*R_g*/ = 8.314459848;
-        Mdouble thicknessDiffusionVacancy /*DB*/ = thicknessDiffusion_*exp(-activationEnergy_/gasConstant/temperature_);
+        Mdouble thicknessDiffusionVacancy /*DB*/ =
+                thicknessDiffusion_ * exp(-activationEnergy_ / gasConstant / temperature_);
         std::cout << thicknessDiffusionVacancy << "|" << thicknessDiffusion_ << std::endl;
-        Mdouble diffusionParameter /*DeltaB*/ = atomicVolume_/boltzmannConstant/temperature_*thicknessDiffusionVacancy;
-        viscosityCoefficient_ = constants::pi/(2.0*beta*diffusionParameter);
-        adhesionCoefficient_ = alpha_/beta_*constants::pi*surfaceEnergy_;
-        slidingFrictionCoefficient_ = pseudoSlidingFrictionCoefficient_ * constants::pi / (2.0*beta*diffusionParameter);
+        Mdouble diffusionParameter /*DeltaB*/ =
+                atomicVolume_ / boltzmannConstant / temperature_ * thicknessDiffusionVacancy;
+        viscosityCoefficient_ = constants::pi / (2.0 * beta * diffusionParameter);
+        adhesionCoefficient_ = alpha_ / beta_ * constants::pi * surfaceEnergy_;
+        slidingFrictionCoefficient_ =
+                pseudoSlidingFrictionCoefficient_ * constants::pi / (2.0 * beta * diffusionParameter);
     }
-
-    Mdouble getViscosityCoefficient() const {return viscosityCoefficient_;}
-    Mdouble getAdhesionCoefficient() const {return adhesionCoefficient_;}
-    Mdouble getSlidingFrictionCoefficient() const {return slidingFrictionCoefficient_;}
+    
+    Mdouble getViscosityCoefficient() const
+    { return viscosityCoefficient_; }
+    
+    Mdouble getAdhesionCoefficient() const
+    { return adhesionCoefficient_; }
+    
+    Mdouble getSlidingFrictionCoefficient() const
+    { return slidingFrictionCoefficient_; }
 
 private:
-
+    
     ///\brief viscous force is adhesionCoefficient_*temperature*contactRadius^4*normalRelativeVelocity
     Mdouble alpha_;
     Mdouble beta_;
@@ -103,14 +113,15 @@ private:
     Mdouble activationEnergy_; /*QB*/
     Mdouble temperature_; /*T*/
     Mdouble pseudoSlidingFrictionCoefficient_; /*etaPart*/
-
+    
     ///\brief viscous force is viscosityCoefficient_*contactRadius^4*normalRelativeVelocity
     Mdouble viscosityCoefficient_;
-
+    
     ///\brief adhesion force is adhesionCoefficient_*radius
     Mdouble adhesionCoefficient_;
-
+    
     ///\brief tangential force is slidingFrictionCoefficient_*contactRadius^2*radius*tangentialRelativeVelocity
     Mdouble slidingFrictionCoefficient_;
 };
+
 #endif

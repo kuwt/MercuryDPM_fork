@@ -38,17 +38,18 @@ TriangulatedWall::TriangulatedWall()
 /*!
  * \param[in] other The TriangulatedWall that must be copied.
  */
-TriangulatedWall::TriangulatedWall(const TriangulatedWall &other)
- : BaseWall(other)
+TriangulatedWall::TriangulatedWall(const TriangulatedWall& other)
+        : BaseWall(other)
 {
     face_ = other.face_;
     vertex_ = other.vertex_;
     //now reset the pointers
-    for (unsigned f = 0; f<face_.size(); f++)
+    for (unsigned f = 0; f < face_.size(); f++)
     {
-        for (unsigned i = 0; i<3; i++)
+        for (unsigned i = 0; i < 3; i++)
         {
-            if (other.face_[f].neighbor[i]) {
+            if (other.face_[f].neighbor[i])
+            {
                 face_[f].neighbor[i] = &face_[other.face_[f].neighbor[i] - &other.face_[0]];
             } //else nullptr
             face_[f].vertex[i] = &vertex_[other.face_[f].vertex[i] - &other.vertex_[0]];
@@ -57,7 +58,7 @@ TriangulatedWall::TriangulatedWall(const TriangulatedWall &other)
     logger(DEBUG, "TriangulatedWall(TriangulatedWall&) constructed.");
 }
 
-TriangulatedWall::TriangulatedWall(std::string filename, const ParticleSpecies *species)
+TriangulatedWall::TriangulatedWall(std::string filename, const ParticleSpecies* species)
 {
     setSpecies(species);
     readVTK(filename);
@@ -70,8 +71,8 @@ void TriangulatedWall::readVTK(std::string filename)
 {
     std::fstream file;
     file.open(filename.c_str(), std::ios::in);
-    logger.assert_always(file.is_open(), "File opening failed: %",filename);
-
+    logger.assert_always(file.is_open(), "File opening failed: %", filename);
+    
     std::string dummy;
     getline(file, dummy);
     getline(file, dummy);
@@ -104,62 +105,86 @@ void TriangulatedWall::readVTK(std::string filename)
     //set normals and positions
     for (auto& face: face_)
     {
-        face.normal = Vec3D::getUnitVector(Vec3D::cross(*face.vertex[1]-*face.vertex[0],*face.vertex[2]-*face.vertex[0]));
+        face.normal = Vec3D::getUnitVector(
+                Vec3D::cross(*face.vertex[1] - *face.vertex[0], *face.vertex[2] - *face.vertex[0]));
     }
     //set neighbours
-    for (auto face0=face_.begin(); face0+1!=face_.end(); face0++)
+    for (auto face0 = face_.begin(); face0 + 1 != face_.end(); face0++)
     {
-        for (auto face1=face0+1; face1!=face_.end(); face1++)
+        for (auto face1 = face0 + 1; face1 != face_.end(); face1++)
         {
-            if (face0->vertex[0]==face1->vertex[0]) {
-                if (face0->vertex[1]==face1->vertex[2]) { //edge 0=2
-                    face0->neighbor[0]=&*face1;
-                    face1->neighbor[2]=&*face0;
-                } else if (face0->vertex[2]==face1->vertex[1]) { //edge 2=0
-                    face0->neighbor[2]=&*face1;
-                    face1->neighbor[0]=&*face0;
+            if (face0->vertex[0] == face1->vertex[0])
+            {
+                if (face0->vertex[1] == face1->vertex[2])
+                { //edge 0=2
+                    face0->neighbor[0] = &*face1;
+                    face1->neighbor[2] = &*face0;
                 }
-            } else if (face0->vertex[0]==face1->vertex[1]) {
-                if (face0->vertex[1]==face1->vertex[0]) { //edge 0=0
-                    face0->neighbor[0]=&*face1;
-                    face1->neighbor[0]=&*face0;
-                } else if (face0->vertex[2]==face1->vertex[2]) { //edge 2=1
-                    face0->neighbor[2]=&*face1;
-                    face1->neighbor[1]=&*face0;
-                }
-            } else if (face0->vertex[0]==face1->vertex[2]) {
-                if (face0->vertex[1]==face1->vertex[1]) { //edge 0=1
-                    face0->neighbor[0]=&*face1;
-                    face1->neighbor[1]=&*face0;
-                } else if (face0->vertex[2]==face1->vertex[0]) { //edge 2=2
-                    face0->neighbor[2]=&*face1;
-                    face1->neighbor[2]=&*face0;
-                }
-            } else if (face0->vertex[1]==face1->vertex[0]) {
-                if (face0->vertex[2]==face1->vertex[2]) { //edge 1=2
-                    face0->neighbor[1]=&*face1;
-                    face1->neighbor[2]=&*face0;
-                }
-            } else if (face0->vertex[1]==face1->vertex[1]) {
-                if (face0->vertex[2]==face1->vertex[0]) { //edge 1=0
-                    face0->neighbor[1]=&*face1;
-                    face1->neighbor[0]=&*face0;
-                }
-            } else if (face0->vertex[1]==face1->vertex[2]) {
-                if (face0->vertex[2]==face1->vertex[1]) { //edge 1=1
-                    face0->neighbor[1]=&*face1;
-                    face1->neighbor[1]=&*face0;
+                else if (face0->vertex[2] == face1->vertex[1])
+                { //edge 2=0
+                    face0->neighbor[2] = &*face1;
+                    face1->neighbor[0] = &*face0;
                 }
             }
-
+            else if (face0->vertex[0] == face1->vertex[1])
+            {
+                if (face0->vertex[1] == face1->vertex[0])
+                { //edge 0=0
+                    face0->neighbor[0] = &*face1;
+                    face1->neighbor[0] = &*face0;
+                }
+                else if (face0->vertex[2] == face1->vertex[2])
+                { //edge 2=1
+                    face0->neighbor[2] = &*face1;
+                    face1->neighbor[1] = &*face0;
+                }
+            }
+            else if (face0->vertex[0] == face1->vertex[2])
+            {
+                if (face0->vertex[1] == face1->vertex[1])
+                { //edge 0=1
+                    face0->neighbor[0] = &*face1;
+                    face1->neighbor[1] = &*face0;
+                }
+                else if (face0->vertex[2] == face1->vertex[0])
+                { //edge 2=2
+                    face0->neighbor[2] = &*face1;
+                    face1->neighbor[2] = &*face0;
+                }
+            }
+            else if (face0->vertex[1] == face1->vertex[0])
+            {
+                if (face0->vertex[2] == face1->vertex[2])
+                { //edge 1=2
+                    face0->neighbor[1] = &*face1;
+                    face1->neighbor[2] = &*face0;
+                }
+            }
+            else if (face0->vertex[1] == face1->vertex[1])
+            {
+                if (face0->vertex[2] == face1->vertex[0])
+                { //edge 1=0
+                    face0->neighbor[1] = &*face1;
+                    face1->neighbor[0] = &*face0;
+                }
+            }
+            else if (face0->vertex[1] == face1->vertex[2])
+            {
+                if (face0->vertex[2] == face1->vertex[1])
+                { //edge 1=1
+                    face0->neighbor[1] = &*face1;
+                    face1->neighbor[1] = &*face0;
+                }
+            }
+            
         }
     }
     //set edge normals (inwards facing)
     for (auto& face: face_)
     {
-        face.edgeNormal[0] = Vec3D::getUnitVector(Vec3D::cross(face.normal,*face.vertex[1]-*face.vertex[0]));
-        face.edgeNormal[1] = Vec3D::getUnitVector(Vec3D::cross(face.normal,*face.vertex[2]-*face.vertex[1]));
-        face.edgeNormal[2] = Vec3D::getUnitVector(Vec3D::cross(face.normal,*face.vertex[0]-*face.vertex[2]));
+        face.edgeNormal[0] = Vec3D::getUnitVector(Vec3D::cross(face.normal, *face.vertex[1] - *face.vertex[0]));
+        face.edgeNormal[1] = Vec3D::getUnitVector(Vec3D::cross(face.normal, *face.vertex[2] - *face.vertex[1]));
+        face.edgeNormal[2] = Vec3D::getUnitVector(Vec3D::cross(face.normal, *face.vertex[0] - *face.vertex[2]));
     }
     file.close();
 }
@@ -172,7 +197,7 @@ TriangulatedWall::~TriangulatedWall()
 /*!
  * \param[in] other The TriangulatedWall that must be copied.
  */
-TriangulatedWall &TriangulatedWall::operator=(const TriangulatedWall &other)
+TriangulatedWall& TriangulatedWall::operator=(const TriangulatedWall& other)
 {
     logger(DEBUG, "TriangulatedWall::operator= called.");
     if (this == &other)
@@ -185,7 +210,7 @@ TriangulatedWall &TriangulatedWall::operator=(const TriangulatedWall &other)
 /*!
  * \return pointer to a TriangulatedWall object allocated using new.
  */
-TriangulatedWall *TriangulatedWall::copy() const
+TriangulatedWall* TriangulatedWall::copy() const
 {
     return new TriangulatedWall(*this);
 }
@@ -206,7 +231,7 @@ TriangulatedWall *TriangulatedWall::copy() const
  *
  * NOTE: THIS ONLY RETURNS ONE OF POSSIBLY MANY INTERACTIONS; it's only used for finding out if interactions exist, so should be fine
  */
-bool TriangulatedWall::getDistanceAndNormal(const BaseParticle &p, Mdouble &distance, Vec3D &normal_return) const
+bool TriangulatedWall::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const
 {
     //it's important to use a reference here, as the faces use pointers
     for (const auto& face : face_)
@@ -228,7 +253,7 @@ bool TriangulatedWall::getDistanceAndNormal(const BaseParticle &p, Mdouble &dist
  * that way, TriangulatedWall can be moved with the standard BaseInteractable::move function, 
  * getting rid of an anomaly in the code and removing the virtual from the move function. \author weinhartt
  */
-void TriangulatedWall::move(const Vec3D &move)
+void TriangulatedWall::move(const Vec3D& move)
 {
     BaseInteractable::move(move);
     for (auto& v : vertex_)
@@ -240,7 +265,7 @@ void TriangulatedWall::move(const Vec3D &move)
 /*!
  * \param[in] is The input stream from which the TriangulatedWall is read, usually a restart file.
  */
-void TriangulatedWall::read(std::istream &is)
+void TriangulatedWall::read(std::istream& is)
 {
     ///\todo
 }
@@ -249,7 +274,7 @@ void TriangulatedWall::read(std::istream &is)
  * \param[in] os The output stream where the TriangulatedWall must be written
  *  to, usually a restart file.
  */
-void TriangulatedWall::write(std::ostream &os) const
+void TriangulatedWall::write(std::ostream& os) const
 {
     os << "Vertices " << vertex_.size();
     for (const auto& vertex: vertex_)
@@ -260,17 +285,17 @@ void TriangulatedWall::write(std::ostream &os) const
     for (const auto& face: face_)
     {
         os << "Face " << counter++
-        << " vertex " << face.vertex[0] - &vertex_[0]
-        << " " << face.vertex[1] - &vertex_[0]
-        << " " << face.vertex[2] - &vertex_[0]
-        << " neighbor " << (face.neighbor[0]?(face.neighbor[0] - &face_[0]):-1)
-        << " " << (face.neighbor[1]?(face.neighbor[1] - &face_[0]):-1)
-        << " " << (face.neighbor[2]?(face.neighbor[2] - &face_[0]):-1)
-        << " normal " << face.normal
-        << " edgeNormal " << face.edgeNormal[0]
-        << "  " << face.edgeNormal[1]
-        << "  " << face.edgeNormal[2]
-        << std::endl;
+           << " vertex " << face.vertex[0] - &vertex_[0]
+           << " " << face.vertex[1] - &vertex_[0]
+           << " " << face.vertex[2] - &vertex_[0]
+           << " neighbor " << (face.neighbor[0] ? (face.neighbor[0] - &face_[0]) : -1)
+           << " " << (face.neighbor[1] ? (face.neighbor[1] - &face_[0]) : -1)
+           << " " << (face.neighbor[2] ? (face.neighbor[2] - &face_[0]) : -1)
+           << " normal " << face.normal
+           << " edgeNormal " << face.edgeNormal[0]
+           << "  " << face.edgeNormal[1]
+           << "  " << face.edgeNormal[2]
+           << std::endl;
     }
 }
 
@@ -289,8 +314,8 @@ std::string TriangulatedWall::getName() const
  * \return A pointer to the BaseInteraction that happened between this InfiniteWall
  * and the BaseParticle at the timeStamp.
  */
-std::vector<BaseInteraction*> TriangulatedWall::getInteractionWith(BaseParticle *p, unsigned timeStamp,
-                                                      InteractionHandler *interactionHandler)
+std::vector<BaseInteraction*> TriangulatedWall::getInteractionWith(BaseParticle* p, unsigned timeStamp,
+                                                                   InteractionHandler* interactionHandler)
 {
     Mdouble distance;
     Vec3D normal;
@@ -311,7 +336,7 @@ std::vector<BaseInteraction*> TriangulatedWall::getInteractionWith(BaseParticle 
     return interactions;
 }
 
-Mdouble TriangulatedWall::Face::getDistance(const Vec3D &otherPosition) const
+Mdouble TriangulatedWall::Face::getDistance(const Vec3D& otherPosition) const
 {
     return Vec3D::dot(*vertex[0] - otherPosition, normal);
 }
@@ -320,7 +345,7 @@ Mdouble TriangulatedWall::Face::getDistance(const Vec3D &otherPosition) const
  * check if there is contact with the face, determine if contact is with face, edge, vertex, return distance and normal;
  * only return edge, vertex contact if neighbor face pointer is higher to avoid doubles
  */
-bool TriangulatedWall::Face::getDistanceAndNormal(const BaseParticle &p, Mdouble &distance, Vec3D &normal_return) const
+bool TriangulatedWall::Face::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const
 {
     //check if particle overlaps
     distance = getDistance(p.getPosition());
@@ -328,68 +353,89 @@ bool TriangulatedWall::Face::getDistanceAndNormal(const BaseParticle &p, Mdouble
     Mdouble interactionRadius = p.getWallInteractionRadius();
     if (fabs(distance) >= interactionRadius)///\todo make the triangle work from both sides
         return false;
-
+    
     //Contact radius squared
-    Mdouble allowedDistanceSquared = interactionRadius*interactionRadius-distance*distance;
+    Mdouble allowedDistanceSquared = interactionRadius * interactionRadius - distance * distance;
     int touchingEdge = -1;
     Vec3D* touchingVertex = nullptr;
     //loop through edges to find out if there is a contact with face, edge, vertex, or neither.
-    for (unsigned i=0; i<3; i++)
+    for (unsigned i = 0; i < 3; i++)
     {
         //distance from the edge
         Mdouble edgeDistance = Vec3D::dot(edgeNormal[i], *vertex[i] - p.getPosition());
-        if (edgeDistance<=0) //if in contact with the face
+        if (edgeDistance <= 0) //if in contact with the face
             continue;
         if (edgeDistance * edgeDistance >= allowedDistanceSquared) //if not in contact with anything
             return false;
         //this point is only reached if in contact, but not with the face
         //if edge is convex, treat as face, not edge contact
-        bool convex = (neighbor[i] && ((neighbor[i]->getDistance(p.getPosition())<0)?(Vec3D::dot(neighbor[i]->normal,edgeNormal[i])>1e-12):(Vec3D::dot(neighbor[i]->normal,edgeNormal[i])<-1e-12)));
-        if (touchingEdge==-1) {
+        bool convex = (neighbor[i] && ((neighbor[i]->getDistance(p.getPosition()) < 0) ? (
+                Vec3D::dot(neighbor[i]->normal, edgeNormal[i]) > 1e-12) : (
+                                               Vec3D::dot(neighbor[i]->normal, edgeNormal[i]) < -1e-12)));
+        if (touchingEdge == -1)
+        {
             //edge or vertex contact (depending if more edges are found)
             touchingEdge = i;
-        } else {
+        }
+        else
+        {
             //vertex contact
-            touchingVertex = vertex[(i==2 && touchingEdge==0)?0:i];
+            touchingVertex = vertex[(i == 2 && touchingEdge == 0) ? 0 : i];
         }
         //if (!convex) continue;
         //do not compute if neighbor exists and has lower index or face contact.
-        if (neighbor[i] > this){ //if neighbor has higher index
-            if (neighbor[i]->neighbor[0]==this) {
+        if (neighbor[i] > this)
+        { //if neighbor has higher index
+            if (neighbor[i]->neighbor[0] == this)
+            {
                 edgeDistance = Vec3D::dot(neighbor[i]->edgeNormal[0], *vertex[i] - p.getPosition());
-            } else if (neighbor[i]->neighbor[1]==this) {
+            }
+            else if (neighbor[i]->neighbor[1] == this)
+            {
                 edgeDistance = Vec3D::dot(neighbor[i]->edgeNormal[1], *vertex[i] - p.getPosition());
-            } else { //if (neighbor[i]->neighbor[2]==this)
+            }
+            else
+            { //if (neighbor[i]->neighbor[2]==this)
                 edgeDistance = Vec3D::dot(neighbor[i]->edgeNormal[2], *vertex[i] - p.getPosition());
             }
-            if (edgeDistance<=0  && !convex) //if neighbor has face contact, ignore the edge contact
+            if (edgeDistance <= 0 && !convex) //if neighbor has face contact, ignore the edge contact
                 return false;
-        } else if (neighbor[i] && !convex) {
+        }
+        else if (neighbor[i] && !convex)
+        {
             return false;
         }
     }
-
-
+    
+    
     //check if convex neighbours are overlapping as well
-    if (touchingVertex) { //vertex contact
-        normal_return = *touchingVertex -p.getPosition();
+    if (touchingVertex)
+    { //vertex contact
+        normal_return = *touchingVertex - p.getPosition();
         distance = Vec3D::getLength(normal_return);
         normal_return /= distance;
         //return false;
         //logger(INFO,"vertex contact");
-    } else if (touchingEdge==-1) { //face contact
-        if (distance>=0) { // front face contact
+    }
+    else if (touchingEdge == -1)
+    { //face contact
+        if (distance >= 0)
+        { // front face contact
             normal_return = normal;
-        } else { // back face contact
+        }
+        else
+        { // back face contact
             normal_return = -normal;
             distance = -distance;
         }
         //return false;
         //logger(INFO,"face contact");
-    } else { //edge contact
+    }
+    else
+    { //edge contact
         Vec3D VP = *vertex[touchingEdge] - p.getPosition();
-        Vec3D VW = *vertex[touchingEdge] - *vertex[(touchingEdge==2)?0:(touchingEdge+1)];
-        normal_return = VP - Vec3D::dot(VP, VW)/Vec3D::getLengthSquared(VW)*VW;
+        Vec3D VW = *vertex[touchingEdge] - *vertex[(touchingEdge == 2) ? 0 : (touchingEdge + 1)];
+        normal_return = VP - Vec3D::dot(VP, VW) / Vec3D::getLengthSquared(VW) * VW;
         distance = Vec3D::getLength(normal_return);
         normal_return /= distance;
         //return false;
@@ -398,19 +444,21 @@ bool TriangulatedWall::Face::getDistanceAndNormal(const BaseParticle &p, Mdouble
     return true;
 }
 
-void TriangulatedWall::writeVTK (VTKContainer& vtk) const
+void TriangulatedWall::writeVTK(VTKContainer& vtk) const
 {
     const int s = vtk.points.size();
-    vtk.points.reserve(s+vertex_.size());
-    for (auto v : vertex_) {
+    vtk.points.reserve(s + vertex_.size());
+    for (auto v : vertex_)
+    {
         vtk.points.push_back(v);
     }
-    for (auto f : face_) {
+    for (auto f : face_)
+    {
         std::vector<double> cell;
         cell.reserve(3);
-        cell.push_back(s+f.vertex[0]- &vertex_[0]);
-        cell.push_back(s+f.vertex[1]- &vertex_[0]);
-        cell.push_back(s+f.vertex[2]- &vertex_[0]);
+        cell.push_back(s + f.vertex[0] - &vertex_[0]);
+        cell.push_back(s + f.vertex[1] - &vertex_[0]);
+        cell.push_back(s + f.vertex[2] - &vertex_[0]);
         vtk.triangleStrips.push_back(cell);
     }
 }

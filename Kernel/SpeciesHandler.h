@@ -38,56 +38,56 @@ class SpeciesHandler final : public BaseHandler<ParticleSpecies>
 public:
     /// \brief Default constructor, it creates an empty SpeciesHandler.
     SpeciesHandler();
-
+    
     /// \brief Constructor that copies all species and the pointer to the DPMBase from the given SpeciesHandler.
     SpeciesHandler(const SpeciesHandler& other);
-
+    
     /// \brief Assignment operator that copies all species and the pointer to the DPMBase from the given SpeciesHandler.
     SpeciesHandler& operator=(const SpeciesHandler& rhs);
     
     /// \brief Destructor, it destructs the SpeciesHandler and all ParticleSpecies it contains.
     ~SpeciesHandler() override;
-
+    
     /// \brief Adds a new ParticleSpecies to the SpeciesHandler.
-    void addObject(ParticleSpecies*S) override;
+    void addObject(ParticleSpecies* S) override;
     
     void clear() override
     {
         BaseHandler<ParticleSpecies>::clear();
         mixedObjects_.clear();
     }
-
+    
     ///\brief Remove the ParticleSpecies with given id.
     void removeObject(unsigned int index) override;
-
+    
     /// \brief Reads Species data into the SpeciesHandler from restart file.
     void readAndAddObject(std::istream& is) override;
-
+    
     /// \brief Reads ParticleSpecies into the SpeciesHandler from old-style restart data.
     ParticleSpecies* readOldObject(std::istream& is);
-
+    
     /// \brief Gets the Id of the behaviour between two given species.
     unsigned int getMixedId(unsigned int id1, unsigned int id2) const;
-
+    
     template<typename U>
-    typename std::enable_if<!std::is_pointer<typename U::MixedSpeciesType>::value,typename U::MixedSpeciesType*>::type
+    typename std::enable_if<!std::is_pointer<typename U::MixedSpeciesType>::value, typename U::MixedSpeciesType*>::type
     getMixedObject(const U* S, const U* T)
     {
-        return dynamic_cast<typename U::MixedSpeciesType*>(getMixedObject(S->getIndex(),T->getIndex()));
+        return dynamic_cast<typename U::MixedSpeciesType*>(getMixedObject(S->getIndex(), T->getIndex()));
     }
-
+    
     /// \brief Gets the mixed object that is constructed from two given species.
     BaseSpecies* getMixedObject(unsigned int id1, unsigned int id2);
-
+    
     /// \brief Returns a pointer to the vector of all mixed objects.
     const std::vector<BaseSpecies*>& getMixedObjects() const;
-
+    
     /// \brief Write all the species and mixed species to an output stream.
     virtual void write(std::ostream& os) const;
-
+    
     /// \brief Returns the name of the handler, namely the string "SpeciesHandler".
     std::string getName() const override;
-
+    
     /// \brief Check if angular DOF have to be used
     bool useAngularDOFs();
 

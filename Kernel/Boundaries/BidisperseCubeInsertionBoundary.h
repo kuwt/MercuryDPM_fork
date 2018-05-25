@@ -38,24 +38,26 @@ public:
     /*!
      * \brief Sets the properties of this bidisperse cuboidal insertion boundary
      */
-    void set(BaseParticle* particleToCopyA, BaseParticle* particleToCopyB, double probA, int maxFailed,Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax);
-
+    void set(BaseParticle* particleToCopyA, BaseParticle* particleToCopyB, double probA, int maxFailed, Vec3D posMin,
+             Vec3D posMax, Vec3D velMin, Vec3D velMax);
+    
     /*!
      * \brief Get the particles that need to be copied 
      */
     BaseParticle* getParticleToCopyA() const;
+    
     BaseParticle* getParticleToCopyB() const;
     
     /*!
      * \brief Generates a particle with random position, radius and velocity 
      */
-    BaseParticle* generateParticle(RNG &random) override;
+    BaseParticle* generateParticle(RNG& random) override;
     
     /*!
      * \brief reads boundary properties from istream
      */
     void read(std::istream& is) override;
-
+    
     /*!
      * \brief writes boundary properties to ostream
      */
@@ -65,7 +67,7 @@ public:
      * \brief Returns the name of the object
      */
     std::string getName() const override;
-    
+
 private:
     BaseParticle* particleToCopyA_;
     BaseParticle* particleToCopyB_;

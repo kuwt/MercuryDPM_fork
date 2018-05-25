@@ -111,8 +111,8 @@ void MercuryBase::read(std::istream& is)
     std::string dummy;
     
     line >> dummy >> dummy
-            >> dummy >> hGridMaxLevels_
-            >> dummy >> hGridCellOverSizeRatio_;
+         >> dummy >> hGridMaxLevels_
+         >> dummy >> hGridCellOverSizeRatio_;
 }
 
 /*!
@@ -188,85 +188,93 @@ bool MercuryBase::getHGridUpdateEachTimeStep() const
 void MercuryBase::hGridRebuild()
 {
     std::vector<Mdouble> cellSizes;
-
+    
     const Mdouble minParticleInteractionRadius = getHGridTargetMinInteractionRadius();
     const Mdouble maxParticleInteractionRadius = getHGridTargetMaxInteractionRadius();
-    if(minParticleInteractionRadius == 0.0 || minParticleInteractionRadius == maxParticleInteractionRadius)
+    if (minParticleInteractionRadius == 0.0 || minParticleInteractionRadius == maxParticleInteractionRadius)
     {
         //this case is executed if the particleHandler is empty (minParticleInteractionRadius == 0)
         //or if the particle distribution is monodispersed. 
         //nextafter(d,std::numeric_limits<Mdouble>::max()) chooses the smallest 
         // Mdouble that is bigger than d.
-        const Mdouble maxCellSize = nextafter(2.0 * maxParticleInteractionRadius * getHGridCellOverSizeRatio(), std::numeric_limits<Mdouble>::max());
+        const Mdouble maxCellSize = nextafter(2.0 * maxParticleInteractionRadius * getHGridCellOverSizeRatio(),
+                                              std::numeric_limits<Mdouble>::max());
         cellSizes.push_back(maxCellSize);
-        if(getHGridMaxLevels() != 1)
+        if (getHGridMaxLevels() != 1)
         {
-
-            logger(VERBOSE, "While rebuilding the hgrid: the number of levels was set to one, as the particle distribution is monodispersed");
+            
+            logger(VERBOSE,
+                   "While rebuilding the hgrid: the number of levels was set to one, as the particle distribution is monodispersed");
         }
     }
     else
     {
-        switch(getHGridDistribution())
+        switch (getHGridDistribution())
         {
-        case LINEAR:
-        {
-            const Mdouble minCellSize = nextafter(2.0 * minParticleInteractionRadius * getHGridCellOverSizeRatio(), 0.0);
-            const Mdouble maxCellSize = nextafter(2.0 * maxParticleInteractionRadius * getHGridCellOverSizeRatio(), std::numeric_limits<Mdouble>::max());
-            //std::cout << "HGrid: using a linear cell size distribution from " << minCellSize << " to " << maxCellSize << " over " << getHGridMaxLevels() << " levels" << std::endl;
-            for(unsigned int i = 0; i + 1 < getHGridMaxLevels(); i++)
+            case LINEAR:
             {
-                cellSizes.push_back(minCellSize + (maxCellSize - minCellSize) 
-                * (static_cast<Mdouble>(i + 1)) / getHGridMaxLevels());
+                const Mdouble minCellSize = nextafter(2.0 * minParticleInteractionRadius * getHGridCellOverSizeRatio(),
+                                                      0.0);
+                const Mdouble maxCellSize = nextafter(2.0 * maxParticleInteractionRadius * getHGridCellOverSizeRatio(),
+                                                      std::numeric_limits<Mdouble>::max());
+                //std::cout << "HGrid: using a linear cell size distribution from " << minCellSize << " to " << maxCellSize << " over " << getHGridMaxLevels() << " levels" << std::endl;
+                for (unsigned int i = 0; i + 1 < getHGridMaxLevels(); i++)
+                {
+                    cellSizes.push_back(minCellSize + (maxCellSize - minCellSize)
+                                                      * (static_cast<Mdouble>(i + 1)) / getHGridMaxLevels());
+                }
+                //The last cell is added separately because in some cases accuracy was lost when calculating it.
+                cellSizes.push_back(maxCellSize);
+                break;
             }
-            //The last cell is added separately because in some cases accuracy was lost when calculating it.
-            cellSizes.push_back(maxCellSize);
-            break;
-        }
-        case EXPONENTIAL:
-        {
-            const Mdouble minCellSize = nextafter(2.0 * minParticleInteractionRadius * getHGridCellOverSizeRatio(), 0.0);
-            const Mdouble maxCellSize = nextafter(2.0 * maxParticleInteractionRadius * getHGridCellOverSizeRatio(), std::numeric_limits<Mdouble>::max());
-            std::cout << "HGrid: using an exponential cell size distribution from " << minCellSize << " to " << maxCellSize << " over " << getHGridMaxLevels() << " levels" << std::endl;
-            for(unsigned int i = 0; i + 1 < getHGridMaxLevels(); i++)
+            case EXPONENTIAL:
             {
-                cellSizes.push_back(minCellSize 
-                * std::pow(maxCellSize / minCellSize, static_cast<Mdouble>(i + 1) 
-                / getHGridMaxLevels()));
+                const Mdouble minCellSize = nextafter(2.0 * minParticleInteractionRadius * getHGridCellOverSizeRatio(),
+                                                      0.0);
+                const Mdouble maxCellSize = nextafter(2.0 * maxParticleInteractionRadius * getHGridCellOverSizeRatio(),
+                                                      std::numeric_limits<Mdouble>::max());
+                std::cout << "HGrid: using an exponential cell size distribution from " << minCellSize << " to "
+                          << maxCellSize << " over " << getHGridMaxLevels() << " levels" << std::endl;
+                for (unsigned int i = 0; i + 1 < getHGridMaxLevels(); i++)
+                {
+                    cellSizes.push_back(minCellSize
+                                        * std::pow(maxCellSize / minCellSize, static_cast<Mdouble>(i + 1)
+                                                                              / getHGridMaxLevels()));
+                }
+                //The last cell is added separately because in some cases accuracy was lost when calculating it.
+                cellSizes.push_back(maxCellSize);
+                break;
             }
-            //The last cell is added separately because in some cases accuracy was lost when calculating it.
-            cellSizes.push_back(maxCellSize);
-            break;
-        }
-        case USER:
-        {
-            for(unsigned int i = 0; i < getHGridMaxLevels(); i++)
+            case USER:
             {
-                cellSizes.push_back(userHGridCellSize(i));
+                for (unsigned int i = 0; i < getHGridMaxLevels(); i++)
+                {
+                    cellSizes.push_back(userHGridCellSize(i));
+                }
+                break;
             }
-            break;
-        }
-        case OLDHGRID:
-        {
-            const Mdouble minCellSize = nextafter(2.0 * minParticleInteractionRadius * getHGridCellOverSizeRatio(), 0.0);
-
-            //std::cout<<"HGrid: using the old HGrid cell size distribution starting from " <<minCellSize<<std::endl;
-            for(unsigned int i = 0; i < getHGridMaxLevels(); i++)
+            case OLDHGRID:
             {
-                cellSizes.push_back(minCellSize * std::pow(2, i));
+                const Mdouble minCellSize = nextafter(2.0 * minParticleInteractionRadius * getHGridCellOverSizeRatio(),
+                                                      0.0);
+                
+                //std::cout<<"HGrid: using the old HGrid cell size distribution starting from " <<minCellSize<<std::endl;
+                for (unsigned int i = 0; i < getHGridMaxLevels(); i++)
+                {
+                    cellSizes.push_back(minCellSize * std::pow(2, i));
+                }
+                break;
             }
-            break;
-        }
         }
     }
-
-
+    
+    
     delete grid;
-
-
+    
+    
     grid = new HGrid(getHGridTargetNumberOfBuckets(), getHGridCellOverSizeRatio(), cellSizes);
-
-    for(BaseParticle* const p : particleHandler)
+    
+    for (BaseParticle* const p : particleHandler)
     {
         hGridInsertParticle(p);
         ///\todo{This is really ugly fix to force the particle to update}
@@ -279,8 +287,8 @@ void MercuryBase::hGridRebuild()
 /*!
  * \param[in] obj A pointer to the BaseParticle that needs to be inserted in the HGrid.
  */
-void MercuryBase::hGridInsertParticle(BaseParticle *obj)
-{  
+void MercuryBase::hGridInsertParticle(BaseParticle* obj)
+{
     if (grid != nullptr)
     {
         grid->insertParticleToHgrid(obj);
@@ -292,14 +300,16 @@ void MercuryBase::broadPhase(BaseParticle *i UNUSED)
 {
 }
 #else
+
 /*!
  * \param[in] i A pointer to the BaseParticle for which we want to see if there 
  *              are interactions on its own level.
  */
-void MercuryBase::broadPhase(BaseParticle *i)
+void MercuryBase::broadPhase(BaseParticle* i)
 {
     hGridFindOneSidedContacts(i);
 }
+
 #endif
 
 /*!
@@ -318,7 +328,8 @@ void MercuryBase::hGridActionsBeforeTimeStep()
 #ifndef CONTACT_LIST_HGRID
         getHGrid()->clearBucketIsChecked();
 #endif
-        if (getHGridUpdateEachTimeStep() || getHGridTotalCurrentMaxRelativeDisplacement() >= getHGridCellOverSizeRatio() - 1)
+        if (getHGridUpdateEachTimeStep() ||
+            getHGridTotalCurrentMaxRelativeDisplacement() >= getHGridCellOverSizeRatio() - 1)
         {
 #ifndef CONTACT_LIST_HGRID
             getHGrid()->clearFirstBaseParticleInBucket();
@@ -363,7 +374,7 @@ void MercuryBase::hGridActionsBeforeIntegration()
  */
 void MercuryBase::hGridActionsAfterIntegration()
 {
-    currentMaxRelativeDisplacement_ = 2.0 * std::sqrt(currentMaxRelativeDisplacement_)*getHGridCellOverSizeRatio();
+    currentMaxRelativeDisplacement_ = 2.0 * std::sqrt(currentMaxRelativeDisplacement_) * getHGridCellOverSizeRatio();
     totalCurrentMaxRelativeDisplacement_ += currentMaxRelativeDisplacement_;
 }
 
@@ -384,7 +395,7 @@ Mdouble MercuryBase::userHGridCellSize(unsigned int level)
  * \param[in] argv  The command line input arguments.
  * \return A boolean which is true if the argument is found and false otherwise.
  */
-bool MercuryBase::readNextArgument(int& i, int argc, char *argv[])
+bool MercuryBase::readNextArgument(int& i, int argc, char* argv[])
 {
     if (!strcmp(argv[i], "-hGridMaxLevels"))
     {
@@ -495,14 +506,20 @@ bool MercuryBase::hGridNeedsRebuilding()
         logger(VERBOSE, "HGrid needs updating, because said so by the grid itself");
         return true;
     }
-    else if (getHGrid()->getNumberOfBuckets() > 10 * getHGridTargetNumberOfBuckets() || 10 * getHGrid()->getNumberOfBuckets() < getHGridTargetNumberOfBuckets())
+    else if (getHGrid()->getNumberOfBuckets() > 10 * getHGridTargetNumberOfBuckets() ||
+             10 * getHGrid()->getNumberOfBuckets() < getHGridTargetNumberOfBuckets())
     {
-        logger(VERBOSE, "HGrid needs updating, because of number of buckets, current = %, target = %.", grid->getNumberOfBuckets(), particleHandler.getSize());
+        logger(VERBOSE, "HGrid needs updating, because of number of buckets, current = %, target = %.",
+               grid->getNumberOfBuckets(), particleHandler.getSize());
         return true;
     }
-    else if (particleHandler.getLargestParticle() != nullptr && 2.0 * particleHandler.getLargestParticle()->getInteractionRadius() > getHGrid()->getCellSizes().back() * grid->getCellOverSizeRatio())
+    else if (particleHandler.getLargestParticle() != nullptr &&
+             2.0 * particleHandler.getLargestParticle()->getInteractionRadius() >
+             getHGrid()->getCellSizes().back() * grid->getCellOverSizeRatio())
     {
-        logger(VERBOSE, "HGrid needs updating, because of maximum cell size, current = %, required = %.", grid->getCellSizes().back() * hGridCellOverSizeRatio_, particleHandler.getLargestParticle()->getInteractionRadius());
+        logger(VERBOSE, "HGrid needs updating, because of maximum cell size, current = %, required = %.",
+               grid->getCellSizes().back() * hGridCellOverSizeRatio_,
+               particleHandler.getLargestParticle()->getInteractionRadius());
         return true;
     }
     else
@@ -522,7 +539,7 @@ unsigned int MercuryBase::getHGridTargetNumberOfBuckets() const
     if (nParticles > 10)
     {
         ///\todo TW SpeedCheckThomas revealed that adding a factor 10 here improved performance by 20% for monodisperse particles, 45% for highly polydisperse (this seems true for particle numbers 1e3 - 1e6); a larger factor seems to little extra effect; the memory cost is small compared to the number of particles, so I added the factor permanently. @Irana please check this is ok to do.
-        return 10*nParticles;
+        return 10 * nParticles;
     }
     else
     {
@@ -541,7 +558,7 @@ Mdouble MercuryBase::getHGridTargetMinInteractionRadius() const
         return 0.0;
     }
     else
-    {   
+    {
         return particleHandler.getSmallestInteractionRadiusLocal();
     }
 }
@@ -587,7 +604,7 @@ bool MercuryBase::checkParticleForInteraction(const BaseParticle& p)
     }
 #else
     bool interaction = checkParticleForInteractionLocalPeriodic(p);
-#endif   
+#endif
     return interaction;
 }
 
@@ -602,7 +619,7 @@ bool MercuryBase::checkParticleForInteractionLocal(const BaseParticle& p)
 {
     Mdouble distance;
     Vec3D normal;
-
+    
     //Check if it has no collision with walls
     for (BaseWall* w :wallHandler)
     {
@@ -633,17 +650,17 @@ bool MercuryBase::checkParticleForInteractionLocal(const BaseParticle& p)
 
 void MercuryBase::hGridInfo(std::ostream& os) const
 {
-    #ifdef MERCURY_USE_MPI
-        MPIContainer& communicator = MPIContainer::Instance();
-        int numberOfProcessors = communicator.getNumberOfProcessors();
-    #else
-        int numberOfProcessors = 1;
-    #endif
+#ifdef MERCURY_USE_MPI
+    MPIContainer& communicator = MPIContainer::Instance();
+    int numberOfProcessors = communicator.getNumberOfProcessors();
+#else
+    int numberOfProcessors = 1;
+#endif
     os << "hGrid"
        << " method " << hGridMethod_
        << " distribution " << hGridDistribution_
        << " cellOverSizeRatio " << hGridCellOverSizeRatio_;
-       //<< " maxLevels " << hGridMaxLevels_;
+    //<< " maxLevels " << hGridMaxLevels_;
     if (numberOfProcessors == 1 && grid != nullptr)
     {
         os << " numberOfBuckets " << grid->getNumberOfBuckets()

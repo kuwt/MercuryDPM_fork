@@ -31,30 +31,32 @@
 #include <complex>
 #include <vector>
 
-class LocalExpansion {
+class LocalExpansion
+{
 public:
-	LocalExpansion(int p, NumericalVector<> *squaredFactorials, Vec3D location);
-	virtual ~LocalExpansion();
-
-	//Set correct length of the localExpansions, based on p
-	void initialiseLocalExpansion();
-
-	//Functions used in the downwards pass
-	NumericalVector<std::complex<Mdouble>> translateLocalExpansion(Vec3D location);
-
-	//add local expansion coefficients to the current coefficients
-	void addLocalExpansionCoefficients(NumericalVector<std::complex<Mdouble>> localExpansionCoefficients);
-
-	NumericalVector<std::complex<Mdouble>> getExpansionCoefficients()
-	{
-		return localExpansionCoefficients_;
-	}
+    LocalExpansion(int p, NumericalVector<>* squaredFactorials, Vec3D location);
+    
+    virtual ~LocalExpansion();
+    
+    //Set correct length of the localExpansions, based on p
+    void initialiseLocalExpansion();
+    
+    //Functions used in the downwards pass
+    NumericalVector<std::complex<Mdouble>> translateLocalExpansion(Vec3D location);
+    
+    //add local expansion coefficients to the current coefficients
+    void addLocalExpansionCoefficients(NumericalVector<std::complex<Mdouble>> localExpansionCoefficients);
+    
+    NumericalVector<std::complex<Mdouble>> getExpansionCoefficients()
+    {
+        return localExpansionCoefficients_;
+    }
 
 private:
-	int p_;
-	NumericalVector<> *squaredFactorials_;
-	Vec3D location_;
-	NumericalVector<std::complex<Mdouble>> localExpansionCoefficients_;
+    int p_;
+    NumericalVector<>* squaredFactorials_;
+    Vec3D location_;
+    NumericalVector<std::complex<Mdouble>> localExpansionCoefficients_;
 };
 
 #endif /* LOCALEXPANSION_H_ */

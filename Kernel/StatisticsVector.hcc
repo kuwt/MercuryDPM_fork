@@ -73,7 +73,8 @@ void StatisticsVector<T>::setCGWidth2(Mdouble new_)
         w2 = new_;
     else
     {
-        logger.assert_always(particleHandler.getLargestParticle(),"cg width could not be induced, as no largest particle exists; please use -w to set CG width");
+        logger.assert_always(particleHandler.getLargestParticle(),
+                             "cg width could not be induced, as no largest particle exists; please use -w to set CG width");
         w2 = mathsFunc::square(w_over_rmax * particleHandler.getLargestParticle()->getRadius());
     }
     //(2.0*getXMax()/nx);
@@ -146,7 +147,7 @@ void StatisticsVector<T>::constructor()
     hmax = 1e20;
     rmax = 1e20;
     indSpecies = -1; //all species
-            
+    
     //set default options - Not used it physially don't make sense i.e if ?max<?min
     xMinStat = NaN;
     xMaxStat = NaN;
@@ -252,10 +253,10 @@ void StatisticsVector<T>::constructor(std::string name)
 {
     //call default constructor
     constructor();
-
+    
     // set name
     setName(name.c_str());
-
+    
     if (!strcmp(getName().c_str(), "c3d"))
     {
         //write here what to do with Stefan's data
@@ -266,9 +267,9 @@ void StatisticsVector<T>::constructor(std::string name)
     {
         //write here what to do with Mercury data
         isMDCLR = false;
-        if (readRestartFile()==0)
+        if (readRestartFile() == 0)
         {
-            logger(WARN,"%.restart does not exist; using unit domain [0,1]^3",name);
+            logger(WARN, "%.restart does not exist; using unit domain [0,1]^3", name);
         }
         setAppend(false);
     }
@@ -276,13 +277,13 @@ void StatisticsVector<T>::constructor(std::string name)
 
 //Constructor that accepts arguments from the command line
 template<StatType T>
-StatisticsVector<T>::StatisticsVector(int argc, char *argv[])
+StatisticsVector<T>::StatisticsVector(int argc, char* argv[])
 {
     //check if filename is given
     if (argc < 2)
     {
         std::cerr << "fstatistics filename [-options]" << std::endl
-                << "Run fstatistics -help for more information" << std::endl;
+                  << "Run fstatistics -help for more information" << std::endl;
         exit(-1);
     }
     
@@ -295,7 +296,7 @@ StatisticsVector<T>::StatisticsVector(int argc, char *argv[])
     //create StatisticsVector
     std::string filename(argv[1]);
     constructor(filename);
-
+    
     //check for options (standardly '-option argument')
     readStatArguments(argc, argv);
 }
@@ -395,7 +396,7 @@ Vec3D StatisticsVector<T>::getVelocityProfile(Vec3D Position)
 
 //Constructor that accepts arguments from the command line
 template<StatType T>
-void StatisticsVector<T>::readStatArguments(int argc, char *argv[])
+void StatisticsVector<T>::readStatArguments(int argc, char* argv[])
 {
     //check for options (standardly '-option argument')
     for (int i = 2; i < argc; i += 2)
@@ -488,7 +489,7 @@ void StatisticsVector<T>::readStatArguments(int argc, char *argv[])
         }
         else if (!strcicmp(argv[i], "-positions"))
         {
-            loadPositions(argv[i+1]);
+            loadPositions(argv[i + 1]);
         }
         else if (!strcicmp(argv[i], "-indSpecies"))
         {
@@ -654,114 +655,128 @@ template<StatType T>
 void StatisticsVector<T>::print_help()
 {
     std::cout << "fstatistics filename [-options]: " << std::endl
-            << "This program evaluates statistical data from .fstat, .data, and. restart files and writes it into a .stat file" << std::endl << std::endl;
-
+              << "This program evaluates statistical data from .fstat, .data, and. restart files and writes it into a .stat file"
+              << std::endl << std::endl;
+    
     std::cout << "OPTIONS:" << std::endl
-            << "The following flags are case-insensitive." << std::endl
-            << std::endl;
-
+              << "The following flags are case-insensitive." << std::endl
+              << std::endl;
+    
     std::cout << "-stattype [X,Y,Z,XY,XZ,YZ,XYZ,RAZ,RA,AZ,RZ,R,A]: " << std::endl
-            << "Used to obtain statistics averaged in all coordinate directions but the ones specified; f.e. -stattype Z yields depth-profiles. Default is XYZ." << std::endl
-            << "However, the cylindrical polar system R(adial), A(zimuthal), Z is not yet supported." << std::endl << std::endl
-
-            << "-CGtype [HeavisideSphere,Gaussian]: " << std::endl
-            << "Averaging function; default: Gaussian" << std::endl << std::endl
-
-            << "-w,-w_over_rmax [Mdouble]: " << std::endl
-            << "Averaging width, absolute or in multiples of the radius of the largest particle in the restart file; default: w_over_rmax=1" << std::endl << std::endl
-
-            << "-n,nx,ny,nz [uint]: " << std::endl
-            << "Specifies the amount of grid points in coordinate directions for which statistics are evaluated;" << std::endl
-            << "use -n to set all 3 directions at once; is set to one in averaged directions (see stattype). Default n=1" << std::endl << std::endl
-
-            << "-h,hx,hy,hz [Mdouble]: " << std::endl
-            << "Defines the amount of grid points by setting the mesh size " << std::endl << std::endl
-
-            << "-x [Mdouble Mdouble]: " << std::endl
-            << "-y [Mdouble Mdouble]: " << std::endl
-            << "-z [Mdouble Mdouble]: " << std::endl
-            << "Specifies the domain of the grid; f.e. for -x 0 1 all grid points will have x-values within [0,1]." << std::endl << std::endl
-            << "By default, these are the coordinates from setMin and setMax, as recorded in the restart file." << std::endl << std::endl
-
-            << "-indSpecies [int]: " << std::endl
-            << "-rmin,rmax [Mdouble]: " << std::endl
-            << "-hmax [Mdouble]: " << std::endl
-            << "Allows to only obtain statistics for specific particles" << std::endl << std::endl
-
-            << "-periodicwalls [bool]: " << std::endl
-            << "Neglects periodic walls" << std::endl << std::endl
-
-            << "-walls [uint]: " << std::endl
-            << "Only takes into account the first n walls" << std::endl << std::endl
-
-            << "-verbosity [uint]: " << std::endl
-            << "Amount of screen output (0 minimal, 1 normal, 2 maximal)" << std::endl << std::endl
-
-            << "-verbose: " << std::endl
-            << "Identical to -verbosity 2" << std::endl
-            << std::endl
-
-            << "-format [uint]: " << std::endl
-            << "Specifies the number of columns (format) for the .data files" << std::endl
-            << "Should be one of 8 (for 2D data), or 14 (for 3D data), or 0 (guess, default)." << std::endl
-            << std::endl
-
-            << "-tmin,tmax,tint [Mdouble]: " << std::endl
-            << "Redefines the time interval [tmin,tmax] for which statistics are evaluated. Default values from restart file." << std::endl
-            << "Setting tint sets tmin to tmax-tint." << std::endl << std::endl
-
-            << "-stepsize [uint]: " << std::endl
-            << "To skip some time steps. Default: 1 (i.e. not skip any)" << std::endl << std::endl
-
-            << "-statfilename [std::string]: " << std::endl
-            << "to change the name of the output file" << std::endl << std::endl
-
-            << "-timeaverage [bool]: " << std::endl
-            << "Sets whether to time-average data (true) or to print statistics for each timestep (false). Default: true" << std::endl << std::endl
-
-            << "-timevariance [bool]: " << std::endl
-            << "For time averaged data, sets whether to calculate and print the variance with time. Default: false." << std::endl << std::endl
-
-            << "-gradient: " << std::endl
-            << "Sets whether to calculate and print the first spatial derivative of each statistical value. Default: false." << std::endl << std::endl
-
-            << "-ignoreFixedParticles: " << std::endl
-            << "Sets whether to ignore fixed particles. Default: true" << std::endl << std::endl
-
-            << "-StressTypeForFixedParticles: " << std::endl
-            << "-mirrorAtDomainBoundary [Mdouble]" << std::endl
-            << std::endl << std::endl
-
-            << "OUTPUT:" << std::endl
-            << "fstatistics produces a .stat file that contains information about the CG fields." << std::endl
-            << "The first line are the labels for each field, which are repeated below." << std::endl
-            << "The second line contains information about the domain width and the coarse-graining parameters." << std::endl
-            << "For time-averaged data, the third line gives tmin and tmax." << std::endl
-            << "Then the CG fields at each gridpoint are printed on a row; the entries are listed below." << std::endl
-            << "Optionally, the variance of these fields are also printed in a separate block." << std::endl
-            << "For non-time-averaged data, each timestep is printed in a separate block and the times are given between them." << std::endl
-            << std::endl
-
-            << "1-3: Coordinates (Cartesian) " << std::endl
-            << "4: Nu " << std::endl
-            << "5: Density " << std::endl
-            << "6-8: Momentum " << std::endl
-            << "9-11: DisplacementMomentum " << std::endl
-            << "12-17: Displacement" << std::endl
-            << "18-23: MomentumFlux" << std::endl
-            << "24-29: DisplacementMomentumFlux" << std::endl
-            << "30-32: EnergyFlux " << std::endl
-            << "33-41: NormalStress " << std::endl
-            << "42-50: TangentialStress " << std::endl
-            << "51-53: NormalTraction " << std::endl
-            << "54-56: TangentialTraction " << std::endl
-            << "57-62: Fabric " << std::endl
-            << "63-65: CollisionalHeatFlux " << std::endl
-            << "66: Dissipation " << std::endl
-            << "67: Potential " << std::endl
-            << "68-70: LocalAngularMomentum " << std::endl
-            << "71-79: LocalAngularMomentumFlux " << std::endl
-            << "80-88: ContactCoupleStress " << std::endl;
+              << "Used to obtain statistics averaged in all coordinate directions but the ones specified; f.e. -stattype Z yields depth-profiles. Default is XYZ."
+              << std::endl
+              << "However, the cylindrical polar system R(adial), A(zimuthal), Z is not yet supported." << std::endl
+              << std::endl
+    
+              << "-CGtype [HeavisideSphere,Gaussian]: " << std::endl
+              << "Averaging function; default: Gaussian" << std::endl << std::endl
+    
+              << "-w,-w_over_rmax [Mdouble]: " << std::endl
+              << "Averaging width, absolute or in multiples of the radius of the largest particle in the restart file; default: w_over_rmax=1"
+              << std::endl << std::endl
+    
+              << "-n,nx,ny,nz [uint]: " << std::endl
+              << "Specifies the amount of grid points in coordinate directions for which statistics are evaluated;"
+              << std::endl
+              << "use -n to set all 3 directions at once; is set to one in averaged directions (see stattype). Default n=1"
+              << std::endl << std::endl
+    
+              << "-h,hx,hy,hz [Mdouble]: " << std::endl
+              << "Defines the amount of grid points by setting the mesh size " << std::endl << std::endl
+    
+              << "-x [Mdouble Mdouble]: " << std::endl
+              << "-y [Mdouble Mdouble]: " << std::endl
+              << "-z [Mdouble Mdouble]: " << std::endl
+              << "Specifies the domain of the grid; f.e. for -x 0 1 all grid points will have x-values within [0,1]."
+              << std::endl << std::endl
+              << "By default, these are the coordinates from setMin and setMax, as recorded in the restart file."
+              << std::endl << std::endl
+    
+              << "-indSpecies [int]: " << std::endl
+              << "-rmin,rmax [Mdouble]: " << std::endl
+              << "-hmax [Mdouble]: " << std::endl
+              << "Allows to only obtain statistics for specific particles" << std::endl << std::endl
+    
+              << "-periodicwalls [bool]: " << std::endl
+              << "Neglects periodic walls" << std::endl << std::endl
+    
+              << "-walls [uint]: " << std::endl
+              << "Only takes into account the first n walls" << std::endl << std::endl
+    
+              << "-verbosity [uint]: " << std::endl
+              << "Amount of screen output (0 minimal, 1 normal, 2 maximal)" << std::endl << std::endl
+    
+              << "-verbose: " << std::endl
+              << "Identical to -verbosity 2" << std::endl
+              << std::endl
+    
+              << "-format [uint]: " << std::endl
+              << "Specifies the number of columns (format) for the .data files" << std::endl
+              << "Should be one of 8 (for 2D data), or 14 (for 3D data), or 0 (guess, default)." << std::endl
+              << std::endl
+    
+              << "-tmin,tmax,tint [Mdouble]: " << std::endl
+              << "Redefines the time interval [tmin,tmax] for which statistics are evaluated. Default values from restart file."
+              << std::endl
+              << "Setting tint sets tmin to tmax-tint." << std::endl << std::endl
+    
+              << "-stepsize [uint]: " << std::endl
+              << "To skip some time steps. Default: 1 (i.e. not skip any)" << std::endl << std::endl
+    
+              << "-statfilename [std::string]: " << std::endl
+              << "to change the name of the output file" << std::endl << std::endl
+    
+              << "-timeaverage [bool]: " << std::endl
+              << "Sets whether to time-average data (true) or to print statistics for each timestep (false). Default: true"
+              << std::endl << std::endl
+    
+              << "-timevariance [bool]: " << std::endl
+              << "For time averaged data, sets whether to calculate and print the variance with time. Default: false."
+              << std::endl << std::endl
+    
+              << "-gradient: " << std::endl
+              << "Sets whether to calculate and print the first spatial derivative of each statistical value. Default: false."
+              << std::endl << std::endl
+    
+              << "-ignoreFixedParticles: " << std::endl
+              << "Sets whether to ignore fixed particles. Default: true" << std::endl << std::endl
+    
+              << "-StressTypeForFixedParticles: " << std::endl
+              << "-mirrorAtDomainBoundary [Mdouble]" << std::endl
+              << std::endl << std::endl
+    
+              << "OUTPUT:" << std::endl
+              << "fstatistics produces a .stat file that contains information about the CG fields." << std::endl
+              << "The first line are the labels for each field, which are repeated below." << std::endl
+              << "The second line contains information about the domain width and the coarse-graining parameters."
+              << std::endl
+              << "For time-averaged data, the third line gives tmin and tmax." << std::endl
+              << "Then the CG fields at each gridpoint are printed on a row; the entries are listed below." << std::endl
+              << "Optionally, the variance of these fields are also printed in a separate block." << std::endl
+              << "For non-time-averaged data, each timestep is printed in a separate block and the times are given between them."
+              << std::endl
+              << std::endl
+    
+              << "1-3: Coordinates (Cartesian) " << std::endl
+              << "4: Nu " << std::endl
+              << "5: Density " << std::endl
+              << "6-8: Momentum " << std::endl
+              << "9-11: DisplacementMomentum " << std::endl
+              << "12-17: Displacement" << std::endl
+              << "18-23: MomentumFlux" << std::endl
+              << "24-29: DisplacementMomentumFlux" << std::endl
+              << "30-32: EnergyFlux " << std::endl
+              << "33-41: NormalStress " << std::endl
+              << "42-50: TangentialStress " << std::endl
+              << "51-53: NormalTraction " << std::endl
+              << "54-56: TangentialTraction " << std::endl
+              << "57-62: Fabric " << std::endl
+              << "63-65: CollisionalHeatFlux " << std::endl
+              << "66: Dissipation " << std::endl
+              << "67: Potential " << std::endl
+              << "68-70: LocalAngularMomentum " << std::endl
+              << "71-79: LocalAngularMomentumFlux " << std::endl
+              << "80-88: ContactCoupleStress " << std::endl;
     exit(0);
 }
 
@@ -825,10 +840,10 @@ std::string StatisticsVector<T>::printStat()
 {
     std::stringstream ss;
     ss << "Statistical parameters: name=" << getName()
-            << ",\n nx=" << nx
-            << ", ny=" << ny
-            << ", nz=" << nz
-            << ", CG_type=";
+       << ",\n nx=" << nx
+       << ", ny=" << ny
+       << ", nz=" << nz
+       << ", CG_type=";
     if (getCGShape() == HeavisideSphere)
     {
         ss << "HeavisideSphere";
@@ -848,19 +863,19 @@ std::string StatisticsVector<T>::printStat()
     }
     
     ss << ", w=" << sqrt(w2)
-            << ", cutoff=" << cutoff
-            << ",\n tStat=[" << getCGTimeMin() << "," << getTimeMaxStat() << "]"
-            << ", xStat=[" << getXMinStat() << "," << getXMaxStat() << "]"
-            << ", yStat=[" << getYMinStat() << "," << getYMaxStat() << "]"
-            << ", zStat=[" << getZMinStat() << "," << getZMaxStat() << "]"
-            << ",\n ignoreFixedParticles=" << ignoreFixedParticles
-            << ", StressTypeForFixedParticles=" << StressTypeForFixedParticles
-            << ",\n mirrorAtDomainBoundary=" << getMirrorAtDomainBoundary()
-            << ",\n doTimeAverage=" << getDoTimeAverage()
-            << ", doVariance=" << getDoVariance()
-            << ", doGradient=" << getDoGradient()
-            << ", verbosity=" << verbosity
-            << std::endl;
+       << ", cutoff=" << cutoff
+       << ",\n tStat=[" << getCGTimeMin() << "," << getTimeMaxStat() << "]"
+       << ", xStat=[" << getXMinStat() << "," << getXMaxStat() << "]"
+       << ", yStat=[" << getYMinStat() << "," << getYMaxStat() << "]"
+       << ", zStat=[" << getZMinStat() << "," << getZMaxStat() << "]"
+       << ",\n ignoreFixedParticles=" << ignoreFixedParticles
+       << ", StressTypeForFixedParticles=" << StressTypeForFixedParticles
+       << ",\n mirrorAtDomainBoundary=" << getMirrorAtDomainBoundary()
+       << ",\n doTimeAverage=" << getDoTimeAverage()
+       << ", doVariance=" << getDoVariance()
+       << ", doGradient=" << getDoGradient()
+       << ", verbosity=" << verbosity
+       << std::endl;
     return ss.str();
 }
 
@@ -871,12 +886,12 @@ std::string StatisticsVector<T>::print_CG()
 {
     std::stringstream ss;
     ss << "w " << sqrt(getCGWidthSquared())
-            << " dim " << getSystemDimensions()
-            << " domainStat " << getXMinStat() << " " << getXMaxStat()
-            << " " << getYMinStat() << " " << getYMaxStat()
-            << " " << getZMinStat() << " " << getZMaxStat()
-            << " n " << nx << " " << ny << " " << nz
-            << " statType " << statType;
+       << " dim " << getSystemDimensions()
+       << " domainStat " << getXMinStat() << " " << getXMaxStat()
+       << " " << getYMinStat() << " " << getYMaxStat()
+       << " " << getZMinStat() << " " << getZMaxStat()
+       << " n " << nx << " " << ny << " " << nz
+       << " statType " << statType;
     if (CG_type == Polynomial)
         ss << " CGPolynomial " << CGPolynomial;
     else
@@ -912,9 +927,9 @@ std::string StatisticsVector<T>::print_CG()
 
 ///Output names of statistical variables
 template<StatType T>
-StatisticsPoint<T> StatisticsVector<T>::average(std::vector<StatisticsPoint<T> > &P)
+StatisticsPoint <T> StatisticsVector<T>::average(std::vector <StatisticsPoint<T>>& P)
 {
-    StatisticsPoint<T> avg;
+    StatisticsPoint <T> avg;
     avg.set_zero();
     for (unsigned int i = 0; i < P.size(); i++)
         avg += P[i];
@@ -928,10 +943,10 @@ void StatisticsVector<T>::initialiseStatistics()
     reset_statistics();
     
     StatisticsVector<T>::setCGWidth2(StatisticsVector<T>::getCGWidthSquared());
-
-
+    
+    
     StatisticsVector<T>::setPositions();
-
+    
     //set tmin and tmax if tint is set
     if (getCGTimeAveragingInterval() != 0.0)
     {
@@ -939,13 +954,14 @@ void StatisticsVector<T>::initialiseStatistics()
         setTimeMaxStat(getCGTimeMin() + getCGTimeAveragingInterval());
         std::cout << "tint set, time goes from: " << getCGTimeMin() << " to: " << getTimeMaxStat() << std::endl;
     }
-
-    if (statFile.open(std::fstream::out)) {
+    
+    if (statFile.open(std::fstream::out))
+    {
         statFile.setLastSavedTimeStep(getNumberOfTimeSteps());
         statFile.getFstream() << Points.begin()->write_variable_names() << std::endl;
         statFile.getFstream() << print_CG() << std::endl;
     }
-
+    
     //std::couts variables
     if (verbosity > 1)
         std::cout << std::endl;
@@ -982,7 +998,7 @@ void StatisticsVector<T>::write_statistics()
 {
     std::cout << "writing statistics for t=" << getTime() << std::endl;
     statFile.setLastSavedTimeStep(getNumberOfTimeSteps());
-
+    
     // write to .stat file
     statFile.getFstream() << std::left << std::setprecision(8) << std::setw(6) << getTime() << std::endl;
     for (unsigned int i = 0; i < Points.size(); i++)
@@ -1121,19 +1137,21 @@ void StatisticsVector<T>::write_time_average_statistics()
             }
         }
     }
-
+    
     // write average to .stat file
-    statFile.getFstream() << std::left << std::setprecision(8) << std::setw(6) << getCGTimeMin() << " " << getTime() << std::endl;
+    statFile.getFstream() << std::left << std::setprecision(8) << std::setw(6) << getCGTimeMin() << " " << getTime()
+                          << std::endl;
     for (unsigned int i = 0; i < timeAverage.size(); i++)
         statFile.getFstream() << timeAverage[i];
     // write to std::cout
-    StatisticsPoint<T> avg = average(timeAverage);
+    StatisticsPoint <T> avg = average(timeAverage);
     std::cout << "Averages: " << avg.print() << std::endl;
     
     if (getDoVariance())
     {
         // write variance to .stat file
-        statFile.getFstream() << std::left << std::setprecision(8) << std::setw(6) << getCGTimeMin() << " " << getTime() << " " << std::endl;
+        statFile.getFstream() << std::left << std::setprecision(8) << std::setw(6) << getCGTimeMin() << " " << getTime()
+                              << " " << std::endl;
         for (unsigned int i = 0; i < timeVariance.size(); i++)
             statFile.getFstream() << timeVariance[i];
         //StatisticsPoint<T> var = average(timeVariance);
@@ -1142,13 +1160,16 @@ void StatisticsVector<T>::write_time_average_statistics()
     if (getDoGradient())
     {
         // write variance to .stat file
-        statFile.getFstream() << std::left << std::setprecision(8) << std::setw(6) << getCGTimeMin() << " " << getTime() << " " << std::endl;
+        statFile.getFstream() << std::left << std::setprecision(8) << std::setw(6) << getCGTimeMin() << " " << getTime()
+                              << " " << std::endl;
         for (unsigned int i = 0; i < timeAverage.size(); i++)
             statFile.getFstream() << dxTimeAverage[i];
-        statFile.getFstream() << std::left << std::setprecision(8) << std::setw(6) << getCGTimeMin() << " " << getTime() << " " << std::endl;
+        statFile.getFstream() << std::left << std::setprecision(8) << std::setw(6) << getCGTimeMin() << " " << getTime()
+                              << " " << std::endl;
         for (unsigned int i = 0; i < timeAverage.size(); i++)
             statFile.getFstream() << dyTimeAverage[i];
-        statFile.getFstream() << std::left << std::setprecision(8) << std::setw(6) << getCGTimeMin() << " " << getTime() << " " << std::endl;
+        statFile.getFstream() << std::left << std::setprecision(8) << std::setw(6) << getCGTimeMin() << " " << getTime()
+                              << " " << std::endl;
         for (unsigned int i = 0; i < timeAverage.size(); i++)
             statFile.getFstream() << dzTimeAverage[i];
     }
@@ -1156,20 +1177,21 @@ void StatisticsVector<T>::write_time_average_statistics()
     setCGTimeMin(getTime());
     
 }
+
 template<StatType T>
 void StatisticsVector<T>::statistics_from_fstat_and_data()
 {
     std::cout << "set " << " positions" << std::endl;
     dataFile.setCounter(0);
     fStatFile.setCounter(0);
-
+    
     //This opens the file the data will be recalled from
     if (dataFile.getFileType() == FileType::ONE_FILE)
         dataFile.open(std::fstream::in);
     if (fStatFile.getFileType() == FileType::ONE_FILE)
         fStatFile.open(std::fstream::in);
-
-
+    
+    
     //load first set of time steps to obtain xdim, ydim, zdim
     
     //try to read data files; if data.0000 does not exist, try the next, up to .9999
@@ -1177,9 +1199,9 @@ void StatisticsVector<T>::statistics_from_fstat_and_data()
     {
         if (readNextDataFile(format))
             break;
-
+        
         /* JMFT: Commented out the following line.  */
-            // fStatFile.open(std::fstream::in);
+        // fStatFile.open(std::fstream::in);
         /* It's necessary to work in the order
               read data file, read fstat file, process
            rather than
@@ -1192,11 +1214,11 @@ void StatisticsVector<T>::statistics_from_fstat_and_data()
            first step if -tmin > 0.
          */
     }
-
+    
     //set tminstat to smallest time evaluated
     if (getTime() >= getCGTimeMin())
         setCGTimeMin(getTime() - getTimeStep());
-
+    
     //This creates the file statistics will be saved to
     //getStatFile.open(std::fstream::out);
     
@@ -1231,10 +1253,11 @@ void StatisticsVector<T>::statistics_from_fstat_and_data()
         //DPMBase::write(std::cout, false);
         //std::cout << std::endl;
     }
-
-
+    
+    
     //this increases the file counter
-    if ((fStatFile.getFileType() == FileType::MULTIPLE_FILES || fStatFile.getFileType() == FileType::MULTIPLE_FILES_PADDED) && getTime() < getCGTimeMin())
+    if ((fStatFile.getFileType() == FileType::MULTIPLE_FILES ||
+         fStatFile.getFileType() == FileType::MULTIPLE_FILES_PADDED) && getTime() < getCGTimeMin())
     {
         if (verbosity > 1)
             findNextExistingDataFile(getCGTimeMin());
@@ -1242,9 +1265,9 @@ void StatisticsVector<T>::statistics_from_fstat_and_data()
             findNextExistingDataFile(getCGTimeMin(), false);
         for (unsigned int i = 1; i < dataFile.getCounter(); i++)
             jump_fstat();
-
+        
     }
-
+    
     //Output statistics for each time step
     std::cout << "Start statistics" << std::endl;
     do
@@ -1252,9 +1275,9 @@ void StatisticsVector<T>::statistics_from_fstat_and_data()
         if (getTime() >= getTimeMaxStat())
         {
             std::cout
-                << "reached end t=" << std::setprecision(9) << getTime()
-                << " tmaxStat=" << std::setprecision(9) << getTimeMaxStat()
-                << std::endl;
+                    << "reached end t=" << std::setprecision(9) << getTime()
+                    << " tmaxStat=" << std::setprecision(9) << getTimeMaxStat()
+                    << std::endl;
             break;
         }
         else if (getTime() < getCGTimeMin())
@@ -1269,21 +1292,24 @@ void StatisticsVector<T>::statistics_from_fstat_and_data()
                 std::cout << "Get statistics for t=" << std::setprecision(9) << getTime() << std::endl;
             if (verbosity > 1)
                 std::cout << "#particles=" << particleHandler.getSize() << std::endl;
-
+            
             if (!walls)
                 wallHandler.clear();
             ///\todo{the ignore-periodic-walls should be automated for averaged dimensions}
-            if (!periodicWalls) {
-                for (auto b=boundaryHandler.begin(); b!=boundaryHandler.end(); b++) {
+            if (!periodicWalls)
+            {
+                for (auto b = boundaryHandler.begin(); b != boundaryHandler.end(); b++)
+                {
                     BaseBoundary* boundary = *b;
-                    if (dynamic_cast<PeriodicBoundary*>(boundary)!=nullptr) {
+                    if (dynamic_cast<PeriodicBoundary*>(boundary) != nullptr)
+                    {
                         //std::cout << "" << std::endl;
                         b--;
                         boundaryHandler.removeObject(boundary->getIndex());
                     }
                 }
             }
-
+            
             outputStatistics();
             gather_force_statistics_from_fstat_and_data();
             processStatistics(true);
@@ -1310,8 +1336,9 @@ void StatisticsVector<T>::statistics_from_fstat_and_data()
 }
 
 template<StatType T>
-void StatisticsVector<T>::autoSetSystemDimensions() {
-    logger.assert_always(particleHandler.getSize()!=0,"No particles, so system dimensions could not be auto-set");
+void StatisticsVector<T>::autoSetSystemDimensions()
+{
+    logger.assert_always(particleHandler.getSize() != 0, "No particles, so system dimensions could not be auto-set");
     const Vec3D& pos = particleHandler.getLastObject()->getPosition();
     const double r = particleHandler.getLastObject()->getRadius();
     setXMaxStat(pos.X);
@@ -1324,14 +1351,14 @@ void StatisticsVector<T>::autoSetSystemDimensions() {
     {
         const Vec3D& pos = p->getPosition();
         const double r = p->getRadius();
-        setXMaxStat(std::max(getXMaxStat(),pos.X+r));
-        setXMinStat(std::min(getXMinStat(),pos.X-r));
-        setYMaxStat(std::max(getYMaxStat(),pos.Y+r));
-        setYMinStat(std::min(getYMinStat(),pos.Y-r));
-        setZMaxStat(std::max(getZMaxStat(),pos.Z+r));
-        setZMinStat(std::min(getZMinStat(),pos.Z-r));
+        setXMaxStat(std::max(getXMaxStat(), pos.X + r));
+        setXMinStat(std::min(getXMinStat(), pos.X - r));
+        setYMaxStat(std::max(getYMaxStat(), pos.Y + r));
+        setYMinStat(std::min(getYMinStat(), pos.Y - r));
+        setZMaxStat(std::max(getZMaxStat(), pos.Z + r));
+        setZMinStat(std::min(getZMinStat(), pos.Z - r));
     }
-    logger(INFO,"Auto-set system dimensions to min % max %",getMin(),getMax());
+    logger(INFO, "Auto-set system dimensions to min % max %", getMin(), getMax());
 }
 
 template<StatType T>
@@ -1348,31 +1375,32 @@ bool StatisticsVector<T>::read_next_from_p3p_file()
     
     //Ignoring first line
     getline(p3p_file, dummyStr);
-    if (verbosity>2)
+    if (verbosity > 2)
         std::cout << dummyStr << std::endl;
     //Reading second line
     p3p_file >> dummy;
     setTime(dummy);
     p3p_file >> N;
     //Ignoring second line
-    logger(INFO,"Loading % particles at time %",N,getTime());
+    logger(INFO, "Loading % particles at time %", N, getTime());
     getline(p3p_file, dummyStr);
     //Ignoring third line
     getline(p3p_file, dummyStr);
     //check if end of file is reached
     if (p3p_file.eof() || p3p_file.peek() == -1)
     {
-        logger(INFO,"Reached end of file");
+        logger(INFO, "Reached end of file");
         return false;
     } //else continue
-
+    
     //create a fake first species
     Mdouble newFirstSpecies = false;
-    if (speciesHandler.getNumberOfObjects() == 0){
+    if (speciesHandler.getNumberOfObjects() == 0)
+    {
         newFirstSpecies = true;
         speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
     }
-
+    
     //reset the size of the particle handler
     if (particleHandler.getNumberOfObjects() < N)
     {
@@ -1382,11 +1410,13 @@ bool StatisticsVector<T>::read_next_from_p3p_file()
         {
             particleHandler.copyAndAddObject(P0);
         }
-    } else {
+    }
+    else
+    {
         while (particleHandler.getNumberOfObjects() > N)
             particleHandler.removeLastObject();
     }
-
+    
     //Read forth to (N+3)rd line
     Vec3D dummyVec;
     Vec3D position, velocity, angle, angularVelocity;
@@ -1397,47 +1427,48 @@ bool StatisticsVector<T>::read_next_from_p3p_file()
     {
         std::getline(p3p_file, p3p);
         std::stringstream(p3p)
-         >> index
-         >> species
-         >> volume
-         >> mass
-         >> position
-         >> velocity
-         >> angularVelocity;
+                >> index
+                >> species
+                >> volume
+                >> mass
+                >> position
+                >> velocity
+                >> angularVelocity;
         //if (index%1000==0) std::cout << '.' << std::flush;
         //logger(INFO, "reading % % % % % % %",index,species,volume,mass,position,velocity,angularVelocity);
-
+        
         //Older p3p files had group/species numbered starting with 1
-        if (p3Format==true) --species;
-
+        if (p3Format == true) --species;
+        
         //set index
         p->setIndex(index);
-
+        
         //check if species/group is ok
-        if (species>speciesHandler.getNumberOfObjects()||species<0)
+        if (species > speciesHandler.getNumberOfObjects() || species < 0)
         {
-            logger(WARN, "Error in loading particle % from p3p file: species % does not exist; setting species to zero", index, species);
+            logger(WARN, "Error in loading particle % from p3p file: species % does not exist; setting species to zero",
+                   index, species);
             species = 0;
         }
         //set species/group
         p->setSpecies(speciesHandler.getObject(species));
-
+        
         //set radius
         p->setRadius(pow(volume / (4. / 3. * constants::pi), 1. / 3.));
-
+        
         //set mass
         // TW Here I really want to set mass, as this function reads in data from an external file, which might have particles of shape
         // TW we could also set density here, but I don't think it is needed
         p->setMassForP3Statistics(mass);
-
+        
         p->setPosition(position);
         p->setVelocity(velocity);
         p->setAngularVelocity(angularVelocity);
     } //end for all particles
-
+    
     //read the empty line at the end of a time step
     getline(p3p_file, dummyStr);
-
+    
     //fix particles, if data_FixedParticles!=0
     
     return true;
@@ -1474,21 +1505,25 @@ void StatisticsVector<T>::statistics_from_p3()
         if (!opened)
         {
             logger(ERROR, "%.p3p or %.p4p not found", getName(), getName());
-        } else {
+        }
+        else
+        {
             logger(INFO, "Reading P3 files instead of P4 files", getName(), getName());
         }
-    } else {
+    }
+    else
+    {
         logger(INFO, "Opened %.p4* files", getName());
     }
-
+    
     //try to read data files; if data.0000 does not exist, try the next, up to .9999
     read_next_from_p3p_file();
-
-    if (getXMaxStat()==inf)
+    
+    if (getXMaxStat() == inf)
     {
         autoSetSystemDimensions();
     }
-
+    
     //set tminstat to smallest time evaluated
     if (getTime() >= getCGTimeMin())
         setCGTimeMin(getTime() - getTimeStep());
@@ -1505,19 +1540,19 @@ void StatisticsVector<T>::statistics_from_p3()
     //getStatFile.open(std::fstream::out);
     
     initialiseStatistics();
-
+    
     //std::couts collision time
     if (verbosity > 1)
     {
         //getLargestParticle()->computeMass(getSpecies()); //This should already have been done in read_next_from_p3p_file();
         Mdouble mass = particleHandler.getLargestParticle()->getMass();
         auto species = dynamic_cast<LinearViscoelasticSpecies*>(speciesHandler.getObject(0));
-        if (species!= nullptr)
+        if (species != nullptr)
         {
             std::cout << "Collision Time " << species->getCollisionTime(mass)
-                << " and restitution coefficient " << species->getRestitutionCoefficient(mass)
-                << " for mass " << mass << std::endl
-                << std::endl;
+                      << " and restitution coefficient " << species->getRestitutionCoefficient(mass)
+                      << " for mass " << mass << std::endl
+                      << std::endl;
         }
         //std::couts particles
     }
@@ -1528,17 +1563,18 @@ void StatisticsVector<T>::statistics_from_p3()
     }
     else if (verbosity)
     {
-        DPMBase::write(std::cout,false);
+        DPMBase::write(std::cout, false);
         std::cout << std::endl;
     }
-
+    
     //Output statistics for each time step
     std::cout << "Start statistics" << std::endl;
     do
     {
         if (getTime() > getTimeMaxStat())
         {
-            std::cout << "reached end t=" << std::setprecision(9) << getTime() << " tMaxStat=" << std::setprecision(9) << getTimeMaxStat() << std::endl;
+            std::cout << "reached end t=" << std::setprecision(9) << getTime() << " tMaxStat=" << std::setprecision(9)
+                      << getTimeMaxStat() << std::endl;
             break;
         }
         else if (getTime() >= getCGTimeMin())
@@ -1556,12 +1592,12 @@ void StatisticsVector<T>::statistics_from_p3()
             processStatistics(true);
             if (verbosity)
                 std::cout << "Processed statistics for t=" << std::setprecision(9) << getTime() << std::endl;
-
+            
         }
         else
         {
             if (verbosity > 1)
-                logger(INFO, "Jumping statistics for t=% until t>%",getTime(),getCGTimeMin());
+                logger(INFO, "Jumping statistics for t=% until t>%", getTime(), getCGTimeMin());
             jump_p3c();
         }
         //if step size>1, skip a number of steps.
@@ -1607,7 +1643,7 @@ void StatisticsVector<T>::jump_p3c()
     
     //Ignoring first line
     getline(p3w_file, dummyStr);
-    if (verbosity>2)
+    if (verbosity > 2)
         std::cout << dummyStr << std::endl;
     //Reading second line
     p3w_file >> dummy;
@@ -1632,18 +1668,18 @@ void StatisticsVector<T>::gather_force_statistics_from_p3c(int version)
     
     //Ignoring first line
     getline(p3c_file, line);
-    if (verbosity>2)
-        logger(INFO,"first line: %",line);
-
+    if (verbosity > 2)
+        logger(INFO, "first line: %", line);
+    
     //Reading second line
     p3c_file >> time >> N;
     setTime(time);
-    logger(INFO,"t= %: loading % contacts from p3c file", getTime(), N);
+    logger(INFO, "t= %: loading % contacts from p3c file", getTime(), N);
     getline(p3c_file, line);
-
+    
     //Ignoring third line
     getline(p3c_file, line);
-
+    
     //set up index list
     unsigned int Nmax = 0;
     for (auto p : particleHandler)
@@ -1651,7 +1687,7 @@ void StatisticsVector<T>::gather_force_statistics_from_p3c(int version)
         Nmax = std::max(Nmax, p->getId());
     }
     static std::vector<int> index;
-    index.resize(Nmax+1);
+    index.resize(Nmax + 1);
     {
         int i = 0;
         for (auto p : particleHandler)
@@ -1687,7 +1723,7 @@ void StatisticsVector<T>::gather_force_statistics_from_p3c(int version)
     //go through N lines in the p4c file
     for (int i = 0; i < N; i++)
     {
-        getline(p3c_file,p3c);
+        getline(p3c_file, p3c);
         counter++;
         if (version == 3)
         {
@@ -1713,22 +1749,22 @@ void StatisticsVector<T>::gather_force_statistics_from_p3c(int version)
         // (only works if periodic walls are >2d apart)
         ///\todo tw: a better way to do p3/p4 statistics is to move p3/p4 files to Mercury files and perform statistics there
         //std::cout << "#forces="  << std::setprecision(9) << P1_P2_normal.Y << "|" << getYMax()-getYMin() << std::endl;
-        if (2.0*P1_P2_normal.X > getXMax()-getXMin())
-            P1_P2_normal.X -=     getXMax()-getXMin();
-        else if (2.0*P1_P2_normal.X < getXMin()-getXMax())
-            P1_P2_normal.X +=     getXMax()-getXMin();
-
-        else if (2.0*P1_P2_normal.Y > getYMax()-getYMin())
-            P1_P2_normal.Y -=     getYMax()-getYMin();
-        else if (2.0*P1_P2_normal.Y < getYMin()-getYMax())
-            P1_P2_normal.Y +=     getYMax()-getYMin();
-
-        else if (2.0*P1_P2_normal.Z > getZMax()-getZMin())
-            P1_P2_normal.Z -=     getZMax()-getZMin();
-        else if (2.0*P1_P2_normal.Z < getZMin()-getZMax())
-            P1_P2_normal.Z +=     getZMax()-getZMin();
+        if (2.0 * P1_P2_normal.X > getXMax() - getXMin())
+            P1_P2_normal.X -= getXMax() - getXMin();
+        else if (2.0 * P1_P2_normal.X < getXMin() - getXMax())
+            P1_P2_normal.X += getXMax() - getXMin();
+        
+        else if (2.0 * P1_P2_normal.Y > getYMax() - getYMin())
+            P1_P2_normal.Y -= getYMax() - getYMin();
+        else if (2.0 * P1_P2_normal.Y < getYMin() - getYMax())
+            P1_P2_normal.Y += getYMax() - getYMin();
+        
+        else if (2.0 * P1_P2_normal.Z > getZMax() - getZMin())
+            P1_P2_normal.Z -= getZMax() - getZMin();
+        else if (2.0 * P1_P2_normal.Z < getZMin() - getZMax())
+            P1_P2_normal.Z += getZMax() - getZMin();
         //std::cout << "#forces="  << std::setprecision(9) << P1_P2_normal.Y << "|" << getYMax()-getYMin() << std::endl;
-
+        
         dist = Vec3D::getLength(P1_P2_normal);
         P1_P2_normal /= dist;
         delta = P1->getRadius() + P2->getRadius() - dist;
@@ -1752,15 +1788,15 @@ void StatisticsVector<T>::gather_force_statistics_from_p3c(int version)
         gatherContactStatistics(index1, index2, Contact, delta, 0, fdotn, fdott, P1_P2_normal, -P1_P2_tangential);
         gatherContactStatistics(index2, index1, Contact, delta, 0, fdotn, fdott, -P1_P2_normal, P1_P2_tangential);
     }
-
+    
     if (verbosity > 1)
         std::cout << "#forces=" << counter << std::endl;
-
+    
     //Ignoring last line
     getline(p3c_file, line);
-    if (verbosity>2)
-        logger(INFO,"last line: %",line);
-
+    if (verbosity > 2)
+        logger(INFO, "last line: %", line);
+    
     gather_force_statistics_from_p3w(version, index);
 }
 
@@ -1773,17 +1809,17 @@ void StatisticsVector<T>::gather_force_statistics_from_p3w(int version, std::vec
     
     //Ignoring first line
     getline(p3w_file, line);
-    if (verbosity>2)
+    if (verbosity > 2)
         std::cout << line << std::endl;
     //Reading second line
     p3w_file >> dummy;
     setTime(dummy);
     p3w_file >> N;
-    logger(INFO,"t= %: loading % wall contacts from p3w file", getTime(), N);
+    logger(INFO, "t= %: loading % wall contacts from p3w file", getTime(), N);
     getline(p3w_file, line);
     //Ignoring third line
     getline(p3w_file, line);
-    if (verbosity>2)
+    if (verbosity > 2)
         std::cout << line << std::endl;
     
     // ==> /Users/weinhartt/CarlosLabra/ConfinedCompression_P3P_Spheres.csv.p3w <==
@@ -1812,7 +1848,7 @@ void StatisticsVector<T>::gather_force_statistics_from_p3w(int version, std::vec
     //go through each line in the fstat file; break when eof or '#' or newline
     for (int i = 0; i < N; i++)
     {
-        getline(p3w_file,p3w);
+        getline(p3w_file, p3w);
         counter++;
         if (version == 3)
         {
@@ -1862,7 +1898,7 @@ void StatisticsVector<T>::gather_force_statistics_from_p3w(int version, std::vec
         std::cout << "#wall forces=" << counter << std::endl;
     //Ignoring last line
     getline(p3w_file, line);
-    if (verbosity>2)
+    if (verbosity > 2)
         std::cout << line << std::endl;
 }
 
@@ -1872,33 +1908,36 @@ template<StatType T>
 void StatisticsVector<T>::setPositions()
 {
     int N = positions_.size();
-    if (N!=0)
+    if (N != 0)
     {
-        logger(INFO,"Setting % evaluation points",N);
+        logger(INFO, "Setting % evaluation points", N);
         Points.resize(N);
-        for (int i = 0; i<N; i++) {
+        for (int i = 0; i < N; i++)
+        {
             Points[i].setPosition(positions_[i]);
         }
-        nx = N; ny=1; nz=1;
+        nx = N;
+        ny = 1;
+        nz = 1;
     }
     else //set automatically on mesh
     {
         //Dimensions of the domain / n
         Vec3D diff = Vec3D(
-            (getXMaxStat() - getXMinStat()) / nx,
-            (getYMaxStat() - getYMinStat()) / ny,
-            (getZMaxStat() - getZMinStat()) / nz);
+                (getXMaxStat() - getXMinStat()) / nx,
+                (getYMaxStat() - getYMinStat()) / ny,
+                (getZMaxStat() - getZMinStat()) / nz);
         //Center of the domain
         Vec3D avg = 0.5 * Vec3D(
-            getXMaxStat() + getXMinStat(),
-            getYMaxStat() + getYMinStat(),
-            getZMaxStat() + getZMinStat());
+                getXMaxStat() + getXMinStat(),
+                getYMaxStat() + getYMinStat(),
+                getZMaxStat() + getZMinStat());
         //Left endpoint of the domain
         Vec3D Min = Vec3D(
-            getXMinStat(),
-            getYMinStat(),
-            getZMinStat());
-
+                getXMinStat(),
+                getYMinStat(),
+                getZMinStat());
+        
         int num[3] = {0, 0, 0};
         if (getMirrorAtDomainBoundary() != 0.0)
         {
@@ -1923,10 +1962,10 @@ void StatisticsVector<T>::setPositions()
                 Min.Z -= num[2] * diff.Z;
             }
         }
-
+        
         //Set position of statistics points and set variables to 0
         N = std::max(nx, 1) * std::max(ny, 1) * std::max(nz, 1);
-        logger(INFO,"Set % evaluation points",N);
+        logger(INFO, "Set % evaluation points", N);
         Points.resize(N);
         {
             int n = 0;
@@ -1935,18 +1974,25 @@ void StatisticsVector<T>::setPositions()
                     for (int k = 0; k < std::max(nz, 1); k++)
                     {
                         Points[n].setPosition(Vec3D((nx > 1) ? (Min.X + diff.X * (i + 0.5)) : avg.X,
-                            (ny > 1) ? (Min.Y + diff.Y * (j + 0.5)) : avg.Y,
-                            (nz > 1) ? (Min.Z + diff.Z * (k + 0.5)) : avg.Z));
+                                                    (ny > 1) ? (Min.Y + diff.Y * (j + 0.5)) : avg.Y,
+                                                    (nz > 1) ? (Min.Z + diff.Z * (k + 0.5)) : avg.Z));
                         if (doDoublePoints)
                             Points[n].setPosition(Points[n].getPosition()
-                                - Vec3D((i % 2) ? (0.99 * diff.X) : 0, (j % 2) ? (0.99 * diff.Y) : 0, (k % 2) ? (0.99 * diff.Z) : 0));
-                        if (getMirrorAtDomainBoundary() != 0.0) if ((i < num[0]) || (i > nx - num[0]) || (j < num[1]) || (j > ny - num[1]) || (k < num[2]) || (k > nz - num[2]))
-                        {
-                            Points[n].mirrorParticle = n +
-                                +((i < num[0]) ? (2 * (num[0] - i) - 1) * ny * nz : 0) + ((i > nx - num[0]) ? (2 * (nx - num[0] - i) + 1) * ny * nz : 0)
-                                + ((j < num[1]) ? (2 * (num[1] - j) - 1) * nz : 0) + ((j > ny - num[1]) ? (2 * (ny - num[1] - j) + 1) * nz : 0)
-                                + ((k < num[2]) ? (2 * (num[2] - k) - 1) : 0) + ((k > nz - num[2]) ? (2 * (nz - num[2] - k) + 1) : 0);
-                        }
+                                                  - Vec3D((i % 2) ? (0.99 * diff.X) : 0, (j % 2) ? (0.99 * diff.Y) : 0,
+                                                          (k % 2) ? (0.99 * diff.Z) : 0));
+                        if (getMirrorAtDomainBoundary() != 0.0)
+                            if ((i < num[0]) || (i > nx - num[0]) || (j < num[1]) || (j > ny - num[1]) ||
+                                (k < num[2]) || (k > nz - num[2]))
+                            {
+                                Points[n].mirrorParticle = n +
+                                                           +((i < num[0]) ? (2 * (num[0] - i) - 1) * ny * nz : 0) +
+                                                           ((i > nx - num[0]) ? (2 * (nx - num[0] - i) + 1) * ny * nz
+                                                                              : 0)
+                                                           + ((j < num[1]) ? (2 * (num[1] - j) - 1) * nz : 0) +
+                                                           ((j > ny - num[1]) ? (2 * (ny - num[1] - j) + 1) * nz : 0)
+                                                           + ((k < num[2]) ? (2 * (num[2] - k) - 1) : 0) +
+                                                           ((k > nz - num[2]) ? (2 * (nz - num[2] - k) + 1) : 0);
+                            }
                         n++;
                     }
         }
@@ -1958,7 +2004,7 @@ void StatisticsVector<T>::setPositions()
             }
         }
     }
-    for (int i = 0; i<N; i++)
+    for (int i = 0; i < N; i++)
     {
         Points[i].setCGInverseVolume();
         Points[i].set_zero();
@@ -1981,7 +2027,7 @@ void StatisticsVector<T>::setPositions()
             dz[n].set_zero();
         }
     }
-
+    
     //Set TimeAverage the same way
     if (getDoTimeAverage())
     {
@@ -1998,7 +2044,7 @@ void StatisticsVector<T>::setPositions()
                         n++;
                     }
         }
-
+        
         if (getDoVariance())
         {
             timeVariance.resize(N);
@@ -2009,7 +2055,7 @@ void StatisticsVector<T>::setPositions()
                 timeVariance[n].set_zero();
             }
         }
-
+        
         if (getDoGradient())
         {
             dxTimeAverage.resize(N);
@@ -2028,7 +2074,7 @@ void StatisticsVector<T>::setPositions()
                 dzTimeAverage[n].set_zero();
             }
         }
-
+        
     } //end if (getDoTimeAverage())
 }
 
@@ -2043,11 +2089,11 @@ bool StatisticsVector<T>::loadPositions(const char* filename)
         std::cout << "Loading positions file " << filename << " failed" << std::endl;
         return false;
     }
-
-    double N=0;
+    
+    double N = 0;
     is >> N;
     positions_.resize(N);
-    for (int i=0; i<N; i++)
+    for (int i = 0; i < N; i++)
     {
         is >> positions_[i];
     }
@@ -2061,7 +2107,8 @@ bool StatisticsVector<T>::loadPositions(const char* filename)
 template<StatType T>
 void StatisticsVector<T>::jump_fstat()
 {
-    if (fStatFile.getFileType() == FileType::MULTIPLE_FILES || fStatFile.getFileType() == FileType::MULTIPLE_FILES_PADDED)
+    if (fStatFile.getFileType() == FileType::MULTIPLE_FILES ||
+        fStatFile.getFileType() == FileType::MULTIPLE_FILES_PADDED)
     {
         fStatFile.open(std::fstream::in);
         if (verbosity > 1)
@@ -2085,13 +2132,15 @@ template<StatType T>
 bool StatisticsVector<T>::satisfiesInclusionCriteria(BaseParticle* P)
 {
     return P->getRadius() > rmin
-            && P->getRadius() < rmax
-            && P->getPosition().Z < hmax
-            && (indSpecies<0 || P->getIndSpecies() == indSpecies);
+           && P->getRadius() < rmax
+           && P->getPosition().Z < hmax
+           && (indSpecies < 0 || P->getIndSpecies() == indSpecies);
 }
 
 template<StatType T>
-void StatisticsVector<T>::gatherContactStatistics(unsigned int index1, int index2, Vec3D Contact, Mdouble delta, Mdouble ctheta UNUSED, Mdouble fdotn, Mdouble fdott, Vec3D P1_P2_normal_, Vec3D P1_P2_tangential)
+void StatisticsVector<T>::gatherContactStatistics(unsigned int index1, int index2, Vec3D Contact, Mdouble delta,
+                                                  Mdouble ctheta UNUSED, Mdouble fdotn, Mdouble fdott,
+                                                  Vec3D P1_P2_normal_, Vec3D P1_P2_tangential)
 {
     Vec3D P1_P2_VelocityAverage, P1_P2_VelocityDifference, P1_P2_Force;
     Mdouble norm_dist;
@@ -2100,8 +2149,8 @@ void StatisticsVector<T>::gatherContactStatistics(unsigned int index1, int index
         //make sure that for a particle-fixed particle collision the fixed particle is on index2 (switch particles if needed)
         if (particleHandler.getObject(index1)->isFixed())
         {
-            if (index2<0)
-                logger(ERROR,"Detected a collision between a fixed particle and a wall, which is impossible");
+            if (index2 < 0)
+                logger(ERROR, "Detected a collision between a fixed particle and a wall, which is impossible");
             int tmp = index1;
             index1 = index2;
             index2 = tmp;
@@ -2132,46 +2181,60 @@ void StatisticsVector<T>::gatherContactStatistics(unsigned int index1, int index
                     //this is because wall-particle collisions appear only once in fstat
                     norm_dist = P1_P2_distance;
                 }
-
+                
                 //logger(ERROR,"WP % P1 % P2 %",P1,P2,centerPointInFStat_);
-
+                
             }
-            else if (particleHandler.getObject(index2)->isFixed() || !satisfiesInclusionCriteria(particleHandler.getObject(index2)))
+            else if (particleHandler.getObject(index2)->isFixed() ||
+                     !satisfiesInclusionCriteria(particleHandler.getObject(index2)))
             { //particle-fixed particle collision (external force acts at contact point)
                 if (particleHandler.getObject(index2)->isFixed() && StressTypeForFixedParticles == 3)
                 {
                     //infinite extension of stress
-                    P1_P2_distance = particleHandler.getObject(index1)->getRadius() + particleHandler.getObject(index2)->getRadius() - delta;
-                    if (centerPointInFStat_) {
+                    P1_P2_distance = particleHandler.getObject(index1)->getRadius() +
+                                     particleHandler.getObject(index2)->getRadius() - delta;
+                    if (centerPointInFStat_)
+                    {
                         P1 = Contact + P1_P2_normal * (0.5 * P1_P2_distance); //flowing particle
                         P2 = Contact - P1_P2_normal * (0.5 * P1_P2_distance); //fixed particle
-                    } else {
-                        P1 = Contact + P1_P2_normal * (particleHandler.getObject(index1)->getRadius() - 0.5 * delta); //flowing particle
-                        P2 = Contact - P1_P2_normal * (particleHandler.getObject(index2)->getRadius() - 0.5 * delta); //fixed particle
+                    }
+                    else
+                    {
+                        P1 = Contact + P1_P2_normal * (particleHandler.getObject(index1)->getRadius() -
+                                                       0.5 * delta); //flowing particle
+                        P2 = Contact - P1_P2_normal *
+                                       (particleHandler.getObject(index2)->getRadius() - 0.5 * delta); //fixed particle
                     }
                     if (P1_P2_normal.Z < 0)
                     { //in this case revert flowing and fixed particle
-                      //std::cerr << "Warning: Force normal upwards on base z=" << P1.Z << "." << P2.Z << std::endl;
-                      //turning force the other way to achieve sigma=0 at z=inf
+                        //std::cerr << "Warning: Force normal upwards on base z=" << P1.Z << "." << P2.Z << std::endl;
+                        //turning force the other way to achieve sigma=0 at z=inf
                         P1_P2_normal *= -1.0;
                         fdotn *= -1.0;
                     }
                     ///\todo this is to make the stresses infinitely (i.e. 300 units) long
                     P1_P2_distance = setInfinitelyLongDistance();
                     ///\todo{this only works for StatType Z}
-                    P2 = P1 - P1_P2_normal * P1_P2_distance; //move endpoint of force line downwards beyond fixed particles out of the domain
+                    P2 = P1 - P1_P2_normal *
+                              P1_P2_distance; //move endpoint of force line downwards beyond fixed particles out of the domain
                     if (P1_P2_normal.Z < 0)
                         std::cout << P1_P2_distance << " z" << P1.Z << " " << P2.Z << " f" << fdotn << std::endl;
                     ///this is because wall-particle collisions appear only once in fstat
                 }
-                else if (StressTypeForFixedParticles == 1 || (!particleHandler.getObject(index2)->isFixed() && StressTypeForFixedParticles == 3))
+                else if (StressTypeForFixedParticles == 1 ||
+                         (!particleHandler.getObject(index2)->isFixed() && StressTypeForFixedParticles == 3))
                 {
                     //add force from flowing particle to contact point to stress
-                    P1_P2_distance = particleHandler.getObject(index1)->getRadius() + particleHandler.getObject(index2)->getRadius() - delta;
-                    if (centerPointInFStat_) {
+                    P1_P2_distance = particleHandler.getObject(index1)->getRadius() +
+                                     particleHandler.getObject(index2)->getRadius() - delta;
+                    if (centerPointInFStat_)
+                    {
                         P1 = Contact + P1_P2_normal * (0.5 * P1_P2_distance); //flowing particle
-                    } else {
-                        P1 = Contact + P1_P2_normal * (particleHandler.getObject(index1)->getRadius() - 0.5 * delta); //flowing particle
+                    }
+                    else
+                    {
+                        P1 = Contact + P1_P2_normal * (particleHandler.getObject(index1)->getRadius() -
+                                                       0.5 * delta); //flowing particle
                     }
                     //P2 = Contact; //Contact point;
                     //P1_P2_distance /= 2.0;
@@ -2181,13 +2244,19 @@ void StatisticsVector<T>::gatherContactStatistics(unsigned int index1, int index
                 else
                 {
                     //add force from flowing particle to fixed particle to stress
-                    P1_P2_distance = particleHandler.getObject(index1)->getRadius() + particleHandler.getObject(index2)->getRadius() - delta;
-                    if (centerPointInFStat_) {
+                    P1_P2_distance = particleHandler.getObject(index1)->getRadius() +
+                                     particleHandler.getObject(index2)->getRadius() - delta;
+                    if (centerPointInFStat_)
+                    {
                         P1 = Contact + P1_P2_normal * (0.5 * P1_P2_distance); //flowing particle
                         P2 = Contact - P1_P2_normal * (0.5 * P1_P2_distance); //fixed particle
-                    } else {
-                        P1 = Contact + P1_P2_normal * (particleHandler.getObject(index1)->getRadius() - 0.5 * delta); //flowing particle
-                        P2 = Contact - P1_P2_normal * (particleHandler.getObject(index2)->getRadius() - 0.5 * delta); //fixed particle
+                    }
+                    else
+                    {
+                        P1 = Contact + P1_P2_normal * (particleHandler.getObject(index1)->getRadius() -
+                                                       0.5 * delta); //flowing particle
+                        P2 = Contact - P1_P2_normal *
+                                       (particleHandler.getObject(index2)->getRadius() - 0.5 * delta); //fixed particle
                     }
                 }
                 ///\todo{I, Thomas, removed the effect on different particle sizes bc it gave wrong results in the stress balance; why is this here?}
@@ -2198,22 +2267,32 @@ void StatisticsVector<T>::gatherContactStatistics(unsigned int index1, int index
             }
             else
             { //particle-particle collision
-            
+                
                 if (particleHandler.getObject(index2)->isFixed())
                     std::cout << "ERROR" << std::endl;
-                P1_P2_distance = particleHandler.getObject(index1)->getRadius() + particleHandler.getObject(index2)->getRadius() - delta;
-                if (centerPointInFStat_) {
+                P1_P2_distance = particleHandler.getObject(index1)->getRadius() +
+                                 particleHandler.getObject(index2)->getRadius() - delta;
+                if (centerPointInFStat_)
+                {
                     P1 = Contact + P1_P2_normal * (0.5 * P1_P2_distance); //flowing particle
                     P2 = Contact - P1_P2_normal * (0.5 * P1_P2_distance); //fixed particle
-                } else {
-                    P1 = Contact + P1_P2_normal * (particleHandler.getObject(index1)->getRadius() - 0.5 * delta); //flowing particle
-                    P2 = Contact - P1_P2_normal * (particleHandler.getObject(index2)->getRadius() - 0.5 * delta); //fixed particle
+                }
+                else
+                {
+                    P1 = Contact + P1_P2_normal *
+                                   (particleHandler.getObject(index1)->getRadius() - 0.5 * delta); //flowing particle
+                    P2 = Contact -
+                         P1_P2_normal * (particleHandler.getObject(index2)->getRadius() - 0.5 * delta); //fixed particle
                 }
                 //logger(WARN,"P1 % P2 %",P1,P2);
                 //This is the length of the contact in particle 1.
-                norm_dist = P1_P2_distance * particleHandler.getObject(index1)->getRadius() / (particleHandler.getObject(index2)->getRadius() + particleHandler.getObject(index1)->getRadius());
-                P1_P2_VelocityAverage = (particleHandler.getObject(index1)->getVelocity() + particleHandler.getObject(index2)->getVelocity()) / 2;
-                P1_P2_VelocityDifference = (particleHandler.getObject(index1)->getVelocity() - particleHandler.getObject(index2)->getVelocity());
+                norm_dist = P1_P2_distance * particleHandler.getObject(index1)->getRadius() /
+                            (particleHandler.getObject(index2)->getRadius() +
+                             particleHandler.getObject(index1)->getRadius());
+                P1_P2_VelocityAverage = (particleHandler.getObject(index1)->getVelocity() +
+                                         particleHandler.getObject(index2)->getVelocity()) / 2;
+                P1_P2_VelocityDifference = (particleHandler.getObject(index1)->getVelocity() -
+                                            particleHandler.getObject(index2)->getVelocity());
             }
             ///\todo{fabric should be divided by N}
             //Particles[max(index1,index2)] is chosen so that it is the non-wall, non-fixed particle
@@ -2226,13 +2305,17 @@ void StatisticsVector<T>::gatherContactStatistics(unsigned int index1, int index
             P1_P2_TangentialStress = Matrix3D::dyadic(P1_P2_tangential, P1_P2_normal) * (fdott * norm_dist);
             P1_P2_NormalTraction = P1_P2_normal * fdotn;
             P1_P2_TangentialTraction = P1_P2_tangential * fdott;
-            P1_P2_ContactCoupleStress = Matrix3D::dyadic(P1_P2_NormalTraction + P1_P2_TangentialTraction, -0.5 * P1_P2_normal * norm_dist);
+            P1_P2_ContactCoupleStress = Matrix3D::dyadic(P1_P2_NormalTraction + P1_P2_TangentialTraction,
+                                                         -0.5 * P1_P2_normal * norm_dist);
             P1_P2_Contact = Contact;
             //P1_P2_Potential = (speciesHandler.getObject(0)->getStiffness() * mathsFunc::square(delta) + dynamic_cast<FrictionalSpecies*>(speciesHandler.getObject(0))->getSlidingStiffness() * mathsFunc::square(ctheta)) / 2;
             P1_P2_Potential = 0.0;
             P1_P2_Force = fdotn * P1_P2_normal + fdott * P1_P2_tangential;
             P1_P2_Dissipation = Vec3D::dot(P1_P2_VelocityDifference, P1_P2_Force) / 2;
-            P1_P2_CollisionalHeatFlux = P1_P2_normal * (P1_P2_distance / 2 * Vec3D::dot(P1_P2_VelocityAverage, fdotn * P1_P2_normal + fdott * P1_P2_tangential)) + P1_P2_Potential * P1_P2_VelocityAverage;
+            P1_P2_CollisionalHeatFlux = P1_P2_normal * (P1_P2_distance / 2 * Vec3D::dot(P1_P2_VelocityAverage,
+                                                                                        fdotn * P1_P2_normal +
+                                                                                        fdott * P1_P2_tangential)) +
+                                        P1_P2_Potential * P1_P2_VelocityAverage;
             //Now P1_P2 distance and normal are in non-averaged directions - This is the projection of the distance on to the CG directions. Required for the later statistics hence done now, not before.
             P1_P2_distance *= sqrt(Points[0].dotNonAveraged(P1_P2_normal, P1_P2_normal));
             
@@ -2245,7 +2328,8 @@ void StatisticsVector<T>::gatherContactStatistics(unsigned int index1, int index
             //P1_P2_normal = (P1-P2)/P1_P2_distance;
             
             //if 2nd particle is wall, fixed particle or not-included particle
-            if (index2 < 0 || particleHandler.getObject(index2)->isFixed() || !satisfiesInclusionCriteria(particleHandler.getObject(index2)))
+            if (index2 < 0 || particleHandler.getObject(index2)->isFixed() ||
+                !satisfiesInclusionCriteria(particleHandler.getObject(index2)))
             {
                 // << "/" << P2 << std::endl;
                 ///todo{Difference here between direct and indirect statistics}
@@ -2281,16 +2365,17 @@ void StatisticsVector<T>::gather_force_statistics_from_fstat_and_data()
 {
     //read in first three lines (should start with '#')
     std::string dummy;
-    if (fStatFile.getFileType() == FileType::MULTIPLE_FILES || fStatFile.getFileType() == FileType::MULTIPLE_FILES_PADDED)
+    if (fStatFile.getFileType() == FileType::MULTIPLE_FILES ||
+        fStatFile.getFileType() == FileType::MULTIPLE_FILES_PADDED)
         fStatFile.open(std::fstream::in);
-
+    
     //check if center or contact point is reported in fstat
     std::stringstream header;
-    helpers::getLineFromStringStream(fStatFile.getFstream(),header);
+    helpers::getLineFromStringStream(fStatFile.getFstream(), header);
     bool contactPointInFStat;
     header >> dummy >> dummy >> contactPointInFStat;
     centerPointInFStat_ = !contactPointInFStat;
-
+    
     getline(fStatFile.getFstream(), dummy);
     getline(fStatFile.getFstream(), dummy);
     
@@ -2351,7 +2436,7 @@ void StatisticsVector<T>::evaluate_force_statistics(int wp)
         for (unsigned int k = wp; k < boundaryHandler.getNumberOfObjects(); k++)
         {
             ///todo{DK: This only works for PeriodicBoundary and not for AngledPeriodicBoundaries}
-            PeriodicBoundary *b0 = dynamic_cast<PeriodicBoundary *>(boundaryHandler.getObject(k));
+            PeriodicBoundary* b0 = dynamic_cast<PeriodicBoundary*>(boundaryHandler.getObject(k));
             if (b0)
             {
                 b0->getDistance(P1);
@@ -2369,7 +2454,7 @@ void StatisticsVector<T>::evaluate_force_statistics(int wp)
             }
         }
     }
-
+    
     ///\todo TW: Couple stress calculation works only for Gaussians
     //evaluate fields that only depend on CParticle parameters
     Mdouble psi; //Course graining integral
@@ -2384,14 +2469,15 @@ void StatisticsVector<T>::evaluate_force_statistics(int wp)
             if (!std::isfinite(psi))
             {
                 std::cerr << "error: psi =" << psi << " is infinite for "
-                    <<   "P1=" << P1
-                    << ", P2=" << P2
-                    << ", P1_P2_normal=" << P1_P2_normal
-                    << ", P1_P2_distance=" << P1_P2_distance
-                    << ", t=" << getTime() << std::endl;
+                          << "P1=" << P1
+                          << ", P2=" << P2
+                          << ", P1_P2_normal=" << P1_P2_normal
+                          << ", P1_P2_distance=" << P1_P2_distance
+                          << ", t=" << getTime() << std::endl;
                 psi = 0;
             }
-            Points[i].ContactCoupleStress += (Matrix3D::cross(P1_P2_Contact * psi, P1_P2_ContactCoupleStress) - Matrix3D::cross(rpsi, P1_P2_ContactCoupleStress)) * (-0.5);
+            Points[i].ContactCoupleStress += (Matrix3D::cross(P1_P2_Contact * psi, P1_P2_ContactCoupleStress) -
+                                              Matrix3D::cross(rpsi, P1_P2_ContactCoupleStress)) * (-0.5);
             Points[i].NormalStress += P1_P2_NormalStress * psi;
             Points[i].TangentialStress += P1_P2_TangentialStress * psi;
             Points[i].Fabric += P1_P2_Fabric * psi;
@@ -2425,7 +2511,7 @@ void StatisticsVector<T>::evaluate_force_statistics(int wp)
             } //end if getDoGradient
         } //end if phi
     } // end forall Points
-      //std::cout << "NCeval" << counter << std::endl;
+    //std::cout << "NCeval" << counter << std::endl;
 }
 
 ///get force statistics (i.e. first particle is a wall particle)
@@ -2505,7 +2591,7 @@ void StatisticsVector<T>::evaluate_particle_statistics(std::vector<BaseParticle*
 {
     ///\todo{I currently disabled displacement calculation as it takes forever}
     bool doDisplacement = false;
-
+    
     if (periodicWalls)
     {
         for (unsigned int k = wp; k < boundaryHandler.getNumberOfObjects(); k++)
@@ -2549,7 +2635,7 @@ void StatisticsVector<T>::evaluate_particle_statistics(std::vector<BaseParticle*
             if (!std::isfinite(phi))
             {
                 std::cout
-                << "t =" << DPMBase::getTime()
+                        << "t =" << DPMBase::getTime()
                         << "error: phi =" << phi
                         << " is infinite for P=" << (*P)->getPosition()
                         << ", Point=" << Points[i].getPosition()
@@ -2561,18 +2647,26 @@ void StatisticsVector<T>::evaluate_particle_statistics(std::vector<BaseParticle*
             if (VelocityProfile.size())
             {
                 Points[i].Momentum += ((*P)->getVelocity() - V) * ((*P)->getMass() * phi);
-                Points[i].MomentumFlux += MatrixSymmetric3D::selfDyadic((*P)->getVelocity() - V) * ((*P)->getMass() * phi);
+                Points[i].MomentumFlux +=
+                        MatrixSymmetric3D::selfDyadic((*P)->getVelocity() - V) * ((*P)->getMass() * phi);
             }
             else
             {
                 Points[i].Momentum += (*P)->getVelocity() * ((*P)->getMass() * phi);
                 Points[i].MomentumFlux += MatrixSymmetric3D::selfDyadic((*P)->getVelocity()) * ((*P)->getMass() * phi);
             }
-            Points[i].DisplacementMomentum += (*P)->getDisplacement2(getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(), getTimeStep() * dataFile.getSaveCount()) * ((*P)->getMass() * phi);
-            Points[i].DisplacementMomentumFlux += MatrixSymmetric3D::selfDyadic((*P)->getDisplacement2(getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(), getTimeStep() * dataFile.getSaveCount())) * ((*P)->getMass() * phi);
-            Points[i].EnergyFlux += (*P)->getVelocity() * ((*P)->getMass() * (*P)->getVelocity().getLengthSquared() / 2 * phi);
+            Points[i].DisplacementMomentum +=
+                    (*P)->getDisplacement2(getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(),
+                                           getTimeStep() * dataFile.getSaveCount()) * ((*P)->getMass() * phi);
+            Points[i].DisplacementMomentumFlux += MatrixSymmetric3D::selfDyadic(
+                    (*P)->getDisplacement2(getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(),
+                                           getTimeStep() * dataFile.getSaveCount())) * ((*P)->getMass() * phi);
+            Points[i].EnergyFlux +=
+                    (*P)->getVelocity() * ((*P)->getMass() * (*P)->getVelocity().getLengthSquared() / 2 * phi);
             
-            Vec3D LocalAngularMomentum = Vec3D::cross(Points[0].clearAveragedDirections((*P)->getPosition() - Points[i].getPosition()), (*P)->getVelocity()) * (*P)->getMass()
+            Vec3D LocalAngularMomentum =
+                    Vec3D::cross(Points[0].clearAveragedDirections((*P)->getPosition() - Points[i].getPosition()),
+                                 (*P)->getVelocity()) * (*P)->getMass()
                     + (*P)->getInertia() * (*P)->getAngularVelocity();
             Points[i].LocalAngularMomentum += phi * LocalAngularMomentum;
             Points[i].LocalAngularMomentumFlux += Matrix3D::dyadic(LocalAngularMomentum, (*P)->getVelocity() * phi);
@@ -2586,10 +2680,16 @@ void StatisticsVector<T>::evaluate_particle_statistics(std::vector<BaseParticle*
                 if (doDisplacement)
                 {
                     ///begin: Linear displacement, \f$1/(2 \rho^2) \sum_{pq} m_p m_q \phi_q *(v_{pqa} \partial_b \phi_p + v_{pqb} \partial_a \phi_p) \f$	
-                    for (std::vector<BaseParticle*>::iterator Q = particleHandler.begin(); Q != particleHandler.end(); ++Q)
+                    for (std::vector<BaseParticle*>::iterator Q = particleHandler.begin();
+                         Q != particleHandler.end(); ++Q)
                     {
                         double phiQ = Points[i].CG_function((*Q)->getPosition()); //Course graining function
-                        Points[i].Displacement += MatrixSymmetric3D::symmetrisedDyadic((*P)->getDisplacement2(getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(), getTimeStep() * dataFile.getSaveCount()) - (*Q)->getDisplacement2(getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(), getTimeStep() * dataFile.getSaveCount()), d_phi) * ((*P)->getMass() * (*Q)->getMass() * phiQ);
+                        Points[i].Displacement += MatrixSymmetric3D::symmetrisedDyadic(
+                                (*P)->getDisplacement2(getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(),
+                                                       getTimeStep() * dataFile.getSaveCount()) -
+                                (*Q)->getDisplacement2(getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(),
+                                                       getTimeStep() * dataFile.getSaveCount()), d_phi) *
+                                                  ((*P)->getMass() * (*Q)->getMass() * phiQ);
                     }
                     //end:Displacement
                 }
@@ -2597,26 +2697,41 @@ void StatisticsVector<T>::evaluate_particle_statistics(std::vector<BaseParticle*
                 dx[i].Nu += (*P)->getVolume() * d_phi.X;
                 dx[i].Density += (*P)->getMass() * d_phi.X;
                 dx[i].Momentum += (*P)->getVelocity() * ((*P)->getMass() * d_phi.X);
-                dx[i].DisplacementMomentum += (*P)->getDisplacement2(getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(), getTimeStep() * dataFile.getSaveCount()) * ((*P)->getMass() * d_phi.X);
+                dx[i].DisplacementMomentum +=
+                        (*P)->getDisplacement2(getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(),
+                                               getTimeStep() * dataFile.getSaveCount()) * ((*P)->getMass() * d_phi.X);
                 dx[i].MomentumFlux += MatrixSymmetric3D::selfDyadic((*P)->getVelocity()) * ((*P)->getMass() * d_phi.X);
-                dx[i].DisplacementMomentumFlux += MatrixSymmetric3D::selfDyadic((*P)->getDisplacement2(getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(), getTimeStep() * dataFile.getSaveCount())) * ((*P)->getMass() * d_phi.X);
-                dx[i].EnergyFlux += (*P)->getVelocity() * ((*P)->getMass() * (*P)->getVelocity().getLengthSquared() / 2 * d_phi.X);
+                dx[i].DisplacementMomentumFlux += MatrixSymmetric3D::selfDyadic(
+                        (*P)->getDisplacement2(getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(),
+                                               getTimeStep() * dataFile.getSaveCount())) * ((*P)->getMass() * d_phi.X);
+                dx[i].EnergyFlux +=
+                        (*P)->getVelocity() * ((*P)->getMass() * (*P)->getVelocity().getLengthSquared() / 2 * d_phi.X);
                 
                 dy[i].Nu += (*P)->getVolume() * d_phi.Y;
                 dy[i].Density += (*P)->getMass() * d_phi.Y;
                 dy[i].Momentum += (*P)->getVelocity() * ((*P)->getMass() * d_phi.Y);
-                dy[i].DisplacementMomentum += (*P)->getDisplacement2(getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(), getTimeStep() * dataFile.getSaveCount()) * ((*P)->getMass() * d_phi.Y);
+                dy[i].DisplacementMomentum +=
+                        (*P)->getDisplacement2(getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(),
+                                               getTimeStep() * dataFile.getSaveCount()) * ((*P)->getMass() * d_phi.Y);
                 dy[i].MomentumFlux += MatrixSymmetric3D::selfDyadic((*P)->getVelocity()) * ((*P)->getMass() * d_phi.Y);
-                dy[i].DisplacementMomentumFlux += MatrixSymmetric3D::selfDyadic((*P)->getDisplacement2(getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(), getTimeStep() * dataFile.getSaveCount())) * ((*P)->getMass() * d_phi.Y);
-                dy[i].EnergyFlux += (*P)->getVelocity() * ((*P)->getMass() * (*P)->getVelocity().getLengthSquared() / 2 * d_phi.Y);
+                dy[i].DisplacementMomentumFlux += MatrixSymmetric3D::selfDyadic(
+                        (*P)->getDisplacement2(getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(),
+                                               getTimeStep() * dataFile.getSaveCount())) * ((*P)->getMass() * d_phi.Y);
+                dy[i].EnergyFlux +=
+                        (*P)->getVelocity() * ((*P)->getMass() * (*P)->getVelocity().getLengthSquared() / 2 * d_phi.Y);
                 
                 dz[i].Nu += (*P)->getVolume() * d_phi.Z;
                 dz[i].Density += (*P)->getMass() * d_phi.Z;
                 dz[i].Momentum += (*P)->getVelocity() * ((*P)->getMass() * d_phi.Z);
-                dz[i].DisplacementMomentum += (*P)->getDisplacement2(getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(), getTimeStep() * dataFile.getSaveCount()) * ((*P)->getMass() * d_phi.Z);
+                dz[i].DisplacementMomentum +=
+                        (*P)->getDisplacement2(getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(),
+                                               getTimeStep() * dataFile.getSaveCount()) * ((*P)->getMass() * d_phi.Z);
                 dz[i].MomentumFlux += MatrixSymmetric3D::selfDyadic((*P)->getVelocity()) * ((*P)->getMass() * d_phi.Z);
-                dz[i].DisplacementMomentumFlux += MatrixSymmetric3D::selfDyadic((*P)->getDisplacement2(getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(), getTimeStep() * dataFile.getSaveCount())) * ((*P)->getMass() * d_phi.Z);
-                dz[i].EnergyFlux += (*P)->getVelocity() * ((*P)->getMass() * (*P)->getVelocity().getLengthSquared() / 2 * d_phi.Z);
+                dz[i].DisplacementMomentumFlux += MatrixSymmetric3D::selfDyadic(
+                        (*P)->getDisplacement2(getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(),
+                                               getTimeStep() * dataFile.getSaveCount())) * ((*P)->getMass() * d_phi.Z);
+                dz[i].EnergyFlux +=
+                        (*P)->getVelocity() * ((*P)->getMass() * (*P)->getVelocity().getLengthSquared() / 2 * d_phi.Z);
             } //end if getDoGradient
         } //end if phi
     } // end for all Points
@@ -2626,177 +2741,269 @@ void StatisticsVector<T>::evaluate_particle_statistics(std::vector<BaseParticle*
 
 //Templated functions
 
-template<> void StatisticsVector<XY>::setNZ(int new_ UNUSED)
-{
-    nz = 1;
-}
-template<> void StatisticsVector<XZ>::setNY(int new_ UNUSED)
-{
-    ny = 1;
-}
-template<> void StatisticsVector<YZ>::setNX(int new_ UNUSED)
-{
-    nx = 1;
-}
-template<> void StatisticsVector<X>::setNY(int new_ UNUSED)
-{
-    ny = 1;
-}
-template<> void StatisticsVector<X>::setNZ(int new_ UNUSED)
-{
-    nz = 1;
-}
-template<> void StatisticsVector<Y>::setNX(int new_ UNUSED)
-{
-    nx = 1;
-}
-template<> void StatisticsVector<Y>::setNZ(int new_ UNUSED)
-{
-    nz = 1;
-}
-template<> void StatisticsVector<Z>::setNX(int new_ UNUSED)
-{
-    nx = 1;
-}
-template<> void StatisticsVector<Z>::setNY(int new_ UNUSED)
-{
-    ny = 1;
-}
-template<> void StatisticsVector<O>::setNX(int new_ UNUSED)
-{
-    nx = 1;
-}
-template<> void StatisticsVector<O>::setNY(int new_ UNUSED)
-{
-    ny = 1;
-}
-template<> void StatisticsVector<O>::setNZ(int new_ UNUSED)
+template<>
+void StatisticsVector<XY>::setNZ(int new_ UNUSED)
 {
     nz = 1;
 }
 
-template<> void StatisticsVector<RAZ>::set_statType()
+template<>
+void StatisticsVector<XZ>::setNY(int new_ UNUSED)
+{
+    ny = 1;
+}
+
+template<>
+void StatisticsVector<YZ>::setNX(int new_ UNUSED)
+{
+    nx = 1;
+}
+
+template<>
+void StatisticsVector<X>::setNY(int new_ UNUSED)
+{
+    ny = 1;
+}
+
+template<>
+void StatisticsVector<X>::setNZ(int new_ UNUSED)
+{
+    nz = 1;
+}
+
+template<>
+void StatisticsVector<Y>::setNX(int new_ UNUSED)
+{
+    nx = 1;
+}
+
+template<>
+void StatisticsVector<Y>::setNZ(int new_ UNUSED)
+{
+    nz = 1;
+}
+
+template<>
+void StatisticsVector<Z>::setNX(int new_ UNUSED)
+{
+    nx = 1;
+}
+
+template<>
+void StatisticsVector<Z>::setNY(int new_ UNUSED)
+{
+    ny = 1;
+}
+
+template<>
+void StatisticsVector<O>::setNX(int new_ UNUSED)
+{
+    nx = 1;
+}
+
+template<>
+void StatisticsVector<O>::setNY(int new_ UNUSED)
+{
+    ny = 1;
+}
+
+template<>
+void StatisticsVector<O>::setNZ(int new_ UNUSED)
+{
+    nz = 1;
+}
+
+template<>
+void StatisticsVector<RAZ>::set_statType()
 {
     statType = RAZ;
 }
-template<> void StatisticsVector<RZ>::set_statType()
+
+template<>
+void StatisticsVector<RZ>::set_statType()
 {
     statType = RZ;
 }
-template<> void StatisticsVector<AZ>::set_statType()
+
+template<>
+void StatisticsVector<AZ>::set_statType()
 {
     statType = AZ;
 }
-template<> void StatisticsVector<RA>::set_statType()
+
+template<>
+void StatisticsVector<RA>::set_statType()
 {
     statType = RA;
 }
-template<> void StatisticsVector<A>::set_statType()
+
+template<>
+void StatisticsVector<A>::set_statType()
 {
     statType = A;
 }
-template<> void StatisticsVector<R>::set_statType()
+
+template<>
+void StatisticsVector<R>::set_statType()
 {
     statType = R;
 }
-template<> void StatisticsVector<XYZ>::set_statType()
+
+template<>
+void StatisticsVector<XYZ>::set_statType()
 {
     statType = XYZ;
 }
-template<> void StatisticsVector<XY>::set_statType()
+
+template<>
+void StatisticsVector<XY>::set_statType()
 {
     statType = XY;
 }
-template<> void StatisticsVector<XZ>::set_statType()
+
+template<>
+void StatisticsVector<XZ>::set_statType()
 {
     statType = XZ;
 }
-template<> void StatisticsVector<YZ>::set_statType()
+
+template<>
+void StatisticsVector<YZ>::set_statType()
 {
     statType = YZ;
 }
-template<> void StatisticsVector<X>::set_statType()
+
+template<>
+void StatisticsVector<X>::set_statType()
 {
     statType = X;
 }
-template<> void StatisticsVector<Y>::set_statType()
+
+template<>
+void StatisticsVector<Y>::set_statType()
 {
     statType = Y;
 }
-template<> void StatisticsVector<Z>::set_statType()
+
+template<>
+void StatisticsVector<Z>::set_statType()
 {
     statType = Z;
 }
-template<> void StatisticsVector<O>::set_statType()
+
+template<>
+void StatisticsVector<O>::set_statType()
 {
     statType = O;
 }
 
-template<> Mdouble StatisticsVector<RAZ>::setInfinitelyLongDistance()
+template<>
+Mdouble StatisticsVector<RAZ>::setInfinitelyLongDistance()
 {
     ///todo{check}
     return std::min(std::min(fabs((P1.Z - getZMinStat() + 5 * getCGWidth()) / P1_P2_normal.Z),
-            std::max((getXMaxStat() - P2.X + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X, -(P2.X - getXMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X)),
-            std::max((getYMaxStat() - P2.Y + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y, -(P2.Y - getYMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y));
-}
-template<> Mdouble StatisticsVector<RA>::setInfinitelyLongDistance()
-{
-    return std::min(std::max((getYMaxStat() - P2.Y + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y, -(P2.Y - getYMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y),
-            std::max((getXMaxStat() - P2.X + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X, -(P2.X - getXMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X));
-}
-template<> Mdouble StatisticsVector<RZ>::setInfinitelyLongDistance()
-{
-    return std::min(fabs((P1.Z - getZMinStat() + 5 * getCGWidth()) / P1_P2_normal.Z),
-            std::max((getXMaxStat() - P2.X + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X, -(P2.X - getXMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X));
-}
-template<> Mdouble StatisticsVector<AZ>::setInfinitelyLongDistance()
-{
-    return std::min(fabs((P1.Z - getZMinStat() + 5 * getCGWidth()) / P1_P2_normal.Z),
-            std::max((getYMaxStat() - P2.Y + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y, -(P2.Y - getYMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y));
-}
-template<> Mdouble StatisticsVector<R>::setInfinitelyLongDistance()
-{
-    return std::max((getXMaxStat() - P2.X + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X, -(P2.X - getXMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X);
-}
-template<> Mdouble StatisticsVector<A>::setInfinitelyLongDistance()
-{
-    return std::max((getYMaxStat() - P2.Y + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y, -(P2.Y - getYMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y);
+                             std::max((getXMaxStat() - P2.X + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X,
+                                      -(P2.X - getXMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X)),
+                    std::max((getYMaxStat() - P2.Y + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y,
+                             -(P2.Y - getYMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y));
 }
 
-template<> Mdouble StatisticsVector<XYZ>::setInfinitelyLongDistance()
+template<>
+Mdouble StatisticsVector<RA>::setInfinitelyLongDistance()
+{
+    return std::min(std::max((getYMaxStat() - P2.Y + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y,
+                             -(P2.Y - getYMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y),
+                    std::max((getXMaxStat() - P2.X + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X,
+                             -(P2.X - getXMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X));
+}
+
+template<>
+Mdouble StatisticsVector<RZ>::setInfinitelyLongDistance()
+{
+    return std::min(fabs((P1.Z - getZMinStat() + 5 * getCGWidth()) / P1_P2_normal.Z),
+                    std::max((getXMaxStat() - P2.X + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X,
+                             -(P2.X - getXMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X));
+}
+
+template<>
+Mdouble StatisticsVector<AZ>::setInfinitelyLongDistance()
+{
+    return std::min(fabs((P1.Z - getZMinStat() + 5 * getCGWidth()) / P1_P2_normal.Z),
+                    std::max((getYMaxStat() - P2.Y + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y,
+                             -(P2.Y - getYMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y));
+}
+
+template<>
+Mdouble StatisticsVector<R>::setInfinitelyLongDistance()
+{
+    return std::max((getXMaxStat() - P2.X + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X,
+                    -(P2.X - getXMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X);
+}
+
+template<>
+Mdouble StatisticsVector<A>::setInfinitelyLongDistance()
+{
+    return std::max((getYMaxStat() - P2.Y + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y,
+                    -(P2.Y - getYMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y);
+}
+
+template<>
+Mdouble StatisticsVector<XYZ>::setInfinitelyLongDistance()
 {
     return std::min(std::min(fabs((P1.Z - getZMinStat() + 5 * getCGWidth()) / P1_P2_normal.Z),
-            std::max((getXMaxStat() - P1.X + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X, -(P1.X - getXMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X)),
-            std::max((getYMaxStat() - P1.Y + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y, -(P1.Y - getYMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y));
+                             std::max((getXMaxStat() - P1.X + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X,
+                                      -(P1.X - getXMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X)),
+                    std::max((getYMaxStat() - P1.Y + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y,
+                             -(P1.Y - getYMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y));
 }
-template<> Mdouble StatisticsVector<XY>::setInfinitelyLongDistance()
+
+template<>
+Mdouble StatisticsVector<XY>::setInfinitelyLongDistance()
 {
-    return std::min(std::max((getYMaxStat() - P1.Y + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y, -(P1.Y - getYMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y),
-            std::max((getXMaxStat() - P1.X + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X, -(P1.X - getXMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X));
+    return std::min(std::max((getYMaxStat() - P1.Y + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y,
+                             -(P1.Y - getYMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y),
+                    std::max((getXMaxStat() - P1.X + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X,
+                             -(P1.X - getXMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X));
 }
-template<> Mdouble StatisticsVector<XZ>::setInfinitelyLongDistance()
+
+template<>
+Mdouble StatisticsVector<XZ>::setInfinitelyLongDistance()
 {
     return std::min(fabs((P1.Z - getZMinStat() + 5 * getCGWidth()) / P1_P2_normal.Z),
-            std::max((getXMaxStat() - P1.X + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X, -(P1.X - getXMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X));
+                    std::max((getXMaxStat() - P1.X + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X,
+                             -(P1.X - getXMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X));
 }
-template<> Mdouble StatisticsVector<YZ>::setInfinitelyLongDistance()
+
+template<>
+Mdouble StatisticsVector<YZ>::setInfinitelyLongDistance()
 {
     return std::min(fabs((P1.Z - getZMinStat() + 5 * getCGWidth()) / P1_P2_normal.Z),
-            std::max((getYMaxStat() - P1.Y + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y, -(P1.Y - getYMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y));
+                    std::max((getYMaxStat() - P1.Y + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y,
+                             -(P1.Y - getYMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y));
 }
-template<> Mdouble StatisticsVector<X>::setInfinitelyLongDistance()
+
+template<>
+Mdouble StatisticsVector<X>::setInfinitelyLongDistance()
 {
-    return std::max((getXMaxStat() - P1.X + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X, -(P1.X - getXMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X);
+    return std::max((getXMaxStat() - P1.X + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X,
+                    -(P1.X - getXMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.X);
 }
-template<> Mdouble StatisticsVector<Y>::setInfinitelyLongDistance()
+
+template<>
+Mdouble StatisticsVector<Y>::setInfinitelyLongDistance()
 {
-    return std::max((getYMaxStat() - P1.Y + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y, -(P1.Y - getYMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y);
+    return std::max((getYMaxStat() - P1.Y + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y,
+                    -(P1.Y - getYMinStat() + 5 * sqrt(getCGWidthSquared())) / P1_P2_normal.Y);
 }
-template<> Mdouble StatisticsVector<Z>::setInfinitelyLongDistance()
+
+template<>
+Mdouble StatisticsVector<Z>::setInfinitelyLongDistance()
 {
     return fabs((P1.Z - getZMinStat() + 5 * getCGWidth()) / P1_P2_normal.Z);
 }
-template<> double StatisticsVector<O>::setInfinitelyLongDistance()
+
+template<>
+double StatisticsVector<O>::setInfinitelyLongDistance()
 {
     return 0;
 }
@@ -2810,6 +3017,6 @@ void StatisticsVector<T>::writeOutputFiles()
         DPMBase::gatherContactStatistics();
         processStatistics(true);
     }
-
+    
     DPMBase::writeOutputFiles();
 }

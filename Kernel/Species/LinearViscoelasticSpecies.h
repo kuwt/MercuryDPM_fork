@@ -29,6 +29,7 @@
 
 #include "Species.h"
 #include "NormalForceSpecies/LinearViscoelasticNormalSpecies.h"
+
 typedef Species<LinearViscoelasticNormalSpecies> LinearViscoelasticSpecies;
 typedef MixedSpecies<LinearViscoelasticNormalSpecies> LinearViscoelasticMixedSpecies;
 #endif

@@ -27,8 +27,11 @@
 #define SINTERINTERACTION_H
 
 #include "Interactions/BaseInteraction.h"
+
 class SinterNormalSpecies;
+
 class BaseInteractable;
+
 /*!
  * \class SinterInteraction
  * \brief Computes normal forces in case of a linear plastic visco-elastic interaction.
@@ -40,16 +43,20 @@ public:
      * \brief An alias for the corresponding species
      */
     typedef SinterNormalSpecies SpeciesType;
+    
     /*!
      * \brief Constructor.
      */
     SinterInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp);
+    
     /*!
      * \brief Copy constructor.
      */
-    SinterInteraction(const SinterInteraction &p);
+    SinterInteraction(const SinterInteraction& p);
+    
     /// \todo: MX add to MPI
     SinterInteraction();
+    
     /*!
      * \brief Destructor.
      */
@@ -62,50 +69,59 @@ public:
      * \brief Computes the normal forces due to linear plastic visco elastic interaction.
      */
     void computeNormalForce();
+    
     /*!
      * \brief Interaction read function, which accepts an std::istream as input.
      */
     void read(std::istream& is) override;
+    
     /*!
      * \brief Interaction write function, which accepts an std::ostream as input.
      */
     void write(std::ostream& os) const override;
+    
     /*!
      * \brief Returns the name of the interaction.
      */
     virtual std::string getBaseName() const;
+    
     /*!
      * \brief Computes and returns the amount of elastic energy stored in the spring.
      */
     Mdouble getElasticEnergy() const override;
+    
     /*!
      * \brief
      */
     const SinterNormalSpecies* getSpecies() const;
+    
     /*!
      * \brief
      */
     Mdouble getPlasticOverlap() const;
+    
     /*!
      * \brief
      */
     void setPlasticOverlap(Mdouble plasticOverlap);
+    
     /*!
      * \brief
      */
     Mdouble getUnloadingStiffness() const;
-
+    
     unsigned getNumberOfFieldsVTK() const override;
-
+    
     std::string getTypeVTK(unsigned i) const override;
-
+    
     std::string getNameVTK(unsigned i) const override;
-
+    
     std::vector<Mdouble> getFieldVTK(unsigned i) const override;
 
 private:
-
+    
     //set in integrate, used in compute force
     Mdouble plasticOverlap_;
 };
+
 #endif

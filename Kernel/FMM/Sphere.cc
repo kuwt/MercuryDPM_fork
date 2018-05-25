@@ -30,10 +30,10 @@
 #include <vector>
 
 Sphere::Sphere(Panel* panel, Vec3D location, Dipole* dipole, Multipole* multipole) :
-panel_(panel),
-location_(location),
-dipole_(dipole),
-multipole_(multipole)
+        panel_(panel),
+        location_(location),
+        dipole_(dipole),
+        multipole_(multipole)
 {
 }
 

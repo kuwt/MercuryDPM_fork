@@ -80,7 +80,7 @@ void BinaryReader::openFile(std::string fileName)
 std::string BinaryReader::readString(unsigned int numChar)
 {
     char tempRead[numChar];
-    binaryFile_.read(tempRead,numChar);
+    binaryFile_.read(tempRead, numChar);
     std::string returnString(tempRead);
     return returnString;
     
@@ -121,7 +121,7 @@ double BinaryReader::readFloat(unsigned int size)
 unsigned int BinaryReader::readUnsignedInt(unsigned int size)
 {
     char tempRead[size];
-    binaryFile_.read(tempRead,size);
+    binaryFile_.read(tempRead, size);
     unsigned int* returnUnsignedInt = reinterpret_cast<unsigned int*>(tempRead);
     return (*returnUnsignedInt);
 }
@@ -133,7 +133,7 @@ unsigned int BinaryReader::readUnsignedInt(unsigned int size)
 void BinaryReader::ignoreChar(unsigned int size)
 {
     char tempRead[size];
-    binaryFile_.read(tempRead,size);
+    binaryFile_.read(tempRead, size);
 }
-               
+
 #endif

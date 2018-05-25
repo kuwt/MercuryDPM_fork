@@ -34,8 +34,8 @@
 
 CubeDeletionBoundary::CubeDeletionBoundary() : DeletionBoundary()
 {
-    posMin_ = Vec3D(0,0,0);
-    posMax_ = Vec3D(0,0,0);
+    posMin_ = Vec3D(0, 0, 0);
+    posMax_ = Vec3D(0, 0, 0);
     logger(DEBUG, "CubeDeletionBoundary::CubeDeletionBoundary() finished");
 }
 
@@ -60,7 +60,7 @@ CubeDeletionBoundary* CubeDeletionBoundary::copy() const
  */
 Mdouble CubeDeletionBoundary::getDistance(const Vec3D& position) const
 {
-    if (   posMin_.X < position.X && position.X < posMax_.X
+    if (posMin_.X < position.X && position.X < posMax_.X
         && posMin_.Y < position.Y && position.Y < posMax_.Y
         && posMin_.Z < position.Z && position.Z < posMax_.Z
             )
@@ -73,8 +73,8 @@ void CubeDeletionBoundary::read(std::istream& is)
 {
     DeletionBoundary::read(is);
     std::string dummy;
-    is >> dummy >> posMin_ 
-       >> dummy >> posMax_; 
+    is >> dummy >> posMin_
+       >> dummy >> posMax_;
 }
 
 void CubeDeletionBoundary::write(std::ostream& os) const

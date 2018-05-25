@@ -28,7 +28,7 @@
 
 #include <iostream> //std::istream and std::stringstream
 #include <fstream> //std::fstream
-#include <cmath> 
+#include <cmath>
 #include <complex>
 #include <limits>
 
@@ -85,32 +85,36 @@ namespace mathsFunc
      * \param[in] endCondition The algorithm terminates when abs(max - min) < endCondition
      * \param[in] curVal The value of the function at the current location (on default this value is calculated internally)
      */
-    Mdouble goldenSectionSearch(Mdouble (*function)(const Mdouble), Mdouble min, Mdouble cur, Mdouble max, Mdouble endCondition, Mdouble curVal = std::numeric_limits<Mdouble>::quiet_NaN());
-
+    Mdouble goldenSectionSearch(Mdouble (* function)(const Mdouble), Mdouble min, Mdouble cur, Mdouble max,
+                                Mdouble endCondition, Mdouble curVal = std::numeric_limits<Mdouble>::quiet_NaN());
+    
     /*!
      * \brief This is a sign function, it returns -1 for negative numbers, 1 for positive numbers and 0 for 0
      */
-    template<typename T> int sign(T val)
+    template<typename T>
+    int sign(T val)
     {
         return (T(0) < val) - (val < T(0));
     }
-
+    
     /*!
      * \brief squares a number
      */
-    template<typename T> T square(const T val)
+    template<typename T>
+    T square(const T val)
     {
         return val * val;
     }
-
+    
     /*!
      * \brief calculates the cube of a number
      */
-    template<typename T> T cubic(const T val)
+    template<typename T>
+    T cubic(const T val)
     {
         return val * val * val;
     }
-
+    
     /*!
      * \brief Compares the difference of two Mdouble with an absolute error, useful in UnitTests
      * \param[in] v1 The first Mdouble
@@ -118,7 +122,8 @@ namespace mathsFunc
      * \param[in] absError The allowed maximum absolute error
      * \return True if the two Mdouble are equal
      */
-    bool isEqual(Mdouble v1,Mdouble v2, Mdouble absError);
+    bool isEqual(Mdouble v1, Mdouble v2, Mdouble absError);
+    
     /*!
      * \brief Compares the difference of two Vec3D with an absolute error, useful in UnitTests
      * \param[in] v1 The first Vec3D
@@ -136,39 +141,44 @@ namespace mathsFunc
     * \return true if the two Vec3D are equal
     */
     bool isEqual(Matrix3D m1, Matrix3D m2, Mdouble absError);
+    
     bool isEqual(MatrixSymmetric3D m1, MatrixSymmetric3D m2, Mdouble absError);
+    
     bool isEqual(Quaternion v1, Quaternion v2, double absError);
-
+    
     /*!
      * \brief factorial function
      */
-    template<typename T> constexpr T factorial(const T t)
+    template<typename T>
+    constexpr T factorial(const T t)
     {
         return (t == 0) ? 1 : t * factorial(t - 1);
     }
-
+    
     //platform independent implementation of sine and cosine, taken from
     // http://stackoverflow.com/questions/18662261/fastest-implementation-of-sine-cosine-and-square-root-in-c-doesnt-need-to-b
     // (cosine was implemented wrongly on the website, here is a corrected version)
-
+    
     // sin(x) = x - x^3/3! + x^5/5! - x^7/7! + ...
     Mdouble sin(Mdouble x);
-
+    
     // cos(x) = 1 - x^2/2! + x^4/4! - x^6/6! + ...
     Mdouble cos(Mdouble x);
-
+    
     Mdouble exp(Mdouble Exponent);
-
+    
     Mdouble log(Mdouble Power);
-
-
+    
+    
     ///\todo should be properly computed
     // tan=sin/cos
-    template<typename T> T tan(T x) {
-        return sin(x)/cos(x);
+    template<typename T>
+    T tan(T x)
+    {
+        return sin(x) / cos(x);
     }
-
-
+    
+    
     /*!
     * \brief Namespace for evaluating the zeroth modified Bessel function of the first kind, I0(x), required in StatisticsPoint.hcc
     */
@@ -177,7 +187,7 @@ namespace mathsFunc
     Mdouble I0_exp(Mdouble x);
     
     Mdouble I0(Mdouble x);
-
+    
 }
 
 /*
@@ -186,15 +196,15 @@ namespace mathsFunc
 
 namespace sphericalHarmonics
 {
-
-	//Compute all the associated LegenderePolynomials up to order n, and only positive order m at location x
-	NumericalVector<> associatedLegendrePolynomials(int n, Mdouble x);
-
-	//Compute all spherical harmonics up to order p, at angles theta and phi
-	NumericalVector<std::complex<Mdouble>> sphericalHarmonics(int p, Mdouble theta, Mdouble phi);
-
-	//Compute all squaredFactorials (see eqn 5.23 in a short course on fast multipole methods) up to order p
-	NumericalVector<> computeSquaredFactorialValues(int p);
+    
+    //Compute all the associated LegenderePolynomials up to order n, and only positive order m at location x
+    NumericalVector<> associatedLegendrePolynomials(int n, Mdouble x);
+    
+    //Compute all spherical harmonics up to order p, at angles theta and phi
+    NumericalVector<std::complex<Mdouble>> sphericalHarmonics(int p, Mdouble theta, Mdouble phi);
+    
+    //Compute all squaredFactorials (see eqn 5.23 in a short course on fast multipole methods) up to order p
+    NumericalVector<> computeSquaredFactorialValues(int p);
 }
 
 #endif

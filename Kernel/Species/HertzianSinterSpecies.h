@@ -29,6 +29,7 @@
 
 #include "Species.h"
 #include "NormalForceSpecies/HertzianSinterNormalSpecies.h"
+
 typedef Species<HertzianSinterNormalSpecies> HertzianSinterSpecies;
 typedef MixedSpecies<HertzianSinterNormalSpecies> HertzianSinterMixedSpecies;
 #endif

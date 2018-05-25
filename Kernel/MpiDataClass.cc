@@ -39,17 +39,17 @@ MPIParticle copyDataFromParticleToMPIParticle(BaseParticle* p)
 {
     MPIParticle bP;
     
-    bP.id 			            = p->getId();
-    bP.indSpecies 		        = p->getIndSpecies();
-    bP.radius 			        = p->getRadius();
-    bP.position			        = p->getPosition();
-    bP.angularVelocity		    = p->getAngularVelocity();
-    bP.velocity			        = p->getVelocity();
-    bP.orientation	    	    = p->getOrientation();
-    bP.HGridLevel		        = p->getHGridLevel();
-    bP.communicationComplexity	= p->getCommunicationComplexity();
-    bP.isMaser                  = p->isMaserParticle();
-    bP.isFixed                  = p->isFixed();
+    bP.id = p->getId();
+    bP.indSpecies = p->getIndSpecies();
+    bP.radius = p->getRadius();
+    bP.position = p->getPosition();
+    bP.angularVelocity = p->getAngularVelocity();
+    bP.velocity = p->getVelocity();
+    bP.orientation = p->getOrientation();
+    bP.HGridLevel = p->getHGridLevel();
+    bP.communicationComplexity = p->getCommunicationComplexity();
+    bP.isMaser = p->isMaserParticle();
+    bP.isFixed = p->isFixed();
     return bP;
 }
 
@@ -61,30 +61,30 @@ MPIParticle copyDataFromParticleToMPIParticle(BaseParticle* p)
  * \param[in] bP Pointer to an MPIParticle which contains data for a ghost particle
  * \param[in,out] p Pointer to BaseParticle, a ghost particle that will be added to the domain
  */
-void copyDataFromMPIParticleToParticle(MPIParticle *bP, BaseParticle* p)
+void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p)
 {
-
-	//Set important quantities
-	p->setId(bP->id);
-	p->setRadius(bP->radius); 
-	p->setPosition(bP->position);
-	p->setAngularVelocity(bP->angularVelocity);
-	p->setVelocity(bP->velocity);
-	p->setOrientation(bP->orientation);
-	p->setCommunicationComplexity(bP->communicationComplexity);
-
-	//Set HGrid values
-	p->setHGridNextObject(nullptr);
-	p->setHGridPrevObject(nullptr);
-	p->setHGridX(99999);
-	p->setHGridY(99999);
-	p->setHGridZ(99999);
-	p->setHGridLevel(bP->HGridLevel);
-	
-	//This is not a periodic particle
-	p->setPeriodicFromParticle(nullptr);
+    
+    //Set important quantities
+    p->setId(bP->id);
+    p->setRadius(bP->radius);
+    p->setPosition(bP->position);
+    p->setAngularVelocity(bP->angularVelocity);
+    p->setVelocity(bP->velocity);
+    p->setOrientation(bP->orientation);
+    p->setCommunicationComplexity(bP->communicationComplexity);
+    
+    //Set HGrid values
+    p->setHGridNextObject(nullptr);
+    p->setHGridPrevObject(nullptr);
+    p->setHGridX(99999);
+    p->setHGridY(99999);
+    p->setHGridZ(99999);
+    p->setHGridLevel(bP->HGridLevel);
+    
+    //This is not a periodic particle
+    p->setPeriodicFromParticle(nullptr);
     p->setInPeriodicDomain(false);
-
+    
     //Fix maser if it is maser
     if (bP->isMaser)
     {
@@ -94,11 +94,11 @@ void copyDataFromMPIParticleToParticle(MPIParticle *bP, BaseParticle* p)
     {
         p->setMaserParticle(false);
     }
-
+    
     //Fixed particles need to be fixed again
     if (bP->isFixed)
     {
-        p->fixParticle();  
+        p->fixParticle();
     }
 }
 
@@ -109,14 +109,14 @@ void copyDataFromMPIParticleToParticle(MPIParticle *bP, BaseParticle* p)
  * \param[in] particleHandler Pointer to the ParticleHandler required for creating a new particle
  * \todo MX: Maybe renamet his function to setParticleSpecies() or something
  */
-void copyDataFromMPIParticleToParticle(MPIParticle *bP, BaseParticle* p, ParticleHandler *particleHandler)
-{  
-	//Set the species of the particle, but before we can do that we have to set the handler
-	p->setHandler(particleHandler);
-	//p->setIndSpecies(bP->indSpecies);
+void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p, ParticleHandler* particleHandler)
+{
+    //Set the species of the particle, but before we can do that we have to set the handler
+    p->setHandler(particleHandler);
+    //p->setIndSpecies(bP->indSpecies);
     const ParticleSpecies* species = p->getHandler()->getDPMBase()->speciesHandler.getObject(bP->indSpecies);
     p->setSpecies(species);
-    copyDataFromMPIParticleToParticle(bP,p);
+    copyDataFromMPIParticleToParticle(bP, p);
 }
 
 /*!
@@ -138,7 +138,7 @@ MPIParticleForce copyForceFromParticleToMPIParticle(BaseParticle* p)
  * \param[in] particleForce MPIDataClass containing the particle forces
  * \param[out] p BaseParticle that receives force data
  */
-void copyForceFromMPIParticleToParticle(MPIParticleForce *particleForce, BaseParticle* p)
+void copyForceFromMPIParticleToParticle(MPIParticleForce* particleForce, BaseParticle* p)
 {
     p->setForce(particleForce->force);
     p->setTorque(particleForce->torque);
@@ -155,7 +155,7 @@ MPIParticlePosition copyPositionFrom(BaseParticle* particle)
     particlePosition.id = particle->getId();
     particlePosition.position = particle->getPosition();
     particlePosition.orientation = particle->getOrientation();
-
+    
     return particlePosition;
 }
 
@@ -169,7 +169,7 @@ MPIParticleVelocity copyVelocityFrom(BaseParticle* particle)
     MPIParticleVelocity particleVelocity;
     particleVelocity.velocity = particle->getVelocity();
     particleVelocity.angularVelocity = particle->getAngularVelocity();
-
+    
     return particleVelocity;
 }
 

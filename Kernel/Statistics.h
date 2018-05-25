@@ -25,6 +25,7 @@
 
 #ifndef STATISTICS_H
 #define STATISTICS_H
+
 #include "StatisticsVector.h"
 
 /*!
@@ -34,7 +35,7 @@
  * picks the correct StatType template from the user-specified flag. The other
  * flags are processed by StatisticsVector.
  */
-void Statistics(int argc, char *argv[])
+void Statistics(int argc, char* argv[])
 {
     if (argc > 1 && strcmp(argv[1], "-help"))
         std::cout << std::endl << "Get statistics for " << argv[1] << std::endl;
@@ -43,7 +44,7 @@ void Statistics(int argc, char *argv[])
     StatType T = O; //default value
     for (unsigned int i = 2; i < argc; i++)
     {
-        if (!strcmp(argv[i], "-stattype")||!strcmp(argv[i], "-statType"))
+        if (!strcmp(argv[i], "-stattype") || !strcmp(argv[i], "-statType"))
         {
             if (!strcmp(argv[i + 1], "XYZ"))
                 T = XYZ;

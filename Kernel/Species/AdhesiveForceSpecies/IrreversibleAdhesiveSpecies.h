@@ -25,6 +25,7 @@
 
 #ifndef LINEARIRREVERSIBLEADHESIVESPECIES_H
 #define LINEARIRREVERSIBLEADHESIVESPECIES_H
+
 #include "Species/BaseSpecies.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/AdhesiveForceInteractions/IrreversibleAdhesiveInteraction.h"
@@ -39,17 +40,18 @@ class IrreversibleAdhesiveSpecies : public ReversibleAdhesiveSpecies
 public:
     ///\brief The correct Interaction type for this AdhesiveForceSpecies
     typedef IrreversibleAdhesiveInteraction InteractionType;
-
+    
     ///\brief The default constructor.
     IrreversibleAdhesiveSpecies();
-
+    
     ///\brief The default copy constructor.
-    IrreversibleAdhesiveSpecies(const IrreversibleAdhesiveSpecies &s);
-
+    IrreversibleAdhesiveSpecies(const IrreversibleAdhesiveSpecies& s);
+    
     ///\brief The default destructor.
     ~IrreversibleAdhesiveSpecies() override;
-
+    
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;
 };
+
 #endif

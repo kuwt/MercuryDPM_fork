@@ -28,8 +28,11 @@
 
 #include "Interactions/BaseInteraction.h"
 #include "Math/Vector.h"
+
 class BaseParticle;
+
 class ChargedBondedSpecies;
+
 class BaseInteractable;
 
 /*!
@@ -43,59 +46,69 @@ public:
      * \brief Setting an alias name for ChargedBondedSpecies.
      */
     typedef ChargedBondedSpecies SpeciesType;
+    
     /*!
      * \brief Constructor
-     */    
+     */
     ChargedBondedInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp);
+    
     /*!
      * \brief Copy constructor.
-     */    
-    ChargedBondedInteraction(const ChargedBondedInteraction &p);
+     */
+    ChargedBondedInteraction(const ChargedBondedInteraction& p);
+    
     /// \todo MX: add to MPI
     ChargedBondedInteraction();
+    
     /*!
      * \brief Destructor.
      */
     ~ChargedBondedInteraction() override;
+    
     /*!
      * \brief Computes the adhesive forces
-     */    
+     */
     void computeAdhesionForce();
+    
     /*!
      * \brief Interaction read function, which accepts an std::istream as input.
-     */        
+     */
     void read(std::istream& is) override;
+    
     /*!
      * \brief Interaction print function, which accepts an std::ostream as input.
-     */        
+     */
     void write(std::ostream& os) const override;
     /*!
      * \brief Returns the amount of Elastic energy involved in an interaction. Basically
      *        used in case you want to write the elastic energy into an output file. 
-     */    
+     */
     /*!
      * \brief Returns the elastic energy stored in the adhesive spring. 
      */
     Mdouble getElasticEnergy() const override;
+    
     /*!
      * \brief A dynamic_cast of BaseSpecies pointer type to a pointer to an object of 
      *        type ChargedBondedSpecies.
-     */    
+     */
     const ChargedBondedSpecies* getSpecies() const;
+    
     /*!
      * \brief Returns the name of the interaction, see Interaction.h.
-     */    
+     */
     std::string getBaseName() const;
-
-
+    
+    
     //*********************************************************************************************************************
     //******************************ADDING ADDITIONAL VARIABLES FOR BOND INTERACTIONS**************************************
     //*********************************************************************************************************************
-
+    
     /*!
     * \brief A pair of functions which can be used to fix or unfix a pair of overlapping particles
     */
     void bond();
+    
     void unbond();
 
 private:
@@ -108,6 +121,7 @@ private:
     *
     */
     bool bonded_;
-
+    
 };
+
 #endif

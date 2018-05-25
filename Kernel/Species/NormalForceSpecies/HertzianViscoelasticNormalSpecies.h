@@ -25,6 +25,7 @@
 
 #ifndef HertzianViscoelasticNormalSpecies_H
 #define HertzianViscoelasticNormalSpecies_H
+
 #include "Species/BaseSpecies.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/NormalForceInteractions/HertzianViscoelasticInteraction.h"
@@ -38,25 +39,25 @@ class HertzianViscoelasticNormalSpecies : public virtual BaseSpecies
 public:
     ///\brief The correct Interaction type for this FrictionForceSpecies
     typedef HertzianViscoelasticInteraction InteractionType;
-
+    
     ///\brief The default constructor.
     HertzianViscoelasticNormalSpecies();
-
+    
     ///\brief The default copy constructor.
-    HertzianViscoelasticNormalSpecies(const HertzianViscoelasticNormalSpecies &p);
-
+    HertzianViscoelasticNormalSpecies(const HertzianViscoelasticNormalSpecies& p);
+    
     ///\brief The default destructor.
     ~HertzianViscoelasticNormalSpecies() override;
-
+    
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
-
+    
     /// \brief Writes the species properties to an output stream.
     void write(std::ostream& os) const override;
-
+    
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;
-
+    
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     Mdouble getCollisionTime(Mdouble particleDiameter, Mdouble particleDensity, Mdouble relativeVelocity) const;
 
@@ -85,31 +86,32 @@ public:
 //     * \brief Calculates restitution coefficient for two copies of given disp, k, mass
 //     */
 //    Mdouble getRestitutionCoefficient(Mdouble mass);
-
+    
     ///\brief creates default values for mixed species
-    void mix(HertzianViscoelasticNormalSpecies*SBase, HertzianViscoelasticNormalSpecies*TBase);
+    void mix(HertzianViscoelasticNormalSpecies* SBase, HertzianViscoelasticNormalSpecies* TBase);
 
 //setters and getters
-
+    
     ///\brief Allows the spring constant to be changed
     void setElasticModulus(Mdouble elasticModulus);
-
+    
     void setElasticModulusAndRestitutionCoefficient(Mdouble elasticModulus, Mdouble rest);
-
+    
     ///\brief Allows the spring constant to be accessed
     Mdouble getElasticModulus() const;
-
+    
     ///\brief Allows the normal dissipation to be changed
     void setDissipation(Mdouble dissipation);
-
+    
     ///\brief Allows the normal dissipation to be accessed
     Mdouble getDissipation() const;
 
 private:
     ///\brief normal spring constant
-    Mdouble elasticModulus_; 
-
+    Mdouble elasticModulus_;
+    
     ///\brief normal dissipation constant
-    Mdouble dissipation_; 
+    Mdouble dissipation_;
 };
+
 #endif

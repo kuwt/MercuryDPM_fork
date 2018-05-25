@@ -75,13 +75,14 @@ InfiniteWall::InfiniteWall(Vec3D PointA, Vec3D PointB, Vec3D PointC, const Parti
 //subtract second and third from the first
     Vec3D SubtB = PointA - PointB;
     Vec3D SubtC = PointA - PointC;
-
+    
     Vec3D WallNormal = Vec3D::cross(SubtB, SubtC);
     //Check if walls coordinates  inline, if true Do not build wall and give error message.
-
-    if (WallNormal.getLengthSquared()==0.0)
+    
+    if (WallNormal.getLengthSquared() == 0.0)
     {
-        logger(ERROR, "Error Building InfiniteWall out of 3 coordinates. Coordinates are in line, Wall not constructed.");
+        logger(ERROR,
+               "Error Building InfiniteWall out of 3 coordinates. Coordinates are in line, Wall not constructed.");
     }
     else
     {
@@ -89,9 +90,8 @@ InfiniteWall::InfiniteWall(Vec3D PointA, Vec3D PointB, Vec3D PointC, const Parti
         setPosition(PointA);
         setSpecies(species);
     }
-
-
-
+    
+    
 }
 
 InfiniteWall::~InfiniteWall()
@@ -136,16 +136,16 @@ void InfiniteWall::setNormal(const Vec3D normal)
 void InfiniteWall::set(Vec3D normal, Mdouble positionInNormalDirection)
 {
     logger(WARN, "InfiniteWall::set(Vec3D, Mdouble) is deprecated. Use set(Vec3D, Vec3D) instead.");
-    set(normal, positionInNormalDirection*normal);
+    set(normal, positionInNormalDirection * normal);
 }
 
 /*!
  * \param[in] otherPosition The position to which the distance must be computed to.
  * \return The distance of the wall to the particle.
- */ 
+ */
 Mdouble InfiniteWall::getDistance(Vec3D otherPosition) const
 {
-    return getOrientation().getDistance(otherPosition,getPosition());
+    return getOrientation().getDistance(otherPosition, getPosition());
 }
 
 /*!
@@ -222,52 +222,57 @@ Vec3D InfiniteWall::getNormal() const
  *   {(0,-1,-1), (0,-1,1), (0,1,1), (0,1,-1)}
  * Calling addToVTK will then create a triangle strip connecting these points with triangle faces.
  */
-void InfiniteWall::createVTK (std::vector<Vec3D>& myPoints) const
+void InfiniteWall::createVTK(std::vector<Vec3D>& myPoints) const
 {
     Vec3D max = getHandler()->getDPMBase()->getMax();
     Vec3D min = getHandler()->getDPMBase()->getMin();
-    createVTK (myPoints, min, max);
+    createVTK(myPoints, min, max);
 }
 
-void InfiniteWall::createVTK (std::vector<Vec3D>& myPoints, const Vec3D min, const Vec3D max) const
+void InfiniteWall::createVTK(std::vector<Vec3D>& myPoints, const Vec3D min, const Vec3D max) const
 {
     const Vec3D& n = getOrientation().getAxis();
     const Vec3D& p = getPosition();
-
-    if (fabs(n.X)>0.5) {
+    
+    if (fabs(n.X) > 0.5)
+    {
         // If the wall normal has a nonzero x-component,
         // We first find four intersection points with the four domain edges pointing in x-direction.
         // Because these points might be outside the domain in x-direction, we use the intersection function have points in the domain
-        myPoints.emplace_back(p.X-((min.Y-p.Y)*n.Y+(min.Z-p.Z)*n.Z)/n.X,min.Y,min.Z);
-        myPoints.emplace_back(p.X-((min.Y-p.Y)*n.Y+(max.Z-p.Z)*n.Z)/n.X,min.Y,max.Z);
-        myPoints.emplace_back(p.X-((max.Y-p.Y)*n.Y+(max.Z-p.Z)*n.Z)/n.X,max.Y,max.Z);
-        myPoints.emplace_back(p.X-((max.Y-p.Y)*n.Y+(min.Z-p.Z)*n.Z)/n.X,max.Y,min.Z);
+        myPoints.emplace_back(p.X - ((min.Y - p.Y) * n.Y + (min.Z - p.Z) * n.Z) / n.X, min.Y, min.Z);
+        myPoints.emplace_back(p.X - ((min.Y - p.Y) * n.Y + (max.Z - p.Z) * n.Z) / n.X, min.Y, max.Z);
+        myPoints.emplace_back(p.X - ((max.Y - p.Y) * n.Y + (max.Z - p.Z) * n.Z) / n.X, max.Y, max.Z);
+        myPoints.emplace_back(p.X - ((max.Y - p.Y) * n.Y + (min.Z - p.Z) * n.Z) / n.X, max.Y, min.Z);
         intersectVTK(myPoints, Vec3D(+1, 0, 0), Vec3D(max.X, 0, 0));
         intersectVTK(myPoints, Vec3D(-1, 0, 0), Vec3D(min.X, 0, 0));
-    } else if (fabs(n.Y)>0.5) {
+    }
+    else if (fabs(n.Y) > 0.5)
+    {
         // Else, if the wall normal has a nonzero y-component ...
-        myPoints.emplace_back(min.X,p.Y-((min.X-p.X)*n.X+(min.Z-p.Z)*n.Z)/n.Y,min.Z);
-        myPoints.emplace_back(min.X,p.Y-((min.X-p.X)*n.X+(max.Z-p.Z)*n.Z)/n.Y,max.Z);
-        myPoints.emplace_back(max.X,p.Y-((max.X-p.X)*n.X+(max.Z-p.Z)*n.Z)/n.Y,max.Z);
-        myPoints.emplace_back(max.X,p.Y-((max.X-p.X)*n.X+(min.Z-p.Z)*n.Z)/n.Y,min.Z);
+        myPoints.emplace_back(min.X, p.Y - ((min.X - p.X) * n.X + (min.Z - p.Z) * n.Z) / n.Y, min.Z);
+        myPoints.emplace_back(min.X, p.Y - ((min.X - p.X) * n.X + (max.Z - p.Z) * n.Z) / n.Y, max.Z);
+        myPoints.emplace_back(max.X, p.Y - ((max.X - p.X) * n.X + (max.Z - p.Z) * n.Z) / n.Y, max.Z);
+        myPoints.emplace_back(max.X, p.Y - ((max.X - p.X) * n.X + (min.Z - p.Z) * n.Z) / n.Y, min.Z);
         intersectVTK(myPoints, Vec3D(0, +1, 0), Vec3D(0, max.Y, 0));
         intersectVTK(myPoints, Vec3D(0, -1, 0), Vec3D(0, min.Y, 0));
-    } else {
+    }
+    else
+    {
         // Else, the wall normal has to have a a nonzero z-component ...
-        myPoints.emplace_back(min.X,min.Y,p.Z-((min.Y-p.Y)*n.Y+(min.X-p.X)*n.X)/n.Z);
-        myPoints.emplace_back(min.X,max.Y,p.Z-((max.Y-p.Y)*n.Y+(min.X-p.X)*n.X)/n.Z);
-        myPoints.emplace_back(max.X,max.Y,p.Z-((max.Y-p.Y)*n.Y+(max.X-p.X)*n.X)/n.Z);
-        myPoints.emplace_back(max.X,min.Y,p.Z-((min.Y-p.Y)*n.Y+(max.X-p.X)*n.X)/n.Z);
+        myPoints.emplace_back(min.X, min.Y, p.Z - ((min.Y - p.Y) * n.Y + (min.X - p.X) * n.X) / n.Z);
+        myPoints.emplace_back(min.X, max.Y, p.Z - ((max.Y - p.Y) * n.Y + (min.X - p.X) * n.X) / n.Z);
+        myPoints.emplace_back(max.X, max.Y, p.Z - ((max.Y - p.Y) * n.Y + (max.X - p.X) * n.X) / n.Z);
+        myPoints.emplace_back(max.X, min.Y, p.Z - ((min.Y - p.Y) * n.Y + (max.X - p.X) * n.X) / n.Z);
         intersectVTK(myPoints, Vec3D(0, 0, +1), Vec3D(0, 0, max.Z));
         intersectVTK(myPoints, Vec3D(0, 0, -1), Vec3D(0, 0, min.Z));
     }
 }
 
-void InfiniteWall::writeVTK (VTKContainer& vtk) const
+void InfiniteWall::writeVTK(VTKContainer& vtk) const
 {
     std::vector<Vec3D> points;
-    createVTK (points);
-    addToVTK (points, vtk);
+    createVTK(points);
+    addToVTK(points, vtk);
 }
 
 
@@ -276,7 +281,7 @@ InfiniteWall::getDistanceNormalOverlapSuperquadric(const SuperQuadric& p, Mdoubl
                                                    Mdouble& overlap) const
 {
     //first check: if the bounding sphere does not touch the wall, there is no contact.
-    if(getDistance(p.getPosition()) >= p.getWallInteractionRadius())
+    if (getDistance(p.getPosition()) >= p.getWallInteractionRadius())
     {
         return false;
     }
@@ -296,10 +301,10 @@ InfiniteWall::getDistanceNormalOverlapSuperquadric(const SuperQuadric& p, Mdoubl
         if (overlap > 0)
         {
             Vec3D overlapBody = overlap * normalBodyFixed;
-            Vec3D contactPoint = furthestPoint - overlapBody/2;
+            Vec3D contactPoint = furthestPoint - overlapBody / 2;
             p.getOrientation().rotate(contactPoint);
             contactPoint += p.getPosition();
-            distance = (contactPoint - overlapBody/2 - p.getPosition()).getLength();
+            distance = (contactPoint - overlapBody / 2 - p.getPosition()).getLength();
             normal_return = getOrientation().getAxis();
             return true;
         }
@@ -319,22 +324,22 @@ Vec3D InfiniteWall::getFurthestPointSuperQuadric(const Vec3D& normalBodyFixed, c
 {
     Vec3D furthestPoint;
     if (std::abs(normalBodyFixed.X) > 1e-10)
-        {
-            Mdouble alpha = std::abs(normalBodyFixed.Y * axes.Y / normalBodyFixed.X / axes.X );
-            Mdouble beta = std::abs(normalBodyFixed.Z * axes.Z / normalBodyFixed.X / axes.X );
-            furthestPoint.X = axes.X * mathsFunc::sign(normalBodyFixed.X) / sqrt(1 + alpha * alpha + beta * beta);
-            furthestPoint.Y = axes.Y * alpha * std::abs(furthestPoint.X) * mathsFunc::sign(normalBodyFixed.Y) / axes.X;
-            furthestPoint.Z = axes.Z * beta * std::abs(furthestPoint.X) * mathsFunc::sign(normalBodyFixed.Z) / axes.X;
-        }
-        else if (std::abs(normalBodyFixed.Y) > 1e-10)
-        {
-            Mdouble alpha = std::abs(normalBodyFixed.Z * axes.Z / normalBodyFixed.Y / axes.Y );
-            furthestPoint.Y = axes.Y * mathsFunc::sign(normalBodyFixed.Y) / sqrt(1 + alpha * alpha);
-            furthestPoint.Z = axes.Z * std::abs(furthestPoint.Y) * alpha * mathsFunc::sign(normalBodyFixed.Z) / axes.Y;
-        }
-        else
-        {
-            furthestPoint.Z = axes.Z * mathsFunc::sign(normalBodyFixed.Z);
-        }
+    {
+        Mdouble alpha = std::abs(normalBodyFixed.Y * axes.Y / normalBodyFixed.X / axes.X);
+        Mdouble beta = std::abs(normalBodyFixed.Z * axes.Z / normalBodyFixed.X / axes.X);
+        furthestPoint.X = axes.X * mathsFunc::sign(normalBodyFixed.X) / sqrt(1 + alpha * alpha + beta * beta);
+        furthestPoint.Y = axes.Y * alpha * std::abs(furthestPoint.X) * mathsFunc::sign(normalBodyFixed.Y) / axes.X;
+        furthestPoint.Z = axes.Z * beta * std::abs(furthestPoint.X) * mathsFunc::sign(normalBodyFixed.Z) / axes.X;
+    }
+    else if (std::abs(normalBodyFixed.Y) > 1e-10)
+    {
+        Mdouble alpha = std::abs(normalBodyFixed.Z * axes.Z / normalBodyFixed.Y / axes.Y);
+        furthestPoint.Y = axes.Y * mathsFunc::sign(normalBodyFixed.Y) / sqrt(1 + alpha * alpha);
+        furthestPoint.Z = axes.Z * std::abs(furthestPoint.Y) * alpha * mathsFunc::sign(normalBodyFixed.Z) / axes.Y;
+    }
+    else
+    {
+        furthestPoint.Z = axes.Z * mathsFunc::sign(normalBodyFixed.Z);
+    }
     return furthestPoint;
 }

@@ -64,61 +64,62 @@ public:
      * \brief Default constructor.
      */
     AxisymmetricIntersectionOfWalls();
-
+    
     /*!
      * \brief Copy constructor.
      */
     AxisymmetricIntersectionOfWalls(const AxisymmetricIntersectionOfWalls& p);
-
+    
     /*!
      * \brief Constructor setting values.
      */
-    AxisymmetricIntersectionOfWalls(Vec3D position, Vec3D normal, std::vector<normalAndPosition> walls, const ParticleSpecies* species);
-
+    AxisymmetricIntersectionOfWalls(Vec3D position, Vec3D normal, std::vector<normalAndPosition> walls,
+                                    const ParticleSpecies* species);
+    
     /*!
      * \brief Destructor.
      */
     ~AxisymmetricIntersectionOfWalls() override;
-
+    
     /*!
      * \brief Copy assignment operator.
      */
     AxisymmetricIntersectionOfWalls& operator=(const AxisymmetricIntersectionOfWalls& other);
-
+    
     /*!
      * \brief Wall copy method. It calls the copy constructor of this Wall, useful for polymorphism
      */
     AxisymmetricIntersectionOfWalls* copy() const final;
-
+    
     /*!
      * \brief Computes the distance from the wall for a given BaseParticle and 
      * returns true if there is a collision. If there is a collision, also 
      * return the normal vector.
      */
     bool getDistanceAndNormal(const BaseParticle& P, Mdouble& distance, Vec3D& normal_return) const final;
-
+    
     /*!
      * \brief reads wall
      */
     void read(std::istream& is) final;
-
+    
     /*!
      * \brief outputs wall
      */
     void write(std::ostream& os) const final;
-
+    
     /*!
      * \brief Returns the name of the object
      */
     std::string getName() const final;
-
+    
     void setAxis(Vec3D a);
-
+    
     /*! converts XYZ limits into RZ limits, to properly limit the VTK plotting area. */
-    void convertLimits (Vec3D& min, Vec3D& max) const;
-
-    void writeVTK (VTKContainer& vtk) const override;
-
+    void convertLimits(Vec3D& min, Vec3D& max) const;
+    
+    void writeVTK(VTKContainer& vtk) const override;
+    
 };
 
 

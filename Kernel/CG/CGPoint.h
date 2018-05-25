@@ -42,27 +42,28 @@ template<class Coordinates, class Fields=CGFields::StandardFields>
 class CGPoint : public Fields
 {
 public:
-
+    
     typedef Coordinates CoordinatesType;
-
+    
     CGPoint() = default;
-
+    
     CGPoint(const CGPoint& orig) = default;
-
+    
     virtual ~CGPoint() = default;
-
+    
     /*!
      * \brief Combines the write functions of the two base classes Coordinates and Fields.
      */
-    void write(std::ostream& os) const {
+    void write(std::ostream& os) const
+    {
         coordinates.write(os);
         Fields::write(os);
     }
 
 public:
-
+    
     Coordinates coordinates;
-
+    
 };
 
 #endif

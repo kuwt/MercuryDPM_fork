@@ -25,6 +25,7 @@
 
 #ifndef LinearPlasticViscoelasticNormalSpecies_H
 #define LinearPlasticViscoelasticNormalSpecies_H
+
 #include "Species/BaseSpecies.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/NormalForceInteractions/LinearPlasticViscoelasticInteraction.h"
@@ -38,105 +39,106 @@ class LinearPlasticViscoelasticNormalSpecies : public virtual BaseSpecies
 public:
     ///\brief The correct Interaction type for this FrictionForceSpecies
     typedef LinearPlasticViscoelasticInteraction InteractionType;
-
+    
     ///\brief The default constructor.
     LinearPlasticViscoelasticNormalSpecies();
-
+    
     ///\brief The default copy constructor.
-    LinearPlasticViscoelasticNormalSpecies(const LinearPlasticViscoelasticNormalSpecies &p);
-
+    LinearPlasticViscoelasticNormalSpecies(const LinearPlasticViscoelasticNormalSpecies& p);
+    
     ///\brief The default destructor.
     ~LinearPlasticViscoelasticNormalSpecies() override;
-
+    
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
-
+    
     /// \brief Writes the species properties to an output stream.
     void write(std::ostream& os) const override;
-
+    
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;
 
 // Species-specific functions
-
+    
     ///\brief creates default values for mixed species
-    void mix(LinearPlasticViscoelasticNormalSpecies*S, LinearPlasticViscoelasticNormalSpecies*T);
-
+    void mix(LinearPlasticViscoelasticNormalSpecies* S, LinearPlasticViscoelasticNormalSpecies* T);
+    
     ///Set k, disp such that is matches a given tc and eps for a collision of two different masses.
     ///Recall the resitution constant is a function of k, disp and the mass of each particle in the collision
     /// See also setCollisionTimeAndRestitutionCoefficient(Mdouble tc, Mdouble eps, Mdouble mass)
     void setCollisionTimeAndRestitutionCoefficient(Mdouble tc, Mdouble eps, Mdouble mass);
-
+    
     ///Sets k, disp such that it matches a given tc and eps for a collision of two copies of P
     void setStiffnessAndRestitutionCoefficient(Mdouble k_, Mdouble eps, Mdouble mass);
-
-        /*!
-     * \brief Calculates collision time for two copies of a particle of given disp, k, mass
-     */
+    
+    /*!
+ * \brief Calculates collision time for two copies of a particle of given disp, k, mass
+ */
     Mdouble getCollisionTime(Mdouble mass);
 
 //setters and getters
-
+    
     /*!
      * \brief Sets all parameters of the linear plastic-viscoelastic normal force at once.
      */
-    void setPlasticParameters(Mdouble loadingStiffness, Mdouble unloadingStiffnessMax, Mdouble cohesionStiffness, Mdouble penetrationDepthMax);
-
+    void setPlasticParameters(Mdouble loadingStiffness, Mdouble unloadingStiffnessMax, Mdouble cohesionStiffness,
+                              Mdouble penetrationDepthMax);
+    
     /*!
      * \brief Returns the loading stiffness of the linear plastic-viscoelastic normal force.
      */
     Mdouble getLoadingStiffness() const;
-
+    
     /*!
      * \brief Returns the maximum unloading stiffness of the linear plastic-viscoelastic normal force.
      */
     Mdouble getUnloadingStiffnessMax() const;
-
+    
     /*!
      * \brief Returns the cohesive stiffness of the linear plastic-viscoelastic normal force.
      */
     Mdouble getCohesionStiffness() const;
-
+    
     /*!
      * \brief Returns the maximum penetration depth of the linear plastic-viscoelastic normal force.
      */
     Mdouble getPenetrationDepthMax() const;
-
+    
     /*!
      * \brief Sets the loading stiffness of the linear plastic-viscoelastic normal force.
      */
     void setLoadingStiffness(Mdouble loadingStiffness);
-
+    
     /*!
      * \brief Sets the maximum unloading stiffness of the linear plastic-viscoelastic normal force.
      */
     void setUnloadingStiffnessMax(Mdouble unloadingStiffnessMax);
-
+    
     /*!
      * \brief Sets the cohesive stiffness of the linear plastic-viscoelastic normal force.
      */
     void setCohesionStiffness(Mdouble cohesionStiffness);
-
+    
     /*!
      * \brief Sets the maximum penetration depth of the linear plastic-viscoelastic normal force.
      */
     void setPenetrationDepthMax(Mdouble penetrationDepthMax);
-
+    
     /*!
      * \brief Sets the linear dissipation coefficient of the linear plastic-viscoelastic normal force.
      */
     void setDissipation(Mdouble dissipation);
-
+    
     /*!
      * \brief Allows the spring and dissipation constants to be changed simultaneously.
      */
     MERCURY_DEPRECATED void setLoadingStiffnessAndDissipation(helpers::KAndDisp new_);
-
+    
     /*!
      * \brief Returns the optimal time step to resolve a collision of two particles of a given mass.
      */
     Mdouble computeTimeStep(Mdouble mass);
-
+    
     /*!
      * \brief Allows the normal dissipation to be accessed.
      */
@@ -144,18 +146,19 @@ public:
 
 private:
     ///(normal) spring constant (k_1)
-    Mdouble loadingStiffness_; 
-
+    Mdouble loadingStiffness_;
+    
     ///the maximum elastic constant (k_2^max) for plastic deformations
-    Mdouble unloadingStiffnessMax_; 
-
+    Mdouble unloadingStiffnessMax_;
+    
     ///the adhesive spring constant (k^c) for plastic deformations
-    Mdouble cohesionStiffness_; 
-
+    Mdouble cohesionStiffness_;
+    
     ///the depth (relative to the normalized radius) at which k_2^max is used (phi_f)
-    Mdouble penetrationDepthMax_; 
-
+    Mdouble penetrationDepthMax_;
+    
     ///linear dissipation coefficient
-    Mdouble dissipation_; 
+    Mdouble dissipation_;
 };
+
 #endif

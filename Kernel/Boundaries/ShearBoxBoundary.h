@@ -46,7 +46,7 @@ public:
     /*!
      * \brief Sets all boundary properties
      */
-    void set(std::function<double (double,double)> velocity, Mdouble left, Mdouble right, Mdouble down, Mdouble up);
+    void set(std::function<double(double, double)> velocity, Mdouble left, Mdouble right, Mdouble down, Mdouble up);
     
     /*!
      * \brief Reads all boundary properties from a stream
@@ -77,20 +77,20 @@ public:
      * \brief Returns distance from given particle to the closest vertical wall
      */
     Mdouble getVerticalDistance(BaseParticle& p, bool& positive);
-
+    
     /*!
      * \brief Applies a horizontal shift to the given particle
-     */    
+     */
     void shiftHorizontalPosition(BaseParticle* p, bool positive);
-
+    
     /*!
      * \brief Applies a vertical shift to the given particle
-     */    
+     */
     void shiftVerticalPosition(BaseParticle* p, bool positive);
     
     /*!
      * \brief Checks if particle crossed a boundary wall and if so, applies periodic shift
-     */    
+     */
     bool checkBoundaryAfterParticleMoved(BaseParticle* p, ParticleHandler& pH UNUSED);
     
     /*!
@@ -108,13 +108,14 @@ public:
      */
     void createVerticalPeriodicParticles(BaseParticle* p, ParticleHandler& pH);
     
-    void setVelocity(std::function<double (double,double)>);
-    
+    void setVelocity(std::function<double(double, double)>);
+
 private:
     Mdouble left_;      ///(signed) Horizontal distance between the left wall and the origin
     Mdouble right_;     ///(signed) Horizontal distance between the right wall and the origin
     Mdouble down_;      ///(signed) Vertical distance between the bottom wall and the origin
     Mdouble up_;        ///(signed) Vertical distance between the top wall and the origin
-    std::function<double (double, double)> velocity_;  ///Velocity difference between the top and bottom wall
+    std::function<double(double, double)> velocity_;  ///Velocity difference between the top and bottom wall
 };
+
 #endif

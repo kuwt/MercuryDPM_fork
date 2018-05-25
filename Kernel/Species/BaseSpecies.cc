@@ -30,10 +30,11 @@
 #include<cmath>
 
 class BaseParticle;
+
 class BaseInteractable;
 
 BaseSpecies::BaseSpecies()
-: BaseObject()
+        : BaseObject()
 {
     handler_ = nullptr;
     logger(DEBUG, "BaseSpecies::BaseSpecies() finished");
@@ -42,8 +43,8 @@ BaseSpecies::BaseSpecies()
 /*!
  * \param[in] p the species that is copied
  */
-BaseSpecies::BaseSpecies(const BaseSpecies &p)
-: BaseObject(p)
+BaseSpecies::BaseSpecies(const BaseSpecies& p)
+        : BaseObject(p)
 {
     handler_ = p.handler_;
     logger(DEBUG, "BaseSpecies::BaseSpecies(const BaseSpecies &p) finished");
@@ -99,7 +100,7 @@ Mdouble BaseSpecies::average(Mdouble a, Mdouble b) const
 {
     //the second algorithm seems to have a better accuracy, at least for the case average(2e5,2e5)
     //return (a + b) != 0.0 ? (2. * (a * b) / (a + b)) : 0;
-    return (a + b) != 0.0 ? (2./(1.0/a+1.0/b)) : 0.0;
+    return (a + b) != 0.0 ? (2. / (1.0 / a + 1.0 / b)) : 0.0;
 }
 
 

@@ -38,7 +38,7 @@ ReversibleAdhesiveSpecies::ReversibleAdhesiveSpecies()
 /*!
  * \param[in] s the species that is copied
  */
-ReversibleAdhesiveSpecies::ReversibleAdhesiveSpecies(const ReversibleAdhesiveSpecies &s)
+ReversibleAdhesiveSpecies::ReversibleAdhesiveSpecies(const ReversibleAdhesiveSpecies& s)
 {
     adhesionForceMax_ = s.adhesionForceMax_;
     adhesionStiffness_ = s.adhesionStiffness_;
@@ -51,14 +51,14 @@ ReversibleAdhesiveSpecies::~ReversibleAdhesiveSpecies()
 {
 #ifdef DEBUG_DESTRUCTOR
     std::cout<<"ReversibleAdhesiveSpecies::~ReversibleAdhesiveSpecies() finished"<<std::endl;
-#endif   
+#endif
 }
 
 /*!
  * \param[out] os output stream (typically the restart file)
  */
 void ReversibleAdhesiveSpecies::write(std::ostream& os) const
-        {
+{
     os << " adhesionForceMax " << adhesionForceMax_;
     os << " adhesionStiffness " << adhesionStiffness_;
 }
@@ -97,9 +97,12 @@ Mdouble ReversibleAdhesiveSpecies::getInteractionDistance() const
 {
     if (adhesionStiffness_ != 0.0)
         return adhesionForceMax_ / adhesionStiffness_;
-    else if (adhesionForceMax_==0.0) {
+    else if (adhesionForceMax_ == 0.0)
+    {
         return 0.0;
-    } else {
+    }
+    else
+    {
         logger(ERROR, "ReversibleAdhesiveSpecies::getInteractionDistance(): adhesionStiffness cannot be zero");
         return 0.0;
     }
@@ -116,6 +119,7 @@ void ReversibleAdhesiveSpecies::setAdhesionStiffness(Mdouble new_k0)
         exit(-1);
     }
 }
+
 ///Allows the spring constant to be accessed
 Mdouble ReversibleAdhesiveSpecies::getAdhesionStiffness() const
 {
@@ -133,6 +137,7 @@ void ReversibleAdhesiveSpecies::setAdhesionForceMax(Mdouble new_f0)
         exit(-1);
     }
 }
+
 ///Allows the spring constant to be accessed
 Mdouble ReversibleAdhesiveSpecies::getAdhesionForceMax() const
 {

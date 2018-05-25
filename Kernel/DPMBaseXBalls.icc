@@ -41,22 +41,25 @@ void DPMBase::outputXBallsDataParticle(unsigned int i, unsigned int format, std:
         {
             if (getSystemDimensions() == 1)
             {
-                os << particleHandler.getObject(i)->getPosition().X << " 0 " << particleHandler.getObject(i)->getVelocity().X << " 0 " << particleHandler.getObject(i)->getRadius() << " 0 0 0" << std::endl;
+                os << particleHandler.getObject(i)->getPosition().X << " 0 "
+                   << particleHandler.getObject(i)->getVelocity().X << " 0 "
+                   << particleHandler.getObject(i)->getRadius() << " 0 0 0" << std::endl;
                 break;
             }
             else
             {
                 std::streamsize prec = os.precision();
-                os  << std::setprecision(std::numeric_limits<double>::digits10)
-                    << particleHandler.getObject(i)->getPosition().X << " "
-                    << particleHandler.getObject(i)->getPosition().Y << " "
-                    << std::setprecision(prec)
-                    << particleHandler.getObject(i)->getVelocity().X << " "
-                    << particleHandler.getObject(i)->getVelocity().Y << " "
-                    << particleHandler.getObject(i)->getRadius() << " "
-                    << particleHandler.getObject(i)->getOrientation().getAngleZ() << " " // negative b/c we are plotting (x,y) coordinates on the xz-axis of xballs
-                    << -particleHandler.getObject(i)->getAngularVelocity().Z << " "
-                    << getInfo(*particleHandler.getObject(i)) << std::endl;
+                os << std::setprecision(std::numeric_limits<double>::digits10)
+                   << particleHandler.getObject(i)->getPosition().X << " "
+                   << particleHandler.getObject(i)->getPosition().Y << " "
+                   << std::setprecision(prec)
+                   << particleHandler.getObject(i)->getVelocity().X << " "
+                   << particleHandler.getObject(i)->getVelocity().Y << " "
+                   << particleHandler.getObject(i)->getRadius() << " "
+                   << particleHandler.getObject(i)->getOrientation().getAngleZ()
+                   << " " // negative b/c we are plotting (x,y) coordinates on the xz-axis of xballs
+                   << -particleHandler.getObject(i)->getAngularVelocity().Z << " "
+                   << getInfo(*particleHandler.getObject(i)) << std::endl;
             }
             break;
         }
@@ -64,22 +67,22 @@ void DPMBase::outputXBallsDataParticle(unsigned int i, unsigned int format, std:
         {
             Quaternion angle = particleHandler.getObject(i)->getOrientation();
             std::streamsize prec = os.precision();
-            os  << std::setprecision(std::numeric_limits<double>::digits10) //highly accurate, so the overlap is accurate
-                << particleHandler.getObject(i)->getPosition().X << " "
-                << particleHandler.getObject(i)->getPosition().Y << " "
-                << particleHandler.getObject(i)->getPosition().Z << " "
-                << std::setprecision(prec)
-                << particleHandler.getObject(i)->getVelocity().X << " "
-                << particleHandler.getObject(i)->getVelocity().Y << " "
-                << particleHandler.getObject(i)->getVelocity().Z << " "
-                << particleHandler.getObject(i)->getRadius() << " "
-                << angle.getEuler() << " "
-                << particleHandler.getObject(i)->getAngularVelocity().X << " "
-                << particleHandler.getObject(i)->getAngularVelocity().Y << " "
-                << particleHandler.getObject(i)->getAngularVelocity().Z << " "
-                << getInfo(*particleHandler.getObject(i));
-            os  << std::endl;
-
+            os << std::setprecision(std::numeric_limits<double>::digits10) //highly accurate, so the overlap is accurate
+               << particleHandler.getObject(i)->getPosition().X << " "
+               << particleHandler.getObject(i)->getPosition().Y << " "
+               << particleHandler.getObject(i)->getPosition().Z << " "
+               << std::setprecision(prec)
+               << particleHandler.getObject(i)->getVelocity().X << " "
+               << particleHandler.getObject(i)->getVelocity().Y << " "
+               << particleHandler.getObject(i)->getVelocity().Z << " "
+               << particleHandler.getObject(i)->getRadius() << " "
+               << angle.getEuler() << " "
+               << particleHandler.getObject(i)->getAngularVelocity().X << " "
+               << particleHandler.getObject(i)->getAngularVelocity().Y << " "
+               << particleHandler.getObject(i)->getAngularVelocity().Z << " "
+               << getInfo(*particleHandler.getObject(i));
+            os << std::endl;
+            
             break;
         } //end case 3
         default:
@@ -100,20 +103,20 @@ void DPMBase::writeXBallsScript() const
     std::ofstream script_file;
     file_name << getName() << ".xballs";
     script_file.open((file_name.str()).c_str());
-
+    
     ///First put in all the script lines. All these lines do is move you to the correct directory from any location
     script_file << "#!/bin/bash" << std::endl;
     script_file << "x=$(echo $0 | cut -c2-)" << std::endl;
     script_file << "file=$PWD$x" << std::endl;
     script_file << "dirname=`dirname \"$file\"`" << std::endl;
     script_file << "cd $dirname" << std::endl;
-
+    
     Mdouble scale;
     //Mdouble offset = 0;
     int verticalOffset = 0;
     int horizontalOffset = static_cast<int> (500.0 * (0.0 - getXMin()) / (getXMax() - getXMin()));
     int format;
-
+    
     if (getSystemDimensions() < 3)
     { // dim = 1 or 2
         format = 8;
@@ -139,14 +142,14 @@ void DPMBase::writeXBallsScript() const
         {
             scale = getXBallsScale();
         }
-
+        
     }
-
+    
     script_file << getMercuryBuildDir() << "/XBalls/xballs -format " << format
-        << " -f " << dataFile.getFullName().substr(dataFile.getFullName().find_last_of("/")+1)
-        << " -s " << scale
-        << " -cmode " << getXBallsColourMode()
-        << " -cmax -sort ";
+                << " -f " << dataFile.getFullName().substr(dataFile.getFullName().find_last_of("/") + 1)
+                << " -s " << scale
+                << " -cmode " << getXBallsColourMode()
+                << " -cmax -sort ";
     if (verticalOffset >= 1)
         script_file << " -o " << verticalOffset;
     else if (verticalOffset >= 1)
@@ -162,7 +165,7 @@ void DPMBase::writeXBallsScript() const
         script_file << " -vscale " << getXBallsVectorScale();
     }
     script_file.close();
-
+    
     //This line changes teh file permision and give the owener (i.e. you) read, write and excute permission to the file.
 #ifdef UNIX
     chmod((file_name.str().c_str()), S_IRWXU);

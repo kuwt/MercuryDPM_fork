@@ -27,7 +27,9 @@
 #include "SinterNormalSpecies.h"
 #include "Interactions/NormalForceInteractions/SinterInteraction.h"
 #include "Logger.h"
+
 class BaseParticle;
+
 class BaseInteractable;
 
 SinterNormalSpecies::SinterNormalSpecies()
@@ -49,7 +51,7 @@ SinterNormalSpecies::SinterNormalSpecies()
 /*!
  * \param[in] the species that is copied
  */
-SinterNormalSpecies::SinterNormalSpecies(const SinterNormalSpecies &p)
+SinterNormalSpecies::SinterNormalSpecies(const SinterNormalSpecies& p)
 {
     sinterType_ = p.sinterType_;
     loadingStiffness_ = p.loadingStiffness_;
@@ -69,7 +71,7 @@ SinterNormalSpecies::~SinterNormalSpecies()
 {
 #ifdef DEBUG_DESTRUCTOR
     std::cout<<"SinterNormalSpecies::~SinterNormalSpecies() finished"<<std::endl;
-#endif   
+#endif
 }
 
 /*!
@@ -77,15 +79,15 @@ SinterNormalSpecies::~SinterNormalSpecies()
  */
 void SinterNormalSpecies::write(std::ostream& os) const
 {
-    os  << " loadingStiffness " << loadingStiffness_;
-    os  << " maxUnloadingStiffness " << unloadingStiffnessMax_;
-    os  << " cohesionStiffness " << cohesionStiffness_;
-    os  << " maxPenetration " << penetrationDepthMax_;
-    os  << " dissipation " << dissipation_;
-    os  << " sinterAdhesion " << sinterAdhesion_;
-    os  << " inverseSinterViscosity " << inverseSinterViscosity_;
-    os  << " sinterRate_ " << sinterRate_;
-    os  << " sinterType " << (unsigned) sinterType_;
+    os << " loadingStiffness " << loadingStiffness_;
+    os << " maxUnloadingStiffness " << unloadingStiffnessMax_;
+    os << " cohesionStiffness " << cohesionStiffness_;
+    os << " maxPenetration " << penetrationDepthMax_;
+    os << " dissipation " << dissipation_;
+    os << " sinterAdhesion " << sinterAdhesion_;
+    os << " inverseSinterViscosity " << inverseSinterViscosity_;
+    os << " sinterRate_ " << sinterRate_;
+    os << " sinterType " << (unsigned) sinterType_;
 }
 
 /*!
@@ -137,9 +139,11 @@ void SinterNormalSpecies::mix(SinterNormalSpecies* const S, SinterNormalSpecies*
  * \param[in] cohesionStiffness     the cohesive stiffness of the linear plastic-viscoelastic normal force.
  * \param[in] penetrationDepthMax   the maximum penetration depth of the linear plastic-viscoelastic normal force.
  */
-void SinterNormalSpecies::setPlasticParameters (Mdouble loadingStiffness, Mdouble unloadingStiffnessMax, Mdouble cohesionStiffness, Mdouble penetrationDepthMax)
+void SinterNormalSpecies::setPlasticParameters(Mdouble loadingStiffness, Mdouble unloadingStiffnessMax,
+                                               Mdouble cohesionStiffness, Mdouble penetrationDepthMax)
 {
-    if (loadingStiffness <= 0 || unloadingStiffnessMax < loadingStiffness || cohesionStiffness < 0 || penetrationDepthMax < 0)
+    if (loadingStiffness <= 0 || unloadingStiffnessMax < loadingStiffness || cohesionStiffness < 0 ||
+        penetrationDepthMax < 0)
     {
         std::cerr << "Error: arguments of setPlasticParameters do not make sense" << std::endl;
         exit(-1);
@@ -220,11 +224,13 @@ void SinterNormalSpecies::setPenetrationDepthMax(Mdouble penetrationDepthMax)
  */
 Mdouble SinterNormalSpecies::computeTimeStep(Mdouble mass)
 {
-    if (unloadingStiffnessMax_ / (.5 * mass) < mathsFunc::square(dissipation_ /mass)) {
+    if (unloadingStiffnessMax_ / (.5 * mass) < mathsFunc::square(dissipation_ / mass))
+    {
         std::cerr << "Dissipation too high; max. allowed " << sqrt(2.0 * unloadingStiffnessMax_ * mass) << std::endl;
         exit(-1);
     }
-    return 0.02 * constants::pi / std::sqrt(unloadingStiffnessMax_ / (.5 * mass) - mathsFunc::square(dissipation_ /mass));
+    return 0.02 * constants::pi /
+           std::sqrt(unloadingStiffnessMax_ / (.5 * mass) - mathsFunc::square(dissipation_ / mass));
 }
 
 /*!
@@ -235,7 +241,7 @@ void SinterNormalSpecies::setDissipation(Mdouble dissipation)
 {
     if (dissipation < 0)
     {
-        logger(ERROR,"setDissipation(%)",dissipation);
+        logger(ERROR, "setDissipation(%)", dissipation);
         exit(-1);
     }
     dissipation_ = dissipation;
@@ -249,11 +255,12 @@ void SinterNormalSpecies::setSinterAdhesion(Mdouble sinterAdhesion)
 {
     if (sinterAdhesion < 0)
     {
-        logger(ERROR,"setSinterAdhesion(%)",sinterAdhesion);
+        logger(ERROR, "setSinterAdhesion(%)", sinterAdhesion);
         exit(-1);
     }
     sinterAdhesion_ = sinterAdhesion;
 }
+
 /*!
  * \details should be non-negative
  * \param[in] sinterAdhesion_
@@ -262,7 +269,7 @@ void SinterNormalSpecies::setSinterRate(Mdouble sinterRate)
 {
     if (sinterRate < 0)
     {
-        logger(ERROR,"setSinterRate(%)",sinterRate);
+        logger(ERROR, "setSinterRate(%)", sinterRate);
     }
     sinterRate_ = sinterRate;
 }
@@ -274,11 +281,11 @@ void SinterNormalSpecies::setSinterRate(Mdouble sinterRate)
 void SinterNormalSpecies::setSinterType(SINTERTYPE sinterType)
 {
     sinterType_ = sinterType;
-    if (sinterType_==SINTERTYPE::CONSTANT_RATE)
+    if (sinterType_ == SINTERTYPE::CONSTANT_RATE)
         logger(INFO, "Sintertype set to CONSTANT_RATE");
-    else if (sinterType_==SINTERTYPE::PARHAMI_MCKEEPING)
+    else if (sinterType_ == SINTERTYPE::PARHAMI_MCKEEPING)
         logger(INFO, "Sintertype set to PARHAMI_MCKEEPING");
-    else if (sinterType_==SINTERTYPE::TEMPERATURE_DEPENDENT_FRENKEL)
+    else if (sinterType_ == SINTERTYPE::TEMPERATURE_DEPENDENT_FRENKEL)
         logger(INFO, "Sintertype set to TEMPERATURE_DEPENDENT_FRENKEL");
     else
         logger(ERROR, "Sintertype not understood");
@@ -293,19 +300,19 @@ void SinterNormalSpecies::setInverseSinterViscosity(Mdouble inverseSinterViscosi
     //assertOrDie(inverseSinterViscosity < 0, "inverseSinterViscosity should be non-negative!");
     if (inverseSinterViscosity < 0)
     {
-        logger(ERROR,"setInverseSinterViscosity(%)",inverseSinterViscosity);
+        logger(ERROR, "setInverseSinterViscosity(%)", inverseSinterViscosity);
     }
     setSinterType(SINTERTYPE::PARHAMI_MCKEEPING);
     inverseSinterViscosity_ = inverseSinterViscosity;
 }
 
-void SinterNormalSpecies::setSinterForceAndTime (Mdouble adhesionForce, Mdouble sinterTime, Mdouble radius)
+void SinterNormalSpecies::setSinterForceAndTime(Mdouble adhesionForce, Mdouble sinterTime, Mdouble radius)
 {
     sinterType_ = SINTERTYPE::PARHAMI_MCKEEPING;
     ///\todo fix
-    setSinterAdhesion(adhesionForce/radius);
-    setInverseSinterViscosity(1.0/(93.75 * adhesionForce * sinterTime / std::pow(radius, 5)));
-    logger(INFO,"Set sintering parameters: adhesion force f_a=%*r,  sinter viscosity is nu = contactRadius^4/%",
+    setSinterAdhesion(adhesionForce / radius);
+    setInverseSinterViscosity(1.0 / (93.75 * adhesionForce * sinterTime / std::pow(radius, 5)));
+    logger(INFO, "Set sintering parameters: adhesion force f_a=%*r,  sinter viscosity is nu = contactRadius^4/%",
            getSinterAdhesion(), getInverseSinterViscosity());
 }
 
@@ -320,11 +327,15 @@ void SinterNormalSpecies::setParhamiMcKeeping
     setSinterType(SINTERTYPE::PARHAMI_MCKEEPING);
     const Mdouble boltzmannConstant /*k_B*/ = 1.38064852e-23;
     const Mdouble gasConstant /*R_g*/ = 8.314459848;
-    const Mdouble thicknessDiffusionVacancy /*DB*/ = thicknessDiffusion*exp(-activationEnergy/gasConstant/temperature);
-    const Mdouble diffusionParameter /*DeltaB*/ = atomicVolume/boltzmannConstant/temperature*thicknessDiffusionVacancy;
+    const Mdouble thicknessDiffusionVacancy /*DB*/ =
+            thicknessDiffusion * exp(-activationEnergy / gasConstant / temperature);
+    const Mdouble diffusionParameter /*DeltaB*/ =
+            atomicVolume / boltzmannConstant / temperature * thicknessDiffusionVacancy;
     setInverseSinterViscosity(constants::pi / (2.0 * beta * diffusionParameter));
-    setSinterAdhesion(alpha/beta*constants::pi*surfaceEnergy);
-    logger(INFO,"Set sintering parameters: the adhesion force f_a=%*r, the rate of change of the plastic overlap is d(delta0)/dt=f_ep/(%*a^4)", getSinterAdhesion(),
+    setSinterAdhesion(alpha / beta * constants::pi * surfaceEnergy);
+    logger(INFO,
+           "Set sintering parameters: the adhesion force f_a=%*r, the rate of change of the plastic overlap is d(delta0)/dt=f_ep/(%*a^4)",
+           getSinterAdhesion(),
            getInverseSinterViscosity());
 }
 
@@ -352,6 +363,7 @@ Mdouble SinterNormalSpecies::getSinterAdhesion() const
 {
     return sinterAdhesion_;
 }
+
 /*!
  * \return value of inverseSinterViscosity_
  */
@@ -359,6 +371,7 @@ Mdouble SinterNormalSpecies::getInverseSinterViscosity() const
 {
     return inverseSinterViscosity_;
 }
+
 /*!
  * \return value of sinterAdhesion_
  */
@@ -366,6 +379,7 @@ Mdouble SinterNormalSpecies::getSinterRate() const
 {
     return sinterRate_;
 }
+
 SINTERTYPE SinterNormalSpecies::getSinterType() const
 {
     return sinterType_;
@@ -381,7 +395,8 @@ std::function<double(double temperature)> SinterNormalSpecies::getTemperatureDep
     return temperatureDependentSinterRate_;
 }
 
-void SinterNormalSpecies::setTemperatureDependentSinterRate(std::function<double(double temperature)> temperatureDependentSinterRate)
+void SinterNormalSpecies::setTemperatureDependentSinterRate(
+        std::function<double(double temperature)> temperatureDependentSinterRate)
 {
     temperatureDependentSinterRate_ = temperatureDependentSinterRate;
 }
@@ -396,12 +411,16 @@ void SinterNormalSpecies::setTemperatureDependentSinterRate(std::function<double
 ///\todo TW: check that the masses are described correctly here (m_eff or m_p?))
 void SinterNormalSpecies::setCollisionTimeAndRestitutionCoefficient(Mdouble tc, Mdouble eps, Mdouble mass)
 {
-    if (eps==0.0) {
+    if (eps == 0.0)
+    {
         loadingStiffness_ = .5 * mass * mathsFunc::square(constants::pi / tc);
         dissipation_ = std::sqrt(2.0 * mass * loadingStiffness_);
-    } else {
+    }
+    else
+    {
         dissipation_ = -mass / tc * std::log(eps);
-        loadingStiffness_ = .5 * mass * (mathsFunc::square(constants::pi / tc) + mathsFunc::square(dissipation_ / mass));
+        loadingStiffness_ =
+                .5 * mass * (mathsFunc::square(constants::pi / tc) + mathsFunc::square(dissipation_ / mass));
     }
     unloadingStiffnessMax_ = loadingStiffness_;
 }
@@ -415,10 +434,14 @@ void SinterNormalSpecies::setCollisionTimeAndRestitutionCoefficient(Mdouble tc, 
 void SinterNormalSpecies::setStiffnessAndRestitutionCoefficient(Mdouble stiffness, Mdouble eps, Mdouble mass)
 {
     loadingStiffness_ = stiffness;
-    if (eps==0.0) {
+    if (eps == 0.0)
+    {
         dissipation_ = std::sqrt(2.0 * mass * stiffness);
-    } else {
-        dissipation_ = -std::sqrt(2.0 * mass * stiffness / (constants::sqr_pi + mathsFunc::square(log(eps)))) * log(eps);
+    }
+    else
+    {
+        dissipation_ =
+                -std::sqrt(2.0 * mass * stiffness / (constants::sqr_pi + mathsFunc::square(log(eps)))) * log(eps);
     }
     unloadingStiffnessMax_ = loadingStiffness_;
 }
@@ -428,23 +451,31 @@ Mdouble SinterNormalSpecies::getCollisionTime(Mdouble mass)
 {
     if (mass <= 0)
     {
-        std::cerr << "Error in getCollisionTime(" << mass << ") mass is not set or has an unexpected value, (getCollisionTime(" << mass << "))" << std::endl;
+        std::cerr << "Error in getCollisionTime(" << mass
+                  << ") mass is not set or has an unexpected value, (getCollisionTime(" << mass << "))" << std::endl;
         exit(-1);
     }
     if (loadingStiffness_ <= 0)
     {
-        std::cerr << "Error in getCollisionTime(" << mass << ") stiffness=" << loadingStiffness_ << " is not set or has an unexpected value, (getCollisionTime(" << mass << "), with stiffness=" << loadingStiffness_ << ")" << std::endl;
+        std::cerr << "Error in getCollisionTime(" << mass << ") stiffness=" << loadingStiffness_
+                  << " is not set or has an unexpected value, (getCollisionTime(" << mass << "), with stiffness="
+                  << loadingStiffness_ << ")" << std::endl;
         exit(-1);
     }
     if (dissipation_ < 0)
     {
-        std::cerr << "Error in getCollisionTime(" << mass << ") dissipation=" << dissipation_ << " is not set or has an unexpected value, (getCollisionTime(" << mass << "), with dissipation=" << dissipation_ << ")" << std::endl;
+        std::cerr << "Error in getCollisionTime(" << mass << ") dissipation=" << dissipation_
+                  << " is not set or has an unexpected value, (getCollisionTime(" << mass << "), with dissipation="
+                  << dissipation_ << ")" << std::endl;
         exit(-1);
     }
     Mdouble tosqrt = loadingStiffness_ / (.5 * mass) - mathsFunc::square(dissipation_ / mass);
-    if (tosqrt <= -1e-8*loadingStiffness_ / (.5 * mass))
+    if (tosqrt <= -1e-8 * loadingStiffness_ / (.5 * mass))
     {
-        std::cerr << "Error in getCollisionTime(" << mass << ") values for mass, stiffness and dissipation would lead to an overdamped system, (getCollisionTime(" << mass << "), with stiffness=" << loadingStiffness_ << " and dissipation=" << dissipation_ << ")" << std::endl;
+        std::cerr << "Error in getCollisionTime(" << mass
+                  << ") values for mass, stiffness and dissipation would lead to an overdamped system, (getCollisionTime("
+                  << mass << "), with stiffness=" << loadingStiffness_ << " and dissipation=" << dissipation_ << ")"
+                  << std::endl;
         exit(-1);
     }
     return constants::pi / std::sqrt(tosqrt);

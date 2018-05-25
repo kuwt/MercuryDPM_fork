@@ -28,8 +28,11 @@
 
 #include "Interactions/BaseInteraction.h"
 #include "Math/Vector.h"
+
 class BaseParticle;
+
 class ReversibleAdhesiveSpecies;
+
 class BaseInteractable;
 
 /*!
@@ -43,9 +46,10 @@ public:
      * \brief Setting an alias name for ReversibleAdhesiveSpecies.
      */
     typedef ReversibleAdhesiveSpecies SpeciesType;
+    
     /*!
      * \brief Constructor
-     */    
+     */
     ReversibleAdhesiveInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp);
     
     //used for mpi
@@ -53,40 +57,47 @@ public:
     
     /*!
      * \brief Copy constructor.
-     */    
-    ReversibleAdhesiveInteraction(const ReversibleAdhesiveInteraction &p);
+     */
+    ReversibleAdhesiveInteraction(const ReversibleAdhesiveInteraction& p);
+    
     /*!
      * \brief Destructor.
      */
     ~ReversibleAdhesiveInteraction() override;
+    
     /*!
      * \brief Computes the adhesive forces
-     */    
+     */
     void computeAdhesionForce();
+    
     /*!
      * \brief Interaction read function, which accepts an std::istream as input.
-     */        
+     */
     void read(std::istream& is) override;
+    
     /*!
      * \brief Interaction print function, which accepts an std::ostream as input.
-     */        
+     */
     void write(std::ostream& os) const override;
     /*!
      * \brief Returns the amount of Elastic energy involved in an interaction. Basically
      *        used in case you want to write the elastic energy into an output file. 
-     */    
+     */
     /*!
      * \brief Returns the elastic energy stored in the adhesive spring. 
      */
     Mdouble getElasticEnergy() const override;
+    
     /*!
      * \brief A dynamic_cast of BaseSpecies pointer type to a pointer to an object of 
      *        type ReversibleAdhesiveSpecies.
-     */    
+     */
     const ReversibleAdhesiveSpecies* getSpecies() const;
+    
     /*!
      * \brief Returns the name of the interaction, see Interaction.h.
-     */    
+     */
     std::string getBaseName() const;
 };
+
 #endif

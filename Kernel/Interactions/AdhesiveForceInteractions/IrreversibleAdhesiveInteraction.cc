@@ -36,10 +36,11 @@
  * \param[in] I
  * \param[in] timeStamp
  */
-IrreversibleAdhesiveInteraction::IrreversibleAdhesiveInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp)
-    : BaseInteraction(P, I, timeStamp),  ReversibleAdhesiveInteraction(P, I, timeStamp)
+IrreversibleAdhesiveInteraction::IrreversibleAdhesiveInteraction(BaseInteractable* P, BaseInteractable* I,
+                                                                 unsigned timeStamp)
+        : BaseInteraction(P, I, timeStamp), ReversibleAdhesiveInteraction(P, I, timeStamp)
 {
-    wasInContact_=false;
+    wasInContact_ = false;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"IrreversibleAdhesiveInteraction::IrreversibleAdhesiveInteraction() finished"<<std::endl;
 #endif
@@ -47,9 +48,9 @@ IrreversibleAdhesiveInteraction::IrreversibleAdhesiveInteraction(BaseInteractabl
 
 //used for mpi
 IrreversibleAdhesiveInteraction::IrreversibleAdhesiveInteraction()
-    : BaseInteraction(),  ReversibleAdhesiveInteraction()
+        : BaseInteraction(), ReversibleAdhesiveInteraction()
 {
-    wasInContact_=false;
+    wasInContact_ = false;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"IrreversibleAdhesiveInteraction::IrreversibleAdhesiveInteraction() finished"<<std::endl;
 #endif
@@ -58,15 +59,16 @@ IrreversibleAdhesiveInteraction::IrreversibleAdhesiveInteraction()
 /*!
  * \param[in] p
  */
-IrreversibleAdhesiveInteraction::IrreversibleAdhesiveInteraction(const IrreversibleAdhesiveInteraction &p)
-    : BaseInteraction(p),  ReversibleAdhesiveInteraction(p)
+IrreversibleAdhesiveInteraction::IrreversibleAdhesiveInteraction(const IrreversibleAdhesiveInteraction& p)
+        : BaseInteraction(p), ReversibleAdhesiveInteraction(p)
 {
-	///\todo tw check if the parameters are valid when inserting the species into the handler
-    wasInContact_=p.wasInContact_;
+    ///\todo tw check if the parameters are valid when inserting the species into the handler
+    wasInContact_ = p.wasInContact_;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"IrreversibleAdhesiveInteraction::IrreversibleAdhesiveInteraction(const IrreversibleAdhesiveInteraction &p finished"<<std::endl;
 #endif
 }
+
 /*!
  *
  */
@@ -76,6 +78,7 @@ IrreversibleAdhesiveInteraction::~IrreversibleAdhesiveInteraction()
     std::cout<<"IrreversibleAdhesiveInteraction::~IrreversibleAdhesiveInteraction() finished"<<std::endl;
 #endif
 }
+
 /*!
  * \param[in,out] os
  */
@@ -83,6 +86,7 @@ void IrreversibleAdhesiveInteraction::write(std::ostream& os) const
 {
     os << " wasInContact " << wasInContact_;
 }
+
 /*!
  * \param[in,out] is
  */
@@ -91,29 +95,32 @@ void IrreversibleAdhesiveInteraction::read(std::istream& is)
     std::string dummy;
     is >> dummy >> wasInContact_;
 }
+
 /*!
  * \details Uses the most basic adhesion contact model.
  */
 void IrreversibleAdhesiveInteraction::computeAdhesionForce()
 {
     const IrreversibleAdhesiveSpecies* species = getSpecies();
-    if (getOverlap()>=0)
+    if (getOverlap() >= 0)
     {
-        wasInContact_=true;
+        wasInContact_ = true;
         addForce(getNormal() * (-species->getAdhesionForceMax()));
     }
     else if (wasInContact_)
     {
-        addForce(getNormal() * (-species->getAdhesionStiffness() *getOverlap() - species->getAdhesionForceMax()));
+        addForce(getNormal() * (-species->getAdhesionStiffness() * getOverlap() - species->getAdhesionForceMax()));
     }
 }
+
 /*!
  * \return const pointer of IrreversibleAdhesiveSpecies*
  */
 const IrreversibleAdhesiveSpecies* IrreversibleAdhesiveInteraction::getSpecies() const
 {
-    return dynamic_cast<const IrreversibleAdhesiveSpecies *>(getBaseSpecies());
+    return dynamic_cast<const IrreversibleAdhesiveSpecies*>(getBaseSpecies());
 }
+
 /*!
  * \return std::string
  */
@@ -132,10 +139,11 @@ Mdouble IrreversibleAdhesiveInteraction::getElasticEnergy() const
     if (!wasInContact_)
         return 0.0;
     else if (getOverlap() <= 0)
-        return -0.5 * getSpecies()->getAdhesionStiffness() * mathsFunc::square(getOverlap() + getSpecies()->getInteractionDistance());
+        return -0.5 * getSpecies()->getAdhesionStiffness() *
+               mathsFunc::square(getOverlap() + getSpecies()->getInteractionDistance());
     else
         return -getSpecies()->getAdhesionForceMax() * getOverlap()
-        - 0.5 * getSpecies()->getAdhesionStiffness() * mathsFunc::square(getSpecies()->getInteractionDistance());
+               - 0.5 * getSpecies()->getAdhesionStiffness() * mathsFunc::square(getSpecies()->getInteractionDistance());
 }
 
 bool IrreversibleAdhesiveInteraction::getWasInContact() const

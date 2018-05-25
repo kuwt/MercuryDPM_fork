@@ -25,6 +25,7 @@
 
 #ifndef BondedSpecies_h
 #define BondedSpecies_h
+
 #include "Species/BaseSpecies.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/AdhesiveForceInteractions/BondedInteraction.h"
@@ -39,49 +40,50 @@ class BondedSpecies : public virtual BaseSpecies
 public:
     ///\brief The correct Interaction type for this AdhesiveForceSpecies
     typedef BondedInteraction InteractionType;
-
+    
     ///\brief The default constructor.
     BondedSpecies();
-
+    
     ///\brief The default copy constructor.
-    BondedSpecies(const BondedSpecies &s);
-
+    BondedSpecies(const BondedSpecies& s);
+    
     ///\brief The default destructor.
     ~BondedSpecies() override;
-
+    
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
-
+    
     /// \brief Writes the species properties to an output stream.
     void write(std::ostream& os) const override;
-
+    
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;
     
     ///\brief creates default values for mixed species
-    void mix(BondedSpecies*S, BondedSpecies*T);
+    void mix(BondedSpecies* S, BondedSpecies* T);
 
 //setters and getters
     ///\brief Allows the spring constant to be changed
     void setBondDissipation(Mdouble disp);
-
+    
     ///\brief Allows the spring constant to be accessed
     Mdouble getBondDissipation() const;
-
+    
     ///\brief Allows the spring constant to be changed
     void setBondForceMax(Mdouble new_f0);
-
+    
     ///\brief Allows the spring constant to be accessed
     Mdouble getBondForceMax() const;
-
+    
     ///\brief returns the largest separation distance at which adhesive short-range forces can occur (0.0 for the default EmptyAdhesiveSpecies).
     Mdouble getInteractionDistance() const override;
 
 private:
     ///\brief dissipation in bond
     Mdouble bondDissipation_;
-
+    
     ///\brief adhesion force at zero overlap
     Mdouble bondForceMax_;
 };
+
 #endif

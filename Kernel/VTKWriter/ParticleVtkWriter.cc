@@ -36,7 +36,7 @@ void ParticleVtkWriter::writeVTKPositions(std::fstream& file) const
 #ifdef MERCURY_USE_MPI
         if (!(p->isMPIParticle() || p->isPeriodicGhostParticle()))
       {
-	    file << '\t' << p->getPosition() << '\n';
+        file << '\t' << p->getPosition() << '\n';
       }
 #else
         file << '\t' << p->getPosition() << '\n';
@@ -56,7 +56,7 @@ void ParticleVtkWriter::writeVTKIndSpecies(std::fstream& file) const
 #ifdef MERCURY_USE_MPI
         if (!(p->isMPIParticle() || p->isPeriodicGhostParticle()))
       {
-	    file << '\t' << p->getIndSpecies() << '\n';
+        file << '\t' << p->getIndSpecies() << '\n';
       }
 #else
         file << '\t' << p->getIndSpecies() << '\n';

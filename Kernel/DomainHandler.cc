@@ -40,7 +40,7 @@
 DomainHandler::DomainHandler()
 {
     currentDomainIndex_ = 0;
-    interactionDistance_ = 0.0;  
+    interactionDistance_ = 0.0;
     logger(DEBUG, "DomainHandler::DomainHandler() finished");
 }
 
@@ -49,7 +49,7 @@ DomainHandler::DomainHandler()
  * \details This is not a copy constructor! It copies the DPMBase and all 
  *          Domain, and sets the other variables to 0.
  */
-DomainHandler::DomainHandler(const DomainHandler &DH)
+DomainHandler::DomainHandler(const DomainHandler& DH)
         : BaseHandler<Domain>()
 {
     copyContentsFromOtherHandler(DH);
@@ -61,7 +61,7 @@ DomainHandler::DomainHandler(const DomainHandler &DH)
  * \details This is not a copy assignment operator! It copies the DPMBase and all 
  *          Domain, and sets the other variables to 0.
  */
-DomainHandler& DomainHandler::operator =(const DomainHandler& rhs)
+DomainHandler& DomainHandler::operator=(const DomainHandler& rhs)
 {
     if (this != &rhs)
     {
@@ -90,14 +90,15 @@ DomainHandler::~DomainHandler()
  * \param[in] numberOfDomains The number of domains in cartesian direction
  * \param[in] open Determines if the boundary domains have infinite limits (true) or not (false)
  */
-void DomainHandler::createMesh(std::vector<Mdouble>& simulationMin, std::vector<Mdouble>& simulationMax, std::vector<unsigned>& numberOfDomains, bool open)
+void DomainHandler::createMesh(std::vector<Mdouble>& simulationMin, std::vector<Mdouble>& simulationMax,
+                               std::vector<unsigned>& numberOfDomains, bool open)
 {
     //Clear the objects in the list, we're gonna make a new mesh, owyeah
     objects_.clear();
-
+    
     //Create the mesh
     setNumberOfDomains(numberOfDomains);
-  
+    
     std::vector<unsigned> globalMeshIndex(3);
     //Recursive function creating the domains
     int dimCounter = 3;
@@ -105,24 +106,24 @@ void DomainHandler::createMesh(std::vector<Mdouble>& simulationMin, std::vector<
     std::vector<Mdouble> meshSize;
     for (int d = 0; d < 3; d++)
     {
-        meshSize.push_back((simulationMax[d] - simulationMin[d])/numberOfDomains[d]);
+        meshSize.push_back((simulationMax[d] - simulationMin[d]) / numberOfDomains[d]);
     }
     //Create the domains
-    createDomains(simulationMin, simulationMax, globalMeshIndex, numberOfDomains, dimCounter, meshSize, open);  
-
+    createDomains(simulationMin, simulationMax, globalMeshIndex, numberOfDomains, dimCounter, meshSize, open);
+    
     //Create lookup tables
-    for(Domain* domain : objects_)
+    for (Domain* domain : objects_)
     {
         domain->setRank(domain->getGlobalIndex());
         domain->createLookUpTable();
     }
-  
+    
     //Disable boundaries that dont require communication
-    for(Domain* domain : objects_)
+    for (Domain* domain : objects_)
     {
         domain->disableBoundaries();
     }
-
+    
     //Output the result
     std::string meshType;
     if (open)
@@ -135,7 +136,8 @@ void DomainHandler::createMesh(std::vector<Mdouble>& simulationMin, std::vector<
     }
     if (PROCESSOR_ID == 0)
     {
-        logger(INFO,"A simulation mesh has been created with % number of domains and % boundaries.",this->getSize(),meshType);
+        logger(INFO, "A simulation mesh has been created with % number of domains and % boundaries.", this->getSize(),
+               meshType);
     }
 }
 
@@ -151,47 +153,49 @@ void DomainHandler::createMesh(std::vector<Mdouble>& simulationMin, std::vector<
  * \param[in] dimCounter The dimension counter that keeps track in whicn direction the rescursive function is working
  * \param[in] open determines if a domain boundary is open (inf) or closed
  */
-void DomainHandler::createDomains(std::vector<Mdouble> domainMin, std::vector<Mdouble> domainMax, std::vector<unsigned>& globalMeshIndex, std::vector<unsigned>& numberOfDomains, int dimCounter, std::vector<Mdouble>& meshSize, bool open)
+void DomainHandler::createDomains(std::vector<Mdouble> domainMin, std::vector<Mdouble> domainMax,
+                                  std::vector<unsigned>& globalMeshIndex, std::vector<unsigned>& numberOfDomains,
+                                  int dimCounter, std::vector<Mdouble>& meshSize, bool open)
 {
     //For convenience
     Mdouble inf = std::numeric_limits<Mdouble>::infinity();
- 
+    
     //
-    if (dimCounter==0)
+    if (dimCounter == 0)
     {
-    	//Create a new domain
-	Domain domain(globalMeshIndex);
-    	domain.setHandler(this);
-        const std::vector<double> &domainBoundMin = domainMin;
-        const std::vector<double> &domainBoundMax = domainMax;
-	domain.setBounds(domainBoundMin, domainBoundMax, true);
-	this->copyAndAddObject(domain);
+        //Create a new domain
+        Domain domain(globalMeshIndex);
+        domain.setHandler(this);
+        const std::vector<double>& domainBoundMin = domainMin;
+        const std::vector<double>& domainBoundMax = domainMax;
+        domain.setBounds(domainBoundMin, domainBoundMax, true);
+        this->copyAndAddObject(domain);
     }
     else
     {
-	    dimCounter--;
-    	//Compute size of a domain in the dimCounter'th direction.
-    	Mdouble boundLeft = domainMin[dimCounter];
+        dimCounter--;
+        //Compute size of a domain in the dimCounter'th direction.
+        Mdouble boundLeft = domainMin[dimCounter];
         //Starting with the bound left, create the number of domains in the given dimCounter-direction
-	    for (int i=0;i<numberOfDomains[dimCounter];i++)
-	    {
-	        globalMeshIndex[dimCounter] = i;
-	        domainMin[dimCounter] = boundLeft + i*meshSize[dimCounter];
-	        domainMax[dimCounter] = boundLeft + (i+1)*meshSize[dimCounter];
-	        if ((i==0) && (open))
-	        {
-		        domainMin[dimCounter] = -inf;
-	        }
-	      
-	        if ((i==numberOfDomains[dimCounter] - 1) && (open))
-	        {
-		        domainMax[dimCounter] = inf;
-	        }
-
-	        //Start recursively a new createDomains function
-	        createDomains(domainMin,domainMax,globalMeshIndex,numberOfDomains,dimCounter,meshSize,open);
-	    }
-    }    
+        for (int i = 0; i < numberOfDomains[dimCounter]; i++)
+        {
+            globalMeshIndex[dimCounter] = i;
+            domainMin[dimCounter] = boundLeft + i * meshSize[dimCounter];
+            domainMax[dimCounter] = boundLeft + (i + 1) * meshSize[dimCounter];
+            if ((i == 0) && (open))
+            {
+                domainMin[dimCounter] = -inf;
+            }
+            
+            if ((i == numberOfDomains[dimCounter] - 1) && (open))
+            {
+                domainMax[dimCounter] = inf;
+            }
+            
+            //Start recursively a new createDomains function
+            createDomains(domainMin, domainMax, globalMeshIndex, numberOfDomains, dimCounter, meshSize, open);
+        }
+    }
 }
 
 /*!
@@ -245,7 +249,7 @@ void DomainHandler::setCurrentDomainIndex(unsigned int index)
  * \brief Returns a pointer to the active domain
  * \details The active domain is the domain that was assigned to the processor 
  * \return Pointer to a Domain on which the processor has to do computations
- */   
+ */
 Domain* DomainHandler::getCurrentDomain()
 {
     return getObject(currentDomainIndex_);
@@ -255,7 +259,7 @@ Domain* DomainHandler::getCurrentDomain()
  * \details Gets the Domain Index in the vector of the DomainHandler 
  * assigned to this processor 
  * \return Index of a Domain on which the processor has to do computations
- */ 
+ */
 unsigned int DomainHandler::getCurrentDomainIndex() const
 {
     return currentDomainIndex_;
@@ -271,7 +275,7 @@ void DomainHandler::setNumberOfDomains(std::vector<unsigned>& numberOfDomains)
 {
     numberOfDomains_ = numberOfDomains;
 }
-    
+
 /*!
  * \brief Gets the number of domains in the domain handler
  * \details The number of domains is given as a vector in the form of (nx,ny,nz)
@@ -294,18 +298,18 @@ void DomainHandler::setInteractionDistance(Mdouble interactionDistance)
 {
     //Update the interaction distance
     interactionDistance_ = interactionDistance;
-
+    
     //Check if the domainsize is not too small
     Domain* domain = getCurrentDomain();
-    logger.assert_always((domain->getDomainMax()[0] - domain->getDomainMin()[0]) > 2*interactionDistance_,
-                 "Size of the domain in x-direction is smaller than communication zone. Size: %, communication zone: %",
-                 (domain->getDomainMax()[0] - domain->getDomainMin()[0]),2*interactionDistance_);
-    logger.assert_always((domain->getDomainMax()[1] - domain->getDomainMin()[1]) > 2*interactionDistance_,
-                 "Size of the domain in y-direction is smaller than communication zone. Size: %, communication zone: %",
-                 (domain->getDomainMax()[1] - domain->getDomainMin()[1]),2*interactionDistance);
-    logger.assert_always((domain->getDomainMax()[2] - domain->getDomainMin()[2]) > 2*interactionDistance_,
-                 "Size of the domain in z-direction is smaller than communication zone. Size: %, communication zone: %",
-                 (domain->getDomainMax()[2] - domain->getDomainMin()[2]),2*interactionDistance_);
+    logger.assert_always((domain->getDomainMax()[0] - domain->getDomainMin()[0]) > 2 * interactionDistance_,
+                         "Size of the domain in x-direction is smaller than communication zone. Size: %, communication zone: %",
+                         (domain->getDomainMax()[0] - domain->getDomainMin()[0]), 2 * interactionDistance_);
+    logger.assert_always((domain->getDomainMax()[1] - domain->getDomainMin()[1]) > 2 * interactionDistance_,
+                         "Size of the domain in y-direction is smaller than communication zone. Size: %, communication zone: %",
+                         (domain->getDomainMax()[1] - domain->getDomainMin()[1]), 2 * interactionDistance);
+    logger.assert_always((domain->getDomainMax()[2] - domain->getDomainMin()[2]) > 2 * interactionDistance_,
+                         "Size of the domain in z-direction is smaller than communication zone. Size: %, communication zone: %",
+                         (domain->getDomainMax()[2] - domain->getDomainMin()[2]), 2 * interactionDistance_);
 }
 
 /*!
@@ -327,21 +331,21 @@ int DomainHandler::getParticleDomainGlobalIndex(BaseParticle* particle)
     //TODO this could possibly be stored in the domainHandler to save computational power
     std::vector<int> decompositionVector(3);
     
-    int i,j,k;
-    Mdouble dx = (getDPMBase()->getXMax() - getDPMBase()->getXMin())/getDPMBase()->getNumberOfDomains()[0];
-    Mdouble dy = (getDPMBase()->getYMax() - getDPMBase()->getYMin())/getDPMBase()->getNumberOfDomains()[1];
-    Mdouble dz = (getDPMBase()->getZMax() - getDPMBase()->getZMin())/getDPMBase()->getNumberOfDomains()[2];
-
+    int i, j, k;
+    Mdouble dx = (getDPMBase()->getXMax() - getDPMBase()->getXMin()) / getDPMBase()->getNumberOfDomains()[0];
+    Mdouble dy = (getDPMBase()->getYMax() - getDPMBase()->getYMin()) / getDPMBase()->getNumberOfDomains()[1];
+    Mdouble dz = (getDPMBase()->getZMax() - getDPMBase()->getZMin()) / getDPMBase()->getNumberOfDomains()[2];
+    
     //x-direction
-    if ( (particle->getPosition().X - getDPMBase()->getXMin()) <= 0)
+    if ((particle->getPosition().X - getDPMBase()->getXMin()) <= 0)
     {
         i = 0;
     }
     else
     {
         //Compute the relative domain cell it is in
-        i = floor((particle->getPosition().X - getDPMBase()->getXMin())/dx);
-
+        i = floor((particle->getPosition().X - getDPMBase()->getXMin()) / dx);
+        
         //Make sure we dont go over our number of domain bounds
         if (i >= getDPMBase()->getNumberOfDomains()[0] - 1)
         {
@@ -351,17 +355,17 @@ int DomainHandler::getParticleDomainGlobalIndex(BaseParticle* particle)
         {
             i = 0;
         }
-   }
-
+    }
+    
     //y-direction
-    if ( (particle->getPosition().Y - getDPMBase()->getYMin()) <= 0)
+    if ((particle->getPosition().Y - getDPMBase()->getYMin()) <= 0)
     {
         j = 0;
     }
     else
-    {   
-        j = floor((particle->getPosition().Y - getDPMBase()->getYMin())/dy);
-
+    {
+        j = floor((particle->getPosition().Y - getDPMBase()->getYMin()) / dy);
+        
         //Make sure we dont go over our number of domain bounds
         if (j >= getDPMBase()->getNumberOfDomains()[1] - 1)
         {
@@ -372,15 +376,15 @@ int DomainHandler::getParticleDomainGlobalIndex(BaseParticle* particle)
             j = 0;
         }
     }
-
+    
     //z-direction
-    if ( (particle->getPosition().Z - getDPMBase()->getZMin()) <= 0)
+    if ((particle->getPosition().Z - getDPMBase()->getZMin()) <= 0)
     {
         k = 0;
     }
     else
-    {   
-        k = floor((particle->getPosition().Z - getDPMBase()->getZMin())/dz);
+    {
+        k = floor((particle->getPosition().Z - getDPMBase()->getZMin()) / dz);
         //Make sure we dont go over our number of domain bounds
         if (k >= getDPMBase()->getNumberOfDomains()[2] - 1)
         {
@@ -390,13 +394,13 @@ int DomainHandler::getParticleDomainGlobalIndex(BaseParticle* particle)
         {
             k = 0;
         }
- 
+        
     }
-
+    
     //Step 2: obtain the processor number
-    int globalIndex =   i + 
-                    getDPMBase()->getNumberOfDomains()[0]*j + 
-                    getDPMBase()->getNumberOfDomains()[1]*getDPMBase()->getNumberOfDomains()[0]*k;
+    int globalIndex = i +
+                      getDPMBase()->getNumberOfDomains()[0] * j +
+                      getDPMBase()->getNumberOfDomains()[1] * getDPMBase()->getNumberOfDomains()[0] * k;
     return globalIndex;
 }
 

@@ -26,6 +26,7 @@
 
 #ifndef FILE_H
 #define FILE_H
+
 #include <fstream>
 
 // A value of File::lastSavedTimeStep_ = NEVER indicates a file was never been written
@@ -40,34 +41,33 @@ enum class FileType : unsigned char
     /*!
      * \brief file will not be created/read\n
      */
-    NO_FILE = 0,
+            NO_FILE = 0,
     /*!
      * \brief all data will be written into/ read from a single file called name_\n
      */
-    ONE_FILE = 1,
+            ONE_FILE = 1,
     /*!
      * \brief each time-step will be written into/read from separate files numbered consecutively: name_.0, name_.1, .. so on \n
      */
-    MULTIPLE_FILES = 2,
+            MULTIPLE_FILES = 2,
     /*!
      * \brief each time-step will be written into/read from separate files numbered consecutively, with numbers padded by zeros to a minimum of four digits: name_.0000, name_.0001, ..
      */
-    MULTIPLE_FILES_PADDED = 3
+            MULTIPLE_FILES_PADDED = 3
 };
 
 
-    
 std::string to_string_padded(unsigned int value);
 
 /*!
  * \brief Writes the FileType as a human-readable string into the output stream 'os' 
  */
-std::ostream& operator<<(std::ostream&os, FileType fileType);
+std::ostream& operator<<(std::ostream& os, FileType fileType);
 
 /*!
  * \brief Reads the FileType from an input stream 'is'
  */
-std::istream& operator>>(std::istream&is, FileType&fileType);
+std::istream& operator>>(std::istream& is, FileType& fileType);
 
 /*!
  * \class File 
@@ -79,111 +79,111 @@ std::istream& operator>>(std::istream&is, FileType&fileType);
 class File
 {
 public:
-
+    
     //constructors
     /*!
      * \brief constructor
      */
     File();
-
+    
     /*!
      * \brief default copy constructor
      */
     File(const File&);
-
+    
     /*!
      * \brief destructor
      */
     virtual ~File();
-
-
+    
+    
     //set and get functions
     /*!
      * \brief Allows to access the member variable File::fstream_
      */
     std::fstream& getFstream();
-
+    
     /*!
      * \brief Allows to access the file name, e.g., "problem.data".
      */
     const std::string& getName() const;
-
+    
     /*!
      * \brief Also allows to access the file name, however with additional information which is the file counter, e.g., "problem.data.0000"
      */
     const std::string getFullName() const;
-
+    
     /*!
      * \brief Allows to access the file name, however with additional information which is the file counter, e.g., "problem.data.0000"
      */
     const std::string getFullName(unsigned) const;
-
+    
     /*!
      * \brief Sets the file name, e.g. "Name.data". 
      * \details Note the file name is usually set by MD::setName(), which sets names for all file types (data, restart, fstat, stat, ene)
      */
     void setName(const std::string& name);
-
+    
     /*!
      * \brief Gets the file type e.g. NOFILE, ONEFILE and MULTIPLE FILES. File::fileType_
      */
     FileType getFileType() const;
-
+    
     /*!
      * \brief Sets the type of file needed to write into or read from. File::fileType_
      */
     void setFileType(FileType fileType);
-
+    
     /*!
      * \brief In case of multiple files, File::getCounter() returns the the number (FILE::Counter_) of the next file i.e. to be opened for reading or writing; NOTE: needed only if FILE::fileType_ is multiple files
      */
     unsigned int getCounter() const;
-
+    
     /*!
       * \brief Allows the user to set the file counter according to his need. Sets File::counter_.
       */
     void setCounter(unsigned int counter);
-
+    
     /*!
      * \brief Allows the user to know the file mode i.e. gets File::openMode_
      */
     std::fstream::openmode getOpenMode() const;
-
+    
     /*!
      * \brief Allows the user to Sets File::openMode_
      */
     void setOpenMode(std::fstream::openmode openMode);
-
+    
     /*!
      * \brief Gets File::saveCount_
      */
     unsigned int getSaveCount() const;
-
+    
     /*!
      * \brief Sets File::saveCount_
      */
     void setSaveCount(unsigned int saveCount);
-
+    
     /*!
      * \brief Gets File::nextSavedTimeStep_
      */
     unsigned int getLastSavedTimeStep() const;
-
+    
     /*!
     * \brief Sets File::nextSavedTimeStep_
     */
     void setLastSavedTimeStep(unsigned int lastSavedTimeStep);
-
+    
     /*!
      * \brief determined if this time step has to be written; if so, opens the output file
      */
     bool saveCurrentTimeStep(unsigned int ntimeSteps);
-
+    
     /*!
      * \brief read function, which accepts an input stream <a href="http://en.cppreference.com/w/cpp/io/basic_istreams.html">std::istream</a>. 
      */
     void read(std::istream& is);
-
+    
     /*!
      * \brief print function, which accepts an std::stringstream as input.
      */
@@ -194,32 +194,33 @@ public:
     * It also returns a reference to the output stream.
     */
     friend std::ostream& operator<<(std::ostream& os, const File& o);
-
+    
     /*!
      * \brief Operator overloading used to read data from the input stream into member variables of an object of class File. It also returns a reference
      * of type std::istream&
      */
-    friend std::istream& operator>>(std::istream& is, File &o);
-
+    friend std::istream& operator>>(std::istream& is, File& o);
+    
     //member functions (other than set/get)
-
+    
     /*!
      * \brief Checks if the file stream fstream_ has any issues while opening. Alongside, it also increments the nextSavedTimeStep and the counter.
      * the counter is useful when the fileType_ is set to Multiple or Multiple with padded. 
      */
     bool open();
-
+    
     /*!
      * \brief First sets openmode to write (and append in some cases), then calls open().
      */
     bool openWrite(unsigned);
+    
     bool openWriteNoAppend(unsigned);
-
+    
     /*!
      * \brief First calls setOpenMode(openMode), then calls open().
      */
     bool open(std::fstream::openmode openMode);
-
+    
     /*!
      * \brief Closes the file by calling fstream_.close()
      */
@@ -230,34 +231,34 @@ private:
      * \brief  name of the file.
      */
     std::string name_;
-
+    
     /*!
      * \brief Stream object used to read/write data files
      */
     std::fstream fstream_;
-
+    
     /*!
      * \brief fileType_ indicates the type of the files. Whether it is No file, one file or multiple file as described in the
      * description of the class.
      */
     FileType fileType_;
-
+    
     /*!
      * \brief counts the number of already opened files, i.e. counter=1 means .0000 exists
      */
     unsigned int counter_;
-
+    
     /*!
      * \brief A variable to indicate how the file should be opened i.e. in, out, ... see http://en.cppreference.com (std::fstream::out by default)
      */
     std::fstream::openmode openMode_;
-
+    
     /*!
      * \brief Allows one to define the number of time steps to be skipped to make a snap shot. E.g. TMax = 100, saveCount_ = 10, timeStep = 1; It stores data at t={0,10,20,30,40...100}.
      * And if TMax =101, it stores data at t={0,10,20,30,...100,101}
      */
     unsigned int saveCount_;
-
+    
     /*!
      * \brief the time step at which the next write or read operation has to happen.
      */

@@ -38,13 +38,13 @@ class ParticleSpecies : public virtual BaseSpecies
 public:
     typedef BaseInteraction InteractionType;
     typedef BaseSpecies MixedSpeciesType;
-
+    
     ///\brief The default constructor.
     ParticleSpecies();
-
+    
     ///\brief The default copy constructor.
-    ParticleSpecies(const ParticleSpecies &p);
-
+    ParticleSpecies(const ParticleSpecies& p);
+    
     ///\brief The default destructor.
     ~ParticleSpecies() override;
     
@@ -53,32 +53,32 @@ public:
      * \details See BaseSpecies::copy for details
      */
     ParticleSpecies* copy() const override = 0;
-
+    
     /*!
      * \brief Creates a new MixedSpecies with the same force properties as the 
      * Species from which it is called. See Species::copyMixed for details
      */
     virtual BaseSpecies* copyMixed() const = 0;
-
+    
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
-
+    
     /// \brief Writes the species properties to an output stream.
     void write(std::ostream& os) const override;
-
+    
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;
-
+    
     ///Allows density_ to be changed
     ///\todo recalculate masses when setting dim_particle or rho
     void setDensity(Mdouble density);
-
+    
     ///\todo TW: should getMassFromRadius be removed? IFCD: it is used in at 
     /// least one driver (AxisymmetricHopper).
     Mdouble getMassFromRadius(Mdouble radius) const;
-
+    
     Mdouble getVolumeFromRadius(Mdouble radius) const;
-
+    
     ///Allows density_ to be accessed
     Mdouble getDensity() const;
     
@@ -86,22 +86,23 @@ public:
      * \brief Compute Particle mass function, which required a reference to the Species vector. It computes the Particles mass, Inertia and the inverses.
      */
     void computeMass(BaseParticle* p) const;
-
-    void setTemperatureDependentDensity(const std::function<double(double)> &temperatureDependentDensity);
-
-    const std::function<double(double)> &getTemperatureDependentDensity() const;
+    
+    void setTemperatureDependentDensity(const std::function<double(double)>& temperatureDependentDensity);
+    
+    const std::function<double(double)>& getTemperatureDependentDensity() const;
 
 private:
     /*!
      * \brief The mass density.
      */
     Mdouble density_;
-
+    
     /*!
      * Change this function to let the particles expand due to temperature.
      * The default value (empty) stands for constant density.
      */
     std::function<double(double temperature)> temperatureDependentDensity_;
-
+    
 };
+
 #endif

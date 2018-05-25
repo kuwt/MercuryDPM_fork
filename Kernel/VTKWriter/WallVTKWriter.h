@@ -34,44 +34,46 @@ class WallVTKWriter final : public BaseVTKWriter<WallHandler>
 {
 
 public:
-
+    
     /**
      * Non-default constructor; sets the handler and fileCounter
      */
-    explicit WallVTKWriter(WallHandler& wallHandler) : BaseVTKWriter(wallHandler) { }
-
+    explicit WallVTKWriter(WallHandler& wallHandler) : BaseVTKWriter(wallHandler)
+    {}
+    
     /**
      * Default copy constructor
      */
     WallVTKWriter(const WallVTKWriter&) = default;
-
+    
     /**
      * extracts vtk data from the wallHandler and stores it in a VTKContainer
      */
     void getVTKData(VTKContainer& vtk) const;
-
+    
     /**
      * writes a vtk file
      */
     void writeVTK() const override;
-
+    
     /**
      * the name of the class in the restart file
      */
-    std::string getName() const { return "WallVTKWriter"; }
+    std::string getName() const
+    { return "WallVTKWriter"; }
 
 protected:
-
+    
     /**
      * writes the point data to the vtu file (i.e. the vertices of the mesh displayed in paraview)
      */
     void writeVTKPoints(std::fstream& file, VTKContainer& vtk) const;
-
+    
     /**
      * writes the cell data to the vtu file (i.e. the faces of the mesh displayed in paraview)
      */
     void writeVTKCells(std::fstream& file, VTKContainer& vtk) const;
-
+    
 };
 
 

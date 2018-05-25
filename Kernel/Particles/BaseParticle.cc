@@ -37,8 +37,8 @@ BaseParticle::BaseParticle()
     displacement_.setZero();
     radius_ = 1.0;
     invMass_ = 1.0;
-    invInertia_ = MatrixSymmetric3D(1,0,0,1,0,1);
-
+    invInertia_ = MatrixSymmetric3D(1, 0, 0, 1, 0, 1);
+    
     periodicFromParticle_ = nullptr;
     isMPIParticle_ = false;
     isInMPIDomain_ = false;
@@ -53,14 +53,14 @@ BaseParticle::BaseParticle()
 #endif
     hGridNextObject_ = nullptr;
     hGridPrevObject_ = nullptr;
-
+    
     hGridCell.setHGridLevel(99999);
     hGridCell.setHGridX(99999);
     hGridCell.setHGridY(99999);
     hGridCell.setHGridZ(99999);
-
+    
     info_ = std::numeric_limits<double>::quiet_NaN();
-
+    
     logger(DEBUG, "BaseParticle::BaseParticle() finished");
 }
 
@@ -72,23 +72,23 @@ BaseParticle::BaseParticle()
  *          that handles this particle. Use with care.
  * \param[in,out] p  Reference to the BaseParticle this one should become a copy of.
  */
-BaseParticle::BaseParticle(const BaseParticle &p)
-: BaseInteractable(p)
+BaseParticle::BaseParticle(const BaseParticle& p)
+        : BaseInteractable(p)
 {
     handler_ = nullptr;
     displacement_ = p.displacement_;
     radius_ = p.radius_;
     invMass_ = p.getInvMass();
     invInertia_ = p.getInvInertia();
-
+    
     hGridNextObject_ = nullptr;
     hGridPrevObject_ = nullptr;
-
+    
     hGridCell.setHGridLevel(p.getHGridLevel());
     hGridCell.setHGridX(99999);
     hGridCell.setHGridY(99999);
     hGridCell.setHGridZ(99999);
-
+    
     periodicFromParticle_ = p.periodicFromParticle_;
     isMPIParticle_ = p.isMPIParticle_;
     isInMPIDomain_ = p.isInMPIDomain_;
@@ -101,13 +101,13 @@ BaseParticle::BaseParticle(const BaseParticle &p)
 #ifdef CONTACT_LIST_HGRID
     firstPossibleContact = nullptr;
 #endif
-
+    
     info_ = p.info_;
     logger(DEBUG, "BaseParticle::BaseParticle(BaseParticle &p) finished");
 }
 
 BaseParticle::BaseParticle(const ParticleSpecies* s)
-: BaseParticle()
+        : BaseParticle()
 {
     setSpecies(s);
 #ifdef CONTACT_LIST_HGRID
@@ -122,7 +122,7 @@ BaseParticle::BaseParticle(const ParticleSpecies* s)
  */
 BaseParticle::~BaseParticle()
 {
-
+    
     if (getHandler() != nullptr)
     {
         getHandler()->checkExtremaOnDelete(this);
@@ -130,7 +130,7 @@ BaseParticle::~BaseParticle()
             getHandler()->removedFixedParticle();
     }
     logger(DEBUG, "BaseParticle::~BaseParticle() of particle % finished.", getId());
-
+    
 }
 
 /*!
@@ -157,15 +157,15 @@ Mdouble BaseParticle::getVolume() const
     }
     switch (getParticleDimensions())
     {
-    case 3:
-        return (4.0 / 3.0 * constants::pi * radius_ * radius_ * radius_);
-    case 2:
-        return (constants::pi * radius_ * radius_);
-    case 1:
-        return (2.0 * radius_);
-    default:
-        logger(ERROR, "[BaseParticle::getVolume] dimension of the particle is not set");
-        return 0;
+        case 3:
+            return (4.0 / 3.0 * constants::pi * radius_ * radius_ * radius_);
+        case 2:
+            return (constants::pi * radius_ * radius_);
+        case 1:
+            return (2.0 * radius_);
+        default:
+            logger(ERROR, "[BaseParticle::getVolume] dimension of the particle is not set");
+            return 0;
     }
 }
 
@@ -175,7 +175,7 @@ Mdouble BaseParticle::getVolume() const
 void BaseParticle::fixParticle()
 {
     invMass_ = 0.0;
-    invInertia_ = MatrixSymmetric3D(0,0,0,0,0,0);
+    invInertia_ = MatrixSymmetric3D(0, 0, 0, 0, 0, 0);
     setVelocity(Vec3D(0.0, 0.0, 0.0));
     setAngularVelocity(Vec3D(0.0, 0.0, 0.0));
     if (getHandler())
@@ -213,7 +213,6 @@ void BaseParticle::setPeriodicComplexity(std::vector<int> complexity)
 }
 
 
-
 void BaseParticle::setPeriodicComplexity(int index, int value)
 {
     //hack: generally you'd add particles after declaring the boundaries
@@ -222,14 +221,14 @@ void BaseParticle::setPeriodicComplexity(int index, int value)
     if (periodicComplexity_.empty())
     {
         int numberOfPeriodicBoundaries = getHandler()->getDPMBase()->periodicBoundaryHandler.getSize();
-        if (numberOfPeriodicBoundaries > 0 )
+        if (numberOfPeriodicBoundaries > 0)
         {
             //First initialisation of the periodic complexity assumes the particle is completely
             //within the real domain
-            periodicComplexity_ = std::vector<int>(numberOfPeriodicBoundaries,2);
+            periodicComplexity_ = std::vector<int>(numberOfPeriodicBoundaries, 2);
         }
     }
-
+    
     periodicComplexity_[index] = value;
 }
 
@@ -242,12 +241,12 @@ const std::vector<int>& BaseParticle::getPeriodicComplexity()
     if (periodicComplexity_.empty())
     {
         const unsigned numberOfPeriodicBoundaries = getHandler()->getDPMBase()->periodicBoundaryHandler.getSize();
-        if (numberOfPeriodicBoundaries > 0 )
+        if (numberOfPeriodicBoundaries > 0)
         {
-            periodicComplexity_.resize(numberOfPeriodicBoundaries,0);
+            periodicComplexity_.resize(numberOfPeriodicBoundaries, 0);
         }
     }
-
+    
     return periodicComplexity_;
 }
 
@@ -260,12 +259,12 @@ int BaseParticle::getPeriodicComplexity(int index)
     if (periodicComplexity_.empty())
     {
         const unsigned numberOfPeriodicBoundaries = getHandler()->getDPMBase()->periodicBoundaryHandler.getSize();
-        if (numberOfPeriodicBoundaries > 0 )
+        if (numberOfPeriodicBoundaries > 0)
         {
-            periodicComplexity_.resize(numberOfPeriodicBoundaries,0);
+            periodicComplexity_.resize(numberOfPeriodicBoundaries, 0);
         }
     }
-
+    
     return periodicComplexity_[index];
 }
 
@@ -344,7 +343,7 @@ void BaseParticle::write(std::ostream& os) const
     BaseInteractable::write(os);
     os << " radius " << radius_
        << " invMass " << invMass_;
-       //invMass_ is a computed value, but needs to be stored to see if a particle is fixed
+    //invMass_ is a computed value, but needs to be stored to see if a particle is fixed
 }
 
 /*!
@@ -358,7 +357,7 @@ std::string BaseParticle::getName() const
 
 void BaseParticle::setInfo(Mdouble info)
 {
-    info_ = info; 
+    info_ = info;
 }
 
 Mdouble BaseParticle::getInfo() const
@@ -432,10 +431,10 @@ void BaseParticle::oldRead(std::istream& is)
 void BaseParticle::printHGrid(std::ostream& os) const
 {
     os << "Particle( HGRID_Level:" << hGridCell.getHGridLevel()
-        << ", HGRID_x:" << hGridCell.getHGridX()
-        << ", HGRID_y:" << hGridCell.getHGridY()
-        << ", HGRID_z:" << hGridCell.getHGridZ()
-        << ")";
+       << ", HGRID_x:" << hGridCell.getHGridX()
+       << ", HGRID_y:" << hGridCell.getHGridY()
+       << ", HGRID_z:" << hGridCell.getHGridZ()
+       << ")";
 }
 
 #ifdef CONTACT_LIST_HGRID
@@ -466,14 +465,16 @@ Mdouble BaseParticle::getRotationalEnergy() const
     if (isFixed())
         return 0.0;
     else
-        return 0.5 * Vec3D::dot(getAngularVelocity(),getInertia() * getAngularVelocity());
+        return 0.5 * Vec3D::dot(getAngularVelocity(), getInertia() * getAngularVelocity());
 }
 
 /*!
  * \todo Rewrite, redefine (TW). Is only used in StatisticsVector.hcc, consider 
  * moving to that class.
  */
-const Vec3D BaseParticle::getDisplacement2(Mdouble xmin, Mdouble xmax, Mdouble ymin, Mdouble ymax, Mdouble zmin, Mdouble zmax, Mdouble t) const
+const Vec3D
+BaseParticle::getDisplacement2(Mdouble xmin, Mdouble xmax, Mdouble ymin, Mdouble ymax, Mdouble zmin, Mdouble zmax,
+                               Mdouble t) const
 {
     Vec3D disp = getPosition() - getPreviousPosition();
     if (xmax > xmin && fabs(disp.X) > .5 * (xmax - xmin))
@@ -566,11 +567,12 @@ void BaseParticle::setRadius(const Mdouble radius)
 void BaseParticle::setMass(const Mdouble mass)
 {
     logger(WARN, "WARNING: Do not use particle->setMass, instead use "
-           "particleSpecies->computeMass, since this function can cause "
-           "inconsistencies between the mass, density and radius of this particle!");
-    logger.assert_always(mass > 0.0 && !isFixed(), "Error in BaseParticle::setMass, the given mass to be set must be positive.");
-
-        invMass_ = 1.0 / mass;
+                 "particleSpecies->computeMass, since this function can cause "
+                 "inconsistencies between the mass, density and radius of this particle!");
+    logger.assert_always(mass > 0.0 && !isFixed(),
+                         "Error in BaseParticle::setMass, the given mass to be set must be positive.");
+    
+    invMass_ = 1.0 / mass;
 }
 
 /*!
@@ -582,10 +584,12 @@ void BaseParticle::setMassForP3Statistics(const Mdouble mass)
     if (mass > 0.0 && !isFixed())
     {
         invMass_ = 1.0 / mass;
-    } else {
+    }
+    else
+    {
         logger(ERROR, "Error in BaseParticle::setMass, the given mass to be set must be positive.");
     }
-} 
+}
 
 /*!
  * \details This is used to set the particle displacement_ 
@@ -677,8 +681,7 @@ ParticleHandler* BaseParticle::getHandler() const
  */
 
 std::vector<BaseInteraction*> BaseParticle::getInteractionWith(BaseParticle* const P, const unsigned timeStamp,
-                                                  InteractionHandler* const interactionHandler)
-
+                                                               InteractionHandler* const interactionHandler)
 {
     //get the normal (from P away from the contact)
     const Vec3D branchVector = P->getPosition() - getPosition();
@@ -730,12 +733,14 @@ void BaseParticle::integrateBeforeForceComputation(double time, double timeStep)
         move(displacement);
         ///\todo TW getLength is very expensive (SpeedTestThomas: 0.2% of simulation time is spent here); can we store the old location and compute the difference to check hGrid updates instead of updating the displacement?
         DPMBase* const dpm = getHandler()->getDPMBase();
-        if (!dpm->getHGridUpdateEachTimeStep()) {
+        if (!dpm->getHGridUpdateEachTimeStep())
+        {
             dpm->hGridUpdateMove(this, displacement.getLengthSquared());
         }
         if (dpm->getRotation())
         {
-            angularAccelerate(getOrientation().rotateInverseInertiaTensor(getInvInertia())* getTorque() * 0.5 * timeStep);
+            angularAccelerate(
+                    getOrientation().rotateInverseInertiaTensor(getInvInertia()) * getTorque() * 0.5 * timeStep);
             //apply to rotation quaternion q: q = normalise(q + \tilde{C}\omega*timeStep) (see Wouter's notes)
             rotate(getAngularVelocity() * timeStep);
         }
@@ -752,7 +757,7 @@ void BaseParticle::integrateAfterForceComputation(double time, double timeStep)
 {
     if (getInvMass() == 0.0)
     {
-	//Updates a baseParticle with a prescribed motion
+        //Updates a baseParticle with a prescribed motion
         BaseInteractable::integrateAfterForceComputation(time, timeStep);
     }
     else
@@ -760,7 +765,8 @@ void BaseParticle::integrateAfterForceComputation(double time, double timeStep)
         accelerate(getForce() * getInvMass() * 0.5 * timeStep);
         if (getHandler()->getDPMBase()->getRotation())
         {
-            angularAccelerate(getOrientation().rotateInverseInertiaTensor(getInvInertia()) * getTorque() * 0.5 * timeStep);
+            angularAccelerate(
+                    getOrientation().rotateInverseInertiaTensor(getInvInertia()) * getTorque() * 0.5 * timeStep);
         }
     }
 }
@@ -784,15 +790,15 @@ void BaseParticle::setIndSpecies(unsigned int indSpecies)
     if (handler_ != nullptr)
     {
         //BaseInteractable::setIndSpecies(indSpecies);
-	setSpecies(handler_->getDPMBase()->speciesHandler.getObject(indSpecies));
+        setSpecies(handler_->getDPMBase()->speciesHandler.getObject(indSpecies));
         ///\todo TW do we have to update the species stored in the interactions here?
     }
     else
     {
         BaseInteractable::setIndSpecies(indSpecies);
         logger(ERROR, "setIndSpecies called on a particle with no particle handler.\n"
-               "Therefore I can't request the given species from the species handler.\n"
-               " PartID = %", getId());
+                      "Therefore I can't request the given species from the species handler.\n"
+                      " PartID = %", getId());
     }
 }
 
@@ -821,27 +827,34 @@ void BaseParticle::setSpecies(const ParticleSpecies* species)
     }
 }
 
-unsigned BaseParticle::getNumberOfFieldsVTK() const {
+unsigned BaseParticle::getNumberOfFieldsVTK() const
+{
     return 0;
 }
 
-std::string BaseParticle::getTypeVTK(unsigned i) const {
+std::string BaseParticle::getTypeVTK(unsigned i) const
+{
     return "";
 }
 
-std::string BaseParticle::getNameVTK(unsigned i) const {
+std::string BaseParticle::getNameVTK(unsigned i) const
+{
     return "";
 }
 
-std::vector<Mdouble> BaseParticle::getFieldVTK(unsigned i) const {
+std::vector<Mdouble> BaseParticle::getFieldVTK(unsigned i) const
+{
     return std::vector<Mdouble>();
 }
 
-Vec3D BaseParticle::getAxes() const {return Vec3D(0,0,0);}
+Vec3D BaseParticle::getAxes() const
+{ return Vec3D(0, 0, 0); }
 
-double BaseParticle::getExponentEps1() const {return 0;}
+double BaseParticle::getExponentEps1() const
+{ return 0; }
 
-double BaseParticle::getExponentEps2() const {return 0;}
+double BaseParticle::getExponentEps2() const
+{ return 0; }
 
 bool BaseParticle::isInContactWith(const BaseParticle* const P) const
 {

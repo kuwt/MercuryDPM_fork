@@ -60,83 +60,83 @@ class TimeSmoothedCG final : public CG<Coordinates, BaseFunction, Fields>
 {
 public:
     typedef BaseFunction<Coordinates> Function;
-
+    
     /*!
      * \brief Default constructor; does nothing, i.e. no points are created
      * initially. 
      */
     TimeSmoothedCG();
-
+    
     /*!
      * \brief Copy constructor. It copies the TimeSmoothedCGFunction and all objects it contains.
      * \param[in] p the TimeSmoothedCGFunction that has to be copied
      */
     TimeSmoothedCG(const TimeSmoothedCG& p) = default;
-
+    
     /*!
      * \brief Destructor, it simply destructs the TimeSmoothedCGFunction and all the objects it contains.
      */
     virtual ~TimeSmoothedCG() = default;
-
+    
     /*!
      * \brief
      */
     TimeSmoothedCG<Coordinates, BaseFunction, Fields>* copy() const override;
-
+    
     /*!
      * \brief
      */
     void write(std::ostream& os) const override;
-
+    
     void writeAll(std::ostream& os, TimeSmoothedFields<Fields>& average) const;
-
+    
     /*!
      * \brief
      */
     std::string getName() const override;
-
+    
     /*!
      * \brief Called at the beginning of the DPM simulation to initialise the cg 
      * evaluation and to open the statFile.
      */
     void initialise() override;
-
+    
     /*!
      * \brief Called after a given number of time steps (statFile::saveCount_)
      * to evaluate the CG fields.
      */
     void evaluate() override;
-
+    
     /*!
      * \brief Called at the end of the DPM simulation to finish the cg 
      * evaluation and to close the statFile.
      */
     void finish() override;
-
+    
     void setWidthTime(Mdouble widthTime);
-
+    
     Mdouble getWidthTime() const;
-
+    
     void setTimeStep(Mdouble timeStep);
-
+    
     Mdouble getTimeStep() const;
 
 protected:
-
+    
     /*!
      * Width of the Gauss function used to calculate the weights for the 
      * temporal smoothing.
      * Has to be specified by the user.
      */
     Mdouble widthTime_;
-
+    
     /*!
      * Cutoff of the Gauss function used to calculate the weights for the 
      * temporal smoothing.
      * Internal variable, set to 3.0*widthTime_.
      */
     Mdouble cutoffTime_;
-
+    
     /*!
      * Stores the next time at which smoothed fields should be evaluated, but 
      * which is not yet included in averages_. 
@@ -144,14 +144,14 @@ protected:
      * timeStep_ every time a new object is added to averages_.
      */
     Mdouble nextTime_;
-
+    
     /*!
      * Interval between two successive time steps for which time-smoothed fields 
      * are evaluated.
      * Has to be specified by the user.
      */
     Mdouble timeStep_;
-
+    
     /*!
      * Stores the smoothed fields that are currently being evaluated.
      * Internal variable, see TimeSmoothedFields for details.

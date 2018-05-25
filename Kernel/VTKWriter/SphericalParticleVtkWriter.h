@@ -35,12 +35,12 @@ class SphericalParticleVtkWriter final
 {
 
 public:
-
+    
     explicit SphericalParticleVtkWriter(ParticleHandler& particleHandler) : ParticleVtkWriter(particleHandler)
     {}
-
+    
     ~SphericalParticleVtkWriter() override = default;
-
+    
     /*!
      * \brief Writes all particles into a vtk file format (unstructured grid), consisting of particle positions,
      * velocities, radii and type of species (IndSpecies)

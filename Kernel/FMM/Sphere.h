@@ -31,21 +31,22 @@
 #include "Panel.h"
 #include <vector>
 
-class Sphere {
+class Sphere
+{
 public:
-	Sphere(Panel* panel, Vec3D location, Dipole* dipole, Multipole* multipole);
-
-	Vec3D getLocation()
-	{
-		return location_;
-	}
+    Sphere(Panel* panel, Vec3D location, Dipole* dipole, Multipole* multipole);
+    
+    Vec3D getLocation()
+    {
+        return location_;
+    }
 
 private:
-	Panel* panel_;					// finest level panel in which the sphere is located
-	Vec3D location_; 	// location of the sphere
-	Dipole* dipole_;				// Dipole corresponding to a single sphere solution
-	Multipole* multipole_;			// Multipole corresponding to other sphere distortions
-
+    Panel* panel_;                    // finest level panel in which the sphere is located
+    Vec3D location_;    // location of the sphere
+    Dipole* dipole_;                // Dipole corresponding to a single sphere solution
+    Multipole* multipole_;            // Multipole corresponding to other sphere distortions
+    
 };
 
 #endif /* SPHERE_H_ */

@@ -36,8 +36,9 @@
  * \param[in] I
  * \param[in] timeStamp
  */
-ReversibleAdhesiveInteraction::ReversibleAdhesiveInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp)
-    : BaseInteraction(P, I, timeStamp)
+ReversibleAdhesiveInteraction::ReversibleAdhesiveInteraction(BaseInteractable* P, BaseInteractable* I,
+                                                             unsigned timeStamp)
+        : BaseInteraction(P, I, timeStamp)
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"ReversibleAdhesiveInteraction::ReversibleAdhesiveInteraction() finished"<<std::endl;
@@ -47,7 +48,7 @@ ReversibleAdhesiveInteraction::ReversibleAdhesiveInteraction(BaseInteractable* P
 
 //used for mpi
 ReversibleAdhesiveInteraction::ReversibleAdhesiveInteraction()
-    : BaseInteraction()
+        : BaseInteraction()
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"ReversibleAdhesiveInteraction::ReversibleAdhesiveInteraction() finished"<<std::endl;
@@ -57,8 +58,8 @@ ReversibleAdhesiveInteraction::ReversibleAdhesiveInteraction()
 /*!
  * \param[in] p
  */
-ReversibleAdhesiveInteraction::ReversibleAdhesiveInteraction(const ReversibleAdhesiveInteraction &p)
-    : BaseInteraction(p)
+ReversibleAdhesiveInteraction::ReversibleAdhesiveInteraction(const ReversibleAdhesiveInteraction& p)
+        : BaseInteraction(p)
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"ReversibleAdhesiveInteraction::ReversibleAdhesiveInteraction(const ReversibleAdhesiveInteraction &p finished"<<std::endl;
@@ -86,6 +87,7 @@ void ReversibleAdhesiveInteraction::write(std::ostream& os  UNUSED) const
  */
 void ReversibleAdhesiveInteraction::read(std::istream& is  UNUSED)
 {}
+
 /*!
  *
  */
@@ -93,11 +95,11 @@ void ReversibleAdhesiveInteraction::computeAdhesionForce()
 {
     //std::cout << "ReversibleAdhesiveInteraction::computeAdhesionForce" << std::endl;
     const ReversibleAdhesiveSpecies* species = getSpecies();
-
-    if (getOverlap()>=0)
+    
+    if (getOverlap() >= 0)
         addForce(getNormal() * (-species->getAdhesionForceMax()));
     else
-        addForce(getNormal() * (-species->getAdhesionStiffness() *getOverlap() - species->getAdhesionForceMax()));
+        addForce(getNormal() * (-species->getAdhesionStiffness() * getOverlap() - species->getAdhesionForceMax()));
 }
 
 /*!
@@ -108,13 +110,15 @@ Mdouble ReversibleAdhesiveInteraction::getElasticEnergy() const
 {
     return 0.0;
 }
+
 /*!
  * \return a constant pointer to an instance of this class.
  */
 const ReversibleAdhesiveSpecies* ReversibleAdhesiveInteraction::getSpecies() const
 {
-    return dynamic_cast<const ReversibleAdhesiveSpecies *> (getBaseSpecies()); //downcast
+    return dynamic_cast<const ReversibleAdhesiveSpecies*> (getBaseSpecies()); //downcast
 }
+
 /*!
  * \return std::string
  */

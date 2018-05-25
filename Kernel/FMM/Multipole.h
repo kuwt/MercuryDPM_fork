@@ -30,44 +30,48 @@
 #include <complex>
 #include <vector>
 
-class Multipole {
+class Multipole
+{
 public:
-	Multipole(int p, NumericalVector<> *squaredFactorials, Vec3D location);
-	virtual ~Multipole();
-
-	//Multipole manipulations
-	virtual void computeMultipoleExpansion();
-	NumericalVector<std::complex<Mdouble>> TranslateMultipoleExpansionTo(Vec3D location);
-	NumericalVector<std::complex<Mdouble>> convertMultipoleToLocal(Vec3D location);
-
-	//add a multipole to this existing multipole
-	void addMultipoleCoefficients(NumericalVector<std::complex<Mdouble>> multipoleExpansionCoefficients);
-
-	NumericalVector<std::complex<Mdouble>> getExpansionCoefficients()
-	{
-		return multipoleExpansionCoefficients_;
-	}
-
-	void setExpansionCoefficients(NumericalVector<std::complex<Mdouble>> multipoleExpansionCoefficients)
-	{
-		multipoleExpansionCoefficients_ = multipoleExpansionCoefficients;
-	}
-
-	NumericalVector<>* getSquaredFactorials()
-	{
-		return squaredFactorials_;
-	}
-
-	int getP()
-	{
-		return p_;
-	}
+    Multipole(int p, NumericalVector<>* squaredFactorials, Vec3D location);
+    
+    virtual ~Multipole();
+    
+    //Multipole manipulations
+    virtual void computeMultipoleExpansion();
+    
+    NumericalVector<std::complex<Mdouble>> TranslateMultipoleExpansionTo(Vec3D location);
+    
+    NumericalVector<std::complex<Mdouble>> convertMultipoleToLocal(Vec3D location);
+    
+    //add a multipole to this existing multipole
+    void addMultipoleCoefficients(NumericalVector<std::complex<Mdouble>> multipoleExpansionCoefficients);
+    
+    NumericalVector<std::complex<Mdouble>> getExpansionCoefficients()
+    {
+        return multipoleExpansionCoefficients_;
+    }
+    
+    void setExpansionCoefficients(NumericalVector<std::complex<Mdouble>> multipoleExpansionCoefficients)
+    {
+        multipoleExpansionCoefficients_ = multipoleExpansionCoefficients;
+    }
+    
+    NumericalVector<>* getSquaredFactorials()
+    {
+        return squaredFactorials_;
+    }
+    
+    int getP()
+    {
+        return p_;
+    }
 
 protected:
-	int p_; // order of truncation
-	NumericalVector<> *squaredFactorials_; // required for multipole manipulations
-	Vec3D location_; // location of the multipole
-	NumericalVector<std::complex<Mdouble>> multipoleExpansionCoefficients_; // coefficients of the multipole
+    int p_; // order of truncation
+    NumericalVector<>* squaredFactorials_; // required for multipole manipulations
+    Vec3D location_; // location of the multipole
+    NumericalVector<std::complex<Mdouble>> multipoleExpansionCoefficients_; // coefficients of the multipole
 };
 
 #endif /* MULTIPOLE_H_ */

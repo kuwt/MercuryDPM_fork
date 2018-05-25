@@ -48,8 +48,8 @@ PeriodicBoundaryHandler::PeriodicBoundaryHandler()
  * \details This is not a copy constructor! It just copies all BasePeriodicBoundary from
  *          the other handler into this handler, and clears all other variables.
  */
-PeriodicBoundaryHandler::PeriodicBoundaryHandler(const PeriodicBoundaryHandler &PBH)
-{ 
+PeriodicBoundaryHandler::PeriodicBoundaryHandler(const PeriodicBoundaryHandler& PBH)
+{
     objects_.clear();
     setDPMBase(nullptr);
     interactionDistance_ = PBH.interactionDistance_;
@@ -61,7 +61,7 @@ PeriodicBoundaryHandler::PeriodicBoundaryHandler(const PeriodicBoundaryHandler &
  * \details This is not a copy assignment operator! It just copies all BaseBoundary
  *          from the other handler into this handler, and clears all other variables.
  */
-PeriodicBoundaryHandler PeriodicBoundaryHandler::operator =(const PeriodicBoundaryHandler& rhs)
+PeriodicBoundaryHandler PeriodicBoundaryHandler::operator=(const PeriodicBoundaryHandler& rhs)
 {
     if (this != &rhs)
     {
@@ -79,7 +79,7 @@ PeriodicBoundaryHandler::~PeriodicBoundaryHandler()
     /// currently we just need to empty the PeriodicBoundaryHandler without destroying the object
     /// Otherwise we create a segfault in the BoundaryHandler
     objects_.clear();
-
+    
     logger(DEBUG, "PeriodicBoundaryHandler::~PeriodicBoundaryHandler() finished");
 }
 
@@ -88,7 +88,7 @@ PeriodicBoundaryHandler::~PeriodicBoundaryHandler()
 void PeriodicBoundaryHandler::addObject(BasePeriodicBoundary* P)
 {
 #ifdef MERCURY_USE_MPI
-    if (NUMBER_OF_PROCESSORS == 1) 
+    if (NUMBER_OF_PROCESSORS == 1)
     {
         return;
     }
@@ -150,10 +150,10 @@ void PeriodicBoundaryHandler::updateStatus(std::set<BaseParticle*>& particlesToB
 {
     //Step 1: collect position and velocity data of the real particle and send the data
     preparePositionAndVelocityUpdate();
-
+    
     //Step 2: finalise the data transision
     finalisePositionAndVelocityUpdate();
-
+    
     //Step 3: Update the status of the ghost and real particles
     updateParticleStatus(particlesToBeDeleted);
 }
@@ -188,7 +188,7 @@ void PeriodicBoundaryHandler::shiftParticle(BaseParticle* particle, const std::v
             boundary->shiftPosition(particle);
         }
         boundaryIndex++;
-    } 
+    }
 }
 
 /*!
@@ -205,16 +205,18 @@ void PeriodicBoundaryHandler::shiftParticle(BaseParticle* particle, const std::v
  * \param[in,out] totalPeriodicComplexity The number of boundaries the position is in close proximity with.
  * \param[in] position The input position for which the relation to the boundaries are determined.
  */
-void PeriodicBoundaryHandler::computePeriodicComplexity(std::vector<int>& periodicComplexity, int& totalPeriodicComplexity, Vec3D position)
+void
+PeriodicBoundaryHandler::computePeriodicComplexity(std::vector<int>& periodicComplexity, int& totalPeriodicComplexity,
+                                                   Vec3D position)
 {
     //Compute the new position
     periodicComplexity.resize(this->getSize());
     totalPeriodicComplexity = 0;
     int index = 0;
-    for (BasePeriodicBoundary*  boundary : *this)
+    for (BasePeriodicBoundary* boundary : *this)
     {
         Mdouble distance = boundary->getDistance(position);
-        if(std::abs(distance) <= interactionDistance_)
+        if (std::abs(distance) <= interactionDistance_)
         {
             if (distance > 0)
             {
@@ -226,7 +228,7 @@ void PeriodicBoundaryHandler::computePeriodicComplexity(std::vector<int>& period
             {
                 //ghost particle
                 periodicComplexity[index] = -1;
-            }   
+            }
             else //distance == 0 In extremely rare cases (test cases mostly)
             {
                 //Check if on left or right side of boundary
@@ -262,7 +264,7 @@ void PeriodicBoundaryHandler::computePeriodicComplexity(std::vector<int>& period
     {
         objects_[b]->modifyPeriodicComplexity(periodicComplexity, position, b);
     }
-*/  
+*/
 }
 
 /*!
@@ -279,9 +281,9 @@ std::vector<int> PeriodicBoundaryHandler::computePeriodicComplexity(Vec3D positi
 {
     std::vector<int> periodicComplexity;
     int totalPeriodicComplexity;
-
+    
     computePeriodicComplexity(periodicComplexity, totalPeriodicComplexity, position);
-
+    
     return periodicComplexity;
 }
 
@@ -353,7 +355,8 @@ void PeriodicBoundaryHandler::addNewParticle(BaseParticle* particle)
 unsigned int PeriodicBoundaryHandler::getNumberOfPeriodicGhostParticles()
 {
     unsigned int sum = 0;
-    for (auto &index : periodicGhostList_) {
+    for (auto& index : periodicGhostList_)
+    {
         sum += index.size();
     }
     return sum;
@@ -364,11 +367,12 @@ unsigned int PeriodicBoundaryHandler::getNumberOfPeriodicGhostParticles()
  * there are in the periodiocGhostLists, but ignores mixed ghost particles that additionally have
  * the flay isMPIParticle() == true.
  * \return The number of periodic particles that are not also MPIParticles
- */ 
+ */
 Mdouble PeriodicBoundaryHandler::getNumberOfTruePeriodicGhostParticles()
 {
     int sum = 0;
-    for (auto &index : periodicGhostList_) {
+    for (auto& index : periodicGhostList_)
+    {
         int numberOfMPIParticles = 0;
         for (int pIndex = 0; pIndex < index.size(); pIndex++)
         {
@@ -455,8 +459,9 @@ void PeriodicBoundaryHandler::setMPIFlags(BaseParticle* particle)
  * \param[in,out] complexity One of the possible permutations of the ghost periodic complexity
  * \param[in] level Indicator at which level the recursive function is
  */
-void PeriodicBoundaryHandler::generateGhosts(std::vector<std::vector<int> >& list, const std::vector<int> periodicComplexity,
-                                                                std::vector<int>& complexity, int level)
+void
+PeriodicBoundaryHandler::generateGhosts(std::vector<std::vector<int> >& list, const std::vector<int> periodicComplexity,
+                                        std::vector<int>& complexity, int level)
 {
     //Add the complexity to the list
     if (level == 0)
@@ -470,14 +475,14 @@ void PeriodicBoundaryHandler::generateGhosts(std::vector<std::vector<int> >& lis
         if (periodicComplexity[level - 1] == 1)
         {
             complexity[level - 1] = 1;
-            generateGhosts(list, periodicComplexity, complexity, level -1);
-
+            generateGhosts(list, periodicComplexity, complexity, level - 1);
+            
             complexity[level - 1] = -1;
-            generateGhosts(list, periodicComplexity, complexity, level -1);
+            generateGhosts(list, periodicComplexity, complexity, level - 1);
         }
         else
         {
-            generateGhosts(list, periodicComplexity, complexity, level -1); 
+            generateGhosts(list, periodicComplexity, complexity, level - 1);
         }
     }
 }
@@ -502,7 +507,7 @@ void PeriodicBoundaryHandler::collectGhostParticleData()
             {
                 MpiPeriodicParticleID* ppid = newPeriodicParticleList_[sendTargetList_[i]][j];
                 BaseParticle* particle = ppid->particle;
-                periodicGhostParticleSend_[i].push_back(copyDataFromParticleToMPIParticle(particle));    
+                periodicGhostParticleSend_[i].push_back(copyDataFromParticleToMPIParticle(particle));
                 for (int k = 0; k < getSize(); k++)
                 {
                     periodicGhostComplexitySend_[i].push_back(ppid->targetPeriodicComplexity[k]);
@@ -528,7 +533,7 @@ void PeriodicBoundaryHandler::collectInteractionData()
     {
         //Allocate enough space
         interactionDataSend_[i] = iH.createMPIInteractionDataArray(numberOfNewInteractionsSend_[i]);
-
+        
         //Fill in the vector
         unsigned int indexInteraction = 0;
         for (BaseInteraction* interaction : newInteractionList_[i])
@@ -549,46 +554,47 @@ void PeriodicBoundaryHandler::collectInteractionData()
  * \param[in] targetIndex The index in the receiveTargetList which indicates where the data is coming from
  * \param[in] newParticles A list to which new ghost particles are added.
  */
-void PeriodicBoundaryHandler::processReceivedGhostParticleData(int targetIndex, std::vector<BaseParticle*>& newParticles)
+void
+PeriodicBoundaryHandler::processReceivedGhostParticleData(int targetIndex, std::vector<BaseParticle*>& newParticles)
 {
     for (int j = 0; j < numberOfNewPeriodicGhostParticlesReceive_[targetIndex]; j++)
     {
         //Create the ghost particle and copy basic information
         BaseParticle particle;
-        copyDataFromMPIParticleToParticle(&(periodicGhostParticleReceive_[targetIndex][j]), 
-                                              &particle, &(getDPMBase()->particleHandler));
-
+        copyDataFromMPIParticleToParticle(&(periodicGhostParticleReceive_[targetIndex][j]),
+                                          &particle, &(getDPMBase()->particleHandler));
+        
         //Obtain real periodic complexity
-        std::vector<int> realPeriodicComplexity = computePeriodicComplexity(particle.getPosition()); 
-
+        std::vector<int> realPeriodicComplexity = computePeriodicComplexity(particle.getPosition());
+        
         //Obtain and set the ghost periodic complexity
         std::vector<int> ghostPeriodicComplexity(getSize());
         for (int k = 0; k < getSize(); k++)
         {
-            ghostPeriodicComplexity[k] = periodicGhostComplexityReceive_[targetIndex][getSize()*j + k];
+            ghostPeriodicComplexity[k] = periodicGhostComplexityReceive_[targetIndex][getSize() * j + k];
         }
         particle.setPeriodicComplexity(ghostPeriodicComplexity);
-
+        
         //Shift the ghost particle to it's correct positions and velocities
         shiftParticle(&particle, ghostPeriodicComplexity);
-
+        
         //Add particle to simulation
-        logger(VERBOSE,"Adding a ghost at position %",particle.getPosition());
+        logger(VERBOSE, "Adding a ghost at position %", particle.getPosition());
         getDPMBase()->particleHandler.copyAndAddGhostObject(particle);
-
+        
         //Set the correct flags
         BaseParticle* pGhost = getDPMBase()->particleHandler.getLastObject();
         pGhost->setPeriodicGhostParticle(true);
         pGhost->setInPeriodicDomain(true);
         //Give the correct mpi flags 
         setMPIFlags(pGhost);
-
+        
         //Create the periodic ID
         MpiPeriodicGhostParticleID* gpid = new MpiPeriodicGhostParticleID;
         gpid->realPeriodicComplexity = realPeriodicComplexity;
         gpid->particle = pGhost;
         periodicGhostList_[receiveTargetList_[targetIndex]].push_back(gpid);
-
+        
         //Add to the newParticle list used for possible interactions
         newParticles.push_back(pGhost);
     }
@@ -613,11 +619,11 @@ void PeriodicBoundaryHandler::processReceivedInteractionData(int targetIndex, st
         unsigned int identificationI;
         bool isWallInteraction;
         unsigned timeStamp;
-
+        
         //Get the general information required to setup a new interaction
-        iH.getInteractionDetails(interactionDataReceive_[targetIndex],l, identificationP, identificationI, 
-                                                                                isWallInteraction, timeStamp);
-
+        iH.getInteractionDetails(interactionDataReceive_[targetIndex], l, identificationP, identificationI,
+                                 isWallInteraction, timeStamp);
+        
         //Obtain the particle pointer of the ghost
         BaseParticle* pGhost;
         int idOther;
@@ -630,7 +636,7 @@ void PeriodicBoundaryHandler::processReceivedInteractionData(int targetIndex, st
                 idOther = identificationI;
                 break;
             }
-
+            
             if (particle->getId() == identificationI)
             {
                 pGhost = particle;
@@ -638,7 +644,7 @@ void PeriodicBoundaryHandler::processReceivedInteractionData(int targetIndex, st
                 break;
             }
         }
-
+        
         //If it is a wall interaction, do stuff
         if (isWallInteraction)
         {
@@ -647,7 +653,7 @@ void PeriodicBoundaryHandler::processReceivedInteractionData(int targetIndex, st
             std::vector<BaseInteraction*> interactions = I->getInteractionWith(pGhost, timeStamp, &iH);
             if (!interactions.empty())
             {
-                interactions[0]->setMPIInteraction(interactionDataReceive_[targetIndex],l,false);
+                interactions[0]->setMPIInteraction(interactionDataReceive_[targetIndex], l, false);
             }
         }
         else
@@ -655,7 +661,7 @@ void PeriodicBoundaryHandler::processReceivedInteractionData(int targetIndex, st
             //Obtain potential interaction particles
             std::vector<BaseParticle*> interactingParticleList;
             getDPMBase()->hGridGetInteractingParticleList(pGhost, interactingParticleList);
-
+            
             //Find the other interacting particle
             BaseParticle* otherParticle;
             for (BaseParticle* p2 : interactingParticleList)
@@ -666,12 +672,13 @@ void PeriodicBoundaryHandler::processReceivedInteractionData(int targetIndex, st
                     break;
                 }
             }
-
+            
             //Add the interaction
-            std::vector<BaseInteraction*> particleInteractions = pGhost->getInteractionWith(otherParticle, timeStamp, &iH);
+            std::vector<BaseInteraction*> particleInteractions = pGhost->getInteractionWith(otherParticle, timeStamp,
+                                                                                            &iH);
             if (!particleInteractions.empty())
             {
-                particleInteractions[0]->setMPIInteraction(interactionDataReceive_[targetIndex],l,false);
+                particleInteractions[0]->setMPIInteraction(interactionDataReceive_[targetIndex], l, false);
             }
         }
     }
@@ -700,10 +707,11 @@ void PeriodicBoundaryHandler::processLocalInteractionData(std::vector<BasePartic
                 unsigned int identificationI;
                 bool isWallInteraction;
                 unsigned timeStamp;
-
+                
                 //Get the general information required to setup a new interaction
-                iH.getInteractionDetails(interactionDataSend_[i],l, identificationP, identificationI, isWallInteraction, timeStamp);
-
+                iH.getInteractionDetails(interactionDataSend_[i], l, identificationP, identificationI,
+                                         isWallInteraction, timeStamp);
+                
                 //Obtain the particle pointer of the ghost
                 BaseParticle* pGhost;
                 int idOther;
@@ -711,49 +719,49 @@ void PeriodicBoundaryHandler::processLocalInteractionData(std::vector<BasePartic
                 for (BaseParticle* particle : newParticles)
                 {
                     if (particle->getId() == identificationP)
-                    {   
+                    {
                         pGhost = particle;
                         idOther = identificationI;
                         break;
                     }
                     
                     if (particle->getId() == identificationI)
-                    {   
+                    {
                         pGhost = particle;
                         idOther = identificationP;
                         break;
                     }
                 }
-
+                
                 //If it is a wall interaction, do stuff
                 if (isWallInteraction)
-                {   
+                {
                     BaseWall* I = getDPMBase()->wallHandler.getObjectById(identificationI);
                     //Create interactions
                     std::vector<BaseInteraction*> interactions = I->getInteractionWith(pGhost, timeStamp, &iH);
                     if (!interactions.empty())
-                    {   
-                        interactions[0]->setMPIInteraction(interactionDataSend_[i],l,false);
+                    {
+                        interactions[0]->setMPIInteraction(interactionDataSend_[i], l, false);
                     }
-                    logger(VERBOSE,"Wall interaction added!");
+                    logger(VERBOSE, "Wall interaction added!");
                 }
                 else
                 {
                     //Obtain potential interaction particles
                     std::vector<BaseParticle*> interactingParticleList;
                     getDPMBase()->hGridGetInteractingParticleList(pGhost, interactingParticleList);
-
+                    
                     if (interactingParticleList.empty())
                     {
-                        logger(VERBOSE,"Failed in creating an interaction :(");
+                        logger(VERBOSE, "Failed in creating an interaction :(");
                     }
-
+                    
                     //Find the other interacting particle
                     BaseParticle* otherParticle = nullptr;
                     for (BaseParticle* p2 : interactingParticleList)
-                    {   
+                    {
                         if (p2->getId() == idOther)
-                        {   
+                        {
                             otherParticle = p2;
                             break;
                         }
@@ -763,13 +771,14 @@ void PeriodicBoundaryHandler::processLocalInteractionData(std::vector<BasePartic
                         //The interacting object can't be found
                         continue;
                     }
-
+                    
                     //Add the interaction
-                    std::vector<BaseInteraction*> particleInteractions = pGhost->getInteractionWith(otherParticle, timeStamp, &iH);
+                    std::vector<BaseInteraction*> particleInteractions = pGhost->getInteractionWith(otherParticle,
+                                                                                                    timeStamp, &iH);
                     if (!particleInteractions.empty())
-                    {   
-                        particleInteractions[0]->setMPIInteraction(interactionDataSend_[i],l,false);
-                        logger(VERBOSE,"Interaction succesfully added!" );
+                    {
+                        particleInteractions[0]->setMPIInteraction(interactionDataSend_[i], l, false);
+                        logger(VERBOSE, "Interaction succesfully added!");
                     }
                 }
             }
@@ -783,15 +792,16 @@ void PeriodicBoundaryHandler::processLocalInteractionData(std::vector<BasePartic
  * This function also flags the particle being in the periodic domain such that it is ignored
  * when finding new periodic particles.
  */
-void PeriodicBoundaryHandler::processPeriodicParticles() 
+void PeriodicBoundaryHandler::processPeriodicParticles()
 {
-    for (int i : sendTargetList_) {
+    for (int i : sendTargetList_)
+    {
         for (int j = 0; j < newPeriodicParticleList_[i].size(); j++)
         {
             //Update the particle status
             MpiPeriodicParticleID* ppid = newPeriodicParticleList_[i][j];
             ppid->particle->setInPeriodicDomain(true);
-
+            
             //make new entry in the list
             periodicParticleList_[i].push_back(ppid);
         }
@@ -816,37 +826,37 @@ void PeriodicBoundaryHandler::processLocalGhostParticles(std::vector<BaseParticl
             {
                 MpiPeriodicParticleID* ppid = newPeriodicParticleList_[PROCESSOR_ID][j];
                 BaseParticle* particle = ppid->particle;
-            
+                
                 //Create ghost particle
                 BaseParticle* pGhost = particle->copy();
-
+                
                 //Obtain and set the ghost periodic complexity
                 pGhost->setPeriodicComplexity(ppid->targetPeriodicComplexity);
-
+                
                 //Shift the particle
                 shiftParticle(pGhost);
-
+                
                 //Set the correct flags
                 pGhost->setPeriodicGhostParticle(true);
                 pGhost->setInPeriodicDomain(true);
                 //Note: mpi flags dont have to be set for local particles
                 //these flags are copied from the original particle
-                logger(VERBOSE,"Adding a ghost with id % at position %",pGhost->getId(), pGhost->getPosition());
-
+                logger(VERBOSE, "Adding a ghost with id % at position %", pGhost->getId(), pGhost->getPosition());
+                
                 //Finally add it to the particle handler
                 getDPMBase()->particleHandler.addGhostObject(pGhost);
-
+                
                 //Do some bookkeeping
                 MpiPeriodicGhostParticleID* gpid = new MpiPeriodicGhostParticleID;
                 gpid->particle = pGhost;
                 gpid->otherParticle = particle;
                 gpid->realPeriodicComplexity = particle->getPeriodicComplexity();
                 periodicGhostList_[PROCESSOR_ID].push_back(gpid);
-
+                
                 //Flag real particle and do some bookkeeping
                 particle->setInPeriodicDomain(true);
                 ppid->otherParticle = pGhost;
-
+                
                 //Add to the new particle list for an interaction update
                 newParticles.push_back(pGhost);
             }
@@ -863,7 +873,7 @@ void PeriodicBoundaryHandler::processLocalGhostParticles(std::vector<BaseParticl
 void PeriodicBoundaryHandler::updateParticles()
 {
     MPIContainer& communicator = MPIContainer::Instance();
-
+    
     //For all lists that contain ghost particles
     //The variable dataIndex indicates which index in update<...>Receive_ the data is located
     int dataIndex = -1;
@@ -874,7 +884,7 @@ void PeriodicBoundaryHandler::updateParticles()
         if (numberOfParticles > 0)
         {
             //Check if the update is global or from the current processor
-            if (i != PROCESSOR_ID)        
+            if (i != PROCESSOR_ID)
             {
                 global = true;
                 dataIndex++;
@@ -883,34 +893,34 @@ void PeriodicBoundaryHandler::updateParticles()
             {
                 global = false;
             }
-
+            
             //Update all particles
             for (int p = 0; p < numberOfParticles; p++)
             {
-                MpiPeriodicGhostParticleID * pgid = periodicGhostList_[i][p];
+                MpiPeriodicGhostParticleID* pgid = periodicGhostList_[i][p];
                 BaseParticle* pGhost = pgid->particle;
-
+                
                 //Depending on where the particle is located the data is stored in a different place
                 if (global)
                 {
                     //logger(VERBOSE,"i: %, numberOfParticles: %, dataIndex: %",i,numberOfParticles, dataIndex);
                     //Check if this particle really belongs to the data that is send
                     logger.assert(pGhost->getId() == updatePositionDataReceive_[dataIndex][p].id,
-                                                                "Periodic particle lists are not in syc");
-
+                                  "Periodic particle lists are not in syc");
+                    
                     //Add the real position and velocity of the particles
                     //Note: The before updating the position is the position of the ghost
                     //Note: The received position and velocity values are of the real particle
                     //Note: It will be shifted to the correct values after the complexity is computed
-                    pGhost->setPreviousPosition(pGhost->getPosition()); 
+                    pGhost->setPreviousPosition(pGhost->getPosition());
                     pGhost->setPosition(updatePositionDataReceive_[dataIndex][p].position);
                     pGhost->setOrientation(updatePositionDataReceive_[dataIndex][p].orientation);
                     pGhost->setVelocity(updateVelocityDataReceive_[dataIndex][p].velocity);
                     pGhost->setAngularVelocity(updateVelocityDataReceive_[dataIndex][p].angularVelocity);
-
+                    
                 }
                 else
-                {   
+                {
                     //MpiPeriodicGhostParticleID * pgip = periodicGhostList_[i][p];
                     pGhost->setPreviousPosition(pGhost->getPosition());
                     pGhost->setPosition(pgid->otherParticle->getPosition());
@@ -918,10 +928,10 @@ void PeriodicBoundaryHandler::updateParticles()
                     pGhost->setVelocity(pgid->otherParticle->getVelocity());
                     pGhost->setAngularVelocity(pgid->otherParticle->getAngularVelocity());
                 }
-
+                
                 //Move current periodic complexity to previous periodic complexity
                 pGhost->setPreviousPeriodicComplexity(pGhost->getPeriodicComplexity());
-
+                
                 //Compute the new realPeriodicComplexity
                 std::vector<int> previousRealPeriodicComplexity = periodicGhostList_[i][p]->realPeriodicComplexity;
                 //The ghost particle has the real position at the moment, so compute the real periodic complexity here
@@ -930,18 +940,18 @@ void PeriodicBoundaryHandler::updateParticles()
                 for (int b = 0; b < getSize(); b++)
                 {
                     int sign = mathsFunc::sign(previousRealPeriodicComplexity[b]
-                                                      *realPeriodicComplexity[b]
-                                                          *pGhost->getPreviousPeriodicComplexity()[b]);
-                        periodicComplexity[b] =  sign*abs(realPeriodicComplexity[b]);
-                        //The maser boundary needs this correction
-                        if (periodicComplexity[b] == -3)
-                        {
-                            periodicComplexity[b] = 1;
-                        }
+                                               * realPeriodicComplexity[b]
+                                               * pGhost->getPreviousPeriodicComplexity()[b]);
+                    periodicComplexity[b] = sign * abs(realPeriodicComplexity[b]);
+                    //The maser boundary needs this correction
+                    if (periodicComplexity[b] == -3)
+                    {
+                        periodicComplexity[b] = 1;
+                    }
                     
                 }
                 pGhost->setPeriodicComplexity(periodicComplexity);
-
+                
                 for (int b = 0; b < getSize(); b++)
                 {
                     objects_[b]->modifyGhostAfterCreation(pGhost, b);
@@ -949,19 +959,19 @@ void PeriodicBoundaryHandler::updateParticles()
                 //Shift the particle to correct position
                 //Note: If the real particle changed complexity this position will be calculated incorrectly
                 //Hence the previous complexity is used.
-                shiftParticle(pGhost,pGhost->getPreviousPeriodicComplexity());
-
+                shiftParticle(pGhost, pGhost->getPreviousPeriodicComplexity());
+                
                 //Update hGrid
                 Vec3D displacement = pGhost->getPreviousPosition() - pGhost->getPosition();
                 getDPMBase()->hGridUpdateMove(pGhost, displacement.getLengthSquared());
-
+                
                 //Do some book keeping
                 periodicGhostList_[i][p]->realPeriodicComplexity = realPeriodicComplexity;
-            
+                
             }
         }
     }
-        
+    
     //Update periodic complexity of periodic particles
     for (BaseParticle* particle : getDPMBase()->particleHandler)
     {
@@ -971,13 +981,13 @@ void PeriodicBoundaryHandler::updateParticles()
             particle->setPreviousPeriodicComplexity(particle->getPeriodicComplexity());
             std::vector<int> periodicComplexity;
             int totalPeriodicComplexity;
-            computePeriodicComplexity(periodicComplexity,totalPeriodicComplexity, particle->getPosition());
+            computePeriodicComplexity(periodicComplexity, totalPeriodicComplexity, particle->getPosition());
             //Modify periodic complexity tailored to specific boundary requirements
             for (int b = 0; b < getSize(); b++)
             {
                 objects_[b]->modifyPeriodicComplexity(periodicComplexity, totalPeriodicComplexity, particle, b);
             }
-            particle->setPeriodicComplexity(periodicComplexity); 
+            particle->setPeriodicComplexity(periodicComplexity);
         }
     }
 }
@@ -1003,6 +1013,7 @@ bool PeriodicBoundaryHandler::checkIsReal(const std::vector<int> complexity)
     
     return isReal;
 }
+
 /*!
  * \detail A large part of the status update requires on if the periodic complexity of the real 
  *  particle is changed. This function will check if the previous and current periodic complexity
@@ -1013,10 +1024,11 @@ bool PeriodicBoundaryHandler::checkIsReal(const std::vector<int> complexity)
  * \return True if the periodic complexity as changed with respect to the reference periodic complexity.
  * returns false if the periodic complexity is exactly the same.
  */
-bool PeriodicBoundaryHandler::checkChanged(const std::vector<int> previousComplexity, const std::vector<int> currentComplexity)
+bool PeriodicBoundaryHandler::checkChanged(const std::vector<int> previousComplexity,
+                                           const std::vector<int> currentComplexity)
 {
     bool changed = false;
-
+    
     for (int i = 0; i < currentComplexity.size(); i++)
     {
         if (previousComplexity[i] != currentComplexity[i])
@@ -1024,7 +1036,7 @@ bool PeriodicBoundaryHandler::checkChanged(const std::vector<int> previousComple
             changed = true;
         }
     }
-
+    
     return changed;
 }
 
@@ -1044,47 +1056,48 @@ void PeriodicBoundaryHandler::updateParticleStatus(std::set<BaseParticle*>& part
     std::set<MpiPeriodicParticleID*> deletePeriodicIDList;
     std::set<MpiPeriodicGhostParticleID*> deletePeriodicGhostIDList;
     std::set<BaseParticle*> specialUpdateParticleList;
-
+    
     //For all domains
     for (int i = 0; i < numberOfProcessors; i++)
     {
         int numberOfPeriodicParticles = periodicParticleList_[i].size();
         int numberOfPeriodicGhostParticles = periodicGhostList_[i].size();
-
+        
         //Loop over all periodic particles to see if their complexity changed 
         for (int p = 0; p < numberOfPeriodicParticles; p++)
         {
             MpiPeriodicParticleID* ppid = periodicParticleList_[i][p];
             BaseParticle* particle = ppid->particle;
-
+            
             //Check particle status
             bool isReal = checkIsReal(particle->getPeriodicComplexity());
             bool changed = checkChanged(particle->getPreviousPeriodicComplexity(), particle->getPeriodicComplexity());
-
+            
             //Only if the particle changed we need to undertake action
             if (changed)
             {
                 if (isReal)
                 {
                     //Flag this particle as normal, it will be re-introduced when finding new periodic particles
-                    logger(VERBOSE,"Real particle % changed complexity at: %", particle->getId(),
+                    logger(VERBOSE, "Real particle % changed complexity at: %", particle->getId(),
                            particle->getPosition());
-                    particle->setInPeriodicDomain(false); 
+                    particle->setInPeriodicDomain(false);
                     //Incase of a special flag 3, perform update action
                     updateMaserParticle(particle);
                 }
                 else
                 {
                     //Oh noes, the particle became a ghost. Kill it with balefire!!... if it is necessary
-                    logger(VERBOSE,"Real particle % changed to ghost at: %", particle->getId(), particle->getPosition());
+                    logger(VERBOSE, "Real particle % changed to ghost at: %", particle->getId(),
+                           particle->getPosition());
                     particlesToBeDeleted.insert(particle);
                 }
-
+                
                 //Delete the ID
                 deletePeriodicIDList.insert(ppid);
                 periodicParticleList_[i][p] = nullptr;
             }
-
+            
             
             //If a PM particle changes from to PMG it will need to be deleted.
             //The deletion will be done by the M boundary, but it still needs to be flushed from the periodic lists
@@ -1094,39 +1107,39 @@ void PeriodicBoundaryHandler::updateParticleStatus(std::set<BaseParticle*>& part
                 bool isMPIParticleOld = particle->isMPIParticle();
                 bool isMPIParticle;
                 bool isInMPIDomain;
-                getMPIFlags(particle,isInMPIDomain,isMPIParticle);
-
+                getMPIFlags(particle, isInMPIDomain, isMPIParticle);
+                
                 //Particle needs to be removed from lists if it becomes an MG particle
                 if (isMPIParticleOld != isMPIParticle)
-                {       
-                    logger(VERBOSE,"PM to PMG: Flush from boundary");
+                {
+                    logger(VERBOSE, "PM to PMG: Flush from boundary");
                     deletePeriodicIDList.insert(ppid);
                     periodicParticleList_[i][p] = nullptr;
                 }
-
+                
                 //MG particle needs to be removed from lists if it moves to another domain
                 if (!isInMPIDomain)
                 {
                     if (particle->isMPIParticle())
                     {
-                        logger(VERBOSE,"PMG leaves domain: Flush from boundary");
+                        logger(VERBOSE, "PMG leaves domain: Flush from boundary");
                         deletePeriodicIDList.insert(ppid);
                         periodicParticleList_[i][p] = nullptr;
                     }
                 }
             }
         }
-
+        
         //Loop over all periodic ghost particles to see if their complexity changed
         for (int p = 0; p < numberOfPeriodicGhostParticles; p++)
         {
             MpiPeriodicGhostParticleID* pgid = periodicGhostList_[i][p];
             BaseParticle* pGhost = pgid->particle;
-
+            
             //Check particle status
             bool isReal = checkIsReal(pGhost->getPeriodicComplexity());
-            bool changed = checkChanged(pGhost->getPreviousPeriodicComplexity(), pGhost->getPeriodicComplexity());   
-
+            bool changed = checkChanged(pGhost->getPreviousPeriodicComplexity(), pGhost->getPeriodicComplexity());
+            
             //Update mixed particles, particles that also are in the mpi domain also need an update
             //Note that these particles are not listed in the domain lists, they are taken care here.
             //Store old values and update status of pGhost
@@ -1135,41 +1148,41 @@ void PeriodicBoundaryHandler::updateParticleStatus(std::set<BaseParticle*>& part
             setMPIFlags(pGhost);
             if (isInMPIDomainOld)
             {
-
+                
                 //Case 1: pGhost changed from real to mpi particle
                 if (isMPIParticleOld != pGhost->isMPIParticle())
                 {
                     //Case 1: turned from M ghost to M
                     //The correct flags have been set above already
-
+                    
                     //Case 2: Turned from M to M ghost
-                    if(pGhost->isMPIParticle())
+                    if (pGhost->isMPIParticle())
                     {
-                        logger(VERBOSE,"PGM to PGMG: Deleting particle.");
+                        logger(VERBOSE, "PGM to PGMG: Deleting particle.");
                         particlesToBeDeleted.insert(pGhost);
-                        deletePeriodicGhostIDList.insert(pgid);        
+                        deletePeriodicGhostIDList.insert(pgid);
                         periodicGhostList_[i][p] = nullptr;
-                    }    
+                    }
                     
                 }
-
+                
                 //Case 2: pGhost left the mpi domain
                 if (pGhost->isInMPIDomain() != isInMPIDomainOld)
                 {
                     //Case 1: Moved inside the current domain
                     //The correct flags have been set above already
-
+                    
                     //Case 2: Moved to a neighbour domain
                     if (pGhost->isMPIParticle())
                     {
-                        logger(VERBOSE,"PGMG moved out of domain: Deleting particle.");
+                        logger(VERBOSE, "PGMG moved out of domain: Deleting particle.");
                         particlesToBeDeleted.insert(pGhost);
                         deletePeriodicGhostIDList.insert(pgid);
                         periodicGhostList_[i][p] = nullptr;
                     }
                 }
             }
-
+            
             //Check if the particles need to be deleted based on their periodic complexity
             if (changed)
             {
@@ -1180,26 +1193,26 @@ void PeriodicBoundaryHandler::updateParticleStatus(std::set<BaseParticle*>& part
                     int tpc = 0;
                     for (int b = 0; b < getSize(); b++)
                     {
-                        objects_[b]->modifyPeriodicComplexity(pc,tpc, pGhost, b);
+                        objects_[b]->modifyPeriodicComplexity(pc, tpc, pGhost, b);
                     }
-                    if(!checkIsReal(pc))
+                    if (!checkIsReal(pc))
                     {
-                        logger(ERROR,"Round-off error detected.");
+                        logger(ERROR, "Round-off error detected.");
                         //logger(WARN,"Round-off error corrected, phew!");
                     }
-
+                    
                     //There are two cases
                     //Case 1: PGMG particles turning PMG; These are still not real
                     //Case 2: PGM particles turning PG; These are truely real
                     if (pGhost->isMPIParticle())
                     {
-                        logger(VERBOSE,"PGMG turned PMG: delete it");
+                        logger(VERBOSE, "PGMG turned PMG: delete it");
                         particlesToBeDeleted.insert(pGhost);
                     }
                     else
                     {
                         //Turn the particle real
-                        logger(VERBOSE,"Ghost particle changed to real at position: %",pGhost->getPosition());
+                        logger(VERBOSE, "Ghost particle changed to real at position: %", pGhost->getPosition());
                         pGhost->setInPeriodicDomain(false);
                         pGhost->setPeriodicGhostParticle(false);
                         //Make sure this particle can be detected now by the parallel boundaries
@@ -1209,24 +1222,26 @@ void PeriodicBoundaryHandler::updateParticleStatus(std::set<BaseParticle*>& part
                 else
                 {
                     //Delete the particle
-                    logger(VERBOSE,"Ghost particle changed complexity at position: %",pGhost->getPosition());
+                    logger(VERBOSE, "Ghost particle changed complexity at position: %", pGhost->getPosition());
                     particlesToBeDeleted.insert(pGhost);
                 }
-
+                
                 //Delete the ID
                 deletePeriodicGhostIDList.insert(pgid);
                 periodicGhostList_[i][p] = nullptr;
             }
         }
-
+        
     }
-
+    
     //Delete IDs 
-    for (auto ppid_it : deletePeriodicIDList) {
+    for (auto ppid_it : deletePeriodicIDList)
+    {
         delete ppid_it;
     }
-
-    for (auto pgid_it : deletePeriodicGhostIDList) {
+    
+    for (auto pgid_it : deletePeriodicGhostIDList)
+    {
         delete pgid_it;
     }
     unsigned int nextId = getDPMBase()->particleHandler.getNextId();
@@ -1252,12 +1267,12 @@ int PeriodicBoundaryHandler::findTargetProcessor(const std::vector<int>& complex
 {
     //Find the middle of this domain (or any valid point anyway)
     Vec3D middlePosition = getDPMBase()->domainHandler.getCurrentDomain()->getMiddle();
-
+    
     //Create the particle with a target position
     BaseParticle particle;
     particle.setPosition(middlePosition);
-    shiftParticle(&particle,complexity);
-
+    shiftParticle(&particle, complexity);
+    
     //Obtain target domain
     int targetGlobalIndex = getDPMBase()->domainHandler.getParticleDomainGlobalIndex(&particle);
     return getDPMBase()->domainHandler.getParticleProcessor(targetGlobalIndex);
@@ -1279,34 +1294,34 @@ void PeriodicBoundaryHandler::findNewParticle(BaseParticle* particle)
         {
             int totalPeriodicComplexity;
             std::vector<int> periodicComplexity;
-            computePeriodicComplexity(periodicComplexity,totalPeriodicComplexity, particle->getPosition());
-
+            computePeriodicComplexity(periodicComplexity, totalPeriodicComplexity, particle->getPosition());
+            
             //Modify periodic complexity tailored to specific boundary requirements
             for (int b = 0; b < getSize(); b++)
             {
                 objects_[b]->modifyPeriodicComplexity(periodicComplexity, totalPeriodicComplexity, particle, b);
             }
-
+            
             //Set periodicComplexity
             particle->setPeriodicComplexity(periodicComplexity);
-
+            
             //Create ghost particle ID's
             std::vector<std::vector<int> > list(0);
             if (totalPeriodicComplexity > 0)
             {
                 periodicComplexity = particle->getPeriodicComplexity();
-            
+                
                 //Generating all possible complexities.
-                generateGhosts(list,periodicComplexity,periodicComplexity,getSize());
+                generateGhosts(list, periodicComplexity, periodicComplexity, getSize());
                 //logger(VERBOSE,"New ghost particles: %",list.size() - 1);
-
+                
                 //Note: the first one in the list is the real particle such that we skip it
                 for (int i = 1; i < list.size(); i++)
                 {
                     //Compute target domain
                     //logger(VERBOSE,"Particle position: %",particle->getPosition());
                     int targetProcessor = findTargetProcessor(list[i]);
-
+                    
                     //Create periodic particle ID
                     MpiPeriodicParticleID* ppid = new MpiPeriodicParticleID;
                     ppid->particle = particle;
@@ -1314,7 +1329,7 @@ void PeriodicBoundaryHandler::findNewParticle(BaseParticle* particle)
                     ppid->targetPeriodicComplexity = list[i];
                     ppid->targetProcessor = targetProcessor;
                     newPeriodicParticleList_[targetProcessor].push_back(ppid);
-                    logger(VERBOSE,"Adding a periodic particle with id % and real particle position: %",
+                    logger(VERBOSE, "Adding a periodic particle with id % and real particle position: %",
                            particle->getId(), particle->getPosition());
                 }
             }
@@ -1329,7 +1344,8 @@ void PeriodicBoundaryHandler::findNewParticle(BaseParticle* particle)
 void PeriodicBoundaryHandler::findNewParticles()
 {
     //Check for all particles if there are unassigned periodic particles
-    for (auto particle_it = getDPMBase()->particleHandler.begin(); particle_it != getDPMBase()->particleHandler.end(); particle_it++)
+    for (auto particle_it = getDPMBase()->particleHandler.begin();
+         particle_it != getDPMBase()->particleHandler.end(); particle_it++)
     {
         findNewParticle(*particle_it);
     }
@@ -1356,14 +1372,14 @@ void PeriodicBoundaryHandler::findNewInteractions()
             {
                 //Find out what the new particle is interacting with
                 BaseParticle* particleP = dynamic_cast<BaseParticle*>(interaction->getP());
-                BaseParticle* objectI = dynamic_cast<BaseParticle*>(interaction->getI());   
-        
+                BaseParticle* objectI = dynamic_cast<BaseParticle*>(interaction->getI());
+                
                 //If the P in the interaction structure is the new particle, find I
-                if (particle==particleP)
-                {      
+                if (particle == particleP)
+                {
                     //Check if the new particle is interacting with a wall
                     if (!objectI)
-                    {     
+                    {
                         newInteractionList_[i].push_back(interaction);
                     }
                     else //is I a particle
@@ -1374,7 +1390,7 @@ void PeriodicBoundaryHandler::findNewInteractions()
                 else //newBoundaryParticle is I in the interaction, P can only be a particle
                 {
                     newInteractionList_[i].push_back(interaction);
-                } 
+                }
             }
         }
         
@@ -1453,15 +1469,15 @@ void PeriodicBoundaryHandler::communicateNumberOfNewParticlesAndInteractions()
     for (int i = 0; i < sendTargetList_.size(); i++)
     {
         if (sendTargetList_[i] != PROCESSOR_ID)
-        { 
-            tagSend = PROCESSOR_ID*MAX_PROC + sendTargetList_[i]*10 + MercuryMPITag::PARTICLE_COUNT;
+        {
+            tagSend = PROCESSOR_ID * MAX_PROC + sendTargetList_[i] * 10 + MercuryMPITag::PARTICLE_COUNT;
             communicator.send(numberOfNewPeriodicGhostParticlesSend_[i], sendTargetList_[i], tagSend);
-
-            tagSend = PROCESSOR_ID*MAX_PROC + sendTargetList_[i]*10 + MercuryMPITag::INTERACTION_COUNT;
+            
+            tagSend = PROCESSOR_ID * MAX_PROC + sendTargetList_[i] * 10 + MercuryMPITag::INTERACTION_COUNT;
             communicator.send(numberOfNewInteractionsSend_[i], sendTargetList_[i], tagSend);
         }
     }
-
+    
     //Perform the receive routines
     numberOfNewPeriodicGhostParticlesReceive_.resize(receiveTargetList_.size());
     numberOfNewInteractionsReceive_.resize(receiveTargetList_.size());
@@ -1470,10 +1486,10 @@ void PeriodicBoundaryHandler::communicateNumberOfNewParticlesAndInteractions()
     {
         if (receiveTargetList_[i] != PROCESSOR_ID)
         {
-            tagReceive = receiveTargetList_[i]*MAX_PROC + PROCESSOR_ID*10 + MercuryMPITag::PARTICLE_COUNT;
+            tagReceive = receiveTargetList_[i] * MAX_PROC + PROCESSOR_ID * 10 + MercuryMPITag::PARTICLE_COUNT;
             communicator.receive(numberOfNewPeriodicGhostParticlesReceive_[i], receiveTargetList_[i], tagReceive);
-
-            tagReceive = receiveTargetList_[i]*MAX_PROC + PROCESSOR_ID*10 + MercuryMPITag::INTERACTION_COUNT;
+            
+            tagReceive = receiveTargetList_[i] * MAX_PROC + PROCESSOR_ID * 10 + MercuryMPITag::INTERACTION_COUNT;
             communicator.receive(numberOfNewInteractionsReceive_[i], receiveTargetList_[i], tagReceive);
         }
     }
@@ -1491,13 +1507,13 @@ void PeriodicBoundaryHandler::prepareNewParticleTransmission()
 {
     //Communicate which domains send and which domains receive particles
     communicateTargetDomains();
-
+    
     //Find new interactions
     findNewInteractions();
-
+    
     //Communicate the number of particles and interactions send to the other domains
     communicateNumberOfNewParticlesAndInteractions();
-
+    
     //Synchronise the communications
     MPIContainer::Instance().sync();
 }
@@ -1507,7 +1523,7 @@ void PeriodicBoundaryHandler::performNewParticleTransmission()
     MPIContainer& communicator = MPIContainer::Instance();
     int numberOfTargetsReceive = receiveTargetList_.size();
     int numberOfTargetsSend = sendTargetList_.size();
-
+    
     //Make sure that the receiving vectors have the correct length
     periodicGhostParticleReceive_.resize(numberOfTargetsReceive);
     periodicGhostComplexityReceive_.resize(numberOfTargetsReceive);
@@ -1516,10 +1532,10 @@ void PeriodicBoundaryHandler::performNewParticleTransmission()
     for (int i = 0; i < numberOfTargetsReceive; i++)
     {
         periodicGhostParticleReceive_[i].resize(numberOfNewPeriodicGhostParticlesReceive_[i]);
-        periodicGhostComplexityReceive_[i].resize(numberOfNewPeriodicGhostParticlesReceive_[i]*getSize());
+        periodicGhostComplexityReceive_[i].resize(numberOfNewPeriodicGhostParticlesReceive_[i] * getSize());
         interactionDataReceive_[i] = iH.createMPIInteractionDataArray(numberOfNewInteractionsReceive_[i]);
     }
-
+    
     //Collect data for sending
     collectGhostParticleData();
     collectInteractionData();
@@ -1532,24 +1548,25 @@ void PeriodicBoundaryHandler::performNewParticleTransmission()
             //Send particle data
             int sendCount = numberOfNewPeriodicGhostParticlesSend_[i];
             int processor = sendTargetList_[i];
-            int tagSend = PROCESSOR_ID*MAX_PROC + sendTargetList_[i]*10 + MercuryMPITag::PARTICLE_DATA;
-            communicator.send(periodicGhostParticleSend_[i].data(), MercuryMPIType::PARTICLE, sendCount, processor, tagSend);
-    
+            int tagSend = PROCESSOR_ID * MAX_PROC + sendTargetList_[i] * 10 + MercuryMPITag::PARTICLE_DATA;
+            communicator.send(periodicGhostParticleSend_[i].data(), MercuryMPIType::PARTICLE, sendCount, processor,
+                              tagSend);
+            
             //Send complexity
-            tagSend = PROCESSOR_ID*MAX_PROC + sendTargetList_[i]*10 + MercuryMPITag::PERIODIC_COMPLEXITY;
-            sendCount = numberOfNewPeriodicGhostParticlesSend_[i]*getSize();
+            tagSend = PROCESSOR_ID * MAX_PROC + sendTargetList_[i] * 10 + MercuryMPITag::PERIODIC_COMPLEXITY;
+            sendCount = numberOfNewPeriodicGhostParticlesSend_[i] * getSize();
             communicator.send(periodicGhostComplexitySend_[i].data(), sendCount, processor, tagSend);
-
+            
             //Send interactions
-            tagSend = PROCESSOR_ID*MAX_PROC + sendTargetList_[i]*10 + MercuryMPITag::INTERACTION_DATA;
+            tagSend = PROCESSOR_ID * MAX_PROC + sendTargetList_[i] * 10 + MercuryMPITag::INTERACTION_DATA;
             sendCount = numberOfNewInteractionsSend_[i];
             if (sendCount > 0)
             {
                 communicator.send(interactionDataSend_[i], MercuryMPIType::INTERACTION, sendCount, processor, tagSend);
             }
         }
-    }    
-
+    }
+    
     //Receive data
     for (int i = 0; i < numberOfTargetsReceive; i++)
     {
@@ -1557,26 +1574,27 @@ void PeriodicBoundaryHandler::performNewParticleTransmission()
         {
             //Receive particle data
             int receiveCount = numberOfNewPeriodicGhostParticlesReceive_[i];
-            int processor = receiveTargetList_[i]; 
-            int tagReceive = receiveTargetList_[i]*MAX_PROC + PROCESSOR_ID*10 + MercuryMPITag::PARTICLE_DATA;
-            communicator.receive(periodicGhostParticleReceive_[i].data(), MercuryMPIType::PARTICLE, 
-                                                                        receiveCount, processor, tagReceive);
-
+            int processor = receiveTargetList_[i];
+            int tagReceive = receiveTargetList_[i] * MAX_PROC + PROCESSOR_ID * 10 + MercuryMPITag::PARTICLE_DATA;
+            communicator.receive(periodicGhostParticleReceive_[i].data(), MercuryMPIType::PARTICLE,
+                                 receiveCount, processor, tagReceive);
+            
             //Receive complexity
-            tagReceive = receiveTargetList_[i]*MAX_PROC + PROCESSOR_ID*10 + MercuryMPITag::PERIODIC_COMPLEXITY;
-            receiveCount = numberOfNewPeriodicGhostParticlesReceive_[i]*getSize();
+            tagReceive = receiveTargetList_[i] * MAX_PROC + PROCESSOR_ID * 10 + MercuryMPITag::PERIODIC_COMPLEXITY;
+            receiveCount = numberOfNewPeriodicGhostParticlesReceive_[i] * getSize();
             communicator.receive(periodicGhostComplexityReceive_[i].data(), receiveCount, processor, tagReceive);
             
             //Send interactions
-            tagReceive = receiveTargetList_[i]*MAX_PROC + PROCESSOR_ID*10 + MercuryMPITag::INTERACTION_DATA;
+            tagReceive = receiveTargetList_[i] * MAX_PROC + PROCESSOR_ID * 10 + MercuryMPITag::INTERACTION_DATA;
             receiveCount = numberOfNewInteractionsReceive_[i];
-            if (receiveCount > 0) 
+            if (receiveCount > 0)
             {
-                communicator.receive(interactionDataReceive_[i], MercuryMPIType::INTERACTION, receiveCount, processor, tagReceive);
+                communicator.receive(interactionDataReceive_[i], MercuryMPIType::INTERACTION, receiveCount, processor,
+                                     tagReceive);
             }
         }
     }
-
+    
     //Synchronise the communications
     communicator.sync();
 }
@@ -1587,18 +1605,18 @@ void PeriodicBoundaryHandler::finaliseNewParticleTransmission()
     for (int i = 0; i < receiveTargetList_.size(); i++)
     {
         std::vector<BaseParticle*> newGhostParticles;
-        processReceivedGhostParticleData(i,newGhostParticles);
-        processReceivedInteractionData(i,newGhostParticles);
+        processReceivedGhostParticleData(i, newGhostParticles);
+        processReceivedInteractionData(i, newGhostParticles);
     }
-
+    
     //Process the local data
     std::vector<BaseParticle*> newGhostParticles;
     processLocalGhostParticles(newGhostParticles);
     processLocalInteractionData(newGhostParticles);
-
+    
     //Process the periodic particles;
-    processPeriodicParticles(); 
-
+    processPeriodicParticles();
+    
     //Clear lists
     receiveTargetList_.clear();
     sendTargetList_.clear();
@@ -1613,10 +1631,12 @@ void PeriodicBoundaryHandler::finaliseNewParticleTransmission()
     interactionDataSend_.clear();
     interactionDataReceive_.clear();
     newInteractionList_.clear();
-    for (auto &i : newPeriodicParticleList_) {
+    for (auto& i : newPeriodicParticleList_)
+    {
         i.clear();
     }
-    for (auto &i : newPeriodicParticleList_) {
+    for (auto& i : newPeriodicParticleList_)
+    {
         i.clear();
     }
 }
@@ -1626,13 +1646,13 @@ void PeriodicBoundaryHandler::preparePositionAndVelocityUpdate()
     MPIContainer& communicator = MPIContainer::Instance();
     unsigned int numberOfProcessors = communicator.getNumberOfProcessors();
     unsigned int processorID = communicator.getProcessorID();
-
+    
     //For all lists that contain periodic particles
     for (unsigned int i = 0; i < numberOfProcessors; i++)
     {
         unsigned int numberOfParticles = periodicParticleList_[i].size();
         if (numberOfParticles > 0 && i != processorID)
-        { 
+        {
             //Increase the vector size;
             updatePositionDataSend_.emplace_back(0);
             updateVelocityDataSend_.emplace_back(0);
@@ -1644,19 +1664,19 @@ void PeriodicBoundaryHandler::preparePositionAndVelocityUpdate()
                 updatePositionDataSend_.back().push_back(copyPositionFrom(particle));
                 updateVelocityDataSend_.back().push_back(copyVelocityFrom(particle));
             }
-
+            
             //Send position data
             unsigned int count = numberOfParticles;
             unsigned int processor = i;
-            unsigned int tag = processorID*MAX_PROC + processor*10 + MercuryMPITag::POSITION_DATA;
+            unsigned int tag = processorID * MAX_PROC + processor * 10 + MercuryMPITag::POSITION_DATA;
             communicator.send(updatePositionDataSend_.back().data(), MercuryMPIType::POSITION, count, processor, tag);
             
             //Send velocity data
-            tag =  processorID*MAX_PROC + processor*10 + MercuryMPITag::VELOCITY_DATA;
+            tag = processorID * MAX_PROC + processor * 10 + MercuryMPITag::VELOCITY_DATA;
             communicator.send(updateVelocityDataSend_.back().data(), MercuryMPIType::VELOCITY, count, processor, tag);
         }
     }
-
+    
     //For all lists that contain ghost particles
     for (int i = 0; i < numberOfProcessors; i++)
     {
@@ -1666,19 +1686,21 @@ void PeriodicBoundaryHandler::preparePositionAndVelocityUpdate()
             //Increase the vector size
             updatePositionDataReceive_.emplace_back(numberOfParticles);
             updateVelocityDataReceive_.emplace_back(numberOfParticles);
-           
+            
             //Receive position data
             int count = numberOfParticles;
             int processor = i;
-            int tag = processor*MAX_PROC + processorID*10 + MercuryMPITag::POSITION_DATA;
-            communicator.receive(updatePositionDataReceive_.back().data(), MercuryMPIType::POSITION, count, processor, tag);
-
+            int tag = processor * MAX_PROC + processorID * 10 + MercuryMPITag::POSITION_DATA;
+            communicator.receive(updatePositionDataReceive_.back().data(), MercuryMPIType::POSITION, count, processor,
+                                 tag);
+            
             //Receive velocity data
-            tag = processor*MAX_PROC + processorID*10 + MercuryMPITag::VELOCITY_DATA;
-            communicator.receive(updateVelocityDataReceive_.back().data(), MercuryMPIType::POSITION, count, processor, tag);
+            tag = processor * MAX_PROC + processorID * 10 + MercuryMPITag::VELOCITY_DATA;
+            communicator.receive(updateVelocityDataReceive_.back().data(), MercuryMPIType::POSITION, count, processor,
+                                 tag);
         }
     }
-
+    
     //Synchronise all the requests
     communicator.sync();
 }
@@ -1687,7 +1709,7 @@ void PeriodicBoundaryHandler::finalisePositionAndVelocityUpdate()
 {
     //Update the positions, velocities and periodic complexities of particles
     updateParticles();
-
+    
     //Delete vectors
     updatePositionDataSend_.clear();
     updatePositionDataReceive_.clear();
@@ -1701,12 +1723,14 @@ void PeriodicBoundaryHandler::flushParticles(std::set<BaseParticle*>& particlesT
     /*!
      * \todo This function uses a brute force method to flush the particles, this
      * can be done in a smarter way if profiling shows that this is a bottleneck.
-     */ 
+     */
     std::set<MpiPeriodicParticleIDBase*> toBeDeleted;
-    for (auto p_it : particlesToBeFlushed) {
+    for (auto p_it : particlesToBeFlushed)
+    {
         for (int i = 0; i < NUMBER_OF_PROCESSORS; i++)
         {
-            for (auto &p : periodicParticleList_[i]) {
+            for (auto& p : periodicParticleList_[i])
+            {
                 if (p != nullptr)
                 {
                     if (p_it == p->particle)
@@ -1717,10 +1741,11 @@ void PeriodicBoundaryHandler::flushParticles(std::set<BaseParticle*>& particlesT
                 }
             }
         }
-    
-        for (int i = 0; i < NUMBER_OF_PROCESSORS; i++)  
+        
+        for (int i = 0; i < NUMBER_OF_PROCESSORS; i++)
         {
-            for (auto &p : periodicGhostList_[i]) {
+            for (auto& p : periodicGhostList_[i])
+            {
                 if (p != nullptr)
                 {
                     if (p_it == p->particle)
@@ -1732,12 +1757,13 @@ void PeriodicBoundaryHandler::flushParticles(std::set<BaseParticle*>& particlesT
             }
         }
     }
-
+    
     //Delete ID's
-    for (auto id_it : toBeDeleted) {
-       delete id_it;
+    for (auto id_it : toBeDeleted)
+    {
+        delete id_it;
     }
-
+    
 }
 
 /*!
@@ -1799,7 +1825,8 @@ void PeriodicBoundaryHandler::clearCommunicationLists()
     if (NUMBER_OF_PROCESSORS > 1)
     {
         //Clear ID lists
-        for (auto &i : periodicParticleList_) {
+        for (auto& i : periodicParticleList_)
+        {
             //logger(INFO,"Size: %",periodicParticleList_[i].size());
             for (int j = 0; j < i.size(); j++)
             {
@@ -1807,15 +1834,16 @@ void PeriodicBoundaryHandler::clearCommunicationLists()
             }
             i.clear();
         }
-    
-        for (auto &i : periodicGhostList_) {
+        
+        for (auto& i : periodicGhostList_)
+        {
             for (int j = 0; j < i.size(); j++)
             {
                 delete i[j];
             }
             i.clear();
         }
-    
+        
         //Collect all ghost particles and unflag
         ParticleHandler& pH = getDPMBase()->particleHandler;
         std::set<BaseParticle*> toBeDeleted; //Set because I am too lazy to implement a vector based flushParticle function
@@ -1825,15 +1853,15 @@ void PeriodicBoundaryHandler::clearCommunicationLists()
             {
                 toBeDeleted.insert(particle);
             }
-        
+            
             //Unflag its periodicity
             particle->setInPeriodicDomain(false);
         }
-    
+        
         //Flush from mpi boundary and clean the lists
         getDPMBase()->getCurrentDomain()->flushParticles(toBeDeleted);
         getDPMBase()->getCurrentDomain()->cleanCommunicationLists();
-    
+        
         //Delete particles
         int index = 0;
         for (BaseParticle* particle : toBeDeleted)

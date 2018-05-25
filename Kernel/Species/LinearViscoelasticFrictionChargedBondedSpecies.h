@@ -31,6 +31,7 @@
 #include "NormalForceSpecies/LinearViscoelasticNormalSpecies.h"
 #include "FrictionForceSpecies/FrictionSpecies.h"
 #include "Species/AdhesiveForceSpecies/ChargedBondedSpecies.h"
-typedef Species<LinearViscoelasticNormalSpecies,FrictionSpecies,ChargedBondedSpecies> LinearViscoelasticFrictionChargedBondedSpecies;
-typedef MixedSpecies<LinearViscoelasticNormalSpecies,FrictionSpecies,ChargedBondedSpecies> LinearViscoelasticFrictionChargedBondedMixedSpecies;
+
+typedef Species<LinearViscoelasticNormalSpecies, FrictionSpecies, ChargedBondedSpecies> LinearViscoelasticFrictionChargedBondedSpecies;
+typedef MixedSpecies<LinearViscoelasticNormalSpecies, FrictionSpecies, ChargedBondedSpecies> LinearViscoelasticFrictionChargedBondedMixedSpecies;
 #endif

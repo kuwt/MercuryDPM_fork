@@ -37,9 +37,9 @@
  * \param[in] timeStamp
  */
 BondedInteraction::BondedInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp)
-    : BaseInteraction(P, I, timeStamp)
+        : BaseInteraction(P, I, timeStamp)
 {
-    bonded_=false;
+    bonded_ = false;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"BondedInteraction::BondedInteraction() finished"<<std::endl;
 #endif
@@ -48,21 +48,23 @@ BondedInteraction::BondedInteraction(BaseInteractable* P, BaseInteractable* I, u
 /*!
  * \param[in] p
  */
-BondedInteraction::BondedInteraction(const BondedInteraction &p)
-    : BaseInteraction(p)
+BondedInteraction::BondedInteraction(const BondedInteraction& p)
+        : BaseInteraction(p)
 {
-	///\todo tw check if the parameters are valid when inserting the species into the handler
-    bonded_=p.bonded_;
+    ///\todo tw check if the parameters are valid when inserting the species into the handler
+    bonded_ = p.bonded_;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"BondedInteraction::BondedInteraction(const BondedInteraction &p finished"<<std::endl;
 #endif
 }
+
 BondedInteraction::BondedInteraction()
 {
 #ifdef MERCURY_USE_MPI
     logger(FATAL,"ChargedBondedInteractions are currently not implemented in parallel MercuryDPM");
-#endif  
+#endif
 }
+
 /*!
  *
  */
@@ -72,6 +74,7 @@ BondedInteraction::~BondedInteraction()
     std::cout<<"BondedInteraction::~BondedInteraction() finished"<<std::endl;
 #endif
 }
+
 /*!
  * \param[in,out] os
  */
@@ -79,6 +82,7 @@ void BondedInteraction::write(std::ostream& os) const
 {
     os << " bonded " << bonded_;
 }
+
 /*!
  * \param[in,out] is
  */
@@ -87,24 +91,28 @@ void BondedInteraction::read(std::istream& is)
     std::string dummy;
     is >> dummy >> bonded_;
 }
+
 /*!
  * \details Uses the most basic adhesion contact model.
  */
 void BondedInteraction::computeAdhesionForce()
 {
     const BondedSpecies* species = getSpecies();
-    if (bonded_ && getOverlap()>=0) {
+    if (bonded_ && getOverlap() >= 0)
+    {
         addForce(getNormal() * (-species->getBondForceMax()
-            - species->getBondDissipation() * getNormalRelativeVelocity()));
+                                - species->getBondDissipation() * getNormalRelativeVelocity()));
     }
 }
+
 /*!
  * \return const pointer of BondedSpecies*
  */
 const BondedSpecies* BondedInteraction::getSpecies() const
 {
-    return dynamic_cast<const BondedSpecies *>(getBaseSpecies());
+    return dynamic_cast<const BondedSpecies*>(getBaseSpecies());
 }
+
 /*!
  * \return std::string
  */
@@ -122,7 +130,7 @@ Mdouble BondedInteraction::getElasticEnergy() const
 {
     if (!bonded_)
         return 0.0;
-    else 
+    else
         return -getSpecies()->getBondForceMax() * getOverlap();
 }
 
@@ -139,10 +147,10 @@ void BondedInteraction::setBonded(bool bonded)
 
 void BondedInteraction::bond()
 {
-    bonded_=true;
+    bonded_ = true;
 }
 
 void BondedInteraction::unbond()
 {
-    bonded_=false;
+    bonded_ = false;
 }

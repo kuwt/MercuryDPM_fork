@@ -44,7 +44,7 @@ LinearViscoelasticNormalSpecies::LinearViscoelasticNormalSpecies()
 /*!
  * \param[in] the species that is copied
  */
-LinearViscoelasticNormalSpecies::LinearViscoelasticNormalSpecies(const LinearViscoelasticNormalSpecies &p)
+LinearViscoelasticNormalSpecies::LinearViscoelasticNormalSpecies(const LinearViscoelasticNormalSpecies& p)
 {
     stiffness_ = p.stiffness_;
     dissipation_ = p.dissipation_;
@@ -66,7 +66,7 @@ LinearViscoelasticNormalSpecies::~LinearViscoelasticNormalSpecies()
 void LinearViscoelasticNormalSpecies::write(std::ostream& os) const
 {
     os << " stiffness " << stiffness_
-            << " dissipation " << dissipation_;
+       << " dissipation " << dissipation_;
 }
 
 /*!
@@ -76,7 +76,7 @@ void LinearViscoelasticNormalSpecies::read(std::istream& is)
 {
     std::string dummy;
     is >> dummy >> stiffness_
-            >> dummy >> dissipation_;
+       >> dummy >> dissipation_;
 }
 
 /*!
@@ -138,20 +138,28 @@ Mdouble LinearViscoelasticNormalSpecies::getCollisionTime(Mdouble mass) const
 {
     if (mass <= 0)
     {
-        std::cerr << "Warning in getCollisionTime(" << mass << ") mass is not set or has an unexpected value, (getCollisionTime(" << mass << "))" << std::endl;
+        std::cerr << "Warning in getCollisionTime(" << mass
+                  << ") mass is not set or has an unexpected value, (getCollisionTime(" << mass << "))" << std::endl;
     }
     if (stiffness_ <= 0)
     {
-        std::cerr << "Warning in getCollisionTime(" << mass << ") stiffness=" << stiffness_ << " is not set or has an unexpected value, (getCollisionTime(" << mass << "), with stiffness=" << stiffness_ << ")" << std::endl;
+        std::cerr << "Warning in getCollisionTime(" << mass << ") stiffness=" << stiffness_
+                  << " is not set or has an unexpected value, (getCollisionTime(" << mass << "), with stiffness="
+                  << stiffness_ << ")" << std::endl;
     }
     if (dissipation_ < 0)
     {
-        std::cerr << "Warning in getCollisionTime(" << mass << ") dissipation=" << dissipation_ << " is not set or has an unexpected value, (getCollisionTime(" << mass << "), with dissipation=" << dissipation_ << ")" << std::endl;
+        std::cerr << "Warning in getCollisionTime(" << mass << ") dissipation=" << dissipation_
+                  << " is not set or has an unexpected value, (getCollisionTime(" << mass << "), with dissipation="
+                  << dissipation_ << ")" << std::endl;
     }
     Mdouble tosqrt = stiffness_ / (.5 * mass) - mathsFunc::square(dissipation_ / mass);
     if (tosqrt <= 0)
     {
-        std::cerr << "Warning in getCollisionTime(" << mass << ") values for mass, stiffness and dissipation would lead to an overdamped system, (getCollisionTime(" << mass << "), with stiffness=" << stiffness_ << " and dissipation=" << dissipation_ << ")" << std::endl;
+        std::cerr << "Warning in getCollisionTime(" << mass
+                  << ") values for mass, stiffness and dissipation would lead to an overdamped system, (getCollisionTime("
+                  << mass << "), with stiffness=" << stiffness_ << " and dissipation=" << dissipation_ << ")"
+                  << std::endl;
     }
     return constants::pi / std::sqrt(tosqrt);
 }
@@ -174,20 +182,23 @@ Mdouble LinearViscoelasticNormalSpecies::getMaximumVelocity(Mdouble radius, Mdou
  * \param[in] eps restitution coefficient
  * \param[in] mass harmonic average mass of a single particle, \f$\frac{2}{1/m1+1/m2}\f$
  */
-void LinearViscoelasticNormalSpecies::setStiffnessAndRestitutionCoefficient(Mdouble stiffness, Mdouble eps, Mdouble mass)
+void
+LinearViscoelasticNormalSpecies::setStiffnessAndRestitutionCoefficient(Mdouble stiffness, Mdouble eps, Mdouble mass)
 {
     stiffness_ = stiffness;
-    if (eps==0.0)
+    if (eps == 0.0)
     {
         dissipation_ = std::sqrt(2.0 * mass * stiffness);
     }
     else
     {
-        dissipation_ = -std::sqrt(2.0 * mass * stiffness / (constants::sqr_pi + mathsFunc::square(log(eps)))) * log(eps);
+        dissipation_ =
+                -std::sqrt(2.0 * mass * stiffness / (constants::sqr_pi + mathsFunc::square(log(eps)))) * log(eps);
     }
 }
 
-void LinearViscoelasticNormalSpecies::setCollisionTimeAndRestitutionCoefficient(Mdouble tc, Mdouble eps, BaseParticle* p)
+void
+LinearViscoelasticNormalSpecies::setCollisionTimeAndRestitutionCoefficient(Mdouble tc, Mdouble eps, BaseParticle* p)
 {
     Mdouble mass = p->getSpecies()->getDensity() * p->getVolume();
     setCollisionTimeAndRestitutionCoefficient(tc, eps, mass);
@@ -202,7 +213,7 @@ void LinearViscoelasticNormalSpecies::setCollisionTimeAndRestitutionCoefficient(
  */
 void LinearViscoelasticNormalSpecies::setCollisionTimeAndRestitutionCoefficient(Mdouble tc, Mdouble eps, Mdouble mass)
 {
-    if (eps==0.0)
+    if (eps == 0.0)
     {
         stiffness_ = .5 * mass * mathsFunc::square(constants::pi / tc);
         dissipation_ = std::sqrt(2.0 * mass * stiffness_);
@@ -210,11 +221,12 @@ void LinearViscoelasticNormalSpecies::setCollisionTimeAndRestitutionCoefficient(
     else
     {
         dissipation_ = -mass / tc * mathsFunc::log(eps);
-        stiffness_ = .5 * mass * (mathsFunc::square(constants::pi / tc) 
-            + mathsFunc::square(dissipation_ / mass));
+        stiffness_ = .5 * mass * (mathsFunc::square(constants::pi / tc)
+                                  + mathsFunc::square(dissipation_ / mass));
     }
-    logger(INFO,"setCollisionTimeAndRestitutionCoefficient: set stiffness to % and dissipation to % to obtain a collision time of % and a restitution coefficient of % for two particles of mass %",
-           getStiffness(),getDissipation(),tc,eps,mass);
+    logger(INFO,
+           "setCollisionTimeAndRestitutionCoefficient: set stiffness to % and dissipation to % to obtain a collision time of % and a restitution coefficient of % for two particles of mass %",
+           getStiffness(), getDissipation(), tc, eps, mass);
 }
 
 /*!
@@ -223,7 +235,9 @@ void LinearViscoelasticNormalSpecies::setCollisionTimeAndRestitutionCoefficient(
  * See also setCollisionTimeAndRestitutionCoefficient(Mdouble tc, Mdouble eps, Mdouble mass)
  * \param[in] collision time
  */
-void LinearViscoelasticNormalSpecies::setCollisionTimeAndRestitutionCoefficient(Mdouble collisionTime, Mdouble restitutionCoefficient, Mdouble mass1, Mdouble mass2)
+void LinearViscoelasticNormalSpecies::setCollisionTimeAndRestitutionCoefficient(Mdouble collisionTime,
+                                                                                Mdouble restitutionCoefficient,
+                                                                                Mdouble mass1, Mdouble mass2)
 {
     Mdouble reduced_mass = mass1 * mass2 / (mass1 + mass2);
     setCollisionTimeAndRestitutionCoefficient(collisionTime, restitutionCoefficient, 2.0 * reduced_mass);
@@ -234,7 +248,8 @@ void LinearViscoelasticNormalSpecies::setCollisionTimeAndRestitutionCoefficient(
  * original two species is a sensible default.
  * \param[in] S,T the two species whose properties are mixed to create the new species
  */
-void LinearViscoelasticNormalSpecies::mix(LinearViscoelasticNormalSpecies* const S, LinearViscoelasticNormalSpecies* const T)
+void
+LinearViscoelasticNormalSpecies::mix(LinearViscoelasticNormalSpecies* const S, LinearViscoelasticNormalSpecies* const T)
 {
     stiffness_ = average(S->getStiffness(), T->getStiffness());
     dissipation_ = average(S->getDissipation(), T->getDissipation());

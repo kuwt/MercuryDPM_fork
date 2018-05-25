@@ -31,30 +31,31 @@
 class STLTriangle
 {
 public:
-    STLTriangle(){};
-
+    STLTriangle()
+    {};
+    
     STLTriangle(const Vec3D newNormal, const Vec3D newVertex1, const Vec3D newVertex2, const Vec3D newVertex3)
     {
-        normal=newNormal;
-        vertex1=newVertex1;
-        vertex2=newVertex2;
-        vertex3=newVertex3;
+        normal = newNormal;
+        vertex1 = newVertex1;
+        vertex2 = newVertex2;
+        vertex3 = newVertex3;
     }
-
+    
     bool isEqualTo(const STLTriangle answer, double toll)
     {
-        if (!normal.isEqualTo(answer.normal,toll)) return false;
-        if (!vertex1.isEqualTo(answer.vertex1,toll)) return false;
-        if (!vertex2.isEqualTo(answer.vertex2,toll)) return false;
-        if (!vertex3.isEqualTo(answer.vertex3,toll)) return false;
+        if (!normal.isEqualTo(answer.normal, toll)) return false;
+        if (!vertex1.isEqualTo(answer.vertex1, toll)) return false;
+        if (!vertex2.isEqualTo(answer.vertex2, toll)) return false;
+        if (!vertex3.isEqualTo(answer.vertex3, toll)) return false;
         return true;
     }
-
+    
     Vec3D normal;
     Vec3D vertex1;
     Vec3D vertex2;
     Vec3D vertex3;
-
+    
 };
 
 #endif //STLTRIANGLE_H

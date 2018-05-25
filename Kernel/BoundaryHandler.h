@@ -42,12 +42,12 @@ public:
      * \brief Default constructor, it creates an empty BoundaryHandler.
      */
     BoundaryHandler();
-
+    
     /*!
      * \brief Constructor that copies all BaseBoundary it contains and sets the other variables to 0/nullptr.
      */
     BoundaryHandler(const BoundaryHandler& BH);
-
+    
     /*!
      * \brief Assignment operator, copies only the vector of BaseBoundary and sets the other variables to 0/nullptr.
      */
@@ -57,24 +57,24 @@ public:
      * \brief Destructor, it destructs the BoundaryHandler and all BaseBoundary it contains.
      */
     ~BoundaryHandler() final;
-
+    
     /*!
      * \brief Adds a BaseBoundary to the BoundaryHandler. 
      */
     void addObject(BaseBoundary* P) final;
-
+    
     static BaseBoundary* createObject(const std::string& type);
-
+    
     /*!
      * \brief Reads BaseBoundary into the BoundaryHandler from restart data. 
      */
     void readAndAddObject(std::istream& is) final;
-
+    
     /*!
      *  \brief Reads a periodic boundary from old-style restart data.    
-     */ 
+     */
     void readOldObject(std::istream& is);
-
+    
     /*!
      *  \brief Returns the name of the handler, namely the string "BoundaryHandler".
      */

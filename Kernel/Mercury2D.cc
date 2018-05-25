@@ -71,7 +71,7 @@ void Mercury2D::constructor()
  */
 void Mercury2D::hGridFindContactsWithinTargetCell(int x, int y, unsigned int l)
 {
-    HGrid* hgrid=getHGrid();
+    HGrid* hgrid = getHGrid();
     unsigned int bucket = hgrid->computeHashBucketIndex(x, y, l);
     
     //Check if this function is already applied to this bucket
@@ -114,36 +114,39 @@ void Mercury2D::hGridFindContactsWithinTargetCell(int x, int y, unsigned int l)
 void Mercury2D::hGridFindContactsWithTargetCell(int x, int y, unsigned int l, BaseParticle* obj)
 {
     //Check if the object is not in the same cell as being checked, CheckCell_current should handle these cases.
-    logger.assert(!obj->getHGridCell().equals(x,y,l),"hGridFindContactsWithTargetCell should not be called if object is in the same cell");
-
+    logger.assert(!obj->getHGridCell().equals(x, y, l),
+                  "hGridFindContactsWithTargetCell should not be called if object is in the same cell");
+    
     HGrid* const hgrid = getHGrid();
-
+    
     // Calculate the bucket
     const unsigned int bucket = hgrid->computeHashBucketIndex(x, y, l);
-
+    
     // Loop through all objects in the bucket to find nearby objects
     for (BaseParticle* p = hgrid->getFirstBaseParticleInBucket(bucket); p != nullptr; p = p->getHGridNextObject())
     {
         //Check if the BaseParticle *p really is in the target cell (i.e. no hashing error has occurred)
-        if (p->getHGridCell().equals(x,y,l)) {
+        if (p->getHGridCell().equals(x, y, l))
+        {
             computeInternalForces(obj, p);
         }
     }
 }
 
 /// \todo: MX: generalise this
-void Mercury2D::hGridFindParticlesWithTargetCell(int x, int y, unsigned int l, BaseParticle* obj, std::vector<BaseParticle*>& list)
+void Mercury2D::hGridFindParticlesWithTargetCell(int x, int y, unsigned int l, BaseParticle* obj,
+                                                 std::vector<BaseParticle*>& list)
 {
-    HGrid* const hgrid=getHGrid();
-
+    HGrid* const hgrid = getHGrid();
+    
     // Calculate the bucket
     const unsigned int bucket = hgrid->computeHashBucketIndex(x, y, l);
-
+    
     // Loop through all objects in the bucket to find nearby objects
     BaseParticle* p = hgrid->getFirstBaseParticleInBucket(bucket);
     while (p != nullptr)
     {
-        if (p->getHGridCell().equals(x,y,l))
+        if (p->getHGridCell().equals(x, y, l))
         {
             list.push_back(p);
         }
@@ -163,18 +166,22 @@ void Mercury2D::hGridGetInteractingParticleList(BaseParticle* obj, std::vector<B
         {
             break;
         }
-
+        
         // If no objects at this level, go on to the next level
         if ((occupiedLevelsMask & 1) == 0)
         {
             continue;
         }
-
+        
         const Mdouble inv_size = hgrid->getInvCellSize(level);
-        const int xs = static_cast<int>(std::floor((obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
-        const int xe = static_cast<int>(std::floor((obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
-        const int ys = static_cast<int>(std::floor((obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
-        const int ye = static_cast<int>(std::floor((obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
+        const int xs = static_cast<int>(std::floor(
+                (obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
+        const int xe = static_cast<int>(std::floor(
+                (obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
+        const int ys = static_cast<int>(std::floor(
+                (obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
+        const int ye = static_cast<int>(std::floor(
+                (obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
         for (int x = xs; x <= xe; ++x)
         {
             for (int y = ys; y <= ye; ++y)
@@ -191,15 +198,15 @@ void Mercury2D::hGridGetInteractingParticleList(BaseParticle* obj, std::vector<B
  * \details Computes all collision between given BaseParticle and all other 
  * particles in the grid (of all levels).
  */
-void Mercury2D::hGridFindOneSidedContacts(BaseParticle *obj)
+void Mercury2D::hGridFindOneSidedContacts(BaseParticle* obj)
 {
-    HGrid* hgrid=getHGrid();
+    HGrid* hgrid = getHGrid();
     unsigned int startLevel = obj->getHGridLevel();
-
+    
     switch (getHGridMethod())
     {
         case BOTTOMUP:
-            {
+        {
             int occupiedLevelsMask = hgrid->getOccupiedLevelsMask() >> obj->getHGridLevel();
             for (unsigned int level = startLevel; level < hgrid->getNumberOfLevels(); occupiedLevelsMask >>= 1, level++)
             {
@@ -230,10 +237,14 @@ void Mercury2D::hGridFindOneSidedContacts(BaseParticle *obj)
                 {
                     int xs, ys, xe, ye;
                     Mdouble inv_size = hgrid->getInvCellSize(level);
-                    xs = static_cast<int>(std::floor((obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
-                    xe = static_cast<int>(std::floor((obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
-                    ys = static_cast<int>(std::floor((obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
-                    ye = static_cast<int>(std::floor((obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
+                    xs = static_cast<int>(std::floor(
+                            (obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
+                    xe = static_cast<int>(std::floor(
+                            (obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
+                    ys = static_cast<int>(std::floor(
+                            (obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
+                    ye = static_cast<int>(std::floor(
+                            (obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
                     for (int x = xs; x <= xe; ++x)
                     {
                         for (int y = ys; y <= ye; ++y)
@@ -246,7 +257,7 @@ void Mercury2D::hGridFindOneSidedContacts(BaseParticle *obj)
             break;
         }
         case TOPDOWN:
-            {
+        {
             int occupiedLevelsMask = hgrid->getOccupiedLevelsMask();
             for (unsigned int level = 0; level <= startLevel; occupiedLevelsMask >>= 1, level++)
             {
@@ -266,7 +277,7 @@ void Mercury2D::hGridFindOneSidedContacts(BaseParticle *obj)
                 {
                     int x = obj->getHGridX();
                     int y = obj->getHGridY();
-
+                    
                     hGridFindContactsWithinTargetCell(x, y, level);
                     hGridFindContactsWithTargetCell(x, y + 1, level, obj);
                     hGridFindContactsWithTargetCell(x + 1, y - 1, level, obj);
@@ -277,10 +288,14 @@ void Mercury2D::hGridFindOneSidedContacts(BaseParticle *obj)
                 {
                     int xs, ys, xe, ye;
                     Mdouble inv_size = hgrid->getInvCellSize(level);
-                    xs = static_cast<int>(std::floor((obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
-                    xe = static_cast<int>(std::floor((obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
-                    ys = static_cast<int>(std::floor((obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
-                    ye = static_cast<int>(std::floor((obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
+                    xs = static_cast<int>(std::floor(
+                            (obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
+                    xe = static_cast<int>(std::floor(
+                            (obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
+                    ys = static_cast<int>(std::floor(
+                            (obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
+                    ye = static_cast<int>(std::floor(
+                            (obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
                     for (int x = xs; x <= xe; ++x)
                     {
                         for (int y = ys; y <= ye; ++y)
@@ -299,14 +314,14 @@ void Mercury2D::hGridFindOneSidedContacts(BaseParticle *obj)
  * \param[in] obj The BaseParticle we want to update the position in the grid for.
  * \details Updates the HGrid positions (x and y) of the given BaseParticle.
  */
-void Mercury2D::hGridUpdateParticle(BaseParticle *obj)
+void Mercury2D::hGridUpdateParticle(BaseParticle* obj)
 {
-    HGrid* hGrid=getHGrid();
+    HGrid* hGrid = getHGrid();
     if (hGrid)
     {
         unsigned int l = obj->getHGridLevel();
         Mdouble inv_size = hGrid->getInvCellSize(l);
-
+        
         int x = static_cast<int>(std::floor(obj->getPosition().X * inv_size));
         int y = static_cast<int>(std::floor(obj->getPosition().Y * inv_size));
 
@@ -336,16 +351,16 @@ void Mercury2D::hGridUpdateParticle(BaseParticle *obj)
         }
 #else
         unsigned int bucket = hGrid->computeHashBucketIndex(x, y, l);
-
+        
         obj->setHGridNextObject(hGrid->getFirstBaseParticleInBucket(bucket));
         obj->setHGridPrevObject(nullptr);
         if (hGrid->getFirstBaseParticleInBucket(bucket))
         {
             hGrid->getFirstBaseParticleInBucket(bucket)->setHGridPrevObject(obj);
         }
-
+        
         hGrid->setFirstBaseParticleInBucket(bucket, obj);
-
+        
         obj->setHGridX(x);
         obj->setHGridY(y);
 #endif
@@ -362,24 +377,25 @@ void Mercury2D::hGridRemoveParticle(BaseParticle* obj)
     HGrid* hGrid = getHGrid();
     if (hGrid != nullptr)
     {
-	    unsigned int bucket = getHGrid()->computeHashBucketIndex(obj->getHGridX(), obj->getHGridY(), obj->getHGridLevel());
-		if (obj->getHGridPrevObject())
-		{
-			obj->getHGridPrevObject()->setHGridNextObject(obj->getHGridNextObject());
-		}
-		else
-		{
-			if (getHGrid()->getFirstBaseParticleInBucket(bucket) == obj)
-			{
-				getHGrid()->setFirstBaseParticleInBucket(bucket, obj->getHGridNextObject());
-			}
-		}
-		
-		if (obj->getHGridNextObject())
-		{
-			obj->getHGridNextObject()->setHGridPrevObject(obj->getHGridPrevObject());
-		}
-	}
+        unsigned int bucket = getHGrid()->computeHashBucketIndex(obj->getHGridX(), obj->getHGridY(),
+                                                                 obj->getHGridLevel());
+        if (obj->getHGridPrevObject())
+        {
+            obj->getHGridPrevObject()->setHGridNextObject(obj->getHGridNextObject());
+        }
+        else
+        {
+            if (getHGrid()->getFirstBaseParticleInBucket(bucket) == obj)
+            {
+                getHGrid()->setFirstBaseParticleInBucket(bucket, obj->getHGridNextObject());
+            }
+        }
+        
+        if (obj->getHGridNextObject())
+        {
+            obj->getHGridNextObject()->setHGridPrevObject(obj->getHGridPrevObject());
+        }
+    }
 }
 
 /*!
@@ -398,7 +414,7 @@ void Mercury2D::hGridRemoveParticle(BaseParticle* obj)
  * have been tested. If there were no contacts, return false.
  */
 ///
-bool Mercury2D::hGridHasContactsInTargetCell(int x, int y, unsigned int l, const BaseParticle *obj) const
+bool Mercury2D::hGridHasContactsInTargetCell(int x, int y, unsigned int l, const BaseParticle* obj) const
 {
     // Loop through all objects in the bucket to find nearby objects
     unsigned int bucket = getHGrid()->computeHashBucketIndex(x, y, l);
@@ -406,7 +422,7 @@ bool Mercury2D::hGridHasContactsInTargetCell(int x, int y, unsigned int l, const
     const BaseParticle* p = getHGrid()->getFirstBaseParticleInBucket(bucket);
     while (p != nullptr)
     {
-        if (p->getHGridCell().equals(x,y,l))
+        if (p->getHGridCell().equals(x, y, l))
         {
             if (areInContact(obj, p))
             {
@@ -483,12 +499,12 @@ std::vector<BaseParticle*> Mercury2D::hGridFindParticleContacts(const BasePartic
         logger(INFO, "HGrid needs rebuilding for \"bool Mercury2D::hGridHasParticleContacts(BaseParticle *obj)\"");
         hGridRebuild();
     }
-
+    
     Mdouble inv_size;
     int occupiedLevelsMask = getHGrid()->getOccupiedLevelsMask();
-
+    
     std::vector<BaseParticle*> particlesInContact;
-
+    
     for (unsigned int level = 0; level < getHGrid()->getNumberOfLevels(); occupiedLevelsMask >>= 1, level++)
     {
         // If no objects in rest of grid, stop now
@@ -497,21 +513,21 @@ std::vector<BaseParticle*> Mercury2D::hGridFindParticleContacts(const BasePartic
             logger(VERBOSE, "Level % and higher levels are empty.", level);
             break;
         }
-
+        
         // If no objects at this level, go on to the next level
         if ((occupiedLevelsMask & 1) == 0)
         {
             logger(VERBOSE, "Level % is empty", level);
             continue;
         }
-
+        
         int xs, ys, xe, ye;
         inv_size = getHGrid()->getInvCellSize(level);
         xs = static_cast<int>(std::floor((obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
         xe = static_cast<int>(std::floor((obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
         ys = static_cast<int>(std::floor((obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
         ye = static_cast<int>(std::floor((obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
-
+        
         logger(VERBOSE, "Level % grid cells [%,%] x [%,%]", level, xs, xe, ys, ye);
         for (int x = xs; x <= xe; ++x)
         {
@@ -522,7 +538,7 @@ std::vector<BaseParticle*> Mercury2D::hGridFindParticleContacts(const BasePartic
                 BaseParticle* p = getHGrid()->getFirstBaseParticleInBucket(bucket);
                 while (p != nullptr)
                 {
-                    if (p->getHGridCell().equals(x,y,level))
+                    if (p->getHGridCell().equals(x, y, level))
                     {
                         if (areInContact(obj, p))
                         {
@@ -534,7 +550,7 @@ std::vector<BaseParticle*> Mercury2D::hGridFindParticleContacts(const BasePartic
             }
         }
     } //end for level
-
+    
     return particlesInContact;
 }
 

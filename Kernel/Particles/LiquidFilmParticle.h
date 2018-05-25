@@ -27,56 +27,58 @@
 #define LiquidFilmParticle_H
 
 #include "BaseParticle.h"
+
 /*!
  * \class LiquidFilmParticle
  * \brief
  */
-class LiquidFilmParticle final: public BaseParticle
+class LiquidFilmParticle final : public BaseParticle
 {
 public:
     /*!
      * \brief Basic Particle constructor, creates an Particle at (0,0,0) with radius, mass and inertia equal to 1
      */
     LiquidFilmParticle();
-
+    
     /*!
      * \brief Particle copy constructor, which accepts as input a reference to a Particle. It creates a copy of this Particle and all it's information. Usually it is better to use the copy() function for polymorfism.
      */
-    LiquidFilmParticle(const LiquidFilmParticle &p);
-
+    LiquidFilmParticle(const LiquidFilmParticle& p);
+    
     /*!
      * \brief Particle destructor, needs to be implemented and checked if it removes tangential spring information
      */
     ~LiquidFilmParticle() override;
-
+    
     /*!
      * \brief Particle copy method. It calls to copy constructor of this Particle, useful for polymorfism
      */
     LiquidFilmParticle* copy() const override;
     
     
-	void write(std::ostream& os) const override;
-	
-	std::string getName() const override;
-	
-	void read(std::istream& is) override;
-
-	Mdouble getLiquidVolume() const;
-	
+    void write(std::ostream& os) const override;
+    
+    std::string getName() const override;
+    
+    void read(std::istream& is) override;
+    
+    Mdouble getLiquidVolume() const;
+    
     void setLiquidVolume(Mdouble liquidVolume);
-
+    
     void addLiquidVolume(Mdouble liquidVolume);
-
-	unsigned getNumberOfFieldsVTK() const override;
-
-	std::string getTypeVTK(unsigned i) const override;
-
-	std::string getNameVTK(unsigned i) const override;
-
-	std::vector<Mdouble> getFieldVTK(unsigned i) const override;
+    
+    unsigned getNumberOfFieldsVTK() const override;
+    
+    std::string getTypeVTK(unsigned i) const override;
+    
+    std::string getNameVTK(unsigned i) const override;
+    
+    std::vector<Mdouble> getFieldVTK(unsigned i) const override;
 
 private:
-
-	Mdouble liquidVolume_;
+    
+    Mdouble liquidVolume_;
 };
+
 #endif

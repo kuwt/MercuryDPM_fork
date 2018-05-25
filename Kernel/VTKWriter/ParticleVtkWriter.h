@@ -34,15 +34,16 @@ class ParticleVtkWriter : public BaseVTKWriter<ParticleHandler>
 {
 
 public:
-
-    explicit ParticleVtkWriter(ParticleHandler& particleHandler) : BaseVTKWriter(particleHandler) { }
-
+    
+    explicit ParticleVtkWriter(ParticleHandler& particleHandler) : BaseVTKWriter(particleHandler)
+    {}
+    
     virtual ~ParticleVtkWriter() = default;
-
+    
     virtual std::string getName() const = 0;
 
 protected:
-
+    
     void writeVTKIndSpecies(std::fstream& file) const;
     
     void writeVTKPositions(std::fstream& file) const;

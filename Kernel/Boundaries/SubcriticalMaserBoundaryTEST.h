@@ -39,7 +39,7 @@ public:
      * \brief MaserBoundary constructor
      */
     SubcriticalMaserBoundaryTEST();
-
+    
     /*!
      * \brief destructor
      */
@@ -93,27 +93,27 @@ public:
     /*!
      * \brief sets the activate time of the maser
      */
-    void setActivationTime(Mdouble time);    
-
+    void setActivationTime(Mdouble time);
+    
     /*!
      * \brief gets the distance to the closest wall if maser is inactive, otherwise distance to right wall
      */
     Mdouble getDistance(const Vec3D& position) const override;
-
+    
     /*!
      * \brief returns the distance to the right wall
      */
     Mdouble getDistanceFromRight(const Vec3D& position) const;
-
+    
     /*!
      * \brief modifies the periodic complexity to support a maser boundary
      */
     void modifyPeriodicComplexity(std::vector<int>& complexity, int& totalPeriodicComplexity,
-                                                            BaseParticle* particle, int i) const override;
-
+                                  BaseParticle* particle, int i) const override;
+    
     void modifyGhostAfterCreation(BaseParticle* particle, int i) override;
-
-
+    
+    
     /*!
      * \brief Checks before adding particles if the maser needs to be activated
      */
@@ -126,11 +126,12 @@ private:
      * \brief Flag whether or not the gap is created and particles transformed already.
      */
     bool maserIsActivated_;
-
-   /*!
-    * \brief Time at which the maser opens
-    */ 
+    
+    /*!
+     * \brief Time at which the maser opens
+     */
     Mdouble activationTime_;
     
 };
+
 #endif

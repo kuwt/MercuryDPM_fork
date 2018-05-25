@@ -25,6 +25,7 @@
 
 #ifndef MindlinRollingTorsionSpecies_H
 #define MindlinRollingTorsionSpecies_H
+
 #include "MindlinSpecies.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/FrictionForceInteractions/MindlinRollingTorsionInteraction.h"
@@ -39,57 +40,57 @@ class MindlinRollingTorsionSpecies : public MindlinSpecies
 public:
     ///\brief The correct Interaction type for this FrictionForceSpecies
     typedef MindlinRollingTorsionInteraction InteractionType;
-
+    
     ///\brief The default constructor.
     MindlinRollingTorsionSpecies();
-
+    
     ///\brief The default copy constructor.
-    MindlinRollingTorsionSpecies(const MindlinRollingTorsionSpecies &s);
-
+    MindlinRollingTorsionSpecies(const MindlinRollingTorsionSpecies& s);
+    
     ///\brief The default destructor.
     ~MindlinRollingTorsionSpecies() override;
-
+    
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
-
+    
     /// \brief Writes the species properties to an output stream.
     void write(std::ostream& os) const override;
-
+    
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const override;
-
+    
     /*!
      * \brief Returns true if torques have to be calculated.
      */
     bool getUseAngularDOFs() const override;
-
+    
     ///\brief creates default values for mixed species
-    void mix(MindlinRollingTorsionSpecies*S, MindlinRollingTorsionSpecies*T);
+    void mix(MindlinRollingTorsionSpecies* S, MindlinRollingTorsionSpecies* T);
 
 //setters and getters
-
+    
     ///Allows the spring constant to be changed
     //void setRollingStiffness(Mdouble new_kt);
-
+    
     ///Allows the spring constant to be accessed
     //Mdouble getRollingStiffness() const;
-
+    
     ///Allows the tangential viscosity to be changed
     void setRollingDissipation(Mdouble new_dispt);
-
+    
     ///Allows the tangential viscosity to be accessed
     Mdouble getRollingDissipation() const;
-
+    
     ///Allows the (dynamic) Coulomb friction coefficient to be changed; also sets mu_s by default
     //mu has to be set to allow tangential forces (sets dispt=disp as default)
     void setRollingFrictionCoefficient(Mdouble new_mu);
-
+    
     ///Allows the (dynamic) Coulomb friction coefficient to be accessed
     Mdouble getRollingFrictionCoefficient() const;
-
+    
     ///Allows the static Coulomb rolling friction coefficient to be changed
     void setRollingFrictionCoefficientStatic(Mdouble new_mu);
-
+    
     ///Allows the static Coulomb rolling friction coefficient to be accessed
     Mdouble getRollingFrictionCoefficientStatic() const;
 
@@ -98,33 +99,33 @@ public:
 //
 //    ///Allows the torsion stiffness to be accessed
 //    Mdouble getTorsionStiffness() const;
-
+    
     ///Allows the torsion viscosity to be changed
     void setTorsionDissipation(Mdouble new_dispt);
-
+    
     ///Allows the torsion viscosity to be accessed
     Mdouble getTorsionDissipation() const;
-
+    
     ///Allows the (dynamic) Coulomb torsion friction coefficient to be changed; also sets mu_s by default
     //mu has to be set to allow tangential forces (sets dispt=disp as default)
     void setTorsionFrictionCoefficient(Mdouble new_mu);
-
+    
     ///Allows the (dynamic) Coulomb torsion friction coefficient to be accessed
     Mdouble getTorsionFrictionCoefficient() const;
-
+    
     ///Allows the static Coulomb torsion friction coefficient to be accessed
     void setTorsionFrictionCoefficientStatic(Mdouble new_mu);
-
+    
     ///Allows the static Coulomb torsion friction coefficient to be accessed
     Mdouble getTorsionFrictionCoefficientStatic() const;
 
 private:
-   /*! 
-     * \brief rolling stiffness. 
-     * \details Typically set to 2/5 of the stiffness of the normal force, as  
-     * both the rolling and the normal spring have the same oscillation  
-     * frequency (and thus require the same timeStep)in this case. 
-     */
+    /*! 
+      * \brief rolling stiffness. 
+      * \details Typically set to 2/5 of the stiffness of the normal force, as  
+      * both the rolling and the normal spring have the same oscillation  
+      * frequency (and thus require the same timeStep)in this case. 
+      */
     Mdouble rollingStiffness_;
     
     /*! 
@@ -133,19 +134,19 @@ private:
      * the tangential and the normal spring have the same restitution coefficients 
      * (if the rolling and normal stiffnesses also have a ratio of 2/5). 
      */
-    Mdouble rollingDissipation_; 
-   
+    Mdouble rollingDissipation_;
+    
     
     /*! 
      * \brief (dynamic) Coulomb rolling friction coefficient. 
      */
-    Mdouble rollingFrictionCoefficient_; 
+    Mdouble rollingFrictionCoefficient_;
     
     /*! 
      * \brief static Coulomb rolling friction coefficient  
      * (by default set equal to the dynamic one).
      */
-    Mdouble rollingFrictionCoefficientStatic_; 
+    Mdouble rollingFrictionCoefficientStatic_;
     
     /*! 
      * \brief rolling stiffness. 
@@ -161,17 +162,18 @@ private:
      * the tangential and the normal spring have the same restitution coefficients 
      * (if the rolling and normal stiffnesses also have a ratio of 2/5). 
      */
-    Mdouble torsionDissipation_; 
-
+    Mdouble torsionDissipation_;
+    
     /*! 
      * \brief (dynamic) Coulomb torsion friction coefficient. 
      */
-    Mdouble torsionFrictionCoefficient_; 
+    Mdouble torsionFrictionCoefficient_;
     
     /*! 
      * \brief static Coulomb torsion friction coefficient  
      * (by default set equal to the dynamic one).
      */
-    Mdouble torsionFrictionCoefficientStatic_; 
+    Mdouble torsionFrictionCoefficientStatic_;
 };
+
 #endif

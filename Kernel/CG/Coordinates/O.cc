@@ -58,6 +58,7 @@ const unsigned O::countVariables()
     return 0;
 }
 
-std::string O::getName() {
+std::string O::getName()
+{
     return "O";
 }

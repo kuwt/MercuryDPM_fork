@@ -30,6 +30,7 @@
 #include "Species/NormalForceSpecies/LinearPlasticViscoelasticNormalSpecies.h"
 
 class BaseParticle;
+
 class BaseInteractable;
 
 MindlinSpecies::MindlinSpecies()
@@ -49,7 +50,7 @@ MindlinSpecies::MindlinSpecies()
 /*!
  * \param[in] s the species that is copied
  */
-MindlinSpecies::MindlinSpecies(const MindlinSpecies &s)
+MindlinSpecies::MindlinSpecies(const MindlinSpecies& s)
 {
     slidingDissipation_ = s.slidingDissipation_;
     slidingFrictionCoefficient_ = s.slidingFrictionCoefficient_;
@@ -66,7 +67,7 @@ MindlinSpecies::~MindlinSpecies()
 {
 #ifdef DEBUG_DESTRUCTOR
     std::cout<<"MindlinSpecies::~MindlinSpecies() finished"<<std::endl;
-#endif   
+#endif
 }
 
 /*!
@@ -74,7 +75,7 @@ MindlinSpecies::~MindlinSpecies()
  *
  */
 void MindlinSpecies::write(std::ostream& os) const
-        {
+{
     //BaseSpecies::write(os);
     os << " shearModulus " << shearModulus_;
     os << " slidingDissipation " << slidingDissipation_;
@@ -104,7 +105,6 @@ std::string MindlinSpecies::getBaseName() const
 }
 
 
-
 ///Allows the tangential viscosity to be changed
 void MindlinSpecies::setSlidingDissipation(Mdouble new_dispt)
 {
@@ -116,6 +116,7 @@ void MindlinSpecies::setSlidingDissipation(Mdouble new_dispt)
         exit(-1);
     }
 }
+
 ///Allows the tangential viscosity to be accessed
 Mdouble MindlinSpecies::getSlidingDissipation() const
 {
@@ -157,9 +158,11 @@ void MindlinSpecies::setSlidingFrictionCoefficientStatic(Mdouble new_mu)
         exit(-1);
     }
 }
+
 //k_edit
 //allows the shear modulus to be set / changed
-void MindlinSpecies::setShearModulus(Mdouble new_G) {
+void MindlinSpecies::setShearModulus(Mdouble new_G)
+{
     //sanity check to ensure that a negative shear modulus cannot be set!
     if (new_G >= 0)
     {
@@ -174,7 +177,8 @@ void MindlinSpecies::setShearModulus(Mdouble new_G) {
 
 //k_edit
 //allows the shear modulus of a given species to be accessed
-Mdouble MindlinSpecies::getShearModulus() const {
+Mdouble MindlinSpecies::getShearModulus() const
+{
     return shearModulus_;
 }
 
@@ -205,7 +209,9 @@ bool MindlinSpecies::getUseAngularDOFs() const
 void MindlinSpecies::mix(MindlinSpecies* const SFrictional, MindlinSpecies* const TFrictional)
 {
     slidingDissipation_ = average(SFrictional->getSlidingDissipation(), TFrictional->getSlidingDissipation());
-    slidingFrictionCoefficient_ = average(SFrictional->getSlidingFrictionCoefficient(), TFrictional->getSlidingFrictionCoefficient());
-    slidingFrictionCoefficientStatic_ = average(SFrictional->getSlidingFrictionCoefficientStatic(), TFrictional->getSlidingFrictionCoefficientStatic());
+    slidingFrictionCoefficient_ = average(SFrictional->getSlidingFrictionCoefficient(),
+                                          TFrictional->getSlidingFrictionCoefficient());
+    slidingFrictionCoefficientStatic_ = average(SFrictional->getSlidingFrictionCoefficientStatic(),
+                                                TFrictional->getSlidingFrictionCoefficientStatic());
 }
 

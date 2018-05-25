@@ -32,6 +32,7 @@
 #include "Math/Matrix.h"
 
 class BaseParticle;
+
 class ParticleHandler;
 
 /*!
@@ -48,7 +49,7 @@ public:
     
     /*!
      * \brief 
-     */    
+     */
     AngledPeriodicBoundary* copy() const final;
     
     //todo constructors instead of set functions?
@@ -66,26 +67,26 @@ public:
     * \details Since this function should be called before calculating any Particle-Wall interactions, it can also be used to set the shift vector in case of curved walls.
     *
     */
-    Mdouble distance(const BaseParticle &P);
+    Mdouble distance(const BaseParticle& P);
     
     /*!
      * \brief 
      */
     //this function should be cheap, as it has to be computed for all particles
-    Mdouble distance(const Vec3D &P);
+    Mdouble distance(const Vec3D& P);
     
     /*!
      * \brief shifts the particle (after distance set the left_wall value)
      * \todo add velocity, angular, springs shift
      */
     void shiftPosition(BaseParticle* P);
-
+    
     
     /*!
      * \brief only needed in StatisticsVector
      */
-    void shiftPositions(Vec3D&  P1, Vec3D& P2);
-
+    void shiftPositions(Vec3D& P1, Vec3D& P2);
+    
     /*!
      * \brief reads wall
      */
@@ -110,43 +111,43 @@ public:
      * \brief 
      */
     Vec3D& getNormal();
-
+    
     /*!
      * \brief angle between walls in radians
      */
     Mdouble getOpeningAngle();
-
+    
     void createPeriodicParticle(BaseParticle* p, ParticleHandler& pH) override;
-
+    
     /*!
      * \brief 
      */
-    void createPeriodicParticles(ParticleHandler &pH) override;
+    void createPeriodicParticles(ParticleHandler& pH) override;
     
     /*!
      * \brief 
      * \todo TW: can't we do the shift in the createPeriodicParticles function only? We are checking the distance three times!
      */
-    void checkBoundaryAfterParticleMoved(BaseParticle *P);
+    void checkBoundaryAfterParticleMoved(BaseParticle* P);
     
     void checkBoundaryAfterParticlesMove(ParticleHandler& pH) override;
-    
+
 private:
     //values set by the user
     /*!
      * \brief 
      */
     Vec3D leftNormal_; ///< outward unit normal vector for left wall
-
+    
     /*!
      * \brief outward unit normal vector for right wall
      */
     Vec3D rightNormal_;
-
+    
     /*!
      * \brief common point of both walls
      */
-    Vec3D origin_; 
+    Vec3D origin_;
     //values set by the code
     /*!
      * \brief true if closest wall is the left wall
@@ -155,11 +156,11 @@ private:
     /*!
      * \brief outward unit normal vector for left wall
      */
-    Vec3D leftRadialAxis_; 
+    Vec3D leftRadialAxis_;
     /*!
      * \brief outward unit normal vector for right wall
      */
-    Vec3D rightRadialAxis_; 
+    Vec3D rightRadialAxis_;
     /*!
      * \brief 
      */
@@ -168,10 +169,10 @@ private:
      * \brief 
      */
     Vec3D differenceNormal_;
-
-    Matrix3D rotateLeft; 
-
-    Matrix3D rotateRight; 
+    
+    Matrix3D rotateLeft;
+    
+    Matrix3D rotateRight;
     
     /*!
      * \brief The normalized cross product of the left and right normal vector. 
@@ -187,4 +188,5 @@ private:
      */
     //Vec3D angularShift_;
 };
+
 #endif

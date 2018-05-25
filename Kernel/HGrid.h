@@ -114,91 +114,105 @@ public:
      * \param[in] i The ordinal number of the bucket we want to set the first BaseParticle for.
      * \param[in] p A pointer to the BaseParticle we want to place in the given bucket.
      */
-    void setFirstBaseParticleInBucket(unsigned int i, BaseParticle* p) {firstBaseParticleInBucket_[i] = p;}
+    void setFirstBaseParticleInBucket(unsigned int i, BaseParticle* p)
+    { firstBaseParticleInBucket_[i] = p; }
     
     /*!
      * \brief Sets that the bucket with the given index is checked to true.
      * \param[in] i The ordinal number of the bucket we want to mark as checked.
      */
-    void setBucketIsChecked(unsigned int i) {bucketIsChecked_[i] = true;}
+    void setBucketIsChecked(unsigned int i)
+    { bucketIsChecked_[i] = true; }
     
     /*!
      * \brief Gets whether or not the bucket with index i is checked.
      * \param[in] i The ordinal number of the bucket we want to know for whether or not it has been checked.
      * \return A boolean which is true if the bucket is checked and false otherwise.
      */
-    bool getBucketIsChecked(unsigned int i) const {return bucketIsChecked_[i];}
+    bool getBucketIsChecked(unsigned int i) const
+    { return bucketIsChecked_[i]; }
     
     /*!
      * \brief Gets the maximum ratio of the cell to a particle it contains.
      * \return The ratio between the size of the smallest cell and the smallest BaseParticle.
      */
-    Mdouble getCellOverSizeRatio() const {return cellOverSizeRatio_;}
+    Mdouble getCellOverSizeRatio() const
+    { return cellOverSizeRatio_; }
     
     /*!
      * \brief Gets the size of the cells at the given level.
      * \param[in] i The level we want to know the cell size of.
      * \return The size of the cells at the given level.
      */
-    double getCellSize(unsigned int i) const {return cellSizes_[i];}
+    double getCellSize(unsigned int i) const
+    { return cellSizes_[i]; }
     
     /*!
      * \brief Gets the sizes of the cells at all levels as a vector.
      * \return A vector with the sizes of the cells of different levels.
      */
-    const std::vector<double>& getCellSizes() const {return cellSizes_;}
+    const std::vector<double>& getCellSizes() const
+    { return cellSizes_; }
     
     /*!
      * \brief Gets the first BaseParticle in the given bucket, const version.
      * \param[in] i The ordinal number of the bucket for which we want to get the first particle of.
      * \return A pointer to the (constant) BaseParticle which is the first Baseparticle in the given bucket.
      */
-    const BaseParticle* getFirstBaseParticleInBucket(unsigned int i) const {return firstBaseParticleInBucket_[i];}
+    const BaseParticle* getFirstBaseParticleInBucket(unsigned int i) const
+    { return firstBaseParticleInBucket_[i]; }
     
     /*!
      * \brief Gets the first BaseParticle in the given bucket.
      * \param[in] i The ordinal number of the bucket for which we want to get the first particle of.
      * \return A pointer to the (constant) BaseParticle which is the first Baseparticle in the given bucket.
      */
-    BaseParticle* getFirstBaseParticleInBucket(unsigned int i) {return firstBaseParticleInBucket_[i];}
+    BaseParticle* getFirstBaseParticleInBucket(unsigned int i)
+    { return firstBaseParticleInBucket_[i]; }
     
     /*!
      * \brief Gets 1/cellSize for the cells on level i.
      * \param[in] i The level we want to know the inverse cell size of.
      * \return The inverse size, i.e. 1/size, of the cells at the given level.
      */
-    double getInvCellSize(unsigned int i) const {return invCellSizes_[i];}
+    double getInvCellSize(unsigned int i) const
+    { return invCellSizes_[i]; }
     
     /*!
      * \brief Gets all the inverse cell sizes (1/cellSize) for all levels as a vector.
      * \return A vector with the inverse sizes (1/size) of the cells of different levels.
      */
-    const std::vector<double>& getInvCellSizes() const {return invCellSizes_;}
+    const std::vector<double>& getInvCellSizes() const
+    { return invCellSizes_; }
     
     /*!
      * \brief Gets whether or not the grid needs to be rebuilt before something else is done with it.
      * \return A boolean which indicates whether or not the HGrid needs rebuilding.
      */
-    bool getNeedsRebuilding() const {return needsRebuilding_;}
+    bool getNeedsRebuilding() const
+    { return needsRebuilding_; }
     
     /*!
      * \brief Gets the number of buckets of this HGrid.
      * \return The number of buckets in this HGrid.
      */
-    unsigned int getNumberOfBuckets() const {return numberOfBuckets_;}
+    unsigned int getNumberOfBuckets() const
+    { return numberOfBuckets_; }
     
     /*!
      * \brief Gets the number of levels of this HGrid.
      * \return The number of levels in this HGrid.
      */
-    unsigned long getNumberOfLevels() const {return cellSizes_.size();}
+    unsigned long getNumberOfLevels() const
+    { return cellSizes_.size(); }
     
     /*!
      * \brief Gets the integer that represents which levels are occupied.
      * \return The integer that represents the bit-vector that indicates which levels have at least one particle.
      */
-    int getOccupiedLevelsMask() const {return occupiedLevelsMask_;}
-
+    int getOccupiedLevelsMask() const
+    { return occupiedLevelsMask_; }
+    
     /*!
      * \brief Displays the member variables of the hGrid object.
      * This function is intended for debugging the hGrid, therefore the 
@@ -258,4 +272,5 @@ private:
      */
     std::vector<bool> bucketIsChecked_;
 };
+
 #endif

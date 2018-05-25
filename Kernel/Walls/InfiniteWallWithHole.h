@@ -37,7 +37,7 @@
 class InfiniteWallWithHole : public BaseWall
 {
 public:
-
+    
     /*!
      * \brief default constructor
      */
@@ -51,13 +51,13 @@ public:
     /*!
      * \brief
      */
-    InfiniteWallWithHole(const InfiniteWallWithHole &p);
+    InfiniteWallWithHole(const InfiniteWallWithHole& p);
     
     /*!
      * \brief Wall copy method. It calls the copy contrustor of this Wall, usefull for polymorfism
      */
     InfiniteWallWithHole* copy() const override;
-
+    
     /*!
      * \brief Defines a standard wall, given an outward normal vector s. t. normal*x=position
      */
@@ -67,7 +67,7 @@ public:
      * \brief Allows the wall to be moved to a new position
      */
     void moveTo(Mdouble position);
-    
+
 //    /*!
 //     * \brief Allows the wall to be moved to a new position (also orthogonal to the normal), and setting the velocity
 //     * note: I commented this function out as it does not add new functionality (instead, BaseInteractable::move(velocity*dt) can be used), 
@@ -83,18 +83,18 @@ public:
     /*!
      * \brief Returns the distance of the wall to the particle. 
      */
-    Mdouble getWallDistance(const Vec3D &position) const;
+    Mdouble getWallDistance(const Vec3D& position) const;
     
     /*!
      * \brief
      */
-    Mdouble getHoleDistance(const Vec3D &position) const;
+    Mdouble getHoleDistance(const Vec3D& position) const;
     
     /*!
      * \brief Since this function should be called before calculating any Particle-Wall interactions, it can also be used to set the normal vector in case of curved walls.
      */
     bool getDistanceAndNormal(const BaseParticle& P, Mdouble& distance, Vec3D& normal_return) const override;
-
+    
     /*!
      * \brief reads wall
      */
@@ -133,10 +133,10 @@ private:
     /*!
      * The factor that needs to be multiplied with normal_ to make it a unit vector.
      */
-    Mdouble factor_; 
+    Mdouble factor_;
     Mdouble position_; ///<position n*x=p
     Mdouble holeRadius_;
-
+    
 };
 
 #endif

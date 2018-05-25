@@ -86,10 +86,10 @@ SpeciesHandler::SpeciesHandler(const SpeciesHandler& other)
     clear();
     setDPMBase(other.getDPMBase());
     copyContentsFromOtherHandler(other);
-    for (BaseSpecies* mixSpec : other.mixedObjects_) 
+    for (BaseSpecies* mixSpec : other.mixedObjects_)
     {
-      mixedObjects_.push_back(mixSpec->copy());
-      mixedObjects_.back()->setHandler(this);
+        mixedObjects_.push_back(mixSpec->copy());
+        mixedObjects_.back()->setHandler(this);
     }
     logger(DEBUG, "SpeciesHandler::SpeciesHandler(const SpeciesHandler &other) finished");
 }
@@ -101,7 +101,7 @@ SpeciesHandler::SpeciesHandler(const SpeciesHandler& other)
  *          BaseSpecies and MixedSpecies and copies the pointer to the DPMBase. 
  *          It sets all other data members to 0 or nullptr.
  */
-SpeciesHandler& SpeciesHandler::operator =(const SpeciesHandler& rhs)
+SpeciesHandler& SpeciesHandler::operator=(const SpeciesHandler& rhs)
 {
     if (this != &rhs)
     {
@@ -112,16 +112,17 @@ SpeciesHandler& SpeciesHandler::operator =(const SpeciesHandler& rhs)
             delete mixSpec;
         }
         mixedObjects_.clear();
-        for (BaseSpecies* mixSpec : rhs.mixedObjects_) 
+        for (BaseSpecies* mixSpec : rhs.mixedObjects_)
         {
             mixedObjects_.push_back(mixSpec->copy());
             mixedObjects_.back()->setHandler(this);
         }
     }
-
+    
     logger(DEBUG, "SpeciesHandler SpeciesHandler::operator =(const SpeciesHandler& rhs)");
     return *this;
 }
+
 /*!
  * \details Destructor: first destroys the objects of the BaseHandler, then destroys the mixedObjects
  * \todo TW Note: deleting the species does not delete the particles and walls of this species.
@@ -140,11 +141,12 @@ SpeciesHandler::~SpeciesHandler()
     mixedObjects_.clear();
     logger(DEBUG, "SpeciesHandler::~SpeciesHandler() finished");
 }
+
 /*!
  * \param[in] is The input stream from which the information is read.
  * \details First determine the type of the object we want to read, then read
  * the actual object. After that, clear the mixed objects and read the mixed objects.
- */ 
+ */
 void SpeciesHandler::readAndAddObject(std::istream& is)
 {
     std::string type;
@@ -273,7 +275,7 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
         LinearPlasticViscoelasticFrictionIrreversibleAdhesiveSpecies species;
         is >> species;
         copyAndAddObject(species);
-    }        
+    }
     else if (type == "LinearViscoelasticReversibleAdhesiveSpecies")
     {
         LinearViscoelasticReversibleAdhesiveSpecies species;
@@ -328,7 +330,8 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
         is >> species;
         copyAndAddObject(species);
     }
-    else if (type == "HertzianViscoelasticMindlinRollingTorsionSpecies"||type == "HertzianViscoelasticFrictionSpecies")
+    else if (type == "HertzianViscoelasticMindlinRollingTorsionSpecies" ||
+             type == "HertzianViscoelasticFrictionSpecies")
     {
         HertzianViscoelasticMindlinRollingTorsionSpecies species;
         is >> species;
@@ -363,12 +366,14 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
         addObject(readOldObject(is));
     }
     else
-    {        
+    {
         std::stringstream line;
         helpers::getLineFromStringStream(is, line);
-        logger(ERROR, "Species type % not understood in restart file: You need to add this species to SpeciesHandler::readObject.", type);
+        logger(ERROR,
+               "Species type % not understood in restart file: You need to add this species to SpeciesHandler::readObject.",
+               type);
     }
-
+    
     //remove the default mixed species
     for (unsigned int i = 0; i + 1 < getNumberOfObjects(); i++)
     {
@@ -381,9 +386,9 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
         delete mixedObjects_.back();
         mixedObjects_.pop_back();
     }
-
+    
     //Read the mixed species.
-    for (unsigned int i = 0; i+1 < getNumberOfObjects(); i++)
+    for (unsigned int i = 0; i + 1 < getNumberOfObjects(); i++)
     {
         is >> type;
         if (type == "LinearViscoelasticMixedSpecies")
@@ -505,7 +510,7 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
             LinearPlasticViscoelasticFrictionIrreversibleAdhesiveMixedSpecies species;
             is >> species;
             mixedObjects_.push_back(species.copy());
-        }        
+        }
         else if (type == "LinearViscoelasticReversibleAdhesiveMixedSpecies")
         {
             LinearViscoelasticReversibleAdhesiveMixedSpecies species;
@@ -560,7 +565,8 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
             is >> species;
             mixedObjects_.push_back(species.copy());
         }
-        else if (type == "HertzianViscoelasticMindlinRollingTorsionMixedSpecies"||type == "HertzianViscoelasticFrictionMixedSpecies")
+        else if (type == "HertzianViscoelasticMindlinRollingTorsionMixedSpecies" ||
+                 type == "HertzianViscoelasticFrictionMixedSpecies")
         {
             HertzianViscoelasticMindlinRollingTorsionMixedSpecies species;
             is >> species;
@@ -594,7 +600,9 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
         }
         else
         {
-            logger(ERROR, "Species type % not understood in restart file: You need to add this species to SpeciesHandler::readMixedObject.", type);
+            logger(ERROR,
+                   "Species type % not understood in restart file: You need to add this species to SpeciesHandler::readMixedObject.",
+                   type);
         }
     }
 }
@@ -612,11 +620,11 @@ ParticleSpecies* SpeciesHandler::readOldObject(std::istream& is)
     //read in next line
     std::stringstream line;
     helpers::getLineFromStringStream(is, line);
-
+    
     //read each property
     std::string property;
-    unsigned int particleDimension=0;
-    Mdouble density=0.0, stiffness=0.0, dissipation=0.0, slidingFrictionCoefficient=0.0, slidingFrictionCoefficientStatic=0.0, slidingStiffness=0.0, slidingDissipation=0.0;
+    unsigned int particleDimension = 0;
+    Mdouble density = 0.0, stiffness = 0.0, dissipation = 0.0, slidingFrictionCoefficient = 0.0, slidingFrictionCoefficientStatic = 0.0, slidingStiffness = 0.0, slidingDissipation = 0.0;
     line >> stiffness;
     while (true)
     {
@@ -650,7 +658,7 @@ ParticleSpecies* SpeciesHandler::readOldObject(std::istream& is)
         if (line.eof())
             break;
     }
-
+    
     //create the correct species
     if (slidingFrictionCoefficient == 0.0)
     {
@@ -687,8 +695,8 @@ ParticleSpecies* SpeciesHandler::readOldObject(std::istream& is)
  */
 unsigned int SpeciesHandler::getMixedId(const unsigned int id1, const unsigned int id2) const
 {
-    unsigned int maxId = std::max(id1,id2);
-    return (maxId*(maxId-1))/2 + std::min(id1,id2);
+    unsigned int maxId = std::max(id1, id2);
+    return (maxId * (maxId - 1)) / 2 + std::min(id1, id2);
 }
 
 /*!
@@ -710,21 +718,24 @@ BaseSpecies* SpeciesHandler::getMixedObject(const unsigned int id1, const unsign
 {
     if (id1 == id2)
     {
-      return getObject(id1);
+        return getObject(id1);
     }
     else
     {
-        if (std::max(id1,id2) >= getNumberOfObjects())
+        if (std::max(id1, id2) >= getNumberOfObjects())
         {
-            logger(ERROR, "In: Object* SpeciesHandler::getMixedObject(const unsigned int id) const. No Object exist with index %, number of objects is %", std::max(id1, id2), getNumberOfObjects());
+            logger(ERROR,
+                   "In: Object* SpeciesHandler::getMixedObject(const unsigned int id) const. No Object exist with index %, number of objects is %",
+                   std::max(id1, id2), getNumberOfObjects());
             return nullptr;
         }
         else
         {
-            return mixedObjects_[getMixedId(id1,id2)];
-        }        
+            return mixedObjects_[getMixedId(id1, id2)];
+        }
     }
 }
+
 /*!
  * \param[in] S A pointer to the ParticleSpecies that has to be added.
  * \details First, add the ParticleSpecies to the vector of ParticleSpecies (object_), 
@@ -745,12 +756,12 @@ void SpeciesHandler::addObject(ParticleSpecies* const S)
     {
         mixedObjects_.push_back(S->copyMixed());
         mixedObjects_.back()->setIndex(id);
-        mixedObjects_.back()->setId(getNumberOfObjects()-1);
-        mixedObjects_.back()->mixAll(S,getObject(id));
+        mixedObjects_.back()->setId(getNumberOfObjects() - 1);
+        mixedObjects_.back()->mixAll(S, getObject(id));
     }
     S->setHandler(this);
     getDPMBase()->particleHandler.computeAllMasses(S->getIndex());
-	getDPMBase()->setRotation(useAngularDOFs());
+    getDPMBase()->setRotation(useAngularDOFs());
 }
 
 /*!
@@ -765,9 +776,9 @@ void SpeciesHandler::removeObject(unsigned const int index)
     BaseHandler<ParticleSpecies>::removeObject(index);
     for (unsigned int index2 = 0; index2 < getNumberOfObjects(); ++index2)
     {
-        mixedObjects_.erase(mixedObjects_.begin()+getMixedId(index, index2));
+        mixedObjects_.erase(mixedObjects_.begin() + getMixedId(index, index2));
     }
-	getDPMBase()->setRotation(useAngularDOFs());
+    getDPMBase()->setRotation(useAngularDOFs());
 }
 
 /*!
@@ -782,7 +793,7 @@ void SpeciesHandler::write(std::ostream& os) const
     for (std::vector<ParticleSpecies*>::const_iterator it = begin(); it != end(); ++it)
     {
         os << (**it) << std::endl;
-        for (unsigned int id2 =0; id2 < (*it)->getIndex(); id2++)
+        for (unsigned int id2 = 0; id2 < (*it)->getIndex(); id2++)
         {
             os << (**it2) << std::endl;
             it2++;
@@ -808,6 +819,7 @@ void SpeciesHandler::write(std::ostream& os) const
     }
     */
 }
+
 /*!
  * \return The string "SpeciesHandler"
  */

@@ -38,7 +38,7 @@
  * \param[in] timeStamp Mdouble which is the time the interaction starts.
  */
 BaseInteraction::BaseInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp)
-    : BaseObject()
+        : BaseObject()
 {
     P_ = P;
     P->addInteraction(this);
@@ -65,7 +65,7 @@ BaseInteraction::BaseInteraction(BaseInteractable* P, BaseInteractable* I, unsig
 
 
 BaseInteraction::BaseInteraction()
-    : BaseObject()
+        : BaseObject()
 {
     P_ = nullptr;
     I_ = nullptr;
@@ -83,8 +83,8 @@ BaseInteraction::BaseInteraction()
  * \details This an copy constructor for a BaseInteraction.
  * \param[in] p BaseInteraction
  */
-BaseInteraction::BaseInteraction(const BaseInteraction &p)
-    : BaseObject(p)
+BaseInteraction::BaseInteraction(const BaseInteraction& p)
+        : BaseObject(p)
 {
     P_ = p.P_;
     I_ = p.I_;
@@ -96,7 +96,7 @@ BaseInteraction::BaseInteraction(const BaseInteraction &p)
     timeStamp_ = p.timeStamp_;
     lagrangeMultiplier_ = p.lagrangeMultiplier_;
     contactPoint_ = p.contactPoint_;
-
+    
     ///\todo why are not all of the member variables copied?
 //    InteractionHandler* handler_;
 //    BaseInteractable* P_;
@@ -134,14 +134,14 @@ BaseInteraction::~BaseInteraction()
     else
     {
 #endif
-    logger.assert(P_ != nullptr,"Trying to destroy an interaction with P_ = nullptr");
-    logger.assert(I_ != nullptr,"Trying to destroy an interaction with I_ = nullptr");
-    File& interactionFile =  getHandler()->getDPMBase()->getInteractionFile();
+    logger.assert(P_ != nullptr, "Trying to destroy an interaction with P_ = nullptr");
+    logger.assert(I_ != nullptr, "Trying to destroy an interaction with I_ = nullptr");
+    File& interactionFile = getHandler()->getDPMBase()->getInteractionFile();
     if (interactionFile.getFileType() == FileType::ONE_FILE)
     {
         writeInteraction(interactionFile.getFstream(), false);
     }
-
+    
     P_->removeInteraction(this);
     I_->removeInteraction(this);
 #if MERCURY_USE_MPI
@@ -163,14 +163,14 @@ void BaseInteraction::write(std::ostream& os) const
     os << getName();
     if (dynamic_cast<BaseParticle*>(I_) != nullptr)
     {
-	    os << " particleIds " << P_->getId() << " " << I_->getId();
-	    ///\todo should we output id's here? os << " id " << getId() << " particleIds " << P_->getId() << " " << I_->getId();
-	}
-	else
-	{
-	    os << " particleWallIds " << P_->getId() << " " << I_->getId();
-	}
-	os <<" timeStamp "<<timeStamp_<< " force " << force_ << " torque " << torque_;
+        os << " particleIds " << P_->getId() << " " << I_->getId();
+        ///\todo should we output id's here? os << " id " << getId() << " particleIds " << P_->getId() << " " << I_->getId();
+    }
+    else
+    {
+        os << " particleWallIds " << P_->getId() << " " << I_->getId();
+    }
+    os << " timeStamp " << timeStamp_ << " force " << force_ << " torque " << torque_;
     //\todo add information that can recreate the contact information (necessary for CG)
     //	os <<" timeStamp "<<timeStamp_<< " contactPoint " << contactPoint_ << " overlap " << overlap_ << " force " << force_ << " torque " << torque_;
 }
@@ -303,11 +303,11 @@ void BaseInteraction::copySwitchPointer(const BaseInteractable* original, BaseIn
         //Reverse some force history
         C->reverseHistory();
         //Set the P to the original particle 
-        C->P_ =C->getI();
+        C->P_ = C->getI();
     }
     //The new ghost particle is set to I in the interaction. 
     C->I_ = ghost;
-
+    
     //Add the the interaction to both original and the ghost
     C->getP()->addInteraction(C);
     C->getI()->addInteraction(C);
@@ -321,7 +321,7 @@ void BaseInteraction::copySwitchPointer(const BaseInteractable* original, BaseIn
  */
 Mdouble BaseInteraction::getContactRadius() const
 {
-    return sqrt(2.0*getEffectiveRadius()*getOverlap());
+    return sqrt(2.0 * getEffectiveRadius() * getOverlap());
 }
 
 /*!
@@ -405,44 +405,44 @@ Vec3D BaseInteraction::getCP() const
 void BaseInteraction::writeToFStat(std::ostream& os, Mdouble time) const
 {
     ///\todo MX The documentation mentions that the first variable is the time - this is incorrect, is is the timeStamp the interaction started
-    auto * IParticle = dynamic_cast<BaseParticle*>(I_);
-    auto * PParticle = dynamic_cast<BaseParticle*>(P_);
-
+    auto* IParticle = dynamic_cast<BaseParticle*>(I_);
+    auto* PParticle = dynamic_cast<BaseParticle*>(P_);
+    
     Vec3D tangentialForce = getTangentialForce();
     Mdouble tangentialOverlap = getTangentialOverlap();
-
+    
     Mdouble scalarNormalForce = Vec3D::dot(force_, getNormal());
     Mdouble scalarTangentialForce = tangentialForce.getLength();
     Vec3D tangential;
-    if (scalarTangentialForce!=0.0)
-        tangential = tangentialForce/scalarTangentialForce;
+    if (scalarTangentialForce != 0.0)
+        tangential = tangentialForce / scalarTangentialForce;
     else
-        tangential = Vec3D(0.0,0.0,0.0);
-
-    if (PParticle!= nullptr && !PParticle->isFixed())
+        tangential = Vec3D(0.0, 0.0, 0.0);
+    
+    if (PParticle != nullptr && !PParticle->isFixed())
     {
         os << time << " " << P_->getIndex()
-            << " " << static_cast<int>((IParticle==nullptr?(-I_->getIndex()-1):I_->getIndex()))
-            << " " << getContactPoint()
-            << " " << getOverlap()
-            << " " << tangentialOverlap
-            << " " << scalarNormalForce
-            << " " << scalarTangentialForce
-            << " " << (IParticle== nullptr ?-normal_:normal_)
-            << " " << (IParticle== nullptr ?-tangential:tangential) << std::endl;
+           << " " << static_cast<int>((IParticle == nullptr ? (-I_->getIndex() - 1) : I_->getIndex()))
+           << " " << getContactPoint()
+           << " " << getOverlap()
+           << " " << tangentialOverlap
+           << " " << scalarNormalForce
+           << " " << scalarTangentialForce
+           << " " << (IParticle == nullptr ? -normal_ : normal_)
+           << " " << (IParticle == nullptr ? -tangential : tangential) << std::endl;
         ///\todo the flip in normal/tangential direction for walls should not be done; this is an old bug
     }
-    if (IParticle!=nullptr && !IParticle->isFixed() && IParticle->getPeriodicFromParticle()==nullptr)
+    if (IParticle != nullptr && !IParticle->isFixed() && IParticle->getPeriodicFromParticle() == nullptr)
     {
         os << time << " " << I_->getIndex()
-            << " " << P_->getIndex()
-            << " " << getContactPoint()
-            << " " << getOverlap()
-            << " " << tangentialOverlap
-            << " " << scalarNormalForce
-            << " " << scalarTangentialForce
-            << " " << -normal_
-            << " " << -tangential << std::endl;
+           << " " << P_->getIndex()
+           << " " << getContactPoint()
+           << " " << getOverlap()
+           << " " << tangentialOverlap
+           << " " << scalarNormalForce
+           << " " << scalarTangentialForce
+           << " " << -normal_
+           << " " << -tangential << std::endl;
     }
 }
 
@@ -477,7 +477,7 @@ Mdouble BaseInteraction::getTangentialOverlap() const
  */
 const Vec3D BaseInteraction::getTangentialForce() const
 {
-    return Vec3D(0.0,0.0,0.0);
+    return Vec3D(0.0, 0.0, 0.0);
 }
 
 /*!
@@ -520,7 +520,7 @@ Mdouble BaseInteraction::getAbsoluteNormalForce() const
  */
 void BaseInteraction::addForce(Vec3D force)
 {
-    force_+=force;
+    force_ += force;
 }
 
 /*!
@@ -530,7 +530,7 @@ void BaseInteraction::addForce(Vec3D force)
  */
 void BaseInteraction::addTorque(Vec3D torque)
 {
-    torque_+=torque;
+    torque_ += torque;
 }
 
 /*!
@@ -541,7 +541,7 @@ void BaseInteraction::addTorque(Vec3D torque)
  */
 void BaseInteraction::setForce(Vec3D force)
 {
-    force_=force;
+    force_ = force;
 }
 
 /*!
@@ -552,7 +552,7 @@ void BaseInteraction::setForce(Vec3D force)
  */
 void BaseInteraction::setTorque(Vec3D torque)
 {
-    torque_=torque;
+    torque_ = torque;
 }
 
 /*!
@@ -563,7 +563,7 @@ void BaseInteraction::setTorque(Vec3D torque)
  */
 void BaseInteraction::setRelativeVelocity(Vec3D relativeVelocity)
 {
-    relativeVelocity_=relativeVelocity;
+    relativeVelocity_ = relativeVelocity;
 }
 
 /*!
@@ -574,7 +574,7 @@ void BaseInteraction::setRelativeVelocity(Vec3D relativeVelocity)
  */
 void BaseInteraction::setNormalRelativeVelocity(Mdouble normalRelativeVelocity)
 {
-    normalRelativeVelocity_=normalRelativeVelocity;
+    normalRelativeVelocity_ = normalRelativeVelocity;
 }
 
 /*!
@@ -651,7 +651,7 @@ void BaseInteraction::writeInteraction(std::ostream& os, bool created) const
     {
         os << "ended   ";
     }
-
+    
     if (dynamic_cast<BaseParticle*>(I_) != nullptr)
     {
         os << " particleIds     " << P_->getId() << " " << I_->getId() << " timeStamp ";
@@ -660,7 +660,7 @@ void BaseInteraction::writeInteraction(std::ostream& os, bool created) const
     {
         os << " particleWallIds " << P_->getId() << " " << I_->getId() << " timeStamp ";
     }
-
+    
     if (created)
     {
         os << timeStamp_;
@@ -669,9 +669,9 @@ void BaseInteraction::writeInteraction(std::ostream& os, bool created) const
     {
         os << P_->getSpecies()->getHandler()->getDPMBase()->getTime();
     }
-
+    
     os << std::endl;
-
+    
 }
 
 
@@ -688,11 +688,11 @@ void BaseInteraction::setMultiContactIdentifier(unsigned int multiContactIdentif
 
 void BaseInteraction::rotateHistory(Matrix3D& rotationMatrix)
 {
-    contactPoint_=rotationMatrix*contactPoint_;
-    relativeVelocity_=rotationMatrix*relativeVelocity_;
-    force_=rotationMatrix*force_;
-    torque_=rotationMatrix*torque_;
-    normal_=rotationMatrix*normal_;
+    contactPoint_ = rotationMatrix * contactPoint_;
+    relativeVelocity_ = rotationMatrix * relativeVelocity_;
+    force_ = rotationMatrix * force_;
+    torque_ = rotationMatrix * torque_;
+    normal_ = rotationMatrix * normal_;
     ///\todo some of these might be unneccesary
 }
 
@@ -708,21 +708,22 @@ void BaseInteraction::rotateHistory(Matrix3D& rotationMatrix)
 Mdouble BaseInteraction::getEffectiveRadius() const
 {
     const BaseParticle* PParticle = dynamic_cast<const BaseParticle*>(getP());
-    const auto * IParticle = dynamic_cast<const BaseParticle*>(getI());
-    if (PParticle==nullptr)
+    const auto* IParticle = dynamic_cast<const BaseParticle*>(getI());
+    if (PParticle == nullptr)
     {
-        std::cerr << "BaseInteraction::getEffectiveCorrectedRadius(): first interactable P is not a particle" << std::endl;
+        std::cerr << "BaseInteraction::getEffectiveCorrectedRadius(): first interactable P is not a particle"
+                  << std::endl;
         exit(-1);
     }
     //Compute the reduced diameter
-    if (IParticle==nullptr) //if particle-wall
+    if (IParticle == nullptr) //if particle-wall
     {
         if (PParticle->getName() != "SuperQuadric")
             return PParticle->getRadius();
         else
         {
             const SuperQuadric* PQuad = dynamic_cast<const SuperQuadric*>(PParticle);
-            return 1./PQuad->getCurvature(contactPoint_);
+            return 1. / PQuad->getCurvature(contactPoint_);
         }
     }
     else
@@ -731,13 +732,13 @@ Mdouble BaseInteraction::getEffectiveRadius() const
         if (PParticle->getName() == "SuperQuadric")
         {
             const SuperQuadric* PQuad = dynamic_cast<const SuperQuadric*>(PParticle);
-            radiusP = 1./PQuad->getCurvature(contactPoint_);
+            radiusP = 1. / PQuad->getCurvature(contactPoint_);
         }
         Mdouble radiusI = IParticle->getRadius();
         if (IParticle->getName() == "SuperQuadric")
         {
             const SuperQuadric* IQuad = dynamic_cast<const SuperQuadric*>(IParticle);
-            radiusI = 1./IQuad->getCurvature(contactPoint_);
+            radiusI = 1. / IQuad->getCurvature(contactPoint_);
         }
         return radiusP * radiusI / (radiusP + radiusI);
     }
@@ -755,21 +756,22 @@ Mdouble BaseInteraction::getEffectiveRadius() const
 Mdouble BaseInteraction::getEffectiveMass() const
 {
     const BaseParticle* PParticle = dynamic_cast<const BaseParticle*>(getP());
-    const auto * IParticle = dynamic_cast<const BaseParticle*>(getI());
-    if (PParticle==nullptr)
+    const auto* IParticle = dynamic_cast<const BaseParticle*>(getI());
+    if (PParticle == nullptr)
     {
-        std::cerr << "BaseInteraction::getEffectiveCorrectedRadius(): first interactable P is not a particle" << std::endl;
+        std::cerr << "BaseInteraction::getEffectiveCorrectedRadius(): first interactable P is not a particle"
+                  << std::endl;
         exit(-1);
     }
     //Compute the reduced diameter
-    if (IParticle==nullptr) //if particle-wall
+    if (IParticle == nullptr) //if particle-wall
     {
         return PParticle->getMass();
     }
     else
     {
         /* Particle-to-particle collision */
-
+        
         /* JMFT: The following doesn't work when fixed particles, with infinite
          * mass, are involved. */
         /*
@@ -777,17 +779,17 @@ Mdouble BaseInteraction::getEffectiveMass() const
         Mdouble massI = IParticle->getMass();
         return massP * massI / (massP + massI);
         */
-
+        
         /* Instead, work based on their inverse masses. In an interaction, we
          * can assume that at least one of the particles is not fixed. */
         Mdouble invMassP = PParticle->getInvMass();
         Mdouble invMassI = IParticle->getInvMass();
-
+        
         if (invMassP + invMassI > 0)
-            return 1.0/(invMassP + invMassI);
+            return 1.0 / (invMassP + invMassI);
         else
             logger(ERROR, "[BaseInteraction::getEffectiveMass()] interaction % at % has infinte effective mass.",
-                    getId(), getContactPoint());
+                   getId(), getContactPoint());
     }
 }
 
@@ -803,21 +805,22 @@ Mdouble BaseInteraction::getEffectiveMass() const
 Mdouble BaseInteraction::getEffectiveCorrectedRadius()
 {
     BaseParticle* PParticle = dynamic_cast<BaseParticle*>(getP());
-    auto * IParticle = dynamic_cast<BaseParticle*>(getI());
-    if (PParticle==nullptr)
+    auto* IParticle = dynamic_cast<BaseParticle*>(getI());
+    if (PParticle == nullptr)
     {
-        std::cerr << "BaseInteraction::getEffectiveCorrectedRadius(): first interactable P is not a particle" << std::endl;
+        std::cerr << "BaseInteraction::getEffectiveCorrectedRadius(): first interactable P is not a particle"
+                  << std::endl;
         exit(-1);
     }
     //Compute the reduced diameter
-    if (IParticle==nullptr) //if particle-wall
+    if (IParticle == nullptr) //if particle-wall
     {
-        return PParticle->getRadius() - 0.5*getOverlap();
+        return PParticle->getRadius() - 0.5 * getOverlap();
     }
     else
     {
-        Mdouble radiusP = PParticle->getRadius() - 0.5*getOverlap();
-        Mdouble radiusI = IParticle->getRadius() - 0.5*getOverlap();
+        Mdouble radiusP = PParticle->getRadius() - 0.5 * getOverlap();
+        Mdouble radiusI = IParticle->getRadius() - 0.5 * getOverlap();
         return radiusP * radiusI / (radiusP + radiusI);
     }
 }
@@ -831,70 +834,74 @@ void BaseInteraction::actionsAfterTimeStep()
  */
 void BaseInteraction::gatherContactStatistics()
 {
-    auto * IParticle = dynamic_cast<BaseParticle*>(I_);
-    auto * PParticle = dynamic_cast<BaseParticle*>(P_);
-
+    auto* IParticle = dynamic_cast<BaseParticle*>(I_);
+    auto* PParticle = dynamic_cast<BaseParticle*>(P_);
+    
     Vec3D tangentialForce = getTangentialForce();
     Mdouble tangentialOverlap = getTangentialOverlap();
-
+    
     Mdouble scalarNormalForce = Vec3D::dot(force_, getNormal());
     Mdouble scalarTangentialForce = tangentialForce.getLength();
     Vec3D tangential;
-    if (scalarTangentialForce!=0.0)
-        tangential = tangentialForce/scalarTangentialForce;
+    if (scalarTangentialForce != 0.0)
+        tangential = tangentialForce / scalarTangentialForce;
     else
-        tangential = Vec3D(0.0,0.0,0.0);
-
+        tangential = Vec3D(0.0, 0.0, 0.0);
+    
     ///\todo TW centre is used just for backward compatibility; replace centre by contact law; we also have to correct it in StatisticsVector::gatherContactStatistics.
     ///There also seems to be an issue with the normal being defined differently for walls
     Vec3D centre;
-    if (IParticle!=nullptr)
-        centre = getP()->getPosition() - normal_ * (PParticle->getRadius() + IParticle->getRadius() - overlap_)/2.0;
+    if (IParticle != nullptr)
+        centre = getP()->getPosition() - normal_ * (PParticle->getRadius() + IParticle->getRadius() - overlap_) / 2.0;
     else
         centre = getP()->getPosition() - normal_ * (PParticle->getRadius() - overlap_);
-
-    if (PParticle!=nullptr && !PParticle->isFixed())
+    
+    if (PParticle != nullptr && !PParticle->isFixed())
     {
         getHandler()->getDPMBase()->gatherContactStatistics(
-            P_->getIndex(),
-            static_cast<int>((IParticle== nullptr ?(-I_->getIndex()-1):I_->getIndex())),
-            centre,
-            getOverlap(),
-            tangentialOverlap,
-            scalarNormalForce,
-            scalarTangentialForce,
-            (IParticle== nullptr ?-normal_:normal_),
-            (IParticle== nullptr ?-tangential:tangential));
+                P_->getIndex(),
+                static_cast<int>((IParticle == nullptr ? (-I_->getIndex() - 1) : I_->getIndex())),
+                centre,
+                getOverlap(),
+                tangentialOverlap,
+                scalarNormalForce,
+                scalarTangentialForce,
+                (IParticle == nullptr ? -normal_ : normal_),
+                (IParticle == nullptr ? -tangential : tangential));
     }
-    if (IParticle!= nullptr && !IParticle->isFixed() && IParticle->getPeriodicFromParticle()== nullptr)
+    if (IParticle != nullptr && !IParticle->isFixed() && IParticle->getPeriodicFromParticle() == nullptr)
     {
         getHandler()->getDPMBase()->gatherContactStatistics(
-            I_->getIndex(),
-            static_cast<int>(P_->getIndex()),
-            centre,
-            getOverlap(),
-            tangentialOverlap,
-            scalarNormalForce,
-            scalarTangentialForce,
-            -normal_,
-            -tangential);
-
+                I_->getIndex(),
+                static_cast<int>(P_->getIndex()),
+                centre,
+                getOverlap(),
+                tangentialOverlap,
+                scalarNormalForce,
+                scalarTangentialForce,
+                -normal_,
+                -tangential);
+        
     }
 }
 
-unsigned BaseInteraction::getNumberOfFieldsVTK() const {
+unsigned BaseInteraction::getNumberOfFieldsVTK() const
+{
     return 0;
 }
 
-std::string BaseInteraction::getTypeVTK(unsigned i) const {
+std::string BaseInteraction::getTypeVTK(unsigned i) const
+{
     return "";
 }
 
-std::string BaseInteraction::getNameVTK(unsigned i) const {
+std::string BaseInteraction::getNameVTK(unsigned i) const
+{
     return "";
 }
 
-std::vector<Mdouble> BaseInteraction::getFieldVTK(unsigned i) const {
+std::vector<Mdouble> BaseInteraction::getFieldVTK(unsigned i) const
+{
     return std::vector<Mdouble>();
 }
 
@@ -903,11 +910,11 @@ void BaseInteraction::createMPIType()
 {
 }
 
-void BaseInteraction::getMPIInteraction(void *historyDataArray, unsigned int index) const
+void BaseInteraction::getMPIInteraction(void* historyDataArray, unsigned int index) const
 {
 }
 
-void BaseInteraction::setMPIInteraction(void *historyDataArray, unsigned int index, const bool resetPointers)
+void BaseInteraction::setMPIInteraction(void* historyDataArray, unsigned int index, const bool resetPointers)
 {
 }
 
@@ -920,12 +927,14 @@ void* BaseInteraction::createMPIInteractionDataArray(unsigned int numberOfIntera
 
 void BaseInteraction::deleteMPIInteractionDataArray(void* dataArray)
 {
-    logger(WARN,"Why on earth is this function called?");
+    logger(WARN, "Why on earth is this function called?");
 }
 
-void BaseInteraction::getInteractionDetails(void* interactionDataArray, unsigned int index, unsigned int &identificationP, unsigned int &identificationI, bool &isWallInteraction, unsigned &timeStamp)
+void
+BaseInteraction::getInteractionDetails(void* interactionDataArray, unsigned int index, unsigned int& identificationP,
+                                       unsigned int& identificationI, bool& isWallInteraction, unsigned& timeStamp)
 {
-    logger(ERROR,"Something went wrong, this function should not be called");
+    logger(ERROR, "Something went wrong, this function should not be called");
 }
 
 
@@ -960,49 +969,52 @@ bool BaseInteraction::isWallInteraction()
 }
 
 ///\todo TW should P, I be of type unsigned?
-void BaseInteraction::setBasicMPIInteractionValues(int P, int I, unsigned timeStamp, Vec3D force, Vec3D torque, bool isWallInteraction, const bool resetPointers)
+void BaseInteraction::setBasicMPIInteractionValues(int P, int I, unsigned timeStamp, Vec3D force, Vec3D torque,
+                                                   bool isWallInteraction, const bool resetPointers)
 {
-  this->setIdentificationP(P);
-  this->setIdentificationI(I);
-  this->setTimeStamp(timeStamp);
-  this->setForce(force);
-  this->setTorque(torque);
-  this->setWallInteraction(isWallInteraction);
-  if (resetPointers)
-  {
-      this->I_ = nullptr;
-      this->P_ = nullptr;
-  }
+    this->setIdentificationP(P);
+    this->setIdentificationI(I);
+    this->setTimeStamp(timeStamp);
+    this->setForce(force);
+    this->setTorque(torque);
+    this->setWallInteraction(isWallInteraction);
+    if (resetPointers)
+    {
+        this->I_ = nullptr;
+        this->P_ = nullptr;
+    }
 }
 
 //note centre is unused
-void BaseInteraction::setFStatData (std::fstream& fstat, BaseParticle* P, BaseParticle* I)
+void BaseInteraction::setFStatData(std::fstream& fstat, BaseParticle* P, BaseParticle* I)
 {
     Mdouble overlap, tangentialOverlap, scalarNormalForce, scalarTangentialForce;
     Vec3D centre, normal, tangential;
-    fstat >> centre >> overlap >>  tangentialOverlap >> scalarNormalForce >> scalarTangentialForce >> normal >> tangential;
+    fstat >> centre >> overlap >> tangentialOverlap >> scalarNormalForce >> scalarTangentialForce >> normal
+          >> tangential;
     const Vec3D force = scalarNormalForce * normal + scalarTangentialForce * tangential;
     setForce(force);
     setNormal(normal);
     setOverlap(overlap);
     const Mdouble radius = P->getRadius();
-    const Vec3D branch = (radius - 0.5 * getOverlap())*getNormal();
-    setContactPoint(P->getPosition()-branch);
+    const Vec3D branch = (radius - 0.5 * getOverlap()) * getNormal();
+    setContactPoint(P->getPosition() - branch);
     setDistance(radius + I->getRadius() - getOverlap());
 }
 
-void BaseInteraction::setFStatData (std::fstream& fstat, BaseParticle* P, BaseWall* I)
+void BaseInteraction::setFStatData(std::fstream& fstat, BaseParticle* P, BaseWall* I)
 {
     Mdouble overlap, tangentialOverlap, scalarNormalForce, scalarTangentialForce;
     Vec3D centre, normal, tangential;
-    fstat >> centre >> overlap >>  tangentialOverlap >> scalarNormalForce >> scalarTangentialForce >> normal >> tangential;
+    fstat >> centre >> overlap >> tangentialOverlap >> scalarNormalForce >> scalarTangentialForce >> normal
+          >> tangential;
     const Vec3D force = scalarNormalForce * normal + scalarTangentialForce * tangential;
     //note walls are defined different than particles (with an extra minus)
     setForce(-force);
     setNormal(-normal);
     setOverlap(overlap);
     const Mdouble radius = P->getRadius();
-    const Vec3D branch = (radius - 0.5 * getOverlap())*getNormal();
-    setContactPoint(P->getPosition()-branch);
+    const Vec3D branch = (radius - 0.5 * getOverlap()) * getNormal();
+    setContactPoint(P->getPosition() - branch);
     setDistance(radius - getOverlap());
 }

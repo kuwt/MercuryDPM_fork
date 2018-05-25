@@ -29,6 +29,7 @@
 #include "BaseBoundary.h"
 
 class ParticleHandler;
+
 class BaseParticle;
 
 /*!
@@ -40,9 +41,9 @@ class CircularPeriodicBoundary : public BaseBoundary
 public:
     /*!
      * \brief default constructor
-     */    
+     */
     CircularPeriodicBoundary();
-
+    
     /*!
      * \brief Constructor
      */
@@ -62,20 +63,20 @@ public:
      * \brief
      * \param[in]
      */
-    void rotateParticle(BaseParticle *P, double angle);
+    void rotateParticle(BaseParticle* P, double angle);
     
     /*!
      * \brief 
      * \param[in]
      */
-    void createPeriodicParticle(BaseParticle* p, ParticleHandler &pH) override;
-   
+    void createPeriodicParticle(BaseParticle* p, ParticleHandler& pH) override;
+    
     void createPeriodicParticles(ParticleHandler& pH) override;
- 
+    
     /*!
      * \brief
      */
-    bool checkBoundaryAfterParticleMoved(BaseParticle *P, ParticleHandler &pH);
+    bool checkBoundaryAfterParticleMoved(BaseParticle* P, ParticleHandler& pH);
     
     /// \todo MX: When implementing this function, I realised there might not be a unit test for this boundary
     void checkBoundaryAfterParticlesMove(ParticleHandler& pH) override;
@@ -100,7 +101,7 @@ public:
      * \return string type
      */
     std::string getName() const override;
-    
+
 private:
     
     /*!
@@ -119,4 +120,5 @@ private:
     //If a particle crosses its outer Radius it may need to be deleted
     
 };
+
 #endif

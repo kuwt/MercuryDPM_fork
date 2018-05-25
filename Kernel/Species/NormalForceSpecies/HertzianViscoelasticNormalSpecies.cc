@@ -30,6 +30,7 @@
 #include <Logger.h>
 
 class BaseParticle;
+
 class BaseInteractable;
 
 HertzianViscoelasticNormalSpecies::HertzianViscoelasticNormalSpecies()
@@ -44,7 +45,7 @@ HertzianViscoelasticNormalSpecies::HertzianViscoelasticNormalSpecies()
 /*!
  * \param[in] the species that is copied
  */
-HertzianViscoelasticNormalSpecies::HertzianViscoelasticNormalSpecies(const HertzianViscoelasticNormalSpecies &p)
+HertzianViscoelasticNormalSpecies::HertzianViscoelasticNormalSpecies(const HertzianViscoelasticNormalSpecies& p)
 {
     elasticModulus_ = p.elasticModulus_;
     dissipation_ = p.dissipation_;
@@ -64,9 +65,9 @@ HertzianViscoelasticNormalSpecies::~HertzianViscoelasticNormalSpecies()
  * \param[out] output stream (typically the restart file)
  */
 void HertzianViscoelasticNormalSpecies::write(std::ostream& os) const
-        {
+{
     os << " stiffness " << elasticModulus_
-            << " dissipation " << dissipation_;
+       << " dissipation " << dissipation_;
 }
 
 /*!
@@ -76,7 +77,7 @@ void HertzianViscoelasticNormalSpecies::read(std::istream& is)
 {
     std::string dummy;
     is >> dummy >> elasticModulus_
-            >> dummy >> dissipation_;
+       >> dummy >> dissipation_;
 }
 
 /*!
@@ -100,29 +101,34 @@ void HertzianViscoelasticNormalSpecies::setElasticModulus(Mdouble elasticModulus
 }
 
 ///Allows the spring constant to be changed
-void HertzianViscoelasticNormalSpecies::setElasticModulusAndRestitutionCoefficient(Mdouble elasticModulus, Mdouble rest) {
+void HertzianViscoelasticNormalSpecies::setElasticModulusAndRestitutionCoefficient(Mdouble elasticModulus, Mdouble rest)
+{
     // Here is a very nice paper describing contact modelling
     // http://people.ds.cam.ac.uk/jae1001/CUS/research/pfizer/Antypov_Elliott_EPL_2011.pdf
     // see also: https://answers.launchpad.net/yade/+question/235934
     if (elasticModulus < 0.0)
-        logger(ERROR, "[HertzianViscoelasticNormalSpecies::setElasticModulusAndRestitutionCoefficient] elasticModulus % should be nonnegative",
-                elasticModulus);
-
+        logger(ERROR,
+               "[HertzianViscoelasticNormalSpecies::setElasticModulusAndRestitutionCoefficient] elasticModulus % should be nonnegative",
+               elasticModulus);
+    
     else if (rest < 0.0 || rest > 1.0)
-        logger(ERROR, "[HertzianViscoelasticNormalSpecies::setElasticModulusAndRestitutionCoefficient] rest % should be between 0 and 1 (inclusive)", rest);
-
+        logger(ERROR,
+               "[HertzianViscoelasticNormalSpecies::setElasticModulusAndRestitutionCoefficient] rest % should be between 0 and 1 (inclusive)",
+               rest);
+    
     else
     {
         elasticModulus_ = elasticModulus;
         if (rest > 0.0)
         {
-            Mdouble logRestSquared = log(rest)*log(rest);
+            Mdouble logRestSquared = log(rest) * log(rest);
             dissipation_ = sqrt(5.0 * logRestSquared / (logRestSquared + constants::sqr_pi));
         }
         else
             dissipation_ = sqrt(5.0);
-
-        logger(INFO,"Dissipation % set to match restitution coefficient % logE % sqrPi %",dissipation_,rest,log(rest),constants::sqr_pi);
+        
+        logger(INFO, "Dissipation % set to match restitution coefficient % logE % sqrPi %", dissipation_, rest,
+               log(rest), constants::sqr_pi);
     }
 }
 
@@ -219,7 +225,8 @@ Mdouble HertzianViscoelasticNormalSpecies::getDissipation() const
  * original two species is a sensible default.
  * \param[in] S,T the two species whose properties are mixed to create the new species
  */
-void HertzianViscoelasticNormalSpecies::mix(HertzianViscoelasticNormalSpecies* const S, HertzianViscoelasticNormalSpecies* const T)
+void HertzianViscoelasticNormalSpecies::mix(HertzianViscoelasticNormalSpecies* const S,
+                                            HertzianViscoelasticNormalSpecies* const T)
 {
     elasticModulus_ = average(S->getElasticModulus(), T->getElasticModulus());
     dissipation_ = average(S->getDissipation(), T->getDissipation());
@@ -230,13 +237,16 @@ void HertzianViscoelasticNormalSpecies::mix(HertzianViscoelasticNormalSpecies* c
  * \param[in] particleDiameter input the minimum particle diameter in your system to get the mininimum collision time
  * \param[in] particleDensity input the minimum particle density in your system to get the mininimum collision time
  */
-Mdouble HertzianViscoelasticNormalSpecies::getCollisionTime(Mdouble particleDiameter, Mdouble particleDensity, Mdouble relativeVelocity) const {
+Mdouble HertzianViscoelasticNormalSpecies::getCollisionTime(Mdouble particleDiameter, Mdouble particleDensity,
+                                                            Mdouble relativeVelocity) const
+{
     // Here is a very nice paper describing contact modelling
     // http://people.ds.cam.ac.uk/jae1001/CUS/research/pfizer/Antypov_Elliott_EPL_2011.pdf
     //caution: this function assumes the contact is elastic (no dissipation)
     //Mdouble omega0 = 2.0/constants::sqrt_pi*sqrt(getElasticModulus()/particleDensity)/relativeVelocity;
     //Mdouble omega1 = sqrt(omega0*omega0-getDissipation()*getDissipation());
-    return 2.214*pow(mathsFunc::square(particleDensity/getElasticModulus())/relativeVelocity,0.2)*particleDiameter;
+    return 2.214 * pow(mathsFunc::square(particleDensity / getElasticModulus()) / relativeVelocity, 0.2) *
+           particleDiameter;
 }
 
 

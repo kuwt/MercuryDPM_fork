@@ -27,8 +27,11 @@
 #define LINEARPLASTICVISCOELASTICINTERACTION_H
 
 #include "Interactions/BaseInteraction.h"
+
 class LinearPlasticViscoelasticNormalSpecies;
+
 class BaseInteractable;
+
 /*!
  * \class LinearPlasticViscoelasticInteraction
  * \brief Computes normal forces in case of a linear plastic visco-elastic interaction.
@@ -40,6 +43,7 @@ public:
      * \brief An alias for the species (needed for e.g. ThermalSpecies)
      */
     typedef LinearPlasticViscoelasticNormalSpecies SpeciesType;
+    
     /*!
      * \brief Constructor.
      */
@@ -51,7 +55,8 @@ public:
     /*!
      * \brief Copy constructor.
      */
-    LinearPlasticViscoelasticInteraction(const LinearPlasticViscoelasticInteraction &p);
+    LinearPlasticViscoelasticInteraction(const LinearPlasticViscoelasticInteraction& p);
+    
     /*!
      * \brief Destructor.
      */
@@ -64,46 +69,56 @@ public:
      * \brief Computes the normal forces due to linear plastic visco elastic interaction.
      */
     void computeLinearPlasticViscoelasticForce();
+    
     /*!
      * \brief Calls computeLinearPlasticViscoElasticForce().
      */
     void computeNormalForce();
+    
     /*!
      * \brief Interaction read function, which accepts an std::istream as input.
      */
     void read(std::istream& is) override;
+    
     /*!
      * \brief Interaction write function, which accepts an std::ostream as input.
      */
     void write(std::ostream& os) const override;
+    
     /*!
      * \brief Returns the name of the interaction.
      */
     virtual std::string getBaseName() const;
+    
     /*!
      * \brief Computes and returns the amount of elastic energy stored in the spring.
      */
     Mdouble getElasticEnergy() const override;
+    
     /*!
      * \brief
      */
     const LinearPlasticViscoelasticNormalSpecies* getSpecies() const;
+    
     /*!
      * \brief
      */
     Mdouble getMaxOverlap() const;
+    
     /*!
      * \brief
      */
     void setMaxOverlap(Mdouble maxOverlap);
+    
     /*!
      * \brief
      */
     Mdouble getUnloadingStiffness() const;
 
 private:
-
+    
     //set in integrate, used in compute force
     Mdouble maxOverlap_;
 };
+
 #endif

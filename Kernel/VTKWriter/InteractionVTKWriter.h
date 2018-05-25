@@ -34,22 +34,23 @@ class InteractionVTKWriter final : public BaseVTKWriter<InteractionHandler>
 {
 
 public:
-
+    
     /**
      * \brief Non-default constructor; sets the handler and fileCounter
      */
-    explicit InteractionVTKWriter(InteractionHandler& interactionHandler) : BaseVTKWriter(interactionHandler) { }
-
+    explicit InteractionVTKWriter(InteractionHandler& interactionHandler) : BaseVTKWriter(interactionHandler)
+    {}
+    
     /**
      * \brief Default copy constructor
      */
     InteractionVTKWriter(const InteractionVTKWriter&) = default;
-
+    
     /**
      * \brief writes a vtk file
      */
     void writeVTK() const override;
-
+    
     /**
      * \brief the name of the class in the restart file
      */
@@ -59,17 +60,17 @@ public:
     }
 
 protected:
-
+    
     /**
      * \brief writes the point data to the vtu file (i.e. the vertices of the mesh displayed in paraview)
      */
     void writeVTKPoints(std::fstream& file) const;
-
+    
     /**
      * \brief writes the point data to the vtu file (i.e. options how to color the interactions displayed in paraview)
      */
     void writeVTKPointData(std::fstream& file) const;
-
+    
 };
 
 

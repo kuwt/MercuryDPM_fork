@@ -27,6 +27,7 @@
 #define CYLINDRICALWALL_H
 
 #include "BaseWall.h"
+
 /*!
  * \class CylindricalWall
  * \brief
@@ -36,59 +37,59 @@
 class CylindricalWall : public BaseWall
 {
 public:
-   /*!
-    * \brief
-    */    
+    /*!
+     * \brief
+     */
     CylindricalWall();
     
-   /*!
-    * \brief
-    */    
-    CylindricalWall(const CylindricalWall &p);
+    /*!
+     * \brief
+     */
+    CylindricalWall(const CylindricalWall& p);
     
-   /*!
-    * \brief
-    */
-   explicit CylindricalWall(double radius);
+    /*!
+     * \brief
+     */
+    explicit CylindricalWall(double radius);
     
-   /*!
-    * \brief Wall copy method. It calls the copy contrustor of this Wall, usefull for polymorfism
-    */
+    /*!
+     * \brief Wall copy method. It calls the copy contrustor of this Wall, usefull for polymorfism
+     */
     CylindricalWall* copy() const override;
-
-   /*!
-    * \brief Defines a standard wall, given an outward normal vector s. t. normal*x=position
-    */
+    
+    /*!
+     * \brief Defines a standard wall, given an outward normal vector s. t. normal*x=position
+     */
     void set(Mdouble radius);
     
-   /*!
-    * \brief Since this function should be called before calculating any Particle-Wall interactions, it can also be used to set the normal vector in case of curved walls.
-    */
+    /*!
+     * \brief Since this function should be called before calculating any Particle-Wall interactions, it can also be used to set the normal vector in case of curved walls.
+     */
     bool getDistanceAndNormal(const BaseParticle& P, Mdouble& distance, Vec3D& normal_return) const override;
     
-   /*!
-    * \brief reads wall
-    */
+    /*!
+     * \brief reads wall
+     */
     void read(std::istream& is) override;
-
-   /*!
-    * \brief
-    */    
+    
+    /*!
+     * \brief
+     */
     void oldRead(std::istream& is);
     
-   /*!
-    * \brief outputs wall
-    */
+    /*!
+     * \brief outputs wall
+     */
     void write(std::ostream& os) const override;
     
-   /*!
-    * \brief Returns the name of the object
-    */
-   std::string getName() const override;
+    /*!
+     * \brief Returns the name of the object
+     */
+    std::string getName() const override;
     
-   /*!
-    * \brief access function for radius
-    */
+    /*!
+     * \brief access function for radius
+     */
     double getRadius() const;
 
 private:

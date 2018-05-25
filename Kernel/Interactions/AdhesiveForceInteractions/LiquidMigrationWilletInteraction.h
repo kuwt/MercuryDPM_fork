@@ -32,8 +32,11 @@
 #include "InteractionHandler.h"
 
 class BaseParticle;
+
 class LiquidMigrationWilletSpecies;
+
 class BaseInteractable;
+
 /*!
  * \class LiquidMigrationWilletInteraction
  * \brief Defines the liquid bridge willet interaction between two particles or walls.
@@ -45,6 +48,7 @@ public:
      * \brief An alias name for LiquidMigrationWilletSpecies data type.
      */
     typedef LiquidMigrationWilletSpecies SpeciesType;
+    
     /*!
      * \brief Constructor.
      */
@@ -56,40 +60,46 @@ public:
     /*!
      * \brief Copy constructor.
      */
-    LiquidMigrationWilletInteraction(const LiquidMigrationWilletInteraction &p);
+    LiquidMigrationWilletInteraction(const LiquidMigrationWilletInteraction& p);
+    
     /*!
      * \brief Destructor.
      */
     ~LiquidMigrationWilletInteraction() override;
-
+    
     void actionsOnErase() override;
-	
+    
     void actionsAfterTimeStep() override;
     
-	/*!
+    /*!
      * \brief Computes the adhesive forces for liquid bridge Willet type of interaction.
      */
     void computeAdhesionForce();
+    
     /*!
      * \brief Interaction read function, which accepts an std::istream as input.
      */
     void read(std::istream& is) override;
+    
     /*!
      * \brief Interaction print function, which accepts an std::ostream as input.
      */
     void write(std::ostream& os) const override;
+    
     /*!
      * \brief Returns the amount of Elastic energy involved in an interaction. Basically
      *        used in case you want to write the elastic energy into an output file. 
-     */ 
+     */
     Mdouble getElasticEnergy() const override;
+    
     /*!
      * \brief A dynamic_cast of BaseSpecies type pointer to a pointer of type LiquidMigrationWilletSpecies.
      */
     const LiquidMigrationWilletSpecies* getSpecies() const;
+    
     /*!
      * \brief Returns the name of the interaction, see Interaction.h.
-     */  
+     */
     std::string getBaseName() const;
     
     Mdouble getLiquidBridgeVolume() const;
@@ -101,37 +111,38 @@ public:
     bool getWasInContact() const;
     
     void setWasInContact(bool wasInContact);
-
-	void rupture();
-
+    
+    void rupture();
+    
     void form();
-
+    
     Mdouble getRuptureDistance();
-
+    
     int getNumberOfContacts(BaseInteractable* interactable);
-
+    
     /**
      * writes extra information to the VTK output
      */
     unsigned getNumberOfFieldsVTK() const override;
-
+    
     std::string getTypeVTK(unsigned i) const override;
-
+    
     std::string getNameVTK(unsigned i) const override;
-
+    
     std::vector<Mdouble> getFieldVTK(unsigned i) const override;
-
+    
     static Mdouble getTotalLiquidFilmVolume(ParticleHandler&);
-
+    
     static Mdouble getTotalLiquidBridgeVolume(InteractionHandler&);
 
 private:
     /*!
      * \brief A history parameter to store if the particles were in contact or not. Useful
      *        to compute adhesive forces.
-     */    
+     */
     bool wasInContact_;
     
     Mdouble liquidBridgeVolume_;
 };
+
 #endif

@@ -36,7 +36,9 @@
  * \param[in] down      The (signed) distance between the origin and the top wall
  * \param[in] up        The (signed) distance between the origin and the bottom wall
  */
-void LeesEdwardsBoundary::set(std::function<Mdouble (Mdouble)> shift, std::function<Mdouble (Mdouble)> velocity, Mdouble left, Mdouble right, Mdouble down, Mdouble up)
+void
+LeesEdwardsBoundary::set(std::function<Mdouble(Mdouble)> shift, std::function<Mdouble(Mdouble)> velocity, Mdouble left,
+                         Mdouble right, Mdouble down, Mdouble up)
 {
     shift_ = shift;
     velocity_ = velocity;
@@ -52,13 +54,13 @@ void LeesEdwardsBoundary::set(std::function<Mdouble (Mdouble)> shift, std::funct
  */
 void LeesEdwardsBoundary::read(std::istream& is)
 {
-	std::string dummy;
+    std::string dummy;
     BaseBoundary::read(is);
     Mdouble shift;
     Mdouble velocity;
-    is>>dummy>>left_>>dummy>>right_>>dummy>>down_>>dummy>>up_>>dummy>>shift>>dummy>>velocity;
-    shift_=[shift,velocity] (Mdouble time UNUSED) { return shift+velocity*time;};
-    velocity_=[velocity] (Mdouble time UNUSED) {return velocity;};
+    is >> dummy >> left_ >> dummy >> right_ >> dummy >> down_ >> dummy >> up_ >> dummy >> shift >> dummy >> velocity;
+    shift_ = [shift, velocity](Mdouble time UNUSED) { return shift + velocity * time; };
+    velocity_ = [velocity](Mdouble time UNUSED) { return velocity; };
 }
 
 /*!
@@ -69,7 +71,8 @@ void LeesEdwardsBoundary::write(std::ostream& os) const
 {
     BaseBoundary::write(os);
     Mdouble time = getHandler()->getDPMBase()->getTime();
-    os<<" left "<<left_<<" right "<<right_<<" down "<<down_<<" up "<<up_<<" shift "<<shift_(time)<<" vel "<<velocity_(time);
+    os << " left " << left_ << " right " << right_ << " down " << down_ << " up " << up_ << " shift " << shift_(time)
+       << " vel " << velocity_(time);
 }
 
 /*!
@@ -103,7 +106,8 @@ Mdouble LeesEdwardsBoundary::getHorizontalDistance(BaseParticle& p, bool& positi
     {
         positive = true;
         return left;
-    } else
+    }
+    else
     {
         positive = false;
         return right;
@@ -124,7 +128,8 @@ Mdouble LeesEdwardsBoundary::getVerticalDistance(BaseParticle& p, bool& positive
     {
         positive = true;
         return down;
-    } else
+    }
+    else
     {
         positive = false;
         return up;
@@ -143,7 +148,8 @@ void LeesEdwardsBoundary::shiftHorizontalPosition(BaseParticle* p, bool positive
     if (positive)
     {
         p->move(Vec3D(right_ - left_, 0.0, 0.0));
-    } else
+    }
+    else
     {
         p->move(Vec3D(left_ - right_, 0.0, 0.0));
     }
@@ -163,7 +169,8 @@ void LeesEdwardsBoundary::shiftVerticalPosition(BaseParticle* p, bool positive)
     {
         p->move(Vec3D(shift_(time), up_ - down_, 0.0));
         p->addVelocity(Vec3D(velocity_(time), 0.0, 0.0));
-    } else
+    }
+    else
     {
         p->move(Vec3D(-shift_(time), down_ - up_, 0.0));
         p->addVelocity(Vec3D(-velocity_(time), 0.0, 0.0));
@@ -181,15 +188,16 @@ void LeesEdwardsBoundary::shiftVerticalPosition(BaseParticle* p, bool positive)
 void LeesEdwardsBoundary::createHorizontalPeriodicParticles(BaseParticle* p, ParticleHandler& pH)
 {
     bool positive;      // TRUE if the particle is closest to the left boundary 
-                        // wall (set by getVerticalDistance in the following if-statement)
+    // wall (set by getVerticalDistance in the following if-statement)
     // check if particle is close enough to either of the walls
-    if (getHorizontalDistance(*p, positive) < p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius())
+    if (getHorizontalDistance(*p, positive) <
+        p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius())
     {
         // create a periodic copy of the particle
         BaseParticle* F0 = p->copy();
         pH.addObject(F0);
         F0->copyInteractionsForPeriodicParticles(*p);
-
+        
         // If Particle is doubly shifted, get correct original particle
         BaseParticle* From = p;
         while (From->getPeriodicFromParticle() != nullptr)
@@ -216,15 +224,15 @@ void LeesEdwardsBoundary::createHorizontalPeriodicParticles(BaseParticle* p, Par
 void LeesEdwardsBoundary::createVerticalPeriodicParticles(BaseParticle* p, ParticleHandler& pH)
 {
     bool positive;      // TRUE if the particle is closest to the bottom boundary 
-                        // wall (set by getVerticalDistance in the following if-statement)
+    // wall (set by getVerticalDistance in the following if-statement)
     // check if particle is close enough to either of the walls
     if (getVerticalDistance(*p, positive) < p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius())
-    {   
+    {
         // create a periodic copy of the particle
         BaseParticle* F0 = p->copy();
         pH.addObject(F0);
         F0->copyInteractionsForPeriodicParticles(*p);
-
+        
         // If Particle is doubly shifted, get correct original particle
         BaseParticle* From = p;
         while (From->getPeriodicFromParticle() != nullptr)
@@ -258,9 +266,9 @@ void LeesEdwardsBoundary::createPeriodicParticle(BaseParticle* p, ParticleHandle
 void LeesEdwardsBoundary::createPeriodicParticles(ParticleHandler& pH)
 {
     unsigned numberOfParticles = pH.getSize();
-    for(unsigned i = 0; i < numberOfParticles; i++)
+    for (unsigned i = 0; i < numberOfParticles; i++)
     {
-        createPeriodicParticle(pH.getObject(i),pH);
+        createPeriodicParticle(pH.getObject(i), pH);
     }
 }
 
@@ -286,7 +294,7 @@ void LeesEdwardsBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
 {
     for (auto p = pH.begin(); p != pH.end(); ++p)
     {
-	checkBoundaryAfterParticleMoved(*p);
+        checkBoundaryAfterParticleMoved(*p);
     }
 }
 
@@ -294,21 +302,21 @@ void LeesEdwardsBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
 Mdouble LeesEdwardsBoundary::getCurrentShift()
 {
     Mdouble time = getHandler()->getDPMBase()->getTime();
-	return shift_(time);
+    return shift_(time);
 }
 
 Mdouble LeesEdwardsBoundary::getCurrentVelocity()
 {
     Mdouble time = getHandler()->getDPMBase()->getTime();
-	return velocity_(time);
+    return velocity_(time);
 }
 
-void LeesEdwardsBoundary::setShift(std::function<Mdouble (Mdouble)> shift)
+void LeesEdwardsBoundary::setShift(std::function<Mdouble(Mdouble)> shift)
 {
-	shift_ = shift;
+    shift_ = shift;
 }
 
-void LeesEdwardsBoundary::setVelocity(std::function<Mdouble (Mdouble)> velocity)
+void LeesEdwardsBoundary::setVelocity(std::function<Mdouble(Mdouble)> velocity)
 {
-	velocity_ = velocity;
+    velocity_ = velocity;
 }

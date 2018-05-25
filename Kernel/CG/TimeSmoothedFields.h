@@ -51,33 +51,34 @@ template<class Fields>
 class TimeSmoothedFields
 {
 public:
-
+    
     /*!
      * \brief Constructor; sets the size of the fields_ vector and time_; sets sumWeights_ to zero.
      */
-    TimeSmoothedFields(std::size_t n, Mdouble time) : time_(time), sumWeights_(0), fields_(n) {}
-
+    TimeSmoothedFields(std::size_t n, Mdouble time) : time_(time), sumWeights_(0), fields_(n)
+    {}
+    
     /*!
      * \brief Default copy Constructor; copies all member variables.
      */
     TimeSmoothedFields(const TimeSmoothedFields& a) = default;
-
+    
     /*!
      * \brief Default destructor; does nothing
      */
     ~TimeSmoothedFields() = default;
-
+    
     /*!
      * A vector of StandardFields values whose length is equal to the number of CGPoints.
      * Is used to compute the time-smoothed fields. 
      */
-    std::vector<Fields> fields_;
-
+    std::vector <Fields> fields_;
+    
     /*!
      * The time for which smoothed-time fields are evaluated
      */
     Mdouble time_;
-
+    
     /*!
      * The sum of weights of all time steps that are already computed
      */

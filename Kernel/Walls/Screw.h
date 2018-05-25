@@ -48,7 +48,7 @@ public:
      * \brief Copy constructor, copies another Screw.
      */
     Screw(const Screw& other);
-
+    
     /*!
      * \brief Constructor in which all parameters of the screw are set.
      */
@@ -58,50 +58,51 @@ public:
      * \brief Default destructor.
      */
     ~Screw() override;
-
+    
     /*!
      * \brief Copy this screw and return a pointer to the copy.
      */
     Screw* copy() const final;
-
+    
     /*!
      * \brief Compute the distance from the Screw for a given BaseParticle and return if there is a collision. If there is a collision, also return the normal vector of the interaction point.
      */
     bool getDistanceAndNormal(const BaseParticle& P, Mdouble& distance, Vec3D& normal_return) const final;
-
-    bool getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wallInteractionRadius, Mdouble& distance, Vec3D& normal_return) const;
-
+    
+    bool getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wallInteractionRadius, Mdouble& distance,
+                                            Vec3D& normal_return) const;
+    
     /*!
      * \brief Rotate the Screw for a period dt, so that the offset_ changes with omega_*dt.
      */
     void move_time(Mdouble dt);
-
+    
     MERCURY_DEPRECATED
-    void rotate(const Vec3D &angularVelocityDt) override;
-
+    void rotate(const Vec3D& angularVelocityDt) override;
+    
     /*!
      * \brief Reads a Screw from an input stream, for example a restart file.
      */
     void read(std::istream& is) override;
-
+    
     /*!
      * \brief Reads a Screw in the old style from an input stream, for example a restart file old style.
      */
     void oldRead(std::istream& is);
-
+    
     /*!
      * \brief Writes this Screw to an output stream, for example a restart file.
      */
     void write(std::ostream& os) const override;
-
+    
     /*!
      * \brief Returns the name of the object, here the string "Screw".
      */
     std::string getName() const final;
-
-    void writeVTK (VTKContainer &vtk) const override;
-
-    void writeVTK (std::string filename) const;
+    
+    void writeVTK(VTKContainer& vtk) const override;
+    
+    void writeVTK(std::string filename) const;
 
 private:
     /*!

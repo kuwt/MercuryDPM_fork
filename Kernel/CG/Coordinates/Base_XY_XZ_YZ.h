@@ -45,34 +45,34 @@ namespace CGCoordinates
  * \details As XY, XZ, and YZ share a lot of functionality, the shared functions 
  * are stored in this common base class.
  */
-class Base_XY_XZ_YZ : public BaseCoordinates
-{
-public:
-
-    /*!
-     * \brief Computes the prefactor of the Gauss CGFunction, which is dependent
-     * on the number of non-averaged dimensions.
-     */
-    static Mdouble getGaussPrefactor(Mdouble width, Mdouble cutoff);
-
-    /*!
-     * \brief Computes the prefactor of the Gauss line integral, which is dependent
-     * on the number of non-averaged dimensions.
-     */
-    static Mdouble getGaussIntegralPrefactor(Mdouble distance, Mdouble width, Mdouble cutoff);
-
-    /*!
-     * \brief Normalises the coefficients of Polynomial CGFunction such that
-     * the integral over all non-averaged dimensions is unity.
-     */
-    static void normalisePolynomialCoefficients(std::vector<Mdouble>& coefficients, Mdouble cutoff);
-
-    /*!
-     * returns the number of variables (in this case two)
-     */
-    static const unsigned countVariables();
-
-};
-
+    class Base_XY_XZ_YZ : public BaseCoordinates
+    {
+    public:
+        
+        /*!
+         * \brief Computes the prefactor of the Gauss CGFunction, which is dependent
+         * on the number of non-averaged dimensions.
+         */
+        static Mdouble getGaussPrefactor(Mdouble width, Mdouble cutoff);
+        
+        /*!
+         * \brief Computes the prefactor of the Gauss line integral, which is dependent
+         * on the number of non-averaged dimensions.
+         */
+        static Mdouble getGaussIntegralPrefactor(Mdouble distance, Mdouble width, Mdouble cutoff);
+        
+        /*!
+         * \brief Normalises the coefficients of Polynomial CGFunction such that
+         * the integral over all non-averaged dimensions is unity.
+         */
+        static void normalisePolynomialCoefficients(std::vector <Mdouble>& coefficients, Mdouble cutoff);
+        
+        /*!
+         * returns the number of variables (in this case two)
+         */
+        static const unsigned countVariables();
+        
+    };
+    
 }
 #endif

@@ -91,7 +91,7 @@ CG<Coordinates, BaseFunction, Fields>* CG<Coordinates, BaseFunction, Fields>::co
 template<class Coordinates, template<class> class BaseFunction, class Fields>
 std::string CG<Coordinates, BaseFunction, Fields>::getName() const
 {
-    return "CG<"+Coordinates::getName()+">";
+    return "CG<" + Coordinates::getName() + ">";
 }
 
 template<class Coordinates, template<class> class BaseFunction, class Fields>
@@ -167,10 +167,10 @@ void CG<Coordinates, BaseFunction, Fields>::initialise()
         min_.Z = dpm->getZMin();
     if (std::isinf(getMax().Z))
         max_.Z = dpm->getZMax();
-
-
-    createMesh();    
-
+    
+    
+    createMesh();
+    
     function_.setWidth(getWidth());
     function_.setEps(getEps());
     
@@ -305,7 +305,7 @@ void CG<Coordinates, BaseFunction, Fields>::evaluateParticleAtPoint(Fields& curr
     Mdouble phi = function_.evaluateCGFunction(p.getPosition(), r.coordinates);
     //logger(INFO,"phi % %",phi,function_.getCutoff());
     r.addParticleStatistics(phi, currentInteraction);
-
+    
     //Compute derivatives if required
     if (CGFields::StandardFields::isDifferentialField())
     {
@@ -385,12 +385,12 @@ void CG<CGCoordinates::RZ, CGFunctions::Gauss, CGFields::StandardFields>::evalua
 {
     CGFields::StandardFields currentInteraction;
     currentInteraction.setFields(p);
-
+    
     for (Point& r : points_)
     {
         Mdouble phi = function_.evaluateCGFunction(p.getPosition(), r.coordinates);
         r.addParticleStatistics(phi, currentInteraction);
-
+        
         //Compute derivatives if required
         if (CGFields::StandardFields::isDifferentialField())
         {
@@ -505,7 +505,7 @@ void CG<CGCoordinates::RZ, CGFunctions::Gauss>::evaluateContact(const BaseIntera
     if (i == IntegralType::NONE) return;
     CGFields::StandardFields currentInteraction;
     currentInteraction.setCylindricalFields(c, i);
-
+    
     for (Point& r : points_)
     {
         Mdouble psi = function_.evaluateCGIntegral(c, r.coordinates, i);
@@ -523,6 +523,6 @@ void CG<Coordinates, BaseFunction, Fields>::finish()
 {
     cgLogger(DEBUG, "CG::finish   %", statFile.getName());
     statFile.close();
-
+    
     outputSumOfVariables();
 }

@@ -149,7 +149,7 @@ public:
     
     void axpy(Mdouble a, const SmallVector& x)
     {
-        for(unsigned int i = 0; i < numberOfRows; ++i)
+        for (unsigned int i = 0; i < numberOfRows; ++i)
         {
             data_[i] += a * x[i];
         }
@@ -159,9 +159,9 @@ public:
     /// a tolerance interval to see if they are equal.
     bool operator==(const SmallVector& right) const
     {
-        for(unsigned int i = 0; i < numberOfRows; ++i)
+        for (unsigned int i = 0; i < numberOfRows; ++i)
         {
-            if(data_[i] != right[i])
+            if (data_[i] != right[i])
             {
                 return false;
             }
@@ -173,13 +173,13 @@ public:
     /// a tolerance interval to see if they are equal.
     bool operator<(const SmallVector& right) const
     {
-        for(unsigned int i = 0; i < numberOfRows; ++i)
+        for (unsigned int i = 0; i < numberOfRows; ++i)
         {
-            if(data_[i] < right[i])
+            if (data_[i] < right[i])
             {
                 return true;
             }
-            if(data_[i] > right[i])
+            if (data_[i] > right[i])
             {
                 return false;
             }
@@ -281,7 +281,7 @@ template<unsigned int numberOfRows>
 std::ostream& operator<<(std::ostream& os, const SmallVector<numberOfRows>& A)
 {
     os << "(";
-    for(std::size_t i = 0; i < numberOfRows; ++i)
+    for (std::size_t i = 0; i < numberOfRows; ++i)
     {
         os << A[i] << " ";
     }

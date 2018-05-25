@@ -47,65 +47,65 @@
 class SphericalWall : public BaseWall
 {
 public:
-
+    
     /*!
      * \brief Default constructor, the normal is infinitely long.
      */
     SphericalWall();
-
+    
     /*!
      * \brief Copy constructor, copy the given wall.
      */
     SphericalWall(const SphericalWall& w);
-
+    
     
     /*!
      * \brief Constructor setting values.
      */
     SphericalWall(Mdouble radius, const ParticleSpecies* species);
-
+    
     /*!
      * \brief Default destructor.
      */
     ~SphericalWall() override;
-
+    
     /*!
      * \brief Wall copy method. It calls the copy constructor of this Wall, useful for polymorphism
      */
     SphericalWall* copy() const override;
-
+    
     /*!
      * \brief Defines a spherical wall with radius r.
      */
     void setRadius(Mdouble radius);
-
+    
     using BaseWall::move;
-
+    
     /*!
      * \brief Returns the distance of the wall to the particle.
      */
     Mdouble getDistance(const Vec3D& otherPosition) const;
-
+    
     /*!
      * \brief Returns the distance of the wall to the particle.
      */
     Mdouble getRadius() const;
-
+    
     /*!
      * \brief Compute the distance from the wall for a given BaseParticle and return if there is a collision. If there is a collision, also return the normal vector.
      */
     bool getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const override;
-
+    
     /*!
      * \brief Reads SphericalWall from a restart file.
      */
     void read(std::istream& is) override;
-
+    
     /*!
      * \brief Writes the SphericalWall to an output stream, usually a restart file.
      */
     void write(std::ostream& os) const override;
-
+    
     /*!
      * \brief Returns the name of the object, in this case the string "SphericalWall".
      */

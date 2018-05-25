@@ -42,69 +42,69 @@
 class BasicIntersectionOfWalls : public BaseWall
 {
 public:
-
+    
     /*!
      * \brief Default constructor, the normal is infinitely long.
      */
     BasicIntersectionOfWalls();
-
+    
     /*!
      * \brief Copy constructor, copy the given wall.
      */
     BasicIntersectionOfWalls(const BasicIntersectionOfWalls& w);
-
+    
     /*!
      * \brief Default destructor.
      */
     ~BasicIntersectionOfWalls() override;
-
+    
     /*!
      * \brief Wall copy method. It calls the copy constructor of this Wall, useful for polymorphism
      */
     BasicIntersectionOfWalls* copy() const override;
-
+    
     /*! 
      * \brief Returns the number of objects 
      */
     unsigned long getNumberOfObjects();
-
+    
     /*!
      * \brief Defines a standard wall, given an outward normal vector s.t. normal*x=normal*point for all x of the wall.
      */
     void add(BaseWall& wall);
-
+    
     /*!
      * \brief Compute the distance from the wall for a given BaseParticle and return if there is a collision. If there is a collision, also return the normal vector.
      */
     bool getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const override;
-
+    
     /*!
      * \brief Reads BasicIntersectionOfWalls from a restart file.
      */
     void read(std::istream& is) override;
-
+    
     /*!
      * \brief Reads BasicIntersectionOfWalls from an old-style restart file.
      */
     void oldRead(std::istream& is);
-
+    
     /*!
      * \brief Writes the BasicIntersectionOfWalls to an output stream, usually a restart file.
      */
     void write(std::ostream& os) const override;
-
+    
     /*!
      * \brief Returns the name of the object, in this case the string "BasicIntersectionOfWalls".
      */
     std::string getName() const override;
-
+    
     /*!
      * \todo change getVTK to writeVTK
      * @param points
      * @param triangleStrips
      */
-    void getVTK (std::vector<Vec3D>& points, std::vector<std::vector<double>>& triangleStrips);
-
+    void getVTK(std::vector<Vec3D>& points, std::vector<std::vector<double>>& triangleStrips);
+    
     BaseWall* getObject(unsigned i);
 
 private:

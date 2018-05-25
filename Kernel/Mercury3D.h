@@ -38,22 +38,22 @@ public:
      * \brief This is the default constructor. All it does is set sensible defaults.
      */
     Mercury3D();
-
+    
     /*!
      * \brief Copy-constructor for creates an Mercury3D problem from an existing MD problem.
      */
     explicit Mercury3D(const DPMBase& other);
-
+    
     /*!
      * \brief Copy-constructor.
      */
     Mercury3D(const Mercury3D& other);
-
+    
     /*!
      * \brief Function that sets the SystemDimension and ParticleDimension to 3.
      */
     void constructor();
-
+    
     /*!
      * \brief Returns all particles that have a contact with a given particle.
      */
@@ -64,27 +64,28 @@ protected:
      * \brief Finds contacts between particles in the target cell.
      */
     void hGridFindContactsWithinTargetCell(int x, int y, int z, unsigned int l);
-
+    
     /*!
      * \brief Finds contacts between the BaseParticle and the target cell.
      */
     void hGridFindContactsWithTargetCell(int x, int y, int z, unsigned int l, BaseParticle* obj);
-
+    
     /*!
      * \brief Compute contacts with a wall.
      */
     void computeWallForces(BaseWall* w) override;
-
+    
     /*!
      * \brief Finds particles within target cell and stores them in a list
      */
-    void hGridFindParticlesWithTargetCell(int x, int y, int z, unsigned int l, BaseParticle* obj, std::vector<BaseParticle*>& list);
-
+    void hGridFindParticlesWithTargetCell(int x, int y, int z, unsigned int l, BaseParticle* obj,
+                                          std::vector<BaseParticle*>& list);
+    
     /*!
      * \brief Obtains all neighbour particles of a given object, obtained from the hgrid
      */
     void hGridGetInteractingParticleList(BaseParticle* obj, std::vector<BaseParticle*>& list) override;
-
+    
     /*!
      * \brief Finds contacts with the BaseParticle; avoids multiple checks.
      */
@@ -94,22 +95,22 @@ protected:
      * \brief Tests if the BaseParticle has contacts with other Particles in the target cell.
      */
     bool hGridHasContactsInTargetCell(int x, int y, int z, unsigned int l, const BaseParticle* obj) const;
-
+    
     /*!
      * \brief Tests if a BaseParticle has any contacts in the HGrid.
      */
     bool hGridHasParticleContacts(const BaseParticle* obj) override;
-
+    
     /*!
      * \brief Removes a BaseParticle from the HGrid.
      */
     void hGridRemoveParticle(BaseParticle* obj) override;
-
+    
     /*!
      * \brief Updates the cell (not the level) of a BaseParticle.
      */
     void hGridUpdateParticle(BaseParticle* obj) override;
-    
+
 #ifdef CONTACT_LIST_HGRID
     /*!
      * \brief Adds the combination of all objects in the cell with ID (x,y,z,l) and given BaseParticle to the list of possible contacts.
@@ -120,6 +121,7 @@ protected:
      * \brief Add the given BaseParticle to possible interactions for all levels.
      */
     void InsertObjAgainstGrid(BaseParticle* obj);
-#endif    
+#endif
 };
+
 #endif

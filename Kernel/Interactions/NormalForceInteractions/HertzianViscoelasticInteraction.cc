@@ -30,18 +30,21 @@
 #include "InteractionHandler.h"
 #include <iomanip>
 #include <fstream>
+
 /*!
  * \param[in] P
  * \param[in] I
  * \param[in] timeStamp
  */
-HertzianViscoelasticInteraction::HertzianViscoelasticInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp)
+HertzianViscoelasticInteraction::HertzianViscoelasticInteraction(BaseInteractable* P, BaseInteractable* I,
+                                                                 unsigned timeStamp)
         : BaseInteraction(P, I, timeStamp)
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"HertzianViscoelasticInteraction::HertzianViscoelasticInteraction() finished"<<std::endl;
 #endif
 }
+
 /*!
  * \param[in] p
  */
@@ -52,6 +55,7 @@ HertzianViscoelasticInteraction::HertzianViscoelasticInteraction(const HertzianV
     std::cout<<"HertzianViscoelasticInteraction::HertzianViscoelasticInteraction(const HertzianViscoelasticInteraction& p) finished"<<std::endl;
 #endif
 }
+
 HertzianViscoelasticInteraction::HertzianViscoelasticInteraction() = default;
 
 /*!
@@ -68,9 +72,10 @@ HertzianViscoelasticInteraction::~HertzianViscoelasticInteraction()
  * \param[in,out] os
  */
 void HertzianViscoelasticInteraction::write(std::ostream& os) const
-        {
+{
     BaseInteraction::write(os);
 }
+
 /*!
  * \param[in,out] is
  */
@@ -78,6 +83,7 @@ void HertzianViscoelasticInteraction::read(std::istream& is)
 {
     BaseInteraction::read(is);
 }
+
 /*!
  * \return std::string
  */
@@ -85,6 +91,7 @@ std::string HertzianViscoelasticInteraction::getBaseName() const
 {
     return "HertzianViscoelastic";
 }
+
 /*!
  * The contact model is based on the description given in
  * http://people.ds.cam.ac.uk/jae1001/CUS/research/pfizer/Antypov_Elliott_EPL_2011.pdf
@@ -98,24 +105,25 @@ std::string HertzianViscoelasticInteraction::getBaseName() const
 void HertzianViscoelasticInteraction::computeNormalForce()
 {
     // This function is called for all particles within interactionRadius distance.
-
+    
     // This has to be outside the loop because it is needed for the other forces
     // Compute the relative velocity vector of particle P w.r.t. I
-    setRelativeVelocity(getP()->getVelocityAtContact(getContactPoint()) - getI()->getVelocityAtContact(getContactPoint()));
+    setRelativeVelocity(
+            getP()->getVelocityAtContact(getContactPoint()) - getI()->getVelocityAtContact(getContactPoint()));
     // Compute the projection of vrel onto the normal (can be negative)
     setNormalRelativeVelocity(Vec3D::dot(getRelativeVelocity(), getNormal()));
-
+    
     if (getOverlap() > 0) //if contact forces
     {
         const HertzianViscoelasticNormalSpecies* species = getSpecies();
-
+        
         Mdouble stiffness = 4. / 3. * species->getElasticModulus() * std::sqrt(getEffectiveRadius() * getOverlap());
-
+        
         //calculating the current normal force
         //dissipation is computed such that the restitution is constant
-        Mdouble dissipationCoefficient  = species->getDissipation()*sqrt(getEffectiveMass()*stiffness);
+        Mdouble dissipationCoefficient = species->getDissipation() * sqrt(getEffectiveMass() * stiffness);
         Mdouble normalForce = stiffness * getOverlap() - dissipationCoefficient * getNormalRelativeVelocity();
-
+        
         //setting the normal force parameter in the base interaction class so that it can be accessed
         //by other classes...
         setAbsoluteNormalForce(std::abs(normalForce)); //used for further force calculations;
@@ -130,6 +138,7 @@ void HertzianViscoelasticInteraction::computeNormalForce()
         setTorque(Vec3D(0.0, 0.0, 0.0));
     }
 }
+
 /*!
  * kn = 4/3 E* sqrt(R/2 delta)
  * fn = kn delta
@@ -137,12 +146,17 @@ void HertzianViscoelasticInteraction::computeNormalForce()
  */
 Mdouble HertzianViscoelasticInteraction::getElasticEnergy() const
 {
-   if (getOverlap() > 0) {
-       return 8. / 15. * getSpecies()->getElasticModulus() * std::sqrt(getEffectiveRadius() * getOverlap())* mathsFunc::square(getOverlap());
-   } else {
-       return 0.0;
-   }
+    if (getOverlap() > 0)
+    {
+        return 8. / 15. * getSpecies()->getElasticModulus() * std::sqrt(getEffectiveRadius() * getOverlap()) *
+               mathsFunc::square(getOverlap());
+    }
+    else
+    {
+        return 0.0;
+    }
 }
+
 /*!
  * \return const HertzianViscoelasticNormalSpecies*
  */
@@ -158,9 +172,10 @@ const HertzianViscoelasticNormalSpecies* HertzianViscoelasticInteraction::getSpe
  * -> E = int_deltaEq^0 fn ddelta = [2/5 mod delta^5/2 - fadh * delta]_deltaEq^0 = [2/5 fn delta - 3/5 fadh delta]_deltaEq^0 = 3/5 fadh deltaEq
  * \todo TW consider renaming to getElasticAdhesiveEnergy or getElasticAdhesiveEnergyRelativeToEquilibrium
  */
-Mdouble HertzianViscoelasticInteraction::getElasticEnergyAtEquilibrium(Mdouble adhesiveForce) const {
+Mdouble HertzianViscoelasticInteraction::getElasticEnergyAtEquilibrium(Mdouble adhesiveForce) const
+{
     const HertzianViscoelasticNormalSpecies* species = getSpecies();
     const Mdouble modulus = 4. / 3. * species->getElasticModulus() * std::sqrt(getEffectiveRadius());
-    const Mdouble equilibriumOverlap = std::cbrt(mathsFunc::square(adhesiveForce/modulus));
-    return 0.6*adhesiveForce*equilibriumOverlap;//why not 0.4?
+    const Mdouble equilibriumOverlap = std::cbrt(mathsFunc::square(adhesiveForce / modulus));
+    return 0.6 * adhesiveForce * equilibriumOverlap;//why not 0.4?
 }

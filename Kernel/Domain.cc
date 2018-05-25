@@ -72,9 +72,9 @@ Domain::Domain(std::vector<unsigned> globalMeshIndex) : globalMeshIndex_(std::mo
  * \details This constructor copies all the private variables of 
  * the current domain into the input domain.
  */
-Domain::Domain(const Domain &b)
+Domain::Domain(const Domain& b)
         : BaseObject(b)
-{     
+{
     rank_ = b.rank_;
     domainHandler_ = b.domainHandler_;
     domainMin_ = b.domainMin_;
@@ -84,14 +84,17 @@ Domain::Domain(const Domain &b)
     
     //A cube has 3^3=27 neighbours
     unsigned long numberOfNeighbours = 27;
-
+    
     //Create all lists
     localIndexToGlobalIndexTable_ = std::vector<int>(numberOfNeighbours);
     localIndexToProcessorList_ = std::vector<int>(numberOfNeighbours);
     boundaryParticleList_ = std::vector<std::vector<BaseParticle*> >(numberOfNeighbours, std::vector<BaseParticle*>(0));
-    boundaryParticleListNeighbour_ = std::vector<std::vector<BaseParticle*> >(numberOfNeighbours, std::vector<BaseParticle*>(0));
-    newBoundaryParticleList_ = std::vector<std::vector<BaseParticle*> >(numberOfNeighbours, std::vector<BaseParticle*>(0));
-    newInteractionList_ = std::vector<std::vector<BaseInteraction*> >(numberOfNeighbours, std::vector<BaseInteraction*>(0));
+    boundaryParticleListNeighbour_ = std::vector<std::vector<BaseParticle*> >(numberOfNeighbours,
+                                                                              std::vector<BaseParticle*>(0));
+    newBoundaryParticleList_ = std::vector<std::vector<BaseParticle*> >(numberOfNeighbours,
+                                                                        std::vector<BaseParticle*>(0));
+    newInteractionList_ = std::vector<std::vector<BaseInteraction*> >(numberOfNeighbours,
+                                                                      std::vector<BaseInteraction*>(0));
     numberOfParticlesSend_ = std::vector<unsigned>(numberOfNeighbours);
     numberOfParticlesReceive_ = std::vector<unsigned>(numberOfNeighbours);
     numNewInteractionsSend_ = std::vector<unsigned>(numberOfNeighbours);
@@ -104,7 +107,7 @@ Domain::Domain(const Domain &b)
     updateVelocityDataReceive_ = std::vector<std::vector<MPIParticleVelocity> >(numberOfNeighbours);
     interactionDataSend_ = std::vector<void*>(numberOfNeighbours);
     interactionDataReceive_ = std::vector<void*>(numberOfNeighbours);
-    activeBoundaryList_ = std::vector<bool>(numberOfNeighbours,true);
+    activeBoundaryList_ = std::vector<bool>(numberOfNeighbours, true);
     boundaryList_ = std::vector<int>(0);
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"Domain::Domain(const Domain &b) finished"<<std::endl;
@@ -118,7 +121,7 @@ Domain::~Domain()
 {
 #ifdef DEBUG_DESTRUCTOR
     std::cout << "Domain::~Domain() finished"<<std::endl;
-#endif 
+#endif
 }
 
 /*!
@@ -135,14 +138,17 @@ void Domain::constructor()
     
     //A cube has 3^3=27 neighbours
     int numberOfNeighbours = 27;
-
+    
     //Create all lists
     localIndexToGlobalIndexTable_ = std::vector<int>(numberOfNeighbours);
     localIndexToProcessorList_ = std::vector<int>(numberOfNeighbours);
     boundaryParticleList_ = std::vector<std::vector<BaseParticle*> >(numberOfNeighbours, std::vector<BaseParticle*>(0));
-    boundaryParticleListNeighbour_ = std::vector<std::vector<BaseParticle*> >(numberOfNeighbours, std::vector<BaseParticle*>(0));
-    newBoundaryParticleList_ = std::vector<std::vector<BaseParticle*> >(numberOfNeighbours, std::vector<BaseParticle*>(0));
-    newInteractionList_ = std::vector<std::vector<BaseInteraction*> >(numberOfNeighbours, std::vector<BaseInteraction*>(0));
+    boundaryParticleListNeighbour_ = std::vector<std::vector<BaseParticle*> >(numberOfNeighbours,
+                                                                              std::vector<BaseParticle*>(0));
+    newBoundaryParticleList_ = std::vector<std::vector<BaseParticle*> >(numberOfNeighbours,
+                                                                        std::vector<BaseParticle*>(0));
+    newInteractionList_ = std::vector<std::vector<BaseInteraction*> >(numberOfNeighbours,
+                                                                      std::vector<BaseInteraction*>(0));
     numberOfParticlesSend_ = std::vector<unsigned>(numberOfNeighbours);
     numberOfParticlesReceive_ = std::vector<unsigned>(numberOfNeighbours);
     numNewInteractionsSend_ = std::vector<unsigned>(numberOfNeighbours);
@@ -155,7 +161,7 @@ void Domain::constructor()
     updateVelocityDataReceive_ = std::vector<std::vector<MPIParticleVelocity> >(numberOfNeighbours);
     interactionDataSend_ = std::vector<void*>(numberOfNeighbours);
     interactionDataReceive_ = std::vector<void*>(numberOfNeighbours);
-    activeBoundaryList_ = std::vector<bool>(numberOfNeighbours,true);
+    activeBoundaryList_ = std::vector<bool>(numberOfNeighbours, true);
     boundaryList_ = std::vector<int>(0);
 }
 
@@ -178,7 +184,7 @@ Domain* Domain::copy() const
  */
 void Domain::read(std::istream& is)
 {
-    logger(WARN,"[Domain::read] should not be called");
+    logger(WARN, "[Domain::read] should not be called");
     //BaseObject::read(is);
 }
 
@@ -189,7 +195,7 @@ void Domain::read(std::istream& is)
  */
 void Domain::write(std::ostream& os) const
 {
-    logger(WARN,"[Domain::write] should not be called");
+    logger(WARN, "[Domain::write] should not be called");
     //BaseObject::write(os);
 }
 
@@ -211,9 +217,9 @@ std::string Domain::getName() const
  */
 void Domain::setRange(Direction direction, Mdouble min, Mdouble max)
 {
-    if(min > max)
+    if (min > max)
     {
-        logger(ERROR,"[MercuryMPI ERROR]: min is larger than max. (%,%)",min,max);
+        logger(ERROR, "[MercuryMPI ERROR]: min is larger than max. (%,%)", min, max);
     }
     
     double maxClosed;
@@ -222,33 +228,33 @@ void Domain::setRange(Direction direction, Mdouble min, Mdouble max)
     {
         minClosed = getHandler()->getDPMBase()->getMin().getComponent(direction);
     }
-
+    
     if (max == inf)
     {
         maxClosed = getHandler()->getDPMBase()->getMax().getComponent(direction);
     }
-
-
-    switch(direction)
+    
+    
+    switch (direction)
     {
-    case Direction::XAXIS :
-        domainMin_[0] = min;
-        domainMax_[0] = max;
-        middle_.X = minClosed + (maxClosed - minClosed)/2.0;
-        break;
-    case Direction::YAXIS :
-        domainMin_[1] = min;
-        domainMax_[1] = max;
-        middle_.Y = minClosed + (maxClosed - minClosed)/2.0;
-        break;
-    case Direction::ZAXIS :
-        domainMin_[2] = min;
-        domainMax_[2] = max;
-        middle_.Z = minClosed + (maxClosed - minClosed)/2.0;
-        break; 
-    default :
-        logger(ERROR, "Direction is not a valid direction. (%)",direction);
-        break;
+        case Direction::XAXIS :
+            domainMin_[0] = min;
+            domainMax_[0] = max;
+            middle_.X = minClosed + (maxClosed - minClosed) / 2.0;
+            break;
+        case Direction::YAXIS :
+            domainMin_[1] = min;
+            domainMax_[1] = max;
+            middle_.Y = minClosed + (maxClosed - minClosed) / 2.0;
+            break;
+        case Direction::ZAXIS :
+            domainMin_[2] = min;
+            domainMax_[2] = max;
+            middle_.Z = minClosed + (maxClosed - minClosed) / 2.0;
+            break;
+        default :
+            logger(ERROR, "Direction is not a valid direction. (%)", direction);
+            break;
     }
 }
 
@@ -262,9 +268,9 @@ void Domain::setBounds(std::vector<double> domainMin, std::vector<double> domain
 {
     domainMin_ = domainMin;
     domainMax_ = domainMax;
-
+    
     //Compute the middle of the closed domain
-    if(computeMiddle)
+    if (computeMiddle)
     {
         double minClosed;
         double maxClosed;
@@ -276,13 +282,13 @@ void Domain::setBounds(std::vector<double> domainMin, std::vector<double> domain
             {
                 minClosed = getHandler()->getDPMBase()->getMin().getComponent(i);
             }
-
+            
             if (domainMax_[i] == inf)
             {
                 maxClosed = getHandler()->getDPMBase()->getMax().getComponent(i);
             }
-
-            middle_.setComponent(i, minClosed + (maxClosed - minClosed)/2.0);
+            
+            middle_.setComponent(i, minClosed + (maxClosed - minClosed) / 2.0);
         }
     }
 }
@@ -394,10 +400,10 @@ bool Domain::containsParticle(BaseParticle* particle, Mdouble offset)
 {
     for (unsigned i = 0; i < 3; i++)
     {
-        if (!( ( (domainMin_[i] + offset)  < particle->getPosition().getComponent(i)) 
-                    &&
-                ( (domainMax_[i] - offset) >= particle->getPosition().getComponent(i)) )
-           )
+        if (!(((domainMin_[i] + offset) < particle->getPosition().getComponent(i))
+              &&
+              ((domainMax_[i] - offset) >= particle->getPosition().getComponent(i)))
+                )
         {
             return false;
         }
@@ -412,7 +418,7 @@ bool Domain::containsParticle(BaseParticle* particle, Mdouble offset)
  */
 bool Domain::isInGreaterDomain(BaseParticle* particle)
 {
-    return containsParticle(particle, -domainHandler_->getInteractionDistance());    
+    return containsParticle(particle, -domainHandler_->getInteractionDistance());
 }
 
 /*! 
@@ -447,28 +453,29 @@ void Domain::createLookUpTable()
     int globalIndex;
     //Get the global decomposition vector, (nx,ny,nz) and compute the mesh multipliers: (1,nx,nx*ny)
     std::vector<unsigned> numberOfDomains = domainHandler_->getNumberOfDomains();
-    std::vector<unsigned> globalMeshMultiplier = {1, 
-                                                  numberOfDomains[Direction::XAXIS], 
-                                                  numberOfDomains[Direction::XAXIS]*numberOfDomains[Direction::YAXIS]};
+    std::vector<unsigned> globalMeshMultiplier = {1,
+                                                  numberOfDomains[Direction::XAXIS],
+                                                  numberOfDomains[Direction::XAXIS] *
+                                                  numberOfDomains[Direction::YAXIS]};
     
     //Compute the globalIndex of this domain
-    globalIndex_ =  globalMeshMultiplier[Direction::XAXIS]*globalMeshIndex_[Direction::XAXIS] + 
-                    globalMeshMultiplier[Direction::YAXIS]*globalMeshIndex_[Direction::YAXIS] + 
-                    globalMeshMultiplier[Direction::ZAXIS]*globalMeshIndex_[Direction::ZAXIS]; 
+    globalIndex_ = globalMeshMultiplier[Direction::XAXIS] * globalMeshIndex_[Direction::XAXIS] +
+                   globalMeshMultiplier[Direction::YAXIS] * globalMeshIndex_[Direction::YAXIS] +
+                   globalMeshMultiplier[Direction::ZAXIS] * globalMeshIndex_[Direction::ZAXIS];
     
     //Create the lookup table from localIndex to globalIndex of the neihbours
-    for (int i=-1;i<2;i++)
+    for (int i = -1; i < 2; i++)
     {
-        for (int j=-1;j<2;j++)
+        for (int j = -1; j < 2; j++)
         {
-            for (int k=-1;k<2;k++)
+            for (int k = -1; k < 2; k++)
             {
                 //Get the local index  
-                localIndex = i + 3*j + 9*k + 13;
+                localIndex = i + 3 * j + 9 * k + 13;
                 //Compute the global index
-                globalIndex = globalMeshMultiplier[Direction::XAXIS]*(globalMeshIndex_[Direction::XAXIS] + i) +
-                              globalMeshMultiplier[Direction::YAXIS]*(globalMeshIndex_[Direction::YAXIS] + j) +
-                              globalMeshMultiplier[Direction::ZAXIS]*(globalMeshIndex_[Direction::ZAXIS] + k);
+                globalIndex = globalMeshMultiplier[Direction::XAXIS] * (globalMeshIndex_[Direction::XAXIS] + i) +
+                              globalMeshMultiplier[Direction::YAXIS] * (globalMeshIndex_[Direction::YAXIS] + j) +
+                              globalMeshMultiplier[Direction::ZAXIS] * (globalMeshIndex_[Direction::ZAXIS] + k);
                 //Fill in the look-up table
                 localIndexToGlobalIndexTable_[localIndex] = globalIndex;
             }
@@ -489,7 +496,7 @@ void Domain::createLookUpTable()
  */
 int Domain::getLocalIndex(const int i, const int j, const int k)
 {
-    return i + 3*j + 9*k + 13;
+    return i + 3 * j + 9 * k + 13;
 }
 
 /*! 
@@ -500,7 +507,8 @@ int Domain::getLocalIndex(const int i, const int j, const int k)
  */
 int Domain::getLocalIndex(const std::vector<int> localMeshIndex)
 {
-    return localMeshIndex[Direction::XAXIS] + 3*localMeshIndex[Direction::YAXIS] + 9*localMeshIndex[Direction::ZAXIS] +13;
+    return localMeshIndex[Direction::XAXIS] + 3 * localMeshIndex[Direction::YAXIS] +
+           9 * localMeshIndex[Direction::ZAXIS] + 13;
 }
 
 /*!
@@ -514,7 +522,7 @@ int Domain::getLocalIndex(const std::vector<int> localMeshIndex)
  */
 BaseParticle* Domain::findParticleInList(unsigned int identification, std::vector<BaseParticle*> particleList)
 {
-    for(BaseParticle* particle : particleList)
+    for (BaseParticle* particle : particleList)
     {
         if (particle->getId() == identification)
         {
@@ -541,23 +549,23 @@ std::vector<int> Domain::findNearbyBoundaries(BaseParticle* particle, Mdouble of
 {
     std::vector<int> boundaryIndex(3);
     Mdouble interactionDistance = domainHandler_->getInteractionDistance();
- 
+    
     //for x,y,z directions, find if the particle is close to the left or right wall or not at all
-    for(int d=0; d<3; d++)
+    for (int d = 0; d < 3; d++)
     {
         //Check if the particle is close to Lx
-        if((particle->getPosition().getComponent(d)) < (domainMin_[d] + interactionDistance + offset))
+        if ((particle->getPosition().getComponent(d)) < (domainMin_[d] + interactionDistance + offset))
         {
             //Update switch
             boundaryIndex[d] = -1;
         }
-        //Check if particle is close to Rx
-        else if((particle->getPosition().getComponent(d)) >= (domainMax_[d] - interactionDistance - offset))
+            //Check if particle is close to Rx
+        else if ((particle->getPosition().getComponent(d)) >= (domainMax_[d] - interactionDistance - offset))
         {
             //Update switch
             boundaryIndex[d] = 1;
         }
-    }  
+    }
     return boundaryIndex;
 }
 
@@ -568,7 +576,7 @@ std::vector<int> Domain::findNearbyBoundaries(BaseParticle* particle, Mdouble of
  * the numberOfDomains[d] = 1.
  */
 void Domain::disableBoundaries()
-{  
+{
     std::vector<unsigned> numberOfDomains = domainHandler_->getNumberOfDomains();
     std::vector<int> localMeshIndex(3);
     int localIndex;
@@ -577,19 +585,19 @@ void Domain::disableBoundaries()
     activeBoundaryList_[13] = false;
     
     //Special case when numberOfDomains[d] = 1 -> disable all d direction boundaries
-    for(unsigned d=0; d<3; d++) //Loop over all dimensions
+    for (unsigned d = 0; d < 3; d++) //Loop over all dimensions
     {
         //If there is only one domain in the d-direction, take action
-        if(numberOfDomains[d] == 1)
+        if (numberOfDomains[d] == 1)
         {
             //Loop over all locaIndices
-            for(int i=-1;i<2;i++)
+            for (int i = -1; i < 2; i++)
             {
                 localMeshIndex[Direction::XAXIS] = i;
-                for(int j=-1;j<2;j++)
+                for (int j = -1; j < 2; j++)
                 {
                     localMeshIndex[Direction::YAXIS] = j;
-                    for(int k=-1;k<2;k++)
+                    for (int k = -1; k < 2; k++)
                     {
                         localMeshIndex[Direction::ZAXIS] = k;
                         //Disable all boundaries that are not in the "middle" of the mesh in the d-direction
@@ -605,40 +613,40 @@ void Domain::disableBoundaries()
                 }
             }
         }
-    }  
-  
+    }
+    
     //Compute the boundaryIndex for all other cases where numberOfDomains is larger than 1
     std::vector<int> boundaryIndex(3);
-    for(int d=0; d<3; d++)
+    for (int d = 0; d < 3; d++)
     {
         //Check if the domain is on the simulationDomainMin boundary
-        if(globalMeshIndex_[d] == 0)
+        if (globalMeshIndex_[d] == 0)
         {
             //Update boundary index
             boundaryIndex[d] = -1;
         }
-        //Check if the domain is on the simulationDomainMax boundary
-        else if(globalMeshIndex_[d] == (numberOfDomains[d] - 1))
+            //Check if the domain is on the simulationDomainMax boundary
+        else if (globalMeshIndex_[d] == (numberOfDomains[d] - 1))
         {
             //Update boundary index
             boundaryIndex[d] = 1;
         }
-    }    
-
+    }
+    
     //Disable the boundaries that are on the edge of the simulation domain
-    for(int d=0; d<3; d++)
+    for (int d = 0; d < 3; d++)
     {
         //If boundary is on the edge of the simulation domain
-        if(boundaryIndex[d]!=0)
+        if (boundaryIndex[d] != 0)
         {
             //Loop over all local indices
-            for(int i=-1;i<2;i++)
+            for (int i = -1; i < 2; i++)
             {
-                for(int j=-1;j<2;j++)
+                for (int j = -1; j < 2; j++)
                 {
-                    for(int k=-1;k<2;k++)
+                    for (int k = -1; k < 2; k++)
                     {
-                        localMeshIndex = {i,j,k};
+                        localMeshIndex = {i, j, k};
                         //Set the localMeshIndex to the boundaryIndex in the d-direction
                         //Since we are only interested in the domains on this boundary
                         localMeshIndex[d] = boundaryIndex[d];
@@ -649,18 +657,18 @@ void Domain::disableBoundaries()
                 }
             }
         }
-    }    
+    }
     
     //Create a list of the active boundaries
     localIndex = 0;
     for (bool active : activeBoundaryList_)
     {
-        if(active)
+        if (active)
         {
             boundaryList_.push_back(localIndex);
         }
         localIndex++;
-    } 
+    }
 }
 
 /*!
@@ -689,14 +697,14 @@ void Domain::addParticlesToLists(BaseParticle* particle, std::vector<std::vector
         //The particle is not close at all
         case 0:
             break;
-        //The particle is close to one side
-        // 1 side contribution
-        case 1 : 
+            //The particle is close to one side
+            // 1 side contribution
+        case 1 :
             //Add the side contribution
             list[getLocalIndex(boundaryIndex)].push_back(particle);
             break;
-        //The particle is close to two neighbouring directions
-        //2 side and 1 rib contrubution
+            //The particle is close to two neighbouring directions
+            //2 side and 1 rib contrubution
         case 2 :
         {
             //Add the two side contributions
@@ -714,9 +722,9 @@ void Domain::addParticlesToLists(BaseParticle* particle, std::vector<std::vector
             //Add the rib contribution
             list[getLocalIndex(boundaryIndex)].push_back(particle);
             break;
-        
-        //The particle is close to three neighbouring directions
-        // 3 side, 3 rib and 1 corner contribution
+            
+            //The particle is close to three neighbouring directions
+            // 3 side, 3 rib and 1 corner contribution
         case 3 :
         {
             //Add the three side contributions
@@ -747,21 +755,21 @@ void Domain::addParticlesToLists(BaseParticle* particle, std::vector<std::vector
                    complexity);
             logger(ERROR, "Particle is in contact with the wrong number of boundaries");
             break;
-    }         
+    }
 }
 
 /*!
  * \brief Function that finds new particles in the particle handler that should be added to the communication lists
  * \param[in] particleHandler the container that contains all particles
  */
-void Domain::findNewMPIParticles(const ParticleHandler &particleHandler)
+void Domain::findNewMPIParticles(const ParticleHandler& particleHandler)
 {
     //For all particles inside the given domain, loop over all the particles to
     //see if we have to add the particles to the new particle list
     for (BaseParticle* particle : particleHandler)
     {
         findNewMPIParticle(particle);
-    }   
+    }
 }
 
 /*!
@@ -771,7 +779,7 @@ void Domain::findNewMPIParticles(const ParticleHandler &particleHandler)
 void Domain::findNewMPIParticle(BaseParticle* particle)
 {
     //If the particle is an MPI particle
-    if(!particle->isInMPIDomain() && !particle->isPeriodicGhostParticle())
+    if (!particle->isInMPIDomain() && !particle->isPeriodicGhostParticle())
     {
         addParticlesToLists(particle, newBoundaryParticleList_);
     }
@@ -871,7 +879,7 @@ void Domain::collectBoundaryParticleData(int localIndex)
     {
         //Add the data to the transmission list
         boundaryParticleDataSend_[localIndex].push_back(copyDataFromParticleToMPIParticle(particle));
-    }  
+    }
 }
 
 /*!
@@ -885,9 +893,9 @@ void Domain::collectInteractionData(int localIndex)
     unsigned int indexInteraction = 0;
     for (BaseInteraction* interaction : newInteractionList_[localIndex])
     {
-        interaction->getMPIInteraction(interactionDataSend_[localIndex],indexInteraction);
+        interaction->getMPIInteraction(interactionDataSend_[localIndex], indexInteraction);
         indexInteraction++;
-    } 
+    }
 }
 
 /*!
@@ -898,7 +906,7 @@ void Domain::collectInteractionData(int localIndex)
  */
 void Domain::processReceivedBoundaryParticleData(const unsigned index, std::vector<BaseParticle*>& newParticles)
 {
-
+    
     ParticleHandler& particleHandler = getHandler()->getDPMBase()->particleHandler;
     //for all MPIPparticles that have been received on the other side
     for (int i = 0; i < numberOfParticlesReceive_[index]; i++)
@@ -906,7 +914,7 @@ void Domain::processReceivedBoundaryParticleData(const unsigned index, std::vect
         //copy data from data
         BaseParticle p0;
         copyDataFromMPIParticleToParticle(&(boundaryParticleDataReceive_[index][i]), &p0, &particleHandler);
-      
+        
         //Flag that the particle is a ghost particle of a real particle in the neighbour domain
         p0.setMPIParticle(true);
         //Flag that the particle is list as a particle in the mpi domain
@@ -918,9 +926,9 @@ void Domain::processReceivedBoundaryParticleData(const unsigned index, std::vect
         pGhost->setPreviousPosition(particleHandler.getLastObject()->getPosition());
         //Add to the newParticle list
         newParticles.push_back(pGhost);
-        logger(VERBOSE,"Adding mpi particle % at: %",particleHandler.getLastObject()->getId(),
-                                                    particleHandler.getLastObject()->getPosition());
-
+        logger(VERBOSE, "Adding mpi particle % at: %", particleHandler.getLastObject()->getId(),
+               particleHandler.getLastObject()->getPosition());
+        
         //add pointer to the particle to the list and set the status to idle
         boundaryParticleListNeighbour_[index].push_back(particleHandler.getLastObject());
     }
@@ -965,8 +973,8 @@ void Domain::processReceivedInteractionData(const unsigned localIndex, std::vect
                                  isWallInteraction, timeStamp);
         
         logger(VERBOSE, "interaction details: %, %, %, %, %, %", interactionDataReceive_[localIndex],
-                                 l, identificationP, identificationI,
-                                 isWallInteraction, timeStamp);
+               l, identificationP, identificationI,
+               isWallInteraction, timeStamp);
         
         //Find the particle in the newParticle list
         BaseParticle* pGhost = nullptr;
@@ -1016,12 +1024,13 @@ void Domain::processReceivedInteractionData(const unsigned localIndex, std::vect
                     break;
                 }
             }
-   
-            logger.assert(pGhost!= nullptr, "pGhost in Domain::processReceivedInteractionData is nullptr, "
-                    "identificationI = %, identificationP = %", identificationI, identificationP);
+            
+            logger.assert(pGhost != nullptr, "pGhost in Domain::processReceivedInteractionData is nullptr, "
+                                             "identificationI = %, identificationP = %", identificationI,
+                          identificationP);
             logger.assert(otherParticle != nullptr,
                           "[MercuryMPI ERROR]: Interacting particle not found, "
-                                  "looking for particle %, current processor %", idOther, getId());
+                          "looking for particle %, current processor %", idOther, getId());
             
             //Add the interaction
             std::vector<BaseInteraction*> particleInteractions = pGhost->getInteractionWith(otherParticle, timeStamp,
@@ -1044,18 +1053,19 @@ void Domain::processReceivedInteractionData(const unsigned localIndex, std::vect
  * \param[in] countSend unsigned integer containing the sending count
  * \param[in] localIndexNeighbour the local index of the domain with which the communication is being done 
  */
-void Domain::sendAndReceiveCount(MercuryMPITag tag, unsigned &countReceive, unsigned &countSend, unsigned localIndexNeighbour)
+void Domain::sendAndReceiveCount(MercuryMPITag tag, unsigned& countReceive, unsigned& countSend,
+                                 unsigned localIndexNeighbour)
 {
     int globalIndexNeighbour = localIndexToGlobalIndexTable_[localIndexNeighbour];
     int processor = localIndexToProcessorList_[localIndexNeighbour];
-   
-    //Create communication tags 
-    int tagReceive = globalIndexNeighbour*MAX_PROC + globalIndex_*10 + tag;
-    int tagSend = globalIndex_*MAX_PROC + globalIndexNeighbour*10 + tag;
     
-    logger.assert(tagSend > 0,"Send tag is wrong. Tag: %",tagSend);
-    logger.assert(tagReceive > 0,"Receive tag is wrong. Tag: %",tagReceive);
-    logger.assert(processor >= 0,"Processor is wrong. processor: %",processor);
+    //Create communication tags 
+    int tagReceive = globalIndexNeighbour * MAX_PROC + globalIndex_ * 10 + tag;
+    int tagSend = globalIndex_ * MAX_PROC + globalIndexNeighbour * 10 + tag;
+    
+    logger.assert(tagSend > 0, "Send tag is wrong. Tag: %", tagSend);
+    logger.assert(tagReceive > 0, "Receive tag is wrong. Tag: %", tagReceive);
+    logger.assert(processor >= 0, "Processor is wrong. processor: %", processor);
     
     //Communicate the requests
     MPIContainer::Instance().receive(countReceive, processor, tagReceive);
@@ -1071,7 +1081,7 @@ void Domain::sendAndReceiveCount(MercuryMPITag tag, unsigned &countReceive, unsi
  * \param[in] particleHandler handles all the particles in the current domain
  */
 void Domain::prepareBoundaryDataTransmission()
-{  
+{
     //Find new particles that have entered the communication zone
     findNewMPIParticles(getHandler()->getDPMBase()->particleHandler);
     
@@ -1080,20 +1090,22 @@ void Domain::prepareBoundaryDataTransmission()
     
     //Compute number of particles to send
     //For all boundaries
-    for(int localIndex : boundaryList_)
+    for (int localIndex : boundaryList_)
     {
         numberOfParticlesSend_[localIndex] = newBoundaryParticleList_[localIndex].size();
         numNewInteractionsSend_[localIndex] = newInteractionList_[localIndex].size();
     }
-  
+    
     //For all active boundaries
-    for(int localIndex : boundaryList_)
-    {     
+    for (int localIndex : boundaryList_)
+    {
         //Send and receive the number of new boundary particles
-        sendAndReceiveCount(MercuryMPITag::PARTICLE_COUNT, (numberOfParticlesReceive_[localIndex]), (numberOfParticlesSend_[localIndex]), localIndex);
-      
+        sendAndReceiveCount(MercuryMPITag::PARTICLE_COUNT, (numberOfParticlesReceive_[localIndex]),
+                            (numberOfParticlesSend_[localIndex]), localIndex);
+        
         //Send and receive the new interactions
-        sendAndReceiveCount(MercuryMPITag::INTERACTION_COUNT, (numNewInteractionsReceive_[localIndex]), (numNewInteractionsSend_[localIndex]), localIndex);
+        sendAndReceiveCount(MercuryMPITag::INTERACTION_COUNT, (numNewInteractionsReceive_[localIndex]),
+                            (numNewInteractionsSend_[localIndex]), localIndex);
     }
 }
 
@@ -1112,29 +1124,31 @@ void Domain::prepareBoundaryDataTransmission(BaseParticle* particle)
     {
         findNewMPIParticle(particle);
     }
-
+    
     //Note: When inserting a single particle, it has no interactions, so no interactions to be copied either
-
+    
     //Compute number of particles to send
     //For all boundaries
-    for(int localIndex : boundaryList_)
+    for (int localIndex : boundaryList_)
     {
         numberOfParticlesSend_[localIndex] = newBoundaryParticleList_[localIndex].size();
         numNewInteractionsSend_[localIndex] = newInteractionList_[localIndex].size();
     }
     
-
+    
     //For all active boundaries
-    for(int localIndex : boundaryList_)
+    for (int localIndex : boundaryList_)
     {
         //Send and recieve the number of new boundary particles
-        sendAndReceiveCount(MercuryMPITag::PARTICLE_COUNT, (numberOfParticlesReceive_[localIndex]), (numberOfParticlesSend_[localIndex]), localIndex);
-
+        sendAndReceiveCount(MercuryMPITag::PARTICLE_COUNT, (numberOfParticlesReceive_[localIndex]),
+                            (numberOfParticlesSend_[localIndex]), localIndex);
+        
         //Send and receive the new interactions
-        sendAndReceiveCount(MercuryMPITag::INTERACTION_COUNT, (numNewInteractionsReceive_[localIndex]), (numNewInteractionsSend_[localIndex]), localIndex);
+        sendAndReceiveCount(MercuryMPITag::INTERACTION_COUNT, (numNewInteractionsReceive_[localIndex]),
+                            (numNewInteractionsSend_[localIndex]), localIndex);
     }
 }
-       
+
 /*!
  * \brief Collects data to be transmitted and then performs the transmission of the data
  * \details The particles and interactions are copied into a data class that can be transmitted to other processors.
@@ -1144,33 +1158,34 @@ void Domain::prepareBoundaryDataTransmission(BaseParticle* particle)
 void Domain::performBoundaryDataTransmission()
 {
     //For all active boundaries
-    for(int localIndex : boundaryList_)
-    {   
+    for (int localIndex : boundaryList_)
+    {
         //make sure enough memory is reserved to receive the data
         boundaryParticleDataReceive_[localIndex].resize(numberOfParticlesReceive_[localIndex]);
-    
+        
         //Collect the particle data
         collectBoundaryParticleData(localIndex);
         
         //Send the data
         sendAndReceiveMPIData(MercuryMPITag::PARTICLE_DATA, MercuryMPIType::PARTICLE,
-                                boundaryParticleDataReceive_[localIndex].data(), numberOfParticlesReceive_[localIndex],
-                                boundaryParticleDataSend_[localIndex].data(), numberOfParticlesSend_[localIndex], localIndex);
+                              boundaryParticleDataReceive_[localIndex].data(), numberOfParticlesReceive_[localIndex],
+                              boundaryParticleDataSend_[localIndex].data(), numberOfParticlesSend_[localIndex],
+                              localIndex);
         
         
         //create arrays for sending and receiving interaction data
         interactionDataSend_[localIndex] = getHandler()->getDPMBase()->interactionHandler.createMPIInteractionDataArray(
-                                                                                numNewInteractionsSend_[localIndex]);
+                numNewInteractionsSend_[localIndex]);
         interactionDataReceive_[localIndex] = getHandler()->getDPMBase()->interactionHandler.createMPIInteractionDataArray(
-                                                                                numNewInteractionsReceive_[localIndex]);
-    
+                numNewInteractionsReceive_[localIndex]);
+        
         //Collect the interaction data
-        collectInteractionData(localIndex);     
-    
+        collectInteractionData(localIndex);
+        
         //Send the data
         sendAndReceiveMPIData(MercuryMPITag::INTERACTION_DATA, MercuryMPIType::INTERACTION,
-                                interactionDataReceive_[localIndex], numNewInteractionsReceive_[localIndex],
-                                interactionDataSend_[localIndex], numNewInteractionsSend_[localIndex], localIndex);
+                              interactionDataReceive_[localIndex], numNewInteractionsReceive_[localIndex],
+                              interactionDataSend_[localIndex], numNewInteractionsSend_[localIndex], localIndex);
     }
 }
 
@@ -1184,7 +1199,7 @@ void Domain::performBoundaryDataTransmission()
 void Domain::finaliseBoundaryDataTransmission()
 {
     //For all boundaries
-    for(int localIndex : boundaryList_)
+    for (int localIndex : boundaryList_)
     {
         //copy the received data into the particleHandler and neighbour particle list
         std::vector<BaseParticle*> newParticles;
@@ -1193,19 +1208,20 @@ void Domain::finaliseBoundaryDataTransmission()
         processSentBoundaryParticles(localIndex);
         //copy the received interaction data into the standard dpm structure
         processReceivedInteractionData(localIndex, newParticles);
-                
+        
         //Delete all send/receive data
         boundaryParticleDataSend_[localIndex].clear();
-        boundaryParticleDataReceive_[localIndex].clear();     
+        boundaryParticleDataReceive_[localIndex].clear();
         getHandler()->getDPMBase()->interactionHandler.deleteMPIInteractionDataArray(interactionDataSend_[localIndex]);
-        getHandler()->getDPMBase()->interactionHandler.deleteMPIInteractionDataArray(interactionDataReceive_[localIndex]);
-          
+        getHandler()->getDPMBase()->interactionHandler.deleteMPIInteractionDataArray(
+                interactionDataReceive_[localIndex]);
+        
         //Reset all counters
         numberOfParticlesSend_[localIndex] = 0;
         numberOfParticlesReceive_[localIndex] = 0;
         numNewInteractionsSend_[localIndex] = 0;
         numNewInteractionsReceive_[localIndex] = 0;
-          
+        
         //Reset all lists
         newBoundaryParticleList_[localIndex].clear();
         newInteractionList_[localIndex].clear();
@@ -1232,26 +1248,26 @@ void Domain::updateParticles(std::set<BaseParticle*>& ghostParticlesToBeDeleted)
     std::vector<int> boundaryIndex;
     
     //For all active boundaries
-    for(int localIndex : boundaryList_)
+    for (int localIndex : boundaryList_)
     {
         //Step 1A: Remove the particles from the boundaryParticleList_ which require re-assignment 
         //or have just moved away from the region
         for (int p = 0; p < boundaryParticleList_[localIndex].size(); p++)
-        {   
+        {
             BaseParticle* particle = boundaryParticleList_[localIndex][p];
             //Check if the particle is still in the domain, but not in the communication zone
-            if(containsParticle(particle))
+            if (containsParticle(particle))
             {
                 //check if the complexity has changed
                 boundaryIndex = findNearbyBoundaries(particle);
-                complexityNew = std::abs(boundaryIndex[Direction::XAXIS]) + 
-                                std::abs(boundaryIndex[Direction::YAXIS]) + 
+                complexityNew = std::abs(boundaryIndex[Direction::XAXIS]) +
+                                std::abs(boundaryIndex[Direction::YAXIS]) +
                                 std::abs(boundaryIndex[Direction::ZAXIS]);
-                if(particle->getCommunicationComplexity() != complexityNew)
+                if (particle->getCommunicationComplexity() != complexityNew)
                 {
-                    logger(VERBOSE,"time: % | global index: % in list % | particle % | CURRENT DOMAIN - CHANGES "
-                            "COMPLEXITY",domainHandler_->getDPMBase()->getTime(),globalIndex_,
-                           localIndexToGlobalIndexTable_[localIndex],particle->getId());
+                    logger(VERBOSE, "time: % | global index: % in list % | particle % | CURRENT DOMAIN - CHANGES "
+                                    "COMPLEXITY", domainHandler_->getDPMBase()->getTime(), globalIndex_,
+                           localIndexToGlobalIndexTable_[localIndex], particle->getId());
                     //Flag the particle that it no longer participates in the communication layer
                     //so it can be reintroduced in the transmission step
                     particle->setMPIParticle(false);
@@ -1261,41 +1277,45 @@ void Domain::updateParticles(std::set<BaseParticle*>& ghostParticlesToBeDeleted)
                 }
             }
             else
-            {         
-                logger(VERBOSE,"time: % | global index: % in list % | particle % | CURRENT DOMAIN - TO NEIGHBOURING "
-                        "DOMAIN",domainHandler_->getDPMBase()->getTime(),globalIndex_,
-                       localIndexToGlobalIndexTable_[localIndex],particle->getId());
-
+            {
+                logger(VERBOSE, "time: % | global index: % in list % | particle % | CURRENT DOMAIN - TO NEIGHBOURING "
+                                "DOMAIN", domainHandler_->getDPMBase()->getTime(), globalIndex_,
+                       localIndexToGlobalIndexTable_[localIndex], particle->getId());
+                
                 ghostParticlesToBeDeleted.insert(particle);
                 boundaryParticleList_[localIndex][p] = nullptr;
             }
         }
-    
+        
         //Step 1B: Remove the particles from the boundaryParticleListNeightbour_ which require re-assignment 
         //or have just moved away from the region
         for (int p = 0; p < boundaryParticleListNeighbour_[localIndex].size(); p++)
         {
             BaseParticle* particle = boundaryParticleListNeighbour_[localIndex][p];
             //Check if the particle moved out of the neighbour domain
-            if(!(domainHandler_->getObject(localIndexToGlobalIndexTable_[localIndex])->containsParticle(particle)))
+            if (!(domainHandler_->getObject(localIndexToGlobalIndexTable_[localIndex])->containsParticle(particle)))
             {
                 //The particle has moved to this domain
-                if(containsParticle(particle))
+                if (containsParticle(particle))
                 {
-                    logger(VERBOSE,"time: % | global index: % in list % | particle % | NEIGHBOURING DOMAIN - TO CURRENT DOMAIN",domainHandler_->getDPMBase()->getTime(),globalIndex_,
-                    localIndexToGlobalIndexTable_[localIndex],particle->getId());
-
+                    logger(VERBOSE,
+                           "time: % | global index: % in list % | particle % | NEIGHBOURING DOMAIN - TO CURRENT DOMAIN",
+                           domainHandler_->getDPMBase()->getTime(), globalIndex_,
+                           localIndexToGlobalIndexTable_[localIndex], particle->getId());
+                    
                     //Flag the particle as not yet communicated
                     particle->setMPIParticle(false);
                     particle->setInMPIDomain(false);
                     particle->setCommunicationComplexity(0);
                     boundaryParticleListNeighbour_[localIndex][p] = nullptr;
                 }
-                //The particle has moved to a different domain
+                    //The particle has moved to a different domain
                 else
                 {
-                    logger(VERBOSE,"time: % | global index: % in list % | particle % | NEIGBOURING DOMAIN - TO OTHER DOMAIN",domainHandler_->getDPMBase()->getTime(),globalIndex_,
-                    localIndexToGlobalIndexTable_[localIndex],particle->getId());
+                    logger(VERBOSE,
+                           "time: % | global index: % in list % | particle % | NEIGBOURING DOMAIN - TO OTHER DOMAIN",
+                           domainHandler_->getDPMBase()->getTime(), globalIndex_,
+                           localIndexToGlobalIndexTable_[localIndex], particle->getId());
                     //Cruelly destroy the particle without any mercy.
                     ghostParticlesToBeDeleted.insert(particle);
                     boundaryParticleListNeighbour_[localIndex][p] = nullptr;
@@ -1304,14 +1324,17 @@ void Domain::updateParticles(std::set<BaseParticle*>& ghostParticlesToBeDeleted)
             else
             {
                 //check if the complexity has changed
-                boundaryIndex = domainHandler_->getObject(localIndexToGlobalIndexTable_[localIndex])->findNearbyBoundaries(particle);
-                complexityNew = std::abs(boundaryIndex[Direction::XAXIS]) + 
-                        std::abs(boundaryIndex[Direction::YAXIS]) + 
-                        std::abs(boundaryIndex[Direction::ZAXIS]);
-                if(particle->getCommunicationComplexity() != complexityNew)
+                boundaryIndex = domainHandler_->getObject(
+                        localIndexToGlobalIndexTable_[localIndex])->findNearbyBoundaries(particle);
+                complexityNew = std::abs(boundaryIndex[Direction::XAXIS]) +
+                                std::abs(boundaryIndex[Direction::YAXIS]) +
+                                std::abs(boundaryIndex[Direction::ZAXIS]);
+                if (particle->getCommunicationComplexity() != complexityNew)
                 {
-                    logger(VERBOSE,"time: % | global index: % in list % | particle % | NEIGHBOURING DOMAIN - CHANGES COMPLEXITY",domainHandler_->getDPMBase()->getTime(),globalIndex_,
-                    localIndexToGlobalIndexTable_[localIndex],particle->getId());
+                    logger(VERBOSE,
+                           "time: % | global index: % in list % | particle % | NEIGHBOURING DOMAIN - CHANGES COMPLEXITY",
+                           domainHandler_->getDPMBase()->getTime(), globalIndex_,
+                           localIndexToGlobalIndexTable_[localIndex], particle->getId());
                     //Cruelly destroy the particle without any mercy.
                     ghostParticlesToBeDeleted.insert(particle);
                     boundaryParticleListNeighbour_[localIndex][p] = nullptr;
@@ -1331,10 +1354,11 @@ void Domain::updateParticlePosition(int localIndex)
 {
     //process the updated information
     unsigned int index = 0;
-    for(BaseParticle* particle : boundaryParticleListNeighbour_[localIndex])
+    for (BaseParticle* particle : boundaryParticleListNeighbour_[localIndex])
     {
-        logger.assert(particle->getId() == updatePositionDataReceive_[localIndex][index].id,"MPI particle lists are not in sync");
-
+        logger.assert(particle->getId() == updatePositionDataReceive_[localIndex][index].id,
+                      "MPI particle lists are not in sync");
+        
         //set position
         particle->setPreviousPosition(particle->getPosition());
         particle->setPosition(updatePositionDataReceive_[localIndex][index].position);
@@ -1343,7 +1367,7 @@ void Domain::updateParticlePosition(int localIndex)
         //Update hGrid
         Vec3D displacement = particle->getPreviousPosition() - particle->getPosition();
         getHandler()->getDPMBase()->hGridUpdateMove(particle, displacement.getLengthSquared());
-
+        
         index++;
     }
 }
@@ -1357,7 +1381,7 @@ void Domain::updateParticleVelocity(int localIndex)
 {
     //process the updated information
     unsigned int index = 0;
-    for(BaseParticle* particle: boundaryParticleListNeighbour_[localIndex])
+    for (BaseParticle* particle: boundaryParticleListNeighbour_[localIndex])
     {
         //set velocity
         particle->setVelocity(updateVelocityDataReceive_[localIndex][index].velocity);
@@ -1365,7 +1389,7 @@ void Domain::updateParticleVelocity(int localIndex)
         index++;
     }
 }
-  
+
 /*!
  * \brief Function that sends particle position and velocity data for ghost particles
  * to other processors
@@ -1375,31 +1399,33 @@ void Domain::updateParticleVelocity(int localIndex)
 void Domain::preparePositionAndVelocityUpdate()
 {
     //For all active boundaries
-    for(int localIndex : boundaryList_)
+    for (int localIndex : boundaryList_)
     {
         numberOfParticlesSend_[localIndex] = boundaryParticleList_[localIndex].size();
         numberOfParticlesReceive_[localIndex] = boundaryParticleListNeighbour_[localIndex].size();
-
+        
         //Increase capacity for the receiving data files
         updatePositionDataReceive_[localIndex].resize(numberOfParticlesReceive_[localIndex]);
         updateVelocityDataReceive_[localIndex].resize(numberOfParticlesReceive_[localIndex]);
-
-    
+        
+        
         //Collect data
         for (BaseParticle* particle : boundaryParticleList_[localIndex])
         {
             updatePositionDataSend_[localIndex].push_back(copyPositionFrom(particle));
             updateVelocityDataSend_[localIndex].push_back(copyVelocityFrom(particle));
-        }       
-    
+        }
+        
         //Send and receive the data
         sendAndReceiveMPIData(MercuryMPITag::POSITION_DATA, MercuryMPIType::POSITION,
-                                updatePositionDataReceive_[localIndex].data(), numberOfParticlesReceive_[localIndex],
-                                updatePositionDataSend_[localIndex].data(), numberOfParticlesSend_[localIndex], localIndex);
+                              updatePositionDataReceive_[localIndex].data(), numberOfParticlesReceive_[localIndex],
+                              updatePositionDataSend_[localIndex].data(), numberOfParticlesSend_[localIndex],
+                              localIndex);
         sendAndReceiveMPIData(MercuryMPITag::VELOCITY_DATA, MercuryMPIType::VELOCITY,
-                                updateVelocityDataReceive_[localIndex].data(), numberOfParticlesReceive_[localIndex],
-                                updateVelocityDataSend_[localIndex].data(), numberOfParticlesSend_[localIndex], localIndex);
-    }  
+                              updateVelocityDataReceive_[localIndex].data(), numberOfParticlesReceive_[localIndex],
+                              updateVelocityDataSend_[localIndex].data(), numberOfParticlesSend_[localIndex],
+                              localIndex);
+    }
 }
 
 /*!
@@ -1413,20 +1439,20 @@ void Domain::preparePositionAndVelocityUpdate()
  */
 void Domain::finalisePositionAndVelocityUpdate(std::set<BaseParticle*>& ghostParticlesToBeDeleted)
 {
-
+    
     //For all active boundaries
-    for(int localIndex : boundaryList_)
+    for (int localIndex : boundaryList_)
     {
         updateParticlePosition(localIndex);
         updateParticleVelocity(localIndex);
-    }   
-
+    }
+    
     //Based on the new position, update the particle lists. 
     //Remove particles that left the communication zone, they will be re-communicated in a later step
     updateParticles(ghostParticlesToBeDeleted);
-          
+    
     //For all active boundaries clear the data lists
-    for(int localIndex : boundaryList_)
+    for (int localIndex : boundaryList_)
     {
         updatePositionDataSend_[localIndex].clear();
         updateVelocityDataSend_[localIndex].clear();
@@ -1442,14 +1468,14 @@ void Domain::finalisePositionAndVelocityUpdate(std::set<BaseParticle*>& ghostPar
 void Domain::prepareVelocityUpdate()
 {
     //For all active boundaries
-    for(int localIndex : boundaryList_)
+    for (int localIndex : boundaryList_)
     {
         numberOfParticlesSend_[localIndex] = boundaryParticleList_[localIndex].size();
         numberOfParticlesReceive_[localIndex] = boundaryParticleListNeighbour_[localIndex].size();
-
+        
         //Resize the vector to the correct size
         updateVelocityDataReceive_[localIndex].resize(numberOfParticlesReceive_[localIndex]);
-      
+        
         //Collect data
         for (BaseParticle* particle : boundaryParticleList_[localIndex])
         {
@@ -1458,9 +1484,10 @@ void Domain::prepareVelocityUpdate()
         
         //Send the data
         sendAndReceiveMPIData(MercuryMPITag::VELOCITY_DATA, MercuryMPIType::VELOCITY,
-                            updateVelocityDataReceive_[localIndex].data(), numberOfParticlesReceive_[localIndex],
-                            updateVelocityDataSend_[localIndex].data(), numberOfParticlesSend_[localIndex], localIndex);
-    }    
+                              updateVelocityDataReceive_[localIndex].data(), numberOfParticlesReceive_[localIndex],
+                              updateVelocityDataSend_[localIndex].data(), numberOfParticlesSend_[localIndex],
+                              localIndex);
+    }
 }
 
 /*!
@@ -1469,13 +1496,13 @@ void Domain::prepareVelocityUpdate()
 void Domain::finaliseVelocityUpdate()
 {
     //For all active boundaries
-    for(int localIndex : boundaryList_)
+    for (int localIndex : boundaryList_)
     {
         updateParticleVelocity(localIndex);
     }
     
     //For all active boundaries clear the data lists
-    for(int localIndex : boundaryList_)
+    for (int localIndex : boundaryList_)
     {
         updateVelocityDataSend_[localIndex].clear();
         updateVelocityDataReceive_[localIndex].clear();
@@ -1502,12 +1529,12 @@ void Domain::addNewParticles()
     //Step 1: For every MPIDomain boundary, create a list of particles that have to be transmitted
     //queue send and receive instructions for the number of particles
     prepareBoundaryDataTransmission();
-    MPIContainer::Instance().sync();    
-
+    MPIContainer::Instance().sync();
+    
     //Step 2: queue send and receive of data
     performBoundaryDataTransmission();
     MPIContainer::Instance().sync();
-        
+    
     //Step 3: Add the received particles to the particleHandler of the current domain
     finaliseBoundaryDataTransmission();
 }
@@ -1523,15 +1550,15 @@ void Domain::addParticle(BaseParticle* particle)
 {
     //Step1: check if the particle has to be sent to other processors
     prepareBoundaryDataTransmission(particle);
-    MPIContainer::Instance().sync();    
-
+    MPIContainer::Instance().sync();
+    
     //Step2: queue send and receive data. Note for an inserted particle, no interactions should be required
     performBoundaryDataTransmission();
-    MPIContainer::Instance().sync();    
-
+    MPIContainer::Instance().sync();
+    
     //Step3: Add the received particles to the particleHandler of the current domain
     finaliseBoundaryDataTransmission();
-    MPIContainer::Instance().sync();    
+    MPIContainer::Instance().sync();
 }
 
 /*!
@@ -1546,12 +1573,12 @@ void Domain::updateStatus(std::set<BaseParticle*>& ghostParticlesToBeDeleted)
 {
     //Collect new positions and velocities and send them to the other domains
     preparePositionAndVelocityUpdate();
-    MPIContainer::Instance().sync();    
-
+    MPIContainer::Instance().sync();
+    
     //Receive the new positions and velocities from other domains
     //and update the mpi flagged particles accordingly. removes and switched particles in the lists
     finalisePositionAndVelocityUpdate(ghostParticlesToBeDeleted);
-    MPIContainer::Instance().sync();    
+    MPIContainer::Instance().sync();
 }
 
 /*!
@@ -1561,11 +1588,11 @@ void Domain::updateVelocity()
 {
     //collect new velocity data and send
     prepareVelocityUpdate();
-    MPIContainer::Instance().sync();    
-
+    MPIContainer::Instance().sync();
+    
     //process the received data
     finaliseVelocityUpdate();
-    MPIContainer::Instance().sync();    
+    MPIContainer::Instance().sync();
 }
 
 /*!
@@ -1576,7 +1603,8 @@ void Domain::updateVelocity()
 unsigned int Domain::getNumberOfMPIParticles()
 {
     unsigned int count = 0;
-    for (auto &index : boundaryParticleListNeighbour_) {
+    for (auto& index : boundaryParticleListNeighbour_)
+    {
         count += index.size();
     }
     return count;
@@ -1590,8 +1618,10 @@ unsigned int Domain::getNumberOfMPIParticles()
 unsigned int Domain::getNumberOfTrueMPIParticles()
 {
     unsigned int count = 0;
-    for (auto &index : boundaryParticleListNeighbour_) {
-        for (auto &p : index) {
+    for (auto& index : boundaryParticleListNeighbour_)
+    {
+        for (auto& p : index)
+        {
             if (!p->isPeriodicGhostParticle())
             {
                 count++;
@@ -1607,7 +1637,7 @@ unsigned int Domain::getNumberOfTrueMPIParticles()
 void Domain::flushParticles(std::set<BaseParticle*>& toBeFlushedList)
 {
     //For all active boundaries
-    for(int localIndex : boundaryList_)
+    for (int localIndex : boundaryList_)
     {
         flushParticlesFromList(boundaryParticleList_[localIndex], toBeFlushedList);
         flushParticlesFromList(boundaryParticleListNeighbour_[localIndex], toBeFlushedList);
@@ -1617,16 +1647,17 @@ void Domain::flushParticles(std::set<BaseParticle*>& toBeFlushedList)
 void Domain::flushParticlesFromList(std::vector<BaseParticle*>& list, std::set<BaseParticle*>& toBeFlushedList)
 {
     //Firstly: turn all particles that need to be flushed into nullptrs
-    for (auto &p : list) {
-        if  (p != nullptr)
+    for (auto& p : list)
+    {
+        if (p != nullptr)
         {
             BaseParticle* particle1 = p;
-            for(BaseParticle* particle2 : toBeFlushedList)
+            for (BaseParticle* particle2 : toBeFlushedList)
             {
                 //If the particle was found in the list, make a nullptr
-                if(particle1 == particle2)
+                if (particle1 == particle2)
                 {
-                    logger(VERBOSE,"Removing particle from mpi domain at: %",particle1->getPosition());
+                    logger(VERBOSE, "Removing particle from mpi domain at: %", particle1->getPosition());
                     p = nullptr;
                 }
             }
@@ -1667,7 +1698,7 @@ void Domain::cleanCommunicationList(std::vector<BaseParticle*>& list)
     for (int i = 0; i < list.size(); i++)
     {
         if (list[i] == nullptr)
-        {   
+        {
             list[i] = list.back();
             list.pop_back();
             i--;

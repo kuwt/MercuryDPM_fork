@@ -31,6 +31,7 @@ SphericalParticle* SphericalParticle::copy() const
     return new SphericalParticle(*this);
 }
 
-std::string SphericalParticle::getName() const {
+std::string SphericalParticle::getName() const
+{
     return "SphericalParticle";
 }

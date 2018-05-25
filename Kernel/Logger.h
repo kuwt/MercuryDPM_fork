@@ -31,10 +31,11 @@
 #include <functional>
 #include <type_traits>
 #include "GeneralDefine.h"
+
 #ifdef MERCURY_USE_MPI
 #include "MpiContainer.h"
 #endif
- 
+
 
 #ifndef MERCURY_LOGLEVEL
 #define MERCURY_LOGLEVEL Log::DEFAULT
@@ -162,9 +163,9 @@
  * Please, use the tags FATAL/ERROR/etc without class/enum/namespace instead.
  */
 enum class Log
-    : signed char
-    {   
-        FATAL = -20, ERROR = -15, WARN = -10, INFO = -5, DEFAULT = 0, VERBOSE = 5, DEBUG = 10
+        : signed char
+{
+    FATAL = -20, ERROR = -15, WARN = -10, INFO = -5, DEFAULT = 0, VERBOSE = 5, DEBUG = 10
 };
 
 /*!
@@ -210,7 +211,8 @@ public:
 extern LoggerOutput* loggerOutput;
 
 // Forward declaration..
-template<Log L = Log::DEFAULT, bool ASSERTS = MERCURY_ASSERTS> class Logger;
+template<Log L = Log::DEFAULT, bool ASSERTS = MERCURY_ASSERTS>
+class Logger;
 
 /*!
  * \brief Tag for template metaprogramming
@@ -339,12 +341,13 @@ public:
             : module(name)
     {
     }
+    
     /*!
      * \brief destructor
      */
     ~Logger()
     = default;
-
+    
     /*
      *
      * \brief Log implementation of this function
@@ -360,52 +363,54 @@ public:
      */
     template<Log LOGLEVEL, typename ... Args>
     typename std::enable_if<!((L < LOGLEVEL) && (MERCURY_LOGLEVEL < LOGLEVEL)), void>::type
-    operator()(const LL<LOGLEVEL> log, const char* format UNUSED, Args&&... arg UNUSED)
-    {   
+    operator()(const LL<LOGLEVEL> log, const char* format UNUSED, Args&& ... arg UNUSED)
+    {
         std::stringstream msgstream;
         createMessage(msgstream, format, arg...);
         if (LOGLEVEL <= Log::FATAL)
-        {   
+        {
             loggerOutput->onFatal(module, msgstream.str());
         }
         else if (LOGLEVEL <= Log::ERROR)
-        {   
+        {
             loggerOutput->onError(module, msgstream.str());
         }
         else if (LOGLEVEL <= Log::WARN)
-        {   
+        {
             loggerOutput->onWarn(module, msgstream.str());
         }
         else if (LOGLEVEL <= Log::INFO)
-        {   
+        {
             loggerOutput->onInfo(module, msgstream.str());
         }
         else if (LOGLEVEL <= Log::VERBOSE)
-        {   
+        {
             loggerOutput->onVerbose(module, msgstream.str());
         }
         else
-        {   
+        {
             loggerOutput->onDebug(module, msgstream.str());
         }
     }
     
     template<Log LOGLEVEL, typename... Args>
-    typename std::enable_if<L < LOGLEVEL && MERCURY_LOGLEVEL < LOGLEVEL, void>::type
-    operator()(const LL<LOGLEVEL> log, const char* format UNUSED, Args&&... arg UNUSED)
-    {   
-
+    typename std::enable_if<L <
+    LOGLEVEL&& MERCURY_LOGLEVEL<LOGLEVEL, void>::type
+    
+    operator()(const LL<LOGLEVEL> log, const char* format UNUSED, Args&& ... arg UNUSED)
+    {
+    
     }
-
+    
     //std::string is sometimes convenient, but always slow, so where possible, don't convert the const char* to a string before converting it back
     template<Log LOGLEVEL, typename... Args>
-    void operator()(const LL<LOGLEVEL> log, const std::string& format UNUSED, Args&&... arg UNUSED)
+    void operator()(const LL<LOGLEVEL> log, const std::string& format UNUSED, Args&& ... arg UNUSED)
     {
         (*this)(log, format.c_str(), arg...);
     }
- 
-
-
+    
+    
+    
     /*
      *
      * \brief Asserts on this logger
@@ -418,83 +423,84 @@ public:
      * \arg format Message format, where % can be used as a placeholder for arguments.
      * \arg arg... Any arguments which needs to be replaced.
      */
-
+    
     
     //the conversion from "" to a std::sting is so slow, it takes 50% of the total run time for a release build...
     template<typename... Args>
     typename std::enable_if<(ASSERTS) && (sizeof...(Args) >= 0), void>::type
-    assert(bool assertion, const char* format, Args&&... arg)
-    {   
+    assert(bool assertion, const char* format, Args&& ... arg)
+    {
         assert_always(assertion, format, arg...);
     }
     
     template<typename... Args>
     typename std::enable_if<!((ASSERTS) && sizeof...(Args) >= 0), void>::type
-    assert(bool assertion, const char* format, Args&&... arg)
-    {   
+    assert(bool assertion, const char* format, Args&& ... arg)
+    {
     }
     
     template<typename... Args>
-    void assert(bool assertion, const std::string format, Args&&... arg)
+    void assert(bool assertion, const std::string format, Args&& ... arg)
     {
         assert(assertion, format.c_str(), arg...);
     }
-
+    
     template<typename... Args>
-    void assert_always(bool assertion, const char* format, Args&&... arg)
-    {   
+    void assert_always(bool assertion, const char* format, Args&& ... arg)
+    {
         if (!assertion)
-        {   
+        {
             std::stringstream msgstream;
             createMessage(msgstream, format, arg...);
             loggerOutput->onFatal(module, msgstream.str());
         }
-
+        
     }
     
     template<typename... Args>
-    void assert_always(bool assertion, const std::string format, Args&&... arg)
+    void assert_always(bool assertion, const std::string format, Args&& ... arg)
     {
         assert_always(assertion, format.c_str(), arg...);
     }
-
+    
     /*!
      * \brief Oldskool log method.
      * \deprecated Use operator() instead.
      */
     template<typename... Args>
-    void log(const Log loglevel, const std::string& format, Args&&... arg)
-    {   
+    void log(const Log loglevel, const std::string& format, Args&& ... arg)
+    {
         if (loglevel <= L || loglevel <= MERCURY_LOGLEVEL)
-        {   
+        {
             std::stringstream msgstream;
             createMessage(msgstream, format.c_str(), arg...);
             if (loglevel <= Log::FATAL)
-            {   
+            {
                 loggerOutput->onFatal(module, msgstream.str());
             }
             else if (loglevel <= Log::ERROR)
-            {   
+            {
                 loggerOutput->onError(module, msgstream.str());
             }
             else if (loglevel <= Log::WARN)
-            {   
+            {
                 loggerOutput->onWarn(module, msgstream.str());
             }
             else if (loglevel <= Log::INFO)
-            {   
+            {
                 loggerOutput->onInfo(module, msgstream.str());
             }
             else if (loglevel <= Log::VERBOSE)
-            {   
+            {
                 loggerOutput->onVerbose(module, msgstream.str());
             }
             else
-            {   
+            {
                 loggerOutput->onDebug(module, msgstream.str());
             }
         }
     }
+
 private:
     /*!
      * \brief Actual implementation to recursively replace all the '%' signs by
@@ -502,45 +508,45 @@ private:
      */
     template<typename Arg1, typename... Args>
     void createMessage(std::stringstream& msg, const char* fmt,
-    Arg1&& arg, Args&&... args)
-    {   
+                       Arg1&& arg, Args&& ... args)
+    {
         bool doSkipNext = false;
         while (*fmt != '%' || doSkipNext)
-        {   
+        {
             //Make sure we're not running past the end of our formatting string.
             if (*fmt == '\0')
-            return;
-
-            if (*fmt == '\\'&& !doSkipNext)
+                return;
+            
+            if (*fmt == '\\' && !doSkipNext)
             { //Escape for the %sign
                 doSkipNext = true;
                 fmt++;
             }
             else
-            {   
+            {
                 msg << *fmt;
                 fmt++;
                 doSkipNext = false;
             }
         }
-
+        
         fmt++; //Consume the % sign
         msg << arg;
         createMessage(msg, fmt, args...);//and recursively call ourselve / the method below.
     }
-
+    
     /*!
      * \brief Terminating case / argument call
      */
     template<typename Arg1>
     void createMessage(std::stringstream& msg, const char* fmt, Arg1&& arg)
-    {   
+    {
         bool doSkipNext = false;
         while (*fmt != '%' || doSkipNext)
-        {   
+        {
             if (*fmt == '\0') // End of string
-            return;
-
+                return;
+            
             if (*fmt == '\\' && !doSkipNext)
             { //Escape for the %sign and the \sign
                 doSkipNext = true;
@@ -556,12 +562,12 @@ private:
         fmt++; //Consume the % sign
         msg << arg << fmt;
     }
-
+    
     /*!
      * \brief Terminating case / no argument call
      */
     void createMessage(std::stringstream& msg, const char* message)
-    {   
+    {
         msg << message;
     }
 };
@@ -582,5 +588,5 @@ extern Logger<CG_LOGLEVEL> cgLogger;
 #if !MERCURY_ASSERTS
 #define assert(e,...) assert(true,"")
 #endif
-        
+
 #endif

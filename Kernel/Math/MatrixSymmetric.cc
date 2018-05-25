@@ -51,7 +51,8 @@ MatrixSymmetric3D::MatrixSymmetric3D()
  * \param[in] yz initializer for an element of the matrix
  * \param[in] zz initializer for an element of the matrix
  */
-MatrixSymmetric3D::MatrixSymmetric3D(const Mdouble xx, const Mdouble xy, const Mdouble xz, const Mdouble yy, const Mdouble yz, const Mdouble zz)
+MatrixSymmetric3D::MatrixSymmetric3D(const Mdouble xx, const Mdouble xy, const Mdouble xz, const Mdouble yy,
+                                     const Mdouble yz, const Mdouble zz)
 {
     XX = xx;
     XY = xy;
@@ -84,8 +85,8 @@ Mdouble MatrixSymmetric3D::trace() const
  * \param[in] A     symmetric matrix to be added
  * \return Result of the addition 
  */
-MatrixSymmetric3D MatrixSymmetric3D::operator +(const MatrixSymmetric3D& A) const
-        {
+MatrixSymmetric3D MatrixSymmetric3D::operator+(const MatrixSymmetric3D& A) const
+{
     return MatrixSymmetric3D(XX + A.XX, XY + A.XY, XZ + A.XZ, YY + A.YY, YZ + A.YZ, ZZ + A.ZZ);
 }
 
@@ -94,8 +95,8 @@ MatrixSymmetric3D MatrixSymmetric3D::operator +(const MatrixSymmetric3D& A) cons
  * \param[in] A     symmetric matrix to be subtracted
  * \return Result of the substraction
  */
-MatrixSymmetric3D MatrixSymmetric3D::operator -(const MatrixSymmetric3D& A) const
-        {
+MatrixSymmetric3D MatrixSymmetric3D::operator-(const MatrixSymmetric3D& A) const
+{
     return MatrixSymmetric3D(XX - A.XX, XY - A.XY, XZ - A.XZ, YY - A.YY, YZ - A.YZ, ZZ - A.ZZ);
 }
 
@@ -104,8 +105,8 @@ MatrixSymmetric3D MatrixSymmetric3D::operator -(const MatrixSymmetric3D& A) cons
  * \param[in] a     scalar to be added
  * \return Result of the addition
  */
-MatrixSymmetric3D MatrixSymmetric3D::operator +(const Mdouble a) const
-        {
+MatrixSymmetric3D MatrixSymmetric3D::operator+(const Mdouble a) const
+{
     return MatrixSymmetric3D(XX + a, XY + a, XZ + a, YY + a, YZ + a, ZZ + a);
 }
 
@@ -114,8 +115,8 @@ MatrixSymmetric3D MatrixSymmetric3D::operator +(const Mdouble a) const
  * \param[in] a     scalar to be subtracted
  * \return Result of the substraction
  */
-MatrixSymmetric3D MatrixSymmetric3D::operator -(const Mdouble a) const
-        {
+MatrixSymmetric3D MatrixSymmetric3D::operator-(const Mdouble a) const
+{
     return MatrixSymmetric3D(XX - a, XY - a, XZ - a, YY - a, YZ - a, ZZ - a);
 }
 
@@ -126,11 +127,11 @@ MatrixSymmetric3D MatrixSymmetric3D::operator -(const Mdouble a) const
  * \param[in] b     the vector
  * \return The multiplication result
  */
-Vec3D operator *(const MatrixSymmetric3D& A, const Vec3D& b)
+Vec3D operator*(const MatrixSymmetric3D& A, const Vec3D& b)
 {
     return Vec3D(A.XX * b.X + A.XY * b.Y + A.XZ * b.Z,
-            A.XY * b.X + A.YY * b.Y + A.YZ * b.Z,
-            A.XZ * b.X + A.YZ * b.Y + A.ZZ * b.Z);
+                 A.XY * b.X + A.YY * b.Y + A.YZ * b.Z,
+                 A.XZ * b.X + A.YZ * b.Y + A.ZZ * b.Z);
 }
 
 /*!
@@ -138,10 +139,10 @@ Vec3D operator *(const MatrixSymmetric3D& A, const Vec3D& b)
  * \param[in] a     the scalar
  * \return The multiplication result
  */
-MatrixSymmetric3D MatrixSymmetric3D::operator *(const Mdouble a) const
-        {
+MatrixSymmetric3D MatrixSymmetric3D::operator*(const Mdouble a) const
+{
     return MatrixSymmetric3D(XX * a, XY * a, XZ * a,
-            YY * a, YZ * a, ZZ * a);
+                             YY * a, YZ * a, ZZ * a);
 }
 
 /*!
@@ -149,8 +150,8 @@ MatrixSymmetric3D MatrixSymmetric3D::operator *(const Mdouble a) const
  * \param[in] a     the scalar to be divided by
  * \return The division result
  */
-MatrixSymmetric3D MatrixSymmetric3D::operator /(const Mdouble a) const
-        {
+MatrixSymmetric3D MatrixSymmetric3D::operator/(const Mdouble a) const
+{
     return MatrixSymmetric3D(XX / a, XY / a, XZ / a, YY / a, YZ / a, ZZ / a);
 }
 
@@ -234,7 +235,8 @@ MatrixSymmetric3D& MatrixSymmetric3D::operator/=(const Mdouble a)
  */
 MatrixSymmetric3D MatrixSymmetric3D::square(const MatrixSymmetric3D& A)
 {
-    return MatrixSymmetric3D(mathsFunc::square(A.XX), mathsFunc::square(A.XY), mathsFunc::square(A.XZ), mathsFunc::square(A.YY), mathsFunc::square(A.YZ), mathsFunc::square(A.ZZ));
+    return MatrixSymmetric3D(mathsFunc::square(A.XX), mathsFunc::square(A.XY), mathsFunc::square(A.XZ),
+                             mathsFunc::square(A.YY), mathsFunc::square(A.YZ), mathsFunc::square(A.ZZ));
 }
 
 /*!
@@ -245,7 +247,8 @@ MatrixSymmetric3D MatrixSymmetric3D::square(const MatrixSymmetric3D& A)
  */
 MatrixSymmetric3D MatrixSymmetric3D::sqrt(const MatrixSymmetric3D& A)
 {
-    return MatrixSymmetric3D(std::sqrt(A.XX), std::sqrt(A.XY), std::sqrt(A.XZ), std::sqrt(A.YY), std::sqrt(A.YZ), std::sqrt(A.ZZ));
+    return MatrixSymmetric3D(std::sqrt(A.XX), std::sqrt(A.XY), std::sqrt(A.XZ), std::sqrt(A.YY), std::sqrt(A.YZ),
+                             std::sqrt(A.ZZ));
 }
 
 /*!
@@ -271,7 +274,8 @@ MatrixSymmetric3D MatrixSymmetric3D::selfDyadic(const Vec3D& a)
  */
 MatrixSymmetric3D MatrixSymmetric3D::symmetrisedDyadic(const Vec3D& a, const Vec3D& b)
 {
-    return MatrixSymmetric3D(a.X * b.X, 0.5 * (a.X * b.Y + b.X * a.Y), 0.5 * (a.X * b.Z + b.X * a.Z), a.Y * b.Y, 0.5 * (a.Y * b.Z + b.Y * a.Z), a.Z * b.Z);
+    return MatrixSymmetric3D(a.X * b.X, 0.5 * (a.X * b.Y + b.X * a.Y), 0.5 * (a.X * b.Z + b.X * a.Z), a.Y * b.Y,
+                             0.5 * (a.Y * b.Z + b.Y * a.Z), a.Z * b.Z);
 }
 
 /*!
@@ -279,7 +283,7 @@ MatrixSymmetric3D MatrixSymmetric3D::symmetrisedDyadic(const Vec3D& a, const Vec
  * \param[in] A Matrix that should be inverted.
  * \return Inverse of matrix A.
  */
-MatrixSymmetric3D MatrixSymmetric3D::inverse (const MatrixSymmetric3D& A)
+MatrixSymmetric3D MatrixSymmetric3D::inverse(const MatrixSymmetric3D& A)
 {
     return A.inverse();
 }
@@ -289,25 +293,26 @@ MatrixSymmetric3D MatrixSymmetric3D::inverse (const MatrixSymmetric3D& A)
  * \param[in] A Matrix that should be inverted.
  * \return Inverse of matrix A.
  */
-MatrixSymmetric3D MatrixSymmetric3D::inverse () const
+MatrixSymmetric3D MatrixSymmetric3D::inverse() const
 {
     MatrixSymmetric3D result;
     Mdouble det = MatrixSymmetric3D::determinant(*this);
-    logger.assert(det!=0,"determinant is not zero"); //should be replaced by the condition number or sth. like fabs(det)>1e-5*norm.
-    result.XX =   ( YY * ZZ - YZ * YZ ) * det;
-    result.XY = - ( XY * ZZ - XZ * YZ ) * det;
-    result.XZ =   ( XY * YZ - XZ * YY ) * det;
-    result.YY =   ( XX * ZZ - XZ * XZ ) * det;
-    result.YZ = - ( XX * YZ - XZ * XY ) * det;
-    result.ZZ =   ( XX * YY - XY * XY ) * det;
+    logger.assert(det != 0,
+                  "determinant is not zero"); //should be replaced by the condition number or sth. like fabs(det)>1e-5*norm.
+    result.XX = (YY * ZZ - YZ * YZ) * det;
+    result.XY = -(XY * ZZ - XZ * YZ) * det;
+    result.XZ = (XY * YZ - XZ * YY) * det;
+    result.YY = (XX * ZZ - XZ * XZ) * det;
+    result.YZ = -(XX * YZ - XZ * XY) * det;
+    result.ZZ = (XX * YY - XY * XY) * det;
     return result;
 }
 
-Mdouble MatrixSymmetric3D::determinant (const MatrixSymmetric3D& A)
+Mdouble MatrixSymmetric3D::determinant(const MatrixSymmetric3D& A)
 {
-    return 1. / ( A.XX * ( A.YY * A.ZZ - A.YZ * A.YZ )
-                + A.XY * ( A.YZ * A.XZ - A.XY * A.ZZ )
-                + A.XZ * ( A.XY * A.YZ - A.YY * A.XZ ));
+    return 1. / (A.XX * (A.YY * A.ZZ - A.YZ * A.YZ)
+                 + A.XY * (A.YZ * A.XZ - A.XY * A.ZZ)
+                 + A.XZ * (A.XY * A.YZ - A.YY * A.XZ));
 }
 
 /*!

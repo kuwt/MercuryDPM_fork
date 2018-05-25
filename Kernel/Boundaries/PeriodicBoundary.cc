@@ -39,7 +39,7 @@ PeriodicBoundary::PeriodicBoundary()
     distanceLeft_ = std::numeric_limits<double>::quiet_NaN();
     distanceRight_ = std::numeric_limits<double>::quiet_NaN();
     scaleFactor_ = std::numeric_limits<double>::quiet_NaN();
-
+    
     logger(DEBUG, "PeriodicBoundary::PeriodicBoundary() finished");
 }
 
@@ -75,13 +75,13 @@ void PeriodicBoundary::set(Vec3D normal, Mdouble distanceLeft, Mdouble distanceR
     distanceLeft_ = distanceLeft * scaleFactor_;
     distanceRight_ = distanceRight * scaleFactor_;
     logger.assert_always(distanceRight_ > distanceLeft_,
-            "PeriodicBoundary::set: left distance needs to be smaller than right distance");
+                         "PeriodicBoundary::set: left distance needs to be smaller than right distance");
     shift_ = normal_ * (distanceRight_ - distanceLeft_);
 }
 
 void PeriodicBoundary::set(Vec3D normal, Vec3D positionLeft, Vec3D positionRight)
 {
-    set(normal, Vec3D::dot(positionLeft,normal), Vec3D::dot(positionRight,normal));
+    set(normal, Vec3D::dot(positionLeft, normal), Vec3D::dot(positionRight, normal));
 }
 
 /*!
@@ -319,26 +319,26 @@ void PeriodicBoundary::createPeriodicParticle(BaseParticle* p, ParticleHandler& 
     }
 }
 
-void PeriodicBoundary::createGhostParticle(BaseParticle *pReal)
+void PeriodicBoundary::createGhostParticle(BaseParticle* pReal)
 {
     ParticleHandler& pH = getHandler()->getDPMBase()->particleHandler;
-
+    
     //Step 1: Copy the particle to new ghost particle.
     BaseParticle* pGhost = pReal->copy();
-
+    
     //Step 2: Copy the interactions of the ghost particle.
     pGhost->copyInteractionsForPeriodicParticles(*pReal);
-
+    
     //Step 3: Shift the ghost to the 'reflected' location.
     shiftPosition(pGhost);
-
+    
     //Step 4: If Particle is double shifted, get correct original particle
     BaseParticle* from = pReal;
     while (from->getPeriodicFromParticle() != nullptr)
         from = from->getPeriodicFromParticle();
     pGhost->setPeriodicFromParticle(from);
     pGhost->setPeriodicGhostParticle(true);
-
+    
     pH.addObject(pGhost);
 }
 
@@ -360,12 +360,12 @@ void PeriodicBoundary::createPeriodicParticles(ParticleHandler& pH)
     if (NUMBER_OF_PROCESSORS == 1)
     {
 #endif
-        unsigned numberOfParticles = pH.getSize();
-
-        for(unsigned i = 0; i < numberOfParticles; i++)
-        {
-            createPeriodicParticle(pH.getObject(i),pH);
-        }
+    unsigned numberOfParticles = pH.getSize();
+    
+    for (unsigned i = 0; i < numberOfParticles; i++)
+    {
+        createPeriodicParticle(pH.getObject(i), pH);
+    }
 #ifdef MERCURY_USE_MPI
     }
 #endif
@@ -386,13 +386,13 @@ void PeriodicBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
     if (NUMBER_OF_PROCESSORS == 1)
     {
 #endif
-        for (auto p = pH.begin(); p != pH.end(); ++p)
+    for (auto p = pH.begin(); p != pH.end(); ++p)
+    {
+        if (getDistance((*p)->getPosition()) < 0)
         {
-            if (getDistance((*p)->getPosition()) < 0)
-            {
-                shiftPosition(*p);
-            }
+            shiftPosition(*p);
         }
+    }
 #ifdef MERCURY_USE_MPI
     }
 #endif

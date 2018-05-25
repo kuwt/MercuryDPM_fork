@@ -123,8 +123,8 @@ void BaseWall::setIndSpecies(unsigned int indSpecies)
     {
         BaseInteractable::setIndSpecies(indSpecies);
         logger(ERROR, "setIndSpecies called on a particle with no particle handler.\n"
-                "Therefore I can't request the given species from the species handler.\n"
-                " PartID = %", getId());
+                      "Therefore I can't request the given species from the species handler.\n"
+                      " PartID = %", getId());
     }
 }
 
@@ -339,7 +339,7 @@ BaseWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHan
         c->setNormal(-normal);
         c->setDistance(distance);
         c->setOverlap(overlap);
-        if(dynamic_cast<SuperQuadric*>(p) == nullptr)
+        if (dynamic_cast<SuperQuadric*>(p) == nullptr)
         {
             ///\todo{DK: What is the contact point for interactions with walls}
             c->setContactPoint(p->getPosition() - (p->getRadius() - 0.5 * c->getOverlap()) * c->getNormal());
@@ -350,7 +350,7 @@ BaseWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHan
             p->getOrientation().rotateBack(normalBodyFixed);
             auto furthestPoint = getFurthestPointSuperQuadric(normalBodyFixed, p->getAxes());
             Vec3D overlapBody = overlap * normalBodyFixed;
-            Vec3D contactPoint = furthestPoint - overlapBody/2;
+            Vec3D contactPoint = furthestPoint - overlapBody / 2;
             p->getOrientation().rotate(contactPoint);
             contactPoint += p->getPosition();
             c->setContactPoint(contactPoint);

@@ -27,7 +27,9 @@
 #define LINEARVISCOELASTICINTERACTION_H
 
 #include "Interactions/BaseInteraction.h"
+
 class BaseInteractable;
+
 class LinearViscoelasticNormalSpecies;
 
 /*!
@@ -41,17 +43,20 @@ public:
      * \brief An alias for LinearViscoelasticNormalSpecies
      */
     typedef LinearViscoelasticNormalSpecies SpeciesType;
+    
     /*!
      * \brief Constructor.
      */
     LinearViscoelasticInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp);
-
+    
     //used for mpi
     LinearViscoelasticInteraction();
+    
     /*!
      * \brief Copy constructor.
      */
-    LinearViscoelasticInteraction(const LinearViscoelasticInteraction &p);
+    LinearViscoelasticInteraction(const LinearViscoelasticInteraction& p);
+    
     /*!
      * \brief Destructor.
      */
@@ -64,32 +69,36 @@ public:
      * \brief Computes the normal force caused due to normal collision between particles or particle-wall.
      */
     void computeNormalForce();
-
+    
     /*!
      * \brief Interaction read function, which accepts an std::istream as input.
-     */    
+     */
     void read(std::istream& is) override;
+    
     /*!
      * \brief Interaction write function, which accepts an std::ostream as input.
-     */    
+     */
     void write(std::ostream& os) const override;
+    
     /*!
      * \brief Returns the type/name of interaction (linear visco-elastic interaction).
      */
     std::string getBaseName() const;
+    
     /*!
      * \brief Returns the amount of energy stored in the spring due to head on collision.
      */
     Mdouble getElasticEnergy() const override;
+    
     /*!
      * \brief Returns a const pointer of type LinearViscoelasticNormalSpecies*
      */
     const LinearViscoelasticNormalSpecies* getSpecies() const;
-
+    
     void copyHistoryInteraction();
-
+    
     Mdouble getElasticEnergyAtEquilibrium(Mdouble adhesiveForce) const override;
-
+    
 };
 
 #endif

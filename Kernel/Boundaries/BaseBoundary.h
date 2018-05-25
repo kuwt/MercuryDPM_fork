@@ -31,9 +31,13 @@
 #include "Math/ExtendedMath.h"
 
 class BoundaryHandler;
+
 class PeriodicBoundaryHandler;
+
 class ParticleHandler;
+
 class BaseParticle;
+
 class DPMBase;
 
 /*!
@@ -102,9 +106,9 @@ public:
      * \brief Virtual function that does something after DPMBase::setupInitialConditions but before the first time step.
      */
     virtual void actionsBeforeTimeLoop();
-   
+    
     virtual void modifyGhostAfterCreation(BaseParticle* particle, int i);
- 
+    
     /*!
      * \brief Sets the boundary's BoundaryHandler
      */

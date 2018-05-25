@@ -59,7 +59,7 @@ ParticleHandler::ParticleHandler()
  *          computes the smallest and largest particle in this handler.
  */
 ParticleHandler::ParticleHandler(const ParticleHandler& PH)
-    : BaseHandler<BaseParticle>() 
+        : BaseHandler<BaseParticle>()
 {
     clear();
     setDPMBase(PH.getDPMBase());
@@ -80,7 +80,7 @@ ParticleHandler::ParticleHandler(const ParticleHandler& PH)
  *          BaseParticle, and sets the other variables to 0. After that, it 
  *          computes the smallest and largest particle in this handler.
  */
-ParticleHandler& ParticleHandler::operator =(const ParticleHandler& rhs)
+ParticleHandler& ParticleHandler::operator=(const ParticleHandler& rhs)
 {
     if (this != &rhs)
     {
@@ -131,11 +131,11 @@ void ParticleHandler::addExistingObject(BaseParticle* P)
     if (P->getSpecies() == nullptr)
     {
         logger(WARN, "WARNING: The particle with ID % that is added in "
-                "ParticleHandler::addObject does not have a species yet."
-                "Please make sure that you have "
-                "set the species somewhere in the driver code.", P->getId());
+                     "ParticleHandler::addObject does not have a species yet."
+                     "Please make sure that you have "
+                     "set the species somewhere in the driver code.", P->getId());
     }
-
+    
     //Puts the particle in the Particle list
     BaseHandler<BaseParticle>::addExistingObject(P);
     if (getDPMBase() != nullptr)
@@ -148,7 +148,7 @@ void ParticleHandler::addExistingObject(BaseParticle* P)
     //set the particleHandler pointer
     P->setHandler(this);
     //compute mass of the particle
-    P->getSpecies()->computeMass(P) ;
+    P->getSpecies()->computeMass(P);
     //Check if this particle has new extrema
     checkExtrema(P);
 }
@@ -172,9 +172,9 @@ void ParticleHandler::addObject(BaseParticle* P)
     if (P->getSpecies() == nullptr)
     {
         logger(WARN, "WARNING: The particle with ID % that is added in "
-                "ParticleHandler::addObject does not have a species yet."
-                "Please make sure that you have "
-                "set the species somewhere in the driver code.", P->getId());
+                     "ParticleHandler::addObject does not have a species yet."
+                     "Please make sure that you have "
+                     "set the species somewhere in the driver code.", P->getId());
     }
 #ifdef MERCURY_USE_MPI
     bool insertParticle;
@@ -192,21 +192,21 @@ void ParticleHandler::addObject(BaseParticle* P)
     if(insertParticle)
     {
 #endif
-        //Puts the particle in the Particle list
-        BaseHandler<BaseParticle>::addObject(P);
-        if (getDPMBase() != nullptr)
-        {
-            //This places the particle in this grid
-            getDPMBase()->hGridInsertParticle(P);
-            //This computes where the particle currently is in the grid
-            getDPMBase()->hGridUpdateParticle(P);
-        }
-        //set the particleHandler pointer
-        P->setHandler(this);
-        //compute mass of the particle
-        P->getSpecies()->computeMass(P)	;
-        //Check if this particle has new extrema
-        checkExtrema(P);
+    //Puts the particle in the Particle list
+    BaseHandler<BaseParticle>::addObject(P);
+    if (getDPMBase() != nullptr)
+    {
+        //This places the particle in this grid
+        getDPMBase()->hGridInsertParticle(P);
+        //This computes where the particle currently is in the grid
+        getDPMBase()->hGridUpdateParticle(P);
+    }
+    //set the particleHandler pointer
+    P->setHandler(this);
+    //compute mass of the particle
+    P->getSpecies()->computeMass(P);
+    //Check if this particle has new extrema
+    checkExtrema(P);
 #ifdef MERCURY_USE_MPI
     }
     else
@@ -258,7 +258,7 @@ void ParticleHandler::addObject(int fromProcessor, BaseParticle* p)
     //All processors now know have the same information and we can proceed with the collective add
     addObject(p);
 #else
-    logger(WARN,"Function addObject(int fromProcessor, BaseParticle* p) should not be used in serial code");
+    logger(WARN, "Function addObject(int fromProcessor, BaseParticle* p) should not be used in serial code");
 #endif
 }
 
@@ -321,7 +321,8 @@ void ParticleHandler::addGhostObject(int fromProcessor, int toProcessor, BasePar
         addGhostObject(p);
     }
 #else
-    logger(WARN,"Function addGhostObject(int fromProcessor, int toProcessor, BaseParticle* p) should not be used in serial code");
+    logger(WARN,
+           "Function addGhostObject(int fromProcessor, int toProcessor, BaseParticle* p) should not be used in serial code");
 #endif
 }
 
@@ -361,7 +362,8 @@ void ParticleHandler::addGhostObject(BaseParticle* P)
     //Check if this particle has new extrema
     checkExtrema(P);
 #else
-    logger(INFO,"Function ParticleHandler::mpiAddObject(BaseParticle* P) should only be called when compiling with parallel build on");
+    logger(INFO,
+           "Function ParticleHandler::mpiAddObject(BaseParticle* P) should only be called when compiling with parallel build on");
 #endif
 }
 
@@ -409,7 +411,7 @@ void ParticleHandler::removeGhostObject(const unsigned int index)
     getDPMBase()->hGridRemoveParticle(getObject(index));
     BaseHandler<BaseParticle>::removeObject(index);
 #else
-    logger(ERROR,"This function should only be used interally for mpi routines");
+    logger(ERROR, "This function should only be used interally for mpi routines");
 #endif
 }
 
@@ -431,15 +433,15 @@ void ParticleHandler::computeSmallestParticle()
     if (getSize() == 0)
     {
         logger(DEBUG, "No particles, so cannot compute the smallest particle.");
-
-	smallestParticle_ = nullptr;
+        
+        smallestParticle_ = nullptr;
         return;
     }
     Mdouble min = std::numeric_limits<Mdouble>::max();
     smallestParticle_ = nullptr;
     for (BaseParticle* const particle : objects_)
     {
-        if(!(particle->isMPIParticle() || particle->isPeriodicGhostParticle()))
+        if (!(particle->isMPIParticle() || particle->isPeriodicGhostParticle()))
         {
             if (particle->getInteractionRadius() < min)
             {
@@ -450,19 +452,19 @@ void ParticleHandler::computeSmallestParticle()
     }
 }
 
-void ParticleHandler::computeLargestParticle() 
+void ParticleHandler::computeLargestParticle()
 {
     if (getSize() == 0)
     {
         logger(DEBUG, "No particles, so cannot compute the largest particle.");
-	largestParticle_ = nullptr;
+        largestParticle_ = nullptr;
         return;
     }
     Mdouble max = -std::numeric_limits<Mdouble>::max();
     largestParticle_ = nullptr;
     for (BaseParticle* const particle : objects_)
     {
-        if(!(particle->isMPIParticle() || particle->isPeriodicGhostParticle()))
+        if (!(particle->isMPIParticle() || particle->isPeriodicGhostParticle()))
         {
             if (particle->getInteractionRadius() > max)
             {
@@ -523,7 +525,7 @@ Mdouble ParticleHandler::getKineticEnergyLocal() const
     Mdouble ene = 0;
     for (auto p : *this)
     {
-        if(!(p->isMPIParticle() || p->isPeriodicGhostParticle()))
+        if (!(p->isMPIParticle() || p->isPeriodicGhostParticle()))
         {
             ene += p->getKineticEnergy();
         }
@@ -580,7 +582,7 @@ Mdouble ParticleHandler::getMassLocal() const
 {
     Mdouble m = 0;
     for (auto p : *this)
-        if (!( p->isFixed() || p->isMPIParticle() || p->isPeriodicGhostParticle()))
+        if (!(p->isFixed() || p->isMPIParticle() || p->isPeriodicGhostParticle()))
             m += p->getMass();
     return m;
 }
@@ -603,7 +605,7 @@ Mdouble ParticleHandler::getMass() const
 
 Vec3D ParticleHandler::getMassTimesPositionLocal() const
 {
-    Vec3D com = {0,0,0};
+    Vec3D com = {0, 0, 0};
     for (auto p : *this)
         if (!(p->isFixed() || p->isMPIParticle() || p->isPeriodicGhostParticle()))
             com += p->getMass() * p->getPosition();
@@ -642,7 +644,7 @@ Vec3D ParticleHandler::getCentreOfMass() const
 
 Vec3D ParticleHandler::getMomentumLocal() const
 {
-    Vec3D mom = {0,0,0};
+    Vec3D mom = {0, 0, 0};
     for (auto p : *this)
         if (!(p->isFixed() || p->isMPIParticle() || p->isPeriodicGhostParticle()))
             mom += p->getMass() * p->getVelocity();
@@ -674,7 +676,7 @@ BaseParticle* ParticleHandler::getFastestParticleLocal() const
 {
     if (getSize() == 0)
     {
-        logger(WARN, "No particles to set getFastestParticle()" );
+        logger(WARN, "No particles to set getFastestParticle()");
         return nullptr;
     }
     BaseParticle* p = nullptr;
@@ -804,7 +806,7 @@ Mdouble ParticleHandler::getMeanRadius() const
 
     return sumRadiusGlobal/numberOfRealParticlesGlobal;
 #else
-    return getSumRadiusLocal()/getSize();
+    return getSumRadiusLocal() / getSize();
 #endif
 }
 
@@ -827,7 +829,7 @@ BaseParticle* ParticleHandler::getLowestPositionComponentParticleLocal(const int
     Mdouble min = std::numeric_limits<Mdouble>::max();
     for (BaseParticle* const pLoop : objects_)
     {
-        if(!(pLoop->isMPIParticle() || pLoop->isPeriodicGhostParticle()))
+        if (!(pLoop->isMPIParticle() || pLoop->isPeriodicGhostParticle()))
         {
             if (pLoop->getPosition().getComponent(i) < min)
             {
@@ -865,12 +867,12 @@ BaseParticle* ParticleHandler::getHighestPositionComponentParticleLocal(const in
     Mdouble max = -std::numeric_limits<Mdouble>::max();
     for (BaseParticle* const pLoop : objects_)
     {
-        if(!(pLoop->isMPIParticle() || pLoop->isPeriodicGhostParticle()))
+        if (!(pLoop->isMPIParticle() || pLoop->isPeriodicGhostParticle()))
         {
             if (pLoop->getPosition().getComponent(i) > max)
             {
                 max = pLoop->getPosition().getComponent(i);
-               p = pLoop;
+                p = pLoop;
             }
         }
     }
@@ -903,7 +905,7 @@ BaseParticle* ParticleHandler::getLowestVelocityComponentParticleLocal(const int
     Mdouble min = std::numeric_limits<Mdouble>::max();
     for (BaseParticle* const pLoop : objects_)
     {
-        if(!(pLoop->isMPIParticle() || pLoop->isPeriodicGhostParticle()))
+        if (!(pLoop->isMPIParticle() || pLoop->isPeriodicGhostParticle()))
         {
             if (pLoop->getVelocity().getComponent(i) < min)
             {
@@ -940,7 +942,7 @@ BaseParticle* ParticleHandler::getHighestVelocityComponentParticleLocal(const in
     Mdouble max = -std::numeric_limits<Mdouble>::max();
     for (BaseParticle* const pLoop : objects_)
     {
-        if(!(pLoop->isMPIParticle() || pLoop->isPeriodicGhostParticle()))
+        if (!(pLoop->isMPIParticle() || pLoop->isPeriodicGhostParticle()))
         {
             if (pLoop->getVelocity().getComponent(i) > max)
             {
@@ -969,7 +971,7 @@ BaseParticle* ParticleHandler::getLightestParticleLocal() const
 #ifdef MERCURY_USE_MPI
     logger(INFO,"getLightestParticle() not implemented yet in parallel");
 #else
-
+    
     if (getSize() == 0)
     {
         logger(WARN, "No particles to set getLightestParticle()");
@@ -979,7 +981,7 @@ BaseParticle* ParticleHandler::getLightestParticleLocal() const
     Mdouble minMass = std::numeric_limits<Mdouble>::max();
     for (BaseParticle* const pLoop : objects_)
     {
-        if(!(pLoop->isMPIParticle() || pLoop->isPeriodicGhostParticle()))
+        if (!(pLoop->isMPIParticle() || pLoop->isPeriodicGhostParticle()))
         {
             if (pLoop->getMass() < minMass)
             {
@@ -1021,11 +1023,11 @@ void ParticleHandler::clear()
 Mdouble ParticleHandler::getHighestPositionX() const
 {
     //Define the attribute function
-    std::function<Mdouble(BaseParticle*)> particleAttribute = [] (BaseParticle* p) {return p->getPosition().X;};
-
+    std::function<Mdouble(BaseParticle*)> particleAttribute = [](BaseParticle* p) { return p->getPosition().X; };
+    
     //Obtain the MAX attribute
     Mdouble positionXGlobal = getParticleAttribute<Mdouble>(particleAttribute, AttributeType::MAX);
-
+    
     return positionXGlobal;
 }
 
@@ -1050,7 +1052,7 @@ unsigned int ParticleHandler::getNumberOfUnfixedParticles() const
  */
 BaseParticle* ParticleHandler::createObject(const std::string& type)
 {
-    if (type == "BaseParticle"||type == "BP"||isdigit(type[0]) || isdigit(type[1]))
+    if (type == "BaseParticle" || type == "BP" || isdigit(type[0]) || isdigit(type[1]))
     {
         return new BaseParticle;
     }
@@ -1070,7 +1072,7 @@ BaseParticle* ParticleHandler::createObject(const std::string& type)
     {
         return new ThermalParticle;
     }
-    else 
+    else
     {
         logger(ERROR, "Particle type % not understood in restart file. Particle will not be read.", type);
         return nullptr;
@@ -1182,14 +1184,14 @@ void ParticleHandler::write(std::ostream& os) const
     {
         if (!it->isPeriodicGhostParticle() && !it->isMPIParticle())
         {
-	        os << (*it) << std::endl;
+            os << (*it) << std::endl;
         }
     }
 #else
     os << "Particles " << getSize() << std::endl;
     for (BaseParticle* it : *this)
     {
-	        os << (*it) << std::endl;
+        os << (*it) << std::endl;
     }
 #endif
     os.flush();
@@ -1201,21 +1203,21 @@ void ParticleHandler::write(std::ostream& os) const
  */
 void ParticleHandler::checkExtrema(BaseParticle* P)
 {
-    if (P == largestParticle_) 
+    if (P == largestParticle_)
     {
         //if the properties of the largest particle changes
         computeLargestParticle();
-    } 
+    }
     else if (!largestParticle_ || P->getInteractionRadius() > largestParticle_->getInteractionRadius())
     {
         largestParticle_ = P;
     }
     
-    if (P == smallestParticle_) 
+    if (P == smallestParticle_)
     {
         //if the properties of the smallest particle changes
         computeSmallestParticle();
-    } 
+    }
     else if (!smallestParticle_ || P->getInteractionRadius() < smallestParticle_->getInteractionRadius())
     {
         smallestParticle_ = P;
@@ -1243,13 +1245,13 @@ void ParticleHandler::checkExtremaOnDelete(BaseParticle* P)
  */
 void ParticleHandler::computeAllMasses(unsigned int indSpecies)
 {
-     for (BaseParticle* particle : objects_)
-     {
+    for (BaseParticle* particle : objects_)
+    {
         if (particle->getIndSpecies() == indSpecies)
         {
             particle->getSpecies()->computeMass(particle);
         }
-     }
+    }
 }
 
 void ParticleHandler::computeAllMasses()
@@ -1281,7 +1283,8 @@ std::string ParticleHandler::getName() const
 Mdouble ParticleHandler::getVolumeLocal() const
 {
     Mdouble volume = 0;
-    for (auto p : *this) {
+    for (auto p : *this)
+    {
         if (!(p->isFixed() || p->isPeriodicGhostParticle() || p->isMPIParticle()))
             volume += p->getVolume();
     }

@@ -38,7 +38,7 @@
  * \param[in] timeStamp
  */
 FrictionInteraction::FrictionInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp)
-    : BaseInteraction(P, I, timeStamp), SlidingFrictionInteraction(P, I, timeStamp)
+        : BaseInteraction(P, I, timeStamp), SlidingFrictionInteraction(P, I, timeStamp)
 {
     rollingSpring_.setZero();
     torsionSpring_.setZero();
@@ -49,7 +49,7 @@ FrictionInteraction::FrictionInteraction(BaseInteractable* P, BaseInteractable* 
 
 //used for mpi
 FrictionInteraction::FrictionInteraction()
-    : BaseInteraction(), SlidingFrictionInteraction()
+        : BaseInteraction(), SlidingFrictionInteraction()
 {
     rollingSpring_.setZero();
     torsionSpring_.setZero();
@@ -62,14 +62,15 @@ FrictionInteraction::FrictionInteraction()
  * \param[in] p
  */
 FrictionInteraction::FrictionInteraction(const FrictionInteraction& p)
-    : BaseInteraction(p), SlidingFrictionInteraction(p)
+        : BaseInteraction(p), SlidingFrictionInteraction(p)
 {
-    rollingSpring_=p.rollingSpring_;
-    torsionSpring_=p.torsionSpring_;
+    rollingSpring_ = p.rollingSpring_;
+    torsionSpring_ = p.torsionSpring_;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"FrictionInteraction::FrictionInteraction(const FrictionInteraction& p) finished"<<std::endl;
 #endif
 }
+
 /*!
  *
  */
@@ -79,6 +80,7 @@ FrictionInteraction::~FrictionInteraction()
     std::cout<<"FrictionInteraction::~FrictionInteraction() finished"<<std::endl;
 #endif
 }
+
 /*!
  * \param[in/out] os output file stream
  */
@@ -88,6 +90,7 @@ void FrictionInteraction::write(std::ostream& os) const
     os << " rollingSpring " << rollingSpring_;
     os << " torsionSpring " << torsionSpring_;
 }
+
 /*!
  * \param[in/out] is input file stream
  */
@@ -98,58 +101,64 @@ void FrictionInteraction::read(std::istream& is)
     is >> dummy >> rollingSpring_;
     is >> dummy >> torsionSpring_;
 }
+
 /*!
  * \details Calls the slidingFrictionInteraction::computeFrictionForce() as well, see slidingFrictionInteraction.cc.
  */
 void FrictionInteraction::computeFrictionForce()
 {
     SlidingFrictionInteraction::computeFrictionForce();
-
+    
     const FrictionSpecies* species = getSpecies();
     //If tangential forces are present
     if (getAbsoluteNormalForce() == 0.0) return;
-
-
+    
+    
     if (species->getRollingFrictionCoefficient() != 0.0)
     {
         if (species->getRollingStiffness() != 0.0)
         {
-            Mdouble effectiveDiameter = 2.0*getEffectiveRadius();
-
+            Mdouble effectiveDiameter = 2.0 * getEffectiveRadius();
+            
             //From Luding2008, objective rolling velocity (eq 15) w/o 2.0!
             Vec3D rollingRelativeVelocity = -effectiveDiameter *
-             Vec3D::cross(getNormal(), getP()->getAngularVelocity() - getI()->getAngularVelocity());
-
-            if (dynamic_cast<BaseParticle*>(getI())== nullptr)  //if particle-wall
-                rollingSpringVelocity_= rollingRelativeVelocity;
+                                            Vec3D::cross(getNormal(),
+                                                         getP()->getAngularVelocity() - getI()->getAngularVelocity());
+            
+            if (dynamic_cast<BaseParticle*>(getI()) == nullptr)  //if particle-wall
+                rollingSpringVelocity_ = rollingRelativeVelocity;
             else //if particle-particle
             {
                 const Vec3D relativeVelocity = getP()->getVelocity() - getI()->getVelocity();
                 rollingSpringVelocity_ = rollingRelativeVelocity
                                          - Vec3D::dot(rollingSpring_, relativeVelocity) / getDistance() * getNormal();
             }
-
+            
             //used to Integrate the spring
             //rollingSpringVelocity_= rollingRelativeVelocity;
             //integrate(getHandler()->timeStep_);
             rollingSpring_ += rollingSpringVelocity_ * getHandler()->getDPMBase()->getTimeStep();
             
             //Calculate test force acting on P including viscous force
-            Vec3D rollingForce = - species->getRollingStiffness() * rollingSpring_ - species->getRollingDissipation() * rollingRelativeVelocity;
-
+            Vec3D rollingForce = -species->getRollingStiffness() * rollingSpring_ -
+                                 species->getRollingDissipation() * rollingRelativeVelocity;
+            
             //tangential forces are modelled by a spring-damper of elasticity kt and viscosity dispt (sticking),
             //but the force is limited by Coulomb friction (rolling):
             Mdouble rollingForceSquared = rollingForce.getLengthSquared();
-            if (rollingForceSquared <= mathsFunc::square(species->getRollingFrictionCoefficientStatic() * getAbsoluteNormalForce()))
+            if (rollingForceSquared <=
+                mathsFunc::square(species->getRollingFrictionCoefficientStatic() * getAbsoluteNormalForce()))
             {
                 //if sticking (|ft|<=mu*|fn|), apply the force
             }
             else
             {
                 //if rolling, resize the tangential force such that |ft|=mu*|fn|
-                rollingForce *= species->getRollingFrictionCoefficient() * getAbsoluteNormalForce() / std::sqrt(rollingForceSquared);
+                rollingForce *= species->getRollingFrictionCoefficient() * getAbsoluteNormalForce() /
+                                std::sqrt(rollingForceSquared);
                 //resize the tangential spring accordingly such ft=-k*delta-nu*relVel
-                rollingSpring_ = -(rollingForce + species->getRollingDissipation() * rollingRelativeVelocity) / species->getRollingStiffness();
+                rollingSpring_ = -(rollingForce + species->getRollingDissipation() * rollingRelativeVelocity) /
+                                 species->getRollingStiffness();
             }
             //Add (virtual) rolling force to torque
             addTorque(effectiveDiameter * Vec3D::cross(getNormal(), rollingForce));
@@ -160,38 +169,46 @@ void FrictionInteraction::computeFrictionForce()
             exit(-1);
         }
     } //end if rolling force
-
+    
     if (species->getTorsionFrictionCoefficient() != 0.0)
     {
         if (species->getTorsionStiffness() != 0.0)
         {
             ///\todo TW: Why do we not use the corrected diameter here, as in the rolling case? And check if Stefan uses radius or diameter
-            Mdouble effectiveDiameter = 2.0*getEffectiveRadius();
-
+            Mdouble effectiveDiameter = 2.0 * getEffectiveRadius();
+            
             //From Luding2008, spin velocity (eq 16) w/o 2.0!
-            Vec3D torsionRelativeVelocity = effectiveDiameter * Vec3D::dot(getNormal(), getP()->getAngularVelocity() - getI()->getAngularVelocity()) * getNormal();
-
+            Vec3D torsionRelativeVelocity = effectiveDiameter * Vec3D::dot(getNormal(), getP()->getAngularVelocity() -
+                                                                                        getI()->getAngularVelocity()) *
+                                            getNormal();
+            
             //Integrate the spring
-            torsionSpringVelocity_= torsionRelativeVelocity;
+            torsionSpringVelocity_ = torsionRelativeVelocity;
             //integrate(getHandler()->timeStep_);
-            torsionSpring_ += Vec3D::dot(torsionSpring_ + torsionSpringVelocity_ * getHandler()->getDPMBase()->getTimeStep(), getNormal()) * getNormal();
-
+            torsionSpring_ +=
+                    Vec3D::dot(torsionSpring_ + torsionSpringVelocity_ * getHandler()->getDPMBase()->getTimeStep(),
+                               getNormal()) * getNormal();
+            
             //Calculate test force acting on P including viscous force
-            Vec3D torsionForce = - species->getTorsionStiffness() * torsionSpring_ - species->getTorsionDissipation() * torsionRelativeVelocity;
-
+            Vec3D torsionForce = -species->getTorsionStiffness() * torsionSpring_ -
+                                 species->getTorsionDissipation() * torsionRelativeVelocity;
+            
             //tangential forces are modelled by a spring-damper of elasticity kt and viscosity dispt (sticking),
             //but the force is limited by Coulomb friction (torsion):
             Mdouble torsionForceSquared = torsionForce.getLengthSquared();
-            if (torsionForceSquared <= mathsFunc::square(species->getTorsionFrictionCoefficientStatic() * getAbsoluteNormalForce()))
+            if (torsionForceSquared <=
+                mathsFunc::square(species->getTorsionFrictionCoefficientStatic() * getAbsoluteNormalForce()))
             {
                 //if sticking (|ft|<=mu*|fn|), apply the force
             }
             else
             {
                 //if torsion, resize the tangential force such that |ft|=mu*|fn|
-                torsionForce *= species->getTorsionFrictionCoefficient() * getAbsoluteNormalForce() / std::sqrt(torsionForceSquared);
+                torsionForce *= species->getTorsionFrictionCoefficient() * getAbsoluteNormalForce() /
+                                std::sqrt(torsionForceSquared);
                 //resize the tangential spring accordingly such ft=-k*delta-nu*relVel
-                torsionSpring_ = -(torsionForce + species->getTorsionDissipation() * torsionRelativeVelocity) / species->getTorsionStiffness();
+                torsionSpring_ = -(torsionForce + species->getTorsionDissipation() * torsionRelativeVelocity) /
+                                 species->getTorsionStiffness();
             }
             //Add (virtual) rolling force to torque
             addTorque(effectiveDiameter * torsionForce);
@@ -203,6 +220,7 @@ void FrictionInteraction::computeFrictionForce()
         }
     } //end if torsion force
 }
+
 /*!
  * \param[in] timeStep the amount of time by which the solution is evolved
  */
@@ -212,15 +230,17 @@ void FrictionInteraction::integrate(Mdouble timeStep)
     rollingSpring_ += rollingSpringVelocity_ * timeStep;
     torsionSpring_ += Vec3D::dot(torsionSpring_ + torsionSpringVelocity_ * timeStep, getNormal()) * getNormal();
 }
+
 /*!
  * \return Mdouble the total elastic energy stored in the frictional springs
  */
 Mdouble FrictionInteraction::getElasticEnergy() const
 {
     return SlidingFrictionInteraction::getElasticEnergy()
-        +  0.5 * getSpecies()->getRollingStiffness() * rollingSpring_.getLengthSquared()
-        +  0.5 * getSpecies()->getTorsionStiffness() * torsionSpring_.getLengthSquared();
+           + 0.5 * getSpecies()->getRollingStiffness() * rollingSpring_.getLengthSquared()
+           + 0.5 * getSpecies()->getTorsionStiffness() * torsionSpring_.getLengthSquared();
 }
+
 /*!
  * \return const FrictionSpecies*
  */
@@ -228,6 +248,7 @@ const FrictionSpecies* FrictionInteraction::getSpecies() const
 {
     return dynamic_cast<const FrictionSpecies*>(getBaseSpecies());
 }
+
 /*!
  * \return std::string
  */
@@ -235,6 +256,7 @@ std::string FrictionInteraction::getBaseName() const
 {
     return "Friction";
 }
+
 /*!
  *
  */
@@ -243,8 +265,8 @@ void FrictionInteraction::reverseHistory()
     SlidingFrictionInteraction::reverseHistory();
     //rollingSpring_=-rollingSpring_;
     //rollingSpringVelocity_=-rollingSpringVelocity_;
-    torsionSpring_=-torsionSpring_;
-    torsionSpringVelocity_=-torsionSpringVelocity_;
+    torsionSpring_ = -torsionSpring_;
+    torsionSpringVelocity_ = -torsionSpringVelocity_;
 }
 
 /*!
@@ -253,30 +275,30 @@ void FrictionInteraction::reverseHistory()
 void FrictionInteraction::rotateHistory(Matrix3D& rotationMatrix)
 {
     SlidingFrictionInteraction::rotateHistory(rotationMatrix);
-    rollingSpring_=rotationMatrix*rollingSpring_;
-    rollingSpringVelocity_=rotationMatrix*rollingSpringVelocity_;
-    torsionSpring_=rotationMatrix*torsionSpring_;
-    torsionSpringVelocity_=rotationMatrix*torsionSpringVelocity_;
+    rollingSpring_ = rotationMatrix * rollingSpring_;
+    rollingSpringVelocity_ = rotationMatrix * rollingSpringVelocity_;
+    torsionSpring_ = rotationMatrix * torsionSpring_;
+    torsionSpringVelocity_ = rotationMatrix * torsionSpringVelocity_;
 }
 
 Vec3D FrictionInteraction::getRollingSpring() const
 {
-  return rollingSpring_;
+    return rollingSpring_;
 }
-    
+
 Vec3D FrictionInteraction::getTorsionSpring() const
 {
-  return torsionSpring_;
+    return torsionSpring_;
 }
 
 void FrictionInteraction::setRollingSpring(Vec3D rollingSpring)
 {
-  rollingSpring_ = rollingSpring; 
+    rollingSpring_ = rollingSpring;
 }
-    
+
 void FrictionInteraction::setTorsionSpring(Vec3D torsionSpring)
 {
-  torsionSpring_ = torsionSpring;  
+    torsionSpring_ = torsionSpring;
 }
 
 

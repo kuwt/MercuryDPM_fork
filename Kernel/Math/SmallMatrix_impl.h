@@ -54,26 +54,26 @@
 extern "C"
 {
 
-    /// This does matrix times vector and is from blas level 2.
-    void dgemv_(const char* trans, int* m, int* n, double* alpha, double* A, int* LDA, double* x, int* incx, double* beta,
-                double* y, int* incy);
-    
-    ///This is the gernal matrix multiplication from blas level 3
-    int
-    dgemm_(const char* transA, const char* transB, int* M, int* N, int* k, double* alpha, double* A, int* LDA, double* B,
-           int* LDB, double* beta, double* C, int* LDC);
-    
-    ///This is the gerneral scalar times vector + vector from blas, hence from blas level 1. Here we also use on a matrix by treating as a vector
-    int daxpy_(int* N, double* DA, double* DX, int* INCX, double* DY, int* INCY);
-    
-    /// This is LU factorisation of the matrix A. This has been taken from LAPACK
-    void dgetrf_(int* M, int* N, double* A, int* lda, int* IPIV, int* INFO);
-    
-    /// This is the inverse calulation also from LAPACK. Calculates inverse if you pass it the LU factorisation.
-    void dgetri_(int* N, double* A, int* lda, int* IPIV, double* WORK, int* lwork, int* INFO);
-    
-    /// This is used for solve Ax=B for x. Again this is from LAPACK.
-    void dgesv_(int* N, int* NRHS, double* A, int* lda, int* IPIV, double* B, int* LDB, int* INFO);
+/// This does matrix times vector and is from blas level 2.
+void dgemv_(const char* trans, int* m, int* n, double* alpha, double* A, int* LDA, double* x, int* incx, double* beta,
+            double* y, int* incy);
+
+///This is the gernal matrix multiplication from blas level 3
+int
+dgemm_(const char* transA, const char* transB, int* M, int* N, int* k, double* alpha, double* A, int* LDA, double* B,
+       int* LDB, double* beta, double* C, int* LDC);
+
+///This is the gerneral scalar times vector + vector from blas, hence from blas level 1. Here we also use on a matrix by treating as a vector
+int daxpy_(int* N, double* DA, double* DX, int* INCX, double* DY, int* INCY);
+
+/// This is LU factorisation of the matrix A. This has been taken from LAPACK
+void dgetrf_(int* M, int* N, double* A, int* lda, int* IPIV, int* INFO);
+
+/// This is the inverse calulation also from LAPACK. Calculates inverse if you pass it the LU factorisation.
+void dgetri_(int* N, double* A, int* lda, int* IPIV, double* WORK, int* lwork, int* INFO);
+
+/// This is used for solve Ax=B for x. Again this is from LAPACK.
+void dgesv_(int* N, int* NRHS, double* A, int* lda, int* IPIV, double* B, int* LDB, int* INFO);
 }
 
 

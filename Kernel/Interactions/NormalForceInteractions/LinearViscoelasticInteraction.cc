@@ -30,12 +30,14 @@
 #include "InteractionHandler.h"
 #include <iomanip>
 #include <fstream>
+
 /*!
  * \param[in] P
  * \param[in] I
  * \param[in] timeStamp
  */
-LinearViscoelasticInteraction::LinearViscoelasticInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp)
+LinearViscoelasticInteraction::LinearViscoelasticInteraction(BaseInteractable* P, BaseInteractable* I,
+                                                             unsigned timeStamp)
         : BaseInteraction(P, I, timeStamp)
 {
 #ifdef DEBUG_CONSTRUCTOR
@@ -78,6 +80,7 @@ void LinearViscoelasticInteraction::write(std::ostream& os) const
 {
     BaseInteraction::write(os);
 }
+
 /*!
  * \details Calls the BaseInteraction() read function.
  * \param[in,out] is
@@ -86,6 +89,7 @@ void LinearViscoelasticInteraction::read(std::istream& is)
 {
     BaseInteraction::read(is);
 }
+
 /*!
  * \return std::string
  */
@@ -93,21 +97,24 @@ std::string LinearViscoelasticInteraction::getBaseName() const
 {
     return "LinearViscoelastic";
 }
+
 /*!
  *
  */
 void LinearViscoelasticInteraction::computeNormalForce()
 {
     // Compute the relative velocity vector of particle P w.r.t. I
-    setRelativeVelocity(getP()->getVelocityAtContact(getContactPoint()) - getI()->getVelocityAtContact(getContactPoint()));
+    setRelativeVelocity(
+            getP()->getVelocityAtContact(getContactPoint()) - getI()->getVelocityAtContact(getContactPoint()));
     // Compute the projection of vrel onto the normal (can be negative)
     setNormalRelativeVelocity(Vec3D::dot(getRelativeVelocity(), getNormal()));
-
+    
     if (getOverlap() > 0) //if contact forces
     {
         const LinearViscoelasticNormalSpecies* species = getSpecies();
-
-        Mdouble normalForce = species->getStiffness() * getOverlap() - species->getDissipation() * getNormalRelativeVelocity();
+        
+        Mdouble normalForce =
+                species->getStiffness() * getOverlap() - species->getDissipation() * getNormalRelativeVelocity();
         setAbsoluteNormalForce(std::abs(normalForce)); //used for further corce calculations;
         setForce(getNormal() * normalForce);
         setTorque(Vec3D(0.0, 0.0, 0.0));
@@ -125,11 +132,12 @@ void LinearViscoelasticInteraction::computeNormalForce()
  */
 Mdouble LinearViscoelasticInteraction::getElasticEnergy() const
 {
-   if (getOverlap() > 0)
+    if (getOverlap() > 0)
         return 0.5 * (getSpecies()->getStiffness() * mathsFunc::square(getOverlap()));
     else
         return 0.0;
 }
+
 /*!
  * \return const LinearViscoelasticNormalSpecies*
  */
@@ -139,6 +147,7 @@ const LinearViscoelasticNormalSpecies* LinearViscoelasticInteraction::getSpecies
     return dynamic_cast<const LinearViscoelasticNormalSpecies*>(getBaseSpecies());
 }
 
-Mdouble LinearViscoelasticInteraction::getElasticEnergyAtEquilibrium(Mdouble adhesiveForce) const {
-    return adhesiveForce*adhesiveForce/(2.0*getSpecies()->getStiffness());
+Mdouble LinearViscoelasticInteraction::getElasticEnergyAtEquilibrium(Mdouble adhesiveForce) const
+{
+    return adhesiveForce * adhesiveForce / (2.0 * getSpecies()->getStiffness());
 }

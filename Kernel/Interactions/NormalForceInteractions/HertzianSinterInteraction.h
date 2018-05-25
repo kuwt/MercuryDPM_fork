@@ -27,8 +27,11 @@
 #define HERTZIANSINTERINTERACTION_H
 
 #include "Interactions/BaseInteraction.h"
+
 class HertzianSinterNormalSpecies;
+
 class BaseInteractable;
+
 /*!
  * \class HertzianSinterInteraction
  * \brief Computes normal forces in case of a linear plastic visco-elastic interaction.
@@ -40,12 +43,15 @@ public:
      * \brief Constructor.
      */
     HertzianSinterInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp);
+    
     /*!
      * \brief Copy constructor.
      */
-    HertzianSinterInteraction(const HertzianSinterInteraction &p);
+    HertzianSinterInteraction(const HertzianSinterInteraction& p);
+
 /// \todo: MX add interaction to mpi
     HertzianSinterInteraction();
+    
     /*!
      * \brief Destructor.
      */
@@ -58,46 +64,56 @@ public:
      * \brief Computes the normal forces due to linear plastic visco elastic interaction.
      */
     void computeSinterForce();
+    
     /*!
      * \brief Calls computeSinterForce().
      */
     void computeNormalForce();
+    
     /*!
      * \brief Interaction read function, which accepts an std::istream as input.
      */
     void read(std::istream& is) override;
+    
     /*!
      * \brief Interaction write function, which accepts an std::ostream as input.
      */
     void write(std::ostream& os) const override;
+    
     /*!
      * \brief Returns the name of the interaction.
      */
     virtual std::string getBaseName() const;
+    
     /*!
      * \brief Computes and returns the amount of elastic energy stored in the spring.
      */
     Mdouble getElasticEnergy() const override;
+    
     /*!
      * \brief
      */
     const HertzianSinterNormalSpecies* getSpecies() const;
+    
     /*!
      * \brief
      */
     Mdouble getMaxOverlap() const;
+    
     /*!
      * \brief
      */
     void setMaxOverlap(Mdouble);
+    
     /*!
      * \brief
      */
     Mdouble getUnloadingModulus() const;
 
 private:
-
+    
     //set in integrate, used in compute force
     Mdouble maxOverlap_;
 };
+
 #endif

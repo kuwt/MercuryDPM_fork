@@ -27,8 +27,11 @@
 #define HERTZIANVISCOELASTICINTERACTION_H
 
 #include "Interactions/BaseInteraction.h"
+
 class BaseInteractable;
+
 class HertzianViscoelasticNormalSpecies;
+
 /*!
  * \class HertzianViscoelasticInteraction
  * \brief Computes normal forces for a Herztian visco-elastic interaction.
@@ -38,8 +41,9 @@ class HertzianViscoelasticInteraction : public virtual BaseInteraction
 public:
     /*!
      * \brief An alias for HertzianViscoelasticNormalSpecies.
-     */    
+     */
     typedef HertzianViscoelasticNormalSpecies SpeciesType;
+    
     /*!
      * \brief Constructor.
      */
@@ -51,7 +55,8 @@ public:
     /*!
      * \brief Copy constructor.
      */
-    HertzianViscoelasticInteraction(const HertzianViscoelasticInteraction &p);
+    HertzianViscoelasticInteraction(const HertzianViscoelasticInteraction& p);
+    
     /*!
      * \brief Destructor.
      */
@@ -63,33 +68,38 @@ public:
      * \brief Computes the amount of normal force due to an Herztian visco-elastic interaction.
      */
     void computeNormalForce();
-
-    explicit HertzianViscoelasticInteraction(const BaseInteraction &p) : BaseInteraction(p)
+    
+    explicit HertzianViscoelasticInteraction(const BaseInteraction& p) : BaseInteraction(p)
     {
-
+        
     }
-
+    
     /*!
      * \brief Interaction read function, which accepts an std::istream as input.
-     */    
+     */
     void read(std::istream& is) override;
+    
     /*!
      * \brief Interaction write function, which accepts an std::ostream as input.
-     */    
+     */
     void write(std::ostream& os) const override;
+    
     /*!
      * \brief Returns the name of the interaction.
      */
     std::string getBaseName() const;
+    
     /*!
      * \brief Computes and returns the amount of elastic energy stored in the spring.
      */
     Mdouble getElasticEnergy() const override;
+    
     /*!
      * \brief Returns a const pointer of type HerztianViscoelasticNormalSpecies (dynamic-cast).
      */
     const HertzianViscoelasticNormalSpecies* getSpecies() const;
-
+    
     Mdouble getElasticEnergyAtEquilibrium(Mdouble adhesiveForce) const override;
 };
+
 #endif

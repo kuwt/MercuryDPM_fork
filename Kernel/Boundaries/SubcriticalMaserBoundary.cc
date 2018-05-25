@@ -45,7 +45,8 @@ SubcriticalMaserBoundary::SubcriticalMaserBoundary()
  *          then immediately opens the maser. Do not insert particles for the maser after this constructor.
  * \param[in] periodicBoundary The periodic boundary on which this maser boundary is based.
  */
-SubcriticalMaserBoundary::SubcriticalMaserBoundary(const PeriodicBoundary& periodicBoundary) : BaseBoundary(periodicBoundary)
+SubcriticalMaserBoundary::SubcriticalMaserBoundary(const PeriodicBoundary& periodicBoundary) : BaseBoundary(
+        periodicBoundary)
 {
     logger(INFO, "Constructor SubcriticalMaserBoundary(const PeriodicBoundary&) started");
     distanceLeft_ = periodicBoundary.getDistanceLeft();
@@ -111,7 +112,7 @@ void SubcriticalMaserBoundary::read(std::istream& is)
         speciesConversionMaserToNormal_[speciesHandler.getObject(value)] = speciesHandler.getObject(key);
     }
     logger(DEBUG, "Finished reading SubcriticalMaserBoundary. \nNormal: % \nDistanceLeft: % \nDistanceRight: % "
-            ": % \nMaserIsActivated: %", normal_, distanceLeft_, distanceRight_, maserIsActivated_);
+                  ": % \nMaserIsActivated: %", normal_, distanceLeft_, distanceRight_, maserIsActivated_);
 }
 
 /*!
@@ -207,9 +208,9 @@ void SubcriticalMaserBoundary::createPeriodicParticle(BaseParticle* p, ParticleH
 void SubcriticalMaserBoundary::createPeriodicParticles(ParticleHandler& pH)
 {
     unsigned numberOfParticles = pH.getSize();
-    for(unsigned i = 0; i < numberOfParticles; i++)
+    for (unsigned i = 0; i < numberOfParticles; i++)
     {
-        createPeriodicParticle(pH.getObject(i),pH);
+        createPeriodicParticle(pH.getObject(i), pH);
     }
 }
 
@@ -247,7 +248,7 @@ BaseParticle* SubcriticalMaserBoundary::createGhostCopy(BaseParticle* const p) c
 bool SubcriticalMaserBoundary::checkBoundaryAfterParticleMoved(BaseParticle* p, ParticleHandler& pH) const
 {
     // check if particle passed either of the boundary walls
-    if ( isMaserParticle(p) && getDistance(p) < 0 )
+    if (isMaserParticle(p) && getDistance(p) < 0)
     {
         // Checks if the particle is closest to the right boundary.
         // If so, and if the Maser is turned on, then create a 'real'
@@ -257,7 +258,7 @@ bool SubcriticalMaserBoundary::checkBoundaryAfterParticleMoved(BaseParticle* p, 
             BaseParticle* pCopy = p->copy();
             pCopy->setSpecies(speciesConversionMaserToNormal_.find(p->getSpecies())->second);
             pH.addObject(pCopy);
-    
+            
             // If the (original) particle has crossed a right boundary,
             // then shift that particle periodically.
             shiftPosition(p);

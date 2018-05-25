@@ -30,12 +30,13 @@
 #include "Math/Vector.h"
 
 class BaseParticle;
+
 class RNG;
 
-    /*!
-     * \class ChuteInsertionBoundary
-     * \brief Used for modeling chute inflow. Inherits from InsertionBoundary.
-     */
+/*!
+ * \class ChuteInsertionBoundary
+ * \brief Used for modeling chute inflow. Inherits from InsertionBoundary.
+ */
 class ChuteInsertionBoundary : public InsertionBoundary
 {
 public:
@@ -56,26 +57,28 @@ public:
     /*!
      * \brief Sets all boundary properties at once.
      */
-    void set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, double radMin, double radMax, double fixedParticleRadius, double inflowVelocity, double inflowVelocityVariance);
+    void
+    set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, double radMin, double radMax,
+        double fixedParticleRadius, double inflowVelocity, double inflowVelocityVariance);
     
     /*!
      * \brief Generates a random particle
      */
-    BaseParticle* generateParticle(RNG &random) override;
-
-    void placeParticle(BaseParticle* p, RNG &random) override;
+    BaseParticle* generateParticle(RNG& random) override;
+    
+    void placeParticle(BaseParticle* p, RNG& random) override;
     
     /*!
      * \brief reads boundary properties from istream
      */
     void read(std::istream& is) override;
-
+    
     /*!
      * \brief deprecated version of CubeInsertionBoundary::read().
      */
     MERCURY_DEPRECATED
     void oldRead(std::istream& is);
-
+    
     /*!
      * \brief writes boundary properties to ostream
      */
@@ -85,19 +88,19 @@ public:
      * \brief Returns the name of the object
      */
     std::string getName() const override;
-    
+
 private:
     
     /*!
      * \brief The two extremal corners of the cuboidal insertion boundary
      */
     Vec3D posMin_, posMax_;
-
+    
     /*!
      * \brief Minimum and maximum radii of the generated particles
      */
     double radMin_, radMax_;
-
+    
     /*!
      * \brief radius of the fixed bottom particles, mean particle velocity in 
      * X-direction, and allowed maximum randomly added/subtracted velocities in all three

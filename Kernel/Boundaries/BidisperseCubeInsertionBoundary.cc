@@ -20,8 +20,8 @@ BidisperseCubeInsertionBoundary::BidisperseCubeInsertionBoundary(const Bidispers
  */
 BidisperseCubeInsertionBoundary::~BidisperseCubeInsertionBoundary()
 {
-    delete particleToCopyA_; 
-    delete particleToCopyB_; 
+    delete particleToCopyA_;
+    delete particleToCopyB_;
 }
 
 /*!
@@ -32,18 +32,19 @@ BidisperseCubeInsertionBoundary* BidisperseCubeInsertionBoundary::copy() const
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout << "BidisperseCubeInsertionBoundary::copy() const finished" << std::endl;
-#endif		
+#endif
     return new BidisperseCubeInsertionBoundary(*this);
 }
 
 
-void BidisperseCubeInsertionBoundary::set(BaseParticle* particleToCopyA, BaseParticle* particleToCopyB, double probA, int maxFailed,Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax)
+void BidisperseCubeInsertionBoundary::set(BaseParticle* particleToCopyA, BaseParticle* particleToCopyB, double probA,
+                                          int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax)
 {
     particleToCopyA_ = particleToCopyA;
     particleToCopyB_ = particleToCopyB;
     probA_ = probA;
     CubeInsertionBoundary::set(particleToCopyA, maxFailed,
-            posMin, posMax, velMin, velMax, 0, 0);
+                               posMin, posMax, velMin, velMax, 0, 0);
 }
 
 BaseParticle* BidisperseCubeInsertionBoundary::getParticleToCopyA() const
@@ -59,11 +60,11 @@ BaseParticle* BidisperseCubeInsertionBoundary::getParticleToCopyB() const
 /*!
  * \brief Generates a particle with random position and velocity 
  */
-BaseParticle* BidisperseCubeInsertionBoundary::generateParticle(RNG &random)
+BaseParticle* BidisperseCubeInsertionBoundary::generateParticle(RNG& random)
 {
-    double check = random.getRandomNumber(0,1);
+    double check = random.getRandomNumber(0, 1);
     BaseParticle* P = (check < probA_) ? particleToCopyA_->copy()
-                                       : particleToCopyB_->copy() ;  
+                                       : particleToCopyB_->copy();
     Vec3D pos, vel;
     pos.X = random.getRandomNumber(posMin_.X, posMax_.X);
     pos.Y = random.getRandomNumber(posMin_.Y, posMax_.Y);
@@ -75,7 +76,7 @@ BaseParticle* BidisperseCubeInsertionBoundary::generateParticle(RNG &random)
     P->setVelocity(vel);
     return P;
 }
-    
+
 /*!
  * \details Reads the boundary properties from an istream
  * \param[in,out] is        the istream

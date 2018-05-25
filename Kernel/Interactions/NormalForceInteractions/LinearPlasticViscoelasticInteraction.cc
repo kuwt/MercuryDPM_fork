@@ -1,4 +1,4 @@
-        //Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -31,15 +31,17 @@
 #include <fstream>
 #include <Species/NormalForceSpecies/LinearPlasticViscoelasticNormalSpecies.h>
 #include <cmath>    // std::max
+
 /*!
  * \param[in] P
  * \param[in] I
  * \param[in] timeStamp
  */
-LinearPlasticViscoelasticInteraction::LinearPlasticViscoelasticInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp)
+LinearPlasticViscoelasticInteraction::LinearPlasticViscoelasticInteraction(BaseInteractable* P, BaseInteractable* I,
+                                                                           unsigned timeStamp)
         : BaseInteraction(P, I, timeStamp)
 {
-    maxOverlap_=0;
+    maxOverlap_ = 0;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"LinearPlasticViscoelasticInteraction::LinearPlasticViscoelasticInteraction() finished"<<std::endl;
 #endif
@@ -49,7 +51,7 @@ LinearPlasticViscoelasticInteraction::LinearPlasticViscoelasticInteraction(BaseI
 LinearPlasticViscoelasticInteraction::LinearPlasticViscoelasticInteraction()
         : BaseInteraction()
 {
-    maxOverlap_=0;
+    maxOverlap_ = 0;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"LinearPlasticViscoelasticInteraction::LinearPlasticViscoelasticInteraction() finished"<<std::endl;
 #endif
@@ -58,14 +60,16 @@ LinearPlasticViscoelasticInteraction::LinearPlasticViscoelasticInteraction()
 /*!
  * \param[in] p 
  */
-LinearPlasticViscoelasticInteraction::LinearPlasticViscoelasticInteraction(const LinearPlasticViscoelasticInteraction &p)
+LinearPlasticViscoelasticInteraction::LinearPlasticViscoelasticInteraction(
+        const LinearPlasticViscoelasticInteraction& p)
         : BaseInteraction(p)
 {
-    maxOverlap_=p.maxOverlap_;
+    maxOverlap_ = p.maxOverlap_;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"LinearPlasticViscoelasticInteraction::LinearPlasticViscoelasticInteraction(const LinearPlasticViscoelasticInteraction &p finished"<<std::endl;
 #endif
 }
+
 /*!
  *
  */
@@ -85,6 +89,7 @@ void LinearPlasticViscoelasticInteraction::write(std::ostream& os) const
     BaseInteraction::write(os);
     os << " maxOverlap " << maxOverlap_;
 }
+
 /*!
  * \details Calls the read function of BaseInteraction().
  * \param[in,out] is
@@ -92,8 +97,9 @@ void LinearPlasticViscoelasticInteraction::write(std::ostream& os) const
 void LinearPlasticViscoelasticInteraction::read(std::istream& is)
 {
     BaseInteraction::read(is);
-    helpers::readOptionalVariable<Mdouble>(is,"maxOverlap",maxOverlap_);
+    helpers::readOptionalVariable<Mdouble>(is, "maxOverlap", maxOverlap_);
 }
+
 /*!
  * \return std::string
  */
@@ -101,49 +107,54 @@ std::string LinearPlasticViscoelasticInteraction::getBaseName() const
 {
     return "LinearPlasticViscoelastic";
 }
+
 /*!
  *
  */
 void LinearPlasticViscoelasticInteraction::computeLinearPlasticViscoelasticForce()
 {
     // Compute the relative velocity vector of particle P w.r.t. I
-    setRelativeVelocity(getP()->getVelocityAtContact(getContactPoint()) - getI()->getVelocityAtContact(getContactPoint()));
+    setRelativeVelocity(
+            getP()->getVelocityAtContact(getContactPoint()) - getI()->getVelocityAtContact(getContactPoint()));
     // Compute the projection of vrel onto the normal (can be negative)
     setNormalRelativeVelocity(Vec3D::dot(getRelativeVelocity(), getNormal()));
-
+    
     if (getOverlap() > 0) //if contact forces
     {
         const LinearPlasticViscoelasticNormalSpecies* species = getSpecies();
-
+        
         //calculate the overlap above which the max. unloading stiffness becomes active (the 'fluid branch')
         Mdouble effectiveDiameter = 2.0 * getEffectiveRadius();
-        Mdouble deltaStar = (species->getUnloadingStiffnessMax() 
-            / (species->getUnloadingStiffnessMax() - species->getLoadingStiffness())) 
-            * species->getPenetrationDepthMax() * effectiveDiameter;
-    
+        Mdouble deltaStar = (species->getUnloadingStiffnessMax()
+                             / (species->getUnloadingStiffnessMax() - species->getLoadingStiffness()))
+                            * species->getPenetrationDepthMax() * effectiveDiameter;
+        
         //increase max overlap if necessary
-        if (getOverlap()>getMaxOverlap())
+        if (getOverlap() > getMaxOverlap())
             setMaxOverlap(std::min(deltaStar, getOverlap()));
-            
+        
         //calculate the unloading stiffness
-        Mdouble unloadingStiffness = species->getLoadingStiffness() 
-            + (species->getUnloadingStiffnessMax() - species->getLoadingStiffness()) * (getMaxOverlap() / deltaStar);
-
+        Mdouble unloadingStiffness = species->getLoadingStiffness()
+                                     + (species->getUnloadingStiffnessMax() - species->getLoadingStiffness()) *
+                                       (getMaxOverlap() / deltaStar);
+        
         //calculate the overlap where the force is zero
-        Mdouble equilibriumOverlap = (unloadingStiffness - species->getLoadingStiffness()) / unloadingStiffness * maxOverlap_;
-
+        Mdouble equilibriumOverlap =
+                (unloadingStiffness - species->getLoadingStiffness()) / unloadingStiffness * maxOverlap_;
+        
         //compute elastic force
         Mdouble normalForce = unloadingStiffness * (getOverlap() - equilibriumOverlap);
-
+        
         //decrease max overlap if necessary
         Mdouble cohesiveForce = -species->getCohesionStiffness() * getOverlap();
-        if (normalForce < cohesiveForce) {
-            setMaxOverlap((unloadingStiffness + species->getCohesionStiffness()) 
-                / (unloadingStiffness - species->getLoadingStiffness()) * getOverlap());
+        if (normalForce < cohesiveForce)
+        {
+            setMaxOverlap((unloadingStiffness + species->getCohesionStiffness())
+                          / (unloadingStiffness - species->getLoadingStiffness()) * getOverlap());
             //only necessary because the timeStep is finite:
             normalForce = cohesiveForce;
         }
-
+        
         //add dissipative force
         normalForce -= species->getDissipation() * getNormalRelativeVelocity();
         
@@ -158,6 +169,7 @@ void LinearPlasticViscoelasticInteraction::computeLinearPlasticViscoelasticForce
         setTorque(Vec3D(0.0, 0.0, 0.0));
     }
 }
+
 /*!
  *
  */
@@ -165,14 +177,16 @@ void LinearPlasticViscoelasticInteraction::computeNormalForce()
 {
     computeLinearPlasticViscoelasticForce();
 }
+
 /*!
  * \return Mdouble
  */
 Mdouble LinearPlasticViscoelasticInteraction::getElasticEnergy() const
 {
     return getOverlap() > 0 ? 0.5 * (getSpecies()->getLoadingStiffness() * mathsFunc::square(getOverlap())) : 0.0;
-  ///\todo TW this is not correct; we should count the return energy
+    ///\todo TW this is not correct; we should count the return energy
 }
+
 /*!
  * \return const LinearPlasticViscoElasticNormalSpecies*
  */
@@ -180,6 +194,7 @@ const LinearPlasticViscoelasticNormalSpecies* LinearPlasticViscoelasticInteracti
 {
     return dynamic_cast<const LinearPlasticViscoelasticNormalSpecies*>(getBaseSpecies());
 }
+
 /*!
  * \return Mdouble plasticOverlap_
  */
@@ -187,6 +202,7 @@ Mdouble LinearPlasticViscoelasticInteraction::getMaxOverlap() const
 {
     return maxOverlap_;
 }
+
 /*!
  * \param[in] maxOverlap
  */
@@ -194,17 +210,20 @@ void LinearPlasticViscoelasticInteraction::setMaxOverlap(const Mdouble maxOverla
 {
     maxOverlap_ = maxOverlap;
 }
+
 /*!
  * \return Mdouble
  */
 Mdouble LinearPlasticViscoelasticInteraction::getUnloadingStiffness() const
 {
     const LinearPlasticViscoelasticNormalSpecies* species = getSpecies();
-    Mdouble effectiveDiameter = 2.0*getEffectiveRadius();
-    Mdouble deltaMaxFluid = species->getPenetrationDepthMax() * effectiveDiameter / (1.0-species->getLoadingStiffness()/species->getUnloadingStiffnessMax());
+    Mdouble effectiveDiameter = 2.0 * getEffectiveRadius();
+    Mdouble deltaMaxFluid = species->getPenetrationDepthMax() * effectiveDiameter /
+                            (1.0 - species->getLoadingStiffness() / species->getUnloadingStiffnessMax());
     if (getOverlap() > deltaMaxFluid)
         return species->getUnloadingStiffnessMax();
     else
-        return species->getLoadingStiffness() + (species->getUnloadingStiffnessMax() - species->getLoadingStiffness()) * getMaxOverlap()/deltaMaxFluid;
+        return species->getLoadingStiffness() +
+               (species->getUnloadingStiffnessMax() - species->getLoadingStiffness()) * getMaxOverlap() / deltaMaxFluid;
 }
 

@@ -32,7 +32,8 @@
  * \param[in] ch The CGHandler that has to be copied.
  */
 CGHandler::CGHandler(const CGHandler& ch)
-        : BaseHandler(ch) {
+        : BaseHandler(ch)
+{
     setDPMBase(ch.getDPMBase());
     //copyContentsFromOtherHandler(ch);
 }
@@ -126,36 +127,43 @@ void CGHandler::finish()
 void CGHandler::restart(std::string name)
 {
     DPMBase* dpm = getDPMBase();
-
+    
     // determines if the variable name contains the name of a restart file, or a problem name
     // (in which case the restart file is assumed to be name.restart)
     std::string::size_type endName = name.find(".restart");
-    if (endName == std::string::npos) {
+    if (endName == std::string::npos)
+    {
         dpm->setName(name);
-    } else {
+    }
+    else
+    {
         dpm->setName(name.substr(0, endName));
         dpm->restartFile.setName(name);
     }
-
+    
     // set name
     cgLogger(INFO, "Evaluating files named %", dpm->getName());
-
+    
     // read restart file
     if (!dpm->readRestartFile())
     {
-        if (dpm->speciesHandler.getNumberOfObjects()==0) {
+        if (dpm->speciesHandler.getNumberOfObjects() == 0)
+        {
             dpm->speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
         }
         std::ifstream data(dpm->dataFile.getName());
-        if (data.is_open()) {
+        if (data.is_open())
+        {
             Mdouble N = 0, t = 0;
             Vec3D min, max;
             data >> N >> t >> min >> max;
             data.close();
-            dpm->setDomain(min,max);
-            logger(INFO,"Reading domain size from %: min %, max % ",dpm->dataFile.getName(), min,max);
-        } else {
-            logger(ERROR,"Data file could not be opened");
+            dpm->setDomain(min, max);
+            logger(INFO, "Reading domain size from %: min %, max % ", dpm->dataFile.getName(), min, max);
+        }
+        else
+        {
+            logger(ERROR, "Data file could not be opened");
         }
         //adding 10 walls by default
 //        while (dpm->wallHandler.getNumberOfObjects()<10) {
@@ -163,7 +171,8 @@ void CGHandler::restart(std::string name)
 //        }
         //what to do if restart file could not be loaded
         cgLogger(WARN, "Using default dpm setup as % does not exist", dpm->restartFile.getName());
-    } else
+    }
+    else
     {
         cgLogger(INFO, "Successfully restarted from %, t=%, Np=%, Nc=%", dpm->restartFile.getFullName(), dpm->getTime(),
                  dpm->particleHandler.getSize(), dpm->interactionHandler.getNumberOfObjects());
@@ -182,7 +191,8 @@ void CGHandler::restartAndEvaluateDataFiles(const std::string& name, bool evalua
     evaluateDataFiles(evaluateFStatFiles);
 }
 
-void CGHandler::computeContactPoints() {
+void CGHandler::computeContactPoints()
+{
     //recompute contact point (necessary for old restart files)
     for (BaseInteraction* const c : getDPMBase()->interactionHandler)
     {
@@ -200,7 +210,9 @@ void CGHandler::computeContactPoints() {
                 c->setOverlap(PParticle->getRadius() + IParticle->getRadius() - distance);
                 c->setDistance(distance);
                 c->setContactPoint(p - (PParticle->getRadius() - 0.5 * c->getOverlap()) * c->getNormal());
-            } else {
+            }
+            else
+            {
                 const InfiniteWall* const IWall = dynamic_cast<InfiniteWall*>(c->getI());
                 if (IWall != nullptr)
                 {
@@ -209,7 +221,8 @@ void CGHandler::computeContactPoints() {
                     const Vec3D branch = (0.5 * (dist + r)) * IWall->getNormal();
                     c->setNormal(-IWall->getNormal());
                     c->setContactPoint(p + branch);
-                } else
+                }
+                else
                 {
                     const Vec3D IP = p - i;
                     const Mdouble distance = Vec3D::getLength(IP);
@@ -253,42 +266,47 @@ bool CGHandler::evaluateRestartFiles()
 #endif
     // reset counters so reading begins with the first data/fstat file
     DPMBase* const dpm = getDPMBase();
-
+    
     //define and check time limits
     Mdouble timeMin = getTimeMin();
     Mdouble timeMax = getTimeMax();
-    if (getDPMBase()->getTime()>timeMax) {
-        logger(ERROR,"initial restart file (t=%) is beyond the maximum cg time (tMax=%)",dpm->getTime(), timeMax);
-    } else while (getDPMBase()->getTime()<timeMin) {
-        cgLogger(INFO,"Skipped %, t = %, because time is below tMin = %",dpm->restartFile.getFullName(),dpm->getTime(), timeMin);
-        //the particle and wall handler is cleared here, because  BaseSpecies doesn't delete particles belonging to it
-        dpm->particleHandler.clear();
-        dpm->wallHandler.clear();
-        dpm->readRestartFile();
+    if (getDPMBase()->getTime() > timeMax)
+    {
+        logger(ERROR, "initial restart file (t=%) is beyond the maximum cg time (tMax=%)", dpm->getTime(), timeMax);
     }
-
+    else
+        while (getDPMBase()->getTime() < timeMin)
+        {
+            cgLogger(INFO, "Skipped %, t = %, because time is below tMin = %", dpm->restartFile.getFullName(),
+                     dpm->getTime(), timeMin);
+            //the particle and wall handler is cleared here, because  BaseSpecies doesn't delete particles belonging to it
+            dpm->particleHandler.clear();
+            dpm->wallHandler.clear();
+            dpm->readRestartFile();
+        }
+    
     //call initialise to set up mesh, stat files, etc
     initialise();
-
+    
     // evaluate restart files, including the one already read
     do
     {
         cgLogger(INFO, "Read %, t=%, Np=%, Nc=%", dpm->restartFile.getFullName(), dpm->getTime(),
                  dpm->particleHandler.getSize(), dpm->interactionHandler.getNumberOfObjects());
-
+        
         //recompute contact point (necessary for old restart files)
         computeContactPoints();
-
+        
         evaluate();
-
+        
         //the particle and wall handler is cleared here, because  BaseSpecies doesn't delete particles belonging to it
         dpm->particleHandler.clear();
         dpm->wallHandler.clear();
-
+        
         //continue if the next restart file can be read and the max time has not been reached
-    } while (dpm->readRestartFile() && getDPMBase()->getTime()<timeMax);
+    } while (dpm->readRestartFile() && getDPMBase()->getTime() < timeMax);
     cgLogger(INFO, "Finished reading from %", dpm->dataFile.getFullName());
-
+    
     finish();
     dpm->dataFile.close();
     return true;
@@ -319,52 +337,62 @@ bool CGHandler::evaluateDataFiles(bool evaluateFStatFiles)
     //dpm->interactionHandler.clear();
     dpm->dataFile.setCounter(0);
     dpm->fStatFile.setCounter(0);
-
+    
     initialise();
-
+    
     // return false if no data file can be read
     if (!dpm->readNextDataFile()) return false;
-
+    
     //define and check time limits
     const Mdouble timeMin = getTimeMin();
     const Mdouble timeMax = getTimeMax();
-    if (dpm->getTime()>timeMax) {
-        logger(ERROR,"Time stamp of initial data file (%) is beyond the maximum cg time (tMax=%)",dpm->getTime(), timeMax);
-    } else while (dpm->getTime()<timeMin) {
-        if (evaluateFStatFiles) dpm->readNextFStatFile();
-        cgLogger(INFO,"Skipped %, t = %, because time is below tMin = %",dpm->dataFile.getFullName(),dpm->getTime(), timeMin);
-        dpm->readNextDataFile();
+    if (dpm->getTime() > timeMax)
+    {
+        logger(ERROR, "Time stamp of initial data file (%) is beyond the maximum cg time (tMax=%)", dpm->getTime(),
+               timeMax);
     }
-
+    else
+        while (dpm->getTime() < timeMin)
+        {
+            if (evaluateFStatFiles) dpm->readNextFStatFile();
+            cgLogger(INFO, "Skipped %, t = %, because time is below tMin = %", dpm->dataFile.getFullName(),
+                     dpm->getTime(), timeMin);
+            dpm->readNextDataFile();
+        }
+    
     // read data file
     do
     {
         if (evaluateFStatFiles) dpm->readNextFStatFile();
-
+        
         cgLogger(INFO, "Read %, t=%, Np=%, Nc=%", dpm->dataFile.getFullName(), dpm->getTime(),
                  dpm->particleHandler.getSize(), dpm->interactionHandler.getNumberOfObjects());
-
+        
         evaluate();
-    } while (dpm->readNextDataFile() && getDPMBase()->getTime()<=timeMax);
+    } while (dpm->readNextDataFile() && getDPMBase()->getTime() <= timeMax);
     cgLogger(INFO, "Finished reading from %", dpm->dataFile.getFullName());
-
+    
     finish();
     dpm->dataFile.close();
     return true;
 }
 
-Mdouble CGHandler::getTimeMin() {
-    Mdouble time  = inf;
-    for (BaseCG *it : *this) {
-        time  = std::min(time, it->getTimeMin());
+Mdouble CGHandler::getTimeMin()
+{
+    Mdouble time = inf;
+    for (BaseCG* it : *this)
+    {
+        time = std::min(time, it->getTimeMin());
     }
     return time;
 }
 
-Mdouble CGHandler::getTimeMax() {
-    Mdouble time  = -inf;
-    for (BaseCG *it : *this) {
-        time  = std::max(time, it->getTimeMax());
+Mdouble CGHandler::getTimeMax()
+{
+    Mdouble time = -inf;
+    for (BaseCG* it : *this)
+    {
+        time = std::max(time, it->getTimeMax());
     }
     return time;
 }

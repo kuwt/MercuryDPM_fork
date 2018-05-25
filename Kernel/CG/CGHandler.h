@@ -68,74 +68,74 @@ public:
      * \brief Default constructor, creates an empty CGHandler.
      */
     CGHandler() = default;;
-
+    
     /*!
      * \brief Copy constructor, copies the CGHandler and all BaseCGPoint's it contains.
      */
     CGHandler(const CGHandler& BH);
-
+    
     /*!
      * \brief Assignment operator that copies the pointer to the DPMBase and all objects.
      */
     CGHandler& operator=(const CGHandler& rhs);
-
+    
     /*!
      * \brief Destructor, destructs the CGHandler and all BaseCGPoint's it contains.
      */
     ~CGHandler() final = default;
-
+    
     void addObject(BaseCG* cg) final;
-
+    
     std::string getName() const final;
-
+    
     /*!
      * \brief Reads objects into the CGHandler from an istream (currently not 
      * implemented).
      */
     void readAndAddObject(std::istream& is) final;
-
+    
     /*!
      * \brief Writes objects into the CGHandler to an ostream (currently not 
      * implemented).
      */
     void write(std::ostream& os) const;
-
+    
     /*!
      * \brief Contains the code executed before the first time step.
      */
     void initialise();
-
+    
     /*!
      * \brief Contains the code executed at each time step.
      */
     void evaluate();
-
+    
     /*!
      * \brief Contains the code executed after the last time step.
      */
     void finish();
-
+    
     /*!
      * \brief loads restart file, before evaluateDataFiles is run
      */
     void restart(std::string name);
-
+    
     void restartAndEvaluateRestartFiles(const std::string& name);
-
+    
     void restartAndEvaluateDataFiles(const std::string& name, bool evaluateFStatFiles = true);
-
+    
     /*!
      * \brief does the same as StatisticsVector::statistics_from_fstat_and_data:
      * loads a restart file (if existing), then several data files, and fstat files (if existing)
      */
     bool evaluateDataFiles(bool evaluateFStatFiles = true);
-
+    
     bool evaluateRestartFiles();
-
+    
     void computeContactPoints();
-
+    
     Mdouble getTimeMin();
-
+    
     Mdouble getTimeMax();
 };
 

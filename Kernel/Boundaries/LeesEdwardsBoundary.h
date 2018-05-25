@@ -42,22 +42,24 @@ class ParticleHandler;
 class LeesEdwardsBoundary : public BaseBoundary
 {
 public:
-  
+    
     LeesEdwardsBoundary()
     {
 #ifdef MERCURY_USE_MPI
-    MPIContainer& communicator = MPIContainer::Instance();
-    if (communicator.getNumberOfProcessors() > 1)
-    {
-	    logger(WARN,"LeesEdwardsBoundaries are currently not implemented in parallel MercuryDPM");
-    }
+        MPIContainer& communicator = MPIContainer::Instance();
+        if (communicator.getNumberOfProcessors() > 1)
+        {
+            logger(WARN,"LeesEdwardsBoundaries are currently not implemented in parallel MercuryDPM");
+        }
 #endif
     }
     
     /*!
      * \brief Sets all boundary properties
      */
-    void set(std::function<Mdouble (Mdouble)> shift, std::function<Mdouble (Mdouble)> velocity, Mdouble left, Mdouble right, Mdouble down, Mdouble up);  
+    void
+    set(std::function<Mdouble(Mdouble)> shift, std::function<Mdouble(Mdouble)> velocity, Mdouble left, Mdouble right,
+        Mdouble down, Mdouble up);
     
     /*!
      * \brief Reads all boundary properties from a stream
@@ -88,29 +90,29 @@ public:
      * \brief Returns distance from given particle to the closest vertical wall
      */
     Mdouble getVerticalDistance(BaseParticle& p, bool& positive);
-
+    
     /*!
      * \brief Applies a horizontal shift to the given particle
-     */    
+     */
     void shiftHorizontalPosition(BaseParticle* p, bool positive);
-
+    
     /*!
      * \brief Applies a vertical shift to the given particle
-     */    
+     */
     void shiftVerticalPosition(BaseParticle* p, bool positive);
     
     /*!
      * \brief Checks if particle crossed a boundary wall and if so, applies periodic shift
-     */    
+     */
     void checkBoundaryAfterParticleMoved(BaseParticle* p);
     
     /*!
      * \brief Checks if particles need to be adjusted after their position has been updated
      */
     void checkBoundaryAfterParticlesMove(ParticleHandler& pH) override;
-   
+    
     void createPeriodicParticle(BaseParticle* p, ParticleHandler& pH) override;
- 
+    
     /*!
      * \brief Creates horizontal and vertical periodic copies of given particle, if needed
      */
@@ -130,16 +132,17 @@ public:
     
     Mdouble getCurrentVelocity();
     
-    void setShift(std::function<Mdouble (Mdouble)>);
+    void setShift(std::function<Mdouble(Mdouble)>);
     
-    void setVelocity(std::function<Mdouble (Mdouble)>);
-    
+    void setVelocity(std::function<Mdouble(Mdouble)>);
+
 private:
     Mdouble left_;      ///(signed) Horizontal distance between the left wall and the origin
     Mdouble right_;     ///(signed) Horizontal distance between the right wall and the origin
     Mdouble down_;      ///(signed) Vertical distance between the bottom wall and the origin
     Mdouble up_;        ///(signed) Vertical distance between the top wall and the origin
-    std::function<Mdouble (Mdouble)> shift_;
-    std::function<Mdouble (Mdouble)> velocity_;  ///Velocity difference between the top and bottom wall
+    std::function<Mdouble(Mdouble)> shift_;
+    std::function<Mdouble(Mdouble)> velocity_;  ///Velocity difference between the top and bottom wall
 };
+
 #endif

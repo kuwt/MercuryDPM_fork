@@ -40,9 +40,11 @@
 #endif
 
 #endif
+
 #include <cstdlib>
 #include <iostream>
 #include <csignal>
+
 /*
  *  We need these to actually exists. These are used as tags in the template metaprogramming for
  *  the Logger class.
@@ -61,8 +63,7 @@ Logger<MERCURY_LOGLEVEL> logger("MercuryKernel");
 Logger<CG_LOGLEVEL> cgLogger("MercuryCG");
 
 
-
-// Default implementation for logging basic information 
+// Default implementation for logging basic information
 static void printInfo(std::string module, std::string msg)
 {
 #ifdef MERCURY_USE_MPI
@@ -74,7 +75,8 @@ static void printInfo(std::string module, std::string msg)
     std::cout << msg << std::endl;
 #endif
 }
-// Default implementation for logging warnings / messages 
+
+// Default implementation for logging warnings / messages
 static void printMessage(std::string module, std::string msg)
 {
 #ifdef MERCURY_USE_MPI
@@ -155,12 +157,12 @@ static void printMessage(std::string module, std::string msg)
 
 // Default output methods.
 LoggerOutput loggerOutputDefaultImpl = {printError, //onFatal
-        printError, //onError
-        printMessage, //onWarn
-        printInfo, //onInfo
-        printInfo, //onVerbose
-        printMessage //onDebug
-        };
+                                        printError, //onError
+                                        printMessage, //onWarn
+                                        printInfo, //onInfo
+                                        printInfo, //onVerbose
+                                        printMessage //onDebug
+};
 
 //And we assign them.
 LoggerOutput* loggerOutput = &loggerOutputDefaultImpl;

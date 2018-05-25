@@ -37,7 +37,7 @@
  * \param[in] timeStamp
  */
 EmptyAdhesiveInteraction::EmptyAdhesiveInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp)
-    : BaseInteraction(P, I, timeStamp)
+        : BaseInteraction(P, I, timeStamp)
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"EmptyAdhesiveInteraction::EmptyAdhesiveInteraction() finished"<<std::endl;
@@ -45,7 +45,7 @@ EmptyAdhesiveInteraction::EmptyAdhesiveInteraction(BaseInteractable* P, BaseInte
 }
 
 EmptyAdhesiveInteraction::EmptyAdhesiveInteraction()
-    : BaseInteraction()
+        : BaseInteraction()
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"EmptyAdhesiveInteraction::EmptyAdhesiveInteraction() finished"<<std::endl;
@@ -56,12 +56,13 @@ EmptyAdhesiveInteraction::EmptyAdhesiveInteraction()
  * \param[in] P
  */
 EmptyAdhesiveInteraction::EmptyAdhesiveInteraction(const EmptyAdhesiveInteraction& p)
-    : BaseInteraction(p)
+        : BaseInteraction(p)
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"EmptyAdhesiveInteraction::EmptyAdhesiveInteraction(const EmptyAdhesiveInteraction &p finished"<<std::endl;
 #endif
 }
+
 /*!
  *
  */
@@ -71,16 +72,19 @@ EmptyAdhesiveInteraction::~EmptyAdhesiveInteraction()
     std::cout<<"EmptyAdhesiveInteraction::~EmptyAdhesiveInteraction() finished"<<std::endl;
 #endif
 }
+
 /*!
  * \param[in,out] os
  */
 void EmptyAdhesiveInteraction::write(std::ostream& os UNUSED) const
 {}
+
 /*!
  * \param[in,out] is
  */
 void EmptyAdhesiveInteraction::read(std::istream& is UNUSED)
 {}
+
 /*!
  *
  */
@@ -89,6 +93,7 @@ void EmptyAdhesiveInteraction::computeAdhesionForce()
 
 void EmptyAdhesiveInteraction::computeAdhesionInteraction()
 {}
+
 /*!
  * \return Mdouble
  */
@@ -96,13 +101,15 @@ Mdouble EmptyAdhesiveInteraction::getElasticEnergy() const
 {
     return 0.0;
 }
+
 /*!
  * \return const EmptyAdhesiveSpecies*
  */
 const EmptyAdhesiveSpecies* EmptyAdhesiveInteraction::getSpecies() const
 {
-    return dynamic_cast<const EmptyAdhesiveSpecies *>(getBaseSpecies());
+    return dynamic_cast<const EmptyAdhesiveSpecies*>(getBaseSpecies());
 }
+
 /*!
  * \return std::string
  */

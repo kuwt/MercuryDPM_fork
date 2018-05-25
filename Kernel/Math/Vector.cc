@@ -72,7 +72,7 @@ bool Vec3D::isNaN() const
  * \return          resulting 3D vector
  */
 Vec3D Vec3D::operator+(const Vec3D& a) const
-        {
+{
     return Vec3D(X + a.X, Y + a.Y, Z + a.Z);
 }
 
@@ -82,7 +82,7 @@ Vec3D Vec3D::operator+(const Vec3D& a) const
  * \return          resulting vector
  */
 Vec3D Vec3D::operator/(const Mdouble a) const
-        {
+{
     return Vec3D(X / a, Y / a, Z / a);
 }
 
@@ -182,7 +182,7 @@ Vec3D Vec3D::square(const Vec3D& a)
 void Vec3D::normalise()
 {
     Mdouble length2 = this->getLengthSquared();
-    if (length2==0)
+    if (length2 == 0)
     {
         logger(ERROR, "Normalizing a vector of length 0");
     }
@@ -246,7 +246,7 @@ Mdouble Vec3D::getDistance(const Vec3D& a, const Vec3D& b)
  */
 Mdouble Vec3D::getDistanceSquared(const Vec3D& a, const Vec3D& b)
 {
-    return getLengthSquared(a-b);
+    return getLengthSquared(a - b);
 }
 
 /*!
@@ -264,7 +264,7 @@ Mdouble Vec3D::getLengthSquared() const
  * \return              the value of the vector element belonging to the given index
  */
 Mdouble Vec3D::getComponent(const int index) const
-        {
+{
     switch (index)
     {
         case 0:
@@ -274,7 +274,8 @@ Mdouble Vec3D::getComponent(const int index) const
         case 2:
             return Z;
         default:
-            logger(ERROR, "[Vector::getComponent] Index = %, which is too high for a 3D vector (should be 0-2).", index);
+            logger(ERROR, "[Vector::getComponent] Index = %, which is too high for a 3D vector (should be 0-2).",
+                   index);
             return 0;
     }
 }
@@ -299,7 +300,8 @@ void Vec3D::setComponent(const int index, const double val)
             Z = val;
             break;
         default:
-            logger(ERROR, "[Vector::setComponent] Index = %, which is too high for a 3D vector (should be 0-2).", index);
+            logger(ERROR, "[Vector::setComponent] Index = %, which is too high for a 3D vector (should be 0-2).",
+                   index);
     }
 }
 
@@ -328,17 +330,18 @@ Vec3D Vec3D::getCylindricalCoordinates() const
  * See https://en.wikipedia.org/wiki/Vector_fields_in_cylindrical_and_spherical_coordinates
  * \return              Transformed vector
  */
-Vec3D Vec3D::getCylindricalTensorField(const Vec3D &p) const
+Vec3D Vec3D::getCylindricalTensorField(const Vec3D& p) const
 {
     //define sin(A)=y/r, cos(A)=x/r
-    Mdouble r = std::sqrt(p.X*p.X+p.Y*p.Y);
-    Mdouble s = p.Y/r;
-    Mdouble c = p.X/r;
-    if (r==0) {
-        s=0;
-        c=1;
+    Mdouble r = std::sqrt(p.X * p.X + p.Y * p.Y);
+    Mdouble s = p.Y / r;
+    Mdouble c = p.X / r;
+    if (r == 0)
+    {
+        s = 0;
+        c = 1;
     }
-    return Vec3D(X*c+Y*s, -X*s+Y*c, Z);
+    return Vec3D(X * c + Y * s, -X * s + Y * c, Z);
 }
 
 /*!

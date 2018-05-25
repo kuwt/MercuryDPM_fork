@@ -25,6 +25,7 @@
 
 #include "MpiContainer.h"
 #include "Logger.h"
+
 #ifdef MERCURY_USE_MPI
 #include <mpi.h>
 #include "Interactions/BaseInteraction.h"
@@ -32,6 +33,7 @@
 #include "Particles/BaseParticle.h"
 #include "MpiDataClass.h"
 #endif
+
 #include "SpeciesHandler.h"
 #include "GeneralDefine.h"
 
@@ -41,18 +43,18 @@
 MPIContainer::MPIContainer()
 {
 #ifdef MERCURY_USE_MPI
-        if(!MPI::Is_initialized())
-        {
-        	logger(FATAL,"MPI should be initialised before calling the MPIContainer constructor");
-        }
-        //A personal communicator will be created to ensure we don't meddle with communicators of other libraries
-	    MPI::Group groupID = MPI::COMM_WORLD.Get_group();
-        communicator_ = MPI::COMM_WORLD.Create( groupID );
-        processorID_ = communicator_.Get_rank();
-        numberOfProcessors_ = communicator_.Get_size();
+    if(!MPI::Is_initialized())
+    {
+        logger(FATAL,"MPI should be initialised before calling the MPIContainer constructor");
+    }
+    //A personal communicator will be created to ensure we don't meddle with communicators of other libraries
+    MPI::Group groupID = MPI::COMM_WORLD.Get_group();
+    communicator_ = MPI::COMM_WORLD.Create( groupID );
+    processorID_ = communicator_.Get_rank();
+    numberOfProcessors_ = communicator_.Get_size();
 #else
-        numberOfProcessors_ = 1;
-        processorID_ = 0;
+    numberOfProcessors_ = 1;
+    processorID_ = 0;
 #endif
 }
 
@@ -108,8 +110,8 @@ std::size_t MPIContainer::getProcessorID()
 {
     return processorID_;
 }
-  
-    
+
+
 #ifdef MERCURY_USE_MPI
 
 /*!
@@ -121,7 +123,7 @@ std::size_t MPIContainer::getProcessorID()
 MPI::Intracomm& MPIContainer::getComm()
 {
     return communicator_;
-}	
+}
 
 #endif
 

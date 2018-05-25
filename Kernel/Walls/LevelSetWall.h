@@ -47,93 +47,98 @@
 class LevelSetWall final : public BaseWall
 {
 public:
-
+    
     // a set of predefined shapes for which level set values can be set easily
-    enum class Shape {
+    enum class Shape
+    {
         Sphere,
         Cube,
         Diamond,
         FourSided
     };
-
+    
     // Constructor; currently only allows predefined shapes
-    LevelSetWall (Shape s, double radius, ParticleSpecies* sp = nullptr);
-
+    LevelSetWall(Shape s, double radius, ParticleSpecies* sp = nullptr);
+    
     /*!
      * \brief Default destructor.
      */
     ~LevelSetWall() override;
-
+    
     /*!
      * \brief Wall copy method. It calls the copy constructor of this Wall, useful for polymorphism
      */
     LevelSetWall* copy() const override;
-
+    
     using BaseWall::move;
 
 //    /*!
 //     * \brief Returns the distance of the wall to the particle.
 //     */
 //    Mdouble getDistance(Vec3D position) const;
-
+    
     /*!
      * \brief Compute the distance from the wall for a given BaseParticle and return if there is a collision. If there is a collision, also return the normal vector.
      */
     bool getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const override;
-
+    
     /*!
      * \brief Reads LevelSetWall from a restart file.
      */
     void read(std::istream& is) override;
-
+    
     /*!
      * \brief Returns the name of the object, in this case the string "LevelSetWall".
      */
     std::string getName() const override;
-
+    
     /*!
      * Adds the vtk wall representation to the VTK container
      */
-    void writeVTK (VTKContainer& vtk) const override;
-
+    void writeVTK(VTKContainer& vtk) const override;
+    
     /*!
     * \param n how many points should be used to interpolate
     * \param radiusContact how much should be added to the radius
     */
-    void writeToFile (int n, double radiusContact) const;
+    void writeToFile(int n, double radiusContact) const;
 
 private:
-
+    
     // Evaluates the distance and normal direction to the surface defined by the level set. Needed for contact detection.
     // If distance is bigger than radius_+radiusContact, no normal & distance is returned because no contact is possible.
     // Else, it returns the overlap (level set value) and normal direction (-gradient).
-    bool getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble interactionRadius, Mdouble& distance, Vec3D& normal) const;
-
-    void setShapeSphere ();
-
-    void setShapeCube ();
-
+    bool getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble interactionRadius, Mdouble& distance,
+                                            Vec3D& normal) const;
+    
+    void setShapeSphere();
+    
+    void setShapeCube();
+    
     //Better interpolated than a square as the edges of the level set align with the mesh.
-    void setShapeDiamond ();
-
-    void setShapeFourSided ();
-
+    void setShapeDiamond();
+    
+    void setShapeFourSided();
+    
     void createVTKSphere();
+    
     void createVTKCube();
+    
     void createVTKDiamond();
+    
     void createVTKFourSided();
-
-
+    
+    
     // N determines the number of level set values (2N+1)^3;
     // \todo template the level set with N.
     static const int N = 10;
-
+    
     // discrete set of level-set values; levelSet_[i,j,k] is the value of the level set at (x,y,z)=(i,j,k)/N*radius_.
-    double levelSet_[2*N+1][2*N+1][2*N+1];
-
+    double levelSet_[2 * N + 1][2 * N + 1][2 * N + 1];
+    
     // the radius of a sphere that envelopes the object
     double radius_ = 1;
-
+    
     VTKContainer vtkLabFrame_;
 };
 

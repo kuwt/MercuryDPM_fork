@@ -27,63 +27,65 @@
 #define ThermalParticle_H
 
 #include "BaseParticle.h"
+
 /*!
  * \class ThermalParticle
  * \brief
  */
-class ThermalParticle final: public BaseParticle
+class ThermalParticle final : public BaseParticle
 {
 public:
     /*!
      * \brief Basic Particle constructor, creates a particle at (0,0,0) with radius, mass and inertia equal to 1
      */
     ThermalParticle();
-
+    
     /*!
      * \brief Particle copy constructor, which accepts as input a reference to a Particle. It creates a copy of this Particle and all it's information. Usually it is better to use the copy() function for polymorfism.
      */
-    ThermalParticle(const ThermalParticle &p);
-
+    ThermalParticle(const ThermalParticle& p);
+    
     /*!
      * \brief Particle destructor, needs to be implemented and checked if it removes tangential spring information
      */
     ~ThermalParticle() override;
-
+    
     /*!
      * \brief Particle copy method. It calls to copy constructor of this Particle, useful for polymorfism
      */
     ThermalParticle* copy() const override;
     
     
-	void write(std::ostream& os) const override;
-	
-	std::string getName() const override;
-	
-	void read(std::istream& is) override;
-
-	Mdouble getTemperature() const;
-	
+    void write(std::ostream& os) const override;
+    
+    std::string getName() const override;
+    
+    void read(std::istream& is) override;
+    
+    Mdouble getTemperature() const;
+    
     void setTemperature(Mdouble temperature);
-
+    
     void addTemperature(Mdouble temperature);
-
-	void setTemperatureDependentDensity(const std::function<double(double)> &temperatureDependentDensity);
-
-	const std::function<double(double)> &getTemperatureDependentDensity() const;
-
-	const std::function<double(double)> &getTimeDependentTemperature() const;
-
-	void setTimeDependentTemperature(const std::function<double(double)> &timeDependentTemperature);
-
-	void actionsAfterTimeStep() override;
+    
+    void setTemperatureDependentDensity(const std::function<double(double)>& temperatureDependentDensity);
+    
+    const std::function<double(double)>& getTemperatureDependentDensity() const;
+    
+    const std::function<double(double)>& getTimeDependentTemperature() const;
+    
+    void setTimeDependentTemperature(const std::function<double(double)>& timeDependentTemperature);
+    
+    void actionsAfterTimeStep() override;
 
 private:
-
-	/*!
-	 * Change this function to let the temperature be time-dependent.
-	 */
-	std::function<double(double temperature)> timeDependentTemperature_;
-
-	Mdouble temperature_;
+    
+    /*!
+     * Change this function to let the temperature be time-dependent.
+     */
+    std::function<double(double temperature)> timeDependentTemperature_;
+    
+    Mdouble temperature_;
 };
+
 #endif

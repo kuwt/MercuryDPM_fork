@@ -47,52 +47,52 @@
 class InfiniteWall final : public BaseWall
 {
 public:
-
+    
     /*!
      * \brief Default constructor, the normal is infinitely long.
      */
     InfiniteWall();
-
+    
     /*!
      * \brief Copy constructor, copy the given wall.
      */
     InfiniteWall(const InfiniteWall& w);
-
+    
     /*!
      * \brief Constructor setting species.
      */
     explicit InfiniteWall(const ParticleSpecies* species);
-
+    
     /*!
      * \brief Constructor setting values.
      */
     InfiniteWall(Vec3D normal, Vec3D point, const ParticleSpecies* species);
-
+    
     /*!
      * \brief Constructor setting values if 3 coordinates are given
      */
     InfiniteWall(Vec3D PointA, Vec3D PointB, Vec3D PointC, const ParticleSpecies* species);
-
+    
     /*!
      * \brief Default destructor.
      */
     ~InfiniteWall() override;
-
+    
     /*!
      * \brief Wall copy method. It calls the copy constructor of this Wall, useful for polymorphism
      */
     InfiniteWall* copy() const override;
-
+    
     /*!
      * \brief Defines a standard wall, given an outward normal vector s.t. normal*x=normal*point for all x of the wall.
      */
     void set(Vec3D normal, Vec3D point);
-
+    
     /*!
      * \brief Changes the normal of the InfiniteWall.
      */
     void setNormal(Vec3D normal);
-
+    
     /*!
      * \brief Defines a standard wall by computing normal*position = point and using the overloaded function set(Vec3D, vec3D).
      * \deprecated In Mercury 2, the user will have to use the new interface, 
@@ -100,14 +100,14 @@ public:
      */
     MERCURY_DEPRECATED
     void set(Vec3D normal, Mdouble position);
-
+    
     using BaseWall::move;
-
+    
     /*!
      * \brief Returns the distance of the wall to the particle.
      */
     Mdouble getDistance(Vec3D position) const;
-
+    
     /*!
      * \brief Compute the distance from the wall for a given BaseParticle and return if there is a collision. If there is a collision, also return the normal vector.
      */
@@ -118,46 +118,46 @@ public:
     */
     bool getDistanceNormalOverlapSuperquadric(const SuperQuadric& p, Mdouble& distance, Vec3D& normal_return,
                                               Mdouble& overlap) const override;
-
+    
     /*!
      * \brief Reads InfiniteWall from a restart file.
      */
     void read(std::istream& is) override;
-
+    
     /*!
      * \brief Reads InfiniteWall from an old-style restart file.
      */
     void oldRead(std::istream& is);
-
+    
     /*!
      * \brief Writes the InfiniteWall to an output stream, usually a restart file.
      */
     //void write(std::ostream& os) const override;
-
+    
     /*!
      * \brief Returns the name of the object, in this case the string "InfiniteWall".
      */
     std::string getName() const override;
-
+    
     /*!
      * \brief Access function for normal.
      */
     Vec3D getNormal() const;
-
+    
     /*!
      * Returns all intersection points of the infinite wall with the domain boundary.
      */
-    void createVTK (std::vector<Vec3D>& myPoints) const;
-
+    void createVTK(std::vector<Vec3D>& myPoints) const;
+    
     /*!
      * Same as createVTK(), but with a self-defined domain size (useful for plotting AxisymmetricWall's).
      */
-    void createVTK (std::vector<Vec3D>& myPoints, Vec3D max, Vec3D min) const;
-
+    void createVTK(std::vector<Vec3D>& myPoints, Vec3D max, Vec3D min) const;
+    
     /*!
      * Adds the vtk wall representation to the VTK container
      */
-    void writeVTK (VTKContainer& vtk) const override;
+    void writeVTK(VTKContainer& vtk) const override;
     
     Vec3D getFurthestPointSuperQuadric(const Vec3D& normalBodyFixed, const Vec3D& axes) const override;
 };

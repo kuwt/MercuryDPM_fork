@@ -50,12 +50,12 @@ public:
      * \brief Default constructor, it creates an empty DomainHandler.
      */
     DomainHandler();
-
+    
     /*!
      * \brief Constructor that copies all Domain it contains.
      */
     DomainHandler(const DomainHandler& DH);
-
+    
     /*!
      * \brief Assignment operator. 
      */
@@ -65,32 +65,35 @@ public:
      * \brief Destructor, it destructs the DomainHandler and all Domain it contains.
      */
     ~DomainHandler() final;
-
+    
     /*!
      * \brief Creates a Cartesian square mesh in 3D
-     */   
-    void createMesh(std::vector<Mdouble>& simulationMin, std::vector<Mdouble>& simulationMax, std::vector<unsigned>& numberOfDomains, bool open);
-   
+     */
+    void createMesh(std::vector<Mdouble>& simulationMin, std::vector<Mdouble>& simulationMax,
+                    std::vector<unsigned>& numberOfDomains, bool open);
+    
     /*!
      * \brief Recursive function that creates the domains for a 3D mesh
-     */ 
-    void createDomains(std::vector<Mdouble> domainMin, std::vector<Mdouble> domainMax, std::vector<unsigned>& globalMeshIndex, std::vector<unsigned>& numberOfDomains, int dimCounter, std::vector<Mdouble>& meshSize, bool open);
-  
+     */
+    void createDomains(std::vector<Mdouble> domainMin, std::vector<Mdouble> domainMax,
+                       std::vector<unsigned>& globalMeshIndex, std::vector<unsigned>& numberOfDomains, int dimCounter,
+                       std::vector<Mdouble>& meshSize, bool open);
+    
     /*!
      * \brief Adds a Domain to the DomainHandler. 
      */
     void addObject(Domain* D) final;
-   
+    
     /*!
      * \brief \todo Still has to be implemented 
      */
     void readAndAddObject(std::istream& is) final;
-
+    
     /*!
      * \brief \todo Still has to be implemented 
      */
     void readOldObject(std::istream& is);
-
+    
     /*!
      * \brief \todo Still has to be implemented 
      */
@@ -100,72 +103,72 @@ public:
      * \brief This sets a domain to the processor
      */
     void setCurrentDomainIndex(unsigned int index);
-
+    
     /*!
      * \brief Gets the domain assigned to the processor
      */
     Domain* getCurrentDomain();
-
+    
     /*!
      * \brief Gets the domain index assigned to the processor
-     */    
+     */
     unsigned int getCurrentDomainIndex() const;
-
+    
     /*!
      * \brief Sets the number of domains in the domain handler
-     */ 
+     */
     void setNumberOfDomains(std::vector<unsigned>& numberOfdomains);
     
     /*!
      * \brief  Gets the number of domains in the domain handler
      */
     std::vector<unsigned> getNumberOfDomains();
-
+    
     /*!
      * \brief Sets the interaction distance of the domain handler
      */
     void setInteractionDistance(Mdouble interactionDistance);
-
+    
     /*!
      * \brief Gets the interaction distance of the domain handler
      */
     Mdouble getInteractionDistance();
-
+    
     /// \todo MX: function under construction
     ///\todo TW@Marnix should this be unsigned int?
     int getParticleDomainGlobalIndex(BaseParticle* particle);
-
+    
     ///\todo TW@Marnix should this be unsigned int?
     int getParticleProcessor(int globalIndex);
-
+    
     ///\todo TW@Marnix should this be unsigned int?
     Domain* getParticleDomain(int globalIndex);
-
+    
     void updateStatus(std::set<BaseParticle*>& particlesToBeDeleted);
-
+    
     void updateVelocity();
-
+    
     void addNewParticles();
     
     void initialise();
 
 private:
-
+    
     /*!
      * \brief Index to the particular domain of this process
-     */ 
+     */
     unsigned int currentDomainIndex_;
-
+    
     /*!
      * \brief look-up table to find the processor of a domain given the globalIndex of the domain
-     */    
+     */
     std::vector<int> globalIndexToProcessorList_;
     
     /*!
      * \brief vector containing the number of domains in Cartesian direction
      */
     std::vector<unsigned> numberOfDomains_;
-
+    
     /*!
      * \brief Interaction distance between a domain boundary and the communication zone boundary
      */

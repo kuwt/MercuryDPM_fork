@@ -26,6 +26,9 @@
 #ifndef Side_H
 #define Side_H
 
-enum class Side{LEFT, RIGHT, NOT_CONNECTED};
+enum class Side
+{
+    LEFT, RIGHT, NOT_CONNECTED
+};
 
 #endif

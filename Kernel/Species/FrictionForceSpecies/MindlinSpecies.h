@@ -25,6 +25,7 @@
 
 #ifndef MINDLINSPECIES_H
 #define MINDLINSPECIES_H
+
 #include "Species/BaseSpecies.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/FrictionForceInteractions/MindlinInteraction.h"
@@ -38,63 +39,64 @@ class MindlinSpecies : public virtual BaseSpecies
 public:
     ///\brief The correct Interaction type for this FrictionForceSpecies
     typedef MindlinInteraction InteractionType;
-
+    
     ///\brief The default constructor.
     MindlinSpecies();
-
+    
     ///\brief The default copy constructor.
-    MindlinSpecies(const MindlinSpecies &s);
-
+    MindlinSpecies(const MindlinSpecies& s);
+    
     ///\brief The default destructor.
     ~MindlinSpecies() override;
-
+    
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is) override;
-
+    
     /// \brief Writes the species properties to an output stream.
     void write(std::ostream& os) const override;
-
+    
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     virtual std::string getBaseName() const;
 
 //setters and getters
-
+    
     ///Allows the tangential viscosity to be changed
     void setSlidingDissipation(Mdouble new_dispt);
-
+    
     ///Allows the tangential viscosity to be accessed
     Mdouble getSlidingDissipation() const;
-
+    
     ///Allows the (dynamic) Coulomb friction coefficient to be changed; also sets mu_s by default
     //mu has to be set to allow tangential forces (sets dispt=disp as default)
     void setSlidingFrictionCoefficient(Mdouble new_mu);
-
+    
     //k_edit
     //allows the shear modulus to be set / changed
     void setShearModulus(Mdouble new_G);
+    
     //k_edit
     //allows the value of the shear modulus to be accessed
     Mdouble getShearModulus() const;
-
+    
     ///Allows the (dynamic) Coulomb friction coefficient to be accessed
     Mdouble getSlidingFrictionCoefficient() const;
-
+    
     ///Allows the static Coulomb friction coefficient to be changed
     void setSlidingFrictionCoefficientStatic(Mdouble new_mu);
-
+    
     ///Allows the static Coulomb friction coefficient to be accessed
     Mdouble getSlidingFrictionCoefficientStatic() const;
-
+    
     /*!
      * \brief Returns true if torques have to be calculated.
      */
     bool getUseAngularDOFs() const override;
-
+    
     ///\brief creates default values for mixed species
-    void mix(MindlinSpecies*S, MindlinSpecies*T);
+    void mix(MindlinSpecies* S, MindlinSpecies* T);
 
 private:
-
+    
     /*! 
      * \brief tangential dissipation coefficient. 
      * \details Typically set to 2/7 of the normal force dissipation, as both
@@ -104,17 +106,18 @@ private:
      * the restitution is zero and the particles stick.
      * \bug not used currently
      */
-    Mdouble slidingDissipation_; 
+    Mdouble slidingDissipation_;
     
     /// (dynamic) Coulomb friction coefficient
-    Mdouble slidingFrictionCoefficient_; 
+    Mdouble slidingFrictionCoefficient_;
     
     /// static Coulomb friction coefficient (by default set equal to mu)
     Mdouble slidingFrictionCoefficientStatic_;
-
+    
     //k_edit
     // the shear modulus of a given particle. By default, set to zero;
     Mdouble shearModulus_;
-
+    
 };
+
 #endif

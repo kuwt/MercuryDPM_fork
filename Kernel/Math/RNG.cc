@@ -43,10 +43,10 @@ RNG::RNG()
     q_ = 273;
     randomSeedLaggedFibonacciGenerator_.resize(p_);
     seedLaggedFibonacciGenerator();
-
+    
     haveSavedBoxMuller_ = false;
     savedBoxMuller_ = 0;
-
+    
 }
 
 void RNG::setRandomSeed(unsigned long int new_seed)
@@ -128,7 +128,7 @@ void RNG::randomise()
         q_ = values[5];
         randomSeedLinearCongruentialGenerator_ = values[6];
         seedLaggedFibonacciGenerator();
-    } 
+    }
 #else
     setRandomSeed(static_cast<unsigned long int>(time(nullptr)));
 #endif
@@ -136,23 +136,23 @@ void RNG::randomise()
 
 void RNG::setRandomNumberGenerator(RNGType type)
 {
-    type_=type;
+    type_ = type;
 }
 
 Mdouble RNG::getRandomNumber()
 {
-    return getRandomNumber(0,1);
+    return getRandomNumber(0, 1);
 }
 
 Mdouble RNG::getRandomNumber(Mdouble min, Mdouble max)
-{   
+{
     switch (type_)
     {
         case RNGType::LINEAR_CONGRUENTIAL_GENERATOR:
             return getRandomNumberFromLinearCongruentialGenerator(min, max);
         case RNGType::LAGGED_FIBONACCI_GENERATOR:
             return getRandomNumberFromLaggedFibonacciGenerator(min, max);
-    }    
+    }
 }
 
 /* \details This uses the Box--Muller transform
@@ -164,7 +164,7 @@ Mdouble RNG::getRandomNumber(Mdouble min, Mdouble max)
 Mdouble RNG::getNormalVariate()
 {
     static const double epsilon = std::numeric_limits<Mdouble>::min();
-
+    
     if (haveSavedBoxMuller_)
     {
         /* If we have already generated a normal variate, use it. */
@@ -179,14 +179,14 @@ Mdouble RNG::getNormalVariate()
         do
         {
             radius = getRandomNumber(0, 1);
-            theta = getRandomNumber(0, 2*constants::pi);
-        } while (radius <= epsilon); 
+            theta = getRandomNumber(0, 2 * constants::pi);
+        } while (radius <= epsilon);
         // make sure that the radius generated is not too small
         // (unlikely to happen, just a safety check)
-
+        
         savedBoxMuller_ = sqrt(-2.0 * log(radius)) * sin(theta);
         haveSavedBoxMuller_ = true;
-        return            sqrt(-2.0 * log(radius)) * cos(theta);
+        return sqrt(-2.0 * log(radius)) * cos(theta);
     }
 }
 
@@ -194,14 +194,14 @@ Mdouble RNG::getNormalVariate(Mdouble mean, Mdouble stdev)
 {
     if (stdev == 0)
     {
-        logger(WARN, 
-            "[RNG::getNormalVariate(Mdouble, Mdouble)] Zero stdev?");
+        logger(WARN,
+               "[RNG::getNormalVariate(Mdouble, Mdouble)] Zero stdev?");
         return mean;
     }
     else if (stdev < 0)
-        logger(ERROR, 
-            "[RNG::getNormalVariate(Mdouble, Mdouble)] Negative stdev is not allowed.");
-    else 
+        logger(ERROR,
+               "[RNG::getNormalVariate(Mdouble, Mdouble)] Negative stdev is not allowed.");
+    else
         return getNormalVariate() * stdev + mean;
 }
 

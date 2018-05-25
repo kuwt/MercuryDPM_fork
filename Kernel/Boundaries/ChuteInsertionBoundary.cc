@@ -32,7 +32,7 @@
  * \details Default constructor. Initiates all properties with 0 value.
  */
 //This is not the most beautiful code, but it works.
-ChuteInsertionBoundary::ChuteInsertionBoundary(): InsertionBoundary()
+ChuteInsertionBoundary::ChuteInsertionBoundary() : InsertionBoundary()
 {
     posMax_ = Vec3D(0.0, 0.0, 0.0);
     posMin_ = Vec3D(0.0, 0.0, 0.0);
@@ -46,7 +46,7 @@ ChuteInsertionBoundary::ChuteInsertionBoundary(): InsertionBoundary()
 /*!
  * \details Copy constructor. Calls InsertionBoundary parent copy constructor.
  */
-ChuteInsertionBoundary::ChuteInsertionBoundary(const ChuteInsertionBoundary& other) 
+ChuteInsertionBoundary::ChuteInsertionBoundary(const ChuteInsertionBoundary& other)
         : InsertionBoundary(other)
 {
     posMax_ = other.posMax_;
@@ -66,7 +66,7 @@ ChuteInsertionBoundary* ChuteInsertionBoundary::copy() const
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout << "ChuteInsertionBoundary::copy() const finished" << std::endl;
-#endif		
+#endif
     return new ChuteInsertionBoundary(*this);
 }
 
@@ -92,7 +92,9 @@ ChuteInsertionBoundary* ChuteInsertionBoundary::copy() const
  *                                      as a percentage of inflowVelocity_.
  *                                      See also the documentation of ChuteInsertionBoundary::generateParticle().
  */
-void ChuteInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, double radMin, double radMax, double fixedParticleRadius, double inflowVelocity, double inflowVelocityVariance)
+void ChuteInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
+                                 double radMin, double radMax, double fixedParticleRadius, double inflowVelocity,
+                                 double inflowVelocityVariance)
 {
     if (particleToCopy != nullptr)
     {
@@ -133,10 +135,10 @@ BaseParticle* ChuteInsertionBoundary::generateParticle(RNG& random)
 void ChuteInsertionBoundary::placeParticle(BaseParticle* p, RNG& random)
 {
     Vec3D position, velocity;
-
+    
     position.X = posMin_.X + p->getRadius();
-
-    if (mathsFunc::isEqual(posMax_.Y - posMin_.Y , 2.0 * radMax_, 1e-10))
+    
+    if (mathsFunc::isEqual(posMax_.Y - posMin_.Y, 2.0 * radMax_, 1e-10))
     {
         position.Y = posMin_.Y + p->getRadius();
     }
@@ -149,14 +151,15 @@ void ChuteInsertionBoundary::placeParticle(BaseParticle* p, RNG& random)
     // The velocity components are first stored in a Vec3D, because if you pass them 
     // directly into setVelocity the compiler is allowed to change the order in 
     // which the numbers are generated
-    velocity.X = inflowVelocity_ * random.getRandomNumber(-inflowVelocityVariance_, inflowVelocityVariance_) + inflowVelocity_;
+    velocity.X = inflowVelocity_ * random.getRandomNumber(-inflowVelocityVariance_, inflowVelocityVariance_) +
+                 inflowVelocity_;
     velocity.Y = inflowVelocity_ * random.getRandomNumber(-inflowVelocityVariance_, inflowVelocityVariance_);
     velocity.Z = inflowVelocity_ * random.getRandomNumber(-inflowVelocityVariance_, inflowVelocityVariance_);
     
     p->setPosition(position);
     p->setVelocity(velocity);
     
-
+    
 }
 
 /*!
@@ -168,12 +171,12 @@ void ChuteInsertionBoundary::read(std::istream& is)
     InsertionBoundary::read(is);
     std::string dummy;
     is >> dummy >> posMin_
-            >> dummy >> posMax_
-            >> dummy >> radMin_
-            >> dummy >> radMax_
-            >> dummy >> fixedParticleRadius_
-            >> dummy >> inflowVelocity_
-            >> dummy >> inflowVelocityVariance_;
+       >> dummy >> posMax_
+       >> dummy >> radMin_
+       >> dummy >> radMax_
+       >> dummy >> fixedParticleRadius_
+       >> dummy >> inflowVelocity_
+       >> dummy >> inflowVelocityVariance_;
 }
 
 /*!
@@ -185,13 +188,13 @@ void ChuteInsertionBoundary::oldRead(std::istream& is)
     unsigned int maxFailed;
     std::string dummy;
     is >> dummy >> maxFailed
-            >> dummy >> posMin_
-            >> dummy >> posMax_
-            >> dummy >> radMin_
-            >> dummy >> radMax_
-            >> dummy >> fixedParticleRadius_
-            >> dummy >> inflowVelocity_
-            >> dummy >> inflowVelocityVariance_;
+       >> dummy >> posMin_
+       >> dummy >> posMax_
+       >> dummy >> radMin_
+       >> dummy >> radMax_
+       >> dummy >> fixedParticleRadius_
+       >> dummy >> inflowVelocity_
+       >> dummy >> inflowVelocityVariance_;
     setMaxFailed(maxFailed);
 }
 
@@ -200,15 +203,15 @@ void ChuteInsertionBoundary::oldRead(std::istream& is)
  * \param[in] os    the ostream
  */
 void ChuteInsertionBoundary::write(std::ostream& os) const
-        {
+{
     InsertionBoundary::write(os);
     os << " posMin " << posMin_
-            << " posMax " << posMax_
-            << " radMin " << radMin_
-            << " radMax " << radMax_
-            << " fixedParticleRadius " << fixedParticleRadius_
-            << " inflowVelocity " << inflowVelocity_
-            << " inflowVelocityVariance " << inflowVelocityVariance_;
+       << " posMax " << posMax_
+       << " radMin " << radMin_
+       << " radMax " << radMax_
+       << " fixedParticleRadius " << fixedParticleRadius_
+       << " inflowVelocity " << inflowVelocity_
+       << " inflowVelocityVariance " << inflowVelocityVariance_;
     
 }
 
