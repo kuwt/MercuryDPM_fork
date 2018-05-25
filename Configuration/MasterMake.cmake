@@ -44,10 +44,21 @@ endif()
 
 
 file(GLOB TESTDATAFILES "${CMAKE_CURRENT_SOURCE_DIR}/SelfTestData/*.*")
+file(GLOB MPITESTDATAFILES "${CMAKE_CURRENT_SOURCE_DIR}/MPITestData/*.*")
+
 #for each file in the selftest_data folder create a test. Which checks the data against this old data. The actually testing is done my the script self_test.
 foreach(TESTFILE ${TESTDATAFILES})
         get_filename_component(TESTNAME ${TESTFILE} NAME)
-	add_test(${TESTNAME} ${CMAKE_SOURCE_DIR}/Scripts/self_test ${TESTFILE} ${TESTNAME})
+		add_test(${TESTNAME} ${CMAKE_SOURCE_DIR}/Scripts/self_test ${TESTFILE} ${TESTNAME})
         #Add the newly created files to the clean target
         set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${TESTNAME}")
 endforeach()
+
+if (Mercury_USE_MPI)
+	foreach(TESTFILE ${MPITESTDATAFILES})
+		get_filename_component(TESTNAME ${TESTFILE} NAME)
+		add_test(${TESTNAME} ${CMAKE_SOURCE_DIR}/Scripts/self_test ${TESTFILE} ${TESTNAME})
+		#Add the newly created files to the clean target
+		set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${TESTNAME}")
+	endforeach()
+endif()
