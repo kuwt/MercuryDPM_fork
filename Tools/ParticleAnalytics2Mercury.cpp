@@ -90,29 +90,32 @@ public:
 
         //read next lines p3p
         logger(INFO,"Reading % particles at time %",N,time);
-        BaseParticle p; ///\todo taking this line of of the for loop gives a huge speed improvement; why?
-        for (unsigned i=0; i<N; ++i) {
-            unsigned id, species;
-            Mdouble volume, mass;
-            Vec3D position, velocity;
-            pFile_ >> id >> species >> volume >> mass >> position >> velocity;
-            std::getline(pFile_, line);
-            //logger(INFO,"% % % % % %",id, species, volume, mass, position, velocity);
-            // add new species as necessary
-            while (dpm.speciesHandler.getNumberOfObjects()<species) {
-                LinearViscoelasticReversibleAdhesiveSpecies species;
-                species.setDensity(mass/volume);
-                //use an infinite interaction radius
-                species.setAdhesionForceMax(1e20);
-                species.setAdhesionStiffness(1);
-                logger(INFO,"Adding species of density %",species.getDensity());
-                dpm.speciesHandler.copyAndAddObject(species);
+        {
+            BaseParticle p; ///\todo taking this line of of the for loop gives a huge speed improvement; why?
+            for (unsigned i = 0; i < N; ++i) {
+                unsigned id, species;
+                Mdouble volume, mass;
+                Vec3D position, velocity;
+                pFile_ >> id >> species >> volume >> mass >> position >> velocity;
+                std::getline(pFile_, line);
+                if (version_==Version::P3) species--;
+                //logger(INFO,"% % % % % %",id, species, volume, mass, position, velocity);
+                // add new species as necessary
+                while (dpm.speciesHandler.getNumberOfObjects() <= species) {
+                    LinearViscoelasticReversibleAdhesiveSpecies species;
+                    species.setDensity(mass / volume);
+                    //use an infinite interaction radius
+                    species.setAdhesionForceMax(1e20);
+                    species.setAdhesionStiffness(1);
+                    logger(INFO, "Adding species of density %", species.getDensity());
+                    dpm.speciesHandler.copyAndAddObject(species);
+                }
+                p.setSpecies(dpm.speciesHandler.getObject(species));
+                p.setRadius(cbrt(0.75 / pi * volume));
+                p.setPosition(position);
+                p.setVelocity(velocity);
+                dpm.particleHandler.copyAndAddObject(p)->setId(id);
             }
-            p.setSpecies(dpm.speciesHandler.getObject(species-1));
-            p.setRadius(cbrt(0.75/pi*volume));
-            p.setPosition(position);
-            p.setVelocity(velocity);
-            dpm.particleHandler.copyAndAddObject(p)->setId(id);
         }
         //logger(INFO,"Read % particles",dpm.particleHandler.getNumberOfObjects());
 
@@ -135,14 +138,30 @@ public:
         logger(INFO,"Reading % contacts",N,time);
         for (unsigned i=0; i<N; ++i) {
             unsigned id1, id2;
-            Vec3D force;
-            cFile_ >> id1 >> id2 >> force;
-            std::getline(cFile_, line);
+            Vec3D force, contact;
+            cFile_ >> id1 >> id2;
             BaseParticle* p1 = dpm.particleHandler.getObjectById(id1);
             BaseParticle* p2 = dpm.particleHandler.getObjectById(id2);
             logger.assert(p1!=nullptr,"Particle % does not exist",id1);
             logger.assert(p2!=nullptr,"Particle % does not exist",id1);
+            Vec3D P1ToP2 = p2->getPosition()-p1->getPosition();
+            std::vector<BaseInteraction*> c = p1->getInteractionWith(p2,time,&dpm.interactionHandler);
+            logger.assert(!c.empty() && c[0],"Particle-particle interaction % % does not exist",p1,p2);
+            c[0]->setDistance(P1ToP2.getLength());
+            c[0]->setNormal(P1ToP2/c[0]->getDistance());
+            c[0]->setOverlap(c[0]->getDistance()-p1->getRadius()-p2->getRadius());
+            if (version_==Version::P3) {
+                cFile_ >> force;
+                contact = p1->getPosition()-P1ToP2*((p1->getRadius()-0.5*c[0]->getOverlap())/c[0]->getDistance());
+            } else {
+                cFile_ >> contact >> force;
+            }
+            std::getline(cFile_, line);
+            c[0]->setContactPoint(contact);
+            c[0]->setForce(force);
+            if (i%(N/10)==0) {std::cout << "\r " << std::round((double)i/N*100) << '%'; std::cout.flush();}
         }
+        std::cout << '\n';
 
         //read first line p3w
         std::getline(wFile_, line);
@@ -168,21 +187,26 @@ public:
         logger(INFO,"Reading % wall contacts",N,time);
         for (unsigned i=0; i<N; ++i) {
             unsigned id;
-            Vec3D force, PC;
-            wFile_ >> id >> force >> PC;
-            std::getline(wFile_, line);
+            Vec3D force, contact, particleToContact;
+            wFile_ >> id;
             BaseParticle* p = dpm.particleHandler.getObjectById(id);
             logger.assert(p!=nullptr,"Particle % does not exist",id);
             std::vector<BaseInteraction*> c = w->getInteractionWith(p,time,&dpm.interactionHandler);
-            logger.assert(!c.empty() && c[0],"Interaction % does not exist",c.size());
-            c[0]->setContactPoint(p->getPosition()-PC);
-            c[0]->setDistance(PC.getLength());
-            c[0]->setNormal(PC/c[0]->getDistance());
+            logger.assert(!c.empty() && c[0],"Particle-wall interaction % % does not exist",p,w);
+            if (version_==Version::P3) {
+                wFile_ >> force >> particleToContact;
+                contact = p->getPosition()-particleToContact;
+            } else {
+                wFile_ >> contact >> force;
+                particleToContact = p->getPosition()-contact;
+            }
+            std::getline(wFile_, line);
+            c[0]->setContactPoint(contact);
+            c[0]->setDistance(particleToContact.getLength());
+            c[0]->setNormal(particleToContact/c[0]->getDistance());
             c[0]->setOverlap(c[0]->getDistance()-p->getRadius());
             c[0]->setForce(force);
-            //logger(INFO,"C % N % P % O %",c[0]->getContactPoint(),c[0]->getNormal(),p->getPosition(),c[0]->getOverlap());
         }
-        //logger(INFO,"Read %",dpm.interactionHandler.getNumberOfObjects());
 
         logger(INFO,"Writing output files");
         for (const auto p : dpm.particleHandler) {

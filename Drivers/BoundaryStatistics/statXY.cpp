@@ -48,11 +48,11 @@ template <StatType T> class statistics_while_running : public StatisticsVector<T
 	// allows getZMax() to be set to the height of the highest particle
 	void auto_set_domain() {
 		if (particleHandler.getNumberOfObjects()) {
-		  Vec3D Max= particleHandler.getObject(0)->getRadius() + particleHandler.getObject(0)->getPosition();
-		  Vec3D Min= - particleHandler.getObject(0)->getRadius() + particleHandler.getObject(0)->getPosition();//Particles[0].Position-Particles[0].Radius;
+		  Vec3D Max= particleHandler.getObject(0)->getRadius()*Vec3D(1,1,1) + particleHandler.getObject(0)->getPosition();
+		  Vec3D Min= - particleHandler.getObject(0)->getRadius()*Vec3D(1,1,1)  + particleHandler.getObject(0)->getPosition();//Particles[0].Position-Particles[0].Radius;
 			for (unsigned int i=0; i<particleHandler.getNumberOfObjects(); i++) {
-			  Max=Vec3D::max(Max,particleHandler.getObject(i)->getRadius() + particleHandler.getObject(0)->getPosition());
-			  Min=Vec3D::min(Min,- particleHandler.getObject(i)->getRadius() + particleHandler.getObject(0)->getPosition());
+			  Max=Vec3D::max(Max,particleHandler.getObject(i)->getRadius()*Vec3D(1,1,1)  + particleHandler.getObject(0)->getPosition());
+			  Min=Vec3D::min(Min,- particleHandler.getObject(i)->getRadius()*Vec3D(1,1,1)  + particleHandler.getObject(0)->getPosition());
 			}
 			setXMax(Max.X+.05*(Max.X-Min.X));
 			setXMin(Min.X-.05*(Max.X-Min.X));

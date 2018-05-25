@@ -44,7 +44,7 @@ public:
 		species->setSlidingStiffness(2.0/7.0* species->getStiffness());
 		species->setSlidingDissipation(species->getDissipation());
 		species->setSlidingFrictionCoefficient(0.5);
-        setTimeStep(0.02 * helpers::computeCollisionTimeFromKAndDispAndEffectiveMass(species->getStiffness(),species->getDissipation(),0.5*species->getMassFromRadius(0.5 * (getMinInflowParticleRadius() + getMaxInflowParticleRadius()))));
+		setTimeStep(0.02 * species->getCollisionTime(species->getMassFromRadius(0.5 * (getMinInflowParticleRadius() + getMaxInflowParticleRadius()))));
 		std::cout << getTimeStep() << std::endl;
 
 		//		setDensity(6./pi);
