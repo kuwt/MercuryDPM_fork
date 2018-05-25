@@ -96,8 +96,7 @@ public:
         //define material properties
 		//set normal force
         //setStiffnessAndRestitutionCoefficient(NormalForce/(relOverlap*RadiusPrime), Restitution, Mass);
-        species->setStiffness(NormalForce/(relOverlap*RadiusPrime));
-        species->setDissipation(helpers::computeDispFromKAndRestitutionCoefficientAndEffectiveMass(species->getStiffness(), Restitution, Mass));
+        species->setStiffnessAndRestitutionCoefficient(NormalForce/relOverlap/RadiusPrime, Restitution, Mass);
         //set dt accordingly
         Mdouble tc = species->getCollisionTime(Mass);
         //setTimeStep(tc/50.);

@@ -59,7 +59,7 @@ public:
 	}
 
 private:
-	void computeExternalForces(BaseParticle* P){computeForcesDueToWalls(P);}
+	void computeExternalForces(BaseParticle* P){}
 		
 };
 
