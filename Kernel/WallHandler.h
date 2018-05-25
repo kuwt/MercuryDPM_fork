@@ -88,10 +88,7 @@ public:
     std::string getName() const final;
 
     /**
-     * \brief Reads triangulated wall from vtk file, and converts it into a set of TriangleWalls
-     * \param[in] filename name of vtk input file, e.g. TriangulatedWallSelfTest.vtk
-     * \param[in] species pointer to a species in the species handler that will be assigned to the walls
-     * \param[in] scaleFactor allows the vertex positions to be scaled (necessary if the vtk file is written in different units than the Mercury implementation) 
+     * \brief Reads triangulated walls from vtk or stl files, and converts them into a set of TriangleWalls
      */
     void readTriangleWall(std::string filename, ParticleSpecies* species, Mdouble scaleFactor=1);
     

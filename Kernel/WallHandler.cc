@@ -309,6 +309,14 @@ void WallHandler::writeVTKBoundingBox() const
     file.close();
 }
 
+/**
+ * \details The stl files have to be binary STL files. If you have ascii files, you need to convert them (use e.g. https://www.meshconvert.com/)
+ *
+ * The vtk files need to be of type POLYDATA and contain triangle strips (see \ref http://www.cacr.caltech.edu/~slombey/asci/vtk/vtk_formats.simple.html)
+ * \param[in] filename name of vtk input file, e.g. TriangulatedWallSelfTest.vtk
+ * \param[in] species pointer to a species in the species handler that will be assigned to the walls
+ * \param[in] scaleFactor allows the vertex positions to be scaled (necessary if the vtk file is written in different units than the Mercury implementation, e.g. if the stl file is given in mm, but the Mercury implementation uses meters)
+ */
 void WallHandler::readTriangleWall(std::string filename, ParticleSpecies *species, Mdouble scaleFactor)
 {
     std::string fileType = filename.substr(filename.find_last_of('.')+1);
