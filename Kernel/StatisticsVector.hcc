@@ -927,29 +927,29 @@ std::string StatisticsVector<T>::print_CG()
 
 ///Output names of statistical variables
 template<StatType T>
-StatisticsPoint <T> StatisticsVector<T>::average(std::vector<StatisticsPoint < T>>
+StatisticsPoint<T> StatisticsVector<T>::average(std::vector<StatisticsPoint<T>>
 
-& P)
+                                                & P)
 {
-StatisticsPoint <T> avg;
-avg.
-
-set_zero();
-
-for (
-unsigned int i = 0;
-i<P.
-
-size();
-
-i++)
-avg += P[i];
-avg /= P.
-
-size();
-
-return
-avg;
+    StatisticsPoint<T> avg;
+    avg.
+            
+            set_zero();
+    
+    for (
+            unsigned int i = 0;
+            i < P.
+                    
+                    size();
+            
+            i++)
+        avg += P[i];
+    avg /= P.
+            
+            size();
+    
+    return
+            avg;
 }
 
 template<StatType T>
@@ -1159,7 +1159,7 @@ void StatisticsVector<T>::write_time_average_statistics()
     for (unsigned int i = 0; i < timeAverage.size(); i++)
         statFile.getFstream() << timeAverage[i];
     // write to std::cout
-    StatisticsPoint <T> avg = average(timeAverage);
+    StatisticsPoint<T> avg = average(timeAverage);
     std::cout << "Averages: " << avg.print() << std::endl;
     
     if (getDoVariance())

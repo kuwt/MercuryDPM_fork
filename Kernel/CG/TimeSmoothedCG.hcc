@@ -57,7 +57,7 @@ void TimeSmoothedCG<Coordinates, BaseFunction, Fields>::write(std::ostream& os) 
 template<class Coordinates, template<class> class BaseFunction, class Fields>
 void
 TimeSmoothedCG<Coordinates, BaseFunction, Fields>::writeAll(std::ostream& os,
-                                                            TimeSmoothedFields <Fields>& average) const
+                                                            TimeSmoothedFields<Fields>& average) const
 {
     auto itPoint = CG<Coordinates, BaseFunction, Fields>::points_.begin();
     for (auto averageVariable : average.fields_)
@@ -96,7 +96,7 @@ Mdouble TimeSmoothedCG<Coordinates, BaseFunction, Fields>::getTimeStep() const
 }
 
 template<class Coordinates, template<class> class BaseFunction, class Fields>
-TimeSmoothedCG <Coordinates, BaseFunction, Fields>* TimeSmoothedCG<Coordinates, BaseFunction, Fields>::copy() const
+TimeSmoothedCG<Coordinates, BaseFunction, Fields>* TimeSmoothedCG<Coordinates, BaseFunction, Fields>::copy() const
 {
     return new TimeSmoothedCG(*this);
 }
@@ -206,8 +206,8 @@ void TimeSmoothedCG<Coordinates, BaseFunction, Fields>::finish()
     while (averages_.size() != 0)
     {
         // find the object with the smallest time value
-        typename std::vector<TimeSmoothedFields < Fields> > ::iterator
-        next = averages_.begin();
+        typename std::vector<TimeSmoothedFields<Fields> >::iterator
+                next = averages_.begin();
         for (auto it = next + 1; it != averages_.end(); it++)
         {
             if (it->time_ < next->time_)
