@@ -47,69 +47,69 @@ namespace CGCoordinates
  * over homogeneously.
  * \details See XYZ for details.
  */
-    class O : public BaseCoordinates
+class O : public BaseCoordinates
+{
+public:
+    
+    /*!
+     * \brief Writes the coordinate names in human-readable form to an ostream.
+     */
+    static void writeNames(std::ostream& os);
+    
+    /*!
+     * \brief Writes the coordinates in human-readable form to an ostream.
+     */
+    void write(std::ostream& os) const;
+    
+    /*!
+     * \brief returns the factor the CGFunction has to be divided by, due to
+     * integrating the variables over the averaged dimensions, 1.0 for XYZ.
+     */
+    static Mdouble getVolumeOfAveragedDimensions(const Vec3D& min, const Vec3D& max);
+    
+    /*!
+     * \brief Returns the square of the distance between the particle p and
+     * the current CGPoint, in the non-averaged directions.
+     */
+    Mdouble getDistanceSquared(const Vec3D& p) const;
+    
+    /*!
+     * \brief Normalises the coefficients of Polynomial CGFunction such that
+     * the integral over all non-averaged dimensions is unity.
+     */
+    static void normalisePolynomialCoefficients(std::vector<Mdouble>& coefficients, Mdouble cutoff);
+    
+    /*!
+     * returns the number of variables (in this case three)
+     */
+    static const unsigned countVariables();
+    
+    static Mdouble getGaussPrefactor(Mdouble width, Mdouble cutoff)
+    { return 1.0; }
+    
+    static std::array<bool, 3> getCoordinateDirection()
     {
-    public:
+        std::array<bool, 3> direction;
+        direction[0] = false;
+        direction[1] = false;
+        direction[2] = false;
         
-        /*!
-         * \brief Writes the coordinate names in human-readable form to an ostream.
-         */
-        static void writeNames(std::ostream& os);
-        
-        /*!
-         * \brief Writes the coordinates in human-readable form to an ostream.
-         */
-        void write(std::ostream& os) const;
-        
-        /*!
-         * \brief returns the factor the CGFunction has to be divided by, due to
-         * integrating the variables over the averaged dimensions, 1.0 for XYZ.
-         */
-        static Mdouble getVolumeOfAveragedDimensions(const Vec3D& min, const Vec3D& max);
-        
-        /*!
-         * \brief Returns the square of the distance between the particle p and
-         * the current CGPoint, in the non-averaged directions.
-         */
-        Mdouble getDistanceSquared(const Vec3D& p) const;
-        
-        /*!
-         * \brief Normalises the coefficients of Polynomial CGFunction such that
-         * the integral over all non-averaged dimensions is unity.
-         */
-        static void normalisePolynomialCoefficients(std::vector <Mdouble>& coefficients, Mdouble cutoff);
-        
-        /*!
-         * returns the number of variables (in this case three)
-         */
-        static const unsigned countVariables();
-        
-        static Mdouble getGaussPrefactor(Mdouble width, Mdouble cutoff)
-        { return 1.0; }
-        
-        static std::array<bool, 3> getCoordinateDirection()
-        {
-            std::array<bool, 3> direction;
-            direction[0] = false;
-            direction[1] = false;
-            direction[2] = false;
-            
-            return direction;
-        }
-        
-        static std::string getName();
-        
-    };
+        return direction;
+    }
+    
+    static std::string getName();
+    
+};
 
 /*!
  * See \ref spaceEvenly for details.
  */
-    template<typename T>
-    typename std::enable_if<std::is_base_of<CGCoordinates::O, typename T::CoordinatesType>::value, void>::type
-    spaceEvenly(Vec3D min, Vec3D max, std::vector <std::size_t> nAll, std::vector <T>& points)
-    {
-        points.resize(1);
-    }
+template<typename T>
+typename std::enable_if<std::is_base_of<CGCoordinates::O, typename T::CoordinatesType>::value, void>::type
+spaceEvenly(Vec3D min, Vec3D max, std::vector<std::size_t> nAll, std::vector<T>& points)
+{
+    points.resize(1);
+}
     
 }
 #endif

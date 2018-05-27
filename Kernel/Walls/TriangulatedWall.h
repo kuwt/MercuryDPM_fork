@@ -143,12 +143,12 @@ private:
     /*!
      * stores the vertex coordinates
      */
-    std::vector <Vec3D> vertex_;
+    std::vector<Vec3D> vertex_;
     
     /*!
      * stores the face properties
      */
-    std::vector <Face> face_;
+    std::vector<Face> face_;
     
 };
 

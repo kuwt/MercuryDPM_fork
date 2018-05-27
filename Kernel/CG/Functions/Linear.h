@@ -34,29 +34,29 @@ namespace CGFunctions
  * \brief A specialisation of Polynomials for PolynomialType::Linear.
  * See Polynomial for details.
  */
-    template<class Coordinates>
-    class Linear : public Polynomial<Coordinates>
-    {
-    public:
-        
-        /*!
-         * \brief Default constructor, simply sets the PolynomialType.
-         * \details
-         */
-        Linear() : Polynomial<Coordinates>()
-        {
-            Polynomial<Coordinates>::setPolynomialType(PolynomialType::LINEAR);
-        }
-    };
+template<class Coordinates>
+class Linear : public Polynomial<Coordinates>
+{
+public:
     
-    typedef CGFunctions::Linear<CGCoordinates::O> LinearO;
-    typedef CGFunctions::Linear<CGCoordinates::X> LinearX;
-    typedef CGFunctions::Linear<CGCoordinates::Y> LinearY;
-    typedef CGFunctions::Linear<CGCoordinates::Z> LinearZ;
-    typedef CGFunctions::Linear<CGCoordinates::YZ> LinearYZ;
-    typedef CGFunctions::Linear<CGCoordinates::XZ> LinearXZ;
-    typedef CGFunctions::Linear<CGCoordinates::XY> LinearXY;
-    typedef CGFunctions::Linear<CGCoordinates::XYZ> LinearXYZ;
+    /*!
+     * \brief Default constructor, simply sets the PolynomialType.
+     * \details
+     */
+    Linear() : Polynomial<Coordinates>()
+    {
+        Polynomial<Coordinates>::setPolynomialType(PolynomialType::LINEAR);
+    }
+};
+
+typedef CGFunctions::Linear<CGCoordinates::O> LinearO;
+typedef CGFunctions::Linear<CGCoordinates::X> LinearX;
+typedef CGFunctions::Linear<CGCoordinates::Y> LinearY;
+typedef CGFunctions::Linear<CGCoordinates::Z> LinearZ;
+typedef CGFunctions::Linear<CGCoordinates::YZ> LinearYZ;
+typedef CGFunctions::Linear<CGCoordinates::XZ> LinearXZ;
+typedef CGFunctions::Linear<CGCoordinates::XY> LinearXY;
+typedef CGFunctions::Linear<CGCoordinates::XYZ> LinearXYZ;
     
 } //namespace CGFunctions
 #endif

@@ -68,12 +68,12 @@ private:
     /*!
      * \brief Stores the coefficients \f$c_i\f$.
      */
-    std::vector <Mdouble> coefficients; //starting with the highest order
+    std::vector<Mdouble> coefficients; //starting with the highest order
     
     /*!
      * \brief Stores some coefficients used in #evaluate and #evaluateIntegral for StatTypes different from XYZ.
      */
-    std::vector <Mdouble> averaged_coefficients;
+    std::vector<Mdouble> averaged_coefficients;
 
 //definition of member functions
 
@@ -92,7 +92,7 @@ public:
     /*!
      * \brief Use this function to set the polynomial #coefficients \f$c_i\f$. This function calls #finish_set_polynomial to normalize the #coefficients.
      */
-    void set_polynomial(std::vector <Mdouble> new_coefficients, unsigned int new_dim);
+    void set_polynomial(std::vector<Mdouble> new_coefficients, unsigned int new_dim);
     
     /*!
      * \brief Some as #set_polynomial, but avoids the use of a vector

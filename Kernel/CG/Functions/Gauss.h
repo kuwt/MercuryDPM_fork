@@ -75,173 +75,173 @@ namespace CGFunctions
  * \class Coordinates
  * \brief Template argument; use a member class of CGCoordinates to instantiate.
  */
-    template<class Coordinates>
-    class Gauss
-    {
-    public:
-        
-        typedef Coordinates CoordinatesType;
-        
-        /*!
-         * \brief Default constructor, it simply creates an empty GaussCoordinates.
-         */
-        Gauss();
-        
-        /*!
-         * \brief Copy constructor. It copies the GaussCoordinates and all objects it contains.
-         */
-        Gauss(const Gauss& c) = default;
-        
-        /*!
-         * \brief Destructor, does nothing, as no new'ed objects are used.
-         */
-        ~Gauss() = default;
-        
-        /*!
-         * \brief Writes class content into an output stream, usually a stat file
-         */
-        void write(std::ostream& os) const;
-        
-        /*!
-         * \brief
-         */
-        //void setStandardDeviation(Mdouble standardDeviation);
-        
-        /*!
-         * \brief Sets the width of the coarse-graining function.
-         */
-        void setWidth(Mdouble width);
-        
-        /*!
-         * \brief Sets the standard deviation of the coarse-graining function.
-         */
-        void setStandardDeviation(Mdouble std);
-        
-        /*!
-         * \brief Sets the width and cutoff of the coarse-graining function.
-         */
-        void setWidthAndCutoff(Mdouble width, Mdouble cutoff);
-        
-        /*!
-         * \brief Returns the width of the coarse-graining function.
-         */
-        Mdouble getWidth() const;
-        
-        /*!
-         * \brief Returns the cutoff of the coarse-graining function.
-         */
-        Mdouble getCutoff() const;
-        
-        /*!
-         * \brief Returns the finite difference step size used to evaluate derivatives
-         * of the CG function
-         */
-        Mdouble getEps() const;
-        
-        /*!
-         * \brief Sets the finite difference step size used to evaluate derivatives
-         * of the CG function.
-         */
-        void setEps(Mdouble eps);
-        
-        /*!
-         * \brief Evaluates the coarse-graining function.
-         */
-        Mdouble evaluateCGFunction(const Vec3D& position, const Coordinates r);
-        
-        Vec3D evaluateCGFunctionDerivatives(const Vec3D& position, const Coordinates& r);
-        
-        Mdouble evaluateCGFunctionDerivativeWithFD(const Vec3D& position, const Coordinates& r, const int i);
-        
-        Mdouble evaluateCylindricalCGFunction(const Vec3D& position, const CGCoordinates::R r)
-        { return NaN; }
-        
-        /*!
-         * \brief Evaluates the line integral needed for the calculation of stresses.
-         */
-        Mdouble
-        evaluateCGIntegral(const BaseInteraction& i, const Coordinates r, IntegralType type = IntegralType::I_TO_P);
-        
-        Mdouble evaluateCylindricalCGIntegral(const BaseInteraction& c, const CGCoordinates::R r,
-                                              IntegralType type = IntegralType::I_TO_P)
-        { return NaN; }
-        
-        /*!
-         * \brief Evaluates the line integral needed for the calculation of stresses
-         * for 1D CGCoordinates.
-         */
-        Mdouble
-        evaluateCGIntegral1D(const BaseInteraction& i, const Coordinates r, IntegralType type = IntegralType::I_TO_P);
+template<class Coordinates>
+class Gauss
+{
+public:
     
-    protected:
-        
-        /*!
-         * The coarse-graining width.
-         * It is 1.0 by default, unless modified by the user.
-         * \todo TW I thought of implementing width_, cutoff_ and prefactor_ as
-         * const Mdouble&, as theses parameters are not set per CGPoint,
-         * but per CG object (i.e. all points share the same values).
-         * However, this site seems to discourage this:
-         * http://stackoverflow.com/questions/12387239/reference-member-variables-as-class-members
-         * Anyone has an opinion on this? @dducks @thorntonar
-         */
-        Mdouble width_;
-        
-        /*!
-         * The cutoff of the coarse-graining function.
-         * It is 3.0 by default, unless modified by the user.
-         */
-        Mdouble cutoff_;
-        
-        /*!
-         * The prefactor of the coarse-graining function.
-         * This parameter is internal, thus cannot be set directly by the user.
-         */
-        Mdouble prefactor_;
-        
-        /*!
-         * The prefactor of the coarse-graining integral.
-         * Depends on the value of currentDistance_.
-         * This parameter is internal, thus cannot be set directly by the user.
-         */
-        Mdouble integralPrefactor_;
-        
-        Mdouble normalLength_;
-        
-        Vec3D normal_;
-        
-        /*!
-         * The length of the branch vector of the current interaction.
-         * If this parameter is changed, the integralPrefactor_ has to be recomputed.
-         * This parameter is internal, thus cannot be set directly by the user.
-         */
-        unsigned currentInteraction_;
-        
-        /*!
-         * Finite Difference step size, used to compute the derivative of the CG function
-         */
-        Mdouble eps_;
-        
-    };
+    typedef Coordinates CoordinatesType;
+    
+    /*!
+     * \brief Default constructor, it simply creates an empty GaussCoordinates.
+     */
+    Gauss();
+    
+    /*!
+     * \brief Copy constructor. It copies the GaussCoordinates and all objects it contains.
+     */
+    Gauss(const Gauss& c) = default;
+    
+    /*!
+     * \brief Destructor, does nothing, as no new'ed objects are used.
+     */
+    ~Gauss() = default;
+    
+    /*!
+     * \brief Writes class content into an output stream, usually a stat file
+     */
+    void write(std::ostream& os) const;
+    
+    /*!
+     * \brief
+     */
+    //void setStandardDeviation(Mdouble standardDeviation);
+    
+    /*!
+     * \brief Sets the width of the coarse-graining function.
+     */
+    void setWidth(Mdouble width);
+    
+    /*!
+     * \brief Sets the standard deviation of the coarse-graining function.
+     */
+    void setStandardDeviation(Mdouble std);
+    
+    /*!
+     * \brief Sets the width and cutoff of the coarse-graining function.
+     */
+    void setWidthAndCutoff(Mdouble width, Mdouble cutoff);
+    
+    /*!
+     * \brief Returns the width of the coarse-graining function.
+     */
+    Mdouble getWidth() const;
+    
+    /*!
+     * \brief Returns the cutoff of the coarse-graining function.
+     */
+    Mdouble getCutoff() const;
+    
+    /*!
+     * \brief Returns the finite difference step size used to evaluate derivatives
+     * of the CG function
+     */
+    Mdouble getEps() const;
+    
+    /*!
+     * \brief Sets the finite difference step size used to evaluate derivatives
+     * of the CG function.
+     */
+    void setEps(Mdouble eps);
+    
+    /*!
+     * \brief Evaluates the coarse-graining function.
+     */
+    Mdouble evaluateCGFunction(const Vec3D& position, const Coordinates r);
+    
+    Vec3D evaluateCGFunctionDerivatives(const Vec3D& position, const Coordinates& r);
+    
+    Mdouble evaluateCGFunctionDerivativeWithFD(const Vec3D& position, const Coordinates& r, const int i);
+    
+    Mdouble evaluateCylindricalCGFunction(const Vec3D& position, const CGCoordinates::R r)
+    { return NaN; }
+    
+    /*!
+     * \brief Evaluates the line integral needed for the calculation of stresses.
+     */
+    Mdouble
+    evaluateCGIntegral(const BaseInteraction& i, const Coordinates r, IntegralType type = IntegralType::I_TO_P);
+    
+    Mdouble evaluateCylindricalCGIntegral(const BaseInteraction& c, const CGCoordinates::R r,
+                                          IntegralType type = IntegralType::I_TO_P)
+    { return NaN; }
+    
+    /*!
+     * \brief Evaluates the line integral needed for the calculation of stresses
+     * for 1D CGCoordinates.
+     */
+    Mdouble
+    evaluateCGIntegral1D(const BaseInteraction& i, const Coordinates r, IntegralType type = IntegralType::I_TO_P);
+
+protected:
+    
+    /*!
+     * The coarse-graining width.
+     * It is 1.0 by default, unless modified by the user.
+     * \todo TW I thought of implementing width_, cutoff_ and prefactor_ as
+     * const Mdouble&, as theses parameters are not set per CGPoint,
+     * but per CG object (i.e. all points share the same values).
+     * However, this site seems to discourage this:
+     * http://stackoverflow.com/questions/12387239/reference-member-variables-as-class-members
+     * Anyone has an opinion on this? @dducks @thorntonar
+     */
+    Mdouble width_;
+    
+    /*!
+     * The cutoff of the coarse-graining function.
+     * It is 3.0 by default, unless modified by the user.
+     */
+    Mdouble cutoff_;
+    
+    /*!
+     * The prefactor of the coarse-graining function.
+     * This parameter is internal, thus cannot be set directly by the user.
+     */
+    Mdouble prefactor_;
+    
+    /*!
+     * The prefactor of the coarse-graining integral.
+     * Depends on the value of currentDistance_.
+     * This parameter is internal, thus cannot be set directly by the user.
+     */
+    Mdouble integralPrefactor_;
+    
+    Mdouble normalLength_;
+    
+    Vec3D normal_;
+    
+    /*!
+     * The length of the branch vector of the current interaction.
+     * If this parameter is changed, the integralPrefactor_ has to be recomputed.
+     * This parameter is internal, thus cannot be set directly by the user.
+     */
+    unsigned currentInteraction_;
+    
+    /*!
+     * Finite Difference step size, used to compute the derivative of the CG function
+     */
+    Mdouble eps_;
+    
+};
 
 ///Defines a short notation for the Gaussian CGFunction templated with a certain CGCoordinate.
-    typedef CGFunctions::Gauss<CGCoordinates::O> GaussO;
+typedef CGFunctions::Gauss<CGCoordinates::O> GaussO;
 ///Defines a short notation for the Gaussian CGFunction templated with a certain CGCoordinate.
-    typedef CGFunctions::Gauss<CGCoordinates::X> GaussX;
+typedef CGFunctions::Gauss<CGCoordinates::X> GaussX;
 ///Defines a short notation for the Gaussian CGFunction templated with a certain CGCoordinate.
-    typedef CGFunctions::Gauss<CGCoordinates::Y> GaussY;
+typedef CGFunctions::Gauss<CGCoordinates::Y> GaussY;
 ///Defines a short notation for the Gaussian CGFunction templated with a certain CGCoordinate.
-    typedef CGFunctions::Gauss<CGCoordinates::Z> GaussZ;
+typedef CGFunctions::Gauss<CGCoordinates::Z> GaussZ;
 ///Defines a short notation for the Gaussian CGFunction templated with a certain CGCoordinate.
-    typedef CGFunctions::Gauss<CGCoordinates::YZ> GaussYZ;
+typedef CGFunctions::Gauss<CGCoordinates::YZ> GaussYZ;
 ///Defines a short notation for the Gaussian CGFunction templated with a certain CGCoordinate.
-    typedef CGFunctions::Gauss<CGCoordinates::XZ> GaussXZ;
+typedef CGFunctions::Gauss<CGCoordinates::XZ> GaussXZ;
 ///Defines a short notation for the Gaussian CGFunction templated with a certain CGCoordinate.
-    typedef CGFunctions::Gauss<CGCoordinates::XY> GaussXY;
+typedef CGFunctions::Gauss<CGCoordinates::XY> GaussXY;
 ///Defines a short notation for the Gaussian CGFunction templated with a certain CGCoordinate.
-    typedef CGFunctions::Gauss<CGCoordinates::XYZ> GaussXYZ;
+typedef CGFunctions::Gauss<CGCoordinates::XYZ> GaussXYZ;
 ///Defines a short notation for the Gaussian CGFunction templated with a certain CGCoordinate.
-    typedef CGFunctions::Gauss<CGCoordinates::R> GaussR;
+typedef CGFunctions::Gauss<CGCoordinates::R> GaussR;
     
 } //namespace CGFunctions
 #include "Gauss.hcc"

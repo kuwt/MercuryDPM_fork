@@ -8,9 +8,9 @@ include_directories(
 #For the Fortran-based linear algebra
 add_subdirectory(Math)
 
-if(Mercury_USE_MPI)
+if (Mercury_USE_MPI)
     include_directories(${MPI_CXX_INCLUDE_PATH})
-endif()
+endif ()
 
 #Compile all .cc in the directories below, and add them to the library DPMBase
 file(GLOB Boundaries_SRC "Boundaries/*.cc")
@@ -54,7 +54,6 @@ add_library(DPMBase STATIC
         MpiDataClass.cc
 
 
-
         BoundaryHandler.cc
         PeriodicBoundaryHandler.cc
         InteractionHandler.cc
@@ -78,25 +77,24 @@ add_library(DPMBase STATIC
         ${Nurbs_SRC}
 
         CMakeDefinitions.cc
-)
+        )
 
 target_link_libraries(DPMBase LinearAlgebra)
 
-if(Mercury_BACKTRACE_DEMANGLE)
+if (Mercury_BACKTRACE_DEMANGLE)
     if (Mercury_BACKTRACE_LINK_DL)
         target_link_libraries(DPMBase dl)
-    endif()
+    endif ()
     if (Mercury_BACKTRACE_LINK_EXECINFO)
         target_link_libraries(DPMBase execinfo)
-    endif()
-endif()
+    endif ()
+endif ()
 
-if(Mercury_USE_MPI)
-    set( DEP_COMPILE_FLAGS "${DEP_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS}" )
-    set( DEP_LINKER_FLAGS "${DEP_LINKER_FLAGS} ${MPI_LINK_FLAGS}")
+if (Mercury_USE_MPI)
+    set(DEP_COMPILE_FLAGS "${DEP_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS}")
+    set(DEP_LINKER_FLAGS "${DEP_LINKER_FLAGS} ${MPI_LINK_FLAGS}")
     target_link_libraries(DPMBase "${MPI_LIBRARIES}")
-endif()
-
+endif ()
 
 
 #Could later create a 2D and 3D library seperatly, but sure how many we want to create

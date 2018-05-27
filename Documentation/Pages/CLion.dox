@@ -16,4 +16,11 @@ Setting up CLion is easy:
 Now your project will be set up, which will take a few minutes. After that, you are ready to go.
 
 N.B. Your build directory will be called cmake-build-debug (or cmake-build-release) and is located inside the source directory.
+
+# Coding style
+
+CLion can directly apply the MercuryDPM coding style. Simply import the file below, and apply the coding style by clicking "Code"->"Reformat COde"
+For import instructions, see https://www.jetbrains.com/help/clion/copying-code-style-settings.html.
+
+<a href="MercuryCodingStyle.xml">MercuryCodingStyle.xml</a>
 */

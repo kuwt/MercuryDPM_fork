@@ -72,7 +72,7 @@ public:
      * A vector of StandardFields values whose length is equal to the number of CGPoints.
      * Is used to compute the time-smoothed fields. 
      */
-    std::vector <Fields> fields_;
+    std::vector<Fields> fields_;
     
     /*!
      * The time for which smoothed-time fields are evaluated

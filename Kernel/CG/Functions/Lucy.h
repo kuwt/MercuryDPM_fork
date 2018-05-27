@@ -34,29 +34,29 @@ namespace CGFunctions
  * \brief A specialisation of Polynomials for PolynomialType::Lucy.
  * See Polynomial for details.
  */
-    template<class Coordinates>
-    class Lucy : public Polynomial<Coordinates>
-    {
-    public:
-        
-        /*!
-         * \brief Default constructor, simply sets the PolynomialType.
-         * \details
-         */
-        Lucy() : Polynomial<Coordinates>()
-        {
-            Polynomial<Coordinates>::setPolynomialType(PolynomialType::LUCY);
-        }
-    };
+template<class Coordinates>
+class Lucy : public Polynomial<Coordinates>
+{
+public:
     
-    typedef CGFunctions::Lucy<CGCoordinates::O> LucyO;
-    typedef CGFunctions::Lucy<CGCoordinates::X> LucyX;
-    typedef CGFunctions::Lucy<CGCoordinates::Y> LucyY;
-    typedef CGFunctions::Lucy<CGCoordinates::Z> LucyZ;
-    typedef CGFunctions::Lucy<CGCoordinates::YZ> LucyYZ;
-    typedef CGFunctions::Lucy<CGCoordinates::XZ> LucyXZ;
-    typedef CGFunctions::Lucy<CGCoordinates::XY> LucyXY;
-    typedef CGFunctions::Lucy<CGCoordinates::XYZ> LucyXYZ;
+    /*!
+     * \brief Default constructor, simply sets the PolynomialType.
+     * \details
+     */
+    Lucy() : Polynomial<Coordinates>()
+    {
+        Polynomial<Coordinates>::setPolynomialType(PolynomialType::LUCY);
+    }
+};
+
+typedef CGFunctions::Lucy<CGCoordinates::O> LucyO;
+typedef CGFunctions::Lucy<CGCoordinates::X> LucyX;
+typedef CGFunctions::Lucy<CGCoordinates::Y> LucyY;
+typedef CGFunctions::Lucy<CGCoordinates::Z> LucyZ;
+typedef CGFunctions::Lucy<CGCoordinates::YZ> LucyYZ;
+typedef CGFunctions::Lucy<CGCoordinates::XZ> LucyXZ;
+typedef CGFunctions::Lucy<CGCoordinates::XY> LucyXY;
+typedef CGFunctions::Lucy<CGCoordinates::XYZ> LucyXYZ;
     
 } //namespace CGFunctions
 #endif

@@ -40,160 +40,160 @@
 
 namespace CGFunctions
 {
-    
-    std::ostream& operator<<(std::ostream& os, PolynomialType polynomialType)
+
+std::ostream& operator<<(std::ostream& os, PolynomialType polynomialType)
+{
+    if (polynomialType == PolynomialType::HEAVISIDE)
+        os << "Heaviside";
+    else if (polynomialType == PolynomialType::LINEAR)
+        os << "Linear";
+    else if (polynomialType == PolynomialType::LUCY)
+        os << "Lucy";
+    else
     {
-        if (polynomialType == PolynomialType::HEAVISIDE)
-            os << "Heaviside";
-        else if (polynomialType == PolynomialType::LINEAR)
-            os << "Linear";
-        else if (polynomialType == PolynomialType::LUCY)
-            os << "Lucy";
-        else
-        {
-            std::cerr << "PolynomialType not recognized" << std::endl;
-            exit(-1);
-        }
-        return os;
+        std::cerr << "PolynomialType not recognized" << std::endl;
+        exit(-1);
     }
-    
-    std::istream& operator>>(std::istream& is, PolynomialType& type)
+    return os;
+}
+
+std::istream& operator>>(std::istream& is, PolynomialType& type)
+{
+    std::string str;
+    is >> str;
+    if (!str.compare("Heaviside"))
+        type = PolynomialType::HEAVISIDE;
+    else if (!str.compare("Linear"))
+        type = PolynomialType::LINEAR;
+    else if (!str.compare("Lucy"))
+        type = PolynomialType::LUCY;
+    else
     {
-        std::string str;
-        is >> str;
-        if (!str.compare("Heaviside"))
-            type = PolynomialType::HEAVISIDE;
-        else if (!str.compare("Linear"))
-            type = PolynomialType::LINEAR;
-        else if (!str.compare("Lucy"))
-            type = PolynomialType::LUCY;
-        else
-        {
-            std::cerr << "PolynomialType not recognized" << std::endl;
-            exit(-1);
-        }
-        return is;
+        std::cerr << "PolynomialType not recognized" << std::endl;
+        exit(-1);
     }
-    
-    template<class Coordinates>
-    Polynomial<Coordinates>::Polynomial()
-    {
-        coefficients_.resize(0);
-        polynomialType_ = PolynomialType::HEAVISIDE;
-        cutoff_ = 1.0;
-        eps_ = 1e-6;
-        currentInteraction_ = 9999;
+    return is;
+}
+
+template<class Coordinates>
+Polynomial<Coordinates>::Polynomial()
+{
+    coefficients_.resize(0);
+    polynomialType_ = PolynomialType::HEAVISIDE;
+    cutoff_ = 1.0;
+    eps_ = 1e-6;
+    currentInteraction_ = 9999;
 #ifdef DEBUG_CONSTRUCTOR
-        std::cerr << "Polynomial::Polynomial() finished" << std::endl;
+    std::cerr << "Polynomial::Polynomial() finished" << std::endl;
 #endif
-    }
-    
-    template<class Coordinates>
-    void Polynomial<Coordinates>::write(std::ostream& os) const
-    {
-        os << polynomialType_;
-        os << " cutoff " << cutoff_;
-    }
-    
-    template<class Coordinates>
-    void Polynomial<Coordinates>::setWidth(Mdouble width)
-    {
-        setCutoff(width);
-    }
+}
+
+template<class Coordinates>
+void Polynomial<Coordinates>::write(std::ostream& os) const
+{
+    os << polynomialType_;
+    os << " cutoff " << cutoff_;
+}
+
+template<class Coordinates>
+void Polynomial<Coordinates>::setWidth(Mdouble width)
+{
+    setCutoff(width);
+}
 
 /*!
  * \return the width of the coarse-graining function.
  */
-    template<class Coordinates>
-    Mdouble Polynomial<Coordinates>::getWidth() const
-    {
-        return getCutoff();
-    }
+template<class Coordinates>
+Mdouble Polynomial<Coordinates>::getWidth() const
+{
+    return getCutoff();
+}
+
+template<class Coordinates>
+void Polynomial<Coordinates>::setStandardDeviation(Mdouble std)
+{
+    if (std::is_same<CGCoordinates::O, Coordinates>::value)
+        return;
     
-    template<class Coordinates>
-    void Polynomial<Coordinates>::setStandardDeviation(Mdouble std)
+    Mdouble relStd = 0;
+    int n = 0;
+    for (const auto c : coefficients_)
     {
-        if (std::is_same<CGCoordinates::O, Coordinates>::value)
-            return;
-        
-        Mdouble relStd = 0;
-        int n = 0;
-        for (const auto c : coefficients_)
+        if (std::is_base_of<CGCoordinates::Base_X_Y_Z, Coordinates>::value)
         {
-            if (std::is_base_of<CGCoordinates::Base_X_Y_Z, Coordinates>::value)
-            {
-                relStd += c * 2. / (n + 3);
-            }
-            else if (std::is_base_of<CGCoordinates::Base_XY_XZ_YZ, Coordinates>::value)
-            {
-                relStd += c * 2. * constants::pi / (n + 4);
-            }
-            else /*XYZ*/ {
-                relStd += c * 4. * constants::pi / (n + 5);
-            }
-            ++n;
+            relStd += c * 2. / (n + 3);
         }
-        relStd = sqrt(relStd);
-        setCutoff(std / relStd);
+        else if (std::is_base_of<CGCoordinates::Base_XY_XZ_YZ, Coordinates>::value)
+        {
+            relStd += c * 2. * constants::pi / (n + 4);
+        }
+        else /*XYZ*/ {
+            relStd += c * 4. * constants::pi / (n + 5);
+        }
+        ++n;
     }
-    
-    template<class Coordinates>
-    void Polynomial<Coordinates>::setCutoff(Mdouble cutoff)
-    {
-        cutoff_ = cutoff;
-        computeCoefficients();
-    }
-    
-    template<class Coordinates>
-    Mdouble Polynomial<Coordinates>::getCutoff() const
-    {
-        return cutoff_;
-    }
-    
-    template<class Coordinates>
-    void Polynomial<Coordinates>::setPolynomialType(PolynomialType polynomialType)
-    {
-        polynomialType_ = polynomialType;
-        //don't recompute before cutoff is set
-        computeCoefficients();
-    }
+    relStd = sqrt(relStd);
+    setCutoff(std / relStd);
+}
+
+template<class Coordinates>
+void Polynomial<Coordinates>::setCutoff(Mdouble cutoff)
+{
+    cutoff_ = cutoff;
+    computeCoefficients();
+}
+
+template<class Coordinates>
+Mdouble Polynomial<Coordinates>::getCutoff() const
+{
+    return cutoff_;
+}
+
+template<class Coordinates>
+void Polynomial<Coordinates>::setPolynomialType(PolynomialType polynomialType)
+{
+    polynomialType_ = polynomialType;
+    //don't recompute before cutoff is set
+    computeCoefficients();
+}
 
 /*!
  * depends on polynomialType_ and cutoff_
  * also sets the prefactor_
  */
 ///\todo
-    
-    template<class Coordinates>
-    void Polynomial<Coordinates>::computeCoefficients()
+
+template<class Coordinates>
+void Polynomial<Coordinates>::computeCoefficients()
+{
+    if (polynomialType_ == PolynomialType::HEAVISIDE)
     {
-        if (polynomialType_ == PolynomialType::HEAVISIDE)
-        {
-            coefficients_ = {1.0};
-        }
-        else if (polynomialType_ == PolynomialType::LINEAR)
-        {
-            coefficients_ = {1.0, -1.0};
-        }
-        else if (polynomialType_ == PolynomialType::LUCY)
-        {
-            coefficients_ = {1.0, 0.0, -6.0, 8.0, -3.0};
-        }
-        else
-        {
-            std::cerr << "PolynomialType not known: " << polynomialType_ << std::endl;
-            exit(-1);
-        }
-        logger.assert(cutoff_ > 0, "Cutoff % should be positive", cutoff_);
-        Coordinates::normalisePolynomialCoefficients(coefficients_, cutoff_);
-        //std::cout << "X" << coefficients_[0] << " " <<  cutoff_ << std::endl; //exit(-1);
+        coefficients_ = {1.0};
     }
-    
-    template<class Coordinates>
-    std::vector <Mdouble> Polynomial<Coordinates>::getCoefficients()
+    else if (polynomialType_ == PolynomialType::LINEAR)
     {
-        return coefficients_;
+        coefficients_ = {1.0, -1.0};
     }
+    else if (polynomialType_ == PolynomialType::LUCY)
+    {
+        coefficients_ = {1.0, 0.0, -6.0, 8.0, -3.0};
+    }
+    else
+    {
+        std::cerr << "PolynomialType not known: " << polynomialType_ << std::endl;
+        exit(-1);
+    }
+    logger.assert(cutoff_ > 0, "Cutoff % should be positive", cutoff_);
+    Coordinates::normalisePolynomialCoefficients(coefficients_, cutoff_);
+    //std::cout << "X" << coefficients_[0] << " " <<  cutoff_ << std::endl; //exit(-1);
+}
+
+template<class Coordinates>
+std::vector<Mdouble> Polynomial<Coordinates>::getCoefficients()
+{
+    return coefficients_;
+}
 
 /*!
  * \details The cg function is used to evaluate particle statistics like density, 
@@ -207,326 +207,326 @@ namespace CGFunctions
  * \param[in] position position of the particle for which the cg-function is computed.
  * \return value of the cg-function at the position of the current CGPoint.
  */
-    template<class Coordinates>
-    Mdouble Polynomial<Coordinates>::evaluateCGFunction(const Vec3D& position, const Coordinates& r)
-    {
-        Mdouble distanceSquared = r.getDistanceSquared(position);
-        if (distanceSquared >= cutoff_ * cutoff_)
-            return 0.0;
-        
-        Mdouble x = sqrt(distanceSquared) / cutoff_;
-        std::vector<Mdouble>::reverse_iterator it = coefficients_.rbegin();
-        Mdouble value = *it;
-        for (++it; it != coefficients_.rend(); ++it)
-            value = value * x + *it;
-        return value;
-    }
+template<class Coordinates>
+Mdouble Polynomial<Coordinates>::evaluateCGFunction(const Vec3D& position, const Coordinates& r)
+{
+    Mdouble distanceSquared = r.getDistanceSquared(position);
+    if (distanceSquared >= cutoff_ * cutoff_)
+        return 0.0;
     
-    template<class Coordinates>
-    Vec3D Polynomial<Coordinates>::evaluateCGFunctionDerivatives(const Vec3D& position, const Coordinates& r)
+    Mdouble x = sqrt(distanceSquared) / cutoff_;
+    std::vector<Mdouble>::reverse_iterator it = coefficients_.rbegin();
+    Mdouble value = *it;
+    for (++it; it != coefficients_.rend(); ++it)
+        value = value * x + *it;
+    return value;
+}
+
+template<class Coordinates>
+Vec3D Polynomial<Coordinates>::evaluateCGFunctionDerivatives(const Vec3D& position, const Coordinates& r)
+{
+    Vec3D functionDerivative;
+    functionDerivative.setZero();
+    
+    std::array<bool, 3> direction = Coordinates::getCoordinateDirection();
+    for (int i = 0; i < 3; i++)
     {
-        Vec3D functionDerivative;
-        functionDerivative.setZero();
-        
-        std::array<bool, 3> direction = Coordinates::getCoordinateDirection();
-        for (int i = 0; i < 3; i++)
+        if (direction[i])
         {
-            if (direction[i])
-            {
-                functionDerivative.setComponent(i, evaluateCGFunctionDerivativeWithFD(position, r, i));
-            }
+            functionDerivative.setComponent(i, evaluateCGFunctionDerivativeWithFD(position, r, i));
         }
-        return functionDerivative;
     }
+    return functionDerivative;
+}
+
+template<class Coordinates>
+Mdouble Polynomial<Coordinates>::evaluateCGFunctionDerivativeWithFD(const Vec3D& position, const Coordinates& r,
+                                                                    const int i)
+{
+    Vec3D posMin = position;
+    Vec3D posPlus = position;
     
-    template<class Coordinates>
-    Mdouble Polynomial<Coordinates>::evaluateCGFunctionDerivativeWithFD(const Vec3D& position, const Coordinates& r,
-                                                                        const int i)
-    {
-        Vec3D posMin = position;
-        Vec3D posPlus = position;
-        
-        //Important: We want to vary r with eps, but the coordinates are rather fixed
-        //Instead we vary position, but uMin requires + eps and uMax requires - eps
-        //To correct for this
-        posMin.setComponent(i, posMin.getComponent(i) + getEps());
-        Mdouble uMin = evaluateCGFunction(posMin, r);
-        
-        posPlus.setComponent(i, posPlus.getComponent(i) - getEps());
-        Mdouble uPlus = evaluateCGFunction(posPlus, r);
-        
-        return (uPlus - uMin) / (2 * getEps());
-    }
+    //Important: We want to vary r with eps, but the coordinates are rather fixed
+    //Instead we vary position, but uMin requires + eps and uMax requires - eps
+    //To correct for this
+    posMin.setComponent(i, posMin.getComponent(i) + getEps());
+    Mdouble uMin = evaluateCGFunction(posMin, r);
     
-    template<class Coordinates>
-    Mdouble Polynomial<Coordinates>::getEps() const
-    {
-        return eps_;
-    }
+    posPlus.setComponent(i, posPlus.getComponent(i) - getEps());
+    Mdouble uPlus = evaluateCGFunction(posPlus, r);
     
-    template<class Coordinates>
-    void Polynomial<Coordinates>::setEps(Mdouble eps)
-    {
-        eps_ = eps;
-    }
+    return (uPlus - uMin) / (2 * getEps());
+}
+
+template<class Coordinates>
+Mdouble Polynomial<Coordinates>::getEps() const
+{
+    return eps_;
+}
+
+template<class Coordinates>
+void Polynomial<Coordinates>::setEps(Mdouble eps)
+{
+    eps_ = eps;
+}
 
 
 /*!
  * \details See Gauss::evaluateCGIntegral for details.
  */
-    template<class Coordinates>
-    Mdouble
-    Polynomial<Coordinates>::evaluateCGIntegral(const BaseInteraction& c, const Coordinates& r, IntegralType type)
+template<class Coordinates>
+Mdouble
+Polynomial<Coordinates>::evaluateCGIntegral(const BaseInteraction& c, const Coordinates& r, IntegralType type)
+{
+    if (currentInteraction_ != c.getId())
     {
-        if (currentInteraction_ != c.getId())
-        {
-            normalLength_ = Coordinates::getLength(c.getNormal());
-            normal_ = c.getNormal() / normalLength_;
-            currentInteraction_ = c.getId();
-        }
-        
-        if (fabs(normalLength_) < 1e-10)
-        {
-            return evaluateCGFunction(c.getContactPoint(), r);
-        }
-        
-        Mdouble iNormal;
-        if (type != IntegralType::CONTACT_TO_P)
-        {
-            iNormal = r.getINormal(c, normal_);
-        }
-        else
-        {
-            iNormal = r.getCNormal(c, normal_);
-        }
-        if (iNormal > getCutoff())
-            return 0.0;
-        
-        Mdouble pNormal;
-        Mdouble tangentialSquared;
-        if (type != IntegralType::I_TO_CONTACT)
-        {
-            pNormal = r.getPNormal(c, normal_);
-        }
-        else
-        {
-            pNormal = r.getCNormal(c, normal_);
-        }
-        if (pNormal < -getCutoff())
-            return 0.0;
-        
-        tangentialSquared = r.getTangentialSquared(c, r.getPNormal(c, normal_));
-        if (tangentialSquared > mathsFunc::square(cutoff_))
-            return 0.0;
-        
-        double normalCutoffSquared = cutoff_ * cutoff_ - tangentialSquared;
-        if ((normalCutoffSquared <= 0)
-            | (iNormal * fabs(iNormal) >= normalCutoffSquared)
-            | (pNormal * fabs(pNormal) <= -normalCutoffSquared))
-        {
-            return 0;
-        }
-        Mdouble normalCutoff = sqrt(normalCutoffSquared);
-        
-        const Mdouble currentDistance = (pNormal - iNormal);
-        iNormal = std::max(iNormal, -normalCutoff) / cutoff_;
-        pNormal = std::min(pNormal, normalCutoff) / cutoff_;
-        tangentialSquared /= cutoff_ * cutoff_;
-        
-        unsigned int n = coefficients_.size();
-        Mdouble value1 = coefficients_[0] * (pNormal - iNormal);
-        if (n == 1)
-        {
-            return value1 * cutoff_ / currentDistance;
-        }
-        
-        Mdouble value2 = 0;
-        Mdouble t = sqrt(tangentialSquared);
-        Mdouble a2 = iNormal * iNormal;
-        Mdouble b2 = pNormal * pNormal;
-        Mdouble roota = sqrt(iNormal * iNormal + tangentialSquared);
-        Mdouble rootb = sqrt(pNormal * pNormal + tangentialSquared);
-        switch (n)
-        {
-            case 7:
-                value1 += coefficients_[6] * (pNormal * (b2 * b2 * b2 / 7.0 + 0.6 * b2 * b2 * tangentialSquared +
-                                                         b2 * tangentialSquared * tangentialSquared +
-                                                         tangentialSquared * tangentialSquared * tangentialSquared) -
-                                              iNormal * (a2 * a2 * a2 / 7.0 + 0.6 * a2 * a2 * tangentialSquared +
-                                                         a2 * tangentialSquared * tangentialSquared +
-                                                         tangentialSquared * tangentialSquared * tangentialSquared));
-                //[[clang::fallthrough]];
-            case 6:
-                value1 += coefficients_[5] * (pNormal * rootb * (8. * b2 * b2 + 26. * b2 * tangentialSquared +
-                                                                 33. * tangentialSquared * tangentialSquared) -
-                                              iNormal * roota * (8. * a2 * a2 + 26. * a2 * tangentialSquared +
-                                                                 33. * tangentialSquared * tangentialSquared)) / 48.;
-                value2 += coefficients_[5] * 15. / 48. * tangentialSquared * tangentialSquared * tangentialSquared;
-                //[[clang::fallthrough]];
-            case 5:
-                value1 += coefficients_[4] * (pNormal * (b2 * b2 / 5. + 2. / 3. * b2 * tangentialSquared +
-                                                         tangentialSquared * tangentialSquared) - iNormal *
-                                                                                                  (a2 * a2 / 5. +
-                                                                                                   2. / 3. * a2 *
-                                                                                                   tangentialSquared +
-                                                                                                   tangentialSquared *
-                                                                                                   tangentialSquared));
-                //[[clang::fallthrough]];
-            case 4:
-                value1 += coefficients_[3] * (pNormal * rootb * (2. * b2 + 5. * tangentialSquared) -
-                                              iNormal * roota * (2. * a2 + 5. * tangentialSquared)) / 8.;
-                value2 += coefficients_[3] * 3. / 8. * tangentialSquared * tangentialSquared;
-                //[[clang::fallthrough]];
-            case 3:
-                value1 += coefficients_[2] *
-                          (pNormal * (b2 / 3. + tangentialSquared) - iNormal * (a2 / 3. + tangentialSquared));
-                //[[clang::fallthrough]];
-            case 2:
-                value1 += coefficients_[1] * (pNormal * rootb - iNormal * roota) / 2.;
-                value2 += coefficients_[1] * tangentialSquared / 2.;
-                //[[clang::fallthrough]];
-            case 1:
-                break;
-            default:
-                std::cerr << "Error: no rules set for high-order polynomials" << std::endl;
-                exit(-1);
-        }
-        double A = iNormal / t;
-        double B = pNormal / t;
-        //todo is there a more efficient version of arcsinh?
-        double arcsinh = t < 1e-12 ? 0.0 : log(B + sqrt(1. + B * B)) - log(A + sqrt(1. + A * A));
-        return (value1 + value2 * arcsinh) * cutoff_ / currentDistance;
+        normalLength_ = Coordinates::getLength(c.getNormal());
+        normal_ = c.getNormal() / normalLength_;
+        currentInteraction_ = c.getId();
     }
+    
+    if (fabs(normalLength_) < 1e-10)
+    {
+        return evaluateCGFunction(c.getContactPoint(), r);
+    }
+    
+    Mdouble iNormal;
+    if (type != IntegralType::CONTACT_TO_P)
+    {
+        iNormal = r.getINormal(c, normal_);
+    }
+    else
+    {
+        iNormal = r.getCNormal(c, normal_);
+    }
+    if (iNormal > getCutoff())
+        return 0.0;
+    
+    Mdouble pNormal;
+    Mdouble tangentialSquared;
+    if (type != IntegralType::I_TO_CONTACT)
+    {
+        pNormal = r.getPNormal(c, normal_);
+    }
+    else
+    {
+        pNormal = r.getCNormal(c, normal_);
+    }
+    if (pNormal < -getCutoff())
+        return 0.0;
+    
+    tangentialSquared = r.getTangentialSquared(c, r.getPNormal(c, normal_));
+    if (tangentialSquared > mathsFunc::square(cutoff_))
+        return 0.0;
+    
+    double normalCutoffSquared = cutoff_ * cutoff_ - tangentialSquared;
+    if ((normalCutoffSquared <= 0)
+        | (iNormal * fabs(iNormal) >= normalCutoffSquared)
+        | (pNormal * fabs(pNormal) <= -normalCutoffSquared))
+    {
+        return 0;
+    }
+    Mdouble normalCutoff = sqrt(normalCutoffSquared);
+    
+    const Mdouble currentDistance = (pNormal - iNormal);
+    iNormal = std::max(iNormal, -normalCutoff) / cutoff_;
+    pNormal = std::min(pNormal, normalCutoff) / cutoff_;
+    tangentialSquared /= cutoff_ * cutoff_;
+    
+    unsigned int n = coefficients_.size();
+    Mdouble value1 = coefficients_[0] * (pNormal - iNormal);
+    if (n == 1)
+    {
+        return value1 * cutoff_ / currentDistance;
+    }
+    
+    Mdouble value2 = 0;
+    Mdouble t = sqrt(tangentialSquared);
+    Mdouble a2 = iNormal * iNormal;
+    Mdouble b2 = pNormal * pNormal;
+    Mdouble roota = sqrt(iNormal * iNormal + tangentialSquared);
+    Mdouble rootb = sqrt(pNormal * pNormal + tangentialSquared);
+    switch (n)
+    {
+        case 7:
+            value1 += coefficients_[6] * (pNormal * (b2 * b2 * b2 / 7.0 + 0.6 * b2 * b2 * tangentialSquared +
+                                                     b2 * tangentialSquared * tangentialSquared +
+                                                     tangentialSquared * tangentialSquared * tangentialSquared) -
+                                          iNormal * (a2 * a2 * a2 / 7.0 + 0.6 * a2 * a2 * tangentialSquared +
+                                                     a2 * tangentialSquared * tangentialSquared +
+                                                     tangentialSquared * tangentialSquared * tangentialSquared));
+            //[[clang::fallthrough]];
+        case 6:
+            value1 += coefficients_[5] * (pNormal * rootb * (8. * b2 * b2 + 26. * b2 * tangentialSquared +
+                                                             33. * tangentialSquared * tangentialSquared) -
+                                          iNormal * roota * (8. * a2 * a2 + 26. * a2 * tangentialSquared +
+                                                             33. * tangentialSquared * tangentialSquared)) / 48.;
+            value2 += coefficients_[5] * 15. / 48. * tangentialSquared * tangentialSquared * tangentialSquared;
+            //[[clang::fallthrough]];
+        case 5:
+            value1 += coefficients_[4] * (pNormal * (b2 * b2 / 5. + 2. / 3. * b2 * tangentialSquared +
+                                                     tangentialSquared * tangentialSquared) - iNormal *
+                                                                                              (a2 * a2 / 5. +
+                                                                                               2. / 3. * a2 *
+                                                                                               tangentialSquared +
+                                                                                               tangentialSquared *
+                                                                                               tangentialSquared));
+            //[[clang::fallthrough]];
+        case 4:
+            value1 += coefficients_[3] * (pNormal * rootb * (2. * b2 + 5. * tangentialSquared) -
+                                          iNormal * roota * (2. * a2 + 5. * tangentialSquared)) / 8.;
+            value2 += coefficients_[3] * 3. / 8. * tangentialSquared * tangentialSquared;
+            //[[clang::fallthrough]];
+        case 3:
+            value1 += coefficients_[2] *
+                      (pNormal * (b2 / 3. + tangentialSquared) - iNormal * (a2 / 3. + tangentialSquared));
+            //[[clang::fallthrough]];
+        case 2:
+            value1 += coefficients_[1] * (pNormal * rootb - iNormal * roota) / 2.;
+            value2 += coefficients_[1] * tangentialSquared / 2.;
+            //[[clang::fallthrough]];
+        case 1:
+            break;
+        default:
+            std::cerr << "Error: no rules set for high-order polynomials" << std::endl;
+            exit(-1);
+    }
+    double A = iNormal / t;
+    double B = pNormal / t;
+    //todo is there a more efficient version of arcsinh?
+    double arcsinh = t < 1e-12 ? 0.0 : log(B + sqrt(1. + B * B)) - log(A + sqrt(1. + A * A));
+    return (value1 + value2 * arcsinh) * cutoff_ / currentDistance;
+}
 
 /*!
  * The 1D case is simpler than 2D and 3D
  * \todo
  */
-    template<class Coordinates>
-    Mdouble
-    Polynomial<Coordinates>::evaluateCGIntegral1D(const BaseInteraction& c, const Coordinates& r, IntegralType type)
+template<class Coordinates>
+Mdouble
+Polynomial<Coordinates>::evaluateCGIntegral1D(const BaseInteraction& c, const Coordinates& r, IntegralType type)
+{
+    if (currentInteraction_ != c.getId())
     {
-        if (currentInteraction_ != c.getId())
-        {
-            normalLength_ = Coordinates::getLength(c.getNormal());
-            normal_ = c.getNormal() / normalLength_;
-            currentInteraction_ = c.getId();
-        }
-        
-        if (fabs(normalLength_) < 1e-10)
-        {
-            return evaluateCGFunction(c.getContactPoint(), r);
-        }
-        
-        Mdouble iNormal;
-        if (type != IntegralType::CONTACT_TO_P)
-        {
-            iNormal = r.getINormal(c, normal_);
-        }
-        else
-        {
-            iNormal = r.getCNormal(c, normal_);
-        }
-        if (iNormal > getCutoff())
-            return 0.0;
-        
-        Mdouble pNormal;
-        if (type != IntegralType::I_TO_CONTACT)
-        {
-            pNormal = r.getPNormal(c, normal_);
-        }
-        else
-        {
-            pNormal = r.getCNormal(c, normal_);
-        }
-        if (pNormal < -getCutoff())
-            return 0.0;
-        
-        Mdouble currentDistance = (pNormal - iNormal);
-        
-        iNormal = std::max(iNormal / cutoff_, -1.0);
-        pNormal = std::min(pNormal / cutoff_, 1.0);
-        
-        unsigned int n = coefficients_.size();
-        Mdouble value1 = coefficients_[0] * (pNormal - iNormal);
-        if (n == 1)
-            return value1 * cutoff_ / currentDistance;
-        
-        Mdouble iNormalSquared = iNormal * iNormal;
-        Mdouble pNormalSquared = pNormal * pNormal;
-        Mdouble absINormal = fabs(iNormal);
-        Mdouble absPNormal = fabs(pNormal);
-        switch (n)
-        {
-            case 5:
-                value1 += coefficients_[4] * 0.2 *
-                          (pNormal * pNormalSquared * pNormalSquared - iNormal * iNormalSquared * iNormalSquared);
-                //[[clang::fallthrough]];
-            case 4:
-                value1 += coefficients_[3] * 0.25 *
-                          (pNormal * absPNormal * pNormalSquared - iNormal * absINormal * iNormalSquared);
-                //[[clang::fallthrough]];
-            case 3:
-                value1 += coefficients_[2] * (pNormal * pNormalSquared - iNormal * iNormalSquared) / 3.;
-                //[[clang::fallthrough]];
-            case 2:
-                value1 += coefficients_[1] * 0.5 * (pNormal * absPNormal - iNormal * absINormal);
-                //[[clang::fallthrough]];
-            case 1:
-                break;
-            default:
-                std::cerr << "Error: no rules set for high-order polynomials" << std::endl;
-                exit(-1);
-        }
-        return value1 * cutoff_ / currentDistance;
+        normalLength_ = Coordinates::getLength(c.getNormal());
+        normal_ = c.getNormal() / normalLength_;
+        currentInteraction_ = c.getId();
     }
+    
+    if (fabs(normalLength_) < 1e-10)
+    {
+        return evaluateCGFunction(c.getContactPoint(), r);
+    }
+    
+    Mdouble iNormal;
+    if (type != IntegralType::CONTACT_TO_P)
+    {
+        iNormal = r.getINormal(c, normal_);
+    }
+    else
+    {
+        iNormal = r.getCNormal(c, normal_);
+    }
+    if (iNormal > getCutoff())
+        return 0.0;
+    
+    Mdouble pNormal;
+    if (type != IntegralType::I_TO_CONTACT)
+    {
+        pNormal = r.getPNormal(c, normal_);
+    }
+    else
+    {
+        pNormal = r.getCNormal(c, normal_);
+    }
+    if (pNormal < -getCutoff())
+        return 0.0;
+    
+    Mdouble currentDistance = (pNormal - iNormal);
+    
+    iNormal = std::max(iNormal / cutoff_, -1.0);
+    pNormal = std::min(pNormal / cutoff_, 1.0);
+    
+    unsigned int n = coefficients_.size();
+    Mdouble value1 = coefficients_[0] * (pNormal - iNormal);
+    if (n == 1)
+        return value1 * cutoff_ / currentDistance;
+    
+    Mdouble iNormalSquared = iNormal * iNormal;
+    Mdouble pNormalSquared = pNormal * pNormal;
+    Mdouble absINormal = fabs(iNormal);
+    Mdouble absPNormal = fabs(pNormal);
+    switch (n)
+    {
+        case 5:
+            value1 += coefficients_[4] * 0.2 *
+                      (pNormal * pNormalSquared * pNormalSquared - iNormal * iNormalSquared * iNormalSquared);
+            //[[clang::fallthrough]];
+        case 4:
+            value1 += coefficients_[3] * 0.25 *
+                      (pNormal * absPNormal * pNormalSquared - iNormal * absINormal * iNormalSquared);
+            //[[clang::fallthrough]];
+        case 3:
+            value1 += coefficients_[2] * (pNormal * pNormalSquared - iNormal * iNormalSquared) / 3.;
+            //[[clang::fallthrough]];
+        case 2:
+            value1 += coefficients_[1] * 0.5 * (pNormal * absPNormal - iNormal * absINormal);
+            //[[clang::fallthrough]];
+        case 1:
+            break;
+        default:
+            std::cerr << "Error: no rules set for high-order polynomials" << std::endl;
+            exit(-1);
+    }
+    return value1 * cutoff_ / currentDistance;
+}
 
 //Template specializations
 
 /*!
  * The 1D case is simpler than 2D and 3D
  */
-    template<>
-    Mdouble Polynomial<CGCoordinates::X>::evaluateCGIntegral(const BaseInteraction& i, const CGCoordinates::X& r,
-                                                             IntegralType type)
-    {
-        return evaluateCGIntegral1D(i, r, type);
-    }
+template<>
+Mdouble Polynomial<CGCoordinates::X>::evaluateCGIntegral(const BaseInteraction& i, const CGCoordinates::X& r,
+                                                         IntegralType type)
+{
+    return evaluateCGIntegral1D(i, r, type);
+}
 
 /*!
  * The 1D case is simpler than 2D and 3D
  */
-    template<>
-    Mdouble Polynomial<CGCoordinates::Y>::evaluateCGIntegral(const BaseInteraction& i, const CGCoordinates::Y& r,
-                                                             IntegralType type)
-    {
-        return evaluateCGIntegral1D(i, r, type);
-    }
+template<>
+Mdouble Polynomial<CGCoordinates::Y>::evaluateCGIntegral(const BaseInteraction& i, const CGCoordinates::Y& r,
+                                                         IntegralType type)
+{
+    return evaluateCGIntegral1D(i, r, type);
+}
 
 /*!
  * The 1D case is simpler than 2D and 3D
  */
-    template<>
-    Mdouble Polynomial<CGCoordinates::Z>::evaluateCGIntegral(const BaseInteraction& i, const CGCoordinates::Z& r,
-                                                             IntegralType type)
-    {
-        return evaluateCGIntegral1D(i, r, type);
-    }
+template<>
+Mdouble Polynomial<CGCoordinates::Z>::evaluateCGIntegral(const BaseInteraction& i, const CGCoordinates::Z& r,
+                                                         IntegralType type)
+{
+    return evaluateCGIntegral1D(i, r, type);
+}
 
 /*!
  * The O case is very simple
  */
-    template<>
-    Mdouble Polynomial<CGCoordinates::O>::evaluateCGIntegral(const BaseInteraction& i, const CGCoordinates::O& r,
-                                                             IntegralType type)
-    {
-        return 1.0;
-    }
-    
-    template<>
-    Mdouble Polynomial<CGCoordinates::O>::evaluateCGFunction(const Vec3D& position, const CGCoordinates::O& r)
-    {
-        return 1.0;
-    }
+template<>
+Mdouble Polynomial<CGCoordinates::O>::evaluateCGIntegral(const BaseInteraction& i, const CGCoordinates::O& r,
+                                                         IntegralType type)
+{
+    return 1.0;
+}
+
+template<>
+Mdouble Polynomial<CGCoordinates::O>::evaluateCGFunction(const Vec3D& position, const CGCoordinates::O& r)
+{
+    return 1.0;
+}
     
 } // namespace CGFunctions

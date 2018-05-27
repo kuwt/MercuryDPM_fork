@@ -31,10 +31,10 @@
 
 namespace NurbsUtils
 {
-    
-    bool isKnotVectorMonotonic(const std::vector<double>& knots);
-    
-    bool close(double a, double b, double eps = std::numeric_limits<double>::epsilon());
+
+bool isKnotVectorMonotonic(const std::vector<double>& knots);
+
+bool close(double a, double b, double eps = std::numeric_limits<double>::epsilon());
 
 /**
 Find the span of the given parameter in the knot vector.
@@ -43,7 +43,7 @@ Find the span of the given parameter in the knot vector.
 @param[in] u Parameter value.
 @return Span index into the knot vector such that (span - 1) < u <= span
 */
-    int findSpan(int degree, const std::vector<double>& knots, double u);
+int findSpan(int degree, const std::vector<double>& knots, double u);
 
 
 /**
@@ -54,7 +54,7 @@ Compute a single B-spline basis function
 @param[in] u Parameter to evaluate the basis functions at.
 @return The value of the ith basis function at u.
 */
-    double bsplineOneBasis(int i, int deg, const std::vector<double>& U, double u);
+double bsplineOneBasis(int i, int deg, const std::vector<double>& U, double u);
 
 /**
 // Compute all non-zero B-spline basis functions
@@ -64,7 +64,7 @@ Compute a single B-spline basis function
 @param[in] u Parameter to evaluate the basis functions at.
 @param[in, out] N Values of (deg+1) non-zero basis functions.
 */
-    void bsplineBasis(int deg, int span, const std::vector<double>& knots, double u, std::vector<double>& N);
+void bsplineBasis(int deg, int span, const std::vector<double>& knots, double u, std::vector<double>& N);
     
 }
 

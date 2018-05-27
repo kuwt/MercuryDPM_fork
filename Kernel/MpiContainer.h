@@ -89,21 +89,21 @@ enum MercuryMPITag
 namespace Detail
 {
 #ifdef MERCURY_USE_MPI
-    //convert integral data to the corresponding MPI type
-    template<typename T>
-    typename std::enable_if<std::is_integral<T>::value, MPI::Datatype>::type
-    toMPIType(T t)
-    {
-        return MPI::Datatype::Match_size(MPI_TYPECLASS_INTEGER,sizeof(T));
-    }
+//convert integral data to the corresponding MPI type
+template<typename T>
+typename std::enable_if<std::is_integral<T>::value, MPI::Datatype>::type
+toMPIType(T t)
+{
+    return MPI::Datatype::Match_size(MPI_TYPECLASS_INTEGER,sizeof(T));
+}
 
-    //convert floating point data to the corresponding MPI type
-    template<typename T>
-    typename std::enable_if<std::is_floating_point<T>::value, MPI::Datatype>::type
-    toMPIType(T t)
-    {
-        return MPI::Datatype::Match_size(MPI_TYPECLASS_REAL,sizeof(T));
-    }
+//convert floating point data to the corresponding MPI type
+template<typename T>
+typename std::enable_if<std::is_floating_point<T>::value, MPI::Datatype>::type
+toMPIType(T t)
+{
+    return MPI::Datatype::Match_size(MPI_TYPECLASS_REAL,sizeof(T));
+}
 #endif
 } /*detail*/
 

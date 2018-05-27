@@ -927,14 +927,29 @@ std::string StatisticsVector<T>::print_CG()
 
 ///Output names of statistical variables
 template<StatType T>
-StatisticsPoint <T> StatisticsVector<T>::average(std::vector <StatisticsPoint<T>>& P)
+StatisticsPoint <T> StatisticsVector<T>::average(std::vector<StatisticsPoint < T>>
+
+& P)
 {
-    StatisticsPoint <T> avg;
-    avg.set_zero();
-    for (unsigned int i = 0; i < P.size(); i++)
-        avg += P[i];
-    avg /= P.size();
-    return avg;
+StatisticsPoint <T> avg;
+avg.
+
+set_zero();
+
+for (
+unsigned int i = 0;
+i<P.
+
+size();
+
+i++)
+avg += P[i];
+avg /= P.
+
+size();
+
+return
+avg;
 }
 
 template<StatType T>

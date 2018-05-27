@@ -33,7 +33,7 @@ class TimeAveragedLebedevCG : public TimeAveragedCGXYZ<BaseFunction, Fields>
 {
 public:
     
-    typedef CGPoint <CGCoordinates::XYZ, Fields> Point;
+    typedef CGPoint<CGCoordinates::XYZ, Fields> Point;
     
     /*!
      * \brief Default constructor. Only sets the evaluation functions,

@@ -71,113 +71,113 @@ namespace CGCoordinates
  * 
  * See member CGCoordinates for more details.
  */
-    class XYZ : public BaseCoordinates
-    {
-    public:
-        
-        /*!
-         * \brief Writes the coordinate names in human-readable form to an ostream.
-         */
-        static void writeNames(std::ostream& os);
-        
-        /*!
-         * \brief Writes the coordinates in human-readable form to an ostream.
-         */
-        void write(std::ostream& os) const;
-        
-        /*!
-         * \brief returns the factor the CGFunction has to be divided by, due to
-         * integrating the variables over the averaged dimensions, 1.0 for XYZ.
-         */
-        static Mdouble getVolumeOfAveragedDimensions(const Vec3D& min, const Vec3D& max);
-        
-        /*!
-         * \brief Returns the square of the distance between the particle p and
-         * the current CGPoint, in the non-averaged directions.
-         */
-        Mdouble getDistanceSquared(const Vec3D& p) const;
-        
-        /*!
-         * \brief Returns the length of the input vector in the non-averaged directions.
-         */
-        static Mdouble getLength(const Vec3D& p);
-        
-        /*!
-         * \brief Returns the position of the current CGPoint, in the non-averaged
-         * directions.
-         */
-        void setXYZ(Vec3D p);
-        
-        /*!
-         * \brief For the Interaction between particles/walls P and I, this function
-         * returns the dot product between the normal vector of the interaction and
-         * the branch vector from the current CGPoint towards I.
-         */
-        Mdouble getINormal(const BaseInteraction& c, const Vec3D& normal) const;
-        
-        /*!
-         * \brief For the Interaction between particles/walls P and I, this function
-         * returns the dot product between the normal vector of the interaction and
-         * the branch vector from the current CGPoint towards P.
-         */
-        Mdouble getPNormal(const BaseInteraction& c, const Vec3D& normal) const;
-        
-        /*!
-         * \brief For the Interaction between particles/walls P and I, this function
-         * returns the dot product between the normal vector of the interaction and
-         * the branch vector from the current CGPoint towards the contact point.
-         */
-        Mdouble getCNormal(const BaseInteraction& c, const Vec3D& normal) const;
-        
-        /*!
-         * \brief For the Interaction between particles/walls P and I, this function
-         * returns the square of the minimum distance between the the current
-         * CGPoint and the branch vector between P and I.
-         */
-        Mdouble getTangentialSquared(const BaseInteraction& c, Mdouble pNormal) const;
-        
-        /*!
-         * \brief Computes the prefactor of the Gauss CGFunction, which is dependent
-         * on the number of non-averaged dimensions.
-         */
-        static Mdouble getGaussPrefactor(Mdouble width, Mdouble cutoff);
-        
-        /*!
-         * \brief Computes the prefactor of the Gauss line integral, which is dependent
-         * on the number of non-averaged dimensions.
-         */
-        static Mdouble getGaussIntegralPrefactor(Mdouble distance, Mdouble width, Mdouble cutoff);
-        
-        /*!
-         * \brief Normalises the coefficients of Polynomial CGFunction such that
-         * the integral over all non-averaged dimensions is unity.
-         */
-        static void normalisePolynomialCoefficients(std::vector <Mdouble>& coefficients, Mdouble cutoff);
-        
-        /*!
-         * returns the number of variables (in this case three)
-         */
-        static const unsigned countVariables();
-        
-        static std::array<bool, 3> getCoordinateDirection()
-        {
-            std::array<bool, 3> direction;
-            direction[0] = true;
-            direction[1] = true;
-            direction[2] = true;
-            
-            return direction;
-        }
-        
-        static std::string getName();
+class XYZ : public BaseCoordinates
+{
+public:
     
-    protected:
+    /*!
+     * \brief Writes the coordinate names in human-readable form to an ostream.
+     */
+    static void writeNames(std::ostream& os);
+    
+    /*!
+     * \brief Writes the coordinates in human-readable form to an ostream.
+     */
+    void write(std::ostream& os) const;
+    
+    /*!
+     * \brief returns the factor the CGFunction has to be divided by, due to
+     * integrating the variables over the averaged dimensions, 1.0 for XYZ.
+     */
+    static Mdouble getVolumeOfAveragedDimensions(const Vec3D& min, const Vec3D& max);
+    
+    /*!
+     * \brief Returns the square of the distance between the particle p and
+     * the current CGPoint, in the non-averaged directions.
+     */
+    Mdouble getDistanceSquared(const Vec3D& p) const;
+    
+    /*!
+     * \brief Returns the length of the input vector in the non-averaged directions.
+     */
+    static Mdouble getLength(const Vec3D& p);
+    
+    /*!
+     * \brief Returns the position of the current CGPoint, in the non-averaged
+     * directions.
+     */
+    void setXYZ(Vec3D p);
+    
+    /*!
+     * \brief For the Interaction between particles/walls P and I, this function
+     * returns the dot product between the normal vector of the interaction and
+     * the branch vector from the current CGPoint towards I.
+     */
+    Mdouble getINormal(const BaseInteraction& c, const Vec3D& normal) const;
+    
+    /*!
+     * \brief For the Interaction between particles/walls P and I, this function
+     * returns the dot product between the normal vector of the interaction and
+     * the branch vector from the current CGPoint towards P.
+     */
+    Mdouble getPNormal(const BaseInteraction& c, const Vec3D& normal) const;
+    
+    /*!
+     * \brief For the Interaction between particles/walls P and I, this function
+     * returns the dot product between the normal vector of the interaction and
+     * the branch vector from the current CGPoint towards the contact point.
+     */
+    Mdouble getCNormal(const BaseInteraction& c, const Vec3D& normal) const;
+    
+    /*!
+     * \brief For the Interaction between particles/walls P and I, this function
+     * returns the square of the minimum distance between the the current
+     * CGPoint and the branch vector between P and I.
+     */
+    Mdouble getTangentialSquared(const BaseInteraction& c, Mdouble pNormal) const;
+    
+    /*!
+     * \brief Computes the prefactor of the Gauss CGFunction, which is dependent
+     * on the number of non-averaged dimensions.
+     */
+    static Mdouble getGaussPrefactor(Mdouble width, Mdouble cutoff);
+    
+    /*!
+     * \brief Computes the prefactor of the Gauss line integral, which is dependent
+     * on the number of non-averaged dimensions.
+     */
+    static Mdouble getGaussIntegralPrefactor(Mdouble distance, Mdouble width, Mdouble cutoff);
+    
+    /*!
+     * \brief Normalises the coefficients of Polynomial CGFunction such that
+     * the integral over all non-averaged dimensions is unity.
+     */
+    static void normalisePolynomialCoefficients(std::vector<Mdouble>& coefficients, Mdouble cutoff);
+    
+    /*!
+     * returns the number of variables (in this case three)
+     */
+    static const unsigned countVariables();
+    
+    static std::array<bool, 3> getCoordinateDirection()
+    {
+        std::array<bool, 3> direction;
+        direction[0] = true;
+        direction[1] = true;
+        direction[2] = true;
         
-        /*!
-         * The position of the current CGPoint.
-         */
-        Vec3D p_;
-    };
+        return direction;
+    }
+    
+    static std::string getName();
+
+protected:
+    
+    /*!
+     * The position of the current CGPoint.
+     */
+    Vec3D p_;
+};
 
 /*!
  * \anchor spaceEvenly
@@ -192,30 +192,30 @@ namespace CGCoordinates
  * \param[in] n the number of points in each spatial direction.
  * \param[out] points the vector of CGPoint's, which are now on a spatial mesh over the given domain.
  */
-    template<typename T>
-    typename std::enable_if<std::is_base_of<CGCoordinates::XYZ, typename T::CoordinatesType>::value, void>::type
-    spaceEvenly(Vec3D min, Vec3D max, std::vector <std::size_t> n, std::vector <T>& points)
+template<typename T>
+typename std::enable_if<std::is_base_of<CGCoordinates::XYZ, typename T::CoordinatesType>::value, void>::type
+spaceEvenly(Vec3D min, Vec3D max, std::vector<std::size_t> n, std::vector<T>& points)
+{
+    Vec3D delta = max - min;
+    delta.X /= n[0];
+    delta.Y /= n[1];
+    delta.Z /= n[2];
+    Vec3D start = min + 0.5 * delta;
+    points.resize(n[0] * n[1] * n[2]);
+    for (std::size_t i = 0; i < n[0]; i++)
     {
-        Vec3D delta = max - min;
-        delta.X /= n[0];
-        delta.Y /= n[1];
-        delta.Z /= n[2];
-        Vec3D start = min + 0.5 * delta;
-        points.resize(n[0] * n[1] * n[2]);
-        for (std::size_t i = 0; i < n[0]; i++)
+        for (std::size_t j = 0; j < n[1]; j++)
         {
-            for (std::size_t j = 0; j < n[1]; j++)
+            for (std::size_t k = 0; k < n[2]; k++)
             {
-                for (std::size_t k = 0; k < n[2]; k++)
-                {
-                    points[(i * n[1] + j) * n[2] + k].coordinates.
-                            setXYZ({start.X + delta.X * i,
-                                    start.Y + delta.Y * j,
-                                    start.Z + delta.Z * k});
-                }
+                points[(i * n[1] + j) * n[2] + k].coordinates.
+                        setXYZ({start.X + delta.X * i,
+                                start.Y + delta.Y * j,
+                                start.Z + delta.Z * k});
             }
         }
     }
+}
     
 }
 #endif

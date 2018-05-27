@@ -97,12 +97,12 @@ public:
      * \brief The probabilities of generating each type of particle. 
      * These probabilities are not normalised.
      */
-    std::vector <Mdouble> probabilitates_;
+    std::vector<Mdouble> probabilitates_;
     
     /*!
      * \brief The dispersity allowed in the particle size.
      */
-    std::vector <Mdouble> sizeDispersities_; // size dispersity in the radii
+    std::vector<Mdouble> sizeDispersities_; // size dispersity in the radii
     
     /*!
      * \brief As in CubeInsertionBoundary. 
@@ -116,8 +116,8 @@ public:
      * \brief For keeping track of how much of each prototype we have inserted.
      */
     std::vector<unsigned int> numbersInserted_;
-    std::vector <Mdouble> massesInserted_;
-    std::vector <Mdouble> volumesInserted_;
+    std::vector<Mdouble> massesInserted_;
+    std::vector<Mdouble> volumesInserted_;
 };
 
 #endif

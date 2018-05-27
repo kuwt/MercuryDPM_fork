@@ -34,28 +34,28 @@ namespace CGFunctions
  * \brief A specialisation of Polynomials for PolynomialType::Heaviside.
  * See Polynomial for details.
  */template<class Coordinates>
-    class Heaviside : public Polynomial<Coordinates>
-    {
-    public:
-        
-        /*!
-         * \brief Default constructor, simply sets the PolynomialType.
-         * \details
-         */
-        Heaviside() : Polynomial<Coordinates>()
-        {
-            Polynomial<Coordinates>::setPolynomialType(PolynomialType::HEAVISIDE);
-        }
-    };
+class Heaviside : public Polynomial<Coordinates>
+{
+public:
     
-    typedef CGFunctions::Heaviside<CGCoordinates::O> HeavisideO;
-    typedef CGFunctions::Heaviside<CGCoordinates::X> HeavisideX;
-    typedef CGFunctions::Heaviside<CGCoordinates::Y> HeavisideY;
-    typedef CGFunctions::Heaviside<CGCoordinates::Z> HeavisideZ;
-    typedef CGFunctions::Heaviside<CGCoordinates::YZ> HeavisideYZ;
-    typedef CGFunctions::Heaviside<CGCoordinates::XZ> HeavisideXZ;
-    typedef CGFunctions::Heaviside<CGCoordinates::XY> HeavisideXY;
-    typedef CGFunctions::Heaviside<CGCoordinates::XYZ> HeavisideXYZ;
+    /*!
+     * \brief Default constructor, simply sets the PolynomialType.
+     * \details
+     */
+    Heaviside() : Polynomial<Coordinates>()
+    {
+        Polynomial<Coordinates>::setPolynomialType(PolynomialType::HEAVISIDE);
+    }
+};
+
+typedef CGFunctions::Heaviside<CGCoordinates::O> HeavisideO;
+typedef CGFunctions::Heaviside<CGCoordinates::X> HeavisideX;
+typedef CGFunctions::Heaviside<CGCoordinates::Y> HeavisideY;
+typedef CGFunctions::Heaviside<CGCoordinates::Z> HeavisideZ;
+typedef CGFunctions::Heaviside<CGCoordinates::YZ> HeavisideYZ;
+typedef CGFunctions::Heaviside<CGCoordinates::XZ> HeavisideXZ;
+typedef CGFunctions::Heaviside<CGCoordinates::XY> HeavisideXY;
+typedef CGFunctions::Heaviside<CGCoordinates::XYZ> HeavisideXYZ;
     
 } //namespace CGFunctions
 #endif

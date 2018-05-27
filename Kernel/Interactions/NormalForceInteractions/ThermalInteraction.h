@@ -37,32 +37,32 @@ class ThermalInteraction : public NormalForceInteraction
 {
 public:
     typedef ThermalSpecies<typename NormalForceInteraction::SpeciesType> SpeciesType;
-
+    
     /*!
      * \brief Constructor.
      */
     ThermalInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp);
-
+    
     /*!
      * \brief Default Constructor.
      */
     ThermalInteraction();
-
+    
     /*!
      * \brief Copy constructor.
      */
     ThermalInteraction(const ThermalInteraction& p);
-
+    
     /*!
      * \brief Destructor.
      */
     virtual ~ThermalInteraction();
-
+    
     /*!
      * \brief Computes the normal forces due to linear plastic visco elastic interaction.
      */
     void computeNormalForce();
-
+    
 };
 
 template<class NormalForceInteraction>

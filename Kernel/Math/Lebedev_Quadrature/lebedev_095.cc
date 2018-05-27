@@ -3077,7 +3077,7 @@ void getQuadratureValues95(std::vector<double>& theta, std::vector<double>& phi,
              176.915274199826058,
              -176.915274199826058,
              -176.915274199826058};
-
+    
     phi.clear();
     phi = {90.000000000000000,
            90.000000000000000,
@@ -6153,7 +6153,7 @@ void getQuadratureValues95(std::vector<double>& theta, std::vector<double>& phi,
            131.730392061000742,
            48.269607938999265,
            131.730392061000742};
-
+    
     weight.clear();
     weight = {0.000025990959538,
               0.000025990959538,
@@ -9229,6 +9229,6 @@ void getQuadratureValues95(std::vector<double>& theta, std::vector<double>& phi,
               0.000359585503466,
               0.000359585503466,
               0.000359585503466};
-
-
+    
+    
 }

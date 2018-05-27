@@ -30,157 +30,157 @@
 
 namespace CGFields
 {
-    
-    LiquidMigrationFields::LiquidMigrationFields()
-    {
-        setZero();
+
+LiquidMigrationFields::LiquidMigrationFields()
+{
+    setZero();
 #ifdef DEBUG_CONSTRUCTOR
-        std::cerr << "LiquidMigrationFields::LiquidMigrationFields() finished" << std::endl;
+    std::cerr << "LiquidMigrationFields::LiquidMigrationFields() finished" << std::endl;
 #endif
-    }
+}
 
 /*!
  * \param[out] os the ostream into which the data is written.
  */
-    void LiquidMigrationFields::writeNames(std::ostream& os, const unsigned countVariables)
-    {
-        os << countVariables + 1 << ":liquidBridgeVolume ";
-        os << countVariables + 2 << ":liquidFilmVolume ";
-    }
+void LiquidMigrationFields::writeNames(std::ostream& os, const unsigned countVariables)
+{
+    os << countVariables + 1 << ":liquidBridgeVolume ";
+    os << countVariables + 2 << ":liquidFilmVolume ";
+}
 
 /*!
  * \param[out] os the ostream into which the data is written.
  */
-    void LiquidMigrationFields::write(std::ostream& os) const
-    {
-        os << liquidBridgeVolume_;
-        os << " " << liquidFilmVolume_;
-    }
+void LiquidMigrationFields::write(std::ostream& os) const
+{
+    os << liquidBridgeVolume_;
+    os << " " << liquidFilmVolume_;
+}
 
 /*!
  * \param[out] os the ostream into which the data is written.
  */
-    void LiquidMigrationFields::output(std::ostream& os) const
-    {
-        os << "liquidBridgeVolume " << liquidBridgeVolume_;
-        os << " liquidFilmVolume " << liquidFilmVolume_;
-    }
-    
-    void LiquidMigrationFields::setZero()
-    {
-        liquidBridgeVolume_ = 0.0;
-        liquidFilmVolume_ = 0.0;
-    }
+void LiquidMigrationFields::output(std::ostream& os) const
+{
+    os << "liquidBridgeVolume " << liquidBridgeVolume_;
+    os << " liquidFilmVolume " << liquidFilmVolume_;
+}
+
+void LiquidMigrationFields::setZero()
+{
+    liquidBridgeVolume_ = 0.0;
+    liquidFilmVolume_ = 0.0;
+}
 
 /*!
  * \return a CGField containing the square of the values in the current object
  */
-    LiquidMigrationFields LiquidMigrationFields::getSquared() const
-    {
-        LiquidMigrationFields P;
-        P.liquidBridgeVolume_ = mathsFunc::square(liquidBridgeVolume_);
-        P.liquidFilmVolume_ = mathsFunc::square(liquidFilmVolume_);
-        return P;
-    }
+LiquidMigrationFields LiquidMigrationFields::getSquared() const
+{
+    LiquidMigrationFields P;
+    P.liquidBridgeVolume_ = mathsFunc::square(liquidBridgeVolume_);
+    P.liquidFilmVolume_ = mathsFunc::square(liquidFilmVolume_);
+    return P;
+}
 
 /*!
  * \param[in] P the CGField that has to be copied
  * \return the CGField into which the values are copied
  */
-    LiquidMigrationFields& LiquidMigrationFields::operator=(const LiquidMigrationFields& P)
-    = default;
-    
-    /*!
- * \param[in] P the CGField that has to be added
- * \return the CGField to which the values are added
- */
-    LiquidMigrationFields& LiquidMigrationFields::operator+=(const LiquidMigrationFields& P)
-    {
-        liquidBridgeVolume_ += P.liquidBridgeVolume_;
-        liquidFilmVolume_ += P.liquidFilmVolume_;
-        return *this;
-    }
+LiquidMigrationFields& LiquidMigrationFields::operator=(const LiquidMigrationFields& P)
+= default;
+
+/*!
+* \param[in] P the CGField that has to be added
+* \return the CGField to which the values are added
+*/
+LiquidMigrationFields& LiquidMigrationFields::operator+=(const LiquidMigrationFields& P)
+{
+    liquidBridgeVolume_ += P.liquidBridgeVolume_;
+    liquidFilmVolume_ += P.liquidFilmVolume_;
+    return *this;
+}
 
 /*!
  * \param[in] P the CGField that has to be subtracted
  * \return the CGField from which the values are subtracted
  */
-    LiquidMigrationFields& LiquidMigrationFields::operator-=(const LiquidMigrationFields& P)
-    {
-        liquidBridgeVolume_ -= P.liquidBridgeVolume_;
-        liquidFilmVolume_ -= P.liquidFilmVolume_;
-        return *this;
-    }
+LiquidMigrationFields& LiquidMigrationFields::operator-=(const LiquidMigrationFields& P)
+{
+    liquidBridgeVolume_ -= P.liquidBridgeVolume_;
+    liquidFilmVolume_ -= P.liquidFilmVolume_;
+    return *this;
+}
 
 /*!
  * \param[in] a the scalar that we multiply with
  * \return the CGField  to which the multiplied values are written
  */
-    LiquidMigrationFields LiquidMigrationFields::operator*(const Mdouble a) const
-    {
-        LiquidMigrationFields p;
-        p.liquidBridgeVolume_ = liquidBridgeVolume_ * a;
-        p.liquidFilmVolume_ = liquidFilmVolume_ * a;
-        return p;
-    }
+LiquidMigrationFields LiquidMigrationFields::operator*(const Mdouble a) const
+{
+    LiquidMigrationFields p;
+    p.liquidBridgeVolume_ = liquidBridgeVolume_ * a;
+    p.liquidFilmVolume_ = liquidFilmVolume_ * a;
+    return p;
+}
 
 /*!
  * \param[in] a the scalar that we divide by
  * \return the CGField to which the divided values are written
  */
-    LiquidMigrationFields& LiquidMigrationFields::operator/=(const Mdouble a)
-    {
-        liquidBridgeVolume_ /= a;
-        liquidFilmVolume_ /= a;
-        return *this;
-    }
+LiquidMigrationFields& LiquidMigrationFields::operator/=(const Mdouble a)
+{
+    liquidBridgeVolume_ /= a;
+    liquidFilmVolume_ /= a;
+    return *this;
+}
 
 /*!
  * \param[in] phi the value of the cg function at the current CGPoint
  * \param[in] p the particle which is used in the cg function
  */
-    void LiquidMigrationFields::addParticleStatistics(Mdouble phi, const LiquidMigrationFields& currentInteraction)
-    {
-        liquidFilmVolume_ += currentInteraction.getLiquidFilmVolume() * phi;
-    }
-    
-    void LiquidMigrationFields::addParticleDifferentialStatistics(Vec3D& dphi,
-                                                                  const LiquidMigrationFields& currentInteraction)
-    {
-    }
+void LiquidMigrationFields::addParticleStatistics(Mdouble phi, const LiquidMigrationFields& currentInteraction)
+{
+    liquidFilmVolume_ += currentInteraction.getLiquidFilmVolume() * phi;
+}
+
+void LiquidMigrationFields::addParticleDifferentialStatistics(Vec3D& dphi,
+                                                              const LiquidMigrationFields& currentInteraction)
+{
+}
 
 /*!
  * \param[in] psi the value of the line integral from C to P at the current CGPoint
  * \param[in] c the contact which is used in the line integral
  */
-    void LiquidMigrationFields::addInteractionStatistics(Mdouble psi, const LiquidMigrationFields& currentInteraction)
-    {
-        liquidBridgeVolume_ += currentInteraction.getLiquidBridgeVolume() * psi;
-    }
+void LiquidMigrationFields::addInteractionStatistics(Mdouble psi, const LiquidMigrationFields& currentInteraction)
+{
+    liquidBridgeVolume_ += currentInteraction.getLiquidBridgeVolume() * psi;
+}
 
 /*!
  * \param[in] phi the value of the cg function for the contact point of c and
  * the current CGPoint
  * \param[in] c the interaction which is used in the cg function
  */
-    void LiquidMigrationFields::addContactPointStatistics(Mdouble phi UNUSED,
-                                                          const LiquidMigrationFields& currentInteraction UNUSED)
-    {
-    }
-    
-    bool LiquidMigrationFields::doInteractionStatistics()
-    {
-        return true;
-    }
-    
-    void LiquidMigrationFields::setFields(const BaseInteraction& c, IntegralType type)
-    {
-        auto l = dynamic_cast<const LiquidMigrationWilletInteraction*>(&c);
-        logger.assert(l != nullptr,
-                      "LiquidMigrationFields::addParticleStatistics: "
-                      "interaction type should be LiquidMigrationWilletInteraction");
-        liquidBridgeVolume_ = l->getLiquidBridgeVolume();
-    }
+void LiquidMigrationFields::addContactPointStatistics(Mdouble phi UNUSED,
+                                                      const LiquidMigrationFields& currentInteraction UNUSED)
+{
+}
+
+bool LiquidMigrationFields::doInteractionStatistics()
+{
+    return true;
+}
+
+void LiquidMigrationFields::setFields(const BaseInteraction& c, IntegralType type)
+{
+    auto l = dynamic_cast<const LiquidMigrationWilletInteraction*>(&c);
+    logger.assert(l != nullptr,
+                  "LiquidMigrationFields::addParticleStatistics: "
+                  "interaction type should be LiquidMigrationWilletInteraction");
+    liquidBridgeVolume_ = l->getLiquidBridgeVolume();
+}
 //    if (type==IntegralType::CONTACT_TO_P)
 //    {
 //        auto p = dynamic_cast<const LiquidFilmParticle*>(c.getI());
@@ -198,25 +198,25 @@ namespace CGFields
 //            liquidBridgeVolume_ = 0;
 //        }
 //    }
-    
-    
-    void LiquidMigrationFields::setFields(const BaseParticle& p)
-    {
-        auto l = dynamic_cast<const LiquidFilmParticle*>(&p);
-        logger.assert(l != nullptr,
-                      "LiquidMigrationFields::addParticleStatistics: particle type should be LiquidFilmParticle");
-        liquidFilmVolume_ = l->getLiquidVolume();
-    }
-    
-    void LiquidMigrationFields::setCylindricalFields(const BaseInteraction& c, IntegralType type)
-    {
-        setFields(c, type);
-    }
-    
-    void LiquidMigrationFields::setCylindricalFields(const BaseParticle& p)
-    {
-        setFields(p);
-    }
+
+
+void LiquidMigrationFields::setFields(const BaseParticle& p)
+{
+    auto l = dynamic_cast<const LiquidFilmParticle*>(&p);
+    logger.assert(l != nullptr,
+                  "LiquidMigrationFields::addParticleStatistics: particle type should be LiquidFilmParticle");
+    liquidFilmVolume_ = l->getLiquidVolume();
+}
+
+void LiquidMigrationFields::setCylindricalFields(const BaseInteraction& c, IntegralType type)
+{
+    setFields(c, type);
+}
+
+void LiquidMigrationFields::setCylindricalFields(const BaseParticle& p)
+{
+    setFields(p);
+}
     
     
 }
