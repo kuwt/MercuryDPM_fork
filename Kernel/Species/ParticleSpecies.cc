@@ -221,3 +221,35 @@ void ParticleSpecies::setTemperatureDependentDensity(
 //    density_ = temperatureDependentDensity_(0);
 //    logger(INFO,"Setting initial density to %",temperature_);
 }
+
+/*!
+ * \return A pointer to the to the lightest BaseParticle (by mass) in this ParticleHandler.
+ */
+Mdouble ParticleSpecies::getLargestInverseParticleMassLocal() const
+{
+    Mdouble maxInvMass = 0;
+    logger.assert(getHandler() != nullptr && getHandler()->getDPMBase() != nullptr,"speciesHandler must be set");
+    for (BaseParticle* const p : getHandler()->getDPMBase()->particleHandler)
+    {
+        if (p->getSpecies()==this && !(p->isFixed() || p->isMPIParticle() || p->isPeriodicGhostParticle()) && p->getInvMass() > maxInvMass)
+        {
+            maxInvMass = p->getInvMass();
+        }
+    }
+    return maxInvMass;
+}
+
+Mdouble ParticleSpecies::getSmallestParticleMass() const
+{
+#ifdef MERCURY_USE_MPI
+    Mdouble maxInvMass = 0;
+    Mdouble invMassLocal = getLargestInverseParticleMassLocal();
+    //Obtain the global value
+    MPIContainer::Instance().allReduce(invMassLocal, maxInvMass, MPI_MAX);
+    //return value
+    return 1.0 / maxInvMass;
+#else
+    return 1.0 / getLargestInverseParticleMassLocal();
+#endif
+
+}

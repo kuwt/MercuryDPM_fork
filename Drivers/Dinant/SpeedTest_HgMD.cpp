@@ -128,7 +128,7 @@ int main(int /*argc*/, char **/*argv[]*/)
     problem.species->setStiffness(1e4);
     problem.species->setDissipation(0.293865);
 	problem.setupInitialConditions();
-    problem.setTimeStep(0.02 * constants::pi / sqrt(2 * problem.species->getStiffness() / problem.particleHandler.getLightestParticle()->getMass()));
+    problem.setTimeStep(0.02 * constants::pi / sqrt(2 * problem.species->getStiffness() / problem.species->getLightestParticleMass()));
 	problem.setTimeMax((1e4-1)* problem.getTimeStep());
 	problem.setSaveCount(1000);
 	problem.solve();

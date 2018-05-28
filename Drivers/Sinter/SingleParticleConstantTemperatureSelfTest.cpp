@@ -91,7 +91,7 @@ public:
     void setupInitialConditions() override
     {
         //set time step
-        Mdouble mass = species->getMassFromRadius(particleHandler.getSmallestParticle()->getRadius());
+        Mdouble mass = species->getSmallestParticleMass();
         setTimeStep(species->computeTimeStep(mass));
         logger(INFO,"Collision time: %, time step: %", 50.*getTimeStep(), getTimeStep());
         if (getTimeMax()==0) {
@@ -174,8 +174,8 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     //set species properties
     Mdouble kMax=20000;
     sp.species->setPlasticParameters(0.1*kMax, kMax, 0.1*kMax, 0.16);
-    Mdouble radius = sp.particleHandler.getSmallestParticle()->getRadius();
-    Mdouble mass = sp.species->getMassFromRadius(radius);
+    Mdouble radius = sp.particleHandler.getSmallestInteractionRadius();
+    Mdouble mass = sp.species->getSmallestParticleMass();
     sp.species->setStiffnessAndRestitutionCoefficient(sp.species->getLoadingStiffness(),0.8,mass);
     //flip between volume and surface sintering
     if (true)

@@ -491,7 +491,7 @@ BaseParticle* ParticleHandler::getSmallestParticleLocal() const
 BaseParticle* ParticleHandler::getSmallestParticle() const
 {
 #ifdef MERCURY_USE_MPI
-    logger(ERROR,"getSmallestParticle should not be used in parallel");
+    logger(ERROR,"getSmallestParticle should not be used in parallel; use getSmallestInteractionRadius or ParticleSpecies::getSmallestParticleMass instead");
     return nullptr;
 #else
     return getSmallestParticleLocal();
@@ -513,7 +513,7 @@ BaseParticle* ParticleHandler::getLargestParticleLocal() const
 BaseParticle* ParticleHandler::getLargestParticle() const
 {
 #ifdef MERCURY_USE_MPIO
-    logger(ERROR,"getLargestParticle() should not be used in parallel");
+    logger(ERROR,"getLargestParticle() should not be used in parallel; use getLargestInteractionRadius instead");
     return nullptr;
 #else
     return getLargestParticleLocal();
@@ -960,46 +960,6 @@ BaseParticle* ParticleHandler::getHighestVelocityComponentParticle(const int i) 
     logger(ERROR,"This function should not be used in parallel");
 #else
     return getHighestVelocityComponentParticleLocal(i);
-#endif
-}
-
-/*!
- * \return A pointer to the to the lightest BaseParticle (by mass) in this ParticleHandler.
- */
-BaseParticle* ParticleHandler::getLightestParticleLocal() const
-{
-#ifdef MERCURY_USE_MPI
-    logger(INFO,"getLightestParticle() not implemented yet in parallel");
-#else
-    
-    if (getSize() == 0)
-    {
-        logger(WARN, "No particles to set getLightestParticle()");
-        return nullptr;
-    }
-    BaseParticle* p = nullptr;
-    Mdouble minMass = std::numeric_limits<Mdouble>::max();
-    for (BaseParticle* const pLoop : objects_)
-    {
-        if (!(pLoop->isMPIParticle() || pLoop->isPeriodicGhostParticle()))
-        {
-            if (pLoop->getMass() < minMass)
-            {
-                minMass = pLoop->getMass();
-                p = pLoop;
-            }
-        }
-    }
-    return p;
-#endif
-}
-
-BaseParticle* ParticleHandler::getLightestParticle() const
-{
-#ifdef MERCURY_USE_MPI
-    logger(ERROR,"This function should not be used in parallel");
-#else
-    return getLightestParticleLocal();
 #endif
 }
 

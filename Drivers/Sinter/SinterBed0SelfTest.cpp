@@ -147,7 +147,7 @@ public:
 //        wallHandler.getLastObject()->setSpecies(wallSpecies);
 
         //set time step
-        Mdouble mass = species->getMassFromRadius(particleHandler.getSmallestParticle()->getRadius());
+        Mdouble mass = species->getSmallestParticleMass();
         setTimeStep(4.0*species->computeTimeStep(mass));
         Mdouble oldGravity = getGravity().Z;
         setGravity(getGravity()*1e5);//set to 5e5/(H/d)
@@ -222,7 +222,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     const Mdouble kMax=readFromFile("in","kMax",20000);
     const Mdouble kL = readFromFile("in","kL",0.1*kMax);
     ic.species->setPlasticParameters(kL, kMax, kL, 0.16);
-    const Mdouble mass = ic.species->getMassFromRadius(ic.particleHandler.getSmallestParticle()->getRadius());
+    const Mdouble mass = ic.species->getSmallestParticleMass();
     ic.species->setStiffnessAndRestitutionCoefficient(ic.species->getLoadingStiffness(),0.5,mass);
     ic.species->setSinterType(SINTERTYPE::CONSTANT_RATE);
     ic.species->setSinterRate(0.0);

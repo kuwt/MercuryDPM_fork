@@ -90,8 +90,21 @@ public:
     void setTemperatureDependentDensity(const std::function<double(double)>& temperatureDependentDensity);
     
     const std::function<double(double)>& getTemperatureDependentDensity() const;
+    
+    /*!
+     * \brief Computes mass of the lightest particle (by mass) belonging to this species.
+     * This computation calls getLightestInverseParticleMassLocal, such that the computation is done on each node.
+     */
+    Mdouble getSmallestParticleMass() const;
 
 private:
+    
+    /*!
+     * \brief Computes inverse mass of the lightest particle (by mass) belonging to this species.
+     * If MPI is used, this computation is done locally on each node.
+     */
+    Mdouble getLargestInverseParticleMassLocal() const;
+
     /*!
      * \brief The mass density.
      */

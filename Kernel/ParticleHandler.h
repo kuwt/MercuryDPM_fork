@@ -224,16 +224,6 @@ public:
     BaseParticle* getHighestVelocityComponentParticle(int i) const;
     
     /*!
-     * \brief Gets a pointer to the lightest BaseParticle (by mass) in this ParticleHandler.
-     */
-    BaseParticle* getLightestParticleLocal() const;
-    
-    /*!
-     * \brief Gets a pointer to the lightest BaseParticle (by mass) in this ParticleHandler. 
-     */
-    BaseParticle* getLightestParticle() const;
-    
-    /*!
      * \brief Computes an attribute type (min/max/..) of a particle attribute (position/velocity) in a local domain
      */
     //Mdouble getParticleAttributeLocal(std::function<Mdouble (BaseParticle*)> attribute, AttributeType type) const;
