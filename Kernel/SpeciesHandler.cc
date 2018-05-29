@@ -789,35 +789,16 @@ void SpeciesHandler::removeObject(unsigned const int index)
 void SpeciesHandler::write(std::ostream& os) const
 {
     os << "Species " << getNumberOfObjects() << std::endl;
-    std::vector<BaseSpecies*>::const_iterator it2 = mixedObjects_.begin();
-    for (std::vector<ParticleSpecies*>::const_iterator it = begin(); it != end(); ++it)
+    unsigned idMixed = 0;
+    for (const ParticleSpecies* species : objects_)
     {
-        os << (**it) << std::endl;
-        for (unsigned int id2 = 0; id2 < (*it)->getIndex(); id2++)
+        os << *species << std::endl;
+        for (unsigned int id2 = 0; id2 < species->getIndex(); id2++)
         {
-            os << (**it2) << std::endl;
-            it2++;
+            os << *mixedObjects_[idMixed] << std::endl;
+            idMixed++;
         }
     }
-    /*
-    This behaves like the code above but is actually readable
-    @weinhartt is there a reason?
-    
-    there is a reason. Curernt architecture does not allow this
-    \todo define new restart format. @dducks
-    
-    The code is written such that it writes PS0, then PS1 and MS01, then PS2 and 
-    MS02, MS12, and so on (PS=ParticleSpecies, MS=MixedSpecies). We can change 
-    the restart format, but we should write the read(os) function such that 
-    it can also read the old format @weinhartt
-    
-    for (ParticleSpecies * spec : objects_) {
-      os << *spec << std::endl;
-    }
-    for (BaseSpecies * spec : mixedObjects_) {
-       os << *spec << std::endl;
-    }
-    */
 }
 
 /*!
