@@ -1,4 +1,4 @@
-restart_version 1.0 name flowRuleSelfTest
+MercuryDPM 0.14 name flowRuleSelfTest revision 2985 repository https://svn.mercurydpm.org/SourceCode/Trunk
 dataFile    fileType ONE_FILE saveCount 500000 counter 2 lastSavedTimeStep 101
 fStatFile   fileType NO_FILE saveCount 500000 counter 0
 eneFile     fileType ONE_FILE saveCount 500000 counter 2 lastSavedTimeStep 101

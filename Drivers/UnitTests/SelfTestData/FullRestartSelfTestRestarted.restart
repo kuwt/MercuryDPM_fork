@@ -1,4 +1,4 @@
-restart_version 1.0 name FullRestartSelfTestRestarted
+MercuryDPM 0.14 name FullRestartSelfTestRestarted revision 2985 repository https://svn.mercurydpm.org/SourceCode/Trunk
 dataFile    fileType ONE_FILE saveCount 20 counter 0
 fStatFile   fileType ONE_FILE saveCount 20 counter 0
 eneFile     fileType ONE_FILE saveCount 20 counter 0

@@ -1,4 +1,4 @@
-restart_version 1.0 name ParticleCreationSelfTest
+MercuryDPM 0.14 name ParticleCreationSelfTest revision 2985 repository https://svn.mercurydpm.org/SourceCode/Trunk
 dataFile    fileType ONE_FILE saveCount 20 counter 2 lastSavedTimeStep 1
 fStatFile   fileType ONE_FILE saveCount 20 counter 2 lastSavedTimeStep 1
 eneFile     fileType ONE_FILE saveCount 20 counter 2 lastSavedTimeStep 1

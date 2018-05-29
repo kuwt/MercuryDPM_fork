@@ -1,4 +1,4 @@
-restart_version 1.0 name wallSpecies
+MercuryDPM 0.14 name wallSpecies revision 2985 repository https://svn.mercurydpm.org/SourceCode/Trunk
 dataFile    fileType ONE_FILE saveCount 500 counter 152 lastSavedTimeStep 75001
 fStatFile   fileType ONE_FILE saveCount 500 counter 152 lastSavedTimeStep 75001
 eneFile     fileType ONE_FILE saveCount 500 counter 152 lastSavedTimeStep 75001

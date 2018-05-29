@@ -1,4 +1,4 @@
-restart_version 1.0 name combinedfiles
+MercuryDPM 0.14 name combinedfiles revision 2985 repository https://svn.mercurydpm.org/SourceCode/Trunk
 dataFile    fileType ONE_FILE saveCount 601 counter 2 lastSavedTimeStep 601
 fStatFile   fileType ONE_FILE saveCount 601 counter 2 lastSavedTimeStep 601
 eneFile     fileType ONE_FILE saveCount 601 counter 2 lastSavedTimeStep 601

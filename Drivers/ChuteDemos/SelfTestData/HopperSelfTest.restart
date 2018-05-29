@@ -1,4 +1,4 @@
-restart_version 1.0 name HopperSelfTest
+MercuryDPM 0.14 name HopperSelfTest revision 2985 repository https://svn.mercurydpm.org/SourceCode/Trunk
 dataFile    fileType ONE_FILE saveCount 51 counter 26 lastSavedTimeStep 1251
 fStatFile   fileType ONE_FILE saveCount 51 counter 26 lastSavedTimeStep 1251
 eneFile     fileType ONE_FILE saveCount 51 counter 26 lastSavedTimeStep 1251

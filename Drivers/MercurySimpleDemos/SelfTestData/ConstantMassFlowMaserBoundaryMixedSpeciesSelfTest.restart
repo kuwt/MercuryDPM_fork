@@ -1,4 +1,4 @@
-restart_version 1.0 name ConstantMassFlowMaserBoundaryMixedSpeciesSelfTest
+MercuryDPM 0.14 name ConstantMassFlowMaserBoundaryMixedSpeciesSelfTest revision 2985 repository https://svn.mercurydpm.org/SourceCode/Trunk
 dataFile    fileType ONE_FILE saveCount 2000 counter 22 lastSavedTimeStep 40232
 fStatFile   fileType ONE_FILE saveCount 2000 counter 22 lastSavedTimeStep 40232
 eneFile     fileType ONE_FILE saveCount 2000 counter 22 lastSavedTimeStep 40232

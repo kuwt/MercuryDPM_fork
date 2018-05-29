@@ -4,11 +4,14 @@
 
 #include <string>
 
-const std::string xballsSupportOn();
 const std::string getMercurySourceDir();
+
 const std::string getMercuryBuildDir();
-constexpr int getMajorVersionNumber();
-constexpr int getMinorVersionNumber();
+
+const int getSVNRevision();
+
+const std::string getSVNURL();
+
 const std::string getVersion();
 
 /*

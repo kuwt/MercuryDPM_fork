@@ -611,7 +611,7 @@ void ChuteWithHopper::write(std::ostream& os, bool writeAllParticles) const
 {
     Chute::write(os, writeAllParticles);
     os << hopperExitLength_ << " " << hopperExitHeight_ << " " << hopperLength_
-       << " " << hopperAngle_ << " " << hopperHeight_ << " " << hopperShift_ << " " << std::endl;
+       << " " << hopperAngle_ << " " << hopperHeight_ << " " << hopperShift_ << " " << '\n';
 }
 
 /*!

@@ -1144,17 +1144,17 @@ void ParticleHandler::write(std::ostream& os) const
     {
         if (!it->isPeriodicGhostParticle() && !it->isMPIParticle())
         {
-            os << (*it) << std::endl;
+            os << (*it) << '\n';
         }
     }
 #else
-    os << "Particles " << getSize() << std::endl;
+    os << "Particles " << getSize() << '\n';
     for (BaseParticle* it : *this)
     {
-        os << (*it) << std::endl;
+        os << (*it) << '\n';
     }
 #endif
-    os.flush();
+    //os.flush();
 }
 
 /*!

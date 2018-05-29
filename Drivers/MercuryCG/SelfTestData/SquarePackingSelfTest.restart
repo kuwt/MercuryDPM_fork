@@ -1,4 +1,4 @@
-restart_version 1.0 name SquarePackingSelfTest
+MercuryDPM 0.14 name SquarePackingSelfTest revision 2985 repository https://svn.mercurydpm.org/SourceCode/Trunk
 dataFile    fileType ONE_FILE saveCount 1000 counter 7 lastSavedTimeStep 5001
 fStatFile   fileType ONE_FILE saveCount 1000 counter 7 lastSavedTimeStep 5001
 eneFile     fileType ONE_FILE saveCount 1000 counter 7 lastSavedTimeStep 5001

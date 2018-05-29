@@ -1903,7 +1903,7 @@ void DPMBase::writeFstatHeader(std::ostream& os) const
     os << "#"
        << " " << getTime()
        << " " << 1 //marker that these are fstat files with contact point instead of center point
-       << std::endl;
+       << '\n';
     os << "#"
        << " " << getXMin()
        << " " << getYMin()
@@ -1911,7 +1911,7 @@ void DPMBase::writeFstatHeader(std::ostream& os) const
        << " " << getXMax()
        << " " << getYMax()
        << " " << getZMax()
-       << std::endl;
+       << '\n';
     os << "#"
        << " ";
     
@@ -1937,12 +1937,13 @@ void DPMBase::writeFstatHeader(std::ostream& os) const
        << " " << 0
        << " " << 0
        << " " << 0
-       << std::endl;
+       << '\n';
     //B: write data
     for (BaseInteraction* c : interactionHandler)
     {
         c->writeToFStat(os, getTime());
     }
+    //os << std::flush;
 }
 
 /*!
@@ -3235,18 +3236,21 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
     /*
      * \todo JMFT: Should we be hardcoding this here?
      */
-    os << "restart_version " << "1.0";
+    //os << "restart_version " << "1.0";
+    os << "MercuryDPM " << getVersion();
     //which outputs basic information regarding the various files  (.data, .fstat etc. etc.)
     //only writes the run number if it is different from 0
     if (runNumber_ != 0)
         os << " runNumber " << runNumber_;
-    os << " name " << name_ << std::endl;
-    os << "dataFile    " << dataFile << std::endl;
-    os << "fStatFile   " << fStatFile << std::endl;
-    os << "eneFile     " << eneFile << std::endl;
-    os << "restartFile " << restartFile << std::endl;
-    os << "statFile    " << statFile << std::endl;
-    os << "interactionFile " << interactionFile << std::endl;
+    os << " name " << name_;
+    os << " revision " << getSVNRevision();
+    os << " repository " << getSVNURL() << '\n';
+    os << "dataFile    " << dataFile << '\n';
+    os << "fStatFile   " << fStatFile << '\n';
+    os << "eneFile     " << eneFile << '\n';
+    os << "restartFile " << restartFile << '\n';
+    os << "statFile    " << statFile << '\n';
+    os << "interactionFile " << interactionFile << '\n';
     //Outputs the "domain" corresponding to the system for
     //use with XBalls, as well as other information regarding the system as a whole
     os << "xMin " << getXMin()
@@ -3254,11 +3258,11 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
        << " yMin " << getYMin()
        << " yMax " << getYMax()
        << " zMin " << getZMin()
-       << " zMax " << getZMax() << std::endl
+       << " zMax " << getZMax() << '\n'
        << "timeStep " << getTimeStep()
        << " time " << getTime()
        << " ntimeSteps " << numberOfTimeSteps_
-       << " timeMax " << getTimeMax() << std::endl
+       << " timeMax " << getTimeMax() << '\n'
        << "systemDimensions " << getSystemDimensions()
        << " particleDimensions " << getParticleDimensions()
        << " gravity " << getGravity();
@@ -3277,16 +3281,16 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
     //only write xBallsArguments if they are nonzero
     if (getXBallsAdditionalArguments().compare(""))
         os << " xBallsArguments " << getXBallsAdditionalArguments();
-    os << std::endl;
+    os << '\n';
     //writes all species (including mixed species) to an output stream
     speciesHandler.write(os);
     //outputs the number of walls/boundaries  in the system
-    os << "Walls " << wallHandler.getNumberOfObjects() << std::endl;
+    os << "Walls " << wallHandler.getNumberOfObjects() << '\n';
     for (BaseWall* w : wallHandler)
-        os << (*w) << std::endl;
-    os << "Boundaries " << boundaryHandler.getNumberOfObjects() << std::endl;
+        os << (*w) << '\n';
+    os << "Boundaries " << boundaryHandler.getNumberOfObjects() << '\n';
     for (BaseBoundary* b : boundaryHandler)
-        os << (*b) << std::endl;
+        os << (*b) << '\n';
 
 #ifdef MERCURY_USE_MPI
     particleHandler.write(os);
@@ -3302,10 +3306,10 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
     else
     {
         //otherwise, only prints out limited information
-        os << "Particles " << particleHandler.getSize() << std::endl;
+        os << "Particles " << particleHandler.getSize() << '\n';
         for (unsigned int i = 0; i < 2; i++)
-            os << *particleHandler.getObject(i) << std::endl;
-        os << "..." << std::endl;
+            os << *particleHandler.getObject(i) << '\n';
+        os << "..." << '\n';
     }
 #endif
 
@@ -3329,10 +3333,10 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
     }
     else
     {
-        os << "Interactions " << interactionHandler.getNumberOfObjects() << std::endl;
+        os << "Interactions " << interactionHandler.getNumberOfObjects() << '\n';
         for (unsigned int i = 0; i < 2; i++)
-            os << *interactionHandler.getObject(i) << std::endl;
-        os << "..." << std::endl;
+            os << *interactionHandler.getObject(i) << '\n';
+        os << "..." << '\n';
     }
     
     ///\todo TW: random number seed is not stored
@@ -3357,7 +3361,7 @@ void DPMBase::read(std::istream& is)
     //compare the string read in to the phrase "restart_version" to see if the stream corresponds
     //to a restart file (all restart files begin with this phrase)
     //if both strings match, strcmp(dummy.c_str(), "restart_version") returns 0 (here read as "false")
-    if (strcmp(dummy.c_str(), "restart_version") != 0)
+    if (dummy != "restart_version" && dummy != "MercuryDPM")
     {
         //If the strings do not match, if statement is fulfilled  and the error logged
         //Note: only very old files did not have a restart_version
@@ -3369,7 +3373,7 @@ void DPMBase::read(std::istream& is)
         is >> restartVersion_;
         //checking which version the current data file corresponds to, and reads the data in
         //accordingly
-        if (!restartVersion_.compare("1.0"))
+        if (restartVersion_ == "1.0" || restartVersion_ == "0.14")
         {
             //reads in and saves the relevant values from the data file to the current instance of DPMBase
             std::stringstream line;

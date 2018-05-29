@@ -28,11 +28,6 @@
 
 #include <CMakeDefinitions.h>
 
-const std::string xballsSupportOn()
-{
-	return "@Mercury_Include_Xballs_Support@";
-}
-
 const std::string getMercurySourceDir()
 {
 	return "@Mercury_SOURCE_DIR@";
@@ -43,14 +38,14 @@ const std::string getMercuryBuildDir()
 	return "@Mercury_BINARY_DIR@";
 }
 
-constexpr int getMajorVersionNumber()
+const int getSVNRevision()
 {
-	return @Mercury_VERSION_MAJOR@;
+	return @SVN_WC_REVISION@;
 }
 
-constexpr int getMinorVersionNumber()
+const std::string getSVNURL()
 {
-	return @Mercury_VERSION_MINOR@;
+	return "@SVN_WC_URL@";
 }
 
 const std::string getVersion()

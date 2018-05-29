@@ -1,4 +1,4 @@
-restart_version 1.0 name PlasticForceUnitTest1.1
+MercuryDPM 0.14 name PlasticForceUnitTest1.1 revision 2985 repository https://svn.mercurydpm.org/SourceCode/Trunk
 dataFile    fileType ONE_FILE saveCount 1 counter 101 lastSavedTimeStep 100
 fStatFile   fileType ONE_FILE saveCount 1 counter 101 lastSavedTimeStep 100
 eneFile     fileType ONE_FILE saveCount 1 counter 101 lastSavedTimeStep 100

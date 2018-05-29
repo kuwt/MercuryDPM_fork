@@ -1,4 +1,4 @@
-restart_version 1.0 name LeesEdwardsSelfTest
+MercuryDPM 0.14 name LeesEdwardsSelfTest revision 2985 repository https://svn.mercurydpm.org/SourceCode/Trunk
 dataFile    fileType ONE_FILE saveCount 100 counter 42 lastSavedTimeStep 4001
 fStatFile   fileType ONE_FILE saveCount 100 counter 42 lastSavedTimeStep 4001
 eneFile     fileType ONE_FILE saveCount 100 counter 42 lastSavedTimeStep 4001

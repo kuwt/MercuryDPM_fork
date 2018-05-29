@@ -412,15 +412,15 @@ void InteractionHandler::write(std::ostream& os) const
     //The rest of the particles are processed in the restart file write function
     MPIContainer& communicator = MPIContainer::Instance();
     unsigned int totalNumberOfInteractions = getNumberOfObjects();
-    os << "Interactions " << totalNumberOfInteractions << std::endl;
+    os << "Interactions " << totalNumberOfInteractions << '\n';
     for (BaseInteraction* it : *this)
     {
-    os << (*it) << std::endl;
+    os << (*it) << '\n';
     }
 #else
-    os << "Interactions " << getNumberOfObjects() << std::endl;
+    os << "Interactions " << getNumberOfObjects() << '\n';
     for (BaseInteraction* i : objects_)
-        os << (*i) << std::endl;
+        os << (*i) << '\n';
 #endif
 }
 

@@ -1,4 +1,4 @@
-restart_version 1.0 name CubicPackingSelfTest
+MercuryDPM 0.14 name CubicPackingSelfTest revision 2985 repository https://svn.mercurydpm.org/SourceCode/Trunk
 dataFile    fileType ONE_FILE saveCount 1000 counter 2 lastSavedTimeStep 1000
 fStatFile   fileType ONE_FILE saveCount 1000 counter 2 lastSavedTimeStep 1000
 eneFile     fileType ONE_FILE saveCount 1000 counter 2 lastSavedTimeStep 1000
