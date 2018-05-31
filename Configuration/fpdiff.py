@@ -44,7 +44,10 @@ def read_file(filename):
  else:
    F=open(filename);
    filedata = F.readlines();
-   F.close() 
+   F.close()
+
+ if ".restart" in filename:
+  filedata = filedata[1:]
 
  return filedata
 
