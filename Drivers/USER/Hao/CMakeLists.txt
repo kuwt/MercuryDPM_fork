@@ -23,4 +23,4 @@ foreach(CPPFILE ${CPPFILES})
 endforeach()
 
 #copy restart input for self tests into build
-file(COPY ${CMAKE_SOURCE_DIR}/Drivers/USER/Hao/s4_SelfTestInput.restart DESTINATION .)
+file(COPY ${CMAKE_SOURCE_DIR}/Drivers/USER/Hao/StressStrainControlBoundarySelfTestInput.restart DESTINATION .)

@@ -876,11 +876,21 @@ public:
     virtual bool getHGridUpdateEachTimeStep() const;
     
     
-    /**
-     * \brief This function will help you set a fixed kinetic energy and mean velocity in your system.
-     **/
+    /// \brief This function will help you set a fixed kinetic energy and mean velocity in your system.
     void setMeanVelocityAndKineticEnergy(Vec3D V_mean_goal, Mdouble Ek_goal);
     
+    /// \brief Get the total volume of the cuboid system.
+    Mdouble getTotalVolume() const;
+    
+    /// \brief Calculate the kinetic stress tensor in the system averaged over the whole volume.
+    Matrix3D getKineticStress() const;
+    
+    /// \brief Calculate the static stress tensor in the system averaged over the whole volume.
+    Matrix3D getStaticStress() const;
+    
+    /// \brief Calculate the total stress tensor in the system averaged over the whole volume.
+    Matrix3D getTotalStress() const;
+
     //functions that should only be used in the class definitions
 protected:
     

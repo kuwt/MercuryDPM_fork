@@ -40,7 +40,9 @@ MatrixSymmetric3D::operator Matrix3D() const
  * \details Default constructor
  */
 MatrixSymmetric3D::MatrixSymmetric3D()
-= default;
+{
+    setZero();
+}
 
 /*!
  * \details Alternative constructor, lets you define all (6) elements

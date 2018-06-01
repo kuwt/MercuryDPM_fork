@@ -4,6 +4,7 @@
 #include <Species/LinearPlasticViscoelasticFrictionSpecies.h>
 #include <Mercury3D.h>
 #include <Boundaries/PeriodicBoundary.h>
+#include <Boundaries/StressStrainControlBoundary.h>
 #include "Boundaries/LeesEdwardsBoundary.h"
 
 class poly_simpleshear: public Mercury3D{
@@ -31,18 +32,20 @@ public:
     
     Mdouble volumeFraction, particleDiameter, rhop, en, K1, K2, Kc, Phic, mu_slid, mu_roll,mu_tor, poly; //!material input parameters
     Mdouble tmax, dampingCoefficient = 0.0; //!material/simulation input parameters
-    Mdouble Lx, Ly, Lz, Cx, Cy, Cz, rpx, rpy, rpz; //!Box length in x-y-z, center position of the box and particle position relative to the center of box
-    Mdouble dot_strain_xx, dot_strain_yy, dot_strain_zz, dot_strain_xy; //!strainrate tensor with four components
-    Mdouble gx, gy, gz, velocity_xy, velocity_yy; //!shear strain rate variables
-    Mdouble gain_xx, gain_yy, gain_zz, gain_xy, Volume; //!Stress control gain factors, which will be multiplied by time step dt
-    Mdouble dStrain_xx, dStrain_yy, dStrain_zz, dStrain_xy; //!Stress control strainrate tensor change per time step
-    Mdouble stressXXGoal,stressYYGoal,stressZZGoal,stressXYGoal;//!Stress control constants
-    Mdouble stressXX,stressXX_static, stressXX_kinetic, stressYY,stressYY_static, stressYY_kinetic;
-    Mdouble stressZZ,stressZZ_static, stressZZ_kinetic, stressXY,stressXY_static, stressXY_kinetic; //!stress components calculation variables
-    Mdouble RHOP, Jx, Jy, Jz, Fx, Fy, Fz, Fxy; //!stress components calculation variables
+	Vec3D lengthBox; //!Box length in x-y-z
+	Vec3D centerBox; //!center position of the box
+	Vec3D relativeToCenter; //!particle position relative to the center of box
+	Matrix3D strainRate; //!strainrate tensor
+    Matrix3D gainFactor; //!Stress control gain factors, which will be multiplied by timestep dt
+    Matrix3D dstrainRate; //!Stress control strainrate tensor change per timestep
+    Matrix3D stressGoal; //!Stress control constants
+	Matrix3D stressTotal;  //!stress components calculation variables
+	Matrix3D stressKinetic;  //!stress components calculation variables
+	Matrix3D stressStatic;  //!stress components calculation variables
+
     
     //! Add Background damping to the system
-    void computeExternalForces (BaseParticle * CI) override	
+    void computeExternalForces (BaseParticle * CI) override
 	{
 		DPMBase::computeExternalForces (CI);
 		if (!CI->isFixed())
@@ -52,7 +55,7 @@ public:
         }
 	}
 
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {		
         double Rmin = particleHandler.getObject(0)->getRadius();
 		double Rmax = particleHandler.getObject(0)->getRadius();
@@ -60,9 +63,9 @@ public:
 		double N = particleHandler.getNumberOfObjects();
 		Mdouble Vp = 0;
 		Mdouble vx = 0;
-		Lx = getXMax()-getXMin();
-     	Ly = getYMax()-getYMin();
-     	Lz = getZMax()-getZMin();
+		lengthBox.X = getXMax()-getXMin();
+     	lengthBox.Y = getYMax()-getYMin();
+     	lengthBox.Z = getZMax()-getZMin();
 		
 		for (int i=1; i < (N-1); i++) {
 			Rmin = std::min(Rmin,particleHandler.getObject(i)->getRadius());
@@ -71,7 +74,7 @@ public:
 		
         for (int i=0; i < N; i++) {
 			//vx = 2*(particleHandler.getObject(i)->getPosition().Y - getYMax()/2.0);
-			//particleHandler.getObject(i)->setVelocity(Vec3D(dot_strain_xy*getTimeStep()*vx, 0.0, 0.0));
+			//particleHandler.getObject(i)->setVelocity(Vec3D(strainRate.XY*getTimeStep()*vx, 0.0, 0.0));
 			particleHandler.getObject(i)->setVelocity(Vec3D(0.0, 0.0, 0.0));
 			particleHandler.getObject(i)->setSpecies(particleSpecies);
 			Vp = Vp + particleHandler.getObject(i)->getVolume();
@@ -80,7 +83,7 @@ public:
         double particleDiameter = 2.0*Rmin;
         double mass = rhop*constants::pi*mathsFunc::cubic(particleDiameter)/6.0;
         double tc = std::sqrt( mass/2.0/K1*( mathsFunc::square(constants::pi) + mathsFunc::square(log(en) ) ));
-		double velocity_xy = dot_strain_xy*Ly;
+        double velocity_xy = strainRate.XY * lengthBox.Y;
         setTimeStep(tc/50);
 		setTimeMax(tmax);
         		
@@ -123,14 +126,13 @@ public:
 		setGravity(Vec3D(0.0,0.0,0.0));
 		
 		boundaryHandler.clear();								//! Delete all exist boundaries
-		
-		
-		if ( stressXYGoal!=0 && dot_strain_xy !=0 || stressXXGoal!=0 && dot_strain_xx !=0 || stressYYGoal!=0 && dot_strain_yy !=0 || stressZZGoal!=0 && dot_strain_zz !=0)
+
+
+		if ( stressGoal.XY!=0 && strainRate.XY !=0 || stressGoal.XX!=0 && strainRate.XX !=0 || stressGoal.YY!=0 && strainRate.YY !=0 || stressGoal.ZZ!=0 && strainRate.ZZ !=0)
 		{
-		std::cout << "wrong control combination, stressGoal and dot_strain can not be controlled at same time"  <<std::endl;
-		return;
+            logger(ERROR,"Wrong control combination, stressGoal and dot_strain can not be controlled at same time");
 		}
-		else if (stressXYGoal==0 && dot_strain_xy ==0)
+		else if (stressGoal.XY==0 && strainRate.XY ==0)
 		{
 		//! Set up new box periodic boundaries, no simple shear activated
         PeriodicBoundary normWall;
@@ -140,11 +142,10 @@ public:
         boundaryHandler.copyAndAddObject(normWall);
         normWall.set(Vec3D(0.0, 0.0, 1.0), getZMin(),getZMax());
         boundaryHandler.copyAndAddObject(normWall);
-        
-        std::cout << "Shear rate is zero, set up normal walls for periodic box" << std::endl;
-        
+
+            logger(INFO,"Shear rate is zero, set up normal walls for periodic box");
 		}
-		else if (stressXYGoal!=0 || dot_strain_xy !=0)
+		else if (stressGoal.XY!=0 || strainRate.XY !=0)
 		{
          //! Lees Edwards bc in y direction & periodic boundary in x direction, simple shear boundary activated
         LeesEdwardsBoundary leesEdwardsBoundary;
@@ -153,285 +154,290 @@ public:
             [velocity_xy] (double time UNUSED) { return 0; },
             getXMin(),getXMax(),getYMin(),getYMax());
         boundaryHandler.copyAndAddObject(leesEdwardsBoundary);
-        
+
         //! periodic boundary in z direction
 		PeriodicBoundary normWall;
         normWall.set(Vec3D(0.0, 0.0, 1.0), getZMin(),getZMax());
         boundaryHandler.copyAndAddObject(normWall);
-        
-        std::cout << "Shear rate is none zero, set up Lees-Edwards periodic boundary in x-y directions" << std::endl;
-		}
-			
+
+            logger(INFO,"Shear rate is none zero, set up Lees-Edwards periodic boundary in x-y directions");
+		}else {
+            logger(ERROR,"This should not happen; please check implementation of StressStrainControlBoundary::set");
+        }
+
 		std::cout << "N = " << N << std::endl;
 		std::cout << "Rmin = " << Rmin << std::endl;
 		std::cout << "Rmax = " << Rmax << std::endl;
-		
-        std::cout << "Lx = " << Lx << ", Ly = " << Ly << ", Lz = " << Lz << std::endl;
+
+        std::cout << "lengthBox.X = " << lengthBox.X << ", lengthBox.Y = " << lengthBox.Y << ", lengthBox.Z = " << lengthBox.Z << std::endl;
         std::cout << "shear velocity = " << velocity_xy << std::endl;
         std::cout << "nu = " << Vp/(getXMax()*getYMax()*getZMax()) << std::endl;
 		std::cout << "gp = " << velocity_xy/getYMax() << std::endl;
-        std::cout << "k1 = " << K1 << "k2 = " << K2 << std::endl;
+        std::cout << "k1 = " << K1 << ", k2 = " << K2 << std::endl;
         std::cout << "output = " << getName() << std::endl;
-        
+
         std::cout << "delta t = " << getTimeStep() << std::endl;
         std::cout << "saving time = " <<  dataFile.getSaveCount()*getTimeStep() << std::endl;
+
+//        StressStrainControlBoundary stressStrainControlBoundary;
+//        boundaryHandler.copyAndAddObject(stressStrainControlBoundary);
 		 
     }
     
-	void actionsAfterTimeStep() override
-    {
-		if (stressXYGoal==0 && dot_strain_xy ==0) //!this activate only the strainrate control in x-y-z
+	void actionsAfterTimeStep() override {
+		//start writing new version of control code
+
+		lengthBox.X = (getXMax() - getXMin());
+		lengthBox.Y = (getYMax() - getYMin());
+		lengthBox.Z = (getZMax() - getZMin());
+		centerBox.X = (getXMax() + getXMin()) / 2.0;
+		centerBox.Y = (getYMax() + getYMin()) / 2.0;
+		centerBox.Z = (getZMax() + getZMin()) / 2.0;//! Box length Lx, Lyand Lz, and center point C of the box
+		static Mdouble integrated_velocity_XY = 0.0; //!Used for updating the shift of Lees-Edwards boundary
+
+		if (stressGoal.XX == 0 && stressGoal.YY == 0 && stressGoal.ZZ == 0 &&
+			stressGoal.XY == 0) //!this activate only the strainrate control in x-y-z
 		{
-		Lx = (getXMax()-getXMin()); Ly = (getYMax()-getYMin()); Lz = (getZMax()-getZMin());
-		Cx = (getXMax()+getXMin())/2.0; Cy = (getYMax()+getYMin())/2.0; Cz = (getZMax()+getZMin())/2.0;//! Box length Lx, Lyand Lz, and center point C of the box
-		Volume = (getXMax()-getXMin())*(getYMax()-getYMin())*(getZMax()-getZMin()); //!Get the volume of the box for later averaging
-		dStrain_xx = 0.0; dStrain_yy = 0.0; dStrain_zz = 0.0; dStrain_xy = 0.0;
-		//std::cout << "Lx = " << Lx << std::endl;
-		//std::cout << "Ly = " << Ly << std::endl;
-		//std::cout << "Lz = " << Lz << std::endl;
-
-       	if (stressXXGoal!=0 || stressYYGoal!=0 || stressZZGoal!=0)
-       	{
-		stressXX = 0.0; stressYY = 0.0; stressZZ = 0.0; stressXY = 0.0;
-		stressXX_static = 0.0; stressYY_static = 0.0; stressZZ_static = 0.0; stressXY_static = 0.0;
-		stressXX_kinetic = 0.0; stressYY_kinetic = 0.0; stressZZ_kinetic = 0.0; stressXY_kinetic = 0.0;
-		RHOP = 0.0;
-		Jx = 0.0; Jy = 0.0; Jz = 0.0;
-		Fx = 0.0; Fy = 0.0; Fz = 0.0, Fxy = 0.0; 
-		Lx = (getXMax()-getXMin()); Ly = (getYMax()-getYMin()); Lz = (getZMax()-getZMin());
-		Cx = (getXMax()+getXMin())/2.0; Cy = (getYMax()+getYMin())/2.0; Cz = (getZMax()+getZMin())/2.0;//! Box length Lx, Lyand Lz, and center point C of the box
-		
-		//!calculate stress for kinetic part
-			double N = particleHandler.getNumberOfObjects();
-			for (int i=0; i < N; i++) {
-			RHOP += rhop*constants::pi*mathsFunc::cubic(particleHandler.getObject(i)->getRadius()*2)/6.0; 
-			Jx += particleHandler.getObject(i)->getVelocity().X*rhop*constants::pi*mathsFunc::cubic(particleHandler.getObject(i)->getRadius()*2)/6.0;
-			Fx += particleHandler.getObject(i)->getVelocity().X*particleHandler.getObject(i)->getVelocity().X*rhop*constants::pi*mathsFunc::cubic(particleHandler.getObject(i)->getRadius()*2)/6.0;
-			
-			Jy += particleHandler.getObject(i)->getVelocity().Y*rhop*constants::pi*mathsFunc::cubic(particleHandler.getObject(i)->getRadius()*2)/6.0;
-			Fy += particleHandler.getObject(i)->getVelocity().Y*particleHandler.getObject(i)->getVelocity().Y*rhop*constants::pi*mathsFunc::cubic(particleHandler.getObject(i)->getRadius()*2)/6.0;
-			
-			Jz += particleHandler.getObject(i)->getVelocity().Z*rhop*constants::pi*mathsFunc::cubic(particleHandler.getObject(i)->getRadius()*2)/6.0;
-			Fz += particleHandler.getObject(i)->getVelocity().Z*particleHandler.getObject(i)->getVelocity().Z*rhop*constants::pi*mathsFunc::cubic(particleHandler.getObject(i)->getRadius()*2)/6.0;
-			
-			Fxy += particleHandler.getObject(i)->getVelocity().X*particleHandler.getObject(i)->getVelocity().Y*rhop*constants::pi*mathsFunc::cubic(particleHandler.getObject(i)->getRadius()*2)/6.0;
-			
-			}
-			stressXX_kinetic = Fx - (Jx*Jx/RHOP);
-			stressYY_kinetic = Fy - (Jy*Jy/RHOP);
-			stressZZ_kinetic = Fz - (Jz*Jz/RHOP);
-			stressXY_kinetic = Fxy - (Jx*Jy/RHOP);
-			
-			//!calculate stress_yy for static part
-			for (auto i : interactionHandler) {
-				stressXX_static += i->getForce().X * i->getNormal().X * i->getDistance();
-				stressYY_static += i->getForce().Y * i->getNormal().Y * i->getDistance();
-				stressZZ_static += i->getForce().Z * i->getNormal().Z * i->getDistance();
-				stressXY_static += i->getForce().X * i->getNormal().Y * i->getDistance();		
-			}
-			
-			
-			//! calculate the stress total and average over the volume
-			stressXX = stressXX_kinetic + stressXX_static;
-			stressXX /= Volume;
-			stressYY = stressYY_kinetic + stressYY_static;
-			stressYY /= Volume;
-			stressZZ = stressZZ_kinetic + stressZZ_static;
-			stressZZ /= Volume;
-			stressXY = stressXY_kinetic + stressXY_static;
-			stressXY /= Volume;
-
-			
-			//! amount by which the strainrate tensor has to be changed
-			if (stressXXGoal!=0)
-			{
-			dStrain_xx = dStrain_xx + gain_xx*getTimeStep()*(stressXX - stressXXGoal);
-			std::cout << "StressXX = " << stressXX << std::endl;
-			}
-			else if (stressYYGoal!=0)
-			{
-			dStrain_yy = dStrain_yy + gain_yy*getTimeStep()*(stressYY - stressYYGoal);
-			std::cout << "StressYY = " << stressYY << std::endl;
-			}
-			else if (stressZZGoal!=0)
-			{
-			dStrain_zz = dStrain_zz + gain_zz*getTimeStep()*(stressZZ - stressZZGoal);
-			std::cout << "StressZZ = " << stressZZ << std::endl;
-			}
-			else if (stressXYGoal!=0)
-			{
-			dStrain_xy = dStrain_xy + gain_xy*getTimeStep()*(stressXY - stressXYGoal);
-			std::cout << "StressXY = " << stressXY << std::endl;
-			}
-			
-		}
-		//!  Update the strainrate tensor
-		dot_strain_xx = dot_strain_xx + dStrain_xx;
-		dot_strain_yy = dot_strain_yy + dStrain_yy;
-		dot_strain_zz = dot_strain_zz + dStrain_zz;
-		dot_strain_xy = dot_strain_xy + dStrain_xy;
-		
-		
-        //!  Change the system size according to next time step
-		setXMax(getXMax()+0.5*Lx*dot_strain_xx*getTimeStep());
-        setXMin(getXMin()-0.5*Lx*dot_strain_xx*getTimeStep());
-        setYMax(getYMax()+0.5*Ly*dot_strain_yy*getTimeStep());
-        setYMin(getYMin()-0.5*Ly*dot_strain_yy*getTimeStep());
-        setZMax(getZMax()+0.5*Lz*dot_strain_zz*getTimeStep());
-        setZMin(getZMin()-0.5*Lz*dot_strain_zz*getTimeStep());
-        
-        //!  Move the boundary in x direction to next time step
-        PeriodicBoundary* normWall;
-        normWall = dynamic_cast<PeriodicBoundary*>(boundaryHandler.getObject(0));
-        normWall->set(Vec3D(1.0, 0.0, 0.0), getXMin(),getXMax());
-        
-         //!  Move the boundary in y direction to next time step
-        normWall = dynamic_cast<PeriodicBoundary*>(boundaryHandler.getObject(1));
-        normWall->set(Vec3D(0.0, 1.0, 0.0), getYMin(),getYMax());
-  
-        //!  Move the boundary in z direction to next time step
-        normWall = dynamic_cast<PeriodicBoundary*>(boundaryHandler.getObject(2));
-        normWall->set(Vec3D(0.0, 0.0, 1.0), getZMin(),getZMax());
-		
-		//!  Give the strain-rate for all particles and move them to next time step before integration
-        double N = particleHandler.getNumberOfObjects();
-        for (int i=0; i < N; i++) {
-			rpx = particleHandler.getObject(i)-> getPosition().X - Cx;
-			rpy = particleHandler.getObject(i)-> getPosition().Y - Cy;
-			rpz = particleHandler.getObject(i)-> getPosition().Z - Cz;
-			particleHandler.getObject(i)->move(Vec3D(dot_strain_xx*getTimeStep()*rpx,dot_strain_yy*getTimeStep()*rpy, dot_strain_zz*getTimeStep()*rpz));				
-        
-		}	
-	} 
-	else
-	{ 
-		Lx = (getXMax()-getXMin()); Ly = (getYMax()-getYMin()); Lz = (getZMax()-getZMin());
-		Cx = (getXMax()+getXMin())/2.0; Cy = (getYMax()+getYMin())/2.0; Cz = (getZMax()+getZMin())/2.0;//! Box length Lx, Lyand Lz, and center point C of the box
-		
-		dStrain_xx = 0.0; dStrain_yy = 0.0; dStrain_zz = 0.0; dStrain_xy = 0.0;
-		static Mdouble integrated_velocity_XY = 0.0;
-		Volume = (getXMax()-getXMin())*(getYMax()-getYMin())*(getZMax()-getZMin());
-		
-		
-			if (stressXXGoal!=0 || stressYYGoal!=0 || stressZZGoal!=0 || stressXYGoal!=0)
-			{
-			stressXX = 0.0; stressYY = 0.0; stressZZ = 0.0; stressXY = 0.0;
-			stressXX_static = 0.0; stressYY_static = 0.0; stressZZ_static = 0.0; stressXY_static = 0.0;
-			stressXX_kinetic = 0.0; stressYY_kinetic = 0.0; stressZZ_kinetic = 0.0; stressXY_kinetic = 0.0;
-			RHOP = 0.0;
-			Jx = 0.0; Jy = 0.0; Jz = 0.0;
-			Fx = 0.0; Fy = 0.0; Fz = 0.0, Fxy = 0.0; 
-		
-			//!calculate stress for kinetic part
-			double N = particleHandler.getNumberOfObjects();
-			for (int i=0; i < N; i++) {
-			RHOP += rhop*constants::pi*mathsFunc::cubic(particleHandler.getObject(i)->getRadius()*2)/6.0; 
-			Jx += particleHandler.getObject(i)->getVelocity().X*rhop*constants::pi*mathsFunc::cubic(particleHandler.getObject(i)->getRadius()*2)/6.0;
-			Fx += particleHandler.getObject(i)->getVelocity().X*particleHandler.getObject(i)->getVelocity().X*rhop*constants::pi*mathsFunc::cubic(particleHandler.getObject(i)->getRadius()*2)/6.0;
-			
-			Jy += particleHandler.getObject(i)->getVelocity().Y*rhop*constants::pi*mathsFunc::cubic(particleHandler.getObject(i)->getRadius()*2)/6.0;
-			Fy += particleHandler.getObject(i)->getVelocity().Y*particleHandler.getObject(i)->getVelocity().Y*rhop*constants::pi*mathsFunc::cubic(particleHandler.getObject(i)->getRadius()*2)/6.0;
-			
-			Jz += particleHandler.getObject(i)->getVelocity().Z*rhop*constants::pi*mathsFunc::cubic(particleHandler.getObject(i)->getRadius()*2)/6.0;
-			Fz += particleHandler.getObject(i)->getVelocity().Z*particleHandler.getObject(i)->getVelocity().Z*rhop*constants::pi*mathsFunc::cubic(particleHandler.getObject(i)->getRadius()*2)/6.0;
-			
-			Fxy += particleHandler.getObject(i)->getVelocity().X*particleHandler.getObject(i)->getVelocity().Y*rhop*constants::pi*mathsFunc::cubic(particleHandler.getObject(i)->getRadius()*2)/6.0;
-			
-			}
-			stressXX_kinetic = Fx - (Jx*Jx/RHOP);
-			stressYY_kinetic = Fy - (Jy*Jy/RHOP);
-			stressZZ_kinetic = Fz - (Jz*Jz/RHOP);
-			stressXY_kinetic = Fxy - (Jx*Jy/RHOP);
-			
-			//!calculate stress_yy for static part
-			for (auto i : interactionHandler) {
-				stressXX_static += i->getForce().X * i->getNormal().X * i->getDistance();
-				stressYY_static += i->getForce().Y * i->getNormal().Y * i->getDistance();
-				stressZZ_static += i->getForce().Z * i->getNormal().Z * i->getDistance();
-				stressXY_static += i->getForce().X * i->getNormal().Y * i->getDistance();		
-			}
-			
-			
-			//! calculate the stress total and average over the volume
-			stressXX = stressXX_kinetic + stressXX_static;
-			stressXX /= Volume;
-			stressYY = stressYY_kinetic + stressYY_static;
-			stressYY /= Volume;
-			stressZZ = stressZZ_kinetic + stressZZ_static;
-			stressZZ /= Volume;
-			stressXY = stressXY_kinetic + stressXY_static;
-			stressXY /= Volume;
-			
-			
-			//! amount by which the strainrate tensor has to be changed
-				if (stressXXGoal!=0)
-				{
-				dStrain_xx = dStrain_xx + gain_xx*getTimeStep()*(stressXX - stressXXGoal);
-				std::cout << "StressXX = " << stressXX << std::endl;
-				}
-				else if (stressYYGoal!=0)
-				{
-				dStrain_yy = dStrain_yy + gain_yy*getTimeStep()*(stressYY - stressYYGoal);
-				std::cout << "StressYY = " << stressYY << std::endl;
-				}
-				else if (stressZZGoal!=0)
-				{
-				dStrain_zz = dStrain_zz + gain_zz*getTimeStep()*(stressZZ - stressZZGoal);
-				std::cout << "StressZZ = " << stressZZ << std::endl;
-				}
-				else if (stressXYGoal!=0)
-				{
-				dStrain_xy = dStrain_xy + gain_xy*getTimeStep()*(stressXY - stressXYGoal);
-				std::cout << "StressXY = " << stressXY << std::endl;
-				}
-			}
-			
-			//!  Update the strainrate tensor
-			dot_strain_xx = dot_strain_xx + dStrain_xx;
-			dot_strain_yy = dot_strain_yy + dStrain_yy;
-			dot_strain_zz = dot_strain_zz + dStrain_zz;
-			dot_strain_xy = dot_strain_xy + dStrain_xy;
-		
-		
 			//!  Change the system size according to next time step
-			setXMax(getXMax()+0.5*Lx*dot_strain_xx*getTimeStep());
-			setXMin(getXMin()-0.5*Lx*dot_strain_xx*getTimeStep());
-			setYMax(getYMax()+0.5*Ly*dot_strain_yy*getTimeStep());
-			setYMin(getYMin()-0.5*Ly*dot_strain_yy*getTimeStep());
-			setZMax(getZMax()+0.5*Lz*dot_strain_zz*getTimeStep());
-			setZMin(getZMin()-0.5*Lz*dot_strain_zz*getTimeStep());
-			
-			Lx = (getXMax()-getXMin());					//! Box length Lx, Lyand Lz for next time step
-			Ly = (getYMax()-getYMin());
-			Lz = (getZMax()-getZMin());
+			setXMax(getXMax() + 0.5 * lengthBox.X * strainRate.XX * getTimeStep());
+			setXMin(getXMin() - 0.5 * lengthBox.X * strainRate.XX * getTimeStep());
+			setYMax(getYMax() + 0.5 * lengthBox.Y * strainRate.YY * getTimeStep());
+			setYMin(getYMin() - 0.5 * lengthBox.Y * strainRate.YY * getTimeStep());
+			setZMax(getZMax() + 0.5 * lengthBox.Z * strainRate.ZZ * getTimeStep());
+			setZMin(getZMin() - 0.5 * lengthBox.Z * strainRate.ZZ * getTimeStep());
 
-			double velocity_xy = dot_strain_xy*Ly;
-			integrated_velocity_XY +=velocity_xy*getTimeStep();
-			LeesEdwardsBoundary* leesEdwardsBoundary = dynamic_cast<LeesEdwardsBoundary*>(boundaryHandler.getObject(0));
+			//! Box length Lx, Lyand Lz for next time step
+			lengthBox.X = (getXMax() - getXMin());
+			lengthBox.Y = (getYMax() - getYMin());
+			lengthBox.Z = (getZMax() - getZMin());
+
+			//!  Move the boundaries to next time step
+			if (strainRate.XY != 0) {
+				//!  Move the Lees-Edwards boundary in z direction to next time step
+				double velocity_xy = strainRate.XY * lengthBox.Y;
+				integrated_velocity_XY += velocity_xy * getTimeStep();
+				LeesEdwardsBoundary *leesEdwardsBoundary = dynamic_cast<LeesEdwardsBoundary *>(boundaryHandler.getObject(
+						0));
+				leesEdwardsBoundary->set(
+						[velocity_xy](double time) { return integrated_velocity_XY; },
+						[velocity_xy](double time UNUSED) { return 0; },
+						getXMin(), getXMax(), getYMin(), getYMax());
+
+				//!  Move the boundary in z direction to next time step
+				PeriodicBoundary *normWall;
+
+				normWall = dynamic_cast<PeriodicBoundary *>(boundaryHandler.getObject(1));
+				normWall->set(Vec3D(0.0, 0.0, 1.0), getZMin(), getZMax());
+			} else {
+				//!  Move the boundary in x direction to next time step
+				PeriodicBoundary *normWall;
+				normWall = dynamic_cast<PeriodicBoundary *>(boundaryHandler.getObject(0));
+				normWall->set(Vec3D(1.0, 0.0, 0.0), getXMin(), getXMax());
+
+				//!  Move the boundary in y direction to next time step
+				normWall = dynamic_cast<PeriodicBoundary *>(boundaryHandler.getObject(1));
+				normWall->set(Vec3D(0.0, 1.0, 0.0), getYMin(), getYMax());
+
+				//!  Move the boundary in z direction to next time step
+				normWall = dynamic_cast<PeriodicBoundary *>(boundaryHandler.getObject(2));
+				normWall->set(Vec3D(0.0, 0.0, 1.0), getZMin(), getZMax());
+			}
+
+			//!  Give the strain-rate for all particles and move them to next timestep before integration
+			for (auto& p : particleHandler) {
+				relativeToCenter.X = p->getPosition().X - centerBox.X;
+				relativeToCenter.Y = p->getPosition().Y - centerBox.Y;
+				relativeToCenter.Z = p->getPosition().Z - centerBox.Z;
+				p->move(Vec3D(strainRate.XX * getTimeStep() * relativeToCenter.X + strainRate.XY * getTimeStep() * relativeToCenter.Y,
+							  strainRate.YY * getTimeStep() * relativeToCenter.Y, strainRate.ZZ * getTimeStep() * relativeToCenter.Z));
+			}
+		} else {
+			dstrainRate.setZero();
+			stressTotal.setZero();
+			stressStatic.setZero();
+			stressKinetic.setZero();
+
+			//!calculate stress for kinetic part
+			stressKinetic = getKineticStress();
+
+			//!calculate the static stress tensor
+			stressStatic = getStaticStress();
+
+			//! calculate the stress total and average over the volume
+			stressTotal = getTotalStress();
+
+			//! amount by which the strainrate tensor has to be changed
+			if (stressGoal.XX != 0) {
+				dstrainRate.XX = dstrainRate.XX + gainFactor.XX * getTimeStep() * (stressTotal.XX - stressGoal.XX);
+				std::cout << "StressXX = " << stressTotal.XX << std::endl;
+			}
+			if (stressGoal.YY != 0) {
+				dstrainRate.YY = dstrainRate.YY + gainFactor.YY * getTimeStep() * (stressTotal.YY - stressGoal.YY);
+				std::cout << "StressYY = " << stressTotal.YY << std::endl;
+			}
+			if (stressGoal.ZZ != 0) {
+				dstrainRate.ZZ = dstrainRate.ZZ + gainFactor.ZZ * getTimeStep() * (stressTotal.ZZ - stressGoal.ZZ);
+				std::cout << "StressZZ = " << stressTotal.ZZ << std::endl;
+			}
+			if (stressGoal.XY != 0) {
+				dstrainRate.XY = dstrainRate.XY + gainFactor.XY * getTimeStep() * (stressTotal.XY - stressGoal.XY);
+                std::cout << "dstrainRate.XY = " << dstrainRate.XY << std::endl;
+				std::cout << "StressXY = " << stressTotal.XY << std::endl;
+				std::cout << "StressYX = " << stressTotal.YX << std::endl;
+			}
+		}
+
+		//!  Update the strainrate tensor
+		strainRate = strainRate + dstrainRate;
+
+		//!  Change the system size according to next time step
+		setXMax(getXMax() + 0.5 * lengthBox.X * strainRate.XX * getTimeStep());
+		setXMin(getXMin() - 0.5 * lengthBox.X * strainRate.XX * getTimeStep());
+		setYMax(getYMax() + 0.5 * lengthBox.Y * strainRate.YY * getTimeStep());
+		setYMin(getYMin() - 0.5 * lengthBox.Y * strainRate.YY * getTimeStep());
+		setZMax(getZMax() + 0.5 * lengthBox.Z * strainRate.ZZ * getTimeStep());
+		setZMin(getZMin() - 0.5 * lengthBox.Z * strainRate.ZZ * getTimeStep());
+
+		//! Box length Lx, Lyand Lz for next time step
+		lengthBox.X = (getXMax() - getXMin());
+		lengthBox.Y = (getYMax() - getYMin());
+		lengthBox.Z = (getZMax() - getZMin());
+
+		//!  Move the boundaries to next time step
+		if (strainRate.XY != 0) {
+			//!  Move the Lees-Edwards boundary in z direction to next time step
+			double velocity_xy = strainRate.XY * lengthBox.Y;
+			integrated_velocity_XY += velocity_xy * getTimeStep();
+			LeesEdwardsBoundary *leesEdwardsBoundary = dynamic_cast<LeesEdwardsBoundary *>(boundaryHandler.getObject(
+					0));
 			leesEdwardsBoundary->set(
-				[velocity_xy] (double time) { return integrated_velocity_XY; },
-				[velocity_xy] (double time UNUSED) { return 0; },
-				getXMin(),getXMax(),getYMin(),getYMax());
-				
-			//!  Give the strain-rate for all particles and move them to next time step before integration
-			double N = particleHandler.getNumberOfObjects();
-			for (int i=0; i < N; i++) {
-			rpx = particleHandler.getObject(i)-> getPosition().X - Cx;
-			rpy = particleHandler.getObject(i)-> getPosition().Y - Cy;
-			rpz = particleHandler.getObject(i)-> getPosition().Z - Cz;
-			particleHandler.getObject(i)->move(Vec3D(dot_strain_xx*getTimeStep()*rpx+dot_strain_xy*getTimeStep()*rpy,dot_strain_yy*getTimeStep()*rpy, dot_strain_zz*getTimeStep()*rpz));				
-        
-		}	
-        }
-	
-     
-	}			
+					[velocity_xy](double time) { return integrated_velocity_XY; },
+					[velocity_xy](double time UNUSED) { return 0; },
+					getXMin(), getXMax(), getYMin(), getYMax());
+
+			//!  Move the boundary in z direction to next time step
+			PeriodicBoundary *normWall;
+
+			normWall = dynamic_cast<PeriodicBoundary *>(boundaryHandler.getObject(1));
+			normWall->set(Vec3D(0.0, 0.0, 1.0), getZMin(), getZMax());
+
+		} else {
+			//  Move the boundary in x direction to next time step
+			PeriodicBoundary *normWall;
+			normWall = dynamic_cast<PeriodicBoundary *>(boundaryHandler.getObject(0));
+			normWall->set(Vec3D(1.0, 0.0, 0.0), getXMin(), getXMax());
+
+			//  Move the boundary in y direction to next time step
+			normWall = dynamic_cast<PeriodicBoundary *>(boundaryHandler.getObject(1));
+			normWall->set(Vec3D(0.0, 1.0, 0.0), getYMin(), getYMax());
+
+			//  Move the boundary in z direction to next time step
+			normWall = dynamic_cast<PeriodicBoundary *>(boundaryHandler.getObject(2));
+			normWall->set(Vec3D(0.0, 0.0, 1.0), getZMin(), getZMax());
+		}
+		// Give the strain-rate for all particles and move them to next timestep before integration
+		for (auto& p : particleHandler) {
+			relativeToCenter.X = p->getPosition().X - centerBox.X;
+			relativeToCenter.Y = p->getPosition().Y - centerBox.Y;
+			relativeToCenter.Z = p->getPosition().Z - centerBox.Z;
+			p->move(Vec3D(strainRate.XX * getTimeStep() * relativeToCenter.X + strainRate.XY * getTimeStep() * relativeToCenter.Y,
+						  strainRate.YY * getTimeStep() * relativeToCenter.Y, strainRate.ZZ * getTimeStep() * relativeToCenter.Z));
+			}
+	}
+
+	Mdouble getTotalVolume() const
+	{
+		/**\brief Get the total volume of the system.
+ 	*/
+
+		return (DPMBase::getXMax() - DPMBase::getXMin()) * (DPMBase::getYMax() - DPMBase::getYMin()) *
+				 (DPMBase::getZMax() - DPMBase::getZMin()); //!Get the total volume of the system
+	}
+
+
+ 	Matrix3D getKineticStress()
+	{
+	/**\brief Calculate the kinetic stress tensor in the system
+ 	* \details The function calculate the kinetic stress tensor based on particle fluctuation velocity.
+ 	*/
+		Matrix3D stressKinetic;
+		Matrix3D Fij;
+		Matrix3D Jij;
+		stressKinetic.setZero();
+		Jij.setZero();
+		Fij.setZero();
+
+		//!calculate stress for kinetic part
+
+		for (auto& p : particleHandler) {
+			//RHOP += rhop * constants::pi * mathsFunc::cubic(particleHandler.getObject(i)->getRadius() * 2) / 6.0;
+			Jij.XX += p->getVelocity().X * p->getMass();
+			Fij.XX += p->getVelocity().X * p->getVelocity().X * p->getMass();
+
+			Jij.YY += p->getVelocity().Y * p->getMass();
+			Fij.YY += p->getVelocity().Y * p->getVelocity().Y * p->getMass();
+
+			Jij.ZZ += p->getVelocity().Z * p->getMass();
+			Fij.ZZ += p->getVelocity().Z * p->getVelocity().Z * p->getMass();
+
+			Fij.XY += p->getVelocity().X * p->getVelocity().Y * p->getMass();
+
+			Fij.YX += p->getVelocity().Y * p->getVelocity().X * p->getMass();
+		}
+
+		stressKinetic.XX = Fij.XX - (Jij.XX * Jij.XX / DPMBase::getTotalMass());
+		stressKinetic.YY = Fij.YY - (Jij.YY * Jij.YY / DPMBase::getTotalMass());
+		stressKinetic.ZZ = Fij.ZZ - (Jij.ZZ * Jij.ZZ / DPMBase::getTotalMass());
+		stressKinetic.XY = Fij.XY - (Jij.XX * Jij.YY / DPMBase::getTotalMass());
+		stressKinetic.YX = Fij.YX - (Jij.XX * Jij.YY / DPMBase::getTotalMass());
+
+		stressKinetic = stressKinetic/getTotalVolume();
+
+		return stressKinetic;
+	}
+	Matrix3D getStaticStress()
+	{
+		/**\brief Calculate the static stress tensor in the system
+         * \details The function calculate the static stress tensor based on particle contact force and
+         * contact normal branch vector.
+         */
+		Matrix3D stressStatic;  //!stress components calculation variables
+		stressStatic.setZero();
+
+		for (auto i : interactionHandler) {
+			stressStatic.XX += i->getForce().X * i->getNormal().X * i->getDistance();
+			stressStatic.YY += i->getForce().Y * i->getNormal().Y * i->getDistance();
+			stressStatic.ZZ += i->getForce().Z * i->getNormal().Z * i->getDistance();
+			stressStatic.XY += i->getForce().X * i->getNormal().Y * i->getDistance();
+			stressStatic.YX += i->getForce().Y * i->getNormal().X * i->getDistance();
+		}
+
+		stressStatic = stressStatic/getTotalVolume();
+
+		return stressStatic;
+	}
+
+	Matrix3D getTotalStress()
+	{
+		/**\brief Calculate the Total stress tensor in the system
+         * \details The function calculate the total stress tensor which is
+         * the sum of kinetic and static stress tensors.
+         */
+		Matrix3D stressTotal;  //!stress components calculation variables
+		stressTotal.setZero();
+
+
+		stressTotal = getKineticStress() + getStaticStress();
+
+		return stressTotal;
+	}
+
 };
         
 
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
-	std::string restartName ("s4_SelfTestInput");
+	std::string restartName ("StressStrainControlBoundarySelfTestInput");
 	
 	poly_simpleshear problem(restartName);
 	//!  --------------------------------------------------
@@ -442,43 +448,45 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     problem.K2 = 100000;				//set unloading stiffness
     problem.Kc = 0.0;					//set cohesive stiffness
     
-    problem.mu_slid = 0.01;				//set sliding friction coefficient
+    problem.mu_slid = 0.0;				//set sliding friction coefficient
     problem.mu_roll = 0.0;				//set rolling friction coefficient
     problem.mu_tor = 0.0;				//set torsional friction coefficient
     problem.Phic = 0.5;					// penetration DepthMax, the maximum depth of linear plastic-viscoelastic normal force
-    problem.poly = 3;		
+    problem.poly = 3;
 
     
     
     //! ----------------------------------------------------------------
     //!set up the stress tensor (activate stress control)
-	problem.stressXXGoal = 0.0;
-	problem.stressYYGoal = 0.0;
-	problem.stressZZGoal = 0.0;
-	problem.stressXYGoal = -2; //! the input for shear stress control should be always negative sign
+	problem.stressGoal.XX = 0.0;
+	problem.stressGoal.YY = 0.0;
+	problem.stressGoal.ZZ = 0.0;
+	problem.stressGoal.XY = -2.0; //! the input for shear stress control should be always negative sign
 	
 	//!set up the strainrate tensor
-	problem.dot_strain_xx = 0.0;
-    problem.dot_strain_yy = 0.0;
-    problem.dot_strain_zz = 0.0;
-    problem.dot_strain_xy = 0.0;
+	problem.strainRate.XX = 0.0;
+    problem.strainRate.YY = 0.0;
+    problem.strainRate.ZZ = 0.0;
+    problem.strainRate.XY = 0.0;
     
     //!set up the gain factors for stress control
-    problem.gain_xx = 0.0001; //!these gain factors will be multiplied by dt, they are case dependent and set by user
-    problem.gain_yy = 0.0001;
-    problem.gain_zz = 0.0001;
-    problem.gain_xy = 0.0001;
+    problem.gainFactor.XX = 0.0001; //!these gain factors will be multiplied by dt, they are case dependent and set by user
+    problem.gainFactor.YY = 0.0001;
+    problem.gainFactor.ZZ = 0.0001;
+    problem.gainFactor.XY = 0.0001;
+
     
     //!set up the simulation time and name of output
-    problem.tmax = 0.2;
+    problem.tmax = 0.1;
     problem.setName("s4_FreeShearStressStrainSelfTest");
-    
+
     problem.setSaveCount(1000);
-    problem.eneFile.setSaveCount(10);
+    problem.eneFile.setSaveCount(1000);
 	problem.dataFile.setFileType(FileType::NO_FILE);
     problem.restartFile.setFileType(FileType::ONE_FILE);
     problem.fStatFile.setFileType(FileType::NO_FILE);
     problem.eneFile.setFileType(FileType::ONE_FILE);
 
     problem.solve();
+	//problem.writeRestartFile();
 }

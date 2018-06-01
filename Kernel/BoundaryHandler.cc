@@ -40,6 +40,7 @@
 #include "Boundaries/SubcriticalMaserBoundaryTEST.h"
 #include "Boundaries/FluxBoundary.h"
 #include "Boundaries/HeaterBoundary.h"
+#include "Boundaries/StressStrainControlBoundary.h"
 
 ///Constructor of the ParticleHandler class. It creates and empty ParticleHandler.
 BoundaryHandler::BoundaryHandler()
@@ -164,6 +165,10 @@ BaseBoundary* BoundaryHandler::createObject(const std::string& type)
     else if (type == "HeaterBoundary")
     {
         return new HeaterBoundary;
+    }
+    else if (type == "StressStrainControlBoundary")
+    {
+        return new StressStrainControlBoundary;
     }
     else if (type == "normal") //for backward compatibility (before svnversion ~2360)
     {

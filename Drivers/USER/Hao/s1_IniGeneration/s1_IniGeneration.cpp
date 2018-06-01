@@ -85,7 +85,7 @@ public:
 		particleSpecies->setSlidingDissipation(2.0/10.0*particleSpecies->getDissipation());
 		particleSpecies->setRollingDissipation(2.0/10.0*particleSpecies->getDissipation());
 		particleSpecies->setTorsionDissipation(2.0/10.0*particleSpecies->getDissipation());
-		dampingCoefficient =  0.1*particleSpecies->getDissipation();
+		dampingCoefficient =  0.6*particleSpecies->getDissipation();
         setGravity(Vec3D(0.0,0.0,0.0));
 		
 		BaseParticle p0;
@@ -163,26 +163,26 @@ int main(int argc , char *argv[] )
     problem.K2 = 100000;				//set unloading stiffness
     problem.Kc = 0.0;					//set cohesive stiffness
     
-    problem.mu_slid = 0.0;				//set sliding friction coefficient
+    problem.mu_slid = 0.01;				//set sliding friction coefficient
     problem.mu_roll = 0.0;				//set rolling friction coefficient
     problem.mu_tor = 0.0;				//set torsional friction coefficient
     problem.Phic = 0.5;					// penetration DepthMax, the maximum depth of linear plastic-viscoelastic normal force
     problem.N = 4096;					// number of particles
-    problem.volumeFraction = 0.6;		// initial volume fraction
-    problem.poly = 1.0;					//polydispersity dmax/dmin
+    problem.volumeFraction = 0.68;		// initial volume fraction
+    problem.poly = 3.0;					//polydispersity dmax/dmin
     // ----------------------------------------------------------------
     
     // assign problem configuration: volume fraction and name
     
 	problem.setName("ini_nu_w1");
-	problem.tmax = 200;
+	problem.tmax = 2000;
     problem.setSaveCount(500);
     problem.eneFile.setSaveCount(500);
     
-    problem.dataFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
+    problem.dataFile.setFileType(FileType::NO_FILE);
 	//problem.restartFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
     problem.restartFile.setFileType(FileType::ONE_FILE);
-    problem.fStatFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
+    problem.fStatFile.setFileType(FileType::NO_FILE);
     problem.eneFile.setFileType(FileType::ONE_FILE);
 
     

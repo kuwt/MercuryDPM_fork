@@ -21,7 +21,6 @@ add_subdirectory(SlidingRollingTorsion)
 #add_subdirectory(Dinant)
 add_subdirectory(Sinter)
 #add_subdirectory(Segregation)
-#add_subdirectory(Siegen)
 add_subdirectory(SpeedTest)
 
 add_subdirectory(ParallelDrum)
