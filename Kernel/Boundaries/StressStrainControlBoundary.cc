@@ -33,7 +33,7 @@
 #include "LeesEdwardsBoundary.h"
 
 /*!
- * \details constructor
+ * \details constructor, set all the parameters to zero.
  */
 StressStrainControlBoundary::StressStrainControlBoundary()
         : BaseBoundary()
@@ -42,20 +42,18 @@ StressStrainControlBoundary::StressStrainControlBoundary()
     strainRate_.setZero();
     gainFactor_.setZero();
     isStrainRateControlled_ = true;
-    stressTotal.setZero();
-    stressKinetic.setZero();
-    stressStatic.setZero();
-    dstrainRate.setZero();
-    lengthBox.setZero();
-    centerBox.setZero();
-    relativeToCenter.setZero();
+    stressTotal_.setZero();
+    dstrainRate_.setZero();
+    lengthBox_.setZero();
+    centerBox_.setZero();
+    relativeToCenter_.setZero();
     integratedShift_ = 0.0;
     //
     logger(DEBUG, "StressStrainControlBoundary::StressStrainControlBoundary() finished");
 }
 
 /*!
- * \details Copy method; creates a copy on the heap and returns its pointer. 
+ * \details Copy method; creates a copy on the heap and returns its pointer.
  */
 StressStrainControlBoundary* StressStrainControlBoundary::copy() const
 {
@@ -68,11 +66,11 @@ StressStrainControlBoundary* StressStrainControlBoundary::copy() const
  */
 void StressStrainControlBoundary::write(std::ostream& os) const
 {
-    for (const LeesEdwardsBoundary& b : leesEdwardsBoundary_)
+    for (const LeesEdwardsBoundary& b : leesEdwardsBoundaries_)
     {
         os << b << "\n";
     }
-    for (const PeriodicBoundary& b : periodicBoundary_)
+    for (const PeriodicBoundary& b : periodicBoundaries_)
     {
         os << b << "\n";
     }
@@ -89,7 +87,7 @@ void StressStrainControlBoundary::write(std::ostream& os) const
 
 /*!
  * \details Reads the boundary properties from an istream
- * \param[in] is        the istream
+ * \param[in] is      the istream
  */
 void StressStrainControlBoundary::read(std::istream& is)
 {
@@ -113,220 +111,211 @@ std::string StressStrainControlBoundary::getName() const
 }
 
 /*!
+ * \details This is where the stress-strain control is implemented and
+ * the boundary will be checked each timestep to make sure the target
+ * stress/strain are achieved.
  */
-void StressStrainControlBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
+void StressStrainControlBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& particleHandler)
+{
+    checkPeriodicLeesEdwardsBoundariesAfterParticlesMove(particleHandler);
+    
+    //Real Stress and StrainRate Control every time step
+    logger.assert(getHandler() != nullptr,
+                  "you need to set the handler of this boundary before the parameters can be set");
+    
+    determineLengthAndCentre();
+    
+    //this activate only the stress control
+    if (stressGoal_.XX != 0 || stressGoal_.YY != 0 || stressGoal_.ZZ != 0 ||
+        stressGoal_.XY != 0)
+    {
+        computeStrainRate();
+    }
+    activateStrainRateControl(particleHandler);
+}
+
+/*!
+ * \details This function checks the boundaries after the particles are moved,
+ * to serve the stress-control for the following steps.
+ */
+void StressStrainControlBoundary::checkPeriodicLeesEdwardsBoundariesAfterParticlesMove(ParticleHandler& particleHandler)
 {
     // Call Boundaries
-    for (PeriodicBoundary& b : periodicBoundary_)
+    for (PeriodicBoundary& b : periodicBoundaries_)
     {
-        b.checkBoundaryAfterParticlesMove(pH);
+        b.checkBoundaryAfterParticlesMove(particleHandler);
     }
-    for (LeesEdwardsBoundary& b : leesEdwardsBoundary_)
+    for (LeesEdwardsBoundary& b : leesEdwardsBoundaries_)
     {
-        b.checkBoundaryAfterParticlesMove(pH);
+        b.checkBoundaryAfterParticlesMove(particleHandler);
     }
-    //Real Stress and StrainRate Control every time step
-    logger.assert_always(getHandler() != nullptr,
-                         "you need to set the handler of this boundary before the parameters can be set");
-    DPMBase* dpm = getHandler()->getDPMBase();
+}
+
+/*!
+ * \details This function determines both the length in x,y,z direction
+ * and center location of the domain.
+ */
+void StressStrainControlBoundary::determineLengthAndCentre()
+{
+    const DPMBase* const dpm = getHandler()->getDPMBase();
+    lengthBox_.X = (dpm->getXMax() - dpm->getXMin());
+    lengthBox_.Y = (dpm->getYMax() - dpm->getYMin());
+    lengthBox_.Z = (dpm->getZMax() - dpm->getZMin());
+    // Box length Lx, Lyand Lz, and center point C of the box
+    centerBox_.X = (dpm->getXMax() + dpm->getXMin()) / 2.0;
+    centerBox_.Y = (dpm->getYMax() + dpm->getYMin()) / 2.0;
+    centerBox_.Z = (dpm->getZMax() + dpm->getZMin()) / 2.0;
     
+}
+
+/*!
+ * \details This function is used to compute the new strainrate tensor based on
+ * the stress differences between the actual and user set values.
+ */
+void StressStrainControlBoundary::computeStrainRate()
+{
+    //Set strainrate change tensor to zero
+    dstrainRate_.setZero();
     
-    lengthBox.X = (dpm->getXMax() - dpm->getXMin());
-    lengthBox.Y = (dpm->getYMax() - dpm->getYMin());
-    lengthBox.Z = (dpm->getZMax() - dpm->getZMin());
-    centerBox.X = (dpm->getXMax() + dpm->getXMin()) / 2.0;
-    centerBox.Y = (dpm->getYMax() + dpm->getYMin()) / 2.0;
-    centerBox.Z = (dpm->getZMax() + dpm->getZMin()) / 2.0;// Box length Lx, Lyand Lz, and center point C of the box
-    //static double integratedShift = 0.0; //!Used for updating the shift of Lees-Edwards boundary
+    //Get the timestep dt
+    const Mdouble timeStep = getHandler()->getDPMBase()->getTimeStep();
     
+    Matrix3D dstrainRate_;
+    // calculate the stress total and average over the volume
+    Matrix3D stressTotal_ = getHandler()->getDPMBase()->getTotalStress();
     
-    if (stressGoal_.XX == 0 && stressGoal_.YY == 0 && stressGoal_.ZZ == 0 &&
-        stressGoal_.XY == 0) //this activate only the strainrate control in x-y-z
+    // amount by which the strainrate tensor has to be changed
+    if (stressGoal_.XX != 0)
     {
-        //  Change the system size according to next time step
-        dpm->setXMax(dpm->getXMax() + 0.5 * lengthBox.X * strainRate_.XX * dpm->getTimeStep());
-        dpm->setXMin(dpm->getXMin() - 0.5 * lengthBox.X * strainRate_.XX * dpm->getTimeStep());
-        dpm->setYMax(dpm->getYMax() + 0.5 * lengthBox.Y * strainRate_.YY * dpm->getTimeStep());
-        dpm->setYMin(dpm->getYMin() - 0.5 * lengthBox.Y * strainRate_.YY * dpm->getTimeStep());
-        dpm->setZMax(dpm->getZMax() + 0.5 * lengthBox.Z * strainRate_.ZZ * dpm->getTimeStep());
-        dpm->setZMin(dpm->getZMin() - 0.5 * lengthBox.Z * strainRate_.ZZ * dpm->getTimeStep());
-        
-        // Box length Lx, Lyand Lz for next time step
-        lengthBox.X = (dpm->getXMax() - dpm->getXMin());
-        lengthBox.Y = (dpm->getYMax() - dpm->getYMin());
-        lengthBox.Z = (dpm->getZMax() - dpm->getZMin());
-        
-        //  Move the boundaries to next time step
-        if (strainRate_.XY != 0 || stressGoal_.XY != 0)
-        {
-            //Determine the current shear velocity and shift of the Lees-Edwards boundary
-            double velocity_xy = strainRate_.XY * lengthBox.Y;
-            integratedShift_ += velocity_xy * dpm->getTimeStep();
-            
-            // Determine how to move boundaries based on strainrate control or boundary control
-            if (isStrainRateControlled_)
-            {
-                //  Move the Lees-Edwards boundary in z direction to next time step
-                leesEdwardsBoundary_[0].set(
-                        [this](double time)
-                        { return integratedShift_; },
-                        [](double time UNUSED)
-                        { return 0; },
-                        dpm->getXMin(), dpm->getXMax(), dpm->getYMin(), dpm->getYMax());
-            }
-            else
-            {
-                //  Update the velocity of Lees-Edwards boundary in x-y direction to next time step
-                leesEdwardsBoundary_[0].set(
-                        [this](double time)
-                        { return integratedShift_; },
-                        [velocity_xy](double time UNUSED)
-                        { return velocity_xy; },
-                        dpm->getXMin(), dpm->getXMax(), dpm->getYMin(), dpm->getYMax());
-            }
-            std::cout << "leesEdwardsShift" << leesEdwardsBoundary_[0].getCurrentShift();
-            //  Move the boundary in z direction to next time step
-            periodicBoundary_[0].set(Vec3D(0.0, 0.0, 1.0), dpm->getZMin(), dpm->getZMax());
-            
-        }
-        else
-        {
-            //  Move the boundary in x direction to next time step
-            periodicBoundary_[0].set(Vec3D(1.0, 0.0, 0.0), dpm->getXMin(), dpm->getXMax());
-            //  Move the boundary in y direction to next time step
-            periodicBoundary_[1].set(Vec3D(0.0, 1.0, 0.0), dpm->getYMin(), dpm->getYMax());
-            //  Move the boundary in z direction to next time step
-            periodicBoundary_[2].set(Vec3D(0.0, 0.0, 1.0), dpm->getZMin(), dpm->getZMax());
-        }
-        
-        //  Give the strain-rate for all particles and move them to next timestep before integration
-        if (isStrainRateControlled_)
-        {
-            for (auto& p : pH)
-            {
-                relativeToCenter.X = p->getPosition().X - centerBox.X;
-                relativeToCenter.Y = p->getPosition().Y - centerBox.Y;
-                relativeToCenter.Z = p->getPosition().Z - centerBox.Z;
-                p->move(Vec3D(strainRate_.XX * dpm->getTimeStep() * relativeToCenter.X +
-                              strainRate_.XY * dpm->getTimeStep() * relativeToCenter.Y,
-                              strainRate_.YY * dpm->getTimeStep() * relativeToCenter.Y,
-                              strainRate_.ZZ * dpm->getTimeStep() * relativeToCenter.Z));
-            }
-        }
+        dstrainRate_.XX = dstrainRate_.XX + gainFactor_.XX * timeStep * (stressTotal_.XX - stressGoal_.XX);
+        logger(VERBOSE, "StressXX = %",stressTotal_.XX);
+    }
+    if (stressGoal_.YY != 0)
+    {
+        dstrainRate_.YY = dstrainRate_.YY + gainFactor_.YY * timeStep * (stressTotal_.YY - stressGoal_.YY);
+        logger(VERBOSE, "StressYY = %",stressTotal_.YY);
+    }
+    if (stressGoal_.ZZ != 0)
+    {
+        dstrainRate_.ZZ = dstrainRate_.ZZ + gainFactor_.ZZ * timeStep * (stressTotal_.ZZ - stressGoal_.ZZ);
+        logger(VERBOSE, "StressZZ = %",stressTotal_.ZZ);
+    }
+    if (stressGoal_.XY != 0)
+    {
+        dstrainRate_.XY = dstrainRate_.XY + gainFactor_.XY * timeStep * (stressTotal_.XY - stressGoal_.XY);
+        logger(VERBOSE, "dstrainRate.XY = %",dstrainRate_.XY);
+        logger(VERBOSE, "StressXY = %",stressTotal_.XY);
+        logger(VERBOSE, "StressYX = %",stressTotal_.YX);
+    }
+    
+    //  Update the strainrate tensor
+    strainRate_ = strainRate_ + dstrainRate_;
+}
+
+/*!
+ * \details This function activate the strainrate control based on user inputs, it takes only
+ * the strainRate_ tensor and move particles based on this tensor, also move boudnaries based
+ * on the new domain size.
+ */
+void StressStrainControlBoundary::activateStrainRateControl(const ParticleHandler& particleHandler)
+{
+    const DPMBase* const dpm = getHandler()->getDPMBase();
+    // update the domain size based on the new strainrate tensor
+    updateDomainSize();
+    
+    //  Move the boundaries to next time step
+    if (strainRate_.XY != 0 || stressGoal_.XY != 0)
+    {
+        determineStressControlledShearBoundaries();
     }
     else
     {
-        dstrainRate.setZero();
-        
-        
-        //calculate stress for kinetic part
-        stressKinetic = dpm->getKineticStress();
-        
-        //calculate the static stress tensor
-        stressStatic = dpm->getStaticStress();
-        
-        // calculate the stress total and average over the volume
-        stressTotal = dpm->getTotalStress();
-        
-        // amount by which the strainrate tensor has to be changed
-        if (stressGoal_.XX != 0)
+        //  Move the boundary in x direction to next time step
+        periodicBoundaries_[0].set(Vec3D(1.0, 0.0, 0.0), dpm->getXMin(), dpm->getXMax());
+        //  Move the boundary in y direction to next time step
+        periodicBoundaries_[1].set(Vec3D(0.0, 1.0, 0.0), dpm->getYMin(), dpm->getYMax());
+        //  Move the boundary in z direction to next time step
+        periodicBoundaries_[2].set(Vec3D(0.0, 0.0, 1.0), dpm->getZMin(), dpm->getZMax());
+    }
+    
+    //  Give the strain-rate for all particles and move them to next timestep before integration
+    if (isStrainRateControlled_)
+    {
+        for (auto& p : particleHandler)
         {
-            dstrainRate.XX = dstrainRate.XX + gainFactor_.XX * dpm->getTimeStep() * (stressTotal.XX - stressGoal_.XX);
-            std::cout << "StressXX = " << stressTotal.XX << std::endl;
-        }
-        if (stressGoal_.YY != 0)
-        {
-            dstrainRate.YY = dstrainRate.YY + gainFactor_.YY * dpm->getTimeStep() * (stressTotal.YY - stressGoal_.YY);
-            std::cout << "StressYY = " << stressTotal.YY << std::endl;
-        }
-        if (stressGoal_.ZZ != 0)
-        {
-            dstrainRate.ZZ = dstrainRate.ZZ + gainFactor_.ZZ * dpm->getTimeStep() * (stressTotal.ZZ - stressGoal_.ZZ);
-            std::cout << "StressZZ = " << stressTotal.ZZ << std::endl;
-        }
-        if (stressGoal_.XY != 0)
-        {
-            dstrainRate.XY = dstrainRate.XY + gainFactor_.XY * dpm->getTimeStep() * (stressTotal.XY - stressGoal_.XY);
-            std::cout << "dstrainRate.XY = " << dstrainRate.XY << std::endl;
-            std::cout << "StressXY = " << stressTotal.XY << std::endl;
-            std::cout << "StressYX = " << stressTotal.YX << std::endl;
-        }
-        
-        
-        //  Update the strainrate tensor
-        strainRate_ = strainRate_ + dstrainRate;
-        
-        //  Change the system size according to next time step
-        dpm->setXMax(dpm->getXMax() + 0.5 * lengthBox.X * strainRate_.XX * dpm->getTimeStep());
-        dpm->setXMin(dpm->getXMin() - 0.5 * lengthBox.X * strainRate_.XX * dpm->getTimeStep());
-        dpm->setYMax(dpm->getYMax() + 0.5 * lengthBox.Y * strainRate_.YY * dpm->getTimeStep());
-        dpm->setYMin(dpm->getYMin() - 0.5 * lengthBox.Y * strainRate_.YY * dpm->getTimeStep());
-        dpm->setZMax(dpm->getZMax() + 0.5 * lengthBox.Z * strainRate_.ZZ * dpm->getTimeStep());
-        dpm->setZMin(dpm->getZMin() - 0.5 * lengthBox.Z * strainRate_.ZZ * dpm->getTimeStep());
-        
-        // Box length Lx, Lyand Lz for next time step
-        lengthBox.X = (dpm->getXMax() - dpm->getXMin());
-        lengthBox.Y = (dpm->getYMax() - dpm->getYMin());
-        lengthBox.Z = (dpm->getZMax() - dpm->getZMin());
-        
-        //  Move the boundaries to next time step
-        if (strainRate_.XY != 0 || stressGoal_.XY != 0)
-        {
-            //Determine the current shear velocity and shift of the Lees-Edwards boundary
-            double velocity_xy = strainRate_.XY * lengthBox.Y;
-            integratedShift_ += velocity_xy * dpm->getTimeStep();
-            
-            // Determine how to move boundaries based on strainrate control or boundary control
-            if (isStrainRateControlled_)
-            {
-                //  Move the Lees-Edwards boundary in z direction to next time step
-                leesEdwardsBoundary_[0].set(
-                        [this](double time)
-                        { return integratedShift_; },
-                        [](double time UNUSED)
-                        { return 0; },
-                        dpm->getXMin(), dpm->getXMax(), dpm->getYMin(), dpm->getYMax());
-            }
-            else
-            {
-                //  Update the velocity of Lees-Edwards boundary in x-y direction to next time step
-                leesEdwardsBoundary_[0].set(
-                        [this](double time)
-                        { return integratedShift_; },
-                        [velocity_xy](double time UNUSED)
-                        { return velocity_xy; },
-                        dpm->getXMin(), dpm->getXMax(), dpm->getYMin(), dpm->getYMax());
-            }
-            //  Move the boundary in z direction to next time step
-            periodicBoundary_[0].set(Vec3D(0.0, 0.0, 1.0), dpm->getZMin(), dpm->getZMax());
-        }
-        else
-        {
-            //  Move the boundary in x direction to next time step
-            periodicBoundary_[0].set(Vec3D(1.0, 0.0, 0.0), dpm->getXMin(), dpm->getXMax());
-            //  Move the boundary in y direction to next time step
-            periodicBoundary_[1].set(Vec3D(0.0, 1.0, 0.0), dpm->getYMin(), dpm->getYMax());
-            //  Move the boundary in z direction to next time step
-            periodicBoundary_[2].set(Vec3D(0.0, 0.0, 1.0), dpm->getZMin(), dpm->getZMax());
-        }
-        //  Give the strain-rate for all particles and move them to next timestep before integration
-        if (isStrainRateControlled_)
-        {
-            for (auto& p : pH)
-            {
-                relativeToCenter.X = p->getPosition().X - centerBox.X;
-                relativeToCenter.Y = p->getPosition().Y - centerBox.Y;
-                relativeToCenter.Z = p->getPosition().Z - centerBox.Z;
-                p->move(Vec3D(strainRate_.XX * dpm->getTimeStep() * relativeToCenter.X +
-                              strainRate_.XY * dpm->getTimeStep() * relativeToCenter.Y,
-                              strainRate_.YY * dpm->getTimeStep() * relativeToCenter.Y,
-                              strainRate_.ZZ * dpm->getTimeStep() * relativeToCenter.Z));
-            }
+            relativeToCenter_.X = p->getPosition().X - centerBox_.X;
+            relativeToCenter_.Y = p->getPosition().Y - centerBox_.Y;
+            relativeToCenter_.Z = p->getPosition().Z - centerBox_.Z;
+            p->move(Vec3D(strainRate_.XX * dpm->getTimeStep() * relativeToCenter_.X +
+                          strainRate_.XY * dpm->getTimeStep() * relativeToCenter_.Y,
+                          strainRate_.YY * dpm->getTimeStep() * relativeToCenter_.Y,
+                          strainRate_.ZZ * dpm->getTimeStep() * relativeToCenter_.Z));
         }
     }
 }
 
+/*!
+ * \details This function is used to upate the domain size based on the strainRate tensor,
+ * note that the system is symmetric and thereofore we have to update boundary in both Min and Max.
+ */
+void StressStrainControlBoundary::updateDomainSize()
+{
+    DPMBase* const dpm = getHandler()->getDPMBase();
+    //  Change the system size according to next time step
+    dpm->setXMax(dpm->getXMax() + 0.5 * lengthBox_.X * strainRate_.XX * dpm->getTimeStep());
+    dpm->setXMin(dpm->getXMin() - 0.5 * lengthBox_.X * strainRate_.XX * dpm->getTimeStep());
+    dpm->setYMax(dpm->getYMax() + 0.5 * lengthBox_.Y * strainRate_.YY * dpm->getTimeStep());
+    dpm->setYMin(dpm->getYMin() - 0.5 * lengthBox_.Y * strainRate_.YY * dpm->getTimeStep());
+    dpm->setZMax(dpm->getZMax() + 0.5 * lengthBox_.Z * strainRate_.ZZ * dpm->getTimeStep());
+    dpm->setZMin(dpm->getZMin() - 0.5 * lengthBox_.Z * strainRate_.ZZ * dpm->getTimeStep());
+    
+    // Box length Lx, Lyand Lz for next time step
+    lengthBox_.X = (dpm->getXMax() - dpm->getXMin());
+    lengthBox_.Y = (dpm->getYMax() - dpm->getYMin());
+    lengthBox_.Z = (dpm->getZMax() - dpm->getZMin());
+}
 
+/*!
+ * \details This function determines the boundary for stress-controlled shear situation.
+ * In this case, the Lees-Edwards boundary in x-y directions and Normal periodic boundary
+ * in z direction are combined together as a cuboid shear box.
+ */
+void StressStrainControlBoundary::determineStressControlledShearBoundaries()
+{
+    const DPMBase* const dpm = getHandler()->getDPMBase();
+    //Determine the current shear velocity and shift of the Lees-Edwards boundary
+    const Mdouble velocity_xy = strainRate_.XY * lengthBox_.Y;
+    integratedShift_ += velocity_xy * dpm->getTimeStep();
+    
+    // Determine how to move boundaries based on strainrate control or boundary control
+    if (isStrainRateControlled_)
+    {
+        //  Move the Lees-Edwards boundary in z direction to next time step
+        leesEdwardsBoundaries_[0].set(
+                [this](Mdouble time)
+                { return integratedShift_; },
+                [](Mdouble time UNUSED)
+                { return 0; },
+                dpm->getXMin(), dpm->getXMax(), dpm->getYMin(), dpm->getYMax());
+    }
+    else
+    {
+        //  Update the velocity of Lees-Edwards boundary in x-y direction to next time step
+        leesEdwardsBoundaries_[0].set(
+                [this](Mdouble time)
+                { return integratedShift_; },
+                [velocity_xy](Mdouble time UNUSED)
+                { return velocity_xy; },
+                dpm->getXMin(), dpm->getXMax(), dpm->getYMin(), dpm->getYMax());
+    }
+    //  Move the boundary in z direction to next time step
+    periodicBoundaries_[0].set(Vec3D(0.0, 0.0, 1.0), dpm->getZMin(), dpm->getZMax());
+}
+
+/*!
+ * \details This function sets the inputs for the whole StressStrainControlBoundary
+ * based on the user inputs.
+ */
 void
 StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D& strainRate, const Matrix3D& gainFactor,
                                  bool isStrainRateControlled)
@@ -349,11 +338,11 @@ StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D& str
         PeriodicBoundary boundary;
         boundary.setHandler(getHandler());
         boundary.set(Vec3D(1.0, 0.0, 0.0), dpm->getXMin(), dpm->getXMax());
-        periodicBoundary_.push_back(boundary);
+        periodicBoundaries_.push_back(boundary);
         boundary.set(Vec3D(0.0, 1.0, 0.0), dpm->getYMin(), dpm->getYMax());
-        periodicBoundary_.push_back(boundary);
+        periodicBoundaries_.push_back(boundary);
         boundary.set(Vec3D(0.0, 0.0, 1.0), dpm->getZMin(), dpm->getZMax());
-        periodicBoundary_.push_back(boundary);
+        periodicBoundaries_.push_back(boundary);
     }
     else if (stressGoal.XY != 0 || strainRate.XY != 0)
     {
@@ -362,51 +351,38 @@ StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D& str
         PeriodicBoundary boundary;
         boundary.setHandler(getHandler());
         boundary.set(Vec3D(0.0, 0.0, 1.0), dpm->getZMin(), dpm->getZMax());
-        periodicBoundary_.push_back(boundary);
+        periodicBoundaries_.push_back(boundary);
         // Lees Edwards bc in y direction & periodic boundary in x direction, simple shear boundary activated
         LeesEdwardsBoundary leesEdwardsBoundary;
         leesEdwardsBoundary.setHandler(getHandler());
         leesEdwardsBoundary.set(
-                [this](double time UNUSED)
+                [this](Mdouble time UNUSED)
                 { return integratedShift_; },
-                [](double time UNUSED)
+                [](Mdouble time UNUSED)
                 { return 0; },
                 dpm->getXMin(), dpm->getXMax(), dpm->getYMin(), dpm->getYMax());
-        leesEdwardsBoundary_.push_back(leesEdwardsBoundary);
+        leesEdwardsBoundaries_.push_back(leesEdwardsBoundary);
     }
     else
     {
         logger(ERROR, "This should not happen; please check implementation of StressStrainControlBoundary::set");
     }
-    //std::cout<< "leesEdwardsShift" << leesEdwardsBoundary_[0].getCurrentShift();
     
 }
 
-void StressStrainControlBoundary::createPeriodicParticles(ParticleHandler& pH)
+/*!
+ * \details This function is used to create ghost particles such that
+ * the stress are calculated correctly after restart from another configuration.
+ */
+void StressStrainControlBoundary::createPeriodicParticles(ParticleHandler& particleHandler)
 {
     // Call Boundaries
-    for (PeriodicBoundary& b : periodicBoundary_)
+    for (PeriodicBoundary& b : periodicBoundaries_)
     {
-        b.createPeriodicParticles(pH);
+        b.createPeriodicParticles(particleHandler);
     }
-    for (LeesEdwardsBoundary& b : leesEdwardsBoundary_)
+    for (LeesEdwardsBoundary& b : leesEdwardsBoundaries_)
     {
-        b.createPeriodicParticles(pH);
+        b.createPeriodicParticles(particleHandler);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -890,7 +890,7 @@ public:
     
     /// \brief Calculate the total stress tensor in the system averaged over the whole volume.
     Matrix3D getTotalStress() const;
-
+    
     //functions that should only be used in the class definitions
 protected:
     

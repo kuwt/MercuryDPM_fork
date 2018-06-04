@@ -154,10 +154,11 @@ int main(int argc UNUSED, char* argv[] UNUSED)
     //helpers::writeToFile("xyz.restart","abc");
     
     Matrix3D stressGoal;
-    stressGoal.XY = -2.0;
     stressGoal.XX = 0.0;
     stressGoal.YY = 0.0;
     stressGoal.ZZ = 0.0;
+    stressGoal.XY = -2.0;
+
     Matrix3D strainRate;
     strainRate.XY = 0.0;
     Matrix3D gainFactor;
