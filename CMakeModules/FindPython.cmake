@@ -38,17 +38,19 @@ IF(_CURRENT_VERSION MATCHES "\\d*\\.\\d*")
     STRING(REPLACE "." "" _CURRENT_VERSION_NO_DOTS ${_CURRENT_VERSION})
 ENDIF()
 
-FIND_LIBRARY(PYTHON_LIBRARY
-    NAMES python${_CURRENT_VERSION_NO_DOTS} python${_CURRENT_VERSION}
-    PATHS
-        ${_LIBDIR}
-        ${_PREFIX}/lib
-        ${_PREFIX}/libs
-        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\${_CURRENT_VERSION}\\InstallPath]/libs
-    # Avoid finding the .dll in the PATH.  We want the .lib.
-    NO_DEFAULT_PATH
-    NO_SYSTEM_ENVIRONMENT_PATH
-)
+#At the moment we do not need the phyton library so have disables this test as many computer do not have this and it gives an unnecessary warning.
+
+#FIND_LIBRARY(PYTHON_LIBRARY
+#    NAMES python${_CURRENT_VERSION_NO_DOTS} python${_CURRENT_VERSION}
+#    PATHS
+#        ${_LIBDIR}
+#        ${_PREFIX}/lib
+#        ${_PREFIX}/libs
+#        [HKEY_LOCAL_MACHINE\\SOFTWARE\\Python\\PythonCore\\${_CURRENT_VERSION}\\InstallPath]/libs
+#    # Avoid finding the .dll in the PATH.  We want the .lib.
+#    NO_DEFAULT_PATH
+#    NO_SYSTEM_ENVIRONMENT_PATH
+#)
 
 
 # Python Should be built and installed as a Framework on OSX
@@ -59,31 +61,31 @@ IF(APPLE)
     ENDIF()
 ENDIF(APPLE)
 
-INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(Python DEFAULT_MSG PYTHON_EXECUTABLE PYTHON_LIBRARY PYTHON_INCLUDE_DIR)
+#INCLUDE(FindPackageHandleStandardArgs)
+#FIND_PACKAGE_HANDLE_STANDARD_ARGS(Python DEFAULT_MSG PYTHON_EXECUTABLE PYTHON_LIBRARY PYTHON_INCLUDE_DIR)
 
 MARK_AS_ADVANCED(
     PYTHON_EXECUTABLE
-PYTHON_LIBRARY
+#   PYTHON_LIBRARY
     PYTHON_INCLUDE_DIR
 )
 
-MACRO(ADD_PYTHON_MODULE name)
-
-    INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIR})
-    ADD_LIBRARY(${name} MODULE ${ARGN})
-    TARGET_LINK_LIBRARIES(${name} ${PYTHON_LIBRARY})
-
-    SET_TARGET_PROPERTIES(${name} PROPERTIES PREFIX "")
-    IF(CMAKE_HOST_WIN32)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES SUFFIX ".pyd")
-    ENDIF(CMAKE_HOST_WIN32)
-
-    # Store the module in the source tree
-    GET_TARGET_PROPERTY(FILEPATH ${name} LOCATION)
-    ADD_CUSTOM_COMMAND(
-        TARGET ${name} POST_BUILD 
-        COMMAND ${CMAKE_COMMAND} 
-        ARGS -E copy ${FILEPATH} ${CMAKE_CURRENT_SOURCE_DIR})
-
-ENDMACRO(ADD_PYTHON_MODULE)
+#MACRO(ADD_PYTHON_MODULE name)
+#
+#    INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_DIR})
+#    ADD_LIBRARY(${name} MODULE ${ARGN})
+#    TARGET_LINK_LIBRARIES(${name} ${PYTHON_LIBRARY})
+#
+#    SET_TARGET_PROPERTIES(${name} PROPERTIES PREFIX "")
+#    IF(CMAKE_HOST_WIN32)
+#        SET_TARGET_PROPERTIES(${name} PROPERTIES SUFFIX ".pyd")
+#    ENDIF(CMAKE_HOST_WIN32)
+#
+#    # Store the module in the source tree
+#    GET_TARGET_PROPERTY(FILEPATH ${name} LOCATION)
+#    ADD_CUSTOM_COMMAND(
+#        TARGET ${name} POST_BUILD
+#        COMMAND ${CMAKE_COMMAND}
+#        ARGS -E copy ${FILEPATH} ${CMAKE_CURRENT_SOURCE_DIR})
+#
+#ENDMACRO(ADD_PYTHON_MODULE)
