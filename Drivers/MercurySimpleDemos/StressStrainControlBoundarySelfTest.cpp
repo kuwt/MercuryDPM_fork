@@ -48,9 +48,7 @@ public:
             p->setSpecies(particleSpecies);
         }
     }
-    
-    
-    LinearPlasticViscoelasticFrictionSpecies* particleSpecies;
+
 
 private:
     
@@ -142,6 +140,7 @@ private:
         
     }
     
+    LinearPlasticViscoelasticFrictionSpecies* particleSpecies;
     Matrix3D stressGoal_;
     Matrix3D strainRate_;
     Matrix3D gainFactor_;
@@ -158,7 +157,7 @@ int main(int argc UNUSED, char* argv[] UNUSED)
     stressGoal.YY = 0.0;
     stressGoal.ZZ = 0.0;
     stressGoal.XY = -2.0;
-
+    
     Matrix3D strainRate;
     strainRate.XY = 0.0;
     Matrix3D gainFactor;
