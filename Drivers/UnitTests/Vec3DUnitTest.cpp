@@ -23,44 +23,41 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Siegen.h"
-#include<fstream>
-#include<iomanip>
+#include <Math/Vector.h>
+#include <Math/Helpers.h>
+#include "Logger.h"
 
-///We let a particle slide along a plane with a constant tangential velocity 
-///and no rotation 
-class Slide : public Siegen {
-public:
-
-	Slide() : Siegen()
-	{
-		setName("SiegenRestitutionSelfTest");
-		
-		// set size of loop
-		double Radius = particleHandler.getObject(0)->getRadius();
-		LoopTime = sqrt(2.*100.*0.1*Radius/10.);
-		std::cout << "LoopTime=" << LoopTime << std::endl;
-
-		//time stepping
-		setTimeMax(LoopTime);
-		setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(200, getTimeMax(), getTimeStep()));
-
-        //set wall
-		InfiniteWall w;
-        w.set(Vec3D(0., -1., 0.), Vec3D(0,0,0));
-        wallHandler.copyAndAddObject(w);
-
-		//set_Particle
-		particleHandler.getObject(0)->setPosition(Vec3D(0,1.1*Radius,0));
-		particleHandler.getObject(0)->setVelocity(Vec3D(0,0,0));
-
-        setGravity(Vec3D(0,-10,0));
-
-	}
-};
-
-int main(int argc UNUSED, char *argv[] UNUSED)
+int main()
 {
-	Slide md;
-	md.solve(argc, argv);
+    logger(INFO,"Checks several Vec3D unit operations");
+    Vec3D a = {1,2,3};
+    Vec3D b = {4,5,6};
+    Vec3D c;
+    
+    c = b - a; //same as c = b.operator-(a);
+    helpers::check(c,{3,3,3},0,"Vector subtraction");
+    
+    c = - a; //same as c = operator-(a);
+    helpers::check(c,{-1,-2,-3},0,"Negation of a vector");
+    
+    c -= a; //same as c.operator-=(a);
+    helpers::check(c,{-2,-4,-6},0,"Vector self-subtraction");
+    
+    c = b + a; //same as c = b.operator-(a);
+    helpers::check(c,{5,7,9},0,"Vector addition");
+    
+    c = a; //same as c = operator+(a); //missing operator
+    //helpers::check(c,{1,2,3},0,"Plus-operation of a vector");
+    
+    c += a; //same as c.operator-=(a);
+    helpers::check(c,{2,4,6},0,"Vector self-addition");
+    
+    helpers::check(Vec3D::dot(a,b),32,0,"Dot product");
+    
+    helpers::check(Vec3D::cross(a,b),{-3,6,-3},0,"Cross product");
+    
+    return 0;
 }
+
+
+

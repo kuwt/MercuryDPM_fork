@@ -454,9 +454,13 @@ void helpers::gnuplot(std::string command)
 #ifdef __CYGWIN__
     logger(WARN, "[helpers::gnuplot] is not supported on Cygwin");
 #else
+#ifdef WINDOWS
+    logger(WARN, "[helpers::gnuplot] is not supported on Windows");
+#else
     FILE* pipe = popen("gnuplot -persist", "w");
     fprintf(pipe, "%s", command.c_str());
     fflush(pipe);
+#endif
 #endif
 }
 

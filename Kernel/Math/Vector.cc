@@ -67,16 +67,6 @@ bool Vec3D::isNaN() const
 }
 
 /*!
- * \details Adds vector to itself
- * \param[in] a     vector to be added
- * \return          resulting 3D vector
- */
-Vec3D Vec3D::operator+(const Vec3D& a) const
-{
-    return Vec3D(X + a.X, Y + a.Y, Z + a.Z);
-}
-
-/*!
  * \details Divides each element by a scalar
  * \param[in] a     the scalar to be divided by
  * \return          resulting vector

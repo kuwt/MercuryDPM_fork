@@ -5,14 +5,13 @@ project (Mercury C CXX Fortran)
 set(Mercury_VERSION_MAJOR 0)
 set(Mercury_VERSION_MINOR 14)
 
-#set(SVN_WC_REVISION -)
+set(SVN_WC_REVISION 0)
 find_package(Subversion)
 if(Subversion_FOUND)
 	Subversion_WC_INFO(${PROJECT_SOURCE_DIR} SVN)
 	set(SVN_VERSION ${Project_WC_REVISION})
     #message("Current revision is ${SVN_WC_URL}")
 endif()
-#message("Current revision is ${SVN_WC_REVISION}")
 
 set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")

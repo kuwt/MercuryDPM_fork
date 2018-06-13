@@ -76,9 +76,9 @@ public:
 			setXMax(5);
 						
 			InfiniteWall w0;
-			w0.set(Vec3D( 0.0, 0,-1.0), -getZMin());
+			w0.set(Vec3D( 0.0, 0,-1.0), getMin());
 			wallHandler.copyAndAddObject(w0);
-			w0.set(Vec3D( 0.0, 0, 1.0),  getZMax());
+			w0.set(Vec3D( 0.0, 0, 1.0), getMax());
 			wallHandler.copyAndAddObject(w0);
 			//w0.set(Vec3D(-1.0, 0, 0.0), -getXMin());
 			//get_WallHandler().copyAndAddWall(w0);

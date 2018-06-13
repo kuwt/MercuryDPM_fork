@@ -74,17 +74,17 @@ public:
 		setZMax(+2.*Radius);
 		if (Angle==0.0) {
             InfiniteWall w;
-			w.set(Vec3D(0., 1., 0.), getYMax());
+			w.set(Vec3D(0., 1., 0.), getMax());
             wallHandler.copyAndAddObject(w);
-			w.set(Vec3D(0.,-1., 0.), 0);
+			w.set(Vec3D(0.,-1., 0.), Vec3D(0,0,0));
             wallHandler.copyAndAddObject(w);
 		} else {
             InfiniteWall w;
-			w.set(Vec3D(0., 1., 0.), getYMax());
+			w.set(Vec3D(0., 1., 0.), getMax());
             wallHandler.copyAndAddObject(w);
-			w.set(Vec3D(0., -c, -s), 0);
+			w.set(Vec3D(0., -c, -s), Vec3D(0,0,0));
             wallHandler.copyAndAddObject(w);
-			w.set(Vec3D(0., -c,  s), 0);
+			w.set(Vec3D(0., -c,  s), Vec3D(0,0,0));
             wallHandler.copyAndAddObject(w);
 		}
 		particleHandler.getObject(0)->setPosition(Vec3D(0,Radius/c,0));

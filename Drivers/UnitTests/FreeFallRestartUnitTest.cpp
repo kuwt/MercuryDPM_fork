@@ -30,14 +30,14 @@
 ///3) and accepting command line argument.
 ///4) Also tests restart reloading.
 
-#include "DPMBase.h"
+#include "Mercury3D.h"
 #include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <iostream>
 #include <Species/LinearViscoelasticSpecies.h>
 #include <Logger.h>
 
-class FreeFall : public DPMBase
+class FreeFall : public Mercury3D
 {
 public:
     

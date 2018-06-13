@@ -35,14 +35,14 @@ class Cstatic2d : public Chute {
 public:
 	
 	void set_particle_properties() {
-        auto species = speciesHandler.copyAndAddObject(LinearViscoelasticSlidingFrictionSpecies());
-        //define species
-	        species->setDensity(6./constants::pi);
+		auto species = speciesHandler.copyAndAddObject(LinearViscoelasticSlidingFrictionSpecies());
+		//define species
+		species->setDensity(6./constants::pi);
 		setGravity(Vec3D(0,0,-1));
 		setInflowParticleRadius(0.5);
 		setFixedParticleRadius(0.5);
 		//double mass = 4. / 3. * constants::pi * pow(getInflowParticleRadius(), 3.0) * S->getDensity();
-                species->setCollisionTimeAndRestitutionCoefficient(0.005,0.88, species->getMassFromRadius(getInflowParticleRadius()));
+		species->setCollisionTimeAndRestitutionCoefficient(0.005,0.88, species->getMassFromRadius(getInflowParticleRadius()));
 		//~ setCollisionTimeAndRestitutionCoefficient(0.005,1);
 		species->setSlidingStiffness(2.0/7.0* species->getStiffness());
 		species->setSlidingDissipation(species->getDissipation());
@@ -62,14 +62,14 @@ public:
 			setYMax(1);
 			setXMax(5);
 			//
-                        InfiniteWall w0;
-                        w0.set(Vec3D( 0.0, 0,-1.0), -getZMin());
-                        wallHandler.copyAndAddObject(w0);
-                        w0.set(Vec3D( 0.0, 0, 1.0),  getZMax());
+			InfiniteWall w0;
+			w0.set(Vec3D( 0.0, 0,-1.0), getMin());
 			wallHandler.copyAndAddObject(w0);
-                        w0.set(Vec3D(-1.0, 0, 0.0), -getXMin());
+			w0.set(Vec3D( 0.0, 0, 1.0), getMax());
 			wallHandler.copyAndAddObject(w0);
-                        w0.set(Vec3D( 1.0, 0, 0.0),  getXMax());
+			w0.set(Vec3D(-1.0, 0, 0.0), getMin());
+			wallHandler.copyAndAddObject(w0);
+			w0.set(Vec3D( 1.0, 0, 0.0), getMax());
 			wallHandler.copyAndAddObject(w0);
 			//set_NWall(4);
 			//wallHandler.getObject(0)->set(Vec3D( 0.0, 0,-1.0), -getZMin());
@@ -78,26 +78,26 @@ public:
 			//Walls[3].set(Vec3D( 1.0, 0, 0.0),  getXMax());
 			
 			//set particles no of particles = 10
-                        BaseParticle p0;
-                        p0.setPosition(Vec3D(0.5,0.5,0.1));
+			BaseParticle p0;
+			p0.setPosition(Vec3D(0.5,0.5,0.1));
 			particleHandler.copyAndAddObject(p0);
-                        p0.setPosition(Vec3D(1.5,0.5,-.2));
+			p0.setPosition(Vec3D(1.5,0.5,-.2));
 			particleHandler.copyAndAddObject(p0);
-                        p0.setPosition(Vec3D(2.5,0.5,0.0));
+			p0.setPosition(Vec3D(2.5,0.5,0.0));
 			particleHandler.copyAndAddObject(p0);
-                        p0.setPosition(Vec3D(3.5,0.5,0.1));
+			p0.setPosition(Vec3D(3.5,0.5,0.1));
 			particleHandler.copyAndAddObject(p0);
-                        p0.setPosition(Vec3D(4.5,0.5,0.05));
+			p0.setPosition(Vec3D(4.5,0.5,0.05));
 			particleHandler.copyAndAddObject(p0);
-                        p0.setPosition(Vec3D(1.,0.5,1.0));
+			p0.setPosition(Vec3D(1.,0.5,1.0));
 			particleHandler.copyAndAddObject(p0);
-                        p0.setPosition(Vec3D(2.0,0.5,1.0));
+			p0.setPosition(Vec3D(2.0,0.5,1.0));
 			particleHandler.copyAndAddObject(p0);
-                        p0.setPosition(Vec3D(3.0,0.5,1.0));
+			p0.setPosition(Vec3D(3.0,0.5,1.0));
 			particleHandler.copyAndAddObject(p0);
-                        p0.setPosition(Vec3D(4.0,0.5,1.0));
+			p0.setPosition(Vec3D(4.0,0.5,1.0));
 			particleHandler.copyAndAddObject(p0);
-                        p0.setPosition(Vec3D(1.5,0.5,2.0));
+			p0.setPosition(Vec3D(1.5,0.5,2.0));
 			particleHandler.copyAndAddObject(p0);
 			//
 			//set_N(10);
@@ -112,20 +112,20 @@ public:
 			//Particles[8].Position=Vec3D(4,0.5,1);
 			//Particles[9].Position=Vec3D(1.5,0.5,2);
 			for (unsigned int i=0; i<particleHandler.getNumberOfObjects(); i++) {
-			  particleHandler.getObject(i)->setRadius(getInflowParticleRadius());
+				particleHandler.getObject(i)->setRadius(getInflowParticleRadius());
 				if (i<5) {
 					particleHandler.getObject(i)->fixParticle();
 				} else {
-				  particleHandler.getObject(i)->setVelocity(Vec3D(random.getRandomNumber(-.1,.1),0.0,random.getRandomNumber(-.1,.1)));
+					particleHandler.getObject(i)->setVelocity(Vec3D(random.getRandomNumber(-.1,.1),0.0,random.getRandomNumber(-.1,.1)));
 				}
 			}
 		}
 		//if (particleHandler.getNumberOfObjects()<10) 
-                write(std::cout,true);
+		write(std::cout,true);
 		//else
-                //write(std::cout,false);
+		//write(std::cout,false);
 	}
-
+	
 };
 
 int main(int argc UNUSED, char *argv[] UNUSED)

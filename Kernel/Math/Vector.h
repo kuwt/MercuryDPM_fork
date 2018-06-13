@@ -109,12 +109,18 @@ public:
     
     /*!
      * \brief Adds another vector
+     * \details Adds vector to itself
+     * \param[in] a     vector to be added
+     * \return          resulting 3D vector
      */
-    Vec3D operator+(const Vec3D& a) const;
+    Vec3D operator+(const Vec3D& a) const
+    {
+        return Vec3D(X + a.X, Y + a.Y, Z + a.Z);
+    }
     
     /*!
-     * \brief Subtracts another vector
-     * \details Subtracts vector from itself
+     * \brief Binary vector subtraction
+     * \details Subtracts a vector from another vector
      * \param[in] a     vector to be subtracted
      * \return          resulting vector
      */

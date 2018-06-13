@@ -53,7 +53,7 @@ public:
 		
 		//set wall
 		InfiniteWall w0;
-		w0.set(Vec3D(0.0,-1.0,0.0), 0.0);
+		w0.set(Vec3D(0.0,-1.0,0.0), Vec3D(0,0,0));
 		wallHandler.copyAndAddObject(w0);
 	
 		//set_Particle
