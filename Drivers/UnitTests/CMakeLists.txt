@@ -1,3 +1,5 @@
+add_subdirectory(Math)
+
 #Part 1 : All cpp files will be made to exec files
 #########################################
 #Collect all the names of the cpp, note at the moment limited to demos, but will be fixed later

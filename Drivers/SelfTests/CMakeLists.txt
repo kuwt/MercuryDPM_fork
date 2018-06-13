@@ -1,0 +1,5 @@
+add_subdirectory(Interactions)
+add_subdirectory(Walls)
+add_subdirectory(Boundaries)
+add_subdirectory(CG)
+add_subdirectory(HGrid)
