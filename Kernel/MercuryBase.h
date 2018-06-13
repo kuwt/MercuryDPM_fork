@@ -111,8 +111,7 @@ inline std::istream& operator>>(std::istream& is, HGridDistribution& h)
         h = USER;
     else
     {
-        std::cerr << "HGridMethod could not be read: " << s << std::endl;
-        exit(-1);
+        logger(ERROR,"HGridDistribution could not be read: %",s);
     }
     return is;
 }

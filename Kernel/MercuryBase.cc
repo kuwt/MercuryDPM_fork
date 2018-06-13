@@ -110,9 +110,24 @@ void MercuryBase::read(std::istream& is)
     
     std::string dummy;
     
-    line >> dummy >> dummy
-         >> dummy >> hGridMaxLevels_
-         >> dummy >> hGridCellOverSizeRatio_;
+    line >> dummy;
+    // if-statement is needed in case a DPMBase (which does not contain the hGrid data)
+    // is read into MercuryBase class
+    if (dummy == "hGrid")
+    {
+        line >> dummy >> hGridMethod_;
+        line >> dummy >> hGridDistribution_;
+        line >> dummy >> hGridCellOverSizeRatio_;
+        //the extra information here is not needed
+        do
+        {
+            line >> dummy;
+        } while (dummy != "gridNeedsUpdate");
+        line >> gridNeedsUpdate_;
+        line >> dummy >> updateEachTimeStep_;
+        line >> dummy >> currentMaxRelativeDisplacement_;
+        line >> dummy >> totalCurrentMaxRelativeDisplacement_;
+    }
 }
 
 /*!
@@ -660,7 +675,7 @@ void MercuryBase::hGridInfo(std::ostream& os) const
        << " method " << hGridMethod_
        << " distribution " << hGridDistribution_
        << " cellOverSizeRatio " << hGridCellOverSizeRatio_;
-    //<< " maxLevels " << hGridMaxLevels_;
+    //os << " maxLevels " << hGridMaxLevels_;
     if (numberOfProcessors == 1 && grid != nullptr)
     {
         os << " numberOfBuckets " << grid->getNumberOfBuckets()
