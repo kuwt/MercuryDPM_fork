@@ -66,6 +66,8 @@ public:
      */
     SuperQuadric(const SuperQuadric& p);
     
+    SuperQuadric(const BaseParticle& p);
+    
     /*!
      * \brief Destructor, needs to be implemented and checked to see if it is the largest or smallest particle currently
      * in its particleHandler

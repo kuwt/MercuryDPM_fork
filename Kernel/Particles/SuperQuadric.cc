@@ -23,6 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <math.h>
 #include "SuperQuadric.h"
 #include "InteractionHandler.h"
 #include "ParticleHandler.h"
@@ -55,6 +56,15 @@ SuperQuadric::SuperQuadric(const SuperQuadric& p)
     axes_ = p.axes_;
     eps1_ = p.eps1_;
     eps2_ = p.eps2_;
+}
+
+
+SuperQuadric::SuperQuadric(const BaseParticle& p) : BaseParticle(p)
+{
+    Mdouble radius = p.getRadius();
+    axes_ = Vec3D(radius, radius, radius);
+    eps1_ = 1;
+    eps2_ = 1;
 }
 
 /*!
@@ -392,6 +402,8 @@ SuperQuadric::getInteractionWithSuperQuad(SuperQuadric* const p, const unsigned 
     const Mdouble alphaI = computeOverlapAlpha(contactPoint, normal);
     const Mdouble alphaJ = p->computeOverlapAlpha(contactPoint, -normal);
     C->setOverlap(alphaI + alphaJ);
+    ///\todo: find correct value
+    C->setDistance((getPosition() - p->getPosition()).getLength() - C->getOverlap());
     
     return {C};
 }
