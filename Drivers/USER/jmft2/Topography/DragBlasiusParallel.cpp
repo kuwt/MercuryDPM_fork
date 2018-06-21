@@ -1,12 +1,10 @@
-/* DragBlasius - As with MaserBlasius, but now the particles inside the Maser
- * experience an additional drag force that is proportional to their velocity,
- * hopefully letting them move at a controlled velocity. */
+/* DragBlasiusParallel - As with DragBlasius, but parallelised. */
 #include "Mercury2D.h"
 #include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "Boundaries/CubeInsertionBoundary.h"
 #include "Boundaries/DeletionBoundary.h"
-#include "Boundaries/ConstantMassFlowMaserBoundary.h"
+#include "Boundaries/SubcriticalMaserBoundaryTEST.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include <iostream>
 #include "Math/RNG.h"
@@ -14,11 +12,11 @@
 #include "File.h"
 #include <map>
 
-class DragBlasius : public Mercury2D {
+class DragBlasiusParallel : public Mercury2D {
     public:
 
         /* Constructor */
-        DragBlasius(std::string parsfile)
+        DragBlasiusParallel(std::string parsfile)
         {
             /* Reading config file */
             std::ifstream file(parsfile);
@@ -73,24 +71,6 @@ class DragBlasius : public Mercury2D {
                 logger(INFO, "transitionLengthscale not specified, setting to 0");
             }
 
-            if (pars.find("beta") == pars.end())
-            {
-                pars["beta"] = 0.0;
-                logger(INFO, "beta not specified, setting to 0");
-            }
-
-            if (pars.find("betaroll") == pars.end())
-            {
-                pars["betaroll"] = 0.0;
-                logger(INFO, "betaroll not specified, setting to 0");
-            }
-
-            if (pars.find("collisionTime") == pars.end())
-                logger(ERROR, "collisionTime not specified, needed for LinearViscoelastic contact model");
-
-            if (pars.find("elasticModulus") != pars.end())
-                logger(WARN, "elasticModulus specified, but this is not used for the LinearViscoelastic contact model");
-
             /* Initially, we don't want to write .data. or .fstat. files, while
              * we are filling up the Maser. Later we will. */
             dataFile.setFileType(FileType::NO_FILE);
@@ -104,6 +84,7 @@ class DragBlasius : public Mercury2D {
             setYMax(pars.at("reservoirHeight"));
             setZMin(0);
             setZMax(1);
+            setNumberOfDomains({1, 1, 1});
 
             /* Species */
             /* JMFT: We must set up species in the constructor, or in any case before
@@ -140,7 +121,7 @@ class DragBlasius : public Mercury2D {
 
         }
 
-        ~DragBlasius(void) {
+        ~DragBlasiusParallel(void) {
         }
 
         void setupInitialConditions() 
@@ -168,7 +149,7 @@ class DragBlasius : public Mercury2D {
             auto back = new InfiniteWall();
             back->setSpecies(spec_particles);
             back->set(Vec3D(-1, 0, 0), 
-                      Vec3D(pars.at("xmin") - pars.at("reservoirLength") - 7*pars.at("particleRadius"), 0, 0)
+                      Vec3D(pars.at("xmin") - pars.at("reservoirLength"), 0, 0)
                      );
             back = wallHandler.copyAndAddObject(back);
 
@@ -262,6 +243,10 @@ class DragBlasius : public Mercury2D {
 
             stillFillingUp = true;
 
+            // dataFile.setFileType(FileType::MULTIPLE_FILES);
+            // fStatFile.setFileType(FileType::MULTIPLE_FILES);
+            restartFile.setFileType(FileType::ONE_FILE);
+
         }
 
         /* If restarting, we need to assign the pointers properly. 
@@ -277,7 +262,7 @@ class DragBlasius : public Mercury2D {
             }
             else
             {
-                masb = (ConstantMassFlowMaserBoundary*) boundaryHandler.getObjectById(1);
+                masb = (SubcriticalMaserBoundaryTEST*) boundaryHandler.getObjectById(1);
                 stillFillingUp = false;
             }
 
@@ -292,39 +277,27 @@ class DragBlasius : public Mercury2D {
             Mdouble volfrac = particleHandler.getVolume() 
                 / ( pars.at("reservoirLength") * pars.at("reservoirHeight") );
 
-            logger(INFO, "t %, n %", 
-                    getTime(), particleHandler.getNumberOfObjects());
+            logger(INFO, "t %, np local %", 
+                    getTime(), particleHandler.getNumberOfRealObjectsLocal());
             logger(INFO, "volfrac %, volfracThreshold %", 
                     volfrac, volfracThreshold);
 
             int warningsSoFar = 0;
-            Mdouble worstOverlapRatio = 0;
-            Vec3D   worstOverlapPosition = Vec3D(0,0,0);
             for (auto i : interactionHandler)
             {
                 Mdouble overlap = i->getOverlap();
-                Mdouble overlapRatio = overlap / pars.at("particleRadius");
-                if (overlapRatio > worstOverlapRatio) 
-                {
-                    worstOverlapRatio = overlapRatio;
-                    worstOverlapPosition = i->getContactPoint();
-                }
-                if (overlapRatio > 0.05)
+                if (overlap > pars.at("particleRadius") * 0.05)
                 {
                     if (warningsSoFar < 5)
                     {
-                        logger(WARN, "interaction at % has overlap %, overlap/radius = %, relative vel %",
-                            i->getContactPoint(), overlap, overlapRatio,
-                            i->getNormalRelativeVelocity());
+                        logger(WARN, "interaction at % has overlap %, overlap/radius = %",
+                            i->getContactPoint(), overlap, overlap / pars.at("particleRadius"));
                         warningsSoFar++;
                         if (warningsSoFar >= 5)
                             logger(WARN, "further overlap warnings this timestep will not be printed");
                     }
                 }
             }
-            if (worstOverlapRatio > 0.05 && warningsSoFar > 5)
-                logger(WARN, "worst overlap/radius = % at position %",
-                        worstOverlapRatio, worstOverlapPosition);
 
         }
 
@@ -336,23 +309,26 @@ class DragBlasius : public Mercury2D {
                 CI->addForce(getGravity() * CI->getMass());
 
                 // Wall forces
-                //computeForcesDueToWalls(CI);
+                computeForcesDueToWalls(CI);
 
                 // Force controller if inside Maser
-                if (masb != nullptr && masb->isMaserParticle(CI))
+                if (masb != nullptr && CI->isMaserParticle())
+                // if (masb != nullptr && masb->isMaserParticle(CI))
                 {
-                    Mdouble dragForce = - CI->getMass() * getGravity().X * CI->getVelocity().X / pars.at("reservoirVel"); 
                     // logger(INFO, "applying a drag force to particle id % at position % velocity %",
                     //        CI->getId(), CI->getPosition(), CI->getVelocity());
                     CI->addForce(Vec3D(
-                                dragForce, 0, 0));
+                            - CI->getMass() * getGravity().X * CI->getVelocity().X / pars.at("reservoirVel"), 
+                        0, 0));
                 }
             }
         }
 
         void actionsAfterTimeStep() 
         {
+            // logger(INFO, "In actionsAfterTimeStep()");
 
+            // logger(INFO, "t = %, np = %", getTime(), particleHandler.getNumberOfRealObjectsLocal());
             /* Are we still filling up? If not, no need to do anything here. */
             if (!stillFillingUp) 
                 return;
@@ -378,12 +354,16 @@ class DragBlasius : public Mercury2D {
                 /* MaserBoundary */
                 /* If restarting from a system that already has a Maser, we will
                  * never actually reach this. */
-                masb = new ConstantMassFlowMaserBoundary();
+                masb = new SubcriticalMaserBoundaryTEST();
                 masb->set(Vec3D(1.0, 0.0, 0.0), 
                         pars.at("xmin") - pars.at("reservoirLength") + pars.at("particleRadius"), 
                         pars.at("xmin"));
+                logger(INFO, "About to put in masb");
                 masb = boundaryHandler.copyAndAddObject(masb);
+                logger(INFO, "Have put in the masb");
+                logger(INFO, "About to activate masb");
                 masb->activateMaser();
+                logger(INFO, "Have activated masb");
 
                 /* Get rid of the lid */
                 wallHandler.removeObject(lid->getIndex());
@@ -448,16 +428,15 @@ class DragBlasius : public Mercury2D {
         CubeInsertionBoundary* insb;
         LinearViscoelasticFrictionSpecies *spec_particles;
         // LinearViscoelasticFrictionSpecies *spec_base;
-        ConstantMassFlowMaserBoundary* masb;
+        SubcriticalMaserBoundaryTEST* masb;
         InfiniteWall* lid;
-
 
 };
 
 int main(const int argc, char* argv[]) {
     if (argc > 1)
     {
-        DragBlasius* problem = new DragBlasius(argv[1]);
+        auto problem = new DragBlasiusParallel(argv[1]);
         argv[1] = argv[0];
         problem->solve(argc-1, argv+1);
         delete problem;

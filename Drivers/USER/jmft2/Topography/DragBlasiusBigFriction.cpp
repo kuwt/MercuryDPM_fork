@@ -1,9 +1,13 @@
-/* DragBlasius - As with MaserBlasius, but now the particles inside the Maser
- * experience an additional drag force that is proportional to their velocity,
- * hopefully letting them move at a controlled velocity. */
+/* DragBlasiusBigFriction - As with DragBlasius, but with a big basal friction
+ * instead of a bumpy base. The parameters beta and betaroll fix interparticular
+ * friction. 
+ * There is no basal friction for x < 0.
+ * The basal friction for x > 0 is set by baseBeta and baseBetaRoll
+ */
 #include "Mercury2D.h"
 #include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
+#include "Walls/IntersectionOfWalls.h"
 #include "Boundaries/CubeInsertionBoundary.h"
 #include "Boundaries/DeletionBoundary.h"
 #include "Boundaries/ConstantMassFlowMaserBoundary.h"
@@ -14,11 +18,11 @@
 #include "File.h"
 #include <map>
 
-class DragBlasius : public Mercury2D {
+class DragBlasiusBigFriction : public Mercury2D {
     public:
 
         /* Constructor */
-        DragBlasius(std::string parsfile)
+        DragBlasiusBigFriction(std::string parsfile)
         {
             /* Reading config file */
             std::ifstream file(parsfile);
@@ -50,28 +54,11 @@ class DragBlasius : public Mercury2D {
                 logger(INFO, "randomSeed not specified, randomising.");
             }
 
-            /* roughBaseType:   0 for sudden 'step function', 
-             *                  1 for mollified 'rising tanh' (default), 
-             *                  2 for bubble 'expanding tanh'
-             * transitionLengthscale
-             */
-            if (pars.find("roughBaseType") == pars.end())
-            {
-                pars["roughBaseType"] = 1; 
-                logger(INFO, "roughBaseType not specified, setting to 1 (for a rising tanh)");
-            }
-            else
-                logger(INFO, "roughBaseType is set to %", pars.at("roughBaseType"));
+            if (pars.find("roughBaseType") != pars.end())
+                logger(WARN, "roughBaseType is specified, but shouldn't be for DragBlasiusBigFriction");
 
-            /* We want to use a switch, so we need to switch over an int,, not a
-             * double. */
-            roughBaseType = (int) pars.at("roughBaseType");
-
-            if (pars.find("transitionLengthscale") == pars.end())
-            {
-                pars["transitionLengthscale"] = 0;
-                logger(INFO, "transitionLengthscale not specified, setting to 0");
-            }
+            if (pars.find("transitionLengthscale") != pars.end())
+                logger(WARN, "transitionLengthscale is specified, but shouldn't be for DragBlasiusBigFriction");
 
             if (pars.find("beta") == pars.end())
             {
@@ -126,6 +113,42 @@ class DragBlasius : public Mercury2D {
             spec_particles->setRollingDissipation(2.0/5.0 * spec_particles->getDissipation());
             spec_particles = speciesHandler.copyAndAddObject(spec_particles);
 
+            spec_baseLeft = new LinearViscoelasticFrictionSpecies();
+            spec_baseLeft->setDensity(pars.at("rho"));
+            spec_baseLeft->setCollisionTimeAndRestitutionCoefficient(
+                    pars.at("collisionTime"), 
+                    pars.at("restitutionCoefficient"),
+                    constants::pi*pow(pars.at("particleRadius"),2)*pars.at("rho") // note - mass per unit _area_
+                    );
+
+            // spec_baseLeft->setSlidingFrictionCoefficient( std::numeric_limits<double>::infinity() );
+            spec_baseLeft->setSlidingFrictionCoefficient( 0 );
+            spec_baseLeft->setSlidingStiffness(2.0/7.0 * spec_baseLeft->getStiffness());
+            spec_baseLeft->setSlidingDissipation(2.0/7.0 * spec_baseLeft->getDissipation());
+            // spec_baseLeft->setRollingFrictionCoefficient( std::numeric_limits<double>::infinity() );
+            spec_baseLeft->setRollingFrictionCoefficient( 0 );
+            spec_baseLeft->setRollingStiffness(2.0/5.0 * spec_baseLeft->getStiffness());
+            spec_baseLeft->setRollingDissipation(2.0/5.0 * spec_baseLeft->getDissipation());
+            spec_baseLeft = speciesHandler.copyAndAddObject(spec_baseLeft);
+
+            spec_baseRight = new LinearViscoelasticFrictionSpecies();
+            spec_baseRight->setDensity(pars.at("rho"));
+            spec_baseRight->setCollisionTimeAndRestitutionCoefficient(
+                    pars.at("collisionTime"), 
+                    pars.at("restitutionCoefficient"),
+                    constants::pi*pow(pars.at("particleRadius"),2)*pars.at("rho") // note - mass per unit _area_
+                    );
+
+            // spec_baseRight->setSlidingFrictionCoefficient( std::numeric_limits<double>::infinity() );
+            spec_baseRight->setSlidingFrictionCoefficient( tan( pars.at("baseBeta") * M_PI / 180. ) );
+            spec_baseRight->setSlidingStiffness(2.0/7.0 * spec_baseRight->getStiffness());
+            spec_baseRight->setSlidingDissipation(2.0/7.0 * spec_baseRight->getDissipation());
+            // spec_baseRight->setRollingFrictionCoefficient( std::numeric_limits<double>::infinity() );
+            spec_baseRight->setRollingFrictionCoefficient( tan( pars.at("baseBetaRoll") * M_PI / 180. ) );
+            spec_baseRight->setRollingStiffness(2.0/5.0 * spec_baseRight->getStiffness());
+            spec_baseRight->setRollingDissipation(2.0/5.0 * spec_baseRight->getDissipation());
+            spec_baseRight = speciesHandler.copyAndAddObject(spec_baseRight);
+
             /* Prototypical particles */
             auto particlePrototype = new BaseParticle();
             particlePrototype->setSpecies(spec_particles);
@@ -140,7 +163,7 @@ class DragBlasius : public Mercury2D {
 
         }
 
-        ~DragBlasius(void) {
+        ~DragBlasiusBigFriction(void) {
         }
 
         void setupInitialConditions() 
@@ -155,10 +178,17 @@ class DragBlasius : public Mercury2D {
             /* Walls */
 
             // The base
-            auto base = new InfiniteWall;
-            base->setSpecies(spec_particles);
-            base->set(Vec3D(0, -1, 0), Vec3D(0, 0, 0));
-            base = wallHandler.copyAndAddObject(base);
+            auto baseLeft = new IntersectionOfWalls;
+            baseLeft->setSpecies(spec_baseLeft);
+            baseLeft->addObject(Vec3D(0, -1, 0), Vec3D(0, 0, 0));
+            baseLeft->addObject(Vec3D(-1, 0, 0), Vec3D(0, 0, 0));
+            baseLeft = wallHandler.copyAndAddObject(baseLeft);
+
+            auto baseRight = new IntersectionOfWalls;
+            baseRight->setSpecies(spec_baseRight);
+            baseRight->addObject(Vec3D(0, -1, 0), Vec3D(0, 0, 0));
+            baseRight->addObject(Vec3D(+1, 0, 0), Vec3D(0, 0, 0));
+            baseRight = wallHandler.copyAndAddObject(baseRight);
 
             lid = new InfiniteWall();
             lid->setSpecies(spec_particles);
@@ -168,83 +198,14 @@ class DragBlasius : public Mercury2D {
             auto back = new InfiniteWall();
             back->setSpecies(spec_particles);
             back->set(Vec3D(-1, 0, 0), 
-                      Vec3D(pars.at("xmin") - pars.at("reservoirLength") - 7*pars.at("particleRadius"), 0, 0)
-                     );
+                    Vec3D(pars.at("xmin") - pars.at("reservoirLength") - 7*pars.at("particleRadius"), 0, 0)
+                    );
             back = wallHandler.copyAndAddObject(back);
-
-            /* Rough base. The type of rough base is determined by the parameter
-             * roughBaseType: 
-             *      0 - sudden step transition 
-             *      1 - mollified 'rising tanh' transition (default)
-             *      2 - 'growing bubble' transition
-             */
-            BaseParticle rbParticle;
-            rbParticle.setSpecies(spec_particles);
-            if (pars.at("baseConc") > 0)
-                for (double xpos = pars.at("xmin"); 
-                        xpos <= pars.at("xmax"); 
-                        xpos += 4*pars.at("baseRadius") / pars.at("baseConc"))
-                {
-                    if (pars.at("transitionLengthscale") == 0 && xpos < 0)
-                        continue;
-
-                    double ypos;
-                    double radius;
-                    bool toInsert = false;
-                    switch (roughBaseType)
-                    {
-                        case 0:
-                            ypos = 0;
-                            radius = pars.at("baseRadius")
-                                        * (1 + pars.at("baseDispersity") * random.getRandomNumber(-1,1));
-                            toInsert = (xpos >= 0);
-                            break;
-
-                        case 1:
-                            ypos = ((pars.at("transitionLengthscale") == 0) 
-                                    ? 0 
-                                    : 0.5 * pars.at("baseRadius") * (
-                                            (tanh(xpos / pars.at("transitionLengthscale")) - 1) 
-                                          )
-                                   );
-                            radius = pars.at("baseRadius")
-                                        * (1 + pars.at("baseDispersity") * random.getRandomNumber(-1,1));
-                            toInsert = true;
-                            break;
-
-                        case 2:
-                            ypos = 0;
-                            double scaleFactor;
-                            scaleFactor = ( (pars.at("transitionLengthscale") == 0) 
-                                            ? 1 : tanh(xpos / pars.at("transitionLengthscale"))
-                                          );
-                            radius = scaleFactor * pars.at("baseRadius")
-                                        * (1 + pars.at("baseDispersity") * random.getRandomNumber(-1,1));
-                            toInsert = (xpos > 0);
-                            break;
-
-                        default:
-                            logger(ERROR, "roughBaseType should be one of 0, 1, 2");
-                            break;
-                    }
-
-                    rbParticle.setRadius(pars.at("baseRadius")  *
-                            (1 + pars.at("baseDispersity") * random.getRandomNumber(-1,1)));
-
-                    rbParticle.setRadius(radius);
-                    rbParticle.setPosition(Vec3D(xpos, ypos, 0));
-                    rbParticle.setVelocity(Vec3D(0,0,0));
-                    rbParticle.fixParticle();
-
-                    if (toInsert)
-                        particleHandler.copyAndAddObject(rbParticle);
-                }
 
             /* CubeInsertionBoundary for introducing new particles */
             auto generandum = new BaseParticle;
             generandum->setSpecies(spec_particles);
             generandum->setRadius(pars.at("particleRadius"));
-            double velvar = 0;
             insb = new CubeInsertionBoundary();
             insb->set(
                 generandum, 0, 
@@ -332,11 +293,7 @@ class DragBlasius : public Mercury2D {
         {
             if (!CI->isFixed())
             {
-                // Applying the force due to gravity
-                CI->addForce(getGravity() * CI->getMass());
-
-                // Wall forces
-                //computeForcesDueToWalls(CI);
+                DPMBase::computeExternalForces(CI);
 
                 // Force controller if inside Maser
                 if (masb != nullptr && masb->isMaserParticle(CI))
@@ -344,8 +301,7 @@ class DragBlasius : public Mercury2D {
                     Mdouble dragForce = - CI->getMass() * getGravity().X * CI->getVelocity().X / pars.at("reservoirVel"); 
                     // logger(INFO, "applying a drag force to particle id % at position % velocity %",
                     //        CI->getId(), CI->getPosition(), CI->getVelocity());
-                    CI->addForce(Vec3D(
-                                dragForce, 0, 0));
+                    CI->addForce(Vec3D(dragForce, 0, 0));
                 }
             }
         }
@@ -443,11 +399,10 @@ class DragBlasius : public Mercury2D {
         std::map<std::string,double> pars;
         bool stillFillingUp;
 
-        int roughBaseType; 
-
         CubeInsertionBoundary* insb;
         LinearViscoelasticFrictionSpecies *spec_particles;
-        // LinearViscoelasticFrictionSpecies *spec_base;
+        LinearViscoelasticFrictionSpecies *spec_baseLeft;
+        LinearViscoelasticFrictionSpecies *spec_baseRight;
         ConstantMassFlowMaserBoundary* masb;
         InfiniteWall* lid;
 
@@ -457,7 +412,7 @@ class DragBlasius : public Mercury2D {
 int main(const int argc, char* argv[]) {
     if (argc > 1)
     {
-        DragBlasius* problem = new DragBlasius(argv[1]);
+        DragBlasiusBigFriction* problem = new DragBlasiusBigFriction(argv[1]);
         argv[1] = argv[0];
         problem->solve(argc-1, argv+1);
         delete problem;
