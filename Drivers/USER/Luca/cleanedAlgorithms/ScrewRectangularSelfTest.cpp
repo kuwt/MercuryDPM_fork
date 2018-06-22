@@ -18,7 +18,6 @@ public:
     {
         setMin({-10, -10, 0});
         setMax({10, 10, 10});
-        setName("ScrewRectangularSelfTest");
     }
     
     void setupInitialConditions()
@@ -86,7 +85,7 @@ private:
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
         
-        for (unsigned int i = 0; i < 100000; i++)
+        for (unsigned int i = 0; i < 1000; i++)
         {
             p0.setRadius(particleRadius * random.getRandomNumber(1.0 - dispersity, 1.0 + dispersity));
             Mdouble r = random.getRandomNumber(1 + p0.getRadius(), 5 - p0.getRadius());
@@ -108,6 +107,7 @@ private:
 int main()
 {
     ScrewRectangularTester problem;
+    problem.setName("ScrewRectangularSelfTest");
     problem.solve();
     
 }
