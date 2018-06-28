@@ -3328,7 +3328,6 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
 
     ///\todo TW: random number seed is not stored
     ///\todo TW: xBalls arguments are not stored
-#endif
 }
 
 /*!
