@@ -3232,11 +3232,6 @@ void DPMBase::computeInternalForces(BaseParticle* i)
  */
 void DPMBase::write(std::ostream& os, bool writeAllParticles) const
 {
-    //writes the restart version to file - 1.0 indicates the current version of Mercury
-    /*
-     * \todo JMFT: Should we be hardcoding this here?
-     */
-    //os << "restart_version " << "1.0";
     os << "MercuryDPM " << getVersion();
     //which outputs basic information regarding the various files  (.data, .fstat etc. etc.)
     //only writes the run number if it is different from 0
@@ -3292,11 +3287,12 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
     for (BaseBoundary* b : boundaryHandler)
         os << (*b) << '\n';
 
+    int nToWrite = 4; // \todo JMFT: Don't hardcode this here, but put it in the argument
+
 #ifdef MERCURY_USE_MPI
     particleHandler.write(os);
 #else
-    /// \todo MX: Why is the second argument there? unit test purposes?
-    if (writeAllParticles || particleHandler.getSize() < 4)
+    if (writeAllParticles || particleHandler.getSize() < nToWrite)
     {
         //if the "writeAllParticles" bool == true, or there are fewer than 4 particles
         //calls the particleHandler version of the "write" function and also
@@ -3307,38 +3303,29 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
     {
         //otherwise, only prints out limited information
         os << "Particles " << particleHandler.getSize() << '\n';
-        for (unsigned int i = 0; i < 2; i++)
+        for (unsigned int i = 0; i < nToWrite; i++)
             os << *particleHandler.getObject(i) << '\n';
         os << "..." << '\n';
     }
 #endif
 
+    // Similarly, print out interaction details (all of them, or up to nToWrite of them)
 #ifdef MERCURY_USE_MPI
-    //in a similar manner, prints out all interaction details.
-    if (writeAllParticles || interactionHandler.getNumberOfObjects() < 4)
-    {
-    //This writes the interaction of the root
-        interactionHandler.write(os);
-    }
-    else
-    {
-    /// \todo MX: this is required for certain self-tests, make a separate function for this and the above
-    //This writes the interaction of the root
-        interactionHandler.write(os);
-    }
+    interactionHandler.write(os);
 #else
-    if (writeAllParticles || interactionHandler.getNumberOfObjects() < 4)
+    if (writeAllParticles || interactionHandler.getNumberOfObjects() < nToWrite)
     {
         interactionHandler.write(os);
     }
     else
     {
         os << "Interactions " << interactionHandler.getNumberOfObjects() << '\n';
-        for (unsigned int i = 0; i < 2; i++)
-            os << *interactionHandler.getObject(i) << '\n';
+        for (unsigned int i = 0; i < nToWrite; i++)
+            os << interactionHandler->getObject(i) << '\n';
         os << "..." << '\n';
     }
-    
+#endif
+
     ///\todo TW: random number seed is not stored
     ///\todo TW: xBalls arguments are not stored
 #endif
