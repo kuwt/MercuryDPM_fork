@@ -3304,7 +3304,7 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
         //otherwise, only prints out limited information
         os << "Particles " << particleHandler.getSize() << '\n';
         for (unsigned int i = 0; i < nToWrite; i++)
-            os << *particleHandler.getObject(i) << '\n';
+            os << *(particleHandler.getObject(i)) << '\n';
         os << "..." << '\n';
     }
 #endif
@@ -3321,7 +3321,7 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
     {
         os << "Interactions " << interactionHandler.getNumberOfObjects() << '\n';
         for (unsigned int i = 0; i < nToWrite; i++)
-            os << interactionHandler->getObject(i) << '\n';
+            os << *(interactionHandler.getObject(i)) << '\n';
         os << "..." << '\n';
     }
 #endif
