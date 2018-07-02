@@ -2858,9 +2858,12 @@ int DPMBase::readRestartFile(std::string fileName)
     {
         //Modify file name
         const unsigned int length = fileName.length();
-        for (int i = pos + 1; i < length + 1; i++)
+        if (isdigit(fileName[pos + 1]))
         {
-            fileName.pop_back();
+            for (int i = pos + 1; i < length + 1; i++)
+            {
+                fileName.pop_back();
+            }
         }
         fileName.append(std::to_string(PROCESSOR_ID));
         if (counter.size() > 0)
