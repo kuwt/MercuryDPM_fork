@@ -2839,10 +2839,10 @@ int DPMBase::readRestartFile(std::string fileName)
     {
         pos = fileName.find('.', pos + 1);
     }
-    //If the next char after the last . is a digit we are using numbered files 
+    //If the next char after the last . is a digit we are using numbered files
+    std::string counter;
     if (isdigit(fileName[pos + 1]))
     {
-        std::string counter;
         for (int i = pos + 1; i < fileName.length(); i++)
         {
             counter.push_back(fileName[i]);
@@ -2850,24 +2850,24 @@ int DPMBase::readRestartFile(std::string fileName)
         //Set counter in restart file
         restartFile.setCounter(std::stoi(counter));
         logger(INFO, "Counter: %", std::stoi(counter));
-        
-        //Modify file name
-        int length = fileName.length();
-        for (int i = pos + 1; i < length + 1; i++)
-        {
-            fileName.pop_back();
-        }
     }
 
 #ifdef MERCURY_USE_MPI
     //Correct for the processor number
     if (NUMBER_OF_PROCESSORS > 1)
     {
-        while(std::isdigit(fileName.back()))
+        //Modify file name
+        const unsigned int length = fileName.length();
+        for (int i = pos + 1; i < length + 1; i++)
         {
             fileName.pop_back();
         }
         fileName.append(std::to_string(PROCESSOR_ID));
+        if (counter.size() > 0)
+        {
+            fileName.append(".");
+            fileName.append(counter);
+        }
     }
 #endif
     
