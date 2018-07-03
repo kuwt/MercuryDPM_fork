@@ -341,7 +341,7 @@ class RotatingHexagon : public Mercury3D
         			numS2ToBeInserted--;
 				numS2Inserted++;
             }
-            
+            		if (failCounter==1000) break;
 			particleHandler.copyAndAddObject(p0);
             
             hGridRebuild();

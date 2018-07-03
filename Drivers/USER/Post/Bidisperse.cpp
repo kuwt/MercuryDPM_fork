@@ -265,7 +265,7 @@ class RotatingDrum : public Mercury3D
 				if (failCounter==1000) break;
 	
 			} while (checkParticleForInteraction(P0));
-            */
+            */ if (failCounter==1000) break;
 			particleHandler.copyAndAddObject(P0);
             
             hGridRebuild();

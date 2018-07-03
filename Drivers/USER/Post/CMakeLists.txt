@@ -1,4 +1,6 @@
 include(${CMAKE_SOURCE_DIR}/Configuration/MasterMake.cmake)
+add_subdirectory(SingleBead)
+add_subdirectory(ChuteSB)
 
 #Part 1 : All cpp files will be made to exec files
 #########################################
