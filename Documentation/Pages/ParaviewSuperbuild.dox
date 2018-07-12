@@ -68,7 +68,7 @@ Install paraview-superbuild
 \code{.sh}
 $ mkdir Build
 $ cd Build
-$ cmake ../Source -DENABLE_qt5=TRUE # use cmake-gui to debug if you encounter errors
+$ cmake ../Source -DENABLE_qt5=TRUE ../Source -DENABLE_qt5=TRUE -DENABLE_python=TRUE # use cmake-gui to debug if you encounter errors
 $ make && sudo make install #or make -j4 && sudo make install
 $ paraview & # check
 $ vi ~/ParaViewSuperBuild/Build/superbuild/paraview/build/ParaViewConfig.cmake

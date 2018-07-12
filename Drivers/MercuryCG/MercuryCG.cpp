@@ -213,7 +213,7 @@ void commandLineCG(Mercury3D &dpm, int argc, char **argv)
     dpm.cgHandler.restart(name);
 
     //make sure no data is written; if data is written (e.g. using the -writedata option, the files will be overwritten, not appended)
-    dpm.setFileType(FileType::NO_FILE);
+    //dpm.setFileType(FileType::NO_FILE);
     dpm.setAppend(false);
 
     //set a default stat file name
@@ -233,6 +233,10 @@ void commandLineCG(Mercury3D &dpm, int argc, char **argv)
         if (!strcmp(argv[i], "-w") || !strcmp(argv[i], "-width")) {
             logger.assert_always(i+1<argc,"% requires argument",argv[i]);
             cg->setWidth(atof(argv[i + 1]));
+            logger(INFO, "Set cg width to %", cg->getWidth());
+        //} else if (!strcmp(argv[i], "-wt") || !strcmp(argv[i], "-width")) {
+            logger.assert_always(i+1<argc,"% requires argument",argv[i]);
+            cg->setWi(atof(argv[i + 1]));
             logger(INFO, "Set cg width to %", cg->getWidth());
         } else if (!strcmp(argv[i], "-std")) {
             logger.assert_always(i+1<argc,"% requires argument",argv[i]);
