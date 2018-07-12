@@ -19,4 +19,7 @@ foreach(CPPFILE ${CPPFILES})
 	target_link_libraries(${EXECNAME}  MercuryBase)
 endforeach()
 
+#copy loadstatistics.m into build
+file(COPY ${CMAKE_SOURCE_DIR}/Drivers/Sinter/SelfTestData/SinterBed0.restart ${CMAKE_SOURCE_DIR}/Drivers/Sinter/SelfTestData/SinterBed1.restart.5 DESTINATION .)
+
 
