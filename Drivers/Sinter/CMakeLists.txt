@@ -19,7 +19,7 @@ foreach(CPPFILE ${CPPFILES})
 	target_link_libraries(${EXECNAME}  MercuryBase)
 endforeach()
 
-#copy loadstatistics.m into build
+#The correct order to run the self tests is 0, 1, 2; the self tests fail if they are not executed in the right order. Thus, copy restart files into build.
 file(COPY ${CMAKE_SOURCE_DIR}/Drivers/Sinter/SelfTestData/SinterBed0.restart ${CMAKE_SOURCE_DIR}/Drivers/Sinter/SelfTestData/SinterBed1.restart.5 DESTINATION .)
 
 
