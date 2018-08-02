@@ -682,17 +682,19 @@ void Domain::disableBoundaries()
 void Domain::addParticlesToLists(BaseParticle* particle, std::vector<std::vector<BaseParticle*> >& list)
 {
     std::vector<int> boundaryIndex = findNearbyBoundaries(particle);
-    
+   
     //Compute and set complexity of the particle
-    unsigned int complexity = 0;
+    unsigned int complexity = boundaryIndex[0] + 3 * boundaryIndex[1] + 9 * boundaryIndex[2] + 13;
+    unsigned int list_complexity = 0;
     for (int d = 0; d < 3; d++) //Loop over all directions
     {
-        complexity += std::abs(boundaryIndex[d]);
+        list_complexity += std::abs(boundaryIndex[d]);
     }
     particle->setCommunicationComplexity(complexity);
+    //particle->setCommunicationComplexity(list_complexity);
     
     //Based on the complexity of the particle, add it to the approriate list
-    switch (complexity)
+    switch (list_complexity)
     {
         //The particle is not close at all
         case 0:
@@ -751,8 +753,8 @@ void Domain::addParticlesToLists(BaseParticle* particle, std::vector<std::vector
             break;
         
         default :
-            logger(INFO, "boundaryIndex : %,%,% | complexity: %", boundaryIndex[0], boundaryIndex[1], boundaryIndex[2],
-                   complexity);
+            logger(INFO, "boundaryIndex : %,%,% | list_complexity: %", boundaryIndex[0], boundaryIndex[1], boundaryIndex[2],
+                   list_complexity);
             logger(ERROR, "Particle is in contact with the wrong number of boundaries");
             break;
     }
@@ -1260,9 +1262,7 @@ void Domain::updateParticles(std::set<BaseParticle*>& ghostParticlesToBeDeleted)
             {
                 //check if the complexity has changed
                 boundaryIndex = findNearbyBoundaries(particle);
-                complexityNew = std::abs(boundaryIndex[Direction::XAXIS]) +
-                                std::abs(boundaryIndex[Direction::YAXIS]) +
-                                std::abs(boundaryIndex[Direction::ZAXIS]);
+    		complexityNew = boundaryIndex[0] + 3 * boundaryIndex[1] + 9 * boundaryIndex[2] + 13;
                 if (particle->getCommunicationComplexity() != complexityNew)
                 {
                     logger(VERBOSE, "time: % | global index: % in list % | particle % | CURRENT DOMAIN - CHANGES "
@@ -1326,9 +1326,7 @@ void Domain::updateParticles(std::set<BaseParticle*>& ghostParticlesToBeDeleted)
                 //check if the complexity has changed
                 boundaryIndex = domainHandler_->getObject(
                         localIndexToGlobalIndexTable_[localIndex])->findNearbyBoundaries(particle);
-                complexityNew = std::abs(boundaryIndex[Direction::XAXIS]) +
-                                std::abs(boundaryIndex[Direction::YAXIS]) +
-                                std::abs(boundaryIndex[Direction::ZAXIS]);
+   		complexityNew = boundaryIndex[0] + 3 * boundaryIndex[1] + 9 * boundaryIndex[2] + 13;
                 if (particle->getCommunicationComplexity() != complexityNew)
                 {
                     logger(VERBOSE,
