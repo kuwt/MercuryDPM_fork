@@ -956,6 +956,11 @@ void Domain::processSentBoundaryParticles(const unsigned index)
  * \details The received interaction data is scanned for interaction id's P and I
  * they are then matches to the actual particle or wall and the interaction is created.
  * The history details of the interaction are filled in after creation.
+ * \bug There is a subtle and very rare bug in here, where two particles with an interaction across a periodic boundary
+ * pass into the next domain at the same time step. In this case, the interactions should be copied over before the
+ * ghost-particles are constructed. However, since the interaction is with the ghost particle, this cannot be done. That
+ * is why there is a 'continue' if one of the particles of the interaction is not found. An illustration of this
+ * situation is given in PeriodicBoundaryEnteringMpiDomainMPI2Test.
  * \param[in] localIndex The boundary index of the boundary list currently being treated
  * \param[in,out] interactionHandler Handler containing all interactions on the current domain
  */
@@ -1026,13 +1031,13 @@ void Domain::processReceivedInteractionData(const unsigned localIndex, std::vect
                     break;
                 }
             }
-            
-            logger.assert(pGhost != nullptr, "pGhost in Domain::processReceivedInteractionData is nullptr, "
-                                             "identificationI = %, identificationP = %", identificationI,
-                          identificationP);
-            logger.assert(otherParticle != nullptr,
-                          "[MercuryMPI ERROR]: Interacting particle not found, "
-                          "looking for particle %, current processor %", idOther, getId());
+            if (pGhost == nullptr || otherParticle == nullptr)
+            {
+                logger(WARN, "In Domain::processReceivedInteractionData: pGhost or otherParticle is nullptr "
+                               "(ids % and %), the interaction data is not copied. They possibly moved into domain % "
+                               "simultaneously.", identificationP, identificationI, getId());
+                continue;
+            }
             
             //Add the interaction
             std::vector<BaseInteraction*> particleInteractions = pGhost->getInteractionWith(otherParticle, timeStamp,
@@ -1266,7 +1271,7 @@ void Domain::updateParticles(std::set<BaseParticle*>& ghostParticlesToBeDeleted)
                 if (particle->getCommunicationComplexity() != complexityNew)
                 {
                     logger(VERBOSE, "time: % | global index: % in list % | particle % | CURRENT DOMAIN - CHANGES "
-                                    "COMPLEXITY", domainHandler_->getDPMBase()->getTime(), globalIndex_,
+                                   "COMPLEXITY", domainHandler_->getDPMBase()->getTime(), globalIndex_,
                            localIndexToGlobalIndexTable_[localIndex], particle->getId());
                     //Flag the particle that it no longer participates in the communication layer
                     //so it can be reintroduced in the transmission step
@@ -1279,7 +1284,7 @@ void Domain::updateParticles(std::set<BaseParticle*>& ghostParticlesToBeDeleted)
             else
             {
                 logger(VERBOSE, "time: % | global index: % in list % | particle % | CURRENT DOMAIN - TO NEIGHBOURING "
-                                "DOMAIN", domainHandler_->getDPMBase()->getTime(), globalIndex_,
+                               "DOMAIN", domainHandler_->getDPMBase()->getTime(), globalIndex_,
                        localIndexToGlobalIndexTable_[localIndex], particle->getId());
                 
                 ghostParticlesToBeDeleted.insert(particle);
@@ -1703,20 +1708,3 @@ void Domain::cleanCommunicationList(std::vector<BaseParticle*>& list)
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

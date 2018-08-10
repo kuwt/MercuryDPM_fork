@@ -35,7 +35,9 @@
 void SphericalParticleVtkWriter::writeVTK() const
 {
     std::fstream file = makeVTKFileWithHeader();
-    file << "<Piece NumberOfPoints=\"" << handler_.getDPMBase()->particleHandler.getNumberOfRealObjectsLocal()
+    long numberOfParticlesToWrite = std::count_if(handler_.begin(), handler_.end(),
+                                                  [this](BaseParticle* p){return particleMustBeWritten(p);});
+    file << "<Piece NumberOfPoints=\"" << numberOfParticlesToWrite
          << "\" NumberOfCells=\"" << 0 << "\">\n";
     writeVTKPositions(file);
     file << "<PointData  Vectors=\"vector\">\n";
@@ -53,7 +55,7 @@ void SphericalParticleVtkWriter::writeVTKVelocity(std::fstream& file) const
     for (const auto& p: handler_)
     {
 #ifdef MERCURY_USE_MPI
-        if (!(p->isMPIParticle() || p->isPeriodicGhostParticle()))
+        if (particleMustBeWritten(p))
       {
         file << '\t' << p->getVelocity() << '\n';
       }
@@ -64,6 +66,12 @@ void SphericalParticleVtkWriter::writeVTKVelocity(std::fstream& file) const
     file << "  </DataArray>\n";
 }
 
+/*!
+ * Notice that we write GrainRadius in the file, since there is a bug in Paraview that defaults to the first
+ * scalar-value in lexicographic order. We therefore need a description for the radius which starts with a letter before
+ * N.
+ * \param file The filestream to which the  radius must be written.
+ */
 void SphericalParticleVtkWriter::writeVTKRadius(std::fstream& file) const
 {
     file << "  <DataArray type=\"Float32\" Name=\"Radius\" format=\"ascii\">\n";
@@ -71,7 +79,7 @@ void SphericalParticleVtkWriter::writeVTKRadius(std::fstream& file) const
     for (const auto& p: handler_)
     {
 #ifdef MERCURY_USE_MPI
-        if (!(p->isMPIParticle() || p->isPeriodicGhostParticle()))
+        if (particleMustBeWritten(p))
       {
         file << '\t' << p->getRadius() << '\n';
       }

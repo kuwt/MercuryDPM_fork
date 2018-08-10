@@ -430,7 +430,7 @@ void PeriodicBoundaryHandler::getMPIFlags(BaseParticle* particle, bool& isInMPID
     }
 }
 
-/*
+/*!
  * \details Mixed particles that are in periodic and mpi domains, PM-particles can create
  * ghosts of themselves PGM and PMG and additionally PGMG-particles. These last particles
  * can't be created both by the periodic routines and the paralle routines and therefore
@@ -447,13 +447,13 @@ void PeriodicBoundaryHandler::setMPIFlags(BaseParticle* particle)
     particle->setMPIParticle(isMPIParticle);
 }
 
-/*
+/*!
  * \details Given a real particle that interacts with periodic boundaries, ghosts need to be generated.
  * Depending on the number of boundaries this particle is interacting the number of ghosts
- * differes. A recursive function makes sure that all possibilities of the periodic complexity of the
+ * differs. A recursive function makes sure that all possibilities of the periodic complexity of the
  * real particle are generated. Note that the first periodic complexity in the list returned by
  * this function is always the periodic complexity of the real particle.
- * \param[in,out] list A list containing all possible ghost periodic complexities for a give periodic complexity
+ * \param[in,out] list A list containing all possible ghost periodic complexities for a given periodic complexity
  * \param[in] periodicComplexity A periodic complexity of a real particle that is used to determine all its
  * possible ghost periodic complexities
  * \param[in,out] complexity One of the possible permutations of the ghost periodic complexity

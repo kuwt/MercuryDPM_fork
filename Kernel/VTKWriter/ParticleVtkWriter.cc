@@ -32,12 +32,11 @@ void ParticleVtkWriter::writeVTKPositions(std::fstream& file) const
     file << "  <DataArray type=\"Float32\" Name=\"Position\" NumberOfComponents=\"3\" format=\"ascii\">\n";
     for (const auto& p: handler_)
     {
-        //file << '\t' << p->getPosition() << '\n';
 #ifdef MERCURY_USE_MPI
-        if (!(p->isMPIParticle() || p->isPeriodicGhostParticle()))
-      {
-        file << '\t' << p->getPosition() << '\n';
-      }
+        if (particleMustBeWritten(p))
+        {
+            file << '\t' << p->getPosition() << '\n';
+        }
 #else
         file << '\t' << p->getPosition() << '\n';
 #endif
@@ -54,10 +53,10 @@ void ParticleVtkWriter::writeVTKIndSpecies(std::fstream& file) const
     for (const auto& p: handler_)
     {
 #ifdef MERCURY_USE_MPI
-        if (!(p->isMPIParticle() || p->isPeriodicGhostParticle()))
-      {
-        file << '\t' << p->getIndSpecies() << '\n';
-      }
+        if (particleMustBeWritten(p))
+        {
+            file << '\t' << p->getIndSpecies() << '\n';
+        }
 #else
         file << '\t' << p->getIndSpecies() << '\n';
 #endif

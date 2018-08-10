@@ -96,8 +96,8 @@ BaseParticle::BaseParticle(const BaseParticle& p)
     isMaserParticle_ = p.isMaserParticle_;
     isPeriodicGhostParticle_ = p.isPeriodicGhostParticle_;
     communicationComplexity_ = p.communicationComplexity_;
-    periodicComplexity_ = p.periodicComplexity_;
-    previousPeriodicComplexity_ = p.previousPeriodicComplexity_;
+    //periodicComplexity_ = p.periodicComplexity_;
+    //previousPeriodicComplexity_ = p.previousPeriodicComplexity_;
 #ifdef CONTACT_LIST_HGRID
     firstPossibleContact = nullptr;
 #endif
@@ -246,7 +246,6 @@ const std::vector<int>& BaseParticle::getPeriodicComplexity()
             periodicComplexity_.resize(numberOfPeriodicBoundaries, 0);
         }
     }
-    
     return periodicComplexity_;
 }
 

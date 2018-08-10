@@ -192,26 +192,27 @@ void ParticleHandler::addObject(BaseParticle* P)
     if(insertParticle)
     {
 #endif
-    //Puts the particle in the Particle list
-    BaseHandler<BaseParticle>::addObject(P);
-    if (getDPMBase() != nullptr)
-    {
-        //This places the particle in this grid
-        getDPMBase()->hGridInsertParticle(P);
-        //This computes where the particle currently is in the grid
-        getDPMBase()->hGridUpdateParticle(P);
-    }
-    //set the particleHandler pointer
-    P->setHandler(this);
-    //compute mass of the particle
-    P->getSpecies()->computeMass(P);
-    //Check if this particle has new extrema
-    checkExtrema(P);
-    if (dynamic_cast<SuperQuadric*> (P) != nullptr)
-    {
-        getDPMBase()->setRotation(true);
-    }
+        //Puts the particle in the Particle list
+        BaseHandler<BaseParticle>::addObject(P);
+        if (getDPMBase() != nullptr)
+        {
+            //This places the particle in this grid
+            getDPMBase()->hGridInsertParticle(P);
+            //This computes where the particle currently is in the grid
+            getDPMBase()->hGridUpdateParticle(P);
+        }
+        //set the particleHandler pointer
+        P->setHandler(this);
+        //compute mass of the particle
+        P->getSpecies()->computeMass(P);
+        //Check if this particle has new extrema
+        checkExtrema(P);
+        if (dynamic_cast<SuperQuadric*> (P) != nullptr)
+        {
+            getDPMBase()->setRotation(true);
+        }
 #ifdef MERCURY_USE_MPI
+        P->setPeriodicComplexity(std::vector<int>(0));
     }
     else
     {

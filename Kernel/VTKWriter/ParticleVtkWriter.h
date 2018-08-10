@@ -47,6 +47,11 @@ protected:
     void writeVTKIndSpecies(std::fstream& file) const;
     
     void writeVTKPositions(std::fstream& file) const;
+    
+    bool particleMustBeWritten(BaseParticle* particle) const
+    {
+        return !(particle->isMPIParticle() || particle->isPeriodicGhostParticle());
+    }
 };
 
 

@@ -120,6 +120,10 @@ public:
     void performActionsBeforeAddingParticles() override;
     
     void extendBottom() const;
+    
+    void copyExtraParticles() const;
+    
+    void setCopyFlowParticles(bool copyFlowParticles);
 
 private:
     /*!
@@ -131,6 +135,11 @@ private:
      * \brief Time at which the maser opens
      */
     Mdouble activationTime_;
+    
+    /*!
+     * \brief Flag for whether or not we copy a few blocks of flow particles in the front when activating the maser
+     */
+    bool copyFlowParticles_;
     
 };
 

@@ -32,13 +32,11 @@
  */
 SubcriticalMaserBoundaryTEST::SubcriticalMaserBoundaryTEST()
 {
-#ifdef MERCURY_USE_MPI
-    logger(WARN, "Make sure the first parallel domain boundary is not close to the maser boundary");
-#endif
     distanceLeft_ = std::numeric_limits<Mdouble>::quiet_NaN();
     distanceRight_ = std::numeric_limits<Mdouble>::quiet_NaN();
     maserIsActivated_ = false;
     activationTime_ = std::numeric_limits<Mdouble>::quiet_NaN();
+    copyFlowParticles_ = false;
 }
 
 /*!
@@ -69,6 +67,7 @@ void SubcriticalMaserBoundaryTEST::read(std::istream& is)
     std::string dummy;
     is >> dummy >> maserIsActivated_
        >> dummy >> activationTime_;
+    logger(INFO, "maser is activated: %", maserIsActivated_);
 }
 
 /*!
@@ -89,6 +88,11 @@ void SubcriticalMaserBoundaryTEST::write(std::ostream& os) const
 std::string SubcriticalMaserBoundaryTEST::getName() const
 {
     return "SubcriticalMaserBoundaryTEST";
+}
+
+void SubcriticalMaserBoundaryTEST::setCopyFlowParticles(bool copyFlowParticles)
+{
+    copyFlowParticles_ = copyFlowParticles;
 }
 
 /*!
@@ -224,30 +228,26 @@ void SubcriticalMaserBoundaryTEST::checkBoundaryAfterParticlesMove(ParticleHandl
  */
 void SubcriticalMaserBoundaryTEST::activateMaser()
 {
+    logger(INFO, "SubcriticalMaserBoundaryTEST::activateMaser ");
 #ifdef MERCURY_USE_MPI
     //Clear the periodic boundaryHandler, only want real particles
     getPeriodicHandler()->clearCommunicationLists();
 #endif
+    //Flag that the maser is active!
+    maserIsActivated_ = true;
     
+    extendBottom();
+    if (copyFlowParticles_)
+    {
+        copyExtraParticles();
+    }
     
     //Loop over all particles to see if they are within the maser boundary
     ParticleHandler& pH = getHandler()->getDPMBase()->particleHandler;
     for (BaseParticle* particle : pH)
     {
-        if (getDistance(particle->getPosition()) > 0)
-        {
-            particle->setMaserParticle(true);
-        }
-        else
-        {
-            particle->setMaserParticle(false);
-        }
+        particle->setMaserParticle((getDistance(particle->getPosition()) > 0));
     }
-    
-    //Flag that the maser is active!
-    maserIsActivated_ = true;
-    
-    extendBottom();
 
 #ifdef MERCURY_USE_MPI
     //Generate ghost particles
@@ -456,7 +456,7 @@ if (NUMBER_OF_PROCESSORS > 1)
             }
             else
             {
-                particle = new BaseParticle;
+                particle = new BaseParticle();
             }
 
             getHandler()->getDPMBase()->particleHandler.addObject(0, particle);
@@ -466,3 +466,94 @@ if (NUMBER_OF_PROCESSORS > 1)
 #endif
 }
 
+/*!
+ * when activating the maser, extend the bottom periodically until the end of the domain, by copying the fixed particles
+ * of the periodic part of the maser with intervals of shift_.
+ */
+void SubcriticalMaserBoundaryTEST::copyExtraParticles() const
+{
+    logger(INFO, "copying flow particles");
+#ifdef MERCURY_USE_MPI
+    MPIContainer& communicator = MPIContainer::Instance();
+    std::vector<unsigned int> numberOfParticlesPerCore(NUMBER_OF_PROCESSORS);
+    std::vector<std::vector<BaseParticle*>> particlesToCores(NUMBER_OF_PROCESSORS);
+    if (PROCESSOR_ID == 0)
+    {
+#endif
+    std::vector<BaseParticle*> flowParticles;
+    std::vector<BaseParticle*> newParticles;
+    for (BaseParticle* p : getHandler()->getDPMBase()->particleHandler)
+    {
+        if (!p->isFixed() && !(p->isPeriodicGhostParticle()) && !(p->isMPIParticle()))
+        {
+            flowParticles.push_back(p);
+        }
+    }
+    
+    for (BaseParticle* p : flowParticles)
+    {
+        Vec3D newPosition = p->getPosition() + shift_;
+        for (unsigned i = 0; i < 4; ++i)
+        {
+            p = p->copy();
+            p->setPosition(newPosition);
+            newParticles.push_back(p);
+            newPosition += shift_;
+        }
+    }
+#ifndef MERCURY_USE_MPI
+    for (BaseParticle* p : newParticles)
+    {
+        getHandler()->getDPMBase()->particleHandler.addObject(p);
+    }
+#else
+    if (NUMBER_OF_PROCESSORS == 1)
+    {
+        for (BaseParticle* p : newParticles)
+        {
+            getHandler()->getDPMBase()->particleHandler.addObject(p);
+        }
+    }
+    else
+    {
+        //count how many particles go to each core
+        for (BaseParticle* p : newParticles)
+        {
+            int targetGlobalIndex = getHandler()->getDPMBase()->domainHandler.getParticleDomainGlobalIndex(p);
+            int targetProcessor = getHandler()->getDPMBase()->domainHandler.getParticleProcessor(
+                    targetGlobalIndex);
+            particlesToCores[targetProcessor].push_back(p);
+        }
+        for (int i = 0; i < NUMBER_OF_PROCESSORS; ++i)
+        {
+            numberOfParticlesPerCore[i] = (particlesToCores[i].size());
+        }
+    }
+}
+if (NUMBER_OF_PROCESSORS > 1)
+{
+    //broadcast numberOfParticlesPerCore to other processors
+    communicator.broadcast(numberOfParticlesPerCore.data(), NUMBER_OF_PROCESSORS, 0);
+    for (unsigned i = 0; i < numberOfParticlesPerCore.size(); ++i)
+    {
+        for (unsigned p = 0; p < numberOfParticlesPerCore[i]; ++p)
+        {
+            BaseParticle* particle;
+            if (PROCESSOR_ID == 0)
+            {
+                particle = particlesToCores[i][p];
+            }
+            else
+            {
+                particle = new BaseParticle();
+            }
+
+            getHandler()->getDPMBase()->particleHandler.addObject(0, particle);
+            //particle->setPeriodicComplexity(getPeriodicHandler()->computePeriodicComplexity(particle->getPosition()));
+        }
+    }
+}
+#endif
+    
+    logger(INFO, "completed copying particles");
+}

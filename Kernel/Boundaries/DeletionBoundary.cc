@@ -40,6 +40,9 @@ DeletionBoundary::DeletionBoundary()
     distance_ = std::numeric_limits<double>::quiet_NaN();
     scaleFactor_ = std::numeric_limits<double>::quiet_NaN();
     isActivated_ = true;
+    numberOfParticlesDeleted_ = 0;
+    massDeleted_ = 0;
+    volumeDeleted_ = 0;
     
     logger(DEBUG, "DeletionBoundary::DeletionBoundary() finished");
 }
@@ -225,6 +228,7 @@ void DeletionBoundary::write(std::ostream& os) const
     os << " normal " << normal_
        << " scaleFactor " << scaleFactor_
        << " distance " << distance_;
+    logger(INFO, "DeletionBoundary, number deleted: %", numberOfParticlesDeleted_);
 }
 
 /*!
