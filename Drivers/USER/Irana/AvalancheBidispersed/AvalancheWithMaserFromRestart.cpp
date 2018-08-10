@@ -46,7 +46,7 @@ public:
             copyParticlesForMaser();
             openMaser();
         }
-        if (maserHasOpened)
+        if (false)
         {
             static Mdouble nextTimeToCheck = getTime() + getTimeStep();
             if (getTime() > nextTimeToCheck && bottomLength < 1e4)
@@ -81,7 +81,7 @@ public:
     void actionsOnRestart() override
     {
         setName(getName());
-        if (getTime() < 500)
+        if (getTime() < 1)
         {
             maserHasOpened = false;
         }
@@ -91,20 +91,23 @@ public:
             bottomLength = particleHandler.getHighestPositionX();
             populateBottomParticles();
         }
-        setName("cgTest" + getName());
+        setName("postProcessing");
         setTimeMax(getTime() + getTimeStep());
         restartFile.setFileType(FileType::MULTIPLE_FILES);
         restartFile.setSaveCount(1.0/getTimeStep());
+        dataFile.setFileType(FileType::ONE_FILE);
         dataFile.setSaveCount(1.0/getTimeStep());
-        fStatFile.setFileType(FileType::ONE_FILE);
-        auto cg0 = cgHandler.copyAndAddObject(TimeAveragedCG<CGCoordinates::XZ,CGFunctions::Lucy>());
+        //fStatFile.setFileType(FileType::ONE_FILE);
+        /*auto cg0 = cgHandler.copyAndAddObject(CG<CGCoordinates::XZ,CGFunctions::Lucy>());
         cg0->setWidth(1);
         cg0->statFile.setSaveCount(100);
         cg0->statFile.setName(getName() + ".LucyXZ.stat");
         cg0->setNX(1000);
-        cg0->setX(0, 1000);
+        cg0->setX(0, 2000);
         cg0->setNZ(20);
-        cg0->setZ(-5, 15);
+        cg0->setZ(-5, 15);*/
+        setParticlesWriteVTK(true);
+        writePythonFileForVTKVisualisation();
     }
 
 private:

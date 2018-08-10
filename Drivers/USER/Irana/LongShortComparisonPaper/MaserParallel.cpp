@@ -5,6 +5,7 @@
 #include <iostream>
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include <cstdlib> //needed to be cygwin compatible (system not found)
+#include <Boundaries/DeletionBoundary.h>
 #include "Boundaries/PeriodicBoundary.h"
 #include "Boundaries/SubcriticalMaserBoundaryTEST.h"
 #include "Walls/IntersectionOfWalls.h"
@@ -37,17 +38,19 @@ public:
             }
         }
         
-        //Add maser boundary
         boundaryHandler.clear();
-        SubcriticalMaserBoundaryTEST m0;
-        m0.set(Vec3D(1.0, 0.0, 0.0), 0.0, 10.0);
-        m0.setActivationTime(10);
-        boundaryHandler.copyAndAddObject(m0);
         
         //Add periodic boundary at side
         PeriodicBoundary b0;
         b0.set(Vec3D(0.0, 1.0, 0.0), 0.0, 20.0);
         boundaryHandler.copyAndAddObject(b0);
+    
+        //Add maser boundary
+        SubcriticalMaserBoundaryTEST m0;
+        m0.set(Vec3D(1.0, 0.0, 0.0), 0.0, 10.0);
+        m0.setActivationTime(1e-5);
+        m0.setCopyFlowParticles(true);
+        boundaryHandler.copyAndAddObject(m0);
         
         //Add bottom wall
         InfiniteWall w0;
@@ -61,11 +64,25 @@ public:
         dataFile.setFileType(FileType::NO_FILE);
         fStatFile.setFileType(FileType::NO_FILE);
         statFile.setFileType(FileType::NO_FILE);
-        eneFile.setFileType(FileType::NO_FILE);
-        setParticlesWriteVTK(false);
+        setSaveCount(10.0 / getTimeStep());
+        eneFile.setFileType(FileType::ONE_FILE);
+        eneFile.setSaveCount(1.0/getTimeStep());
+        //dataFile.setSaveCount(0.1/getTimeStep());
+        setParticlesWriteVTK(true);
         setWallsWriteVTK(FileType::NO_FILE);
-        setSaveCount(1.0 / getTimeStep());
         restartFile.setFileType(FileType::MULTIPLE_FILES);
+    
+        auto maser = static_cast<SubcriticalMaserBoundaryTEST*>(boundaryHandler.getLastObject());
+        maser->setCopyFlowParticles(true);
+        
+        DeletionBoundary deletionBoundary;
+        deletionBoundary.set({1, 0, 0}, 3 * getXMax());
+        
+        /*InfiniteWall w;
+        w.set(Vec3D(0,-1, 0), Vec3D(0,-0.5, 0));
+        wallHandler.copyAndAddObject(w);
+        w.set(Vec3D(0,1,0), Vec3D(0, 6.5, 0));
+        wallHandler.copyAndAddObject(w);*/
     }
     
     void printTime() const override
@@ -78,6 +95,7 @@ public:
                   << std::endl;
         std::cout.flush();
     }
+    
 };
 
 int main(int argc, char* argv[])
@@ -106,7 +124,6 @@ int main(int argc, char* argv[])
     problem.setGravity(Vec3D(1.0 * 0.37460659341, 0.0, -1.0 * 0.92718385456));
     
     //Set the number of domains for parallel decomposition
-    //todo make this more than 1 for true parallel code
     problem.setNumberOfDomains({2, 1, 1});
     
     //specify contact properties

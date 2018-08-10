@@ -104,7 +104,7 @@ public:
     {
         logger.assert_always(area > 0, "chute should have positive area");
         const Mdouble totalVolume = area * inflowHeight;
-        return totalVolume / std::pow(2*getLargeParticleRadius(), 3.0);
+        return (1-concentrationSmall) * totalVolume / std::pow(2*getLargeParticleRadius(), 3.0);
         const Mdouble volumeForLarge = (1 - concentrationSmall) * totalVolume;
         const Mdouble volumeOneLarge = 4./3 * constants::pi * std::pow(getLargeParticleRadius(), 3.0);
         const Mdouble packingFraction = 0.57;
@@ -124,6 +124,7 @@ public:
     {
         logger.assert_always(area > 0, "chute should have positive area");
         const Mdouble totalVolume = area * inflowHeight;
+        return concentrationSmall * totalVolume / std::pow(2*getSmallParticleRadius(), 3.0);
         const Mdouble volumeForSmall = concentrationSmall * totalVolume;
         const Mdouble volumeOneSmall = 4./3 * constants::pi * std::pow(getSmallParticleRadius(), 3.0);
         const Mdouble packingFraction = 0.57;
