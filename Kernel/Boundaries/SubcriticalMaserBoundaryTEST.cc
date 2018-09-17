@@ -169,9 +169,11 @@ bool SubcriticalMaserBoundaryTEST::checkBoundaryAfterParticleMoved(BaseParticle*
             BaseParticle* pCopy = p->copy();
             pCopy->setMaserParticle(false);
             pH.addObject(pCopy);
+            /*
             logger(INFO, "copying particle");
             p->write(std::cout);
-            
+            */
+            logger(VERBOSE, "copying particle %", p);
             //Shift position of the particle
             shiftPosition(p);
         }
@@ -254,6 +256,33 @@ void SubcriticalMaserBoundaryTEST::activateMaser()
     getPeriodicHandler()->addNewParticles();
 #endif
 
+}
+
+void SubcriticalMaserBoundaryTEST::deactivateMaser()
+{
+    if (maserIsActivated_)
+    {
+        for (BaseParticle* particle : getHandler()->getDPMBase()->particleHandler)
+        {
+            if (getDistance(particle->getPosition()) > 0)
+            {
+                particle->setMaserParticle(false);
+            }
+        }
+
+        maserIsActivated_ = false;
+
+
+        // TODO JMFT: @Marnix In activateMaser(), what do extendBottom() and
+        // addNewParticles() do, and how do I undo their effects?
+    }
+    else
+        logger(WARN, "[SubcriticalMaserBoundaryTEST::deactivateMaser()] Maser is not activated, so can't deactivate");
+}
+
+bool SubcriticalMaserBoundaryTEST::isActivated() const
+{
+    return maserIsActivated_; 
 }
 
 /*!

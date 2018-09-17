@@ -171,10 +171,9 @@ void SlidingFrictionInteraction::computeFrictionForce()
             addForce(tangentialForce_);
         }
     }
-//    else
-//    {
-//        std::cerr << "SlidingFrictionInteraction::getForce(): warning: sliding friction is zero" << std::endl;
-//    }
+
+    /* And if species->getSlidingFrictionCoefficient() == 0.0, then there is no
+     * friction force at all. */
 }
 
 /*!

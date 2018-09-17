@@ -229,10 +229,9 @@ void SlidingFrictionSpecies::setCollisionTimeAndNormalAndTangentialRestitutionCo
         }
         else
         {
-            std::cerr
-                    << "SlidingFrictionSpecies::setCollisionTimeAndNormalAndTangentialRestitutionCoefficient only works for LinearViscoelasticSlidingFrictionSpecies or LinearPlasticViscoelasticSlidingFrictionSpecies"
-                    << std::endl;
-            exit(-1);
+            logger(ERROR, 
+                "SlidingFrictionSpecies::setCollisionTimeAndNormalAndTangentialRestitutionCoefficient only works for LinearViscoelasticSlidingFrictionSpecies or LinearPlasticViscoelasticSlidingFrictionSpecies"
+                );
         }
     }
     

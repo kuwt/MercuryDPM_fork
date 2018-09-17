@@ -89,6 +89,16 @@ public:
      * \brief Activates the maser functionaly of this periodic boundary.
      */
     void activateMaser();
+
+    /*!
+     * \brief Stops copying particles, and act merely as a periodic domain
+     */
+    void deactivateMaser();
+
+    /*!
+     * \brief Returns whether the maser is activated or not.
+     */
+    bool isActivated() const;
     
     /*!
      * \brief sets the activate time of the maser

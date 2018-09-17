@@ -134,13 +134,13 @@ void FrictionSpecies::mix(FrictionSpecies* const S, FrictionSpecies* const T)
 {
     rollingStiffness_ = average(S->getRollingStiffness(), T->getRollingStiffness());
     rollingDissipation_ = average(S->getRollingDissipation(), T->getRollingDissipation());
-    rollingFrictionCoefficient_ = average(S->getRollingFrictionCoefficient(), T->getRollingFrictionCoefficient());
-    rollingFrictionCoefficientStatic_ = average(S->getRollingFrictionCoefficientStatic(),
+    rollingFrictionCoefficient_ = averageInf(S->getRollingFrictionCoefficient(), T->getRollingFrictionCoefficient());
+    rollingFrictionCoefficientStatic_ = averageInf(S->getRollingFrictionCoefficientStatic(),
                                                 T->getRollingFrictionCoefficientStatic());
     torsionStiffness_ = average(S->getTorsionStiffness(), T->getTorsionStiffness());
     torsionDissipation_ = average(S->getTorsionDissipation(), T->getTorsionDissipation());
-    torsionFrictionCoefficient_ = average(S->getTorsionFrictionCoefficient(), T->getTorsionFrictionCoefficient());
-    torsionFrictionCoefficientStatic_ = average(S->getTorsionFrictionCoefficientStatic(),
+    torsionFrictionCoefficient_ = averageInf(S->getTorsionFrictionCoefficient(), T->getTorsionFrictionCoefficient());
+    torsionFrictionCoefficientStatic_ = averageInf(S->getTorsionFrictionCoefficientStatic(),
                                                 T->getTorsionFrictionCoefficientStatic());
 }
 
@@ -192,10 +192,7 @@ void FrictionSpecies::setRollingFrictionCoefficient(Mdouble new_mu)
         rollingFrictionCoefficientStatic_ = rollingFrictionCoefficient_;
     }
     else
-    {
-        std::cerr << "Error in setSlidingFrictionCoefficient" << std::endl;
-        exit(-1);
-    }
+        logger(ERROR, "[FrictionSpecies::setRollingFrictionCoefficient(Mdouble)] The coefficient of friction must be nonnegative.");
 }
 
 ///Allows the (dynamic) Coulomb friction coefficient to be accessed
@@ -212,10 +209,7 @@ void FrictionSpecies::setRollingFrictionCoefficientStatic(Mdouble new_mu)
         rollingFrictionCoefficientStatic_ = new_mu;
     }
     else
-    {
-        std::cerr << "Error in setSlidingFrictionCoefficientStatic" << std::endl;
-        exit(-1);
-    }
+        logger(ERROR, "[FrictionSpecies::setRollingFrictionCoefficientStatic(Mdouble)] The coefficient of friction must be nonnegative.");
 }
 
 ///Allows the static Coulomb friction coefficient to be accessed

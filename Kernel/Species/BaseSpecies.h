@@ -83,8 +83,11 @@ public:
     ///\brief Returns the pointer to the handler to which this species belongs.
     SpeciesHandler* getHandler() const;
     
-    ///\brief defines the average of two variables by the harmonic mean.
+    ///\brief Returns the harmonic mean of two variables.
     Mdouble average(Mdouble a, Mdouble b) const;
+
+    ///\brief Returns the harmonic mean of two variables, returning inf if either is inf.
+    Mdouble averageInf(Mdouble a, Mdouble b) const;
     
     ///\brief creates default values for mixed species
     /*!
