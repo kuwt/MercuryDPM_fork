@@ -9,7 +9,7 @@
 class relax: public Mercury3D{
 public:
 /*! s3_IsoRelax will load the 1 or more configurations from s2_IsotropicCompression
- * and relax those samples in order to create the initial homogeneous jammed samples 
+ * and relax those samples in order to create the initial homogeneous jammed samples
  * for the further shear process. Here we basiclly doing nothing but just let all the
  * particles cool down in the cubic box. Be aware that if the sample is compressed with
  * friciton on, the following process should be also with frition on, same for cohesion.
@@ -129,6 +129,8 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 {
     std::string restartName ("mu0-w1-relaxed"); //the Prefix of your restart file from stage 1
     relax problem(restartName);
+    double logarithmicSaveCountBase = 10;
+    
 
     //  --------------------------------------------------
 
@@ -144,17 +146,18 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     problem.mu_tor = 0.0;				//set torsional friction coefficient
     problem.Phic = 0.5;					// penetration DepthMax, the maximum depth of linear plastic-viscoelastic normal force
     problem.poly = 1.0;					//set polydispersity
-    problem.tmax = 0.1;				//set simulation time
+    problem.tmax = 1000;				//set simulation time
     // ----------------------------------------------------------------
 
     problem.setName("mu0-w1-excitation");
 
 
-    problem.setSaveCount(5);
-    problem.eneFile.setSaveCount(5);
+    problem.setSaveCount(1);
+	problem.setLogarithmicSaveCount(logarithmicSaveCountBase);
+    //problem.eneFile.setSaveCount(5);
     problem.dataFile.setFileType(FileType::ONE_FILE);
-    problem.restartFile.setFileType(FileType::NO_FILE);
-    problem.fStatFile.setFileType(FileType::NO_FILE);
+    problem.restartFile.setFileType(FileType::ONE_FILE);
+    problem.fStatFile.setFileType(FileType::ONE_FILE);
     problem.eneFile.setFileType(FileType::ONE_FILE);
  
     problem.solve();
