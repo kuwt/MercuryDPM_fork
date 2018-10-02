@@ -28,6 +28,7 @@
 #define FILE_H
 
 #include <fstream>
+#include "GeneralDefine.h"
 
 // A value of File::lastSavedTimeStep_ = NEVER indicates a file was never been written
 ///\todo IFCD: can we make this an int instead of unsigned int, as -1 as an unsigned is not good style?
@@ -225,6 +226,11 @@ public:
      * \brief Closes the file by calling fstream_.close()
      */
     void close();
+    
+    /*!
+    * \brief the function to set the user input base of logarithmic saving count
+    */
+    void setlogarithmicSaveCount(const Mdouble logarithmicSaveCountBase);
 
 private:
     /*!
@@ -258,6 +264,12 @@ private:
      * And if TMax =101, it stores data at t={0,10,20,30,...100,101}
      */
     unsigned int saveCount_;
+    
+    /*!
+    * \brief the switch allow user to set saveCount in logarithmic timescale with equal distance ,
+    * the number is the base of log scale from user input
+    */
+    Mdouble logarithmicSaveCountBase_;
     
     /*!
      * \brief the time step at which the next write or read operation has to happen.

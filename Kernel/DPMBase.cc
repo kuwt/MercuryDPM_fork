@@ -4856,4 +4856,20 @@ void DPMBase::computeWallForces(BaseWall* const w)
     }
 }
 
+/*!
+ * \details sets the number of time steps skipped between each save for ALL data files, except for the interaction file.
+ * And the increament of this number of time steps is based on a user input logarithmicSaveCountBase, e.g. if you put 10
+ * as your input, the saving point will be at 10, 10^1, 10^2, 10^3, which results equal distance on a log scale.
+ * Note, that the interaction file is independent of time steps, and just writes when an interaction starts or ends.
+ *  \param[in] logarithmicSaveCountBase
+ */
+void DPMBase::setLogarithmicSaveCount(const Mdouble logarithmicSaveCountBase)
+{
+    dataFile.setlogarithmicSaveCount(logarithmicSaveCountBase);
+    fStatFile.setlogarithmicSaveCount(logarithmicSaveCountBase);
+    restartFile.setlogarithmicSaveCount(logarithmicSaveCountBase);
+    statFile.setlogarithmicSaveCount(logarithmicSaveCountBase);
+    eneFile.setlogarithmicSaveCount(logarithmicSaveCountBase);
+}
+
 ///\todo When restarting the indexMax should be reset

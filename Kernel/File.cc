@@ -29,6 +29,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <cmath>
 #include <iomanip>
 #include "Logger.h"
 
@@ -120,6 +121,9 @@ File::File()
     //sets the default openMode to "out"
     //i.e. files will by default be written to, not read from.
     openMode_ = std::fstream::out;
+    
+    //sets the default logarithmicSaveCount to zero
+    logarithmicSaveCountBase_ = 0;
 }
 
 /*!
@@ -134,6 +138,7 @@ File::File(const File& f)
     counter_ = f.counter_;
     lastSavedTimeStep_ = f.lastSavedTimeStep_;
     openMode_ = f.openMode_;
+    logarithmicSaveCountBase_ = f.logarithmicSaveCountBase_;
 }
 
 /*!
@@ -262,6 +267,17 @@ void File::setSaveCount(unsigned int saveCount)
     saveCount_ = saveCount;
 }
 
+
+/*!
+ * \details File::setlogarithmicSaveCount assigns the base of the saveCount on a logarithmic time scale
+ * \param[in] logarithmicSaveCountBase
+ */
+void File::setlogarithmicSaveCount(const Mdouble logarithmicSaveCountBase)
+{
+    logger.assert_always(logarithmicSaveCountBase > 1, "logarithmicSaveCountBase should always be larger than 1");
+    logarithmicSaveCountBase_ = logarithmicSaveCountBase;
+}
+
 /*!
  * \details Returns the time step at which the next write or read operation has to happen
  * \return unsigned int nextSaveTimeStep_
@@ -296,6 +312,15 @@ bool File::saveCurrentTimeStep(unsigned int ntimeSteps)
     if ((lastSavedTimeStep_ == NEVER || ntimeSteps >= lastSavedTimeStep_ + saveCount_)
         && getFileType() != FileType::NO_FILE)
     {
+        //note: do not do the following at t = 0 because this makes no sense for a logarithm
+        if (logarithmicSaveCountBase_ > 1 && ntimeSteps > 0 &&
+            saveCount_ < ceil((logarithmicSaveCountBase_ - 1) * lastSavedTimeStep_))
+        {
+            /*calculate the new saveCount base on the user input logarithmicSaveCountBase,
+             *and multiply by the actual number of time steps
+             */
+            saveCount_ = ceil((logarithmicSaveCountBase_ - 1) * lastSavedTimeStep_);
+        }
         return true;
     }
     else

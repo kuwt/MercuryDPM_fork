@@ -476,6 +476,11 @@ public:
      * \brief Returns the maximum simulation duration.
      */
     Mdouble getTimeMax() const;
+    
+    /*!
+     * \brief Sets File::logarithmicSaveCount_ for all files (ene, data, fstat, restart, stat)
+     */
+    void setLogarithmicSaveCount(const Mdouble logarithmicSaveCountBase);
 
 #ifdef CONTACT_LIST_HGRID
     /*!
