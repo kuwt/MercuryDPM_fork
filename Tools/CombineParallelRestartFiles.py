@@ -47,6 +47,9 @@ def main():
 
     index_particles = 0
     while 'Particles' not in file0[index_particles]:
+        if 'numberOfProcessors' in file0[index_particles]:
+            i = file0[index_particles].find('numberOfProcessors')
+            file0[index_particles] = file0[index_particles][:i] + '\n'
         header.append(file0[index_particles])
         index_particles += 1
 
