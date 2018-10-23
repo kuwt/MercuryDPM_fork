@@ -591,9 +591,12 @@ w 0.5 ...
 ...\endcode
 
 \subsection space Spatially-resolved fields
-The coarse-graining formulations can return data which is complete avegarge in space (as shown in the previous examples) or only in certain spactial directions. Note, the CG formulation returns fields at ALL points in space; however, we have to evaluate this continuum fields at a final number of 'grid points'.
-Use the `-cgtype [O,X,Y,Z,XY,XZ,YZ,XYZ]` and `-n [double]` commands to produce spatially resolved fields:
- \code  ./fstatistics NewtonsCradleSelfTest -cgtype Z -n 100 -w 0.2\endcode
+The coarse-graining formulations can return data which is complete avegarge in
+space (as shown in the previous examples) or only in certain spactial
+directions. Note, the CG formulation returns fields at ALL points in space;
+however, we have to evaluate these continuum fields at a final number of 'grid points'.
+Use the `-stattype [O,X,Y,Z,XY,XZ,YZ,XYZ]` and `-n [double]` commands to produce spatially resolved fields:
+ \code  ./fstatistics NewtonsCradleSelfTest -stattype Z -n 100 -w 0.2\endcode
 This produces data that is resolved in the z-coordinate (but averaged in t, x and y). The 'n'-options means a 100 different z-values are evaluated, evenly spread over the domain. The output file now contains 100 lines of data, one for each z-value:
 
 \code
