@@ -26,6 +26,7 @@
 #ifndef MPIINTERACTION_H
 #define MPIINTERACTION_H
 
+#include "Interactions/NormalForceInteractions/LinearPlasticViscoelasticInteraction.h"
 #include "Interactions/FrictionForceInteractions/SlidingFrictionInteraction.h"
 #include "Interactions/FrictionForceInteractions/FrictionInteraction.h"
 #include "Interactions/AdhesiveForceInteractions/LiquidBridgeWilletInteraction.h"
@@ -88,7 +89,11 @@ public:
     typename std::conditional<
             //if true, enable liquidbridgeVolume
             std::is_base_of<LiquidMigrationWilletInteraction, AdhesiveForceInteraction>::value, Mdouble, Empty>::type liquidbridgeVolume;
-    
+
+    //MaxOverlap
+    typename std::conditional<
+        //if true, enable max overlap
+        std::is_base_of<LinearPlasticViscoelasticInteraction, NormalForceInteraction>::value, Mdouble, Empty>::type maxOverlap;    
     
     void copyFromInteraction(
             const Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>* interaction);
@@ -279,6 +284,40 @@ public:
             Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>* interaction)
     {
     }
+
+    //Max overlap
+    template<class DUMMY = NormalForceInteraction>
+    typename std::enable_if<(std::is_base_of<LinearPlasticViscoelasticInteraction, DUMMY>::value), void>::type
+    getMaximumOverlap(
+                const Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>* interaction)
+    {
+        maxOverlap = interaction->NormalForceInteraction::getMaxOverlap();
+    }
+
+    //Max overlap
+    template<class DUMMY = NormalForceInteraction>
+    typename std::enable_if<(std::is_base_of<LinearPlasticViscoelasticInteraction, DUMMY>::value), void>::type
+    setMaximumOverlap(
+                Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>* interaction)
+    {
+        interaction->NormalForceInteraction::setMaxOverlap(maxOverlap);
+    }
+
+    //Max overlap
+    template<class DUMMY = NormalForceInteraction>
+    typename std::enable_if<!(std::is_base_of<LinearPlasticViscoelasticInteraction, DUMMY>::value), void>::type
+    getMaximumOverlap(
+                const Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>* interaction)
+    {
+    }
+
+    //Max overlap
+    template<class DUMMY = NormalForceInteraction>
+    typename std::enable_if<!(std::is_base_of<LinearPlasticViscoelasticInteraction, DUMMY>::value), void>::type
+    setMaximumOverlap(
+                Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>* interaction)
+    {
+    }
     
 };
 
@@ -316,6 +355,7 @@ void MPIInteraction<NormalForceInteraction, FrictionForceInteraction, AdhesiveFo
     getWasInContact(interaction);
     getBonded(interaction);
     getLiquidBridge(interaction);
+    getMaximumOverlap(interaction);
 }
 
 
@@ -334,6 +374,7 @@ void MPIInteraction<NormalForceInteraction, FrictionForceInteraction, AdhesiveFo
     setWasInContact(interaction);
     setBonded(interaction);
     setLiquidBridge(interaction);
+    setMaximumOverlap(interaction);
 }
 
 
