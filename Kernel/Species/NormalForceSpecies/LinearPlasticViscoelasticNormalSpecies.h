@@ -29,6 +29,7 @@
 #include "Species/BaseSpecies.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/NormalForceInteractions/LinearPlasticViscoelasticInteraction.h"
+#include "Species/FrictionForceSpecies/SlidingFrictionSpecies.h"
 
 /*!
  * \brief LinearPlasticViscoelasticNormalSpecies contains the parameters used to describe a plastic-cohesive normal force (Stefan Ludings plastic-cohesive force model).
@@ -71,10 +72,16 @@ public:
     ///Sets k, disp such that it matches a given tc and eps for a collision of two copies of P
     void setStiffnessAndRestitutionCoefficient(Mdouble k_, Mdouble eps, Mdouble mass);
     
+    ///Sets disp to obtain a restitution coefficient eps for a collision of two particles of mass m
+    void setRestitutionCoefficient(double eps, Mdouble mass);
+    
     /*!
  * \brief Calculates collision time for two copies of a particle of given disp, k, mass
  */
-    Mdouble getCollisionTime(Mdouble mass);
+    Mdouble getCollisionTime(Mdouble mass) const;
+    
+    ///Calculates restitution coefficient for two copies of given disp, k, mass
+    Mdouble getRestitutionCoefficient(Mdouble mass) const;
 
 //setters and getters
     
@@ -143,6 +150,19 @@ public:
      * \brief Allows the normal dissipation to be accessed.
      */
     Mdouble getDissipation() const;
+
+    /*!
+     * \brief
+     * 1) Computes the maximum plastic overlap
+     *    delta_p* = phi*r
+     * 2) Computes the overlap at which the maximum adhesive force is generated:
+     *    delta_c* = delta_p* / (1+k_c/k_2*)
+     * 3) Computes the maximum adhesive force
+     *    f_c* = k_c * delta_c*
+     * 4) Computes the maximum bond number
+     *    Bo* = f_c* / (m*g)
+     */
+    Mdouble computeBondNumberMax(Mdouble harmonicMeanRadius, Mdouble gravitationalAcceleration) const;
 
 private:
     ///(normal) spring constant (k_1)

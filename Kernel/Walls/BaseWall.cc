@@ -53,6 +53,7 @@ BaseWall::BaseWall(const BaseWall& w)
     //sets the current handler to that belonging to the existing wall, w
     handler_ = w.handler_;
     renderedWalls_.reserve(w.renderedWalls_.capacity());
+    vtkVisibility_ = w.vtkVisibility_;
     for (auto* const r : w.renderedWalls_)
         renderedWalls_.push_back(r->copy());
     logger(DEBUG, "BaseWall::BaseWall(const BaseWall &p) finished");
@@ -79,14 +80,41 @@ BaseWall::~BaseWall()
 void BaseWall::read(std::istream& is)
 {
     BaseInteractable::read(is);
+    unsigned size;
+    std::string type;
+    if (helpers::isNext(is,"vtkVisibility")) {
+        is >> vtkVisibility_;
+    }
+    if (helpers::isNext(is,"renderedWalls")) {
+        is >> size;
+        for (unsigned i = 0; i < size; i++)
+        {
+            is >> type;
+            BaseWall* wall = getHandler()->createObject(type);
+            wall->setHandler(getHandler());
+            wall->read(is);
+            renderedWalls_.push_back(wall);
+            renderedWalls_.back()->setId(renderedWalls_.size());
+        }
+    }
 }
 
-/*!
- * \param[in] os Output stream the BaseWall has to be written to.
- */
 void BaseWall::write(std::ostream& os) const
 {
     BaseInteractable::write(os);
+    if (vtkVisibility_==false)
+    {
+        os << " vtkVisibility " << vtkVisibility_;
+    }
+    if (renderedWalls_.size()>0)
+    {
+        os << " renderedWalls " << renderedWalls_.size();
+        for (auto w : renderedWalls_)
+        {
+            os << " ";
+            w->write(os);
+        }
+    }
 }
 
 /*!
@@ -363,7 +391,7 @@ BaseWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHan
 
 void BaseWall::writeVTK(VTKContainer& vtk) const
 {
-    logger(WARN, "Wall % (%) cannot has no vtk writer defined", getIndex(), getName());
+    logger(WARN, "Walls % of type % have no vtk writer defined", getIndex(), getName());
 }
 
 void BaseWall::addToVTK(const std::vector<Vec3D>& points, VTKContainer& vtk)
@@ -446,4 +474,43 @@ Vec3D BaseWall::getFurthestPointSuperQuadric(const Vec3D& normalBodyFixed, const
 {
     logger(ERROR, "Generic wall-superquadric interactions not implemented yet.");
     return {};
+}
+
+//todo how do i write a copy and add function?
+void BaseWall::addRenderedWall(BaseWall* w)
+{
+    renderedWalls_.push_back(w);
+}
+
+BaseWall* BaseWall::getRenderedWall(size_t i) const
+{
+    return renderedWalls_[i];
+}
+
+void BaseWall::renderWall(VTKContainer& vtk)
+{
+    if (getVTKVisibility())
+    {
+        if (renderedWalls_.empty())
+        {
+            writeVTK(vtk);
+        }
+        else
+        {
+            const Mdouble time = getHandler()->getDPMBase()->getTime();
+            for (const auto& r: renderedWalls_)
+            {
+                r->applyPrescribedPosition(time);
+                r->applyPrescribedOrientation(time);
+                r->writeVTK(vtk);
+            }
+        }
+    }
+}
+
+void BaseWall::setVelocityControl(Vec3D forceGoal, Vec3D gainFactor, Vec3D baseVelocity) {
+    setPrescribedVelocity([this, forceGoal, gainFactor, baseVelocity] (double time){
+        auto dForce = getForce()-forceGoal;
+        return baseVelocity + gainFactor.multiplyElementwise(dForce);
+    });
 }

@@ -140,6 +140,16 @@ public:
     
     virtual void deleteEmptyInteraction(BaseInteraction* interaction) const = 0;
 
+    /*!
+     * \brief Accesses the boolean constantRestitution_.
+     */
+    bool getConstantRestitution() const {return constantRestitution_;}
+
+    /*!
+     * \brief Sets the boolean constantRestitution_.
+     */
+    void setConstantRestitution(bool constantRestitution);
+
 private:
     /*!
      * \brief A pointer to the handler to which this species belongs. It is 
@@ -147,6 +157,11 @@ private:
      * is called. 
      */
     SpeciesHandler* handler_;
+
+    // If constantRestitution_ is true, the elastic and dissipative force is multiplied by the harmonic mean mass, making restitution and collision time independent of the particle mass.
+    // This is set to false by default.
+    bool constantRestitution_;
+
 };
 
 #endif

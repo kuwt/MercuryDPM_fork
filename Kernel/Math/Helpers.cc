@@ -38,6 +38,7 @@
 #include "Math/ExtendedMath.h"
 #include <numeric>
 #include <chrono>
+#include <sys/types.h> // required for stat.h
 
 #ifdef WINDOWS
 #include <direct.h>
@@ -340,7 +341,7 @@ Mdouble helpers::getMaximumVelocity(Mdouble k, Mdouble disp, Mdouble radius, Mdo
     // note: underestimate based on energy argument,
     // Ekin = 2*1/2*m*(v/2)^2 = 1/2*k*(2*r)^2, gives
     // return radius * sqrt(8.0*k/mass);
-    
+
     // with dissipation, see S. Luding, Collisions & Contacts between two particles, eq 34
     Mdouble w = sqrt(k / mass - mathsFunc::square(disp / (2.0 * mass)));
     Mdouble w0 = sqrt(k / mass);
@@ -352,12 +353,12 @@ Mdouble helpers::getMaximumVelocity(Mdouble k, Mdouble disp, Mdouble radius, Mdo
 /*!
  * \details MercuryDPM uses the DPMBase::setSaveCount to determine how often output is written.
  * However, if the user wants to set the total number of saves instead of the saveCount,
- * he can use this function to calculate the correct saveCount, assuming that the 
+ * he can use this function to calculate the correct saveCount, assuming that the
  * final time and the mean time step is known.
- * 
+ *
  * Example of use:
  * > setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(numberOfSaves, getTimeMax(), getTimeStep()));
- * 
+ *
  * \param[in] numberOfSaves the total number of output files the user wants at the end of the simulation.
  * \param[in] timeMax       the final time of the simulation
  * \param[in] time step      the mean time step used during the simulation
@@ -398,20 +399,20 @@ unsigned int helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(unsigne
 
 /*!
  * \details This function is used to avoid errors from reading in old or manually modified restart files.
- * Instead of reading variable by variable directly from the restart stringstream, 
- * a full line is read first, from which the variables are read. Thus, if a line 
- * has the wrong number of arguments, it might affect the reading of the current 
+ * Instead of reading variable by variable directly from the restart stringstream,
+ * a full line is read first, from which the variables are read. Thus, if a line
+ * has the wrong number of arguments, it might affect the reading of the current
  * line, but correctly reads the next line.
- * 
+ *
  * Example of usage:
  * > std::stringstream line;
  * > std::stringstream is = restartFile.getFStream();
  * > helpers::getLineFromStringStream(is, line);
- * > std::string dummy; 
- * > line >> dummy; 
- *          
+ * > std::string dummy;
+ * > line >> dummy;
+ *
  * \param[in]  in the stringstream from which a line is read out should be initialized as std::stringstream(std::stringstream::out)
- * \param[out] out the stringstream into which the line is read; should be initialized as std::stringstream(std::stringstream::in | std::stringstream::out)         
+ * \param[out] out the stringstream into which the line is read; should be initialized as std::stringstream(std::stringstream::in | std::stringstream::out)
  */
 void helpers::getLineFromStringStream(std::istream& in, std::stringstream& out)
 {
@@ -422,17 +423,17 @@ void helpers::getLineFromStringStream(std::istream& in, std::stringstream& out)
 }
 
 /*!
- * \details Provides a simple interface for writing a string to a file. 
- * This function is mainly used to create ini or restart file that the code 
+ * \details Provides a simple interface for writing a string to a file.
+ * This function is mainly used to create ini or restart file that the code
  * later reads back in.
- * 
+ *
  * Example of usage:
  * > helpers::writeToFile("RestartUnitTest.ini",
  * > "1 0 0 0 0 1 1 1\n"
  * > "0.5 0.5 0  0 0 0.5  0  0 0 0  0 0 0  0\n");
- *          
+ *
  * \param[in] filename the name of the file
- * \param[in] filecontent the content         
+ * \param[in] filecontent the content
  * \returns true on success.
  */
 bool helpers::writeToFile(std::string filename, std::string filecontent)
@@ -448,6 +449,16 @@ bool helpers::writeToFile(std::string filename, std::string filecontent)
     file.close();
     return true;
 }
+
+void helpers::writeCommandLineToFile(const std::string filename, const int argc, char * const argv[])
+{
+    std::stringstream ss;
+    for (int i=0; i<argc; ++i) {
+        ss << argv[i] << ' ';
+    }
+    writeToFile(filename,ss.str());
+}
+
 
 void helpers::gnuplot(std::string command)
 {
@@ -487,9 +498,9 @@ bool helpers::fileExists(std::string strFilename)
     struct stat stFileInfo;
     bool blnReturn;
     int intStat;
-    
+
     // Attempt to get the file attributes
-    
+
     intStat = stat(strFilename.c_str(), &stFileInfo);
     if (intStat == 0)
     {
@@ -507,12 +518,12 @@ bool helpers::fileExists(std::string strFilename)
         // more details on why stat failed.
         blnReturn = false;
     }
-    
+
     return blnReturn;
 }
 
 /*!
- * \details Provides a simple interface for opening a file, in order to avoid 
+ * \details Provides a simple interface for opening a file, in order to avoid
  * that the user has to learn the syntax for opening a file.
  * \param[out] file The std::fstream object that the user can write to.
  * \param[in] filename The name of the file.
@@ -608,7 +619,7 @@ void helpers::loadingTest(const ParticleSpecies* species, Mdouble displacement, 
         LoadingTest(const ParticleSpecies* species, Mdouble displacement, Mdouble velocity, Mdouble radius)
                 : species(species), displacement(displacement), velocity(velocity), radius(radius)
         {}
-        
+
         void setupInitialConditions() override
         {
             //setName("LoadingTest"+species->getName());
@@ -617,32 +628,32 @@ void helpers::loadingTest(const ParticleSpecies* species, Mdouble displacement, 
             setSaveCount(1);
             setFileType(FileType::NO_FILE);
             fStatFile.setFileType(FileType::ONE_FILE);
-            
+
             setMax({radius, radius, radius + radius});
             setMin({-radius, -radius, 0});
             setSystemDimensions(3);
             setParticleDimensions(3);
-            
+
             speciesHandler.copyAndAddObject(*species);
-            
+
             BaseParticle p;
             p.setSpecies(speciesHandler.getObject(0));
             p.setRadius(radius);
             p.setPosition({0, 0, radius});
             particleHandler.copyAndAddObject(p);
-            
+
             InfiniteWall w;
             w.setSpecies(speciesHandler.getObject(0));
             w.set(Vec3D(0, 0, -1), Vec3D(0.0, 0.0, 0.0));
             wallHandler.copyAndAddObject(w);
         }
-        
+
         void actionsBeforeTimeStep() override
         {
             BaseParticle* p = particleHandler.getLastObject();
             assert(p);
             p->setAngularVelocity({0, 0, 0});
-            
+
             //Moving particle normally into surface
             if (getTime() <= displacement / velocity)
             {
@@ -686,7 +697,7 @@ void helpers::normalAndTangentialLoadingTest(const ParticleSpecies* species, Mdo
                 : species(species), displacement(displacement), tangentialDisplacement(tangentialDisplacement),
                   velocity(velocity), radius(radius)
         {}
-        
+
         void setupInitialConditions() override
         {
             //setName("TangentialLoadingTest"+species->getName());
@@ -695,32 +706,32 @@ void helpers::normalAndTangentialLoadingTest(const ParticleSpecies* species, Mdo
             setSaveCount(1);
             setFileType(FileType::NO_FILE);
             fStatFile.setFileType(FileType::ONE_FILE);
-            
+
             setMax({radius, radius, radius + radius});
             setMin({-radius, -radius, 0});
             setSystemDimensions(3);
             setParticleDimensions(3);
-            
+
             speciesHandler.copyAndAddObject(*species);
-            
+
             BaseParticle p;
             p.setSpecies(speciesHandler.getObject(0));
             p.setRadius(radius);
             p.setPosition({0, 0, radius - displacement});
             particleHandler.copyAndAddObject(p);
-            
+
             InfiniteWall w;
             w.setSpecies(speciesHandler.getObject(0));
             w.set(Vec3D(0, 0, -1), Vec3D(0.0, 0.0, 0.0));
             wallHandler.copyAndAddObject(w);
         }
-        
+
         void actionsBeforeTimeStep() override
         {
             BaseParticle* p = particleHandler.getLastObject();
             assert(p);
             p->setAngularVelocity({0, 0, 0});
-            
+
             //Moving particle normally into surface
             Mdouble time = getTime() / (tangentialDisplacement / velocity);
             if (time <= 1.0)
@@ -747,11 +758,11 @@ void helpers::normalAndTangentialLoadingTest(const ParticleSpecies* species, Mdo
                                                                                           velocity * (getTime() -
                                                                                                       (tangentialDisplacement /
                                                                                                        velocity)))});
-                
+
             }
-            
+
         }
-        
+
     } test(species, displacement, tangentialDisplacement, velocity, radius);
     test.setName(name);
     test.solve();
@@ -782,7 +793,7 @@ void helpers::objectivenessTest(const ParticleSpecies* species, Mdouble displace
                 : species(species), displacement(displacement), tangentialDisplacement(tangentialDisplacement),
                   velocity(velocity), radius(radius)
         {}
-        
+
         void setupInitialConditions() override
         {
             //setName("ObjectivenessTest"+species->getName());
@@ -792,14 +803,14 @@ void helpers::objectivenessTest(const ParticleSpecies* species, Mdouble displace
             setFileType(FileType::NO_FILE);
             dataFile.setFileType(FileType::ONE_FILE);
             fStatFile.setFileType(FileType::ONE_FILE);
-            
+
             setMax(radius * Vec3D(2, 2, 2));
             setMin(radius * Vec3D(-2, -2, -2));
             setSystemDimensions(2);
             setParticleDimensions(3);
-            
+
             speciesHandler.copyAndAddObject(*species);
-            
+
             BaseParticle p;
             p.setSpecies(speciesHandler.getObject(0));
             p.setRadius(radius);
@@ -808,14 +819,14 @@ void helpers::objectivenessTest(const ParticleSpecies* species, Mdouble displace
             p.setPosition({0, -radius + displacement, 0});
             particleHandler.copyAndAddObject(p);
         }
-        
+
         void actionsBeforeTimeStep() override
         {
             BaseParticle* p = particleHandler.getObject(0);
             BaseParticle* q = particleHandler.getLastObject();
             assert(p);
             assert(q);
-            
+
             //Moving particle normally into surface
             if (getTime() <= tangentialDisplacement / velocity)
             {
@@ -843,7 +854,7 @@ void helpers::objectivenessTest(const ParticleSpecies* species, Mdouble displace
                 q->setPosition(-p->getPosition());
             }
         }
-        
+
     } test(species, displacement, tangentialDisplacement, velocity, radius);
     test.setName(name);
     test.solve();
@@ -871,7 +882,7 @@ void helpers::check(double real, double ideal, double error, std::string errorMe
 {
     logger.assert_always(mathsFunc::isEqual(real, ideal, error),
                          errorMessage + ": % (should be %) ", real, ideal);
-    logger(INFO, errorMessage + ": % (correct)", real);
+    logger(INFO,"Check passed");
 }
 
 void helpers::check(Vec3D real, Vec3D ideal, double error, std::string errorMessage)
@@ -889,7 +900,7 @@ void helpers::check(Vec3D real, Vec3D ideal, double error, std::string errorMess
 std::string helpers::getPath()
 {
     char cCurrentPath[FILENAME_MAX];
-    GetCurrentDir(cCurrentPath, sizeof(cCurrentPath));
+    if (GetCurrentDir(cCurrentPath, sizeof(cCurrentPath))); //if added to avoid compiler warning
     return std::string(cCurrentPath);
 }
 
@@ -900,4 +911,56 @@ Mdouble helpers::getRealTime()
     auto end = std::chrono::steady_clock::now();
     std::chrono::duration<double> diff = end - start;
     return diff.count();
+}
+
+/**
+ * reads next value in stream as a string and compares it with name.
+ * If name is equal to string, the function outputs true.
+ * If name is not equal to string, the function undoes the read by setting seekg, and outputs false.
+ * @param is
+ * @param name
+ * @return
+ */
+bool helpers::isNext(std::istream& is, const std::string name) {
+    std::string dummy;
+    auto pos = is.tellg();
+    is >> dummy;
+    if (dummy != name) {
+        is.seekg(pos);
+        return false;
+    } else {
+        return true;
+    }
+}
+
+namespace helpers {
+template<>
+std::string readFromCommandLine<std::string>(int argc, char *argv[], std::string varName, std::string value)
+{
+    for (unsigned i=0; i<argc-1; ++i) {
+        if (varName == argv[i]) {
+            value = argv[i+1];
+            logger(INFO, "readFromCommandLine: % set to % ", varName.substr(1), value);
+            return value;
+        }
+    }
+    //if the variable is not found
+    logger(INFO, "readFromCommandLine: % set to default value % ", varName.substr(1), value);
+    return value;
+}
+
+bool createDirectory(std::string path) {
+    //see https://stackoverflow.com/questions/20358455/cross-platform-way-to-make-a-directory
+    mode_t nMode = 0733; // UNIX style permissions
+    int nError = 0;
+#if defined(_WIN32)
+    nError = _mkdir(sPath.c_str()); // can be used on Windows
+#else
+    nError = mkdir(path.c_str(),nMode); // can be used on non-Windows
+#endif
+    if (nError != 0) {
+        // handle your error here
+    }
+    return false;
+}
 }

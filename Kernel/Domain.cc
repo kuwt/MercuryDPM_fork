@@ -828,9 +828,10 @@ void Domain::findNewMPIInteractions()
                     }
                     else //is I a particle
                     {
-                        //check if particle is in mpi domain
-                        if (objectI->isInMPIDomain())
-                        {
+			//TODO
+                        //check if particle is in mpi domain OR (TODO) if it is in the newBoundaryParticleList_
+                        //if (objectI->isInMPIDomain())
+                        //{
                             //Is the particle still interacting after the position update?
                             Vec3D branchVector = particleP->getPosition() - objectI->getPosition();
                             //Get the square of the distance between particle i and particle j
@@ -842,7 +843,7 @@ void Domain::findNewMPIInteractions()
                                 //Add the interaction to the list
                                 newInteractionList_[localIndex].push_back(interaction);
                             }
-                        }
+                        //}
                     }
                 }
                 else //newBoundaryParticle is I in the interaction, P can only be a particle
@@ -1672,7 +1673,7 @@ void Domain::flushParticlesFromList(std::vector<BaseParticle*>& list, std::set<B
  * \details Returns the middle of this square domain, required for periodic particles
  * \return middle_ The middle position of a cubic domain
  */
-Vec3D Domain::getMiddle()
+Vec3D Domain::getMiddle() const
 {
     return middle_;
 }

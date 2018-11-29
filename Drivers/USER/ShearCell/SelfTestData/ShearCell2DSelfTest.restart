@@ -1,4 +1,4 @@
-restart_version 1.0 name ShearCell2DSelfTest
+MercuryDPM 0.14 name ShearCell2DSelfTest revision 3137 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
 dataFile    fileType ONE_FILE saveCount 10 counter 202 lastSavedTimeStep 2001
 fStatFile   fileType ONE_FILE saveCount 10 counter 202 lastSavedTimeStep 2001
 eneFile     fileType ONE_FILE saveCount 10 counter 202 lastSavedTimeStep 2001
@@ -7,7 +7,7 @@ statFile    fileType ONE_FILE saveCount 10 counter 0
 interactionFile fileType NO_FILE saveCount 0 counter 0
 xMin 0 xMax 10 yMin 0 yMax 10 zMin -0.5 zMax 0.5
 timeStep 0.001 time 2.00099999999989 ntimeSteps 2001 timeMax 2
-systemDimensions 3 particleDimensions 2 gravity 0 0 0 writeVTK 0 NO_FILE NO_FILE random  0 1103515245 12345 1073741824 607 273 784607267 xBallsArguments -v0 -solid -3dturn 1
+systemDimensions 3 particleDimensions 2 gravity 0 0 0 writeVTK 0 NO_FILE NO_FILE 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267 xBallsArguments -v0 -solid -3dturn 1
 Species 1
 LinearViscoelasticFrictionLiquidMigrationWilletSpecies id 0 density 1.90985931710274 stiffness 1000 dissipation 25 slidingStiffness 0 slidingDissipation 0 slidingFrictionCoefficient 0 slidingFrictionCoefficientStatic 0 rollingStiffness 0 rollingDissipation 0 rollingFrictionCoefficient 0 rollingFrictionCoefficientStatic 0 torsionStiffness 0 torsionDissipation 0 torsionFrictionCoefficient 0 torsionFrictionCoefficientStatic 0 liquidBridgeVolume 2e-11 distributionCoefficient 0.8 surfaceTension 0.02 contactAngle 0.349065850398866
 Walls 0

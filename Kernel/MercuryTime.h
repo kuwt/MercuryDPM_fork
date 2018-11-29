@@ -37,10 +37,15 @@
  * \details Calculates the amount of computational time used, in seconds. Works on
  *        the same concept of stopwatch, where one presses start and stops when needed.
  *        The difference returns the total time used up.
+ * Usage: Time time; ...; std::cout << time.toc();
  */
 class Time
 {
 public:
+    
+    Time () {
+        tic();
+    }
     
     /*!
      * \brief This is like a start button of a stopwatch. Assigns the variable
@@ -61,7 +66,17 @@ public:
         finish = clock();
         return (Mdouble(finish) - Mdouble(start)) / CLOCKS_PER_SEC;
     }
-
+    
+    /*!
+     * \brief Outputs the toc value and resets the start time
+     */
+    Mdouble toctic()
+    {
+        Mdouble tocTime = toc();
+        start = finish;
+        return tocTime;
+    }
+    
 private:
     /*!
      * \brief Stores the number of clock ticks, called by Time::tic().

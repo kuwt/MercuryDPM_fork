@@ -61,6 +61,8 @@ public:
     set(std::function<Mdouble(Mdouble)> shift, std::function<Mdouble(Mdouble)> velocity, Mdouble left, Mdouble right,
         Mdouble down, Mdouble up);
     
+    void updateBoundaries(Mdouble left, Mdouble right, Mdouble down, Mdouble up);
+    
     /*!
      * \brief Reads all boundary properties from a stream
      */

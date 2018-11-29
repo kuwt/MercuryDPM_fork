@@ -116,17 +116,9 @@ void CG<Coordinates, BaseFunction, Fields>::initialise()
     //set name if none is given
     if (!statFile.getName().compare("out"))
     {
-#ifdef MERCURY_USE_MPI
-        MPIContainer& communicator = MPIContainer::Instance();
-        int numberOfProcessors = communicator.getNumberOfProcessors();
-        int processorID = communicator.getProcessorID();
-#else
-        int processorID = 0;
-        int numberOfProcessors = 1;
-#endif
-        if (numberOfProcessors > 1)
+        if (NUMBER_OF_PROCESSORS > 1)
         {
-            statFile.setName(dpm->getName() + "." + std::to_string(getId()) + ".stat" + std::to_string(processorID));
+            statFile.setName(dpm->getName() + "." + std::to_string(getId()) + ".stat" + std::to_string(PROCESSOR_ID));
         }
         else
         {

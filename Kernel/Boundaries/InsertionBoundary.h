@@ -81,7 +81,12 @@ public:
      * \brief Fills the boundary with particles.
      */
     void checkBoundaryBeforeTimeStep(DPMBase* md) override;
-    
+
+    void insertParticles(DPMBase* md) {
+        checkBoundaryBeforeTimeStep(md);
+        logger(INFO,"Inserted % particles",getNumberOfParticlesInserted());
+    }
+
     /*!
      * \brief Gets the number of particles inserted by the boundary.
      */
@@ -137,6 +142,19 @@ public:
     Mdouble getVolumeFlowRate() const;
     
     void setVolumeFlowRate(Mdouble volumeFlowRate_);
+    
+    Mdouble getInitialVolume() const;
+    
+    void setInitialVolume(Mdouble initialVolume);
+
+    ///\see variableCumulativeVolumeFlowRate_
+    void setVariableVolumeFlowRate(std::vector<Mdouble> variableCumulativeVolumeFlowRate, Mdouble samplingInterval) {
+        logger.assert(samplingInterval>0,"sampling interval needs to be positive");
+        variableCumulativeVolumeFlowRate_ = variableCumulativeVolumeFlowRate;
+        samplingInterval_ = samplingInterval;
+    };
+
+    bool insertParticle(Mdouble time);
 
 protected:
     
@@ -171,11 +189,33 @@ protected:
      * for trying to maintain a certain insertion rate).
      */
     bool isActivated_;
-    
+
     /*!
-     * \brief defines a maximum flow rate beyond which no particles are inserted.
+     * The inflow can be controlled by setting a volume flow rate and an initial volume
+     * thus, this ensures the volume V inserted before time t is less than
+     * V = initialVolume_+volumeFlowRate_*t
+     *
+     * The default value is volumeFlowRate_=inf, i.e. the volume is not controlled.
+     *
+     * \see To set a variable flow rate instead, see variableCumulativeVolumeFlowRate_.
      */
     Mdouble volumeFlowRate_;
+
+    ///\see volumeFlowRate_
+    Mdouble initialVolume_;
+
+    /*!
+     * Defines a variable volume flow rate, taken at fixed sampling intervals; the values are cumulative; thus, we need to ensure the volume inserted before time t=n*samplingInterval is less than variableCumulativeVolumeFlowRate[n].
+     *
+     * By default, this vector is empty; in that case, a constant volume flow rate will be used.
+     * \see volumeFlowRate_.
+     */
+    std::vector<Mdouble> variableCumulativeVolumeFlowRate_;
+
+    ///\see variableCumulativeVolumeFlowRate_
+    Mdouble samplingInterval_;
+
+
 };
 
 #endif

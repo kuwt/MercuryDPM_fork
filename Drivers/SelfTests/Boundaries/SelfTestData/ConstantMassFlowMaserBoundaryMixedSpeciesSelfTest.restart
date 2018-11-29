@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name ConstantMassFlowMaserBoundaryMixedSpeciesSelfTest revision 2985 repository https://svn.mercurydpm.org/SourceCode/Trunk
+MercuryDPM 0.14 name ConstantMassFlowMaserBoundaryMixedSpeciesSelfTest revision 3137 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
 dataFile    fileType ONE_FILE saveCount 2000 counter 22 lastSavedTimeStep 40232
 fStatFile   fileType ONE_FILE saveCount 2000 counter 22 lastSavedTimeStep 40232
 eneFile     fileType ONE_FILE saveCount 2000 counter 22 lastSavedTimeStep 40232
@@ -7,7 +7,7 @@ statFile    fileType ONE_FILE saveCount 2000 counter 0
 interactionFile fileType NO_FILE saveCount 0 counter 0
 xMin 0 xMax 5 yMin 0 yMax 2 zMin 0 zMax 2
 timeStep 9.94235877012513e-05 time 4.00000978039975 ntimeSteps 40232 timeMax 4
-systemDimensions 3 particleDimensions 3 gravity 0.4067366430758 0 -0.913545457642601 writeVTK 0 NO_FILE NO_FILE random  0 1103515245 12345 1073741824 607 273 784607267
+systemDimensions 3 particleDimensions 3 gravity 0.4067366430758 0 -0.913545457642601 writeVTK 0 NO_FILE NO_FILE 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267
 Species 4
 LinearViscoelasticSpecies id 0 density 1.90985931710274 stiffness 200000 dissipation 25
 LinearViscoelasticSpecies id 1 density 1.90985931710274 stiffness 100000 dissipation 25

@@ -531,6 +531,7 @@ private:
         }
         
         fmt++; //Consume the % sign
+        ///\todo TW add more format specifications for logger, e.g. how to plot a double with a certain width
         msg << arg;
         createMessage(msg, fmt, args...);//and recursively call ourselve / the method below.
     }

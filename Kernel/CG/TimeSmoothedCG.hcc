@@ -134,9 +134,11 @@ void TimeSmoothedCG<Coordinates, BaseFunction, Fields>::evaluate()
     //divide by volume
     CG<Coordinates, BaseFunction, Fields>::volumeAverageVariables();
     
-    DPMBase* dpm = CG<Coordinates, BaseFunction, Fields>::getHandler()->getDPMBase();
-    Mdouble currentTime = dpm->getTime();
+    const DPMBase* dpm = CG<Coordinates, BaseFunction, Fields>::getHandler()->getDPMBase();
+    const Mdouble currentTime = dpm->getTime();
     
+    if (std::isinf(nextTime_)) nextTime_ = currentTime;
+
     // Create new set of values if currentTime+cutoff>=nextTime
     if (currentTime + cutoffTime_ >= nextTime_)
     {

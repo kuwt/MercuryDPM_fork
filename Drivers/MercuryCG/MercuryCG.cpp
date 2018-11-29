@@ -320,6 +320,10 @@ void commandLineCG(Mercury3D &dpm, int argc, char **argv)
             logger(INFO, "Set evaluation time interval to %", argv[i + 1]);
         } else if (!strcmp(argv[i], "-timemax")) {
             logger(ERROR, "% is not a valid argument; use -tMax instead",argv[i]);
+        } else if (!strcmp(argv[i], "-species")) {
+            logger.assert_always(i+1<argc,"% requires argument",argv[i]);
+            cg->selectSpecies(atoi(argv[i + 1]));
+            logger(INFO, "Evaluating species #%", atoi(argv[i + 1]));
         } else if (!strcmp(argv[i], "-o")) {
             logger.assert_always(i+1<argc,"% requires argument",argv[i]);
             cg->statFile.setName(argv[i + 1]);
@@ -335,6 +339,8 @@ void commandLineCG(Mercury3D &dpm, int argc, char **argv)
     }
 
     logger(INFO, "Created object of type %", cg->getName());
+
+    dpm.readSpeciesFromDataFile();
 
     //Determine what kind of input to read from (data files, restart files, or live cg)
     //Variable that stores the type of data source

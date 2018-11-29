@@ -260,6 +260,15 @@ unsigned int File::getSaveCount() const
 
 /*!
  * \details File::setSaveCount assigns the number of time steps to be skipped before the data is written to an existing file or a new file.
+ * \param[in] saveCount
+ */
+void File::writeFirstAndLastTimeStep()
+{
+    saveCount_ = NEVER;
+}
+
+/*!
+ * \details File::setSaveCount assigns the number of time steps to be skipped before the data is written to an existing file or a new file.
  * \param[in] saveCount 
  */
 void File::setSaveCount(unsigned int saveCount)

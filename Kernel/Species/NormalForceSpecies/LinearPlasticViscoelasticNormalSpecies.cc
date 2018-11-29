@@ -26,6 +26,7 @@
 
 #include "LinearPlasticViscoelasticNormalSpecies.h"
 #include "Interactions/NormalForceInteractions/LinearPlasticViscoelasticInteraction.h"
+#include "Species/ParticleSpecies.h"
 
 class BaseParticle;
 
@@ -203,9 +204,11 @@ void LinearPlasticViscoelasticNormalSpecies::setPenetrationDepthMax(Mdouble pene
 /*!
  * \details Calculates collision time for stiffest spring constant, divides by 50
  * \param[in] the optimal time step is computed to resolve a collision of two particles of this mass.
+ * If constant restitution is enabled, the collision time is mass-independent.
  */
 Mdouble LinearPlasticViscoelasticNormalSpecies::computeTimeStep(Mdouble mass)
 {
+    if (getConstantRestitution()) mass = 1;
     return 0.02 * constants::pi /
            std::sqrt(unloadingStiffnessMax_ / (.5 * mass) - mathsFunc::square(dissipation_ / mass));
 }
@@ -216,15 +219,8 @@ Mdouble LinearPlasticViscoelasticNormalSpecies::computeTimeStep(Mdouble mass)
  */
 void LinearPlasticViscoelasticNormalSpecies::setDissipation(Mdouble dissipation)
 {
-    if (dissipation >= 0)
-    {
-        dissipation_ = dissipation;
-    }
-    else
-    {
-        std::cerr << "Error in setDissipation(" << dissipation << ")" << std::endl;
-        exit(-1);
-    }
+    logger.assert(dissipation >= 0, "setDissipation(%): dissipation should be non-negative",dissipation);
+    dissipation_ = dissipation;
 }
 
 /*!
@@ -248,12 +244,14 @@ Mdouble LinearPlasticViscoelasticNormalSpecies::getDissipation() const
  * \details Sets k, disp such that it matches a given tc and eps for a collision of two copies of equal mass m
  * \param[in] tc collision time
  * \param[in] eps restitution coefficient
- * \param[in] mass effective particle mass, \f$\frac{2}{1/m1+1/m2}\f$
+ * \param[in] mass harmonic mean of particle mass, \f$\frac{2}{1/m1+1/m2}\f$
+ * If constant restitution is enabled, the collision time and restitution is mass-independent.
  */
 ///\todo TW: check that the masses are described correctly here (m_eff or m_p?))
 void
 LinearPlasticViscoelasticNormalSpecies::setCollisionTimeAndRestitutionCoefficient(Mdouble tc, Mdouble eps, Mdouble mass)
 {
+    if (getConstantRestitution()) mass = 1;
     if (eps == 0.0)
     {
         loadingStiffness_ = .5 * mass * mathsFunc::square(constants::pi / tc);
@@ -273,52 +271,74 @@ LinearPlasticViscoelasticNormalSpecies::setCollisionTimeAndRestitutionCoefficien
  * \param[in] stiffness stiffness
  * \param[in] eps restitution coefficient
  * \param[in] mass effective particle mass, \f$\frac{2}{1/m1+1/m2}\f$
+ * If constant restitution is enabled, the restitution coefficient is mass-independent.
  */
-void LinearPlasticViscoelasticNormalSpecies::setStiffnessAndRestitutionCoefficient(Mdouble stiffness, Mdouble eps,
-                                                                                   Mdouble mass)
+void LinearPlasticViscoelasticNormalSpecies::setStiffnessAndRestitutionCoefficient(Mdouble stiffness, Mdouble eps, Mdouble mass)
 {
+    if (getConstantRestitution()) mass = 1;
     loadingStiffness_ = stiffness;
-    if (eps == 0.0)
-    {
-        dissipation_ = std::sqrt(2.0 * mass * stiffness);
-    }
-    else
-    {
-        dissipation_ =
-                -std::sqrt(2.0 * mass * stiffness / (constants::sqr_pi + mathsFunc::square(log(eps)))) * log(eps);
+    setRestitutionCoefficient(eps, mass);
+}
+
+/*!
+ * \details Sets k, disp such that it matches a given tc and eps for a collision of two copies of P
+ * \param[in] stiffness stiffness
+ * \param[in] eps restitution coefficient
+ * \param[in] mass effective particle mass, \f$\frac{2}{1/m1+1/m2}\f$
+ * If constant restitution is enabled, the restitution coefficient is mass-independent.
+ */
+void LinearPlasticViscoelasticNormalSpecies::setRestitutionCoefficient(Mdouble eps, Mdouble mass)
+{
+    if (getConstantRestitution()) mass = 1;
+    if (eps == 0.0) {
+        dissipation_ = std::sqrt(2.0 * mass * getLoadingStiffness());
+    } else {
+        const Mdouble logEps = log(eps);
+        dissipation_ = -std::sqrt(2.0 * mass * getLoadingStiffness()
+                / (constants::sqr_pi + mathsFunc::square(logEps))) * logEps;
     }
 }
 
-///Calculates collision time for two copies of a particle of given disp, k, mass
-Mdouble LinearPlasticViscoelasticNormalSpecies::getCollisionTime(Mdouble mass)
+
+/** Calculates collision time for two copies of a particle of given disp, k, mass
+ * If constant restitution is enabled, the collision time is mass-independent.
+ */
+Mdouble LinearPlasticViscoelasticNormalSpecies::getCollisionTime(Mdouble mass) const
 {
-    if (mass <= 0)
-    {
-        std::cerr << "Error in getCollisionTime(" << mass
-                  << ") mass is not set or has an unexpected value, (getCollisionTime(" << mass << "))" << std::endl;
-        exit(-1);
+    if (getConstantRestitution()) mass = 1;
+
+    logger.assert(mass > 0, "getCollisionTime(%): mass should be positive",mass);
+
+    Mdouble elasticContribution = loadingStiffness_ / (.5 * mass);
+    Mdouble elastoDissipativeContribution = elasticContribution - mathsFunc::square(dissipation_ / mass);
+
+    logger.assert(elastoDissipativeContribution > -1e-8 * elasticContribution,
+            "getCollisionTime(%): values for mass, stiffness and dissipation lead to an overdamped system: reduce dissipation",mass);
+
+    return constants::pi / std::sqrt(elastoDissipativeContribution);
+}
+
+Mdouble LinearPlasticViscoelasticNormalSpecies::getRestitutionCoefficient(Mdouble mass) const
+{
+    if (getConstantRestitution()) mass = 1;
+
+    return std::exp(-dissipation_ / mass * getCollisionTime(mass));
+}
+
+Mdouble LinearPlasticViscoelasticNormalSpecies::computeBondNumberMax(Mdouble harmonicMeanRadius, Mdouble gravitationalAcceleration) const {
+    if (getConstantRestitution()) {
+        //harmonicMeanRadius unused
+        const Mdouble plasticOverlapMax = penetrationDepthMax_;
+        const Mdouble overlapMaxCohesion = plasticOverlapMax / (1 + cohesionStiffness_ / unloadingStiffnessMax_);
+        const Mdouble cohesionAccelerationMax = cohesionStiffness_ * overlapMaxCohesion;
+        return cohesionAccelerationMax / gravitationalAcceleration;
+    } else {
+        const Mdouble plasticOverlapMax = penetrationDepthMax_ * harmonicMeanRadius;
+        const Mdouble overlapMaxCohesion = plasticOverlapMax / (1 + cohesionStiffness_ / unloadingStiffnessMax_);
+        const Mdouble cohesionForceMax = cohesionStiffness_ * overlapMaxCohesion;
+        auto species = dynamic_cast<const ParticleSpecies*>(this);
+        logger.assert(species,"computeBondNumberMax: species needs to be a ParticleSpecies");
+        const Mdouble gravitationalForce = gravitationalAcceleration * species->getMassFromRadius(harmonicMeanRadius);
+        return cohesionForceMax / gravitationalForce;
     }
-    if (loadingStiffness_ <= 0)
-    {
-        std::cerr << "Error in getCollisionTime(" << mass << ") stiffness=" << loadingStiffness_
-                  << " is not set or has an unexpected value, (getCollisionTime(" << mass << "), with stiffness="
-                  << loadingStiffness_ << ")" << std::endl;
-        exit(-1);
-    }
-    if (dissipation_ < 0)
-    {
-        std::cerr << "Error in getCollisionTime(" << mass << ") dissipation=" << dissipation_
-                  << " is not set or has an unexpected value, (getCollisionTime(" << mass << "), with dissipation="
-                  << dissipation_ << ")" << std::endl;
-        exit(-1);
-    }
-    Mdouble tosqrt = loadingStiffness_ / (.5 * mass) - mathsFunc::square(dissipation_ / mass);
-    if (tosqrt <= -1e-8 * loadingStiffness_ / (.5 * mass))
-    {
-        std::cerr << "Error in getCollisionTime(" << mass << ") values for mass, stiffness and dissipation would "
-                                                             "lead to an overdamped system: reduce dissipation."
-                  << std::endl;
-        exit(-1);
-    }
-    return constants::pi / std::sqrt(tosqrt);
 }

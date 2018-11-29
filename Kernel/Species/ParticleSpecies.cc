@@ -68,6 +68,9 @@ void ParticleSpecies::write(std::ostream& os) const
     //note we inherit from BaseObject, not BaseParticle
     BaseObject::write(os);
     os << " density " << density_;
+    if (getConstantRestitution()) {
+        os << " constantRestitution " << getConstantRestitution();
+    }
 }
 
 /*!
@@ -77,7 +80,11 @@ void ParticleSpecies::read(std::istream& is)
 {
     BaseSpecies::read(is);
     std::string dummy;
+    bool constantRestitution;
     is >> dummy >> density_;
+    if (helpers::readOptionalVariable(is, "constantRestitution", constantRestitution)) {
+        setConstantRestitution(constantRestitution);
+    }
 }
 
 /*!

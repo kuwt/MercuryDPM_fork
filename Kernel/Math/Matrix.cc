@@ -87,6 +87,16 @@ Mdouble Matrix3D::trace() const
 }
 
 /*!
+ * \details Returns the sum of the diagonal elements of the matrix.
+ * \return The trace of the matrix divided by 3 as an Mdouble
+ */
+Vec3D Matrix3D::diag() const
+{
+    return Vec3D(XX, YY, ZZ);
+}
+
+
+/*!
  * \details Returns an invariant of the deviatoric tensor, scaled such that it is equal to shear stress for the stress tensor.
  * \return resulting scalar
  */
@@ -170,6 +180,7 @@ Vec3D Matrix3D::operator*(const Vec3D& a) const
                  ZX * a.X + ZY * a.Y + ZZ * a.Z);
 }
 
+///\todo check
 Matrix3D Matrix3D::operator*(const Matrix3D& a) const
 {
     return Matrix3D(XX * a.XX + XY * a.YX + XZ * a.ZX,

@@ -118,7 +118,7 @@ bool BasicIntersectionOfWalls::getDistanceAndNormal(const BaseParticle& p, Mdoub
     unsigned int id2 = static_cast<unsigned int>(-1); //id of the second-closest wall
     unsigned int id3 = static_cast<unsigned int>(-1); //id of the third-closest wall
     Mdouble wallInteractionRadius = p.getWallInteractionRadius();
-    Vec3D position = p.getPosition(); //- getPosition();
+    Vec3D position = p.getPosition() - getPosition();
     getOrientation().rotateBack(position);
     BaseParticle shifted;
     shifted.setSpecies(p.getSpecies());
@@ -263,6 +263,7 @@ void BasicIntersectionOfWalls::read(std::istream& is)
         // read e.g. "IntersectionOfWalls"
         is >> type;
         BaseWall* wall = getHandler()->createObject(type);
+        wall->setHandler(getHandler());
         wall->read(is);
         walls_.push_back(wall);
         walls_.back()->setId(walls_.size());

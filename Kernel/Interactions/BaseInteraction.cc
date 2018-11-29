@@ -361,6 +361,7 @@ void BaseInteraction::setP(BaseInteractable* P)
     P_->removeInteraction(this);
     P_ = P;
     P_->addInteraction(this);
+    identificationP_ = P_->getId();
 }
 
 /*!
@@ -376,6 +377,7 @@ void BaseInteraction::setI(BaseInteractable* I)
     I_->removeInteraction(this);
     I_ = I;
     I_->addInteraction(this);
+    identificationI_ = I_->getId();
 }
 
 Vec3D BaseInteraction::getIP() const
@@ -707,41 +709,10 @@ void BaseInteraction::rotateHistory(Matrix3D& rotationMatrix)
  */
 Mdouble BaseInteraction::getEffectiveRadius() const
 {
-    const BaseParticle* PParticle = dynamic_cast<const BaseParticle*>(getP());
-    const auto* IParticle = dynamic_cast<const BaseParticle*>(getI());
-    if (PParticle == nullptr)
-    {
-        std::cerr << "BaseInteraction::getEffectiveCorrectedRadius(): first interactable P is not a particle"
-                  << std::endl;
-        exit(-1);
-    }
-    //Compute the reduced diameter
-    if (IParticle == nullptr) //if particle-wall
-    {
-        if (PParticle->getName() != "SuperQuadric")
-            return PParticle->getRadius();
-        else
-        {
-            const SuperQuadric* PQuad = dynamic_cast<const SuperQuadric*>(PParticle);
-            return 1. / PQuad->getCurvature(contactPoint_);
-        }
-    }
-    else
-    {
-        Mdouble radiusP = PParticle->getRadius();
-        if (PParticle->getName() == "SuperQuadric")
-        {
-            const SuperQuadric* PQuad = dynamic_cast<const SuperQuadric*>(PParticle);
-            radiusP = 1. / PQuad->getCurvature(contactPoint_);
-        }
-        Mdouble radiusI = IParticle->getRadius();
-        if (IParticle->getName() == "SuperQuadric")
-        {
-            const SuperQuadric* IQuad = dynamic_cast<const SuperQuadric*>(IParticle);
-            radiusI = 1. / IQuad->getCurvature(contactPoint_);
-        }
-        return radiusP * radiusI / (radiusP + radiusI);
-    }
+    Mdouble invEffectiveRadius = getP()->getCurvature(contactPoint_) + getI()->getCurvature(contactPoint_);
+    logger.assert(invEffectiveRadius>0,
+                  "getEffectiveRadius(): interaction % at % has infinite effective radius",getId(), getContactPoint());
+    return 1.0 / invEffectiveRadius;
 }
 
 /*!
@@ -755,74 +726,10 @@ Mdouble BaseInteraction::getEffectiveRadius() const
  */
 Mdouble BaseInteraction::getEffectiveMass() const
 {
-    const BaseParticle* PParticle = dynamic_cast<const BaseParticle*>(getP());
-    const auto* IParticle = dynamic_cast<const BaseParticle*>(getI());
-    if (PParticle == nullptr)
-    {
-        std::cerr << "BaseInteraction::getEffectiveCorrectedRadius(): first interactable P is not a particle"
-                  << std::endl;
-        exit(-1);
-    }
-    //Compute the reduced diameter
-    if (IParticle == nullptr) //if particle-wall
-    {
-        return PParticle->getMass();
-    }
-    else
-    {
-        /* Particle-to-particle collision */
-        
-        /* JMFT: The following doesn't work when fixed particles, with infinite
-         * mass, are involved. */
-        /*
-        Mdouble massP = PParticle->getMass();
-        Mdouble massI = IParticle->getMass();
-        return massP * massI / (massP + massI);
-        */
-        
-        /* Instead, work based on their inverse masses. In an interaction, we
-         * can assume that at least one of the particles is not fixed. */
-        Mdouble invMassP = PParticle->getInvMass();
-        Mdouble invMassI = IParticle->getInvMass();
-        
-        if (invMassP + invMassI > 0)
-            return 1.0 / (invMassP + invMassI);
-        else
-            logger(ERROR, "[BaseInteraction::getEffectiveMass()] interaction % at % has infinte effective mass.",
-                   getId(), getContactPoint());
-    }
-}
-
-/*!
- * \details Computes the effective corrected radius of a particle. This is used 
- *          by some of the later interaction models. This correction is for the
- *          overlap.
- *          This functions assumes P is the particle and I is either a particle
- *          or a wall.
- *          See also BaseInteraction::getEffectiveCorrectedRadius()
- * \return  A Mdouble which is the effective radius of the particles.
- */
-Mdouble BaseInteraction::getEffectiveCorrectedRadius()
-{
-    BaseParticle* PParticle = dynamic_cast<BaseParticle*>(getP());
-    auto* IParticle = dynamic_cast<BaseParticle*>(getI());
-    if (PParticle == nullptr)
-    {
-        std::cerr << "BaseInteraction::getEffectiveCorrectedRadius(): first interactable P is not a particle"
-                  << std::endl;
-        exit(-1);
-    }
-    //Compute the reduced diameter
-    if (IParticle == nullptr) //if particle-wall
-    {
-        return PParticle->getRadius() - 0.5 * getOverlap();
-    }
-    else
-    {
-        Mdouble radiusP = PParticle->getRadius() - 0.5 * getOverlap();
-        Mdouble radiusI = IParticle->getRadius() - 0.5 * getOverlap();
-        return radiusP * radiusI / (radiusP + radiusI);
-    }
+    Mdouble invEffectiveMass = getP()->getInvMass() + getI()->getInvMass();
+    logger.assert(invEffectiveMass>0,
+            "getEffectiveMass(): interaction % at % has infinite effective mass",getId(), getContactPoint());
+    return 1.0 / invEffectiveMass;
 }
 
 void BaseInteraction::actionsAfterTimeStep()

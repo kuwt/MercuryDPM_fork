@@ -13,7 +13,7 @@ foreach(CPPFILE ${CPPFILES})
 	#extract the filename minus the cpp. This will be the name of exe file
 	get_filename_component(EXECNAME ${CPPFILE} NAME_WE)
 	#Make the exe
-	add_executable(${EXECNAME} ${FILENAME} MergeVTK.cpp)
+	add_executable(${EXECNAME} ${FILENAME} ../Trioliet/TriolietScrew.cc ../Trioliet/TriolietBaseScrew.cc)
 	#All cpp folder and linked agaist Chute
 	target_link_libraries(${EXECNAME}  Chute)
 endforeach()

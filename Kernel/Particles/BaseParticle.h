@@ -288,9 +288,12 @@ public:
      * \brief Returns the inverse of the particle's mass
      * \return the inverse of the particle's mass
      */
-    Mdouble getInvMass() const
+    Mdouble getInvMass() const override
     { return invMass_; }
-    
+
+    Mdouble getCurvature(const Vec3D& labFixedCoordinates) const override
+    { return 1.0/radius_; }
+
     /*!
      * \brief Calculates the particle's translational kinetic energy
      * \return the particle's translational kinetic energy

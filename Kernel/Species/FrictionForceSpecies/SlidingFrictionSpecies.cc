@@ -195,14 +195,14 @@ bool SlidingFrictionSpecies::getUseAngularDOFs() const
  * \param[in] SFrictional the first species whose properties are mixed to create the new species
  * \param[in] TFrictional the second species whose properties are mixed to create the new species
  */
-void SlidingFrictionSpecies::mix(SlidingFrictionSpecies* const SFrictional, SlidingFrictionSpecies* const TFrictional)
+void SlidingFrictionSpecies::mix(SlidingFrictionSpecies* const S, SlidingFrictionSpecies* const T)
 {
-    slidingStiffness_ = average(SFrictional->getSlidingStiffness(), TFrictional->getSlidingStiffness());
-    slidingDissipation_ = average(SFrictional->getSlidingDissipation(), TFrictional->getSlidingDissipation());
-    slidingFrictionCoefficient_ = average(SFrictional->getSlidingFrictionCoefficient(),
-                                          TFrictional->getSlidingFrictionCoefficient());
-    slidingFrictionCoefficientStatic_ = average(SFrictional->getSlidingFrictionCoefficientStatic(),
-                                                TFrictional->getSlidingFrictionCoefficientStatic());
+    slidingStiffness_ = average(S->getSlidingStiffness(), T->getSlidingStiffness());
+    slidingDissipation_ = average(S->getSlidingDissipation(), T->getSlidingDissipation());
+    slidingFrictionCoefficient_ = average(S->getSlidingFrictionCoefficient(),
+                                          T->getSlidingFrictionCoefficient());
+    slidingFrictionCoefficientStatic_ = average(S->getSlidingFrictionCoefficientStatic(),
+                                                T->getSlidingFrictionCoefficientStatic());
 }
 
 ///Sets k, disp, kt, dispt such that it matches a given tc and eps for a collision of two particles of masses m0,m1

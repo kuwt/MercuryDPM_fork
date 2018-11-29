@@ -52,7 +52,17 @@ public:
     }
     
     virtual void writeVTK() const = 0;
-
+    
+    unsigned getFileCounter() const
+    {
+        return fileCounter;
+    }
+    
+    void setFileCounter(unsigned fileCounter)
+    {
+        this->fileCounter = fileCounter;
+    }
+    
 protected:
     std::fstream makeVTKFileWithHeader() const;
     
@@ -65,15 +75,17 @@ protected:
     
 };
 
+///\todo vtw wall files only need to be written by one processor
 template<typename T>
 std::fstream BaseVTKWriter<T>::makeVTKFileWithHeader() const
 {
+    //extract the word "Wall" or "Particle" from the VTK writer name
     std::string name = handler_.getName();
     name = name.substr(0, name.length() - 7);
     
     std::string fileName;
 #ifdef MERCURY_USE_MPI
-    if (NUMBER_OF_PROCESSORS > 1)
+    if (NUMBER_OF_PROCESSORS > 1 && name != "Wall")
     {
         fileName = handler_.getDPMBase()->getName() + "Processor_" + std::to_string(PROCESSOR_ID) +
         '_' + name + '_' + std::to_string(fileCounter++)  + ".vtu";
@@ -97,7 +109,8 @@ std::fstream BaseVTKWriter<T>::makeVTKFileWithHeader() const
         logger(WARN, "File % could not be opened", fileName);
     }
     //
-    file << "<?xml version=\"1.0\"?>\n\n";
+    file << "<?xml version=\"1.0\"?>\n";
+    file << "<!-- time " << handler_.getDPMBase()->getTime() << "-->\n";
     file << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n";
     file << "<UnstructuredGrid>\n";
     return file;

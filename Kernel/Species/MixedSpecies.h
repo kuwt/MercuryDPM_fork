@@ -279,18 +279,26 @@ template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveFor
 void MixedSpecies<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::mixAll(BaseSpecies* const S,
                                                                                           BaseSpecies* const T)
 {
-    if (dynamic_cast<NormalForceSpecies*> (T) == NULL ||
-        dynamic_cast<FrictionForceSpecies*> (T) == NULL ||
-        dynamic_cast<AdhesiveForceSpecies*> (T) == NULL)
-    {
-        std::cerr
-                << "Warning: cannot mix two species of different type; the mixed species is an empty species of the same type as the second species instead"
-                << std::endl;
-        return;
-    }
-    NormalForceSpecies::mix(dynamic_cast<NormalForceSpecies*> (S), dynamic_cast<NormalForceSpecies*> (T));
-    FrictionForceSpecies::mix(dynamic_cast<FrictionForceSpecies*> (S), dynamic_cast<FrictionForceSpecies*> (T));
-    AdhesiveForceSpecies::mix(dynamic_cast<AdhesiveForceSpecies*> (S), dynamic_cast<AdhesiveForceSpecies*> (T));
+    logger.assert_always(T!= nullptr && S!= nullptr,"Arguments of mixAll cannot be null pointers");
+
+    logger.assert_always(S->getConstantRestitution() == T->getConstantRestitution(), "mixing two LinearPlasticViscoelasticNormalSpecies, but only one has constantRestitution");
+    NormalForceSpecies::setConstantRestitution(S->getConstantRestitution());
+
+    const auto TN = dynamic_cast<NormalForceSpecies*> (T);
+    const auto TF = dynamic_cast<FrictionForceSpecies*> (T);
+    const auto TA = dynamic_cast<AdhesiveForceSpecies*> (T);
+    logger.assert_always(TN!= nullptr && TF!= nullptr && TA!= nullptr,
+            "Cannot mix two species of different type (% and %)",S->getName(),T->getName());
+
+    const auto SN = dynamic_cast<NormalForceSpecies*> (S);
+    const auto SF = dynamic_cast<FrictionForceSpecies*> (S);
+    const auto SA = dynamic_cast<AdhesiveForceSpecies*> (S);
+    logger.assert_always(SN!= nullptr && SF!= nullptr && SA!= nullptr,
+            "Cannot mix two species of different type (% and %)",S->getName(),T->getName());
+
+    NormalForceSpecies::mix(SN,TN);
+    FrictionForceSpecies::mix(SF,TF);
+    AdhesiveForceSpecies::mix(SA,TA);
 }
 
 ///Returns the particle distance below which adhesive forces can occur (needed for contact detection)

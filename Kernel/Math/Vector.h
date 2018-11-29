@@ -129,6 +129,14 @@ public:
         return Vec3D(X - a.X, Y - a.Y, Z - a.Z);
     };
     
+    Vec3D multiplyElementwise(const Vec3D& a) const {
+        return Vec3D(X*a.X, Y*a.Y, Z*a.Z);
+    }
+    
+    Vec3D signedSquare() const {
+        return Vec3D(fabs(X)*X, fabs(Y)*Y, fabs(Z)*Z);
+    }
+
     /*!
      * \brief Multiplies by a scalar
      * \details Multiplies each element with a scalar

@@ -144,9 +144,9 @@ void ChuteInsertionBoundary::placeParticle(BaseParticle* p, RNG& random)
     }
     else
     {
-        position.Y = random.getRandomNumber(posMin_.Y + p->getRadius(), posMax_.Y - p->getRadius());
+        position.Y = random.getRandomNumber(posMin_.Y - p->getRadius(), posMax_.Y + p->getRadius());
     }
-    position.Z = random.getRandomNumber(posMin_.Z + fixedParticleRadius_ + p->getRadius(), posMax_.Z - p->getRadius());
+    position.Z = random.getRandomNumber(posMin_.Z - p->getRadius(), posMax_.Z + p->getRadius() + fixedParticleRadius_);
     
     // The velocity components are first stored in a Vec3D, because if you pass them 
     // directly into setVelocity the compiler is allowed to change the order in 

@@ -1,0 +1,303 @@
+#include "GCG.h"
+
+enum RunID {
+    _, _1, _2, _2b, _3, _4, _5, _6, _8, _11, _14, _17, _19, _19b, _21, _21b, _22, _22b, _30, _82
+};
+
+/*!
+ * write to file
+ */
+std::ostream &operator<<(std::ostream &os, RunID runID) {
+    switch (runID) {
+        case _:
+            os << "";
+            break;
+        case _1:
+            os << "1";
+            break;
+        case _2:
+            os << "2";
+            break;
+        case _2b:
+            os << "2b";
+            break;
+        case _3:
+            os << "3";
+            break;
+        case _4:
+            os << "4";
+            break;
+        case _5:
+            os << "5";
+            break;
+        case _6:
+            os << "6";
+            break;
+        case _8:
+            os << "8";
+            break;
+        case _11:
+            os << "11";
+            break;
+        case _14:
+            os << "14";
+            break;
+        case _17:
+            os << "17";
+            break;
+        case _19:
+            os << "19";
+            break;
+        case _19b:
+            os << "19b";
+            break;
+        case _21:
+            os << "21";
+            break;
+        case _21b:
+            os << "21b";
+            break;
+        case _22:
+            os << "22";
+            break;
+        case _22b:
+            os << "22b";
+            break;
+        case _30:
+            os << "30";
+            break;
+        case _82:
+            os << "82";
+            break;
+        default:
+            logger(ERROR, "runID % not found", static_cast<unsigned>(runID));
+    }
+    return os;
+}
+
+/*!
+ * write from file
+ */
+RunID getRunID(std::string s) {
+    RunID runID;
+    if (s == "") runID = _;
+    else if (s == "1") runID = _1;
+    else if (s == "2") runID = _2;
+    else if (s == "2b") runID = _2b;
+    else if (s == "3") runID = _3;
+    else if (s == "4") runID = _4;
+    else if (s == "5") runID = _5;
+    else if (s == "6") runID = _6;
+    else if (s == "8") runID = _8;
+    else if (s == "11") runID = _11;
+    else if (s == "14") runID = _14;
+    else if (s == "17") runID = _17;
+    else if (s == "19") runID = _19;
+    else if (s == "19b") runID = _19b;
+    else if (s == "21") runID = _21;
+    else if (s == "21b") runID = _21b;
+    else if (s == "22") runID = _22;
+    else if (s == "22b") runID = _22b;
+    else if (s == "30") runID = _30;
+    else if (s == "82") runID = _82;
+    else logger(ERROR, "SpeciesType % not found", s);
+    return runID;
+}
+
+
+/**
+ * Simulates mixing in a GCG-70
+ */
+int main(int argc, char *argv[]) {
+    // GENERAL PARAMETERS
+
+    // read simulation time (default 60)
+    const Mdouble timeMax = helpers::readFromCommandLine(argc, argv, "-timeMax", 1);
+
+    // restart from restart file if requested; else start new simulation
+    const std::string restart = helpers::readFromCommandLine(argc, argv, "-r", std::string(""));
+    if (!restart.empty()) {
+        GCG(restart, timeMax);
+        return 0;
+    }
+
+    // belt velocity [m/s]; 0 means no belt is created
+    const Mdouble beltVelocity = helpers::readFromCommandLine(argc, argv, "-beltVelocity", 1.0);
+
+    // timestep between the output files
+    const Mdouble timeStepOutput = helpers::readFromCommandLine(argc, argv, "-timeStepOutput", 5);
+
+    // Determines if vtk files get written
+    const bool writeVTK = helpers::readFromCommandLine(argc, argv, "-writeVTK", true);
+
+    // Determines if mixer gets initially filled
+    const Mdouble initiallyFilled = helpers::readFromCommandLine(argc, argv, "-initiallyFilled", false);
+    // Mean residence time [s]; determines how much particles are initially in the blender
+    const Mdouble meanResidenceTime = initiallyFilled ?
+            helpers::readFromCommandLine(argc, argv, "-meanResidenceTime",30.0) : 0.0;
+
+    // FIXED SIMULATION PARAMETERS
+
+    // Scale of casing radius vs default value of 35mm
+    Mdouble scaleFactor = 1;
+
+    // blade inclination [deg]
+    Mdouble bladeInclination = 20.0;
+
+    // VARIABLE SIMULATION PARAMETERS
+
+    // type of filler and api (determines density, contact properties and psd)
+    SpeciesType fillerType, apiType;
+    // solid volume fraction of filler (solid volume fraction of api is 1-fillerVolumeFraction)
+    Mdouble fillerVolumeFraction;
+    // relative standard deviation of particle radius
+    Mdouble maxFillRate;
+    // blade rotation speed [revolutions per minute]
+    Mdouble rpm;
+    //set blade pattern (default: OldScrew)
+    BladePattern bladePattern;
+
+    // runID
+    RunID runID = getRunID(helpers::readFromCommandLine(argc, argv, "-runID", std::string("21")));
+
+    if (runID == _) { //if no runID is selected use values from command line
+        // type of material (0=PH101--APAP, 1=SD100--MPT)
+        const unsigned mixType = helpers::readFromCommandLine(argc, argv, "-mixType", (unsigned) 0);
+        fillerType = (mixType == 0) ? SpeciesType::PH101 : SpeciesType::SD100;
+        apiType = (mixType == 0) ? SpeciesType::APAPP : SpeciesType::MPT;
+        fillerVolumeFraction = helpers::readFromCommandLine(argc, argv, "-fillerVolumeFraction", 0.99);
+        maxFillRate = helpers::readFromCommandLine(argc, argv, "-fillRate", 20e-6);
+        rpm = helpers::readFromCommandLine(argc, argv, "-rpm", 460.0);
+        bladePattern = (BladePattern) helpers::readFromCommandLine(argc, argv, "-bladePattern", 1);
+    } else {
+        logger(INFO, "runID %", runID);
+
+        //select fillerType, apiType, fillerVolumeFraction, and check if runID exists
+        switch (runID) {
+            case _1:
+            case _2:
+            case _2b:
+            case _3:
+            case _8:
+            case _14:
+            case _19:
+            case _21:
+            case _22:
+                fillerType = SpeciesType::PH101;
+                apiType = SpeciesType::APAPP;
+                fillerVolumeFraction = 0.99;
+                break;
+            case _4:
+            case _5:
+            case _6:
+            case _11:
+            case _17:
+            case _19b:
+            case _21b:
+            case _22b:
+            case _30:
+                fillerType = SpeciesType::SD100;
+                apiType = SpeciesType::MPT;
+                fillerVolumeFraction = 0.3;
+                break;
+            case _82:
+                fillerType = SpeciesType::MPT;
+                apiType = SpeciesType::MPT;
+                fillerVolumeFraction = 0.5;
+                break;
+            default:
+                logger(ERROR, "RunID % does not exist", runID);
+        }
+        logger(INFO, "fillerType %, apiType %, fillerVolumeFraction %", fillerType, apiType, fillerVolumeFraction);
+
+        //select maxFillRate
+        const Mdouble massFlow = (runID == _2b) ? 24 : 12;
+        const Mdouble meanDensity = fillerVolumeFraction * getDensity(fillerType)
+                                    + (1.0 - fillerVolumeFraction) * getDensity(apiType);
+        maxFillRate = massFlow / 3600. / meanDensity;
+        logger(INFO, "massFlow % kg/h, meanDensity % kg/m^3, maxFillRate % ml/s", massFlow, meanDensity, maxFillRate*1e6);
+
+
+        //select rpm
+        switch (runID) {
+            case _1:
+            case _4:
+            case _82:
+                rpm = 112;
+                break;
+            case _3:
+            case _6:
+                rpm = 460;
+                break;
+            default:
+                rpm = 286;
+        }
+        logger(INFO, "rpm %", rpm);
+
+        //select bladePattern
+        switch (runID) {
+            case _8:
+            case _11:
+                bladePattern = BladePattern::FullMixingWithForward; //3F
+                break;
+            case _14:
+            case _17:
+                bladePattern = BladePattern::FullMixingWithForwardWithPins; //3F*
+                break;
+            case _19:
+            case _19b:
+                bladePattern = BladePattern::FullAltShifted; //11
+                break;
+            case _21:
+            case _21b:
+                bladePattern = BladePattern::FullAlt; //6
+                break;
+            case _22:
+            case _22b:
+                bladePattern = BladePattern::FullMixingShifted; //8
+                break;
+            default:
+                bladePattern = BladePattern::FullMixing; //3
+        }
+        logger(INFO, "bladePattern %", bladePattern);
+
+        //allows the user to reset certain values
+        fillerVolumeFraction = helpers::readFromCommandLine(argc, argv, "-fillerVolumeFraction", fillerVolumeFraction);
+        maxFillRate = helpers::readFromCommandLine(argc, argv, "-fillRate", 0*1e6)*1e-6;
+        rpm = helpers::readFromCommandLine(argc, argv, "-rpm", rpm);
+    }
+
+    // IMPLEMENTATION
+    logger(INFO, "\n\nCalling constructor ...");
+    GCG gcg(fillerType, apiType, maxFillRate, rpm, beltVelocity, fillerVolumeFraction, bladePattern, scaleFactor,
+            bladeInclination);
+    if (initiallyFilled) gcg.initialFillBasedOnMeanResidenceTime(meanResidenceTime);
+    //logger(INFO, "\n\nSystem length %",gcg.getXMax()-gcg.getXMin());
+    std::stringstream name;
+    name << "GCG" << runID;
+    gcg.setName(name.str());
+    logger(INFO, "\n\nRemoving old files ...");
+    gcg.removeOldFiles();
+    gcg.setTimeMax(60./rpm/8.);
+    gcg.setNumberOfDomains({NUMBER_OF_PROCESSORS, 1, 1});
+    gcg.setParticlesWriteVTK(writeVTK);
+    gcg.setWallsWriteVTK(writeVTK);
+    gcg.setSaveCount(static_cast<unsigned>(timeStepOutput / gcg.getTimeStep()));
+
+    // SOLVE
+    gcg.writeParaviewSnapshotScript();
+    helpers::writeCommandLineToFile(gcg.getName() + ".cmd", argc, argv);
+    gcg.addCG();
+    logger(INFO, "\n\nCalling solve ...");
+    gcg.solve();
+
+//    // RESTART
+//    if (NUMBER_OF_PROCESSORS==1)
+//    {
+//        logger(INFO, "Running 20% longer to test the restart capability");
+//        std::string cmd = "./GCGSelfTest -r GCGSelfTest -timeMax " + helpers::to_string(1.2 * timeMax, 8);
+//        system(cmd.c_str());
+//    }
+
+    return 0;
+}

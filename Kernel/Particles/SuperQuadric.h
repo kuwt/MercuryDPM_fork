@@ -182,7 +182,7 @@ public:
      * \brief Get the mean curvature of this superquadric at the given (lab-fixed) position, see Podlozhyuk et al.
      * (2017) eq (39)
      */
-    Mdouble getCurvature(const LabFixedCoordinates& labFixedCoordinates) const;
+    Mdouble getCurvature(const LabFixedCoordinates& labFixedCoordinates) const override;
     
     /*!
      * \brief Get whether or not this superquadric is in contact with the given particle.

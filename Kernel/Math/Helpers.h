@@ -188,6 +188,11 @@ void getLineFromStringStream(std::istream& in, std::stringstream& out);
 bool writeToFile(std::string filename, std::string filecontent);
 
 /*!
+ * \brief Writes a string to a file.
+ */
+void writeCommandLineToFile(const std::string filename, const int argc, char * const argv[]);
+
+/*!
  * \brief Plots to a gnuplot window.
  */
 void gnuplot(std::string command);
@@ -226,17 +231,28 @@ std::string to_string(const T& n)
 
 std::string to_string(Mdouble value, unsigned precision);
 
-//reads optional variables in the restart file
-// (a variable is optional, if it may or may not be defined in the restart file)
+/**
+ * \brief Reads optional variables in the restart file
+ *
+ * \details A variable is stored in the restart file by storing the variables name and value, e.g.
+ *   " name value"
+ * If a variable is always written to the restart file, it can be read-in like this:
+ *   is >> dummy >> variable;
+ * If a variable is optional, the variable name has to be checked, and should be read in like this:
+ *   readOptionalVariable(is,"name",variable);
+ */
 template<typename T>
-void readOptionalVariable(std::istream& is, const std::string& name, T& variable)
+bool readOptionalVariable(std::istream& is, const std::string& name, T& variable)
 {
-    ///\todo checkAndRead should check if the next variable in the ifstream is equal to the string nam, and
-    /// only read in this case; otherwise continue, but I don't know how to put the location in the ifstream back.
+    ///\todo readOptionalVariable should check the full variable name, not just the next value.
+    /// However, I don't know how to put the location in the ifstream back.
     if (is.peek() == name.c_str()[0])
     {
         std::string dummy;
         is >> dummy >> variable;
+        return true;
+    } else {
+        return false;
     }
 }
 
@@ -312,9 +328,27 @@ T readFromFile(std::string fileName, std::string varName, T value)
     }
     
     //if the right variable is never found
-    logger(WARN, "readFromFile: variable % not set in file %, set to default value % ", varName, fileName, value);
+    logger(WARN, "readFromFile: variable % not set in file %, using default value % ", varName, fileName, value);
     return value;
 }
+
+template<typename T>
+T readFromCommandLine(int argc, char *argv[], std::string varName, T value)
+{
+    for (unsigned i=0; i<argc-1; ++i) {
+        if (varName == argv[i]) {
+            value = atof(argv[i+1]);
+            logger(INFO, "readFromCommandLine: % set to % ", varName.substr(1), value);
+            return value;
+        }
+    }
+    //if the variable is not found
+    logger(INFO, "readFromCommandLine: % set to default value % ", varName.substr(1), value);
+    return value;
+}
+
+template<>
+std::string readFromCommandLine<std::string>(int argc, char *argv[], std::string varName, std::string value);
 
 void check(double real, double ideal, double error, std::string errorMessage);
 
@@ -323,6 +357,10 @@ void check(Vec3D real, Vec3D ideal, double error, std::string errorMessage);
 std::string getPath();
 
 Mdouble getRealTime();
+
+bool isNext(std::istream& is, const std::string name);
+
+bool createDirectory(std::string);
 }
 
 #endif

@@ -92,18 +92,33 @@ public:
     
     /// \brief Determines stress-controlled shear Lees-Edwards boundary in x-y direction and normal periodic in z direction
     void determineStressControlledShearBoundaries();
-    
+
     /// \brief update the domain to new sizes
     void updateDomainSize();
 
+    /// \brief accesses the strain rate tensor
+    Matrix3D getStrainRate() const {return strainRate_;}
+
+    /// \brief accesses the stressGoal_
+    Matrix3D getStressGoal() const {return stressGoal_;}
+
+    /// \brief accesses the gainFactor
+    Matrix3D getGainFactor() const {return gainFactor_;}
 
 private:
-    
+
+    //Set by the user
+
     /*!
      * \brief Stores the stress value the boundary should attain.
      * \details Unused if the stressGoal values are set to zero.
      */
     Matrix3D stressGoal_, strainRate_, gainFactor_;
+    /// The boolean input, true means switch on the strain rate control
+    bool isStrainRateControlled_;
+
+    //Set each time step in checkBoundariesAfterParticlesMove
+
     /// Stress components calculation variables
     Matrix3D stressTotal_;
     Matrix3D dstrainRate_;
@@ -113,10 +128,14 @@ private:
     Vec3D centerBox_;
     /// Particle position relative to the center of domain
     Vec3D relativeToCenter_;
-    /// The boolean input, true means switch on the strain rate control
-    bool isStrainRateControlled_;
+
+    // Set in the constructor, incremented in checkBoundariesAfterParticlesMove
+
     /// Shift integrated for all the time when using Lees-Edwards Boundary
     Mdouble integratedShift_;
+
+    //Defined in the set function
+
     /// Store boundaries into a vector for the pushback
     /// Note, there is always either no LeesEdwardsBoundary and 3 PeriodicBoundary,
     /// or 1 LeesEdwardsBoundary and 1 PeriodicBoundary

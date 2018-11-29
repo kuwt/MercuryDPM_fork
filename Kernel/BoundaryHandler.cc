@@ -42,7 +42,7 @@
 #include "Boundaries/HeaterBoundary.h"
 #include "Boundaries/StressStrainControlBoundary.h"
 
-///Constructor of the ParticleHandler class. It creates and empty ParticleHandler.
+///Constructor of the BoundaryHandler class. It creates and empty BoundaryHandler.
 BoundaryHandler::BoundaryHandler()
 {
     logger(DEBUG, "BoundaryHandler::BoundaryHandler() finished");
@@ -87,9 +87,9 @@ BoundaryHandler::~BoundaryHandler()
 ///Add the object and tell the object that this is his handler.
 void BoundaryHandler::addObject(BaseBoundary* P)
 {
-    //Puts the particle in the Particle list
+    //Puts the boundary in the Boundary list
     BaseHandler<BaseBoundary>::addObject(P);
-    //set the particleHandler pointer
+    //set the handler pointer
     P->setHandler(this);
 
 #ifdef MERCURY_USE_MPI

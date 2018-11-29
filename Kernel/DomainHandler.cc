@@ -255,6 +255,11 @@ Domain* DomainHandler::getCurrentDomain()
     return getObject(currentDomainIndex_);
 }
 
+const Domain* DomainHandler::getCurrentDomain() const
+{
+    return getObject(currentDomainIndex_);
+}
+
 /*!
  * \details Gets the Domain Index in the vector of the DomainHandler 
  * assigned to this processor 

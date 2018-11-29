@@ -180,20 +180,28 @@ Mdouble LinearViscoelasticNormalSpecies::getMaximumVelocity(Mdouble radius, Mdou
  * \details Sets k, disp such that it matches a given tc and eps for a collision of two copies of P
  * \param[in] stiffness stiffness
  * \param[in] eps restitution coefficient
- * \param[in] mass harmonic average mass of a single particle, \f$\frac{2}{1/m1+1/m2}\f$
+ * \param[in] harmonic mean of particle masses, \f$\frac{2}{1/m1+1/m2}\f$
  */
-void
-LinearViscoelasticNormalSpecies::setStiffnessAndRestitutionCoefficient(Mdouble stiffness, Mdouble eps, Mdouble mass)
+void LinearViscoelasticNormalSpecies::setStiffnessAndRestitutionCoefficient(Mdouble stiffness, Mdouble eps, Mdouble mass)
 {
     stiffness_ = stiffness;
-    if (eps == 0.0)
-    {
-        dissipation_ = std::sqrt(2.0 * mass * stiffness);
-    }
-    else
-    {
-        dissipation_ =
-                -std::sqrt(2.0 * mass * stiffness / (constants::sqr_pi + mathsFunc::square(log(eps)))) * log(eps);
+    setRestitutionCoefficient(eps, mass);
+}
+
+/*!
+ * \details Sets k, disp such that it matches a given tc and eps for a collision of two copies of P
+ * \param[in] stiffness stiffness
+ * \param[in] eps restitution coefficient
+ * \param[in] mass effective particle mass, \f$\frac{2}{1/m1+1/m2}\f$
+ */
+void LinearViscoelasticNormalSpecies::setRestitutionCoefficient(Mdouble eps, Mdouble mass)
+{
+    if (eps == 0.0) {
+        dissipation_ = std::sqrt(2.0 * mass * getStiffness());
+    } else {
+        const Mdouble logEps = log(eps);
+        dissipation_ = -std::sqrt(2.0 * mass * getStiffness()
+                                  / (constants::sqr_pi + mathsFunc::square(logEps))) * logEps;
     }
 }
 

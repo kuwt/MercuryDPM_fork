@@ -47,6 +47,7 @@ Screw::Screw()
     omega_ = 1.0;
     offset_ = 0.0;
     thickness_ = 0.0;
+    screwType_ = ScrewType::doubleHelix;
     setOrientationViaNormal({0, 0, 1});//default screw is in z-direction
     logger(DEBUG, "Screw() constructor finished.");
 }
@@ -64,6 +65,7 @@ Screw::Screw(const Screw& other)
     omega_ = other.omega_;
     thickness_ = other.thickness_;
     offset_ = other.offset_;
+    screwType_ = other.screwType_;
     logger(DEBUG, "Screw(const Screw&) copy constructor finished.");
 }
 
@@ -77,7 +79,7 @@ Screw::Screw(const Screw& other)
  * \details Make a Screw by assigning all input parameters to the data-members of
  * this class, and setting the offset_ to 0.
  */
-Screw::Screw(Vec3D start, Mdouble l, Mdouble r, Mdouble n, Mdouble omega, Mdouble thickness)
+Screw::Screw(Vec3D start, Mdouble l, Mdouble r, Mdouble n, Mdouble omega, Mdouble thickness, ScrewType screwType)
 {
     start_ = start;
     l_ = l;
@@ -86,6 +88,7 @@ Screw::Screw(Vec3D start, Mdouble l, Mdouble r, Mdouble n, Mdouble omega, Mdoubl
     omega_ = omega;
     thickness_ = thickness;
     offset_ = 0.0;
+    screwType_ = screwType;
     logger(DEBUG, "Screw(Vec3D, Mdouble, Mdouble, Mdouble, Mdouble, Mdouble) constructor finished.");
 }
 
@@ -135,23 +138,24 @@ bool Screw::getDistanceAndNormal(const BaseParticle& P, Mdouble& distance, Vec3D
 bool Screw::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wallInteractionRadius, Mdouble& distance,
                                                Vec3D& normal_return) const
 {
-    Mdouble RSquared = square(position.Y - start_.Y) + square(position.Z - start_.Z);
-    Mdouble X = position.X - start_.X;
+    // compute the square of the radial distance (in yz-plane) between particle and screw.
+    const Mdouble RSquared = square(position.Y - start_.Y) + square(position.Z - start_.Z);
+    const Mdouble X = position.X - start_.X;
+
     //first do a simple check if particle is within the cylindrical hull of the screw
     if (RSquared > square(maxR_ + wallInteractionRadius + thickness_)
         || X > l_ + wallInteractionRadius + thickness_
         || X < -wallInteractionRadius - thickness_)
     {
-        //std::cout << "failed " << position << std::endl;
         return false;
     }
     
-    //else:
-    Mdouble R = sqrt(RSquared);
-    Mdouble A = atan2(position.Z - start_.Z, position.Y - start_.Y);
+    //else compute radial distance, and angle in yz-plane
+    const Mdouble R = sqrt(RSquared);
+    const Mdouble A = atan2(position.Z - start_.Z, position.Y - start_.Y);
     
-    //after subtracting the start position and transforming the particle position from (XYZ) into (RAZ) 
-    //coordinates, we compute the distance to the wall at, located at (r,a,z)=(r,2*pi*(offset+N*q+k/2),q*L), 0<q<1.
+    //after subtracting the start position and transforming the particle position from (XYZ) into (XRA)
+    //coordinates, we compute the distance to the wall at, located at (r,a,z)=(q*L,r,2*pi*(offset+N*q+k/2)), 0<q<1.
     
     //To find the contact point we have to minimize (with respect to r and q)
     //distance^2=(x-x0-r*cos(2*pi*(offset+N*q)))^2+(y-y0-r*sin(2*pi*(offset+N*q)))^2+(z-z0-q*L)^2
@@ -176,35 +180,55 @@ bool Screw::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wallInter
     Mdouble q; //Current guess
     Mdouble dd; //Derivative at current guess
     Mdouble ddd; //Second derivative at current guess
-    Mdouble q0 = X / l_; //assume closest point q0 is at same z-location as the particle
     
     //Set initial q to the closest position on the screw with the same angle as A
     //The initial guess will be in the minimum of the sin closest to q0
     //Minima of the sin are at
     //A-2*pi*(offset+N*q)=k*pi (k=integer)
     //q=A/(2*pi*N)-k/(2*N)-offset/N (k=integer)
-    
-    Mdouble k = round(A / constants::pi - 2.0 * (offset_ + n_ * q0)); // k: |A-a(q0)-k*pi|=min
-    q = A / (2.0 * constants::pi * n_) - k / (2.0 * n_) - offset_ / n_; // q: a(q)=A
+    {
+        const Mdouble q0 = X / l_; //assume closest point q0 is at same z-location as the particle
+        const Mdouble k = round(A / constants::pi - 2.0 * (offset_ + n_ * q0)); // k: |A-a(q0)-k*pi|=min
+        q = A / (2.0 * constants::pi * n_) - k / (2.0 * n_) - offset_ / n_; // q: a(q)=A
+    }
     
     //Now apply Newton's method
+    unsigned count = 0;
+    const unsigned maxCount = 30;
     do
     {
         Mdouble arg = 2.0 * A - 4.0 * constants::pi * (n_ * q + offset_);
         dd = -2.0 * constants::pi * n_ * RSquared * sin(arg) - 2.0 * l_ * (X - q * l_);
         ddd = 8.0 * constants::sqr_pi * n_ * n_ * RSquared * cos(arg) + 2.0 * l_ * l_;
         q -= dd / ddd;
-    } while (fabs(dd / ddd) > 1e-14);
+        if(++count>maxCount) {
+            logger(WARN,"Screw contact detection did not converge (err=%); continuing with approximate contact point",fabs(dd/ddd));
+            break;
+        }
+    } while (fabs(dd / ddd) > 2e-14);
     
     //Calculate r
     Mdouble r = R * cos(2.0 * constants::pi * (offset_ + n_ * q) - A);
     
+    //If the particle touches the single screw center
+    if (screwType_==ScrewType::singleHelix && r>0) {
+        distance = R-thickness_;
+        if (distance>wallInteractionRadius) {
+            return false;
+        } else {
+            normal_return = Vec3D(0,-position.Y/R,-position.Z/R);
+            return true;
+        }
+    }
+
     //Check if the location is actually on the screw:
     //First posibility is that the radius is too large:
+    Mdouble distanceSquared = 0;
     if (fabs(r) > maxR_) //Left boundary of the coil
     {
         r = mathsFunc::sign(r) * maxR_;
-        unsigned int steps = 0;
+        distanceSquared = mathsFunc::square(R-maxR_);
+        count = 0;
         //This case reduces to the coil problem
         do
         {
@@ -213,8 +237,11 @@ bool Screw::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wallInter
             ddd = 8.0 * R * r * constants::sqr_pi * n_ * n_ * cos(A - 2.0 * constants::pi * (n_ * q + offset_)) +
                   2.0 * l_ * l_;
             q -= dd / ddd;
-            steps++;
-        } while (fabs(dd / ddd) > 1e-14);
+            if(++count>maxCount) {
+                logger(WARN,"Screw contact detection at left boundary did not converge (err=%); continuing with approximate contact point",fabs(dd/ddd));
+                break;
+            }
+        } while (fabs(dd / ddd) > 2e-14);
     }
     //Second possibility is that it occured before the start of after the end
     if (q < 0)
@@ -236,13 +263,16 @@ bool Screw::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wallInter
         }
     }
     
-    Mdouble distanceSquared = R * R * pow(sin(A - 2 * constants::pi * (offset_ + n_ * q)), 2) + pow(X - q * l_, 2);
+    //compute squared distance between particle and contact point
+    distanceSquared += square(X - q * l_) + square(R*sin(A - 2 * constants::pi * (offset_ + n_ * q)));
+    
     //If distance is too large there is no contact
     if (distanceSquared >= square(wallInteractionRadius + thickness_))
     {
         return false;
     }
     
+    //Else
     Vec3D ContactPoint;
     distance = sqrt(distanceSquared) - thickness_;
     ContactPoint.Y = start_.Y + r * cos(2.0 * constants::pi * (offset_ + n_ * q));
@@ -279,13 +309,16 @@ void Screw::read(std::istream& is)
 {
     BaseWall::read(is);
     std::string dummy;
+    unsigned screwType;
     is >> dummy >> start_
        >> dummy >> l_
        >> dummy >> maxR_
        >> dummy >> n_
        >> dummy >> omega_
        >> dummy >> thickness_
-       >> dummy >> offset_;
+       >> dummy >> offset_
+       >> dummy >> screwType;
+    screwType_ = static_cast<ScrewType>(screwType);
 }
 
 /*!
@@ -317,7 +350,8 @@ void Screw::write(std::ostream& os) const
        << " Revolutions " << n_
        << " Omega " << omega_
        << " Thickness " << thickness_
-       << " Offset " << offset_;
+       << " Offset " << offset_
+       << " ScrewType " << static_cast<unsigned>(screwType_);
 }
 
 /*!
@@ -330,37 +364,56 @@ std::string Screw::getName() const
 
 void Screw::writeVTK(VTKContainer& vtk) const
 {
-    unsigned nr = 10;
-    unsigned nz = static_cast<unsigned int>(60 * abs(n_));
+    //number of points in radial direction (for one side of the screw)
+    unsigned nr = 5;
+    //number of points in axial direction
+    unsigned nz = static_cast<unsigned int>(99 * fabs(n_));
     
     unsigned long nPoints = vtk.points.size();
-    vtk.points.reserve(nPoints + nr * nz);
+    vtk.points.reserve(nPoints + (screwType_==ScrewType::doubleHelix?2:1) * 2 *nr * nz);
     Vec3D contactPoint;
-    for (unsigned iz = 0; iz < nz; iz++)
+    // either one or two helices
+    for (Mdouble offset = offset_; offset<=offset_+(screwType_==ScrewType::doubleHelix?0.5:0); offset+=0.5)
     {
-        for (unsigned ir = 0; ir < nr; ir++)
+        for (unsigned iz = 0; iz < nz; iz++)
         {
-            double q = (double) iz / nz;
-            double r = (double) ir / nr * maxR_;
-            contactPoint.Y = start_.Y - r * cos(2.0 * constants::pi * (offset_ + n_ * q));
-            contactPoint.Z = start_.Z - r * sin(2.0 * constants::pi * (offset_ + n_ * q));
-            contactPoint.X = start_.X + q * l_;
-            getOrientation().rotate(contactPoint);
-            contactPoint += getPosition();
-            vtk.points.push_back(contactPoint);
+            for (unsigned ir = 0; ir < nr; ir++)
+            {
+                double q = (double) iz / nz;
+                double r = (double) ir / (nr - 1) * maxR_;
+                contactPoint.Y = start_.Y - r * cos(2.0 * constants::pi * (offset + n_ * q));
+                contactPoint.Z = start_.Z - r * sin(2.0 * constants::pi * (offset + n_ * q));
+                contactPoint.X = start_.X + q * l_ - thickness_;
+                getOrientation().rotate(contactPoint);
+                contactPoint += getPosition();
+                vtk.points.push_back(contactPoint);
+            }
+            for (unsigned ir = 0; ir < nr; ir++)
+            {
+                double q = (double) iz / nz;
+                double r = (double) (nr - 1 - ir) / (nr - 1) * maxR_;
+                contactPoint.Y = start_.Y - r * cos(2.0 * constants::pi * (offset + n_ * q));
+                contactPoint.Z = start_.Z - r * sin(2.0 * constants::pi * (offset + n_ * q));
+                contactPoint.X = start_.X + q * l_ + thickness_;
+                getOrientation().rotate(contactPoint);
+                contactPoint += getPosition();
+                vtk.points.push_back(contactPoint);
+            }
         }
     }
     
     unsigned long nCells = vtk.triangleStrips.size();
-    vtk.triangleStrips.reserve(nCells + (nz - 1));
-    for (unsigned iz = 0; iz < nz - 1; iz++)
+    vtk.triangleStrips.reserve(nCells + (nz - 1)*(screwType_==ScrewType::doubleHelix?2:1));
+    for (unsigned iz = 0; iz < (screwType_==ScrewType::doubleHelix?2:1)*nz-1; iz++)
     {
+        //skip step that would connect the two screw parts
+        if (iz==nz-1) ++iz;
         std::vector<double> cell;
         cell.reserve(2 * nr);
-        for (unsigned ir = 0; ir < nr; ir++)
+        for (unsigned ir = 0; ir < 2*nr; ir++)
         {
-            cell.push_back(nPoints + ir + iz * nr);
-            cell.push_back(nPoints + ir + (iz + 1) * nr);
+            cell.push_back(nPoints + ir + 2*iz * nr);
+            cell.push_back(nPoints + ir + 2*(iz + 1) * nr);
         }
         vtk.triangleStrips.push_back(cell);
     }

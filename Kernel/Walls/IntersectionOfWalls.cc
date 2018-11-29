@@ -792,8 +792,8 @@ std::string IntersectionOfWalls::getName() const
 
 void IntersectionOfWalls::writeVTK(VTKContainer& vtk) const
 {
-    Vec3D max = getHandler()->getDPMBase()->getMax();
-    Vec3D min = getHandler()->getDPMBase()->getMin();
+    Vec3D max = getHandler()->getDPMBase()->getMax()-getPosition();
+    Vec3D min = getHandler()->getDPMBase()->getMin()-getPosition();
     for (auto wall = wallObjects_.begin(); wall != wallObjects_.end(); wall++)
     {
         std::vector<Vec3D> points;

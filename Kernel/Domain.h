@@ -410,8 +410,8 @@ public:
     /*!
      * \brief Gives the middle of the domain
      */
-    Vec3D getMiddle();
-    
+    Vec3D getMiddle() const ;
+
     /*!
      * \brief Removes nullptrs from boundaryParticleList_ and boundaryParticleListNeighbour_
      */

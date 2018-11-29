@@ -32,6 +32,7 @@
 
 void DPMBase::outputXBallsDataParticle(unsigned int i, unsigned int format, std::ostream& os) const
 {
+    const auto p = particleHandler.getObject(i);
     //dataFile.precision(14);
     ///\todo{changes in *.icc files are not immediately regognized by the makefile!}
     //This outputs the data about particle i again to the file.
@@ -41,48 +42,42 @@ void DPMBase::outputXBallsDataParticle(unsigned int i, unsigned int format, std:
         {
             if (getSystemDimensions() == 1)
             {
-                os << particleHandler.getObject(i)->getPosition().X << " 0 "
-                   << particleHandler.getObject(i)->getVelocity().X << " 0 "
-                   << particleHandler.getObject(i)->getRadius() << " 0 0 0" << std::endl;
+                os << p->getPosition().X << " 0 "
+                   << p->getVelocity().X << " 0 "
+                   << p->getRadius() << " 0 0 0" << std::endl;
                 break;
             }
             else
             {
                 std::streamsize prec = os.precision();
                 os << std::setprecision(std::numeric_limits<double>::digits10)
-                   << particleHandler.getObject(i)->getPosition().X << " "
-                   << particleHandler.getObject(i)->getPosition().Y << " "
+                   << p->getPosition().X << " "
+                   << p->getPosition().Y << " "
                    << std::setprecision(prec)
-                   << particleHandler.getObject(i)->getVelocity().X << " "
-                   << particleHandler.getObject(i)->getVelocity().Y << " "
-                   << particleHandler.getObject(i)->getRadius() << " "
-                   << particleHandler.getObject(i)->getOrientation().getAngleZ()
+                   << p->getVelocity().X << " "
+                   << p->getVelocity().Y << " "
+                   << p->getRadius() << " "
+                   << p->getOrientation().getAngleZ()
                    << " " // negative b/c we are plotting (x,y) coordinates on the xz-axis of xballs
-                   << -particleHandler.getObject(i)->getAngularVelocity().Z << " "
-                   << getInfo(*particleHandler.getObject(i)) << std::endl;
+                   << -p->getAngularVelocity().Z << " "
+                   << getInfo(*p) << '\n';
             }
             break;
         }
         case 14:
         {
-            Quaternion angle = particleHandler.getObject(i)->getOrientation();
+            Quaternion angle = p->getOrientation();
             std::streamsize prec = os.precision();
-            os << std::setprecision(std::numeric_limits<double>::digits10) //highly accurate, so the overlap is accurate
-               << particleHandler.getObject(i)->getPosition().X << " "
-               << particleHandler.getObject(i)->getPosition().Y << " "
-               << particleHandler.getObject(i)->getPosition().Z << " "
+            //plot position highly accurate, so the overlap is accurate
+            os << std::setprecision(std::numeric_limits<double>::digits10)
+               << p->getPosition() << " "
                << std::setprecision(prec)
-               << particleHandler.getObject(i)->getVelocity().X << " "
-               << particleHandler.getObject(i)->getVelocity().Y << " "
-               << particleHandler.getObject(i)->getVelocity().Z << " "
-               << particleHandler.getObject(i)->getRadius() << " "
+               << p->getVelocity() << " "
+               << p->getRadius() << " "
+               ///\todo TW should we really write the expensive-to-compute Euler angles instead of the unit quaternion?
                << angle.getEuler() << " "
-               << particleHandler.getObject(i)->getAngularVelocity().X << " "
-               << particleHandler.getObject(i)->getAngularVelocity().Y << " "
-               << particleHandler.getObject(i)->getAngularVelocity().Z << " "
-               << getInfo(*particleHandler.getObject(i));
-            os << std::endl;
-            
+               << p->getAngularVelocity() << " "
+               << getInfo(*p) << '\n';
             break;
         } //end case 3
         default:

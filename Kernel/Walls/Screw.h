@@ -29,6 +29,11 @@
 #include "BaseWall.h"
 #include "Math/Vector.h"
 
+/**
+ * used to define if the screw consists of a single or double helical thread
+ */
+enum class ScrewType {singleHelix = 1, doubleHelix = 2};
+
 /*!
  * \brief This function defines an Archimedes' screw in the z-direction from a (constant)  starting point, a (constant) length L, a (constant) radius r, a (constant) number or revelations N and a (constant) rotation speed (rev/s)
  *
@@ -52,7 +57,7 @@ public:
     /*!
      * \brief Constructor in which all parameters of the screw are set.
      */
-    Screw(Vec3D start, Mdouble l, Mdouble r, Mdouble n, Mdouble omega, Mdouble thickness);
+    Screw(Vec3D start, Mdouble l, Mdouble r, Mdouble n, Mdouble omega, Mdouble thickness, ScrewType screwType = ScrewType::doubleHelix);
     
     /*!
      * \brief Default destructor.
@@ -77,7 +82,7 @@ public:
      */
     void move_time(Mdouble dt);
     
-    MERCURY_DEPRECATED
+    //MERCURY_DEPRECATED
     void rotate(const Vec3D& angularVelocityDt) override;
     
     /*!
@@ -133,6 +138,10 @@ private:
      * \brief The thickness of the Screw.
      */
     Mdouble thickness_;
+    /*!
+     * \brief Single or double helix screw.
+     */
+    ScrewType screwType_;
 };
 
 #endif

@@ -83,7 +83,7 @@ static void printMessage(std::string module, std::string msg)
     //Check if MPI is initialised
     initialiseMPI();
     MPIContainer& communicator = MPIContainer::Instance();
-    std::cout << "Module " << module << ":\n" << "[Processor: " << communicator.getProcessorID() << "]" << msg << std::endl;
+    std::cout << "\033[1;33mModule " << module << ":\033[0m\n" << "[Processor: " << communicator.getProcessorID() << "]" << msg << std::endl;
 #else
     std::cout << "\033[1;33mMessage " << module << ":\033[0m\n" << msg << std::endl;
 #endif
@@ -97,7 +97,7 @@ static void printMessage(std::string module, std::string msg)
     //Check if MPI is initialised
     initialiseMPI();
     MPIContainer& communicator = MPIContainer::Instance();
-    std::cout << "Module " << module << ":\n" << "[Processor: " << communicator.getProcessorID() << "]" << msg << std::endl;
+    std::cout << "\033[1;33mError " << module << ":\033[0m\n" << "[Processor: " << communicator.getProcessorID() << "]" << msg << std::endl;
 #else
     std::cout << "\033[1;31mError " << module << ":\033[0m\n" << msg << std::endl;
 #endif

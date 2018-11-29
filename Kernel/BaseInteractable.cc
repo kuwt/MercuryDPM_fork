@@ -392,7 +392,7 @@ void BaseInteractable::applyPrescribedVelocity(double time)
  *            takes a double the time and returns a Vec 3D which is the orientation 
  *            of the interactable for that time.
  */
-void BaseInteractable::setPrescribedOrientation(std::function<Quaternion(double)>& prescribedOrientation)
+void BaseInteractable::setPrescribedOrientation(const std::function<Quaternion(double)>& prescribedOrientation)
 {
     prescribedOrientation_ = prescribedOrientation;
 }

@@ -200,6 +200,31 @@ void BaseCG::setZ(Mdouble min, Mdouble max)
     max_.Z = max;
 }
 
+void BaseCG::setXGrid(Mdouble min, Mdouble max, Mdouble h)
+{
+    setX(min,max);
+    setHX(h);
+}
+
+void BaseCG::setYGrid(Mdouble min, Mdouble max, Mdouble h)
+{
+    setY(min,max);
+    setHY(h);
+}
+
+void BaseCG::setZGrid(Mdouble min, Mdouble max, Mdouble h)
+{
+    setZ(min,max);
+    setHZ(h);
+}
+
+void BaseCG::setGrid(Vec3D min, Vec3D max, Mdouble h)
+{
+    setMin(min);
+    setMax(max);
+    setH(h);
+}
+
 void BaseCG::selectSpecies(unsigned speciesIndex)
 {
     selectedParticle_ = [speciesIndex](const BaseInteractable* p)
@@ -223,19 +248,28 @@ void BaseCG::setH(Mdouble h)
 
 void BaseCG::setHX(Mdouble h)
 {
+    logger.assert(h > 0, "setHX(%): h has to be positive");
+    logger.assert(max_.X!=inf && min_.X!=-inf,
+                  "setHX(%) can only be used after setting min and max values", h);
     setNX(static_cast<size_t>(std::ceil((max_.X - min_.X) / h)));
-    logger.assert_always(h > 0 && getNX() > 0, "setHX(%) generated nX=% for %<x<%", h, getNX(), min_.X, max_.X);
+    logger.assert_always(getNX() > 0, "setHX(%) generated nX=% for %<x<%", h, getNX(), min_.X, max_.X);
 }
 
 void BaseCG::setHY(Mdouble h)
 {
+    logger.assert(h > 0, "setHY(%): h has to be positive");
+    logger.assert(max_.Y!=inf && min_.Y!=-inf,
+                  "setHY(%) can only be used after setting min and max values", h);
     setNY(static_cast<size_t>(std::ceil((max_.Y - min_.Y) / h)));
-    logger.assert_always(h > 0 && getNY() > 0, "setHY(%) generated nY=% for %<y<%", h, getNY(), min_.Y, max_.Y);
+    logger.assert_always(getNY() > 0, "setHY(%) generated nY=% for %<y<%", h, getNY(), min_.Y, max_.Y);
 }
 
 void BaseCG::setHZ(Mdouble h)
 {
+    logger.assert(h > 0, "setHZ(%): h has to be positive");
+    logger.assert(max_.Z!=inf && min_.Z!=-inf,
+                  "setHZ(%) can only be used after setting min and max values", h);
     setNZ(static_cast<size_t>(std::ceil((max_.Z - min_.Z) / h)));
-    logger.assert_always(h > 0 && getNZ() > 0, "setHZ(%) generated nZ=% for %<z<%", h, getNZ(), min_.Z, max_.Z);
+    logger.assert_always(getNZ() > 0, "setHZ(%) generated nZ=% for %<z<%", h, getNZ(), min_.Z, max_.Z);
 }
 

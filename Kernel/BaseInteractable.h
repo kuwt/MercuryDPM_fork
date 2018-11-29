@@ -327,7 +327,7 @@ public:
      * \brief Allows the orientation of the infinite mass interactbale to be
      *        prescribed. 
      */
-    void setPrescribedOrientation(std::function<Quaternion(double)>& prescribedOrientation);
+    void setPrescribedOrientation(const std::function<Quaternion(double)>& prescribedOrientation);
     
     /*!
      * \brief Computes the orientation from the user defined prescribed 
@@ -376,6 +376,14 @@ public:
      * used to distinguish particles which belong to the flow and fixed particles/walls
      */
     virtual bool isFixed() const =0;
+
+    /*! returns the inverse mass. This value is zero for walls and gets overridden for particles that have finite mass*/
+    virtual Mdouble getInvMass() const { return 0.0; }
+
+    /*! returns the inverse radius, or curvature, of the surface. This value is zero for walls and gets overridden for particles that have finite radius
+     * \todo should be wall-type dependent
+     * */
+    virtual Mdouble getCurvature(const Vec3D& labFixedCoordinates) const { return 0.0; }
 
 private:
     /*!

@@ -159,7 +159,12 @@ public:
      * \brief Gets File::saveCount_
      */
     unsigned int getSaveCount() const;
-    
+
+    /*!
+     * \brief Sets File::saveCount_ to the highest possible value such that only the first and last time step is written
+     */
+    void writeFirstAndLastTimeStep();
+
     /*!
      * \brief Sets File::saveCount_
      */

@@ -44,6 +44,8 @@ InsertionBoundary::InsertionBoundary()
     maxFailed_ = 0;
     isActivated_ = true;
     volumeFlowRate_ = inf;
+    initialVolume_ = 0;
+    samplingInterval_ = 0;
 }
 
 /*!
@@ -57,7 +59,10 @@ InsertionBoundary::InsertionBoundary(const InsertionBoundary& other)
     maxFailed_ = other.maxFailed_;
     isActivated_ = other.isActivated_;
     volumeFlowRate_ = other.volumeFlowRate_;
-    
+    initialVolume_ = other.initialVolume_;
+    samplingInterval_ = other.samplingInterval_;
+    variableCumulativeVolumeFlowRate_ = other.variableCumulativeVolumeFlowRate_;
+
     if (other.particleToCopy_ != nullptr)
     {
         particleToCopy_ = other.particleToCopy_->copy();
@@ -103,6 +108,18 @@ BaseParticle* InsertionBoundary::generateParticle(RNG& random)
     return P;
 }
 
+bool InsertionBoundary::insertParticle(Mdouble time) {
+    // check if the flow rate limit has been reached
+    if (variableCumulativeVolumeFlowRate_.size()==0) {
+        return volumeInserted_ < getVolumeFlowRate() * time+ initialVolume_;
+    } else {
+        Mdouble i = std::min(time/samplingInterval_,(Mdouble)variableCumulativeVolumeFlowRate_.size()-2);
+        size_t id = i;
+        Mdouble allowedVolume = variableCumulativeVolumeFlowRate_[id] + (variableCumulativeVolumeFlowRate_[id+1]-variableCumulativeVolumeFlowRate_[id])*(i-id);
+        return volumeInserted_ < allowedVolume;
+    }
+}
+
 /*!
  * \details Is used to fill the insides of the boundary with particles until 
  * it is filled up. 
@@ -139,7 +156,7 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
     // Keep count of how many successive times we have failed to place a new
     // particle. 
     unsigned int failed = 0;
-    while (failed <= maxFailed_ && (volumeInserted_ <= getVolumeFlowRate() * md->getNextTime())) // 'generating' loop
+    while (failed <= maxFailed_ && insertParticle(md->getNextTime())) // 'generating' loop
     {
         /* Generate random *intrinsic* properties for the new particle. */
         logger(VERBOSE, "about to call generateParticle\n");
@@ -303,21 +320,25 @@ void InsertionBoundary::read(std::istream& is)
 {
     BaseBoundary::read(is);
     std::string dummy, type;
-    is >> dummy >> maxFailed_;
+    is >> dummy >> maxFailed_ >> dummy;
+    if (dummy=="volumeFlowRate")
+        is >> volumeFlowRate_ >> dummy;
+    is >> massInserted_;
+    is >> dummy >> volumeInserted_;
     is >> dummy >> numberOfParticlesInserted_;
+    is >> dummy >> isActivated_;
+
     is >> dummy;
-    
-    delete particleToCopy_;
-    particleToCopy_ = getHandler()->getDPMBase()->particleHandler.readAndCreateObject(is);
-    
-    // The .restart file records the index of the particle's species, but
-    // doesn't record the pointer, i.e. the memory address of the species within
-    // the speciesHandler. The latter needs to be reset now.
-    particleToCopy_->setSpecies(getHandler()->getDPMBase()->speciesHandler.getObject(
-            particleToCopy_->getIndSpecies()
-    ));
-    
-    logger(VERBOSE, "maxFailed_ = %d\n", maxFailed_);
+    if (dummy!="noParticleToCopy") {
+        delete particleToCopy_;
+        particleToCopy_ = getHandler()->getDPMBase()->particleHandler.readAndCreateObject(is);
+        // The .restart file records the index of the particle's species, but
+        // doesn't record the pointer, i.e. the memory address of the species within
+        // the speciesHandler. The latter needs to be reset now.
+        particleToCopy_->setSpecies(getHandler()->getDPMBase()->speciesHandler.getObject(
+                particleToCopy_->getIndSpecies()
+        ));
+    }
 }
 
 /*!
@@ -329,8 +350,17 @@ void InsertionBoundary::write(std::ostream& os) const
     logger(VERBOSE, "In InsertionBoundary::write\n");
     BaseBoundary::write(os);
     os << " maxFailed " << maxFailed_;
+    if (std::isfinite(volumeFlowRate_))
+        os << " volumeFlowRate " << volumeFlowRate_;
+    os << " massInserted " << massInserted_;
+    os << " volumeInserted " << volumeInserted_;
     os << " numberOfParticlesInserted " << numberOfParticlesInserted_;
-    //os << " particleToCopy " << particleToCopy_;
+    os << " isActivated " << isActivated_;
+    if (particleToCopy_== nullptr)
+        os << " noParticleToCopy";
+    else {
+        os << " particleToCopy " << *particleToCopy_;
+    }
 }
 
 Mdouble InsertionBoundary::getVolumeFlowRate() const
@@ -341,4 +371,15 @@ Mdouble InsertionBoundary::getVolumeFlowRate() const
 void InsertionBoundary::setVolumeFlowRate(Mdouble volumeFlowRate)
 {
     volumeFlowRate_ = volumeFlowRate;
+}
+
+Mdouble InsertionBoundary::getInitialVolume() const
+{
+    return initialVolume_;
+}
+
+void InsertionBoundary::setInitialVolume(Mdouble initialVolume)
+{
+    initialVolume_ = initialVolume;
+    if (!std::isfinite(volumeFlowRate_)) volumeFlowRate_=0;
 }

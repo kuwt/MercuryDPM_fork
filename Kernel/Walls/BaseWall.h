@@ -178,6 +178,16 @@ public:
      */
     static void addToVTK(const std::vector<Vec3D>& points, VTKContainer& vtk);
     
+    //todo how do i write a copy and add function?
+    void addRenderedWall(BaseWall* w);
+    
+    BaseWall* getRenderedWall(size_t i) const;
+
+    void renderWall(VTKContainer& vtk);
+
+    void setVelocityControl(Vec3D forceGoal, Vec3D gainFactor, Vec3D baseVelocity={0,0,0});
+
+private:
     /*!
      * A pointer to the WallHandler that handles this BaseWall.
      */
@@ -190,29 +200,6 @@ public:
      */
     std::vector<BaseWall*> renderedWalls_;
 
-public:
-    
-    //todo how do i write a copy and add function?
-    void addRenderedWall(BaseWall* w)
-    {
-        renderedWalls_.push_back(w);
-    }
-    
-    void renderWall(VTKContainer& vtk)
-    {
-        if (getVTKVisibility())
-        {
-            if (renderedWalls_.empty())
-            {
-                writeVTK(vtk);
-            }
-            else
-            {
-                for (const auto& r: renderedWalls_)
-                    r->writeVTK(vtk);
-            }
-        }
-    }
 };
 
 #endif

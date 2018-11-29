@@ -809,6 +809,18 @@ void DPMBase::setWallsWriteVTK(FileType writeWallsVTK)
 
 /*!
  * \details
+ * The VTK file is used for visualisation in Paraview.
+ * \todo Move this (and the get) to WallHandler.
+ * \param[in] writeWallsVTK
+ */
+void DPMBase::setWallsWriteVTK(bool writeVTK)
+{
+    writeWallsVTK_ = writeVTK?FileType::MULTIPLE_FILES:FileType::NO_FILE;
+
+}
+
+/*!
+ * \details
  * The VTK format is used for visualisation in Paraview.
  * \todo Move this (and the get) to ParticleHandler.
  * \param[in] writeParticlesVTK
@@ -2110,7 +2122,7 @@ void DPMBase::writePythonFileForVTKVisualisation() const
     script += "Render()\n"
               "ResetCamera()\n";
     
-    helpers::writeToFile(getName() + ".paraview.py", script);
+    helpers::writeToFile(getName() + ".py", script);
 #ifdef MERCURY_USE_MPI
     } // end of communicator is root statement
 #endif
@@ -2139,15 +2151,9 @@ void DPMBase::outputXBallsData(std::ostream& os) const
             std::cerr << "Unknown system dimension" << std::endl;
             exit(-1);
     }
-#ifdef MERCURY_USE_MPI
-    /// \todo MX: This might look weird indeed, I have not yet decided what to output - for the CG tools all particles (including mpi particles)
-    /// need to be outputted, but generally when plotting data you want to ignore these...
-    unsigned int numberOfParticles = particleHandler.getSize();
-#else
-    unsigned int numberOfParticles = particleHandler.getSize();
-#endif
-    
-    
+
+    unsigned int numberOfParticles = particleHandler.getNumberOfRealObjectsLocal();
+
     // This outputs the location of walls and how many particles there are to file this is required by the xballs plotting
     if (format != 14) // dim = 1 or 2
     {
@@ -3265,6 +3271,7 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
        << " particleDimensions " << getParticleDimensions()
        << " gravity " << getGravity();
     os << " writeVTK " << writeParticlesVTK_ << " " << writeWallsVTK_ << " " << interactionHandler.getWriteVTK();
+    os << " " << (vtkWriter_?vtkWriter_->getFileCounter():0) << " " << wallVTKWriter_.getFileCounter() << " " << interactionVTKWriter_.getFileCounter();
     os << " random ";
     random.write(os);
 #ifdef MERCURY_USE_MPI
@@ -3292,9 +3299,7 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
 
     int nToWrite = 4; // \todo JMFT: Don't hardcode this here, but put it in the argument
 
-#ifdef MERCURY_USE_MPI
-    particleHandler.write(os);
-#else
+
     if (writeAllParticles || particleHandler.getSize() < nToWrite)
     {
         //if the "writeAllParticles" bool == true, or there are fewer than 4 particles
@@ -3310,12 +3315,7 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
             os << *(particleHandler.getObject(i)) << '\n';
         os << "..." << '\n';
     }
-#endif
-
     // Similarly, print out interaction details (all of them, or up to nToWrite of them)
-#ifdef MERCURY_USE_MPI
-    interactionHandler.write(os);
-#else
     if (writeAllParticles || interactionHandler.getNumberOfObjects() < nToWrite)
     {
         interactionHandler.write(os);
@@ -3327,10 +3327,6 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
             os << *(interactionHandler.getObject(i)) << '\n';
         os << "..." << '\n';
     }
-#endif
-
-    ///\todo TW: random number seed is not stored
-    ///\todo TW: xBalls arguments are not stored
 }
 
 /*!
@@ -3444,8 +3440,14 @@ void DPMBase::read(std::istream& is)
             if (!dummy.compare("writeVTK"))
             {
                 FileType writeInteractionsVTK = FileType::NO_FILE;
-                line >> writeParticlesVTK_ >> writeWallsVTK_ >> writeInteractionsVTK >> dummy;
+                unsigned particlesCounter, wallCounter, interactionCounter;
+                line >> writeParticlesVTK_ >> writeWallsVTK_ >> writeInteractionsVTK >> particlesCounter >> wallCounter >> interactionCounter >> dummy;
+                setParticlesWriteVTK(writeParticlesVTK_);
+                setWallsWriteVTK(writeWallsVTK_);
                 interactionHandler.setWriteVTK(writeInteractionsVTK);
+                vtkWriter_->setFileCounter(particlesCounter);
+                wallVTKWriter_.setFileCounter(particlesCounter);
+                interactionVTKWriter_.setFileCounter(particlesCounter);
             }
             if (!dummy.compare("random"))
             {
@@ -3504,7 +3506,7 @@ void DPMBase::read(std::istream& is)
             
             is >> dummy >> N;
             if (dummy.compare("Particles"))
-                logger(ERROR, "DPMBase::read(is): Error during restart: 'Boundaries' argument could not be found.");
+                logger(ERROR, "DPMBase::read(is): Error during restart: 'Particles' argument could not be found. %",dummy);
             particleHandler.clear();
             particleHandler.setStorageCapacity(N);
             helpers::getLineFromStringStream(is, line);
@@ -3614,7 +3616,7 @@ void DPMBase::checkSettings()
 {
     //check if name is set
     logger.assert_always(getName() != "",
-                         "File name not set: % Use setName()", getName());
+                         "File name not set: use setName()");
     //check if time step is set
     logger.assert_always(getTimeStep() != 0,
                          "Time step undefined: use setTimeStep()");
@@ -3694,9 +3696,7 @@ void DPMBase::writeOutputFiles()
 }
 
 /*!
- * \details This function takes the simulation domain boundaries and decomposes it into sub domains ready for parallel computaions
- *
- * After decomposition all the particles that are not inside a specific domain are deleted for memory purposes
+ * \details This function takes the simulation domain boundaries and decomposes it into sub domains ready for parallel computations
  */
 void DPMBase::decompose()
 {
@@ -4017,8 +4017,16 @@ bool DPMBase::readArguments(int argc, char* argv[])
 
 void DPMBase::removeOldFiles() const
 {
+    //logger(INFO,"ID %",PROCESSOR_ID);
+    //if (PROCESSOR_ID!=0) return;
+
+    logger(INFO,"Removing old files named %.*",getName());
     std::ostringstream filename;
-    std::vector<std::string> ext{".restart", ".stat", ".fstat", ".data", ".ene", ".xballs"};
+
+    // add processor id to file extension for mpi jobs
+    std::string p = (NUMBER_OF_PROCESSORS > 1)?std::to_string(PROCESSOR_ID):"";
+    // all the file extensions that should be deleted
+    std::vector<std::string> ext{".restart"+p, ".stat"+p, ".fstat"+p, ".data"+p, ".ene"+p, ".xballs"};
     for (const auto& j : ext)
     {
         // remove files with given extension for FileType::ONE_FILE
@@ -4026,7 +4034,7 @@ void DPMBase::removeOldFiles() const
         filename << getName() << j;
         if (!remove(filename.str().c_str()))
         {
-            std::cout << "  File " << filename.str() << " successfully deleted" << std::endl;
+            logger(INFO,"  File % successfully deleted",filename.str());
         }
         // remove files with given extension for FileType::MULTIPLE_FILES
         unsigned k = 0;
@@ -4034,7 +4042,7 @@ void DPMBase::removeOldFiles() const
         filename << getName() << j << '.' << k;
         while (!remove(filename.str().c_str()))
         {
-            std::cout << "  File " << filename.str() << " successfully deleted" << std::endl;
+            logger(INFO,"  File % successfully deleted",filename.str());
             filename.clear();
             filename << getName() << j << '.' << ++k;
         }
@@ -4044,13 +4052,16 @@ void DPMBase::removeOldFiles() const
         filename << getName() << j << '.' << to_string_padded(k);
         while (!remove(filename.str().c_str()))
         {
-            std::cout << "  File " << filename.str() << " successfully deleted" << std::endl;
+            logger(INFO,"  File % successfully deleted",filename.str());
             filename.clear();
             filename << getName() << j << '.' << to_string_padded(++k);
         }
     }
     // remove vtk files
-    ext = {"Wall_", "Particle_", "Interaction_"};
+    // add processor id to file extension for mpi jobs
+    std::string q = (NUMBER_OF_PROCESSORS > 1)?("Processor_"+std::to_string(PROCESSOR_ID)+"_"):"";
+    // all the file extensions that should be deleted
+    ext = {"Wall_", q+"Particle_", q+"Interaction_"};
     for (const auto& j : ext)
     {
         // remove files with given extension for FileType::ONE_FILE
@@ -4058,7 +4069,7 @@ void DPMBase::removeOldFiles() const
         filename << getName() << j << ".vtu";
         if (!remove(filename.str().c_str()))
         {
-            std::cout << "  File " << filename.str() << " successfully deleted" << std::endl;
+            logger(INFO,"  File % successfully deleted",filename.str());
         }
         // remove files with given extension for FileType::MULTIPLE_FILES
         unsigned k = 0;
@@ -4066,7 +4077,7 @@ void DPMBase::removeOldFiles() const
         filename << getName() << j << k << ".vtu";
         while (!remove(filename.str().c_str()))
         {
-            std::cout << "  File " << filename.str() << " successfully deleted" << std::endl;
+            logger(INFO,"  File % successfully deleted",filename.str());
             filename.str("");
             filename << getName() << j << ++k << ".vtu";
         }

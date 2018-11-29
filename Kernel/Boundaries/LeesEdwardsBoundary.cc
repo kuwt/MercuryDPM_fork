@@ -48,6 +48,15 @@ LeesEdwardsBoundary::set(std::function<Mdouble(Mdouble)> shift, std::function<Md
     up_ = up;
 }
 
+void LeesEdwardsBoundary::updateBoundaries(Mdouble left, Mdouble right, Mdouble down, Mdouble up)
+{
+    left_ = left;
+    right_ = right;
+    down_ = down;
+    up_ = up;
+}
+
+
 /*!
  * \details  Reads all the properties of the LeesEdwardsBoundary from an std::istream
  * \param[in,out] is    The stream from which the parameters are read

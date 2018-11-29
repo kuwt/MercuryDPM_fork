@@ -248,8 +248,8 @@ void MercuryBase::hGridRebuild()
                                                       0.0);
                 const Mdouble maxCellSize = nextafter(2.0 * maxParticleInteractionRadius * getHGridCellOverSizeRatio(),
                                                       std::numeric_limits<Mdouble>::max());
-                std::cout << "HGrid: using an exponential cell size distribution from " << minCellSize << " to "
-                          << maxCellSize << " over " << getHGridMaxLevels() << " levels" << std::endl;
+                logger(INFO,"HGrid: using exponential cell size distribution from % to % over % levels",
+                       minCellSize,maxCellSize,getHGridMaxLevels());
                 for (unsigned int i = 0; i + 1 < getHGridMaxLevels(); i++)
                 {
                     cellSizes.push_back(minCellSize

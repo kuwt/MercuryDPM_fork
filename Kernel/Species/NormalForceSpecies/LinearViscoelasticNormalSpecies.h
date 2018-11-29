@@ -66,6 +66,9 @@ public:
     ///Sets k, disp such that it matches a given tc and eps for a collision of two copies of P
     void setStiffnessAndRestitutionCoefficient(Mdouble k_, Mdouble eps, Mdouble mass);
     
+    ///Sets disp to obtain a restitution coefficient eps for a collision of two particles of mass m
+    void setRestitutionCoefficient(double eps, Mdouble mass);
+
     ///Sets k, disp such that it matches a given tc and eps for a collision of two copies of particle p
     void setCollisionTimeAndRestitutionCoefficient(Mdouble tc, Mdouble eps, BaseParticle* p);
     

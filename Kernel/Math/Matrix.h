@@ -71,6 +71,11 @@ public:
     double trace() const;
     
     /*!
+     * \brief The diagonal elements
+     */
+    Vec3D diag() const;
+
+    /*!
      * \brief Deviator
      */
     double deviator() const;

@@ -237,6 +237,14 @@ public:
      */
     void setZ(Mdouble min, Mdouble max);
     
+    void setXGrid(Mdouble min, Mdouble max, Mdouble h);
+    
+    void setYGrid(Mdouble min, Mdouble max, Mdouble h);
+    
+    void setZGrid(Mdouble min, Mdouble max, Mdouble h);
+    
+    void setGrid(Vec3D min, Vec3D max, Mdouble h);
+    
     /*!
      * \brief Sets max_, the upper limit of the spatial domain.
      */

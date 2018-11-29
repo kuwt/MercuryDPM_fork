@@ -133,6 +133,7 @@ void SlidingFrictionInteraction::computeFrictionForce()
             //Calculate test force acting on P including viscous force
             tangentialForce_ = -species->getSlidingStiffness() * slidingSpring_ -
                                species->getSlidingDissipation() * tangentialRelativeVelocity;
+            if (getSpecies()->getConstantRestitution()) tangentialForce_ *=2.0*getEffectiveMass();
             
             //tangential forces are modelled by a spring-damper of elasticity kt and viscosity dispt (sticking),
             //but the force is limited by Coulomb friction (sliding):
@@ -189,7 +190,11 @@ void SlidingFrictionInteraction::integrate(Mdouble timeStep)
  */
 Mdouble SlidingFrictionInteraction::getElasticEnergy() const
 {
-    return 0.5 * getSpecies()->getSlidingStiffness() * slidingSpring_.getLengthSquared();
+    if (getSpecies()->getConstantRestitution()) {
+        return getEffectiveMass() * getSpecies()->getSlidingStiffness() * slidingSpring_.getLengthSquared();
+    } else {
+        return 0.5 * getSpecies()->getSlidingStiffness() * slidingSpring_.getLengthSquared();
+    }
 }
 
 /*!

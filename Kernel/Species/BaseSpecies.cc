@@ -28,6 +28,8 @@
 #include "DPMBase.h"
 #include "Interactions/BaseInteraction.h"
 #include<cmath>
+#include <Interactions/NormalForceInteractions/LinearPlasticViscoelasticInteraction.h>
+#include "Species/NormalForceSpecies/LinearPlasticViscoelasticNormalSpecies.h"
 
 class BaseParticle;
 
@@ -37,6 +39,7 @@ BaseSpecies::BaseSpecies()
         : BaseObject()
 {
     handler_ = nullptr;
+    constantRestitution_ = false;
     logger(DEBUG, "BaseSpecies::BaseSpecies() finished");
 }
 
@@ -47,6 +50,7 @@ BaseSpecies::BaseSpecies(const BaseSpecies& p)
         : BaseObject(p)
 {
     handler_ = p.handler_;
+    constantRestitution_ = p.constantRestitution_;
     logger(DEBUG, "BaseSpecies::BaseSpecies(const BaseSpecies &p) finished");
 }
 
@@ -114,3 +118,13 @@ Mdouble BaseSpecies::averageInf(Mdouble a, Mdouble b) const
         return average(a, b);
 }
 
+
+/*!
+ * \brief Sets the boolean constantRestitution_.
+ */
+void BaseSpecies::setConstantRestitution(bool constantRestitution) {
+    logger.assert(constantRestitution_ == constantRestitution ||
+    dynamic_cast<LinearPlasticViscoelasticNormalSpecies*>(this)!= nullptr,
+    "ConstantRestitution is currently only implemented for the plastic contact law");
+    constantRestitution_ = constantRestitution;
+}

@@ -386,11 +386,6 @@ protected:
      */
     Mdouble getEffectiveMass() const;
     
-    /*!
-     * \brief Returns a Mdouble to the effective radius corrected for the overlaps of the particles. 
-     */
-    Mdouble getEffectiveCorrectedRadius();
-    
     //functions that only the derived Interactions have to know about:
     /*!
      * \brief add an force increment to the total force.

@@ -52,15 +52,13 @@ const unsigned unsignedMax = std::numeric_limits<unsigned>::max();
  * defining this macro makes the code a bit cleaner. Sadly it can't be defind
  * as a constant global variable as on compile time it is not known what it should be
  */
-#define NUMBER_OF_PROCESSORS MPIContainer::Instance().getNumberOfProcessors()
-
-/*!
- * \brief For the MPI communication routines this quantity is often required.
- * defining this macro makes the code a bit cleaner. Sadly it can't be defind
- * as a constant global variable as on compile time it is not known what it should be
- */
-
+#ifdef MERCURY_USE_MPI
+#define NUMBER_OF_PROCESSORS static_cast<unsigned>(MPIContainer::Instance().getNumberOfProcessors())
 #define PROCESSOR_ID MPIContainer::Instance().getProcessorID()
+#else
+#define NUMBER_OF_PROCESSORS 1
+#define PROCESSOR_ID 0
+#endif
 
 /*!
  * \brief An enum that indicates the direction in Cartesian coordinates

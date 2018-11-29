@@ -46,6 +46,7 @@ void WallVTKWriter::getVTKData(VTKContainer& vtk) const
 
 void WallVTKWriter::writeVTK() const
 {
+    if (PROCESSOR_ID!=0) return;
     std::fstream file = makeVTKFileWithHeader();
     
     VTKContainer vtk;

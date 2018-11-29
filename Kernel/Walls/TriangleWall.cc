@@ -152,9 +152,10 @@ void TriangleWall::read(std::istream& is)
 {
     BaseWall::read(is);
     std::string dummy;
+    is >> dummy;
     for (int i = 0; i < 3; i++)
     {
-        is >> dummy >> vertex_[i];
+        is >> vertexInLabFrame_[i];
     }
     updateVertexAndNormal();
 }
@@ -166,9 +167,10 @@ void TriangleWall::read(std::istream& is)
 void TriangleWall::write(std::ostream& os) const
 {
     BaseWall::write(os);
+    os << " vertexInLabFrame ";
     for (int i = 0; i < 3; i++)
     {
-        os << " vertex" << i << ' ' << vertex_[i];
+        os << ' ' << vertexInLabFrame_[i];
     }
 }
 

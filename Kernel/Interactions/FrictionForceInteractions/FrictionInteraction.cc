@@ -142,7 +142,8 @@ void FrictionInteraction::computeFrictionForce()
             //Calculate test force acting on P including viscous force
             Vec3D rollingForce = -species->getRollingStiffness() * rollingSpring_ -
                                  species->getRollingDissipation() * rollingRelativeVelocity;
-            
+            if (getSpecies()->getConstantRestitution()) rollingForce *=2.0*getEffectiveMass();
+
             //tangential forces are modelled by a spring-damper of elasticity kt and viscosity dispt (sticking),
             //but the force is limited by Coulomb friction (rolling):
             Mdouble rollingForceSquared = rollingForce.getLengthSquared();
@@ -192,7 +193,8 @@ void FrictionInteraction::computeFrictionForce()
             //Calculate test force acting on P including viscous force
             Vec3D torsionForce = -species->getTorsionStiffness() * torsionSpring_ -
                                  species->getTorsionDissipation() * torsionRelativeVelocity;
-            
+            if (getSpecies()->getConstantRestitution()) torsionForce *=2.0*getEffectiveMass();
+
             //tangential forces are modelled by a spring-damper of elasticity kt and viscosity dispt (sticking),
             //but the force is limited by Coulomb friction (torsion):
             Mdouble torsionForceSquared = torsionForce.getLengthSquared();
@@ -236,9 +238,15 @@ void FrictionInteraction::integrate(Mdouble timeStep)
  */
 Mdouble FrictionInteraction::getElasticEnergy() const
 {
-    return SlidingFrictionInteraction::getElasticEnergy()
-           + 0.5 * getSpecies()->getRollingStiffness() * rollingSpring_.getLengthSquared()
-           + 0.5 * getSpecies()->getTorsionStiffness() * torsionSpring_.getLengthSquared();
+    if (getSpecies()->getConstantRestitution()) {
+        return SlidingFrictionInteraction::getElasticEnergy()
+               + getEffectiveMass() * getSpecies()->getRollingStiffness() * rollingSpring_.getLengthSquared()
+               + getEffectiveMass() * getSpecies()->getTorsionStiffness() * torsionSpring_.getLengthSquared();
+    } else {
+        return SlidingFrictionInteraction::getElasticEnergy()
+               + 0.5 * getSpecies()->getRollingStiffness() * rollingSpring_.getLengthSquared()
+               + 0.5 * getSpecies()->getTorsionStiffness() * torsionSpring_.getLengthSquared();
+    }
 }
 
 /*!

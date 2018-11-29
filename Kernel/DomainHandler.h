@@ -108,7 +108,8 @@ public:
      * \brief Gets the domain assigned to the processor
      */
     Domain* getCurrentDomain();
-    
+    const Domain* getCurrentDomain() const;
+
     /*!
      * \brief Gets the domain index assigned to the processor
      */

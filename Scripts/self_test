@@ -16,7 +16,7 @@ date=$(date)
 echo Test run on $date >> $testlogname
 
 #run the fpdiff command and write the out to testlogfile
-${0/self_test/fpdiff.py} $1 $2 >> $testlogname || echo "FAILED to execute: ${0/self_test/fpdiff.py} $1 $2" >> $testlogname
+"${0/self_test/fpdiff.py}" "$1" "$2" >> $testlogname || echo "FAILED to execute: ${0/self_test/fpdiff.py} $1 $2" >> $testlogname
 
 #If the work FAILED is in the testlogfile it failed.
 failed=$(less $testlogname | grep FAILED --count)

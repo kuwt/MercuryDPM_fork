@@ -130,6 +130,10 @@ BaseWall* WallHandler::createObject(const std::string& type)
     {
         return new IntersectionOfWalls;
     }
+    else if (type == "BasicIntersectionOfWalls")
+    {
+        return new BasicIntersectionOfWalls;
+    }
     else if (type == "InfiniteWall")
     {
         return new InfiniteWall;
@@ -146,15 +150,19 @@ BaseWall* WallHandler::createObject(const std::string& type)
     {
         return new Coil;
     }
+    else if (type == "TriangleWall")
+    {
+        return new TriangleWall;
+    }
     else if (type == "VChute")
     {
         return new VChute;
     }
-        //for backward compatibility (before svnversion ~2360)
-    else if (type == "numFiniteWalls")
-    {
-        return new BasicIntersectionOfWalls;
-    }
+//    //for backward compatibility (before svnversion ~2360)
+//    else if (type == "numFiniteWalls")
+//    {
+//        return new InfiniteWall;
+//    }
     else
     {
         logger(WARN, "Wall type: % not understood in restart file", type);

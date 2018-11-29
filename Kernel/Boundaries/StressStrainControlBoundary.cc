@@ -66,23 +66,23 @@ StressStrainControlBoundary* StressStrainControlBoundary::copy() const
  */
 void StressStrainControlBoundary::write(std::ostream& os) const
 {
-    for (const LeesEdwardsBoundary& b : leesEdwardsBoundaries_)
-    {
-        os << b << "\n";
-    }
-    for (const PeriodicBoundary& b : periodicBoundaries_)
-    {
-        os << b << "\n";
-    }
     BaseBoundary::write(os);
-    
-    
-    os << "\n";
     os << " stressGoal " << stressGoal_;
     os << " strainRate " << strainRate_;
     os << " gainFactor " << gainFactor_;
     os << " isStrainRateControlled " << isStrainRateControlled_;
     os << " integratedShift " << integratedShift_;
+//    os << leesEdwardsBoundaries_.size() << ' ';
+//    for (const LeesEdwardsBoundary& b : leesEdwardsBoundaries_)
+//    {
+//        os << b << ' ';
+//    }
+//
+//    os << periodicBoundaries_.size() << ' ';
+//    for (const PeriodicBoundary& b : periodicBoundaries_)
+//    {
+//        os << b << ' ';
+//    }
 }
 
 /*!
@@ -97,8 +97,8 @@ void StressStrainControlBoundary::read(std::istream& is)
     is >> dummy >> strainRate_;
     is >> dummy >> gainFactor_;
     is >> dummy >> isStrainRateControlled_;
-    is >> dummy >> integratedShift_;
     set(stressGoal_, strainRate_, gainFactor_, isStrainRateControlled_);
+    is >> dummy >> integratedShift_;
 }
 
 /*!
@@ -320,6 +320,9 @@ void
 StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D& strainRate, const Matrix3D& gainFactor,
                                  bool isStrainRateControlled)
 {
+    periodicBoundaries_.clear();
+    leesEdwardsBoundaries_.clear();
+
     isStrainRateControlled_ = isStrainRateControlled;
     stressGoal_ = stressGoal;
     strainRate_ = strainRate;

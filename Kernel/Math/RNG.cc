@@ -127,8 +127,8 @@ void RNG::randomise()
         p_ = values[4];
         q_ = values[5];
         randomSeedLinearCongruentialGenerator_ = values[6];
-        seedLaggedFibonacciGenerator();
     }
+    seedLaggedFibonacciGenerator();
 #else
     setRandomSeed(static_cast<unsigned long int>(time(nullptr)));
 #endif
@@ -146,6 +146,7 @@ Mdouble RNG::getRandomNumber()
 
 Mdouble RNG::getRandomNumber(Mdouble min, Mdouble max)
 {
+    logger.assert(min <= max, "getRandomNumber: min cannot be larger than max");
     switch (type_)
     {
         case RNGType::LINEAR_CONGRUENTIAL_GENERATOR:

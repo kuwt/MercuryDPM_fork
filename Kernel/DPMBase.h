@@ -306,7 +306,9 @@ public:
     virtual bool checkParticleForInteractionLocal(const BaseParticle& P);
     
     bool checkParticleForInteractionLocalPeriodic(const BaseParticle& P);
-    
+
+    void readSpeciesFromDataFile(bool read = true){readSpeciesFromDataFile_=read;}
+
     //getters and setters
     
     /*!
@@ -514,6 +516,11 @@ public:
      */
     void setWallsWriteVTK(FileType writeWallsVTK);
     
+    /*!
+     * \brief Sets whether walls are written in a VTK file.
+     */
+    void setWallsWriteVTK(bool);
+
     /*!
      * \brief Sets whether particles are written in a VTK file.
      */

@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name ParticleCreationSelfTest revision 2985 repository https://svn.mercurydpm.org/SourceCode/Trunk
+MercuryDPM 0.14 name ParticleCreationSelfTest revision 3137 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
 dataFile    fileType ONE_FILE saveCount 20 counter 2 lastSavedTimeStep 1
 fStatFile   fileType ONE_FILE saveCount 20 counter 2 lastSavedTimeStep 1
 eneFile     fileType ONE_FILE saveCount 20 counter 2 lastSavedTimeStep 1
@@ -7,7 +7,7 @@ statFile    fileType ONE_FILE saveCount 20 counter 0
 interactionFile fileType NO_FILE saveCount 0 counter 0
 xMin 0 xMax 20 yMin 0 yMax 20 zMin 0 zMax 20
 timeStep 0.0174192436756409 time 0.0174192436756409 ntimeSteps 1 timeMax 0.0174192436756409
-systemDimensions 3 particleDimensions 3 gravity 0 -9.8 0 writeVTK 0 NO_FILE NO_FILE random  0 1103515245 12345 1073741824 607 273 784607267
+systemDimensions 3 particleDimensions 3 gravity 0 -9.8 0 writeVTK 0 NO_FILE NO_FILE 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267
 Species 1
 LinearViscoelasticSpecies id 0 density 1.90985931710274 stiffness 10 dissipation 2.64372568163104
 Walls 6

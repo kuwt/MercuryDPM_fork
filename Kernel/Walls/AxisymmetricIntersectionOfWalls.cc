@@ -163,8 +163,8 @@ void AxisymmetricIntersectionOfWalls::convertLimits(Vec3D& min, Vec3D& max) cons
     q.rotateBack(rMax); //set min/max initial values to values of first corner point
     
     Mdouble r = std::sqrt(std::max(rMax.Y * rMax.Y + rMax.Z * rMax.Z, rMin.Y * rMin.Y + rMin.Z * rMin.Z));
-    max = Vec3D(r, 0.001, rMax.X);
-    min = Vec3D(0, 0, rMin.X);
+    max = Vec3D(r, 0.001, std::max(rMin.X,rMax.X));
+    min = Vec3D(0, 0, std::min(rMin.X,rMax.X));
     //std::cout << "r=" << r << std::endl;
 }
 

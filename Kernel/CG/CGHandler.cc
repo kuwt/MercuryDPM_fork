@@ -341,6 +341,7 @@ bool CGHandler::evaluateDataFiles(bool evaluateFStatFiles)
     initialise();
     
     // return false if no data file can be read
+    ///\todo use ignore if time is out of bounds
     if (!dpm->readNextDataFile()) return false;
     
     //define and check time limits
