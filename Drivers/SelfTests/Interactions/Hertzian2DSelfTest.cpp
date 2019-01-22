@@ -18,20 +18,20 @@ class Hertzian2DUnitTest : public Mercury2D
 
             auto spec = new HertzianViscoelasticFrictionSpecies();
             spec->setDensity(1);
-            spec->setElasticModulusAndRestitutionCoefficient(6e-3, 0.1);
+            spec->setElasticModulusAndRestitutionCoefficient(6e2, 0.80);
             spec = speciesHandler.copyAndAddObject(spec);
 
             /* Collision between fixed and movable */
             auto pf = new BaseParticle;
             pf->setSpecies(spec);
-            pf->setRadius(5e-2);
+            pf->setRadius(0.1);
             pf->setPosition(Vec3D(0,0,0));
             pf->fixParticle();
             particleHandler.copyAndAddObject(pf);
 
             auto pm = new BaseParticle;
             pm->setSpecies(spec);
-            pm->setRadius(5e-2);
+            pm->setRadius(0.1);
             pm->setPosition(Vec3D(1,0,0));
             pm->setVelocity(Vec3D(-1,0,0));
             particleHandler.copyAndAddObject(pm);
