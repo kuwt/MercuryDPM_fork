@@ -83,21 +83,30 @@ public:
     
     /*!
      * \brief Returns the distance between a particle and the closest boundary, required for any periodic boundary
+     * \param[in] particle The distance between this particle and the closest boundary is calculated
      */
     virtual Mdouble getDistance(const BaseParticle& particle) const = 0;
     
     /*!
      * \brief Returns the distance between a position and the closest boundary
+     * \param[in] position The distance between this particle and the closest boundary is calculated
      */
     virtual Mdouble getDistance(const Vec3D& position) const = 0;
     
     /*!
      * \brief Returns true if it is closer to the left boundary than the right boundary
-     */
+     * \details Computes if a certain position is close to the left boundary (true)
+     * or if it is not close to the left boundary (false)
+     * \param[in] position The position which is being checked
+    */
     virtual bool isClosestToLeftBoundary(const Vec3D& position) const = 0;
     
     /*!
      * \brief Shifts the position (and velocity) of to the ghost particle
+    * \details Shifts the position of a particle to the other boundary.
+    * Note: In some cases it doesnt only shift the position, but also other quantities such
+    * as velocity
+    * \param[in] particle Pointer to the particle that will shift position
      */
     virtual void shiftPosition(BaseParticle* particle) const = 0;
     

@@ -954,7 +954,7 @@ bool createDirectory(std::string path) {
     mode_t nMode = 0733; // UNIX style permissions
     int nError = 0;
 #if defined(_WIN32)
-    nError = _mkdir(sPath.c_str()); // can be used on Windows
+    nError = _mkdir(path.c_str()); // can be used on Windows
 #else
     nError = mkdir(path.c_str(),nMode); // can be used on non-Windows
 #endif

@@ -36,6 +36,7 @@ bool setDistance(Mdouble& distance, const Vec3D& branch, Mdouble distanceMax)
     const Mdouble distance2 = branch.getLengthSquared();
     if (distance2 > distanceMax * distanceMax) return false;
     distance = sqrt(distance2);
+    return true;
 }
 
 

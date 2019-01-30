@@ -228,10 +228,9 @@ Vec3D Polynomial<Coordinates>::evaluateCGFunctionDerivatives(const Vec3D& positi
     Vec3D functionDerivative;
     functionDerivative.setZero();
     
-    std::array<bool, 3> direction = Coordinates::getCoordinateDirection();
-    for (int i = 0; i < 3; i++)
+    for (unsigned i = 0; i < 3; i++)
     {
-        if (direction[i])
+        if (Coordinates::isResolvedIn(i))
         {
             functionDerivative.setComponent(i, evaluateCGFunctionDerivativeWithFD(position, r, i));
         }

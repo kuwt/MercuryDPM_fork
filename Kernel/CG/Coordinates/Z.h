@@ -107,17 +107,9 @@ public:
      * the branch vector from the current CGPoint towards the contact point.
      */
     Mdouble getCNormal(const BaseInteraction& c, const Vec3D& normal) const;
-    
-    static std::array<bool, 3> getCoordinateDirection()
-    {
-        std::array<bool, 3> direction;
-        direction[0] = false;
-        direction[1] = false;
-        direction[2] = true;
-        
-        return direction;
-    }
-    
+
+    static bool isResolvedIn(unsigned i) {return i==2?true:false;}
+
     static std::string getName();
 
 protected:

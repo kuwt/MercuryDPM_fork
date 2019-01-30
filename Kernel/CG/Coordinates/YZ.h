@@ -111,18 +111,9 @@ public:
      * CGPoint and the branch vector between P and I.
      */
     Mdouble getTangentialSquared(const BaseInteraction& c, Mdouble pNormal) const;
-    
-    static std::array<bool, 3> getCoordinateDirection()
-    {
-        std::array<bool, 3> direction;
-        direction[0] = false;
-        direction[1] = true;
-        direction[2] = true;
-        
-        return direction;
-    }
-    
-    
+
+    static bool isResolvedIn(unsigned i) {return i==0?false:true;}
+
     static std::string getName();
 
 protected:

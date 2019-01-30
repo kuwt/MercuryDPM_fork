@@ -271,7 +271,10 @@ public:
     void setEps(Mdouble eps);
     
     Mdouble getEps() const;
-    
+
+    void setAverageBeyondDomain(const bool val) {averageBeyondDomain_=val;}
+
+    bool getAverageBeyondDomain() const {return averageBeyondDomain_;}
     /*
      * Sets width such that the CG function has a fixed standard deviation
      * See CGStandardDeviationUnitTest.
@@ -345,6 +348,19 @@ protected:
      * A function returning true for each particle that should be included in the statistics (all by default).
      */
     std::function<bool(const BaseInteractable*)> selectedParticle_;
+
+    /**
+     * \brief Determines whether particles outside the domain are considered when computing the averaged fields
+     * \details
+     * If set to true, then the average of field f over a coordinate direction x is computed as
+     *  \f$\frac1{x_{max}-x_{min}}\int_\mathbb{R} f dx\f$
+     * If set to false, then the average of field f over a coordinate direction x is computed as
+     *  \f$\frac1{x_{max}-x_{min}}\int_{x_{min}}^{x_{max}} f dx\f$
+     *
+     * \todo should the default be false?
+     * \todo currently, the above description is not implemented; it simply ignores particles outside the domain.
+     */
+    bool averageBeyondDomain_ = true;
 
 public:
     /*!

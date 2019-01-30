@@ -214,7 +214,7 @@ Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::Species
  */
 template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveForceSpecies>
 Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::Species(const Species& s)
-        : ParticleSpecies(s), NormalForceSpecies(s), FrictionForceSpecies(s), AdhesiveForceSpecies(s)
+        : BaseSpecies(s), ParticleSpecies(s), NormalForceSpecies(s), FrictionForceSpecies(s), AdhesiveForceSpecies(s)
 {
     logger(DEBUG, "Species::Species(const Species &p) finished");
 }

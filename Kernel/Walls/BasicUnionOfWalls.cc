@@ -110,6 +110,7 @@ bool BasicUnionOfWalls::getDistanceAndNormal(const BaseParticle& p, Mdouble& dis
     shifted.setPosition(position);
     shifted.setRadius(p.getRadius());
 
+    //check wall after wall; the first wall that returns an interaction is chosen
     for (auto w : walls_) {
         if (w->getDistanceAndNormal(shifted, distance, normal) == true) {
             getOrientation().rotate(normal);

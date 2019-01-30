@@ -86,16 +86,8 @@ public:
     
     static Mdouble getGaussPrefactor(Mdouble width, Mdouble cutoff)
     { return 1.0; }
-    
-    static std::array<bool, 3> getCoordinateDirection()
-    {
-        std::array<bool, 3> direction;
-        direction[0] = false;
-        direction[1] = false;
-        direction[2] = false;
-        
-        return direction;
-    }
+
+    static bool isResolvedIn(unsigned dim) {return false;}
     
     static std::string getName();
     

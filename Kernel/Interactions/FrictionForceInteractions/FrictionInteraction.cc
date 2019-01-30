@@ -186,7 +186,7 @@ void FrictionInteraction::computeFrictionForce()
             //Integrate the spring
             torsionSpringVelocity_ = torsionRelativeVelocity;
             //integrate(getHandler()->timeStep_);
-            torsionSpring_ +=
+            torsionSpring_ =
                     Vec3D::dot(torsionSpring_ + torsionSpringVelocity_ * getHandler()->getDPMBase()->getTimeStep(),
                                getNormal()) * getNormal();
             

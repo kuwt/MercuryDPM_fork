@@ -214,7 +214,9 @@ public:
     void writeEneFile();
     
     void writeFStatFile();
-    
+
+    void fillDomainWithParticles(unsigned N=50);
+
     /*!
      * \brief Reads all the particle data corresponding to a given, existing . restart file (for more details regarding restart files,
      * refer to the <A HREF="http://mercurydpm.org/assets/downloads/MercuryLesson/MercuryDPMLessonSlides.pdf">training materials</A> on the
@@ -512,14 +514,19 @@ public:
     { return rotation_; }
     
     /*!
-     * \brief Sets whether walls are written in a VTK file.
+     * \brief Sets whether walls are written into a VTK file.
      */
     void setWallsWriteVTK(FileType writeWallsVTK);
     
     /*!
-     * \brief Sets whether walls are written in a VTK file.
+     * \brief Sets whether walls are written into a VTK file.
      */
     void setWallsWriteVTK(bool);
+
+    /*!
+     * \brief Sets whether interactions are written into a VTK file.
+     */
+    void setInteractionsWriteVTK(bool);
 
     /*!
      * \brief Sets whether particles are written in a VTK file.
@@ -1338,6 +1345,13 @@ public:
      */
     
     void writePythonFileForVTKVisualisation() const;
+
+    void setReadInteractions(const bool readInteractions) {readInteractions_=readInteractions;}
+
+    bool getReadInteractions() const {return readInteractions_;}
+
+private:
+    bool readInteractions_ = true;
 };
 
 #endif

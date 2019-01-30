@@ -41,6 +41,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
+#include <Boundaries/CubeInsertionBoundary.h>
 #include "Interactions/Interaction.h"
 
 #include "Species/Species.h"
@@ -816,9 +817,12 @@ void DPMBase::setWallsWriteVTK(FileType writeWallsVTK)
 void DPMBase::setWallsWriteVTK(bool writeVTK)
 {
     writeWallsVTK_ = writeVTK?FileType::MULTIPLE_FILES:FileType::NO_FILE;
-
 }
 
+void DPMBase::setInteractionsWriteVTK(bool writeVTK)
+{
+    interactionHandler.setWriteVTK(writeVTK?FileType::MULTIPLE_FILES:FileType::NO_FILE);
+}
 /*!
  * \details
  * The VTK format is used for visualisation in Paraview.
@@ -2794,6 +2798,20 @@ void DPMBase::writeFStatFile()
     }
 }
 
+void DPMBase::fillDomainWithParticles(unsigned N) {
+    logger.assert_always(speciesHandler.getSize()>0,"There needs to be at least one species");
+    ParticleSpecies* s = speciesHandler.getLastObject();
+    BaseParticle p(s);
+    CubeInsertionBoundary b;
+    Mdouble r = cbrt(getTotalVolume())/N;
+    b.set(p,100,getMin(),getMax(),{0,0,0},{0,0,0},r,r);
+    b.insertParticles(this);
+    logger(INFO,"Inserted % particles",particleHandler.getSize());
+    //setTimeMax(0);
+    //solve();
+}
+
+
 /*!
  * \details Opens a file input stream corresponding to the restart file to be opened. If the file can be successfully opened,
  * uses the \ref read() function to extract all data from the restart file.
@@ -3532,7 +3550,7 @@ void DPMBase::read(std::istream& is)
 #endif
             //Add interactions to particles and ghost particles
             
-            interactionHandler.read(is);
+            if (getReadInteractions()) interactionHandler.read(is);
         }
             //reading in for older versions of the Mercury restart file.
         else if (!restartVersion_.compare("3"))

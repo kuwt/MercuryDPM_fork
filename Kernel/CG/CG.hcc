@@ -98,15 +98,10 @@ template<class Coordinates, template<class> class BaseFunction, class Fields>
 void CG<Coordinates, BaseFunction, Fields>::createMesh()
 {
     spaceEvenly(getMin(), getMax(), {getNX(), getNY(), getNZ()}, points_);
-    std::array<bool, 3> coordinateDirections = Coordinates::getCoordinateDirection();
-    nX_ = coordinateDirections[0] ? nX_ : 1;
-    nY_ = coordinateDirections[1] ? nY_ : 1;
-    nZ_ = coordinateDirections[2] ? nZ_ : 1;
-    if (!coordinateDirections[0] || !coordinateDirections[1] || !coordinateDirections[2])
-    {
-        logger(INFO, "In CG, setting number of evaluation points to %, %, % in X, Y and Z dimensions respectively",
-               nX_, nY_, nZ_);
-    }
+    nX_ = Coordinates::isResolvedIn(0) ? nX_ : 1;
+    nY_ = Coordinates::isResolvedIn(1) ? nY_ : 1;
+    nZ_ = Coordinates::isResolvedIn(2) ? nZ_ : 1;
+    logger(INFO, "In CG, setting number of evaluation points to %, %, % in X, Y and Z dimensions respectively", nX_, nY_, nZ_);
 }
 
 template<class Coordinates, template<class> class BaseFunction, class Fields>
@@ -236,6 +231,7 @@ void CG<Coordinates, BaseFunction, Fields>::evaluateCommon()
     // only if the function selectedParticle returns true for the given particle
     for (const BaseParticle* const p : dpm->particleHandler)
     {
+        //if p is (a) not a ghost,MPI, or fixed particle
         if (!(p->isMPIParticle() || p->isPeriodicGhostParticle()) &&
             (!p->isFixed() || Fields::evaluateFixedParticles()) &&
             selectedParticle_(p))
@@ -317,24 +313,54 @@ void CG<Coordinates, BaseFunction, Fields>::evaluateParticleAtPoint(Fields& curr
 template<class Coordinates, template<class> class BaseFunction, class Fields>
 void CG<Coordinates, BaseFunction, Fields>::evaluateParticle(const BaseParticle& p)
 {
-    const Mdouble invDeltaX = nX_ / (max_.X - min_.X);
-    const Mdouble pX = (p.getPosition().X - min_.X) * invDeltaX - 0.5;
-    const Mdouble cX = function_.getCutoff() * invDeltaX;
-    const std::size_t minX = (nX_ == 1 ? 0 : static_cast<std::size_t>(std::max(0.0, pX - cX + 1)));
-    const std::size_t maxX = (nX_ == 1 ? 1 : std::min(nX_, static_cast<std::size_t> (pX + cX + 1)));
-    
-    const Mdouble invDeltaY = nY_ / (max_.Y - min_.Y);
-    const Mdouble pY = (p.getPosition().Y - min_.Y) * invDeltaY - 0.5;
-    const Mdouble cY = function_.getCutoff() * invDeltaY;
-    const std::size_t minY = (nY_ == 1 ? 0 : static_cast<std::size_t>(std::max(0.0, pY - cY + 1)));
-    const std::size_t maxY = (nY_ == 1 ? 1 : std::min(nY_, static_cast<std::size_t> (pY + cY + 1)));
-    
-    const Mdouble invDeltaZ = nZ_ / (max_.Z - min_.Z);
-    const Mdouble pZ = (p.getPosition().Z - min_.Z) * invDeltaZ - 0.5;
-    const Mdouble cZ = function_.getCutoff() * invDeltaZ;
-    const std::size_t minZ = (nZ_ == 1 ? 0 : static_cast<std::size_t>(std::max(0.0, pZ - cZ + 1)));
-    const std::size_t maxZ = (nZ_ == 1 ? 1 : std::min(nZ_, static_cast<std::size_t> (pZ + cZ + 1)));
-    
+    const Vec3D pos = p.getPosition()-min_;
+    const Mdouble cutoff = function_.getCutoff();
+
+    std::size_t minX;
+    std::size_t maxX;
+    // if x-coordinate is averaged
+    if (!Coordinates::isResolvedIn(0)) {
+        minX = 0;
+        maxX = (averageBeyondDomain_ || (pos.X>=min_.X && pos.X<=max_.X) )?1:0; // don't do anything if particle is beyond domain and should not be considered
+    } else {
+        //Example
+        // min.X=0, max.X=6, nX=3 => points[0,1,2]=1,3,5
+        // pos=2, cutoff=1.1 => points 0,1 should be considered
+        //    minX=ceil(0.5-0.55)=0
+        //    maxX=floor(0.5+0.55)=1 (!one is added to the max since the max is never reached!)
+        const Mdouble invDelta = nX_ / (max_.X - min_.X);
+        const Mdouble idPos = pos.X * invDelta - 0.5;
+        const Mdouble idCutoff = cutoff * invDelta;
+        minX = static_cast<std::size_t>(std::max(0.0, idPos - idCutoff + 1));  //max before cast to avoid negative number issue
+        maxX = std::min(nX_, static_cast<std::size_t> (idPos + idCutoff + 1));
+    }
+
+    std::size_t minY;
+    std::size_t maxY;
+    if (!Coordinates::isResolvedIn(1)) {
+        minY = 0;
+        maxY = (averageBeyondDomain_ || (pos.Y>=min_.Y && pos.Y<=max_.Y) )?1:0;
+    } else {
+        const Mdouble invDelta = nY_ / (max_.Y - min_.Y);
+        const Mdouble idPos = pos.Y * invDelta - 0.5;
+        const Mdouble idCutoff = cutoff * invDelta;
+        minY = static_cast<std::size_t>(std::max(0.0, idPos - idCutoff + 1));
+        maxY = std::min(nY_, static_cast<std::size_t> (idPos + idCutoff +1));
+    }
+
+    std::size_t minZ;
+    std::size_t maxZ;
+    if (!Coordinates::isResolvedIn(2)) {
+        minZ = 0;
+        maxZ = (averageBeyondDomain_ || (pos.Z>=min_.Z && pos.Z<=max_.Z) )?1:0;
+    } else {
+        const Mdouble invDelta = nZ_ / (max_.Z - min_.Z);
+        const Mdouble idPos = pos.Z * invDelta - 0.5;
+        const Mdouble idCutoff = cutoff * invDelta;
+        minZ = static_cast<std::size_t>(std::max(0.0, idPos - idCutoff + 1));
+        maxZ = std::min(nZ_, static_cast<std::size_t> (idPos + idCutoff +1));
+    }
+
     Fields currentInteraction;
     currentInteraction.setFields(p);
     

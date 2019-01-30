@@ -243,6 +243,10 @@ void commandLineCG(Mercury3D &dpm, int argc, char **argv)
             logger.assert_always(i+1<argc,"% requires argument",argv[i]);
             cg->setStandardDeviation(atof(argv[i + 1]));
             logger(INFO, "Set cg width to % (std %)", cg->getWidth(),atof(argv[i + 1]));
+        } else if (!strcmp(argv[i], "-averagebeyonddomain")) {
+            logger.assert_always(i+1<argc,"% requires argument",argv[i]);
+            cg->setAverageBeyondDomain(atoi(argv[i + 1]));
+            logger(INFO, "Set averageBeyondDomain to %", argv[i + 1]);
         } else if (!strcmp(argv[i], "-n")) {
             logger.assert_always(i+1<argc,"% requires argument",argv[i]);
             cg->setN(atoi(argv[i + 1]));

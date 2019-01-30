@@ -145,6 +145,7 @@ void CGHandler::restart(std::string name)
     cgLogger(INFO, "Evaluating files named %", dpm->getName());
     
     // read restart file
+    getDPMBase()->setReadInteractions(false);
     if (!dpm->readRestartFile())
     {
         if (dpm->speciesHandler.getNumberOfObjects() == 0)
@@ -177,6 +178,7 @@ void CGHandler::restart(std::string name)
         cgLogger(INFO, "Successfully restarted from %, t=%, Np=%, Nc=%", dpm->restartFile.getFullName(), dpm->getTime(),
                  dpm->particleHandler.getSize(), dpm->interactionHandler.getNumberOfObjects());
     }
+    getDPMBase()->setReadInteractions(true);
 }
 
 void CGHandler::restartAndEvaluateRestartFiles(const std::string& name)

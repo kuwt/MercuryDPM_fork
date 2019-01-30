@@ -69,10 +69,10 @@ public:
     ///\brief Allows the spring constant to be accessed
     Mdouble getBondDissipation() const;
     
-    ///\brief Allows the spring constant to be changed
+    ///\brief Allows bondForceMax_ to be changed
     void setBondForceMax(Mdouble new_f0);
     
-    ///\brief Allows the spring constant to be accessed
+    ///\brief Allows bondForceMax_ to be accessed
     Mdouble getBondForceMax() const;
     
     ///\brief returns the largest separation distance at which adhesive short-range forces can occur (0.0 for the default EmptyAdhesiveSpecies).

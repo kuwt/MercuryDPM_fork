@@ -158,17 +158,9 @@ public:
      * returns the number of variables (in this case three)
      */
     static const unsigned countVariables();
-    
-    static std::array<bool, 3> getCoordinateDirection()
-    {
-        std::array<bool, 3> direction;
-        direction[0] = true;
-        direction[1] = true;
-        direction[2] = true;
-        
-        return direction;
-    }
-    
+
+    static bool isResolvedIn(unsigned i) {return true;}
+
     static std::string getName();
 
 protected:

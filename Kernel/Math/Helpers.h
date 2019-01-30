@@ -246,12 +246,15 @@ bool readOptionalVariable(std::istream& is, const std::string& name, T& variable
 {
     ///\todo readOptionalVariable should check the full variable name, not just the next value.
     /// However, I don't know how to put the location in the ifstream back.
-    if (is.peek() == name.c_str()[0])
+    const auto pos = is.tellg();
+    std::string dummy;
+    is >> dummy;
+    if (dummy == name)
     {
-        std::string dummy;
-        is >> dummy >> variable;
+        is >> variable;
         return true;
     } else {
+        is.seekg(pos);
         return false;
     }
 }

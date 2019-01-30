@@ -102,41 +102,6 @@ PeriodicBoundaryHandler* BasePeriodicBoundary::getPeriodicHandler() const
 }
 
 /*!
- * \details Shifts the position of a particle to the other boundary.
- * Note: In some cases it doesnt only shift the position, but also other quantities such
- * as velocity
- * \param[in] particle Pointer to the particle that will shift position
- */
-void BasePeriodicBoundary::shiftPosition(BaseParticle* particle UNUSED) const
-{
-}
-
-/*!
- * \details Obtains the distance between the particle and the closest boundary
- * \param[in] particle The distance between this particle and the closest boundary is calculated
- */
-Mdouble BasePeriodicBoundary::getDistance(const BaseParticle& particle) const
-{
-}
-
-/*!
- * \details Obtains the distance between a position and the closest boundary
- * \param[in] position The distance between this particle and the closest boundary is calculated
- */
-Mdouble BasePeriodicBoundary::getDistance(const Vec3D& position) const
-{
-}
-
-/*!
- * \details Computes if a certain position is close to the left boundary (true)
- * or if it is not close to the left boundary (false)
- * \param[in] position The position which is being checked
- */
-bool BasePeriodicBoundary::isClosestToLeftBoundary(const Vec3D& position) const
-{
-}
-
-/*!
  * \details checks whether particles have passed the boundary, and if so, does something
  * special with it. (i.e. deletion boundary, insertion boundary)
  * NB: virtual function
