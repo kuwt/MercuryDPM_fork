@@ -34,14 +34,16 @@
 /*!
  * \brief A IntersectionOfWalls is convex polygon defined as an intersection of InfiniteWall's.
  * \details It can be defined as the intersection of a set
- * of #InfiniteWalls, defined by the normal vector into the wall and a point on the wall:
+ * of #InfiniteWalls, defined by the normal vector into the wall and a point on
+ * the wall.
+ * For example, the following gives a cube |x|<1 and |y|<1:
  * \code
  *   IntersectionOfWalls w;
  *   //for each wall, specify a normal and position vector
- *   w.addObject(Vec3D(-1.0,0.0,0.0),Vec3D(1.0,0.0,0.0));
- *   w.addObject(Vec3D(1.0,0.0,0.0),Vec3D(0.0,0.0,0.0));
- *   w.addObject(Vec3D(0.0,-1.0,0.0),Vec3D(0.0,1.0,0.0));
- *   w.addObject(Vec3D(0.0,1.0,0.0),Vec3D(0.0,0.0,0.0));
+ *   w.addObject(Vec3D(-1, 0, 0),Vec3D(1, 0, 0));
+ *   w.addObject(Vec3D(1, 0, 0),Vec3D(0, 0, 0));
+ *   w.addObject(Vec3D(0, -1, 0),Vec3D(0, 1, 0));
+ *   w.addObject(Vec3D(0, 1, 0),Vec3D(0, 0, 0));
  *   wallHandler.copyAndAddObject(w);
  * \endcode
  * A particle of radius *r* and position *x* touches an #InfiniteWall with normal *n* and position *p* if
@@ -108,7 +110,8 @@ public:
     unsigned int getNumberOfObjects();
     
     /*!
-     * \brief Adds a wall to the set of infinite walls, given an outward normal vector s.t. normal*x=normal*point
+     * \brief Adds a wall to the set of infinite walls, given a normal vector pointing into the wall (i.e. out of the simulation domain), going through the point, 
+     * so that normal*x=normal*point
      */
     void addObject(Vec3D normal, Vec3D point);
     
@@ -133,7 +136,8 @@ public:
                   const Mdouble& Thickness, int wallidentifier);
     
     /*!
-     * \brief Adds a wall to the set of finite walls, given an outward normal vector s. t. normal*x=position
+     * \brief Adds a wall to the set of finite walls, given an normal vector pointing into the wall (i.e. out of the flow domain), 
+     * to give a plane defined by normal*x=position
      * \deprecated Don't use this function, instead use the function addObject(Vec3D, Vec3D).
      */
     MERCURY_DEPRECATED

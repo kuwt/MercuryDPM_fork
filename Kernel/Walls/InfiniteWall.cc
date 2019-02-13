@@ -108,10 +108,12 @@ InfiniteWall* InfiniteWall::copy() const
 }
 
 /*
+ * \details Defines a standard wall, given a normal vector pointing into the
+ * wall (i.e. out of the flow domain) and a point that the wall goes through,
+ * to give a plane defined by
+ * normal*x=normal*point.
  * \param[in] normal A Vec3D that represents the normal to the wall.
  * \param[in] point A Vec3D which is a point on the wall.
- * \details Sets the wall such that for all points x on the wall it holds that 
- * normal*x=normal*point.
  */
 void InfiniteWall::set(Vec3D normal, Vec3D point)
 {
@@ -128,7 +130,8 @@ void InfiniteWall::setNormal(const Vec3D normal)
 }
 
 /*!
- * \details Defines a standard wall, given an outward normal vector s. t. normal*x=position
+ * \details Defines a standard wall, given an normal vector pointing into the wall (i.e. out of the flow domain), 
+ * to give a plane defined by normal*x=position
  * \param[in] normal A Vec3D that represents the normal vector to the wall.
  * \param[in] positionInNormalDirection The position of the wall in the direction
  *  of the normal vector.
