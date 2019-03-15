@@ -36,8 +36,10 @@ class ParticleSpecies;
 
 namespace helpers
 {
+    // returns the input string after converting upper-case characters to lower case
+    std::string lower(std::string s);
 
-/*!
+    /*!
  * \brief return type specifically for fuctions returning k and disp at once
  */
 class KAndDisp

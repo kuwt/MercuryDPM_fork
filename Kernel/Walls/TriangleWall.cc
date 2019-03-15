@@ -56,8 +56,9 @@ bool setDistance(Mdouble& distance, const Vec3D& branch, Mdouble distanceMax)
  */
 bool TriangleWall::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal) const
 {
-    const Vec3D position = p.getPosition() - getPosition();
-    const Mdouble signedDistance = Vec3D::dot(position, faceNormal_);
+    const Vec3D position = p.getPosition();// - getPosition();
+    //getOrientation().rotateBack(position);
+    const Mdouble signedDistance = Vec3D::dot(position-vertex_[0], faceNormal_);
     distance = fabs(signedDistance);
     if (distance >= p.getWallInteractionRadius())
     {
@@ -181,7 +182,7 @@ void TriangleWall::writeVTK(VTKContainer& vtk) const
     vtk.points.reserve(s + 3);
     for (auto v : vertex_)
     {
-        vtk.points.push_back(v + getPosition());
+        vtk.points.push_back(v);
     }
     std::vector<double> cell;
     cell.reserve(3);
@@ -199,15 +200,35 @@ void TriangleWall::setVertices(const Vec3D A, const Vec3D B, const Vec3D C)
     vertexInLabFrame_[0] = A - getPosition();
     vertexInLabFrame_[1] = B - getPosition();
     vertexInLabFrame_[2] = C - getPosition();
+    //vertexInLabFrame_[0] = A;
+    //vertexInLabFrame_[1] = B;
+    //vertexInLabFrame_[2] = C;
     updateVertexAndNormal();
 }
 
+void TriangleWall::setVertices(const Vec3D A, const Vec3D B, const Vec3D C, const Vec3D position)
+{
+    setPosition(position);
+    setOrientation({1, 0, 0, 0});
+    vertexInLabFrame_[0] = A - getPosition();
+    vertexInLabFrame_[1] = B - getPosition();
+    vertexInLabFrame_[2] = C - getPosition();
+    updateVertexAndNormal();
+}
+
+/**
+ * This function should be called after setting either position_ or vertexInLabFrame_.
+ *  - vertex is set to the vertex position in the real coordinate system (rotated and shifted)
+ *  - vertexMin_/vertexMax_ is set to define a bounding box around the wall (for contact detection)
+ *  - edge_, edgeNormal_ and faceNormal_ is updated (stored for quick computation of contact point)
+ */
 void TriangleWall::updateVertexAndNormal()
 {
     for (int i = 0; i < 3; i++)
     {
-        vertex_ = vertexInLabFrame_;
+        vertex_[i] = vertexInLabFrame_[i];
         getOrientation().rotate(vertex_[i]);
+        vertex_[i] += getPosition();
     }
     vertexMin_ = Vec3D::min(Vec3D::min(vertex_[0], vertex_[1]), vertex_[2]);
     vertexMax_ = Vec3D::max(Vec3D::max(vertex_[0], vertex_[1]), vertex_[2]);

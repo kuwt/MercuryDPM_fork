@@ -95,11 +95,19 @@ public:
     void write(std::ostream& os) const override;
     
     /*!
-     * \brief Writes an TriangleWall to an output stream, for example a restart file.
+     * \brief Sets member variables such that the wall represents a triangle with vertices A, B, C
+     *  - position_ is set to the center of mass of the wall
+     *  - vertexInLabFrame_ is set relative to the position
+     *  - updateVertexAndNormal is called to set the remaining variables
      */
     void setVertices(Vec3D A, Vec3D B, Vec3D C);
-    
-    
+
+    /*!
+     * \brief Same as #setVertices(A,B,C), but sets the position explicitly.
+     * The position is important when you rotate the wall, as the wall will be rotated around this position.
+     */
+    void setVertices(Vec3D A, Vec3D B, Vec3D C, Vec3D position);
+
     void writeVTK(VTKContainer& vtk) const override;
     
     /*!

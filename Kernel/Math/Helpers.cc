@@ -50,6 +50,12 @@
 #define GetCurrentDir getcwd
 #endif
 
+
+std::string helpers::lower(std::string s) {
+    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+    return s;
+}
+
 //helpers::KAndDisp helpers::computeKAndDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass)
 //{
 //    helpers::KAndDisp ans;

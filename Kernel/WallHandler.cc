@@ -330,11 +330,17 @@ void WallHandler::writeVTKBoundingBox() const
  * \param[in] species pointer to a species in the species handler that will be assigned to the walls
  * \param[in] scaleFactor allows the vertex positions to be scaled (necessary if the vtk file is written in different units than the Mercury implementation, e.g. if the stl file is given in mm, but the Mercury implementation uses meters)
  */
-void WallHandler::readTriangleWall(std::string filename, ParticleSpecies* species, Mdouble scaleFactor)
+void WallHandler::readTriangleWall(std::string filename, ParticleSpecies* species, Mdouble scaleFactor, Vec3D shift, Vec3D velocity, Vec3D angularVelocity)
 {
     std::string fileType = filename.substr(filename.find_last_of('.') + 1);
-    
-    if (!fileType.compare("vtk"))
+
+    //define a default triangle wall
+    TriangleWall triangleWall;
+    triangleWall.setSpecies(species);
+    triangleWall.setVelocity(velocity);
+    triangleWall.setAngularVelocity(angularVelocity);
+
+    if (helpers::lower(fileType) == "vtk")
     {
         //try open the input file
         std::fstream file;
@@ -364,13 +370,11 @@ void WallHandler::readTriangleWall(std::string filename, ParticleSpecies* specie
         //read faces
         unsigned n = getSize();
         file >> dummy >> num >> dummy;
-        TriangleWall triangleWall;
-        triangleWall.setSpecies(species);
         unsigned id0, id1, id2;
         for (unsigned i = 0; i < num; i++)
         {
             file >> dummy >> id0 >> id1 >> id2;
-            triangleWall.setVertices(vertex[id0], vertex[id1], vertex[id2]);
+            triangleWall.setVertices(vertex[id0], vertex[id1], vertex[id2], shift);
             copyAndAddObject(triangleWall);
         }
         
@@ -380,15 +384,13 @@ void WallHandler::readTriangleWall(std::string filename, ParticleSpecies* specie
         logger(INFO, "Read in % walls", getSize() - n);
         
     }
-    else if (!fileType.compare("stl"))
+    else if (helpers::lower(fileType) == "stl")
     {
         
         BinaryReader file(filename);
         
         STLTriangle triangle;
-        TriangleWall triangleWall;
-        triangleWall.setSpecies(species);
-        
+
         std::string header = file.readString(80);
         unsigned numTriangles = file.readUnsignedInt(4);
         
@@ -417,14 +419,14 @@ void WallHandler::readTriangleWall(std::string filename, ParticleSpecies* specie
             triangle.vertex3 *= scaleFactor;
             
             //add to triangle wall
-            triangleWall.setVertices(triangle.vertex1, triangle.vertex2, triangle.vertex3);
+            triangleWall.setVertices(triangle.vertex1, triangle.vertex2, triangle.vertex3, shift);
             copyAndAddObject(triangleWall);
             
             //Now ignore (read) the two dummy characters
             file.ignoreChar(2);
             
         }
-        
+
         logger(INFO, "Read in % walls", numTriangles);
         
     }
@@ -435,4 +437,3 @@ void WallHandler::readTriangleWall(std::string filename, ParticleSpecies* specie
         
     }
 }
-

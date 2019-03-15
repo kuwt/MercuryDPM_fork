@@ -90,7 +90,8 @@ public:
     /**
      * \brief Reads triangulated walls from vtk or stl files, and converts them into a set of TriangleWalls
      */
-    void readTriangleWall(std::string filename, ParticleSpecies* species, Mdouble scaleFactor = 1);
+
+    void readTriangleWall(std::string filename, ParticleSpecies* species, Mdouble scaleFactor = 1, Vec3D shift = {0,0,0}, Vec3D velocity = {0,0,0}, Vec3D angularVelocity = {0,0,0});
 
 private:
     
