@@ -26,6 +26,12 @@
 #include <fstream>
 #include <map>
 
+#include "CG/CG.h"
+#include "CG/TimeSmoothedCG.h"
+#include "CG/TimeAveragedCG.h"
+
+#define MAX_STRLEN 1024
+
 void terminationUncaughtException()
 {
     std::cout << "Uncaught exception!" << std::endl;
@@ -66,10 +72,9 @@ class muICal2D : public Mercury2D
             setYMin(0);
             setYMax(pars.at("height"));
             setZMin(0);
-            setZMax(0);
+            setZMax(1);
 
             dataFile.setFileType(FileType::NO_FILE);
-            // dataFile.setFileType(FileType::MULTIPLE_FILES);
             fStatFile.setFileType(FileType::NO_FILE);
 
             /* Define species */
@@ -138,6 +143,7 @@ class muICal2D : public Mercury2D
                     particleHandler.copyAndAddObject(rbParticle);
                 }
 
+            /* Gravity initially points downwards */
             setGravity(Vec3D(0, -1, 0));
         }
 
@@ -192,6 +198,30 @@ class muICal2D : public Mercury2D
             lid = wallHandler.copyAndAddObject(lid);
 
             not_yet_removed_insb = true;
+
+            /* Create a CG object for live statistics */
+            auto cg = cgHandler.copyAndAddObject(
+                    new CG<CGCoordinates::Y>);
+            cg->statFile.setSaveCount(pars.at("saveEvery"));
+            cg->setWidth(pars.at("particleRadius") * 1.5);
+            cg->setY(0, pars.at("height")*1.5);
+            cg->setN(64);
+        }
+
+        void actionsOnRestart()
+        {
+            if (boundaryHandler.getNumberOfObjects() == 1)
+            {
+                not_yet_removed_insb = false;
+
+                /* Continue writing to the .muI file. */
+                char muICal2D_fn[MAX_STRLEN];
+                snprintf(muICal2D_fn, MAX_STRLEN, "%s.muI", getName().c_str());
+                muICal2D_f = fopen(muICal2D_fn, "a");
+                setbuf(muICal2D_f, NULL);
+                logger(INFO, "Continuing writing to .muI file\n");
+
+            }
         }
 
         void actionsAfterTimeStep()
@@ -206,30 +236,52 @@ class muICal2D : public Mercury2D
                 // wallHandler.removeObject(dam->getIndex());
                 wallHandler.removeObject(lid->getIndex());
 
+
                 /* Gravity: Only start the sloping after the container has been
                  * filled.*/
                 setGravity(Vec3D(pars.at("g")*sin(pars.at("theta")), -pars.at("g")*cos(pars.at("theta")), 0.0));
                 not_yet_removed_insb = false;
-                fprintf(stderr, "time %f, removed insb, dam and lid\n", getTime());
+                logger(INFO, "time %, removed insb, dam and lid", getTime());
+
+                /* Start writing to output files. */
                 setTime(0);
+                // dataFile.setFileType(FileType::MULTIPLE_FILES);
+                // fStatFile.setFileType(FileType::MULTIPLE_FILES);
+                forceWriteOutputFiles();
 
-                size_t MAX_STRLEN = 1024;
-                char fn[MAX_STRLEN];
-                snprintf(fn, MAX_STRLEN, "%s.muI", getName().c_str());
-                muICal2D_f = fopen(fn, "w");
+                /* Start writing to the .muI file. */
+                char muICal2D_fn[MAX_STRLEN];
+                snprintf(muICal2D_fn, MAX_STRLEN, "%s.muI", getName().c_str());
+                muICal2D_f = fopen(muICal2D_fn, "w");
                 setbuf(muICal2D_f, NULL);
-                fprintf(muICal2D_f, "time theta depth mass xmom ke\n"); 
-                fprintf(stderr, "Started writing to .muI file\n");
-
+                fprintf(muICal2D_f, "time theta depth mass xmom ke basfx basfy\n"); 
+                logger(INFO, "Started writing to .muI file\n");
             }
 
+            /* If the experiment has started, then write to the .muI file. */
             if (!not_yet_removed_insb 
                     && getNumberOfTimeSteps() % dataFile.getSaveCount() == 0)
-                fprintf(muICal2D_f, "%g %g %g %g %g %g\n",
+            {
+                /* Calculate the forces on the basal particles 
+                 * and the basal wall. */
+                Vec3D basalForce;
+                for (auto p : particleHandler)
+                {
+                    if (p->isFixed())
+                    {
+                        basalForce += p->getForce();
+                    }
+                }
+                basalForce += wallHandler.getObject(0)->getForce();
+                
+                /* Write all these details to the .muI file. */
+                fprintf(muICal2D_f, "%g %g %g %g %g %g %g %g\n",
                         getTime(), pars.at("theta"),
                         2*getCentreOfMass().Y,
                         getTotalMass(), 
-                        getTotalMomentum().X, getKineticEnergy());
+                        getTotalMomentum().X, getKineticEnergy(),
+                        basalForce.X, basalForce.Y);
+            }
         }
 
         void actionsAfterSolve()
@@ -254,12 +306,22 @@ class muICal2D : public Mercury2D
 
 int main(int argc, char ** argv) 
 {
-    // std::set_terminate(terminationUncaughtException);
+    std::set_terminate(terminationUncaughtException);
 
+    auto problem = new muICal2D(argv[1], M_PI * atof(argv[2]) / 180.);
+    argv[2] = argv[0];
+    problem->solve(argc-2, argv+2);
+    delete problem;
+    return 0;
+}
+
+#if 0
     switch (argc)
     {
         case 2:
             {
+                /* No angle has been specified, 
+                 * so choose from the pars file. */
                 auto problem = new muICal2D(argv[1]);
                 argv[1] = argv[0];
                 problem->solve(argc-1, argv+1);
@@ -268,7 +330,9 @@ int main(int argc, char ** argv)
             }
         case 3:
             {
-                auto problem = new muICal2D(argv[1], M_PI * atof(argv[2]) / 180.);
+                /* An angle has been specified */
+                auto problem 
+                    = new muICal2D(argv[1], M_PI * atof(argv[2]) / 180.);
                 argv[2] = argv[0];
                 problem->solve(argc-2, argv+2);
                 delete problem;
@@ -276,12 +340,10 @@ int main(int argc, char ** argv)
             }
         default:
             {
-                fprintf(stderr, "Usage: %s pars-file [angle]\n", argv[0]);
+                fprintf(stderr, 
+                    "Usage: %s pars-file [angle]\n", argv[0]);
                 exit(-1);
                 break;
             }
     }
-
-    return 0;
-}
-
+#endif

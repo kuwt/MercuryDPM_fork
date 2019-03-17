@@ -1,0 +1,33 @@
+theta            12.0
+timeStep          1.5823e-4
+timeMax         300
+saveEvery       3160
+xmin            -3
+xmax            50
+
+reservoirLength 1
+reservoirHeight 1.5
+reservoirVel 3
+reservoirTemperature 0
+gateHeight 1
+volfracThreshold 0.8
+
+baseRadius 1.67e-2
+baseDispersity 0.0
+baseConc 1.0
+roughBaseType 3
+transitionLengthscale 1
+
+particleRadius 1.67e-2
+dispersity 0.10
+
+beta     0.0
+betaroll 0.0
+collisionTime  6.3291e-3
+restitutionCoefficient 0.10
+
+rho 1.0
+g 1.0
+
+dataFile 1
+fStatFile 0

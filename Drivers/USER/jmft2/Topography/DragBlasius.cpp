@@ -14,6 +14,10 @@
 #include "File.h"
 #include <map>
 
+#include "sys/times.h"
+#include "sys/vtimes.h"
+#include<ctime>
+
 class DragBlasius : public Mercury2D {
     public:
 
@@ -41,16 +45,20 @@ class DragBlasius : public Mercury2D {
             setName(parsfile.erase(parsfile.find_last_of('.')));
 
             /* roughBaseType:   0 for sudden 'step function', 
-             *                  1 for mollified 'rising tanh' (default),
+             *                  1 for mollified 'rising tanh' 
              *                  2 for bubble 'expanding tanh'
+             *                          (Very slow, don't use this!)
              *                  3 for 'mollified half' (same as 1 but starting only
-             *                          after x = 0) 
-             * transitionLengthscale
+             *                          after x = 0) (default) 
+             *                  4 for Amalia's 'alternating'  base (abusing
+             *                          baseDispersity for the larger particles)
+             * transitionLengthscale: For roughBaseType = 1, 2 or 3, you need to
+             *                  specify this. (default to 0)
              */
             if (pars.find("roughBaseType") == pars.end())
             {
                 pars["roughBaseType"] = 1; 
-                logger(INFO, "roughBaseType not specified, setting to 3 (for a rising tanh)");
+                logger(INFO, "roughBaseType not specified, setting to 3 (for a rising half-tanh)");
             }
             else
                 logger(INFO, "roughBaseType is set to %", pars.at("roughBaseType"));
@@ -102,37 +110,49 @@ class DragBlasius : public Mercury2D {
              * we call setupInitialConditions(), if we want to use MPI. 
              */
 
-            spec_particles = new LinearViscoelasticFrictionSpecies();
-            spec_particles->setDensity(pars.at("rho"));
-            spec_particles->setCollisionTimeAndRestitutionCoefficient(
+            speciesP = new LinearViscoelasticFrictionSpecies();
+            speciesP->setDensity(pars.at("rho"));
+            speciesP->setCollisionTimeAndRestitutionCoefficient(
                     pars.at("collisionTime"), 
                     pars.at("restitutionCoefficient"),
                     constants::pi*pow(pars.at("particleRadius"),2)*pars.at("rho") // note - mass per unit _area_
                     );
 
-            spec_particles->setSlidingFrictionCoefficient(tan( pars.at("beta") * M_PI / 180. ));
-            spec_particles->setSlidingStiffness(2.0/7.0 * spec_particles->getStiffness());
-            spec_particles->setSlidingDissipation(2.0/7.0 * spec_particles->getDissipation());
-            spec_particles->setRollingFrictionCoefficient(tan( pars.at("betaroll") * M_PI / 180. ));
-            spec_particles->setRollingStiffness(2.0/5.0 * spec_particles->getStiffness());
-            spec_particles->setRollingDissipation(2.0/5.0 * spec_particles->getDissipation());
-            spec_particles = speciesHandler.copyAndAddObject(spec_particles);
+            speciesP->setSlidingFrictionCoefficient(tan( pars.at("beta") * M_PI / 180. ));
+            speciesP->setSlidingStiffness(2.0/7.0 * speciesP->getStiffness());
+            speciesP->setSlidingDissipation(2.0/7.0 * speciesP->getDissipation());
+            speciesP->setRollingFrictionCoefficient(tan( pars.at("betaroll") * M_PI / 180. ));
+            speciesP->setRollingStiffness(2.0/5.0 * speciesP->getStiffness());
+            speciesP->setRollingDissipation(2.0/5.0 * speciesP->getDissipation());
+            speciesP = speciesHandler.copyAndAddObject(speciesP);
 
             /* Prototypical particles */
             auto particlePrototype = new BaseParticle();
-            particlePrototype->setSpecies(spec_particles);
+            particlePrototype->setSpecies(speciesP);
             particlePrototype->setRadius(pars.at("particleRadius"));
 
             logger(INFO, "Maximum collision speed %",
-                    spec_particles->getMaximumVelocity(
+                    speciesP->getMaximumVelocity(
                         particlePrototype->getRadius(), particlePrototype->getMass()
                     ));
+
+            /* Profiling */
+            /* TODO The filename size limit of 1024 is arbitrary and unnecessary. */
+            char profilingFileName[1024];
+            if (snprintf(profilingFileName, 1024, "%s.prof", getName().c_str()) > 1024)
+                logger(ERROR, "profilingFileName exceeds 1024 bytes");
+
+            profilingFile = fopen(profilingFileName, "a+");
+            setbuf(profilingFile, NULL);
+            fprintf(profilingFile, "tsim Np treal proj\n");
+            startTime_ = std::time(nullptr);
 
             logger(INFO, "Constructor completed.");
 
         }
 
         ~DragBlasius(void) {
+            fclose(profilingFile);
         }
 
         void setupInitialConditions() 
@@ -159,31 +179,34 @@ class DragBlasius : public Mercury2D {
 
             // The base
             auto base = new InfiniteWall;
-            base->setSpecies(spec_particles);
+            base->setSpecies(speciesP);
             base->set(Vec3D(0, -1, 0), Vec3D(0, 0, 0));
             base = wallHandler.copyAndAddObject(base);
 
             lid = new InfiniteWall();
-            lid->setSpecies(spec_particles);
+            lid->setSpecies(speciesP);
             lid->set(Vec3D(0, +1, 0), Vec3D(0, pars.at("reservoirHeight"), 0));
             lid = wallHandler.copyAndAddObject(lid);
 
-            auto back = new InfiniteWall();
-            back->setSpecies(spec_particles);
-            back->set(Vec3D(-1, 0, 0), 
-                    Vec3D(pars.at("xmin") - pars.at("reservoirLength") - 7*pars.at("particleRadius"), 0, 0)
-                    );
-            back = wallHandler.copyAndAddObject(back);
+            auto backWall = new InfiniteWall();
+            backWall->setSpecies(speciesP);
+            backWall->set(Vec3D(-1, 0, 0), 
+                    Vec3D(pars.at("xmin") - pars.at("reservoirLength") - 7*pars.at("particleRadius"), 
+                        0, 0) );
+            backWall = wallHandler.copyAndAddObject(backWall);
 
             /* Rough base. The type of rough base is determined by the parameter
              * roughBaseType: 
              *      0 - sudden step transition 
-             *      1 - mollified 'rising tanh' transition (default)
+             *      1 - mollified 'rising tanh' transition 
              *      2 - 'growing bubble' transition
+             *      3 - rising half-tanh
+             *      4 - Amalia's alternating base (baseRadius for smaller)
              */
             BaseParticle rbParticle;
-            rbParticle.setSpecies(spec_particles);
+            rbParticle.setSpecies(speciesP);
             if (pars.at("baseConc") > 0)
+            {
                 for (double xpos = pars.at("xmin"); 
                         xpos <= pars.at("xmax"); 
                         xpos += 4*pars.at("baseRadius") / pars.at("baseConc"))
@@ -238,8 +261,11 @@ class DragBlasius : public Mercury2D {
                             toInsert = (xpos >= 0);
                             break;
 
+                        case 4:
+                            logger(ERROR, "Sorry, roughBaseType = 4 (Amalia's alternating) is not implemented in DragBlasius. Try PEChute!");
+
                         default:
-                            logger(ERROR, "roughBaseType should be one of 0, 1, 2 or 3");
+                            logger(ERROR, "roughBaseType should be one of 0, 1, 2, 3 or 4 (but not 4)");
                             break;
                     }
 
@@ -254,10 +280,12 @@ class DragBlasius : public Mercury2D {
                     if (toInsert)
                         particleHandler.copyAndAddObject(rbParticle);
                 }
+            }
 
-            /* CubeInsertionBoundary for introducing new particles */
+            /* CubeInsertionBoundary for introducing particles when initialising
+             * the system (will use Maser during the simulation proper) */
             auto generandum = new BaseParticle;
-            generandum->setSpecies(spec_particles);
+            generandum->setSpecies(speciesP);
             generandum->setRadius(pars.at("particleRadius"));
             insb = new CubeInsertionBoundary();
             insb->set(
@@ -275,7 +303,6 @@ class DragBlasius : public Mercury2D {
             insb->checkBoundaryBeforeTimeStep(this);
 
             stillFillingUp = true;
-
         }
 
         /* If restarting, we need to assign the pointers properly. 
@@ -311,6 +338,7 @@ class DragBlasius : public Mercury2D {
             logger(INFO, "volfrac %, volfracThreshold %", 
                     volfrac, volfracThreshold);
 
+            /* Warnings about particles overlapping (try cranking up stiffness?) */
             int warningsSoFar = 0;
             Mdouble worstOverlapRatio = 0;
             Vec3D   worstOverlapPosition = Vec3D(0,0,0);
@@ -339,6 +367,15 @@ class DragBlasius : public Mercury2D {
             if (worstOverlapRatio > 0.05 && warningsSoFar > 5)
                 logger(WARN, "worst overlap/radius = % at position %",
                         worstOverlapRatio, worstOverlapPosition);
+
+            /* Profiling */
+            std::time_t timeSinceStart = std::time(nullptr) - startTime_;
+            std::time_t projectedTimeLeft = timeSinceStart * (getTimeMax() - getTime())/getTime();
+            fprintf(profilingFile, "%f %d %d %d\n",
+                getTime(), particleHandler.getNumberOfObjects(),
+                timeSinceStart, 
+                projectedTimeLeft
+            );
 
         }
 
@@ -379,7 +416,7 @@ class DragBlasius : public Mercury2D {
                  * (maser and deletion) */
                 boundaryHandler.removeObject(insb->getId());
 
-                /* Deletion boundary */
+                /* Deletion boundary. Put this in after the initialisation. */
                 auto delb = new DeletionBoundary;
                 delb->set(Vec3D(1,0,0), pars.at("xmax"));
                 delb = boundaryHandler.copyAndAddObject(delb);
@@ -426,6 +463,7 @@ class DragBlasius : public Mercury2D {
 
                 /* The experiment has properly started! Start writing to .data. and
                  * .fstat. files, if the user wants them. */
+                std::cout << "The experiment has properly started!" << std::endl;
                 setTime(0);
                 eneFile.setFileType(FileType::ONE_FILE);
 
@@ -442,8 +480,7 @@ class DragBlasius : public Mercury2D {
 
                 /* default is not to save the fStatFile */
                 fStatFile.setFileType(FileType::NO_FILE);
-                /*
-                if (pars.find("fStatFile") != pars.end() && pars.at("fStatFle") == 1) 
+                if (pars.find("fStatFile") != pars.end() && pars.at("fStatFile") == 1) 
                 {
                     fStatFile.setFileType(FileType::MULTIPLE_FILES);
                     logger(INFO, ".fstat files will be saved");
@@ -453,7 +490,6 @@ class DragBlasius : public Mercury2D {
                     fStatFile.setFileType(FileType::NO_FILE);
                     logger(INFO, ".fstat file will not be saved.");
                 }
-                */
 
                 forceWriteOutputFiles();
             }
@@ -467,11 +503,12 @@ class DragBlasius : public Mercury2D {
         int roughBaseType; 
 
         CubeInsertionBoundary* insb;
-        LinearViscoelasticFrictionSpecies *spec_particles;
+        LinearViscoelasticFrictionSpecies *speciesP;
         ConstantMassFlowMaserBoundary* masb;
         InfiniteWall* lid;
 
-
+        std::time_t startTime_;
+        FILE* profilingFile;
 };
 
 int main(const int argc, char* argv[]) {
