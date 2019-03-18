@@ -32,6 +32,12 @@ if (CYGWIN)
 	add_definitions( -DCYGWIN )
 endif(CYGWIN)
 
+#If user has not given build type set it to Release
+if(NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE "Release" CACHE
+			STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
+			FORCE)
+endif(NOT CMAKE_BUILD_TYPE)
 
 include(CMakeModules/MercuryMPI.cmake)
 
@@ -44,15 +50,6 @@ include(CMakeModules/MercuryCppFeatureCheck.cmake)
 include(CMakeModules/MercuryDocumentation.cmake)
 
 include(CMakeModules/MercuryXballs.cmake)
-
-
-
-#If user has not given build type set it to Release
-if(NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE "Release" CACHE 
-	STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
-		FORCE)
-endif(NOT CMAKE_BUILD_TYPE)
 
 add_subdirectory(Drivers)
 add_subdirectory(Kernel)
@@ -69,7 +66,6 @@ add_custom_target(fullTest
 
 #This section generates a configuration file that contains the CMake variables#
 #############################################
-
 configure_file(Configuration/CMakeDefinitions.cc
 	${PROJECT_SOURCE_DIR}/Kernel/CMakeDefinitions.cc)
 configure_file(Configuration/CMakeDefinitions.h

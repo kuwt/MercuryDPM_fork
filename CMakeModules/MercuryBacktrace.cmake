@@ -25,6 +25,8 @@ if (${HAS_EXECINFO_H})
     else()
       set( Mercury_BACKTRACE_ENABLE OFF CACHE BOOL "Enable stacktraces for terminating log messages")
     endif()
+  else()
+    message(FATAL_ERROR "Build type has to be declared first")
   endif()
   #allow us to do demangling!
   set( USE_DEMANGLE ON )
