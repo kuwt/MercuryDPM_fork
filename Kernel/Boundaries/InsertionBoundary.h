@@ -36,6 +36,13 @@ class RNG;
  * \class InsertionBoundary
  * \brief Boundary structure for boundaries used for insertion of particles
  * \todo IFCD: Should operator= be implemented here and in the derived classes?
+ *
+ * To cite the InsertionBoundary algorithm:
+ *   A. R. Thornton, D. Krijgsman, A. Te Voortwis, V. Ogarko, S. Luding, R.
+ *   Fransen, S. Gonzalez, O. Bokhove, O. Imole, and T. Weinhart. A review of
+ *   recent work on the discrete particle method at the University of Twente: An
+ *   introduction to the open-source package MercuryDPM. DEM6 - International
+ *   Conference on DEMs, 2013. 
  */
 class InsertionBoundary : public BaseBoundary
 {

@@ -393,6 +393,7 @@ void ConstantMassFlowMaserBoundary::actionsBeforeTimeLoop()
  * For an explanation of the magic number 6, see the detailed documentation for gapSize_. Note that gapSize_ is set here
  * and not in set, since it is possible that the user first adds boundaries to the domain before the particles. The
  * maser boundary should only be activated after all particles are in.
+ * \todo JMFT: Would it be helpful to be able to set a custom gapSize ?
  */
 void ConstantMassFlowMaserBoundary::activateMaser()
 {

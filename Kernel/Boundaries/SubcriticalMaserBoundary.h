@@ -66,6 +66,13 @@ class ParticleSpecies;
  *
  * For a compact overview of the behaviour of SubcriticalMaserBoundary, please
  * look at the output of SubcriticalMaserBoundarySelfTest.
+ *
+ * \todo Which Maser is it used in Denissen2019?
+ * To cite the Maser:
+ *   I. F. C. Denissen, T. Weinhart, A. Te Voortwis, S. Luding, J. M. N. T. Gray
+ *   and A. R. Thornton, Bulbous head formation in bidisperse shallow granular
+ *   flow over an inclined plane. Journal of Fluid Mechanics, 866:263--297,
+ *   mar 2019.
  */
 class SubcriticalMaserBoundary : public BaseBoundary
 {

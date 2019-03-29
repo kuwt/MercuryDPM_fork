@@ -70,6 +70,13 @@ class ParticleSpecies;
  *
  * For a compact overview of the behaviour of ConstantMassFlowMaserBoundary, please
  * look at the output of ConstantMassFlowMaserSelfTest.
+ *
+ * \todo Which Maser is it used in Denissen2019?
+ * To cite the Maser:
+ *   I. F. C. Denissen, T. Weinhart, A. Te Voortwis, S. Luding, J. M. N. T. Gray
+ *   and A. R. Thornton, Bulbous head formation in bidisperse shallow granular
+ *   flow over an inclined plane. Journal of Fluid Mechanics, 866:263--297,
+ *   mar 2019.
  */
 class ConstantMassFlowMaserBoundary : public BaseBoundary
 {
@@ -229,6 +236,7 @@ private:
      *          the centre of the ghostparticle is at most 1 diameter (2 radii) away from the boundary, so a ghost
      *          particle can extend at most 3 particle radii away from the domain. Do this on both sides, and it follows
      *          that the gap should be at least 6 diameters wide.
+     * \todo JMFT: Do you mean 6 radii?
      */
     Mdouble gapSize_;
     
