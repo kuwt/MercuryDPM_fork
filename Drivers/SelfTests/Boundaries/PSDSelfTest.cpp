@@ -32,10 +32,17 @@
 #include "Walls/InfiniteWall.h"
 
 
+/**
+ * An example code on how to add particles of a given particle size distribution and flow rate. I have added some documentation to it today, so please use svn up first.
+ */
+
 class PSDSelfTest : public Mercury3D
 {
 public:
-    
+
+    /**
+     * Use setupInitialConditions to define a.o. an insertion boundary, which will insert particles in a given region, at a given flow rate and of a given particle size distribution
+     */
     void setupInitialConditions() override
     {
         setName("PSDSelfTest");
@@ -54,13 +61,25 @@ public:
         species.setStiffness(10000);
         speciesHandler.copyAndAddObject(species);
         
-        
-        BaseParticle insertionBoundaryParticle;
-        insertionBoundaryParticle.setSpecies(speciesHandler.getObject(0));
-        
+        // define a cube insertion boundary, which inserts particles in a cuboid region
         CubeInsertionBoundary insertionBoundary;
-        insertionBoundary.set(&insertionBoundaryParticle, 1, getMin(), getMax(),
-                Vec3D(0, 0, 0), Vec3D(0, 0, 0), 1, 2);
+
+        // define the type of particle you want to insert (radius, position and velocity will be set by the insertion boundary)
+        BaseParticle templateParticle(speciesHandler.getObject(0));
+
+        // insert particles in the whole domain (between getMin and getMax) with initial velocity 0 and and a radius between 1 and 2 (uniform number distribution)
+        Vec3D posMin = getMin();
+        Vec3D posMax = getMax();
+        Vec3D velMin = {0,0,0};
+        Vec3D velMax = {0,0,0};
+        unsigned maxFail = 1; //insert as quick as possible: try every time step, until you maxFail=1 particle fails to be insertable (overlaps with another particle or wall)
+        double radMin = 1;
+        double radMax = 2;
+        insertionBoundary.set(&templateParticle, maxFail, posMin, posMax, velMin, velMax, radMin, radMax);
+
+        // instead of a radius between 1 and 2, change to inserting particles of a given cumulative particle size distribution (psd)
+        // (these values were taken from a laser diffraction measurement)
+        // The psd is given by a vector of size and probability values (r_i, p_i); it means p_i is the probability of inserting a particle of radius less than r_i.
         const std::vector<PSD> APAPM = {{0.000387645, 0},
                                         {0.000405195, 0.00641963},
                                         {0.000423541, 0.0157881},
@@ -109,6 +128,11 @@ public:
                                         {0.00284328,  0.999995},
                                         {0.00297201,  1},};
         insertionBoundary.setPSD(APAPM);
+
+        //instead of inserting 1 particle per timestep, insert a a given flow rate, such as 0.001 m^3/s
+        // insertionBoundary.setVolumeFlowRate(1e-3);
+
+        //add the insertion boundary to the handler
         boundaryHandler.copyAndAddObject(insertionBoundary);
         
     }
@@ -121,8 +145,6 @@ public:
 
 int main(int argc UNUSED, char* argv[] UNUSED)
 {
-    logger(INFO, "Simple box for creating particles");
-    
-    PSDSelfTest insertionBoundary_problem;
-    insertionBoundary_problem.solve();
+    PSDSelfTest problem;
+    problem.solve();
 }
