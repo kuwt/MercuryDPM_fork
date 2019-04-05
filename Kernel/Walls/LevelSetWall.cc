@@ -30,6 +30,7 @@
 #include "InteractionHandler.h"
 #include "WallHandler.h"
 #include "DPMBase.h"
+#include "InfiniteWall.h"
 
 // Constructor; currently only allows predefined shapes
 LevelSetWall::LevelSetWall(Shape s, double radius, ParticleSpecies* sp) : radius_(radius)
@@ -182,7 +183,30 @@ void LevelSetWall::createVTKDiamond()
 }
 
 void LevelSetWall::createVTKFourSided()
-{}
+{
+    Mdouble distance;
+    Vec3D normal;
+    InfiniteWall wall;
+
+    Mdouble interactionRadius = radius_/(2*N);
+    for (int i=-N; i<N; ++i) {
+        for (int j=-N; j<=N; ++j) {
+            for (int k=-N; k<=N; ++k) {
+                Vec3D min = interactionRadius*Vec3D(2*i,2*j,2*k);
+                Vec3D position = min + interactionRadius*Vec3D(1,1,1);
+                Vec3D max = min + interactionRadius*Vec3D(2,2,2);
+                if (getDistanceAndNormalLabCoordinates(position, 2*interactionRadius, distance, normal)) {
+                    wall.set(normal,position+distance*normal);
+                    std::vector<Vec3D> points;
+                    wall.createVTK(points,min,max);
+                    if (!points.empty()) {
+                        wall.addToVTK(points, vtkLabFrame_);
+                    }
+                }
+            }
+        }
+    }
+}
 
 void LevelSetWall::createVTKSphere()
 {
