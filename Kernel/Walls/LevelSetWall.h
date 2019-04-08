@@ -54,7 +54,8 @@ public:
         Sphere,
         Cube,
         Diamond,
-        FourSided
+        FourSided,
+        Cylinder
     };
     
     // Constructor; currently only allows predefined shapes
@@ -117,7 +118,9 @@ private:
     
     //Better interpolated than a square as the edges of the level set align with the mesh.
     void setShapeDiamond();
-    
+
+    void setShapeCylinder();
+
     void setShapeFourSided();
     
     void createVTKSphere();
@@ -126,7 +129,7 @@ private:
     
     void createVTKDiamond();
     
-    void createVTKFourSided();
+    void createVTK();
     
     
     // N determines the number of level set values (2N+1)^3;

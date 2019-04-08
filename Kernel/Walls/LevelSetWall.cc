@@ -49,12 +49,17 @@ LevelSetWall::LevelSetWall(Shape s, double radius, ParticleSpecies* sp) : radius
     else if (s == Shape::Diamond)
     {
         setShapeDiamond();
-        createVTKDiamond();
+        createVTK();
+    }
+    else if (s == Shape::Cylinder)
+    {
+        setShapeCylinder();
+        createVTK();
     }
     else if (s == Shape::FourSided)
     {
         setShapeFourSided();
-        createVTKFourSided();
+        createVTK();
     }
     else
     {
@@ -182,7 +187,7 @@ void LevelSetWall::createVTKDiamond()
     vtkLabFrame_.triangleStrips[7] = {1, 2, 5};
 }
 
-void LevelSetWall::createVTKFourSided()
+void LevelSetWall::createVTK()
 {
     Mdouble distance;
     Vec3D normal;
@@ -190,11 +195,11 @@ void LevelSetWall::createVTKFourSided()
 
     Mdouble interactionRadius = radius_/(2*N);
     for (int i=-N; i<N; ++i) {
-        for (int j=-N; j<=N; ++j) {
-            for (int k=-N; k<=N; ++k) {
+        for (int j=-N; j<N; ++j) {
+            for (int k=-N; k<N; ++k) {
                 Vec3D min = interactionRadius*Vec3D(2*i,2*j,2*k);
-                Vec3D position = min + interactionRadius*Vec3D(1,1,1);
                 Vec3D max = min + interactionRadius*Vec3D(2,2,2);
+                Vec3D position = min + interactionRadius*Vec3D(1,1,1);
                 if (getDistanceAndNormalLabCoordinates(position, 2*interactionRadius, distance, normal)) {
                     wall.set(normal,position+distance*normal);
                     std::vector<Vec3D> points;
@@ -350,8 +355,9 @@ bool LevelSetWall::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble in
                    + levelSet_[i + 1][j + 1][k + 1] * x * y;
         Mdouble length = normal.getLength();
         if (length != 0)
-            normal /= length;
-        normal = -normal;
+            normal /= -length;
+        else
+            normal = {1,0,0};
         return true;
     }
     return false;
@@ -367,6 +373,21 @@ void LevelSetWall::setShapeSphere()
             for (int i = -N; i <= N; ++i)
             {
                 levelSet_[i + N][j + N][k + N] = radius_ * sqrt(i * i + j * j + k * k) / N - radius_;
+            }
+        }
+    }
+}
+
+void LevelSetWall::setShapeCylinder()
+{
+    logger(INFO, "Creating a cylinder");
+    for (int k = -N; k <= N; ++k)
+    {
+        for (int j = -N; j <= N; ++j)
+        {
+            for (int i = -N; i <= N; ++i)
+            {
+                levelSet_[i + N][j + N][k + N] = radius_*std::fmax(sqrt(i * i + j * j) / N - 1,fabs(k)/N-1);
             }
         }
     }
@@ -431,64 +452,96 @@ void LevelSetWall::setShapeFourSided()
     std::ifstream is(fileName.c_str(), std::ios::in);
     if (is.fail())
     {
-        helpers::writeToFile("fourSided.m", "%% parameters\n"
-                                            "n=10;\n"
-                                            "w=1; %halfwidth\n"
-                                            "x0=[1 1.8 1.8 1.4 1];\n"
-                                            "y0=[-1 0 1 1.4 1];\n"
-                                            "% createShape (n,w,x0,y0)\n"
-                                            "% \n"
-                                            "% function createShape (n,w,x0,y0)\n"
-                                            "%% create curve, and plot\n"
-                                            "t0=1:length(x0);\n"
-                                            "t1= linspace(1,length(x0));\n"
-                                            "x1=interpn(t0,x0,t1,'spline');\n"
-                                            "y1=interpn(t0,y0,t1,'spline');\n"
-                                            "x=[x1 -y1 -x1 y1];\n"
-                                            "y=[y1 x1 -y1 -x1];\n"
-                                            "figure(1)\n"
-                                            "plot(x,y,'-',x0,y0,'o')\n"
-                                            "axis equal\n"
-                                            "\n"
-                                            "%% create level set, and plot\n"
-                                            "%radius = sqrt(max(x.^2+y.^2+w^2))\n"
-                                            "radius = max([max(abs(x)),max(abs(y)),abs(w)]);\n"
-                                            "radius = n/floor(n/radius);\n"
-                                            "LS = linspace(-radius,radius,2*n+1);\n"
-                                            "[xLS,yLS,zLS]=meshgrid(LS);\n"
-                                            "dist = zeros(size(xLS));\n"
-                                            "for i=1:length(xLS(:))\n"
-                                            "   dist(i) = sqrt(min((x-xLS(i)).^2+(y-yLS(i)).^2));\n"
-                                            "   if inpolygon(xLS(i),yLS(i),x,y)\n"
-                                            "       dist(i) = -dist(i);\n"
-                                            "   end\n"
-                                            "   dist(i) = max(dist(i),abs(zLS(i))-w);\n"
-                                            "end\n"
-                                            "figure(2)\n"
-                                            "mesh(xLS(:,:,n+1),yLS(:,:,n+1),dist(:,:,n+1),'FaceColor','none')\n"
-                                            "hold on\n"
-                                            "contourf(xLS(:,:,n+1),yLS(:,:,n+1),dist(:,:,n+1),[0 0])\n"
-                                            "plot(x0,y0,'ro')\n"
-                                            "hold off\n"
-                                            "view(0,90)\n"
-                                            "axis equal\n"
-                                            "title(['z=' num2str(unique(zLS(:,:,n+1)))])\n"
-                                            "figure(3)\n"
-                                            "mesh(squeeze(yLS(:,n+1,:)),squeeze(zLS(:,n+1,:)),squeeze(dist(:,n+1,:)),'FaceColor','none')\n"
-                                            "hold on\n"
-                                            "contourf(squeeze(yLS(:,n+1,:)),squeeze(zLS(:,n+1,:)),squeeze(dist(:,n+1,:)),[0 0])\n"
-                                            "hold off\n"
-                                            "view(90,0)\n"
-                                            "axis equal\n"
-                                            "title(['x=' num2str(unique(xLS(:,n+1,:)))])\n"
-                                            "\n"
-                                            "\n"
-                                            "%% write to file\n"
-                                            "fid = fopen('fourSided.txt','w');\n"
-                                            "fprintf(fid,'%d\\n',n);\n"
-                                            "fprintf(fid,'%f ',dist);\n"
-                                            "fclose(fid);\n"
-                                            "% end");
+        helpers::writeToFile("fourSided.m",
+                "%% parameters\n"
+                "n=10; % 2n+1 is the number of cells in the level set per dimension\n"
+                "w=1; % [-w,w] is the width of the shape in z-direction\n"
+                "% define a few points on the xy-cross section of the shape that will be interpolated\n"
+                "% we define a quarter of the cross section only; thus the first point has differ \n"
+                "% from the last point by a quarter rotation around the origin\n"
+                "x0=[1 1.8 1.8 1.4 1];\n"
+                "y0=[-1 0 1 1.4 1];\n"
+                "\n"
+                "%% create curve, and plot\n"
+                "% define a parameter t0, such that the parametrisation is x0(t0), y0(t0)\n"
+                "t0=1:length(x0);\n"
+                "% define a more fine-grained parameter t1, and interpolate, obtaining a \n"
+                "% finer parametrisation x1(t1), y1(t1)\n"
+                "t1= linspace(1,length(x0));\n"
+                "x1=interpn(t0,x0,t1,'spline');\n"
+                "y1=interpn(t0,y0,t1,'spline');\n"
+                "% complete the shape by repeating it four times, each rotated by 90 deg\n"
+                "% the points (x,y) are on the shape \n"
+                "x=[x1 -y1 -x1 y1];\n"
+                "y=[y1 x1 -y1 -x1];\n"
+                "% plot the resulting shape\n"
+                "figure(1)\n"
+                "plot(x,y,'-',x0,y0,'o')\n"
+                "axis equal\n"
+                "\n"
+                "%% create level set, and plot\n"
+                "% compute the size of the domain needed to contain the shape ...\n"
+                "radius = max([max(abs(x)),max(abs(y)),abs(w)]);\n"
+                "% .. then divide by the number of cells to get the cell size\n"
+                "radius = n/floor(n/radius);\n"
+                "% create xLS,yLS,zLS values of the level set function dist(xLS,yLS,zLS)\n"
+                "LS = linspace(-radius,radius,2*n+1);\n"
+                "[xLS,yLS,zLS]=meshgrid(LS);\n"
+                "% define the level set function by computing the distance of (xLS,yLS,zLS)\n"
+                "% to the nearest point on the shape (x,y,+-w)\n"
+                "dist = zeros(size(xLS));\n"
+                "for i=1:length(xLS(:))\n"
+                "   dist(i) = sqrt(min((x-xLS(i)).^2+(y-yLS(i)).^2));\n"
+                "   % make it a signed distance\n"
+                "   if inpolygon(xLS(i),yLS(i),x,y)\n"
+                "       dist(i) = -dist(i);\n"
+                "   end\n"
+                "   % compute the signed distance as the max of signed distances in xy and z\n"
+                "   dist(i) = max(dist(i),abs(zLS(i))-w);\n"
+                "end\n"
+                "% rescale the distance\n"
+                "dist = dist/radius;\n"
+                "\n"
+                "% plot the i-th cross-section in xy (i=n+1 is in the center)\n"
+                "figure(2)\n"
+                "i=n+4\n"
+                "mesh(xLS(:,:,i),yLS(:,:,i),dist(:,:,i),'FaceColor','none')\n"
+                "hold on\n"
+                "contourf(xLS(:,:,i),yLS(:,:,i),dist(:,:,i),[0 0])\n"
+                "plot(x0,y0,'ro')\n"
+                "hold off\n"
+                "view(0,90)\n"
+                "axis equal\n"
+                "title(['z=' num2str(unique(zLS(:,:,i)))])\n"
+                "xlabel('x'), ylabel('y'), zlabel('dist')\n"
+                "\n"
+                "% plot the i-th cross-section in yz (i=n+1 is in the center)\n"
+                "figure(3)\n"
+                "mesh(squeeze(yLS(:,i,:)),squeeze(zLS(:,i,:)),squeeze(dist(:,i,:)),'FaceColor','none')\n"
+                "hold on\n"
+                "contourf(squeeze(yLS(:,i,:)),squeeze(zLS(:,i,:)),squeeze(dist(:,i,:)),[0 0])\n"
+                "hold off\n"
+                "view(90,0)\n"
+                "axis equal\n"
+                "title(['x=' num2str(unique(xLS(:,i,:)))])\n"
+                "xlabel('y'), ylabel('z'), zlabel('dist')\n"
+                "\n"
+                "% plot the i-th cross-section in xz (i=n+1 is in the center)\n"
+                "figure(4)\n"
+                "mesh(squeeze(xLS(i,:,:)),squeeze(zLS(i,:,:)),squeeze(dist(i,:,:)),'FaceColor','none')\n"
+                "hold on\n"
+                "contourf(squeeze(xLS(i,:,:)),squeeze(zLS(i,:,:)),squeeze(dist(i,:,:)),[0 0])\n"
+                "hold off\n"
+                "view(90,0)\n"
+                "axis equal\n"
+                "title(['y=' num2str(unique(yLS(i,:,:)))])\n"
+                "xlabel('x'), ylabel('z'), zlabel('dist')\n"
+                "\n"
+                "%% write n and dist values to file (read into Mercury)\n"
+                "fid = fopen('fourSided.txt','w');\n"
+                "fprintf(fid,'%d\\n',n);\n"
+                "fprintf(fid,'%f ',dist);\n"
+                "fclose(fid);");
         logger(ERROR, "readFromFile: file % could not be opened; make sure you run fourSided.m first.", fileName);
     }
     
