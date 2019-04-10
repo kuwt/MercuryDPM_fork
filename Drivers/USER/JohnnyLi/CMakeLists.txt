@@ -21,5 +21,6 @@ endforeach()
 
 #The correct order to run the self tests is 0, 1, 2; the self tests fail if they are not executed in the right order. Thus, copy restart files into build.
 file(COPY ${CMAKE_SOURCE_DIR}/Drivers/USER/JohnnyLi/fourSided.txt DESTINATION .)
+file(COPY ${CMAKE_SOURCE_DIR}/Drivers/USER/JohnnyLi/3S.stl DESTINATION .)
 
 

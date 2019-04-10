@@ -330,7 +330,7 @@ void WallHandler::writeVTKBoundingBox() const
  * \param[in] species pointer to a species in the species handler that will be assigned to the walls
  * \param[in] scaleFactor allows the vertex positions to be scaled (necessary if the vtk file is written in different units than the Mercury implementation, e.g. if the stl file is given in mm, but the Mercury implementation uses meters)
  */
-void WallHandler::readTriangleWall(std::string filename, ParticleSpecies* species, Mdouble scaleFactor, Vec3D shift, Vec3D velocity, Vec3D angularVelocity)
+void WallHandler::readTriangleWall(std::string filename, ParticleSpecies* species, Mdouble scaleFactor, Vec3D centerOfRotation, Vec3D velocity, Vec3D angularVelocity)
 {
     std::string fileType = filename.substr(filename.find_last_of('.') + 1);
 
@@ -374,7 +374,7 @@ void WallHandler::readTriangleWall(std::string filename, ParticleSpecies* specie
         for (unsigned i = 0; i < num; i++)
         {
             file >> dummy >> id0 >> id1 >> id2;
-            triangleWall.setVertices(vertex[id0], vertex[id1], vertex[id2], shift);
+            triangleWall.setVertices(vertex[id0], vertex[id1], vertex[id2], centerOfRotation);
             copyAndAddObject(triangleWall);
         }
         
@@ -419,7 +419,7 @@ void WallHandler::readTriangleWall(std::string filename, ParticleSpecies* specie
             triangle.vertex3 *= scaleFactor;
             
             //add to triangle wall
-            triangleWall.setVertices(triangle.vertex1, triangle.vertex2, triangle.vertex3, shift);
+            triangleWall.setVertices(triangle.vertex1, triangle.vertex2, triangle.vertex3, centerOfRotation);
             copyAndAddObject(triangleWall);
             
             //Now ignore (read) the two dummy characters
