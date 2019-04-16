@@ -353,9 +353,9 @@ protected:
      * \brief Determines whether particles outside the domain are considered when computing the averaged fields
      * \details
      * If set to true, then the average of field f over a coordinate direction x is computed as
-     *  \f$\frac1{x_{max}-x_{min}}\int_\mathbb{R} f dx\f$
+     *  \f$\frac{1}{x_{max}-x_{min}}\int_{-\infty}^{\infty} f dx\f$
      * If set to false, then the average of field f over a coordinate direction x is computed as
-     *  \f$\frac1{x_{max}-x_{min}}\int_{x_{min}}^{x_{max}} f dx\f$
+     *  \f$\frac{1}{x_{max}-x_{min}}\int_{x_{min}}^{x_{max}} f dx\f$
      *
      * \todo should the default be false?
      * \todo currently, the above description is not implemented; it simply ignores particles outside the domain.
