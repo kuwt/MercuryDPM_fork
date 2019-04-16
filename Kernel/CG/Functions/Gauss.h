@@ -183,7 +183,7 @@ protected:
      * but per CG object (i.e. all points share the same values).
      * However, this site seems to discourage this:
      * http://stackoverflow.com/questions/12387239/reference-member-variables-as-class-members
-     * Anyone has an opinion on this? @dducks @thorntonar
+     * Anyone has an opinion on this? \@dducks \@thorntonar
      */
     Mdouble width_;
     

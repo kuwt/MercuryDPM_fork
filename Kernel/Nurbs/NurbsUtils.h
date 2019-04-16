@@ -50,7 +50,7 @@ int findSpan(int degree, const std::vector<double>& knots, double u);
 Compute a single B-spline basis function
 @param[in] i The ith basis function to compute.
 @param[in] deg Degree of the basis function.
-@param[in] knots Knot vector corresponding to the basis functions.
+@param[in] U Knot vector corresponding to the basis functions.
 @param[in] u Parameter to evaluate the basis functions at.
 @return The value of the ith basis function at u.
 */

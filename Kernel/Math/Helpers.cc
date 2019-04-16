@@ -367,7 +367,7 @@ Mdouble helpers::getMaximumVelocity(Mdouble k, Mdouble disp, Mdouble radius, Mdo
  *
  * \param[in] numberOfSaves the total number of output files the user wants at the end of the simulation.
  * \param[in] timeMax       the final time of the simulation
- * \param[in] time step      the mean time step used during the simulation
+ * \param[in] timeStep      the mean time step used during the simulation
  * \return the saveCount value that should be used to get the desired number of saves.
  */
 unsigned int helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(unsigned int numberOfSaves, Mdouble timeMax,
