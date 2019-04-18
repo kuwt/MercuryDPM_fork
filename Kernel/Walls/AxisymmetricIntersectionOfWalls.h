@@ -31,31 +31,96 @@
 #include "Math/Vector.h"
 
 /*!
- * \brief A AxisymmetricIntersectionOfWalls is an axisymmetric wall, defined by
- * rotating a twodimensional IntersectionOfWalls around a symmetry axis.
- * \details It is defined by defining an axis position *p* and orientation *o*, around which the wall is axisymmetric, and an IntersectionOfWalls object *w*.
- * To determine if a particle of touches an #AxisymmetricIntersectionOfWalls,
- * the particle's location is determined is a cylindrical coordinate system \f$(r,\theta,z)\f$,
- * where *r* is the radial distance from the axis, *z* is the axial distance along the axis, and \f$\theta\f$ the angular position around the axis (which is ignored as the object is axisymmetric).
- * A particle touches an #AxisymmetricIntersectionOfWalls if it touches the #IntersectionOfWalls *w* in the \f$(r,\theta,z)\f$ coordinate system.
+ * \brief Use #AxisymmetricIntersectionOfWalls to define axisymmetric walls, such as cylinders, cones, etc
  *
- * The code below defines a cylindrical outer wall of radius *r* with an axis position *p* and orientation *o* and contact properties *s*:
+ * \details An #AxisymmetricIntersectionOfWalls is equivalent to an #IntersectionOfWalls where the Cartesian coordinate system (x,y,z) is replaced by a cylindrical coordinate system \f$(\hat{r},\theta,\hat{z})\f$. The origin and orientation of the cylindrical coordinate system is defined by the position and orientation of the wall, respectively.
+ *
+ * In other words, a particle touches an #AxisymmetricIntersectionOfWalls, if it touches the #IntersectionOfWalls object in the \f$(r,\theta,z)\f$ coordinate system.
+ *
+ * Thus, you need to define:
+ *  - the position *p* of the wall, which is also the origin of the cylindrical coordinate system
+ *  - the orientation *o* of the wall, which is the \f$\hat{z}\f$ direction of the cylindrical coordinate system
+ *  - a set of walls in the \f$(\hat{r},\theta,\hat{z})\f$ coordinate system, defined by a normal *n* and position *p*. Only axisymmetric objects can be defined, thus the \f$\theta \f$ value of the normals has to be zero.
+ *
+ * ### Example 1
+ *
+ * Say you want to define a cylindrical wall as in the left image below. If you define the origin and orientation of the cylindrical coordinate system as *(0,0,0)* and *(0,0,1)*, respectively, then the cylinder is a rectangle in the cylindrical coordinate system. Thus, you need to intersect three walls, with normals and position as indicated in the right figure below.
+ *
+ * \image html AxisymmetricWalls.png "A cylindric wall that repels particles"
+ *
+ * The following code defines such a cylinder:
  * \code
- * ParticleSpecies s = setSpecies(speciesHandler.getObject(0));
- * Vec3D p = Vec3D(0.0, 0.0, 0.0);
- * Vec3D o = Vec3D(0.0, 0.0, 1.0);
- * Mdouble r = 1.0;
- *
  * AxisymmetricIntersectionOfWalls w;
- * w.setSpecies(s);
- * w.setPosition(p);
- * w.setOrientation(o);
- * w.addObject(Vec3D(1.0, 0.0, 0.0), Vec3D(r, 0.0, 0.0));
+ * w.setSpecies(species);
+ * w.setPosition(Vec3D(0,0,0));
+ * w.setOrientation(Vec3D(0,0,1));
+ * //arguments of addObject are normal and position of the intersected walls
+ * w.addObject(Vec3D(-1,0,0), Vec3D(1,0,0));  //Cylindric wall
+ * w.addObject(Vec3D(0,0,1), Vec3D(.5,0,-1)); //Bottom wall
+ * w.addObject(Vec3D(0,0,-1), Vec3D(.5,0,1)); //Top wall
  * wallHandler.copyAndAddObject(w);
  * \endcode
  *
- * For a demonstration on how to use this class, see \ref HourGlass3DDemo (shown in the image below).
- * <img src="HourGlass3DDemo.png" height="250px">
+ * ### Example 2
+ *
+ * Note, one can also define a cylindric casing that can be filled with particles, see image below.
+ *
+ * \image html AxisymmetricWallsOuter.png "A cylindric casing that can be filled with particles"
+ *
+ * In this case, you don't have to intersect the walls; instead you need to create three separate walls. A sample code:
+ * \code
+ * AxisymmetricIntersectionOfWalls w;
+ * w.setSpecies(species);
+ * w.setPosition(Vec3D(0,0,0));
+ * w.setOrientation(Vec3D(0,0,1));
+ * w.addObject(Vec3D(1,0,0), Vec3D(1,0,0));  //Cylindric wall
+ * wallHandler.copyAndAddObject(w);
+ *
+ * InfiniteWall w1;
+ * w1.set(Vec3D(0,0,-1), Vec3D(0,0,-1)); //Bottom wall
+ * wallHandler.copyAndAddObject(w1);
+ * w1.set(Vec3D(0,0,1), Vec3D(0,0,1)); //Top wall
+ * wallHandler.copyAndAddObject(w1);
+ * \endcode
+ *
+ * ### Example 3
+ *
+ * Say you want a cylindrical casing with an outflow at the base. In this case, you need to define three walls:
+ * - The outer cylinder of radius R, height H
+ * - The flat top wall
+ * - A bottom wall which is a outer cylinder of radius r<R, with a flat top wall at z=0
+ *
+ * \image html AxisymmetricWallsSilo.png "A cylindric casing that can be filled with particles"
+ *
+ * This can be done as follows:
+    \code
+    double R = 2;
+    double H = 1;
+    double r = 1;
+
+    AxisymmetricIntersectionOfWalls w;
+    w.setSpecies(species);
+    w.setPosition(Vec3D(0,0,0));
+    w.setOrientation(Vec3D(0,0,1));
+    //normal and position of the outer shell in cylindrical coordinates
+    w.addObject(Vec3D(1,0,0), Vec3D(R,0,0));
+    wallHandler.copyAndAddObject(w);
+
+    InfiniteWall w1;
+    w1.set(Vec3D(0,0,1), Vec3D(0,0,H)); //Top wall
+
+    AxisymmetricIntersectionOfWalls w0;
+    w0.setSpecies(species);
+    w0.setPosition(Vec3D(0,0,0));
+    w0.setOrientation(Vec3D(0,0,1));
+    // bottom wall is an intersection of two walls, an outer cylinder of radius r and a flat top wall at z=0
+    w0.addObject(Vec3D(1,0,0), Vec3D(r,0,0));
+    w0.addObject(Vec3D(0,0,1), Vec3D(r,0,0));
+    wallHandler.copyAndAddObject(w0);
+    \endcode
+ *
+
+ * For a demonstration on how to use this class, see \ref HourGlass3DDemo.
  */
 class AxisymmetricIntersectionOfWalls : public IntersectionOfWalls
 {

@@ -9,6 +9,6 @@
 div.tabs > ul li:first-child {
 	display:none;
 }
-div.image img{ 
-    width:50%;
+div.image img{
+	max-width: 50%;
 }
