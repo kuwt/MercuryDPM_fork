@@ -20,3 +20,4 @@ endforeach()
 
 #copy restart input for self tests into build
 file(COPY ${CMAKE_SOURCE_DIR}/Drivers/MercurySimpleDemos/InputData/StressStrainControlBoundarySelfTestInput.restart DESTINATION .)
+file(COPY Screw.stl Casing.stl DESTINATION .)

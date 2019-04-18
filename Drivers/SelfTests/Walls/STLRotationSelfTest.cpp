@@ -48,16 +48,17 @@ int main(int argc, char* argv[])
     // Introduce an material (no properties set, as no collisions happen here)
     problem.speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
     // introduce an outer wall
-    problem.wallHandler.readTriangleWall("BakX.STL",problem.speciesHandler.getObject(0));
+    problem.wallHandler.readTriangleWall("Casing.stl",problem.speciesHandler.getObject(0));
     // introduce an inner, rotating wall
     Mdouble scaleFactor = 1;
     Vec3D shift = {0,0,0};
     Vec3D velocity = {0,0,0};
     Vec3D angularVelocity = {2.0*constants::pi,0,0};
-    problem.wallHandler.readTriangleWall("SchroefX.STL",problem.speciesHandler.getObject(0),
+    problem.wallHandler.readTriangleWall("Screw.stl",problem.speciesHandler.getObject(0),
             scaleFactor,shift,velocity,angularVelocity);
     // start solving in time
     problem.solve();
+    logger.assert_always(problem.wallHandler.getSize()==4316,"Didn't read the right number of walls");
     logger(INFO,"Load %Wall_*.vtu in paraview to see the wall geometry",problem.getName());
     return 0;
 }

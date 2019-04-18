@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     29888,        777]
-NotebookOptionsPosition[     28559,        739]
-NotebookOutlinePosition[     28895,        754]
-CellTagsIndexPosition[     28852,        751]
+NotebookDataLength[     24496,        645]
+NotebookOptionsPosition[     22923,        601]
+NotebookOutlinePosition[     23259,        616]
+CellTagsIndexPosition[     23216,        613]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -494,247 +494,109 @@ Cell[BoxData["\<\"AxisymmetricWallsOuter.png\"\>"], "Output",
 Cell[CellGroupData[{
 
 Cell[BoxData[{
- RowBox[{
-  RowBox[{
-   RowBox[{"G3D", "=", 
-    RowBox[{"Graphics3D", "[", 
+ RowBox[{"G3D", "=", 
+  RowBox[{"Graphics3D", "[", 
+   RowBox[{
+    RowBox[{"{", "\[IndentingNewLine]", 
      RowBox[{
-      RowBox[{"{", "\[IndentingNewLine]", 
+      RowBox[{"Cylinder", "[", "]"}], ",", "\[IndentingNewLine]", 
+      RowBox[{"Cylinder", "[", 
        RowBox[{
-        RowBox[{"Cylinder", "[", "]"}], ",", "\[IndentingNewLine]", 
-        RowBox[{"Cylinder", "[", 
+        RowBox[{"{", 
          RowBox[{
           RowBox[{"{", 
-           RowBox[{
-            RowBox[{"{", 
-             RowBox[{"0", ",", "0", ",", 
-              RowBox[{"-", "2"}]}], "}"}], ",", 
-            RowBox[{"{", 
-             RowBox[{"0", ",", "0", ",", 
-              RowBox[{"-", "1"}]}], "}"}]}], "}"}], ",", ".5"}], "]"}], ",", 
-        "\[IndentingNewLine]", 
-        RowBox[{"Arrow", "[", 
-         RowBox[{"{", 
-          RowBox[{
-           RowBox[{"{", 
-            RowBox[{"0", ",", "0", ",", "0"}], "}"}], ",", 
-           RowBox[{"{", 
-            RowBox[{"0", ",", "0", ",", "2"}], "}"}]}], "}"}], "]"}], ",", 
-        "\[IndentingNewLine]", 
-        RowBox[{"Text", "[", 
-         RowBox[{"orientation", ",", 
+           RowBox[{"0", ",", "0", ",", 
+            RowBox[{"-", "2"}]}], "}"}], ",", 
           RowBox[{"{", 
-           RowBox[{"0", ",", "0", ",", "1.5"}], "}"}], ",", 
-          RowBox[{"{", 
-           RowBox[{
-            RowBox[{"-", "1"}], ",", 
-            RowBox[{"-", "1"}]}], "}"}]}], "]"}]}], "\[IndentingNewLine]", 
-       "}"}], ",", 
-      RowBox[{"Axes", "->", "True"}], ",", 
-      RowBox[{"Ticks", "\[Rule]", 
+           RowBox[{"0", ",", "0", ",", 
+            RowBox[{"-", "1"}]}], "}"}]}], "}"}], ",", ".5"}], "]"}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{"Arrow", "[", 
        RowBox[{"{", 
         RowBox[{
          RowBox[{"{", 
-          RowBox[{
-           RowBox[{"-", "1"}], ",", "1"}], "}"}], ",", 
+          RowBox[{"0", ",", "0", ",", "0"}], "}"}], ",", 
          RowBox[{"{", 
-          RowBox[{
-           RowBox[{"-", "1"}], ",", "1"}], "}"}], ",", 
-         RowBox[{"{", 
-          RowBox[{
-           RowBox[{"-", "1"}], ",", "1"}], "}"}]}], "}"}]}], ",", 
-      RowBox[{"AxesLabel", "\[Rule]", 
-       RowBox[{"{", 
-        RowBox[{"x", ",", "y", ",", "z"}], "}"}]}]}], "]"}]}], ";"}], 
-  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{
-   RowBox[{"G2D", "=", 
-    RowBox[{"Graphics", "[", 
-     RowBox[{
-      RowBox[{"{", "\[IndentingNewLine]", 
-       RowBox[{"LightGray", ",", 
-        RowBox[{"Rectangle", "[", 
+          RowBox[{"0", ",", "0", ",", "2"}], "}"}]}], "}"}], "]"}], ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{"Text", "[", 
+       RowBox[{"orientation", ",", 
+        RowBox[{"{", 
+         RowBox[{"0", ",", "0", ",", "1.5"}], "}"}], ",", 
+        RowBox[{"{", 
          RowBox[{
-          RowBox[{"{", 
-           RowBox[{"0", ",", 
-            RowBox[{"-", "1"}]}], "}"}], ",", 
-          RowBox[{"{", 
-           RowBox[{"1", ",", "1"}], "}"}]}], "]"}], ",", 
-        "\[IndentingNewLine]", "Black", ",", "Thick", ",", 
-        RowBox[{"Line", "[", 
-         RowBox[{"{", 
-          RowBox[{
-           RowBox[{"{", 
-            RowBox[{"0", ",", 
-             RowBox[{"-", "1"}]}], "}"}], ",", 
-           RowBox[{"{", 
-            RowBox[{"1", ",", 
-             RowBox[{"-", "1"}]}], "}"}], ",", 
-           RowBox[{"{", 
-            RowBox[{"1", ",", "1"}], "}"}], ",", 
-           RowBox[{"{", 
-            RowBox[{"0", ",", "1"}], "}"}]}], "}"}], "]"}], ",", 
-        "\[IndentingNewLine]", 
-        RowBox[{"FontSize", "\[Rule]", "14"}], ",", 
-        RowBox[{"Arrowheads", "[", ".1", "]"}], ",", "\[IndentingNewLine]", 
-        RowBox[{"Arrow", "[", 
-         RowBox[{"{", 
-          RowBox[{
-           RowBox[{"{", 
-            RowBox[{".5", ",", 
-             RowBox[{"-", "1"}]}], "}"}], ",", 
-           RowBox[{"{", 
-            RowBox[{".5", ",", 
-             RowBox[{"-", ".7"}]}], "}"}]}], "}"}], "]"}], ",", 
-        RowBox[{"Text", "[", 
-         RowBox[{"\"\<\!\(\*SubscriptBox[\(n\), \(0\)]\)\>\"", ",", 
-          RowBox[{"{", 
-           RowBox[{".5", ",", 
-            RowBox[{"-", ".9"}]}], "}"}], ",", "Right"}], "]"}], ",", 
-        "\[IndentingNewLine]", 
-        RowBox[{"Arrow", "[", 
-         RowBox[{"{", 
-          RowBox[{
-           RowBox[{"{", 
-            RowBox[{"1", ",", "0"}], "}"}], ",", 
-           RowBox[{"{", 
-            RowBox[{".7", ",", "0"}], "}"}]}], "}"}], "]"}], ",", 
-        RowBox[{"Text", "[", 
-         RowBox[{"\"\<\!\(\*SubscriptBox[\(n\), \(1\)]\)\>\"", ",", 
-          RowBox[{"{", 
-           RowBox[{".9", ",", "0.05"}], "}"}], ",", "Bottom"}], "]"}], ",", 
-        "\[IndentingNewLine]", 
-        RowBox[{"Arrow", "[", 
-         RowBox[{"{", 
-          RowBox[{
-           RowBox[{"{", 
-            RowBox[{".5", ",", "1"}], "}"}], ",", 
-           RowBox[{"{", 
-            RowBox[{".5", ",", ".7"}], "}"}]}], "}"}], "]"}], ",", 
-        RowBox[{"Text", "[", 
-         RowBox[{"\"\<\!\(\*SubscriptBox[\(n\), \(2\)]\)\>\"", ",", 
-          RowBox[{"{", 
-           RowBox[{".5", ",", ".9"}], "}"}], ",", "Right"}], "]"}], ",", 
-        "\[IndentingNewLine]", 
-        RowBox[{"PointSize", "[", "Large", "]"}], ",", "\[IndentingNewLine]", 
-        
-        RowBox[{"Point", "[", 
-         RowBox[{"{", 
-          RowBox[{".5", ",", 
-           RowBox[{"-", "1"}]}], "}"}], "]"}], ",", 
-        RowBox[{"Text", "[", 
-         RowBox[{
-          SubscriptBox["p", "0"], ",", 
-          RowBox[{"{", 
-           RowBox[{".5", ",", 
-            RowBox[{"-", "1.05"}]}], "}"}]}], "]"}], ",", 
-        "\[IndentingNewLine]", 
-        RowBox[{"Point", "[", 
-         RowBox[{"{", 
-          RowBox[{"1", ",", "0"}], "}"}], "]"}], ",", 
-        RowBox[{"Text", "[", 
-         RowBox[{
-          SubscriptBox["p", "1"], ",", 
-          RowBox[{"{", 
-           RowBox[{"1.1", ",", "0.05"}], "}"}]}], "]"}], ",", 
-        "\[IndentingNewLine]", 
-        RowBox[{"Point", "[", 
-         RowBox[{"{", 
-          RowBox[{".5", ",", "1"}], "}"}], "]"}], ",", 
-        RowBox[{"Text", "[", 
-         RowBox[{
-          SubscriptBox["p", "2"], ",", 
-          RowBox[{"{", 
-           RowBox[{".5", ",", "1.05"}], "}"}], ",", "Bottom"}], "]"}]}], 
-       "\[IndentingNewLine]", "}"}], ",", 
-      RowBox[{"Axes", "\[Rule]", "True"}], ",", 
-      RowBox[{"AxesLabel", "\[Rule]", 
+          RowBox[{"-", "1"}], ",", 
+          RowBox[{"-", "1"}]}], "}"}]}], "]"}]}], "\[IndentingNewLine]", 
+     "}"}], ",", 
+    RowBox[{"Axes", "->", "True"}], ",", 
+    RowBox[{"Ticks", "\[Rule]", 
+     RowBox[{"{", 
+      RowBox[{
        RowBox[{"{", 
         RowBox[{
-         OverscriptBox["r", "^"], ",", 
-         OverscriptBox["z", "^"]}], "}"}]}]}], "]"}]}], ";"}], 
-  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
- RowBox[{"GraphicsGrid", "[", 
-  RowBox[{
-   RowBox[{"{", 
-    RowBox[{"{", 
-     RowBox[{"G3D", ",", "G2D"}], "}"}], "}"}], ",", 
-   RowBox[{"ImageSize", "->", "Full"}]}], "]"}], "\[IndentingNewLine]", 
+         RowBox[{"-", "1"}], ",", "1"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"-", "1"}], ",", "1"}], "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"-", "1"}], ",", "1"}], "}"}]}], "}"}]}], ",", 
+    RowBox[{"AxesLabel", "\[Rule]", 
+     RowBox[{"{", 
+      RowBox[{"x", ",", "y", ",", "z"}], "}"}]}], ",", 
+    RowBox[{"ViewPoint", "\[Rule]", "Front"}]}], 
+   "]"}]}], "\[IndentingNewLine]", 
  RowBox[{"Export", "[", 
   RowBox[{"\"\<AxisymmetricWallsSilo.png\>\"", ",", "%"}], "]"}]}], "Input",
- CellChangeTimes->{{3.764564397630232*^9, 
-  3.764564449318349*^9}},ExpressionUUID->"619901a5-2b33-41e7-b1bd-\
+ CellChangeTimes->{{3.764564397630232*^9, 3.764564449318349*^9}, {
+  3.764564729284691*^9, 
+  3.764564804211001*^9}},ExpressionUUID->"619901a5-2b33-41e7-b1bd-\
 bad95011d3fe"],
 
 Cell[BoxData[
- GraphicsBox[{{}, {{InsetBox[
-      Graphics3DBox[{CylinderBox[{{0, 0, -1}, {0, 0, 1}}], 
-        CylinderBox[{{0, 0, -2}, {0, 0, -1}}, 0.5], 
-        Arrow3DBox[{{0, 0, 0}, {0, 0, 2}}], 
-        Text3DBox["orientation", {0, 0, 1.5}, {-1, -1}]},
-       Axes->True,
-       AxesLabel->{
-         FormBox["x", TraditionalForm], 
-         FormBox["y", TraditionalForm], 
-         FormBox["z", TraditionalForm]},
-       ImageSize->{281.85875414535815`, 298.21013252850395`},
-       ImageSizeRaw->Automatic,
-       Ticks->{{{-1, 
-           FormBox[
-            RowBox[{"-", "1"}], TraditionalForm]}, {1, 
-           FormBox["1", TraditionalForm]}}, {{-1, 
-           FormBox[
-            RowBox[{"-", "1"}], TraditionalForm]}, {1, 
-           FormBox["1", TraditionalForm]}}, {{-1, 
-           FormBox[
-            RowBox[{"-", "1"}], TraditionalForm]}, {1, 
-           FormBox["1", TraditionalForm]}}},
-       ViewPoint->{0.9314697736025421, -3.195959950634764, 0.6067981994069068},
-       ViewVertical->{0.23474515437620996`, -0.8415855321477599, 
-        0.8995316148663789}], {192., -189.}, ImageScaled[{0.5, 0.5}], {360., 360.},
-      
-      ContentSelectable->True], InsetBox[
-      GraphicsBox[{
-        {GrayLevel[0.85], RectangleBox[{0, -1}, {1, 1}]}, 
-        {GrayLevel[0], Thickness[Large], 
-         LineBox[{{0, -1}, {1, -1}, {1, 1}, {0, 1}}], 
-         {Arrowheads[0.1], 
-          
-          StyleBox[{ArrowBox[{{0.5, -1}, {0.5, -0.7}}], 
-            InsetBox["\<\"\\!\\(\\*SubscriptBox[\\(n\\), \\(0\\)]\\)\"\>", {0.5, -0.9},
-              Right], ArrowBox[{{1, 0}, {0.7, 0}}], 
-            InsetBox["\<\"\\!\\(\\*SubscriptBox[\\(n\\), \\(1\\)]\\)\"\>", {0.9, 0.05},
-              Bottom], ArrowBox[{{0.5, 1}, {0.5, 0.7}}], 
-            InsetBox["\<\"\\!\\(\\*SubscriptBox[\\(n\\), \\(2\\)]\\)\"\>", {0.5, 0.9},
-              Right], 
-            {PointSize[Large], PointBox[{0.5, -1}], InsetBox[
-              SubscriptBox["p", "0"], {0.5, -1.05}], PointBox[{1, 0}], 
-             InsetBox[
-              SubscriptBox["p", "1"], {1.1, 0.05}], PointBox[{0.5, 1}], 
-             InsetBox[
-              SubscriptBox["p", "2"], {0.5, 1.05}, Bottom]}},
-           FontSize->14]}}},
-       Axes->True,
-       AxesLabel->{
-         FormBox[
-          OverscriptBox["r", "^"], TraditionalForm], 
-         FormBox[
-          OverscriptBox["z", "^"], TraditionalForm]}], {576., -189.}, 
-      ImageScaled[{0.5, 0.5}], {360., 360.}]}}, {}},
-  ContentSelectable->True,
-  ImageSize->Full,
-  PlotRangePadding->{6, 5}]], "Output",
+ Graphics3DBox[{CylinderBox[{{0, 0, -1}, {0, 0, 1}}], 
+   CylinderBox[{{0, 0, -2}, {0, 0, -1}}, 0.5], 
+   Arrow3DBox[{{0, 0, 0}, {0, 0, 2}}], 
+   Text3DBox["orientation", {0, 0, 1.5}, {-1, -1}]},
+  Axes->True,
+  AxesLabel->{
+    FormBox["x", TraditionalForm], 
+    FormBox["y", TraditionalForm], 
+    FormBox["z", TraditionalForm]},
+  Ticks->{{{-1, 
+      FormBox[
+       RowBox[{"-", "1"}], TraditionalForm]}, {1, 
+      FormBox["1", TraditionalForm]}}, {{-1, 
+      FormBox[
+       RowBox[{"-", "1"}], TraditionalForm]}, {1, 
+      FormBox["1", TraditionalForm]}}, {{-1, 
+      FormBox[
+       RowBox[{"-", "1"}], TraditionalForm]}, {1, 
+      FormBox["1", TraditionalForm]}}},
+  ViewPoint->Front]], "Output",
  CellChangeTimes->{
-  3.764564388840527*^9, {3.7645644368554564`*^9, 
-   3.764564449850355*^9}},ExpressionUUID->"7e1c076f-ccf3-495c-b66b-\
-9f6026199e85"],
+  3.764564814831943*^9},ExpressionUUID->"ff450767-d5e4-4047-9cc9-\
+9788a07aed94"],
 
 Cell[BoxData["\<\"AxisymmetricWallsSilo.png\"\>"], "Output",
  CellChangeTimes->{
-  3.764564388840527*^9, {3.7645644368554564`*^9, 
-   3.764564449973728*^9}},ExpressionUUID->"40e22c94-3893-46f6-a850-\
-02c2fca13da8"]
+  3.764564814930504*^9},ExpressionUUID->"f2fefa00-9bb3-4346-b82a-\
+0bc0b38c5c7e"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[""], "Input",
+ CellChangeTimes->{{3.76456481343361*^9, 
+  3.7645648134683533`*^9}},ExpressionUUID->"f681e361-e607-4ef2-a23d-\
+5a3f84957e8a"],
+
+Cell[BoxData["\<\"AxisymmetricWallsSilo.png\"\>"], "Output",
+ CellChangeTimes->{
+  3.764564388840527*^9, {3.7645644368554564`*^9, 3.764564449850355*^9}, {
+   3.7645647211937647`*^9, 3.764564747169651*^9}, {3.764564800891881*^9, 
+   3.764564810499175*^9}},ExpressionUUID->"c10ff0e1-e06c-400b-b1e2-\
+58e4373a5051"]
 }, Open  ]]
 },
 WindowSize->{808, 903},
@@ -772,12 +634,18 @@ Cell[19130, 487, 212, 3, 32, "Output", "ExpressionUUID" -> \
 "0bdd6b83-e209-474e-af38-2a2aa77627f6"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[19379, 495, 6247, 172, 518, "Input", "ExpressionUUID" -> \
+Cell[19379, 495, 2028, 58, 193, "Input", "ExpressionUUID" -> \
 "619901a5-2b33-41e7-b1bd-bad95011d3fe"],
-Cell[25629, 669, 2697, 61, 372, "Output", "ExpressionUUID" -> \
-"7e1c076f-ccf3-495c-b66b-9f6026199e85"],
-Cell[28329, 732, 214, 4, 32, "Output", "ExpressionUUID" -> \
-"40e22c94-3893-46f6-a850-02c2fca13da8"]
+Cell[21410, 555, 827, 23, 447, "Output", "ExpressionUUID" -> \
+"ff450767-d5e4-4047-9cc9-9788a07aed94"],
+Cell[22240, 580, 162, 3, 89, "Output", "ExpressionUUID" -> \
+"f2fefa00-9bb3-4346-b82a-0bc0b38c5c7e"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[22439, 588, 153, 3, 32, InheritFromParent, "ExpressionUUID" -> \
+"f681e361-e607-4ef2-a23d-5a3f84957e8a"],
+Cell[22595, 593, 312, 5, 32, "Output", "ExpressionUUID" -> \
+"c10ff0e1-e06c-400b-b1e2-58e4373a5051"]
 }, Open  ]]
 }
 ]
