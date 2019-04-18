@@ -26,9 +26,11 @@
 #include <fstream>
 #include <map>
 
+/*
 #include "CG/CG.h"
 #include "CG/TimeSmoothedCG.h"
 #include "CG/TimeAveragedCG.h"
+*/
 
 #define MAX_STRLEN 1024
 
@@ -200,12 +202,14 @@ class muICal2D : public Mercury2D
             not_yet_removed_insb = true;
 
             /* Create a CG object for live statistics */
+            /*
             auto cg = cgHandler.copyAndAddObject(
                     new CG<CGCoordinates::Y>);
             cg->statFile.setSaveCount(pars.at("saveEvery"));
             cg->setWidth(pars.at("particleRadius") * 1.5);
             cg->setY(0, pars.at("height")*1.5);
             cg->setN(64);
+            */
         }
 
         void actionsOnRestart()
