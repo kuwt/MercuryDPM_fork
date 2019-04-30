@@ -27,7 +27,8 @@
 #define	SPHERICALINDENTER_H
 
 #include "Mercury3D.h"
-#include <assert.h>
+//#include <assert.h>
+#include "Logger.h"
 
 /** Puts a spherical indenter into Mercury3D */
 class SphericalIndenter : public Mercury3D
@@ -44,9 +45,9 @@ public:
             << " force " << indentationForce_
             << " velocity " << indentationVelocity_
             << std::endl;
-        assert(indenterDiameter_ >= 0.0);
-        assert(indentationVelocity_ >= 0.0);
-        assert(indentationForce_ >= 0.0);
+        logger.assert_always(indenterDiameter_ >= 0.0,"");
+        logger.assert_always(indentationVelocity_ >= 0.0,"");
+        logger.assert_always(indentationForce_ >= 0.0,"");
     }
 
     /** first create particles and species before calling this */

@@ -29,6 +29,7 @@
 #include "Walls/InfiniteWall.h"
 #include "Boundaries/PeriodicBoundary.h"
 #include "Walls/AxisymmetricIntersectionOfWalls.h"
+#include "Logger.h"
 using std::cout;
 using std::endl;
 using helpers::readFromFile;
@@ -61,7 +62,7 @@ public:
         }
 
         species = dynamic_cast<SinterFrictionSpecies*>(speciesHandler.getObject(0));
-        assert(species);
+        logger.assert(species,"Species pointer not set");
         species->setSinterRate(0.0);
         //species->setSinterAdhesion(0.0);
     }
