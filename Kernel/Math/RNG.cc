@@ -31,7 +31,6 @@
  * \todo{Thomas: This code does sth. when min>max; I would prefer to throw an error.}
  * \todo{the random seed should be stored in restart}
  * */
-
 RNG::RNG()
 {
     randomSeedLinearCongruentialGenerator_ = 0;
@@ -211,6 +210,7 @@ Mdouble RNG::getNormalVariate(Mdouble mean, Mdouble stdev)
  * This is a basic Linear Congruential Generator Random
  * Is described by three parameters, the multiplication a, the addition c and the mod m
  */
+#pragma optimize( "", off )
 Mdouble RNG::getRandomNumberFromLinearCongruentialGenerator(Mdouble min, Mdouble max)
 {
     //Update the random seed
@@ -218,13 +218,12 @@ Mdouble RNG::getRandomNumberFromLinearCongruentialGenerator(Mdouble min, Mdouble
     
     //Generate a random number in the required range
     
-    Mdouble random_num;
-    
     Mdouble range = max - min;
-    random_num = min + range * randomSeedLinearCongruentialGenerator_ / (static_cast<Mdouble>(m_) + 1.0);
+    Mdouble random_num = min + range * randomSeedLinearCongruentialGenerator_ / (static_cast<Mdouble>(m_) + 1.0);
     
     return random_num;
 }
+#pragma optimize( "", on )
 
 /**************************************
  * This sets the seed for LFG using LCG
@@ -237,6 +236,7 @@ void RNG::seedLaggedFibonacciGenerator()
     {
         randomSeedLaggedFibonacciGenerator_[i] = getRandomNumberFromLinearCongruentialGenerator(0, 1.0);
     }
+    
 }
 
 /**
@@ -245,14 +245,12 @@ void RNG::seedLaggedFibonacciGenerator()
  */
 Mdouble RNG::getRandomNumberFromLaggedFibonacciGenerator(Mdouble min, Mdouble max)
 {
+#pragma optimize( "", off )
     Mdouble new_seed = fmod(randomSeedLaggedFibonacciGenerator_[0] + randomSeedLaggedFibonacciGenerator_[p_ - q_],
                             static_cast<Mdouble>(1.0));
     //Update the random seed
-    for (unsigned int i = 0; i < p_ - 1; i++)
-    {
-        randomSeedLaggedFibonacciGenerator_[i] = randomSeedLaggedFibonacciGenerator_[i + 1];
-    }
-    randomSeedLaggedFibonacciGenerator_[p_ - 1] = new_seed;
+    randomSeedLaggedFibonacciGenerator_.erase(randomSeedLaggedFibonacciGenerator_.begin());
+    randomSeedLaggedFibonacciGenerator_.emplace_back(new_seed);
     
     //Generate a random number in the required range
     
@@ -260,8 +258,8 @@ Mdouble RNG::getRandomNumberFromLaggedFibonacciGenerator(Mdouble min, Mdouble ma
     
     Mdouble range = max - min;
     random_num = min + range * new_seed;
-    
     return random_num;
+#pragma optimize( "", on )
 }
 
 /**
