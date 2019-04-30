@@ -1,10 +1,14 @@
+/* PeriodicFingering - fingering experiments in a periodic domain. 
+ * Particles are released by a reservoir and the depth is controlled by a gate. 
+ * For best results, take quite a low coefficient of restitution and quite a
+ * high coefficient of friction. This helps impose a no-slip condition.
+ */
 #include "Species/Species.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Walls/InfiniteWall.h"
 #include "Walls/IntersectionOfWalls.h"
 #include "Mercury3D.h"
 #include "Particles/BaseParticle.h"
-#include "Boundaries/CubeInsertionBoundary.h"
 #include "Boundaries/PeriodicBoundary.h"
 #include "Boundaries/PolydisperseInsertionBoundary.h"
 #include "Math/RNG.h"
@@ -12,7 +16,11 @@
 #include <fstream>
 #include <map>
 
-// #define DEGREES
+/* Specify angles, coefficients of friction in terms of degrees? */
+#define DEGREES
+
+/* Do we write .data. and .fstat. files? while filling up? */
+#define FILESWHILEFILLING
 
 using namespace std;
 
@@ -40,7 +48,7 @@ class PeriodicFingering : public Mercury3D {
       }
       */
 
-#if DEGREES
+#ifdef DEGREES
       /* The slope is specified in degrees, not radians. */
       pars.at("alpha") = M_PI * pars.at("alpha") / 180.;
       /* The coefficients of friction are best specified by their arctangents in degrees. */
@@ -50,21 +58,36 @@ class PeriodicFingering : public Mercury3D {
       pars.at("rolling_large") = tan(M_PI * pars.at("rolling_large") / 180.);
 #endif
 
+      /* Initialization */
       setName(parsfile.erase(parsfile.find_last_of('.')));
 
-      /* Initialization */
-      generator.setRandomSeed(int(pars.at("randomSeed")));
+      if (pars.find("randomSeed") != pars.end())
+      {
+          random.setRandomSeed(int(pars.at("randomSeed")));
+          logger(INFO, "Set random seed to %", pars.at("randomSeed"));
+      }
+      else
+      {
+          random.randomise();
+          logger(INFO, "randomSeed not specified, randomising.");
+      }
 
-      /* Do we write .data. and .fstat. files? 
-       * Initially, _no_ --- not while filling up. */
+
+      /* Do we write .data. and .fstat. files? while filling up? */
+#ifdef FILESWHILEFILLING
+      dataFile.setFileType(FileType::MULTIPLE_FILES);
+      fStatFile.setFileType(FileType::MULTIPLE_FILES);
+#else
       dataFile.setFileType(FileType::NO_FILE);
       fStatFile.setFileType(FileType::NO_FILE);
       eneFile.setFileType(FileType::NO_FILE);
+#endif
+
 
       setXMin(pars.at("reservoirLength"));
       setXMax(pars.at("domainLength"));
       setYMin(0);
-      setYMax(+pars.at("width"));
+      setYMax(+pars.at("domainWidth"));
       setZMin(0);
       setZMax(pars.at("reservoirHeight")); // This is about to be overwritten...
       setNumberOfDomains({8,2,2});   //For hopper
@@ -194,7 +217,6 @@ class PeriodicFingering : public Mercury3D {
       liftableGate->addObject(Vec3D(1,0,0),Vec3D(0,0,0));
       liftableGate->setSpecies(basal_);
       liftableGate = wallHandler.copyAndAddObject(liftableGate);
-      stillFillingUp = true;
 
       auto endWall = new InfiniteWall();
       endWall->set(Vec3D(+1,0,0), Vec3D(pars.at("domainLength"), 0, 0));
@@ -203,7 +225,7 @@ class PeriodicFingering : public Mercury3D {
 
       /* Sides */
       auto sides = new PeriodicBoundary();
-      sides->set(Vec3D(0,1,0), 0, +pars.at("width"));
+      sides->set(Vec3D(0,1,0), 0, +pars.at("domainWidth"));
       sides = boundaryHandler.copyAndAddObject(sides);
 
       auto topWall = new InfiniteWall();
@@ -214,14 +236,16 @@ class PeriodicFingering : public Mercury3D {
       /* A PolydisperseInsertionBoundary */
       // JMFT: TODO: You have to add the PolydisperseInsertionBoundary to the
       // boundaryHandler before setting its properties. The other way round
-      // doesn't work. I suspect this is a problem in the copy constructor of
-      // PolydisperseInsertionBoundary.
-      auto insb = boundaryHandler.copyAndAddObject(new PolydisperseInsertionBoundary());
+      // doesn't work. That's because the copy constructor of the
+      // PolydisperseInsertionBoundary currently (as of r2978) doesn't copy
+      // species over.
+      auto insb = boundaryHandler.copyAndAddObject(new
+              PolydisperseInsertionBoundary());
       insb->setGeometry(pars.at("insbMaxFailed"),
-              Vec3D( -pars.at("reservoirLength"), 0, 0 ),
-              Vec3D( 0, pars.at("width"), pars.at("reservoirHeight") ),
-              Vec3D(0, 0, 0),
-              Vec3D(0, 0, 0)
+              Vec3D( -pars.at("reservoirLength"), 0, 0.9*pars.at("reservoirHeight") ),
+              Vec3D( 0, pars.at("domainWidth"), pars.at("reservoirHeight") ),
+              Vec3D(0, 0, - sqrt(pars.at("g") * pars.at("reservoirHeight"))),
+              Vec3D(0, 0, - sqrt(pars.at("g") * pars.at("reservoirHeight")))
               );
 
       double probsmall = pars.at("ratio_small"); // TODO
@@ -229,7 +253,8 @@ class PeriodicFingering : public Mercury3D {
       std::cout << "probsmall = " << probsmall << std::endl;
       insb->addGenerandum(smallPrototype, probsmall, pars.at("dispersitySmall") );
       insb->addGenerandum(largePrototype, problarge, pars.at("dispersityLarge") );
-
+      insb->checkBoundaryBeforeTimeStep(this);
+      stillFillingUp = true;
     }
 
     void actionsOnRestart() 
@@ -247,16 +272,22 @@ class PeriodicFingering : public Mercury3D {
                 stillFillingUp = false;
                 break;
             default:
-                logger(ERROR, "liftableGate has % objects, which shouldn't happen. (Should be 1 or 3.) Terminating.", 
+                logger(ERROR, "liftableGate has % objects, which shouldn't happen. (Should be 1, if still filling up, or 3 if already filled.) Terminating.", 
                         liftableGate->getNumberOfObjects());
                 break;
         }
 
         if (stillFillingUp)
         {
+#ifdef FILESWHILEFILLING
+            eneFile.setFileType(FileType::ONE_FILE);
+            fStatFile.setFileType(FileType::MULTIPLE_FILES);
+            dataFile.setFileType(FileType::MULTIPLE_FILES);
+#else
             eneFile.setFileType(FileType::NO_FILE);
             fStatFile.setFileType(FileType::NO_FILE);
             dataFile.setFileType(FileType::NO_FILE);
+#endif
         }
         else
         {
@@ -282,7 +313,7 @@ class PeriodicFingering : public Mercury3D {
     {
         Mdouble rmsvel = sqrt(2*getKineticEnergy() / getTotalMass());
         Mdouble volfrac = particleHandler.getVolume() 
-                            / ( pars.at("reservoirLength") * pars.at("width") * pars.at("reservoirHeight") );
+                            / ( pars.at("reservoirLength") * pars.at("domainWidth") * pars.at("reservoirHeight") );
 
         logger(INFO, 
                 "t = %, tmax = %, Np = %, m = %, KE = %, rmsvel = %, vol = %, volfrac = %",
@@ -294,28 +325,68 @@ class PeriodicFingering : public Mercury3D {
                  particleHandler.getVolume(),
                  volfrac);
 
+        /* Warnings about particles overlapping (try cranking up stiffness?) */
+        int warningsSoFar = 0;
+        Mdouble worstOverlapRatio = 0;
+        Vec3D   worstOverlapPosition = Vec3D(0,0,0);
+        for (auto i : interactionHandler)
+        {
+            Mdouble overlap = i->getOverlap();
+            Mdouble overlapRatio = overlap / pars.at("radius_small");
+            if (overlapRatio > worstOverlapRatio) 
+            {
+                worstOverlapRatio = overlapRatio;
+                worstOverlapPosition = i->getContactPoint();
+            }
+            if (overlapRatio > 0.05)
+            {
+                if (warningsSoFar < 5)
+                {
+                    logger(WARN, "interaction at % has overlap %, overlap/radius = %, relative vel %",
+                            i->getContactPoint(), overlap, overlapRatio,
+                            i->getNormalRelativeVelocity());
+                    warningsSoFar++;
+                    if (warningsSoFar >= 5)
+                        logger(WARN, "further overlap warnings this timestep will not be printed");
+                }
+            }
+        }
+        if (worstOverlapRatio > 0.05 && warningsSoFar > 5)
+            logger(WARN, "worst overlap/radius = % at position %",
+                    worstOverlapRatio, worstOverlapPosition);
+
         std::cout.flush();
     }
 
     void actionsAfterTimeStep() 
     {
 
-        /* Are we still filling up? If not, no need to do anything here. */
+        /* If we're done filling up, no need to do anything here, just let
+         * things run. */
         if (!stillFillingUp) 
             return;
 
-        /* Have we met the condition for the system to stop filling up, and
-         * start releasing? */
+        /* Otherwise... Have we met the conditions for the system to stop
+         * filling up, and start releasing? */
+
         /* We shall say that the system has come to rest provided that the
          * particles' r.m.s. speed is sufficiently low and the volume fraction
          * exceeds a certain amount. */
+
+        /* There are two separate conditions:
+         *   After the volume fraction is high enough, remove the
+         *   InsertionBoundary.
+         *
+         *   After the particles' r.m.s. speed is low enough, open the gate.
+         * These are tested for separately.
+         */
 
         Mdouble rmsvelThreshold = pars.at("rmsvelThreshold");
         Mdouble volfracThreshold = pars.at("volfracThreshold");
 
         // Volume fraction in the reservoir
         Mdouble volfrac = particleHandler.getVolume() 
-                            / ( pars.at("reservoirLength") * pars.at("width") * pars.at("reservoirHeight") );
+                            / ( pars.at("reservoirLength") * pars.at("domainWidth") * pars.at("reservoirHeight") );
 
         if ( volfrac > volfracThreshold && boundaryHandler.getNumberOfObjects() > 1 )
         {
@@ -325,9 +396,9 @@ class PeriodicFingering : public Mercury3D {
              * particles. Be careful --- we don't want to delete the
              * PeriodicBoundary! */
             boundaryHandler.clear();
-            /* Put the sides back in */
+            /* Put the periodic sides back in */
             auto sides = new PeriodicBoundary();
-            sides->set(Vec3D(0,1,0), 0, +pars.at("width"));
+            sides->set(Vec3D(0,1,0), 0, +pars.at("domainWidth"));
             sides = boundaryHandler.copyAndAddObject(sides);
 
             /* Turn on gravity */
@@ -345,8 +416,8 @@ class PeriodicFingering : public Mercury3D {
                     "t = %, removed all the InsertionBoundary. volume = %, volfrac = %",
                     getTime(), particleHandler.getVolume(), volfrac);
 
+            writeRestartFile();
             setTime(0);
-            
         }
         
         Mdouble rmsvel = sqrt(2*getKineticEnergy() / getTotalMass());
@@ -364,7 +435,7 @@ class PeriodicFingering : public Mercury3D {
 
             /* Remove initial confinement after the particles come to rest */
             liftableGate->addObject(Vec3D(0,0,1),
-                    Vec3D(0,0, pars.at("gap")));
+                    Vec3D(0,0, pars.at("gateHeight")));
             liftableGate->addObject(Vec3D(-1,0,0),
                     Vec3D(2*pars.at("radius_large"),0,0));
             stillFillingUp = false;
@@ -382,13 +453,16 @@ class PeriodicFingering : public Mercury3D {
                 basalConcentration = 1;
                 std::cout << "Set basalConcentration to default value 1" << std::endl;
             }
-            int NBasalParticle = basalConcentration * pars.at("width") * pars.at("domainLength") 
+            int NBasalParticle = basalConcentration * pars.at("domainWidth") * pars.at("domainLength") 
                 / (4 * pow(pars.at("radius_large"), 2));
 
-            
+
+            /* The rough base should be generated according to a seed, so that
+             * we can make the same rough base across different experiments
+             * (assuming same domain length and width) */
             if (pars.find("basalSeed") != pars.end())
             {
-                generator.setRandomSeed(pars.at("basalSeed"));
+                baseGenerator.setRandomSeed(pars.at("basalSeed"));
                 std::cout << "Set the random seed for the rough base to be " << pars.at("basalSeed") << std::endl;
             }
             else
@@ -396,11 +470,11 @@ class PeriodicFingering : public Mercury3D {
 
             for (int n = 0; n < NBasalParticle; n++) 
             {
-                // double rand = generator.getRandomNumber(0,1);
+                // double rand = baseGenerator.getRandomNumber(0,1);
                 // double r = rand*pars.at("radius_small") + (1-rand)*pars.at("radius_large");
                 double r = pars.at("radius_large");
-                double x = generator.getRandomNumber(0, pars.at("domainLength"));
-                double y = generator.getRandomNumber(0,1) * pars.at("width");
+                double x = baseGenerator.getRandomNumber(0,1) * pars.at("domainLength");
+                double y = baseGenerator.getRandomNumber(0,1) * pars.at("domainWidth");
                 double z = 0;
 
                 BaseParticle P;
@@ -441,14 +515,20 @@ class PeriodicFingering : public Mercury3D {
             else
                 dataFile.setFileType(FileType::MULTIPLE_FILES);
 
+#ifdef FILESWHILEFILLING
+            dataFile.setCounter(0);
+            fStatFile.setCounter(0);
+#endif
 
+
+            forceWriteOutputFiles(); 
         }
 
     }
 
   private:
     LinearViscoelasticFrictionSpecies *small_, *large_, *basal_;
-    RNG generator;
+    RNG baseGenerator;
     map<string,double> pars;
     bool stillFillingUp;
     IntersectionOfWalls* liftableGate;
@@ -457,7 +537,7 @@ class PeriodicFingering : public Mercury3D {
 };
 
 int main(int argc, char *argv[]) {
-    set_terminate (terminationUncaughtException);
+    // set_terminate (terminationUncaughtException);
     if (argc > 1) {
         PeriodicFingering* problem = new PeriodicFingering(argv[1]);
         argv[1] = argv[0];
