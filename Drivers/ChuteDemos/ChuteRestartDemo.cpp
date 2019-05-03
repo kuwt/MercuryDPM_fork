@@ -23,54 +23,43 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include<iostream>
-#include "scr/DPMBase.h"
-#include "scr/Mercury3D.h"
-#include "scr/Chute.h"
-using namespace std;
+#include <sstream>
+#include <iostream>
+#include <iomanip>
+#include <cmath>
+#include <string.h>
 
-class ChutePeriodic : public Chute{
-public:
+#include "Chute.h"
 
-	void actionsBeforeTimeStep(){};
-		
-	void setupInitialConditions(){
-		//load initial particles
-		readDataFile("c3d.ini") || readDataFile("../c3d.ini");
-		//fix Particles with zero velocity
-		int count=0;
-		for (vector<CParticle>::iterator it = Particles.begin(); it!=Particles.end(); ++it) {
-			if (it->Velocity.X==0.0 && it->Velocity.Y==0.0 && it->Velocity.Z==0.0) {
-				it->fixParticle();
-				count++;
-			}
-		}
-		//set time step to an eigth
-		setTimeStep(getTimeStep()/8);
-		//save every .2 time units
-		setSaveCount(floor(0.25/getTimeStep()));
-		//set number of buckets to power of two
-		int NUM_BUCKETS = 1024;
-		while (NUM_BUCKETS<2*get_N()) {
-			NUM_BUCKETS *= 2;
-		}
-		set_HGRID_num_buckets(NUM_BUCKETS);
-		//output
-		cout << "fixed particles: " << count << endl;
-		cout << "dt=" << getTimeStep() << ", savecount=" << get_savecount()  << ", NUM_BUCKETS=" << NUM_BUCKETS << endl; 
-	  write(std::cout,false);
-	};
-
+class ChuteRestartDemo : public Chute
+{
+    void actionsOnRestart() override
+    {
+        setName("ChuteRestartDemo");
+        setTimeMax(0.5);
+        setSaveCount(100);
+        fStatFile.setFileType(FileType::NO_FILE);
+    }
 };
 
-int main(int argc, char *argv[])
+/*!
+ * This code tests if chute problems restart properly. As can be seen above, it is very similar to restarting any other
+ * Mercury driver.
+ */
+int main(int argc, char* argv[])
 {
-	if (argc<2) {cerr << "Arguments needed!" << endl; exit(-1);}
-
- 	ChutePeriodic problem;
- 	problem.setName(argv[1]);
-	problem.load_restart_data();
-	problem.solve();
-	problem.write(std::cout,false);
-	problem.writeRestartFile();
+    logger.assert_always(argc > 1, "Please provide a restart file to this code. Usage: ./ChuteRestartDemo -r "
+            "\"ChuteDemo.restart\"");
+    bool isRestart = false;
+    for (unsigned int i = 0; i < argc; ++i)
+    {
+        if (!strcmp(argv[i], "-restart") || !strcmp(argv[i], "-r"))
+        {
+            isRestart = true;
+        }
+    }
+    logger.assert_always(isRestart, "Please provide a restart file to this code. Usage: ./ChuteRestartDemo -r "
+            "ChuteDemo.restart");
+    ChuteRestartDemo problem;
+    problem.solve(argc, argv);
 }

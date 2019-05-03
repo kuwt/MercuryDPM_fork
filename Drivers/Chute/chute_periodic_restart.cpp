@@ -24,40 +24,46 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include<iostream>
-#include "scr/DPMBase.h"
-#include "scr/Mercury3D.h"
-#include "scr/Chute.h"
+#include "DPMBase.h"
+#include "Mercury3D.h"
+#include "Chute.h"
+
 using namespace std;
 
-class ChutePeriodic : public Chute{
+class ChutePeriodic : public Chute
+{
 public:
-
-	void actionsBeforeTimeStep(){};
-		
-	void setupInitialConditions()
-	{
-		if (readDataFile("c3d.ini") || readDataFile("../c3d.ini")) {
-			//setTimeMax(getTime()+.1);
-			//setSaveCount(50);
-			write(std::cout,false);
-		} else {
-			cerr << "Input data not found exiting " << endl;
-			exit(-1);
-		}
-	}
-
+    
+    void actionsBeforeTimeStep()
+    {};
+    
+    void setupInitialConditions()
+    {
+        if (readDataFile("c3d.ini") || readDataFile("../c3d.ini"))
+        {
+            //setTimeMax(getTime()+.1);
+            //setSaveCount(50);
+            write(std::cout, false);
+        }
+        else
+        {
+            cerr << "Input data not found exiting " << endl;
+            exit(-1);
+        }
+    }
+    
 };
 
-int main(int argc UNUSED, char *argv[] UNUSED)
+int main(int argc UNUSED, char* argv[] UNUSED)
 {
-
- 	ChutePeriodic problem;
- 	problem.setName("c3d");
-	problem.load_restart_data();
- 	//problem.setName("chute_periodic");
-	 	
-	//problem.solve();
-	
-	problem.write(std::cout,false);
-	problem.writeRestartFile();
+    
+    ChutePeriodic problem;
+    problem.setName("c3d");
+    problem.load_restart_data();
+    //problem.setName("chute_periodic");
+    
+    //problem.solve();
+    
+    problem.write(std::cout, false);
+    problem.writeRestartFile();
 }

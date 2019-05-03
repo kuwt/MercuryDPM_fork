@@ -1014,3 +1014,38 @@ void Chute::setInsertionBoundary(InsertionBoundary* insertionBoundary)
 {
     insertionBoundary_ = insertionBoundary;
 }
+
+void Chute::addFlowParticlesCompactly()
+{
+    logger(INFO, "Adding flowing particles");
+    unsigned int N = particleHandler.getNumberOfObjects() + getChuteLength() * getChuteWidth() * getInflowHeight() /
+                                                            mathsFunc::cubic(getInflowParticleRadius()) / 8;
+    particleHandler.setStorageCapacity((N));
+    setZMax(1.2 * getInflowHeight());
+    while (particleHandler.getSize() < N)
+    {
+        BaseParticle p0 = createFlowParticle();
+        if (checkParticleForInteraction(p0))
+        {
+            particleHandler.copyAndAddObject(p0);
+        }
+        else
+        {
+            setInflowHeight(getInflowHeight() + .0001 * getMaxInflowParticleRadius());
+        }
+    }
+    logger(DEBUG, "InflowHeight = %", getInflowHeight());
+}
+
+BaseParticle Chute::createFlowParticle()
+{
+    BaseParticle p0;
+    p0.setSpecies(speciesHandler.getObject(0));
+    p0.setRadius(random.getRandomNumber(getMinInflowParticleRadius(), getMaxInflowParticleRadius()));
+    p0.setPosition(Vec3D(random.getRandomNumber(getXMin() + p0.getRadius(), getXMax() - p0.getRadius()),
+                         random.getRandomNumber(getYMin() + p0.getRadius(), getYMax() - p0.getRadius()),
+                         random.getRandomNumber(getZMin() + p0.getRadius() + getFixedParticleRadius(),
+                                                getInflowHeight())));
+    p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
+    return p0;
+}

@@ -35,7 +35,6 @@ class RNG;
 /*!
  * \class InsertionBoundary
  * \brief Boundary structure for boundaries used for insertion of particles
- * \todo IFCD: Should operator= be implemented here and in the derived classes?
  *
  * To cite the InsertionBoundary algorithm:
  *   A. R. Thornton, D. Krijgsman, A. Te Voortwis, V. Ogarko, S. Luding, R.

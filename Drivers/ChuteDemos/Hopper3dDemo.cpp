@@ -28,58 +28,66 @@
 #include <iomanip>
 #include <cmath>
 #include "ChuteWithHopper.h"
+#include "Species/LinearViscoelasticSlidingFrictionSpecies.h"
 
-using namespace std;
 
-/** A three-dimensional hopper inflow.
+/**
+ * A three-dimensional hopper inflow.
  **/
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     //Print description
-    cout << endl << "Description: A three-dimensional hopper inflow." << endl;
-
+    logger(INFO, "Description: A three-dimensional hopper inflow.\n\n");
+    
     // Problem parameters
     ChuteWithHopper problem;
     problem.setName("hopper_3d_demo");
     problem.setTimeMax(2.0); //Should be 10 for full length problem, but here I keep it low for a test case
-        
+    
     // Particle properties
-    problem.setDensity(2400.0);
-    problem.setInflowParticleRadius(0.5,0.5);
-    problem.speciesHandler.getObject(0)->setCollisionTimeAndRestitutionCoefficient(4e-3, 0.6);
-    problem.setTimeStep(4e-3/10);
-    problem.speciesHandler.getObject(0)->setSlidingDissipation(problem.get_dissipation());
-    problem.speciesHandler.getObject(0)->setSlidingFrictionCoefficient(0.8);
-    problem.setFixedParticleRadius(0.0);
-    problem.setRoughBottomType(MONOLAYER_ORDERED);
-    problem.setAlignBase(false);
+    LinearViscoelasticSlidingFrictionSpecies species;
+    species.setDensity(2400.0);
+    species.setCollisionTimeAndRestitutionCoefficient(4e-3, 0.6, 2400);
+    species.setSlidingDissipation(species.getDissipation());
+    species.setSlidingFrictionCoefficient(0.8);
+    problem.speciesHandler.copyAndAddObject(species);
+    
     
     // Chute properties
     problem.setChuteAngle(30.0);
     problem.setChuteLength(50.0);
     problem.setChuteWidth(100);
+    problem.setInflowParticleRadius(0.5, 0.5);
+    problem.setFixedParticleRadius(0.0);
+    problem.setRoughBottomType(MONOLAYER_ORDERED);
+    
     problem.setMaxFailed(6);
     problem.makeChutePeriodic();
+    problem.setTimeStep(4e-3 / 50);
     
     // Hopper properties
     problem.setHopperDimension(2);
     problem.setHopperLift(20);
     Mdouble ExitHeight = 4.0, ExitLength = 1.0 * ExitHeight, hopperAngle_ = 45.0, hopperLength_ = 3.0 * ExitLength;
     Mdouble hopperLowestPoint_ = ExitHeight - ExitLength * tan(problem.getChuteAngle());
-    Mdouble hopperHeight_=hopperLowestPoint_ + 1.1 * 0.5*(hopperLength_+ExitLength) / tan(hopperAngle_*constants::pi/180.0);
-    Mdouble HopperCornerHeight = hopperHeight_ - 0.5*(hopperLength_-ExitLength) / tan(hopperAngle_*constants::pi/180.0);
-    if (HopperCornerHeight<=0.0) { hopperHeight_ += -HopperCornerHeight + problem.getInflowParticle()->getRadius(); HopperCornerHeight = problem.getInflowParticle()->getRadius(); }    
-    problem.set_Hopper(ExitLength,ExitHeight,hopperAngle_,hopperLength_,hopperHeight_);    
-        
+    Mdouble hopperHeight_ =
+            hopperLowestPoint_ + 1.1 * 0.5 * (hopperLength_ + ExitLength) / tan(hopperAngle_ * constants::pi / 180.0);
+    Mdouble HopperCornerHeight =
+            hopperHeight_ - 0.5 * (hopperLength_ - ExitLength) / tan(hopperAngle_ * constants::pi / 180.0);
+    if (HopperCornerHeight <= 0.0)
+    {
+        hopperHeight_ += -HopperCornerHeight + problem.getInflowParticleRadius();
+        HopperCornerHeight = problem.getInflowParticleRadius();
+    }
+    problem.setHopper(ExitLength, ExitHeight, hopperAngle_, hopperLength_, hopperHeight_);
+    
     // Output properties
-    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(1,problem.getTimeMax(),problem.getTimeStep())); //minimize output to the last time step
-    problem.set_number_of_saves_data(100); //allow enough data output so the evolution can be viewed in xballs
-    problem.set_number_of_saves_ene(100);
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(100, problem.getTimeMax(),
+                                                                                     problem.getTimeStep()));
+    problem.restartFile.setSaveCount(problem.getTimeMax() / problem.getTimeStep());
     problem.setXBallsAdditionalArguments("-sort -v0 -solidf -drotphi 0.05 -v0 -oh -200 -p 20 -noborder 3");
-
-    cout << "Maximum allowed speed of particles: " << problem.getMaximumVelocity() << endl; // speed allowed before particles move through each other!
-    cout << "dt=" << problem.getTimeStep() << endl;
-
+    problem.setParticlesWriteVTK(true);
+    
     //solve
-    problem.solve(argc,argv);
+    problem.solve(argc, argv);
 }
