@@ -25,7 +25,7 @@
 
  */
 
-class ScrewFiller : public Mercury3D
+class ScrewConveyor : public Mercury3D
 {
 private:
 
@@ -128,9 +128,9 @@ private:
         // stage 3: the max time is reset according to the desired screw running time
         if (stage == 3 && getKineticEnergy()/getElasticEnergy() < 1.e-4)
         {
-          std::cout << "Starting the screw rotation...\n";
-           std::cout << "Resetting the maximum time...\n";
-           setTimeMax(screwRunningTime + getTime());
+            std::cout << "Starting the screw rotation...\n";
+//            std::cout << "Resetting the maximum time...\n";
+//            setTimeMax(screwRunningTime + getTime());
 
             stage++;
         }
@@ -782,13 +782,13 @@ int main(int argc, char *argv[])
 {
     // Variables
     int radiusRatio = 15;
-    double fillingRatio = 1.00;
     double packingFraction = 0.60;
     double sfPP = 0.3;
     double sfPW = 0.3;
+    double screwAngularVelocity = constants::pi;
 
     // Problem setup
-    ScrewFiller problem;
+    ScrewConveyor problem;
 
     problem.setGravity(Vec3D(0.,-9.81,0.));
     problem.setSystemDimensions(3);
@@ -803,7 +803,7 @@ int main(int argc, char *argv[])
 
     problem.setPackingFraction(true, packingFraction);   // if true forces the second value to be the packing fraction after the casing insertion
 
-//    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(2000, problem.getTimeMax(), problem.getTimeStep()));
+//    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimestep(2000, problem.getTimeMax(), problem.getTimeStep()));
     problem.setSaveCount(0.01/problem.getTimeStep());
 
     problem.setParticleRadiusAndDispersity((.015-.005)/radiusRatio,0.1);
@@ -816,16 +816,16 @@ int main(int argc, char *argv[])
     problem.setParticleBiModalDispersity(true);    // switches the bi-modal size dispersity on or off
 
     // length, casing radius, blade radius, shaft radius, number of turns, thickness
-    problem.setScrewGeometry(.05, .02, .02, .01, 1.0, 0.002);
+    problem.setScrewGeometry(.1, .02, .02, .01, 1.0, 0.002);
     problem.setScrewOrigin(Vec3D(0.,0.,0.));
-    problem.setScrewVelocity(2.0*constants::pi);
-    problem.setScrewFillingRatio(fillingRatio);
-    problem.setScrewRunningTime(50.0);  // this will overwrite the value set by setTimeMax once the screw starts turning
+    problem.setScrewVelocity(constants::pi);
+    problem.setScrewFillingRatio(0.50);
+    problem.setScrewRunningTime(20.0);  // this will overwrite the value set by setTimeMax once the screw starts turning
 
     problem.setBoxToScrewWidthRatio(true, 1.0); // if true manually sets the box-to-screw size ratio
     problem.setInterParticleLoadingLatticeRelativeDistance(0.1);   // relative to particle radius
 
-    problem.developmentHackParticles(false, 10);
+    problem.developmentHackParticles(true, 10);
 
     // If true prints the interaction coefficients for every specie
     problem.printParticleInteractionProperties = true;
@@ -833,8 +833,7 @@ int main(int argc, char *argv[])
     std::ostringstream name;
     std::cout.unsetf(std::ios::floatfield);
 //    name << "screw_" << radiusRatio << "_pf_" << std::fixed << std::setprecision(2) << packingFraction << "_" << std::fixed << std::setprecision(2) << sfPP << "_" << std::fixed << std::setprecision(2) << sfPW << "_0.01_0.01_nI_forValidation";
-    name << "screw_" << radiusRatio << "_fillRatio_" << std::fixed << std::setprecision(2) << fillingRatio << "_pf_"  << packingFraction << "_" << std::fixed << std::setprecision(2) << sfPP <<
-    "_" << std::fixed << std::setprecision(2) << sfPW << "_0.01_0.01_BIDISPERSE_longRun";
+    name << "screw_" << radiusRatio << "_BIDISPERSE_pf_" << std::fixed << std::setprecision(2) << packingFraction << "_" << std::fixed << std::setprecision(2) << sfPP << "_" << std::fixed << std::setprecision(2) << sfPW << "_0.01_0.01_omega_" << screwAngularVelocity;
     problem.setName(name.str());
 //    problem.setName("screw_6_054_0.30_0.10_0.00_0.00");
     problem.setXBallsAdditionalArguments("-h 800 -p 10 -o 200 -3dturn 1");

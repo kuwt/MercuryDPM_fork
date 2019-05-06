@@ -1,0 +1,1034 @@
+#include <Mercury3D.h>
+#include <Particles/BaseParticle.h>
+#include <Species/LinearPlasticViscoelasticFrictionSpecies.h>
+#include <Walls/InfiniteWall.h>
+#include <Boundaries/PeriodicBoundary.h>
+#include <Walls/AxisymmetricIntersectionOfWalls.h>
+#include <math.h>
+#include <fstream>
+
+/*
+* ToDo:
+* - make the box size dependent on the particle max size
+* - add force dependence on particle volume (for isotropical big/small distribution)
+* - modify and correct non-isotropical forces cases
+*/
+
+
+class Granules : public Mercury3D
+{
+
+private:
+
+   void setupInitialConditions() override
+   {
+      stage = 1;
+      nBigInserted = 0;
+      nSmallInserted = 0;
+      forceModulus = 0.0;
+      t0 = getTime();
+
+      std::cout << "SETTING SPECIES..." << std::endl;
+      setSpecies();
+
+      std::cout << "COMPUTING BOX SIZE... " << std::endl;
+      computeBoxSize();
+
+      std::cout << "SETTING DOMAIN LIMITS... " << std::endl;
+      setDomainLimits();
+
+      std::cout << "CREATING BOUNDARIES..." << std::endl;
+      makeBoundaries();
+
+      std::cout << std::endl << "PARTICLE INSERTION" << std::endl;
+      insertParticles();
+
+      std::cout << "SETTING COMPRESSION TARGET HEIGHT" << std::endl;
+      setPistonTargetHeight();
+      std::cout << "TOTAL HEIGHT " << getZMax() << std::endl;
+      std::cout << "TARGET HEIGHT " << pistonTargetHeight << std::endl;
+      std::cout << "TARGET/BOX_SIZE " << pistonTargetHeight/boxSize << std::endl;
+
+      std::cout << "ACTIVATING CENTRAL FORCES" << std::endl;
+
+      stage++;
+   }
+
+   void actionsOnRestart() override
+   {
+
+   }
+
+   void actionsAfterTimeStep() override
+   {
+      // ACTIVATION OF LOCAL FORCE
+      if (stage == 2)
+      {
+         applyCentralForce();
+         if (getTime() < 0.2) increaseForce();
+
+         if (getKineticEnergy()/getElasticEnergy() < energyRatioTolerance && getTime() > 0.2)
+         {
+            std::cout << "DAMPING FORCES" << std::endl << std::endl;
+            stage++;
+         }
+      }
+
+      // DAMPING OF LOCAL FORCE
+      if (stage == 3)
+      {
+         applyCentralForce();
+         dampForce();
+
+         if (forceModulus < 1.0e-2)
+         {
+            std::cout << "TUNING GRAVITY" << std::endl << std::endl;
+            makeFloor();
+            t0 = getTime();
+            stage++;
+         }
+      }
+
+      // GRAVITY TUNING
+      if (stage == 4)
+      {
+         tuneGravity();
+
+         if (getTime() > t0 + gravityTuningDuration)
+         {
+            std::cout << "SETTLING" << std::endl << std::endl;
+            t0 = getTime();
+            stage++;
+         }
+      }
+
+      // PISTON CREATION
+      if (stage == 5)
+      {
+         if (getKineticEnergy()/getElasticEnergy() < energyRatioTolerance && getTime() > t0 + 0.1)
+         {
+            std::cout << "CREATING PISTON" << std::endl << std::endl;
+            makePiston();
+            std::cout << "Piston initial height " << pistonHeight << std::endl;
+            std::cout << "Piston target height " << pistonTargetHeight << std::endl;
+            std::cout << "Piston velocity " << pistonVelocity << std::endl << std::endl;
+
+            std::cout << "CREATING CDAT FILE" << std::endl << std::endl;
+            makeCdatFile();
+
+            std::cout << "COMPRESSION" << std::endl << std::endl;
+            stage++;
+         }
+      }
+
+      // DATA ANALYSIS AND OUTPUT TO CDAT
+      if (stage >= 6) makeDataAnalysis();
+      if (stage >= 6 && fmod(getTime(), 0.001) < getTimeStep()) writeToCdatFile();
+
+      // COMPRESSION
+      if (stage == 6)
+      {
+         if (pistonHeight > pistonTargetHeight)
+         {
+            movePiston();
+         }
+         else
+         {
+            std::cout << "PISTON TARGET REACHED. DISSIPATING ENERGY." << std::endl << std::endl;
+            stage++;
+         }
+      }
+
+      // ENERGY DISSIPATION
+      if (stage == 7)
+      {
+         if (getKineticEnergy()/getElasticEnergy() < energyRatioTolerance)
+         {
+            std::cout << "ENERGY DISSIPATED. UNLOADING PISTON." << std::endl << std::endl;
+            pistonVelocity *= -1.0;
+
+            stage++;
+         }
+      }
+
+      // PISTON UNLOADING
+      if (stage == 8)
+      {
+         if (pistonHeight < (particleHandler.getHighestPositionComponentParticle(2) -> getPosition()).Z + 2.0*radiusBig)
+         {
+            movePiston();
+         }
+         else
+         {
+            std::cout << "PISTON UNLOADED. QUITTING." << std::endl << std::endl;
+            setTimeMax(getTime() + 0.1);
+            stage++;
+         }
+      }
+   }
+
+   void actionsAfterSolve() override
+   {
+      cdatFile.close();
+   }
+
+public:
+
+
+   // FUNCTIONS CALLED IN MAIN ----------------------------------------
+
+   void setCdatOutputTimeInterval(double dt)
+   {
+      cdatOutputTimeInterval = dt;
+   }
+
+   void setEnergyRatioTolerance(double eRatio)
+   {
+      energyRatioTolerance = eRatio;
+   }
+
+   void setNumberOfGranules(int n)
+   {
+      numberOfGranules = n;
+   }
+
+   //void setBoxSize(double size)
+   //{
+   //boxSize = size;
+   //}
+
+   void setNumberOfParticlesPerGranule(int nB, int nS)
+   {
+      nBig = nB;
+      nSmall = nS;
+   }
+
+   void setParticleProperties(double rB, double rS, double dB, double dS, double rhoB, double rhoS, double massRatio)
+   {
+      radiusBig = rB;
+      radiusSmall = rS;
+      sizeDispersityBig = dB;
+      sizeDispersitySmall = dS;
+      densityBig = rhoB;
+      densitySmall = rhoS;
+      smallToBigMassRatio = massRatio;
+
+      volumeBig = 4.0*constants::pi*pow(radiusBig,3.0)/3.0;
+      volumeSmall = 4.0*constants::pi*pow(radiusSmall,3.0)/3.0;
+      massBig = volumeBig*densityBig;
+      massSmall = volumeSmall*densitySmall;
+   }
+
+   void setWallDensity(double rhoW)
+   {
+      densityWall = rhoW;
+   }
+
+   void setParticleWallSlidingFrictionCoefficients(double bigWallMu, double smallWallMu)
+   {
+      bigWallSlidingFrictionCoeff = bigWallMu;
+      smallWallSlidingFrictionCoeff = smallWallMu;
+   }
+
+   void setParticleWallRollingFrictionCoefficients(double bigWallMu, double smallWallMu)
+   {
+      bigWallRollingFrictionCoeff = bigWallMu;
+      smallWallRollingFrictionCoeff = smallWallMu;
+   }
+
+   void setParticleWallTorsionFrictionCoefficients(double bigWallMu, double smallWallMu)
+   {
+      bigWallTorsionFrictionCoeff = bigWallMu;
+      smallWallTorsionFrictionCoeff = smallWallMu;
+   }
+
+   void setParticleParticleSlidingFrictionCoefficients(double bigBigMu, double smallSmallMu, double bigSmallMu)
+   {
+      bigBigSlidingFrictionCoeff = bigBigMu;
+      smallSmallSlidingFrictionCoeff = smallSmallMu;
+      bigSmallSlidingFrictionCoeff = bigSmallMu;
+   }
+
+   void setParticleParticleRollingFrictionCoefficients(double bigBigMu, double smallSmallMu, double bigSmallMu)
+   {
+      bigBigRollingFrictionCoeff = bigBigMu;
+      smallSmallRollingFrictionCoeff = smallSmallMu;
+      bigSmallRollingFrictionCoeff = bigSmallMu;
+   }
+
+   void setParticleParticleTorsionFrictionCoefficients(double bigBigMu, double smallSmallMu, double bigSmallMu)
+   {
+      bigBigTorsionFrictionCoeff = bigBigMu;
+      smallSmallTorsionFrictionCoeff = smallSmallMu;
+      bigSmallTorsionFrictionCoeff = bigSmallMu;
+   }
+
+   void setWallStiffnessAndRestitutionCoefficients(double kW, double eB, double eS)
+   {
+      k1Wall = kW;
+      bigWallRestitutionCoeff = eB;
+      smallWallRestitutionCoeff = eS;
+   }
+
+   void setParticleParticleRestitutionCoefficients(double bigBigE, double smallSmallE, double bigSmallE)
+   {
+      bigBigRestitutionCoeff = bigBigE;
+      smallSmallRestitutionCoeff = smallSmallE;
+      bigSmallRestitutionCoeff = bigSmallE;
+   }
+
+   void setBigParticlePlasticProperties(double k1, double k2max, double kC, double phi)
+   {
+      k1Big = k1;
+      k2MaxBig = k2max;
+      kCBig = kC;
+      phiBig = phi;
+   }
+
+   void setSmallParticlePlasticProperties(double k1, double k2max, double kC, double phi)
+   {
+      k1Small = k1;
+      k2MaxSmall = k2max;
+      kCSmall = kC;
+      phiSmall = phi;
+   }
+
+   void setForceAndVelocityProperties(double fsm, double fdm, double fdi, double vdm, double vdi)
+   {
+      forceScaleModulus = fsm;
+      forceDampingModulus = fdm;
+      forceDampingInterval = fdi;
+      velocityDampingModulus = vdm;
+      velocityDampingInterval = vdi;
+   }
+
+   void setGravityTuningDuration(double dt)
+   {
+      gravityTuningDuration = dt;
+   }
+
+   void setCompressionRatio(double ratio)
+   {
+      looseBedCompressionRatio = ratio;
+   }
+
+
+
+   // FUNCTIONS CALLED IN THE CLASS -----------------------------------
+
+   void setSpecies()
+   {
+      speciesHandler.clear();
+
+      // BIG-BIG
+      speciesBig = new LinearPlasticViscoelasticFrictionSpecies;
+      speciesBig -> setDensity(densityBig);
+      speciesBig -> setStiffnessAndRestitutionCoefficient(k1Big, bigBigRestitutionCoeff, massBig);
+      speciesBig -> setUnloadingStiffnessMax(k2MaxBig);
+      speciesBig -> setCohesionStiffness(kCBig);
+      speciesBig -> setPenetrationDepthMax(phiBig);
+
+      speciesBig -> setSlidingFrictionCoefficient(bigBigSlidingFrictionCoeff);
+      speciesBig -> setSlidingStiffness(speciesBig -> getLoadingStiffness()*2.0/7.0);
+      speciesBig -> setSlidingDissipation(speciesBig -> getDissipation()*2.0/7.0);
+      speciesBig -> setRollingFrictionCoefficient(bigBigRollingFrictionCoeff);
+      speciesBig -> setRollingStiffness(speciesBig -> getLoadingStiffness()*2.0/7.0);
+      speciesBig -> setRollingDissipation(speciesBig -> getDissipation()*2.0/7.0);
+      speciesBig -> setTorsionFrictionCoefficient(bigBigTorsionFrictionCoeff);
+      speciesBig -> setTorsionStiffness(speciesBig -> getLoadingStiffness()*2.0/7.0);
+      speciesBig -> setTorsionDissipation(speciesBig -> getDissipation()*2.0/7.0);
+      speciesHandler.addObject(speciesBig);
+
+      // SMALL-SMALL
+      speciesSmall = new LinearPlasticViscoelasticFrictionSpecies;
+      speciesSmall -> setDensity(densitySmall);
+      speciesSmall -> setStiffnessAndRestitutionCoefficient(k1Small, smallSmallRestitutionCoeff, massSmall);
+      speciesSmall -> setUnloadingStiffnessMax(k2MaxSmall);
+      speciesSmall -> setCohesionStiffness(kCSmall);
+      speciesSmall -> setPenetrationDepthMax(phiSmall);
+
+      speciesSmall -> setSlidingFrictionCoefficient(smallSmallSlidingFrictionCoeff);
+      speciesSmall -> setSlidingStiffness(speciesSmall -> getLoadingStiffness()*2.0/7.0);
+      speciesSmall -> setSlidingDissipation(speciesSmall -> getDissipation()*2.0/7.0);
+      speciesSmall -> setRollingFrictionCoefficient(smallSmallRollingFrictionCoeff);
+      speciesSmall -> setRollingStiffness(speciesSmall -> getLoadingStiffness()*2.0/7.0);
+      speciesSmall -> setRollingDissipation(speciesSmall -> getDissipation()*2.0/7.0);
+      speciesSmall -> setTorsionFrictionCoefficient(smallSmallTorsionFrictionCoeff);
+      speciesSmall -> setTorsionStiffness(speciesSmall -> getLoadingStiffness()*2.0/7.0);
+      speciesSmall -> setTorsionDissipation(speciesSmall -> getDissipation()*2.0/7.0);
+      speciesHandler.addObject(speciesSmall);
+
+      // WALL-WALL
+      speciesWall = new LinearPlasticViscoelasticFrictionSpecies;
+      speciesWall -> setDensity(densityWall);
+      speciesWall -> setStiffnessAndRestitutionCoefficient(k1Wall, 1.0, massSmall);
+      speciesWall -> setUnloadingStiffnessMax(k1Wall);
+      speciesWall -> setCohesionStiffness(0.0);
+      speciesWall -> setPenetrationDepthMax(0.001);
+
+      speciesWall -> setSlidingFrictionCoefficient(0.0);
+      speciesWall -> setSlidingStiffness(speciesWall -> getLoadingStiffness()*2.0/7.0);
+      speciesWall -> setSlidingDissipation(speciesWall -> getDissipation()*2.0/7.0);
+      speciesWall -> setRollingFrictionCoefficient(0.0);
+      speciesWall -> setRollingStiffness(speciesWall -> getLoadingStiffness()*2.0/7.0);
+      speciesWall -> setRollingDissipation(speciesWall -> getDissipation()*2.0/7.0);
+      speciesWall -> setTorsionFrictionCoefficient(0.0);
+      speciesWall -> setTorsionStiffness(speciesWall -> getLoadingStiffness()*2.0/7.0);
+      speciesWall -> setTorsionDissipation(speciesWall -> getDissipation()*2.0/7.0);
+      speciesHandler.addObject(speciesWall);
+
+      // BIG-WALL
+      //speciesMixedBigWall = speciesHandler.getMixedObject(speciesBig, speciesWall);
+      speciesHandler.getMixedObject(speciesBig, speciesWall) -> setStiffnessAndRestitutionCoefficient(0.5*(k1Big + k1Wall), bigWallRestitutionCoeff, massBig);
+      speciesHandler.getMixedObject(speciesBig, speciesWall) -> setUnloadingStiffnessMax(k2MaxBig);
+      speciesHandler.getMixedObject(speciesBig, speciesWall) -> setCohesionStiffness(0.0);
+      speciesHandler.getMixedObject(speciesBig, speciesWall) -> setPenetrationDepthMax(0.001);
+
+      speciesHandler.getMixedObject(speciesBig, speciesWall) -> setSlidingFrictionCoefficient(bigWallSlidingFrictionCoeff);
+      speciesHandler.getMixedObject(speciesBig, speciesWall) -> setSlidingStiffness(speciesHandler.getMixedObject(speciesBig, speciesWall) -> getLoadingStiffness()*2.0/7.0);
+      speciesHandler.getMixedObject(speciesBig, speciesWall) -> setSlidingDissipation(speciesHandler.getMixedObject(speciesBig, speciesWall) -> getDissipation()*2.0/7.0);
+      speciesHandler.getMixedObject(speciesBig, speciesWall) -> setRollingFrictionCoefficient(bigWallRollingFrictionCoeff);
+      speciesHandler.getMixedObject(speciesBig, speciesWall) -> setRollingStiffness(speciesHandler.getMixedObject(speciesBig, speciesWall) -> getLoadingStiffness()*2.0/7.0);
+      speciesHandler.getMixedObject(speciesBig, speciesWall) -> setRollingDissipation(speciesHandler.getMixedObject(speciesBig, speciesWall) -> getDissipation()*2.0/7.0);
+      speciesHandler.getMixedObject(speciesBig, speciesWall) -> setTorsionFrictionCoefficient(bigWallTorsionFrictionCoeff);
+      speciesHandler.getMixedObject(speciesBig, speciesWall) -> setTorsionStiffness(speciesHandler.getMixedObject(speciesBig, speciesWall) -> getLoadingStiffness()*2.0/7.0);
+      speciesHandler.getMixedObject(speciesBig, speciesWall) -> setTorsionDissipation(speciesHandler.getMixedObject(speciesBig, speciesWall) -> getDissipation()*2.0/7.0);
+
+      // SMALL-WALL
+      //speciesMixedSmallWall = speciesHandler.getMixedObject(speciesSmall, speciesWall);
+      speciesHandler.getMixedObject(speciesSmall, speciesWall) -> setStiffnessAndRestitutionCoefficient(0.5*(k1Small + k1Wall), smallWallRestitutionCoeff, massSmall);
+      speciesHandler.getMixedObject(speciesSmall, speciesWall) -> setUnloadingStiffnessMax(k2MaxSmall);
+      speciesHandler.getMixedObject(speciesSmall, speciesWall) -> setCohesionStiffness(0.0);
+      speciesHandler.getMixedObject(speciesSmall, speciesWall) -> setPenetrationDepthMax(0.001);
+
+      speciesHandler.getMixedObject(speciesSmall, speciesWall) -> setSlidingFrictionCoefficient(smallWallSlidingFrictionCoeff);
+      speciesHandler.getMixedObject(speciesSmall, speciesWall) -> setSlidingStiffness(speciesHandler.getMixedObject(speciesSmall, speciesWall) -> getLoadingStiffness()*2.0/7.0);
+      speciesHandler.getMixedObject(speciesSmall, speciesWall) -> setSlidingDissipation(speciesHandler.getMixedObject(speciesSmall, speciesWall) -> getDissipation()*2.0/7.0);
+      speciesHandler.getMixedObject(speciesSmall, speciesWall) -> setRollingFrictionCoefficient(smallWallRollingFrictionCoeff);
+      speciesHandler.getMixedObject(speciesSmall, speciesWall) -> setRollingStiffness(speciesHandler.getMixedObject(speciesSmall, speciesWall) -> getLoadingStiffness()*2.0/7.0);
+      speciesHandler.getMixedObject(speciesSmall, speciesWall) -> setRollingDissipation(speciesHandler.getMixedObject(speciesSmall, speciesWall) -> getDissipation()*2.0/7.0);
+      speciesHandler.getMixedObject(speciesSmall, speciesWall) -> setTorsionFrictionCoefficient(smallWallTorsionFrictionCoeff);
+      speciesHandler.getMixedObject(speciesSmall, speciesWall) -> setTorsionStiffness(speciesHandler.getMixedObject(speciesSmall, speciesWall) -> getLoadingStiffness()*2.0/7.0);
+      speciesHandler.getMixedObject(speciesSmall, speciesWall) -> setTorsionDissipation(speciesHandler.getMixedObject(speciesSmall, speciesWall) -> getDissipation()*2.0/7.0);
+
+      // BIG-SMALL
+      //speciesMixedBigSmall = speciesHandler.getMixedObject(speciesBig, speciesSmall);
+      speciesHandler.getMixedObject(speciesBig, speciesSmall) -> setStiffnessAndRestitutionCoefficient(0.5*(k1Big + k1Small), bigSmallRestitutionCoeff, 0.5*(massBig + massSmall));
+      speciesHandler.getMixedObject(speciesBig, speciesSmall) -> setUnloadingStiffnessMax(0.5*(k2MaxBig + k2MaxSmall));
+      speciesHandler.getMixedObject(speciesBig, speciesSmall) -> setCohesionStiffness(0.5*(kCBig + kCSmall));
+      speciesHandler.getMixedObject(speciesBig, speciesSmall) -> setPenetrationDepthMax(0.5*(phiBig + phiSmall));
+
+      speciesHandler.getMixedObject(speciesBig, speciesSmall) -> setSlidingFrictionCoefficient(bigSmallSlidingFrictionCoeff);
+      speciesHandler.getMixedObject(speciesBig, speciesSmall) -> setSlidingStiffness(speciesHandler.getMixedObject(speciesBig, speciesSmall) -> getLoadingStiffness()*2.0/7.0);
+      speciesHandler.getMixedObject(speciesBig, speciesSmall) -> setSlidingDissipation(speciesHandler.getMixedObject(speciesBig, speciesSmall) -> getDissipation()*2.0/7.0);
+      speciesHandler.getMixedObject(speciesBig, speciesSmall) -> setRollingFrictionCoefficient(bigSmallRollingFrictionCoeff);
+      speciesHandler.getMixedObject(speciesBig, speciesSmall) -> setRollingStiffness(speciesHandler.getMixedObject(speciesBig, speciesSmall) -> getLoadingStiffness()*2.0/7.0);
+      speciesHandler.getMixedObject(speciesBig, speciesSmall) -> setRollingDissipation(speciesHandler.getMixedObject(speciesBig, speciesSmall) -> getDissipation()*2.0/7.0);
+      speciesHandler.getMixedObject(speciesBig, speciesSmall) -> setTorsionFrictionCoefficient(bigSmallTorsionFrictionCoeff);
+      speciesHandler.getMixedObject(speciesBig, speciesSmall) -> setTorsionStiffness(speciesHandler.getMixedObject(speciesBig, speciesSmall) -> getLoadingStiffness()*2.0/7.0);
+      speciesHandler.getMixedObject(speciesBig, speciesSmall) -> setTorsionDissipation(speciesHandler.getMixedObject(speciesBig, speciesSmall) -> getDissipation()*2.0/7.0);
+
+      std::cout << "BIG-BIG stiffness and dissipation coefficients: " << speciesBig -> getLoadingStiffness() << " " << speciesBig -> getDissipation() << "\n";
+      std::cout << "BIG-BIG friction coefficients: " << bigBigSlidingFrictionCoeff << " " << bigBigRollingFrictionCoeff << " " << bigBigTorsionFrictionCoeff << "\n";
+      std::cout << "BIG-BIG tangential stiffnesses: " << speciesBig -> getSlidingStiffness() << " " << speciesBig -> getRollingStiffness() << " " << speciesBig -> getTorsionStiffness() << "\n";
+      std::cout << "BIG-BIG tangential dissipation coefficients: " << speciesBig -> getSlidingDissipation() << " " << speciesBig -> getRollingDissipation() << " " << speciesBig -> getTorsionDissipation() << "\n";
+      std::cout << "BIG-BIG collision time: " << std::setprecision(4) << speciesBig -> getCollisionTime(massBig) << "\n\n";
+
+      std::cout << "SMALL-SMALL stiffness and dissipation coefficients: " << speciesSmall -> getLoadingStiffness() << " " << speciesSmall -> getDissipation() << "\n";
+      std::cout << "SMALL-SMALL friction coefficients: " << smallSmallSlidingFrictionCoeff << " " << smallSmallRollingFrictionCoeff << " " << smallSmallTorsionFrictionCoeff << "\n";
+      std::cout << "SMALL-SMALL tangential stiffnesses: " << speciesSmall -> getSlidingStiffness() << " " << speciesSmall -> getRollingStiffness() << " " << speciesSmall -> getTorsionStiffness() << "\n";
+      std::cout << "SMALL-SMALL tangential dissipation coefficients: " << speciesSmall -> getSlidingDissipation() << " " << speciesSmall -> getRollingDissipation() << " " << speciesSmall -> getTorsionDissipation() << "\n";
+      std::cout << "SMALL-SMALL collision time: " << std::setprecision(4) << speciesSmall -> getCollisionTime(massSmall) << "\n\n";
+
+      std::cout << "BIG-WALL stiffness and dissipation coefficients: " << speciesHandler.getMixedObject(speciesBig, speciesWall) -> getLoadingStiffness() << " " << speciesHandler.getMixedObject(speciesBig, speciesWall) -> getDissipation() << "\n";
+      std::cout << "BIG-WALL friction coefficients: " << bigWallSlidingFrictionCoeff << " " << bigWallRollingFrictionCoeff << " " << bigWallTorsionFrictionCoeff << "\n";
+      std::cout << "BIG-WALL tangential stiffnesses: " << speciesHandler.getMixedObject(speciesBig, speciesWall) -> getSlidingStiffness() << " " << speciesHandler.getMixedObject(speciesBig, speciesWall) -> getRollingStiffness() << " " << speciesHandler.getMixedObject(speciesBig, speciesWall) -> getTorsionStiffness() << "\n";
+      std::cout << "BIG-WALL tangential dissipation coefficients: " << speciesHandler.getMixedObject(speciesBig, speciesWall) -> getSlidingDissipation() << " " << speciesHandler.getMixedObject(speciesBig, speciesWall) -> getRollingDissipation() << " " << speciesHandler.getMixedObject(speciesBig, speciesWall) -> getTorsionDissipation() << "\n";
+      std::cout << "BIG-WALL collision time: " << std::setprecision(4) << speciesHandler.getMixedObject(speciesBig, speciesWall) -> getCollisionTime(massBig) << "\n\n";
+
+      std::cout << "SMALL-WALL stiffness and dissipation coefficients: " << speciesHandler.getMixedObject(speciesSmall, speciesWall) -> getLoadingStiffness() << " " << speciesHandler.getMixedObject(speciesSmall, speciesWall) -> getDissipation() << "\n";
+      std::cout << "SMALL-WALL friction coefficients: " << smallWallSlidingFrictionCoeff << " " << smallWallRollingFrictionCoeff << " " << smallWallTorsionFrictionCoeff << "\n";
+      std::cout << "SMALL-WALL tangential stiffnesses: " << speciesHandler.getMixedObject(speciesSmall, speciesWall) -> getSlidingStiffness() << " " << speciesHandler.getMixedObject(speciesSmall, speciesWall) -> getRollingStiffness() << " " << speciesHandler.getMixedObject(speciesSmall, speciesWall) -> getTorsionStiffness() << "\n";
+      std::cout << "SMALL-WALL tangential dissipation coefficients: " << speciesHandler.getMixedObject(speciesSmall, speciesWall) -> getSlidingDissipation() << " " << speciesHandler.getMixedObject(speciesSmall, speciesWall) -> getRollingDissipation() << " " << speciesHandler.getMixedObject(speciesSmall, speciesWall) -> getTorsionDissipation() << "\n";
+      std::cout << "SMALL-WALL collision time: " << std::setprecision(4) << speciesHandler.getMixedObject(speciesSmall, speciesWall) -> getCollisionTime(massSmall) << "\n\n";
+
+      std::cout << "BIG-SMALL stiffness and dissipation coefficients: " << speciesHandler.getMixedObject(speciesBig, speciesSmall) -> getLoadingStiffness() << " " << speciesHandler.getMixedObject(speciesBig, speciesSmall) -> getDissipation() << "\n";
+      std::cout << "BIG-SMALL friction coefficients: " << bigSmallSlidingFrictionCoeff << " " << bigSmallRollingFrictionCoeff << " " << bigSmallTorsionFrictionCoeff << "\n";
+      std::cout << "BIG-SMALL tangential stiffnesses: " << speciesHandler.getMixedObject(speciesBig, speciesSmall) -> getSlidingStiffness() << " " << speciesHandler.getMixedObject(speciesBig, speciesSmall) -> getRollingStiffness() << " " << speciesHandler.getMixedObject(speciesBig, speciesSmall) -> getTorsionStiffness() << "\n";
+      std::cout << "BIG-SMALL tangential dissipation coefficients: " << speciesHandler.getMixedObject(speciesBig, speciesSmall) -> getSlidingDissipation() << " " << speciesHandler.getMixedObject(speciesBig, speciesSmall) -> getRollingDissipation() << " " << speciesHandler.getMixedObject(speciesBig, speciesSmall) -> getTorsionDissipation() << "\n";
+      std::cout << "BIG-SMALL collision time: " << std::setprecision(4) << speciesHandler.getMixedObject(speciesBig, speciesSmall) -> getCollisionTime(0.5*(massBig + massSmall)) << "\n\n";
+
+      std::cout << "tC_BB/dt: " << std::setprecision(4) << speciesBig -> getCollisionTime(massBig)/getTimeStep() << "\n";
+      std::cout << "tC_SS/dt: " << std::setprecision(4) << speciesSmall -> getCollisionTime(massSmall)/getTimeStep() << "\n";
+      std::cout << "tC_BW/dt: " << std::setprecision(4) << speciesHandler.getMixedObject(speciesBig, speciesWall) -> getCollisionTime(massBig)/getTimeStep() << "\n";
+      std::cout << "tC_SW/dt: " << std::setprecision(4) << speciesHandler.getMixedObject(speciesSmall, speciesWall) -> getCollisionTime(massSmall)/getTimeStep() << "\n";
+      std::cout << "tC_BS/dt: " << std::setprecision(4) << speciesHandler.getMixedObject(speciesBig, speciesSmall) -> getCollisionTime(0.5*(massBig + massSmall))/getTimeStep() << "\n\n";
+   }
+
+   void computeBoxSize()
+   {
+      boxVolume = 20.0*(nBig*volumeBig + nSmall*volumeSmall);
+      boxSize = pow(boxVolume,1.0/3.0);
+   }
+
+   void setDomainLimits()
+   {
+      setXMin(-0.5*boxSize);
+      setYMin(-0.5*boxSize);
+      setZMin(0.0);
+
+      setXMax(0.5*boxSize);
+      setYMax(0.5*boxSize);
+      setZMax(3.0*numberOfGranules*boxSize);
+   }
+
+   void makeBoundaries()
+   {
+      wallHandler.clear();
+
+      xBoundary.set(Vec3D(1.0,0.0,0.0), getXMin(), getXMax());
+      boundaryHandler.copyAndAddObject(xBoundary);
+
+      yBoundary.set(Vec3D(0.0,1.0,0.0), getYMin(), getYMax());
+      boundaryHandler.copyAndAddObject(yBoundary);
+
+      zBoundary.set(Vec3D(0.0,0.0,1.0), getZMin(), getZMax());
+      boundaryHandler.copyAndAddObject(zBoundary);
+
+      //wall.setSpecies(speciesWall);
+
+      //wall.set(Vec3D(-1.,0.,0.),Vec3D(getXMin(),0.,0.));
+      //wallHandler.copyAndAddObject(wall);
+      //wall.set(Vec3D(1.,0.,0.),Vec3D(getXMax(),0.,0.));
+      //wallHandler.copyAndAddObject(wall);
+
+      //wall.set(Vec3D(0,-1.,0.),Vec3D(0.,getYMin(),0.));
+      //wallHandler.copyAndAddObject(wall);
+      //wall.set(Vec3D(0.,1.,0.),Vec3D(0.,getYMax(),0.));
+      //wallHandler.copyAndAddObject(wall);
+   }
+
+   bool particleInsertionSuccessful(bool isBig, int nGranule)
+   {
+      int insertionFailCounter = 0;
+      Vec3D particlePosition;
+      BaseParticle p0;
+
+      p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
+
+      if (isBig)
+      {
+         p0.setRadius(radiusBig*(1.0 + sizeDispersityBig*random.getRandomNumber(-1.0,1.0)));
+         p0.setSpecies(speciesBig);
+      }
+      else
+      {
+         p0.setRadius(radiusSmall*(1.0 + sizeDispersitySmall*random.getRandomNumber(-1.0,1.0)));
+         p0.setSpecies(speciesSmall);
+      }
+
+      do
+      {
+         particlePosition.X = (getXMax() - 1.01*(p0.getRadius()))*random.getRandomNumber(-1.0,1.0);
+         particlePosition.Y = (getYMax() - 1.01*(p0.getRadius()))*random.getRandomNumber(-1.0,1.0);
+         particlePosition.Z = (nGranule + 0.5)*boxSize + (0.5*boxSize - 1.01*(p0.getRadius()))*random.getRandomNumber(-1.0,1.0);
+
+         p0.setPosition(particlePosition);
+
+         if (checkParticleForInteraction(p0))
+         {
+            particleHandler.copyAndAddObject(p0);
+            return true;
+         }
+
+         insertionFailCounter++;
+      }
+      while (insertionFailCounter < 1000);
+
+      return false;
+   }
+
+   void insertParticles()
+   {
+      for (int i = 0; i < numberOfGranules; i++)
+      {
+         nBigInserted = 0;
+         nSmallInserted = 0;
+
+         while(nBigInserted < nBig || nSmallInserted < nSmall)
+         {
+            if (nBigInserted < nBig && nSmallInserted < nSmall)
+            {
+               if (random.getRandomNumber(0.0,1.0) < nBig/(nBig + nSmall))
+               {
+                  if (particleInsertionSuccessful(true, i)) nBigInserted++;
+               }
+               else
+               {
+                  if (particleInsertionSuccessful(false, i)) nSmallInserted++;
+               }
+            }
+            else if (nBigInserted < nBig && nSmallInserted >= nSmall)
+            {
+               if (particleInsertionSuccessful(true, i)) nBigInserted++;
+            }
+            else if (nBigInserted >= nBig && nSmallInserted < nSmall)
+            {
+               if (particleInsertionSuccessful(false, i)) nSmallInserted++;
+            }
+            else
+            {
+               t0 = getTime();
+            }
+         }
+      }
+
+      std::cout << std::endl << "PARTICLE INSERTION TERMINATED" << std::endl << std::endl;
+   }
+
+   void applyCentralForce()
+   {
+      Vec3D distanceFromForceCenter;
+      int zLatticePosition;
+
+      for (int i=particleHandler.getNumberOfObjects()-1; i>=0; i--)
+      {
+         zLatticePosition = (int)((particleHandler.getObject(i) -> getPosition().Z)/boxSize);
+
+         distanceFromForceCenter.X = (particleHandler.getObject(i) -> getPosition().X);
+         distanceFromForceCenter.Y = (particleHandler.getObject(i) -> getPosition().Y);
+         distanceFromForceCenter.Z = (particleHandler.getObject(i) -> getPosition().Z) - boxSize*(0.5 + zLatticePosition);
+
+         //particleHandler.getObject(i) -> addForce(-forceScaleModulus*Vec3D(0.2*distanceFromForceCenter.X,0.2*distanceFromForceCenter.Y,distanceFromForceCenter.Z));
+         particleHandler.getObject(i) -> addForce(-forceModulus*distanceFromForceCenter);
+         //particleHandler.getObject(i) -> addForce(-forceScaleModulus*distanceFromForceCenter*(particleHandler.getObject(i) -> getRadius())/(0.5*(radiusBig + radiusSmall)));
+         //particleHandler.getObject(i) -> addForce(-1.0*distanceFromForceCenter/(distanceFromForceCenter.getLength()*distanceFromForceCenter.getLength())/10000);
+
+         if (fmod(getTime(),velocityDampingInterval) < getTimeStep())
+         {
+            particleHandler.getObject(i) -> setVelocity(velocityDampingModulus*(particleHandler.getObject(i) -> getVelocity()));
+         }
+      }
+   }
+
+   void increaseForce()
+   {
+      forceModulus = forceScaleModulus*getTime()/0.2;
+   }
+
+   void dampForce()
+   {
+      if (fmod(getTime(),forceDampingInterval) < getTimeStep())
+      {
+         forceModulus *= forceDampingModulus;
+      }
+   }
+
+   void makeFloor()
+   {
+      wallHandler.clear();
+      base.setSpecies(speciesWall);
+      base.set(Vec3D(0.,0.,-1.),Vec3D(0.,0.,getZMin()));
+      wallHandler.copyAndAddObject(base);
+
+      top.setSpecies(speciesWall);
+      top.set(Vec3D(0.,0.,1.),Vec3D(0.,0.,getZMax()));
+      wallHandler.copyAndAddObject(top);
+
+      //wall.setSpecies(speciesWall);
+      //wall.set(Vec3D(-1.,0.,0.),Vec3D(0.8*getXMin(),0.,0.));
+      //wallHandler.copyAndAddObject(wall);
+      //wall.set(Vec3D(1.,0.,0.),Vec3D(0.8*getXMax(),0.,0.));
+      //wallHandler.copyAndAddObject(wall);
+
+      //wall.set(Vec3D(0,-1.,0.),Vec3D(0.,0.8*getYMin(),0.));
+      //wallHandler.copyAndAddObject(wall);
+      //wall.set(Vec3D(0.,1.,0.),Vec3D(0.,0.8*getYMax(),0.));
+      //wallHandler.copyAndAddObject(wall);
+
+      AxisymmetricIntersectionOfWalls(cylinder);
+      cylinder.setSpecies(speciesWall);
+      cylinder.setPosition(Vec3D(0.0,0.0,0.0));
+      cylinder.setOrientation(Vec3D(0.0,0.0,1.0));
+      cylinder.addObject(Vec3D(1.0,0.0,0.0),Vec3D(0.5*boxSize,0.0,0.0));
+      wallHandler.copyAndAddObject(cylinder);
+   }
+
+   void tuneGravity()
+   {
+      if (getTime() < t0 + gravityTuningDuration) setGravity(Vec3D(0.0,0.0,-9.81*(getTime() - t0)/gravityTuningDuration));
+   }
+
+   void setPistonTargetHeight()
+   {
+      double totalParticleVolume = 0.0;
+      for (int i=0; i<particleHandler.getNumberOfObjects(); i++)
+      {
+         totalParticleVolume += pow(particleHandler.getObject(i) -> getRadius(),3.0);
+      }
+      totalParticleVolume *= 4.0*constants::pi/3.0;
+
+      pistonTargetHeight = looseBedCompressionRatio*totalParticleVolume/(0.6*pow(boxSize,2.0));
+   }
+
+   void makePiston()
+   {
+      std::cout << std::endl << "CREATING PISTON" << std::endl << std::endl;
+
+      pistonHeight = (particleHandler.getHighestPositionComponentParticle(2) -> getPosition()).Z + 1.5*radiusBig;
+      pistonVelocity = -radiusBig/10000.0/getTimeStep();
+
+      piston.setSpecies(speciesWall);
+      piston.set(Vec3D(0.0,0.0,1.0),Vec3D(0.0,0.0,pistonHeight));
+      pistonPointer = wallHandler.copyAndAddObject(piston);
+   }
+
+   void movePiston()
+   {
+      pistonHeight += pistonVelocity*getTimeStep();
+      pistonPointer -> set(Vec3D(0.0,0.0,1.0),Vec3D(0.0,0.0,pistonHeight));
+      pistonPointer -> setVelocity(Vec3D(0.0,0.0,pistonVelocity));
+   }
+
+   void makeDataAnalysis()
+   {
+      meanCoordinationNumber = 0.0;
+
+      for (int i=particleHandler.getNumberOfObjects()-1; i>=0; i--)
+      {
+         meanCoordinationNumber += (particleHandler.getObject(i) -> getInteractions()).size();
+      }
+
+      meanCoordinationNumber /= particleHandler.getNumberOfObjects();
+
+      pistonPressure = 0.0;
+      basePressure = 0.0;
+      cylinderPressure = 0.0;
+      meanTotalRelativeOverlap = 0.0;
+      maxTotalRelativeOverlap = 0.0;
+      meanPistonRelativeOverlap = 0.0;
+      maxPistonRelativeOverlap = 0.0;
+      meanBaseRelativeOverlap = 0.0;
+      maxBaseRelativeOverlap = 0.0;
+      meanCylinderRelativeOverlap = 0.0;
+      maxCylinderRelativeOverlap = 0.0;
+
+      int totalInteractionCounter = 0;
+      int pistonInteractionCounter = 0;
+      int baseInteractionCounter = 0;
+      int cylinderInteractionCounter = 0;
+
+      for (std::vector<BaseInteraction*>::const_iterator i = interactionHandler.begin(); i != interactionHandler.end(); ++i)
+      {
+         meanTotalRelativeOverlap += ((*i) -> getOverlap())/(particleHandler.getObject((*i) -> getP() -> getIndex()) -> getRadius());
+         if (((*i) -> getOverlap())/(particleHandler.getObject((*i) -> getP() -> getIndex()) -> getRadius()) > maxTotalRelativeOverlap) maxTotalRelativeOverlap = ((*i) -> getOverlap())/(particleHandler.getObject((*i) -> getP() -> getIndex()) -> getRadius());
+
+         // piston interactions
+         if ((*i) -> getI() -> getIndex() == pistonPointer -> getIndex())
+         {
+            pistonPressure -= ((*i) -> getForce()).Z;
+
+            meanPistonRelativeOverlap += ((*i) -> getOverlap())/(particleHandler.getObject((*i) -> getP() -> getIndex()) -> getRadius());
+            if (((*i) -> getOverlap())/(particleHandler.getObject((*i) -> getP() -> getIndex()) -> getRadius()) > maxPistonRelativeOverlap) maxPistonRelativeOverlap = ((*i) -> getOverlap())/(particleHandler.getObject((*i) -> getP() -> getIndex()) -> getRadius());
+
+            pistonInteractionCounter++;
+         }
+
+         // base interactions
+         if ((*i) -> getI() -> getIndex() == base.getIndex())
+         {
+            basePressure += ((*i) -> getForce()).Z;
+
+            meanBaseRelativeOverlap += ((*i) -> getOverlap())/(particleHandler.getObject((*i) -> getP() -> getIndex()) -> getRadius());
+            if (((*i) -> getOverlap())/(particleHandler.getObject((*i) -> getP() -> getIndex()) -> getRadius()) > maxBaseRelativeOverlap) maxBaseRelativeOverlap = ((*i) -> getOverlap())/(particleHandler.getObject((*i) -> getP() -> getIndex()) -> getRadius());
+
+            baseInteractionCounter++;
+         }
+
+         // cylinder interactions
+         if ((*i) -> getI() -> getIndex() == cylinder.getIndex())
+         {
+            cylinderPressure -= (((*i) -> getContactPoint()).X * ((*i) -> getForce()).X + ((*i) -> getContactPoint()).Y * ((*i) -> getForce()).Y)/(0.5*boxSize);
+
+            meanCylinderRelativeOverlap += ((*i) -> getOverlap())/(particleHandler.getObject((*i) -> getP() -> getIndex()) -> getRadius());
+            if (((*i) -> getOverlap())/(particleHandler.getObject((*i) -> getP() -> getIndex()) -> getRadius()) > maxCylinderRelativeOverlap) maxCylinderRelativeOverlap = ((*i) -> getOverlap())/(particleHandler.getObject((*i) -> getP() -> getIndex()) -> getRadius());
+
+            cylinderInteractionCounter++;
+         }
+
+         totalInteractionCounter++;
+      }
+
+      pistonPressure /= constants::pi*pow(0.5*boxSize,2.0);
+      basePressure /= constants::pi*pow(0.5*boxSize,2.0);
+      cylinderPressure /= 2.0*constants::pi*(0.5*boxSize)*pistonHeight;
+      meanTotalRelativeOverlap /= totalInteractionCounter;
+      meanPistonRelativeOverlap /= pistonInteractionCounter;
+      meanBaseRelativeOverlap /= baseInteractionCounter;
+      meanCylinderRelativeOverlap /= cylinderInteractionCounter;
+   }
+
+   // creates the data output file and writes the first row
+   void makeCdatFile()
+   {
+      std::ostringstream cdatName;
+      std::cout.unsetf(std::ios::floatfield);
+      cdatName << getName() << ".cdat";
+
+      cdatFile.open(cdatName.str(), std::ios::out);
+      cdatFile << "time \t Eel \t Ekin/Eel \t h \t v \t P \t Pbase \t Pcyl \t coord. number \t dTotMean \t dTotMax \t dPistonMean \t dPistonMax \t dBaseMean \t dBaseMax \t k1 \t k2 \t kC \t phi \t STAGE" << std::endl;
+   }
+
+   // writes the compression data to the output file
+   void writeToCdatFile()
+   {
+      cdatFile <<
+      getTime() << "   " <<
+      getElasticEnergy() << "   " <<
+      getKineticEnergy()/getElasticEnergy() << "   " <<
+      pistonHeight << "   " <<
+      pistonVelocity << "   " <<
+      pistonPressure << "   " <<
+      basePressure << "   " <<
+      cylinderPressure << "   " <<
+      meanCoordinationNumber << "   " <<
+      meanTotalRelativeOverlap << "   " <<
+      maxTotalRelativeOverlap << "   " <<
+      meanPistonRelativeOverlap << "   " <<
+      maxPistonRelativeOverlap << "   " <<
+      meanBaseRelativeOverlap << "   " <<
+      maxBaseRelativeOverlap << "   " <<
+      k1Big << "   " <<
+      k2MaxBig << "   " <<
+      kCBig << "   " <<
+      phiBig << "   " <<
+      stage <<
+      std::endl;
+   }
+
+
+
+   //  ----- GLOBAL FUNCTIONS -----
+   void printTime() const override
+   {
+      if (stage < 6)
+      {
+         std::cout << "t = " << std::setprecision(3) << std::left << std::setw(6) << getTime() << ", tmax = " << std::setprecision(3) << std::left << std::setw(4) << getTimeMax() <<
+         ", Eratio = " << std::setprecision(4) << std::left << std::setw(8) << getKineticEnergy()/getElasticEnergy() <<
+         ", Force Modulus = " << forceModulus << ", g_z = " << getGravity().Z << ", STAGE " << std::setprecision(0) << stage
+         << std::endl;
+      }
+      else
+      {
+         std::cout << "t = " << std::setprecision(3) << std::left << std::setw(6) << getTime() << ", tmax = " << std::setprecision(3) << std::left << std::setw(4) << getTimeMax() <<
+         ", Elastic Energy = " << std::setprecision(6) << std::left << std::setw(10) << getElasticEnergy() << ", Eratio = " << getKineticEnergy()/getElasticEnergy() << ", h = " << pistonHeight <<
+         ", v = " << pistonVelocity << std::endl <<
+         "P = " << std::setprecision(6) << std::left << std::setw(10) << pistonPressure << ", Pbase = " << basePressure << ", Pcylinder = " << cylinderPressure << std::endl <<
+         "cN = " << std::setprecision(6) << std::left << std::setw(10) << meanCoordinationNumber << ", <d_tot> = " << meanTotalRelativeOverlap << ", max(d_tot) = " << maxTotalRelativeOverlap <<
+         ", <d_pist> = " << meanPistonRelativeOverlap << ", max(d_pist) = " << maxPistonRelativeOverlap << ", <d_base> = " << meanBaseRelativeOverlap <<
+         ", max(d_base) = " << maxBaseRelativeOverlap << ", <d_cyl> = " << meanCylinderRelativeOverlap << ", max(d_cyl) = " << maxCylinderRelativeOverlap << std::endl <<
+         "k1 = " << std::setprecision(6) << std::left << std::setw(10) << speciesBig -> getLoadingStiffness() <<
+         ", k2 = " << speciesBig -> getUnloadingStiffnessMax() << ", kC = " << speciesBig -> getCohesionStiffness() << ", phi = " << speciesBig -> getPenetrationDepthMax() << std::endl << std::endl;
+      }
+      std::cout.flush();
+   }
+
+
+   // VARIABLES -------------------------------------------------------
+   // particles
+   double radiusBig, radiusSmall;
+   double sizeDispersityBig, sizeDispersitySmall;
+   double densityBig, densitySmall;
+   double volumeBig, volumeSmall;
+   double massBig, massSmall;
+   double smallToBigMassRatio;
+   double nBig, nSmall;
+   int nBigInserted, nSmallInserted;
+
+   // granules
+   int numberOfGranules;
+
+   // geometry
+   double boxSize;
+   double boxVolume;
+   //InfiniteWall wall;
+   InfiniteWall base;
+   InfiniteWall top;
+   InfiniteWall piston;
+   InfiniteWall *pistonPointer;
+   AxisymmetricIntersectionOfWalls cylinder;
+
+   // friction
+   double bigWallSlidingFrictionCoeff, smallWallSlidingFrictionCoeff;
+   double bigWallRollingFrictionCoeff, smallWallRollingFrictionCoeff;
+   double bigWallTorsionFrictionCoeff, smallWallTorsionFrictionCoeff;
+   double bigBigSlidingFrictionCoeff, smallSmallSlidingFrictionCoeff, bigSmallSlidingFrictionCoeff;
+   double bigBigRollingFrictionCoeff, smallSmallRollingFrictionCoeff, bigSmallRollingFrictionCoeff;
+   double bigBigTorsionFrictionCoeff, smallSmallTorsionFrictionCoeff, bigSmallTorsionFrictionCoeff;
+
+   // collision
+   double k1Wall, k1Big, k1Small;
+   double k2MaxBig, k2MaxSmall;
+   double kCBig, kCSmall;
+   double phiBig, phiSmall;
+   double bigWallRestitutionCoeff, smallWallRestitutionCoeff;
+   double bigBigRestitutionCoeff, smallSmallRestitutionCoeff, bigSmallRestitutionCoeff;
+   double densityWall;
+
+   // central force
+   double forceModulus;
+   double forceScaleModulus;
+   double forceDampingModulus;
+   double forceDampingInterval;
+   double velocityDampingModulus;
+   double velocityDampingInterval;
+
+   // compression
+   double pistonHeight;
+   double pistonVelocity;
+   double pistonTargetHeight;
+   double looseBedCompressionRatio;
+
+   // species
+   LinearPlasticViscoelasticFrictionSpecies *speciesBig, *speciesSmall, *speciesWall;
+
+   // boundaries
+   PeriodicBoundary xBoundary, yBoundary, zBoundary;
+
+   // output
+   double cdatOutputTimeInterval;
+   std::ofstream cdatFile;
+
+   // data analysis
+   double pistonPressure;
+   double basePressure;
+   double cylinderPressure;
+   double meanCoordinationNumber;
+   double meanTotalRelativeOverlap;
+   double maxTotalRelativeOverlap;
+   double meanPistonRelativeOverlap;
+   double maxPistonRelativeOverlap;
+   double meanBaseRelativeOverlap;
+   double maxBaseRelativeOverlap;
+   double meanCylinderRelativeOverlap;
+   double maxCylinderRelativeOverlap;
+
+   // global
+   int stage;
+   double energyRatioTolerance;
+   double t0;
+   double gravityTuningDuration;
+
+   int counter;
+};
+
+
+int main(int argc, char *argv[])
+{
+   // TIME STEP
+   double timeStep = 1.0e-5;
+
+   // SETUP PARAMETERS
+   int numberOfGranules = 3;
+   int nBigPerGranule = 1000;
+   int nSmallPerGranule = 0;
+
+   double boxSize = 0.05;
+
+   double bigToBoxSizeRatio = 30.0;
+   double bigToSmallSizeRatio = 0.5;
+   double smallToBigMassRatio = 0.5;
+   double sizeDispersionBigParticles = 0.1;
+   double sizeDispersionSmallParticles = 0.1;
+   double densityBigParticles = 1452.7;
+   double densitySmallParticles = 1452.7;
+
+   double densityWall = 2000.0;
+
+   // INTERACTION PARAMETERS
+   double k1Big = 1000.0;
+   double k2MaxBig = 3000.0;
+   double kCBig = 200.0;
+   double phiBig = 0.1;
+
+   double k1Small = 1000.0;
+   double k2MaxSmall = 3000.0;
+   double kCSmall = 5000.0;
+   double phiSmall = 0.1;
+
+   double k1Wall = 3000.0;
+
+   // FRICTION PARAMETERS
+   double muSBigBig = 0.16;
+   double muRBigBig = 0.05;
+
+   // FORCE AND DAMPING PARAMETERS
+   double forceScaleModulus = 1000.0;
+   double forceDampingModulus = 0.9;
+   double forceDampingInterval = 0.005;
+   double velocityDampingModulus = 0.9;
+   double velocityDampingInterval = 0.01;
+
+   // GLOBAL PARAMETERS
+   double energyRatioTolerance = 5.0e-5;
+   double gravityTuningDuration = 0.2;
+
+   // COMPRESSION PARAMETERS
+   double looseBedCompressionRatio = 0.70;
+
+   // STRING VARIABLES
+   std::ostringstream name;
+   name.str("");
+   name.clear();
+
+   Granules problem;
+
+   // INITIALIZATION
+   problem.setTimeStep(timeStep);
+   problem.setTimeMax(10.0);
+   problem.setGravity(Vec3D(0.00,0.00,0.00));
+   problem.setSystemDimensions(3);
+   problem.setCdatOutputTimeInterval(0.001);
+   problem.setEnergyRatioTolerance(energyRatioTolerance);
+   problem.setSaveCount(0.001/problem.getTimeStep());
+
+   problem.setNumberOfGranules(numberOfGranules);
+
+   //problem.setBoxSize(boxSize);
+   problem.setNumberOfParticlesPerGranule(nBigPerGranule, nSmallPerGranule);
+   problem.setParticleProperties(boxSize/bigToBoxSizeRatio, boxSize/bigToBoxSizeRatio/bigToSmallSizeRatio, sizeDispersionBigParticles, sizeDispersionSmallParticles, densityBigParticles, densitySmallParticles, smallToBigMassRatio);
+   problem.setWallDensity(densityWall);
+
+   problem.setParticleWallSlidingFrictionCoefficients(0.3, 0.3);
+   problem.setParticleWallRollingFrictionCoefficients(0.01, 0.01);
+   problem.setParticleWallTorsionFrictionCoefficients(0.0, 0.0);
+
+   problem.setParticleParticleSlidingFrictionCoefficients(muSBigBig, 0.0, 0.0);
+   problem.setParticleParticleRollingFrictionCoefficients(muRBigBig, 0.0, 0.0);
+   problem.setParticleParticleTorsionFrictionCoefficients(0.0, 0.0, 0.0);
+
+   problem.setWallStiffnessAndRestitutionCoefficients(k1Wall, 0.7, 0.7);
+   problem.setParticleParticleRestitutionCoefficients(0.5, 0.5, 0.5);
+   problem.setBigParticlePlasticProperties(k1Big, k2MaxBig, kCBig, phiBig);
+   problem.setSmallParticlePlasticProperties(k1Small, k2MaxSmall, kCSmall, phiSmall);
+
+   problem.setForceAndVelocityProperties(forceScaleModulus, forceDampingModulus, forceDampingInterval, velocityDampingModulus, velocityDampingInterval);
+   problem.setGravityTuningDuration(gravityTuningDuration);
+
+   problem.setCompressionRatio(looseBedCompressionRatio);
+
+   // NAME SETTING
+   std::cout.unsetf(std::ios::floatfield);
+   name << "Granules___TESTING_nB_" << nBigPerGranule << "_nS_" << nSmallPerGranule << "_nG_" << numberOfGranules << "_cr_" << looseBedCompressionRatio <<
+   "_F_" << forceScaleModulus << "_k1_" << k1Big << "_k2_" << k2MaxBig << "_kC_" << kCBig << "_phi_" << phiBig << "_muS_" << muSBigBig << "_muR_" << muRBigBig;
+   problem.setName(name.str());
+
+   problem.solve();
+
+   return 0;
+}
+
+
+
+// XBALLS ARGUMENTS TO ADD
+// -h 800 -p 1 -s 8 -v0 -3dturn 3

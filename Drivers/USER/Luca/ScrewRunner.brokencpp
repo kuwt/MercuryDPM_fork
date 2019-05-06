@@ -1,0 +1,243 @@
+
+#include "Mercury3D.h"
+#include "Particles/BaseParticle.h"
+#include "Boundaries/PeriodicBoundary.h"
+#include "Walls/InfiniteWall.h"
+#include "Walls/AxisymmetricIntersectionOfWalls.h"
+#include "Helicoid02.h"
+#include "Species/LinearViscoelasticFrictionSpecies.h"
+#include "sstream"
+
+/*
+ Last update : 9.07.16 at 18:30
+ Development stage : ALPHA
+ 
+ ToDo:
+ MAJOR
+ 
+ MINOR
+
+ WHATEVER
+ - create a .h and .cc of this stuff
+ - write the comments in doxigen style and standardise them
+ - provide a talkative version
+ - write a small thing that outputs the spatial distribution of the big/small particles to check if isotropic (cut in cake style)
+ 
+ DEVELOPMENT
+ - correct the particle-screw_side interaction
+ 
+ 
+ 
+ merge this with the other one, and use the same condition as in kit's chute flow (if (restart) -> just run the screw else run the loading)
+ 
+ 
+
+ */
+
+class ScrewRunner : public Mercury3D
+{
+    
+public:
+//  --- STANDARD FUNCTIONS ---
+    
+    void setupInitialConditions()
+    {
+        
+        // resets the time
+        std::cout << "\nResetting time.";
+        setTime(0.0);
+        std::cout << "\nThe screw speed is set to " << screwAngularVelocity << " rad/s (" << 30.0*screwAngularVelocity/constants::pi << " rpm).";
+        std::cout << "\nAbout to compute " << numberOfSettlingRounds << " settling rounds and " << numberOfSteadyRounds << " steady rounds.";
+        std::cout << "\nThe settling will take " << << " seconds. The good simulation will take " << << " seconds";
+        
+    }
+    
+    void actionsBeforeTimeStep()
+    {
+      
+        if (roundCounter == (int)(getTime()/period))
+        {
+            
+            std::cout << "\nRound number " << roundCounter + 1;
+            roundCounter++;
+            
+        }
+        
+    }
+    
+    
+//  --- FUNCTIONS CALLED IN THE MAIN ---
+   
+    // cuts the particles to achieve the desired filling
+    void setScrewFilling(double e)  // ToDo: define screwCasingRadius
+    {
+        
+        for (int i=particleHandler.getNumberOfObjects()-1; i>=0; i--)
+        {
+            
+            if (particleHandler.getObject(i) -> getPosition().Y - screwOrigin.Y > (2.0*e-1.0)*screwCasingRadius) particleHandler.removeObject(i);
+            
+        }
+        
+    }
+    
+    // updates the screw angular velocity
+    void setScrewSpeed(double omega)    // ToDo: define helicoid
+    {
+        
+        screwAngularVelocity = omega;
+        helicoid -> setOmega(omega);
+        
+    }
+    
+    // sets the number of rounds the screw should turn
+    void setNumberOfRounds(double rounds)
+    {
+        
+        numberOfSteadyRounds = rounds;
+        numberOfSettlingRounds = 0.0;
+        settlingPhase = false;
+        
+    }
+
+    // sets the number of rounds the screw should turn
+    void setNumberOfRounds(double steadyRounds, double settlingRounds)
+    {
+        
+        numberOfSteadyRounds = steadyRounds;
+        numberOfSettlingRounds = settlingRounds;
+        settlingPhase = true;
+        
+    }
+    
+    // override the print time so it prints the throughput and the mean velocities
+    
+
+//  --- FUNCTIONS USED BY THE CLASS ---
+    
+    // computes and sets the time the simulation should last. Computes the duration of one screw rotation
+    void computePeriodAndMaxTime()
+    {
+        
+        period = 2.0*constants::pi/screwAngularVelocity;
+        settlingTime = period*numberOfSettlingRounds;
+        steadyTime = period*numberOfSteadyRounds;
+        maxTime = settlingTime + steadyTime;
+        setTimeMax(maxTime);
+        
+    }
+    
+    void computeThroughput  // ToDo
+    void computeParticleLevels  // ToDo
+    void computeParticleMeanVelocities  // ToDo
+    
+    void writeThroughput    // ToDo
+    void writeParticleLevels    // ToDo
+    void writeParticleMeanVelocities    // ToDo
+
+    bool continueSolve() const override // ToDo
+    {
+        // close the streams before quitting
+        
+        return true;
+        
+    }
+    
+    // counts the number of rounds made
+    int roundCounter = 0;
+    
+    // the various stages of the loading process
+    int stage = 0;
+    
+    
+private:
+    // screw properties
+    double screwAngularVelocity;
+    double period;
+
+    // system variables
+    double numberOfSteadyRounds;
+    double numberOfSettlingRounds;
+    double numberOfTotalRounds;
+    
+    double settlingTime;
+    double steadyTime;
+    double maxTime;
+    
+    bool settlingPhase;
+    
+    // physical objects
+    BaseParticle p;
+    
+    InfiniteWall wall;
+    AxisymmetricIntersectionOfWalls *shaft;
+    AxisymmetricIntersectionOfWalls *casing;
+    Helicoid02 *helicoid;
+    PeriodicBoundary boundary;
+    
+    LinearViscoelasticFrictionSpecies *speciesSmall;
+    LinearViscoelasticFrictionSpecies *speciesBig;
+    LinearViscoelasticFrictionSpecies *speciesScrew;
+    
+};
+
+
+
+int main(int argc UNUSED, char *argv[] UNUSED)
+{
+    
+    ScrewRunner runner;
+    runner.setName("ScrewRunner");
+    
+    if (argc>1)
+    {
+        
+        fileName = argv[1];
+        std::cout << "\nRestarting the system according to " << fileName << "\n";
+        runner.readRestartFile(fileName);
+
+    }
+    else
+    {
+        
+        std::cout << "\nNo restart file specified. Exiting...\n";
+        exit(0);
+        
+    }
+    
+    runner.setCollisionTime(0.005);
+    runner.setTimeStep(0.0001);
+    runner.setSaveCount(0.01/runner.getTimeStep());
+
+    // screw operational parameters
+    runner.setScrewSpeed(constants::pi);
+    runner.setScrewFilling(0.5);
+    
+    // the number of rounds to be computed OVERLOADED
+    runner.setNumberRounds(20, 2);
+    
+    runner.solve();
+    
+    return 0;
+    
+}
+
+
+
+
+/*  --- JUNKYARD ---
+ 
+ --- FUNCTIONS CALLED IN THE MAIN ---
+
+ 
+ --- MAIN ---
+
+ 
+*/
+
+
+
+
+
+
+

@@ -1,0 +1,1194 @@
+/*
+*** CALIBRATION TEST - ANGLE OF REPOSE MEASUREMENT ***
+Particles are placed inside a paralelepipedal casing and let settle under gravity.
+When the system is at rest the particles above a determined level are removed and the remaining ones are let to re-settle.
+When E_kin/E_el < 1.0e-5 two sections of the pavement are removed, the particles falling inside of the holes progressively removed until the threshold E_kin/E_el < 1.0e-5 is met again.
+
+*** IMPORTANT ***
+The interaction law is purely cohesive with no adhesion.
+If needed uncomment the proper parts and substitute
+LinearPlasticViscoelasticFrictionSpecies -> LinearPlasticViscoelasticFrictionReversibleAdhesiveSpecies
+
+LAST UPDATE: 30/06/17
+*/
+
+#include <Mercury3D.h>
+#include <Particles/BaseParticle.h>
+#include <Species/LinearViscoelasticFrictionSpecies.h>
+#include <Species/LinearPlasticViscoelasticFrictionSpecies.h>
+#include <Species/LinearPlasticViscoelasticFrictionReversibleAdhesiveSpecies.h>
+#include <Walls/InfiniteWall.h>
+#include <Walls/IntersectionOfWalls.h>
+#include <Boundaries/PeriodicBoundary.h>
+#include <math.h>
+#include <fstream>
+#include <chrono>
+#include <ctime>
+
+/*
+TODOs:
+
+*/
+
+class CalibrationRoutine_AngleOfReposeTest : public Mercury3D
+{
+private:
+
+   void setupInitialConditions()
+   {
+      stage = 1;
+      setsInserted = 0;
+
+      // sets particle masses
+      std::cout << "Setting particles masses...\n";
+      setParticleMassAndVolume();
+      std::cout << "DONE\n";
+
+      // sets the species
+      std::cout << "Setting up the species...\n";
+      setSpecies();
+      std::cout << "DONE\n";
+
+      // sets the system size based on the mean small particle size
+      std::cout << "Setting the box dimensions...\n";
+      setBoxDimensions();
+      std::cout << "DONE\n";
+
+      // computes the number of particle sets needed
+      std::cout << "Computing the number of particle sets and the total number of particles needed...\n";
+      computeNumberOfSetsAndParticles();
+      std::cout << "DONE\n";
+
+      // computes the filling region dimensions
+      std::cout << "Computing the initialization region dimensions...\n";
+      computeInitializationRegionDimensions();
+      std::cout << "DONE\n";
+
+      // computes the total volume of particles
+      std::cout << "Computing the total volume of particles...\n";
+      computeParticleTotalVolume();
+      std::cout << "DONE\n";
+
+      // setting the simulation domain
+      std::cout << "Setting the simulation domain...\n";
+      setBoundaries();
+      std::cout << "DONE\n";
+
+      // creating the geometrical components of the casing
+      std::cout << "Creating the geometry...\n";
+      makeGeometry();
+      std::cout << "DONE\n";
+
+      // first round of particle insertion
+      std::cout << "Inserting the particles...\n";
+      makeParticleSet();
+
+      stage++;
+   }
+
+   void actionsAfterTimeStep()
+   {
+      //        if (setsInserted==4) {computeAngleOfRepose2(); exit(0);}
+
+      // particle insertion loop
+      if (stage == 2)
+      {
+         // other rounds of particle insertion
+         if (setsInserted < nSets + 1 && getTime() > 0.05*setsInserted)
+         {
+            makeParticleSet();
+         }
+         // when all teh particles are loaded thermalize
+         if (setsInserted == nSets + 1 && getKineticEnergy()/getElasticEnergy() < 1.0e-4)
+         {
+            timePlaceholder = getTime();
+            std::cout << "Cutting the particles...\n";
+            stage++;
+         }
+      }
+
+      if (stage == 3)
+      {
+         std::cout << "Particle insertion terminated.\nRemoving the exceeding particles...\n";
+         removeParticles();
+         std::cout << "DONE.\nSettling the particles...\n";
+
+         stage++;
+      }
+
+      if (stage == 4 && getTime() > timePlaceholder + 0.5 && getKineticEnergy()/getElasticEnergy() < 1.0e-4)
+      {
+         std::cout << "Removing the floor...\n";
+         removeFloor();
+         std::cout << "DONE.\nLetting the particle fall and settle...\n";
+
+         timePlaceholder = getTime();
+         stage++;
+      }
+
+      if (stage == 5)
+      {
+         dischargeParticles();
+      }
+   }
+
+   void actionAfterSolve()
+   {
+
+   }
+
+public:
+
+   // ----- FUNCTIONS CALLED IN THE MAIN -----
+   // sets verbosity on or off
+   void setVerbose(bool v)
+   {
+      verbose = v;
+   }
+
+   // set the particle density (OVERLOADED)
+   void setParticleDensity(double rhoB)
+   {
+      particleDensityBig = rhoB;
+      particleDensitySmall = rhoB;
+   }
+   void setParticleDensity(double rhoB, double rhoS)
+   {
+      particleDensityBig = rhoB;
+      particleDensitySmall = rhoS;
+   }
+
+   // set the mean and the dispersity of the particles (OVERLOADED)
+   void setParticleRadiusAndDispersity(double mu, double sigma)
+   {
+      meanRadiusBig = mu;
+      meanRadiusSmall = mu;
+      dispersityBig = sigma;
+      dispersitySmall = sigma;
+
+      biModal = false;
+   }
+   void setParticleRadiusAndDispersity(double muBig, double sigmaBig, double muSmall, double sigmaSmall)
+   {
+      meanRadiusBig = muBig;
+      meanRadiusSmall = muSmall;
+      dispersityBig = sigmaBig;
+      dispersitySmall = sigmaSmall;
+
+      biModal = true;
+   }
+
+   // set the small-to-big total mass ratio
+   void setTotalMassRatio(double ratio)
+   {
+      smallToBigMassRatio = ratio;
+   }
+
+   // set wall stiffness
+   void setWallStiffness(double kW)
+   {
+      wallStiffness = kW;
+   }
+
+   // set particle stiffness (OVERLOADED)
+   void setParticleStiffness(double k)
+   {
+      particleStiffnessBig = k;
+      particleStiffnessSmall = k;
+   }
+   void setParticleStiffness(double kBig, double kSmall)
+   {
+      particleStiffnessBig = kBig;
+      particleStiffnessSmall = kSmall;
+   }
+
+   // set particle-wall sliding friction coefficients (OVERLOADED)
+   void setParticleWallSlidingFrictionCoeff(double bigWallMu)
+   {
+      bigWallSlidingFrictionCoeff = bigWallMu;
+      smallWallSlidingFrictionCoeff = bigWallMu;
+   }
+   void setParticleWallSlidingFrictionCoeff(double bigWallMu, double smallWallMu)
+   {
+      bigWallSlidingFrictionCoeff = bigWallMu;
+      smallWallSlidingFrictionCoeff = smallWallMu;
+   }
+
+   // set particle-wall rolling friction coefficients (OVERLOADED)
+   void setParticleWallRollingFrictionCoeff(double bigWallMu)
+   {
+      bigWallRollingFrictionCoeff = bigWallMu;
+      smallWallRollingFrictionCoeff = bigWallMu;
+   }
+   void setParticleWallRollingFrictionCoeff(double bigWallMu, double smallWallMu)
+   {
+      bigWallRollingFrictionCoeff = bigWallMu;
+      smallWallRollingFrictionCoeff = smallWallMu;
+   }
+
+   // set particle-wall torsion friction coefficients (OVERLOADED)
+   void setParticleWallTorsionFrictionCoeff(double bigWallMu)
+   {
+      bigWallTorsionFrictionCoeff = bigWallMu;
+      smallWallTorsionFrictionCoeff = bigWallMu;
+   }
+   void setParticleWallTorsionFrictionCoeff(double bigWallMu, double smallWallMu)
+   {
+      bigWallTorsionFrictionCoeff = bigWallMu;
+      smallWallTorsionFrictionCoeff = smallWallMu;
+   }
+
+   // set particle-particle sliding friction coefficients (OVERLOADED)
+   void setParticleParticleSlidingFrictionCoeff(double bigBigMu)
+   {
+      bigBigSlidingFrictionCoeff = bigBigMu;
+      smallSmallSlidingFrictionCoeff = bigBigMu;
+      bigSmallSlidingFrictionCoeff = bigBigMu;
+   }
+   void setParticleParticleSlidingFrictionCoeff(double bigBigMu, double smallSmallMu, double bigSmallMu)
+   {
+      bigBigSlidingFrictionCoeff = bigBigMu;
+      smallSmallSlidingFrictionCoeff = smallSmallMu;
+      bigSmallSlidingFrictionCoeff = bigSmallMu;
+   }
+
+   // set particle-particle rolling friction coefficients (OVERLOADED)
+   void setParticleParticleRollingFrictionCoeff(double bigBigMu)
+   {
+      bigBigRollingFrictionCoeff = bigBigMu;
+      smallSmallRollingFrictionCoeff = bigBigMu;
+      bigSmallRollingFrictionCoeff = bigBigMu;
+   }
+   void setParticleParticleRollingFrictionCoeff(double bigBigMu, double smallSmallMu, double bigSmallMu)
+   {
+      bigBigRollingFrictionCoeff = bigBigMu;
+      smallSmallRollingFrictionCoeff = smallSmallMu;
+      bigSmallRollingFrictionCoeff = bigSmallMu;
+   }
+
+   // set particle-particle torsion friction coefficients (OVERLOADED)
+   void setParticleParticleTorsionFrictionCoeff(double bigBigMu)
+   {
+      bigBigTorsionFrictionCoeff = bigBigMu;
+      smallSmallTorsionFrictionCoeff = bigBigMu;
+      bigSmallTorsionFrictionCoeff = bigBigMu;
+   }
+   void setParticleParticleTorsionFrictionCoeff(double bigBigMu, double smallSmallMu, double bigSmallMu)
+   {
+      bigBigTorsionFrictionCoeff = bigBigMu;
+      smallSmallTorsionFrictionCoeff = smallSmallMu;
+      bigSmallTorsionFrictionCoeff = bigSmallMu;
+   }
+
+   // set particle-wall restitution coefficients (OVERLOADED)
+   void setParticleWallRestitutionCoeff(double bigWallE)
+   {
+      bigWallRestitutionCoeff = bigWallE;
+      smallWallRestitutionCoeff = bigWallE;
+   }
+   void setParticleWallRestitutionCoeff(double bigWallE, double smallWallE)
+   {
+      bigWallRestitutionCoeff = bigWallE;
+      smallWallRestitutionCoeff = smallWallE;
+   }
+
+   // set particle-particle restitution coefficients (OVERLOADED)
+   void setParticleParticleRestitutionCoeff(double bigBigE)
+   {
+      bigBigRestitutionCoeff = bigBigE;
+      smallSmallRestitutionCoeff = bigBigE;
+      bigSmallRestitutionCoeff = bigBigE;
+   }
+   void setParticleParticleRestitutionCoeff(double bigBigE, double smallSmallE, double bigSmallE)
+   {
+      bigBigRestitutionCoeff = bigBigE;
+      smallSmallRestitutionCoeff = smallSmallE;
+      bigSmallRestitutionCoeff = bigSmallE;
+   }
+
+   // set particle plastic properties
+   void setParticlePlasticProperties(double k1, double k2max, double kC, double phiC)
+   {
+      particleStiffnessBig = k1;
+      particleStiffnessSmall = k1;
+
+      particleMaxUnloadingStiffness = k2max;
+      particleCohesiveStiffness = kC;
+      particlePlasticityDepth = phiC;
+   }
+
+   //    // set particle adhesion properties
+   //    void setParticlesAdhesionProperties(double kA, double fAmax)
+   //    {
+   //        particleAdhesionStiffness = kA;
+   //        particleMaxAdhesiveForce = fAmax;
+   //    }
+
+   // sets the geometry rescale ratio
+   void setGeometryRescaleRatio(double ratio)
+   {
+      geometryRescaleRatio = ratio;
+   }
+
+
+   // ----- FUNCTIONS CALLED IN THE CLASS -----
+   // set the particle masses
+   void setParticleMassAndVolume()
+   {
+      particleVolumeBig = 4.0*constants::pi*pow(meanRadiusBig,3.)/3.;
+      particleVolumeSmall = 4.0*constants::pi*pow(meanRadiusSmall,3.)/3.;
+
+      particleMassBig = particleDensityBig*particleVolumeBig;
+      particleMassSmall = particleDensitySmall*particleVolumeSmall;
+
+      if (verbose)
+      {
+         if (biModal)
+         {
+            std::cout << "\tParticle mass BIG: " << particleMassBig << "\n";
+            std::cout << "\tParticle mass SMALL: " << particleMassSmall << "\n";
+         }
+         else std::cout << "\tParticle mass: " << particleMassBig << "\n";
+      }
+   }
+
+   // set the particle species
+   void setSpecies()
+   {
+      speciesHandler.clear();
+
+      // BIG-BIG
+      //        specieBig = new LinearViscoelasticFrictionSpecies;
+      specieBig = new LinearPlasticViscoelasticFrictionSpecies;
+      specieBig -> setDensity(particleDensityBig);
+      specieBig -> setStiffnessAndRestitutionCoefficient(particleStiffnessBig, bigBigRestitutionCoeff, particleMassBig);
+      // plastic-adhesive part
+      specieBig -> setUnloadingStiffnessMax(particleMaxUnloadingStiffness);
+      specieBig -> setCohesionStiffness(particleCohesiveStiffness);
+      specieBig -> setPenetrationDepthMax(particlePlasticityDepth);
+      //        specieBig -> setAdhesionStiffness(particleAdhesionStiffness);
+      //        specieBig -> setAdhesionForceMax(particleMaxAdhesiveForce);
+
+      specieBig -> setSlidingFrictionCoefficient(bigBigSlidingFrictionCoeff);
+      specieBig -> setSlidingStiffness(particleStiffnessBig*2.0/7.0);
+      specieBig -> setSlidingDissipation(specieBig -> getDissipation()*2.0/7.0);
+
+      specieBig -> setRollingFrictionCoefficient(bigBigRollingFrictionCoeff);
+      specieBig -> setRollingStiffness(particleStiffnessBig*2.0/7.0);
+      specieBig -> setRollingDissipation(specieBig -> getDissipation()*2.0/7.0);
+
+      specieBig -> setTorsionFrictionCoefficient(bigBigTorsionFrictionCoeff);
+      specieBig -> setTorsionStiffness(particleStiffnessBig*2.0/7.0);
+      specieBig -> setTorsionDissipation(specieBig -> getDissipation()*2.0/7.0);
+      speciesHandler.addObject(specieBig);
+
+      // SMALL-SMALL
+      //        specieSmall = new LinearViscoelasticFrictionSpecies;
+      specieSmall = new LinearPlasticViscoelasticFrictionSpecies;
+      specieSmall -> setDensity(particleDensitySmall);
+      specieSmall -> setStiffnessAndRestitutionCoefficient(particleStiffnessSmall, smallSmallRestitutionCoeff, particleMassSmall);
+      // plastic-adhesive part
+      specieSmall -> setUnloadingStiffnessMax(particleMaxUnloadingStiffness);
+      specieSmall -> setCohesionStiffness(particleCohesiveStiffness);
+      specieSmall -> setPenetrationDepthMax(particlePlasticityDepth);
+      //        specieSmall -> setAdhesionStiffness(particleAdhesionStiffness);
+      //        specieSmall -> setAdhesionForceMax(particleMaxAdhesiveForce);
+
+      specieSmall -> setSlidingFrictionCoefficient(smallSmallSlidingFrictionCoeff);
+      specieSmall -> setSlidingStiffness(particleStiffnessSmall*2.0/7.0);
+      specieSmall -> setSlidingDissipation(specieSmall -> getDissipation()*2.0/7.0);
+
+      specieSmall -> setRollingFrictionCoefficient(smallSmallRollingFrictionCoeff);
+      specieSmall -> setRollingStiffness(particleStiffnessSmall*2.0/7.0);
+      specieSmall -> setRollingDissipation(specieSmall -> getDissipation()*2.0/7.0);
+
+      specieSmall -> setTorsionFrictionCoefficient(smallSmallTorsionFrictionCoeff);
+      specieSmall -> setTorsionStiffness(particleStiffnessSmall*2.0/7.0);
+      specieSmall -> setTorsionDissipation(specieSmall -> getDissipation()*2.0/7.0);
+      speciesHandler.addObject(specieSmall);
+
+      // WALL-WALL    ( *** DENSITY AND MASS USED ARE THE MEAN OF THE RESPECTIVE PARTICLE BIG AND SMALL ONES, FRICTION SET TO ZERO, RESTITUTION TO 1 *** )
+      //        specieWall = new LinearViscoelasticFrictionSpecies;
+      specieWall = new LinearPlasticViscoelasticFrictionSpecies;
+      specieWall -> setDensity(0.5*(particleDensityBig + particleDensitySmall));
+      specieWall -> setStiffnessAndRestitutionCoefficient(wallStiffness, 1.0, (particleMassBig + particleMassSmall)/2.0);
+      // plastic-adhesive part
+      specieWall -> setUnloadingStiffnessMax(0.0);
+      specieWall -> setCohesionStiffness(0.0);
+      specieWall -> setPenetrationDepthMax(0.0);
+      //        specieWall -> setAdhesionStiffness(0.0);
+      //        specieWall -> setAdhesionForceMax(0.0);
+
+      specieWall -> setSlidingFrictionCoefficient(0.0);
+      specieWall -> setSlidingStiffness(wallStiffness*2.0/7.0);
+      specieWall -> setSlidingDissipation(specieWall -> getDissipation()*2.0/7.0);
+
+      specieWall -> setRollingFrictionCoefficient(0.0);
+      specieWall -> setRollingStiffness(wallStiffness*2.0/7.0);
+      specieWall -> setRollingDissipation(specieWall -> getDissipation()*2.0/7.0);
+
+      specieWall -> setTorsionFrictionCoefficient(0.0);
+      specieWall -> setTorsionStiffness(wallStiffness*2.0/7.0);
+      specieWall -> setTorsionDissipation(specieWall -> getDissipation()*2.0/7.0);
+      speciesHandler.addObject(specieWall);
+
+      // BIG-WALL
+      speciesHandler.getMixedObject(specieBig, specieWall) -> setStiffnessAndRestitutionCoefficient(0.5*(particleStiffnessBig + wallStiffness), bigWallRestitutionCoeff, particleMassBig);
+      // plastic-adhesive part
+      speciesHandler.getMixedObject(specieBig, specieWall) -> setUnloadingStiffnessMax(particleMaxUnloadingStiffness);
+      speciesHandler.getMixedObject(specieBig, specieWall) -> setCohesionStiffness(particleCohesiveStiffness);
+      speciesHandler.getMixedObject(specieBig, specieWall) -> setPenetrationDepthMax(particlePlasticityDepth);
+      //        speciesHandler.getMixedObject(specieBig, specieWall) -> setAdhesionStiffness(particleAdhesionStiffness);
+      //        speciesHandler.getMixedObject(specieBig, specieWall) -> setAdhesionForceMax(particleMaxAdhesiveForce);
+
+      speciesHandler.getMixedObject(specieBig, specieWall) -> setSlidingFrictionCoefficient(bigWallSlidingFrictionCoeff);
+      speciesHandler.getMixedObject(specieBig, specieWall) -> setSlidingStiffness(0.5*(particleStiffnessBig + wallStiffness)*2.0/7.0);
+      speciesHandler.getMixedObject(specieBig, specieWall) -> setSlidingDissipation(speciesHandler.getMixedObject(specieBig, specieWall) -> getDissipation()*2.0/7.0);
+
+      speciesHandler.getMixedObject(specieBig, specieWall) -> setRollingFrictionCoefficient(bigWallRollingFrictionCoeff);
+      speciesHandler.getMixedObject(specieBig, specieWall) -> setRollingStiffness(0.5*(particleStiffnessBig + wallStiffness)*2.0/7.0);
+      speciesHandler.getMixedObject(specieBig, specieWall) -> setRollingDissipation(speciesHandler.getMixedObject(specieBig, specieWall) -> getDissipation()*2.0/7.0);
+
+      speciesHandler.getMixedObject(specieBig, specieWall) -> setTorsionFrictionCoefficient(bigWallTorsionFrictionCoeff);
+      speciesHandler.getMixedObject(specieBig, specieWall) -> setTorsionStiffness(0.5*(particleStiffnessBig + wallStiffness)*2.0/7.0);
+      speciesHandler.getMixedObject(specieBig, specieWall) -> setTorsionDissipation(speciesHandler.getMixedObject(specieBig, specieWall) -> getDissipation()*2.0/7.0);
+
+      // SMALL-WALL
+      speciesHandler.getMixedObject(specieSmall, specieWall) -> setStiffnessAndRestitutionCoefficient(0.5*(particleStiffnessSmall + wallStiffness), smallWallRestitutionCoeff, particleMassSmall);
+      // plastic-adhesive part
+      speciesHandler.getMixedObject(specieSmall, specieWall) -> setUnloadingStiffnessMax(particleMaxUnloadingStiffness);
+      speciesHandler.getMixedObject(specieSmall, specieWall) -> setCohesionStiffness(particleCohesiveStiffness);
+      speciesHandler.getMixedObject(specieSmall, specieWall) -> setPenetrationDepthMax(particlePlasticityDepth);
+      //        speciesHandler.getMixedObject(specieSmall, specieWall) -> setAdhesionStiffness(particleAdhesionStiffness);
+      //        speciesHandler.getMixedObject(specieSmall, specieWall) -> setAdhesionForceMax(particleMaxAdhesiveForce);
+
+      speciesHandler.getMixedObject(specieSmall, specieWall) -> setSlidingFrictionCoefficient(smallWallSlidingFrictionCoeff);
+      speciesHandler.getMixedObject(specieSmall, specieWall) -> setSlidingStiffness(0.5*(particleStiffnessSmall + wallStiffness)*2.0/7.0);
+      speciesHandler.getMixedObject(specieSmall, specieWall) -> setSlidingDissipation(speciesHandler.getMixedObject(specieSmall, specieWall) -> getDissipation()*2.0/7.0);
+
+      speciesHandler.getMixedObject(specieSmall, specieWall) -> setRollingFrictionCoefficient(smallWallRollingFrictionCoeff);
+      speciesHandler.getMixedObject(specieSmall, specieWall) -> setRollingStiffness(0.5*(particleStiffnessSmall + wallStiffness)*2.0/7.0);
+      speciesHandler.getMixedObject(specieSmall, specieWall) -> setRollingDissipation(speciesHandler.getMixedObject(specieSmall, specieWall) -> getDissipation()*2.0/7.0);
+
+      speciesHandler.getMixedObject(specieSmall, specieWall) -> setTorsionFrictionCoefficient(smallWallTorsionFrictionCoeff);
+      speciesHandler.getMixedObject(specieSmall, specieWall) -> setTorsionStiffness(0.5*(particleStiffnessSmall + wallStiffness)*2.0/7.0);
+      speciesHandler.getMixedObject(specieSmall, specieWall) -> setTorsionDissipation(speciesHandler.getMixedObject(specieSmall, specieWall) -> getDissipation()*2.0/7.0);
+
+      // BIG-SMALL
+      speciesHandler.getMixedObject(specieBig, specieSmall) -> setStiffnessAndRestitutionCoefficient(0.5*(particleStiffnessBig + particleStiffnessSmall), bigSmallRestitutionCoeff, 0.5*(particleMassBig + particleMassSmall));
+      // plastic-adhesive part
+      speciesHandler.getMixedObject(specieBig, specieSmall) -> setUnloadingStiffnessMax(particleMaxUnloadingStiffness);
+      speciesHandler.getMixedObject(specieBig, specieSmall) -> setCohesionStiffness(particleCohesiveStiffness);
+      speciesHandler.getMixedObject(specieBig, specieSmall) -> setPenetrationDepthMax(particlePlasticityDepth);
+      //        speciesHandler.getMixedObject(specieBig, specieSmall) -> setAdhesionStiffness(particleAdhesionStiffness);
+      //        speciesHandler.getMixedObject(specieBig, specieSmall) -> setAdhesionForceMax(particleMaxAdhesiveForce);
+
+      speciesHandler.getMixedObject(specieBig, specieSmall) -> setSlidingFrictionCoefficient(bigSmallSlidingFrictionCoeff);
+      speciesHandler.getMixedObject(specieBig, specieSmall) -> setSlidingStiffness(0.5*(particleStiffnessBig + particleStiffnessSmall)*2.0/7.0);
+      speciesHandler.getMixedObject(specieBig, specieSmall) -> setSlidingDissipation(speciesHandler.getMixedObject(specieBig, specieSmall) -> getDissipation()*2.0/7.0);
+
+      speciesHandler.getMixedObject(specieBig, specieSmall) -> setRollingFrictionCoefficient(bigSmallRollingFrictionCoeff);
+      speciesHandler.getMixedObject(specieBig, specieSmall) -> setRollingStiffness(0.5*(particleStiffnessBig + particleStiffnessSmall)*2.0/7.0);
+      speciesHandler.getMixedObject(specieBig, specieSmall) -> setRollingDissipation(speciesHandler.getMixedObject(specieBig, specieSmall) -> getDissipation()*2.0/7.0);
+
+      speciesHandler.getMixedObject(specieBig, specieSmall) -> setTorsionFrictionCoefficient(bigSmallTorsionFrictionCoeff);
+      speciesHandler.getMixedObject(specieBig, specieSmall) -> setTorsionStiffness(0.5*(particleStiffnessBig + particleStiffnessSmall)*2.0/7.0);
+      speciesHandler.getMixedObject(specieBig, specieSmall) -> setTorsionDissipation(speciesHandler.getMixedObject(specieBig, specieSmall) -> getDissipation()*2.0/7.0);
+
+      if (verbose)
+      {
+         if (biModal)
+         {
+            std::cout << "\tBIG-BIG stiffness and dissipation coefficients: " << specieBig -> getLoadingStiffness() << " " << specieBig -> getDissipation() << "\n";
+            std::cout << "\tBIG-BIG friction coefficients: " << bigBigSlidingFrictionCoeff << " " << bigBigRollingFrictionCoeff << " " << bigBigTorsionFrictionCoeff << "\n";
+            std::cout << "\tBIG-BIG tangential stiffnesses: " << specieBig -> getSlidingStiffness() << " " << specieBig -> getRollingStiffness() << " " << specieBig -> getTorsionStiffness() << "\n";
+            std::cout << "\tBIG-BIG tangential dissipation coefficients: " << specieBig -> getSlidingDissipation() << " " << specieBig -> getRollingDissipation() << " " << specieBig -> getTorsionDissipation() << "\n";
+            std::cout << "\tBIG-BIG collision time: " << std::setprecision(4) << specieBig -> getCollisionTime(particleMassBig) << "\n\n";
+
+            std::cout << "\tSMALL-SMALL stiffness and dissipation coefficients: " << specieSmall -> getLoadingStiffness() << " " << specieSmall -> getDissipation() << "\n";
+            std::cout << "\tSMALL-SMALL friction coefficients: " << smallSmallSlidingFrictionCoeff << " " << smallSmallRollingFrictionCoeff << " " << smallSmallTorsionFrictionCoeff << "\n";
+            std::cout << "\tSMALL-SMALL tangential stiffnesses: " << specieSmall -> getSlidingStiffness() << " " << specieSmall -> getRollingStiffness() << " " << specieSmall -> getTorsionStiffness() << "\n";
+            std::cout << "\tSMALL-SMALL tangential dissipation coefficients: " << specieSmall -> getSlidingDissipation() << " " << specieSmall -> getRollingDissipation() << " " << specieSmall -> getTorsionDissipation() << "\n";
+            std::cout << "\tSMALL-SMALL collision time: " << std::setprecision(4) << specieSmall -> getCollisionTime(particleMassSmall) << "\n\n";
+
+            std::cout << "\tBIG-WALL stiffness and dissipation coefficients: " << speciesHandler.getMixedObject(specieBig, specieWall) -> getLoadingStiffness() << " " << speciesHandler.getMixedObject(specieBig, specieWall) -> getDissipation() << "\n";
+            std::cout << "\tBIG-WALL friction coefficients: " << bigWallSlidingFrictionCoeff << " " << bigWallRollingFrictionCoeff << " " << bigWallTorsionFrictionCoeff << "\n";
+            std::cout << "\tBIG-WALL tangential stiffnesses: " << speciesHandler.getMixedObject(specieBig, specieWall) -> getSlidingStiffness() << " " << speciesHandler.getMixedObject(specieBig, specieWall) -> getRollingStiffness() << " " << speciesHandler.getMixedObject(specieBig, specieWall) -> getTorsionStiffness() << "\n";
+            std::cout << "\tBIG-WALL tangential dissipation coefficients: " << speciesHandler.getMixedObject(specieBig, specieWall) -> getSlidingDissipation() << " " << speciesHandler.getMixedObject(specieBig, specieWall) -> getRollingDissipation() << " " << speciesHandler.getMixedObject(specieBig, specieWall) -> getTorsionDissipation() << "\n";
+            std::cout << "\tBIG-WALL collision time: " << std::setprecision(4) << speciesHandler.getMixedObject(specieBig, specieWall) -> getCollisionTime(particleMassBig) << "\n\n";
+
+            std::cout << "\tSMALL-WALL stiffness and dissipation coefficients: " << speciesHandler.getMixedObject(specieSmall, specieWall) -> getLoadingStiffness() << " " << speciesHandler.getMixedObject(specieSmall, specieWall) -> getDissipation() << "\n";
+            std::cout << "\tSMALL-WALL friction coefficients: " << smallWallSlidingFrictionCoeff << " " << smallWallRollingFrictionCoeff << " " << smallWallTorsionFrictionCoeff << "\n";
+            std::cout << "\tSMALL-WALL tangential stiffnesses: " << speciesHandler.getMixedObject(specieSmall, specieWall) -> getSlidingStiffness() << " " << speciesHandler.getMixedObject(specieSmall, specieWall) -> getRollingStiffness() << " " << speciesHandler.getMixedObject(specieSmall, specieWall) -> getTorsionStiffness() << "\n";
+            std::cout << "\tSMALL-WALL tangential dissipation coefficients: " << speciesHandler.getMixedObject(specieSmall, specieWall) -> getSlidingDissipation() << " " << speciesHandler.getMixedObject(specieSmall, specieWall) -> getRollingDissipation() << " " << speciesHandler.getMixedObject(specieSmall, specieWall) -> getTorsionDissipation() << "\n";
+            std::cout << "\tSMALL-WALL collision time: " << std::setprecision(4) << speciesHandler.getMixedObject(specieSmall, specieWall) -> getCollisionTime(particleMassSmall) << "\n\n";
+
+            std::cout << "\tBIG-SMALL stiffness and dissipation coefficients: " << speciesHandler.getMixedObject(specieBig, specieSmall) -> getLoadingStiffness() << " " << speciesHandler.getMixedObject(specieBig, specieSmall) -> getDissipation() << "\n";
+            std::cout << "\tBIG-SMALL friction coefficients: " << bigSmallSlidingFrictionCoeff << " " << bigSmallRollingFrictionCoeff << " " << bigSmallTorsionFrictionCoeff << "\n";
+            std::cout << "\tBIG-SMALL tangential stiffnesses: " << speciesHandler.getMixedObject(specieBig, specieSmall) -> getSlidingStiffness() << " " << speciesHandler.getMixedObject(specieBig, specieSmall) -> getRollingStiffness() << " " << speciesHandler.getMixedObject(specieBig, specieSmall) -> getTorsionStiffness() << "\n";
+            std::cout << "\tBIG-SMALL tangential dissipation coefficients: " << speciesHandler.getMixedObject(specieBig, specieSmall) -> getSlidingDissipation() << " " << speciesHandler.getMixedObject(specieBig, specieSmall) -> getRollingDissipation() << " " << speciesHandler.getMixedObject(specieBig, specieSmall) -> getTorsionDissipation() << "\n";
+            std::cout << "\tBIG-SMALL collision time: " << std::setprecision(4) << speciesHandler.getMixedObject(specieBig, specieSmall) -> getCollisionTime(0.5*(particleMassBig + particleMassSmall)) << "\n\n";
+
+            std::cout << "\tBIG-BIG collision time / TIME STEP: " << std::setprecision(4) << (specieBig -> getCollisionTime(particleMassBig))/getTimeStep() << "\n";
+            std::cout << "\tSMALL-SMALL collision time / TIME STEP: " << std::setprecision(4) << (specieSmall -> getCollisionTime(particleMassSmall))/getTimeStep() << "\n";
+            std::cout << "\tBIG-WALL collision time / TIME STEP: " << std::setprecision(4) << (speciesHandler.getMixedObject(specieBig, specieWall) -> getCollisionTime(particleMassBig))/getTimeStep() << "\n";
+            std::cout << "\tSMALL-WALL collision time / TIME STEP: " << std::setprecision(4) << (speciesHandler.getMixedObject(specieSmall, specieWall) -> getCollisionTime(particleMassSmall))/getTimeStep() << "\n";
+            std::cout << "\tBIG-SMALL collision time / TIME STEP: " << std::setprecision(4) << (speciesHandler.getMixedObject(specieBig, specieSmall) -> getCollisionTime(0.5*(particleMassBig + particleMassSmall)))/getTimeStep() << "\n\n";
+         }
+         else
+         {
+            std::cout << "\tPARTICLE stiffness and dissipation coefficients: " << specieBig -> getLoadingStiffness() << " " << specieBig -> getDissipation() << "\n";
+            std::cout << "\tPARTICLE friction coefficients: " << bigBigSlidingFrictionCoeff << " " << bigBigRollingFrictionCoeff << " " << bigBigTorsionFrictionCoeff << "\n";
+            std::cout << "\tPARTICLE tangential stiffnesses: " << specieBig -> getSlidingStiffness() << " " << specieBig -> getRollingStiffness() << " " << specieBig -> getTorsionStiffness() << "\n";
+            std::cout << "\tPARTICLE tangential dissipation coefficients: " << specieBig -> getSlidingDissipation() << " " << specieBig -> getRollingDissipation() << " " << specieBig -> getTorsionDissipation() << "\n";
+            std::cout << "\tPARTICLE collision time: " << std::setprecision(4) << specieBig -> getCollisionTime(particleMassBig) << "\n\n";
+
+            std::cout << "\tPARTICLE-WALL stiffness and dissipation coefficients: " << speciesHandler.getMixedObject(specieBig, specieWall) -> getLoadingStiffness() << " " << speciesHandler.getMixedObject(specieBig, specieWall) -> getDissipation() << "\n";
+            std::cout << "\tPARTICLE-WALL friction coefficients: " << bigWallSlidingFrictionCoeff << " " << bigWallRollingFrictionCoeff << " " << bigWallTorsionFrictionCoeff << "\n";
+            std::cout << "\tPARTICLE-WALL tangential stiffnesses: " << speciesHandler.getMixedObject(specieBig, specieWall) -> getSlidingStiffness() << " " << speciesHandler.getMixedObject(specieBig, specieWall) -> getRollingStiffness() << " " << speciesHandler.getMixedObject(specieBig, specieWall) -> getTorsionStiffness() << "\n";
+            std::cout << "\tPARTICLE-WALL tangential dissipation coefficients: " << speciesHandler.getMixedObject(specieBig, specieWall) -> getSlidingDissipation() << " " << speciesHandler.getMixedObject(specieBig, specieWall) -> getRollingDissipation() << " " << speciesHandler.getMixedObject(specieBig, specieWall) -> getTorsionDissipation() << "\n";
+            std::cout << "\tPARTICLE-WALL collision time: " << std::setprecision(4) << speciesHandler.getMixedObject(specieBig, specieWall) -> getCollisionTime(particleMassBig) << "\n\n";
+
+            std::cout << "\tPARTICLE collision time / TIME STEP: " << std::setprecision(4) << (specieBig -> getCollisionTime(particleMassBig))/getTimeStep() << "\n";
+            std::cout << "\tPARTICLE-WALL collision time / TIME STEP: " << std::setprecision(4) << (speciesHandler.getMixedObject(specieBig, specieWall) -> getCollisionTime(particleMassBig))/getTimeStep() << "\n\n";
+         }
+      }
+   }
+
+   // sets the dimensions of the device
+   void setBoxDimensions()
+   {
+      double referenceLength = geometryRescaleRatio*20.0*meanRadiusBig;
+      initialParticleHeight = 1.15*referenceLength;    // i.e. 1.15*2.0*L, now 1.15*L
+      finalParticleHeight = 1.0*referenceLength;
+      boxLength = 2.0*referenceLength;
+      boxWidth = referenceLength;
+      pedestalLength = referenceLength;
+      initialParticleBedVolume = initialParticleHeight*boxLength*boxWidth;
+
+      if (verbose)
+      {
+         std::cout << "\tThe geometry rescale ratio is set to: " << geometryRescaleRatio << "\n";
+         std::cout << "\tInitial particle height: " << initialParticleHeight << "\n";
+         std::cout << "\tFinal particle height: " << finalParticleHeight << "\n";
+         std::cout << "\tBox length: " << boxLength << "\n";
+         std::cout << "\tBox width: " << boxWidth << "\n";
+         std::cout << "\tPedestal length: " << pedestalLength << "\n";
+         std::cout << "\tInitial particle bed volume: " << initialParticleBedVolume << "\n";
+      }
+   }
+
+   // compute the number of particles and the number of sets (packing fraction assumed to be 0.70)
+   void computeNumberOfSetsAndParticles()
+   {
+      nSmallParticles = (int)(0.70*initialParticleBedVolume/particleVolumeSmall)*(smallToBigMassRatio*particleDensityBig/(particleDensitySmall + smallToBigMassRatio*particleDensityBig));
+      nBigParticles = (int)((0.70*initialParticleBedVolume - nSmallParticles*particleVolumeSmall)/particleVolumeBig);
+
+      // the max number of sets is set to 20
+      nSets = 20;
+
+      // takes the smaller between nBigParticles and nSmallParticles
+      // starts from 20 and checks if nXPerSet > 1
+      // if not, nSets is decreased to 19 and the check is repeated, and so on
+      if (nSmallParticles > nBigParticles) {while (nBigParticles/nSets < 1.0) {nSets--;};}
+      else {while (nSmallParticles/nSets < 1.0) {nSets--;};}
+
+      nSmallPerSet = (int)(nSmallParticles/nSets);
+      nBigPerSet = (int)(nBigParticles/nSets);
+      nParticlesPerSet = nSmallPerSet + nBigPerSet;
+
+      if (verbose)
+      {
+         std::cout << "\tNumber of BIG particles needed: " << nBigParticles << "\n";
+         std::cout << "\tNumber of SMALL particles needed: " << nSmallParticles << "\n";
+         std::cout << "\tNumber of particle sets needed: " << nSets << "\n";
+         std::cout << "\tNumber of BIG particles loaded per set: " << nBigPerSet << "\n";
+         std::cout << "\tNumber of SMALL particles loaded per set: " << nSmallPerSet << "\n";
+         std::cout << "\tNumber of TOTAL particles loaded per set: " << nParticlesPerSet << "\n";
+         std::cout << "\tTotal number of BIG particles loaded: " << nBigPerSet*nSets << "\n";
+         std::cout << "\tTotal number of SMALL particles loaded: " << nSmallPerSet*nSets << "\n";
+         std::cout << "\tSanity check: NB/NS = " << nBigParticles/nSmallParticles << ", nB/nS = " << nBigPerSet/nSmallPerSet << ", (NB/NS)/(nB/nS) = " << (nBigParticles/nSmallParticles)/(nBigPerSet/nSmallPerSet) << "\n";
+      }
+   }
+
+   // computes the initialization region height to reach 0.1 packing fraction inside the loading volume for every load
+   void computeInitializationRegionDimensions()
+   {
+      // compute the mean volume of each set of particles
+      volumeOfParticlesPerSet = nBigPerSet*particleVolumeBig + nSmallPerSet*particleVolumeSmall;
+
+      // computes the height of the initialization region assuming a packing fraction of 0.1
+      // vol_set = 0.1*vol_loadingBox = 0.1*l*w*h -> h = vol_set/(0.1*l*w)
+      initRegionHeight = volumeOfParticlesPerSet/(0.1*boxLength*boxWidth);
+
+      // the total height of the system is set accordingly
+      totalHeight = initialParticleHeight + 1.5*initRegionHeight;
+
+      if (verbose)
+      {
+         std::cout << "\tVolume of particle set: " << volumeOfParticlesPerSet << "\n";
+         std::cout << "\tInitialization region height: " << initRegionHeight << "\n";
+         std::cout << "\tThe total height of the system is set to: " << totalHeight << "\n";
+      }
+   }
+
+   // computes the total volume of all the loaded particles
+   void computeParticleTotalVolume()
+   {
+      particleTotalVolume = nSets*volumeOfParticlesPerSet;
+
+      if (verbose)
+      {
+         std::cout << "\tTotal volume of particles: " << particleTotalVolume << "\n";
+         std::cout << "\tSanity check (nSets*volumePerSet)/(0.70*initialParticleBedVolume): " << particleTotalVolume/(0.70*initialParticleBedVolume) << "\n";
+      }
+   }
+
+   // sets the simulation domain and the walls
+   void setBoundaries()
+   {
+      setXMin(-0.51*boxLength);
+      setYMin(-0.51*boxWidth);
+      setZMin(-0.51*boxWidth);
+
+      setXMax(0.51*boxLength);
+      setYMax(0.51*boxWidth);
+      setZMax(1.01*totalHeight);
+
+      if (verbose)
+      {
+         std::cout << "\tSimulation domain minimum point: (" << getXMin() << " , " << getYMin() << " , " << getZMin() << ")\n";
+         std::cout << "\tSimulation domain maximum point: (" << getXMax() << " , " << getYMax() << " , " << getZMax() << ")\n";
+      }
+   }
+
+   // makes the geometric components
+   void makeGeometry()
+   {
+      wallHandler.clear();
+
+      // the walls in the x direction
+      xWall.setSpecies(specieWall);
+      xWall.set(Vec3D(-1.0,0.0,0.0),Vec3D(-0.5*boxLength,0.0,0.0));
+      wallHandler.copyAndAddObject(xWall);
+      xWall.setSpecies(specieWall);
+      xWall.set(Vec3D(1.0,0.0,0.0),Vec3D(0.5*boxLength,0.0,0.0));
+      wallHandler.copyAndAddObject(xWall);
+
+      // periodic boundary in the y direction
+      yBoundary.set(Vec3D(0.0,1.0,0.0), -0.5*boxWidth, 0.5*boxWidth);
+      boundaryHandler.copyAndAddObject(yBoundary);
+
+      // the wall in the z direction
+      zWall.setSpecies(specieWall);
+      zWall.set(Vec3D(0.0,0.0,1.0),Vec3D(0.0,0.0,totalHeight));
+      wallHandler.copyAndAddObject(zWall);
+
+      // the basis of the box
+      basis.setSpecies(specieWall);
+      basis.set(Vec3D(0.0,0.0,-1.0),Vec3D(0.0,0.0,0.0));
+      wallHandler.copyAndAddObject(basis);
+
+      // the pedestal where the particles are left to pile
+      pedestal.setSpecies(specieWall);
+      pedestal.addObject(Vec3D(1.0,0.0,0.0),Vec3D(-0.5*pedestalLength,0.0,0.0));
+      pedestal.addObject(Vec3D(-1.0,0.0,0.0),Vec3D(0.5*pedestalLength,0.0,0.0));
+      pedestal.addObject(Vec3D(0.0,0.0,-1.0),Vec3D(0.0,0.0,0.0));
+      pedestal.addObject(Vec3D(0.0,0.0,1.0),Vec3D(0.0,0.0,-0.5*pedestalLength));
+      wallHandler.copyAndAddObject(pedestal);
+   }
+
+   // makes one particle set
+   void makeParticleSet()
+   {
+      double x, y, z;
+      p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
+
+      for (int i=0; i<nParticlesPerSet; i++)
+      {
+         if (i<nBigPerSet)
+         {
+            if (!setsInserted && !i) {p0.setRadius(meanRadiusBig*(1.0 + dispersityBig));}
+            else {p0.setRadius(meanRadiusBig*(1.0 + dispersityBig*random.getRandomNumber(-1.0,1.0)));}
+            p0.setSpecies(specieBig);
+         }
+         else
+         {
+            if (!setsInserted && !i) {p0.setRadius(meanRadiusSmall*(1.0 - dispersitySmall));}
+            else {p0.setRadius(meanRadiusSmall*(1.0 + dispersitySmall*random.getRandomNumber(-1.0,1.0)));}
+            p0.setSpecies(specieSmall);
+         }
+
+         x = (0.5*boxLength - 1.1*p0.getRadius())*random.getRandomNumber(-1.0,1.0);
+         y = 0.5*boxWidth*random.getRandomNumber(-1.0,1.0);
+         z = totalHeight - 1.1*p0.getRadius() - initRegionHeight*random.getRandomNumber(0.0,1.0);
+
+         p0.setPosition(Vec3D(x, y, z));
+         particleHandler.copyAndAddObject(p0);
+      }
+
+      setsInserted++;
+      std::cout << "Inserted particle set n " << setsInserted << "\n";
+
+      if (verbose)
+      {
+         std::cout << "\tTotal number of particles: " << particleHandler.getNumberOfObjects() << "\n";
+         std::cout << "\tSanity check: setsInserted*nParticlesPerSet/numberOfParticlesInTheSystem = " << setsInserted*nParticlesPerSet/particleHandler.getNumberOfObjects() << "\n";
+      }
+   }
+
+   // removes the particles laying above the desired height
+   void removeParticles()
+   {
+      for (int i=particleHandler.getNumberOfObjects()-1; i>=0; i--)
+      {
+         if (particleHandler.getObject(i) -> getPosition().Z + particleHandler.getObject(i) -> getRadius() > finalParticleHeight) particleHandler.removeObject(i);
+      }
+   }
+
+   // removes the floor
+   void removeFloor()
+   {
+      basis.move(Vec3D(0.0,0.0,-1.0));
+      wallHandler.removeObject(3);
+
+      if (verbose)
+      {
+         std::cout << "\tFloor removed\n";
+      }
+   }
+
+   // removes the particles laying above the casing height and the pnes in contact with the side walls (in case they are stuck there due to cohesion)
+   void dischargeParticles()
+   {
+      for (int i=particleHandler.getNumberOfObjects()-1; i>=0; i--)
+      {
+         if (particleHandler.getObject(i) -> getPosition().Z < -0.5*boxWidth) particleHandler.removeObject(i);
+         if (fabs(particleHandler.getObject(i) -> getPosition().X) > 0.5*boxLength - 1.1*particleHandler.getObject(i) -> getRadius()) particleHandler.removeObject(i);
+      }
+   }
+
+   // computes the heights of the particles and evaluates the angle of repose
+   void computeAngleOfRepose() const
+   {
+      double meanAngleOfRepose;
+
+      // variables for the a.o.r. computation
+      int nCells;
+      double initialOffset, localBedHeight;
+      double xGrid, gridSize;
+      double xP, rP;
+      double tempZ = 0.0;
+
+      if (verbose)
+      {
+         std::cout << "\tComputing the angle of repose and outputing the data to file...\n";
+      }
+
+      // setting the grid size and related parameters for the a.o.r. computation
+      gridSize = 2.0*meanRadiusBig;
+      nCells = (int)(boxWidth/gridSize);
+      initialOffset = 0.5*(gridSize - boxWidth);
+
+      // creation of the output file
+      std::ofstream outputFile;
+      std::ostringstream outputFileName;
+      std::cout.unsetf(std::ios::floatfield);
+      outputFileName << getName() << ".aor";
+
+      // write of the header
+      outputFile.open(outputFileName.str(), std::ios::out);
+      outputFile << "Grid size: " << gridSize << std::endl;
+      outputFile << "N. of cells: " << nCells << std::endl;
+      outputFile << "Pedestal side: " << boxWidth << std::endl;
+      outputFile << "1. x \t 2. xGrid \t 3. z \t 4. radius" << std::endl;
+
+      // initialization of the angles of repose
+      meanAngleOfRepose = 0.0;
+      double *localAngleOfRepose;
+      localAngleOfRepose = new double[nCells-1];
+
+      // computation of the highest particle per x-slice
+      for (int i=0; i<nCells; i++)
+      {
+         xP = 0.0;
+         xGrid = i*gridSize + initialOffset;
+         localBedHeight = 0.0;
+         rP = 0.0;
+
+         for (int n=particleHandler.getNumberOfObjects()-1; n>=0; n--)
+         {
+            if (fabs(particleHandler.getObject(n) -> getPosition().X - xGrid) <= 0.5*gridSize &&
+            particleHandler.getObject(n) -> getPosition().Z + particleHandler.getObject(n) -> getRadius() > localBedHeight)
+            {
+               localBedHeight = particleHandler.getObject(n) -> getPosition().Z + particleHandler.getObject(n) -> getRadius();
+               xP = particleHandler.getObject(n) -> getPosition().X;
+               rP = particleHandler.getObject(n) -> getRadius();
+            }
+         }
+
+         // computes the local angle of repose
+         if (i>0)
+         {
+            meanAngleOfRepose += atan(fabs(localBedHeight - tempZ)/gridSize);
+            localAngleOfRepose[i-1] = atan(fabs(localBedHeight - tempZ)/gridSize);
+         }
+
+         // updates the temporary value to be the bed height of the "previous" slice (for computing the gradient)
+         tempZ = localBedHeight;
+
+         // write to output
+         outputFile <<
+         xP << "   " <<
+         xGrid << "   " <<
+         localBedHeight << "   " <<
+         rP << "   " <<
+         std::endl;
+      }
+
+      meanAngleOfRepose /= nCells - 1;
+
+      // writes the angles of repose in the output file
+      outputFile << "Local angles of repose (rad): ";
+      for (int i=0; i<nCells-1; i++)
+      {
+         outputFile << localAngleOfRepose[i] << "\t";
+      }
+      outputFile << std::endl << "Mean angle of repose: " << meanAngleOfRepose << std::endl;
+      outputFile.close();
+
+      // deleting the initialized array
+      delete[] localAngleOfRepose;
+
+      if (verbose)
+      {
+         std::cout << "\tDONE!\n";
+      }
+
+   }
+
+   // computes the heights of the particles and evaluates the angle of repose
+   void computeAngleOfRepose2() const
+   {
+      double meanAngleOfRepose;
+      double *meanAngleOfReposeLine;
+      double *localAngleOfRepose;
+
+      // variables for the a.o.r. computation
+      int nCellsX, nCellsY;
+      double initialOffsetX, initialOffsetY;
+      double localBedHeight;
+      double xGrid, yGrid, gridSize;
+      double xP, yP, rP;
+      double tempZ = 0.0;
+
+      if (verbose)
+      {
+         std::cout << "\tComputing the angle of repose and outputing the data to file...\n";
+      }
+
+      // setting the grid size and related parameters for the a.o.r. computation
+      gridSize = 2.0*meanRadiusBig;
+      nCellsX = (int)(0.5*boxWidth/gridSize);
+      nCellsY = 2*(int)(boxWidth/gridSize);
+      initialOffsetX = 0.5*(gridSize - boxWidth);
+      initialOffsetY = 0.5*(gridSize - boxWidth);
+
+      // creation of the output file
+      std::ofstream outputFile;
+      std::ostringstream outputFileName;
+      std::cout.unsetf(std::ios::floatfield);
+      outputFileName << getName() << "_NEW.aor";
+
+      // write of the header
+      outputFile.open(outputFileName.str(), std::ios::out);
+      outputFile << "Grid size: " << gridSize << std::endl;
+      outputFile << "N. cells X: " << nCellsX << std::endl;
+      outputFile << "N. cells Y: " << nCellsY << std::endl;
+      outputFile << "Pedestal length: " << boxLength << std::endl;
+      outputFile << "Pedestal width: " << boxWidth << std::endl;
+      //        outputFile << "1. xGrid \t 2. yGrid \t 3. xP \t 4. yP \t 5. rP \t 6. localHeight" << std::endl;
+
+      // initialization of the angles of repose
+      meanAngleOfRepose = 0.0;
+      localAngleOfRepose = new double[nCellsX-1];
+      meanAngleOfReposeLine = new double[nCellsY];
+
+      for (int i=0; i<nCellsX-1; i++) localAngleOfRepose[i] = 0.0;
+      for (int i=0; i<nCellsY; i++) meanAngleOfReposeLine[i] = 0.0;
+
+      // cycles over all the y-grid side profiles
+      for (int j=0; j<nCellsY; j++)
+      {
+         meanAngleOfReposeLine[j] = 0.0;
+
+         // computation of the highest particle per x-slice
+         for (int i=0; i<nCellsX; i++)
+         {
+            if (j < nCellsY/2)
+            {
+               xGrid = i*gridSize + initialOffsetX;
+               yGrid = j*gridSize + initialOffsetY;
+            }
+            else
+            {
+               xGrid = - i*gridSize - initialOffsetX;
+               yGrid = (j - nCellsY/2)*gridSize + initialOffsetY;
+            }
+
+            localBedHeight = 0.0;
+            //                xP = 0.0;
+            //                yP = 0.0;
+            //                rP = 0.0;
+
+            for (int n=particleHandler.getNumberOfObjects()-1; n>=0; n--)
+            {
+               if (fabs(particleHandler.getObject(n) -> getPosition().X - xGrid) <= 0.5*gridSize &&
+               fabs(particleHandler.getObject(n) -> getPosition().X - yGrid) <= 0.5*gridSize &&
+               particleHandler.getObject(n) -> getPosition().Z + particleHandler.getObject(n) -> getRadius() > localBedHeight)
+               {
+                  localBedHeight = particleHandler.getObject(n) -> getPosition().Z + particleHandler.getObject(n) -> getRadius();
+                  //                        xP = particleHandler.getObject(n) -> getPosition().X;
+                  //                        yP = particleHandler.getObject(n) -> getPosition().Y;
+                  //                        rP = particleHandler.getObject(n) -> getRadius();
+               }
+            }
+
+            // computes the local angle of repose
+            if (i>0)
+            {
+               localAngleOfRepose[i-1] = atan(fabs(localBedHeight - tempZ)/gridSize);
+               meanAngleOfReposeLine[j] += localAngleOfRepose[i-1];
+
+               std::cout << j << "\t" << i << "\t" << xGrid << "\t" << yGrid << "\t" << atan(fabs(localBedHeight - tempZ)/gridSize) << std::endl;
+               std::cout << localAngleOfRepose[i-1] << "\t" << meanAngleOfReposeLine[j] << std::endl;
+
+               outputFile << localAngleOfRepose[i-1] << "\t";
+            }
+
+            // updates the temporary value to be the bed height of the "previous" slice (for computing the gradient)
+            tempZ = localBedHeight;
+
+            // write to output
+            outputFile <<
+            xGrid << "   " <<
+            yGrid << "   " <<
+            //                xP << "   " <<
+            //                yP << "   " <<
+            //                rP << "   " <<
+            localBedHeight << "   " <<
+            std::endl;
+         }
+
+         outputFile << std::endl;
+
+         meanAngleOfReposeLine[j] /= (nCellsX - 1);
+         meanAngleOfRepose += meanAngleOfReposeLine[j];
+
+         std::cout << j << "\t" << xGrid << "\t" << yGrid << "\t" << meanAngleOfReposeLine[j] << std::endl;
+      }
+
+      meanAngleOfRepose /= nCellsY;
+
+      // writes the angles of repose in the output file
+      outputFile << "Mean local angles of repose (rad)\n";
+      for (int i=0; i<nCellsY; i++)
+      {
+         outputFile << meanAngleOfReposeLine[i] << "\t";
+      }
+      outputFile << std::endl << "Mean angle of repose: " << meanAngleOfRepose << std::endl;
+      outputFile.close();
+
+      // deleting the initialized array
+      delete[] localAngleOfRepose;
+      delete[] meanAngleOfReposeLine;
+
+      if (verbose)
+      {
+         std::cout << "\tDONE!\n";
+      }
+
+   }
+
+
+   //  ----- GLOBAL FUNCTIONS -----
+   void printTime() const override
+   {
+      std::cout << "t = " << std::setprecision(3) << std::left << std::setw(6) << getTime() << ", tmax = " << std::setprecision(3) << std::left << std::setw(4) << getTimeMax() << ", Eratio = " << std::setprecision(6) << std::left << std::setw(10) << getKineticEnergy()/getElasticEnergy() << std::endl;
+      std::cout.flush();
+   }
+
+   bool continueSolve() const override
+   {
+      if (stage == 5 && getTime() > timePlaceholder + 1.0 && getKineticEnergy() < 1.0e-5*getElasticEnergy())
+      {
+         computeAngleOfRepose();
+         computeAngleOfRepose2();
+         return false;
+      }
+      return true;
+   }
+
+
+   // ----- VARIABLES -----
+   // particle intrinsic properties
+   double particleDensityBig, particleDensitySmall;
+   double meanRadiusBig, meanRadiusSmall;
+   double dispersityBig, dispersitySmall;
+   double particleVolumeBig, particleVolumeSmall;
+   double particleMassBig, particleMassSmall;
+   double particleTotalVolume;
+
+   // particle interaction properties
+   double wallStiffness;
+   double particleStiffnessBig, particleStiffnessSmall;
+   double bigWallRestitutionCoeff, smallWallRestitutionCoeff;
+   double bigBigRestitutionCoeff, smallSmallRestitutionCoeff, bigSmallRestitutionCoeff;
+   // particle-wall friction coefficients
+   double bigWallSlidingFrictionCoeff, smallWallSlidingFrictionCoeff;
+   double bigWallRollingFrictionCoeff, smallWallRollingFrictionCoeff;
+   double bigWallTorsionFrictionCoeff, smallWallTorsionFrictionCoeff;
+   // particle-particle friction coefficients
+   double bigBigSlidingFrictionCoeff, smallSmallSlidingFrictionCoeff, bigSmallSlidingFrictionCoeff;
+   double bigBigRollingFrictionCoeff, smallSmallRollingFrictionCoeff, bigSmallRollingFrictionCoeff;
+   double bigBigTorsionFrictionCoeff, smallSmallTorsionFrictionCoeff, bigSmallTorsionFrictionCoeff;
+   // particle plastic and adhesive coefficients   // *** CARE: NO SEPARATE CASES FOR BIG AND SMALL YET! ***
+   double particleMaxUnloadingStiffness;
+   double particleCohesiveStiffness;
+   double particlePlasticityDepth;
+   //    double particleAdhesionStiffness;
+   //    double particleMaxAdhesiveForce;
+
+   // static geometry related variables
+   double boxLength;
+   double boxWidth;
+   double pedestalLength;
+   double initialParticleHeight;
+   double finalParticleHeight;
+   double initialParticleBedVolume;
+   double totalHeight;
+   double geometryRescaleRatio;
+
+   // simulation variables
+   int stage;
+   int nSets, nParticlesPerSet;
+   double nBigPerSet, nSmallPerSet;
+   double nBigParticles, nSmallParticles;
+   double smallToBigMassRatio;
+   double timePlaceholder;
+
+   // initialization variables
+   double initRegionHeight;
+   double volumeOfParticlesPerSet;
+   int setsInserted;
+
+   // output variables
+   //    double meanAngleOfRepose;
+   //    double *localAngleOfRepose;
+
+   // Mercury-specific variables
+   //    LinearViscoelasticFrictionSpecies *specieBig, *specieSmall, *specieWall;
+   LinearPlasticViscoelasticFrictionSpecies *specieBig, *specieSmall, *specieWall;
+   InfiniteWall xWall, zWall, basis;
+   PeriodicBoundary yBoundary;
+   IntersectionOfWalls pedestal;
+   BaseParticle p0;
+
+   // global variables
+   bool verbose;
+   bool biModal;
+};
+
+int main(int argc, char *argv[])
+{
+   //    double coefficientOfRollingFriction[10] = {0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.10, 0.15, 0.20, 0.30};
+   //
+   //    for (int i=0; i<10; i++)
+   //    {
+   // initialization of elapsed time evaluation
+   std::clock_t clockStart = std::clock();
+   auto chronoStart = std::chrono::high_resolution_clock::now();
+
+   double cylinderRadius;
+   double cylinderHeight;
+
+   cylinderRadius = 0.0125;
+   cylinderHeight = 0.019;
+
+   // particle size setting
+   double particleRadius;
+   double cylinderToParticleRadiusRatio;
+   double particleSizeScalingFactor;
+
+   cylinderToParticleRadiusRatio = 40.0;
+   particleSizeScalingFactor = 1.0;
+   particleRadius = particleSizeScalingFactor*cylinderRadius/cylinderToParticleRadiusRatio;
+
+   CalibrationRoutine_AngleOfReposeTest aorTest;
+
+   // sets the name
+   std::ostringstream name;
+   std::cout.unsetf(std::ios::floatfield);
+   name << "AngleOfReposeTest_muS_0.40_muR_0.30_k1_286_k2max_3000_kc_0_phi_0.03";
+   aorTest.setName(name.str());
+
+   // sets simulation parameters
+   aorTest.setTimeStep(2.0e-6);
+   aorTest.setTimeMax(30.0);
+   aorTest.setGravity(Vec3D(0.0,0.0,-9.81));
+   aorTest.setSystemDimensions(3);
+   aorTest.setVerbose(true);
+
+   // sets the number of saved timesteps such that the output is printed every 0.01s
+   aorTest.setSaveCount(0.01/aorTest.getTimeStep());
+
+   // sets the particle intrinsic properties
+   aorTest.setParticleDensity(1452.7, 1452.7);
+   aorTest.setParticleRadiusAndDispersity(particleRadius, 0.10, particleRadius, 0.10);
+
+   // sets the small-to-big total mass ratio
+   aorTest.setTotalMassRatio(0.01);
+
+   // sets the stiffnesses
+   aorTest.setWallStiffness(3000.0);
+   //    aorTest.setParticleStiffness(1000.0);
+   aorTest.setParticlePlasticProperties(286, 3000, 0, 0.03);
+   //    aorTest.setParticlesAdhesionProperties(0.0, 0.0);
+
+   // sets the particle-wall friction coefficients
+   aorTest.setParticleWallSlidingFrictionCoeff(0.3, 0.3);
+   aorTest.setParticleWallRollingFrictionCoeff(0.01, 0.01);
+   aorTest.setParticleWallTorsionFrictionCoeff(0.0, 0.0);
+
+   // sets the particle-particle friction coefficients
+   aorTest.setParticleParticleSlidingFrictionCoeff(0.4, 0.4, 0.4);
+   aorTest.setParticleParticleRollingFrictionCoeff(0.3, 0.3, 0.3);
+   aorTest.setParticleParticleTorsionFrictionCoeff(0.0, 0.0, 0.0);
+
+   // sets the particle restitution coefficients
+   aorTest.setParticleWallRestitutionCoeff(0.7, 0.7);
+   aorTest.setParticleParticleRestitutionCoeff(0.5, 0.5, 0.5);
+
+   // sets the casing dimensions
+   aorTest.setGeometryRescaleRatio(1.0);   // must be [0;1]
+
+   // sets additional built-in arguments for the xballs visualization
+   aorTest.setXBallsAdditionalArguments("-h 800 -p 10 -o 200 -3dturn 3");
+
+   aorTest.solve();
+
+   // computes the total duration of the simulation
+   std::ofstream runningTime;
+   std::ostringstream runningTimeFileName;
+   std::cout.unsetf(std::ios::floatfield);
+   runningTimeFileName << aorTest.getName() << ".time";
+
+   runningTime.open(runningTimeFileName.str(), std::ios::out);
+   runningTime << "CPU time used: " << (std::clock() - clockStart) / CLOCKS_PER_SEC << "s" << std::endl;
+   runningTime << "Wall clock time passed: " << std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - chronoStart).count() << "s" << std::endl;
+
+   runningTime.close();
+   //    }
+
+   return 0;
+}

@@ -1,0 +1,171 @@
+
+#include "SphericalEnvelope.h"
+#include "InteractionHandler.h"
+#include "Math/ExtendedMath.h"
+#include "Particles/BaseParticle.h"
+
+// Last update 22.03.19
+// - creation
+// - eventually move this into an elliproidal shell
+
+// Default constructor
+SphericalEnvelope::SphericalEnvelope()
+{
+   start_.setZero();
+   a_ = 1.0;
+   b_ = 1.0;
+
+   logger(DEBUG, "SphericalEnvelope() constructor finished.");
+}
+
+// Copy constructor
+SphericalEnvelope::SphericalEnvelope(const SphericalEnvelope& other)
+: BaseWall(other)
+{
+   start_ = other.start_;
+   a_ = other.a_;
+   b_ = other.b_;
+
+   logger(DEBUG, "SphericalEnvelope(const SphericalEnvelope&) copy constructor finished.");
+}
+
+// Initialized constructor
+// Parameters in: centre of the sphere and its radius
+SphericalEnvelope::SphericalEnvelope(Vec3D start, Mdouble a, Mdouble b)
+{
+   start_ = start;
+   a_ = a;
+   b_ = b;
+
+   logger(DEBUG, "SphericalEnvelope(Vec3D, Mdouble, Mdouble) constructor finished.");
+}
+
+// Destructor
+SphericalEnvelope::~SphericalEnvelope()
+{
+   logger(DEBUG, "~SphericalEnvelope() finished, destroyed the screw.");
+}
+
+// A pointer to the copy of the envelope
+SphericalEnvelope* SphericalEnvelope::copy() const
+{
+   return new SphericalEnvelope(*this);
+}
+
+// Function to set the envelope parameters
+void SphericalEnvelope::set(Vec3D start, Mdouble a, Mdouble b)
+{
+   start_ = start;
+   a_ = a;
+   b_ = b;
+
+   std::cout << "\n\nSpherical envelope parameters set\n";
+   std::cout << "Start: " << start_ << "\n";
+   std::cout << "Z semi-axis: " << a_ << "\n";
+   std::cout << "XY semi-axes: " << b_ << "\n";
+}
+
+// Function to set the radius
+void SphericalEnvelope::setAxes(Mdouble a, Mdouble b)
+{
+   a_ = a;
+   b_ = b;
+}
+
+// Function to get the Z semi-axis
+double SphericalEnvelope::getA()
+{
+   return a_;
+}
+
+// Function to get the XY semi-axes
+double SphericalEnvelope::getB()
+{
+   return b_;
+}
+
+// Input stream
+void SphericalEnvelope::read(std::istream& is)
+{
+   BaseWall::read(is);
+   std::string dummy;
+   is >> dummy >> start_
+   >> dummy >> a_
+   >> dummy >> b_;
+}
+
+// Old input stream (no idea what this is)
+void SphericalEnvelope::oldRead(std::istream& is)
+{
+   std::string dummy;
+   is >> dummy >> start_
+   >> dummy >> a_
+   >> dummy >> b_;
+}
+
+// Writer
+void SphericalEnvelope::write(std::ostream& os) const
+{
+   BaseWall::write(os);
+   os << " Start " << start_
+   << " a " << a_
+   << " b " << b_;
+}
+
+// Returns the string "SphericalEnvelope"
+std::string SphericalEnvelope::getName() const
+{
+   return "SphericalEnvelope";
+}
+
+// The contact detection algorithm
+bool SphericalEnvelope::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const
+{
+   // radial position of the particle with respect to the envelope centre in spherical coordinates
+   Mdouble r_P = (p.getPosition() - start_).getLength();
+
+   // axial position of the particle with respect to the envelope centre
+   Mdouble z_P = (p.getPosition() - start_).Z;
+
+   distance = sqrt(pow(r_P, 2.0) + a_*pow(z_P, 2.0)*(a_ - 2.0*r_P)/pow(r_P, 2.0) + b_*(1.0 - pow(z_P, 2.0)/pow(r_P, 2.0))*(b_ - 2.0*r_P));
+
+
+   // collision check
+   if (distance < p.getWallInteractionRadius()) // collision
+   {
+      // this error check allows for unphysical compressions up to twice the particle radius due to the heavy compression needed
+      // if (distance < - p.getWallInteractionRadius()) std::cout << std::endl << "COLLISION ERROR WITH THE SPHERICAL SURFACE" << std::endl;
+
+      normal_return.X = a_*(p.getPosition() - start_).X;
+      normal_return.Y = a_*(p.getPosition() - start_).Y;
+      normal_return.Z = b_*z_P;
+
+      normal_return /= normal_return.getLength();
+
+      return true;
+   }
+   else // no collision
+   {
+      return false;
+   }
+}
+
+// Checks for the interaction between a particle p at a time timeStamp
+// In case of interaction returns a pointer to the BaseInteraction happened between the Envelope and the BaseParticle at time timeStamp
+std::vector<BaseInteraction *>
+SphericalEnvelope::getInteractionWith(BaseParticle* p, Mdouble timeStamp, InteractionHandler* interactionHandler)
+{
+   Mdouble distance;
+   Vec3D normal;
+   std::vector<BaseInteraction*> interactions;
+   if (getDistanceAndNormal(*p,distance,normal))
+   {
+      BaseInteraction* c = interactionHandler->getInteraction(p, this, timeStamp);
+      c->setNormal(-normal);
+      c->setDistance(distance);
+      c->setOverlap(p->getRadius() - distance);
+      c->setContactPoint(p->getPosition()-(p->getRadius() - 0.5 * c->getOverlap()) * c->getNormal());
+      interactions.push_back(c);
+   }
+   return interactions;
+}

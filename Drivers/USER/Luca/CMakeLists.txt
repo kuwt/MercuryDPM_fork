@@ -2,11 +2,16 @@ include(${CMAKE_SOURCE_DIR}/Configuration/MasterMake.cmake)
 add_subdirectory(cleanedAlgorithms)
 
 add_library(Luca STATIC
-	CompressionPiston.cc
+	NewInteractions/LinearPlasticViscoelasticInteractionCutoff.cc
+	NewInteractions/LinearPlasticViscoelasticNormalSpeciesExtended.cc
+	SphericalEnvelope.cc
+	DualFeederCasing_BOT.cc
+	DualFeederCasing_TOP.cc
+	ScrewCC.cc
+	CompressionPistonSurface.cc
 	Helicoid.cc
 	Helicoid02.cc
 	Helicoid03.cc
-	Helicoid03bis.cc
 	Helicoid04.cc
 	Helicoid05.cc
 	Helicoid06.cc
@@ -14,7 +19,9 @@ add_library(Luca STATIC
 	ScrewRectangularSection.cc
 	ScrewRoundEdges.cc
 	ScrewTriangularSection.cc
-	Shaft.cc
+	HopperAndCasing.cc
+	ScrewBottom.cc
+	RotatingIntersectionOfWalls.cc
 )
 
 
