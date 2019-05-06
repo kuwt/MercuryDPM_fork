@@ -31,7 +31,7 @@ public:
         setWallsWriteVTK(FileType::ONE_FILE);
         setParticlesWriteVTK(true);
         setSaveCount(1000);
-        setGravity({0, 0, 0});
+        setGravity({1, 0, 0});
     }
 
 private:
@@ -43,11 +43,11 @@ private:
         Vec3D startPosition(0, 0, 0);
         Mdouble screwLength = 5;
         Mdouble bladeRadius = 5;
-        Mdouble numberOfTurns = 2;
-        Mdouble screwSpeed = 10*constants::pi;
+        Mdouble numberOfTurns = 1;
+        Mdouble screwSpeed = -1*constants::pi;
         Mdouble bladeThickness = 1;
         Mdouble shaftRadius = 1;
-        helicoid.set(startPosition, screwLength, bladeRadius, shaftRadius, numberOfTurns, screwSpeed, bladeThickness, true);
+        helicoid.set(startPosition, screwLength, bladeRadius, shaftRadius, numberOfTurns, screwSpeed, bladeThickness, false);
         helicoid.setSpecies(speciesHandler.getObject(0));
         wallHandler.copyAndAddObject(helicoid);
         
@@ -70,7 +70,7 @@ private:
         
         species.setSlidingDissipation(species.getDissipation() * 2.0 / 7.0);
         species.setSlidingStiffness(species.getStiffness() * 2.0 / 7.0);
-        species.setSlidingFrictionCoefficient(0.75);
+        species.setSlidingFrictionCoefficient(0.5);
         speciesHandler.copyAndAddObject(species);
     }
     

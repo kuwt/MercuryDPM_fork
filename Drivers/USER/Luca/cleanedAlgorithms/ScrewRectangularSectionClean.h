@@ -1,12 +1,3 @@
-// This function defines an Archimedes' screw in the z-direction from a (constant) starting point,
-// a (constant) length L, a (constant) radius r, a (constant) number or revelations N and a (constant) rotation speed (rev/s).
-
-// The screw H=H(r,theta) is a 2D surface embedded in E3, which parametric equations are:
-// xH = r*Cos(theta)
-// yH = r*Sin(theta)
-// zH = L*theta/(2*pi*N)
-// where r and theta are the parameters with r\in[rMin;rMax] and theta\in[0;2*pi*N[.
-
 #ifndef ScrewRectangularSectionClean_H
 #define ScrewRectangularSectionClean_H
 
@@ -14,109 +5,124 @@
 #include "Math/Vector.h"
 #include "Math/ExtendedMath.h"
 
+/*! \brief This class defines an Archimedes' screw in the z-direction from a (constant) starting point,
+ a (constant) length L, a (constant) radius r, a (constant) number or revelations N and a (constant) rotation speed (rev/s).
+
+ \details The screw H=H(r,theta) is a 2D surface embedded in E3, which parametric equations are:
+ xH = r*Cos(theta)
+ yH = r*Sin(theta)
+ zH = L*theta/(2*pi*N)
+ where r and theta are the parameters with r\in[rMin;rMax] and theta\in[0;2*pi*N[.
+ For a schematic drawing, see ScrewRectangularSectionClean.cc
+*/
 class ScrewRectangularSectionClean : public BaseWall
 {
 public:
     
-    // Default constructor
+    ///\brief Default constructor: set all variables to sensible defaults
     ScrewRectangularSectionClean();
     
-    // Copy constructor
+    ///\brief Copy constructor
     ScrewRectangularSectionClean(const ScrewRectangularSectionClean& other);
     
-    // Initialized constructor
-    // Parameters in: initial starting point of the screw, length, blade radius, number of turns, angular velocity,
-    // thickness of the blade.
-    ScrewRectangularSectionClean(Vec3D start, Mdouble l, Mdouble R, Mdouble r, Mdouble n, Mdouble omega,
-                                 Mdouble thickness, bool rightHandeness);
+    ///\brief Constructor that takes relevant parameters and initialises the screw values
+    // Parameters in: initial starting point of the screw (bottom centre), length, blade radius, number of turns,
+    // angular velocity, thickness of the blade.
+    ScrewRectangularSectionClean(const Vec3D& start, Mdouble length, Mdouble bladeRadius, Mdouble shaftRadius,
+                                 Mdouble numberOfTurns, Mdouble omega, Mdouble thickness, bool rightHandeness);
     
-    // Destructor
+    ///\brief Destructor
     ~ScrewRectangularSectionClean();
     
-    // Pointer to a copy of the screw
-    ScrewRectangularSectionClean* copy() const final;
+    ///\brief Copy function: returns a pointer to a new copy of this screw
+    ScrewRectangularSectionClean* copy() const override;
     
     // ----------   SET FUNCTIONS   ----------
-    // Sets the screw parameters
-    void
-    set(Vec3D Start, Mdouble length, Mdouble bladeRadius, Mdouble shaftRadius, Mdouble numberOfTurns, Mdouble omega,
-        Mdouble thickness, bool rightHandeness);
+    ///\brief Function that sets the screw parameters
+    void set(const Vec3D& start, Mdouble length, Mdouble bladeRadius, Mdouble shaftRadius, Mdouble numberOfTurns,
+             Mdouble omega, Mdouble thickness, bool rightHandeness);
     
-    // Sets the screw max radius
+    ///\brief Function that sets the screw max radius, which is the outer radius of the blade
     void setRadius(Mdouble bladeRadius);
     
-    // Sets the screw thickness
+    ///\brief Function that sets the thickness of the screw blade
     void setThickness(Mdouble thickness);
     
-    // Sets the screw angular velocity
+    ///\brief Function that sets the angular velocity of the screw
     void setOmega(Mdouble omega);
     
-    // Sets the angular offset
-    void setOffset(Mdouble off);
+    ///\brief Function that sets the angular offset, i.e. the rotation in z-direction
+    void setOffset(Mdouble offset);
     
     // ----------   GET FUNCTIONS   ------------------------------------------------------
-    // Determines if there is a collision between a BaseParticle P and the screw.
-    // If so, computes the distance between particle centre and collision point and the normal to the latter and
-    // returns true:
-    bool getDistanceAndNormal(const BaseParticle& P, Mdouble& distance, Vec3D& normal_return) const final;
+    ///\brief Function that computes the distance of a BaseParticle to this wall and the normal of this wall if there is a collision.
+    // Returns true if there is a collision
+    bool getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const override;
     
-    // Returns the current angular offset
-    Mdouble getOffset();
+    ///\brief Function that returns the current angular offset, i.e. the rotation in z-direction
+    Mdouble getOffset() const;
     
-    // Returns the right handeness
-    bool getRightHandeness();
+    ///\brief Function that returns the right handeness of the screw
+    bool getRightHandedness() const;
     
     // ----------   ROTATION FUNCTIONS   ------------------------------------------------------
     
-    // Rotates the screw of a period dt, so that the offset_ changes with omega_*dt.
+    ///\brief Function that rotates the screw of a period dt, so that the orientation in z-direction changes with omega_*dt.
     void rotate(Mdouble dt);
     
-    // Increments the angular offset, de facto substituting the move_time function
+    ///\brief Increments the angular offset, de facto substituting the move_time function
     void incrementOffset(Mdouble off);
     
     // ----------------------------------------------------------------------------------------
     
-    // Reads a screw from an input stream, for example a restart file.
+    ///\brief Reads a screw from an input stream, for example a restart file.
     void read(std::istream& is) override;
     
-    //Reads a screw in the old style from an input stream, for example a restart file old style.
+    ///\brief Reads a screw in the old style from an input stream, for example a restart file old style.
     void oldRead(std::istream& is);
     
-    // Writes this screw to an output stream, for example a restart file.
+    ///\brief Writes this screw to an output stream, for example a restart file.
     void write(std::ostream& os) const override;
     
-    // Returns the name of the object, here the string "ScrewRectangularSectionClean".
+    ///\brief Returns the name of the object, here the string "ScrewRectangularSectionClean".
     std::string getName() const final;
-    
+
     // Gets the interaction between this screw and a given BaseParticle at a given time.
     std::vector<BaseInteraction*> getInteractionWith(BaseParticle* p, unsigned timeStamp,
                                                      InteractionHandler* interactionHandler) final;
 
 private:
-    // The centre of the lower end of the screw.
+    ///\brief Auxiliary function for getDistanceAndNormal, this computes the normal vector, radial vector and distance in normal direction to the screw
+    void
+    computeNormalRadialDeltaN(const BaseParticle& p, Vec3D& normalVector, Vec3D& radialVector, Mdouble& deltaN) const;
+
+    ///\brief Auxiliary function for computeNormalRadialDeltaN, computes the oriented axial distance between the particle's centre and the blade centre
+    Mdouble computeDeltaZ(const Vec3D& distanceParticleStart, Mdouble h, Mdouble pitch) const;
+
+    ///\brief The centre of the lower end of the screw.
     Vec3D startPosition_;
-    // The length of the screw.
+
+    ///\brief The length of the screw.
     Mdouble length_;
-    // The screw blade radius.
+
+    ///\brief The outer screw blade radius.
     Mdouble rMax_;
-    // The screw shaft radius.
+
+    ///\brief The screw shaft radius.
     Mdouble rMin_;
-    // The number of turns.
-    Mdouble n_;
-    // Rotation speed in rad/s.
+
+    ///\brief The number of turns.
+    Mdouble numberOfTurns_;
+
+    ///\brief Rotation speed in rad per time unit.
+    ///\todo Can probably removed? \author irana
     Mdouble omega_;
-    // The angle that describes how much the screw has turned.
-    Mdouble offset_;
-    // The thickness of the screw.
+
+    ///\brief The thickness of the screw blade.
     Mdouble thickness_;
-    // The half-thickness of the screw.
-    Mdouble delta_;
-    // The pitch length of the screw (length_/n_).
-    Mdouble pitch_;
-    // The rescaled length of the screw (length_/2*pi*n_).
-    Mdouble h_;
-    // The right handeness of the screw.
-    bool rightHandeness_;
+
+    ///\brief The right handedness of the screw, i.e. the direction of the screw-blade.
+    bool rightHandedness_;
 };
 
 #endif
