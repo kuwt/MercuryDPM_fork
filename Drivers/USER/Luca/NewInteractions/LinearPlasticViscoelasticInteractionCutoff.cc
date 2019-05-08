@@ -215,3 +215,12 @@ Mdouble LinearPlasticViscoelasticInteractionCutoff::getUnloadingStiffness() cons
     else
         return species->getLoadingStiffness() + (species->getUnloadingStiffnessMax() - species->getLoadingStiffness()) * getMaxOverlap()/deltaMaxFluid;
 }
+
+//used for mpi
+LinearPlasticViscoelasticInteractionCutoff::LinearPlasticViscoelasticInteractionCutoff()
+        : BaseInteraction()
+{
+#ifdef DEBUG_CONSTRUCTOR
+    std::cout<<"LinearViscoelasticInteraction::LinearViscoelasticInteraction() finished"<<std::endl;
+#endif
+}

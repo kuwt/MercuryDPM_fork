@@ -1,6 +1,8 @@
 #include "ScrewRectangularSectionClean.h"
 #include "InteractionHandler.h"
 #include "Particles/BaseParticle.h"
+#include "WallHandler.h"
+#include "DPMBase.h"
 
 ///\todo include this drawing in Doxygen comments
 /*

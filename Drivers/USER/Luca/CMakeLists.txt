@@ -1,6 +1,9 @@
 include(${CMAKE_SOURCE_DIR}/Configuration/MasterMake.cmake)
 add_subdirectory(cleanedAlgorithms)
 
+file(GLOB CCFILES  "*.cc")
+
+
 add_library(Luca STATIC
 	NewInteractions/LinearPlasticViscoelasticInteractionCutoff.cc
 	NewInteractions/LinearPlasticViscoelasticNormalSpeciesExtended.cc
@@ -9,6 +12,7 @@ add_library(Luca STATIC
 	DualFeederCasing_TOP.cc
 	ScrewCC.cc
 	CompressionPistonSurface.cc
+	CompressionPiston.cc
 	Helicoid.cc
 	Helicoid02.cc
 	Helicoid03.cc

@@ -49,6 +49,10 @@ public:
    */
    LinearPlasticViscoelasticInteractionCutoff(const LinearPlasticViscoelasticInteractionCutoff &p);
    /*!
+    * Default constructor (for MPI)
+    */
+   LinearPlasticViscoelasticInteractionCutoff();
+    /*!
    * \brief Destructor.
    */
    virtual ~LinearPlasticViscoelasticInteractionCutoff();
