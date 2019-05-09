@@ -5,6 +5,7 @@ file(GLOB CCFILES  "*.cc")
 
 
 add_library(Luca STATIC
+	ScrewAuger.cc
 	NewInteractions/LinearPlasticViscoelasticInteractionCutoff.cc
 	NewInteractions/LinearPlasticViscoelasticNormalSpeciesExtended.cc
 	SphericalEnvelope.cc
