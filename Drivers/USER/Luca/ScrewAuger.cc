@@ -283,10 +283,10 @@ void ScrewAuger::setOffset(Mdouble angularOffset)
 Vec3D ScrewAuger::getCylindricalCoordinate(const Vec3D pInScrewReference) const
 {
     Vec3D pInCylindricalFrame;
-    pInCylindricalFrame.X = std::sqrt(pInScrewReference.X * pInScrewReference.X + pInScrewReference.Y * pInScrewReference.Y);
-    pInCylindricalFrame.Y = atan2(pInScrewReference.Y, pInScrewReference.X);
+    pInCylindricalFrame.X = std::sqrt(pInScrewReference.Y * pInScrewReference.Y + pInScrewReference.Z * pInScrewReference.Z);
+    pInCylindricalFrame.Y = atan2(pInScrewReference.Z, pInScrewReference.Y);
     if (pInCylindricalFrame.Y < 0.0) pInCylindricalFrame.Y += 2.0 * constants::pi;
-    pInCylindricalFrame.Z = pInScrewReference.Z;
+    pInCylindricalFrame.Z = pInScrewReference.X;
 
     return pInCylindricalFrame;
 }
@@ -296,29 +296,29 @@ Vec3D ScrewAuger::getCylindricalCoordinate(const Vec3D pInScrewReference) const
  * \param[in] particle position in cylindrical coordinates with respect to the screw (Vec3D)
  * \return oriented axial distance between particle centre and blade centre (Mdouble)
  */
-Mdouble ScrewAuger::getDeltaZ(const Vec3D pInCylindricalFrame) const
+Mdouble ScrewAuger::getDeltaX(const Vec3D pInCylindricalFrame) const
 {
-    Mdouble deltaZ;
+    Mdouble deltaX;
 
     if (rightHandedness_) // right-handed thread
     {
-        deltaZ = fmod(pInCylindricalFrame.Z - rescaledPitch_*(pInCylindricalFrame.Y + 2.0*constants::pi*static_cast<int>(pInCylindricalFrame.Z/pitch_)) - rescaledPitch_*angularOffset_, pitch_);
+        deltaX = fmod(pInCylindricalFrame.Z - rescaledPitch_*(pInCylindricalFrame.Y + 2.0*constants::pi*static_cast<int>(pInCylindricalFrame.Z/pitch_)) - rescaledPitch_*angularOffset_, pitch_);
     }
     else // left-handed thread
     {
-        deltaZ = fmod(pInCylindricalFrame.Z - rescaledPitch_*(pInCylindricalFrame.Y + 2.0*constants::pi*static_cast<int>(pInCylindricalFrame.Z/pitch_)) - rescaledPitch_*angularOffset_, pitch_);
+        deltaX = fmod(pInCylindricalFrame.Z - rescaledPitch_*(pInCylindricalFrame.Y + 2.0*constants::pi*static_cast<int>(pInCylindricalFrame.Z/pitch_)) - rescaledPitch_*angularOffset_, pitch_);
     }
 
-    if (deltaZ > 0.5*pitch_)
+    if (deltaX > 0.5*pitch_)
     {
-        deltaZ -= pitch_;
+        deltaX -= pitch_;
     }
-    else if (deltaZ < -0.5*pitch_)
+    else if (deltaX < -0.5*pitch_)
     {
-        deltaZ += pitch_;
+        deltaX += pitch_;
     }
 
-    return deltaZ;
+    return deltaX;
 }
 
 /*!
@@ -333,19 +333,19 @@ Vec3D ScrewAuger::getNormalVector(const Vec3D pInScrewReference, const Vec3D pIn
 
     if (rightHandedness_) // right-handed thread
     {
-        normalVector.X = rescaledPitch_ * pInScrewReference.Y/pInCylindricalFrame.X;
-        normalVector.Y = - rescaledPitch_ * pInScrewReference.X/pInCylindricalFrame.X;
-        normalVector.Z = pInCylindricalFrame.X;
+        normalVector.X = pInCylindricalFrame.X;
+        normalVector.Y = rescaledPitch_ * pInScrewReference.Z/pInCylindricalFrame.X;
+        normalVector.Z = - rescaledPitch_ * pInScrewReference.Y/pInCylindricalFrame.X;
     }
     else // left-handed thread
     {
-        normalVector.X = - rescaledPitch_ * pInScrewReference.X/pInCylindricalFrame.X;
-        normalVector.Y = rescaledPitch_ * pInScrewReference.Y/pInCylindricalFrame.X;
-        normalVector.Z = pInCylindricalFrame.X;
+        normalVector.X = pInCylindricalFrame.X;
+        normalVector.Y = - rescaledPitch_ * pInScrewReference.Y/pInCylindricalFrame.X;
+        normalVector.Z = rescaledPitch_ * pInScrewReference.Z/pInCylindricalFrame.X;
     }
 
     // takes the right direction of the vector
-    normalVector *= - getDeltaZ(pInCylindricalFrame);
+    normalVector *= - getDeltaX(pInCylindricalFrame);
     normalVector /= normalVector.getLength();
 
     return normalVector;
@@ -361,9 +361,9 @@ Vec3D ScrewAuger::getRadialVector(const Vec3D pInScrewReference, const Vec3D pIn
 {
     Vec3D radialVector;
 
-    radialVector.X = - pInScrewReference.X/pInCylindricalFrame.X;;
-    radialVector.Y = - pInScrewReference.Y/pInCylindricalFrame.X;;
-    radialVector.Z = 0.0;
+    radialVector.X = 0.0;
+    radialVector.Y = - pInScrewReference.Y/pInCylindricalFrame.X;
+    radialVector.Z = - pInScrewReference.Z/pInCylindricalFrame.X;
 
     return radialVector;
 }
@@ -387,12 +387,12 @@ bool ScrewAuger::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wall
     const Vec3D pInScrewReference = position - screwOrigin_;
 
     // squared radial distance
-    Mdouble rho2 = pInScrewReference.X * pInScrewReference.X + pInScrewReference.Y * pInScrewReference.Y;
+    Mdouble rho2 = pInScrewReference.Y * pInScrewReference.Y + pInScrewReference.Z * pInScrewReference.Z;
 
     // if the particle is outside the cylinder containing the screw there is no collision
     if (rho2 > (bladeRadius_ + wallInteractionRadius) * (bladeRadius_ + wallInteractionRadius) ||
-        pInScrewReference.Z > length_ + wallInteractionRadius ||
-        pInScrewReference.Z < - wallInteractionRadius)
+        pInScrewReference.X > length_ + wallInteractionRadius ||
+        pInScrewReference.X < - wallInteractionRadius)
     {
         return false;
     }
@@ -401,7 +401,7 @@ bool ScrewAuger::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wall
     const Vec3D pInCylindricalScrewReference = getCylindricalCoordinate(pInScrewReference);
 
     // component of the particle-blade_center distance normal to the blade surface
-    const Mdouble deltaN = fabs(getDeltaZ(pInCylindricalScrewReference)) * pInCylindricalScrewReference.X / std::sqrt(pInCylindricalScrewReference.X * pInCylindricalScrewReference.X + rescaledPitch_ * rescaledPitch_) - delta_;
+    const Mdouble deltaN = fabs(getDeltaX(pInCylindricalScrewReference)) * pInCylindricalScrewReference.X / std::sqrt(pInCylindricalScrewReference.X * pInCylindricalScrewReference.X + rescaledPitch_ * rescaledPitch_) - delta_;
 
     // collision check
     if (pInCylindricalScrewReference.X >= bladeRadius_) // check for collision with the blade edge
@@ -417,7 +417,7 @@ bool ScrewAuger::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wall
             distance = deltaR;
 
             // if the distance is negative prints an error message
-            logger.assert(distance < 0.0, "\nCOLLISION ERROR WITH THE SCREW SIDE: OVERLAP > PARTICLE RADIUS, REGION 1");
+            logger.assert(distance >= 0.0, "\nCOLLISION ERROR WITH THE SCREW SIDE: OVERLAP > PARTICLE RADIUS, REGION 1");
 
             // the collision has no other component other than the radial vector
             normal_return = getRadialVector(pInScrewReference, pInCylindricalScrewReference);
@@ -436,7 +436,7 @@ bool ScrewAuger::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wall
                 return false;
 
             // if the distance is negative prints an error message
-            logger.assert(distance < 0.0, "\nCOLLISION ERROR WITH THE SCREW EDGE: OVERLAP > PARTICLE RADIUS, REGION 2");
+            logger.assert(distance >= 0.0, "\nCOLLISION ERROR WITH THE SCREW EDGE: OVERLAP > PARTICLE RADIUS, REGION 2");
 
             // the collision has mixed radial and normal components
             normal_return = deltaN * getNormalVector(pInScrewReference, pInCylindricalScrewReference) + deltaR * getRadialVector(pInScrewReference, pInCylindricalScrewReference);
@@ -457,7 +457,7 @@ bool ScrewAuger::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wall
         distance = deltaN;
 
         // if the distance is negative prints an error message
-        logger.assert(distance < 0.0, "\nCOLLISION ERROR WITH THE SCREW BLADE SURFACE: OVERLAP > PARTICLE RADIUS, REGION 3");
+        logger.assert(distance >= 0.0, "\nCOLLISION ERROR WITH THE SCREW BLADE SURFACE: OVERLAP > PARTICLE RADIUS, REGION 3");
 
         // the collision has no other component other than the normal to the blade
         normal_return = getNormalVector(pInScrewReference, pInCylindricalScrewReference);
@@ -477,7 +477,7 @@ bool ScrewAuger::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wall
             distance = deltaR;
 
             // if the distance is negative prints an error message
-            logger.assert(distance < 0.0, "\nCOLLISION ERROR WITH THE SCREW SHAFT: OVERLAP > PARTICLE RADIUS, REGION 4");
+            logger.assert(distance >= 0.0, "\nCOLLISION ERROR WITH THE SCREW SHAFT: OVERLAP > PARTICLE RADIUS, REGION 4");
 
             // the collision has no other component other than the radial vector
             normal_return = getRadialVector(pInScrewReference, pInCylindricalScrewReference);
@@ -493,7 +493,7 @@ bool ScrewAuger::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wall
             distance = wallInteractionRadius - distance;
 
             // if the distance is negative prints an error message
-            logger.assert(distance < 0.0, "\nCOLLISION ERROR WITH THE SCREW CORNER: OVERLAP > PARTICLE RADIUS, REGION 5");
+            logger.assert(distance >= 0.0, "\nCOLLISION ERROR WITH THE SCREW CORNER: OVERLAP > PARTICLE RADIUS, REGION 5");
 
             // the collision has mixed radial and normal components
             normal_return = fabs(deltaN - wallInteractionRadius) * getNormalVector(pInScrewReference, pInCylindricalScrewReference) + fabs(deltaR - wallInteractionRadius) * getRadialVector(pInScrewReference, pInCylindricalScrewReference);
@@ -582,7 +582,7 @@ void ScrewAuger::incrementOffset(Mdouble angularOffsetIncrement)
  */
 void ScrewAuger::rotate(Mdouble dt)
 {
-    BaseInteractable::rotate({0.0, 0.0, dt*omega_});
+    BaseInteractable::rotate({dt*omega_, 0.0, 0.0});
     incrementOffset(dt*omega_);
 }
 
@@ -729,29 +729,3 @@ void ScrewAuger::writeVTK(std::string filename) const
         file << "5\n";
     helpers::writeToFile(filename, file.str());
 }
-
-///*!
-// * \details Function that checks if a particle p is interacting with the screw at a given time stamp. If getDistanceAndNormal returns true, the particle is interacting with
-// * \param[in] p particle for which is checked if there is an interaction with this screw (BaseParticle)
-// * \param[in] timeStamp time stamp at which the interaction between particle and screw is checked (Mdouble)
-// * \param[in] interactionHandler pointer to the interaction handler (InteractionHandler*)
-// * \param[out] an interaction is added to the interaction handler, containing the particle-screw interaction detected by getDistanceAndNormal (Mdouble)
-// * \return interactions an updated list of all the interactions of particle p at time timeStamp, with the actual screw-particle interaction at the bottom of the list (std::vector<BaseInteraction*>)
-// */
-//std::vector<BaseInteraction *> ScrewAuger::getInteractionWith(BaseParticle* p, Mdouble timeStamp, InteractionHandler* interactionHandler)
-//{
-//    Mdouble distance;
-//    Vec3D normal;
-//    std::vector<BaseInteraction*> interactions;
-//    if (getDistanceAndNormal(*p,distance,normal))
-//    {
-//        BaseInteraction* c = interactionHandler->getInteraction(p, this, timeStamp);
-//        c->setNormal(-normal);
-//        c->setDistance(distance);
-//        c->setOverlap(p->getRadius() - distance);
-//        c->setContactPoint(p->getPosition() - (p->getRadius() - 0.5 * c->getOverlap()) * c->getNormal());
-//        interactions.push_back(c);
-//    }
-//    return interactions;
-//}
-

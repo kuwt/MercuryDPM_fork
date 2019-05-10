@@ -1268,7 +1268,7 @@ int main(int argc, char *argv[])
    double clusterSizeToLatticeRatio = 0.5;
 
    // SHAPE PARAMETERS
-   double axesRatio = 3.0;
+   double axesRatio = 1.0;
    bool parallelFaces = false;
    double maximumFaceAngle = constants::pi/12.0; // 12.0
 

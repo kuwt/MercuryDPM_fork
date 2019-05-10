@@ -116,7 +116,7 @@ public:
      * \param[in] particle position in cylindrical coordinates with respect to the screw (Vec3D)
      * \return oriented axial distance between particle centre and blade centre (Mdouble)
      */
-    Mdouble getDeltaZ(const Vec3D pInCylindricalFrame) const;
+    Mdouble getDeltaX(const Vec3D pInCylindricalFrame) const;
 
     /*!
      * \details Function that returns the normal vector with respect to the blade surface at the particle's position

@@ -4,7 +4,7 @@
 #include <Walls/InfiniteWall.h>
 #include <Boundaries/PeriodicBoundary.h>
 #include <Walls/AxisymmetricIntersectionOfWalls.h>
-#include "Helicoid05.h"
+#include "ScrewAuger.h"
 #include <fstream>
 #include <chrono>
 #include <ctime>
@@ -370,7 +370,7 @@ public:
 
    void makeScrew()
    {
-      Helicoid05 screw;
+      ScrewAuger screw;
 
       screw.setSpecies(speciesWall);
       screw.set(screwOrigin, screwLength, screwBladeRadius, screwShaftRadius, numberOfScrewPitches, screwAngularVelocity[screwVelocityIncrementControlVariable], screwThickness, true);
@@ -555,7 +555,7 @@ public:
    {
       cdatFile <<
       getTime() << "   " <<
-      screwPointer -> getOffset() << "   " <<
+      screwPointer -> getAngularOffset() << "   " <<
       screwAngularVelocity[screwVelocityIncrementControlVariable] << "   " <<
       meanParticleCylindricalPosition.X << "   " <<
       meanParticleCylindricalPosition.Y << "   " <<
@@ -582,7 +582,7 @@ public:
       else
       {
          std::cout << "t = " << std::setprecision(3) << std::left << std::setw(6) << getTime() <<
-         ", theta = " << screwPointer -> getOffset() << ", omega = " << screwAngularVelocity[screwVelocityIncrementControlVariable] <<
+         ", theta = " << screwPointer -> getAngularOffset() << ", omega = " << screwAngularVelocity[screwVelocityIncrementControlVariable] <<
          ", vCyl = " << meanParticleCylindricalVelocity << ", dV/dt = " << volumetricThroughput << ", torque = " << totalTorque << std::endl;
       }
    }
@@ -625,7 +625,7 @@ public:
    int numberOfScrewPitches;
    Vec3D screwOrigin;
    AxisymmetricIntersectionOfWalls *casingPointer;
-   Helicoid05 *screwPointer;
+   ScrewAuger *screwPointer;
 
    // screw operational parameters
    double runtimePerScrewVelocity;
@@ -753,7 +753,7 @@ int main(int argc, char *argv[])
       problem.setScrewOperationalParameters(runtimePerScrewVelocity, nVelocityIncrements, screwAngularVelocity, screwFillingRatio[i]);
 
       problem.setSetupParameters(assumedInitialPackingFraction, settlingBoxToScrewSizeRatio, interParticleLoadingLatticeRelativeDistance);
-      problem.developmentHackParticles(false, 5);
+      problem.developmentHackParticles(true, 5);
 
       // NAME SETTING
       std::ostringstream name;
