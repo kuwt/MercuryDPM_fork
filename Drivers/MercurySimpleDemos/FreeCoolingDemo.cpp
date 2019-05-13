@@ -74,7 +74,7 @@ public:
         wallHandler.copyAndAddObject(w0);
     }
     
-    int N;
+    int N = 1;
 };
 
 int main(int argc UNUSED, char *argv[] UNUSED)
@@ -88,11 +88,12 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 	FreeCoolingDemoProblem problem;
 	problem.setName("FreeCoolingDemo");
 
-    problem.N=1024;
+    problem.N=25;
     problem.setGravity(Vec3D(0.0,0.0,0.0));
     problem.setTimeStep(5e-5);
     problem.setSaveCount(10);
-    problem.setTimeMax(0.05);
+    problem.setTimeMax(1);
+    problem.setMax({0.002,0.002,0.002});
 
     problem.setHGridMaxLevels(1);
 	problem.setHGridCellOverSizeRatio(1.2);
