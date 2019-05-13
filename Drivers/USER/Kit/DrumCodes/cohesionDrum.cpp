@@ -23,7 +23,6 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Particles/BaseParticle.h"
 #include "Species/Species.h"
 #include "Species/NormalForceSpecies/LinearViscoelasticNormalSpecies.h"
 #include "Species/NormalForceSpecies/LinearPlasticViscoelasticNormalSpecies.h"
@@ -236,7 +235,7 @@ public:
         /////////////////////////////////////////////////////////////////////////////////////////////
         
         //Declaring a generalised base particle, not yet assigned species or any other properties
-        BaseParticle P;
+        SphericalParticle P;
                 
         //Counters to keep track of the number of each species already inserted
         //Initialised at zero as no particles initially inserted

@@ -25,7 +25,6 @@
 
 #include "Mercury3D.h"
 #include "StatisticsVector.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <cmath>
 #include <iostream>
@@ -61,7 +60,7 @@ struct MercuryCGSelfTest : public Mercury3D
         speciesHandler.copyAndAddObject(s);
         speciesHandler.copyAndAddObject(s);
 
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setRadius(0.5);
         for (Mdouble x = getXMin()+0.5; x < getXMax(); x++)

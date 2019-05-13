@@ -27,7 +27,6 @@
 #include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
 
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 //#define DEBUG_OUTPUT
 
@@ -93,7 +92,7 @@ public:
     
 
                 //Put the partilces on a grid with small random velocities
-		BaseParticle p0;
+		SphericalParticle p0;
 		
 		unsigned int N=numberOfParticles;
 		double x=particle_radius*1.01;

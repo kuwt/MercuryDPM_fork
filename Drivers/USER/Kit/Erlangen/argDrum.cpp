@@ -215,7 +215,7 @@ public:
         /////////////////////////////////////////////////////////////////////////////////////////////
         
         //Declaring a generalised base particle, not yet assigned species or any other properties
-        BaseParticle P;
+        SphericalParticle P;
                 
         //Counters to keep track of the number of each species already inserted
         //Initialised at zero as no particles initially inserted

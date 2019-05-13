@@ -310,7 +310,12 @@ void File::setLastSavedTimeStep(unsigned int lastSavedTimeStep)
  * \param[in] ntimeSteps
  * \return True or False (a bool)
  */
-bool File::saveCurrentTimeStep(unsigned int ntimeSteps)
+bool File::saveCurrentTimeStep(unsigned int ntimeSteps) {
+    return getFileType() != FileType::NO_FILE && saveCurrentTimeStepNoFileTypeCheck(ntimeSteps);
+}
+
+
+bool File::saveCurrentTimeStepNoFileTypeCheck(unsigned int ntimeSteps)
 {
     /* check:
      * - if this time step should be written
@@ -318,8 +323,7 @@ bool File::saveCurrentTimeStep(unsigned int ntimeSteps)
      * - if file can be opened
      * in that case, change lastSavedTimeStep and return true;
      */
-    if ((lastSavedTimeStep_ == NEVER || ntimeSteps >= lastSavedTimeStep_ + saveCount_)
-        && getFileType() != FileType::NO_FILE)
+    if ((lastSavedTimeStep_ == NEVER || ntimeSteps >= lastSavedTimeStep_ + saveCount_))
     {
         //note: do not do the following at t = 0 because this makes no sense for a logarithm
         if (logarithmicSaveCountBase_ > 1 && ntimeSteps > 0 &&
@@ -331,9 +335,7 @@ bool File::saveCurrentTimeStep(unsigned int ntimeSteps)
             saveCount_ = ceil((logarithmicSaveCountBase_ - 1) * lastSavedTimeStep_);
         }
         return true;
-    }
-    else
-    {
+    } else {
         return false;
     }
 }

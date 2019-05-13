@@ -1,7 +1,6 @@
 //made by irana, 2018
 
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include <iostream>
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include <cstdlib> //needed to be cygwin compatible (system not found)
@@ -19,7 +18,7 @@ public:
     void setupInitialConditions()
     {
         //Add a particle
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         
         

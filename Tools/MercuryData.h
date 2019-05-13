@@ -550,7 +550,7 @@ class MercuryDataFile
     template<std::size_t NDIMS>
     MercuryTimeStepIterator<NDIMS> end() const
     {
-      return {};
+      return nullptr;
     }
   private:
     /*!

@@ -71,7 +71,7 @@ public:
         Mdouble getDistance(const Vec3D& otherPosition) const;
         
         ///Returns true if contact with the face exists, false if not. If contact exists, then the distance and normal is returned as well
-        bool getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const;
+        bool getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return, Mdouble interactionRadius) const;
     };
     
     /*!
@@ -136,7 +136,7 @@ public:
     /*!
      * \brief Get the interaction between this TriangulatedWall and given BaseParticle at a given time.
      */
-    std::vector<BaseInteraction*> getInteractionWith(BaseParticle* p, unsigned timeStamp,
+    BaseInteraction* getInteractionWith(BaseParticle* p, unsigned timeStamp,
                                                      InteractionHandler* interactionHandler) override;
 
 private:

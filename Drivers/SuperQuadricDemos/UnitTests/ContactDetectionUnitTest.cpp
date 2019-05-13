@@ -62,7 +62,6 @@ private:
         p1->setOrientationViaNormal({1.0, 0.0, 0.0});
         particleHandler.addObject(p0);
         particleHandler.addObject(p1);
-        p1;
     }
     
     ///\todo For each contact, check position, overlap and normal
@@ -70,22 +69,22 @@ private:
     {
         setupParticles();
         auto C = p0->getInteractionWith(p1, 0, &interactionHandler);
-        logger.assert_always(C.empty(), "Spheres far away should not touch");
+        logger.assert_always(C==nullptr, "Spheres far away should not touch");
         p1->setPosition({1.99, 0, 0});
         C = p0->getInteractionWith(p1, 0, &interactionHandler);
-        logger.assert_always(!C.empty(), "Spheres close together should touch");
+        logger.assert_always(C!=nullptr, "Spheres close together should touch");
         p1->setOrientationViaNormal({0, 1.0, 0});
         C = p0->getInteractionWith(p1, 0, &interactionHandler);
-        logger.assert_always(!C.empty(), "Rotated spheres close together should touch");
+        logger.assert_always(C!=nullptr, "Rotated spheres close together should touch");
         p1->setPosition({3.0, 0, 0});
         C = p0->getInteractionWith(p1, 0, &interactionHandler);
-        logger.assert_always(C.empty(), "Rotated spheres far away should not touch");
+        logger.assert_always(C==nullptr, "Rotated spheres far away should not touch");
         p1->setVelocity({-3.0, 0, 0});
         C = p0->getInteractionWith(p1, 0, &interactionHandler);
-        logger.assert_always(C.empty(), "Moving spheres far away should not touch");
+        logger.assert_always(C==nullptr, "Moving spheres far away should not touch");
         p1->setPosition({1.99, 0, 0});
         C = p0->getInteractionWith(p1, 0, &interactionHandler);
-        logger.assert_always(!C.empty(), "Moving spheres close together should touch");
+        logger.assert_always(C!=nullptr, "Moving spheres close together should touch");
         cleanup();
     }
     
@@ -97,28 +96,28 @@ private:
         p1->setAxes(2, 1, 1);
     
         auto C = p0->getInteractionWith(p1, 0, &interactionHandler);
-        logger.assert_always(C.empty(), "Ellipsoids far away should not touch");
+        logger.assert_always(C==nullptr, "Ellipsoids far away should not touch");
         logger.assert_always(!p0->isInContactWith(p1), "isInContactWith: Ellipsoids far away");
         p1->setPosition({3.99, 0, 0});
         C = p0->getInteractionWith(p1, 0, &interactionHandler);
-        logger.assert_always(!C.empty(), "Ellipsoids close together should touch");
+        logger.assert_always(C!=nullptr, "Ellipsoids close together should touch");
         logger.assert_always(p0->isInContactWith(p1), " isInContactWith: Ellipsoids close together should touch");
         p1->setOrientationViaNormal({0,1,0});
         C = p0->getInteractionWith(p1, 0, &interactionHandler);
-        logger.assert_always(C.empty(), "Rotated ellipsoid with normal ellipsoid far away should not touch");
+        logger.assert_always(C==nullptr, "Rotated ellipsoid with normal ellipsoid far away should not touch");
         p1->setPosition({2.99, 0, 0});
         C = p0->getInteractionWith(p1, 0, &interactionHandler);
-        logger.assert_always(!C.empty(), "One rotated ellipsoid with normal ellipsoid close together should touch");
+        logger.assert_always(C!=nullptr, "One rotated ellipsoid with normal ellipsoid close together should touch");
         p0->setOrientationViaNormal({0, 0, 1});
         C = p0->getInteractionWith(p1, 0, &interactionHandler);
-        logger.assert_always(C.empty(), "Rotated ellipsoids  far away should not touch");
+        logger.assert_always(C==nullptr, "Rotated ellipsoids  far away should not touch");
         p1->setPosition({1.99, 0, 0});
         C = p0->getInteractionWith(p1, 0, &interactionHandler);
-        logger.assert_always(!C.empty(), "Rotated ellipsoids close together should touch");
+        logger.assert_always(C!=nullptr, "Rotated ellipsoids close together should touch");
         p0->setOrientationViaNormal({1,0,0});
         p1->setPosition({1.99, -1.99, 0});
         C = p0->getInteractionWith(p1, 0, &interactionHandler);
-        logger.assert_always(!C.empty(), "One rotated ellipsoid with normal ellipsoid close together should touch");
+        logger.assert_always(C!=nullptr, "One rotated ellipsoid with normal ellipsoid close together should touch");
         cleanup();
     }
     

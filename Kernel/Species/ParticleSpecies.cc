@@ -260,3 +260,24 @@ Mdouble ParticleSpecies::getSmallestParticleMass() const
 #endif
 
 }
+
+/**
+ * \details Sets #maxInteractionDistance_
+ * @param interactionDistance the interaction distance that has been changed
+ */
+void ParticleSpecies::setMaxInteractionDistance(Mdouble interactionDistance) {
+    // if maxInteractionDistance_ has increased it's simple
+    if (interactionDistance>=maxInteractionDistance_) {
+        maxInteractionDistance_ = interactionDistance;
+    } else /*else we need to recompute*/ {
+        maxInteractionDistance_ = 0;
+        int j = getIndex();
+        for (int i=0; i<getHandler()->getSize(); ++i) {
+            maxInteractionDistance_ = std::max(maxInteractionDistance_,getHandler()->getMixedObject(i,j)->getInteractionDistance());
+        }
+    }
+}
+
+const BaseSpecies* ParticleSpecies::getMixedSpecies(const ParticleSpecies* s) const {
+    return (getIndex()==s->getIndex())?this:getHandler()->getMixedObject(getIndex(),s->getIndex());
+}

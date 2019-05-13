@@ -28,7 +28,6 @@
 #include "Mercury3D.h"
 #include "Boundaries/ShearBoxBoundary.h"
 #include "Boundaries/PeriodicBoundary.h"
-#include "Particles/BaseParticle.h"
 #include "Species/LinearViscoelasticSlidingFrictionSpecies.h"
 #include "StatisticsVector.h"
 #include "Walls/InfiniteWall.h"
@@ -79,7 +78,7 @@ public:
 
         unsigned N=bulkVolumeFraction*boxHeight*boxLength*boxWidth/species->getVolumeFromRadius(particleRadius);
         logger(INFO,"Adding % particles", N);
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(species);
         p.setRadius(particleRadius);
         Vec3D position;

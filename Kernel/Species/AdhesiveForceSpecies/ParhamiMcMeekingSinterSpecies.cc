@@ -101,9 +101,3 @@ void ParhamiMcMeekingSinterSpecies::mix(ParhamiMcMeekingSinterSpecies* const S, 
 //    adhesionForceMax_ = average(S->getAdhesionForceMax(), T->getAdhesionForceMax());
 //    adhesionStiffness_ = average(S->getAdhesionStiffness(), T->getAdhesionStiffness());
 }
-
-///\return the maximum separation distance below which adhesive forces can occur (needed for contact detection)
-Mdouble ParhamiMcMeekingSinterSpecies::getInteractionDistance() const
-{
-    return 0.0;
-}

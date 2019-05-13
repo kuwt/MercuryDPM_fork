@@ -9,9 +9,7 @@
 #include "Walls/InfiniteWall.h"
 #include "Walls/AxisymmetricIntersectionOfWalls.h"
 #include "Walls/IntersectionOfWalls.h"
-#include "Particles/BaseParticle.h"
-
-//NOTE: power function for squared numbers can be replaced with: mathsFunc::square(x), mathsFunc::cubic(x) 
+//NOTE: power function for squared numbers can be replaced with: mathsFunc::square(x), mathsFunc::cubic(x)
 
 using namespace std;	
 
@@ -42,7 +40,7 @@ CinderDriver()
 
 // **************** Define smallest and largest BaseParticles possible based on user-set initial conditions ********************//
 BaseParticle* getSmallestParticle(){
-	BaseParticle P0;
+	SphericalParticle P0;
 	P0.setRadius(getMinParticleRadius());
 	BaseParticle* Pp=&P0;
 	return Pp;
@@ -50,7 +48,7 @@ BaseParticle* getSmallestParticle(){
 
 
 BaseParticle* getLargestParticle(){
-	BaseParticle P0;
+	SphericalParticle P0;
 	P0.setRadius(getMaxParticleRadius());
 	BaseParticle* Pp=&P0;
 	return Pp;
@@ -123,7 +121,7 @@ void setupInitialConditions(){
         
         
     //   actionsBeforeTimeStep();          UNCOMMENT TO RUN XBALLS!!
-    //   BaseParticle P0;
+    //   SphericalParticle P0;
     //   P0.setPosition(Vec3D(45,45,700));
     //   P0.setRadius(getMinParticleRadius());
     //   particleHandler.copyAndAddObject(P0);
@@ -154,7 +152,7 @@ void setupInitialConditions(){
 			        int i=0;
 			
 			        while (i<getEjectionRate()*getBurstTime()) {
-        	            BaseParticle P0;
+        	            SphericalParticle P0;
 			            P0.setRadius(calcParticleRadiusPower());                                                // set particle radius
   	    	            P0.setPosition(calcParticlePositionBubble(getVentElevation()-P0.getRadius()));  // set position in 3 dimensions  	
     		            P0.setVelocity(calcVelocityBurstDecay(P0.getRadius(),P0.getPosition()));    			// set 3D velocity

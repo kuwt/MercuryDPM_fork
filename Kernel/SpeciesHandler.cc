@@ -752,6 +752,7 @@ void SpeciesHandler::addObject(ParticleSpecies* const S)
     BaseHandler<ParticleSpecies>::addObject(S);
     //logger(INFO, "Part / Mix: % / %", objects_.size(), mixedObjects_.size());
     ///\todo TW don't put logger messages that only make sense for one application!
+    S->setHandler(this);
     for (unsigned int id = 0; id + 1 < getNumberOfObjects(); ++id)
     {
         mixedObjects_.push_back(S->copyMixed());
@@ -759,9 +760,9 @@ void SpeciesHandler::addObject(ParticleSpecies* const S)
         mixedObjects_.back()->setId(getNumberOfObjects() - 1);
         mixedObjects_.back()->mixAll(S, getObject(id));
     }
-    S->setHandler(this);
     getDPMBase()->particleHandler.computeAllMasses(S->getIndex());
     getDPMBase()->setRotation(useAngularDOFs());
+    S->setMaxInteractionDistance(S->getInteractionDistance());
 }
 
 /*!

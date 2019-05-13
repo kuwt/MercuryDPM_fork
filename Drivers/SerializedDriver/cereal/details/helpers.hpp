@@ -438,7 +438,7 @@ namespace cereal
         std::unique_ptr<Base> clone() const
         {
           if( itsPtr ) return itsPtr->clone();
-          else return {};
+          else return nullptr;
         }
 
       private:

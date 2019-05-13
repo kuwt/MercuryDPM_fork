@@ -145,7 +145,7 @@ class DrumRot : public Mercury3D
 		w0.set(Vec3D(0.,1.,0.),Vec3D(drumCenter.X,getYMax(),drumCenter.Z));
 		wallHandler.copyAndAddObject(w0);
 
-		BaseParticle p0;
+		SphericalParticle p0;
 		double radius = 0.0;
 		int numS1Inserted=0;
 		int numS2Inserted=0;

@@ -47,7 +47,7 @@ public:
         {
             ///\todo make a more sensible logger message
             logger(VERBOSE, "hello % : %", getTime(), getTime() + getTimeStep());
-            BaseParticle p0;
+            SphericalParticle p0;
             p0.setSpecies(speciesHandler.getObject(0));
             p0.setRadius(0.0015);
             Vec3D pos;
@@ -104,7 +104,7 @@ public:
         wallHandler.copyAndAddObject(w0);
 
         // Initial particle position and velocity
-        BaseParticle p0;
+        SphericalParticle p0;
         Vec3D pos;
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setRadius(0.0015);

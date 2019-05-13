@@ -28,7 +28,6 @@
 #include "Boundaries/CubeInsertionBoundary.h"
 #include "Boundaries/ChuteInsertionBoundary.h"
 #include "Boundaries/HopperInsertionBoundary.h"
-#include "Particles/BaseParticle.h"
 #include "Species/LinearViscoelasticSpecies.h"
 #include "Walls/InfiniteWall.h"
 
@@ -61,7 +60,7 @@ public:
         setTimeMax(1);
         setHGridMaxLevels(2);
 
-        BaseParticle* insertionBoundaryParticle = new BaseParticle;
+        BaseParticle* insertionBoundaryParticle = new SphericalParticle;
         insertionBoundaryParticle->setSpecies(speciesHandler.getObject(0));
 
         //CubeInsertionBoundary

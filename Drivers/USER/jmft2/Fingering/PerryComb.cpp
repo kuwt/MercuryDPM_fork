@@ -8,7 +8,6 @@
 #include "Walls/Combtooth.h"
 #include "Boundaries/DeletionBoundary.h"
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Math/RNG.h"
 #include <iostream>
 #include <fstream>
@@ -174,7 +173,7 @@ class PerryComb : public Mercury3D {
     }
 
     void setupInitialConditions() {
-      BaseParticle p0;
+      SphericalParticle p0;
 
       /* Set up moving particles */
       int NSmallParticle = 0, NLargeParticle = 0;

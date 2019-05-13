@@ -27,7 +27,6 @@
 #include "Mercury3D.h"
 #include "Boundaries/PolydisperseInsertionBoundary.h"
 #include "Boundaries/PeriodicBoundary.h"
-#include "Particles/BaseParticle.h"
 #include "Species/LinearViscoelasticSpecies.h"
 #include "Walls/InfiniteWall.h"
 
@@ -69,10 +68,10 @@ public:
                 4./3. * constants::pi * pow(radB, 3));
         speciesHandler.copyAndAddObject(specB);
 
-        auto genA = new BaseParticle();
+        auto genA = new SphericalParticle();
         genA->setSpecies(speciesHandler.getObject(0));
         genA->setRadius(radA);
-        auto genB = new BaseParticle();
+        auto genB = new SphericalParticle();
         genB->setSpecies(speciesHandler.getObject(1));
         genB->setRadius(radB);
 

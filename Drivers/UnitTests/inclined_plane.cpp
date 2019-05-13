@@ -24,7 +24,6 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DPMBase.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <iostream>
 #include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
@@ -38,7 +37,7 @@ public:
 		w0.set(Vec3D(0,-1,0),Vec3D(0, getYMin(), 0));
 		wallHandler.copyAndAddObject(w0);
 		
-		BaseParticle p0; //important
+		SphericalParticle p0; //important
         p0.setSpecies(speciesHandler.getObject(0));
 		p0.setRadius(0.005);
 		p0.setPosition(Vec3D((getXMin()+getXMax())/2.0,getYMin()+p0.getRadius(),0));

@@ -40,6 +40,7 @@ BaseSpecies::BaseSpecies()
 {
     handler_ = nullptr;
     constantRestitution_ = false;
+    interactionDistance_ = 0;
     logger(DEBUG, "BaseSpecies::BaseSpecies() finished");
 }
 
@@ -51,6 +52,7 @@ BaseSpecies::BaseSpecies(const BaseSpecies& p)
 {
     handler_ = p.handler_;
     constantRestitution_ = p.constantRestitution_;
+    interactionDistance_ = p.interactionDistance_;
     logger(DEBUG, "BaseSpecies::BaseSpecies(const BaseSpecies &p) finished");
 }
 
@@ -127,4 +129,39 @@ void BaseSpecies::setConstantRestitution(bool constantRestitution) {
     dynamic_cast<LinearPlasticViscoelasticNormalSpecies*>(this)!= nullptr,
     "ConstantRestitution is currently only implemented for the plastic contact law");
     constantRestitution_ = constantRestitution;
+}
+
+/**
+ * Sets BaseSpecies::interactionDistance_.
+ * This function should not be called by the user, only by functions in classes derived from BaseSpecies (in particular, the adhesive-force species).
+ * This function gets called every time a variable is set on which the interaction distance depends.
+ * See for example LiquidBridgeWilletSpecies::setLiquidBridgeVolume.
+ * @param interactionDistance
+ */
+void BaseSpecies::setInteractionDistance(Mdouble interactionDistance) {
+    interactionDistance_ = interactionDistance;
+    
+    SpeciesHandler* handler = getHandler();
+    if (handler == nullptr) return;
+    
+    for (auto mixedSpecies : handler->getMixedObjects()) {
+        if (mixedSpecies == this) {
+            // get the two particlespecies id's
+            unsigned mixedId = mixedSpecies->getIndex();
+            unsigned maxId= 1;
+            unsigned maxMixedId = (maxId * (maxId + 1)) / 2;
+            while (maxMixedId<mixedId) {
+                ++maxId;
+                maxMixedId = (maxId * (maxId + 1)) / 2;
+            }
+            unsigned minId = (mixedId + maxId) - maxMixedId;
+            handler->getObject(minId)->setMaxInteractionDistance(interactionDistance);
+            handler->getObject(maxId)->setMaxInteractionDistance(interactionDistance);
+            //logger(INFO,"setInteractionDistance(%) mixed % handler %",interactionDistance, getIndex(), getHandler());
+            return;
+        }
+    }
+    handler->getObject(getId())->setMaxInteractionDistance(interactionDistance);
+    
+    //logger(INFO,"setInteractionDistance(%) species % handler %",interactionDistance, getIndex(), getHandler());
 }

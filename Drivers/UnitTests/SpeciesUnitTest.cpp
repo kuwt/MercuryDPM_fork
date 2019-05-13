@@ -24,7 +24,6 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include <cmath>
 #include <Species/LinearViscoelasticSpecies.h>
 
@@ -59,7 +58,7 @@ public:
 
         auto species1 = speciesHandler.copyAndAddObject(species0);
 
-        BaseParticle P0, P1, P2, P3, P4, P5;
+        SphericalParticle P0, P1, P2, P3, P4, P5;
         P0.setSpecies(speciesHandler.getObject(0));
         P1.setSpecies(speciesHandler.getObject(0));
         P2.setSpecies(speciesHandler.getObject(0));

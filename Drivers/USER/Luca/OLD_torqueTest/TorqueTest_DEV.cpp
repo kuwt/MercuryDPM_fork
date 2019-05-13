@@ -598,7 +598,7 @@ public:
     Vec3D latticeParticlePosition;
     pistonLatticeParticleCounter = 0;
 
-    BaseParticle p0;
+    SphericalParticle p0;
     p0.setRadius(radiusBig);
     p0.setVelocity(Vec3D(0.0,0.0,pistonMaximumVelocity));
     p0.setSpecies(speciesPiston);
@@ -657,7 +657,7 @@ public:
     effectivePistonHeight = pistonHeight - totalParticlesSphericalCapVolume/(3.0*pow(casingRadius,2.0));
     pistonMaximumVelocity = 0.0001*radiusSmall*pistonVelocityScalingFactor*(1.0 - sizeDispersitySmall)/getTimeStep();
 
-    BaseParticle p0;
+    SphericalParticle p0;
     p0.setVelocity(Vec3D(0.0,0.0,pistonMaximumVelocity));
     p0.setSpecies(speciesPiston);
 
@@ -717,7 +717,7 @@ public:
   //// needs this value tor escale all teh position of the particles accordingly
   //double particlePistonVerticalShift = samplingHeight - lowerEdgeSampledParticles;
 
-  //BaseParticle p0;
+  //SphericalParticle p0;
   //p0.setVelocity(Vec3D(0.0,0.0,pistonMaximumVelocity));
   //p0.setSpecies(speciesPiston);
 

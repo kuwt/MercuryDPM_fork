@@ -179,6 +179,8 @@ public:
     
     Vec3D getMomentum() const;
     
+    Vec3D getAngularMomentum() const;
+    
     Mdouble getVolume() const;
     
     Mdouble getMeanRadius() const;
@@ -446,8 +448,6 @@ private:
     Mdouble getVolumeLocal() const;
     
     Vec3D getMassTimesPositionLocal() const;
-    
-    Vec3D getMomentumLocal() const;
     
     Mdouble getSumRadiusLocal() const;
     

@@ -141,7 +141,7 @@ public:
         
         
         // CREATE THE PARTICLES
-        BaseParticle P0;
+        SphericalParticle P0;
         while ((Ns > 0) || (Nl > 0))
         {
             
@@ -200,7 +200,7 @@ public:
         std::cout << "Restarting and adding " << Ns << " small particles and " << Nl <<" large particles" << std::endl;
         
         
-        BaseParticle P0;
+        SphericalParticle P0;
         while ((Ns > 0) || (Nl > 0))
         {
             

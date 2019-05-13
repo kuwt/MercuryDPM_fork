@@ -24,7 +24,6 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <iostream>
 #include "Species/LinearViscoelasticFrictionSpecies.h"
@@ -52,7 +51,7 @@ public:
         boundaryHandler.copyAndAddObject(b0);
     
         //Add a particles
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
         p0.setRadius(1.0);

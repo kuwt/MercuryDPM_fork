@@ -25,7 +25,6 @@
 
 #include "Mercury3D.h"
 #include "HGridOptimiser.h"
-#include "Particles/BaseParticle.h"
 #include <iostream>
 #include <vector>
 #include "Species/LinearViscoelasticSpecies.h"
@@ -56,7 +55,7 @@ public:
             setZMax(L);
 
             particleHandler.setStorageCapacity(2*N);
-            BaseParticle p0;
+            SphericalParticle p0;
             p0.setVelocity(Vec3D(0.0,0.0,0.0));
 
             double V=0;

@@ -26,7 +26,6 @@
 #include "Mercury3D.h"
 #include "Math/ExtendedMath.h"
 #include "Species/HertzianViscoelasticMindlinSpecies.h"
-
 class HertzContactRestitutionUnitTest : public DPMBase
 {
 public:
@@ -36,9 +35,9 @@ public:
         species.setElasticModulusAndRestitutionCoefficient(20000, 0.8);
         speciesHandler.copyAndAddObject(species);
         
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
-        BaseParticle p1 = *(p0.copy());
+        SphericalParticle p1 = *(p0.copy());
         
         p0.setPosition(Vec3D(0, 0.0, 0.0));
         p1.setPosition(Vec3D(3, 0.0, 0.0));

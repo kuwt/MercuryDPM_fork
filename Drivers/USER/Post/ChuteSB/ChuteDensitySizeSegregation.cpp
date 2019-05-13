@@ -31,7 +31,6 @@
 //This code is based of chute
 #include "Chute.h"
 #include "Boundaries/PeriodicBoundary.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 
 #include <sys/types.h>
@@ -403,7 +402,7 @@ double radius_1;
 double radius_2;
 int N_1;
 int N_2;
-BaseParticle inflowParticle_;
+SphericalParticle inflowParticle_;
 double sizeRatio;
 double densityRatio;
 

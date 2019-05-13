@@ -123,7 +123,7 @@ void RestrictedWall::set(BaseWall* wall, InfiniteWall* restriction)
  */
 bool RestrictedWall::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const
 {
-    if (restriction_->getDistance(p.getPosition()) < p.getWallInteractionRadius())
+    if (restriction_->getDistance(p.getPosition()) < p.getWallInteractionRadius(this))
         return wall_->getDistanceAndNormal(p, distance, normal_return);
     else
         return false;
@@ -166,10 +166,10 @@ std::string RestrictedWall::getName() const
  * and the BaseParticle at the timeStamp.
  */
 ///\todo Shouldn't this function be defined in BaseWall?
-std::vector<BaseInteraction*>
+BaseInteraction*
 RestrictedWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler)
 {
-    if (restriction_->getDistance(p->getPosition()) < p->getWallInteractionRadius())
+    if (restriction_->getDistance(p->getPosition()) < p->getWallInteractionRadius(this))
     {
         ///\todo{setting the index of the wall is necessary to get the right index reported in fstat; however, the better way would be to make setIndex virtual.}
         wall_->setIndex(getIndex());
@@ -177,7 +177,7 @@ RestrictedWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, Interact
     }
     else
     {
-        return std::vector<BaseInteraction*>();
+        return nullptr;
     }
 }
 

@@ -189,9 +189,9 @@ ScrewTriangularSectionClean::getDistanceAndNormal(const BaseParticle& p, Mdouble
     Mdouble rho2 = pow(p.getPosition().X - start_.X, 2) + pow(p.getPosition().Y - start_.Y, 2);
     
     // if the particle is outside the cylinder containing the screw there is no collision
-    if (rho2 > pow(rMax_ + p.getWallInteractionRadius(), 2)) return false;
-    if (p.getPosition().Z > l_ + start_.Z + p.getWallInteractionRadius()) return false;
-    if (p.getPosition().Z < start_.Z - p.getWallInteractionRadius()) return false;
+    if (rho2 > pow(rMax_ + p.getWallInteractionRadius(this), 2)) return false;
+    if (p.getPosition().Z > l_ + start_.Z + p.getWallInteractionRadius(this)) return false;
+    if (p.getPosition().Z < start_.Z - p.getWallInteractionRadius(this)) return false;
     
     // radial position of the particle
     Mdouble rho = sqrt(rho2);
@@ -230,8 +230,8 @@ ScrewTriangularSectionClean::getDistanceAndNormal(const BaseParticle& p, Mdouble
     Mdouble cosGamma = 1.0 / sqrt(1.0 + pow(lambda, 2));
     
     // if the particle-blade_surface distance is higher than the collision threshold there is no collision
-//    if ((deltaN + lambda*rho)*cosGamma > p.getWallInteractionRadius()) return false;
-    if ((deltaN + lambda * deltaR) * cosGamma > p.getWallInteractionRadius())
+//    if ((deltaN + lambda*rho)*cosGamma > p.getWallInteractionRadius(this)) return false;
+    if ((deltaN + lambda * deltaR) * cosGamma > p.getWallInteractionRadius(this))
         return false;
     
     
@@ -279,7 +279,7 @@ ScrewTriangularSectionClean::getDistanceAndNormal(const BaseParticle& p, Mdouble
         distance = sqrt(pow(deltaN, 2) + pow(deltaR, 2));
         
         // if the particle-blade_edge distance is higher than the particle radius there is no collision
-        if (distance > p.getWallInteractionRadius()) return false;
+        if (distance > p.getWallInteractionRadius(this)) return false;
         
         // if the distance is negative prints an error message
         if (distance < 0.0) std::cout << "\nCOLLISION ERROR WITH THE SCREW EDGE: OVERLAP > PARTICLE RADIUS\n";

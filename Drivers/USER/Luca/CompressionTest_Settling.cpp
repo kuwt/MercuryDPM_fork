@@ -960,7 +960,7 @@ public:
    LinearPlasticViscoelasticFrictionSpecies *speciesBig, *speciesSmall, *speciesWall;
    InfiniteWall basis, roof;
    AxisymmetricIntersectionOfWalls casing;
-   BaseParticle p0;
+   SphericalParticle p0;
 
    // global variables
    bool verbose;

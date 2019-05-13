@@ -110,11 +110,11 @@ bool SphericalEnvelope::getDistanceAndNormal(const BaseParticle& p, Mdouble& dis
    Mdouble r_P = (p.getPosition() - start_).getLength();
 
    // collision check
-   if (r_P > r_ - p.getWallInteractionRadius()) // collision
+   if (r_P > r_ - p.getWallInteractionRadius(this)) // collision
    {
       distance = r_ - r_P;
       // this error check allows for unphysical compressions up to twice the particle radius due to the heavy compression needed
-      // if (distance < - p.getWallInteractionRadius()) std::cout << std::endl << "COLLISION ERROR WITH THE SPHERICAL SURFACE" << std::endl;
+      // if (distance < - p.getWallInteractionRadius(this)) std::cout << std::endl << "COLLISION ERROR WITH THE SPHERICAL SURFACE" << std::endl;
 
       normal_return = p.getPosition()/r_P;
 

@@ -1419,7 +1419,7 @@ bool StatisticsVector<T>::read_next_from_p3p_file()
     //reset the size of the particle handler
     if (particleHandler.getNumberOfObjects() < N)
     {
-        BaseParticle P0;
+        SphericalParticle P0;
         P0.setSpecies(speciesHandler.getLastObject());
         while (particleHandler.getNumberOfObjects() < N)
         {
@@ -2399,8 +2399,8 @@ void StatisticsVector<T>::gather_force_statistics_from_fstat_and_data()
     static Vec3D Contact;
     static Mdouble delta, ctheta, fdotn, fdott;
     static Vec3D P1_P2_normal_, P1_P2_tangential;
-    static BaseParticle PI;
-    static BaseParticle PJ;
+    static SphericalParticle PI;
+    static SphericalParticle PJ;
     
     int counter = 0;
     //go through each line in the fstat file; break when eof or '#' or newline
@@ -2615,7 +2615,8 @@ void StatisticsVector<T>::evaluate_particle_statistics(std::vector<BaseParticle*
             if (b != nullptr)
             {
                 Mdouble dist = b->getDistance(P1);
-                if (mathsFunc::square(dist - (*P)->getInteractionRadius()) < getCutoff2())
+                ///\todo TW why is it interaction radius?
+                if (mathsFunc::square(dist - (*P)->getMaxInteractionRadius()) < getCutoff2())
                 {
                     b->shiftPosition(*P);
                     evaluate_particle_statistics(P, k + 1);
@@ -2626,7 +2627,7 @@ void StatisticsVector<T>::evaluate_particle_statistics(std::vector<BaseParticle*
             if (c != nullptr)
             {
                 Mdouble dist = c->distance(P1);
-                if (mathsFunc::square(dist - (*P)->getInteractionRadius()) < getCutoff2())
+                if (mathsFunc::square(dist - (*P)->getMaxInteractionRadius()) < getCutoff2())
                 {
                     c->shiftPosition(*P);
                     evaluate_particle_statistics(P, k + 1);

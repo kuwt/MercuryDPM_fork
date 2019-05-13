@@ -28,7 +28,6 @@
 #include <Boundaries/CubeInsertionBoundary.h>
 #include <Boundaries/PeriodicBoundary.h>
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 using constants::pi;
 using mathsFunc::cubic;

@@ -28,7 +28,6 @@
 
 #include "DPMBase.h"
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 
 class my_problem : public Mercury3D
@@ -66,7 +65,7 @@ public:
         wallHandler.copyAndAddObject(w0);
 
         //Put the particles on a grid with small random velocities
-        BaseParticle p0;
+        SphericalParticle p0;
 
         N = 2500;
         double x = 0.6;

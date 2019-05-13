@@ -30,6 +30,7 @@ ReversibleAdhesiveSpecies::ReversibleAdhesiveSpecies()
 {
     adhesionForceMax_ = 0;
     adhesionStiffness_ = 0;
+    //interaction distance not yet determined
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"ReversibleAdhesiveSpecies::ReversibleAdhesiveSpecies() finished"<<std::endl;
 #endif
@@ -93,31 +94,18 @@ void ReversibleAdhesiveSpecies::mix(ReversibleAdhesiveSpecies* const S, Reversib
 }
 
 ///\return the maximum separation distance below which adhesive forces can occur (needed for contact detection)
-Mdouble ReversibleAdhesiveSpecies::getInteractionDistance() const
+void ReversibleAdhesiveSpecies::setInteractionDistance()
 {
-    if (adhesionStiffness_ != 0.0)
-        return adhesionForceMax_ / adhesionStiffness_;
-    else if (adhesionForceMax_ == 0.0)
-    {
-        return 0.0;
-    }
-    else
-    {
-        logger(ERROR, "ReversibleAdhesiveSpecies::getInteractionDistance(): adhesionStiffness cannot be zero");
-        return 0.0;
-    }
+    logger.assert(adhesionStiffness_ != 0.0,"ReversibleAdhesiveSpecies::getInteractionDistance(): adhesionStiffness cannot be zero");
+    BaseSpecies::setInteractionDistance(adhesionForceMax_ / adhesionStiffness_);
 }
 
 ///Allows the spring constant to be changed
-void ReversibleAdhesiveSpecies::setAdhesionStiffness(Mdouble new_k0)
+void ReversibleAdhesiveSpecies::setAdhesionStiffness(Mdouble adhesionStiffness)
 {
-    if (new_k0 >= 0)
-        adhesionStiffness_ = new_k0;
-    else
-    {
-        std::cerr << "Error in setAdhesionStiffness" << std::endl;
-        exit(-1);
-    }
+    logger.assert(adhesionStiffness >= 0,"Error in setAdhesionStiffness");
+    adhesionStiffness_ = adhesionStiffness;
+    setInteractionDistance();
 }
 
 ///Allows the spring constant to be accessed
@@ -127,15 +115,11 @@ Mdouble ReversibleAdhesiveSpecies::getAdhesionStiffness() const
 }
 
 ///Allows the spring constant to be changed
-void ReversibleAdhesiveSpecies::setAdhesionForceMax(Mdouble new_f0)
+void ReversibleAdhesiveSpecies::setAdhesionForceMax(Mdouble adhesionForceMax)
 {
-    if (new_f0 >= 0)
-        adhesionForceMax_ = new_f0;
-    else
-    {
-        std::cerr << "Error in setBondForceMax" << std::endl;
-        exit(-1);
-    }
+    logger.assert(adhesionForceMax >= 0,"Error in setAdhesionForceMax");
+    adhesionForceMax_ = adhesionForceMax;
+    setInteractionDistance();
 }
 
 ///Allows the spring constant to be accessed

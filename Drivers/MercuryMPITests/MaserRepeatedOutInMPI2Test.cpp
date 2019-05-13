@@ -62,7 +62,7 @@ public:
     
     void setupInitialConditions() override {
         //Start with just one particle, which moves out, in, out of maser-boundary
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getLastObject());
         p0.setPosition({19,3,0});
         p0.setVelocity({1,1,0});

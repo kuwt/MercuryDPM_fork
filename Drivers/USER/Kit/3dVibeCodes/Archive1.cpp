@@ -53,7 +53,7 @@ public:
 	   //p1.set(Vec3D(1,0,0),getXMin(),getXMax());
 	   //boundaryHandler.copyAndAddObject(p1);
 		
-	  BaseParticle p0;
+	  SphericalParticle p0;
 	  //declaring a 3D vector named 'position' to (unsurprisingly)
 	  //set up the initial positions of particles
 	  Vec3D position;

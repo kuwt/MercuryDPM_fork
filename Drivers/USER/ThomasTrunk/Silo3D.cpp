@@ -24,7 +24,6 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "Walls/AxisymmetricIntersectionOfWalls.h"
 #include "Species/Species.h"
@@ -116,7 +115,7 @@ public:
         // wallHandler.copyAndAddObject(w);
 
         //add particles
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         //creating a random number whose magnitude is defined by 'polydispersity'
         //to give particles within the system a randomised distribution of sizes

@@ -24,7 +24,7 @@ dpm.speciesHandler.copyAndAddObject(species);
 
 Then you need to assign a species to each particle. The species added to speciesHandler can be retrieved by their index, with index 0 being the first inserted species, index 1 the second, etc:
 \code{.cpp}
-BaseParticle p0;
+SphericalParticle p0;
 //defines this particle to be of Species 0
 p0.setSpecies(speciesHandler.getObject(0));
 p0.setPosition(position);

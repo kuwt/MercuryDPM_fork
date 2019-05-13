@@ -100,7 +100,7 @@ void BidispersedChute::insertParticles(unsigned int numberOfLargeToGo, unsigned 
  */
 void BidispersedChute::insertLargeParticle(unsigned int& numberOfLargeToGo)
 {
-    BaseParticle p0;
+    SphericalParticle p0;
     p0.setSpecies(speciesHandler.getObject(1));
     p0.setRadius(parameters.getLargeParticleRadius() * distribution(generator));
     insertOneParticle(p0);
@@ -113,7 +113,7 @@ void BidispersedChute::insertLargeParticle(unsigned int& numberOfLargeToGo)
  */
 void BidispersedChute::insertSmallParticle(unsigned int& numberOfSmallToGo)
 {
-    BaseParticle p0;
+    SphericalParticle p0;
     p0.setSpecies(speciesHandler.getObject(2));
     p0.setRadius(parameters.getSmallParticleRadius()* distribution(generator));
     insertOneParticle(p0);

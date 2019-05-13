@@ -27,8 +27,6 @@
 #include <Species/LinearViscoelasticSpecies.h>
 #include "DPMBase.h"
 #include "Boundaries/AngledPeriodicBoundary.h"
-#include "Particles/BaseParticle.h"
-
 class AngledPeriodicBoundaryTestA : public DPMBase {
 public:
     /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,7 +47,7 @@ public:
         B0.set(normal_left,normal_right,origin);
         boundaryHandler.copyAndAddObject(B0);
 
-        BaseParticle P0;
+        SphericalParticle P0;
         P0.setSpecies(speciesHandler.getObject(0));
         P0.setPosition(Vec3D(9.0,0.5,0.0));      
         P0.setVelocity(Vec3D(0.0,1.0,0.0));
@@ -91,7 +89,7 @@ class AngledPeriodicBoundaryTestB : public DPMBase {
         B0.set(normal_left,normal_right,origin);
         boundaryHandler.copyAndAddObject(B0);
 
-        BaseParticle P0;
+        SphericalParticle P0;
         P0.setSpecies(speciesHandler.getObject(0));
         P0.setPosition(Vec3D(9.0,0.5+1e-8,0.0));      
         P0.setVelocity(Vec3D(0.0,1.0,0.0));
@@ -148,7 +146,7 @@ class AngledPeriodicBoundaryTestC : public DPMBase {
         B0.set(normal_left,normal_right,origin);
         boundaryHandler.copyAndAddObject(B0);
 
-        BaseParticle P0;
+        SphericalParticle P0;
         P0.setSpecies(speciesHandler.getObject(0));
         P0.setOrientation(Vec3D(0.0,0.0,1.0));
         P0.setAngularVelocity(Vec3D(0.0,0.0,2.0));

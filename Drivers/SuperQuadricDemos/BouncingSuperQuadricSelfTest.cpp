@@ -30,7 +30,7 @@
 #include "Species/LinearViscoelasticSpecies.h"
 #include "Math/ExtendedMath.h"
 
-class BouncingSuperQuadricTest : public Mercury3D
+class BouncingSuperQuadric : public Mercury3D
 {
 public:
     void setupInitialConditions() override
@@ -49,10 +49,10 @@ public:
         p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
         p0.setOrientationViaNormal(Vec3D(0.0,1.0,1.0));
         particleHandler.copyAndAddObject(p0);
-        logger.assert_always(mathsFunc::isEqual(p0.getInteractionRadius(), 1.0, 1e-10),
-                             "interaction radius p0 equals % but should be 1.0", p0.getInteractionRadius());
+        logger.assert_always(mathsFunc::isEqual(p0.getMaxInteractionRadius(), 1.0, 1e-10),
+                             "interaction radius p0 equals % but should be 1.0", p0.getMaxInteractionRadius());
         
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setRadius(1);
         p.setPosition(Vec3D(4.0, 0.0, 2.0));
@@ -87,7 +87,7 @@ public:
     
     void test()
     {
-        setName("BouncingSuperQuadricTest");
+        setName("BouncingSuperQuadricSelfTest");
         setSuperquadricParticlesWriteVTK(true);
         setSaveCount(500);
         solve();
@@ -97,7 +97,9 @@ public:
 
 int main(int argc, char* argv[])
 {
-    BouncingSuperQuadricTest problem;
+    BouncingSuperQuadric problem;
+    // comment next line to turn on file output
+    problem.setFileType(FileType::NO_FILE);
     problem.test();
     return 0;
 }

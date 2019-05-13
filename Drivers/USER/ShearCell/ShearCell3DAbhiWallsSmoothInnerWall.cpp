@@ -227,7 +227,7 @@ private:
                 it->createPeriodicParticle(particleHandler.getObject(i-1), particleHandler);
 
         std::cout << "setupInitialConditions()" << std::endl;
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setVelocity(Vec3D(0.0, 0.0, 0.0));
         p.setOrientation(Vec3D(0.0, 0.0, 0.0));

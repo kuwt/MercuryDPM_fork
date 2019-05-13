@@ -754,7 +754,7 @@ public:
             PeriodicBoundary* perw = static_cast<PeriodicBoundary*>(boundaryHandler.getObject(k));
             if ((k ? true : InPeriodicBox(i)) && (perw->getDistance(*i) < i->getRadius() + getMaxInflowParticleRadius()))
             {
-                BaseParticle F0 = *i;
+                SphericalParticle F0 = *i;
                 perw->shiftPosition(i);
 
                 //If Particle is Mdouble shifted, get correct original particle
@@ -890,7 +890,7 @@ public:
         return P->getIndSpecies() < PeriodicBoxNSpecies;
     }
 
-    BaseParticle inflowParticle_;
+    SphericalParticle inflowParticle_;
 
 private:
     ///stores the length of the periodic box

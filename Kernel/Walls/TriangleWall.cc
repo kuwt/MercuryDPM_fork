@@ -60,12 +60,12 @@ bool TriangleWall::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance
     //getOrientation().rotateBack(position);
     const Mdouble signedDistance = Vec3D::dot(position-vertex_[0], faceNormal_);
     distance = fabs(signedDistance);
-    if (distance >= p.getWallInteractionRadius())
+    if (distance >= p.getWallInteractionRadius(this))
     {
         return false;
     }
     
-    const Mdouble distanceMax2 = p.getWallInteractionRadius() * p.getWallInteractionRadius();
+    const Mdouble distanceMax2 = mathsFunc::square(p.getWallInteractionRadius(this));
     const Vec3D edgeBranch0 = position - vertex_[0];
     const Vec3D edgeBranch1 = position - vertex_[1];
     const Vec3D edgeBranch2 = position - vertex_[2];

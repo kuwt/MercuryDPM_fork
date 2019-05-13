@@ -26,7 +26,6 @@
 #include <cmath>
 
 #include "DPMBase.h"
-#include "Particles/BaseParticle.h"
 #include "Species/LinearViscoelasticSpecies.h"
 #include "Math/ExtendedMath.h"
 
@@ -41,7 +40,7 @@ public:
     void setupInitialConditions() override {
         speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
         
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         //At the moment, it is still necessary to fix the particle before we can
         //move it manually.

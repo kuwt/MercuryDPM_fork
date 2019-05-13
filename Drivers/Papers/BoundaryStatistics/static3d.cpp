@@ -72,7 +72,7 @@ public:
 			setYMax(1);
 			setXMax(2);
 			//set_N(2);
-			BaseParticle p0;
+			SphericalParticle p0;
 			p0.setPosition(Vec3D(1,0.5,0.5));
                         particleHandler.copyAndAddObject(p0);
 			p0.setPosition(Vec3D(1,0.5,0.5)-Vec3D(sin(20.*constants::pi/180.),0,-cos(20.*constants::pi/180.)));
@@ -89,7 +89,7 @@ public:
 			setYMax(1);
 			setXMax(2);
 			//set_N(4);
-			BaseParticle p0;
+			SphericalParticle p0;
 		        p0.setPosition(Vec3D(0.5,0.5,0.5));
                         particleHandler.copyAndAddObject(p0);                       
 		        p0.setPosition(Vec3D(1.5,0.5,0.5));

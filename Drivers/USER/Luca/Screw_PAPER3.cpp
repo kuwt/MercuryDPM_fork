@@ -765,7 +765,7 @@ public:
     int controlVariableForVelocityIncrement = 0;
 
     // Mercury specific pointers
-    BaseParticle p0;
+    SphericalParticle p0;
     InfiniteWall wall;
     PeriodicBoundary boundary;
     AxisymmetricIntersectionOfWalls *shaft, *casing;

@@ -24,7 +24,6 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <iostream>
 #include <Species/LinearViscoelasticSpecies.h>
@@ -129,7 +128,7 @@ public:
 		sidewall.set(Vec3D(0.0, 1.0, 0.0), Vec3D(0.0, getYMax(), 0.0));
 		wallHandler.copyAndAddObject(sidewall);
 
-		BaseParticle saw; // Fixed particles to make up the sawteeth
+		SphericalParticle saw; // Fixed particles to make up the sawteeth
 		saw.setRadius(1.25e-3);
 		saw.setVelocity(Vec3D(0.0, 0.0, 0.0));
 		saw.setSpecies(species);
@@ -449,12 +448,12 @@ public:
 			breakpercent = 10.0;
 		}
 
-		BaseParticle p0;
+		SphericalParticle p0;
 		p0.setRadius(r0);
 		p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
 		p0.setSpecies(species);
 		
-		BaseParticle p1;
+		SphericalParticle p1;
 		p1.setRadius(r1);
 		p1.setVelocity(Vec3D(0.0, 0.0, 0.0));
 		p1.setSpecies(species);
@@ -492,7 +491,7 @@ public:
 			}
 		} while (((partvol/totvol) * 100) < breakpercent);
 		
-		BaseParticle wobbler;
+		SphericalParticle wobbler;
 		wobbler.setVelocity(Vec3D(-0.1, 0.0, -1.0));
 		wobbler.setRadius(r0);
 		wobbler.setPosition(Vec3D(0.55 * getXMax(), getYMax()/2, 0.75 * getZMax()));

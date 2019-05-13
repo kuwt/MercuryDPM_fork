@@ -71,7 +71,7 @@ public:
     /*!
      * \brief Particle copy method. It calls to copy constructor of this Particle, useful for polymorfism
      */
-    virtual BaseParticle* copy() const;
+    virtual BaseParticle* copy() const = 0;
     
     /*!
      * \brief Get Particle volume function, which required a reference to the Species vector. It returns the volume of the Particle.
@@ -320,9 +320,14 @@ public:
     Mdouble getMass() const
     { return 1.0 / invMass_; }
     
+    Vec3D getMomentum() const
+    { return getVelocity() / invMass_; }
+
     MatrixSymmetric3D getInertia() const
     { return invInertia_.inverse(); }
     
+    Vec3D getAngularMomentum() const;
+
     /*!
      * \brief Returns the 'original' particle this one's a periodic copy of
      * \details Returns a pointer to the 'original' particle if the current one is a 'periodic copy' used for a periodic boundary implementation.
@@ -349,18 +354,33 @@ public:
      * species).
      * \return the particle's interaction radius for particle-particle interaction
      */
-    virtual Mdouble getInteractionRadius() const
-    { return radius_ + getSpecies()->getInteractionDistance() * 0.5; }
+    Mdouble getMaxInteractionRadius() const {
+        return getRadius() + getSpecies()->getMaxInteractionDistance() * 0.5;
+    }
     
-    /*!
-     * \brief Returns the interaction radius for interaction with walls. See also
-     * BaseParticle::getInteractionRadius().
-     * \details The interaction radius of the particle (when it comes to interaction
-     * with walls). See also BaseParticle::getInteractionRadius().
-     * \return the particle's interaction radius for particle-wall interaction
+    /**
+     * \brief Returns the interactionDistance_ of the mixed species of this particle and the particle or wall i
      */
-    Mdouble getWallInteractionRadius() const
-    { return getInteractionRadius() + getSpecies()->getInteractionDistance() * 0.5; }
+    Mdouble getInteractionDistance(const BaseInteractable* i) const
+    {
+        //const auto mixedSpecies = getSpecies()->getHandler()->getMixedObject(getSpecies(),particle->getSpecies());
+        //return mixedSpecies->getInteractionDistance();
+        return getSpecies()->getMixedSpecies(i->getSpecies())->getInteractionDistance();
+    }
+    
+    /**
+     * \brief returns the sum of the radii plus the interactionDistance
+     */
+    Mdouble getSumOfInteractionRadii(const BaseParticle* particle) const {
+        return getRadius() + particle->getRadius() + getInteractionDistance((const BaseInteractable*)particle);
+    }
+    
+    /**
+     * \brief returns the radius plus the interactionDistance
+     */
+    Mdouble getWallInteractionRadius(const BaseWall* wall) const {
+        return getRadius() + getInteractionDistance((const BaseInteractable*)wall);
+    }
     
     /*!
      * \brief Returns the particle's displacement relative to the previous time step
@@ -474,7 +494,7 @@ public:
      * \brief Sets the particle's radius_ (and adjusts the mass_ accordingly, 
      * based on the particle's species)
      */
-    void setRadius(Mdouble radius);
+    virtual void setRadius(Mdouble radius);
     
     /*
      * The below 6 functions had to be declared virtual here in order to allow access of these functions in ParticleHandler class in the function writeVTK.
@@ -556,8 +576,7 @@ public:
      * \brief Checks if particle is in interaction with given particle P, and if 
      * so, returns vector of pointer to the associated BaseInteraction object (else returns empty vector).
      */
-    std::vector<BaseInteraction*>
-    getInteractionWith(BaseParticle* P, unsigned timeStamp, InteractionHandler* interactionHandler) override;
+    BaseInteraction* getInteractionWith(BaseParticle* P, unsigned timeStamp, InteractionHandler* interactionHandler) override;
     
     /*!
      * \brief Get whether or not this particle is in contact with the given particle.

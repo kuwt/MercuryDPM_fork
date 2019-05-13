@@ -28,7 +28,6 @@
 //#include "Species/LinearViscoelasticSlidingFrictionSpecies.h"
 #include "Species/LinearViscoelasticFrictionChargedBondedSpecies.h"
 #include "DPMBase.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "Logger.h"
 
@@ -50,7 +49,7 @@ public:
         //**************************************Creating Particles and Assigning Species and Properties*******************************************
 
         //Creating base particles
-        BaseParticle P0,P1,P2,P3,P4;
+        SphericalParticle P0,P1,P2,P3,P4;
 
         //setting the number of conglomerate particles to create
         int nParticles = 6;

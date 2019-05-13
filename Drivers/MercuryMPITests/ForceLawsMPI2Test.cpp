@@ -62,7 +62,7 @@ public:
     {
         auto s = speciesHandler.getLastObject();
 
-        BaseParticle particle;
+        SphericalParticle particle;
         particle.setSpecies(s);
         particle.setRadius(0.5);
         particle.setVelocity(Vec3D(10,0,0));

@@ -723,7 +723,7 @@ public:
     InfiniteWall *backWallPointer;
     AxisymmetricIntersectionOfWalls casing;
     AxisymmetricIntersectionOfWalls *casingPointer;
-    BaseParticle p0;
+    SphericalParticle p0;
     
     // global variables
     bool verbose;

@@ -47,7 +47,7 @@ public:
         logger(INFO,"tc %", s->getCollisionTime(8));
 
         //add particles
-        BaseParticle p;
+        SphericalParticle p;
 		p.setSpecies(s);
         p.setRadius(5);
         particleHandler.copyAndAddObject(p);

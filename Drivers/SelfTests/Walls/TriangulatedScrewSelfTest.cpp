@@ -88,7 +88,7 @@ public:
         wallHandler.copyAndAddObject(w);
 
         //introduce particles randomly
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getLastObject());
 
         unsigned n = 1000;

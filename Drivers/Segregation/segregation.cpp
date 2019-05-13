@@ -231,7 +231,7 @@ public:
 private:
 	double radius_s;
 	double radius_l;
-	BaseParticle inflowParticle_;
+	SphericalParticle inflowParticle_;
 };
 
 

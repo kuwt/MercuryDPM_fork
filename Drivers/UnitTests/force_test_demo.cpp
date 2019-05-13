@@ -24,7 +24,6 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DPMBase.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "Species/Species.h"
 #include "Species/LinearViscoelasticSlidingFrictionSpecies.h"
@@ -56,7 +55,7 @@ public:
 			normal = Vec3D(-1.0,0.0,0.0);
 			tangent = Vec3D(0.0,1.0,0.0);
 			
-			BaseParticle P0;
+			SphericalParticle P0;
             P0.setSpecies(speciesHandler.getObject(0));
             for (unsigned int j=0; j< nParticle; j++){
 				P0.setRadius(random.getRandomNumber(0.0005,0.001));
@@ -138,7 +137,7 @@ public:
 			w0.set(Vec3D(1, 0, 0), Vec3D(0.0025, 0, 0));
 			wallHandler.copyAndAddObject(w0);
 			
-			BaseParticle P0;
+			SphericalParticle P0;
             P0.setSpecies(speciesHandler.getObject(0));
 			particleHandler.copyAndAddObject(P0);			
 			setXMax(0.005);

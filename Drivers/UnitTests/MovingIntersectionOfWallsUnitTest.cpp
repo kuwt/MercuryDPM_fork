@@ -29,7 +29,6 @@
 
 #include "Logger.h"
 #include "DPMBase.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/IntersectionOfWalls.h"
 #include "Species/LinearViscoelasticSpecies.h"
 
@@ -61,7 +60,7 @@ public:
         setTimeMax(1.0);
         setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(20, getTimeMax(), getTimeStep()));
 
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));   
         p1f = particleHandler.copyAndAddObject(p);
         p2f = particleHandler.copyAndAddObject(p);

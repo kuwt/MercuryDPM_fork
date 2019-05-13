@@ -60,7 +60,7 @@ int main()
     dpm.setDomain({-1,-1,-1},{1,1,1});
     dpm.setSaveCount(dpm.getTimeMax()/dpm.getTimeStep()/100);
     // add particles in a limited region
-    BaseParticle p(s);
+    SphericalParticle p(s);
     Mdouble d;
     Vec3D n;
     p.setRadius(radius);

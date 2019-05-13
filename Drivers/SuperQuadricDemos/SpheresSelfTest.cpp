@@ -41,7 +41,6 @@ class SphericalSuperQuadricCollision : public Mercury3D
         SuperQuadric p0;
         p0.setSpecies(speciesHandler.getObject(0));
         //temporary hack:
-        p0.setRadius(1.0);
         p0.setAxesAndExponents(1.0,1.0,1.0,1.0,1.0);
         p0.setInertia();
         SuperQuadric p1 = *(p0.copy());
@@ -52,7 +51,7 @@ class SphericalSuperQuadricCollision : public Mercury3D
         p1.setVelocity(Vec3D(-1, 0.0, 0.0));
         particleHandler.copyAndAddObject(p0);
         particleHandler.copyAndAddObject(p1);
-        logger(INFO, "interaction radius p0: %", p0.getInteractionRadius());
+        logger(INFO, "interaction radius p0: %", p0.getMaxInteractionRadius());
     
     
         setTimeStep(species.getCollisionTime(1) / 50);
@@ -64,8 +63,8 @@ class SphericalSuperQuadricCollision : public Mercury3D
     //check contact time
     void actionsAfterTimeStep() override
     {
-        std::vector<BaseInteraction*> interaction = particleHandler.getObject(0)->getInteractionWith(particleHandler.getObject(1), getTimeStep(), &interactionHandler);
-        if (!interaction.empty())
+        BaseInteraction* interaction = particleHandler.getObject(0)->getInteractionWith(particleHandler.getObject(1), getTimeStep(), &interactionHandler);
+        if (interaction!=nullptr)
         {
             logger.assert_always(getTime() > 0.499 && getTime() < 0.511, "Contact is at the wrong time (time=%)", getTime());
             contactHasOccured = true;

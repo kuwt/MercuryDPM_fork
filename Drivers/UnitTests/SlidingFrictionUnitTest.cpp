@@ -26,7 +26,6 @@
 #include "DPMBase.h"
 #include <Species/LinearViscoelasticSlidingFrictionBondedSpecies.h>
 #include <cassert>
-
 class SlidingFrictionUnitTest : public DPMBase {
 
 	void writeEneHeader(std::ostream& os) const override
@@ -78,7 +77,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 	logger(INFO,"Stiffness k=%",s->getStiffness());
 
 	//Add particles
-	BaseParticle p;
+	SphericalParticle p;
 	p.setSpecies(s);
 	p.setRadius(radius);
 	p.setPosition({ radius-0.5*overlap,0,0});

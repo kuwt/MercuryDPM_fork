@@ -166,7 +166,7 @@ Mdouble InfiniteWall::getDistance(Vec3D otherPosition) const
 bool InfiniteWall::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const
 {
     distance = getDistance(p.getPosition());
-    if (distance >= p.getWallInteractionRadius())
+    if (distance >= p.getWallInteractionRadius(this))
         return false;
     normal_return = getOrientation().getAxis();
     return true;
@@ -284,7 +284,7 @@ InfiniteWall::getDistanceNormalOverlapSuperquadric(const SuperQuadric& p, Mdoubl
                                                    Mdouble& overlap) const
 {
     //first check: if the bounding sphere does not touch the wall, there is no contact.
-    if (getDistance(p.getPosition()) >= p.getWallInteractionRadius())
+    if (getDistance(p.getPosition()) >= p.getWallInteractionRadius(this))
     {
         return false;
     }

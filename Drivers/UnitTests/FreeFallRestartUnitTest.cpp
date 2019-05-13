@@ -31,7 +31,6 @@
 ///4) Also tests restart reloading.
 
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <iostream>
 #include <Species/LinearViscoelasticSpecies.h>
@@ -53,7 +52,7 @@ public:
         w0.set(Vec3D(0, 1, 0), Vec3D(0, getYMax(), 0));
         wallHandler.copyAndAddObject(w0);
         
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setPosition(Vec3D(getXMax() / 2, getYMax() / 2, 0.0));
         p0.setVelocity(Vec3D(0.0, 0.0, 0.0));

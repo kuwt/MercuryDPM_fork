@@ -105,7 +105,7 @@ bool AxisymmetricIntersectionOfWalls::getDistanceAndNormal(const BaseParticle& p
     Vec3D normal;
     //determine wall distance, normal and contact in axissymmetric coordinates
     //and transform from axisymmetric coordinates
-    if (!IntersectionOfWalls::getDistanceAndNormal(Vec3D(r, 0, a), p.getWallInteractionRadius(), distance, normal))
+    if (!IntersectionOfWalls::getDistanceAndNormal(Vec3D(r, 0, a), p.getWallInteractionRadius(this), distance, normal))
     {
         //if not in contact
         return false;

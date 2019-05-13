@@ -261,8 +261,6 @@ void LiquidMigrationWilletInteraction::rupture()
     if (getLiquidBridgeVolume() == 0.0)
         return;
     
-    //logger(INFO,"rupture % cp % p % i %",getIndex(),getContactPoint(),getP()->getIndex(),getI()->getIndex());
-    
     //else rupture a bridge 
     const LiquidMigrationWilletSpecies* species = getSpecies();
     LiquidFilmParticle* IParticle = dynamic_cast<LiquidFilmParticle*>(getI());

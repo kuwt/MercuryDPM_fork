@@ -113,7 +113,7 @@ public:
 
         //add particles until the volume to be added is zero
         logger(INFO,"Adding particles ...");
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setRadius(meanRadius);
         Mdouble fillHeight = getZMin();
@@ -157,7 +157,7 @@ public:
 
         //add particles until the volume to be added is zero
         logger(INFO,"Adding particles ...");
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setRadius(meanRadius);
         Mdouble fillHeight = getZMin();

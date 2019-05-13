@@ -64,7 +64,7 @@ public:
 //adhesion-specific functions
     
     ///\brief returns the largest separation distance at which adhesive short-range forces can occur.
-    Mdouble getInteractionDistance() const override;
+    void setInteractionDistance();
 
 //setters and getters
     /*!
@@ -115,14 +115,6 @@ private:
      * Particle or Interaction property.
      */
     Mdouble liquidBridgeVolumeMax_;
-    
-    /*! 
-     * \brief Cube root of the liquid bridge. 
-     * \details This is a slave variable of liquidBridgeVolumeMax_ (i.e. it is 
-     * always set together) but is useful, because the cube root has to be 
-     * calculated to obtain the liquid bridge adhesive force.
-     */
-    Mdouble maxInteractionDistance_;
     
     /*! 
      * \brief distribution coefficient of the liquid

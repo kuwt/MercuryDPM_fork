@@ -1,6 +1,5 @@
 
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Boundaries/PeriodicBoundary.h"
 #include "Walls/InfiniteWall.h"
 #include "Walls/InfiniteWallWithHole.h"
@@ -237,7 +236,7 @@ public:
     Mdouble fillingRatio = .50;
     
     LinearViscoelasticFrictionSpecies *specieParticle, *specieWall, *specieMixedParticleWall;
-    BaseParticle p0;
+    SphericalParticle p0;
     Helicoid03 *screw;
     InfiniteWall *xMinWall, *xMaxWall;
     InfiniteWall *yMinWall, *yMaxWall;

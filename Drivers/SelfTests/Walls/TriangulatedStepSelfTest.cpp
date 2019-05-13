@@ -69,7 +69,7 @@ public:
         wallHandler.copyAndAddObject(w);
 
         //introduce single particle
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getLastObject());
         p.setRadius(0.5);
         p.setPosition({0.95,0.5,1.5});
@@ -114,7 +114,7 @@ public:
         wallHandler.copyAndAddObject(w);
 
         //introduce single particle
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(s);
         p.setRadius(0.4);
         Mdouble h = 0.05*2;

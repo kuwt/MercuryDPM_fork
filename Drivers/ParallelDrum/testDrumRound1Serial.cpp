@@ -190,7 +190,7 @@ class RotatingDrum : public Mercury3D
 		wallHandler.copyAndAddObject(w0);
 
 
-		BaseParticle P0;
+		SphericalParticle P0;
 		double radius = 0.0;
 		int numS1Inserted=0;
 		int numS2Inserted=0;

@@ -27,7 +27,6 @@
 #include "StatisticsVector.h"
 #include "Math/ExtendedMath.h"
 #include "Boundaries/PeriodicBoundary.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <sstream>
 #include <iostream>
@@ -61,7 +60,7 @@ template <StatType T> class create_initial_conditions_fixed_packing_fraction : p
 	{
 		particleHandler.clear();
 		
-		BaseParticle P0;
+		SphericalParticle P0;
 		double vmax=1;
 		double rmin=0.0064;
 		double rmax=0.008;

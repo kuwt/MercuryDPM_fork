@@ -36,28 +36,40 @@ class SphericalParticle final : public BaseParticle
 public:
     
     /*!
-     * \brief Particle constructors
+     * \brief Particle constructor
      */
     SphericalParticle() = default;
     
-    SphericalParticle(const SphericalParticle& p) = default;
+    /*!
+     * \brief Particle constructor, setting the species.
+     * This is useful to create e.g. template particles for the InsertionBoundaries.
+     * It is marked explicit because you dont want to use it with the assignment operator, particle = species;
+     */
+    explicit SphericalParticle(const ParticleSpecies* s) : BaseParticle(s) {
     
-    explicit SphericalParticle(const ParticleSpecies* s) : BaseParticle(s)
-    {};
+    };
+
+    /*!
+     * \brief Particle constructor
+     */
+    SphericalParticle(const SphericalParticle& p) = default;
     
     ~SphericalParticle() override = default;
     
     /*!
      * \brief Particle copy method. Calls copy constructor of this class (useful for polymorphism)
      */
-    SphericalParticle* copy() const override;
+    SphericalParticle* copy() const override {
+        return new SphericalParticle(*this);
+    }
     
     /*!
      * \brief Returns the name of the object
      */
-    std::string getName() const override;
+    std::string getName() const override {
+        return "BaseParticle";
+    }
     
     
 };
-
 #endif

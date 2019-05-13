@@ -134,7 +134,7 @@ public:
 
    // VARIABLES -------------------------------------------------------
    LinearPlasticViscoelasticFrictionSpecies *speciesParticle;
-   BaseParticle p0;
+   SphericalParticle p0;
    InfiniteWall wall;
    std::ofstream cdatFile;
 

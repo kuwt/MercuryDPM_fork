@@ -142,10 +142,10 @@ bool Shaft::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D
     
     // if the particle is outside of the Shaft returns false
     // check for the radius
-    if (rho2 > pow(radius_ + p.getWallInteractionRadius(), 2)) return false;
+    if (rho2 > pow(radius_ + p.getWallInteractionRadius(this), 2)) return false;
     // check for the height
-    if (p.getPosition().Z > l_ + start_.Z + p.getWallInteractionRadius()) return false;
-    if (p.getPosition().Z < start_.Z - p.getWallInteractionRadius()) return false;
+    if (p.getPosition().Z > l_ + start_.Z + p.getWallInteractionRadius(this)) return false;
+    if (p.getPosition().Z < start_.Z - p.getWallInteractionRadius(this)) return false;
     
     // radial distance of the particle from the Shaft axis
     Mdouble rho = sqrt(rho2);
@@ -236,12 +236,11 @@ std::string Shaft::getName() const
  * \return A pointer to the BaseInteraction that happened between this Shaft
  * and the BaseParticle at the timeStamp.
  */
-std::vector<BaseInteraction *>
+BaseInteraction*
 Shaft::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler)
 {
     Mdouble distance;
     Vec3D normal;
-    std::vector<BaseInteraction*> interactions;
     if (getDistanceAndNormal(*p,distance,normal))
     {
         BaseInteraction* c = interactionHandler->getInteraction(p, this, timeStamp);
@@ -249,9 +248,9 @@ Shaft::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandle
         c->setDistance(distance);
         c->setOverlap(p->getRadius() - distance);
         c->setContactPoint(p->getPosition()-(p->getRadius() - 0.5 * c->getOverlap()) * c->getNormal());
-        interactions.push_back(c);
+        return c;
     }
-    return interactions;
+    return nullptr;
 }
 
 

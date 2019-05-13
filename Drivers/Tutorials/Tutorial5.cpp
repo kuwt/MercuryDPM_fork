@@ -44,7 +44,7 @@ class Tutorial5 : public Mercury3D
 public:
     
     void setupInitialConditions() override {
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         
         p0.setRadius(0.005); //particle-1 radius

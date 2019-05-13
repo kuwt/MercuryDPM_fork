@@ -353,8 +353,7 @@ public:
      * \todo TW make sure this function sets normal, distance, overlap, contact point
      * \todo AT why is this a BaseParticle and not a BaseInteratable.
      */
-    virtual std::vector<BaseInteraction*>
-    getInteractionWith(BaseParticle* P, unsigned timeStamp, InteractionHandler* interactionHandler)=0;
+    virtual BaseInteraction* getInteractionWith(BaseParticle* P, unsigned timeStamp, InteractionHandler* interactionHandler)=0;
     
     /*!
      * \brief Returns the velocity at the contact point, use by many force laws.

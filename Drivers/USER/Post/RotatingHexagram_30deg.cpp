@@ -272,7 +272,7 @@ class RotatingHexagon : public Mercury3D
                 
 // PLACING THE PARTICLES
     // SETTING THE SPECIES FOR THE BASEPARTICLE
-                BaseParticle p0;
+                SphericalParticle p0;
 
 		int numS1Inserted=0;
 		int numS2Inserted=0;

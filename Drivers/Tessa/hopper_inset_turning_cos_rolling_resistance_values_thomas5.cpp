@@ -206,7 +206,7 @@ public:
 			if (get_CreateInHopper()) {
 				//cout<<"Adding particles in hopper"<<endl;
                 HopperInsertionBoundary b1;
-                b1.set(new BaseParticle, getMaxFailed(), getYMin(), getYMax(), getMinInflowParticleRadius(), getMaxInflowParticleRadius(),
+                b1.set(new SphericalParticle, getMaxFailed(), getYMin(), getYMax(), getMinInflowParticleRadius(), getMaxInflowParticleRadius(),
                        getChuteAngle(), getFixedParticleRadius(), getIsHopperCentred(), getHopperDimension(), getHopperAngle(), getHopperLength(),
                        getHopperExitLength(),getHopperHeight(), getHopperLift(), getHopperFillingPercentage());
                 boundaryHandler.copyAndAddObject(b1);
@@ -336,7 +336,7 @@ public:
 	}
     
 private:
-     BaseParticle inflowParticle_;
+     SphericalParticle inflowParticle_;
 };
 int main(int argc UNUSED, char *argv[] UNUSED)
 {

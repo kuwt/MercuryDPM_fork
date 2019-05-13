@@ -130,7 +130,7 @@ public:
 			//computeForcesDueToWalls(CI);
 			//add spherical indenter as wall (quicker due to hGrid problems)
 			if (IndenterType==Spherical)
-				computeInternalForces(CI, &SphericalIndenter);
+				computeInternalForce(CI, &SphericalIndenter);
 		}
 	}
 
@@ -319,7 +319,7 @@ private:
 	IT IndenterType;
 	Mdouble IndenterVelocity;
 	AxisymmetricIntersectionOfWalls FlatIndenter;
-	BaseParticle SphericalIndenter;
+	SphericalParticle SphericalIndenter;
 	//StageType Stage;
 	Mdouble MinIndenterHeight;
     int N;

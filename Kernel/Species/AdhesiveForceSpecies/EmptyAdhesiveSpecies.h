@@ -60,11 +60,6 @@ public:
     
     ///\brief creates default values for mixed species
     void mix(EmptyAdhesiveSpecies* S, EmptyAdhesiveSpecies* T);
-    
-    //adhesion-specific functions
-    
-    ///\brief returns the largest separation distance at which adhesive short-range forces can occur (0.0 for the default EmptyAdhesiveSpecies).
-    Mdouble getInteractionDistance() const override;
 };
 
 #endif

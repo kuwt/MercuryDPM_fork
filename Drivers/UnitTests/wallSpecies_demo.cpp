@@ -24,7 +24,6 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DPMBase.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticSpecies.h"
 #include <cmath>
@@ -59,7 +58,7 @@ public:
         species01->setCollisionTimeAndRestitutionCoefficient(0.01,0.5,2);
 
 		//set particles
-		BaseParticle P0;
+		SphericalParticle P0;
         P0.setSpecies(speciesHandler.getObject(0));
 		P0.setRadius(0.5);
 		P0.setPosition(Vec3D(5,10,10));

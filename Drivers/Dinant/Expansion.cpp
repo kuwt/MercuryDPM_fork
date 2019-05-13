@@ -28,7 +28,6 @@
 #include "Mercury2D.h"
 #include "StatisticsVector.h"
 #include "Boundaries/LeesEdwardsBoundary.h"
-#include "Particles/BaseParticle.h"
 #include "Species/LinearViscoelasticSpecies.h"
 
 template <StatType T> class Expansion : public StatisticsVector<T>, public Mercury2D

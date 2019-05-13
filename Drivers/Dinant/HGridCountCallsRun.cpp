@@ -29,7 +29,6 @@
 
 #include "HGridCountCalls.h"
 #include "Boundaries/PeriodicBoundary.h"
-#include "Particles/BaseParticle.h"
 #include "HGridOptimiser.h"
 #include "Species/LinearViscoelasticSpecies.h"
 
@@ -103,7 +102,7 @@ public:
         double V = 0;
         
         particleHandler.setStorageCapacity(2 * N);
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
         
         //Use at least particles with maximum and minimum size
@@ -186,7 +185,7 @@ public:
     {
         for (std::vector<BaseParticle*>::iterator it = particleHandler.begin(); it != particleHandler.end(); ++it)
         {
-            broadPhase(*it);
+            computeInternalForces(*it);
         }
     }
     

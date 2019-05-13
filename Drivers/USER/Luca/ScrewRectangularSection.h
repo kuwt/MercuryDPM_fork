@@ -75,7 +75,7 @@ public:
     std::string getName() const final;
 
     // Gets the interaction between this screw and a given BaseParticle at a given time.
-    std::vector<BaseInteraction *> getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler) final;
+    BaseInteraction* getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler) final;
     
 private:
     // The centre of the lower end of the screw.

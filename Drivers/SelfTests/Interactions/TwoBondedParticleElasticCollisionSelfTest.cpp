@@ -24,7 +24,6 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <iostream>
 #include "Species/Species.h"
@@ -41,7 +40,7 @@ class TwoBondedParticleElasticCollision : public Mercury3D {
 		setMin(Vec3D(0,0,0));
 
 		//set particle properties
-		BaseParticle p;
+		SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
 		p.setPosition(Vec3D(0.006,0.0051,0.0));
 		p.setVelocity(Vec3D(-0.1,0.0,0.0));

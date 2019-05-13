@@ -199,8 +199,8 @@ void LeesEdwardsBoundary::createHorizontalPeriodicParticles(BaseParticle* p, Par
     bool positive;      // TRUE if the particle is closest to the left boundary 
     // wall (set by getVerticalDistance in the following if-statement)
     // check if particle is close enough to either of the walls
-    if (getHorizontalDistance(*p, positive) <
-        p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius())
+    const Mdouble maxDistance = p->getMaxInteractionRadius() + pH.getLargestParticle()->getMaxInteractionRadius();
+    if (getHorizontalDistance(*p, positive) < maxDistance)
     {
         // create a periodic copy of the particle
         BaseParticle* F0 = p->copy();
@@ -235,7 +235,8 @@ void LeesEdwardsBoundary::createVerticalPeriodicParticles(BaseParticle* p, Parti
     bool positive;      // TRUE if the particle is closest to the bottom boundary 
     // wall (set by getVerticalDistance in the following if-statement)
     // check if particle is close enough to either of the walls
-    if (getVerticalDistance(*p, positive) < p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius())
+    const Mdouble maxDistance = p->getMaxInteractionRadius() + pH.getLargestParticle()->getMaxInteractionRadius();
+    if (getVerticalDistance(*p, positive) < maxDistance)
     {
         // create a periodic copy of the particle
         BaseParticle* F0 = p->copy();

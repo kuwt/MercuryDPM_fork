@@ -72,7 +72,7 @@ public:
         setGravity({0,0,0});
         
         //Check if particle is copied correctly when moving
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getLastObject());
         p0.setPosition({1,0,0});
         p0.setVelocity({1,0,0});

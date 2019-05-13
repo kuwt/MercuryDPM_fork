@@ -239,7 +239,7 @@ protected:
     Mdouble FunnelMaxRadius;
     Mdouble FunnelHeight;
     Mdouble FunnelInflowHeight;
-    BaseParticle P0;
+    SphericalParticle P0;
     unsigned int max_failed;
     unsigned int num_created;
 };

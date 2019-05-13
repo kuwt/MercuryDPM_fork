@@ -28,7 +28,7 @@
 #include "Logger.h"
 #include "MpiContainer.h"
 #include "MpiDataClass.h"
-#include "Particles/BaseParticle.h"
+#include "Particles/SphericalParticle.h"
 #include "Walls/BaseWall.h"
 #include "InteractionHandler.h"
 #include "DomainHandler.h"
@@ -820,7 +820,7 @@ void Domain::findNewMPIInteractions()
                         Mdouble distance;
                         Vec3D normal;
                         wall->getDistanceAndNormal(*particleP, distance, normal);
-                        if (distance <= particleP->getInteractionRadius())
+                        if (distance <= particleP->getMaxInteractionRadius())
                         {
                             //Add the interaction to the list if there are still in contact (hence the if statement)
                             newInteractionList_[localIndex].push_back(interaction);
@@ -837,7 +837,7 @@ void Domain::findNewMPIInteractions()
                             //Get the square of the distance between particle i and particle j
                             Mdouble distanceSquared = Vec3D::getLengthSquared(branchVector);
                             Mdouble sumOfInteractionRadii =
-                                    particleP->getInteractionRadius() + objectI->getInteractionRadius();
+                                    objectI->getSumOfInteractionRadii(particleP);
                             if (distanceSquared < (sumOfInteractionRadii * sumOfInteractionRadii))
                             {
                                 //Add the interaction to the list
@@ -856,7 +856,7 @@ void Domain::findNewMPIInteractions()
                         //Get the square of the distance between particle i and particle j
                         Mdouble distanceSquared = Vec3D::getLengthSquared(branchVector);
                         Mdouble sumOfInteractionRadii =
-                                particleP->getInteractionRadius() + objectI->getInteractionRadius();
+                                objectI->getSumOfInteractionRadii(particleP);
                         if (distanceSquared < (sumOfInteractionRadii * sumOfInteractionRadii))
                         {
                             //Add the interaction to the list
@@ -915,7 +915,7 @@ void Domain::processReceivedBoundaryParticleData(const unsigned index, std::vect
     for (int i = 0; i < numberOfParticlesReceive_[index]; i++)
     {
         //copy data from data
-        BaseParticle p0;
+        SphericalParticle p0;
         copyDataFromMPIParticleToParticle(&(boundaryParticleDataReceive_[index][i]), &p0, &particleHandler);
         
         //Flag that the particle is a ghost particle of a real particle in the neighbour domain
@@ -1010,11 +1010,9 @@ void Domain::processReceivedInteractionData(const unsigned localIndex, std::vect
         {
             BaseInteractable* I = getHandler()->getDPMBase()->wallHandler.getObjectById(identificationI);
             //Create interactions
-            std::vector<BaseInteraction*> interactions = I->getInteractionWith(pGhost, timeStamp, &iH);
-            if (!interactions.empty())
-            {
-                interactions[0]->setMPIInteraction(interactionDataReceive_[localIndex], l, false);
-            }
+            BaseInteraction* j = I->getInteractionWith(pGhost, timeStamp, &iH);
+            if (j!= nullptr) j->setMPIInteraction(interactionDataReceive_[localIndex], l, false);
+            
         }
         else
         {
@@ -1041,12 +1039,8 @@ void Domain::processReceivedInteractionData(const unsigned localIndex, std::vect
             }
             
             //Add the interaction
-            std::vector<BaseInteraction*> particleInteractions = pGhost->getInteractionWith(otherParticle, timeStamp,
-                                                                                            &iH);
-            if (!particleInteractions.empty())
-            {
-                particleInteractions[0]->setMPIInteraction(interactionDataReceive_[localIndex], l, false);
-            }
+            BaseInteraction* j = pGhost->getInteractionWith(otherParticle, timeStamp, &iH);
+            if (j!= nullptr) j->setMPIInteraction(interactionDataReceive_[localIndex], l, false);
         }
     }
 }

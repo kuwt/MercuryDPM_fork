@@ -27,8 +27,7 @@
 #include "Species/LinearViscoelasticFrictionReversibleAdhesiveSpecies.h"
 #include "DPMBase.h"
 #include "Boundaries/AngledPeriodicBoundary.h"
-
-/*! 
+/*!
  * This code tests if the contact properties are preserved when a particle pair 
  * crosses a set of AngularPeriodicWalls. It creates a pair of adhesive-elastic 
  * particles that rotate around the center of the domain due to a body force.
@@ -84,7 +83,7 @@ public:
         //centrifugal acc. a=v^2/R;
         Mdouble velocity = 2.0;
         Mdouble R = 4.0;
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setRadius(0.5);
         p.setPosition({R, 0, 0});

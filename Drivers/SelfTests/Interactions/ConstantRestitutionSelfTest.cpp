@@ -1,6 +1,5 @@
 /* Hertzian2DUnitTest */
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Species/LinearPlasticViscoelasticSpecies.h"
 
 
@@ -35,7 +34,7 @@ int main()
     radius = 1e-4;
     Mdouble relativeVelocity = 1;
 
-    BaseParticle particle;
+    SphericalParticle particle;
     particle.setSpecies(species);
     particle.setRadius(radius);
     particle.setPosition(Vec3D(-radius,0,0));

@@ -97,7 +97,7 @@ public:
         boundaryHandler.copyAndAddObject(periodicBoundary);
 
         //Place particles into the box
-        BaseParticle particle;
+        SphericalParticle particle;
         particle.setSpecies(speciesHandler.getObject(0));
         //Insert a set of particles (3 large and 57 small):
         while (particleHandler.getNumberOfObjects()<60)

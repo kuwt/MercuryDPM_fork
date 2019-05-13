@@ -24,7 +24,6 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DPMBase.h"
-#include "Particles/BaseParticle.h"
 #include <iostream>
 #include <vector>
 #include <Species/LinearPlasticViscoelasticSpecies.h>
@@ -53,7 +52,7 @@ public:
         
         particleHandler.clear();
 		
-		BaseParticle P0,P1;
+		SphericalParticle P0,P1;
         P0.setSpecies(speciesHandler.getObject(0));
         P1.setSpecies(speciesHandler.getObject(0));
 		P0.setPosition(Vec3D( 1.0,1.0,1.0));

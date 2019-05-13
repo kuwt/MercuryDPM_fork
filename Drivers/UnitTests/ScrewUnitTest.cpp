@@ -26,7 +26,6 @@
 #include <Species/LinearViscoelasticSpecies.h>
 #include <Walls/Screw.h>
 #include "Mercury3D.h"
-
 /**
  * Testing if screw geometry is implemented well
  */
@@ -53,7 +52,7 @@ int main()
     Mdouble h = 0.05;
     Mdouble distance;
     Vec3D normal;
-    BaseParticle particle(s);
+    SphericalParticle particle(s);
     particle.setRadius(0.5*h);
     for (Mdouble x = dpm.getXMin(); x<dpm.getXMax(); x+=h) {
         for (Mdouble y = dpm.getYMin(); y<dpm.getYMax(); y+=h) {

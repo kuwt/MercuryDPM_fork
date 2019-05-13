@@ -197,7 +197,7 @@ public:
     }
 
     int nCreated_;
-    BaseParticle inflowParticle_;
+    SphericalParticle inflowParticle_;
 
 };
 

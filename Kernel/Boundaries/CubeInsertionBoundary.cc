@@ -104,7 +104,7 @@ void CubeInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFa
 }
 
 void
-CubeInsertionBoundary::set(BaseParticle particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax,
+CubeInsertionBoundary::set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax,
     double radMin, double radMax) {
     set(&particleToCopy, maxFailed, posMin, posMax, velMin, velMax, radMin, radMax);
 }

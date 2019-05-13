@@ -175,7 +175,7 @@ public:
     }
 
     int nCreated_;
-    BaseParticle inflowParticle_;
+    SphericalParticle inflowParticle_;
 };
 
 int main(int argc, char *argv[]) {

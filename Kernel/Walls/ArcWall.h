@@ -47,7 +47,7 @@ public:
     bool getDistanceAndNormal(const BaseParticle& p,
                               Mdouble& distance, Vec3D& normal_return) const override;
     
-    std::vector<BaseInteraction*> getInteractionWith(BaseParticle* p,
+    BaseInteraction* getInteractionWith(BaseParticle* p,
                                                      unsigned timeStamp,
                                                      InteractionHandler* interactionHandler) override;
     

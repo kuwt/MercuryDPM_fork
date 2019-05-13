@@ -248,7 +248,7 @@ public:
 
     int nCreated_;
 	bool randomiseSpecies;
-	BaseParticle inflowParticle_;
+	SphericalParticle inflowParticle_;
 
     LinearViscoelasticSpecies* species;
     LinearViscoelasticMixedSpecies* baseSpecies;

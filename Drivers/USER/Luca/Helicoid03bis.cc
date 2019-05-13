@@ -217,13 +217,13 @@ bool Helicoid03bis::getDistanceAndNormal(const BaseParticle& p, Mdouble& distanc
     Mdouble dZ, dR, dN;
     
     // z coordinate check
-    if (p.getPosition().Z > l_ + start_.Z + p.getWallInteractionRadius() || p.getPosition().Z < start_.Z - p.getWallInteractionRadius()) return false;
+    if (p.getPosition().Z > l_ + start_.Z + p.getWallInteractionRadius(this) || p.getPosition().Z < start_.Z - p.getWallInteractionRadius(this)) return false;
     
     // radial distance of the particle from the helicoid axis
     Mdouble rho = sqrt(pow(p.getPosition().X - start_.X, 2) + pow(p.getPosition().Y - start_.Y, 2));
     
     // r coordinate check
-    if (rho > maxR_ + p.getWallInteractionRadius()) return false;
+    if (rho > maxR_ + p.getWallInteractionRadius(this)) return false;
     
     // cosine of the helix angle
     Mdouble cosEta = 1.0/sqrt(1.0+pow(h_/rho,2));
@@ -239,7 +239,7 @@ bool Helicoid03bis::getDistanceAndNormal(const BaseParticle& p, Mdouble& distanc
     else if (deltaZ < -0.5*pitch_) {deltaZ += pitch_;}
     
     // n coordinate check
-    if (fabs(deltaZ)*cosEta > p.getWallInteractionRadius() + delta_) return false;
+    if (fabs(deltaZ)*cosEta > p.getWallInteractionRadius(this) + delta_) return false;
     
     // sine of the helix angle
     Mdouble sinEta = 1.0/sqrt(1.0+pow(rho/h_,2));
@@ -254,7 +254,7 @@ bool Helicoid03bis::getDistanceAndNormal(const BaseParticle& p, Mdouble& distanc
     Mdouble sinXi = (p.getPosition().Y - start_.Y)/rho;
     
     // collision cases
-    if (dZ <= -p.getWallInteractionRadius()*cosEta) // (-,-,0) collision
+    if (dZ <= -p.getWallInteractionRadius(this)*cosEta) // (-,-,0) collision
     {
         if (dR <= 0.0) // (0,n,0) collision
         {
@@ -295,7 +295,7 @@ bool Helicoid03bis::getDistanceAndNormal(const BaseParticle& p, Mdouble& distanc
                 // the collision distance
                 distance = sqrt(pow(dN,2.0) + pow(dR,2.0));
                 
-                if (distance > p.getWallInteractionRadius()) return false;
+                if (distance > p.getWallInteractionRadius(this)) return false;
                 
                 // gets the right n vector direction
                 nVector *= -deltaZ;
@@ -353,7 +353,7 @@ bool Helicoid03bis::getDistanceAndNormal(const BaseParticle& p, Mdouble& distanc
                     // the collision distance
                     distance = sqrt(pow(dZ,2.0) + pow(dR,2.0));
                     
-                    if (distance > p.getWallInteractionRadius()) return false;
+                    if (distance > p.getWallInteractionRadius(this)) return false;
                     
                     // gets the right z vector direction
                     zVector *= p.getPosition().Z - 0.5*(l_ + start_.Z);
@@ -392,7 +392,7 @@ bool Helicoid03bis::getDistanceAndNormal(const BaseParticle& p, Mdouble& distanc
             double dPhi = dN/sinXi;
             double zPhiDistance = sqrt(pow(dPhi,2.0) + pow(dZ,2.0));
             
-            if (zPhiDistance > p.getWallInteractionRadius()) return false;
+            if (zPhiDistance > p.getWallInteractionRadius(this)) return false;
             
             // gets the right phi vector direction
             phiVector *= -deltaZ;
@@ -422,7 +422,7 @@ bool Helicoid03bis::getDistanceAndNormal(const BaseParticle& p, Mdouble& distanc
                     // the collision distance
                     distance = sqrt(pow(dR,2.0) + pow(zPhiDistance,2.0));
                     
-                    if (distance > p.getWallInteractionRadius()) return false;
+                    if (distance > p.getWallInteractionRadius(this)) return false;
                     
                     // the collision vector
                     normal_return = (dPhi*phiVector + dZ*zVector + dR*rVector)/distance;
@@ -434,7 +434,7 @@ bool Helicoid03bis::getDistanceAndNormal(const BaseParticle& p, Mdouble& distanc
             {
                 if (dR <= 0.0) // (0,n,z) collision
                 {
-                    if (dZ > p.getWallInteractionRadius()*cosEta) // actual collision with the edge
+                    if (dZ > p.getWallInteractionRadius(this)*cosEta) // actual collision with the edge
                     {
                         // the collision vector
                         normal_return = (dPhi*phiVector + dZ*zVector)/zPhiDistance;
@@ -457,12 +457,12 @@ bool Helicoid03bis::getDistanceAndNormal(const BaseParticle& p, Mdouble& distanc
                     rVector.Y = -sinXi;
                     rVector.Z = 0.0;
                     
-                    if (dZ > p.getWallInteractionRadius()*cosEta) // actual collision with the edge
+                    if (dZ > p.getWallInteractionRadius(this)*cosEta) // actual collision with the edge
                     {
                         // the collision distance
                         distance = sqrt(pow(dR,2.0) + pow(zPhiDistance,2.0));
                         
-                        if (distance > p.getWallInteractionRadius()) return false;
+                        if (distance > p.getWallInteractionRadius(this)) return false;
                         
                         // the collision vector
                         normal_return = (dPhi*phiVector + dZ*zVector + dR*rVector)/distance;
@@ -480,7 +480,7 @@ bool Helicoid03bis::getDistanceAndNormal(const BaseParticle& p, Mdouble& distanc
                         // the collision distance
                         distance = sqrt(pow(dN,2.0) + pow(dR,2.0));
                         
-                        if (distance > p.getWallInteractionRadius()) return false;
+                        if (distance > p.getWallInteractionRadius(this)) return false;
                         
                         // gets the right n vector direction
                         nVector *= -deltaZ;
@@ -547,7 +547,7 @@ bool Helicoid03bis::getDistanceAndNormal(const BaseParticle& p, Mdouble& distanc
 //                
 //                // distance from the contact point
 //                distance = sqrt(pow(dZ,2) + pow(dR,2) + pow(dN,2));
-//                if (distance > p.getWallInteractionRadius()) return false;
+//                if (distance > p.getWallInteractionRadius(this)) return false;
 //                
 //                // takes the correct orientation of zVector and normalizes
 //                zVector *= -dZ;
@@ -569,7 +569,7 @@ bool Helicoid03bis::getDistanceAndNormal(const BaseParticle& p, Mdouble& distanc
 //            {
 //                // distance from the contact point
 //                distance = sqrt(pow(dZ,2) + pow(dR,2));
-//                if (distance > p.getWallInteractionRadius()) return false;
+//                if (distance > p.getWallInteractionRadius(this)) return false;
 //                
 //                // takes the correct orientation of zVector and normalizes
 //                zVector *= -dZ;
@@ -600,7 +600,7 @@ bool Helicoid03bis::getDistanceAndNormal(const BaseParticle& p, Mdouble& distanc
 //                
 //                // distance from the contact point
 //                distance = sqrt(pow(dZ,2) + pow(dN,2));
-//                if (distance > p.getWallInteractionRadius()) return false;
+//                if (distance > p.getWallInteractionRadius(this)) return false;
 //                
 //                // takes the correct orientation of zVector and normalizes
 //                zVector *= -dZ;
@@ -661,7 +661,7 @@ bool Helicoid03bis::getDistanceAndNormal(const BaseParticle& p, Mdouble& distanc
 //                
 //                // distance from the contact point
 //                distance = sqrt(pow(dR,2) + pow(dN,2));
-//                if (distance > p.getWallInteractionRadius()) return false;
+//                if (distance > p.getWallInteractionRadius(this)) return false;
 //                
 //                // takes the correct orientation of nVector and normalizes
 //                nVector *= -deltaZ;
@@ -714,11 +714,10 @@ bool Helicoid03bis::getDistanceAndNormal(const BaseParticle& p, Mdouble& distanc
 // Checks for the interaction between a particle p at a time timeStamp.
 // In case of interaction returns a pointer to the BaseInteraction happened between the Helicoid and the
 // BaseParticle at time timeStamp
-std::vector<BaseInteraction *> Helicoid03bis::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler)
+BaseInteraction* Helicoid03bis::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler)
 {
     Mdouble distance;
     Vec3D normal;
-    std::vector<BaseInteraction*> interactions;
     if (getDistanceAndNormal(*p,distance,normal))
     {
         BaseInteraction* c = interactionHandler->getInteraction(p, this, timeStamp);
@@ -726,9 +725,9 @@ std::vector<BaseInteraction *> Helicoid03bis::getInteractionWith(BaseParticle* p
         c->setDistance(distance);
         c->setOverlap(p->getRadius() - distance);
         c->setContactPoint(p->getPosition() - (p->getRadius() - 0.5 * c->getOverlap()) * c->getNormal());
-        interactions.push_back(c);
+        return c;
     }
-    return interactions;
+    return nullptr;
 }
 
 

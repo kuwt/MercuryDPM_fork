@@ -127,7 +127,7 @@ class DragBlasius : public Mercury2D {
             speciesP = speciesHandler.copyAndAddObject(speciesP);
 
             /* Prototypical particles */
-            auto particlePrototype = new BaseParticle();
+            auto particlePrototype = new SphericalParticle();
             particlePrototype->setSpecies(speciesP);
             particlePrototype->setRadius(pars.at("particleRadius"));
 
@@ -203,7 +203,7 @@ class DragBlasius : public Mercury2D {
              *      3 - rising half-tanh
              *      4 - Amalia's alternating base (baseRadius for smaller)
              */
-            BaseParticle rbParticle;
+            SphericalParticle rbParticle;
             rbParticle.setSpecies(speciesP);
             if (pars.at("baseConc") > 0)
             {
@@ -284,7 +284,7 @@ class DragBlasius : public Mercury2D {
 
             /* CubeInsertionBoundary for introducing particles when initialising
              * the system (will use Maser during the simulation proper) */
-            auto generandum = new BaseParticle;
+            auto generandum = new SphericalParticle;
             generandum->setSpecies(speciesP);
             generandum->setRadius(pars.at("particleRadius"));
             insb = new CubeInsertionBoundary();

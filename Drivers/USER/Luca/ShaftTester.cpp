@@ -24,7 +24,6 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Boundaries/PeriodicBoundary.h"
 #include "Walls/InfiniteWall.h"
 #include "Walls/InfiniteWallWithHole.h"
@@ -136,7 +135,7 @@ private:
         Mdouble dispersity = 0.1;
         
         particleHandler.clear();
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(species);
         p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
         

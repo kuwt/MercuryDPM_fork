@@ -195,12 +195,12 @@ public:
         return function_;
     }
     
-    void setStandardDeviation(Mdouble std)
+    void setStandardDeviation(Mdouble std) override
     {
         function_.setStandardDeviation(std);
     }
     
-    void setRadius(Mdouble radius)
+    void setRadius(Mdouble radius) override
     {
         if (std::is_base_of<CGCoordinates::Base_X_Y_Z, Coordinates>::value)
         {
@@ -218,7 +218,7 @@ public:
     /*!
      * \param[in] width of the cg function for all CGPoints
      */
-    void setWidth(Mdouble width)
+    void setWidth(Mdouble width) override
     {
         function_.setWidth(width);
     }
@@ -226,7 +226,7 @@ public:
     /*!
      * \return width of the cg function for all CGPoints
      */
-    Mdouble getWidth() const
+    Mdouble getWidth() const override
     {
         return function_.getWidth();
     }

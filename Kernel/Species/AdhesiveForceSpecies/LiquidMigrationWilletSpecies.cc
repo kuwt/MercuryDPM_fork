@@ -30,7 +30,6 @@ LiquidMigrationWilletSpecies::LiquidMigrationWilletSpecies()
 {
     liquidBridgeVolumeMax_ = 0.0; //std::numeric_limits<double>::infinity();
     distributionCoefficient_ = 1.0;
-    maxInteractionDistance_ = 0.0;
     surfaceTension_ = 0.0;
     contactAngle_ = 0.0;
 #ifdef DEBUG_CONSTRUCTOR
@@ -45,7 +44,6 @@ LiquidMigrationWilletSpecies::LiquidMigrationWilletSpecies(const LiquidMigration
 {
     liquidBridgeVolumeMax_ = s.liquidBridgeVolumeMax_;
     distributionCoefficient_ = s.distributionCoefficient_;
-    maxInteractionDistance_ = s.maxInteractionDistance_;
     surfaceTension_ = s.surfaceTension_;
     contactAngle_ = s.contactAngle_;
 #ifdef DEBUG_CONSTRUCTOR
@@ -104,12 +102,10 @@ void LiquidMigrationWilletSpecies::mix(LiquidMigrationWilletSpecies* const S, Li
     contactAngle_ = average(S->getContactAngle(), T->getContactAngle());
 }
 
-/*!
- * \return the maximum separation distance between particles below which the adhesive force is active.
- */
-Mdouble LiquidMigrationWilletSpecies::getInteractionDistance() const
+///\return the maximum separation distance below which adhesive forces can occur (needed for contact detection)
+void LiquidMigrationWilletSpecies::setInteractionDistance()
 {
-    return maxInteractionDistance_;
+    BaseSpecies::setInteractionDistance((1.0 + 0.5 * contactAngle_) * cbrt(liquidBridgeVolumeMax_));
 }
 
 /*!
@@ -120,7 +116,7 @@ void LiquidMigrationWilletSpecies::setLiquidBridgeVolumeMax(Mdouble liquidBridge
     if (liquidBridgeVolumeMax >= 0)
     {
         liquidBridgeVolumeMax_ = liquidBridgeVolumeMax;
-        maxInteractionDistance_ = (1.0 + 0.5 * contactAngle_) * cbrt(liquidBridgeVolumeMax_);
+        setInteractionDistance();
     }
     else
     {
@@ -190,7 +186,7 @@ void LiquidMigrationWilletSpecies::setContactAngle(Mdouble contactAngle)
     if (contactAngle >= 0)
     {
         contactAngle_ = contactAngle;
-        maxInteractionDistance_ = (1.0 + 0.5 * contactAngle_) * cbrt(liquidBridgeVolumeMax_);
+        setInteractionDistance();
     }
     else
     {

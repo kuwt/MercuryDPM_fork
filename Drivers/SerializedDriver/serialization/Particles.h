@@ -43,7 +43,7 @@ void load(Archive& ar, ParticleHandler& handl) {
     cereal::size_type size;
     ar ( cereal::make_size_tag(size) );
     
-    BaseParticle p;
+    SphericalParticle p;
     
     for (int i = 0; i < size; i++) {
         ar ( p );

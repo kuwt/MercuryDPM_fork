@@ -29,7 +29,6 @@
 #include <Species/LinearViscoelasticSpecies.h>
 
 #include "DPMBase.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "Boundaries/PeriodicBoundary.h"
 
@@ -40,7 +39,7 @@ public:
     void setupInitialConditions() override {
         speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
 
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         particleHandler.copyAndAddObject(p0);
         
@@ -61,9 +60,9 @@ int main(int argc UNUSED, char *argv[] UNUSED)
         problem.setName("ParticleHandlerDestructorTest");
         std::cout<<"Finished creating base problem"<<std::endl<<std::endl;
         
-        std::cout<<"Adding a BaseParticle, InfiniteWall and PeriodicBoundary to the base problem"<<std::endl;
+        std::cout<<"Adding a SphericalParticle, InfiniteWall and PeriodicBoundary to the base problem"<<std::endl;
         problem.setupInitialConditions();
-        std::cout<<"Finished adding a BaseParticle, InfiniteWall and PeriodicBoundary to the base problem"<<std::endl<<std::endl;
+        std::cout<<"Finished adding a SphericalParticle, InfiniteWall and PeriodicBoundary to the base problem"<<std::endl<<std::endl;
         
         std::cout<<"Copying base problem"<<std::endl;
         //my_problem problem2(problem);

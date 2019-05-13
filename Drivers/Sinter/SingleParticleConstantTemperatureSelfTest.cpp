@@ -62,7 +62,7 @@ public:
         species->setDensity(1000); //overly heavy
 
         // Inserting particle
-        BaseParticle P;
+        SphericalParticle P;
         P.setSpecies(species);
         P.setRadius(radius);
         P.setPosition(Vec3D(0, 0, 0));

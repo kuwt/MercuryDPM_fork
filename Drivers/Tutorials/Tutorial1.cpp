@@ -47,7 +47,7 @@ public:
     
     void setupInitialConditions() override {
 //! [T1:createParticle]
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setRadius(0.05); // sets particle radius
         p0.setPosition(Vec3D(0.1 * getXMax(), 0.1 * getYMax(), 0.1 * getZMax())); // sets particle position

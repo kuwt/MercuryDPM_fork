@@ -183,7 +183,7 @@ void ConstantMassFlowMaserBoundary::createPeriodicParticle(BaseParticle* p, Part
     if (isMaserParticle(p))
     {
         // check if particle is near the boundaries of the maser domain
-        if (getDistance(p) < p->getInteractionRadius() + pH.getLargestParticleLocal()->getInteractionRadius())
+        if (getDistance(p) < p->getMaxInteractionRadius() + pH.getLargestParticleLocal()->getMaxInteractionRadius())
         {
             BaseParticle* pGhost = createGhostCopy(p);
             

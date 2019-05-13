@@ -311,7 +311,7 @@ public:
         wallHandler.copyAndAddObject(wall);
     }
 
-    BaseParticle inflowParticle_;
+    SphericalParticle inflowParticle_;
 
 
 };

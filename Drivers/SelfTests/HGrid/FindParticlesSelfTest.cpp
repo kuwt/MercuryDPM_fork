@@ -24,7 +24,6 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Mercury2D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/IntersectionOfWalls.h"
 #include "Species/LinearViscoelasticSpecies.h"
 #include "Boundaries/CubeInsertionBoundary.h"
@@ -53,7 +52,7 @@ int main() {
 
     // define an insertion boundary and use it to insert particles;
     // note, the boundary is not added to the dpm, it is only used to insert particles initially
-    BaseParticle particle;
+    SphericalParticle particle;
     particle.setSpecies(dpm.speciesHandler.getLastObject());
     particle.setRadius(0.5);
     int maxFailed = 100;
@@ -70,7 +69,7 @@ int main() {
     logger(INFO,"number of particles % ",dpm.particleHandler.getNumberOfObjects());
 
     // use a search particle to find all particles close to the center of the domain, and give those particles a velocity
-    BaseParticle searchParticle;
+    SphericalParticle searchParticle;
     searchParticle.setSpecies(dpm.speciesHandler.getLastObject());
     searchParticle.setRadius(3);
     searchParticle.setPosition({5,5,0});

@@ -28,6 +28,8 @@
 
 #include "Math/SmallVector.h"
 #include "BaseParticle.h"
+#include "BaseInteractable.h"
+#include "Species/ParticleSpecies.h"
 
 typedef Vec3D BodyFixedCoordinates;
 typedef Vec3D LabFixedCoordinates;
@@ -166,16 +168,13 @@ public:
      */
     void setInertia() override;
     
-    /*!\brief Get the radius of the sphere that fits precisely around the particle.
-     * \todo Currently only implemented for ellipsoids
-     */
-    Mdouble getInteractionRadius() const override;
+    void setRadius(const Mdouble radius) override;
     
     /*!
      * \brief Checks if this superquadric is in interaction with the given particle, and if
      * so, returns vector of pointer to the associated BaseInteraction object (else returns empty vector).
      */
-    std::vector<BaseInteraction*> getInteractionWith(BaseParticle* P, unsigned timeStamp,
+    BaseInteraction* getInteractionWith(BaseParticle* P, unsigned timeStamp,
                                                      InteractionHandler* interactionHandler) override;
     
     /*!
@@ -199,7 +198,7 @@ public:
      * \brief Checks if this superquadric is in interaction with the given superquadric, and if
      * so, returns vector of pointer to the associated BaseInteraction object (else returns empty vector).
      */
-    std::vector<BaseInteraction*> getInteractionWithSuperQuad(SuperQuadric* p, unsigned timeStamp,
+    BaseInteraction* getInteractionWithSuperQuad(SuperQuadric* p, unsigned timeStamp,
                                                               InteractionHandler* interactionHandler);
     
     /*!
@@ -270,7 +269,18 @@ public:
     writeDebugMessageMiddleOfLoop(const SuperQuadric& p1, const SuperQuadric& p2, SmallVector<4>& contactPointPlanB,
                                   const unsigned int& counter) const;
 
+    /**
+     * \brief returns the radius plus half the interactionDistance of the mixed species
+     */
+    Mdouble getInteractionRadius(const BaseParticle* particle) const;
+
 private:
+    
+    /*!\brief Get the radius of the sphere that fits precisely around the particle.
+     * \todo Currently only implemented for ellipsoids
+     */
+    void setBoundingRadius();
+    
     /*!
      * \brief Blockiness parameters
      * \details Blockiness parameters should be in the range (0,1], where a sphere or ellipsoid is represented by

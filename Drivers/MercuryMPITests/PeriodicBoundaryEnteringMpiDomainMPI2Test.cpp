@@ -41,7 +41,7 @@ public:
     void setupInitialConditions() override
     {
         //Add a particle
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setRadius(0.5);
         

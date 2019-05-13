@@ -7,8 +7,6 @@
 
 #include "Mercury3D.h"
 #include "Boundaries/PeriodicBoundary.h"
-#include "Particles/BaseParticle.h"
-
 // NOTE: r is restitution coefficient not radius!! Use getMinParticleRadius when setting collision time and stiffness
 
 class CinderDriver : public Mercury3D
@@ -43,7 +41,7 @@ public:
     {
         
         //P0 is the smallest possible ejected particle
-        BaseParticle P0;
+        SphericalParticle P0;
         P0.setSpecies(species);
         P0.setRadius(MinParticleRadius);
         BaseParticle* Pp = &P0;
@@ -148,7 +146,7 @@ public:
         {
             
             //top left layer
-            BaseParticle p1;
+            SphericalParticle p1;
             p1.setSpecies(species);
             p1.setPosition(Vec3D(getXMin() + (2.0 * i + 1.0) * getFixedParticleRadius(), 1, 0.0));
             p1.setRadius(getFixedParticleRadius());
@@ -156,7 +154,7 @@ public:
             particleHandler.copyAndAddObject(p1);
             
             //bottom left layer
-            BaseParticle p2;
+            SphericalParticle p2;
             p2.setSpecies(species);
             p2.setPosition(Vec3D(getXMin() + (2.0 * i + 1.0) * getFixedParticleRadius(), 1, -getFixedParticleRadius() * 2.0));
             p2.setRadius(getFixedParticleRadius());
@@ -164,7 +162,7 @@ public:
             particleHandler.copyAndAddObject(p2);
             
             //top right layer
-            BaseParticle p3;
+            SphericalParticle p3;
             p3.setSpecies(species);
             p3.setPosition(Vec3D(getXMax() - (2.0 * i + 1.0) * getFixedParticleRadius(), 1, 0.0));
             p3.setRadius(getFixedParticleRadius());
@@ -172,7 +170,7 @@ public:
             particleHandler.copyAndAddObject(p3);
             
             //bottom right layer
-            BaseParticle p4;
+            SphericalParticle p4;
             p4.setSpecies(species);
             p4.setPosition(Vec3D(getXMax() - (2.0 * i + 1.0) * getFixedParticleRadius(), 1, -getFixedParticleRadius() * 2.0));
             p4.setRadius(getFixedParticleRadius());
@@ -199,7 +197,7 @@ public:
         
         if (CurrentRate < EjectionRate)
         {
-            BaseParticle P0;
+            SphericalParticle P0;
             P0.setSpecies(species);
             P0.setRadius(random.getRandomNumber(MinParticleRadius, MaxParticleRadius)); // particle radius
 //			P0.computeMass(Species);	// particle mass  (Species)?????

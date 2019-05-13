@@ -80,7 +80,7 @@ class CurrentTest2D : public Mercury2D
             bounds.set(Vec3D(1,0,0), -pars.length/2, +pars.length/2);
             boundaryHandler.copyAndAddObject(bounds);
 
-            BaseParticle p0;
+            SphericalParticle p0;
             p0.setSpecies(speciesP);
             double jump = 2*pars.particleRadius*(1 + pars.dispersity);
             for (double x = -pars.length/2; x < pars.length/2; x += jump)

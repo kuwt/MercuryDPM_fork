@@ -245,7 +245,7 @@ public:
 					set_StartFillHopperTime(getTime());
 					currStatus=fillHopper;
 					HopperInsertionBoundary b1;
-                    b1.set(new BaseParticle, getMaxFailed(), getYMin(), getYMax(), getMinInflowParticleRadius(), getMaxInflowParticleRadius(), getChuteAngle(), getFixedParticleRadius(), getIsHopperCentred(), getHopperDimension(), getHopperAngle(), getHopperLength(), getHopperExitLength(), getHopperHeight(), getHopperLift(), getHopperFillingPercentage());
+                    b1.set(new SphericalParticle, getMaxFailed(), getYMin(), getYMax(), getMinInflowParticleRadius(), getMaxInflowParticleRadius(), getChuteAngle(), getFixedParticleRadius(), getIsHopperCentred(), getHopperDimension(), getHopperAngle(), getHopperLength(), getHopperExitLength(), getHopperHeight(), getHopperLift(), getHopperFillingPercentage());
                     boundaryHandler.copyAndAddObject(b1);
 				}
 				break;
@@ -426,7 +426,7 @@ public:
 	
 	Mdouble startWait1Time,startTurningTime,startWait2Time;
 	Mdouble startFillHopperTime,startWait3Time,startFinishedTime;
-	BaseParticle inflowParticle_;
+	SphericalParticle inflowParticle_;
 };
 
 int main(int argc UNUSED, char *argv[] UNUSED)

@@ -211,9 +211,9 @@ bool ScrewCC::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec
    Mdouble z_P = p.getPosition().Z - start_.Z;
 
    // if the particle is outside the cylinder containing the screw there is no collision
-   if (r_P > rMax_ + p.getWallInteractionRadius()) return false;
-   if (z_P > l_ + p.getWallInteractionRadius()) return false;
-   if (z_P < - p.getWallInteractionRadius()) return false;
+   if (r_P > rMax_ + p.getWallInteractionRadius(this)) return false;
+   if (z_P > l_ + p.getWallInteractionRadius(this)) return false;
+   if (z_P < - p.getWallInteractionRadius(this)) return false;
 
    // trigonometric functions of the helix angle at the particle position
    Mdouble cosEta = r_P/sqrt(pow(r_P, 2.0) + pow(h_, 2.0));
@@ -290,7 +290,7 @@ bool ScrewCC::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec
 
          return true;
       }
-      else if (deltaN < p.getWallInteractionRadius()) // complex collision
+      else if (deltaN < p.getWallInteractionRadius(this)) // complex collision
       {
          // radial distance from screw edge
          Mdouble deltaR = r_P - rMax_;
@@ -299,7 +299,7 @@ bool ScrewCC::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec
          distance = sqrt(pow(deltaN, 2) + pow(deltaR, 2));
 
          // if the particle-blade_edge distance is higher than the particle radius there is no collision
-         if (distance > p.getWallInteractionRadius()) return false;
+         if (distance > p.getWallInteractionRadius(this)) return false;
 
          // if the distance is negative prints an error message
          if (distance < 0.0) std::cout << "\nCOLLISION ERROR WITH THE SCREW EDGE: OVERLAP > PARTICLE RADIUS\n";
@@ -333,7 +333,7 @@ bool ScrewCC::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec
       distance = sqrt(pow(deltaR, 2.0) + pow(deltaN, 2.0));
 
       // checkes for collision
-      if (distance > p.getWallInteractionRadius()) return false;
+      if (distance > p.getWallInteractionRadius(this)) return false;
 
       normal_return = normalVector;
 

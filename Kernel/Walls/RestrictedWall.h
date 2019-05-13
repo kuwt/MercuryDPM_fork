@@ -102,7 +102,7 @@ public:
     /*!
      * \brief Look up the interaction between this wall and a BaseParticle at a certain timeStamp.
      */
-    std::vector<BaseInteraction*>
+    BaseInteraction*
     getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler) override;
     
     void writeVTK(VTKContainer& vtk) const override;

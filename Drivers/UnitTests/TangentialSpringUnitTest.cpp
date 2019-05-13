@@ -26,7 +26,6 @@
 #include <iostream>
 #include "Species/LinearViscoelasticSlidingFrictionSpecies.h"
 #include "DPMBase.h"
-#include "Particles/BaseParticle.h"
 #include "Logger.h"
 
 /// In this file, the rolling behaviour of the tangential spring is tested. This is done by placing one normal partilce on top of a fixed partilce and letting graviry roll it over the other particle until it losses contact.
@@ -39,7 +38,7 @@ public:
         setSystemDimensions(3);
 		setParticleDimensions(3);
 		
-		BaseParticle P0,P1;
+		SphericalParticle P0,P1;
 
         P0.setSpecies(speciesHandler.getObject(0));
         P1.setSpecies(speciesHandler.getObject(0));

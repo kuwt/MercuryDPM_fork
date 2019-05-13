@@ -47,7 +47,7 @@ class VisualisationTest : public Mercury3D
         p0.setPosition(Vec3D(1.0, 0.0, 0.0));
         p0.setVelocity(Vec3D(1, 0.0, 0.0));
         particleHandler.copyAndAddObject(p0);
-        logger(INFO, "interaction radius p0: %", p0.getInteractionRadius());
+        logger(INFO, "interaction radius p0: %", p0.getMaxInteractionRadius());
         
         
         setTimeStep(species.getCollisionTime(1) / 50);

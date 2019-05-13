@@ -234,9 +234,9 @@ ScrewRectangularSectionClean::getDistanceAndNormal(const BaseParticle& p, Mdoubl
     Mdouble rho2 = distancePToStart.X * distancePToStart.X + distancePToStart.Y * distancePToStart.Y;
     
     // if the particle is outside the cylinder containing the screw there is no collision
-    if (rho2 > (rMax_ + p.getWallInteractionRadius()) * (rMax_ + p.getWallInteractionRadius()) ||
-        distancePToStart.Z > length_ + p.getWallInteractionRadius() ||
-        distancePToStart.Z < -p.getWallInteractionRadius())
+    if (rho2 > (rMax_ + p.getWallInteractionRadius(this)) * (rMax_ + p.getWallInteractionRadius(this)) ||
+        distancePToStart.Z > length_ + p.getWallInteractionRadius(this) ||
+        distancePToStart.Z < -p.getWallInteractionRadius(this))
     {
         return false;
     }
@@ -276,7 +276,7 @@ ScrewRectangularSectionClean::getDistanceAndNormal(const BaseParticle& p, Mdoubl
             distance = std::sqrt(deltaN * deltaN + deltaR * deltaR);
             
             // if the particle-blade_edge distance is higher than the particle radius there is no collision
-            if (distance > p.getWallInteractionRadius())
+            if (distance > p.getWallInteractionRadius(this))
                 return false;
             
             // if the distance is negative prints an error message
@@ -291,12 +291,12 @@ ScrewRectangularSectionClean::getDistanceAndNormal(const BaseParticle& p, Mdoubl
             return true;
         }
     }
-    else if (rho >= rMin_ + p.getWallInteractionRadius()) // check for collision with the blade side only, region 3
+    else if (rho >= rMin_ + p.getWallInteractionRadius(this)) // check for collision with the blade side only, region 3
     {
         logger(DEBUG, "region 3");
 
         // if the particle-blade_surface distance is higher than the collision threshold there is no collision
-        if (deltaN > p.getWallInteractionRadius())
+        if (deltaN > p.getWallInteractionRadius(this))
             return false;
         
         // region 3
@@ -317,7 +317,7 @@ ScrewRectangularSectionClean::getDistanceAndNormal(const BaseParticle& p, Mdoubl
         // radial distance between the particle centre and the shaft
         const Mdouble deltaR = rho - rMin_;
         
-        if (deltaN > p.getWallInteractionRadius()) // region 4
+        if (deltaN > p.getWallInteractionRadius(this)) // region 4
         {
             logger(DEBUG, "region 4");
             // the distance between the collision point and the particle centre
@@ -335,12 +335,12 @@ ScrewRectangularSectionClean::getDistanceAndNormal(const BaseParticle& p, Mdoubl
         {
             logger(DEBUG, "region 5");
             // distance between the particle centre and the and the point (rMin + rp, delta + rp)
-            distance = std::sqrt((deltaN - p.getWallInteractionRadius()) * (deltaN - p.getWallInteractionRadius()) +
-                                 (deltaR - p.getWallInteractionRadius()) * (deltaR - p.getWallInteractionRadius()));
+            distance = std::sqrt((deltaN - p.getWallInteractionRadius(this)) * (deltaN - p.getWallInteractionRadius(this)) +
+                                 (deltaR - p.getWallInteractionRadius(this)) * (deltaR - p.getWallInteractionRadius(this)));
             
             // transform the former to be the actual distance of the particle from the contact point
             // on the rounded corner
-            distance = p.getWallInteractionRadius() - distance;
+            distance = p.getWallInteractionRadius(this) - distance;
             
             // if the distance is negative prints an error message
             logger.assert(distance >= 0.0 || getHandler()->getDPMBase()->getTime() < 1e-2,
@@ -349,8 +349,8 @@ ScrewRectangularSectionClean::getDistanceAndNormal(const BaseParticle& p, Mdoubl
             
             // the normal to the edge through the particle centre
             // IMPORTANT: it needs to be normalized!
-            normal_return = fabs(deltaN - p.getWallInteractionRadius()) * normalVector -
-                            fabs(deltaR - p.getWallInteractionRadius()) * radialVector;
+            normal_return = fabs(deltaN - p.getWallInteractionRadius(this)) * normalVector -
+                            fabs(deltaR - p.getWallInteractionRadius(this)) * radialVector;
             normal_return.normalise();
             
             return true;
@@ -581,12 +581,11 @@ std::string ScrewRectangularSectionClean::getName() const
 
 // Checks for the interaction between a particle p at a time timeStamp
 // In case of interaction returns a pointer to the BaseInteraction happened between the Screw and the BaseParticle at time timeStamp
-std::vector<BaseInteraction*> ScrewRectangularSectionClean::getInteractionWith(BaseParticle* p, unsigned timeStamp,
+BaseInteraction* ScrewRectangularSectionClean::getInteractionWith(BaseParticle* p, unsigned timeStamp,
                                                                                InteractionHandler* interactionHandler)
 {
     Mdouble distance;
     Vec3D normal;
-    std::vector<BaseInteraction*> interactions;
     if (getDistanceAndNormal(*p, distance, normal))
     {
         BaseInteraction* c = interactionHandler->getInteraction(p, this, timeStamp);
@@ -594,7 +593,7 @@ std::vector<BaseInteraction*> ScrewRectangularSectionClean::getInteractionWith(B
         c->setDistance(distance);
         c->setOverlap(p->getRadius() - distance);
         c->setContactPoint(p->getPosition() - (p->getRadius() - 0.5 * c->getOverlap()) * c->getNormal());
-        interactions.push_back(c);
+        return c;
     }
-    return interactions;
+    return nullptr;
 }

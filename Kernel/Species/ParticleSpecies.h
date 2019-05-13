@@ -96,7 +96,26 @@ public:
      * This computation calls getLightestInverseParticleMassLocal, such that the computation is done on each node.
      */
     Mdouble getSmallestParticleMass() const;
-
+    
+    ///\brief returns the largest separation distance at which adhesive short-range forces can occur.
+    /*!
+     * \details returns the largest separation distance (negative overlap) at which
+     * (adhesive) short-range forces can occur (needed for contact detection).
+     * Defined in each of the AdhesiveForceSpecies
+     * It is defined as a virtual function here to allow the function
+     * to be called from a BaseSpecies pointer (which is the kind of pointer
+     * used for MixedSpecies).
+     */
+    Mdouble getMaxInteractionDistance() const {return maxInteractionDistance_;}
+    
+    /**
+     * \brief Sets #maxInteractionDistance_
+     * @param interactionDistance the interaction distance that has been changed
+     */
+    void setMaxInteractionDistance(Mdouble interactionDistance=0);
+    
+    const BaseSpecies* getMixedSpecies(const ParticleSpecies* s) const;
+    
 private:
     
     /*!
@@ -115,6 +134,12 @@ private:
      * The default value (empty) stands for constant density.
      */
     std::function<double(double temperature)> temperatureDependentDensity_;
+    
+    /**
+     * Returns the max distance between particles of this species and any other species below which adhesive forces can occur (needed for contact detection)
+     */
+    Mdouble maxInteractionDistance_;
+    
     
 };
 

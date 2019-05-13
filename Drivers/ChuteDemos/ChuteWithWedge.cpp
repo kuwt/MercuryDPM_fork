@@ -120,9 +120,9 @@ public:
     
     
     ///creates flow particles in the whole chute
-     BaseParticle createFlowParticle() override
+     SphericalParticle createFlowParticle() override
     {
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setRadius(random.getRandomNumber(getMinInflowParticleRadius(), getMaxInflowParticleRadius()));
         p0.setPosition(Vec3D(random.getRandomNumber(getXMin() + 2.0 * p0.getRadius(), inflowLength),

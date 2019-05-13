@@ -25,7 +25,6 @@
 
 //! [CST:headers]
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "Walls/InfiniteWallWithHole.h"
 #include "Walls/Coil.h"
@@ -112,7 +111,7 @@ private:
         
         //! [CST:particle]
         particleHandler.clear();
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
         p0.setRadius(particleRadius);

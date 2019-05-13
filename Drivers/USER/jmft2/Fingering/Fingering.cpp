@@ -3,7 +3,6 @@
 #include "Walls/InfiniteWall.h"
 #include "Walls/IntersectionOfWalls.h"
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Boundaries/CubeInsertionBoundary.h"
 #include "Math/RNG.h"
 #include <iostream>
@@ -135,9 +134,9 @@ class Fingering : public Mercury3D {
       basal_ = speciesHandler.copyAndAddObject(basal_);
 
       /* Prototypical particles, to be copied out later */
-      smallPrototype = new BaseParticle();
+      smallPrototype = new SphericalParticle();
       smallPrototype->setSpecies(small_);
-      largePrototype = new BaseParticle();
+      largePrototype = new SphericalParticle();
       largePrototype->setSpecies(large_);
 
     }
@@ -328,7 +327,7 @@ class Fingering : public Mercury3D {
                 double y = generator.getRandomNumber(-1,1) * pars["width"];
                 double z = 0;
 
-                BaseParticle P;
+                SphericalParticle P;
                 P.fixParticle();
                 P.setRadius(r);
                 P.setSpecies(basal_);
@@ -366,7 +365,7 @@ class Fingering : public Mercury3D {
     bool stillFillingUp;
     IntersectionOfWalls* frontWall;
     CubeInsertionBoundary* insb;
-    BaseParticle *smallPrototype, *largePrototype;
+    SphericalParticle *smallPrototype, *largePrototype;
 
 };
 

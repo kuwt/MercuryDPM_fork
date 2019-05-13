@@ -29,7 +29,6 @@
 #include <Species/LinearViscoelasticSpecies.h>
 
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Boundaries/PeriodicBoundary.h"
 #include "Math/ExtendedMath.h"
 
@@ -38,7 +37,7 @@ class ScalingTestInitialConditionsRelax : public Mercury3D
 public:
     
     void setupInitialConditions() override {
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setRadius(particleRadius);
         
         setXMin(0.0);

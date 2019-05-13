@@ -87,7 +87,7 @@ public:
         }
 
         // Inserting particles; 50% of the particles are large (r_s=0.6*d), 50% small (r_s=0.4*d)
-        BaseParticle P;
+        SphericalParticle P;
         P.setRadius(0.6*particleDiameter);
         P.setSpecies(particleSpecies);
 

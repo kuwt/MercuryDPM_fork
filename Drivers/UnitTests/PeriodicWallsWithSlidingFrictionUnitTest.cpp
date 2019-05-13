@@ -26,7 +26,6 @@
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Mercury2D.h"
 #include "Boundaries/PeriodicBoundary.h"
-#include "Particles/BaseParticle.h"
 #include <Logger.h>
 
 ///This test is a UnitTest for:
@@ -68,7 +67,7 @@ class PeriodicWallsWithSlidingFrictionUnitTest : public Mercury2D
         b0.set(Vec3D(0, 1, 0), getYMin(), getYMax());
         boundaryHandler.copyAndAddObject(b0);
 
-        BaseParticle P0, P1, P2, P3, P4, P5, P6, P7;
+        SphericalParticle P0, P1, P2, P3, P4, P5, P6, P7;
         P0.setSpecies(speciesHandler.getObject(0));
         P1.setSpecies(speciesHandler.getObject(0));
         P2.setSpecies(speciesHandler.getObject(0));

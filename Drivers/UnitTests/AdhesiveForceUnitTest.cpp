@@ -23,7 +23,6 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Particles/BaseParticle.h"
 #include "Species/Species.h"
 #include "Species/NormalForceSpecies/LinearViscoelasticNormalSpecies.h"
 #include "Species/NormalForceSpecies/LinearPlasticViscoelasticNormalSpecies.h"
@@ -73,7 +72,7 @@ public:
 		setZMin(-R);
 		
         particleHandler.clear();
-		BaseParticle P;
+		SphericalParticle P;
         P.setSpecies(speciesHandler.getObject(0));
     	P.setRadius(R);
 
@@ -130,7 +129,7 @@ public:
         species->setSlidingFrictionCoefficient(0.01);
 
         particleHandler.clear();
-		BaseParticle P;
+		SphericalParticle P;
         P.setSpecies(speciesHandler.getObject(0));
 		P.setRadius(R);
         
@@ -189,7 +188,7 @@ protected:
 		setZMin(-R);
 		
         particleHandler.clear();
-		BaseParticle P;
+		SphericalParticle P;
         P.setSpecies(speciesHandler.getObject(0));
 		P.setRadius(R);
 		P.setPosition(Vec3D(R+species->getInteractionDistance()*1/3,0,0));

@@ -23,7 +23,6 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DPMBase.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <iostream>
 #include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
@@ -68,7 +67,7 @@ public:
         setGravity(Vec3D(0,-9.8,0));
 
         //Create both particles and set their positions, radii, and velocities.
-		BaseParticle p;
+		SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
 		p.setPosition(Vec3D(0.0,r0,0.0));
 		p.setVelocity(Vec3D(0.0,0.0,0.0));

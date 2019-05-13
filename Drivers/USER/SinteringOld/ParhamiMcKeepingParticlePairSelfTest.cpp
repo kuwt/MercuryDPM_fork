@@ -54,7 +54,7 @@ int main(int argc UNUSED, char *argv[] UNUSED) {
     ps.speciesHandler.copyAndAddObject(s);
 
     //add particle
-    BaseParticle p;
+    SphericalParticle p;
     p.setSpecies(ps.speciesHandler.getObject(0));
     p.setRadius(50e-9);
     p.setPosition(p.getRadius() * Vec3D(0, 0, 1.0-1e-6*1e-3));

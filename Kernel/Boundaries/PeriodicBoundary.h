@@ -114,6 +114,7 @@ public:
      * \param[in] p A pointer to the particle which will be shifted.
      */
     void shiftPosition(BaseParticle* p) const override;
+    void shiftPosition(Vec3D& p) const;
     
     /*!
      * \brief shifts two positions

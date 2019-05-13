@@ -25,7 +25,6 @@
 
 #include "Mercury3D.h"
 #include "StatisticsVector.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 
 #include <cmath>
@@ -45,7 +44,7 @@ public:
 		//set Particles' position, radius, velocity and bounding box
 		setDomain({0,0,-0.5},{5,5,0.5});
 
-		BaseParticle P0;
+		SphericalParticle P0;
         P0.setSpecies(speciesHandler.getObject(0));
 		for (int i=0;i<N;i++)
             for (int j=0;j<N;j++)

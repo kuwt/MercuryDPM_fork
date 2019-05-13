@@ -155,7 +155,7 @@ int main()
     dpm.wallHandler.readTriangleWall("TriangulatedWall.vtk",s);
 
     //introduce particles
-    BaseParticle p(s);
+    SphericalParticle p(s);
 
     //random insertion
     for (unsigned i=0; i<300; i++)

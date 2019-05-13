@@ -41,7 +41,7 @@ public:
         species01->setSlidingFrictionCoefficient(0.5);
         species01->setSlidingStiffness(species01->getStiffness() * 2.0 / 7.0);
         //
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setRadius(0.5);
         p0.fixParticle();
         p0.setSpecies(species0);
@@ -59,7 +59,7 @@ public:
         wallHandler.copyAndAddObject(w0);
         ///////////////////
         //Make the "free" particle to be inserted
-        BaseParticle p1;
+        SphericalParticle p1;
         p1.setRadius(0.35);
         p1.setSpecies(species1);
         Vec3D pos;

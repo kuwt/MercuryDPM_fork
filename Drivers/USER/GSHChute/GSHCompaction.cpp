@@ -28,7 +28,6 @@
 #include <Boundaries/CubeInsertionBoundary.h>
 #include <Boundaries/PeriodicBoundary.h>
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 using constants::pi;
 using mathsFunc::cubic;
@@ -68,8 +67,9 @@ public:
         species.setSlidingStiffness(2./7.*species.getStiffness());
         auto s = speciesHandler.copyAndAddObject(species);
 
+		SphericalParticle p(s);
         CubeInsertionBoundary insertionBoundary;
-        insertionBoundary.set(BaseParticle(s),NEVER,getMin(),getMax(),Vec3D(0,0,0),Vec3D(0,0,0),0.475,0.525);
+        insertionBoundary.set(p,NEVER,getMin(),getMax(),Vec3D(0,0,0),Vec3D(0,0,0),0.475,0.525);
         insertionBoundary.setInitialVolume((double)n*pi/6.0);
         insertionBoundary.insertParticles(this);
     }

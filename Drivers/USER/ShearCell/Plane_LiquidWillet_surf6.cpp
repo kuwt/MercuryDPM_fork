@@ -6,8 +6,6 @@
 #include <Mercury3D.h>
 #include <Boundaries/PeriodicBoundary.h>
 #include "Boundaries/LeesEdwardsBoundary.h"
-#include "Particles/BaseParticle.h"
-
 class poly_simpleshear: public Mercury3D{
 public:
 /* 

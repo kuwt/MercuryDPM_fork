@@ -78,7 +78,7 @@ public:
         wallHandler.copyAndAddObject(w0);
 
         //Insert particles. A very simple insertion routine is used, where particles locations are in a grid.
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
         for (double z = zContraction + ContractionHeight;

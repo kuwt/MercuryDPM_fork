@@ -51,7 +51,7 @@ class myproblem : public DPMBase {
 		setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(3,getTimeMax(),getTimeStep()));
 	
 		//Create the particles	
-		BaseParticle p0;
+		SphericalParticle p0;
 	
 		//overlap at which the system is in balance
 		double delta = 1./getStiffness();

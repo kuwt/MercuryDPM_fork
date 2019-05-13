@@ -350,7 +350,7 @@ public:
                     currStatus = fillHopper;
                     
                     HopperInsertionBoundary b1;
-                    BaseParticle* hopperInsertionParticle = new BaseParticle;
+                    BaseParticle* hopperInsertionParticle = new SphericalParticle;
                     hopperInsertionParticle->setSpecies(species);
                     b1.set(hopperInsertionParticle, getMaxFailed(), getYMin(), getYMax(), getMinInflowParticleRadius(), getMaxInflowParticleRadius(), getChuteAngle(), getFixedParticleRadius(), getIsHopperCentred(), getHopperDimension(), getHopperAngle(), getHopperLength(), getHopperExitLength(), getHopperHeight(), getHopperLift(), getHopperFillingPercentage());
                     boundaryHandler.copyAndAddObject(b1);
@@ -549,7 +549,7 @@ private:
 
     Mdouble startWait1Time, startTurningTime, startWait2Time;
     Mdouble startFillHopperTime, startWait3Time, startFinishedTime;
-    BaseParticle inflowParticle_;
+    SphericalParticle inflowParticle_;
     
 };
 

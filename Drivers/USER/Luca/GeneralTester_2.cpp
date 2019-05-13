@@ -288,7 +288,7 @@ public:
 
    LinearPlasticViscoelasticFrictionSpecies *specieParticle1;
    LinearPlasticViscoelasticFrictionSpecies *specieParticle2;
-   BaseParticle p0;
+   SphericalParticle p0;
    InfiniteWall wall;
    AxisymmetricIntersectionOfWalls cylinder;
    AxisymmetricIntersectionOfWalls* cylPointer;

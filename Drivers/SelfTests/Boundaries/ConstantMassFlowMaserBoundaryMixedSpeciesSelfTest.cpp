@@ -80,7 +80,7 @@ public:
         setYMax(2.0);
         setZMax(2.0);
     
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setPosition(Vec3D(2.0,0.0,0.0));
         p.setVelocity(Vec3D(1.0,0.0,0.0));

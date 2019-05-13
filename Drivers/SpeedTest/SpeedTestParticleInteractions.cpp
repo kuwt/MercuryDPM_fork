@@ -25,9 +25,7 @@
 
 #include<iostream>
 #include "Species/LinearViscoelasticSpecies.h"
-#include "Particles/SphericalParticle.h"
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "MercuryTime.h"
 
@@ -133,7 +131,6 @@ int main()
 	highPoly.solve();
     std::cout << "Total time to run highly polydisperse simulation: " << time.toc() << "s (Expected: 3s)" << std::endl;
 
-    highPoly.write(std::cout);
 	return 0;
 }
 

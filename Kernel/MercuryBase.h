@@ -283,19 +283,6 @@ protected:
     void hGridInsertParticle(BaseParticle* obj) final;
     
     /*!
-     * \brief This checks particles in the HGRID to see if for closer enough
-     *        for possible contact.
-     */
-    void broadPhase(BaseParticle* i) override;
-    
-    /*!
-     * \brief This is a purely virtual function that checks if an object is in
-     *        the grid, this code is dimension dependent so purely virtual at
-     *        this stage.
-     */
-    virtual void hGridFindOneSidedContacts(BaseParticle* obj) = 0;
-    
-    /*!
      * \brief Purely virtual function that checks if the given particle has a 
      *        possible contact with any other BaseParticle in the HGrid.
      */

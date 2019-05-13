@@ -402,7 +402,7 @@ class TaperedDrum : public Mercury3D
 	{
 		int insertionFailCounter = 0;
 		Vec3D particlePosition;
-		BaseParticle p0;
+		SphericalParticle p0;
 		
 		p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
 		

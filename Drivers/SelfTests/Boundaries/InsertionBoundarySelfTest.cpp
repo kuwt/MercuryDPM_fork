@@ -27,7 +27,6 @@
 #include "Mercury3D.h"
 #include "Boundaries/CubeInsertionBoundary.h"
 #include "Boundaries/PeriodicBoundary.h"
-#include "Particles/BaseParticle.h"
 #include "Species/LinearViscoelasticSpecies.h"
 #include "Walls/InfiniteWall.h"
 
@@ -54,7 +53,7 @@ public:
         speciesHandler.copyAndAddObject(species);
 
 
-        BaseParticle insertionBoundaryParticle;
+        SphericalParticle insertionBoundaryParticle;
         insertionBoundaryParticle.setSpecies(speciesHandler.getObject(0));
 
         CubeInsertionBoundary insertionBoundary;

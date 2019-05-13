@@ -1,5 +1,4 @@
 #include "Mercury2D.h"
-#include "Particles/BaseParticle.h"
 #include "Boundaries/CubeInsertionBoundary.h"
 #include "Boundaries/DeletionBoundary.h"
 #include "Boundaries/FluxBoundary.h"
@@ -46,7 +45,7 @@ class FluxBoundarySelfTest : public Mercury2D
 
             insbA = new CubeInsertionBoundary;
             insbB = new CubeInsertionBoundary;
-            BaseParticle* insertionBoundaryParticle = new BaseParticle; // Possibly evil!
+            BaseParticle* insertionBoundaryParticle = new SphericalParticle; // Possibly evil!
             insertionBoundaryParticle->setSpecies(speciesP);
             insbA->set(
                     insertionBoundaryParticle,

@@ -41,7 +41,7 @@ public:
         setSystemDimensions(3);
         setParticleDimensions(3);
         
-        BaseParticle P0, P1;
+        SphericalParticle P0, P1;
         
         P0.setSpecies(speciesHandler.getObject(0));
         P1.setSpecies(speciesHandler.getObject(1));

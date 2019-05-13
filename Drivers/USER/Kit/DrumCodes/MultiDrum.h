@@ -510,7 +510,7 @@ public:
         BaseParticle* original = particleHandler.getObject(0);
  
         for (int i = 1; i < nPolygon.size(); i++) {
-            BaseParticle wallPart = *original; //We copy!
+            BaseParticle* wallPart = original->copy(); //We copy!
             //and now we tune!...
             
             lengthSum = 0;
@@ -534,10 +534,10 @@ public:
                 initialPos.Z = r;
               
                 position = mapToCartesian(theta, y, r);
-                wallPart.setPosition(position);
+                wallPart->setPosition(position);
                 particleHandler.copyAndAddObject(wallPart);
             }
-                        
+            delete wallPart;
             
         }
         
@@ -592,7 +592,7 @@ public:
         std::cout << "Number of small particles to be inserted:" << numSmallToBeInserted << std::endl;
         
         // CREATE THE PARTICLES
-        BaseParticle P0;
+        SphericalParticle P0;
         
         Vec3D position;
         double r, r0, theta, y;

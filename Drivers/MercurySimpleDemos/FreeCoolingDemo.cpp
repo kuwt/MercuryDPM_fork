@@ -28,7 +28,6 @@
 #include <Species/LinearViscoelasticSpecies.h>
 
 #include "Mercury2D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 
 /// In this file 32^2 particles with the same velocity are placed in a bi-axial box. This makes them collide with the
@@ -43,7 +42,7 @@ public:
         species->setStiffness(1e3);
 
         int N1=static_cast<int>(sqrt(N))+1;
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         for (int i=0;i<N;i++)
         {

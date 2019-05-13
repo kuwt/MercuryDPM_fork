@@ -80,7 +80,7 @@ class CurrentTest : public Mercury3D
             
             /* Periodic boundaries */
 
-            BaseParticle p0;
+            SphericalParticle p0;
             p0.setSpecies(speciesP);
             for (double x = -.5*pars.boundbox; x < .5*pars.boundbox; x += 2*pars.particleRadius*pars.dispersity_max)
                 for (double y = -.5*pars.boundbox; y < .5*pars.boundbox; y += 2*pars.particleRadius*pars.dispersity_max)

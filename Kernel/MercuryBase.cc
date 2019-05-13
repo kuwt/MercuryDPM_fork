@@ -310,23 +310,6 @@ void MercuryBase::hGridInsertParticle(BaseParticle* obj)
     }
 }
 
-#ifdef CONTACT_LIST_HGRID
-void MercuryBase::broadPhase(BaseParticle *i UNUSED)
-{
-}
-#else
-
-/*!
- * \param[in] i A pointer to the BaseParticle for which we want to see if there 
- *              are interactions on its own level.
- */
-void MercuryBase::broadPhase(BaseParticle* i)
-{
-    hGridFindOneSidedContacts(i);
-}
-
-#endif
-
 /*!
  * \details The actions that are done before each time step, it rebuilds the HGrid
  *          if necessary, otherwise it computes which cell each particle is in.
@@ -529,12 +512,12 @@ bool MercuryBase::hGridNeedsRebuilding()
         return true;
     }
     else if (particleHandler.getLargestParticle() != nullptr &&
-             2.0 * particleHandler.getLargestParticle()->getInteractionRadius() >
+             2.0 * particleHandler.getLargestParticle()->getMaxInteractionRadius() >
              getHGrid()->getCellSizes().back() * grid->getCellOverSizeRatio())
     {
         logger(VERBOSE, "HGrid needs updating, because of maximum cell size, current = %, required = %.",
                grid->getCellSizes().back() * hGridCellOverSizeRatio_,
-               particleHandler.getLargestParticle()->getInteractionRadius());
+               particleHandler.getLargestParticle()->getMaxInteractionRadius());
         return true;
     }
     else

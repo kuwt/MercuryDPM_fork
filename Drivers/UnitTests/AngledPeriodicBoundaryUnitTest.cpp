@@ -88,7 +88,7 @@ public:
     void setupInitialConditions() override {
         //centrifugal acc. a=v^2/R;
         Mdouble R = 4.0;
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
 		p.setRadius(0.5);
 		p.setPosition({R,0.5,0});

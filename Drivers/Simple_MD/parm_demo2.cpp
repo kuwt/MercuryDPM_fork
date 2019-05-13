@@ -41,7 +41,7 @@ class two_particle_elastic_collision : public DPMBase {
 			exit(0);
 		}
 		
-		BaseParticle P0,P1;
+		SphericalParticle P0,P1;
 		
 		particleHandler.copyAndAddObject(P0);
 		particleHandler.copyAndAddObject(P1);

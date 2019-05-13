@@ -150,7 +150,7 @@ public:
         wallHandler.copyAndAddObject(InfiniteWall(Vec3D(+1, 0, 0), getMax(), wallSpecies));
         wallHandler.copyAndAddObject(InfiniteWall(Vec3D(-1, 0, 0), getMin(), wallSpecies));
 
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(particleSpecies);
 
         BehzadInsertionBoundary c; //delete is done in boundaryHandler

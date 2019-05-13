@@ -681,7 +681,7 @@ public:
    bool particleInsertionSuccessful()
    {
       int insertionFailCounter = 0;
-      BaseParticle p0;
+      SphericalParticle p0;
 
       p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
 
@@ -1032,7 +1032,7 @@ public:
    void computeInternalStructure()
    {
       Vec3D gridPoint;
-      BaseParticle p0;
+      SphericalParticle p0;
       double nPointsInsideAgglomerateBoundary;
       double nPointsInsideComponents;
       Vec3D pMin, pMax;

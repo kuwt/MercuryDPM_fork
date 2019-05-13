@@ -272,7 +272,7 @@ void ChuteBottom::setupInitialConditions()
     unsigned int failed = 0;
     const unsigned int max_failed = 500;
     
-    BaseParticle inflowParticle_;
+    SphericalParticle inflowParticle_;
     inflowParticle_.setSpecies(speciesHandler.getObject(0));
     inflowParticle_.setHandler(&particleHandler);
     inflowParticle_.setOrientation({1, 0, 0, 0});

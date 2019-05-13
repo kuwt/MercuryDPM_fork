@@ -562,7 +562,7 @@ class TorqueTest_calibrationRoutine : public Mercury3D
 		
 		pistonLatticeParticleCounter = 0;
 		
-		BaseParticle p0;
+		SphericalParticle p0;
 		p0.setRadius(radiusBig);
 		p0.setVelocity(Vec3D(0.0,0.0,0.0));
 		p0.setSpecies(speciesPiston);

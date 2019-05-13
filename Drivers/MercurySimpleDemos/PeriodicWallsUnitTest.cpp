@@ -25,7 +25,6 @@
 
 #include "Mercury2D.h"
 #include "Boundaries/PeriodicBoundary.h"
-#include "Particles/BaseParticle.h"
 #include "Species/LinearViscoelasticSpecies.h"
 #include <Logger.h>
 
@@ -45,7 +44,7 @@ class PeriodicWalls : public Mercury2D
         setMax({0.01,0.01,0.0});
         setGravity({0.0,-9.8,0.0});
 
-        BaseParticle P0, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13;
+        SphericalParticle P0, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12, P13;
         P0.setSpecies(speciesHandler.getObject(0));
         P1.setSpecies(speciesHandler.getObject(0));
         P2.setSpecies(speciesHandler.getObject(0));

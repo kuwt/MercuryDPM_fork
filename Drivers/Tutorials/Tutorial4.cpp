@@ -42,7 +42,7 @@ class Tutorial4 : public Mercury3D
 public:
     
     void setupInitialConditions() override {
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setRadius(0.005);
         p0.setPosition(Vec3D(0.5 * getXMax(), 0.5 * getYMax(), getZMax()));

@@ -46,7 +46,7 @@ bool VChute::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3
     const Mdouble x0 = p.getPosition().X;
     const Mdouble y0 = p.getPosition().Y;
     const Mdouble z0 = p.getPosition().Z;
-    const Mdouble ra = p.getWallInteractionRadius(); // note, not getRadius()
+    const Mdouble ra = p.getWallInteractionRadius(this); // note, not getRadius()
     
     /* Has the particle flown off the ends of the chute? */
     if (x0 < -ra || x0 > l_ + ra)
@@ -103,7 +103,7 @@ bool VChute::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3
     }
     
     //If distance is too large there is no contact
-    if (distanceSquared >= pow(p.getWallInteractionRadius(), 2))
+    if (distanceSquared >= pow(p.getWallInteractionRadius(this), 2))
     {
         return false;
     }
@@ -119,7 +119,7 @@ bool VChute::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3
     
 }
 
-std::vector<BaseInteraction*>
+BaseInteraction*
 VChute::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler)
 {
     Mdouble distance;
@@ -132,10 +132,10 @@ VChute::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandl
         c->setOverlap(p->getRadius() - distance);
         c->setContactPoint(p->getPosition() - (p->getRadius() - 0.5 * c->getOverlap()) * c->getNormal());
         /// \todo Hacked please fix
-        return {c};
+        return c;
     }
     else
-        return {};
+        return nullptr;
 }
 
 /*!

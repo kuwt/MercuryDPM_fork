@@ -29,7 +29,7 @@
 #include "Species/LinearViscoelasticSpecies.h"
 #include "Math/ExtendedMath.h"
 
-class SlidingSpheresSelfTest: public Mercury3D
+class SlidingSpheresUnitTest: public Mercury3D
 {
 public:
     void setupInitialConditions() override
@@ -59,18 +59,18 @@ public:
         p1.setVelocity(Vec3D(0.0, 0.0, -1.0));
         particleHandler.copyAndAddObject(p0);
         particleHandler.copyAndAddObject(p1);
-        logger.assert_always(mathsFunc::isEqual(p0.getInteractionRadius(), 1.0, 1e-10),
-                             "interaction radius p0 equals % but should be 1.0", p0.getInteractionRadius());
+        logger.assert_always(mathsFunc::isEqual(p0.getMaxInteractionRadius(), 1.0, 1e-10),
+                             "interaction radius p0 equals % but should be 1.0", p0.getMaxInteractionRadius());
         
-        logger.assert_always(mathsFunc::isEqual(p1.getInteractionRadius(), 1.0, 1e-10),
-                             "interaction radius p1 equals % but should be 1.0", p1.getInteractionRadius());
+        logger.assert_always(mathsFunc::isEqual(p1.getMaxInteractionRadius(), 1.0, 1e-10),
+                             "interaction radius p1 equals % but should be 1.0", p1.getMaxInteractionRadius());
         
         
-        BaseParticle pSphere;
+        SphericalParticle pSphere;
         pSphere.setSpecies(speciesHandler.getObject(0));
         pSphere.setRadius(1);
         pSphere.setInertia();
-        BaseParticle pSphere1 = *(pSphere.copy());
+        SphericalParticle pSphere1 = pSphere;
         pSphere.setPosition(Vec3D(11.2, 0.0, 0.0));
         pSphere1.setPosition(Vec3D(12.9, 0.0, 2.0));
         pSphere.setVelocity(Vec3D(0.0, 0.0, 1.0));
@@ -89,20 +89,17 @@ public:
     void actionsAfterTimeStep() override
     {
         ///\todo should getTimeStep be getNTimeStep?
-        std::vector<BaseInteraction*> interaction = particleHandler.getObject(0)->
+        BaseInteraction* interaction = particleHandler.getObject(0)->
                 getInteractionWith(particleHandler.getObject(1), getTimeStep(), &interactionHandler);
-        if (!interaction.empty())
-        {
-            contactHasOccured = true;
-        }
+        if (interaction!= nullptr) contactHasOccured = true;
     }
     
     void test()
     {
-        setName("SlidingSphereSelfTest");
+        setName("SlidingSpheresUnitTest");
         setSaveCount(5000);
         solve();
-        logger.assert_always(contactHasOccured, "The contact has not occured");
+        logger.assert_always(contactHasOccured, "The contact has not occurred");
     }
 
 private:
@@ -111,7 +108,9 @@ private:
 
 int main(int argc, char* argv[])
 {
-    SlidingSpheresSelfTest problem;
+    SlidingSpheresUnitTest problem;
+    // comment next line to turn on file output
+    problem.setFileType(FileType::NO_FILE);
     problem.test();
     return 0;
 }

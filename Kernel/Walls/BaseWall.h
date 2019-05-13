@@ -150,7 +150,7 @@ public:
     void intersectVTK(std::vector<Vec3D>& points, Vec3D normal, Vec3D position) const;
     
     
-    virtual std::vector<BaseInteraction*>
+    virtual BaseInteraction*
     getInteractionWithSuperQuad(SuperQuadric* p, unsigned timeStamp, InteractionHandler* interactionHandler);
     
     /*!
@@ -166,7 +166,7 @@ public:
     const Vec3D getAxis() const;
     
     ///\brief Returns the interaction between this wall and a given particle, nullptr if there is no interaction.
-    std::vector<BaseInteraction*>
+    BaseInteraction*
     getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler) override;
     
     bool getVTKVisibility() const;

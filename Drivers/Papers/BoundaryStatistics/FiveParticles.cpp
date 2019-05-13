@@ -51,7 +51,7 @@ public:
 		setXMax(5); setYMax(1); setZMax(2.5);
 
 		//define common particle properties
-		BaseParticle p0;
+		SphericalParticle p0;
 		p0.setSpecies(speciesHandler.getObject(0));
 		p0.setRadius(particleRadius);
 

@@ -126,8 +126,8 @@ void SubcriticalMaserBoundaryTEST::actionsBeforeTimeLoop()
  */
 void SubcriticalMaserBoundaryTEST::createPeriodicParticle(BaseParticle* p, ParticleHandler& pH)
 {
-    
-    Mdouble proximityDistance = p->getInteractionRadius() + 2 * pH.getLargestParticleLocal()->getInteractionRadius();
+    ///\todo why 2.0?
+    const Mdouble proximityDistance = p->getMaxInteractionRadius() + 2.0* pH.getLargestParticle()->getMaxInteractionRadius();
     if (maserIsActivated_)
     {
         if (p->isMaserParticle())
@@ -485,7 +485,7 @@ if (NUMBER_OF_PROCESSORS > 1)
             }
             else
             {
-                particle = new BaseParticle();
+                particle = new SphericalParticle();
             }
 
             getHandler()->getDPMBase()->particleHandler.addObject(0, particle);
@@ -574,7 +574,7 @@ if (NUMBER_OF_PROCESSORS > 1)
             }
             else
             {
-                particle = new BaseParticle();
+                particle = new SphericalParticle();
             }
 
             getHandler()->getDPMBase()->particleHandler.addObject(0, particle);

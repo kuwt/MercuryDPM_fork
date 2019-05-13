@@ -233,10 +233,11 @@ TriangulatedWall* TriangulatedWall::copy() const
  */
 bool TriangulatedWall::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const
 {
+    Mdouble interactionRadius = p.getWallInteractionRadius(this);
     //it's important to use a reference here, as the faces use pointers
     for (const auto& face : face_)
     {
-        if (face.getDistanceAndNormal(p, distance, normal_return))
+        if (face.getDistanceAndNormal(p, distance, normal_return, interactionRadius))
             return true;
     }
     return false;
@@ -314,15 +315,15 @@ std::string TriangulatedWall::getName() const
  * \return A pointer to the BaseInteraction that happened between this InfiniteWall
  * and the BaseParticle at the timeStamp.
  */
-std::vector<BaseInteraction*> TriangulatedWall::getInteractionWith(BaseParticle* p, unsigned timeStamp,
+BaseInteraction* TriangulatedWall::getInteractionWith(BaseParticle* p, unsigned timeStamp,
                                                                    InteractionHandler* interactionHandler)
 {
     Mdouble distance;
     Vec3D normal;
-    std::vector<BaseInteraction*> interactions;
+    Mdouble interactionRadius = p->getWallInteractionRadius(this);
     for (const auto& face : face_)
     {
-        if (face.getDistanceAndNormal(*p, distance, normal))
+        if (face.getDistanceAndNormal(*p, distance, normal,interactionRadius))
         {
             normal = -normal;
             BaseInteraction* const c = interactionHandler->getInteraction(p, this, timeStamp, normal);
@@ -330,10 +331,10 @@ std::vector<BaseInteraction*> TriangulatedWall::getInteractionWith(BaseParticle*
             c->setDistance(distance);
             c->setOverlap(p->getRadius() - distance);
             c->setContactPoint(p->getPosition() - distance * normal);
-            interactions.push_back(c);
+            return c;
         }
     }
-    return interactions;
+    return nullptr;
 }
 
 Mdouble TriangulatedWall::Face::getDistance(const Vec3D& otherPosition) const
@@ -345,12 +346,11 @@ Mdouble TriangulatedWall::Face::getDistance(const Vec3D& otherPosition) const
  * check if there is contact with the face, determine if contact is with face, edge, vertex, return distance and normal;
  * only return edge, vertex contact if neighbor face pointer is higher to avoid doubles
  */
-bool TriangulatedWall::Face::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const
+bool TriangulatedWall::Face::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return, Mdouble interactionRadius) const
 {
     //check if particle overlaps
     distance = getDistance(p.getPosition());
     //return if distance is large, or particle has too much overlap
-    Mdouble interactionRadius = p.getWallInteractionRadius();
     if (fabs(distance) >= interactionRadius)///\todo make the triangle work from both sides
         return false;
     

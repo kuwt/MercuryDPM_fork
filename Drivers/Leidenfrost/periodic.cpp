@@ -28,7 +28,6 @@
 
 #include "Mercury2D.h"
 #include "Boundaries/PeriodicBoundary.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 
 class my_problem : public Mercury2D

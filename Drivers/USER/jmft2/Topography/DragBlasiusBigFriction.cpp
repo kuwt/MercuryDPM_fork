@@ -5,7 +5,6 @@
  * The basal friction for x > 0 is set by baseBeta and baseBetaRoll
  */
 #include "Mercury2D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "Walls/IntersectionOfWalls.h"
 #include "Boundaries/CubeInsertionBoundary.h"
@@ -150,7 +149,7 @@ class DragBlasiusBigFriction : public Mercury2D {
             spec_baseRight = speciesHandler.copyAndAddObject(spec_baseRight);
 
             /* Prototypical particles */
-            auto particlePrototype = new BaseParticle();
+            auto particlePrototype = new SphericalParticle();
             particlePrototype->setSpecies(spec_particles);
             particlePrototype->setRadius(pars.at("particleRadius"));
 
@@ -203,7 +202,7 @@ class DragBlasiusBigFriction : public Mercury2D {
             back = wallHandler.copyAndAddObject(back);
 
             /* CubeInsertionBoundary for introducing new particles */
-            auto generandum = new BaseParticle;
+            auto generandum = new SphericalParticle;
             generandum->setSpecies(spec_particles);
             generandum->setRadius(pars.at("particleRadius"));
             insb = new CubeInsertionBoundary();

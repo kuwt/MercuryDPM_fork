@@ -52,11 +52,11 @@ public:
         p1.setOrientationViaNormal({1.0,0.0,0.0});
         particleHandler.copyAndAddObject(p0);
         particleHandler.copyAndAddObject(p1);
-        logger.assert_always(mathsFunc::isEqual(p0.getInteractionRadius(), 1.0, 1e-10),
-                             "interaction radius p0 equals % but should be 1.0", p0.getInteractionRadius());
+        logger.assert_always(mathsFunc::isEqual(p0.getMaxInteractionRadius(), 1.0, 1e-10),
+                             "interaction radius p0 equals % but should be 1.0", p0.getMaxInteractionRadius());
     
-        logger.assert_always(mathsFunc::isEqual(p1.getInteractionRadius(), 1.0, 1e-10),
-                             "interaction radius p1 equals % but should be 1.0", p1.getInteractionRadius());
+        logger.assert_always(mathsFunc::isEqual(p1.getMaxInteractionRadius(), 1.0, 1e-10),
+                             "interaction radius p1 equals % but should be 1.0", p1.getMaxInteractionRadius());
         
         
         setTimeStep(species.getCollisionTime(1, 1, constants::pi / 6) / 50);
@@ -68,14 +68,14 @@ public:
     //check contact time
     void actionsAfterTimeStep() override
     {
-        std::vector<BaseInteraction*> interaction = particleHandler.getObject(0)->
+        BaseInteraction* interaction = particleHandler.getObject(0)->
                 getInteractionWith(particleHandler.getObject(1), getTimeStep(), &interactionHandler);
-        if (!interaction.empty())
+        if (interaction!=nullptr)
         {
             logger.assert_always(getTime() > 0.49 && getTime() < 0.6,
                                  "Contact is at the wrong time (time=%)", getTime());
             /// \todo merge hack please fix
-            const Vec3D contactPoint = interaction[0]->getContactPoint();
+            const Vec3D contactPoint = interaction->getContactPoint();
             logger.assert_always(mathsFunc::isEqual(contactPoint.X, 1.5, 1e-1),
                                  "Contact point X incorrect: % should be approximately 1.5", contactPoint.X);
             logger.assert_always(mathsFunc::isEqual(contactPoint.Y, 0, 1e-5),

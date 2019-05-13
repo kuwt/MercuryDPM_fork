@@ -53,7 +53,7 @@ public:
  */
     void insertParticles()
     {
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(1));
         while (particleHandler.getSize() - particleHandler.getNumberOfFixedObjects()
                < getChuteLength() * getChuteWidth() * getInflowHeight())

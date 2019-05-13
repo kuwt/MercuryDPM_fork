@@ -108,7 +108,7 @@ class AvalancheTest2D : public Mercury2D
             double probinsert = pars.releaseRate * pars.timeStep / (M_PI * pars.rho * pow(pars.particleRadius,2));
             if (generator.getRandomNumber(0,1) < probinsert) 
             {
-                BaseParticle pnew;
+                SphericalParticle pnew;
                 pnew.setSpecies(speciesP);
                 pnew.setRadius(pars.particleRadius * (1 + pars.dispersity*generator.getRandomNumber(-1,1)));
                 pnew.setPosition(Vec3D(
@@ -130,15 +130,15 @@ class AvalancheTest2D : public Mercury2D
             for (std::vector<BaseParticle*>::iterator it = particleHandler.begin();
                     it != particleHandler.end(); ++it)
             {
-                BaseParticle p = **it;
-                Vec3D pos = p.getPosition();
+                const BaseParticle* p = *it;
+                Vec3D pos = p->getPosition();
                 double r = fabs(pos.X);
                 if (       
-                           !(p.isFixed()) 
+                           !(p->isFixed())
                         && r > pars.releaseRadius 
                         && pos.Y > 0 
                      // && pos.Y < pars.releaseHeight
-                        && p.getVelocity().getLength() 
+                        && p->getVelocity().getLength()
                              < pow(pars.restitutionCoefficient,2)*sqrt(pars.g * pars.releaseHeight ) 
                 )
                 {

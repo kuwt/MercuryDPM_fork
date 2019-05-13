@@ -274,7 +274,7 @@ public:
     }
 
     int nCreated_;
-	BaseParticle inflowParticle_;
+	SphericalParticle inflowParticle_;
     LinearViscoelasticSlidingFrictionSpecies* species;
     LinearViscoelasticSlidingFrictionMixedSpecies* baseSpecies;
 };

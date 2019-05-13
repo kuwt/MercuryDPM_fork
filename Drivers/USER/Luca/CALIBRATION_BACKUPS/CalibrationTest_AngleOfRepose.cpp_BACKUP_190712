@@ -1092,7 +1092,7 @@ public:
    InfiniteWall xWall, zWall, basis;
    PeriodicBoundary yBoundary;
    IntersectionOfWalls pedestal;
-   BaseParticle p0;
+   SphericalParticle p0;
 
    // global variables
    bool verbose;

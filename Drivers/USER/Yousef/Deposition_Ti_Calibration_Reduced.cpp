@@ -7,7 +7,6 @@
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Boundaries/CubeInsertionBoundary.h"
 #include "Boundaries/PeriodicBoundary.h"
-#include "Particles/BaseParticle.h"
 //#include "Species/LinearViscoelasticSpecies.h"
 #include "Walls/InfiniteWall.h"
 #include "Walls/IntersectionOfWalls.h"
@@ -186,7 +185,7 @@ public:
         //
         //add particles until the volume to be added is zero
         //logger(INFO,"Adding particles ...");
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setRadius(meanRadius1);
         Mdouble fillHeight = 0.0;

@@ -80,10 +80,10 @@ bool HopperAndCasing::getDistanceAndNormal(const BaseParticle& p, Mdouble& dista
    if (pPosition.Z < hopperLength_ && pPosition.Y > radius_)
    {
       // collision with back or front wall of the hopper
-      if (fabs(pPosition.Z - 0.5*hopperLength_) > 0.5*hopperLength_ - p.getWallInteractionRadius())
+      if (fabs(pPosition.Z - 0.5*hopperLength_) > 0.5*hopperLength_ - p.getWallInteractionRadius(this))
       {
          // pure collision
-         if (fabs(pPosition.X) < radius_ - p.getWallInteractionRadius())
+         if (fabs(pPosition.X) < radius_ - p.getWallInteractionRadius(this))
          {
             distance = 0.5*hopperLength_ - fabs(pPosition.Z - 0.5*hopperLength_);
             normal_return.X = 0.0;
@@ -97,9 +97,9 @@ bool HopperAndCasing::getDistanceAndNormal(const BaseParticle& p, Mdouble& dista
          else // mixed collision
          {
             distance = sqrt(pow(radius_ - fabs(pPosition.X),2.0) + pow(0.5*hopperLength_ - fabs(pPosition.Z - 0.5*hopperLength_),2.0));
-            normal_return.X = (p.getWallInteractionRadius() - radius_ + fabs(pPosition.X));
+            normal_return.X = (p.getWallInteractionRadius(this) - radius_ + fabs(pPosition.X));
             normal_return.Y = 0.0;
-            normal_return.Z = (p.getWallInteractionRadius() - 0.5*hopperLength_ + fabs(pPosition.Z - 0.5*hopperLength_));
+            normal_return.Z = (p.getWallInteractionRadius(this) - 0.5*hopperLength_ + fabs(pPosition.Z - 0.5*hopperLength_));
             normal_return /= normal_return.getLength();
 
             // taking the correct sign of the normal
@@ -110,7 +110,7 @@ bool HopperAndCasing::getDistanceAndNormal(const BaseParticle& p, Mdouble& dista
       }
 
       // collison with side walls of the hopper
-      if (fabs(pPosition.X) > radius_ - p.getWallInteractionRadius())
+      if (fabs(pPosition.X) > radius_ - p.getWallInteractionRadius(this))
       {
          // only the pure collision has to be evaluated, since the mixed one is already accounted for
          distance = radius_ - fabs(pPosition.X);
@@ -134,7 +134,7 @@ bool HopperAndCasing::getDistanceAndNormal(const BaseParticle& p, Mdouble& dista
       Mdouble rho = sqrt(pow(pPosition.X,2.0) + pow(pPosition.Y,2.0));
 
       // collision from the casing inside
-      if (rho > radius_ - p.getWallInteractionRadius())
+      if (rho > radius_ - p.getWallInteractionRadius(this))
       {
          distance = radius_ - rho;
          normal_return.X = pPosition.X/rho;
@@ -158,10 +158,10 @@ bool HopperAndCasing::getDistanceAndNormal(const BaseParticle& p, Mdouble& dista
          Mdouble rho = sqrt(pow(pPosition.X,2.0) + pow(pPosition.Y,2.0));
 
          // collision with the bottom of the casing
-         if (rho > radius_ - p.getWallInteractionRadius())
+         if (rho > radius_ - p.getWallInteractionRadius(this))
          {
             // pure collision with the half-cilinder on the bottom
-            if (pPosition.Z > p.getWallInteractionRadius())
+            if (pPosition.Z > p.getWallInteractionRadius(this))
             {
                distance = radius_ - rho;
                normal_return.X = pPosition.X/rho;
@@ -173,9 +173,9 @@ bool HopperAndCasing::getDistanceAndNormal(const BaseParticle& p, Mdouble& dista
             else // mixed collision
             {
                distance = sqrt(pow(pPosition.Z,2.0) + pow(radius_ - rho,2.0));
-               normal_return.X = pPosition.X/rho*(p.getWallInteractionRadius() - radius_ + rho);
-               normal_return.Y = pPosition.Y/rho*(p.getWallInteractionRadius() - radius_ + rho);
-               normal_return.Z = -(p.getWallInteractionRadius() - pPosition.Z);
+               normal_return.X = pPosition.X/rho*(p.getWallInteractionRadius(this) - radius_ + rho);
+               normal_return.Y = pPosition.Y/rho*(p.getWallInteractionRadius(this) - radius_ + rho);
+               normal_return.Z = -(p.getWallInteractionRadius(this) - pPosition.Z);
                normal_return /= normal_return.getLength();
 
                return true;
@@ -183,7 +183,7 @@ bool HopperAndCasing::getDistanceAndNormal(const BaseParticle& p, Mdouble& dista
          }
 
          // collision with the back wall of the hopper
-         if (pPosition.Z < p.getWallInteractionRadius())
+         if (pPosition.Z < p.getWallInteractionRadius(this))
          {
             // only the pure collision has to be evaluated, since the mixed one is already accounted for
             distance = pPosition.Z;
@@ -200,10 +200,10 @@ bool HopperAndCasing::getDistanceAndNormal(const BaseParticle& p, Mdouble& dista
       else // top part
       {
          // collision with the back wall
-         if (pPosition.Z < p.getWallInteractionRadius())
+         if (pPosition.Z < p.getWallInteractionRadius(this))
          {
             // pure collision
-            if (fabs(pPosition.X) < radius_ - p.getWallInteractionRadius())
+            if (fabs(pPosition.X) < radius_ - p.getWallInteractionRadius(this))
             {
                distance = pPosition.Z;
                normal_return.X = 0.0;
@@ -215,9 +215,9 @@ bool HopperAndCasing::getDistanceAndNormal(const BaseParticle& p, Mdouble& dista
             else // mixed collision
             {
                distance = sqrt(pow(radius_ - pPosition.X,2.0) + pow(pPosition.Z,2.0));
-               normal_return.X = (p.getWallInteractionRadius() - radius_ + fabs(pPosition.X));
+               normal_return.X = (p.getWallInteractionRadius(this) - radius_ + fabs(pPosition.X));
                normal_return.Y = 0.0;
-               normal_return.Z = -(p.getWallInteractionRadius() - pPosition.Z);
+               normal_return.Z = -(p.getWallInteractionRadius(this) - pPosition.Z);
                normal_return /= normal_return.getLength();
 
                // taking the correct sign of the normal
@@ -227,30 +227,30 @@ bool HopperAndCasing::getDistanceAndNormal(const BaseParticle& p, Mdouble& dista
          }
 
          // collision with the front wall
-         if (pPosition.Z > hopperLength_ - p.getWallInteractionRadius())
+         if (pPosition.Z > hopperLength_ - p.getWallInteractionRadius(this))
          {
             // distance from the screw axis
             Mdouble rho = sqrt(pow(pPosition.X,2.0) + pow(pPosition.Y,2.0));
 
             // collision with top of cylindrical casing
-            if (rho < radius_ && rho > radius_ - p.getWallInteractionRadius())
+            if (rho < radius_ && rho > radius_ - p.getWallInteractionRadius(this))
             {
                distance = sqrt(pow(hopperLength_ - pPosition.Z,2.0) + pow(radius_ - rho,2.0));
-               normal_return.X = pPosition.X/rho*(p.getWallInteractionRadius() - radius_ + rho);
-               normal_return.Y = pPosition.Y/rho*(p.getWallInteractionRadius() - radius_ + rho);
-               normal_return.Z = (p.getWallInteractionRadius() - hopperLength_ + pPosition.Z);
+               normal_return.X = pPosition.X/rho*(p.getWallInteractionRadius(this) - radius_ + rho);
+               normal_return.Y = pPosition.Y/rho*(p.getWallInteractionRadius(this) - radius_ + rho);
+               normal_return.Z = (p.getWallInteractionRadius(this) - hopperLength_ + pPosition.Z);
                normal_return /= normal_return.getLength();
 
                return true;
             }
 
             // collision with lateral walls
-            if (fabs(pPosition.X) > radius_ - p.getWallInteractionRadius())
+            if (fabs(pPosition.X) > radius_ - p.getWallInteractionRadius(this))
             {
                distance = sqrt(pow(radius_ - fabs(pPosition.X),2.0) + pow(hopperLength_ - pPosition.Z,2.0));
-               normal_return.X = (p.getWallInteractionRadius() - radius_ + fabs(pPosition.X));
+               normal_return.X = (p.getWallInteractionRadius(this) - radius_ + fabs(pPosition.X));
                normal_return.Y = 0.0;
-               normal_return.Z = (p.getWallInteractionRadius() - hopperLength_ + pPosition.Z);
+               normal_return.Z = (p.getWallInteractionRadius(this) - hopperLength_ + pPosition.Z);
                normal_return /= normal_return.getLength();
 
                // taking the correct sign of the normal
@@ -271,7 +271,7 @@ bool HopperAndCasing::getDistanceAndNormal(const BaseParticle& p, Mdouble& dista
          }
 
          // pure collision with side walls
-         if (fabs(pPosition.X) > radius_ - p.getWallInteractionRadius())
+         if (fabs(pPosition.X) > radius_ - p.getWallInteractionRadius(this))
          {
             // only the pure collision has to be evaluated, since the mixed ones are already accounted for
             distance = radius_ - fabs(pPosition.X);
@@ -291,12 +291,12 @@ bool HopperAndCasing::getDistanceAndNormal(const BaseParticle& p, Mdouble& dista
 
    // // the particle was no t in the specified domain (likely to be an error)
    // std::cout << std::endl << "FATAL: COLLISION DIDN'T RETURN PROPERLY" << std::endl;
-   // std::cout << pPosition.X/radius_ << " " << pPosition.Y/hopperHeight_ << " " << pPosition.Z/hopperLength_ << "   " << distance/p.getWallInteractionRadius() << "   " << distance << "   " << normal_return << std::endl;
+   // std::cout << pPosition.X/radius_ << " " << pPosition.Y/hopperHeight_ << " " << pPosition.Z/hopperLength_ << "   " << distance/p.getWallInteractionRadius(this) << "   " << distance << "   " << normal_return << std::endl;
    // exit(0);
    return false;
 }
 
-// std::cout << pPosition << "   " << distance/p.getWallInteractionRadius() << "   " << distance << "   " << normal_return << std::endl;
+// std::cout << pPosition << "   " << distance/p.getWallInteractionRadius(this) << "   " << distance << "   " << normal_return << std::endl;
 
 void HopperAndCasing::read(std::istream& is)
 {

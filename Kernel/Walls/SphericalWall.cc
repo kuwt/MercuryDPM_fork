@@ -113,10 +113,10 @@ bool SphericalWall::getDistanceAndNormal(const BaseParticle& p, Mdouble& distanc
 {
     normal_return = p.getPosition() - getPosition();
     distance = Vec3D::getLength(normal_return) - radius_;
-    if (distance >= p.getWallInteractionRadius())
+    if (distance >= p.getWallInteractionRadius(this))
         return false;
     normal_return /= distance + radius_;
-    //logger(WARN,"p% q% q% q% q%", getPosition(), p.getPosition(), normal_return, distance, p.getWallInteractionRadius());
+    //logger(WARN,"p% q% q% q% q%", getPosition(), p.getPosition(), normal_return, distance, p.getWallInteractionRadius(this));
     return true;
 }
 

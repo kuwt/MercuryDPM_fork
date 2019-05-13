@@ -53,7 +53,7 @@ template <StatType T> class create_initial_conditions : public StatisticsVector<
 		
         particleHandler.clear();
         		
-		BaseParticle P0;
+		SphericalParticle P0;
 		int N=50;
 		double vmax=1;
 		double rmin=0.4;

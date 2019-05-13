@@ -1,5 +1,4 @@
 #include "Mercury2D.h"
-#include "Particles/BaseParticle.h"
 #include "Boundaries/FluxBoundary.h"
 #include "Boundaries/PeriodicBoundary.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
@@ -51,7 +50,7 @@ class FluxAndPeriodicBoundarySelfTest : public Mercury2D
             fluxb->set(Vec3D(1,0,0), 0);
             fluxb = boundaryHandler.copyAndAddObject(fluxb);
 
-            BaseParticle p;
+            SphericalParticle p;
             p.setSpecies(speciesP);
             for (int i = -20; i <= 20; i++)
             {

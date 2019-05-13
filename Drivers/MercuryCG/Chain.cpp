@@ -60,7 +60,7 @@ public:
         setYMin(-r);
         setZMin(0);
 
-        BaseParticle p(species);
+        SphericalParticle p(species);
         p.setRadius(r);
         for (unsigned i = 0; i < n; ++i)
         {

@@ -29,7 +29,6 @@
 
 #include <Logger.h>
 #include "DPMBase.h"
-#include "Particles/BaseParticle.h"
 #include "Species/LinearViscoelasticSlidingFrictionSpecies.h"
 #include "Walls/InfiniteWall.h"
 
@@ -44,7 +43,7 @@ public:
     MovingWall()
     {
         species = speciesHandler.copyAndAddObject(LinearViscoelasticSlidingFrictionSpecies());
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));   
         particle = particleHandler.copyAndAddObject(p);
         InfiniteWall w;
@@ -78,7 +77,7 @@ public:
 protected:
     LinearViscoelasticSlidingFrictionSpecies* species;
     InfiniteWall* wall;
-    BaseParticle* particle;
+    SphericalParticle* particle;
 };
 
 /// In the reference case the particle just moves two times as fast

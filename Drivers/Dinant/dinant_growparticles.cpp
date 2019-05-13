@@ -26,7 +26,6 @@
 #include "DPMBase.h"
 #include "Math/ExtendedMath.h"
 #include "Boundaries/PeriodicBoundary.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <sstream>
 #include <iostream>
@@ -59,7 +58,7 @@ class dinant_growparticles : public DPMBase
 		setYMin(0);
 		setYMax(0.1);
 		particleHandler.clear();
-        BaseParticle P0;
+        SphericalParticle P0;
 		for(int i=0;i<100;i++)
 		{
 			P0.setPosition(Vec3D(random.getRandomNumber(getXMin(),getXMax()),random.getRandomNumber(getYMin(),getYMax()),0));

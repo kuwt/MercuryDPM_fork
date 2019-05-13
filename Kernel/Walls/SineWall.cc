@@ -143,7 +143,7 @@ bool SineWall::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Ve
         Mdouble distanceSquared
                 = pow(q - x0, 2) + pow(sw_amp_ * sin(sw_wavn_ * q + sw_phshift_) - z0, 2);
         
-        if (distanceSquared >= pow(p.getWallInteractionRadius(), 2)
+        if (distanceSquared >= mathsFunc::square(p.getWallInteractionRadius(this))
             && z0 > sw_amp_ * sin(sw_wavn_ * q + sw_phshift_))
         {
             return false;
@@ -163,7 +163,7 @@ bool SineWall::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Ve
     }
 }
 
-std::vector<BaseInteraction*>
+BaseInteraction*
 SineWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler)
 {
     Mdouble distance;
@@ -177,10 +177,10 @@ SineWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHan
         // c->setContactPoint( p->getPosition() - (p->getRadius() - 0.5*c->getOverlap()) * c->getNormal());
         c->setContactPoint(p->getPosition() + distance * normal);
         /// \todo Hacked please fix
-        return {c};
+        return c;
     }
     else
-        return {};
+        return nullptr;
 }
 
 /*!

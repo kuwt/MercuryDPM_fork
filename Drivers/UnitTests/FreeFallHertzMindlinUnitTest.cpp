@@ -26,7 +26,6 @@
 
 
 #include "Mercury2D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <Species/HertzianViscoelasticMindlinSpecies.h>
 
@@ -46,7 +45,7 @@ public:
 		w0.set(Vec3D(0,-1,0), Vec3D(0, getYMin(), 0));
 		wallHandler.copyAndAddObject(w0);
 		
-		BaseParticle p0;
+		SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
 		p0.setPosition(Vec3D(0.0,2.0*radius,0.0));
 		p0.setVelocity(Vec3D(0.0,0.0,0.0));

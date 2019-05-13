@@ -64,7 +64,7 @@ public:
         boundaryHandler.copyAndAddObject(leesEdwardsBoundary);
 
         //define common particle properties
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setRadius(particleRadius);
         Mdouble rMin=2.0*particleRadius/(sizeDistribution+1);

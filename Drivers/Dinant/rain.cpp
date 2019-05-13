@@ -24,7 +24,6 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Mercury2D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <sstream>
 #include <iostream>
@@ -55,7 +54,7 @@ class rain : public Mercury2D
 		setYMax(20);
 
 		particleHandler.clear();		
-        BaseParticle P0;
+        SphericalParticle P0;
         P0.setRadius(0.5);
 		P0.setVelocity(Vec3D(0.0, 0.0, 0.0));
         P0.setPosition(Vec3D(3,getYMax()-0.5,0.0));
@@ -85,7 +84,7 @@ class rain : public Mercury2D
 	{
         if(particleHandler.getLastObject()->getPosition().Y+1.5<getYMax()&&particleHandler.getNumberOfObjects()<200)
         {
-            BaseParticle P0;
+            SphericalParticle P0;
             P0.setRadius(random.getRandomNumber(0.3,0.5));
     		P0.setVelocity(Vec3D(0.0, 0.0, 0.0));
             P0.setPosition(Vec3D(random.getRandomNumber(getXMin()+0.5,getXMax()-0.5),getYMax()-0.5,0.0));

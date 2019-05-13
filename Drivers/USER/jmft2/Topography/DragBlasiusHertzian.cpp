@@ -1,7 +1,6 @@
 /* DragBlasiusHertzian - As with DragBlasius, but with a HertzianViscoelastic
  * contact model instead of a LinearViscoelastic one. */
 #include "Mercury2D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "Boundaries/CubeInsertionBoundary.h"
 #include "Boundaries/DeletionBoundary.h"
@@ -157,7 +156,7 @@ class DragBlasiusHertzian : public Mercury2D {
              *      1 - mollified 'rising tanh' transition (default)
              *      2 - 'growing bubble' transition
              */
-            BaseParticle rbParticle;
+            SphericalParticle rbParticle;
             rbParticle.setSpecies(spec_particles);
             if (pars.at("baseConc") > 0)
                 for (double xpos = pars.at("xmin"); 
@@ -220,7 +219,7 @@ class DragBlasiusHertzian : public Mercury2D {
                 }
 
             /* CubeInsertionBoundary for introducing new particles */
-            auto generandum = new BaseParticle;
+            auto generandum = new SphericalParticle;
             generandum->setSpecies(spec_particles);
             generandum->setRadius(pars.at("particleRadius"));
             double velvar = 0;

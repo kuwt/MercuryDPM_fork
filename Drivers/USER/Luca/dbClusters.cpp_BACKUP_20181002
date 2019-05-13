@@ -395,7 +395,7 @@ public: //  ----- FUNCTIONS AND VARIABLES --------------------------------------
    {
       // initialization of important parameters
       Vec3D gridPoint;
-      BaseParticle p0;
+      SphericalParticle p0;
       double nPointsInsideAgglomerateBoundary;
       double nPointsInsideComponents;
 
@@ -645,7 +645,7 @@ public: //  ----- FUNCTIONS AND VARIABLES --------------------------------------
       int insertionFailCounter = 0;
       double rad, theta, phi;
       Vec3D particlePosition;
-      BaseParticle p0;
+      SphericalParticle p0;
 
       // setup of particle properties and initial conditions (besides position)
       p0.setVelocity(Vec3D(0.0, 0.0, 0.0));

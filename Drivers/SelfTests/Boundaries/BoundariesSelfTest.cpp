@@ -2,7 +2,6 @@
  * they allocate and free memory properly, when used with valgrind. */
 
 #include "Mercury2D.h"
-#include "Particles/BaseParticle.h"
 #include "Boundaries/CubeInsertionBoundary.h"
 #include "Boundaries/DeletionBoundary.h"
 #include "Boundaries/FluxBoundary.h"
@@ -49,7 +48,7 @@ class BoundariesSelfTest : public Mercury2D
 
             /* Introduce the InsertionBoundary */
             insb = new CubeInsertionBoundary;
-            BaseParticle* insertionBoundaryParticle = new BaseParticle; // Possibly evil!
+            BaseParticle* insertionBoundaryParticle = new SphericalParticle; // Possibly evil!
             insertionBoundaryParticle->setSpecies(speciesP);
             insb->set(
                     insertionBoundaryParticle,

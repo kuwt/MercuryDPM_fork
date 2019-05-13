@@ -528,7 +528,7 @@ public:
       int insertionFailCounter = 0;
       double rad, theta, phi;
       Vec3D particlePosition;
-      BaseParticle p0;
+      SphericalParticle p0;
 
       p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
       p0.setRadius(radiusParticle*(1.0 + sizeDispersityParticle*random.getRandomNumber(-1.0,1.0)));
@@ -765,7 +765,7 @@ public:
    void computeInternalStructure()
    {
       Vec3D gridPoint;
-      BaseParticle p0;
+      SphericalParticle p0;
       double nPointsInsideAgglomerateBoundary;
       double nPointsInsideComponents;
 

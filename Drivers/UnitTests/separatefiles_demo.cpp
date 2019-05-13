@@ -24,7 +24,6 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DPMBase.h"
-#include "Particles/BaseParticle.h"
 #include <iostream>
 #include <Species/LinearViscoelasticSpecies.h>
 
@@ -44,13 +43,13 @@ public:
         species->setStiffness(200000);
 
         particleHandler.clear();
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setPosition(Vec3D(0.5,0.5,0.5));
         p.setVelocity(Vec3D(0.0,0.0,0.0));
         p.setRadius(0.5);
         particleHandler.copyAndAddObject(p);
-        BaseParticle q;
+        SphericalParticle q;
         q.setSpecies(speciesHandler.getObject(0));
         q.setPosition(Vec3D(0.5,0.5,1.499));
         q.setVelocity(Vec3D(0.0,0.0,0.0));

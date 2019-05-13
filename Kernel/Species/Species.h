@@ -198,8 +198,6 @@ public:
      */
     void mixAll(BaseSpecies* const S, BaseSpecies* const T);
     
-    ///Returns the particle distance below which adhesive forces can occur (needed for contact detection)
-    Mdouble getInteractionDistance() const final;
 };
 
 template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveForceSpecies>
@@ -382,13 +380,6 @@ void Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::mi
                                                                                      BaseSpecies* const T UNUSED)
 {
     logger(ERROR, "%::mix() This function should not be called", getName());
-}
-
-///\return the maximum separation distance below which adhesive forces can occur (needed for contact detection)
-template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveForceSpecies>
-Mdouble Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::getInteractionDistance() const
-{
-    return AdhesiveForceSpecies::getInteractionDistance();
 }
 
 #endif

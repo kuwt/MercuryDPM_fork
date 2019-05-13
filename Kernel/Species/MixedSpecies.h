@@ -96,9 +96,6 @@ public:
      * two particle species
      */
     void mixAll(BaseSpecies* const S, BaseSpecies* const T) final;
-    
-    ///Returns the particle distance below which adhesive forces can occur (needed for contact detection)
-    Mdouble getInteractionDistance() const final;
 };
 
 template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveForceSpecies>
@@ -301,12 +298,5 @@ void MixedSpecies<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies
     AdhesiveForceSpecies::mix(SA,TA);
 }
 
-///Returns the particle distance below which adhesive forces can occur (needed for contact detection)
-
-template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveForceSpecies>
-Mdouble MixedSpecies<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::getInteractionDistance() const
-{
-    return AdhesiveForceSpecies::getInteractionDistance();
-}
 
 #endif

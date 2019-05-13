@@ -215,10 +215,10 @@ std::string OscillatingLattice1D::getName() const
 bool OscillatingLattice1D::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const
 {
     // Checks if the particle is too high to touch the walls
-    if (p.getPosition().Z > z_ + h_ + p.getWallInteractionRadius()) return false;
+    if (p.getPosition().Z > z_ + h_ + p.getWallInteractionRadius(this)) return false;
     
     // Check if the particles are close enough to the walls from the side
-    if (fabs(fmod(p.getPosition().X,L_) - 0.5*L_) < 0.5*d_ + p.getWallInteractionRadius()) return false;
+    if (fabs(fmod(p.getPosition().X,L_) - 0.5*L_) < 0.5*d_ + p.getWallInteractionRadius(this)) return false;
     
     // collision checker, the space being divided in 4 regions
     if (p.getPosition().Z <= z_ + h_ && fabs(fmod(p.getPosition().X,L_) - 0.5*L_) >= 0.5*d_)  // REGION 1
@@ -258,7 +258,7 @@ bool OscillatingLattice1D::getDistanceAndNormal(const BaseParticle& p, Mdouble& 
         {
             distance = sqrt(pow(fmod(p.getPosition().X,L_) - 0.5*d_,2) + pow(p.getPosition().Z - (z_ + h_),2));
             
-            if (distance > p.getWallInteractionRadius()) return false;
+            if (distance > p.getWallInteractionRadius(this)) return false;
             
             normal_return.X = (fmod(p.getPosition().X,L_) - 0.5*d_)/distance;
             normal_return.Y = 0.0;
@@ -268,7 +268,7 @@ bool OscillatingLattice1D::getDistanceAndNormal(const BaseParticle& p, Mdouble& 
         {
             distance = sqrt(pow(L_ - fmod(p.getPosition().X,L_) - 0.5*d_,2) + pow(p.getPosition().Z - (z_ + h_),2));
             
-            if (distance > p.getWallInteractionRadius()) return false;
+            if (distance > p.getWallInteractionRadius(this)) return false;
             
             normal_return.X = (L_ - fmod(p.getPosition().X,L_) - 0.5*d_)/distance;
             normal_return.Y = 0.0;
@@ -289,11 +289,10 @@ bool OscillatingLattice1D::getDistanceAndNormal(const BaseParticle& p, Mdouble& 
 // Checks for the interaction between a particle p at a time timeStamp.
 // In case of interaction returns a pointer to the BaseInteraction happened between the inter-well wall and the
 // BaseParticle at time timeStamp
-std::vector<BaseInteraction *> OscillatingLattice1D::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler)
+BaseInteraction* OscillatingLattice1D::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler)
 {
     Mdouble distance;
     Vec3D normal;
-    std::vector<BaseInteraction*> interactions;
     if (getDistanceAndNormal(*p,distance,normal))
     {
         BaseInteraction* c = interactionHandler->getInteraction(p, this, timeStamp);
@@ -301,9 +300,9 @@ std::vector<BaseInteraction *> OscillatingLattice1D::getInteractionWith(BasePart
         c->setDistance(distance);
         c->setOverlap(p->getRadius() - distance);
         c->setContactPoint(p->getPosition() - (p->getRadius() - 0.5 * c->getOverlap()) * c->getNormal());
-        interactions.push_back(c);
+        return c;
     }
-    return interactions;
+    return nullptr;
 }
 
 

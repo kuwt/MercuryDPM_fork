@@ -67,7 +67,7 @@ public:
 		boundaryHandler.copyAndAddObject(b0);
 
         //insert the particles in a cubic domain
-        BaseParticle p; // defines a new particle
+        SphericalParticle p; // defines a new particle
         p.setSpecies(speciesHandler.getObject(0)); // sets particle species
 
         CubeInsertionBoundary b;

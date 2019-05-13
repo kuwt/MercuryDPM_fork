@@ -23,6 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <Particles/SphericalParticle.h>
 #include "Mercury3D.h"
 //#include "Math/ExtendedMath.h"
 #include "Species/LinearViscoelasticFrictionReversibleAdhesiveSpecies.h"
@@ -92,7 +93,7 @@ public:
         }
 
         //put particles into the domain in a 3d grid of mesh size distance
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setRadius(0.5);
         p.setPosition(position+Vec3D(1,0,-0.49));

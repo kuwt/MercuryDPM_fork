@@ -74,7 +74,7 @@ public:
         std::cout << "Inserting " << n << " particles" << std::endl;
         //try to find new insertable particles
         unsigned int i = 0;
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(species);
         Mdouble s = sizeDistribution;
         Mdouble rMin=cbrt(0.5/(s*s + 1.0)/(s + 1.0));

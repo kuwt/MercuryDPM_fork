@@ -27,7 +27,6 @@
 ///todo{This code is not working as is wanted}
 #include <iostream>
 #include "Mercury2D.h"
-#include "Particles/BaseParticle.h"
 #include "Species/LinearViscoelasticSlidingFrictionReversibleAdhesiveSpecies.h"
 #include "Walls/InfiniteWall.h"
 
@@ -41,7 +40,7 @@ public:
     
 	void setupInitialConditions() override {
 		int N1=static_cast<int>(ceil(sqrt(N)));
-		BaseParticle p0;
+		SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setRadius(0.0001);
 		for (int i=0;i<N;i++)
@@ -113,6 +112,6 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     problem.fStatFile.setFileType(FileType::NO_FILE);
     problem.solve();
     std::cout << problem.particleHandler.getObject(0)->getRadius() << std::endl;
-    std::cout << problem.particleHandler.getObject(0)->getInteractionRadius() << std::endl;
+    std::cout << problem.particleHandler.getObject(0)->getMaxInteractionRadius() << std::endl;
     return 0;
 }

@@ -111,7 +111,7 @@ public:
 		double HalfWidth = particleHandler.getObject(0)->getRadius() 
 			*(RelLoopSize + sqrt(mathsFunc::square(1+relOverlap)-1));
 		//insert particle and get mass
-		BaseParticle p0;
+		SphericalParticle p0;
 		p0.setRadius(Radius);
 		p0.fixParticle();
 		double PositionX = -HalfWidth;

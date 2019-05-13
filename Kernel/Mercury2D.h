@@ -83,7 +83,7 @@ protected:
     /*!
      * \brief Finds contacts with the BaseParticle; avoids multiple checks.
      */
-    void hGridFindOneSidedContacts(BaseParticle* obj) override;
+    void computeInternalForces(BaseParticle* obj) override;
     
     /*!
      * \brief Tests if the BaseParticle has contacts with other Particles in the target cell.

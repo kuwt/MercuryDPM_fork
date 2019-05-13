@@ -27,7 +27,6 @@
 #include <Species/LinearPlasticViscoelasticSlidingFrictionSpecies.h>
 #include "Mercury3D.h"
 #include "Boundaries/AngledPeriodicBoundary.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/AxisymmetricIntersectionOfWalls.h"
 
 class ShearCellMDCLR : public Mercury3D {

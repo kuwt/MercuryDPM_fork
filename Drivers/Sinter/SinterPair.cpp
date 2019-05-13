@@ -71,7 +71,7 @@ public:
 
         setTimeStep(0.02*collisionTime);
 
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(species);
         p.setRadius(radius);
         p.setPosition({-(1-1e-15)*radius,0,0});

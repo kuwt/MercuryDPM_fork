@@ -178,7 +178,8 @@ void SubcriticalMaserBoundary::createPeriodicParticle(BaseParticle* p, ParticleH
     if (isMaserParticle(p) || !maserIsActivated_)
     {
         // check if particle is near the boundaries of the maser domain
-        if (getDistance(p) < p->getInteractionRadius() + 2 * pH.getLargestParticleLocal()->getInteractionRadius())
+        const Mdouble periodicDistance = p->getMaxInteractionRadius() + 2.0* pH.getLargestParticle()->getMaxInteractionRadius();
+        if (getDistance(p) < periodicDistance)
         {
             //furthermore, if the particle is on the right it has to be copied over to the outflow domain
             if (isClosestToRightBoundary(p))

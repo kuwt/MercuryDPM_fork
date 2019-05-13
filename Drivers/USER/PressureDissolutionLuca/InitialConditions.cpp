@@ -105,7 +105,7 @@ public:
             exit(-1);
         }
 
-        BaseParticle P;
+        SphericalParticle P;
         Vec3D pos;
         
         // Inserting particles; 50% of the particles are large (r_s=0.6*d), 50% small (r_s=0.4*d)

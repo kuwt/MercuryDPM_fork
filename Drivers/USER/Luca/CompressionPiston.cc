@@ -148,7 +148,7 @@ bool CompressionPiston::getDistanceAndNormal(const BaseParticle& p, Mdouble& dis
     distance = height_ - p.getPosition().Z;
     
     // Checks if the particle is in contact with the wall
-    if (distance > p.getWallInteractionRadius()) return false;
+    if (distance > p.getWallInteractionRadius(this)) return false;
     
     // If the compression is too high throws a warning but doesn't exit
     if (distance <= 0.0)
@@ -167,11 +167,10 @@ bool CompressionPiston::getDistanceAndNormal(const BaseParticle& p, Mdouble& dis
 // Checks for the interaction between a particle p at a time timeStamp.
 // In case of interaction returns a pointer to the BaseInteraction happened between the inter-well wall and the
 // BaseParticle at time timeStamp
-std::vector<BaseInteraction *> CompressionPiston::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler)
+BaseInteraction* CompressionPiston::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler)
 {
     Mdouble distance;
     Vec3D normal;
-    std::vector<BaseInteraction*> interactions;
     if (getDistanceAndNormal(*p,distance,normal))
     {
         BaseInteraction* c = interactionHandler->getInteraction(p, this, timeStamp);
@@ -179,9 +178,9 @@ std::vector<BaseInteraction *> CompressionPiston::getInteractionWith(BaseParticl
         c->setDistance(distance);
         c->setOverlap(p->getRadius() - distance);
         c->setContactPoint(p->getPosition() - (p->getRadius() - 0.5 * c->getOverlap()) * c->getNormal());
-        interactions.push_back(c);
+        return c;
     }
-    return interactions;
+    return nullptr;
 }
 
 

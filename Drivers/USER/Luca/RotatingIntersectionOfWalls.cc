@@ -268,7 +268,7 @@ void RotatingIntersectionOfWalls::createPrism(std::vector<Vec3D> points)
  */
 bool RotatingIntersectionOfWalls::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const
 {
-    return getDistanceAndNormal(p.getPosition(), p.getInteractionRadius(), distance, normal_return);
+    return getDistanceAndNormal(p.getPosition(), p.getWallInteractionRadius(this), distance, normal_return);
 }
 
 /*!

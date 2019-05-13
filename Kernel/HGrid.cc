@@ -91,7 +91,7 @@ void HGrid::insertParticleToHgrid(BaseParticle* obj)
     if (!needsRebuilding_)
     {
         // Find lowest level where object fully fits inside cell, taking cellOverSizeRatio_ into account
-        Mdouble diameter = obj->getInteractionRadius() * 2.0;
+        Mdouble diameter = obj->getMaxInteractionRadius() * 2.0;
         unsigned int level = 0;
         while (level < (cellSizes_.size() - 1) && cellSizes_[level] <= diameter * cellOverSizeRatio_)
         {

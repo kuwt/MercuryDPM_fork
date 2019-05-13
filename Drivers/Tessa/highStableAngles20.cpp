@@ -457,7 +457,7 @@ public:
 	
 	Mdouble startWait1Time,startTurningTime,startWait2Time;
 	Mdouble startFillHopperTime,startWait3Time,startFinishedTime;
-  BaseParticle inflowParticle_;
+  SphericalParticle inflowParticle_;
 	
 };
 

@@ -89,7 +89,7 @@ public:
 
 		setParticleDimensions(3);
         setSystemDimensions(3);
-		BaseParticle* p0 = particleHandler.copyAndAddObject(BaseParticle());
+		BaseParticle* p0 = particleHandler.copyAndAddObject(SphericalParticle());
         p0->setRadius(Radius);
         Mdouble Mass = p0->getMass();
 

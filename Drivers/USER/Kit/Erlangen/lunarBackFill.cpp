@@ -26,7 +26,6 @@
 //based on /storage2/usr/people/sluding/MDCC/C3DshearXL30/MU0_LONG2
 #include "Mercury3D.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
-#include "Particles/BaseParticle.h"
 #include "Boundaries/PeriodicBoundary.h"
 #include "Walls/AxisymmetricIntersectionOfWalls.h"
 
@@ -184,7 +183,7 @@ public:
 
         //try to find new insertable particles
         unsigned int numberOfParticlesInserted = 0; //counter recording current particle number
-        BaseParticle p; //creating a particle
+        SphericalParticle p; //creating a particle
         p.setSpecies(species); //assigning its species
         const Mdouble s = sizeDistribution_;
         const Mdouble rMin = radMin;

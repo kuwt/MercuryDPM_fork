@@ -78,7 +78,7 @@ public:
         wallHandler.copyAndAddObject(w);
 
         //introduce particles
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getLastObject());
 
         //orderly insertion

@@ -1,7 +1,6 @@
 /* TimeDependentBlasius - Periodic domain; initially smooth base, rough base
  * suddenly turned on */
 #include "Mercury2D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "Walls/IntersectionOfWalls.h"
 #include "Boundaries/CubeInsertionBoundary.h"
@@ -124,10 +123,10 @@ class TimeDependentBlasius : public Mercury2D {
             spec_base = speciesHandler.copyAndAddObject(spec_base);
 
             /* Prototypical particles */
-            particlePrototype = new BaseParticle();
+            particlePrototype = new SphericalParticle();
             particlePrototype->setSpecies(spec_particles);
             particlePrototype->setRadius(pars.at("particleRadius"));
-            basePrototype = new BaseParticle();
+            basePrototype = new SphericalParticle();
             basePrototype->setSpecies(spec_base);
             // basePrototype->setSpecies(spec_particles);
             basePrototype->setRadius(pars.at("baseRadius"));
@@ -181,7 +180,7 @@ class TimeDependentBlasius : public Mercury2D {
             dam->addObject(Vec3D(-1, 0, 0), Vec3D(pars.at("length")*0.51, 0, 0));
 
             /* CubeInsertionBoundary for introducing new particles */
-            auto generandum = new BaseParticle;
+            auto generandum = new SphericalParticle;
             generandum->setSpecies(spec_particles);
             generandum->setRadius(pars.at("particleRadius"));
             auto insb = new CubeInsertionBoundary;
@@ -260,7 +259,7 @@ class TimeDependentBlasius : public Mercury2D {
                             xpos += 4*pars.at("baseRadius") / pars.at("baseConc"))
                     {
                         double ypos = 0;
-                        BaseParticle rbParticle;
+                        SphericalParticle rbParticle;
                         auto spec_base = speciesHandler.getObject(1);
                         rbParticle.setSpecies(spec_base);
                         rbParticle.setRadius(pars.at("baseRadius") *

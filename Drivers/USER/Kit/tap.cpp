@@ -1,6 +1,5 @@
 //NEED TO FIND A SUITABLE VALUE OF KE BELOW WHICH WE RE-START THE EXCITATION OF PARTICLES!!
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <iostream>
 #include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
@@ -192,7 +191,7 @@ public:
 
 
 //Put the partilces on a grid with small random velocities
-	BaseParticle p0;
+	SphericalParticle p0;
 	double max_radius = max(particle_radius1,particle_radius2);
 		unsigned int N=numberOfParticles;
 		double x=max_radius*1.01;

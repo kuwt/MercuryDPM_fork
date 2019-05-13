@@ -35,6 +35,7 @@
 #include "ParticleHandler.h"
 //This class defines the base particle (such that not every Driver has to include it)
 #include "Particles/BaseParticle.h"
+#include "Particles/SphericalParticle.h"
 //This class defines the wall handler
 #include "WallHandler.h"
 //This class defines the boundary handler
@@ -923,23 +924,23 @@ protected:
      * \brief Computes the internal forces on particle i (internal in the sense that the
      *        sum over all these forces is zero i.e. fully modelled forces)
      */
-    virtual void computeInternalForces(BaseParticle* i);
+    virtual void computeInternalForces(BaseParticle*);
     
     /*!
      * \brief Computes the forces between two particles (internal in the sense that
      *        the sum over all these forces is zero i.e. fully modelled forces)
      */
-    virtual void computeInternalForces(BaseParticle* P1, BaseParticle* P2);
+    virtual void computeInternalForce(BaseParticle*, BaseParticle*);
     
     /*!
      * \brief Computes the external forces, such as gravity, acting on particles.
      */
-    virtual void computeExternalForces(BaseParticle* PI);
+    virtual void computeExternalForces(BaseParticle*);
     
     /*!
      * \brief Computes the forces on the particles due to the walls (normals are outward normals)
      */
-    void computeForcesDueToWalls(BaseParticle* PI, BaseWall* w);
+    void computeForcesDueToWalls(BaseParticle*, BaseWall*);
     
     /*!
      * \brief A virtual function where the users can add extra code which is executed
@@ -1067,11 +1068,6 @@ protected:
      * \brief This function has to be called after integrateBeforeForceComputation.
      */
     virtual void hGridActionsAfterIntegration();
-    
-    /*!
-     * \brief Calculates the internal forces on i from all other particles.
-     */
-    virtual void broadPhase(BaseParticle* i);
     
     /*!
      * \brief Sets a number, <TT>n</TT>, of particles in the particleHandler as "fixed particles".

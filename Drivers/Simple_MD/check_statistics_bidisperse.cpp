@@ -66,7 +66,7 @@ class myMD : public DPMBase {
 		Walls[0].set(Vec3D(0,0,-1),0);
 		set_NWallPeriodic(0);
 		
-		BaseParticle P;
+		SphericalParticle P;
 
 		P.setPosition(Vec3D(0,0,2));
 		P.setVelocity(Vec3D(0,0,0));

@@ -118,8 +118,8 @@ std::string ChargedBondedSpecies::getBaseName() const
 void ChargedBondedSpecies::mix(ChargedBondedSpecies* const S, ChargedBondedSpecies* const T)
 {
     //'mixing' properties relating to the charged force interactions between particles
-    adhesionForceMax_ = average(S->getAdhesionForceMax(), T->getAdhesionForceMax());
-    adhesionStiffness_ = average(S->getAdhesionStiffness(), T->getAdhesionStiffness());
+    setAdhesionForceMax(average(S->getAdhesionForceMax(), T->getAdhesionForceMax()));
+    setAdhesionStiffness(average(S->getAdhesionStiffness(), T->getAdhesionStiffness()));
     
     //ensuring that, in addition, bond properties are also 'mixed'
     bondForceMax_ = average(S->getBondForceMax(), T->getBondForceMax());
@@ -133,26 +133,21 @@ void ChargedBondedSpecies::mix(ChargedBondedSpecies* const S, ChargedBondedSpeci
 }
 
 ///\return the maximum separation distance below which adhesive forces can occur (needed for contact detection)
-Mdouble ChargedBondedSpecies::getInteractionDistance() const
+void ChargedBondedSpecies::setInteractionDistance()
 {
-    if (adhesionStiffness_ != 0.0)
-        return adhesionForceMax_ / adhesionStiffness_;
-    else
-    {
-        std::cerr << "ChargedBondedSpecies::getInteractionDistance(): adhesionStiffness cannot be zero" << std::endl;
-        exit(-1);
-    }
+    logger.assert(adhesionStiffness_ != 0.0,"ChargedBondedSpecies::getInteractionDistance(): adhesionStiffness cannot be zero");
+    BaseSpecies::setInteractionDistance(adhesionForceMax_ / adhesionStiffness_);
 }
+
 
 ///Allows the spring constant to be changed
 void ChargedBondedSpecies::setAdhesionStiffness(Mdouble new_k0)
 {
-    if (new_k0 >= 0)
+    if (new_k0 >= 0) {
         adhesionStiffness_ = new_k0;
-    else
-    {
-        std::cerr << "Error in setAdhesionStiffness" << std::endl;
-        exit(-1);
+        setInteractionDistance();
+    } else {
+        logger(ERROR, "Error in setAdhesionStiffness");
     }
 }
 
@@ -165,12 +160,11 @@ Mdouble ChargedBondedSpecies::getAdhesionStiffness() const
 ///Allows the spring constant to be changed
 void ChargedBondedSpecies::setAdhesionForceMax(Mdouble new_f0)
 {
-    if (new_f0 >= 0)
+    if (new_f0 >= 0) {
         adhesionForceMax_ = new_f0;
-    else
-    {
-        std::cerr << "Error in setBondForceMax" << std::endl;
-        exit(-1);
+        setInteractionDistance();
+    } else {
+        logger(ERROR, "Error in setAdhesionForceMax");
     }
 }
 

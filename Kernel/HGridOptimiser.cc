@@ -43,8 +43,8 @@ void HGridOptimiser::initialise(const MercuryBase& problem, unsigned int numberO
     }
     
     //Set the minimum and maximum radius of the particles.
-    rMin_ = nextafter(problem.particleHandler.getSmallestParticle()->getInteractionRadius(), 0.0);
-    rMax_ = nextafter(nextafter(problem.particleHandler.getLargestParticle()->getInteractionRadius(),
+    rMin_ = nextafter(problem.particleHandler.getSmallestParticle()->getMaxInteractionRadius(), 0.0);
+    rMax_ = nextafter(nextafter(problem.particleHandler.getLargestParticle()->getMaxInteractionRadius(),
                                 std::numeric_limits<double>::max()), std::numeric_limits<double>::max());
     
     //for all particles, add one to the cell in cellN_ which has is associated with
@@ -52,7 +52,7 @@ void HGridOptimiser::initialise(const MercuryBase& problem, unsigned int numberO
     for (std::vector<BaseParticle*>::const_iterator it = problem.particleHandler.begin();
          it != problem.particleHandler.end(); ++it)
     {
-        cellN_[radius2Cell((*it)->getInteractionRadius())]++;
+        cellN_[radius2Cell((*it)->getMaxInteractionRadius())]++;
     }
     
     //assign what the number of particles is.

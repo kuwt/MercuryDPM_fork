@@ -25,7 +25,6 @@
 
 #include "Mercury2D.h"
 #include "Boundaries/PeriodicBoundary.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <sstream>
 #include <iostream>

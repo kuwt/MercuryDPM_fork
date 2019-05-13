@@ -8,7 +8,6 @@
 #include "Walls/InfiniteWall.h"
 #include "Walls/IntersectionOfWalls.h"
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Boundaries/PeriodicBoundary.h"
 #include "Boundaries/PolydisperseInsertionBoundary.h"
 #include "Math/RNG.h"
@@ -167,10 +166,10 @@ class PeriodicFingering : public Mercury3D {
       basal_ = speciesHandler.copyAndAddObject(basal_);
 
       /* Prototypical particles, to be copied out later */
-      smallPrototype = new BaseParticle();
+      smallPrototype = new SphericalParticle();
       smallPrototype->setSpecies(small_);
       smallPrototype->setRadius(pars.at("radius_small"));
-      largePrototype = new BaseParticle();
+      largePrototype = new SphericalParticle();
       largePrototype->setSpecies(large_);
       largePrototype->setRadius(pars.at("radius_large"));
 
@@ -477,7 +476,7 @@ class PeriodicFingering : public Mercury3D {
                 double y = baseGenerator.getRandomNumber(0,1) * pars.at("domainWidth");
                 double z = 0;
 
-                BaseParticle P;
+                SphericalParticle P;
                 P.fixParticle();
                 P.setRadius(r);
                 P.setSpecies(basal_);

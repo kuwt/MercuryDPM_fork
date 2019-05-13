@@ -61,7 +61,7 @@ public:
         auto species = speciesHandler.copyAndAddObject(s);
 
         // create a chain of particles
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(species);
         p.setRadius(0.5);
         for (unsigned i = 0; i<n; i++)

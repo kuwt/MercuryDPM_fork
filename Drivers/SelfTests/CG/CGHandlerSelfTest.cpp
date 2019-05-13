@@ -25,7 +25,6 @@
 
 #include "Mercury3D.h"
 #include "StatisticsVector.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "CG/CG.h"
 #include "CG/TimeSmoothedCG.h"
@@ -96,7 +95,7 @@ public:
         setZMin(-0.5 * d);
 
         //define the three particles stacked in Z-direction
-        BaseParticle P0;
+        SphericalParticle P0;
         P0.setSpecies(speciesHandler.getLastObject());
         P0.setRadius(0.5 * d);
         P0.setVelocity(Vec3D(0.0, 0.0, 0.0));

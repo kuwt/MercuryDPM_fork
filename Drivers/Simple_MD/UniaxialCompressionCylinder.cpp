@@ -43,7 +43,7 @@ public:
     {
         //Set the initial positions and velocities of the particles
         particleHandler.clear();
-        BaseParticle p0;
+        SphericalParticle p0;
         for (unsigned int i=0;i<numberOfParticles_;i++)
         {
             p0.setRadius(random.getRandomNumber(minParticleRadius_,maxParticleRadius_));

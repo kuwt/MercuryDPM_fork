@@ -88,7 +88,7 @@ public:
     std::string getName() const final;
 
     // Gets the interaction between this screw and a given BaseParticle at a given time.
-    std::vector<BaseInteraction*> getInteractionWith(BaseParticle* p, unsigned timeStamp,
+    BaseInteraction* getInteractionWith(BaseParticle* p, unsigned timeStamp,
                                                      InteractionHandler* interactionHandler) final;
 
 private:

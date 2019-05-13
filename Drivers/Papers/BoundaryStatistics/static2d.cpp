@@ -26,7 +26,6 @@
 // This code generates the plot in boundary statistics paper
 #include "Chute.h"
 #include "StatisticsVector.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <iostream>
 #include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
@@ -78,7 +77,7 @@ public:
 			//Walls[3].set(Vec3D( 1.0, 0, 0.0),  getXMax());
 			
 			//set particles no of particles = 10
-			BaseParticle p0;
+			SphericalParticle p0;
 			p0.setPosition(Vec3D(0.5,0.5,0.1));
 			particleHandler.copyAndAddObject(p0);
 			p0.setPosition(Vec3D(1.5,0.5,-.2));

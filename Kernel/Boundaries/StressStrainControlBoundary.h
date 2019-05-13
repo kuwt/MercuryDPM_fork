@@ -61,10 +61,10 @@ public:
     void write(std::ostream& os) const override;
     
     /// \brief Sets the name of the boundary
-    std::string getName() const;
+    std::string getName() const override;
     
     /// \brief Used to create a copy of the object
-    virtual StressStrainControlBoundary* copy() const;
+    StressStrainControlBoundary* copy() const override;
     
     /// \brief Virtual function that does things to particles, each timestep after particles have moved.
     void checkBoundaryAfterParticlesMove(ParticleHandler& particleHandler) override;

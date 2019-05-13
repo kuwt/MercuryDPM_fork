@@ -28,7 +28,6 @@
 #include "DPMBase.h"
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticSpecies.h"
-
 class FreeFall : public DPMBase{
 public:
 
@@ -46,7 +45,7 @@ public:
         w0.set(Vec3D(0,0,-1), Vec3D(0, 0, 0));
 		wallHandler.copyAndAddObject(w0);
 
-		BaseParticle p0;
+		SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
 		p0.setPosition(Vec3D(0,0,getZMax()-1e-3));
 		p0.setRadius(1e-3);

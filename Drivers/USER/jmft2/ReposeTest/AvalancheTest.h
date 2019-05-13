@@ -103,7 +103,7 @@ class AvalancheTest : public Mercury3D
             int Nbasal = pow(pars.radiusDisc / pars.particleRadius, 2);
             for (int i = 0; i < Nbasal; i++)
             {
-                BaseParticle pbasal;
+                SphericalParticle pbasal;
                 pbasal.setSpecies(speciesP);
                 pbasal.setRadius(pars.particleRadius * generator.getRandomNumber
                         (pars.dispersity_min, pars.dispersity_max));
@@ -139,7 +139,7 @@ class AvalancheTest : public Mercury3D
             /* Need this extra large particle to make sure the largest particle
              * never gets deleted. I *think* this will stop segfaults from the
              * deletion boundary. */
-            BaseParticle phack;
+            SphericalParticle phack;
             phack.setSpecies(speciesP);
             phack.setRadius(pars.particleRadius * pars.dispersity_max * 2);
             phack.setPosition(Vec3D(0,0, -50*pars.particleRadius));
@@ -185,7 +185,7 @@ class AvalancheTest : public Mercury3D
             /* Introduce a new particle, or not, depending on the flow rate. */
             if (getTime() > nextInsertionTime)
             {
-                BaseParticle pnew;
+                SphericalParticle pnew;
                 pnew.setSpecies(speciesP);
                 pnew.setRadius(
                         pars.particleRadius * generator.getRandomNumber(
@@ -213,16 +213,16 @@ class AvalancheTest : public Mercury3D
             int i = 0; int actual_n = n;
             for (std::vector<BaseParticle*>::iterator it = particleHandler.begin(); it != particleHandler.end(); ++it)
             {
-                BaseParticle p = **it;
-                Vec3D pos = p.getPosition();
+                BaseParticle* p = *it;
+                Vec3D pos = p->getPosition();
                 double rcoord = sqrt(pos.X*pos.X + pos.Y*pos.Y);
                 // We only count this particle if it is unfixed, but unmoving, and inside the
                 // domain that we care about..
-                if (!(p.isFixed()) 
+                if (!(p->isFixed()) 
                         && rcoord < pars.radiusDisc 
                         && pos.Z > 0
                         && pos.Z < pars.radiusDisc 
-                        && p.getVelocity().getLength() < 0.1 * sqrt(pars.g*pars.radiusDisc) // what should this number be..?
+                        && p->getVelocity().getLength() < 0.1 * sqrt(pars.g*pars.radiusDisc) // what should this number be..?
                 )
                 {
                     rs[i] = rcoord;

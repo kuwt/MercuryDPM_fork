@@ -23,7 +23,6 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Particles/BaseParticle.h"
 #include "Species/LinearViscoelasticSpecies.h"
 #include "DPMBase.h"
 using constants::pi;
@@ -47,7 +46,7 @@ void test1() {
     //compute mass (requires species and handler to be set)
     DPMBase D;
     LinearViscoelasticSpecies* S = D.speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
-    BaseParticle* P = D.particleHandler.copyAndAddObject(BaseParticle(S));
+    BaseParticle* P = D.particleHandler.copyAndAddObject(SphericalParticle(S));
     D.setDimension(3); ///\todo shouldn't this be default?
     S->setDensity(6.0/constants::pi);
     P->setRadius(0.5);
@@ -102,7 +101,7 @@ void test2() {
     //compute mass (requires species and handler to be set)
     DPMBase D;
     LinearViscoelasticSpecies* S = D.speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
-    BaseParticle* P = D.particleHandler.copyAndAddObject(BaseParticle(S));
+    BaseParticle* P = D.particleHandler.copyAndAddObject(SphericalParticle(S));
     D.setDimension(3); ///\todo shouldn't this be default?
     S->setDensity(6.0/constants::pi);
     P->setRadius(0.5);

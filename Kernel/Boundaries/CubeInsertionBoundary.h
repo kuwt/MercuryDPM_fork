@@ -77,7 +77,7 @@ public:
         double radMin, double radMax);
 
     void
-    set(BaseParticle particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax,
+    set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax,
         double radMin, double radMax);
     /*!
      * \brief Sets the range of particle radii that may be generated.

@@ -4,8 +4,7 @@
 #include "Mercury3D.h"
 #include "Species/HertzianViscoelasticMindlinSpecies.h"
 #include "Walls/InfiniteWall.h"
-//#include "Particles/BaseParticle.h"
-//#include "Species/LinearViscoelasticFrictionSpecies.h"
+////#include "Species/LinearViscoelasticFrictionSpecies.h"
 
 class GranularCollapse
         : public Mercury3D // [granularCollapse : class] from 'MercurySimpleDemos/InsertionBoundarySelfTest.cpp'

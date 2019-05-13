@@ -156,7 +156,7 @@ public:
 
     int nCreated_;
     //causes segmentation faults if this is not there;
-    BaseParticle P0;
+    SphericalParticle P0;
 public:
 	int N, M;
     LinearPlasticViscoelasticSlidingFrictionSpecies* species;

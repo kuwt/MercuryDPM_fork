@@ -115,7 +115,7 @@ class Funnel : public Chute {
 	void setName_();
 
 protected:
-	BaseParticle inflowParticle_;
+	SphericalParticle inflowParticle_;
 	
 	///Set funnel Heigth:
 	void set_funH(double funH_){funH=funH_;}

@@ -28,7 +28,6 @@
 #include "Math/ExtendedMath.h"
 #include "Species/HertzianViscoelasticMindlinSpecies.h"
 #include "CG/CG.h"
-
 class CreateDataAndFStatFiles : public DPMBase
 {
 public:
@@ -43,7 +42,7 @@ public:
         species.setDensity(6.0 / constants::pi);
         speciesHandler.copyAndAddObject(species);
 
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setRadius(0.5);
         p.setPosition(Vec3D(0.0, 0.0, 0.0));

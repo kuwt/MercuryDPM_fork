@@ -190,7 +190,7 @@ class RotatingDrum : public Mercury3D
 		wallHandler.copyAndAddObject(w0);
 
 
-		BaseParticle P0;
+		SphericalParticle P0;
 		double radius = 0.0;
 		int numS1Inserted=0;
 		int numS2Inserted=0;
@@ -293,9 +293,9 @@ class RotatingDrum : public Mercury3D
 
             if (particleHandler.getLargestParticleLocal())
             {
-                if (particleHandler.getLargestParticleLocal()->getInteractionRadius() > maxVal)
+                if (particleHandler.getLargestParticleLocal()->getMaxInteractionRadius() > maxVal)
                 {
-                    maxVal = particleHandler.getLargestParticleLocal()->getInteractionRadius();
+                    maxVal = particleHandler.getLargestParticleLocal()->getMaxInteractionRadius();
                     hGridRebuild();
                     nRebuild++;
                 }
@@ -303,9 +303,9 @@ class RotatingDrum : public Mercury3D
 
             if (particleHandler.getSmallestParticleLocal())
             { 
-                if (particleHandler.getSmallestParticleLocal()->getInteractionRadius() < minVal)
+                if (particleHandler.getSmallestParticleLocal()->getMaxInteractionRadius() < minVal)
                 {
-                    minVal = particleHandler.getSmallestParticleLocal()->getInteractionRadius();
+                    minVal = particleHandler.getSmallestParticleLocal()->getMaxInteractionRadius();
                     hGridRebuild();
                     nRebuild++;
                 } 

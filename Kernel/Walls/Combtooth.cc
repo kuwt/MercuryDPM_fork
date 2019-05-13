@@ -41,14 +41,14 @@ bool Combtooth::getDistanceAndNormal(const BaseParticle& p,
     const Mdouble x0 = p.getPosition().X;
     const Mdouble y0 = p.getPosition().Y;
     const Mdouble z0 = p.getPosition().Z;
-    const Mdouble ra = p.getWallInteractionRadius(); // note, not getRadius()
+    const Mdouble ra = p.getWallInteractionRadius(this); // note, not getRadius()
     
     // distance between x0 and the *surface* (not the axis)
     distance = sqrt(
             pow((p.getPosition() - position_).getLength(), 2)
             - pow(Vec3D::dot(p.getPosition() - position_, axis_), 2)
     ) - radius_;
-    if (distance >= p.getWallInteractionRadius())
+    if (distance >= p.getWallInteractionRadius(this))
         return false;
     else
     {
@@ -60,7 +60,7 @@ bool Combtooth::getDistanceAndNormal(const BaseParticle& p,
     }
 }
 
-std::vector<BaseInteraction*> Combtooth::getInteractionWith(BaseParticle* p,
+BaseInteraction* Combtooth::getInteractionWith(BaseParticle* p,
                                                             unsigned timeStamp, InteractionHandler* interactionHandler)
 {
     Mdouble distance;
@@ -73,10 +73,10 @@ std::vector<BaseInteraction*> Combtooth::getInteractionWith(BaseParticle* p,
         c->setOverlap(p->getRadius() - distance);
         /// \todo Quick hack JMF2 please clean up with teh new way
         c->setContactPoint(p->getPosition() - (p->getRadius() - 0.5 * c->getOverlap()) * c->getNormal());
-        return {c};
+        return c;
     }
     else
-        return {};
+        return nullptr;
 }
 
 void Combtooth::read(std::istream& is)

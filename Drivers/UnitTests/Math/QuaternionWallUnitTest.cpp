@@ -23,7 +23,6 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Particles/BaseParticle.h"
 #include "Species/LinearViscoelasticFrictionBondedSpecies.h"
 #include "Walls/InfiniteWall.h"
 #include "Walls/IntersectionOfWalls.h"
@@ -105,7 +104,7 @@ int main() {
         q.wallHandler.copyAndAddObject(w);
 
         //Create particle
-        BaseParticle p(s);
+        SphericalParticle p(s);
         p.setRadius(0.50001);
         p.setVelocity(Vec3D(0, 0, 0));
         p.setPosition(position + Vec3D(0, 0, 1));
@@ -136,7 +135,7 @@ int main() {
         q.wallHandler.copyAndAddObject(w);
 
         //Create particle
-        BaseParticle p(s);
+        SphericalParticle p(s);
         p.setRadius(0.50001);
         p.setVelocity(Vec3D(0, 0, 0));
         p.setPosition(position + Vec3D(0, 0, 1));
@@ -185,7 +184,7 @@ int main() {
         q.wallHandler.copyAndAddObject(w);
 
         //Create particle
-        BaseParticle p(s);
+        SphericalParticle p(s);
         p.setRadius(0.50001);
         p.setVelocity(Vec3D(0, 0, 0));
         p.setPosition(Vec3D(   0, 0,-4.5));

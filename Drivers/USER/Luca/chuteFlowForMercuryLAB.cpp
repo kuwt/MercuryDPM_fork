@@ -710,7 +710,7 @@ public:
     LinearViscoelasticFrictionSpecies *specieBigWall, *specieSmallWall, *specieBigSmall;
     InfiniteWall floor, ceiling;
     PeriodicBoundary xBoundary, yBoundary;
-    BaseParticle p0;
+    SphericalParticle p0;
     
     // global variables
     bool verbose;

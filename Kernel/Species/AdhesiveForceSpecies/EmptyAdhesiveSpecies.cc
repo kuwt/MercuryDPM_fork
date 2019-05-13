@@ -79,9 +79,3 @@ void EmptyAdhesiveSpecies::mix(EmptyAdhesiveSpecies* const S UNUSED, EmptyAdhesi
 {
 }
 
-///\return the maximum separation distance below which adhesive forces can occur (needed for contact detection)
-Mdouble EmptyAdhesiveSpecies::getInteractionDistance() const
-{
-    return 0.0;
-}
-

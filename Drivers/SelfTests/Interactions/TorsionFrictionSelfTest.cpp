@@ -24,7 +24,6 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <iostream>
 #include "Species/Species.h"
@@ -66,7 +65,7 @@ class TorsionFrictionSelfTest : public Mercury3D {
 		setMin(-getMax());
 
 		//define two particles at equilibrium overlap twisting around each other
-		BaseParticle particle;
+		SphericalParticle particle;
         particle.setSpecies(s);
 		particle.setPosition(Vec3D(0,0,+0.45));
 		particle.setRadius(0.5);

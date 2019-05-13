@@ -11,7 +11,6 @@
 #include "Mercury2D.h"
 #include "Boundaries/PeriodicBoundary.h"
 #include "Boundaries/CubeInsertionBoundary.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Math/RNG.h"
@@ -135,7 +134,7 @@ class muICal2D : public Mercury2D
                 {
                     double ypos = 0;
 
-                    BaseParticle rbParticle;
+                    SphericalParticle rbParticle;
                     rbParticle.setSpecies(speciesB);
                     rbParticle.setRadius(pars.at("baseRadius") * 
                             (1 + pars.at("baseDispersity") * generator.getRandomNumber(-1,1)));
@@ -169,7 +168,7 @@ class muICal2D : public Mercury2D
              * remove this after a few (arbitrary number of) timesteps. If the
              * InsertionBoundary is doing its job properly then it will stop
              * introducing particles after a while anyway. */
-            BaseParticle* p0 = new BaseParticle;
+            BaseParticle* p0 = new SphericalParticle;
             p0->setSpecies(speciesP);
             insb = new CubeInsertionBoundary;
             insb->set( p0, 1,

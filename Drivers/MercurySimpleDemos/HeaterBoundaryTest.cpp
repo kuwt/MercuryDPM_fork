@@ -28,7 +28,6 @@
 
 #include "Mercury3D.h"
 #include "Boundaries/HeaterBoundary.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "MercuryTime.h"
 
@@ -42,7 +41,7 @@ public:
 
     void setupInitialConditions() override {
         const unsigned int N1 = static_cast<unsigned int>(pow(N, 0.33)) + 1;
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         for (unsigned int i = 0; i < N; ++i)
         {

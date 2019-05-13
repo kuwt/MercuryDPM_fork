@@ -32,6 +32,7 @@ LiquidBridgeWilletSpecies::LiquidBridgeWilletSpecies()
     cbrtLiquidBridgeVolume_ = 0;
     surfaceTension_ = 0;
     contactAngle_ = 0;
+    setInteractionDistance();
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"LiquidBridgeWilletSpecies::LiquidBridgeWilletSpecies() finished"<<std::endl;
 #endif
@@ -77,6 +78,7 @@ void LiquidBridgeWilletSpecies::read(std::istream& is)
     is >> dummy >> liquidBridgeVolume_;
     is >> dummy >> surfaceTension_;
     is >> dummy >> contactAngle_;
+    setInteractionDistance();
 }
 
 /*!
@@ -99,12 +101,10 @@ void LiquidBridgeWilletSpecies::mix(LiquidBridgeWilletSpecies* const S, LiquidBr
     contactAngle_ = average(S->getContactAngle(), T->getContactAngle());
 }
 
-/*!
- * \return the maximum separation distance between particles below which the adhesive force is active.
- */
-Mdouble LiquidBridgeWilletSpecies::getInteractionDistance() const
+///\return the maximum separation distance below which adhesive forces can occur (needed for contact detection)
+void LiquidBridgeWilletSpecies::setInteractionDistance()
 {
-    return (1.0 + 0.5 * contactAngle_) * cbrtLiquidBridgeVolume_;
+    BaseSpecies::setInteractionDistance((1.0 + 0.5 * contactAngle_) * cbrtLiquidBridgeVolume_);
 }
 
 /*!
@@ -116,6 +116,7 @@ void LiquidBridgeWilletSpecies::setLiquidBridgeVolume(Mdouble liquidBridgeVolume
     {
         liquidBridgeVolume_ = liquidBridgeVolume;
         cbrtLiquidBridgeVolume_ = cbrt(liquidBridgeVolume);
+        setInteractionDistance();
     }
     else
     {
@@ -159,13 +160,9 @@ Mdouble LiquidBridgeWilletSpecies::getSurfaceTension() const
  */
 void LiquidBridgeWilletSpecies::setContactAngle(Mdouble contactAngle)
 {
-    if (contactAngle >= 0)
-        contactAngle_ = contactAngle;
-    else
-    {
-        std::cerr << "Error in setContactAngle" << std::endl;
-        exit(-1);
-    }
+    logger.assert(contactAngle >= 0,"Error in setContactAngle");
+    contactAngle_ = contactAngle;
+    setInteractionDistance();
 }
 
 /*!

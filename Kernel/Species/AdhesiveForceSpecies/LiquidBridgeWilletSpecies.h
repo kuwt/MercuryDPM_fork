@@ -60,12 +60,9 @@ public:
     
     ///\brief creates default values for mixed species
     void mix(LiquidBridgeWilletSpecies* S, LiquidBridgeWilletSpecies* T);
-
-//adhesion-specific functions
     
-    ///\brief returns the largest separation distance at which adhesive short-range forces can occur.
-    Mdouble getInteractionDistance() const override;
-
+    void setInteractionDistance();
+    
 //setters and getters
     /*!
      * \brief used to set the Volume of the liquid bridge.

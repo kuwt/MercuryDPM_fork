@@ -74,9 +74,6 @@ public:
     
     ///\brief Allows bondForceMax_ to be accessed
     Mdouble getBondForceMax() const;
-    
-    ///\brief returns the largest separation distance at which adhesive short-range forces can occur (0.0 for the default EmptyAdhesiveSpecies).
-    Mdouble getInteractionDistance() const override;
 
 private:
     ///\brief dissipation in bond

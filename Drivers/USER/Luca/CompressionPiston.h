@@ -61,7 +61,7 @@ public:
     bool getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const final;
     
     // Gets the interaction between the piston and a given BaseParticle at a given time.
-    std::vector<BaseInteraction *> getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler) final;
+    BaseInteraction* getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler) final;
     
 private:
     // The piston height.

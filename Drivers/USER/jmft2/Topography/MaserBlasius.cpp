@@ -1,7 +1,6 @@
 /* MaserBlasius - As with MaserBlasius but using a Maser boundary for
  * upstream conditions. */
 #include "Mercury2D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "Walls/IntersectionOfWalls.h"
 #include "Boundaries/CubeInsertionBoundary.h"
@@ -111,10 +110,10 @@ class MaserBlasius : public Mercury2D {
             */
 
             /* Prototypical particles */
-            particlePrototype = new BaseParticle();
+            particlePrototype = new SphericalParticle();
             particlePrototype->setSpecies(spec_particles);
             particlePrototype->setRadius(pars.at("particleRadius"));
-            basePrototype = new BaseParticle();
+            basePrototype = new SphericalParticle();
             // basePrototype->setSpecies(spec_base);
             basePrototype->setSpecies(spec_particles);
             basePrototype->setRadius(pars.at("baseRadius"));
@@ -179,7 +178,7 @@ class MaserBlasius : public Mercury2D {
                 for (double xpos = 0; xpos <= pars.at("xmax"); xpos += 4*pars.at("baseRadius") / pars.at("baseConc"))
                 {
                     double ypos = 0;
-                    BaseParticle rbParticle;
+                    SphericalParticle rbParticle;
                     // rbParticle.setSpecies(spec_base);
                     rbParticle.setSpecies(spec_particles);
                     rbParticle.setRadius(pars.at("baseRadius")  *
@@ -192,7 +191,7 @@ class MaserBlasius : public Mercury2D {
                 }
 
             /* CubeInsertionBoundary for introducing new particles */
-            BaseParticle* generandum = new BaseParticle;
+            BaseParticle* generandum = new SphericalParticle;
             generandum->setSpecies(spec_particles);
             generandum->setRadius(pars.at("particleRadius"));
             // double velvar = pars.at("reservoirTemperature") * sqrt(pars.at("g") * pars.at("particleRadius"));

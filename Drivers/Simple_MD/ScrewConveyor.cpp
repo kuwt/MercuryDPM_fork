@@ -53,7 +53,7 @@ class ScrewConveyor : public Mercury3D{
 		boundaryHandler.addObject(deletionBoundary);
 		
 		particleHandler.clear();
-		BaseParticle p0;
+		SphericalParticle p0;
 		p0.setVelocity(Vec3D(0.0,0.0,0.0));
 		p0.setRadius(BaseParticleRadius);
 		p0.computeMass(Species);

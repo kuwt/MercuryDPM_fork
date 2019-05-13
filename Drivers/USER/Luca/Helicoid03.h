@@ -72,7 +72,7 @@ public:
     std::string getName() const final;
 
     // Gets the interaction between this Helicoid and a given BaseParticle at a given time.
-    std::vector<BaseInteraction *> getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler) final;
+    BaseInteraction* getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler) final;
 
     // The angle that describes how much the Helicoid has turned.
     Mdouble offset_;

@@ -1,7 +1,6 @@
 #include <iostream>
 #include "Mercury3D.h"
 #include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "Walls/IntersectionOfWalls.h"
 //#include "Boundaries/CubeInsertionBoundary.h"
@@ -179,7 +178,7 @@ public:
         auto speciesWall = speciesHandler.getObject(0);
         auto speciesParticles = speciesHandler.getObject(1);
         
-        BaseParticle p0;
+        SphericalParticle p0;
 		
 
         //Current insertion is in (xmin+pr, ymin+pr,zmin-pr) to (xmin+7pm,ymax-pr,zmax+pr) : recall peridoic in z but have insertion check bug for peroidic
@@ -229,7 +228,7 @@ public:
     
         
         // Insertion boundary version, will be used in the future but currently not working.
-        //        BaseParticle* insertionBoundaryParticle =new BaseParticle;
+        //        BaseParticle* insertionBoundaryParticle =new SphericalParticle;
         //        insertionBoundaryParticle->setSpecies(speciesParticles);
         //
         //        CubeInsertionBoundary* insertionBoundary;

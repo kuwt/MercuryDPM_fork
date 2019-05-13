@@ -1,6 +1,5 @@
 /* IncidentOntoRoughness - Flow on a slope that starts smooth and suddenly becomes rough */
 #include "Mercury2D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "Walls/IntersectionOfWalls.h"
 #include "Boundaries/CubeInsertionBoundary.h"
@@ -77,7 +76,7 @@ class IncidentOntoRoughness : public Mercury2D {
                 double xpos = generator.getRandomNumber(0, pars.xmax);
                 double ypos = 0;
 
-                BaseParticle rbParticle;
+                SphericalParticle rbParticle;
                 rbParticle.setSpecies(species);
                 rbParticle.setRadius(pars.baseRadius  * 
                         (1 + pars.baseDispersity * generator.getRandomNumber(-1,1)));
@@ -95,7 +94,7 @@ class IncidentOntoRoughness : public Mercury2D {
             delb = boundaryHandler.copyAndAddObject(delb);
 
             /* CubeInsertionBoundary for introducing new particles */
-            BaseParticle* generandum = new BaseParticle;
+            BaseParticle* generandum = new SphericalParticle;
             generandum->setSpecies(species);
             generandum->setRadius(pars.particleRadius);
             double velvar = pars.reservoirTemperature * sqrt(pars.g * pars.particleRadius);

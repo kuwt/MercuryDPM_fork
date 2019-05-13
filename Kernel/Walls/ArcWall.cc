@@ -48,7 +48,7 @@ bool ArcWall::getDistanceAndNormal(const BaseParticle& p,
             pow((p.getPosition() - pos_).getLength(), 2)
             - pow(Vec3D::dot(p.getPosition() - pos_, axis_), 2)
     );
-    if (distance >= p.getWallInteractionRadius())
+    if (distance >= p.getWallInteractionRadius(this))
         return false;
     else
     {
@@ -68,7 +68,7 @@ bool ArcWall::getDistanceAndNormal(const BaseParticle& p,
     }
 }
 
-std::vector<BaseInteraction*> ArcWall::getInteractionWith(BaseParticle* p,
+BaseInteraction* ArcWall::getInteractionWith(BaseParticle* p,
                                                           unsigned timeStamp, InteractionHandler* interactionHandler)
 {
     Mdouble distance;
@@ -81,10 +81,10 @@ std::vector<BaseInteraction*> ArcWall::getInteractionWith(BaseParticle* p,
         c->setOverlap(p->getRadius() - distance);
         c->setContactPoint(p->getPosition() - (p->getRadius() - 0.5 * c->getOverlap()) * c->getNormal());
         /// \todo Hacked please fix @Thomas
-        return {c};
+        return c;
     }
     else
-        return {};
+        return nullptr;
 }
 
 void ArcWall::read(std::istream& is)

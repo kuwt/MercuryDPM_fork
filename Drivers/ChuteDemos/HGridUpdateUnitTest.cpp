@@ -86,7 +86,7 @@ int main()
     species.setCollisionTimeAndRestitutionCoefficient( 5e-3, 0.8, 1);
     auto s = problem.speciesHandler.copyAndAddObject(species);   // assign species to problem species handler
 
-    BaseParticle particle;
+    SphericalParticle particle;
     particle.setSpecies(s);
     particle.setRadius(0.5);
     particle.setVelocity({1,0,0});

@@ -1,7 +1,6 @@
 #include<iostream>
 
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticFrictionIrreversibleAdhesiveSpecies.h"
 #include <iomanip>
@@ -48,7 +47,7 @@ public:
 
         int N1 = static_cast<int>(std::pow(N, 0.33)) + 1;
 
-        BaseParticle P0;
+        SphericalParticle P0;
         P0.setSpecies(sandSpecies);
         for (int i = 0; i < N; i++)
         {
@@ -184,7 +183,7 @@ private:
 			double y=0.3;
 			double z=0.9;
 			
-		    BaseParticle P0;
+		    SphericalParticle P0;
             P0.setSpecies(sandSpecies);
 			P0.setPosition(Vec3D(x,y,z));
 			P0.setVelocity(Vec3D(0.0,0.0,-200.0));

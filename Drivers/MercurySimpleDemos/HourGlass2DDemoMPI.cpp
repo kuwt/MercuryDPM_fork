@@ -24,7 +24,6 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/IntersectionOfWalls.h"
 #include "Walls/AxisymmetricIntersectionOfWalls.h"
 #include "Boundaries/DeletionBoundary.h"
@@ -68,7 +67,7 @@ public:
         w0.set(Vec3D(0, 0, -1), Vec3D(0, 0, -0.5 * (getZMin() + getZMax())));
         wallHandler.copyAndAddObject(w0);
 
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
 

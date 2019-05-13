@@ -107,7 +107,7 @@ bool LevelSetWall::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance
     Vec3D position = p.getPosition() - getPosition();
     getOrientation().rotateBack(position);
     ///\todo do this for all walls
-    if (getDistanceAndNormalLabCoordinates(position, p.getInteractionRadius(), distance, normal_return))
+    if (getDistanceAndNormalLabCoordinates(position, p.getWallInteractionRadius(this), distance, normal_return))
     {
         getOrientation().rotate(normal_return);
         return true;

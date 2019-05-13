@@ -184,8 +184,8 @@ void ShearBoxBoundary::createHorizontalPeriodicParticles(BaseParticle* p, Partic
     bool positive;      // TRUE if the particle is closest to the left boundary 
     // wall (set by getVerticalDistance in the following if-statement)
     // check if particle is close enough to either of the walls
-    if (getHorizontalDistance(*p, positive) <
-        p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius())
+    const Mdouble maxDistance = p->getMaxInteractionRadius() + pH.getLargestParticle()->getMaxInteractionRadius();
+    if (getHorizontalDistance(*p, positive) < maxDistance)
     {
         // create a periodic copy of the particle
         BaseParticle* F0 = p->copy();
@@ -220,7 +220,8 @@ void ShearBoxBoundary::createVerticalPeriodicParticles(BaseParticle* p, Particle
     bool positive;      // TRUE if the particle is closest to the bottom boundary 
     // wall (set by getVerticalDistance in the following if-statement)
     // check if particle is close enough to either of the walls
-    if (getVerticalDistance(*p, positive) < p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius())
+    const Mdouble maxDistance = p->getMaxInteractionRadius() + pH.getLargestParticle()->getMaxInteractionRadius();
+    if (getVerticalDistance(*p, positive) < maxDistance)
     {
         // create a periodic copy of the particle
         BaseParticle* F0 = p->copy();

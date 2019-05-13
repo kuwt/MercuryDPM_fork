@@ -433,7 +433,7 @@ public:
         std::cout << "Number of small particles to be inserted:" << numSmallToBeInserted << std::endl;
         
         // Create a  paticles to use as the template for creating new particles
-        BaseParticle P0;
+        SphericalParticle P0;
         
         if (segregatedFilling)
         {

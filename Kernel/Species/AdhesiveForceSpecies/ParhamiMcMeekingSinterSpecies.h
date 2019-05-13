@@ -62,10 +62,7 @@ public:
     void mix(ParhamiMcMeekingSinterSpecies* S, ParhamiMcMeekingSinterSpecies* T);
 
 //adhesion-specific functions
-    
-    ///\brief returns the largest separation distance at which adhesive short-range forces can occur.
-    Mdouble getInteractionDistance() const override;
-    
+
     //setters and getters
     void set(Mdouble alpha, Mdouble beta, Mdouble atomicVolume /*Omega*/, Mdouble surfaceEnergy /*gamma_s*/,
              Mdouble thicknessDiffusion /*deltaB*D0B*/, Mdouble activationEnergy /*QB*/, Mdouble temperature /*T*/,

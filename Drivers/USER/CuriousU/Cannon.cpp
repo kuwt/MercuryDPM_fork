@@ -126,7 +126,7 @@ public:
         wallHandler.copyAndAddObject(target);
 
         //Place the cannon ball at 0% distance, 0% height
-        BaseParticle cannonBall;
+        SphericalParticle cannonBall;
         cannonBall.setSpecies(speciesHandler.getObject(0));
         cannonBall.setRadius(radius);
         cannonBall.setPosition(Vec3D(0,0,radius));

@@ -127,8 +127,8 @@ bool DualFeederCasing_TOP::getDistanceAndNormal(const BaseParticle& p, Mdouble& 
    if (p.getPosition().Y < start_.Y) return false;
 
    // if the particle is outside the length containing the screw there is no collision
-   if (p.getPosition().Z > l_ + start_.Z + p.getWallInteractionRadius()) return false;
-   if (p.getPosition().Z < start_.Z - p.getWallInteractionRadius()) return false;
+   if (p.getPosition().Z > l_ + start_.Z + p.getWallInteractionRadius(this)) return false;
+   if (p.getPosition().Z < start_.Z - p.getWallInteractionRadius(this)) return false;
 
    // radial position of the particle with respect to the closest screw axis
    Mdouble r_P = sqrt(pow(fabs(p.getPosition().X - start_.X) - delta_, 2.0) + pow(p.getPosition().Y - start_.Y, 2.0));
@@ -147,7 +147,7 @@ bool DualFeederCasing_TOP::getDistanceAndNormal(const BaseParticle& p, Mdouble& 
    radialVector.Z = 0.0;
 
    // distinguishing between the cases
-   if (fabs(p.getPosition().X - start_.X) < p.getWallInteractionRadius()) // collision with the edgy part where the cylinders merge together
+   if (fabs(p.getPosition().X - start_.X) < p.getWallInteractionRadius(this)) // collision with the edgy part where the cylinders merge together
    {
       // Y position of the merging point (the X is zero by definition)
       Mdouble m_Y = sqrt(pow(r_, 2.0) - pow(delta_, 2.0));
@@ -157,7 +157,7 @@ bool DualFeederCasing_TOP::getDistanceAndNormal(const BaseParticle& p, Mdouble& 
 
       // if the distance is negative prints an error message
       if (distance < 0.0) std::cout << std::endl << "COLLISION ERROR WITH THE CYLINDER MERGING POINT" << std::endl;
-      if (distance > p.getWallInteractionRadius()) return false;
+      if (distance > p.getWallInteractionRadius(this)) return false;
 
       // Y vector
       Vec3D yVector;
@@ -171,7 +171,7 @@ bool DualFeederCasing_TOP::getDistanceAndNormal(const BaseParticle& p, Mdouble& 
 
       return true;
    }
-   // else if (fabs(p.getPosition().X - start_.X) > r_ + delta_ - p.getWallInteractionRadius()) // collision with the flat parts where the cylinders merge with the vertical walls
+   // else if (fabs(p.getPosition().X - start_.X) > r_ + delta_ - p.getWallInteractionRadius(this)) // collision with the flat parts where the cylinders merge with the vertical walls
    // {
    //    // X position of the merging point (the Y is zero by definition)
    //    Mdouble n_X = r_ + delta_;
@@ -181,7 +181,7 @@ bool DualFeederCasing_TOP::getDistanceAndNormal(const BaseParticle& p, Mdouble& 
    // 
    //    // if the distance is negative prints an error message
    //    if (distance < 0.0) std::cout << std::endl << "COLLISION ERROR WITH THE WALLS MERGING POINT" << std::endl;
-   //    if (distance > p.getWallInteractionRadius()) return false;
+   //    if (distance > p.getWallInteractionRadius(this)) return false;
    //
    //    // X vector
    //    Vec3D xVector;
@@ -203,7 +203,7 @@ bool DualFeederCasing_TOP::getDistanceAndNormal(const BaseParticle& p, Mdouble& 
 
       // if the distance is negative prints an error message
       if (distance < 0.0) std::cout << std::endl << "COLLISION ERROR WITH THE CYLINDRICAL SURFACE" << std::endl;
-      if (distance > p.getWallInteractionRadius()) return false;
+      if (distance > p.getWallInteractionRadius(this)) return false;
 
       // the normal is purely radial
       normal_return = radialVector;

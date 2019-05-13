@@ -25,7 +25,6 @@
 
 #include "Mercury3D.h"
 #include "StatisticsVector.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <cmath>
 #include <iostream>
@@ -49,7 +48,7 @@ public:
         setYMax(5);
         setZMax(5);
 
-        BaseParticle P0;
+        SphericalParticle P0;
         P0.setSpecies(speciesHandler.getObject(0));
         for (int i = 0; i < N; i++)
             for (int j = 0; j < N; j++)

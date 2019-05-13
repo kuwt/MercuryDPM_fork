@@ -30,8 +30,7 @@
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Boundaries/CubeInsertionBoundary.h"
 #include "Boundaries/PeriodicBoundary.h"
-//#include "Particles/BaseParticle.h"
-//#include "Species/LinearViscoelasticSpecies.h"
+////#include "Species/LinearViscoelasticSpecies.h"
 #include "Walls/InfiniteWall.h"
 #include "Walls/IntersectionOfWalls.h"
 
@@ -127,7 +126,7 @@ public:
         Vec3D minPoint_particles = Vec3D(scale*ToolThickness,scale*ToolThickness,0.0);
         Vec3D maxPoint_particles = Vec3D(scale*ToolLength,scale*(ToolWidth-ToolThickness),scale*ToolHight);
         //
-        BaseParticle insertionBoundaryParticle;
+        SphericalParticle insertionBoundaryParticle;
         insertionBoundaryParticle.setSpecies(speciesHandler.getObject(0));
         //CubeInsertionBoundary::set(BaseParticle* particleToCopy, int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax, double radMin, double radMax)
         CubeInsertionBoundary insertionBoundary;

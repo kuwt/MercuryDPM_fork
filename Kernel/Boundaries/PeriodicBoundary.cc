@@ -204,6 +204,24 @@ void PeriodicBoundary::shiftPosition(BaseParticle* p) const
 }
 
 /*!
+ * \details Shifts the particle either to the left or right, using the method isClosestToLeftBoundary to determine which
+ * sid-> it should be shifted to.
+ * \param[in] p         A pointer to the particle which will be shifted.
+ */
+void PeriodicBoundary::shiftPosition(Vec3D& p) const
+{
+    if (isClosestToLeftBoundary(p))
+    {
+        p += shift_;
+    }
+    else
+    {
+        p -= shift_;
+    }
+}
+
+
+/*!
  * \details Shifts two given positions by the shift_ vector. 
  * \param[in] position1     The first position to be shifted
  * \param[in] position2     The second position to be shifted
@@ -313,7 +331,8 @@ std::string PeriodicBoundary::getName() const
 void PeriodicBoundary::createPeriodicParticle(BaseParticle* p, ParticleHandler& pH)
 {
     //note that getDistance sets closestToLeftBoundary_ to true or false depending on which side is closest
-    if (getDistance(*p) < p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius())
+    const Mdouble maxDistance = p->getMaxInteractionRadius() + pH.getLargestParticle()->getMaxInteractionRadius();
+    if (getDistance(*p) < maxDistance)
     {
         createGhostParticle(p);
     }

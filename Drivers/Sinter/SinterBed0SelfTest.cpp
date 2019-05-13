@@ -94,7 +94,7 @@ public:
 
         // Inserting particles with 10% standard deviation
         hGridRebuild();
-        BaseParticle p;
+        SphericalParticle p;
         p.setRadius(1.1*radius);
         p.setSpecies(species);
         Mdouble volumeOfParticles = 0;

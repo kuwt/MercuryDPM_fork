@@ -1,6 +1,5 @@
 
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Boundaries/PeriodicBoundary.h"
 #include "Walls/InfiniteWall.h"
 #include "Walls/AxisymmetricIntersectionOfWalls.h"
@@ -398,7 +397,7 @@ private:
     double collisionTime;
     
     // physical objects
-    BaseParticle p;
+    SphericalParticle p;
     
     InfiniteWall wall;
     AxisymmetricIntersectionOfWalls *shaft;

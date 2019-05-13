@@ -106,7 +106,7 @@ public:
     /*!
      * \brief Get the interaction between this Shaft and given BaseParticle at a given time.
      */
-    std::vector<BaseInteraction *> getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler) final;
+    BaseInteraction* getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler) final;
 
 private:
     /*!

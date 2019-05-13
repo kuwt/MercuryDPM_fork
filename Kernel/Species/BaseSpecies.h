@@ -100,17 +100,6 @@ public:
      */
     virtual void mixAll(BaseSpecies* S, BaseSpecies* T) = 0;
     
-    ///\brief returns the largest separation distance at which adhesive short-range forces can occur.
-    /*!
-     * \details returns the largest separation distance (negative overlap) at which 
-     * (adhesive) short-range forces can occur (needed for contact detection).
-     * Defined in each of the AdhesiveForceSpecies
-     * It is defined as a virtual function here to allow the function 
-     * to be called from a BaseSpecies pointer (which is the kind of pointer 
-     * used for MixedSpecies).
-     */
-    virtual Mdouble getInteractionDistance() const = 0;
-
 //setters and getters
     
     ///\brief Returns true if torques (i.e. angular degrees of freedom) have to be calculated.
@@ -149,6 +138,21 @@ public:
      * \brief Sets the boolean constantRestitution_.
      */
     void setConstantRestitution(bool constantRestitution);
+    
+    ///\brief returns the largest separation distance at which adhesive short-range forces can occur.
+    /*!
+     * \details returns the largest separation distance (negative overlap) at which
+     * (adhesive) short-range forces can occur (needed for contact detection).
+     * Defined in each of the AdhesiveForceSpecies
+     * It is defined as a virtual function here to allow the function
+     * to be called from a BaseSpecies pointer (which is the kind of pointer
+     * used for MixedSpecies).
+     */
+    Mdouble getInteractionDistance() const {return interactionDistance_;}
+    
+protected:
+    
+    void setInteractionDistance(Mdouble interactionDistance);
 
 private:
     /*!
@@ -161,7 +165,12 @@ private:
     // If constantRestitution_ is true, the elastic and dissipative force is multiplied by the harmonic mean mass, making restitution and collision time independent of the particle mass.
     // This is set to false by default.
     bool constantRestitution_;
-
+    
+    /**
+     * Returns the distance between particles of this species below which adhesive forces can occur (needed for contact detection)
+     * set by the adhesive species
+     */
+    Mdouble interactionDistance_;
 };
 
 #endif

@@ -28,7 +28,6 @@
 #include "Species/LinearViscoelasticSpecies.h"
 #include "Boundaries/PeriodicBoundary.h"
 #include "CG/CG.h"
-
 //number of particles in all directions
 const unsigned n = 5;
 
@@ -46,7 +45,7 @@ public:
         speciesHandler.copyAndAddObject(species);
 
         //put particles into the domain in a 3d grid of mesh size distance
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setRadius(0.5);
         for (unsigned i=0; i<n; i++) {

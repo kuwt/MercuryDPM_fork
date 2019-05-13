@@ -56,7 +56,7 @@ public:
         setDomain({0,0,0},{1,1,1});
 
         particleHandler.setStorageCapacity(nParticles);
-        BaseParticle p(speciesHandler.getObject(0));
+        SphericalParticle p(speciesHandler.getObject(0));
         for (unsigned i = 0; i < nParticles; ++i)
         {
             p.setRadius(std::fmin(2*meanRadius,std::fmax(0,d(gen))));

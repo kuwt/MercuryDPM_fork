@@ -79,7 +79,7 @@ bool ParabolaChute::getDistanceAndNormal(const BaseParticle& p, Mdouble& distanc
     
     Mdouble distanceSquared = pow(q - y0, 2) + pow(pow(q, 2) / ws_ - z0, 2);
     // TODO
-    if (distanceSquared >= pow(p.getWallInteractionRadius(), 2))
+    if (distanceSquared >= mathsFunc::square(p.getWallInteractionRadius(this)))
     {
         return false;
     }

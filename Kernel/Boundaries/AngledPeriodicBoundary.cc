@@ -272,7 +272,8 @@ Mdouble AngledPeriodicBoundary::getOpeningAngle()
  */
 void AngledPeriodicBoundary::createPeriodicParticle(BaseParticle* p, ParticleHandler& pH)
 {
-    if (distance(*p) < p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius())
+    const Mdouble maxDistance = p->getMaxInteractionRadius() + pH.getLargestParticle()->getMaxInteractionRadius();
+    if (distance(*p) < maxDistance)
     {
         //std::cout << "Copy particle " << p->getIndex() << " to new ghost particle" << std::endl;
         //Step 1: Copy the particle to new ghost particle.

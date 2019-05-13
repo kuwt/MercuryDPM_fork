@@ -384,7 +384,7 @@ public:
    void makeParticles()
    {
       Vec3D particlePosition;
-      BaseParticle p0;
+      SphericalParticle p0;
 
       p0.setSpecies(speciesParticle);
       p0.setVelocity(Vec3D(0.0, 0.0, 0.0));

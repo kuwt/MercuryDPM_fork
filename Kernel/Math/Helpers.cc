@@ -46,6 +46,7 @@
 #else
 
 #include <unistd.h>
+#include "Particles/SphericalParticle.h"
 
 #define GetCurrentDir getcwd
 #endif
@@ -642,7 +643,7 @@ void helpers::loadingTest(const ParticleSpecies* species, Mdouble displacement, 
 
             speciesHandler.copyAndAddObject(*species);
 
-            BaseParticle p;
+            SphericalParticle p;
             p.setSpecies(speciesHandler.getObject(0));
             p.setRadius(radius);
             p.setPosition({0, 0, radius});
@@ -720,7 +721,7 @@ void helpers::normalAndTangentialLoadingTest(const ParticleSpecies* species, Mdo
 
             speciesHandler.copyAndAddObject(*species);
 
-            BaseParticle p;
+            SphericalParticle p;
             p.setSpecies(speciesHandler.getObject(0));
             p.setRadius(radius);
             p.setPosition({0, 0, radius - displacement});
@@ -816,8 +817,8 @@ void helpers::objectivenessTest(const ParticleSpecies* species, Mdouble displace
             setParticleDimensions(3);
 
             speciesHandler.copyAndAddObject(*species);
-
-            BaseParticle p;
+    
+            SphericalParticle p;
             p.setSpecies(speciesHandler.getObject(0));
             p.setRadius(radius);
             p.setPosition({0, radius - displacement, 0});
@@ -884,29 +885,29 @@ bool helpers::compare(std::istream& is, std::string s)
     return true;
 }
 
-void helpers::check(double real, double ideal, double error, std::string errorMessage)
+void helpers::check(double real, double ideal, double error, std::string whatIsChecked)
 {
     logger.assert_always(mathsFunc::isEqual(real, ideal, error),
-                         errorMessage + ": % (should be %) ", real, ideal);
-    logger(INFO,"Check passed");
+                         whatIsChecked + ": % (should be %) ", real, ideal);
+    logger(INFO, whatIsChecked + ": % (correct)", real);
 }
 
-void helpers::check(Vec3D real, Vec3D ideal, double error, std::string errorMessage)
+void helpers::check(Vec3D real, Vec3D ideal, double error, std::string whatIsChecked)
 {
     //std::numeric_limits<double>::epsilon()
     logger.assert_always(mathsFunc::isEqual(real.X, ideal.X, error),
-                         errorMessage + ": % (should be %) ", real, ideal);
+                         whatIsChecked + ": % (should be %) ", real, ideal);
     logger.assert_always(mathsFunc::isEqual(real.Y, ideal.Y, error),
-                         errorMessage + ": % (should be %) ", real, ideal);
+                         whatIsChecked + ": % (should be %) ", real, ideal);
     logger.assert_always(mathsFunc::isEqual(real.Z, ideal.Z, error),
-                         errorMessage + ": % (should be %) ", real, ideal);
-    logger(INFO, errorMessage + ": % (correct)", real);
+                         whatIsChecked + ": % (should be %) ", real, ideal);
+    logger(INFO, whatIsChecked + ": % (correct)", real);
 }
 
 std::string helpers::getPath()
 {
     char cCurrentPath[FILENAME_MAX];
-    if (GetCurrentDir(cCurrentPath, sizeof(cCurrentPath))); //if added to avoid compiler warning
+    GetCurrentDir(cCurrentPath, sizeof(cCurrentPath)); //if added to avoid compiler warning
     return std::string(cCurrentPath);
 }
 

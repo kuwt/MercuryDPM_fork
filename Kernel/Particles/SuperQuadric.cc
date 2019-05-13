@@ -23,10 +23,13 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include "DPMBase.h"
+#include "BaseParticle.h"
 #include <cmath>
 #include "SuperQuadric.h"
 #include "InteractionHandler.h"
 #include "ParticleHandler.h"
+#include "SpeciesHandler.h"
 
 /*!
  * \details calls the default constructor of BaseParticle, and creates an SuperEllipsoid with axes (1,1,1) and exponents
@@ -38,7 +41,6 @@ SuperQuadric::SuperQuadric()
     axes_ = Vec3D(1.0, 1.0, 1.0);
     eps1_ = 1.0;
     eps2_ = 1.0;
-    
     logger(DEBUG, "SuperQuadric::SuperQuadric() finished");
 }
 
@@ -63,8 +65,8 @@ SuperQuadric::SuperQuadric(const BaseParticle& p) : BaseParticle(p)
 {
     Mdouble radius = p.getRadius();
     axes_ = Vec3D(radius, radius, radius);
-    eps1_ = 1;
-    eps2_ = 1;
+    eps1_ = 1.0;
+    eps2_ = 1.0;
 }
 
 /*!
@@ -101,7 +103,6 @@ void SuperQuadric::write(std::ostream& os) const
     os << " axes " << axes_
        << " exp1 " << eps1_
        << " exp2 " << eps2_;
-    
 }
 
 /*!
@@ -132,35 +133,28 @@ void SuperQuadric::read(std::istream& is)
 void SuperQuadric::setAxesAndExponents(const Mdouble& a1, const Mdouble& a2, const Mdouble& a3, const Mdouble& eps1,
                                        const Mdouble& eps2)
 {
-    axes_.X = a1;
-    axes_.Y = a2;
-    axes_.Z = a3;
     eps1_ = eps1;
     eps2_ = eps2;
     logger.assert_always(eps1_ < 1 + 1e-10, "epsilon1 should be at most 1");
     logger.assert_always(eps2_ < 1 + 1e-10, "epsilon2 should be at most 1");
-    if (getSpecies() != nullptr)
-    {
-        getSpecies()->computeMass(this);
-    }
+
+    setAxes(a1,a2,a3);
 }
 
 void SuperQuadric::setAxesAndExponents(const Vec3D& axes, const Mdouble& eps1, const Mdouble& eps2)
 {
-    axes_ = axes;
     eps1_ = eps1;
     eps2_ = eps2;
     logger.assert_always(eps1_ < 1 + 1e-10, "epsilon1 should be at most 1");
     logger.assert_always(eps2_ < 1 + 1e-10, "epsilon2 should be at most 1");
-    if (getSpecies() != nullptr)
-    {
-        getSpecies()->computeMass(this);
-    }
+    
+    setAxes(axes);
 }
 
 void SuperQuadric::setAxes(const Vec3D& axes)
 {
     axes_ = axes;
+    setBoundingRadius();
     if (getSpecies() != nullptr)
     {
         getSpecies()->computeMass(this);
@@ -169,19 +163,14 @@ void SuperQuadric::setAxes(const Vec3D& axes)
 
 void SuperQuadric::setAxes(const Mdouble& a1, const Mdouble& a2, const Mdouble& a3)
 {
-    axes_.X = a1;
-    axes_.Y = a2;
-    axes_.Z = a3;
-    if (getSpecies() != nullptr)
-    {
-        getSpecies()->computeMass(this);
-    }
+    setAxes({a1,a2,a3});
 }
 
 void SuperQuadric::setExponents(const Mdouble& eps1, const Mdouble& eps2)
 {
     eps1_ = eps1;
     eps2_ = eps2;
+    setBoundingRadius();
     logger.assert_always(eps1_ < 1 + 1e-10, "epsilon1 should be at most 1");
     logger.assert_always(eps2_ < 1 + 1e-10, "epsilon2 should be at most 1");
     if (getSpecies() != nullptr)
@@ -197,13 +186,11 @@ Vec3D SuperQuadric::getAxes() const
 
 Mdouble SuperQuadric::getExponentEps1() const
 {
-    logger.assert_always(eps1_ < 1 + 1e-10, "epsilon1 should be at most 1");
     return eps1_;
 }
 
 Mdouble SuperQuadric::getExponentEps2() const
 {
-    logger.assert_always(eps2_ < 1 + 1e-10, "epsilon2 should be at most 1");
     return eps2_;
 }
 
@@ -218,17 +205,8 @@ Mdouble SuperQuadric::getVolume() const
 {
     logger.assert(getHandler() != nullptr, "[SuperQuadric::getVolume] no particle handler specified");
     
-    /*
-    logger(VERBOSE,"2*a1*a2*a3*eps1*eps2 = %",2.0 * axes_.X * axes_.Y * axes_.Z * eps1_ * eps2_);
-    logger(VERBOSE,"beta(0.5 * eps1_ + 1.0, eps1_) = %",mathsFunc::beta(0.5 * eps1_ + 1.0, eps1_));
-    logger(VERBOSE,"beta(0.5 * eps2_, 0.5 * eps2_) = %",mathsFunc::beta(0.5 * eps2_, 0.5 * eps2_));
-    logger(VERBOSE,"volume = %",(2.0 * axes_.X * axes_.Y * axes_.Z * eps1_ * eps2_) * mathsFunc::beta(0.5 * eps1_ + 1.0, eps1_) *
-                             mathsFunc::beta(0.5 * eps2_, 0.5 * eps2_));
-    */
-    
     return (2.0 * axes_.X * axes_.Y * axes_.Z * eps1_ * eps2_) * mathsFunc::beta(0.5 * eps1_ + 1.0, eps1_) *
            mathsFunc::beta(0.5 * eps2_, 0.5 * eps2_);
-    
 }
 
 /*!
@@ -258,18 +236,12 @@ void SuperQuadric::setInertia()
     BaseParticle::setInertia(inertia);
 }
 
-/*!
- * \details This function determines the minimum bounding radius of the bounding sphere. Bounding sphere is a bounding
- * volume technique where a simple sphere encapsulates a more complex shaped object. Additionally, we also for other
- * surrounding effects such as liquid films or electromagnetic fields. For spheres and ellipsoids the mininmum bounding
- * radius is max(a1,a2,a3), where (a1,a2,a3) are the principal axes. For generalised superellipsoidic shapes, we
- * determine the minimum radius by utilising the solution presented in Eq. 12 of the article by Podlozhynuk et al. in
- * Comp. Part. Mech. (2017). They basically solve an optimisation problem using Lagrange multipliers, which result
- * in easy-to-use analytical expressions. However note that in their solutions n1 = 2.0/eps1_ and n2 = 2.0/eps2_
- * \return The radius of the bounding sphere + 0.5 *interactionDistance (in case of e.g. liquid films around the
- *          particle)
- */
-Mdouble SuperQuadric::getInteractionRadius() const
+void SuperQuadric::setRadius(const Mdouble radius)
+{
+    logger(ERROR,"This function should not be used");
+}
+
+void SuperQuadric::setBoundingRadius()
 {
     const Mdouble alpha = std::pow(axes_.Y / axes_.X, 2.0 / (2.0 / eps2_ - 2.0));
     const Mdouble help1 = std::pow(alpha, 2.0 / eps2_);
@@ -277,44 +249,9 @@ Mdouble SuperQuadric::getInteractionRadius() const
     const Mdouble beta = std::pow(gamma * axes_.Z * axes_.Z / (axes_.X * axes_.X), 1.0 / (2.0 / eps1_ - 2.0));
     const Mdouble xTilde = std::pow(std::pow(1 + help1, eps2_ / eps1_) + std::pow(beta, 2.0 / eps1_),
                                     -eps1_ / 2.0);
-    const Mdouble boundingRadius = std::sqrt(mathsFunc::square(axes_.X * xTilde)
+    BaseParticle::setRadius(std::sqrt(mathsFunc::square(axes_.X * xTilde)
                                              + mathsFunc::square(alpha * axes_.Y * xTilde)
-                                             + mathsFunc::square(beta * axes_.Z * xTilde));
-    return boundingRadius + getSpecies()->getInteractionDistance() * 0.5;
-    // For spheres and ellipsoids
-    /*if (mathsFunc::isEqual(eps1_, 1, 1.e-16) && mathsFunc::isEqual(eps2_, 1, 1e-16))
-    {
-        const Mdouble boundingRadius = std::max(std::max(axes_.X, axes_.Y), axes_.Z);
-        return boundingRadius + getSpecies()->getInteractionDistance() * 0.5;
-    }
-    // For cylinders
-    else if (mathsFunc::isEqual(eps2_, 1.0, 1e-16))
-    {
-        ///\todo automatically let a > b or implement the case b >= a
-        ///\todo check validity for a = b
-        logger.assert(axes_.X >= axes_.Y, "Need a >= b for bounding sphere computation. Please re-arrange your axes.");
-        const Mdouble beta = std::pow(axes_.Z * axes_.Z / (axes_.X * axes_.X), 1.0 / (2.0 / eps1_ - 2.0));
-        const Mdouble xTilde = std::pow(1.0 + std::pow(beta, 2.0 / eps1_), -eps1_ / 2);
-        const Mdouble boundingRadius = std::sqrt(mathsFunc::square(axes_.X * xTilde)
-                                                 + mathsFunc::square(beta * axes_.Z * xTilde));
-        return boundingRadius + getSpecies()->getInteractionDistance() * 0.5;
-    }
-    else if (mathsFunc::isEqual(eps1_, 1.0, 1e-16))
-    {
-        const Mdouble alpha = std::pow(axes_.Y / axes_.X, 2.0 / (2.0 / eps2_ - 2.0));
-        const Mdouble help1 = std::pow(alpha, 2.0 / eps2_);
-        const Mdouble gamma = std::pow(1.0 + help1, eps2_ / eps1_ - 1.0);
-        logger.assert(gamma * axes_.Z * axes_.Z < axes_.X * axes_.X, "Please choose your axes such that a >= c");
-        const Mdouble xTilde = (std::pow((1 + help1), -eps2_ / 2.0));
-        const Mdouble boundingRadius = std::sqrt(mathsFunc::square(axes_.X * xTilde)
-                                                 + mathsFunc::square(alpha * axes_.Y * xTilde));
-        return boundingRadius + getSpecies()->getInteractionDistance() * 0.5;
-    }
-    else  // For other shapes
-    {*/
-    
-    //}
-    
+                                             + mathsFunc::square(beta * axes_.Z * xTilde)));
 }
 
 /*!
@@ -327,15 +264,16 @@ Mdouble SuperQuadric::getInteractionRadius() const
  *                              assigned (if it is a new interaction).
  * \return                      A vector with size 1 (if there is an interaction) or 0 (if there is no interaction).
  */
-std::vector<BaseInteraction*> SuperQuadric::getInteractionWith(BaseParticle* const p, const unsigned timeStamp,
+BaseInteraction* SuperQuadric::getInteractionWith(BaseParticle* const p, const unsigned timeStamp,
                                                                InteractionHandler* const interactionHandler)
 {
     //get the normal (from P away from the contact)
     const LabFixedCoordinates branchVector = p->getPosition() - getPosition();
     //Get the square of the distance between particle i and particle j
     const Mdouble distanceSquared = Vec3D::getLengthSquared(branchVector);
-    const Mdouble sumOfInteractionRadii = p->getInteractionRadius() + getInteractionRadius();
-    std::vector<BaseInteraction*> contacts;
+    auto mixedSpecies = getSpecies()->getHandler()->getMixedObject(getSpecies(),p->getSpecies());
+    
+    const Mdouble sumOfInteractionRadii = getMaxInteractionRadius()+p->getMaxInteractionRadius();
     if (distanceSquared < (sumOfInteractionRadii * sumOfInteractionRadii))
     {
         //make a superquadric out of the particle.
@@ -349,15 +287,17 @@ std::vector<BaseInteraction*> SuperQuadric::getInteractionWith(BaseParticle* con
             pQuad->setAxes(p->getRadius(), p->getRadius(), p->getRadius());
         }
         
-        contacts = getInteractionWithSuperQuad(pQuad, timeStamp, interactionHandler);
+        BaseInteraction* contacts = getInteractionWithSuperQuad(pQuad, timeStamp, interactionHandler);
         
         if (fromSphere)
         {
             delete pQuad;
         }
         
+        return contacts;
+        
     }
-    return contacts;
+    return nullptr;
 }
 
 /*!
@@ -370,8 +310,7 @@ std::vector<BaseInteraction*> SuperQuadric::getInteractionWith(BaseParticle* con
  * \return                          A vector of Interaction* with size 1 (if there is an interaction) or 0
  *                                  (if there is no interaction).
  */
-std::vector<BaseInteraction*>
-SuperQuadric::getInteractionWithSuperQuad(SuperQuadric* const p, const unsigned timeStamp,
+BaseInteraction* SuperQuadric::getInteractionWithSuperQuad(SuperQuadric* const p, const unsigned timeStamp,
                                           InteractionHandler* const interactionHandler)
 {
     BaseInteraction* const C = interactionHandler->getInteraction(p, this, timeStamp);
@@ -386,7 +325,7 @@ SuperQuadric::getInteractionWithSuperQuad(SuperQuadric* const p, const unsigned 
     //if the minimum is positive, there is no contact: return empty vector
     if (computeShape(contactPoint) > -1e-10)
     {
-        return {};
+        return nullptr;
     }
     
     C->setContactPoint(contactPoint);
@@ -405,7 +344,7 @@ SuperQuadric::getInteractionWithSuperQuad(SuperQuadric* const p, const unsigned 
     ///\todo: find correct value
     C->setDistance((getPosition() - p->getPosition()).getLength() - C->getOverlap());
     
-    return {C};
+    return C;
 }
 
 /*!
@@ -494,9 +433,9 @@ SmallVector<4> SuperQuadric::getInitialGuessForContact(const SuperQuadric* pQuad
         const Mdouble distanceSquared = Vec3D::getLengthSquared(branchVector);
         const Mdouble distance = sqrt(distanceSquared);
         const LabFixedCoordinates normal = (branchVector / distance);
-        const Mdouble overlap = (pQuad->getInteractionRadius() + getInteractionRadius() - distance);
+        const Mdouble overlap = getSumOfInteractionRadii(pQuad) - distance;
         const LabFixedCoordinates contactPoint = (pQuad->getPosition() -
-                                                  (pQuad->getInteractionRadius() - 0.5 * overlap) * normal);
+                                                  (pQuad->getInteractionRadius(this) - 0.5 * overlap) * normal);
         
         approximateContactPoint[0] = contactPoint.X;
         approximateContactPoint[1] = contactPoint.Y;
@@ -777,8 +716,8 @@ SmallVector<4> SuperQuadric::getContactPointPlanB(const SuperQuadric* const pOth
 {
     logger(VERBOSE, "Number of iterations: %", numberOfSteps);
     // Step 1: Compute contact point for two volume equivalent spheres
-    const Mdouble interactionRadiusThis = getInteractionRadius();
-    const Mdouble interactionRadiusOther = pOther->getInteractionRadius();
+    const Mdouble interactionRadiusThis = getInteractionRadius(pOther);
+    const Mdouble interactionRadiusOther = pOther->getInteractionRadius(this);
     const Vec3D positionThis = getPosition();
     const Vec3D positionOther = pOther->getPosition();
     
@@ -1016,8 +955,8 @@ void SuperQuadric::writeDebugMessageStep1(const SuperQuadric* pQuad, const Small
     logger(VERBOSE, "Position of particle 2 (pQuad): % ", pQuad->getPosition());
     logger(VERBOSE, " ");
     
-    logger(VERBOSE, "Radius of particle 1: % ", getInteractionRadius());
-    logger(VERBOSE, "Radius of particle 2 (pQuad): % \n", pQuad->getInteractionRadius());
+    logger(VERBOSE, "Radius of particle 1: % ", getInteractionRadius(pQuad));
+    logger(VERBOSE, "Radius of particle 2 (pQuad): % \n", pQuad->getInteractionRadius(this));
     
     logger(VERBOSE, "Orientation of particle 1: % ", getOrientation());
     logger(VERBOSE, "Orientation of particle 2 (pQuad): % ", pQuad->getOrientation());
@@ -1027,4 +966,10 @@ void SuperQuadric::writeDebugMessageStep1(const SuperQuadric* pQuad, const Small
     logger(VERBOSE, "Particle 2 axes (pQuad): % \n", pQuad->getAxes());
     
     logger(VERBOSE, "Analytical solution for two equivalent spheres in contact: % \n", contactPointPlanB);
+}
+
+Mdouble SuperQuadric::getInteractionRadius(const BaseParticle* particle) const
+{
+    const auto mixedSpecies = getSpecies()->getHandler()->getMixedObject(getSpecies(),particle->getSpecies());
+    return getRadius() + 0.5 * mixedSpecies->getInteractionDistance();
 }

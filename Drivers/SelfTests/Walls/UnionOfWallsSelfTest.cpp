@@ -95,7 +95,7 @@ class UnionOfWalls : public Mercury3D {
         unionDrum.setVelocity(Vec3D(0,0,1));
         auto l = wallHandler.copyAndAddObject(unionDrum);
 
-        BaseParticle particle;
+        SphericalParticle particle;
         particle.setSpecies(s);
         particle.setRadius(0.5);
         particle.setPosition(Vec3D(0,0,-drumRadius+particle.getRadius()));

@@ -53,7 +53,7 @@ class EllipticalSuperQuadricCollision : public Mercury3D
         logger(INFO, "Euler angles p1: %",p1.getOrientation().getEuler());
         particleHandler.copyAndAddObject(p0);
         particleHandler.copyAndAddObject(p1);
-        logger(INFO, "interaction radius p0: %", p0.getInteractionRadius());
+        logger(INFO, "interaction radius p0: %", p0.getMaxInteractionRadius());
         
         
         setTimeStep(species.getCollisionTime(1) / 50);
@@ -81,9 +81,12 @@ private:
 int main(int argc, char* argv[])
 {
     EllipticalSuperQuadricCollision problem;
-    problem.setName("EllipticalSuperQuadricCollision");
+    problem.setName("EllipsoidSelfTest");
     problem.setSaveCount(50);
+    // comment the  next to lines to turn on file output
     problem.setSuperquadricParticlesWriteVTK(true);
+    problem.setFileType(FileType::NO_FILE);
+    problem.restartFile.setFileType(FileType::ONE_FILE);
     problem.solve();
     return 0;
 }

@@ -92,7 +92,7 @@ void Mercury3D::hGridFindContactsWithinTargetCell(int x, int y, int z, unsigned 
             //Check if the BaseParticle* p1 and BaseParticle* p2 are really in the same cell (i.e. no hashing error has occurred)
             if (p1->getHGridCell() == (p2->getHGridCell()))
             {
-                computeInternalForces(p1, p2);
+                computeInternalForce(p1, p2);
             }
             p2 = p2->getHGridNextObject();
         }
@@ -132,7 +132,7 @@ void Mercury3D::hGridFindContactsWithTargetCell(int x, int y, int z, unsigned in
         //TW speedcheck revealed that this pre-check is cheaper than allowing computeInternalForces to sort out mismatches; even if a large number of hash cells (10*Np) is used.
         if (p->getHGridCell().equals(x, y, z, l))
         {
-            computeInternalForces(obj, p);
+            computeInternalForce(obj, p);
         }
     }
 }
@@ -187,17 +187,17 @@ void Mercury3D::hGridGetInteractingParticleList(BaseParticle* obj, std::vector<B
         
         const Mdouble inv_size = hgrid->getInvCellSize(level);
         const int xs = static_cast<int>(std::floor(
-                (obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
+                (obj->getPosition().X - obj->getMaxInteractionRadius()) * inv_size - 0.5));
         const int xe = static_cast<int>(std::floor(
-                (obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
+                (obj->getPosition().X + obj->getMaxInteractionRadius()) * inv_size + 0.5));
         const int ys = static_cast<int>(std::floor(
-                (obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
+                (obj->getPosition().Y - obj->getMaxInteractionRadius()) * inv_size - 0.5));
         const int ye = static_cast<int>(std::floor(
-                (obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
+                (obj->getPosition().Y + obj->getMaxInteractionRadius()) * inv_size + 0.5));
         const int zs = static_cast<int>(std::floor(
-                (obj->getPosition().Z - obj->getInteractionRadius()) * inv_size - 0.5));
+                (obj->getPosition().Z - obj->getMaxInteractionRadius()) * inv_size - 0.5));
         const int ze = static_cast<int>(std::floor(
-                (obj->getPosition().Z + obj->getInteractionRadius()) * inv_size + 0.5));
+                (obj->getPosition().Z + obj->getMaxInteractionRadius()) * inv_size + 0.5));
         for (int x = xs; x <= xe; ++x)
         {
             for (int y = ys; y <= ye; ++y)
@@ -217,7 +217,7 @@ void Mercury3D::hGridGetInteractingParticleList(BaseParticle* obj, std::vector<B
  *                  particles in the grid. Please note that we're looking only one way, so that 
  *                  interactions are not detected twice.
  */
-void Mercury3D::hGridFindOneSidedContacts(BaseParticle* obj)
+void Mercury3D::computeInternalForces(BaseParticle* obj)
 {
     HGrid* const hgrid = getHGrid();
     const unsigned int startLevel = obj->getHGridLevel();
@@ -258,17 +258,17 @@ void Mercury3D::hGridFindOneSidedContacts(BaseParticle* obj)
             {
                 const Mdouble inv_size = getHGrid()->getInvCellSize(level);
                 const int xs = static_cast<int>(std::floor(
-                        (obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
+                        (obj->getPosition().X - obj->getMaxInteractionRadius()) * inv_size - 0.5));
                 const int xe = static_cast<int>(std::floor(
-                        (obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
+                        (obj->getPosition().X + obj->getMaxInteractionRadius()) * inv_size + 0.5));
                 const int ys = static_cast<int>(std::floor(
-                        (obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
+                        (obj->getPosition().Y - obj->getMaxInteractionRadius()) * inv_size - 0.5));
                 const int ye = static_cast<int>(std::floor(
-                        (obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
+                        (obj->getPosition().Y + obj->getMaxInteractionRadius()) * inv_size + 0.5));
                 const int zs = static_cast<int>(std::floor(
-                        (obj->getPosition().Z - obj->getInteractionRadius()) * inv_size - 0.5));
+                        (obj->getPosition().Z - obj->getMaxInteractionRadius()) * inv_size - 0.5));
                 const int ze = static_cast<int>(std::floor(
-                        (obj->getPosition().Z + obj->getInteractionRadius()) * inv_size + 0.5));
+                        (obj->getPosition().Z + obj->getMaxInteractionRadius()) * inv_size + 0.5));
                 for (int x = xs; x <= xe; ++x)
                 {
                     for (int y = ys; y <= ye; ++y)
@@ -324,17 +324,17 @@ void Mercury3D::hGridFindOneSidedContacts(BaseParticle* obj)
             {
                 const Mdouble inv_size = hgrid->getInvCellSize(level);
                 const int xs = static_cast<int>(std::floor(
-                        (obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
+                        (obj->getPosition().X - obj->getMaxInteractionRadius()) * inv_size - 0.5));
                 const int xe = static_cast<int>(std::floor(
-                        (obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
+                        (obj->getPosition().X + obj->getMaxInteractionRadius()) * inv_size + 0.5));
                 const int ys = static_cast<int>(std::floor(
-                        (obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
+                        (obj->getPosition().Y - obj->getMaxInteractionRadius()) * inv_size - 0.5));
                 const int ye = static_cast<int>(std::floor(
-                        (obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
+                        (obj->getPosition().Y + obj->getMaxInteractionRadius()) * inv_size + 0.5));
                 const int zs = static_cast<int>(std::floor(
-                        (obj->getPosition().Z - obj->getInteractionRadius()) * inv_size - 0.5));
+                        (obj->getPosition().Z - obj->getMaxInteractionRadius()) * inv_size - 0.5));
                 const int ze = static_cast<int>(std::floor(
-                        (obj->getPosition().Z + obj->getInteractionRadius()) * inv_size + 0.5));
+                        (obj->getPosition().Z + obj->getMaxInteractionRadius()) * inv_size + 0.5));
                 for (int x = xs; x <= xe; ++x)
                 {
                     for (int y = ys; y <= ye; ++y)
@@ -504,17 +504,17 @@ bool Mercury3D::hGridHasParticleContacts(const BaseParticle* obj)
         
         const Mdouble inv_size = getHGrid()->getInvCellSize(level);
         const int xs = static_cast<int>(std::floor(
-                (obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
+                (obj->getPosition().X - obj->getMaxInteractionRadius()) * inv_size - 0.5));
         const int xe = static_cast<int>(std::floor(
-                (obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
+                (obj->getPosition().X + obj->getMaxInteractionRadius()) * inv_size + 0.5));
         const int ys = static_cast<int>(std::floor(
-                (obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
+                (obj->getPosition().Y - obj->getMaxInteractionRadius()) * inv_size - 0.5));
         const int ye = static_cast<int>(std::floor(
-                (obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
+                (obj->getPosition().Y + obj->getMaxInteractionRadius()) * inv_size + 0.5));
         const int zs = static_cast<int>(std::floor(
-                (obj->getPosition().Z - obj->getInteractionRadius()) * inv_size - 0.5));
+                (obj->getPosition().Z - obj->getMaxInteractionRadius()) * inv_size - 0.5));
         const int ze = static_cast<int>(std::floor(
-                (obj->getPosition().Z + obj->getInteractionRadius()) * inv_size + 0.5));
+                (obj->getPosition().Z + obj->getMaxInteractionRadius()) * inv_size + 0.5));
         
         logger(VERBOSE, "Level = % grid cells [%,%] x [%,%] x [%,%]", level, xs, xe, ys, ye, zs, ze);
         for (int x = xs; x <= xe; ++x)
@@ -565,17 +565,17 @@ std::vector<BaseParticle*> Mercury3D::hGridFindParticleContacts(const BasePartic
         
         const Mdouble inv_size = getHGrid()->getInvCellSize(level);
         const int xs = static_cast<int>(std::floor(
-                (obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
+                (obj->getPosition().X - obj->getMaxInteractionRadius()) * inv_size - 0.5));
         const int xe = static_cast<int>(std::floor(
-                (obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
+                (obj->getPosition().X + obj->getMaxInteractionRadius()) * inv_size + 0.5));
         const int ys = static_cast<int>(std::floor(
-                (obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
+                (obj->getPosition().Y - obj->getMaxInteractionRadius()) * inv_size - 0.5));
         const int ye = static_cast<int>(std::floor(
-                (obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
+                (obj->getPosition().Y + obj->getMaxInteractionRadius()) * inv_size + 0.5));
         const int zs = static_cast<int>(std::floor(
-                (obj->getPosition().Z - obj->getInteractionRadius()) * inv_size - 0.5));
+                (obj->getPosition().Z - obj->getMaxInteractionRadius()) * inv_size - 0.5));
         const int ze = static_cast<int>(std::floor(
-                (obj->getPosition().Z + obj->getInteractionRadius()) * inv_size + 0.5));
+                (obj->getPosition().Z + obj->getMaxInteractionRadius()) * inv_size + 0.5));
         
         logger(VERBOSE, "Level = % grid cells [%,%] x [%,%] x [%,%]", level, xs, xe, ys, ye, zs, ze);
         for (int x = xs; x <= xe; ++x)

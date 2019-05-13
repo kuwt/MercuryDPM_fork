@@ -69,7 +69,7 @@ bool ScrewBottom::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance,
       Mdouble rho = sqrt(pow(pPosition.X,2.0) + pow(pPosition.Y,2.0));
 
       // collision from the casing inside
-      if (rho > radius_ - p.getWallInteractionRadius())
+      if (rho > radius_ - p.getWallInteractionRadius(this))
       {
          distance = radius_ - rho;
          normal_return.X = pPosition.X/rho;
@@ -83,7 +83,7 @@ bool ScrewBottom::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance,
    }
    else
    {
-      if (fabs(pPosition.X) > radius_ - p.getWallInteractionRadius())
+      if (fabs(pPosition.X) > radius_ - p.getWallInteractionRadius(this))
       {
          distance = radius_ - fabs(pPosition.X);
          normal_return.X = pPosition.X;

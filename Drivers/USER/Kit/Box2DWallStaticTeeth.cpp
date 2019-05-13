@@ -24,7 +24,6 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "Walls/IntersectionOfWalls.h"
 #include "Boundaries/PeriodicBoundary.h"
@@ -247,12 +246,12 @@ public:
 			breakpercent = 25.0;
 		}
 
-		BaseParticle p0;
+		SphericalParticle p0;
 		p0.setRadius(r0);
 		p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
 		p0.setSpecies(species);
 		
-		BaseParticle p1;
+		SphericalParticle p1;
 		p1.setRadius(r1);
 		p1.setVelocity(Vec3D(0.0, 0.0, 0.0));
 		p1.setSpecies(species);
@@ -290,7 +289,7 @@ public:
 			}
 		} while ( ((partarea/totarea) * 100) < breakpercent );
 		
-		BaseParticle wobbler; // Particle to displace main body of particles
+		SphericalParticle wobbler; // Particle to displace main body of particles
 		wobbler.setVelocity(Vec3D(-0.5, 0.0, -2.0));
 		wobbler.setRadius(r0);
 		wobbler.setPosition(Vec3D(getXMax()/2, getYMax()/2, 0.3 * getZMax()));

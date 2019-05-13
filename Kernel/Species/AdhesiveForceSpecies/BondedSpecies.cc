@@ -134,9 +134,4 @@ Mdouble BondedSpecies::getBondForceMax() const
     return bondForceMax_;
 }
 
-///\return the maximum separation distance below which adhesive forces can occur (needed for contact detection)
-Mdouble BondedSpecies::getInteractionDistance() const
-{
-    return 0.0;
-}
 

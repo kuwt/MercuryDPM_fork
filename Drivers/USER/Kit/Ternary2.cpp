@@ -1,5 +1,4 @@
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <iostream>
 #include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
@@ -170,7 +169,7 @@ class my_problem : public Mercury3D{
         
 
     //Setup the particles (Put the partilces on a grid with small random velocities)
-	BaseParticle p0;
+	SphericalParticle p0;
 	double max_radius = max(particle_radius1,particle_radius4);
     unsigned int N=numberOfParticles;
     double x=max_radius*1.01;

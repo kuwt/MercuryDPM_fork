@@ -30,7 +30,6 @@
 
 #include "Mercury2D.h"
 #include "Boundaries/PeriodicBoundary.h"
-#include "Particles/BaseParticle.h"
 #include "HGridOptimiser.h"
 #include "Species/LinearViscoelasticSpecies.h"
 #include "Walls/InfiniteWall.h"
@@ -157,7 +156,7 @@ public:
         double V = 0;
         
         particleHandler.setStorageCapacity(2 * n);
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(species);
         
         double absVel = 1000;

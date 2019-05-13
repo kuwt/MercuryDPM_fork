@@ -81,7 +81,7 @@ private:
         
         
         particleHandler.clear();
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
         

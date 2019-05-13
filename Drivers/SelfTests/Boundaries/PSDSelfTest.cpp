@@ -27,7 +27,6 @@
 #include "Mercury3D.h"
 #include "Boundaries/CubeInsertionBoundary.h"
 #include "Boundaries/PeriodicBoundary.h"
-#include "Particles/BaseParticle.h"
 #include "Species/LinearViscoelasticSpecies.h"
 #include "Walls/InfiniteWall.h"
 
@@ -65,7 +64,7 @@ public:
         CubeInsertionBoundary insertionBoundary;
 
         // define the type of particle you want to insert (radius, position and velocity will be set by the insertion boundary)
-        BaseParticle templateParticle(speciesHandler.getObject(0));
+        SphericalParticle templateParticle(speciesHandler.getObject(0));
 
         // insert particles in the whole domain (between getMin and getMax) with initial velocity 0 and and a radius between 1 and 2 (uniform number distribution)
         Vec3D posMin = getMin();

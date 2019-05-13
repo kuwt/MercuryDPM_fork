@@ -74,7 +74,7 @@ public:
         w0.set(Vec3D(0, 0, -1), Vec3D(0, 0, mid.Z));
         wallHandler.copyAndAddObject(w0);
 
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         for (Mdouble z = mid.Z + contractionHeight;
             particleHandler.getNumberOfObjects() <= N; 

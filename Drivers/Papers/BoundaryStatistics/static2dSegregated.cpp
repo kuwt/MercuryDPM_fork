@@ -26,7 +26,6 @@
 // This produces the picture for the Powders and Grains 2013 conference talk by Thomas Weinhart.
 #include "Chute.h"
 #include "StatisticsVector.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <iostream>
 #include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
@@ -91,7 +90,7 @@ public:
 
 			
 			//set particles
-			BaseParticle p0;
+			SphericalParticle p0;
 			p0.setRadius(getFixedParticleRadius());
 			p0.fixParticle();
 
@@ -106,7 +105,7 @@ public:
 			p0.setPosition(Vec3D(4.5,0.5,0.05));
 			particleHandler.copyAndAddObject(p0);
 			
-			BaseParticle p1;
+			SphericalParticle p1;
 			p1.setRadius(getInflowParticleRadius());
 			
 			p1.setPosition(Vec3D(1,0.5,1));

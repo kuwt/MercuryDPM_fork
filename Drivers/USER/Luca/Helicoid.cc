@@ -153,7 +153,7 @@ void Helicoid::setOmega(Mdouble omega)
 }
 
 // this stuff is for checking the collision on the run
-// std::cout << p.getId() << "\t" << fabs(phi)/tau << "\t" << signPhi << "\t" << epsilon/(p.getWallInteractionRadius()+delta_) << "\t" << (distance+delta_)/(p.getWallInteractionRadius()+delta_) << "\t" << p.getPosition().X << "\t" << p.getPosition().Y << "\t" << p.getPosition().Z << "\t" << ContactPoint.X << "\t" << ContactPoint.Y << "\t" << ContactPoint.Z << "\t" << normal_return.X << "\t" << normal_return.Y << "\t" << normal_return.Z << "\n";
+// std::cout << p.getId() << "\t" << fabs(phi)/tau << "\t" << signPhi << "\t" << epsilon/(p.getWallInteractionRadius(this)+delta_) << "\t" << (distance+delta_)/(p.getWallInteractionRadius(this)+delta_) << "\t" << p.getPosition().X << "\t" << p.getPosition().Y << "\t" << p.getPosition().Z << "\t" << ContactPoint.X << "\t" << ContactPoint.Y << "\t" << ContactPoint.Z << "\t" << normal_return.X << "\t" << normal_return.Y << "\t" << normal_return.Z << "\n";
 
 // the contact detection algorithm
 bool Helicoid::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const
@@ -163,10 +163,10 @@ bool Helicoid::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Ve
     
     // if the particle is outside of the cylinder that contains the helicoid returns false
     // check for the radius
-    if (rho2 > pow(maxR_ + p.getWallInteractionRadius(), 2)) return false;
+    if (rho2 > pow(maxR_ + p.getWallInteractionRadius(this), 2)) return false;
     // check for the height
-    if (p.getPosition().Z > l_ + start_.Z + p.getWallInteractionRadius() + delta_) return false;
-    if (p.getPosition().Z < start_.Z - p.getWallInteractionRadius() - delta_) return false;
+    if (p.getPosition().Z > l_ + start_.Z + p.getWallInteractionRadius(this) + delta_) return false;
+    if (p.getPosition().Z < start_.Z - p.getWallInteractionRadius(this) - delta_) return false;
     
     // radial distance of the particle from the helicoid axis
     Mdouble rho = sqrt(rho2);
@@ -184,7 +184,7 @@ bool Helicoid::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Ve
     else phi = theta - xi - 2.0 * constants::pi;
     
     // angular distance threshold for the collision
-    Mdouble tau = (p.getWallInteractionRadius() + delta_)/(h_ * cosEta_);
+    Mdouble tau = (p.getWallInteractionRadius(this) + delta_)/(h_ * cosEta_);
     
     // if the absolute value of phi is bigger than tau there is no collision
     if (fabs(phi) > tau) return false;
@@ -194,7 +194,7 @@ bool Helicoid::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Ve
     Mdouble epsilon = h_ * cosEta_ * (tau - fabs(phi));
     
     // distance between the contact point and the particle's centre
-    distance = (p.getWallInteractionRadius() - epsilon)/cosEta_;
+    distance = (p.getWallInteractionRadius(this) - epsilon)/cosEta_;
     
     // sign of phi
     Mdouble signPhi = 0.0;

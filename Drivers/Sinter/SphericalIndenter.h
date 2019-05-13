@@ -113,7 +113,7 @@ public:
     {
         DPMBase::computeExternalForces(p);
         if (!p->isFixed())
-            computeInternalForces(p, &indenter_);
+            computeInternalForce(p, &indenter_);
     }
 
     /** add indenter forces */
@@ -239,7 +239,7 @@ public:
     }
 
 private:
-    BaseParticle indenter_;
+    SphericalParticle indenter_;
     Mdouble initialBedHeight_;
     Mdouble indenterDiameter_;
     Mdouble indentationVelocity_;

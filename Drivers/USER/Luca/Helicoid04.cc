@@ -193,9 +193,9 @@ bool Helicoid04::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, 
     Mdouble rho2 = pow(p.getPosition().X - start_.X, 2) + pow(p.getPosition().Y - start_.Y, 2);
     
     // if the particle is outside of the cylinder that contains the helicoid returns false
-    if (rho2 > pow(maxR_ + p.getWallInteractionRadius(), 2)) return false;
-    if (p.getPosition().Z > l_ + start_.Z + p.getWallInteractionRadius()) return false;
-    if (p.getPosition().Z < start_.Z - p.getWallInteractionRadius()) return false;
+    if (rho2 > pow(maxR_ + p.getWallInteractionRadius(this), 2)) return false;
+    if (p.getPosition().Z > l_ + start_.Z + p.getWallInteractionRadius(this)) return false;
+    if (p.getPosition().Z < start_.Z - p.getWallInteractionRadius(this)) return false;
     
     // radial distance of the particle from the helicoid axis
     Mdouble rho = sqrt(rho2);
@@ -225,7 +225,7 @@ bool Helicoid04::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, 
     Mdouble modFactor = 1.0 - (rho - minR_)/(maxR_ - minR_);
     
     // check for the collision threshold
-    if (fabs(deltaZ)*cosEta > p.getWallInteractionRadius() + delta_*modFactor) return false;
+    if (fabs(deltaZ)*cosEta > p.getWallInteractionRadius(this) + delta_*modFactor) return false;
     
     // trigonometric functions relative to the particle position
     Mdouble cosXi = (p.getPosition().X - start_.X)/rho;
@@ -265,7 +265,7 @@ bool Helicoid04::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, 
         sinGamma = 1.0/sqrt(1.0+pow(normalDistance/radialDistance,2));
         
         // checks for collision with the edge
-        if (fabs(normalDistance) > p.getWallInteractionRadius()*cosGamma) return false;
+        if (fabs(normalDistance) > p.getWallInteractionRadius(this)*cosGamma) return false;
         
         // distance between the contact point and the particle's centre
         distance = sqrt(pow(normalDistance,2) + pow(radialDistance,2));
@@ -307,11 +307,10 @@ bool Helicoid04::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, 
 // Checks for the interaction between a particle p at a time timeStamp.
 // In case of interaction returns a pointer to the BaseInteraction happened between the Helicoid and the
 // BaseParticle at time timeStamp
-std::vector<BaseInteraction *> Helicoid04::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler)
+BaseInteraction* Helicoid04::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler)
 {
     Mdouble distance;
     Vec3D normal;
-    std::vector<BaseInteraction*> interactions;
     if (getDistanceAndNormal(*p,distance,normal))
     {
         BaseInteraction* c = interactionHandler->getInteraction(p, this, timeStamp);
@@ -319,9 +318,9 @@ std::vector<BaseInteraction *> Helicoid04::getInteractionWith(BaseParticle* p, u
         c->setDistance(distance);
         c->setOverlap(p->getRadius() - distance);
         c->setContactPoint(p->getPosition() - (p->getRadius() - 0.5 * c->getOverlap()) * c->getNormal());
-        interactions.push_back(c);
+        return c;
     }
-    return interactions;
+    return nullptr;
 }
 
 

@@ -242,12 +242,11 @@ public:
         if (nPolygon.size()==2)
         {
             BaseParticle* P0 = particleHandler.getObject(0);
-            BaseParticle P1;
+            BaseParticle* P1 = P0->copy();
             int numWallParticles=particleHandler.getNumberOfObjects();
 	    //previously had this hard-wired to 10000-15000
 	    int numPartitionWallParticles = particleHandler.getNumberOfObjects() / 2; 
             BedParticlesInitialLocation.resize(numWallParticles+numPartitionWallParticles);
-            P1=*P0;
             for (int i=0;i<15000;i++)
             {
             
@@ -272,11 +271,12 @@ public:
                 position.Z=(r*sin(theta)+1+getZMin())*(getZMax()-getZMin())/2.0;
             
             
-                P1.setPosition(position);
+                P1->setPosition(position);
             
                 particleHandler.copyAndAddObject(P1);
             
                 }
+            delete P1;
         }
         
         // Set the step to step 2 and set the time to check if relaxed to 0.1 seconds from now.
@@ -302,7 +302,7 @@ public:
         std::cout << "Number of small particles to be inserted:" << numSmallToBeInserted << std::endl;
         
         // CREATE THE PARTICLES
-        BaseParticle P0;
+        SphericalParticle P0;
         
         Vec3D position;
         double r, theta, y;

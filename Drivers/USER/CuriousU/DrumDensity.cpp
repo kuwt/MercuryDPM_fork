@@ -87,7 +87,7 @@ public:
 		wallHandler.copyAndAddObject(drum);
 
 		//Place particles into the box
-		BaseParticle particle;
+		SphericalParticle particle;
 		//Insert a set of particles (30 density, 30 light):
 		while (particleHandler.getNumberOfObjects()<60)
 		{

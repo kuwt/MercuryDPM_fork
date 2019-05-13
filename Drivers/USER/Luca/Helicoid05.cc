@@ -195,9 +195,9 @@ bool Helicoid05::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, 
     Mdouble rho2 = pow(p.getPosition().X - start_.X, 2) + pow(p.getPosition().Y - start_.Y, 2);
     
     // if the particle is outside the cylinder containing the screw there is no collision
-    if (rho2 > pow(rMax_ + p.getWallInteractionRadius(), 2)) return false;
-    if (p.getPosition().Z > l_ + start_.Z + p.getWallInteractionRadius()) return false;
-    if (p.getPosition().Z < start_.Z - p.getWallInteractionRadius()) return false;
+    if (rho2 > pow(rMax_ + p.getWallInteractionRadius(this), 2)) return false;
+    if (p.getPosition().Z > l_ + start_.Z + p.getWallInteractionRadius(this)) return false;
+    if (p.getPosition().Z < start_.Z - p.getWallInteractionRadius(this)) return false;
     
     // radial position of the particle
     Mdouble rho = sqrt(rho2);
@@ -298,7 +298,7 @@ bool Helicoid05::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, 
             distance = sqrt(pow(deltaN, 2) + pow(deltaR, 2));
             
             // if the particle-blade_edge distance is higher than the particle radius there is no collision
-            if (distance > p.getWallInteractionRadius()) return false;
+            if (distance > p.getWallInteractionRadius(this)) return false;
             
             // if the distance is negative prints an error message
             if (distance < 0.0) std::cout << "\nCOLLISION ERROR WITH THE SCREW EDGE: OVERLAP > PARTICLE RADIUS\n";
@@ -318,10 +318,10 @@ bool Helicoid05::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, 
         
         return false;
     }
-    else if (rho >= rMin_ + p.getWallInteractionRadius()) // check for collision with the blade side only
+    else if (rho >= rMin_ + p.getWallInteractionRadius(this)) // check for collision with the blade side only
     {
         // if the particle-blade_surface distance is higher than the collision threshold there is no collision
-        if (deltaN > p.getWallInteractionRadius()) return false;
+        if (deltaN > p.getWallInteractionRadius(this)) return false;
         
         // region 3
         // the distance between the collision point and the particle centre
@@ -341,7 +341,7 @@ bool Helicoid05::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, 
         // radial distance between the particle centre and the shaft
         Mdouble deltaR = rho - rMin_;
         
-        if (deltaN > p.getWallInteractionRadius()) // region 4
+        if (deltaN > p.getWallInteractionRadius(this)) // region 4
         {
             // the distance between the collision point and the particle centre
             distance = deltaR;
@@ -357,24 +357,24 @@ bool Helicoid05::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, 
         else // region 5
         {
             // distance between the particle centre and the and the point (rMin + rp, delta + rp)
-            distance = sqrt(pow(deltaN - p.getWallInteractionRadius(), 2) + pow(deltaR - p.getWallInteractionRadius(), 2));
+            distance = sqrt(pow(deltaN - p.getWallInteractionRadius(this), 2) + pow(deltaR - p.getWallInteractionRadius(this), 2));
             
             // transform the former to be the actual distance of the particle from the contact point on the rounded corner
-            distance = p.getWallInteractionRadius() - distance;
+            distance = p.getWallInteractionRadius(this) - distance;
             
             // if the distance is negative prints an error message
             if (distance < 0.0) std::cout << "\nCOLLISION ERROR WITH THE SCREW CORNER: OVERLAP > PARTICLE RADIUS\n";
             
             // the normal to the edge through the particle centre
             // IMPORTANT: it needs to be normalized!
-            normal_return = fabs(deltaN - p.getWallInteractionRadius())*normalVector - fabs(deltaR - p.getWallInteractionRadius())*radialVector;
+            normal_return = fabs(deltaN - p.getWallInteractionRadius(this))*normalVector - fabs(deltaR - p.getWallInteractionRadius(this))*radialVector;
             normal_return /= normal_return.getLength();
             
             return true;
         }
         
         // error message if some case has not been accounted for
-        std::cout << "\nERROR: THE SCREW COLLISION FUNCTION DID NOT RETURN PROPERLY FOR rho >= rMin + p.getWallInteractionRadius()\n";
+        std::cout << "\nERROR: THE SCREW COLLISION FUNCTION DID NOT RETURN PROPERLY FOR rho >= rMin + p.getWallInteractionRadius(this)\n";
         
         return false;
     }
@@ -472,11 +472,10 @@ std::string Helicoid05::getName() const
 
 // Checks for the interaction between a particle p at a time timeStamp
 // In case of interaction returns a pointer to the BaseInteraction happened between the Screw and the BaseParticle at time timeStamp
-std::vector<BaseInteraction *> Helicoid05::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler)
+BaseInteraction* Helicoid05::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler)
 {
     Mdouble distance;
     Vec3D normal;
-    std::vector<BaseInteraction*> interactions;
     if (getDistanceAndNormal(*p,distance,normal))
     {
         BaseInteraction* c = interactionHandler->getInteraction(p, this, timeStamp);
@@ -484,9 +483,9 @@ std::vector<BaseInteraction *> Helicoid05::getInteractionWith(BaseParticle* p, u
         c->setDistance(distance);
         c->setOverlap(p->getRadius() - distance);
         c->setContactPoint(p->getPosition() - (p->getRadius() - 0.5 * c->getOverlap()) * c->getNormal());
-        interactions.push_back(c);
+        return c;
     }
-    return interactions;
+    return nullptr;
 }
 
 

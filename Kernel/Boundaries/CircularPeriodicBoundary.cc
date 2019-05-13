@@ -90,9 +90,11 @@ void CircularPeriodicBoundary::createPeriodicParticle(BaseParticle* p, ParticleH
     //std::cout<<"R="<<R<<" alpha="<<alpha<<" i="<<i<<" pieSize="<<pieSize<<std::endl;
     
     //Check if the particle is close to it's inner Radius or is is close to zero alpha (small y)
-    if (i > 0 && (R - (p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius()) <
+    ///\todo TW getLargestParticle()->getInteractionRadius() should be getLargestInteractionRadius()
+    const Mdouble maxDistance = p->getMaxInteractionRadius() + pH.getLargestParticle()->getMaxInteractionRadius();
+    if (i > 0 && (R - maxDistance <
                   pow(2.0, i - 1) * innerRadius_ ||
-                  p->getPosition().Y < (p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius())))
+                  p->getPosition().Y < maxDistance))
     {
         //std::cout<<"Going to shift because "<<R-P->getRadius()<<"<"<<pow(2,i-1)*innerRadius<<" or "<<P->getPosition().Y<<"<"<<P->getRadius()<<std::endl;
         //std::cout<<*P<<" has been shifted"<<std::endl;
@@ -110,8 +112,7 @@ void CircularPeriodicBoundary::createPeriodicParticle(BaseParticle* p, ParticleH
         pH.addObject(F0);
     }
     //Check here only for i>0 becuase for i=1 they both give the same particle
-    if (i > 1 && R * R * (1 - pow(cos(alpha - pieSize), 2)) <
-                 p->getInteractionRadius() + pH.getLargestParticle()->getInteractionRadius())
+    if (i > 1 && R * R * (1 - pow(cos(alpha - pieSize), 2)) < maxDistance)
     {
         //std::cout<<*P<<" has been shifted back"<<std::endl;
         

@@ -42,7 +42,7 @@ int main () {
     auto s = dpm.speciesHandler.copyAndAddObject(species);
     dpm.setTimeStep(0.01);
 
-    BaseParticle particle;
+    SphericalParticle particle;
     particle.setSpecies(s);
     particle.setRadius(0.5*d);
     particle.setVelocity({0,0,-.1});

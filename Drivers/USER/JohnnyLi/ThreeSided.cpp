@@ -64,7 +64,8 @@ int main()
     //}
     // add particles in a limited region
     CubeInsertionBoundary b;
-    b.set(BaseParticle(s),1000,dpm.getMin()+Vec3D(0,2*halfWidth.Y,0),dpm.getMax()+Vec3D(0,.5*halfWidth.Y,0),{0,0,0},{0,0,0},radius,radius);
+    SphericalParticle p(s);
+    b.set(p,1000,dpm.getMin()+Vec3D(0,2*halfWidth.Y,0),dpm.getMax()+Vec3D(0,.5*halfWidth.Y,0),{0,0,0},{0,0,0},radius,radius);
     b.insertParticles(&dpm);
     logger(INFO,"#particles %",dpm.particleHandler.getNumberOfObjects());
     // turn on vtk output

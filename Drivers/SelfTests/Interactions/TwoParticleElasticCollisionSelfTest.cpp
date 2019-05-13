@@ -24,7 +24,6 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Mercury2D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "Species/Species.h"
 #include "Species/LinearViscoelasticSpecies.h"
@@ -39,7 +38,7 @@ class TwoParticleElasticCollision : public Mercury2D
         setMax({0.01,0.01,0.0});
         setGravity({0.0,-9.8,0.0});
 
-        BaseParticle p0, p1;
+        SphericalParticle p0, p1;
         p0.setSpecies(speciesHandler.getObject(0));
         p1.setSpecies(speciesHandler.getObject(0));
 

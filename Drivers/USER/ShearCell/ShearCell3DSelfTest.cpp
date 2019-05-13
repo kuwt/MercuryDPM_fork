@@ -151,7 +151,7 @@ private:
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     void setupInitialConditions() 
     {
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setVelocity(Vec3D(0.0,0.0,0.0));
         p.setAngularVelocity(Vec3D(0.0,0.0,0.0));

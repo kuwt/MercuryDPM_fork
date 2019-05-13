@@ -53,7 +53,7 @@ int main() {
     dpm.setTimeStep(0.01);
     dpm.setDomain({-1,-1,-1},{1,1,1});
     dpm.setGravity(Vec3D(1,1,0)*0.5*s->getStiffness());
-    BaseParticle p(s);
+    SphericalParticle p(s);
     Mdouble d;
     Vec3D n;
     p.setRadius(r);

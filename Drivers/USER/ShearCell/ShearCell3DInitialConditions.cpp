@@ -25,7 +25,6 @@
 
 //based on /storage2/usr/people/sluding/MDCC/C3DshearXL30/MU0_LONG2
 #include "Species/LinearViscoelasticSpecies.h"
-#include "Particles/BaseParticle.h"
 #include "Particles/LiquidFilmParticle.h"
 #include "Mercury3D.h"
 #include "Boundaries/AngledPeriodicBoundary.h"

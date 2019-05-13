@@ -57,7 +57,7 @@ public:
             wall->setSpecies(speciesHandler.getObject(0));
         }
     
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setRadius(0.5);
         CubeInsertionBoundary insertionBoundary;

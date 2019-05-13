@@ -4,7 +4,6 @@
  * Example usage: mpirun -n 2 ./BrokenMaserMinimalExampleBlasius db-minimal.pars 
  */
 #include "Mercury2D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "Boundaries/CubeInsertionBoundary.h"
 #include "Boundaries/DeletionBoundary.h"
@@ -86,7 +85,7 @@ class BrokenMaserMinimalExample : public Mercury2D {
             spec_particles = speciesHandler.copyAndAddObject(spec_particles);
 
             /* Prototypical particles */
-            auto particlePrototype = new BaseParticle();
+            auto particlePrototype = new SphericalParticle();
             particlePrototype->setSpecies(spec_particles);
             particlePrototype->setRadius(pars.at("particleRadius"));
 
@@ -141,7 +140,7 @@ class BrokenMaserMinimalExample : public Mercury2D {
                         continue;
 
                     double ypos = 0;
-                    BaseParticle rbParticle;
+                    SphericalParticle rbParticle;
                     // rbParticle.setSpecies(spec_base);
                     rbParticle.setSpecies(spec_particles);
                     rbParticle.setRadius(pars.at("particleRadius"));
@@ -154,7 +153,7 @@ class BrokenMaserMinimalExample : public Mercury2D {
                 }
 
             /* CubeInsertionBoundary for introducing new particles */
-            auto generandum = new BaseParticle;
+            auto generandum = new SphericalParticle;
             generandum->setSpecies(spec_particles);
             generandum->setRadius(pars.at("particleRadius"));
             double velvar = 0;

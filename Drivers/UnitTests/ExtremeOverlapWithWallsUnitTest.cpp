@@ -23,7 +23,6 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DPMBase.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <iostream>
 #include <Species/LinearViscoelasticSpecies.h>
@@ -82,7 +81,7 @@ public:
         });
         wallHandler.copyAndAddObject(w0);
 		
-		BaseParticle p0;
+		SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
 		p0.setPosition(Vec3D(0,0,r0));
 		p0.setVelocity(Vec3D(0.0,0.0,0.0));

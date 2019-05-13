@@ -117,7 +117,7 @@ void PeriodicChute::insertParticles()
 {
     if (isMonoDisperse)
     {
-        BaseParticle p0;
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(1));
         for (unsigned int numberInserted = 0; numberInserted < numberOfParticles; ++numberInserted)
         {
@@ -151,7 +151,7 @@ void PeriodicChute::insertParticles(unsigned int numberOfLargeToGo, unsigned int
 
 void PeriodicChute::insertLargeParticle(unsigned int& numberOfLargeToGo)
 {
-    BaseParticle p0;
+    SphericalParticle p0;
     p0.setSpecies(speciesHandler.getObject(1));
     const Mdouble radius = random.getRandomNumber((2.0 / 3.0 * 0.9), (2.0 / 3.0 * 1.1));
     p0.setRadius(radius);
@@ -162,7 +162,7 @@ void PeriodicChute::insertLargeParticle(unsigned int& numberOfLargeToGo)
 
 void PeriodicChute::insertSmallParticle(unsigned int& numberOfSmallToGo)
 {
-    BaseParticle p0;
+    SphericalParticle p0;
     p0.setSpecies(speciesHandler.getObject(2));
     const Mdouble radius = random.getRandomNumber((1.0 / 3.0 * 0.9), (1.0 / 3.0 * 1.1));
     p0.setRadius(radius);

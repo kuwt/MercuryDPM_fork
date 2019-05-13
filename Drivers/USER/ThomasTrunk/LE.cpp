@@ -108,7 +108,7 @@ public:
         boundaryHandler.copyAndAddObject(periodicBoundary);
 
         //define common particle properties
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setRadius(0.5);
 

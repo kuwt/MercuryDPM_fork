@@ -37,7 +37,7 @@ class myproblem : public DPMBase {
 		setYMax(1);
 		setZMax(1);
 
-		BaseParticle P0,P1;
+		SphericalParticle P0,P1;
 
 		P0.setPosition(Vec3D(0.51,0.0,0.5));
 		P1.setPosition(Vec3D(1.49,0.0,0.5));

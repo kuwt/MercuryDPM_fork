@@ -26,8 +26,6 @@
 #include<iostream>
 #include <Species/LinearViscoelasticFrictionSpecies.h>
 #include "Mercury2D.h"
-#include "Particles/BaseParticle.h"
-
 class free_cooling : public Mercury2D{
 public:
 

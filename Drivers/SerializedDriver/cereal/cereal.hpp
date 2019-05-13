@@ -201,7 +201,7 @@ namespace cereal
       {                                                                          \
         ::cereal::detail::StaticObject<Versions>::getInstance().mapping.emplace( \
              std::type_index(typeid(TYPE)).hash_code(), VERSION_NUMBER );        \
-        return {};                                                               \
+        return nullptr;                                                               \
       }                                                                          \
     }; /* end Version */                                                         \
     static const auto CEREAL_CLASS_VERSION_REGISTER##TYPE##VERSION_NUMBER =      \

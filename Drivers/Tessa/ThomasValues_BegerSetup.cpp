@@ -200,7 +200,7 @@ public:
 			} else setZMax(getZMax()+0.00001);
 		};
 	}
-  BaseParticle P0;
+  SphericalParticle P0;
     LinearViscoelasticFrictionSpecies* species;
 };
 

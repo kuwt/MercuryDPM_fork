@@ -934,7 +934,7 @@ public:
     InfiniteWall basis, roof;
     CompressionPiston *piston;
     AxisymmetricIntersectionOfWalls casing;
-    BaseParticle p0;
+    SphericalParticle p0;
     
     // global variables
     bool verbose;

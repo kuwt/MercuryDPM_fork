@@ -134,16 +134,6 @@ BaseParticle::~BaseParticle()
 }
 
 /*!
- * \details Copy method. Uses copy constructor to create a copy on the heap. 
- *          Useful for polymorphism.
- * \return pointer to the particle's copy
- */
-BaseParticle* BaseParticle::copy() const
-{
-    return new BaseParticle(*this);
-}
-
-/*!
  * \details Returns the volume of the BaseParticle, which is calculated using
  *          its number of dimensions and radius.
  * \return The actual volume of this BaseParticle.
@@ -574,6 +564,12 @@ void BaseParticle::setMass(const Mdouble mass)
     invMass_ = 1.0 / mass;
 }
 
+Vec3D BaseParticle::getAngularMomentum() const
+{
+    return invInertia_.inverse()*getAngularVelocity() + Vec3D::cross(getPosition(),getVelocity()) / invMass_;
+}
+
+
 /*!
  * \details Sets the mass of the particle
  * \param[in] mass  the new particle's  mass
@@ -679,15 +675,15 @@ ParticleHandler* BaseParticle::getHandler() const
  * (if they don't overlap).
  */
 
-std::vector<BaseInteraction*> BaseParticle::getInteractionWith(BaseParticle* const P, const unsigned timeStamp,
+BaseInteraction* BaseParticle::getInteractionWith(BaseParticle* const P, const unsigned timeStamp,
                                                                InteractionHandler* const interactionHandler)
 {
     //get the normal (from P away from the contact)
     const Vec3D branchVector = P->getPosition() - getPosition();
     //Get the square of the distance between particle i and particle j
     const Mdouble distanceSquared = Vec3D::getLengthSquared(branchVector);
-    const Mdouble sumOfInteractionRadii = P->getRadius() + getRadius() + getSpecies()->getInteractionDistance();
-    std::vector<BaseInteraction*> interactions;
+    const auto species = interactionHandler->getDPMBase()->speciesHandler.getMixedObject(getSpecies(),P->getSpecies());
+    const Mdouble sumOfInteractionRadii = getSumOfInteractionRadii(P);
     if (distanceSquared < (sumOfInteractionRadii * sumOfInteractionRadii))
     {
         BaseInteraction* const C = interactionHandler->getInteraction(P, this, timeStamp);
@@ -699,9 +695,9 @@ std::vector<BaseInteraction*> BaseParticle::getInteractionWith(BaseParticle* con
         ///\todo We should consider setting the contact point to \author weinhartt
         //Mdouble ratio=P->getRadius()/(getRadius()+P->getRadius());
         //C->setContactPoint(P->getPosition() - (P->getRadius() - ratio * C->getOverlap()) * C->getNormal());
-        interactions.push_back(C);
+        return C;
     }
-    return interactions;
+    return nullptr;
 }
 
 /*!
@@ -860,7 +856,7 @@ bool BaseParticle::isInContactWith(const BaseParticle* const P) const
     if (P->getName() != "Superquadric")
     {
         return Vec3D::getDistanceSquared(getPosition(), P->getPosition()) <
-               mathsFunc::square(getInteractionRadius() + P->getInteractionRadius());
+               mathsFunc::square(getSumOfInteractionRadii(P));
     }
     return P->isInContactWith(this);
 }

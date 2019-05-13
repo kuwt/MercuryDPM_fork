@@ -31,7 +31,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 class Hertz : public DPMBase{
 	
-	void broadPhase(int i){
+	void computeInternalForces(int i){
 		for (int j=0;j<i;j++){
 			computeInternalForces(i,j);
 		}

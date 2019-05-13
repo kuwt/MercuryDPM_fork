@@ -114,7 +114,7 @@ public:
    void makeGridFileAndComputeInternalStructure()
    {
       Vec3D gridPoint;
-      BaseParticle p0;
+      SphericalParticle p0;
       double nPointsInsideAgglomerateBoundary;
       double nPointsInsideComponents;
 

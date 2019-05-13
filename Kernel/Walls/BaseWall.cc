@@ -353,13 +353,12 @@ void BaseWall::intersectVTK(std::vector<Vec3D>& points, const Vec3D normal, cons
  * \return A pointer to the BaseInteraction that happened between this BaseWall
  * and the BaseParticle at the timeStamp.
  */
-std::vector<BaseInteraction*>
+BaseInteraction*
 BaseWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler)
 {
     Mdouble distance;
     Vec3D normal;
     Mdouble overlap;
-    std::vector<BaseInteraction*> interactions;
     
     if (getDistanceNormalOverlap(*p, distance, normal, overlap))
     {
@@ -384,9 +383,9 @@ BaseWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHan
             c->setContactPoint(contactPoint);
         }
         logger(DEBUG, "Particle contact with wall at %", c->getContactPoint());
-        interactions.push_back(c);
+        return c;
     }
-    return interactions;
+    return nullptr;
 }
 
 void BaseWall::writeVTK(VTKContainer& vtk) const
@@ -417,11 +416,11 @@ void BaseWall::addToVTK(const std::vector<Vec3D>& points, VTKContainer& vtk)
 
 
 ///\todo make it work with screw, coil and other weird walls
-std::vector<BaseInteraction*> BaseWall::getInteractionWithSuperQuad(SuperQuadric* p, unsigned timeStamp,
+BaseInteraction* BaseWall::getInteractionWithSuperQuad(SuperQuadric* p, unsigned timeStamp,
                                                                     InteractionHandler* interactionHandler)
 {
     logger(ERROR, "Generic wall-superquad interactions not implemented yet.");
-    return {};
+    return nullptr;
 }
 
 /// \details This functions returns a axis for a wall using it Quaternion descriptions. At the moment Quaternion are not implemented for a wall; so this is currently a workaround for the non-implementation Quaternion for the walls. In the future this functions will be replaced.

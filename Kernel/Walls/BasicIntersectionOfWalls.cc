@@ -27,6 +27,7 @@
 
 #include "BasicIntersectionOfWalls.h"
 #include "Particles/BaseParticle.h"
+#include "Particles/SphericalParticle.h"
 #include "InteractionHandler.h"
 #include "WallHandler.h"
 #include "DPMBase.h"
@@ -117,10 +118,10 @@ bool BasicIntersectionOfWalls::getDistanceAndNormal(const BaseParticle& p, Mdoub
     unsigned int id = static_cast<unsigned int>(-1); //id of the closest wall
     unsigned int id2 = static_cast<unsigned int>(-1); //id of the second-closest wall
     unsigned int id3 = static_cast<unsigned int>(-1); //id of the third-closest wall
-    Mdouble wallInteractionRadius = p.getWallInteractionRadius();
+    Mdouble wallInteractionRadius = p.getWallInteractionRadius(this);
     Vec3D position = p.getPosition() - getPosition();
     getOrientation().rotateBack(position);
-    BaseParticle shifted;
+    SphericalParticle shifted;
     shifted.setSpecies(p.getSpecies());
     shifted.setPosition(position);
     shifted.setRadius(p.getRadius());
@@ -181,7 +182,7 @@ bool BasicIntersectionOfWalls::getDistanceAndNormal(const BaseParticle& p, Mdoub
     if (distance2 > -wallInteractionRadius)
     {
         //contact point on wall id
-        BaseParticle contact;
+        SphericalParticle contact;
         contact.setSpecies(p.getSpecies());
         contact.setPosition(position + distance * normal);
         contact.setRadius(0);
@@ -312,7 +313,7 @@ void BasicIntersectionOfWalls::getVTK(std::vector<Vec3D>& points, std::vector<st
     //create a vector which points are in the wall (actually, only the new points are necessary)
     std::vector<bool> pointInWall;
     pointInWall.reserve(points.size());
-    BaseParticle particle;
+    SphericalParticle particle;
     particle.setSpecies(getSpecies());
     particle.setRadius(1e-10); //points within that distance are declared part of the wall
     Mdouble distance;

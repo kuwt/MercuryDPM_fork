@@ -64,7 +64,7 @@ public:
 
         //two particles
         Mdouble relativeVelocity = 0.1;
-        BaseParticle p(species_);
+        SphericalParticle p(species_);
         p.setRadius(radius_);
         p.setPosition(Vec3D(-1,0,0)*radius_);
         p.setVelocity(Vec3D(1,0,0)*relativeVelocity);
@@ -104,7 +104,7 @@ public:
         particleHandler.clear();
 
         //one particle
-        BaseParticle p(species_);
+        SphericalParticle p(species_);
         p.setRadius(radius_);
         p.setPosition(Vec3D(0,0,0)*radius_);
         particleHandler.copyAndAddObject(p);

@@ -25,7 +25,6 @@
 
 #include "Mercury3D.h"
 #include "StatisticsVector.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <array>
 #include <Species/LinearViscoelasticSpecies.h>
@@ -52,7 +51,7 @@ public:
 		setYMax(2.*Radius);
 		setZMax(N*2.*Radius);
 		
-		BaseParticle P0;
+		SphericalParticle P0;
         P0.setSpecies(speciesHandler.getObject(0));
         P0.setPosition(Radius * Vec3D(1.,1.,0.));
         for (int k = 0; k < N; k++)

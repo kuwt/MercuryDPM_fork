@@ -448,9 +448,9 @@ void ParticleHandler::computeSmallestParticle()
     {
         if (!(particle->isMPIParticle() || particle->isPeriodicGhostParticle()))
         {
-            if (particle->getInteractionRadius() < min)
+            if (particle->getMaxInteractionRadius() < min)
             {
-                min = particle->getInteractionRadius();
+                min = particle->getMaxInteractionRadius();
                 smallestParticle_ = particle;
             }
         }
@@ -471,9 +471,9 @@ void ParticleHandler::computeLargestParticle()
     {
         if (!(particle->isMPIParticle() || particle->isPeriodicGhostParticle()))
         {
-            if (particle->getInteractionRadius() > max)
+            if (particle->getMaxInteractionRadius() > max)
             {
-                max = particle->getInteractionRadius();
+                max = particle->getMaxInteractionRadius();
                 largestParticle_ = particle;
             }
         }
@@ -647,31 +647,37 @@ Vec3D ParticleHandler::getCentreOfMass() const
         return getMassTimesPosition() / m;
 }
 
-Vec3D ParticleHandler::getMomentumLocal() const
+Vec3D getMPISum(Vec3D& val)
 {
-    Vec3D mom = {0, 0, 0};
-    for (auto p : *this)
-        if (!(p->isFixed() || p->isMPIParticle() || p->isPeriodicGhostParticle()))
-            mom += p->getMass() * p->getVelocity();
-    return mom;
+#ifdef MERCURY_USE_MPI
+    //Sum up over all domains
+    Vec3D valGlobal = {0.0,0.0,0.0};
+    MPIContainer& communicator = MPIContainer::Instance();
+    communicator.allReduce(val.X, valGlobal.X, MPI_SUM);
+    communicator.allReduce(val.Y, valGlobal.Y, MPI_SUM);
+    communicator.allReduce(val.Z, valGlobal.Z, MPI_SUM);
+    return valGlobal;
+#else
+    return val;
+#endif
 }
 
 Vec3D ParticleHandler::getMomentum() const
 {
-#ifdef MERCURY_USE_MPI
-    Vec3D momentumLocal = getMomentumLocal();
-    Vec3D momentumGlobal = {0.0,0.0,0.0};
+    Vec3D momentum = {0, 0, 0};
+    for (auto p : *this)
+        if (!(p->isFixed() || p->isMPIParticle() || p->isPeriodicGhostParticle()))
+            momentum += p->getMomentum();
+    return getMPISum(momentum);
+}
 
-    //Sum up over all domains
-    MPIContainer& communicator = MPIContainer::Instance();
-    communicator.allReduce(momentumLocal.X, momentumGlobal.X, MPI_SUM);
-    communicator.allReduce(momentumLocal.Y, momentumGlobal.Y, MPI_SUM);
-    communicator.allReduce(momentumLocal.Z, momentumGlobal.Z, MPI_SUM);
-
-    return momentumGlobal;
-#else
-    return getMomentumLocal();
-#endif
+Vec3D ParticleHandler::getAngularMomentum() const
+{
+    Vec3D momentum = {0, 0, 0};
+    for (auto p : *this)
+        if (!(p->isFixed() || p->isMPIParticle() || p->isPeriodicGhostParticle()))
+            momentum += p->getAngularMomentum();
+    return getMPISum(momentum);
 }
 
 /*!
@@ -716,7 +722,7 @@ Mdouble ParticleHandler::getSmallestInteractionRadiusLocal() const
 {
     if (!(getSmallestParticleLocal() == nullptr))
     {
-        return getSmallestParticleLocal()->getInteractionRadius();
+        return getSmallestParticleLocal()->getMaxInteractionRadius();
     }
     else
     {
@@ -752,7 +758,7 @@ Mdouble ParticleHandler::getLargestInteractionRadiusLocal() const
 {
     if (!(getLargestParticle() == nullptr))
     {
-        return getLargestParticle()->getInteractionRadius();
+        return getLargestParticle()->getMaxInteractionRadius();
     }
     else
     {
@@ -1019,7 +1025,8 @@ BaseParticle* ParticleHandler::createObject(const std::string& type)
 {
     if (type == "BaseParticle" || type == "BP" || isdigit(type[0]) || isdigit(type[1]))
     {
-        return new BaseParticle;
+        //for backwards compatibility
+        return new SphericalParticle;
     }
     else if (type == "SphericalParticle")
     {
@@ -1061,7 +1068,7 @@ BaseParticle* ParticleHandler::readAndCreateObject(std::istream& is)
         logger(DEBUG, "ParticleHandler::readAndCreateObject(is): type %", type);
         if (isdigit(type[0]) || isdigit(type[1]))
         {
-            particle = new BaseParticle;
+            particle = new SphericalParticle;
             particle->setHandler(this);
             particle->oldRead(lineCopy);
         }
@@ -1173,7 +1180,7 @@ void ParticleHandler::checkExtrema(BaseParticle* P)
         //if the properties of the largest particle changes
         computeLargestParticle();
     }
-    else if (!largestParticle_ || P->getInteractionRadius() > largestParticle_->getInteractionRadius())
+    else if (!largestParticle_ || P->getMaxInteractionRadius() > largestParticle_->getMaxInteractionRadius())
     {
         largestParticle_ = P;
     }
@@ -1183,7 +1190,7 @@ void ParticleHandler::checkExtrema(BaseParticle* P)
         //if the properties of the smallest particle changes
         computeSmallestParticle();
     }
-    else if (!smallestParticle_ || P->getInteractionRadius() < smallestParticle_->getInteractionRadius())
+    else if (!smallestParticle_ || P->getMaxInteractionRadius() < smallestParticle_->getMaxInteractionRadius())
     {
         smallestParticle_ = P;
     }

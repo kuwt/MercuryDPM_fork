@@ -27,6 +27,7 @@
 
 #include "BasicUnionOfWalls.h"
 #include "Particles/BaseParticle.h"
+#include "Particles/SphericalParticle.h"
 #include "InteractionHandler.h"
 #include "WallHandler.h"
 #include "DPMBase.h"
@@ -105,7 +106,7 @@ bool BasicUnionOfWalls::getDistanceAndNormal(const BaseParticle& p, Mdouble& dis
 
     Vec3D position = p.getPosition() - getPosition();
     getOrientation().rotateBack(position);
-    BaseParticle shifted;
+    SphericalParticle shifted;
     shifted.setSpecies(p.getSpecies());
     shifted.setPosition(position);
     shifted.setRadius(p.getRadius());
@@ -184,7 +185,7 @@ void BasicUnionOfWalls::getVTK(std::vector<Vec3D>& points, std::vector<std::vect
     //create a vector which points are in the wall (actually, only the new points are necessary)
     std::vector<bool> pointInWall;
     pointInWall.reserve(points.size());
-    BaseParticle particle;
+    SphericalParticle particle;
     particle.setSpecies(getSpecies());
     particle.setRadius(1e-10); //points within that distance are declared part of the wall
     Mdouble distance;

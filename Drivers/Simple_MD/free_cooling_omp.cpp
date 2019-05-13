@@ -55,7 +55,7 @@ public:
 	    double x=(ix+1);
 	    double y=(iy+1);
     
-    	BaseParticle p0;
+    	SphericalParticle p0;
     	
     	p0.setPosition(Vec3D(x+random.getRandomNumber(-.01,.01),y+random.getRandomNumber(-.01,.01),0.0));
 		p0.setVelocity(Vec3D(0.0,0.0,0.0));

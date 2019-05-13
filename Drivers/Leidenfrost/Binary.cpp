@@ -26,7 +26,6 @@
 #include<iostream>
 #include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
 #include "Mercury3D.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 
 //#define DEBUG_OUTPUT
@@ -158,7 +157,7 @@ public:
         wallHandler.copyAndAddObject(w0);
         
         //Put the particles on a grid with small random velocities
-        BaseParticle p0;
+        SphericalParticle p0;
         double max_radius = std::max(particle_radius1, particle_radius2);
         unsigned int N = numberOfParticles;
         double x = max_radius * 1.01;

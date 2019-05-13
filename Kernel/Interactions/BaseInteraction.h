@@ -419,11 +419,6 @@ protected:
      */
     void setAbsoluteNormalForce(Mdouble absoluteNormalForce);
     
-    /*!
-     * \brief Return a constant point to BaseSpecies of the interaction. 
-     */
-    const BaseSpecies* getBaseSpecies() const;
-    
     virtual Mdouble getElasticEnergyAtEquilibrium(Mdouble adhesiveForce) const
     { return 0; }
     
@@ -439,6 +434,11 @@ protected:
     void writeInteraction(std::ostream& os, bool created) const;
 
 public:
+    
+    /*!
+     * \brief Return a constant point to BaseSpecies of the interaction.
+     */
+    const BaseSpecies* getBaseSpecies() const;
     
     // create the mpi data type for the history data class
     virtual void createMPIType();

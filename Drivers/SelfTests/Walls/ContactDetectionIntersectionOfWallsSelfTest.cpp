@@ -75,7 +75,7 @@ public:
     void introduceParticlesAtWall()
     {
 
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setRadius(0.01);
 

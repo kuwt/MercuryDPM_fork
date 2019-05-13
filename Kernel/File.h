@@ -184,7 +184,8 @@ public:
      * \brief determined if this time step has to be written; if so, opens the output file
      */
     bool saveCurrentTimeStep(unsigned int ntimeSteps);
-    
+    bool saveCurrentTimeStepNoFileTypeCheck(unsigned int ntimeSteps);
+
     /*!
      * \brief read function, which accepts an input stream <a href="http://en.cppreference.com/w/cpp/io/basic_istreams.html">std::istream</a>. 
      */

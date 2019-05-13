@@ -25,7 +25,6 @@
 
 #include "Mercury3D.h"
 #include "StatisticsVector.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "CG/CG.h"
 #include "CG/TimeSmoothedCG.h"
@@ -93,7 +92,7 @@ public:
         setGravity(Vec3D::getUnitVector(Vec3D(-1,-1,-0)));
 
         //define the three particles
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(speciesHandler.getLastObject());
         p.setRadius(0.5 * getGravity().getLength());
         p.setPosition(-1.5 * getGravity());

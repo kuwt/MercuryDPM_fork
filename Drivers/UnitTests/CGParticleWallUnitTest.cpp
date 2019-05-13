@@ -42,7 +42,7 @@ public:
         setDomain({-1,-1,-2},{1,1,2});
 
         //define two particles
-        BaseParticle p(species);
+        SphericalParticle p(species);
         p.setRadius(1.0);
         p.setPosition({0.05, 0, 0.95});
         particleHandler.copyAndAddObject(p);

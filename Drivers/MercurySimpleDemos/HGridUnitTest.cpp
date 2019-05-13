@@ -27,8 +27,6 @@
 #include "Mercury3D.h"
 #include "DPMBase.h"
 #include "Boundaries/PeriodicBoundary.h"
-#include "Particles/BaseParticle.h"
-
 class MD_demo : public DPMBase
 {
 public:
@@ -64,7 +62,7 @@ public:
             boundaryHandler.copyAndAddObject(b0);
             
             particleHandler.setStorageCapacity(2 * N);
-            BaseParticle p0;
+            SphericalParticle p0;
             p0.setSpecies(speciesHandler.getObject(0));
             p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
             

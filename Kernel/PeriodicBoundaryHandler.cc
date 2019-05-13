@@ -35,6 +35,7 @@
 #include "ParticleHandler.h"
 #include <set>
 #include "Logger.h"
+#include "Particles/SphericalParticle.h"
 
 ///Constructor of the PeriodicBoundaryHandler class. It creates and empty PeriodicBoundaryHandler.
 PeriodicBoundaryHandler::PeriodicBoundaryHandler()
@@ -560,7 +561,7 @@ PeriodicBoundaryHandler::processReceivedGhostParticleData(int targetIndex, std::
     for (int j = 0; j < numberOfNewPeriodicGhostParticlesReceive_[targetIndex]; j++)
     {
         //Create the ghost particle and copy basic information
-        BaseParticle particle;
+        SphericalParticle particle;
         copyDataFromMPIParticleToParticle(&(periodicGhostParticleReceive_[targetIndex][j]),
                                           &particle, &(getDPMBase()->particleHandler));
         
@@ -650,11 +651,8 @@ void PeriodicBoundaryHandler::processReceivedInteractionData(int targetIndex, st
         {
             BaseInteractable* I = getDPMBase()->wallHandler.getObjectById(identificationI);
             //Create interactions
-            std::vector<BaseInteraction*> interactions = I->getInteractionWith(pGhost, timeStamp, &iH);
-            if (!interactions.empty())
-            {
-                interactions[0]->setMPIInteraction(interactionDataReceive_[targetIndex], l, false);
-            }
+            BaseInteraction* i = I->getInteractionWith(pGhost, timeStamp, &iH);
+            if (i!= nullptr) i->setMPIInteraction(interactionDataReceive_[targetIndex], l, false);
         }
         else
         {
@@ -674,12 +672,8 @@ void PeriodicBoundaryHandler::processReceivedInteractionData(int targetIndex, st
             }
             
             //Add the interaction
-            std::vector<BaseInteraction*> particleInteractions = pGhost->getInteractionWith(otherParticle, timeStamp,
-                                                                                            &iH);
-            if (!particleInteractions.empty())
-            {
-                particleInteractions[0]->setMPIInteraction(interactionDataReceive_[targetIndex], l, false);
-            }
+            BaseInteraction* i = pGhost->getInteractionWith(otherParticle, timeStamp, &iH);
+            if (i!= nullptr) i->setMPIInteraction(interactionDataReceive_[targetIndex], l, false);
         }
     }
 }
@@ -738,11 +732,8 @@ void PeriodicBoundaryHandler::processLocalInteractionData(std::vector<BasePartic
                 {
                     BaseWall* I = getDPMBase()->wallHandler.getObjectById(identificationI);
                     //Create interactions
-                    std::vector<BaseInteraction*> interactions = I->getInteractionWith(pGhost, timeStamp, &iH);
-                    if (!interactions.empty())
-                    {
-                        interactions[0]->setMPIInteraction(interactionDataSend_[i], l, false);
-                    }
+                    BaseInteraction* j = I->getInteractionWith(pGhost, timeStamp, &iH);
+                    if (j!= nullptr) j->setMPIInteraction(interactionDataSend_[i], l, false);
                     logger(VERBOSE, "Wall interaction added!");
                 }
                 else
@@ -773,13 +764,8 @@ void PeriodicBoundaryHandler::processLocalInteractionData(std::vector<BasePartic
                     }
                     
                     //Add the interaction
-                    std::vector<BaseInteraction*> particleInteractions = pGhost->getInteractionWith(otherParticle,
-                                                                                                    timeStamp, &iH);
-                    if (!particleInteractions.empty())
-                    {
-                        particleInteractions[0]->setMPIInteraction(interactionDataSend_[i], l, false);
-                        logger(VERBOSE, "Interaction succesfully added!");
-                    }
+                    BaseInteraction* j = pGhost->getInteractionWith(otherParticle, timeStamp, &iH);
+                    if (j!= nullptr) j->setMPIInteraction(interactionDataSend_[i], l, false);
                 }
             }
         }
@@ -1269,7 +1255,7 @@ int PeriodicBoundaryHandler::findTargetProcessor(const std::vector<int>& complex
     Vec3D middlePosition = getDPMBase()->domainHandler.getCurrentDomain()->getMiddle();
     
     //Create the particle with a target position
-    BaseParticle particle;
+    SphericalParticle particle;
     particle.setPosition(middlePosition);
     shiftParticle(&particle, complexity);
     

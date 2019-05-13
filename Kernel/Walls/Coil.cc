@@ -131,11 +131,12 @@ Coil* Coil::copy() const
  */
 bool Coil::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const
 {
+    const Mdouble interactionRadius = p.getWallInteractionRadius(this) + thickness_;
     Mdouble Rsqr = pow(p.getPosition().X - start_.X, 2) + pow(p.getPosition().Y - start_.Y, 2);
-    if (Rsqr > pow(r_ + p.getWallInteractionRadius() + thickness_, 2) ||
-        Rsqr < pow(r_ - p.getWallInteractionRadius() - thickness_, 2) ||
-        p.getPosition().Z > l_ + start_.Z + p.getWallInteractionRadius() + thickness_ ||
-        p.getPosition().Z < start_.Z - p.getWallInteractionRadius() - thickness_)
+    if (Rsqr > pow(r_ + interactionRadius, 2) ||
+        Rsqr < pow(r_ - interactionRadius, 2) ||
+        p.getPosition().Z > l_ + start_.Z + interactionRadius ||
+        p.getPosition().Z < start_.Z - interactionRadius)
     {
         //std::cout<<"Particle is out of first bound checking"<<std::endl;
         //std::cout<<"Rule 1: "<<pow(r-P.getRadius()-thickness_,2)<<"<"<<Rsqr<<"<"<<pow(r+P.getRadius()+thickness_,2)<<std::endl;
@@ -191,7 +192,7 @@ bool Coil::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D&
     Mdouble distanceSquared =
             R * R + r_ * r_ - 2 * R * r_ * cos(alpha - 2 * constants::pi * (offset_ + n_ * q)) + pow(dz - q * l_, 2);
     //If distance is too large there is no contact
-    if (distanceSquared >= (p.getWallInteractionRadius() + thickness_) * (p.getWallInteractionRadius() + thickness_))
+    if (distanceSquared >= mathsFunc::square(p.getWallInteractionRadius(this) + thickness_))
     {
         //std::cout<<"Particle is out of second bound checking, distance^2="<<distance<<" max="<<(P.getRadius()+thickness_)*(P.getRadius()+thickness_)<<std::endl;
         return false;

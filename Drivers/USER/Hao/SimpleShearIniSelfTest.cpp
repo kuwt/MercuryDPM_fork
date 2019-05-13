@@ -74,7 +74,7 @@ public:
 		dampingCoefficient =  0.1*particleSpecies->getDissipation();
         setGravity(Vec3D(0.0,0.0,0.0));
 		
-		BaseParticle p0;
+		SphericalParticle p0;
         p0.setSpecies(particleSpecies);
         p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
         Mdouble Vp = 0.0;

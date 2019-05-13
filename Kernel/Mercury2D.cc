@@ -91,7 +91,7 @@ void Mercury2D::hGridFindContactsWithinTargetCell(int x, int y, unsigned int l)
             //Check if the BaseParticle* p1 and BaseParticle* p2 are really in the same cell (i.e. no hashing error has occurred)
             if (p1->getHGridCell() == p2->getHGridCell())
             {
-                computeInternalForces(p1, p2);
+                computeInternalForce(p1, p2);
             }
             p2 = p2->getHGridNextObject();
         }
@@ -128,7 +128,7 @@ void Mercury2D::hGridFindContactsWithTargetCell(int x, int y, unsigned int l, Ba
         //Check if the BaseParticle *p really is in the target cell (i.e. no hashing error has occurred)
         if (p->getHGridCell().equals(x, y, l))
         {
-            computeInternalForces(obj, p);
+            computeInternalForce(obj, p);
         }
     }
 }
@@ -175,13 +175,13 @@ void Mercury2D::hGridGetInteractingParticleList(BaseParticle* obj, std::vector<B
         
         const Mdouble inv_size = hgrid->getInvCellSize(level);
         const int xs = static_cast<int>(std::floor(
-                (obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
+                (obj->getPosition().X - obj->getMaxInteractionRadius()) * inv_size - 0.5));
         const int xe = static_cast<int>(std::floor(
-                (obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
+                (obj->getPosition().X + obj->getMaxInteractionRadius()) * inv_size + 0.5));
         const int ys = static_cast<int>(std::floor(
-                (obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
+                (obj->getPosition().Y - obj->getMaxInteractionRadius()) * inv_size - 0.5));
         const int ye = static_cast<int>(std::floor(
-                (obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
+                (obj->getPosition().Y + obj->getMaxInteractionRadius()) * inv_size + 0.5));
         for (int x = xs; x <= xe; ++x)
         {
             for (int y = ys; y <= ye; ++y)
@@ -198,7 +198,7 @@ void Mercury2D::hGridGetInteractingParticleList(BaseParticle* obj, std::vector<B
  * \details Computes all collision between given BaseParticle and all other 
  * particles in the grid (of all levels).
  */
-void Mercury2D::hGridFindOneSidedContacts(BaseParticle* obj)
+void Mercury2D::computeInternalForces(BaseParticle* obj)
 {
     HGrid* hgrid = getHGrid();
     unsigned int startLevel = obj->getHGridLevel();
@@ -238,13 +238,13 @@ void Mercury2D::hGridFindOneSidedContacts(BaseParticle* obj)
                     int xs, ys, xe, ye;
                     Mdouble inv_size = hgrid->getInvCellSize(level);
                     xs = static_cast<int>(std::floor(
-                            (obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
+                            (obj->getPosition().X - obj->getMaxInteractionRadius()) * inv_size - 0.5));
                     xe = static_cast<int>(std::floor(
-                            (obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
+                            (obj->getPosition().X + obj->getMaxInteractionRadius()) * inv_size + 0.5));
                     ys = static_cast<int>(std::floor(
-                            (obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
+                            (obj->getPosition().Y - obj->getMaxInteractionRadius()) * inv_size - 0.5));
                     ye = static_cast<int>(std::floor(
-                            (obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
+                            (obj->getPosition().Y + obj->getMaxInteractionRadius()) * inv_size + 0.5));
                     for (int x = xs; x <= xe; ++x)
                     {
                         for (int y = ys; y <= ye; ++y)
@@ -289,13 +289,13 @@ void Mercury2D::hGridFindOneSidedContacts(BaseParticle* obj)
                     int xs, ys, xe, ye;
                     Mdouble inv_size = hgrid->getInvCellSize(level);
                     xs = static_cast<int>(std::floor(
-                            (obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
+                            (obj->getPosition().X - obj->getMaxInteractionRadius()) * inv_size - 0.5));
                     xe = static_cast<int>(std::floor(
-                            (obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
+                            (obj->getPosition().X + obj->getMaxInteractionRadius()) * inv_size + 0.5));
                     ys = static_cast<int>(std::floor(
-                            (obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
+                            (obj->getPosition().Y - obj->getMaxInteractionRadius()) * inv_size - 0.5));
                     ye = static_cast<int>(std::floor(
-                            (obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
+                            (obj->getPosition().Y + obj->getMaxInteractionRadius()) * inv_size + 0.5));
                     for (int x = xs; x <= xe; ++x)
                     {
                         for (int y = ys; y <= ye; ++y)
@@ -471,10 +471,10 @@ bool Mercury2D::hGridHasParticleContacts(const BaseParticle* obj)
         
         int xs, ys, xe, ye;
         inv_size = getHGrid()->getInvCellSize(level);
-        xs = static_cast<int>(std::floor((obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
-        xe = static_cast<int>(std::floor((obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
-        ys = static_cast<int>(std::floor((obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
-        ye = static_cast<int>(std::floor((obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
+        xs = static_cast<int>(std::floor((obj->getPosition().X - obj->getMaxInteractionRadius()) * inv_size - 0.5));
+        xe = static_cast<int>(std::floor((obj->getPosition().X + obj->getMaxInteractionRadius()) * inv_size + 0.5));
+        ys = static_cast<int>(std::floor((obj->getPosition().Y - obj->getMaxInteractionRadius()) * inv_size - 0.5));
+        ye = static_cast<int>(std::floor((obj->getPosition().Y + obj->getMaxInteractionRadius()) * inv_size + 0.5));
         
         logger(VERBOSE, "Level % grid cells [%,%] x [%,%]", level, xs, xe, ys, ye);
         for (int x = xs; x <= xe; ++x)
@@ -523,10 +523,10 @@ std::vector<BaseParticle*> Mercury2D::hGridFindParticleContacts(const BasePartic
         
         int xs, ys, xe, ye;
         inv_size = getHGrid()->getInvCellSize(level);
-        xs = static_cast<int>(std::floor((obj->getPosition().X - obj->getInteractionRadius()) * inv_size - 0.5));
-        xe = static_cast<int>(std::floor((obj->getPosition().X + obj->getInteractionRadius()) * inv_size + 0.5));
-        ys = static_cast<int>(std::floor((obj->getPosition().Y - obj->getInteractionRadius()) * inv_size - 0.5));
-        ye = static_cast<int>(std::floor((obj->getPosition().Y + obj->getInteractionRadius()) * inv_size + 0.5));
+        xs = static_cast<int>(std::floor((obj->getPosition().X - obj->getMaxInteractionRadius()) * inv_size - 0.5));
+        xe = static_cast<int>(std::floor((obj->getPosition().X + obj->getMaxInteractionRadius()) * inv_size + 0.5));
+        ys = static_cast<int>(std::floor((obj->getPosition().Y - obj->getMaxInteractionRadius()) * inv_size - 0.5));
+        ye = static_cast<int>(std::floor((obj->getPosition().Y + obj->getMaxInteractionRadius()) * inv_size + 0.5));
         
         logger(VERBOSE, "Level % grid cells [%,%] x [%,%]", level, xs, xe, ys, ye);
         for (int x = xs; x <= xe; ++x)

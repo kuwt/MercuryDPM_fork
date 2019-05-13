@@ -56,7 +56,7 @@ public:
         setZMin(-0.5);
 
         particleHandler.clear();
-        BaseParticle P;
+        SphericalParticle P;
         P.setSpecies(speciesHandler.getObject(0));
         P.setRadius(0.5);
         P.setPosition({-0.551, 0.0, 0.0});

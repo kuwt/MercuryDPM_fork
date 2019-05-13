@@ -303,7 +303,7 @@ protected:
     ///Add initial flow particles in a dense packing.
     virtual void addFlowParticlesCompactly();
     
-    virtual BaseParticle createFlowParticle();
+    virtual SphericalParticle createFlowParticle();
     
     /*!
      * \brief prints time, max time and number of particles

@@ -263,7 +263,7 @@ void Chute::setupInitialConditions()
     
     
     
-    BaseParticle* particleToInsert = new BaseParticle;
+    SphericalParticle* particleToInsert = new SphericalParticle;
     // by default, insert particles of species 0
     particleToInsert->setSpecies(speciesHandler.getObject(0));
     if (speciesHandler.getNumberOfObjects() > 0)
@@ -350,7 +350,7 @@ void Chute::createBottom()
          * Maybe add a BaseParticle* argument, and add a default value with 
          * particle radius < 1e-12.
          */
-        BaseParticle F0;
+        SphericalParticle F0;
         F0.setSpecies(speciesHandler.getObject(0));
         F0.setHandler(&particleHandler);
         F0.setRadius(getFixedParticleRadius());
@@ -1024,7 +1024,7 @@ void Chute::addFlowParticlesCompactly()
     setZMax(1.2 * getInflowHeight());
     while (particleHandler.getSize() < N)
     {
-        BaseParticle p0 = createFlowParticle();
+        SphericalParticle p0 = createFlowParticle();
         if (checkParticleForInteraction(p0))
         {
             particleHandler.copyAndAddObject(p0);
@@ -1037,9 +1037,9 @@ void Chute::addFlowParticlesCompactly()
     logger(DEBUG, "InflowHeight = %", getInflowHeight());
 }
 
-BaseParticle Chute::createFlowParticle()
+SphericalParticle Chute::createFlowParticle()
 {
-    BaseParticle p0;
+    SphericalParticle p0;
     p0.setSpecies(speciesHandler.getObject(0));
     p0.setRadius(random.getRandomNumber(getMinInflowParticleRadius(), getMaxInflowParticleRadius()));
     p0.setPosition(Vec3D(random.getRandomNumber(getXMin() + p0.getRadius(), getXMax() - p0.getRadius()),

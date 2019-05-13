@@ -26,7 +26,6 @@
 //based on /storage2/usr/people/sluding/MDCC/C3DshearXL30/MU0_LONG2
 #include "Mercury3D.h"
 #include "Species/LinearViscoelasticSpecies.h"
-#include "Particles/BaseParticle.h"
 #include "Boundaries/PeriodicBoundary.h"
 #include "Walls/AxisymmetricIntersectionOfWalls.h"
 
@@ -92,7 +91,7 @@ public:
                                                    (getZMax() - getZMin()));
         //try to find new insertable particles
         unsigned int numberOfParticlesInserted = 0;
-        BaseParticle p;
+        SphericalParticle p;
         p.setSpecies(species);
         const Mdouble s = sizeDistribution_;
         const Mdouble rMin = cbrt(0.5 / (s * s + 1.0) / (s + 1.0));

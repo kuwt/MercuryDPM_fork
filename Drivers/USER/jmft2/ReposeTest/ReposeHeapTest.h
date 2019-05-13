@@ -101,7 +101,7 @@ class ReposeHeapTest : public Mercury3D
             boundaryHandler.copyAndAddObject(delb);
             */
 
-            BaseParticle p0;
+            SphericalParticle p0;
             p0.setSpecies(speciesP);
             for (double x = -.5*pars.boundbox; x < .5*pars.boundbox; x += 2*pars.particleRadius*pars.dispersity_max)
                 for (double y = -.5*pars.boundbox; y < .5*pars.boundbox; y += 2*pars.particleRadius*pars.dispersity_max)
@@ -200,9 +200,9 @@ class ReposeHeapTest : public Mercury3D
             int i = 0;
             for (std::vector<BaseParticle*>::iterator it = particleHandler.begin(); it != particleHandler.end(); ++it)
             {
-                BaseParticle p = **it;
-                xs[i] = p.getPosition().X;
-                zs[i] = p.getPosition().Z;
+                BaseParticle* p = *it;
+                xs[i] = p->getPosition().X;
+                zs[i] = p->getPosition().Z;
                 // fprintf(stdout, "i %d z %f\n", i, zs[i]);
                 i++;
             }

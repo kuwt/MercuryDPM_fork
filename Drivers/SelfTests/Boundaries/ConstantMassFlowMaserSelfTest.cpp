@@ -74,7 +74,7 @@ public:
         //insert particles with a cubeInsertionBoundary, all particles have diameter 1
         const double radMin = 0.5;
         const double radMax = radMin;
-        BaseParticle particleToCopy;
+        SphericalParticle particleToCopy;
         particleToCopy.setSpecies(speciesHandler.getObject(0));
         CubeInsertionBoundary cubeInsertionBoundary;
         cubeInsertionBoundary.set(&particleToCopy, 500, Vec3D(radMax, radMax, radMax),

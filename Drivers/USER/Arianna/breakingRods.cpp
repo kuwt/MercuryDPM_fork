@@ -29,7 +29,6 @@
 #include "Species/LinearViscoelasticFrictionChargedBondedSpecies.h"
 #include "DPMBase.h"
 #include "Boundaries/PeriodicBoundary.h"
-#include "Particles/BaseParticle.h"
 #include "Walls/InfiniteWall.h"
 #include "Logger.h"
 
@@ -56,7 +55,7 @@ public:
         //**************************************Creating Particles and Assigning Species and Properties*******************************************
 
         //Creating base particles
-        BaseParticle P0,P1,P2,P3,P4,P5;
+        SphericalParticle P0,P1,P2,P3,P4,P5;
 
         //setting the initial overlap of bonded particles forming a single
         //conglomerate particle

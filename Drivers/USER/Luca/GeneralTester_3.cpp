@@ -314,7 +314,7 @@ public:
    double t0;
    LinearPlasticViscoelasticFrictionSpecies *speciesParticleBig;
    LinearPlasticViscoelasticFrictionSpecies *speciesParticleSmall;
-   BaseParticle p0;
+   SphericalParticle p0;
    InfiniteWall wall;
    Vec3D f1;
    Vec3D f2;

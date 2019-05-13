@@ -52,7 +52,7 @@
 #include "CMakeDefinitions.h"
 #include "DPMBaseXBalls.icc"
 #include "Logger.h"
-#include "Particles/BaseParticle.h"
+#include "Particles/SphericalParticle.h"
 #include "Walls/BaseWall.h"
 #include "Walls/InfiniteWall.h"
 #include "Boundaries/PeriodicBoundary.h"
@@ -77,7 +77,7 @@
 /**
  * \deprecated
  */
-void logWriteAndDie(std::string module, std::string message)
+[[noreturn]] void logWriteAndDie(std::string module, std::string message)
 {
     std::cerr << "A fatal   error has occured"
               << "\n Module  :" << module
@@ -1690,14 +1690,14 @@ void DPMBase::updateGhostGrid(BaseParticle* P)
 
     //Check if the interactionRadius of the BaseParticle is larger than given in the domain
     Domain* domain = domainHandler.getCurrentDomain();
-    if(2.0*P->getInteractionRadius() > domainHandler.getInteractionDistance())
+    if(2.0*P->getMaxInteractionRadius() > domainHandler.getInteractionDistance())
     {
         logger(VERBOSE,"Processor % | Updating mpi grid. Old interactionDistance: %, new interactionDistance %.",
-            PROCESSOR_ID,domainHandler.getInteractionDistance(),2.0*P->getInteractionRadius());
+            PROCESSOR_ID,domainHandler.getInteractionDistance(),2.0*P->getMaxInteractionRadius());
 
         //Update the interactionDistance in the domain and periodicBoundaryHandler
-        domainHandler.setInteractionDistance(2.0*P->getInteractionRadius());
-        periodicBoundaryHandler.setInteractionDistance(2.0*P->getInteractionRadius());
+        domainHandler.setInteractionDistance(2.0*P->getMaxInteractionRadius());
+        periodicBoundaryHandler.setInteractionDistance(2.0*P->getMaxInteractionRadius());
 
         //Find new ghost particless
         domainHandler.addNewParticles();
@@ -1795,24 +1795,6 @@ void DPMBase::hGridActionsBeforeIntegration()
  */
 void DPMBase::hGridActionsAfterIntegration()
 {
-}
-
-/*!
- * \details
- * Loops over all other particles in the particleHandler and computes the relevant forces for any
- * particle pairing found to be in contact.
- * \n\n
- * By broad one means to screen and determine an
- * approximate number of particles that a given particle can be in contact with. Hence the word
- * "Broad phase" of contact detection.
- * \param[in] i
- */
-void DPMBase::broadPhase(BaseParticle* i)
-{
-    for (auto it = particleHandler.begin(); (*it) != i; ++it)
-    {
-        computeInternalForces(i, *it);
-    }
 }
 
 /*!
@@ -2000,15 +1982,16 @@ void DPMBase::writeVTKFiles() const
     if (getWallsWriteVTK() == FileType::ONE_FILE && getTime() == 0.0)
     {
         wallVTKWriter_.writeVTK();
-    }
-    else if (getWallsWriteVTK() == FileType::MULTIPLE_FILES || getWallsWriteVTK() == FileType::MULTIPLE_FILES_PADDED)
-    {
+    } else if (getWallsWriteVTK() == FileType::MULTIPLE_FILES
+        || getWallsWriteVTK() == FileType::MULTIPLE_FILES_PADDED) {
         wallVTKWriter_.writeVTK();
-    }
+    } // else do nothing
+
     if (getParticlesWriteVTK() || getSuperquadricParticlesWriteVTK())
     {
         vtkWriter_->writeVTK();
-    }
+    }  // else do nothing
+
     if (interactionHandler.getWriteVTK() != FileType::NO_FILE)
     {
         interactionVTKWriter_.writeVTK();
@@ -2511,7 +2494,7 @@ bool DPMBase::readNextDataFile(unsigned int format)
     {
         if (particleHandler.getSize() == 0)
         {
-            BaseParticle p;
+            SphericalParticle p;
             p.setSpecies(speciesHandler.getObject(0));
             particleHandler.copyAndAddObject(p);
             /** 
@@ -2798,10 +2781,16 @@ void DPMBase::writeFStatFile()
     }
 }
 
+/**
+ * Inserts particles in the whole domain.
+ * THis is useful if you want to check whether the wall visualisation or wall computation is correct:
+ * First insert the walls, then the particles, then check in paraview if the walls and particles overlap
+ * @param N
+ */
 void DPMBase::fillDomainWithParticles(unsigned N) {
     logger.assert_always(speciesHandler.getSize()>0,"There needs to be at least one species");
     ParticleSpecies* s = speciesHandler.getLastObject();
-    BaseParticle p(s);
+    SphericalParticle p(s);
     CubeInsertionBoundary b;
     Mdouble r = cbrt(getTotalVolume())/N;
     b.set(p,100,getMin(),getMax(),{0,0,0},{0,0,0},r,r);
@@ -2917,7 +2906,7 @@ int DPMBase::readRestartFile(std::string fileName)
  * \param[in] P1
  * \param[in] P2
  */
-void DPMBase::computeInternalForces(BaseParticle* const P1, BaseParticle* const P2)
+void DPMBase::computeInternalForce(BaseParticle* const P1, BaseParticle* const P2)
 {
     //Does not compute forces if particles are fixed
     //this is necessary because the rough bottom allows overlapping fixed particles
@@ -2948,21 +2937,18 @@ void DPMBase::computeInternalForces(BaseParticle* const P1, BaseParticle* const 
     //("getInteractionWith" returns the relevant pointer if PI and PJ are interacting,
     //zero if not)
     //if statement above ensures that the PI has the lower id than PJ
-    std::vector<BaseInteraction*> interactions = PJ->getInteractionWith(PI, getNumberOfTimeSteps() + 1,
+    BaseInteraction* i = PJ->getInteractionWith(PI, getNumberOfTimeSteps() + 1,
                                                                         &interactionHandler);
-    for (auto i : interactions)
-    {
-        
+    if (i!= nullptr) {
         //calculates the force corresponding to the interaction
         i->computeForce();
-        
+    
         //Applies the relevant calculated forces to PI and PJ
         PI->addForce(i->getForce());
         PJ->addForce(-i->getForce());
-        
+    
         //checks if particle rotation is turned on...
-        if (getRotation())
-        {
+        if (getRotation()) {
             //...and, if so, performs equivalent calculations for the torque as were
             //performed for the force.
             PI->addTorque(i->getTorque() - Vec3D::cross(PI->getPosition() - i->getContactPoint(), i->getForce()));
@@ -3002,11 +2988,9 @@ void DPMBase::computeForcesDueToWalls(BaseParticle* pI, BaseWall* w)
         return;
     
     //Checks if the particle is interacting with the current wall
-    std::vector<BaseInteraction*> interactions = w->getInteractionWith(pI, getNumberOfTimeSteps() + 1,
+    BaseInteraction* i = w->getInteractionWith(pI, getNumberOfTimeSteps() + 1,
                                                                        &interactionHandler);
-    
-    for (auto i : interactions)
-    {
+    if (i!=nullptr) {
         //...calculates the forces between the two objects...
         i->computeForce();
         
@@ -3247,7 +3231,10 @@ void DPMBase::computeAllForces()
  */
 void DPMBase::computeInternalForces(BaseParticle* i)
 {
-    broadPhase(i);
+    for (auto it = particleHandler.begin(); (*it) != i; ++it)
+    {
+        computeInternalForce(i, *it);
+    }
 }
 
 /*!
@@ -3694,15 +3681,16 @@ void DPMBase::writeOutputFiles()
         writeEneFile();
     }
     //writing .data data if .saveCurrentTimeStep(numberOfTimeSteps_) is true
-    if (dataFile.saveCurrentTimeStep(numberOfTimeSteps_))
+    if (dataFile.saveCurrentTimeStepNoFileTypeCheck(numberOfTimeSteps_))
     {
+        if (dataFile.getFileType() != FileType::NO_FILE) {
+            if (getRestarted() || dataFile.getCounter() == 0)
+                writeXBallsScript();
+            writeDataFile();
+        }
         printTime();
-        if ((getRestarted() || dataFile.getCounter() == 0) && dataFile.getFileType() != FileType::NO_FILE)
-            writeXBallsScript();
         writeVTKFiles();
-        writeDataFile();
     }
-    
     cgHandler.evaluate();
     
     
@@ -4469,35 +4457,37 @@ bool DPMBase::checkParticleForInteraction(const BaseParticle& p)
 bool DPMBase::checkParticleForInteractionLocalPeriodic(const BaseParticle& p)
 {
     //A vector of ghost particles of the particle that is to be inserted (empty if no periodic boundaries are present)
-    std::vector<BaseParticle> pPeriodic;
+    std::vector<Vec3D> pPeriodic;
     for (BaseBoundary* b : boundaryHandler)
     {
         PeriodicBoundary* pb = dynamic_cast<PeriodicBoundary*>(b);
-        if (pb)
+        if (pb && particleHandler.getNumberOfObjects() > 0 )
         {
+            const Mdouble maxDistance = p.getMaxInteractionRadius() + particleHandler.getLargestParticle()->getMaxInteractionRadius();
             for (int i = pPeriodic.size() - 1; i >= 0; --i)
             {
-                if (particleHandler.getNumberOfObjects() > 0 && pb->getDistance(pPeriodic[i]) <
-                                                                pPeriodic[i].getInteractionRadius() +
-                                                                particleHandler.getLargestParticle()->getInteractionRadius())
+                if (pb->getDistance(pPeriodic[i]) < maxDistance)
                 {
                     pPeriodic.push_back(pPeriodic[i]);
-                    pb->shiftPosition(&pPeriodic.back());
+                    pb->shiftPosition(pPeriodic.back());
                 }
             }
-            if (particleHandler.getNumberOfObjects() > 0 && pb->getDistance(p) < p.getInteractionRadius() +
-                                                                                 particleHandler.getLargestParticle()->getInteractionRadius())
+            if (pb->getDistance(p) < maxDistance)
             {
-                pPeriodic.push_back(p);
-                pb->shiftPosition(&pPeriodic.back());
+                pPeriodic.push_back(p.getPosition());
+                pb->shiftPosition(pPeriodic.back());
             }
         }
     }
     //check the particle AND the ghost particles for intersection problems
     bool insertable = checkParticleForInteractionLocal(p);
-    for (BaseParticle& pP : pPeriodic)
-    {
-        insertable &= checkParticleForInteractionLocal(pP);
+    if (!pPeriodic.empty()) {
+        BaseParticle* q = p.copy();
+        for (const Vec3D& pos : pPeriodic) {
+            q->setPosition(pos);
+            insertable &= checkParticleForInteractionLocal(*q);
+        }
+        delete q;
     }
     return insertable;
 }
@@ -4542,7 +4532,7 @@ bool DPMBase::checkParticleForInteractionLocal(const BaseParticle& p)
         //returns false if the particle separation is less than the relevant sum of interaction radii
         //(i.e. another particle is in contact with P)
         if (Vec3D::getDistanceSquared(q->getPosition(), p.getPosition())
-            < mathsFunc::square(q->getInteractionRadius() + p.getInteractionRadius()))
+            < mathsFunc::square(p.getSumOfInteractionRadii(q)))
         {
             //std::cout<<"failure: Collision with particle "<<**it<<std::endl;
             return false;

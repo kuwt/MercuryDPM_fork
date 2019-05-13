@@ -43,9 +43,6 @@
 
 #include "Species/LinearViscoelasticSpecies.h"
 
-#include "Particles/BaseParticle.h"
-
-
 class FullRestartTest : public DPMBase
 {
 public:
@@ -94,15 +91,15 @@ public:
         angledPeriodicBoundary.set(Vec3D(0.1, 0.2, 0.3), Vec3D(0.4, 0.5, 0.6), Vec3D(0.7, 0.8, 0.9));
         
         ChuteInsertionBoundary chuteInsertionBoundary;
-        chuteInsertionBoundary.set(new BaseParticle, 13, Vec3D(0.1, 0.2, 0.3), Vec3D(0.4, 0.5, 0.6), 0.33, 0.44, 0.55,
+        chuteInsertionBoundary.set(new SphericalParticle, 13, Vec3D(0.1, 0.2, 0.3), Vec3D(0.4, 0.5, 0.6), 0.33, 0.44, 0.55,
                                    1.1, 1.2);
         
         CubeInsertionBoundary cubeInsertionBoundary;
-        cubeInsertionBoundary.set(new BaseParticle, 13, Vec3D(0.1, 0.2, 0.3), Vec3D(0.4, 0.5, 0.6),
+        cubeInsertionBoundary.set(new SphericalParticle, 13, Vec3D(0.1, 0.2, 0.3), Vec3D(0.4, 0.5, 0.6),
                                   Vec3D(0.11, 0.22, 0.33), Vec3D(0.44, 0.55, 0.66), 0.77, 0.88);
         
         HopperInsertionBoundary hopperInsertionBoundary;
-        hopperInsertionBoundary.set(new BaseParticle, 13, 0.2, 0.3, 0.66, 0.77, 3.1, 0.69, false, 3, 0.11, 0.21, 0.09,
+        hopperInsertionBoundary.set(new SphericalParticle, 13, 0.2, 0.3, 0.66, 0.77, 3.1, 0.69, false, 3, 0.11, 0.21, 0.09,
                                     2.31, 0.001, 30);
         
         PeriodicBoundary periodicBoundary;
@@ -134,7 +131,7 @@ public:
         boundaryHandler.copyAndAddObject(deletionBoundary);
         boundaryHandler.copyAndAddObject(leesEdwardsBoundary);
         
-        BaseParticle baseParticle;
+        SphericalParticle baseParticle;
         baseParticle.setSpecies(speciesHandler.getObject(0));
         particleHandler.copyAndAddObject(baseParticle);
     }

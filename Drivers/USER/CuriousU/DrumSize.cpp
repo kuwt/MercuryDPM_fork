@@ -85,7 +85,7 @@ public:
 		wallHandler.copyAndAddObject(drum);
 
 		//Place particles into the box
-		BaseParticle particle;
+		SphericalParticle particle;
 		particle.setSpecies(speciesHandler.getObject(0));
 		//Insert a set of particles (90 small and 10 large):
 		while (particleHandler.getNumberOfObjects()<90)
