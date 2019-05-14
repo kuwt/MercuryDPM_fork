@@ -126,8 +126,15 @@ public:
     void rotateHistory(Matrix3D& rotationMatrix) override;
     
     void moveSlidingSpring(Vec3D displacement);
+    
+    void computeSlidingSpring(const Vec3D& tangentialRelativeVelocity);
+    
+    void computeSlidingSpringSuperQuadric(const Vec3D& tangentialRelativeVelocity);
+    
+    void setIsSuperQuadricInteraction(bool isSuperQuadricInteraction);
+    
 
-private:
+protected:
     /*!
      * \brief Stores the amount of sliding spring (\f$\delta\f$) compression from the expression \f$f_t=-k*\delta-\nu*relVel\f$.
      *        Set in the member function integrate(), used in computeFrictionForce().
@@ -142,6 +149,8 @@ private:
      * \brief Computes the tangential force such that \f$|f_t|=\mu*|f_n|\f$. Set and computed in computeFrictionForce().
      */
     Vec3D tangentialForce_;
+    
+    bool isSuperQuadricInteraction_;
 };
 
 #endif

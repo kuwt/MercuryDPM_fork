@@ -41,6 +41,7 @@ SlidingFrictionInteraction::SlidingFrictionInteraction(BaseInteractable* P, Base
         : BaseInteraction(P, I, timeStamp)
 {
     slidingSpring_.setZero();
+    isSuperQuadricInteraction_ = false;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"SlidingFrictionInteraction::SlidingFrictionInteraction() finished"<<std::endl;
 #endif
@@ -51,6 +52,7 @@ SlidingFrictionInteraction::SlidingFrictionInteraction()
         : BaseInteraction()
 {
     slidingSpring_.setZero();
+    isSuperQuadricInteraction_ = false;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"SlidingFrictionInteraction::SlidingFrictionInteraction() finished"<<std::endl;
 #endif
@@ -63,6 +65,7 @@ SlidingFrictionInteraction::SlidingFrictionInteraction(const SlidingFrictionInte
         : BaseInteraction(p)
 {
     slidingSpring_ = p.slidingSpring_;
+    isSuperQuadricInteraction_ = p.isSuperQuadricInteraction_;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"SlidingFrictionInteraction::SlidingFrictionInteraction(const SlidingFrictionInteraction& p) finished"<<std::endl;
 #endif
@@ -106,6 +109,7 @@ void SlidingFrictionInteraction::computeFrictionForce()
     if (getAbsoluteNormalForce() == 0.0) return;
     
     const SlidingFrictionSpecies* species = getSpecies();//dynamic_cast
+    isSuperQuadricInteraction_ = species->getIsSuperquadricSpecies();
     
     if (species->getSlidingFrictionCoefficient() != 0.0)
     {
@@ -116,19 +120,14 @@ void SlidingFrictionInteraction::computeFrictionForce()
         
         if (species->getSlidingStiffness() != 0.0)
         {
-            //used to Integrate the spring
-            if (dynamic_cast<BaseParticle*>(getI()) == nullptr)  //if particle-wall
-                slidingSpringVelocity_ = tangentialRelativeVelocity;
-            else //if particle-particle
-                slidingSpringVelocity_ = (tangentialRelativeVelocity -
-                                          Vec3D::dot(slidingSpring_, getP()->getVelocity() - getI()->getVelocity()) *
-                                          getNormal() / getDistance());
-            // v_s = v_t - [xi . (v_p-v_i)/|r_pi|] n
-            
-            //integrate(getHandler()->timeStep_);
-            // xi = xi' + dt v_s
-            slidingSpring_ += slidingSpringVelocity_ * getHandler()->getDPMBase()->getTimeStep();
-            // Stefan does [EJECE-12/2008] sth. like xi = xi' - (xi . n) n + dt*v_t
+            if (!isSuperQuadricInteraction_)
+            {
+                computeSlidingSpring(tangentialRelativeVelocity);
+            }
+            else
+            {
+                computeSlidingSpringSuperQuadric(tangentialRelativeVelocity);
+            }
             
             //Calculate test force acting on P including viscous force
             tangentialForce_ = -species->getSlidingStiffness() * slidingSpring_ -
@@ -176,6 +175,57 @@ void SlidingFrictionInteraction::computeFrictionForce()
     /* And if species->getSlidingFrictionCoefficient() == 0.0, then there is no
      * friction force at all. */
 }
+
+void SlidingFrictionInteraction::computeSlidingSpring(const Vec3D& tangentialRelativeVelocity)
+{
+    //used to Integrate the spring
+    if (dynamic_cast<BaseParticle*>(getI()) == nullptr)  //if particle-wall
+    {
+        slidingSpringVelocity_ = tangentialRelativeVelocity;
+    }
+    else //if particle-particle
+    {
+        slidingSpringVelocity_ = (tangentialRelativeVelocity -
+                                  Vec3D::dot(slidingSpring_, getP()->getVelocity() - getI()->getVelocity()) *
+                                  getNormal() / getDistance());
+    }
+    // v_s = v_t - [xi . (v_p-v_i)/|r_pi|] n
+    
+    
+    //integrate(getHandler()->timeStep_);
+    // xi = xi' + dt v_s
+    slidingSpring_ += slidingSpringVelocity_ * getHandler()->getDPMBase()->getTimeStep();
+    // Stefan does [EJECE-12/2008] sth. like xi = xi' - (xi . n) n + dt*v_t, see SlidingFrictionSuperQuadricInteraction
+}
+
+void SlidingFrictionInteraction::computeSlidingSpringSuperQuadric(const Vec3D& tangentialRelativeVelocity)
+{
+    //used to Integrate the spring
+    if (dynamic_cast<BaseParticle*>(getI()) == nullptr)  //if particle-wall
+    {
+        slidingSpringVelocity_ = tangentialRelativeVelocity;
+    }
+    else //if particle-particle
+    {
+        slidingSpringVelocity_ = tangentialRelativeVelocity;
+    }
+    
+    // From Stefan [EJECE-12/2008]:
+    // xi = xi' - (xi . n) n and renormalising, then add v_t * dt
+    logger(DEBUG, "sliding spring, normal before rotation-step: %, %", slidingSpring_, getNormal());
+    if (slidingSpring_.getLength() > 1e-10)
+    {
+        const Mdouble springLength = slidingSpring_.getLength();
+        slidingSpring_ -= Vec3D::dot(slidingSpring_, getNormal()) * getNormal();
+        slidingSpring_.normalise();
+        slidingSpring_ *= springLength;
+        logger.assert(std::abs(slidingSpring_.getLength() - springLength) < 1e-10, "Spring length not the same after rotation");
+    }
+    logger(DEBUG, "sliding spring after rotation-step: %\n", slidingSpring_);
+    slidingSpring_ += slidingSpringVelocity_ * getHandler()->getDPMBase()->getTimeStep();
+    logger.assert(std::abs(Vec3D::dot(slidingSpring_, getNormal())) < 1e-10, "sliding spring not perpendicular to normal");
+}
+
 
 /*!
  * \param[in] timeStep the dt
@@ -261,4 +311,9 @@ Vec3D SlidingFrictionInteraction::getSlidingSpring() const
 void SlidingFrictionInteraction::moveSlidingSpring(const Vec3D displacement)
 {
     slidingSpring_ += displacement;
+}
+
+void SlidingFrictionInteraction::setIsSuperQuadricInteraction(bool isSuperQuadricInteraction)
+{
+    isSuperQuadricInteraction_ = isSuperQuadricInteraction;
 }

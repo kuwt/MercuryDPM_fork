@@ -147,7 +147,7 @@ void SuperQuadric::setAxesAndExponents(const Vec3D& axes, const Mdouble& eps1, c
     eps2_ = eps2;
     logger.assert_always(eps1_ < 1 + 1e-10, "epsilon1 should be at most 1");
     logger.assert_always(eps2_ < 1 + 1e-10, "epsilon2 should be at most 1");
-    
+
     setAxes(axes);
 }
 
@@ -204,7 +204,7 @@ Mdouble SuperQuadric::getExponentEps2() const
 Mdouble SuperQuadric::getVolume() const
 {
     logger.assert(getHandler() != nullptr, "[SuperQuadric::getVolume] no particle handler specified");
-    
+
     return (2.0 * axes_.X * axes_.Y * axes_.Z * eps1_ * eps2_) * mathsFunc::beta(0.5 * eps1_ + 1.0, eps1_) *
            mathsFunc::beta(0.5 * eps2_, 0.5 * eps2_);
 }
@@ -241,6 +241,8 @@ void SuperQuadric::setRadius(const Mdouble radius)
     logger(ERROR,"This function should not be used");
 }
 
+
+
 void SuperQuadric::setBoundingRadius()
 {
     const Mdouble alpha = std::pow(axes_.Y / axes_.X, 2.0 / (2.0 / eps2_ - 2.0));
@@ -250,9 +252,10 @@ void SuperQuadric::setBoundingRadius()
     const Mdouble xTilde = std::pow(std::pow(1 + help1, eps2_ / eps1_) + std::pow(beta, 2.0 / eps1_),
                                     -eps1_ / 2.0);
     BaseParticle::setRadius(std::sqrt(mathsFunc::square(axes_.X * xTilde)
-                                             + mathsFunc::square(alpha * axes_.Y * xTilde)
-                                             + mathsFunc::square(beta * axes_.Z * xTilde)));
+                                      + mathsFunc::square(alpha * axes_.Y * xTilde)
+                                      + mathsFunc::square(beta * axes_.Z * xTilde)));
 }
+
 
 /*!
  * \details Overwrites BaseInteractable::getInteractionWith. First checks if the bounding radii overlap, and if so,
@@ -272,7 +275,7 @@ BaseInteraction* SuperQuadric::getInteractionWith(BaseParticle* const p, const u
     //Get the square of the distance between particle i and particle j
     const Mdouble distanceSquared = Vec3D::getLengthSquared(branchVector);
     auto mixedSpecies = getSpecies()->getHandler()->getMixedObject(getSpecies(),p->getSpecies());
-    
+
     const Mdouble sumOfInteractionRadii = getMaxInteractionRadius()+p->getMaxInteractionRadius();
     if (distanceSquared < (sumOfInteractionRadii * sumOfInteractionRadii))
     {
@@ -295,7 +298,7 @@ BaseInteraction* SuperQuadric::getInteractionWith(BaseParticle* const p, const u
         }
         
         return contacts;
-        
+
     }
     return nullptr;
 }
@@ -338,10 +341,10 @@ BaseInteraction* SuperQuadric::getInteractionWithSuperQuad(SuperQuadric* const p
     normal.Z = gradThis[2];
     C->setNormal(normal);
     
-    const Mdouble alphaI = computeOverlapAlpha(contactPoint, normal);
-    const Mdouble alphaJ = p->computeOverlapAlpha(contactPoint, -normal);
+    const Mdouble alphaI = overlapFromContactPoint(contactPoint, normal);
+    const Mdouble alphaJ = p->overlapFromContactPoint(contactPoint, -normal);
     C->setOverlap(alphaI + alphaJ);
-    ///\todo: find correct value
+    ///\todo: find correct value for 'distance'
     C->setDistance((getPosition() - p->getPosition()).getLength() - C->getOverlap());
     
     return C;
@@ -380,7 +383,7 @@ SmallVector<4> SuperQuadric::getContactPoint(const SuperQuadric* const p, BaseIn
  * \return Distance between contact-point and surface of this particle
  */
 Mdouble
-SuperQuadric::computeOverlapAlpha(const LabFixedCoordinates& contactPoint, const LabFixedCoordinates& normal) const
+SuperQuadric::overlapFromContactPoint(const LabFixedCoordinates& contactPoint, const LabFixedCoordinates& normal) const
 {
     Mdouble alphaI = 0;
     LabFixedCoordinates xEdge = contactPoint + alphaI * normal;
@@ -456,7 +459,7 @@ SmallVector<4> SuperQuadric::getInitialGuessForContact(const SuperQuadric* pQuad
 }
 
 /*!
- * \details This function computes the value of the shape function in the body-fixed coordinate system. The expression
+ * \details This function computes the value of the shape function in the lab-fixed coordinate system. The expression
  * is provided in Section 2.3 of the article in Comp. Part. Mech. (2017) 4 : 101-118.
  * \return The value of the shape-function at the given (lab-fixed) coordinates.
  */
@@ -474,7 +477,7 @@ Mdouble SuperQuadric::computeShape(const LabFixedCoordinates& labFixedCoordinate
 }
 
 /*!
- * \details This function computes the gradient ("first derivative") of the shape function in the body-fixed coordinate
+ * \details This function computes the gradient ("first derivative") of the shape function in the lab-fixed coordinate
  * system. The expressions are provided in Eq. 14 of the article in Comp. Part. Mech. (2017) 4 : 101-118.
  * \return The gradient of the shape function at the given (lab-fixed) coordinates. Note, that this is the gradient to
  * the lab-fixed coordinates, \nabla_X F(X)
@@ -687,10 +690,7 @@ bool SuperQuadric::isInContactWith(const BaseParticle* const p) const
     
     const SmallVector<4> approximateContactPoint = getContactPoint(pQuad, nullptr);
     
-    if (fromSphere)
-    {
-        delete pQuad;
-    }
+    delete pQuad;
     
     //set the new contact point:
     LabFixedCoordinates contactPoint;
@@ -789,7 +789,7 @@ SmallVector<4> SuperQuadric::getContactPointPlanB(const SuperQuadric* const pOth
         }
     }
     logger.assert(p1.getAxes().X == getAxes().X, "In getContactPointPlanB, final particle for contact-detection not "
-                                                 "the same as original particle");
+            "the same as original particle");
     
     logger(VERBOSE, "Plan B contact point: %", contactPointPlanB);
     
@@ -806,7 +806,7 @@ SmallVector<4> SuperQuadric::getContactPointPlanB(const SuperQuadric* const pOth
  *                              tolerance.
  * \param[in] p1                The first particle of the contact we are looking for
  * \param[in] p2                The second particle of the contact we are looking for
- * \return                      Boolean for wheather or not the contact-detection was successful.
+ * \return                      Boolean for whether or not the contact-detection was successful.
  */
 bool SuperQuadric::computeContactPoint(SmallVector<4>& contactPoint, const SuperQuadric* const p1,
                                        const SuperQuadric* const p2) const

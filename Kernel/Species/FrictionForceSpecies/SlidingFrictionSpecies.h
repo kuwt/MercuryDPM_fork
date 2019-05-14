@@ -99,6 +99,9 @@ public:
     ///Sets k, disp, kt (with dispt=0) such that it matches a given tc and eps for a collision of two particles of mass m
     void setCollisionTimeAndNormalAndTangentialRestitutionCoefficientNoDispt(Mdouble tc, Mdouble eps, Mdouble beta,
                                                                              Mdouble mass);
+        
+    void setIsSuperquadricSpecies(bool isSuperquadricSpecies);
+    bool getIsSuperquadricSpecies() const;
 
 private:
     /*! 
@@ -124,6 +127,8 @@ private:
     
     /// static Coulomb friction coefficient (by default set equal to mu)
     Mdouble slidingFrictionCoefficientStatic_;
+    
+    bool isSuperquadricSpecies_;
 };
 
 #endif

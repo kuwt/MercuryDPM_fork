@@ -27,9 +27,9 @@
 #include "Species/LinearViscoelasticSpecies.h"
 #include "Mercury3D.h"
 
-///Tests whether the shape-function of a superquadric and its jacobian and hessian are computed correctly
+///Tests whether the shape-function of a superquadric and its gradient and hessian are computed correctly
 ///For now, only test spheres and ellipsoids.
-class ShapeJacobianHessianTester : public Mercury3D
+class ShapeGradientHessianTester : public Mercury3D
 {
 public:
     void test()
@@ -180,7 +180,7 @@ public:
 
 int main()
 {
-    ShapeJacobianHessianTester test;
+    ShapeGradientHessianTester test;
     test.test();
     return 0;
 }

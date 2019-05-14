@@ -23,77 +23,77 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "VTKWriter/SuperQuadricParticleVtkWriter.h"
-#include "Species/HertzianViscoelasticMindlinSpecies.h"
-#include "Walls/InfiniteWall.h"
 #include "Mercury3D.h"
 #include "Species/LinearViscoelasticSpecies.h"
+#include "Walls/InfiniteWall.h"
 
-/*!
- * Small class that shows the influence of varying the geometrical parameters
- * To test if your visualisation is working, you can first try the minimal example in VisualisationTest.
- */
-class ShapesDemo : public Mercury3D
+class EllipsoidsBouncingOnWallDemo : public Mercury3D
 {
     void setupInitialConditions() override
     {
-        setMin(-10, -10, 10);
-        setMax(20, 20, 20);
-        HertzianViscoelasticMindlinSpecies species;
-        species.setElasticModulusAndRestitutionCoefficient(20000, 0.8);
-        species.setDensity(constants::pi / 6);
+        
+        LinearViscoelasticSpecies species;
+        species.setDensity(6 / constants::pi);
+        species.setStiffness(2e5);
+        species.setDissipation(25);
         speciesHandler.copyAndAddObject(species);
         
-        SuperQuadric p;
-        //standard: sphere
-        p.setSpecies(speciesHandler.getLastObject());
-        p.setPosition({0,0,0});
-        particleHandler.copyAndAddObject(p);
+        SuperQuadric p0;
+        p0.setSpecies(speciesHandler.getObject(0));
+        p0.setAxesAndExponents(2.0,1.0,1.0,1.0,1.0);
+        p0.setInertia();
+        p0.setVelocity({0,0,-1});
         
-        //ellipsoid
-        p.setAxes({1,1,2});
-        p.setPosition({4, 0, 0});
-        particleHandler.copyAndAddObject(p);
+        p0.setPosition(Vec3D(0, 0.0, 3));
+        p0.setOrientationViaNormal({1, 0, 0});
+        particleHandler.copyAndAddObject(p0);
+    
+        SuperQuadric p1 = *(p0.copy());
+        p1.setPosition(Vec3D(4, 4, 3));
+        p1.setOrientationViaNormal({0,0,1});
+        particleHandler.copyAndAddObject(p1);
         
-        //rounded beam
-        p.setExponents(0.5, 0.5);
-        p.setPosition({8, 0, 0});
-        particleHandler.copyAndAddObject(p);
+        SuperQuadric p2 = *(p0.copy());
+        p2.setPosition(Vec3D(8, 8, 3));
+        p2.setOrientationViaNormal({1,0,1});
+        p2.setInertia();
+        particleHandler.copyAndAddObject(p2);
         
-        //cylinder
-        p.setAxes({1,1,1});
-        p.setExponents(0.01, 1);
-        p.setPosition({0, 0, -5});
-        particleHandler.copyAndAddObject(p);
+        InfiniteWall wall;
+        wall.set({0, 0, -1}, {0,0,0});
+        wall.setSpecies(speciesHandler.getObject(0));
+        wallHandler.copyAndAddObject(wall);
         
-        //pillow
-        p.setExponents(1, 0.01);
-        p.setPosition({4,0,-5});
-        particleHandler.copyAndAddObject(p);
+        setGravity({0,0,0});
         
-        //cube
-        p.setExponents(0.01, 0.01);
-        p.setPosition({8, 0, -5});
-        particleHandler.copyAndAddObject(p);
-        
-        
-        setTimeStep(1e-5);
-        setTimeMax(0);
-        write(std::cout, true);
-        SuperQuadricParticleVtkWriter vtkWriter(particleHandler);
-        vtkWriter.writeVTK();
+        setTimeStep(species.getCollisionTime(1) / 50);
+        setTimeMax(10);
+        setMin(-10, -1, -1);
+        setMax(10, 1, 1);
+    }
+    
+    //check contact time
+    void actionsAfterTimeStep() override
+    {
+    
+    }
+    
+    void actionsAfterSolve() override
+    {
+        getHGrid()->info();
+        particleHandler.write(std::cout);
     }
 
 private:
-    
+
 };
 
 int main(int argc, char* argv[])
 {
-    ShapesDemo problem;
-    problem.setName("ShapesDemo");
+    EllipsoidsBouncingOnWallDemo problem;
+    problem.setName("EllipsoidsBouncingOnWallDemo");
+    problem.setSaveCount(5000);
     problem.setSuperquadricParticlesWriteVTK(true);
-    //problem.setWallsWriteVTK(FileType::ONE_FILE);
     problem.solve();
     return 0;
 }

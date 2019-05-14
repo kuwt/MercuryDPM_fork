@@ -29,6 +29,8 @@
 #include "Particles/BaseParticle.h"
 #include "ParticleHandler.h"
 
+class SuperQuadric;
+
 /*!
  * \class MPIParticle
  * \brief Data class to send a particle over MPI
@@ -47,6 +49,16 @@ public:
     unsigned communicationComplexity;
     bool isMaser; //TODO 
     bool isFixed;
+    
+    virtual ~MPIParticle() = default;
+};
+
+class MPISuperQuadric : public MPIParticle
+{
+public:
+    Vec3D axes;
+    Mdouble epsilon1;
+    Mdouble epsilon2;
 };
 
 /*!
@@ -135,17 +147,23 @@ typedef MpiPeriodicParticleIDBase MpiPeriodicGhostParticleID;
 /*!
  * \brief Copies data from a BaseParticle to an MPIParticle class and returns this
  */
-MPIParticle copyDataFromParticleToMPIParticle(BaseParticle* p);
+MPISuperQuadric copyDataFromParticleToMPIParticle(BaseParticle* p);
 
 /*!
  * \brief Copies data from an MPIParticle class to a BaseParticle
  */
-void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p);
+void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, BaseParticle* p);
 
 /*!
  * \brief Copies data from an MPIParticle class to a BaseParticle
  */
-void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p, ParticleHandler* particleHandler);
+void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, BaseParticle* p, ParticleHandler* particleHandler);
+
+
+/*!
+ * \brief Copies data from an MPIParticle class to a BaseParticle
+ */
+void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, SuperQuadric* p, ParticleHandler* particleHandler);
 
 /*!
  * \brief Copies data from a BaseParticle to an MPIParticle class and returns this

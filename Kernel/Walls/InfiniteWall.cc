@@ -296,49 +296,44 @@ InfiniteWall::getDistanceNormalOverlapSuperquadric(const SuperQuadric& p, Mdoubl
     Mdouble eps1 = p.getExponentEps1();
     Mdouble eps2 = p.getExponentEps2();
     
-    //ellipsoids:
-    if (mathsFunc::isEqual(eps1, 1, 1e-5) && mathsFunc::isEqual(eps2, 1, 1e-5))
+    Vec3D furthestPoint = getFurthestPointSuperQuadric(normalBodyFixed, axes, eps1, eps2);
+    overlap = Vec3D::dot(xWallBodyFixed - furthestPoint, -normalBodyFixed);
+    if (overlap > 0)
     {
-        Vec3D furthestPoint = getFurthestPointSuperQuadric(normalBodyFixed, axes);
-        overlap = Vec3D::dot(xWallBodyFixed - furthestPoint, -normalBodyFixed);
-        if (overlap > 0)
-        {
-            Vec3D overlapBody = overlap * normalBodyFixed;
-            Vec3D contactPoint = furthestPoint - overlapBody / 2;
-            p.getOrientation().rotate(contactPoint);
-            contactPoint += p.getPosition();
-            distance = (contactPoint - overlapBody / 2 - p.getPosition()).getLength();
-            normal_return = getOrientation().getAxis();
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    else
-    {
-        logger(ERROR, "Particle-wall detection not implemented for non-ellipsoid superquadrics.");
+        Vec3D overlapBody = overlap * normalBodyFixed;
+        Vec3D contactPoint = furthestPoint - overlapBody / 2;
+        p.getOrientation().rotate(contactPoint);
+        contactPoint += p.getPosition();
+        distance = (contactPoint - overlapBody / 2 - p.getPosition()).getLength();
+        normal_return = getOrientation().getAxis();
+        return true;
     }
     return false;
 }
 
-Vec3D InfiniteWall::getFurthestPointSuperQuadric(const Vec3D& normalBodyFixed, const Vec3D& axes) const
+
+///Largely untested, use at your own risk for anything other than ellipsoids.
+Vec3D InfiniteWall::getFurthestPointSuperQuadric(const Vec3D& normalBodyFixed, const Vec3D& axes, Mdouble eps1,
+                                                 Mdouble eps2) const
 {
     Vec3D furthestPoint;
     if (std::abs(normalBodyFixed.X) > 1e-10)
     {
         Mdouble alpha = std::abs(normalBodyFixed.Y * axes.Y / normalBodyFixed.X / axes.X);
-        Mdouble beta = std::abs(normalBodyFixed.Z * axes.Z / normalBodyFixed.X / axes.X);
-        furthestPoint.X = axes.X * mathsFunc::sign(normalBodyFixed.X) / sqrt(1 + alpha * alpha + beta * beta);
-        furthestPoint.Y = axes.Y * alpha * std::abs(furthestPoint.X) * mathsFunc::sign(normalBodyFixed.Y) / axes.X;
-        furthestPoint.Z = axes.Z * beta * std::abs(furthestPoint.X) * mathsFunc::sign(normalBodyFixed.Z) / axes.X;
+        Mdouble gamma = std::pow(1 + std::pow(alpha, 2 / eps2), eps2 / eps1 - 1);
+        Mdouble beta = std::pow(gamma * std::abs(normalBodyFixed.Z * axes.Z / normalBodyFixed.X / axes.X),
+                                eps1 / (2 - eps1));
+        furthestPoint.X = axes.X * mathsFunc::sign(normalBodyFixed.X) /
+                          (std::pow(std::pow(1 + std::pow(alpha, 2 / eps2), eps2 / eps1) + std::pow(beta, 2 / eps1),
+                                    eps1 / 2));
+        furthestPoint.Y = axes.Y * alpha / axes.X * std::abs(furthestPoint.X) * mathsFunc::sign(normalBodyFixed.Y);
+        furthestPoint.Z = axes.Z * beta / axes.X * std::abs(furthestPoint.X) * mathsFunc::sign(normalBodyFixed.Z);
     }
     else if (std::abs(normalBodyFixed.Y) > 1e-10)
     {
-        Mdouble alpha = std::abs(normalBodyFixed.Z * axes.Z / normalBodyFixed.Y / axes.Y);
-        furthestPoint.Y = axes.Y * mathsFunc::sign(normalBodyFixed.Y) / sqrt(1 + alpha * alpha);
-        furthestPoint.Z = axes.Z * std::abs(furthestPoint.Y) * alpha * mathsFunc::sign(normalBodyFixed.Z) / axes.Y;
+        Mdouble beta = std::pow(std::abs(normalBodyFixed.Z * axes.Z / normalBodyFixed.Y / axes.Y), eps1 / (2 - eps1));
+        furthestPoint.Y = axes.Y / std::pow((1 + std::pow(beta, 2/eps1)), eps1 / 2) * mathsFunc::sign(normalBodyFixed.Y);
+        furthestPoint.Z = axes.Z / axes.Y * std::abs(furthestPoint.Y) * beta * mathsFunc::sign(normalBodyFixed.Z);
     }
     else
     {

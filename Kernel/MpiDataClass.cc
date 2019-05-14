@@ -35,23 +35,6 @@
  * \param[in] p Pointer to a base particle from which data is copied
  * \return MPIParticle class is returned filled with data from BaseParticle p
  */
-MPIParticle copyDataFromParticleToMPIParticle(BaseParticle* p)
-{
-    MPIParticle bP;
-    
-    bP.id = p->getId();
-    bP.indSpecies = p->getIndSpecies();
-    bP.radius = p->getRadius();
-    bP.position = p->getPosition();
-    bP.angularVelocity = p->getAngularVelocity();
-    bP.velocity = p->getVelocity();
-    bP.orientation = p->getOrientation();
-    bP.HGridLevel = p->getHGridLevel();
-    bP.communicationComplexity = p->getCommunicationComplexity();
-    bP.isMaser = p->isMaserParticle();
-    bP.isFixed = p->isFixed();
-    return bP;
-}
 
 /*!
  * \brief Copies data from an MPIParticle class to a BaseParticle
@@ -61,7 +44,7 @@ MPIParticle copyDataFromParticleToMPIParticle(BaseParticle* p)
  * \param[in] bP Pointer to an MPIParticle which contains data for a ghost particle
  * \param[in,out] p Pointer to BaseParticle, a ghost particle that will be added to the domain
  */
-void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p)
+void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, BaseParticle* p)
 {
     
     //Set important quantities
@@ -72,6 +55,9 @@ void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p)
     p->setVelocity(bP->velocity);
     p->setOrientation(bP->orientation);
     p->setCommunicationComplexity(bP->communicationComplexity);
+    
+    p->setAxes(bP->axes);
+    p->setExponents(bP->epsilon1, bP->epsilon2);
     
     //Set HGrid values
     p->setHGridNextObject(nullptr);
@@ -86,14 +72,7 @@ void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p)
     p->setInPeriodicDomain(false);
     
     //Fix maser if it is maser
-    if (bP->isMaser)
-    {
-        p->setMaserParticle(true);
-    }
-    else
-    {
-        p->setMaserParticle(false);
-    }
+    p->setMaserParticle(bP->isMaser);
     
     //Fixed particles need to be fixed again
     if (bP->isFixed)
@@ -109,7 +88,54 @@ void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p)
  * \param[in] particleHandler Pointer to the ParticleHandler required for creating a new particle
  * \todo MX: Maybe renamet his function to setParticleSpecies() or something
  */
-void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p, ParticleHandler* particleHandler)
+void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, BaseParticle* p, ParticleHandler* particleHandler)
+{
+    //Set the species of the particle, but before we can do that we have to set the handler
+    p->setHandler(particleHandler);
+    //p->setIndSpecies(bP->indSpecies);
+    const ParticleSpecies* species = p->getHandler()->getDPMBase()->speciesHandler.getObject(bP->indSpecies);
+    p->setSpecies(species);
+    copyDataFromMPIParticleToParticle(bP, p);
+}
+
+/*!
+ * \brief Copies data from a SuperQuadric to an MPISuperQuadric class and returns this
+ * \details In order to create ghost particles on other processors, data of particles
+ * have to be transmitted to other processors. Only the required data is
+ * sent. The data is sent in an MPISuperQuadric data class and this function copies
+ * the data from a particle into that class.
+ * \param[in] p Pointer to a SuperQuadric particle from which data is copied
+ * \return MPISuperQuadric class is returned filled with data from BaseParticle p
+ */
+MPISuperQuadric copyDataFromParticleToMPIParticle(BaseParticle* p)
+{
+    MPISuperQuadric bP;
+    
+    bP.id = p->getId();
+    bP.indSpecies = p->getIndSpecies();
+    bP.axes = p->getAxes();
+    bP.epsilon1 = p->getExponentEps1();
+    bP.epsilon2 = p->getExponentEps2();
+    bP.position = p->getPosition();
+    bP.angularVelocity = p->getAngularVelocity();
+    bP.velocity = p->getVelocity();
+    bP.orientation = p->getOrientation();
+    bP.HGridLevel = p->getHGridLevel();
+    bP.communicationComplexity = p->getCommunicationComplexity();
+    bP.isMaser = p->isMaserParticle();
+    bP.isFixed = p->isFixed();
+    return bP;
+}
+
+
+/*!
+ * \brief Copies data from an MPIParticle class to a BaseParticle and sets the particleHandler and species
+ * \param[in] bP Pointer to an MPIParticle which contains data for a ghost particle
+ * \param[in,out] p Pointer to BaseParticle, a ghost particle that will be added to the domain
+ * \param[in] particleHandler Pointer to the ParticleHandler required for creating a new particle
+ * \todo MX: Maybe renamet his function to setParticleSpecies() or something
+ */
+void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, SuperQuadric* p, ParticleHandler* particleHandler)
 {
     //Set the species of the particle, but before we can do that we have to set the handler
     p->setHandler(particleHandler);

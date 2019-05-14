@@ -99,8 +99,8 @@ Domain::Domain(const Domain& b)
     numberOfParticlesReceive_ = std::vector<unsigned>(numberOfNeighbours);
     numNewInteractionsSend_ = std::vector<unsigned>(numberOfNeighbours);
     numNewInteractionsReceive_ = std::vector<unsigned>(numberOfNeighbours);
-    boundaryParticleDataSend_ = std::vector<std::vector<MPIParticle> >(numberOfNeighbours);
-    boundaryParticleDataReceive_ = std::vector<std::vector<MPIParticle> >(numberOfNeighbours);
+    boundaryParticleDataSend_ = std::vector<std::vector<MPISuperQuadric> >(numberOfNeighbours);
+    boundaryParticleDataReceive_ = std::vector<std::vector<MPISuperQuadric> >(numberOfNeighbours);
     updatePositionDataSend_ = std::vector<std::vector<MPIParticlePosition> >(numberOfNeighbours);
     updatePositionDataReceive_ = std::vector<std::vector<MPIParticlePosition> >(numberOfNeighbours);
     updateVelocityDataSend_ = std::vector<std::vector<MPIParticleVelocity> >(numberOfNeighbours);
@@ -153,8 +153,8 @@ void Domain::constructor()
     numberOfParticlesReceive_ = std::vector<unsigned>(numberOfNeighbours);
     numNewInteractionsSend_ = std::vector<unsigned>(numberOfNeighbours);
     numNewInteractionsReceive_ = std::vector<unsigned>(numberOfNeighbours);
-    boundaryParticleDataSend_ = std::vector<std::vector<MPIParticle> >(numberOfNeighbours);
-    boundaryParticleDataReceive_ = std::vector<std::vector<MPIParticle> >(numberOfNeighbours);
+    boundaryParticleDataSend_ = std::vector<std::vector<MPISuperQuadric> >(numberOfNeighbours);
+    boundaryParticleDataReceive_ = std::vector<std::vector<MPISuperQuadric> >(numberOfNeighbours);
     updatePositionDataSend_ = std::vector<std::vector<MPIParticlePosition> >(numberOfNeighbours);
     updatePositionDataReceive_ = std::vector<std::vector<MPIParticlePosition> >(numberOfNeighbours);
     updateVelocityDataSend_ = std::vector<std::vector<MPIParticleVelocity> >(numberOfNeighbours);

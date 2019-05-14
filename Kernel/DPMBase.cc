@@ -836,7 +836,8 @@ void DPMBase::setParticlesWriteVTK(bool writeParticlesVTK)
     {
         writeSuperquadricParticlesVTK_ = false;
     }
-    delete vtkWriter_;
+    if(vtkWriter_ != nullptr)
+        delete vtkWriter_;
     vtkWriter_ = new SphericalParticleVtkWriter(particleHandler);
 }
 
@@ -850,7 +851,8 @@ void DPMBase::setSuperquadricParticlesWriteVTK(bool writeParticlesVTK)
     {
         writeParticlesVTK_ = false;
     }
-    delete vtkWriter_;
+    if(vtkWriter_ != nullptr)
+        delete vtkWriter_;
     vtkWriter_ = new SuperQuadricParticleVtkWriter(particleHandler);
 }
 
@@ -4660,7 +4662,7 @@ void DPMBase::synchroniseParticle(BaseParticle* p, unsigned fromProcessor)
     MPIContainer& communicator = MPIContainer::Instance();
 
     //The processor that contains the particle that needs to be copied needs to identify the target, and communicate this
-    MPIParticle pInfo;
+    MPISuperQuadric pInfo;
     if (communicator.getProcessorID() == fromProcessor)
     {
         pInfo = copyDataFromParticleToMPIParticle(p);

@@ -508,12 +508,23 @@ public:
     /*!
      * \brief Only ustilised in case of superquadric particles. Had to create a virtual function to allow function access in writeVTK function in the particle handler.
      */
-    virtual double getExponentEps1() const;
+    virtual Mdouble getExponentEps1() const;
     
     /*!
      * \brief Only ustilised in case of superquadric particles. Had to create a virtual function to allow function access in writeVTK function in the particle handler.
      */
-    virtual double getExponentEps2() const;
+    virtual Mdouble getExponentEps2() const;
+    
+    
+    /*!
+     * \brief Only ustilised in case of superquadric particles.
+     */
+    virtual void setAxes(const Vec3D& axes){ }
+    
+    /*!
+     * \brief Only ustilised in case of superquadric particles.
+     */
+    virtual void setExponents(const Mdouble& eps1, const Mdouble& eps2){}
     
     //
     /*!

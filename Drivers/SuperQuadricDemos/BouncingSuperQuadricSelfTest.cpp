@@ -33,12 +33,18 @@
 class BouncingSuperQuadric : public Mercury3D
 {
 public:
-    void setupInitialConditions() override
+    BouncingSuperQuadric()
     {
-        HertzianViscoelasticMindlinSpecies species;
-        species.setElasticModulusAndRestitutionCoefficient(20000, 0.8);
+        LinearViscoelasticSpecies species;
+        species.setCollisionTimeAndRestitutionCoefficient(0.005, 0.8, 1);
         species.setDensity(constants::pi / 6);
         speciesHandler.copyAndAddObject(species);
+    
+        setTimeStep(1e-4);
+    }
+    
+    void setupInitialConditions() override
+    {
         
         SuperQuadric p0;
         p0.setSpecies(speciesHandler.getObject(0));
@@ -64,7 +70,6 @@ public:
         w0.set(Vec3D(0.0,0.0,-1.0),Vec3D(0.0,0.0,0.0));
         wallHandler.copyAndAddObject(w0);
         
-        setTimeStep(species.getCollisionTime(1, 1, constants::pi / 6) / 50);
         setTimeMax(3);
         setMin(-1, -1, -1);
         setMax(4, 1, 1);
@@ -100,6 +105,9 @@ int main(int argc, char* argv[])
     BouncingSuperQuadric problem;
     // comment next line to turn on file output
     problem.setFileType(FileType::NO_FILE);
+    problem.setMax(2,2,2);
+    problem.setMin(0,0,1);
+    problem.setNumberOfDomains({1,1,2});
     problem.test();
     return 0;
 }

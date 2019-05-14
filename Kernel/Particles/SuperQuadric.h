@@ -126,14 +126,14 @@ public:
      * We use the super-ellipsoid definition stated in Chapter 2 of the book "Segmentation and recovery of
      * superquadrics" by Jaklic et al.
      */
-    void setAxes(const Vec3D& axes);
+    void setAxes(const Vec3D& axes) override;
     
     /*!
      * \brief Set the exponents to eps1 and eps2 for this superquadric.
      * We use the super-ellipsoid definition stated in Chapter 2 of the book "Segmentation and recovery of
      * superquadrics" by Jaklic et al.
      */
-    void setExponents(const Mdouble& eps1, const Mdouble& eps2);
+    void setExponents(const Mdouble& eps1, const Mdouble& eps2) override;
     
     ///\todo TW we could remove this function from the BaseParticle and use a dynamic_cast instead
     ///\todo ID Middle-term plan is to template the BaseParticle on shape-type, so that we won't have to cast etc.
@@ -235,7 +235,7 @@ public:
     /*!
      * \brief Compute the distance between the contact-point and surface of this superquadric particle.
      */
-    Mdouble computeOverlapAlpha(const LabFixedCoordinates& contactPoint, const LabFixedCoordinates& normal) const;
+    Mdouble overlapFromContactPoint(const LabFixedCoordinates& contactPoint, const LabFixedCoordinates& normal) const;
     
     /*!
      * \brief Compute the contact point between this and the given superquadric particle.

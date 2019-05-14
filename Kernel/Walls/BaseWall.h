@@ -95,7 +95,8 @@ public:
     virtual bool getDistanceNormalOverlapSuperquadric(const SuperQuadric& p, Mdouble& distance, Vec3D& normal_return,
                                                       Mdouble& overlap) const;
     
-    virtual Vec3D getFurthestPointSuperQuadric(const Vec3D& normalBodyFixed, const Vec3D& axes) const;
+    virtual Vec3D
+    getFurthestPointSuperQuadric(const Vec3D& normalBodyFixed, const Vec3D& axes, Mdouble eps1, Mdouble eps2) const;
     
     /*!
      * \brief A function which sets the WallHandler for this BaseWall.

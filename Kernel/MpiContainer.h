@@ -64,7 +64,7 @@ class SpeciesHandler;
  */
 enum MercuryMPIType
 {
-    PARTICLE = 0, POSITION = 1, VELOCITY = 2, FORCE = 3, INTERACTION = 4
+    PARTICLE = 0, POSITION = 1, VELOCITY = 2, FORCE = 3, INTERACTION = 4, SUPERQUADRIC = 5
 };
 
 /*!
@@ -83,7 +83,8 @@ enum MercuryMPITag
     INTERACTION_COUNT = 5,
     INTERACTION_DATA = 6,
     PERIODIC_COMPLEXITY = 7,
-    PARTICLE_INDEX = 8
+    PARTICLE_INDEX = 8,
+    SUPERQUADRIC_DATA = 9
 };
 
 namespace Detail

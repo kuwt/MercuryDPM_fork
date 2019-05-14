@@ -23,29 +23,30 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
 #include "Species/HertzianViscoelasticMindlinSpecies.h"
 #include "Walls/InfiniteWall.h"
 #include "Mercury3D.h"
-#include "Species/LinearViscoelasticSpecies.h"
 
 class EllipticalSuperQuadricCollision : public Mercury3D
 {
     void setupInitialConditions() override
     {
         
-        HertzianViscoelasticMindlinSpecies species;
-        species.setElasticModulusAndRestitutionCoefficient(2e5, 0.7);
-        species.setShearModulus(100000.0);
+        LinearViscoelasticSlidingFrictionSpecies species;
+        species.setCollisionTimeAndRestitutionCoefficient(5e-3, 0.8, 1);
+        species.setSlidingStiffness(species.getStiffness());
+        species.setSlidingDissipation(species.getDissipation());
         species.setDensity(constants::pi / 6);
-        //species.setSlidingFrictionCoefficient(0.5);
+        species.setSlidingFrictionCoefficient(0.5);
         speciesHandler.copyAndAddObject(species);
         setMax(8.0, 8.0, 20);
         setMin(1.5, 1.5, 1.5);
-        setGravity({0,0,-1});
+        setGravity({0, 0, -1});
         
         SuperQuadric p0;
         p0.setSpecies(speciesHandler.getObject(0));
-        p0.setAxesAndExponents(2.0,2.0,0.25,1.0,1.0);
+        p0.setAxesAndExponents(2.0, 0.25, 0.25, 1.0, 1.0);
         p0.setInertia();
         
         unsigned int numberOfParticles = 50;
@@ -57,13 +58,13 @@ class EllipticalSuperQuadricCollision : public Mercury3D
             dummy.Y = random.getRandomNumber(getYMin(), getYMax());
             dummy.Z = random.getRandomNumber(getZMin(), getZMax());
             p0.setPosition(dummy);
-    
-            dummy.X = random.getRandomNumber(-2,2);
+            
+            dummy.X = random.getRandomNumber(-2, 2);
             dummy.Y = random.getRandomNumber(-2, 2);
             dummy.Z = random.getRandomNumber(-2, 2);
             p0.setVelocity(dummy);
-    
-            dummy.X = random.getRandomNumber(-1,1);
+            
+            dummy.X = random.getRandomNumber(-1, 1);
             dummy.Y = random.getRandomNumber(-1, 1);
             dummy.Z = random.getRandomNumber(-1, 1);
             p0.setOrientationViaNormal(dummy);
@@ -79,19 +80,18 @@ class EllipticalSuperQuadricCollision : public Mercury3D
         }
         InfiniteWall w0;
         w0.setSpecies(speciesHandler.getObject(0));
-        w0.set(Vec3D(0.0,0.0,-1.0),Vec3D(0.0,0.0,0.0));
+        w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0.0, 0.0, 0.0));
         wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0,-1.0,0.0),Vec3D(0.0,0.0,0.0));
+        w0.set(Vec3D(0.0, -1.0, 0.0), Vec3D(0.0, 0.0, 0.0));
         wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0,1.0,0.0),Vec3D(0.0,10.0,0.0));
+        w0.set(Vec3D(0.0, 1.0, 0.0), Vec3D(0.0, 10.0, 0.0));
         wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(-1.0,0.0,0.0),Vec3D(0.0,0.0,0.0));
+        w0.set(Vec3D(-1.0, 0.0, 0.0), Vec3D(0.0, 0.0, 0.0));
         wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(1.0,0.0,0.0),Vec3D(10.0,0.0,0.0));
+        w0.set(Vec3D(1.0, 0.0, 0.0), Vec3D(10.0, 0.0, 0.0));
         wallHandler.copyAndAddObject(w0);
         
-           
-        setTimeStep(species.getCollisionTime(1, 1, constants::pi/6) / 100);
+        setTimeStep(1e-4);
         logger(INFO, "time step %", getTimeStep());
         setTimeMax(10);
         write(std::cout, true);

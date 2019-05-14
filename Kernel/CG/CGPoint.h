@@ -26,6 +26,7 @@
 #define    CGPOINT_H
 
 #include "CG/Fields/StandardFields.h"
+#include "CG/Fields/OrientationField.h"
 
 /*!
  * \brief Combines the position of the CGPoint (e.g. x, y, z), the parameters 

@@ -64,10 +64,10 @@ void SuperQuadricParticleVtkWriter::writeVTKOrientation(std::fstream& file) cons
 void SuperQuadricParticleVtkWriter::writeVTKSuperquadricGeometry(std::fstream& file) const
 {
     file << "  <DataArray type=\"Float32\" Name=\"phiAndTheta\" NumberOfComponents=\"2\" format=\"ascii\">\n";
-    // Add exponents eps1 and eps2
+    // Add exponents eps1 and eps2. Note, they are defined in reverse order in Paraview!
     for (const auto& p: handler_)
     {
-        file << '\t' << p->getExponentEps1() << " " << p->getExponentEps2() << '\n';
+        file << '\t' << p->getExponentEps2() << " " <<  p->getExponentEps1()  << '\n';
     }
     file << "  </DataArray>\n";
     file << "  <DataArray type=\"Float32\" Name=\"axesScales\" NumberOfComponents=\"3\" format=\"ascii\">\n";

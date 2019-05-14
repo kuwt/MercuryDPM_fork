@@ -375,7 +375,8 @@ BaseWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHan
         {
             Vec3D normalBodyFixed = normal;
             p->getOrientation().rotateBack(normalBodyFixed);
-            auto furthestPoint = getFurthestPointSuperQuadric(normalBodyFixed, p->getAxes());
+            auto furthestPoint = getFurthestPointSuperQuadric(normalBodyFixed, p->getAxes(),
+                                                              p->getExponentEps1(), p->getExponentEps2());
             Vec3D overlapBody = overlap * normalBodyFixed;
             Vec3D contactPoint = furthestPoint - overlapBody / 2;
             p->getOrientation().rotate(contactPoint);
@@ -469,7 +470,7 @@ BaseWall::getDistanceNormalOverlapSuperquadric(const SuperQuadric& p, Mdouble& d
     return false;
 }
 
-Vec3D BaseWall::getFurthestPointSuperQuadric(const Vec3D& normalBodyFixed, const Vec3D& axes) const
+Vec3D BaseWall::getFurthestPointSuperQuadric(const Vec3D& normalBodyFixed, const Vec3D& axes, Mdouble eps1, Mdouble eps2) const
 {
     logger(ERROR, "Generic wall-superquadric interactions not implemented yet.");
     return {};

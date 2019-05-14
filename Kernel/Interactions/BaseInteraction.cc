@@ -699,7 +699,7 @@ void BaseInteraction::rotateHistory(Matrix3D& rotationMatrix)
 }
 
 /*!
- * \details Computes the effective radius of a particle. This is used by many of
+ * \details Computes the effective radius of the two particles in the interaction. This is used by many of
  *          the later interaction models.
  *          This functions assumes P is the particle and I is either a particle
  *          or a wall.
@@ -716,7 +716,7 @@ Mdouble BaseInteraction::getEffectiveRadius() const
 }
 
 /*!
- * \details Computes the effective radius of a particle. This is used by many of
+ * \details Computes the effective mass of the particles in the interaction. This is used by many of
  *          the later interaction models.
  *          This functions assumes P is the particle and I is either a particle
  *          or a wall.

@@ -159,7 +159,8 @@ public:
      */
     void writeVTK(VTKContainer& vtk) const override;
     
-    Vec3D getFurthestPointSuperQuadric(const Vec3D& normalBodyFixed, const Vec3D& axes) const override;
+    Vec3D
+    getFurthestPointSuperQuadric(const Vec3D& normalBodyFixed, const Vec3D& axes, Mdouble eps1, Mdouble eps2) const override;
 };
 
 #endif

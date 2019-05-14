@@ -39,6 +39,7 @@ SlidingFrictionSpecies::SlidingFrictionSpecies()
     slidingDissipation_ = 0;
     slidingFrictionCoefficient_ = 0;
     slidingFrictionCoefficientStatic_ = 0;
+    isSuperquadricSpecies_ = false;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"SlidingFrictionSpecies::SlidingFrictionSpecies() finished"<<std::endl;
 #endif
@@ -53,6 +54,7 @@ SlidingFrictionSpecies::SlidingFrictionSpecies(const SlidingFrictionSpecies& s)
     slidingDissipation_ = s.slidingDissipation_;
     slidingFrictionCoefficient_ = s.slidingFrictionCoefficient_;
     slidingFrictionCoefficientStatic_ = s.slidingFrictionCoefficientStatic_;
+    isSuperquadricSpecies_ = s.isSuperquadricSpecies_;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"SlidingFrictionSpecies::SlidingFrictionSpecies(const SlidingFrictionSpecies &p) finished"<<std::endl;
 #endif
@@ -263,4 +265,14 @@ SlidingFrictionSpecies::setCollisionTimeAndNormalAndTangentialRestitutionCoeffic
     //from BeckerSchwagerPoeschel2008, eq. 56
     setSlidingStiffness(2.0 / 7.0 * species->getStiffness() * mathsFunc::square(acos(-beta) / constants::pi));
     setSlidingDissipation(0);
+}
+
+void SlidingFrictionSpecies::setIsSuperquadricSpecies(bool isSuperquadricSpecies)
+{
+    SlidingFrictionSpecies::isSuperquadricSpecies_ = isSuperquadricSpecies;
+}
+
+bool SlidingFrictionSpecies::getIsSuperquadricSpecies() const
+{
+    return isSuperquadricSpecies_;
 }

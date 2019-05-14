@@ -30,6 +30,7 @@
 #include <CG/Functions/Linear.h>
 #include <CG/Fields/GradVelocityField.h>
 #include <CG/Fields/LiquidMigrationFields.h>
+#include <CG/Fields/OrientationField.h>
 #include <algorithm>
 #include <Interactions/AdhesiveForceInteractions/LiquidMigrationWilletInteraction.h>
 #include <cstring>

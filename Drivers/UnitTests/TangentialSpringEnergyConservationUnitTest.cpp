@@ -23,78 +23,70 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "VTKWriter/SuperQuadricParticleVtkWriter.h"
-#include "Species/HertzianViscoelasticMindlinSpecies.h"
+#include <iostream>
+#include "Species/LinearViscoelasticSlidingFrictionSpecies.h"
+#include "DPMBase.h"
 #include "Walls/InfiniteWall.h"
-#include "Mercury3D.h"
-#include "Species/LinearViscoelasticSpecies.h"
 
-/*!
- * Small class that shows the influence of varying the geometrical parameters
- * To test if your visualisation is working, you can first try the minimal example in VisualisationTest.
- */
-class ShapesDemo : public Mercury3D
+class TangentialSpringEnergyConservationUnitTest : public DPMBase
 {
+public:
+    TangentialSpringEnergyConservationUnitTest()
+    {
+        //set the species properties, with a very large sliding friction coefficient
+        auto species = speciesHandler.copyAndAddObject(LinearViscoelasticSlidingFrictionSpecies());
+        species->setDensity(6.0 / constants::pi);
+        species->setCollisionTimeAndRestitutionCoefficient(1e-3, .2, 1);
+        species->setSlidingStiffness(species->getStiffness() * 2 / 7);
+        species->setSlidingDissipation(0);
+        species->setSlidingFrictionCoefficient(0.5);
+        setName("TangentialSpringEnergyConservationUnitTest");
+        setMin({-1, -1, -1});
+        setMax({1, 1, 1});
+        
+        setTimeMax(10);
+        setTimeStep(species->getCollisionTime(1) / 50);
+        setParticlesWriteVTK(true);
+        setWallsWriteVTK(FileType::ONE_FILE);
+        setSaveCount(0.1 / getTimeStep());
+    }
+    
     void setupInitialConditions() override
     {
-        setMin(-10, -10, 10);
-        setMax(20, 20, 20);
-        HertzianViscoelasticMindlinSpecies species;
-        species.setElasticModulusAndRestitutionCoefficient(20000, 0.8);
-        species.setDensity(constants::pi / 6);
-        speciesHandler.copyAndAddObject(species);
-        
-        SuperQuadric p;
-        //standard: sphere
-        p.setSpecies(speciesHandler.getLastObject());
-        p.setPosition({0,0,0});
+        SphericalParticle p;
+        p.setSpecies(speciesHandler.getObject(0));
+        p.setPosition({0, 0, 0});
+        p.setVelocity({0, 0, 0});
+        p.setAngularVelocity({0.1, 0, 0});
+        p.setRadius(0.5);
         particleHandler.copyAndAddObject(p);
         
-        //ellipsoid
-        p.setAxes({1,1,2});
-        p.setPosition({4, 0, 0});
+        p.setPosition({0.9999, 0, 0});
+        p.fixParticle();
+        particleHandler.copyAndAddObject(p);
+        p.setPosition({-.9999,0,0});
+        particleHandler.copyAndAddObject(p);
+        p.setPosition({0,.9999,0});
+        particleHandler.copyAndAddObject(p);
+        p.setPosition({0,-.9999,0});
+        particleHandler.copyAndAddObject(p);
+        p.setPosition({0,0,.9999});
+        particleHandler.copyAndAddObject(p);
+        p.setPosition({0,0,-.9999});
         particleHandler.copyAndAddObject(p);
         
-        //rounded beam
-        p.setExponents(0.5, 0.5);
-        p.setPosition({8, 0, 0});
-        particleHandler.copyAndAddObject(p);
-        
-        //cylinder
-        p.setAxes({1,1,1});
-        p.setExponents(0.01, 1);
-        p.setPosition({0, 0, -5});
-        particleHandler.copyAndAddObject(p);
-        
-        //pillow
-        p.setExponents(1, 0.01);
-        p.setPosition({4,0,-5});
-        particleHandler.copyAndAddObject(p);
-        
-        //cube
-        p.setExponents(0.01, 0.01);
-        p.setPosition({8, 0, -5});
-        particleHandler.copyAndAddObject(p);
-        
-        
-        setTimeStep(1e-5);
-        setTimeMax(0);
-        write(std::cout, true);
-        SuperQuadricParticleVtkWriter vtkWriter(particleHandler);
-        vtkWriter.writeVTK();
     }
-
-private:
     
+    void printTime() const override
+    {
+        DPMBase::printTime();
+        std::cout << " total energy: " << std::setprecision(10) << getRotationalEnergy() + getElasticEnergy() << '\n' << '\n';
+    }
 };
 
-int main(int argc, char* argv[])
+int main()
 {
-    ShapesDemo problem;
-    problem.setName("ShapesDemo");
-    problem.setSuperquadricParticlesWriteVTK(true);
-    //problem.setWallsWriteVTK(FileType::ONE_FILE);
-    problem.solve();
+    TangentialSpringEnergyConservationUnitTest test;
+    test.solve();
     return 0;
 }
-

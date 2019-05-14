@@ -68,7 +68,7 @@ public:
         logger.assert_always(mathsFunc::isEqual(p->getVolume(), volume, 1e-5),
                              "Volume got %, need %", p->getVolume(), volume);
         logger(INFO,"volume got % need %",p->getVolume(),volume);
-        p->setAxesAndExponents(2.0, 2.0, 4.0, 0.1, 1);
+        /*p->setAxesAndExponents(2.0, 2.0, 4.0, 0.1, 1);
         volume = 2.0 * constants::pi * 2.0 * 2.0 * 4.0; // 2*pi*a1*a2*a3
         logger.assert_always(mathsFunc::isEqual(p->getVolume(), volume, 1e-5),
                              "Volume got %, need %", p->getVolume(), volume);
