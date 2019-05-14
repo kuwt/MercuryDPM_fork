@@ -24,6 +24,7 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DPMBase.h"
+#include "Particles/SphericalParticle.h"
 #include <iostream>
 #include <Species/LinearViscoelasticSpecies.h>
 
@@ -67,15 +68,15 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 {
 	SeparateFilesSelfTest problem;
 
-	problem.setName("nofiles");
+	problem.setName("NoFiles");
     problem.setFileType(FileType::NO_FILE);
 	problem.solve();
 	
-	problem.setName("combinedfiles");
+	problem.setName("CombinedFiles");
 	problem.setFileType(FileType::ONE_FILE);
 	problem.solve();
 	
-	problem.setName("separatefiles");
+	problem.setName("SeparateFiles");
 	problem.setFileType(FileType::MULTIPLE_FILES_PADDED);
 	problem.solve();
 }

@@ -30,85 +30,75 @@
 ///3) and accepting command line argument.
 ///4) Also tests restart reloading.
 
-#include "Mercury3D.h"
+#include "Mercury2D.h"
 #include "Walls/InfiniteWall.h"
 #include <iostream>
 #include <Species/LinearViscoelasticSpecies.h>
 #include <Logger.h>
 
-class FreeFall : public Mercury3D
+class FreeFall : public Mercury2D
 {
 public:
     
     void setupInitialConditions() override {
-        InfiniteWall w0;
-        w0.setSpecies(speciesHandler.getObject(0));
-        w0.set(Vec3D(-1, 0, 0), Vec3D(getXMin(), 0, 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(1, 0, 0), Vec3D(getXMax(), 0, 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0, -1, 0), Vec3D(0, getYMin(), 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0, 1, 0), Vec3D(0, getYMax(), 0));
-        wallHandler.copyAndAddObject(w0);
-        
-        SphericalParticle p0;
-        p0.setSpecies(speciesHandler.getObject(0));
-        p0.setPosition(Vec3D(getXMax() / 2, getYMax() / 2, 0.0));
-        p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
-        p0.setRadius(0.0005);
-        particleHandler.copyAndAddObject(p0);
-        
+        InfiniteWall w;
+        w.setSpecies(speciesHandler.getObject(0));
+        w.set(Vec3D(0, -1, 0), Vec3D(0, 0, 0));
+        wallHandler.copyAndAddObject(w);
+
+        SphericalParticle p;
+        p.setSpecies(speciesHandler.getObject(0));
+        p.setRadius(0.5);
+        p.setPosition(Vec3D(p.getRadius(), 2.0*p.getRadius(), 0));
+        particleHandler.copyAndAddObject(p);
+
+        //particle reaches ground after r=gt^2/2 => t=sqrt(d/g)=1
+        setGravity(Vec3D(0,-1,0));
     }
-    
-    void actionsOnRestart() override {
-        
-        std::cout << "In this function you can add code that is run on restart" << std::endl;
-    }
-    
+
 };
 
 
 void runFreeFall(int argc, char* argv[])
 {
     ///Start off my solving the default problem
-    FreeFall FreeFallProblem;
-    auto species = FreeFallProblem.speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
-    species->setDensity(2000);
-    FreeFallProblem.setName("FreeFallRestartUnitTest");
-    FreeFallProblem.setSaveCount(10000);
-    FreeFallProblem.setTimeStep(1e-6);
-    FreeFallProblem.setMax({0.1, 0.01, 0.01});
-    FreeFallProblem.dataFile.getFstream().precision(10);
-    FreeFallProblem.solve(argc, argv);
+    FreeFall dpm;
+    dpm.setName("FreeFallRestart");
+    dpm.setMax({1.0,1.5,0.0});
+    auto species = dpm.speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
+    species->setDensity(4.0/constants::pi);
+    species->setCollisionTimeAndRestitutionCoefficient(0.1,1,species->getMassFromRadius(0.5));
+    dpm.setTimeStep(0.002);
+    dpm.setTimeMax(2.1);
+    dpm.setSaveCount(100);
+    dpm.solve(argc, argv);
 }
 
 int main(int argc, char* argv[])
 {
-    
-    //On first pass i.e. code being called as a selftest, it enters here and call the code again 3 times with different arguments.
+    //If code is being called with no arguments (e.g. as a selftest), it enters here and call the code again 3 times with different arguments.
     if (argc == 1)
     {
-        logger(INFO, "Case 1: not restarted");
-        if (system("./FreeFallRestartUnitTest -tmax 0.4 -name FreeFallRestartUnitTest_NoRestart"))
+        logger(INFO, "Case 1: simple run");
+        if (system("./FreeFallRestartUnitTest -name FreeFallRestart0"))
             logger(FATAL, "code did not run");
-        
-        logger(INFO, "Case 2: restarted at t=0.2");
+
+        logger(INFO, "Case 2: restart in the middle");
         //restarted at t=0.2
-        
-        if (system("./FreeFallRestartUnitTest -tmax 0.2 -name FreeFallRestartUnitTest_Restarted"))
+
+        if (system("./FreeFallRestartUnitTest -tmax 1.05 -name FreeFallRestart1"))
             logger(FATAL, "code did not run");
         
-        if (system("./FreeFallRestartUnitTest -r FreeFallRestartUnitTest_Restarted -tmax 0.4"))
+        if (system("./FreeFallRestartUnitTest -r FreeFallRestart1 -tmax 2.1"))
             logger(FATAL, "code did not run");
         
         
-        logger(INFO, "Case 3: restarted at t=0.2; using separate data files");
-        
-        
-        if (system("./FreeFallRestartUnitTest -tmax 0.2 -name FreeFallRestartUnitTest_SeparateFiles -fileTypeData 2"))
+        logger(INFO, "Case 3: restart in the middle, using separate data files");
+
+        if (system("./FreeFallRestartUnitTest -tmax 1.05 -name FreeFallRestart2 -fileTypeData 2"))
             logger(FATAL, "code did not run");
-        if (system("./FreeFallRestartUnitTest -r FreeFallRestartUnitTest_SeparateFiles -tmax 0.4 "))
+
+        if (system("./FreeFallRestartUnitTest -r FreeFallRestart2 -tmax 2.1"))
             logger(FATAL, "code did not run");
     }
     else
@@ -124,36 +114,31 @@ int main(int argc, char* argv[])
     //Final stage now we check what we get.
     logger(INFO, "Finished running, now comparing");
     
-    FreeFall FreeFallProblemReload;
-    FreeFall FreeFallProblemReloadRestart;
-    FreeFall FreeFallProblemReloadSplitFiles;
+    FreeFall dpm0;
+    FreeFall dpm1;
+    FreeFall dpm2;
     
-    FreeFallProblemReload.readRestartFile("FreeFallRestartUnitTest_NoRestart.restart");
-    FreeFallProblemReloadRestart.readRestartFile("FreeFallRestartUnitTest_Restarted.restart");
-    FreeFallProblemReloadSplitFiles.readRestartFile("FreeFallRestartUnitTest_SeparateFiles.restart");
+    dpm0.readRestartFile("FreeFallRestart0.restart");
+    dpm1.readRestartFile("FreeFallRestart1.restart");
+    dpm2.readRestartFile("FreeFallRestart2.restart");
     
-    auto FreeFallProblemReloadRestartIt = FreeFallProblemReloadRestart.particleHandler.begin();
-    auto FreeFallProblemReloadSplitFilesIt = FreeFallProblemReloadSplitFiles.particleHandler.begin();
-    
-    for (auto FreeFallProblemReloadIt = FreeFallProblemReload.particleHandler.begin();
-         FreeFallProblemReloadIt != FreeFallProblemReload.particleHandler.end(); ++FreeFallProblemReloadIt)
+    auto p1 = dpm1.particleHandler.begin();
+    auto p2 = dpm2.particleHandler.begin();
+
+    for (auto p0 = dpm0.particleHandler.begin(); p0 != dpm0.particleHandler.end(); ++p0)
     {
-        //  if (!(*FreeFallProblemReloadIt))->getTimeMax()
-        
-        if (!(*FreeFallProblemReloadIt)->getPosition().isEqualTo((*FreeFallProblemReloadRestartIt)->getPosition(),
-                                                                 1e-6))
+        if (!(*p0)->getPosition().isEqualTo((*p1)->getPosition(),1e-6))
         {
             logger(FATAL, "Particles is not in the same place after restart. Before it was % and now it is %.",
-                   (*FreeFallProblemReloadIt)->getPosition(), (*FreeFallProblemReloadRestartIt)->getPosition());
+                   (*p0)->getPosition(), (*p1)->getPosition());
         }
-        if (!(*FreeFallProblemReloadIt)->getPosition().isEqualTo((*FreeFallProblemReloadSplitFilesIt)->getPosition(),
-                                                                 1e-10))
+        if (!(*p0)->getPosition().isEqualTo((*p2)->getPosition(),1e-10))
         {
             logger(FATAL, "Particles velocities are not the same place. Before it was % and now it is %.",
-                   (*FreeFallProblemReloadIt)->getVelocity(), (*FreeFallProblemReloadRestartIt)->getVelocity());
+                   (*p0)->getVelocity(), (*p1)->getVelocity());
         }
-        ++FreeFallProblemReloadRestartIt;
-        ++FreeFallProblemReloadSplitFilesIt;
+        ++p1;
+        ++p2;
     }
     
     return 0;

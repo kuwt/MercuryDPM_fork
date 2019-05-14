@@ -279,9 +279,9 @@ void LevelSetWall::writeToFile(int n, double extraRadius) const
             }
         }
     }
-    helpers::writeToFile("levelSet.txt", s.str());
-    helpers::writeToFile("levelSet.m", "close all\n"
-                                       "data=importdata('levelSet.txt');\n"
+    helpers::writeToFile("LevelSet.txt", s.str());
+    helpers::writeToFile("LevelSet.m", "close all\n"
+                                       "data=importdata('LevelSet.txt');\n"
                                        "N = nthroot(size(data.data,1),3);\n"
                                        "x = reshape(data.data(:,1),N,N,N);\n"
                                        "y = reshape(data.data(:,2),N,N,N);\n"
@@ -302,7 +302,7 @@ void LevelSetWall::writeToFile(int n, double extraRadius) const
                                        "hold off\n"
                                        "xlabel('x'); ylabel('y'); title('cross-section at z=0');\n"
                                        "view(0,0); axis equal;");
-    logger(INFO, "Run levelSet.m to view level set");
+    logger(INFO, "Run LevelSet.m to view level set");
 }
 
 bool LevelSetWall::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble interactionRadius, Mdouble& distance,

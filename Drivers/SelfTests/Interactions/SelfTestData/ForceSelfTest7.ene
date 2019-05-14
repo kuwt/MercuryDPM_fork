@@ -1,4 +1,4 @@
-            time     gravitEnergy traKineticEnergy rotKineticEnergy    elasticEnergy    centerOfMassX    centerOfMassY    centerOfMassZ
+           time    gravitEnergy traKineticEnergy rotKineticEnergy   elasticEnergy   centerOfMassX   centerOfMassY   centerOfMassZ
                0  3.797390721e-07  7.433746794e-08                0  4.974838913e+37   0.002524659084           0.0025           0.0025
  3.688815223e-08  3.797393462e-07  7.428667125e-08  5.728793744e-16   4.95406707e+37   0.002524660857   0.002500001805           0.0025
  7.377630447e-08  3.797396203e-07  7.421847793e-08  2.535273284e-20  5.003323427e+37   0.002524662631    0.00250000361           0.0025

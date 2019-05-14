@@ -24,11 +24,12 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DPMBase.h"
+#include "Particles/SphericalParticle.h"
 #include "Walls/InfiniteWall.h"
 #include <iostream>
 #include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
 
-class incl_plane : public DPMBase {
+class InclinedPlane : public DPMBase {
 public:
 	
 	void setupInitialConditions() override {
@@ -51,11 +52,12 @@ int main(int argc, char *argv[])
 {
 	std::cout<<"Single particle rolling on a bottom plate"<<std::endl;
 	///Start off my solving the default problem
-	incl_plane problem;
+	InclinedPlane problem;
     
     auto species = problem.speciesHandler.copyAndAddObject(LinearViscoelasticSlidingFrictionSpecies());
-    problem.setName("inclined_plane");
-	problem.setSaveCount(5000);
+    problem.setName("InclinedPlane");
+    problem.setFileType(FileType::NO_FILE); //comment if you want file output
+    problem.setSaveCount(50000);
     problem.setSystemDimensions(2);
 	problem.setParticleDimensions(3);
 	Mdouble theta = 15.0*constants::pi/180.0;
@@ -70,13 +72,17 @@ int main(int argc, char *argv[])
 	//species->setRollingDissipation(0);
 	//species->setRollingFrictionCoefficient(0.5);
 	//tc=7e-5
-    problem.setTimeStep(2e-6);
+    problem.setTimeStep(0.02*species->getCollisionTime(species->getMassFromRadius(0.005)));
 	problem.setTimeMax(1.0);
 	problem.setXMax(0.1);
 	problem.setYMax(0.1);
 	problem.setZMax(0.1);
 	problem.solve(argc, argv);
-	problem.write(std::cout, true);
-	std::cout << problem.particleHandler.getObject(0)->getVelocity() << std::endl;
+	//problem.write(std::cout, true);
+    const Vec3D v = problem.particleHandler.getObject(0)->getVelocity();
+    logger(INFO,"v_x(t_max)=% should be ~1.81",v.X);
+    logger(INFO,"v_y(t_max)=% should be ~0",v.Y);
+    helpers::check(v.X,1.81167,1e-4,"v_x");
+    helpers::check(v.Y,0.00234107,1e-4,"v_y");
 
 }
