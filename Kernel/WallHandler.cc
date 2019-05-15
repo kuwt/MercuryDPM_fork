@@ -34,6 +34,7 @@
 #include "Walls/IntersectionOfWalls.h"
 #include "Walls/InfiniteWall.h"
 #include "Walls/InfiniteWallWithHole.h"
+#include "Walls/NurbsWall.h"
 #include "Walls/Screw.h"
 #include "Walls/Coil.h"
 #include "DPMBase.h"
@@ -158,11 +159,17 @@ BaseWall* WallHandler::createObject(const std::string& type)
     {
         return new VChute;
     }
-//    //for backward compatibility (before svnversion ~2360)
-//    else if (type == "numFiniteWalls")
-//    {
-//        return new InfiniteWall;
-//    }
+    else if (type == "NurbsWall")
+    {
+        return new NurbsWall();
+    }
+    //for backward compatibility (before svnversion ~2360)
+    else if (type == "numFiniteWalls")
+    {
+        return new BasicIntersectionOfWalls;
+    }
+        /// \todo Review this line. Problem came up in merging.
+   // else if (!getDPMBase()->readUserDefinedWall(type,is))
     else
     {
         logger(WARN, "Wall type: % not understood in restart file", type);
@@ -175,7 +182,7 @@ BaseWall* WallHandler::readAndCreateObject(std::istream& is)
     std::string type;
     is >> type;
     logger(DEBUG, "WallHandler::readAndAddObject(is): reading type %.", type);
-    
+
     //for backward compatibility (before svnversion ~2360)
     if (type == "numFiniteWalls")
     {
@@ -220,13 +227,13 @@ BaseWall* WallHandler::readAndCreateOldObject(std::istream& is)
     std::stringstream line;
     helpers::getLineFromStringStream(is, line);
     logger(VERBOSE, line.str());
-    
+
     std::string dummy;
     unsigned int numWalls;
     Mdouble position;
     Vec3D normal;
     line >> numWalls;
-    
+
     if (numWalls == 0)
     {
         InfiniteWall* wall = new InfiniteWall();
@@ -346,14 +353,14 @@ void WallHandler::readTriangleWall(std::string filename, ParticleSpecies* specie
         std::fstream file;
         file.open(filename.c_str(), std::ios::in);
         logger.assert_always(file.is_open(), "File opening failed: %", filename);
-        
+
         //skip the header lines
         std::string dummy;
         getline(file, dummy);
         getline(file, dummy);
         getline(file, dummy);
         getline(file, dummy);
-        
+
         //read vertices, apply scaling
         unsigned num;
         file >> dummy >> num >> dummy;
@@ -366,7 +373,7 @@ void WallHandler::readTriangleWall(std::string filename, ParticleSpecies* specie
             v *= scaleFactor;
             vertex.push_back(v);
         }
-        
+
         //read faces
         unsigned n = getSize();
         file >> dummy >> num >> dummy;
@@ -377,63 +384,63 @@ void WallHandler::readTriangleWall(std::string filename, ParticleSpecies* specie
             triangleWall.setVertices(vertex[id0], vertex[id1], vertex[id2], centerOfRotation);
             copyAndAddObject(triangleWall);
         }
-        
+
         //close file
         file.close();
-        
+
         logger(INFO, "Read in % walls", getSize() - n);
-        
+
     }
     else if (helpers::lower(fileType) == "stl")
     {
-        
+
         BinaryReader file(filename);
-        
+
         STLTriangle triangle;
 
         std::string header = file.readString(80);
         unsigned numTriangles = file.readUnsignedInt(4);
-        
+
         for (unsigned i = 0; i < numTriangles; i++)
         {
             triangle.normal.x() = file.readFloat(4);
             triangle.normal.y() = file.readFloat(4);
             triangle.normal.z() = file.readFloat(4);
-            
-            
+
+
             triangle.vertex1.x() = file.readFloat(4);
             triangle.vertex1.y() = file.readFloat(4);
             triangle.vertex1.z() = file.readFloat(4);
-            
+
             triangle.vertex2.x() = file.readFloat(4);
             triangle.vertex2.y() = file.readFloat(4);
             triangle.vertex2.z() = file.readFloat(4);
-            
-            
+
+
             triangle.vertex3.x() = file.readFloat(4);
             triangle.vertex3.y() = file.readFloat(4);
             triangle.vertex3.z() = file.readFloat(4);
-            
+
             triangle.vertex1 *= scaleFactor;
             triangle.vertex2 *= scaleFactor;
             triangle.vertex3 *= scaleFactor;
-            
+
             //add to triangle wall
             triangleWall.setVertices(triangle.vertex1, triangle.vertex2, triangle.vertex3, centerOfRotation);
             copyAndAddObject(triangleWall);
-            
+
             //Now ignore (read) the two dummy characters
             file.ignoreChar(2);
-            
+
         }
 
         logger(INFO, "Read in % walls", numTriangles);
-        
+
     }
     else
     {
-        
+
         logger(ERROR, "File type of % must be vtk or stl");
-        
+
     }
 }

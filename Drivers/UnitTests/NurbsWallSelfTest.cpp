@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2017, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -25,52 +25,67 @@
 
 #include "Nurbs/NurbsSurface.h"
 #include "Walls/NurbsWall.h"
+#include "Walls/InfiniteWall.h"
 #include "Math/Helpers.h"
 #include <sstream>
 #include <DPMBase.h>
 #include <Interactions/NormalForceInteractions/LinearViscoelasticInteraction.h>
 #include <Species/LinearViscoelasticSpecies.h>
 
+/**
+ * Tests if contact with nurbs surface is correctly implemented.
+ * The setup consists of five particles and two walls, on of which is a NurbsWall.
+ * The particles fall downwards by gravity, filling the space between the two walls.
+ */
 int main()
 {
     //define quarter circle as nurbs surface
     std::vector<double> knotsU = {0,0,0,1,1,1};
     std::vector<double> knotsV = {0,0,1,1};
-    std::vector<std::vector<Vec3D>> controlPoints = {{{1,0,0},{1,0,2}},{{1,1,0},{1,1,2}},{{0,1,0},{0,1,2}}} ;
+    std::vector<std::vector<Vec3D>> controlPoints = {{{1,0,0},{1,0,2}},{{1,1,0},{1,1,2}},{{0,1,0},{0,1,2}}};
     std::vector<std::vector<Mdouble>> weights = {{1,1},{1,1},{2,2}};
     NurbsSurface nurbsSurface(knotsU,knotsV,controlPoints,weights);
-
-    //output of the unit test: check if evaluation works
-    Vec3D val = nurbsSurface.evaluate(0.5,0.5);
-    helpers::check(val,{.6,.8,1},std::numeric_limits<double>::epsilon(),"Nurbs evaluation failed");
-
-    //now demonstrate how nurbs wall can be defined:
+    //nurbsSurface.flipOrientation();
 
     //create a basic dpm class
     DPMBase dpm;
-    dpm.setName("NurbsSurfaceUnitTest");
+    dpm.setName("NurbsWallSelfTest");
+    dpm.setGravity({0,0,-1});
     auto s = dpm.speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
-    SphericalParticle p;
-    p.setSpecies(s);
-    p.setRadius(1);
-    p.setPosition({1,1,.2});
-    dpm.particleHandler.copyAndAddObject(p);
+    s->setCollisionTimeAndRestitutionCoefficient(.05,.1,s->getMassFromRadius(0.1));
 
     //define nurbs wall and add to dpm class
     NurbsWall nurbsWall;
     nurbsWall.setSpecies(s);
     nurbsWall.set(nurbsSurface);
-    auto w = dpm.wallHandler.copyAndAddObject(nurbsWall);
+    nurbsWall.setOrientationViaNormal({0,0,1});
+    nurbsWall.setPosition({1,0,0});
+    dpm.wallHandler.copyAndAddObject(nurbsWall);
 
-    //write vtk file
+    InfiniteWall infiniteWall;
+    infiniteWall.setSpecies(s);
+    infiniteWall.set({0,1,0},{1,1,1});
+    dpm.wallHandler.copyAndAddObject(infiniteWall);
+
+    SphericalParticle particle;
+    particle.setSpecies(s);
+    particle.setRadius(.1);
+    for (double x=0; x<=0; x+=.2) {
+        for (double y = .1; y <= .9; y += .2) {
+            for (double z = 1.1; z <= 1.1; z += .2) {
+                particle.setPosition({x, y, z});
+                dpm.particleHandler.copyAndAddObject(particle);
+            }
+        }
+    }
+
     dpm.setWallsWriteVTK(FileType::ONE_FILE);
-    dpm.forceWriteOutputFiles();
-
-    //test if contact can be found
-    Vec3D normal;
-    double distance;
-    w->getDistanceAndNormal(p,distance,normal);
-    helpers::check(normal,{-sqrt(.5),-sqrt(.5),0},4*std::numeric_limits<double>::epsilon(),"Nurbs contact evaluation");
+    dpm.setParticlesWriteVTK(true);
+    dpm.setTimeStep(0.001);
+    dpm.setTimeMax(2.0);
+    dpm.setSaveCount(100);
+    dpm.setDomain({-1,0,0},{1,1,1});
+    dpm.solve();
 
     return 0;
 }

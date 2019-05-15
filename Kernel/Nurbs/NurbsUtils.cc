@@ -44,13 +44,13 @@ int findSpan(int degree, const std::vector<double>& knots, double u)
 {
     // index of last control point
     int n = static_cast<int>(knots.size()) - degree - 2;
-    
+
     // For u that is equal to last knot value
     if (close(u, knots[n + 1]))
     {
         return n;
     }
-    
+
     // For values of u that lies outside the domain
     if (u > knots[n + 1])
     {
@@ -60,7 +60,7 @@ int findSpan(int degree, const std::vector<double>& knots, double u)
     {
         return degree;
     }
-    
+
     // Binary search
     // TODO: Replace this with std::lower_bound
     int low = degree;
@@ -134,9 +134,9 @@ void bsplineBasis(int deg, int span, const std::vector<double>& knots, double u,
     std::vector<double> left, right;
     left.resize(deg + 1, 0.0);
     right.resize(deg + 1, 0.0);
-    
+
     N[0] = 1.0;
-    
+
     for (int j = 1; j <= deg; j++)
     {
         left[j] = (u - knots[span + 1 - j]);
@@ -151,5 +151,105 @@ void bsplineBasis(int deg, int span, const std::vector<double>& knots, double u,
         N[j] = saved;
     }
 }
-    
+
+void bsplineDerBasis(int deg, int span, const std::vector<double>& knots, double u,
+                     int nDers, std::vector<std::vector<double>> &ders) {
+
+    std::vector<double> left, right;
+    left.resize(deg + 1, 0.0);
+    right.resize(deg + 1, 0.0);
+    double saved = 0.0, temp = 0.0;
+
+    array2<double> ndu(deg + 1, deg + 1);
+    ndu(0, 0) = 1.0;
+
+    for (int j = 1; j <= deg; j++) {
+        left[j] = u - knots[span + 1 - j];
+        right[j] = knots[span + j] - u;
+        saved = 0.0;
+
+        for (int r = 0; r < j; r++) {
+            // Lower triangle
+            ndu(j, r) = right[r + 1] + left[j - r];
+            temp = ndu(r, j - 1) / ndu(j, r);
+            // Upper triangle
+            ndu(r, j) = saved + right[r + 1] * temp;
+            saved = left[j - r] * temp;
+        }
+
+        ndu(j, j) = saved;
+    }
+
+    ders.clear();
+    ders.resize(nDers + 1);
+    for (int i = 0; i < ders.size(); i++) {
+        ders[i].resize(deg + 1, 0.0);
+    }
+
+    for (int j = 0; j <= deg; j++) {
+        ders[0][j] = ndu(j, deg);
+    }
+
+    array2<double> a(2, deg + 1);
+
+    for (int r = 0; r <= deg; r++) {
+        int s1 = 0;
+        int s2 = 1;
+        a(0, 0) = 1.0;
+
+        for (int k = 1; k <= nDers; k++) {
+            double d = 0.0;
+            int rk = r - k;
+            int pk = deg - k;
+            int j1 = 0;
+            int j2 = 0;
+
+            if (r >= k) {
+                a(s2, 0) = a(s1, 0) / ndu(pk + 1, rk);
+                d = a(s2, 0) * ndu(rk, pk);
+            }
+
+            if (rk >= -1) {
+                j1 = 1;
+            }
+            else {
+                j1 = -rk;
+            }
+
+            if (r - 1 <= pk) {
+                j2 = k - 1;
+            }
+            else {
+                j2 = deg - r;
+            }
+
+            for (int j = j1; j <= j2; j++) {
+                a(s2, j) = (a(s1, j) - a(s1, j - 1)) / ndu(pk + 1, rk + j);
+                d += a(s2, j) * ndu(rk + j, pk);
+            }
+
+            if (r <= pk) {
+                a(s2, k) = -a(s1, k - 1) / ndu(pk + 1, r);
+                d += a(s2, k) * ndu(r, pk);
+            }
+
+
+            ders[k][r] = d;
+
+            int temp = s1;
+            s1 = s2;
+            s2 = temp;
+        }
+    }
+
+    double fac = static_cast<double>(deg);
+    for (int k = 1; k <= nDers; k++) {
+        for (int j = 0; j <= deg; j++) {
+            ders[k][j] *= fac;
+        }
+        fac *= static_cast<double>(deg - k);
+    }
+}
+
+
 }

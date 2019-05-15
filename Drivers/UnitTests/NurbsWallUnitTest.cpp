@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2017, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -40,21 +40,10 @@ int main()
     std::vector<std::vector<Mdouble>> weights = {{1,1},{1,1},{2,2}};
     NurbsSurface nurbsSurface(knotsU,knotsV,controlPoints,weights);
 
-    //output of the unit test: check if evaluation works
-    Vec3D val = nurbsSurface.evaluate(0.5,0.5);
-    helpers::check(val,{.6,.8,1},std::numeric_limits<double>::epsilon(),"Nurbs evaluation failed");
-
-    //now demonstrate how nurbs wall can be defined:
-
     //create a basic dpm class
     DPMBase dpm;
     dpm.setName("NurbsSurfaceUnitTest");
     auto s = dpm.speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
-    SphericalParticle p;
-    p.setSpecies(s);
-    p.setRadius(1);
-    p.setPosition({1,1,.2});
-    dpm.particleHandler.copyAndAddObject(p);
 
     //define nurbs wall and add to dpm class
     NurbsWall nurbsWall;
@@ -62,15 +51,35 @@ int main()
     nurbsWall.set(nurbsSurface);
     auto w = dpm.wallHandler.copyAndAddObject(nurbsWall);
 
-    //write vtk file
-    dpm.setWallsWriteVTK(FileType::ONE_FILE);
-    dpm.forceWriteOutputFiles();
+    SphericalParticle particle;
+    particle.setSpecies(s);
+    particle.setRadius(.99);
+    for (double x=-.5; x<=4.5; x+=.125) {
+        for (double z = -.5; z <= 2.5; z += .5) {
+            particle.setPosition({x, 2-x, z});
+            dpm.particleHandler.copyAndAddObject(particle);
+        }
+    }
 
     //test if contact can be found
     Vec3D normal;
     double distance;
-    w->getDistanceAndNormal(p,distance,normal);
-    helpers::check(normal,{-sqrt(.5),-sqrt(.5),0},4*std::numeric_limits<double>::epsilon(),"Nurbs contact evaluation");
+    std::stringstream ss;
+    for (auto p : dpm.particleHandler) {
+        if (w->getDistanceAndNormal(*p, distance, normal)) {
+            p->setPosition(distance * normal + p->getPosition());
+            ss << p->getPosition() << '\t' << distance << '\t' << distance * normal + p->getPosition() << '\n';
+        } else {
+            p->setPosition({0,0,0});
+        }
+    }
+    helpers::writeToFile("NurbsWallUnitTest.txt",ss.str());
+
+    //write vtk file
+    dpm.setName("NurbsWallUnitTest");
+    dpm.setWallsWriteVTK(FileType::ONE_FILE);
+    dpm.setParticlesWriteVTK(true);
+    dpm.forceWriteOutputFiles();
 
     return 0;
 }

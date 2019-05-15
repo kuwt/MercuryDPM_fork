@@ -27,12 +27,39 @@
 #define MERCURY_NURBSUTILS_H
 
 #include <vector>
+#include <algorithm>
 #include "Math/Vector.h"
 
 namespace NurbsUtils
 {
 
+
+/**
+// A simple class for representing 2D runtime arrays.
+*/
+template <typename T>
+class array2 {
+public:
+    array2(size_t nRows, size_t nCols, T fillValue = 0.0)
+    : rows(nRows), cols(nCols) {
+        data.resize(rows * cols, fillValue);
+    }
+
+    T operator()(size_t row, size_t col) const {
+        return data[row*cols + col];
+    }
+
+    T& operator()(size_t row, size_t col) {
+        return data[row*cols + col];
+    }
+
+private:
+    size_t rows, cols;
+    std::vector<T> data;
+};
+
 bool isKnotVectorMonotonic(const std::vector<double>& knots);
+
 
 bool close(double a, double b, double eps = std::numeric_limits<double>::epsilon());
 
@@ -65,7 +92,19 @@ double bsplineOneBasis(int i, int deg, const std::vector<double>& U, double u);
 @param[in, out] N Values of (deg+1) non-zero basis functions.
 */
 void bsplineBasis(int deg, int span, const std::vector<double>& knots, double u, std::vector<double>& N);
-    
+
+/**
+// Compute all non-zero derivatives of B-spline basis functions
+@param[in] deg Degree of the basis function.
+@param[in] span Index obtained from findSpan() corresponding the u and knots.
+@param[in] knots Knot vector corresponding to the basis functions.
+@param[in] u Parameter to evaluate the basis functions at.
+@param[in] nDers Number of derivatives to compute (nDers <= deg)
+@param[in, out] ders Values of non-zero derivatives of basis functions.
+*/
+void bsplineDerBasis(int deg, int span, const std::vector<double>& knots, double u,
+                     int nDers, std::vector<std::vector<double>>& ders);
+
 }
 
 #endif //MERCURY_NURBSUTILS_H
