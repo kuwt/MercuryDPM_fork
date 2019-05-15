@@ -147,7 +147,6 @@ public:
             << "\t" << std::setw(11) << "eneRatio"
             << std::endl;
     }
-    
     /** creates custom console output */
     void printTime() const override
     {
@@ -171,7 +170,7 @@ public:
     {
         os << std::setw(12) << getTime()
             << "\t" << std::setw(12)<< getIndenterHeight()
-            << "\t" << std::setw(12) << getForceOnIndenter() 
+            << "\t" << std::setw(12) << getForceOnIndenter()/ indentationForce_
             << "\t" << (getIndenterVelocity()<0?"down":(getIndenterVelocity()==0?"stop":"up"))
             << std::endl;
 //        os << "t " << getTime()
@@ -240,15 +239,14 @@ public:
 
 private:
     SphericalParticle indenter_;
-    Mdouble initialBedHeight_;
     Mdouble indenterDiameter_;
     Mdouble indentationVelocity_;
     Mdouble indentationForce_;
     
-    Mdouble measuredIndentationForce;
-    Mdouble measuredIndentation;
-    Mdouble measuredForceGradient;
-    Mdouble measuredElasticDisplacement;
+    Mdouble measuredIndentationForce = 0;
+    Mdouble measuredIndentation = 0;
+    Mdouble measuredForceGradient = 0;
+    Mdouble measuredElasticDisplacement = 0;
     
 };
 

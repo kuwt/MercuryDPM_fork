@@ -42,7 +42,7 @@ public:
     LinearSinterInteraction();
     virtual ~LinearSinterInteraction();
 
-    void computeForce();
+    void computeForce() override;
 
     const LinearSinterSpecies* getSpecies() const;
 
