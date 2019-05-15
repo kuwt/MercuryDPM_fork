@@ -52,34 +52,34 @@ typedef Vec3D LabFixedCoordinates;
  * of superquadric particles in Discrete element Method within an open-source framework" by Podlozhnyuk, Pirker and
  * Kloss.
  */
-class SuperQuadric final : public BaseParticle
+class SuperQuadricParticle final : public BaseParticle
 {
 public:
     /*!
      * \brief Basic Particle constructor, creates a superquadric with axes (1,1,1) and exponents (2,2), so it creates a
      * sphere with radius 1.
      */
-    SuperQuadric();
+    SuperQuadricParticle();
     
     /*!
      * \brief Copy constructor, which accepts as input a reference to a Superquadric.
      * It creates a copy of this Particle and all it's information.
      * Usually it is better to use the copy() function for polymorphism.
      */
-    SuperQuadric(const SuperQuadric& p);
+    SuperQuadricParticle(const SuperQuadricParticle& p);
     
-    SuperQuadric(const BaseParticle& p);
+    SuperQuadricParticle(const BaseParticle& p);
     
     /*!
      * \brief Destructor, needs to be implemented and checked to see if it is the largest or smallest particle currently
      * in its particleHandler
      */
-    ~SuperQuadric() override;
+    ~SuperQuadricParticle() override;
     
     /*!
      * \brief Copy method. It calls to copy constructor of this superquadric, useful for polymorphism
      */
-    SuperQuadric* copy() const override;
+    SuperQuadricParticle* copy() const override;
     
     /*!
      * \brief Write function: write this superquadric to the given output-stream, for example a restart-file
@@ -93,7 +93,7 @@ public:
     void read(std::istream& is) override;
     
     /*!
-     * \brief Returns the name of the class, here "SuperQuadric"
+     * \brief Returns the name of the class, here "SuperQuadricParticle"
      */
     std::string getName() const override;
     
@@ -198,7 +198,7 @@ public:
      * \brief Checks if this superquadric is in interaction with the given superquadric, and if
      * so, returns vector of pointer to the associated BaseInteraction object (else returns empty vector).
      */
-    BaseInteraction* getInteractionWithSuperQuad(SuperQuadric* p, unsigned timeStamp,
+    BaseInteraction* getInteractionWithSuperQuad(SuperQuadricParticle* p, unsigned timeStamp,
                                                               InteractionHandler* interactionHandler);
     
     /*!
@@ -216,21 +216,21 @@ public:
      * (2017) eq (22).
      */
     SmallVector<4> computeResidualContactDetection(const SmallVector<4>& position,
-                                                   const SuperQuadric* p1,
-                                                   const SuperQuadric* p2) const;
+                                                   const SuperQuadricParticle* p1,
+                                                   const SuperQuadricParticle* p2) const;
     
     /*!
      * \brief Compute and return the derivative of functionThatShouldBecomeZeroForContactDetection, both to the position
      * and the Lagrange multiplier, and evaluated at the contact point.
      */
     SmallMatrix<4, 4> getJacobianOfContactDetectionObjective(const SmallVector<4>& contactPoint,
-                                                             const SuperQuadric* p1,
-                                                             const SuperQuadric* p2) const;
+                                                             const SuperQuadricParticle* p1,
+                                                             const SuperQuadricParticle* p2) const;
     
     /*!
      * \brief Get an initial guess for the contact-point between this particle and the given particle.
      */
-    SmallVector<4> getInitialGuessForContact(const SuperQuadric* pQuad, BaseInteraction* C) const;
+    SmallVector<4> getInitialGuessForContact(const SuperQuadricParticle* pQuad, BaseInteraction* C) const;
     
     /*!
      * \brief Compute the distance between the contact-point and surface of this superquadric particle.
@@ -240,25 +240,25 @@ public:
     /*!
      * \brief Compute the contact point between this and the given superquadric particle.
      */
-    SmallVector<4> getContactPoint(const SuperQuadric* p, BaseInteraction* C) const;
+    SmallVector<4> getContactPoint(const SuperQuadricParticle* p, BaseInteraction* C) const;
     
     /*!
      * \brief If the "normal" procedure fails to find a contact point, use an alternative approach that involves
      * starting with two spheres to compute the interaction, and becoming less and less spherical.
      */
-    SmallVector<4> getContactPointPlanB(const SuperQuadric* pOther, unsigned numberOfSteps) const;
+    SmallVector<4> getContactPointPlanB(const SuperQuadricParticle* pOther, unsigned numberOfSteps) const;
     
     /*!
      * \brief Perform the actual Newton-iterations to find the contact point. Note, that it is given back as a
      * parameter.
      */
-    bool computeContactPoint(SmallVector<4>& contactPoint, const SuperQuadric* p1,
-                             const SuperQuadric* p2) const;
+    bool computeContactPoint(SmallVector<4>& contactPoint, const SuperQuadricParticle* p1,
+                             const SuperQuadricParticle* p2) const;
     
     
-    void writeDebugMessageStep1(const SuperQuadric* pQuad, const SmallVector<4>& contactPointPlanB) const;
+    void writeDebugMessageStep1(const SuperQuadricParticle* pQuad, const SmallVector<4>& contactPointPlanB) const;
     
-    void writeDebugMessageStep2(const SuperQuadric* pQuad, const Vec3D& dAxesThis, const Mdouble& dn11,
+    void writeDebugMessageStep2(const SuperQuadricParticle* pQuad, const Vec3D& dAxesThis, const Mdouble& dn11,
                                 const Mdouble& dn12, const Vec3D& dAxesOther, const Mdouble& dn21,
                                 const Mdouble& dn22) const;
     
@@ -266,7 +266,7 @@ public:
                                 const Mdouble& n21, const Mdouble& n22) const;
     
     void
-    writeDebugMessageMiddleOfLoop(const SuperQuadric& p1, const SuperQuadric& p2, SmallVector<4>& contactPointPlanB,
+    writeDebugMessageMiddleOfLoop(const SuperQuadricParticle& p1, const SuperQuadricParticle& p2, SmallVector<4>& contactPointPlanB,
                                   const unsigned int& counter) const;
 
     /**

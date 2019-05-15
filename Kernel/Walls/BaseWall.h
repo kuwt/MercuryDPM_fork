@@ -27,7 +27,7 @@
 #define BASEWALL_H
 
 #include "BaseInteractable.h"
-#include "Particles/SuperQuadric.h"
+#include "Particles/SuperQuadricParticle.h"
 
 class WallHandler;
 
@@ -92,7 +92,7 @@ public:
     virtual bool
     getDistanceNormalOverlap(const BaseParticle& P, Mdouble& distance, Vec3D& normal_return, Mdouble& overlap) const;
     
-    virtual bool getDistanceNormalOverlapSuperquadric(const SuperQuadric& p, Mdouble& distance, Vec3D& normal_return,
+    virtual bool getDistanceNormalOverlapSuperquadric(const SuperQuadricParticle& p, Mdouble& distance, Vec3D& normal_return,
                                                       Mdouble& overlap) const;
     
     virtual Vec3D
@@ -152,7 +152,7 @@ public:
     
     
     virtual BaseInteraction*
-    getInteractionWithSuperQuad(SuperQuadric* p, unsigned timeStamp, InteractionHandler* interactionHandler);
+    getInteractionWithSuperQuad(SuperQuadricParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler);
     
     /*!
      * adds extra information to the points and triangleStrips vectors needed to plot the wall in vtk format

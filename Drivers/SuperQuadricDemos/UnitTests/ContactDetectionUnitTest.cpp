@@ -23,7 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Particles/SuperQuadric.h"
+#include "Particles/SuperQuadricParticle.h"
 #include "Species/LinearViscoelasticSpecies.h"
 #include "Mercury3D.h"
 
@@ -48,7 +48,7 @@ private:
         species.setStiffness(2e5);
         species.setDissipation(25);
         speciesHandler.copyAndAddObject(species);
-        p0 = new SuperQuadric;
+        p0 = new SuperQuadricParticle;
         p0->setSpecies(speciesHandler.getObject(0));
         p0->setAxesAndExponents(1.0, 1.0, 1.0, 1.0, 1.0);
         p0->setInertia();
@@ -127,8 +127,8 @@ private:
         particleHandler.removeObject(0);
     }
     
-    SuperQuadric* p0;
-    SuperQuadric* p1;
+    SuperQuadricParticle* p0;
+    SuperQuadricParticle* p1;
     
 };
 

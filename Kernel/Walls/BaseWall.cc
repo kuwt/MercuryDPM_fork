@@ -23,7 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <Particles/SuperQuadric.h>
+#include <Particles/SuperQuadricParticle.h>
 #include "BaseWall.h"
 #include "DPMBase.h"
 
@@ -366,7 +366,7 @@ BaseWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHan
         c->setNormal(-normal);
         c->setDistance(distance);
         c->setOverlap(overlap);
-        if (dynamic_cast<SuperQuadric*>(p) == nullptr)
+        if (dynamic_cast<SuperQuadricParticle*>(p) == nullptr)
         {
             ///\todo{DK: What is the contact point for interactions with walls}
             c->setContactPoint(p->getPosition() - (p->getRadius() - 0.5 * c->getOverlap()) * c->getNormal());
@@ -417,7 +417,7 @@ void BaseWall::addToVTK(const std::vector<Vec3D>& points, VTKContainer& vtk)
 
 
 ///\todo make it work with screw, coil and other weird walls
-BaseInteraction* BaseWall::getInteractionWithSuperQuad(SuperQuadric* p, unsigned timeStamp,
+BaseInteraction* BaseWall::getInteractionWithSuperQuad(SuperQuadricParticle* p, unsigned timeStamp,
                                                                     InteractionHandler* interactionHandler)
 {
     logger(ERROR, "Generic wall-superquad interactions not implemented yet.");
@@ -449,7 +449,7 @@ void BaseWall::setVTKVisibility(const bool vtkVisibility)
 bool BaseWall::getDistanceNormalOverlap(const BaseParticle& P, Mdouble& distance, Vec3D& normal_return,
                                         Mdouble& overlap) const
 {
-    auto superQuadric = dynamic_cast<const SuperQuadric*>(&P);
+    auto superQuadric = dynamic_cast<const SuperQuadricParticle*>(&P);
     if (superQuadric == nullptr)
     {
         bool isInContact = getDistanceAndNormal(P, distance, normal_return);
@@ -463,7 +463,7 @@ bool BaseWall::getDistanceNormalOverlap(const BaseParticle& P, Mdouble& distance
 }
 
 bool
-BaseWall::getDistanceNormalOverlapSuperquadric(const SuperQuadric& p, Mdouble& distance, Vec3D& normal_return,
+BaseWall::getDistanceNormalOverlapSuperquadric(const SuperQuadricParticle& p, Mdouble& distance, Vec3D& normal_return,
                                                Mdouble& overlap) const
 {
     logger(ERROR, "Generic wall-superquadric interactions not implemented yet.");

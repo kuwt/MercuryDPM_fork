@@ -77,7 +77,7 @@ public:
      */
     bool getDistanceAndNormal(const BaseParticle& P, Mdouble& distance, Vec3D& normal_return) const override;
     
-    bool getDistanceNormalOverlapSuperquadric(const SuperQuadric& p, Mdouble& distance, Vec3D& normal_return,
+    bool getDistanceNormalOverlapSuperquadric(const SuperQuadricParticle& p, Mdouble& distance, Vec3D& normal_return,
                                               Mdouble& overlap) const override;
     
     /*!
@@ -103,7 +103,7 @@ public:
         logger(INFO, "setting drum radius to %", radius_);
     }
     
-    BaseInteraction* getInteractionWithSuperQuad(SuperQuadric* p, unsigned timeStamp,
+    BaseInteraction* getInteractionWithSuperQuad(SuperQuadricParticle* p, unsigned timeStamp,
                                                                         InteractionHandler* interactionHandler) override
     {
         return wall.getInteractionWithSuperQuad(p, timeStamp, interactionHandler);

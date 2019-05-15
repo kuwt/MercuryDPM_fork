@@ -34,7 +34,7 @@
 #include "Species/ParticleSpecies.h"
 #include "Particles/LiquidFilmParticle.h"
 #include "Particles/BaseParticle.h"
-#include "Particles/SuperQuadric.h"
+#include "Particles/SuperQuadricParticle.h"
 #include "MpiContainer.h"
 #include "MpiDataClass.h"
 #include "BoundaryHandler.h"
@@ -207,7 +207,7 @@ void ParticleHandler::addObject(BaseParticle* P)
         P->getSpecies()->computeMass(P);
         //Check if this particle has new extrema
         checkExtrema(P);
-        if (dynamic_cast<SuperQuadric*> (P) != nullptr)
+        if (dynamic_cast<SuperQuadricParticle*> (P) != nullptr)
         {
             getDPMBase()->setRotation(true);
         }
@@ -1036,9 +1036,9 @@ BaseParticle* ParticleHandler::createObject(const std::string& type)
     {
         return new LiquidFilmParticle;
     }
-    else if (type == "SuperQuadric")
+    else if (type == "SuperQuadricParticle")
     {
-        return new SuperQuadric;
+        return new SuperQuadricParticle;
     }
     else if (type == "ThermalParticle")
     {

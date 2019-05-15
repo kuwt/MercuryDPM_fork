@@ -33,7 +33,7 @@ class AirySavageHutter : public ChuteWithHopper
 {
 public:
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         logger(INFO, "Entering the solve now what happens");
         logger(INFO, "Problem name %", getName());

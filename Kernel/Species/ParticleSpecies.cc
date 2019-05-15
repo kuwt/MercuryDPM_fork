@@ -27,7 +27,7 @@
 #include "ParticleSpecies.h"
 #include "DPMBase.h"
 #include "Particles/BaseParticle.h"
-#include "Particles/SuperQuadric.h"
+#include "Particles/SuperQuadricParticle.h"
 
 class BaseParticle;
 
@@ -164,9 +164,9 @@ void ParticleSpecies::computeMass(BaseParticle* p) const
                 p->invInertia_ =
                         MatrixSymmetric3D(1, 0, 0, 1, 0, 1) / (.4 * p->getMass() * mathsFunc::square(p->getRadius()));
                 //
-                if (p->getName() == "SuperQuadric")
+                if (p->getName() == "SuperQuadricParticle")
                 {
-                    SuperQuadric* SE = dynamic_cast<SuperQuadric*>(p);
+                    SuperQuadricParticle* SE = dynamic_cast<SuperQuadricParticle*>(p);
                     Vec3D axes = SE->getAxes();
                     Mdouble eps1 = SE->getExponentEps1();
                     Mdouble eps2 = SE->getExponentEps2();

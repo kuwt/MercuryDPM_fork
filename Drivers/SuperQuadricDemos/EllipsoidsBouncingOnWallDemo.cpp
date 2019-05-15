@@ -38,7 +38,7 @@ class EllipsoidsBouncingOnWallDemo : public Mercury3D
         species.setDissipation(25);
         speciesHandler.copyAndAddObject(species);
         
-        SuperQuadric p0;
+        SuperQuadricParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setAxesAndExponents(2.0,1.0,1.0,1.0,1.0);
         p0.setInertia();
@@ -48,12 +48,12 @@ class EllipsoidsBouncingOnWallDemo : public Mercury3D
         p0.setOrientationViaNormal({1, 0, 0});
         particleHandler.copyAndAddObject(p0);
     
-        SuperQuadric p1 = *(p0.copy());
+        SuperQuadricParticle p1 = *(p0.copy());
         p1.setPosition(Vec3D(4, 4, 3));
         p1.setOrientationViaNormal({0,0,1});
         particleHandler.copyAndAddObject(p1);
         
-        SuperQuadric p2 = *(p0.copy());
+        SuperQuadricParticle p2 = *(p0.copy());
         p2.setPosition(Vec3D(8, 8, 3));
         p2.setOrientationViaNormal({1,0,1});
         p2.setInertia();

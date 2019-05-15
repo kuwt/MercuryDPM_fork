@@ -24,7 +24,7 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#include "Particles/SuperQuadric.h"
+#include "Particles/SuperQuadricParticle.h"
 #include "Species/LinearViscoelasticSpecies.h"
 #include "Mercury3D.h"
 
@@ -40,7 +40,7 @@ public:
         auto species = new LinearViscoelasticSpecies();
         species->setDensity(1);
         speciesHandler.addObject(species);
-        SuperQuadric p;
+        SuperQuadricParticle p;
         p.setSpecies(species);
 
         //sphere

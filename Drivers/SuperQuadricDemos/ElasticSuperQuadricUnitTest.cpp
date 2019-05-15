@@ -26,7 +26,7 @@
 #include <Species/HertzianViscoelasticMindlinSpecies.h>
 #include <Walls/InfiniteWall.h>
 #include "Mercury3D.h"
-#include "Particles/SuperQuadric.h"
+#include "Particles/SuperQuadricParticle.h"
 #include "Species/LinearViscoelasticSpecies.h"
 #include "Math/ExtendedMath.h"
 
@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
     s->setStiffness(2e5);
     s->setDensity(6.0/constants::pi);
     
-    SuperQuadric p;
+    SuperQuadricParticle p;
     p.setSpecies(s);
     p.setAxes(.5,.5,.5);
     p.setExponents(.5,.9);

@@ -23,12 +23,12 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Particles/SuperQuadric.h"
+#include "Particles/SuperQuadricParticle.h"
 #include "Species/LinearViscoelasticSpecies.h"
 #include "Mercury3D.h"
 
 ///tests whether the radius of the bounding sphere for superquadrics is computed correctly
-/// At the moment it only checks for ellipsoids and spheres using simplified expressions in the SuperQuadric::getMaxInteractionRadius() function.
+/// At the moment it only checks for ellipsoids and spheres using simplified expressions in the SuperQuadricParticle::getMaxInteractionRadius() function.
 /// Definitely needs generalisation for complex shapes.
 
 class BoundingRadiusTester : public Mercury3D
@@ -36,7 +36,7 @@ class BoundingRadiusTester : public Mercury3D
 public:
     void test()
     {
-        SuperQuadric p;
+        SuperQuadricParticle p;
         auto species = new LinearViscoelasticSpecies();
         speciesHandler.addObject(species);
         p.setSpecies(species);

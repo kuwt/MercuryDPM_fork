@@ -29,7 +29,7 @@
 #include "Particles/BaseParticle.h"
 #include "ParticleHandler.h"
 
-class SuperQuadric;
+class SuperQuadricParticle;
 
 /*!
  * \class MPIParticle
@@ -163,7 +163,7 @@ void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, BaseParticle* p, Par
 /*!
  * \brief Copies data from an MPIParticle class to a BaseParticle
  */
-void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, SuperQuadric* p, ParticleHandler* particleHandler);
+void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, SuperQuadricParticle* p, ParticleHandler* particleHandler);
 
 /*!
  * \brief Copies data from a BaseParticle to an MPIParticle class and returns this

@@ -24,7 +24,7 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Mercury3D.h"
-#include "Particles/SuperQuadric.h"
+#include "Particles/SuperQuadricParticle.h"
 #include "Species/LinearViscoelasticSpecies.h"
 
 ///Small system to check if your paraview-visualisation works.
@@ -39,7 +39,7 @@ class VisualisationTest : public Mercury3D
         species.setDissipation(25);
         speciesHandler.copyAndAddObject(species);
         
-        SuperQuadric p0;
+        SuperQuadricParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setAxesAndExponents(2.0,1.0,1.0,1.0,1.0);
         p0.setInertia();

@@ -44,7 +44,7 @@ class EllipticalSuperQuadricCollision : public Mercury3D
         setMin(1.5, 1.5, 1.5);
         setGravity({0, 0, -1});
         
-        SuperQuadric p0;
+        SuperQuadricParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setAxesAndExponents(2.0, 0.25, 0.25, 1.0, 1.0);
         p0.setInertia();

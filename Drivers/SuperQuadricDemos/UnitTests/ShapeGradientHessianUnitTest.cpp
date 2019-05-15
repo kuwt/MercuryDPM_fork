@@ -23,7 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Particles/SuperQuadric.h"
+#include "Particles/SuperQuadricParticle.h"
 #include "Species/LinearViscoelasticSpecies.h"
 #include "Mercury3D.h"
 
@@ -44,7 +44,7 @@ public:
     
     void testSphere()
     {
-        SuperQuadric p;
+        SuperQuadricParticle p;
         auto species = new LinearViscoelasticSpecies();
         speciesHandler.addObject(species);
         p.setSpecies(species);
@@ -82,7 +82,7 @@ public:
     
     void testEllipsoid()
     {
-        SuperQuadric p;
+        SuperQuadricParticle p;
         auto species = new LinearViscoelasticSpecies();
         speciesHandler.addObject(species);
         p.setSpecies(species);
@@ -127,7 +127,7 @@ public:
     
     void testRoundedBeam()
     {
-        SuperQuadric p;
+        SuperQuadricParticle p;
         auto species = new LinearViscoelasticSpecies();
         speciesHandler.addObject(species);
         p.setSpecies(species);
@@ -152,7 +152,7 @@ public:
     
     void testCushion()
     {
-        SuperQuadric p;
+        SuperQuadricParticle p;
         auto species = new LinearViscoelasticSpecies();
         speciesHandler.addObject(species);
         p.setSpecies(species);

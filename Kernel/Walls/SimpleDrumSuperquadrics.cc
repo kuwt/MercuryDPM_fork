@@ -99,7 +99,7 @@ bool SimpleDrumSuperquadrics::getDistanceAndNormal(const BaseParticle& p, Mdoubl
     return  (wall.getDistanceAndNormal(p, distance, normalReturn));
 }
 
-bool SimpleDrumSuperquadrics::getDistanceNormalOverlapSuperquadric(const SuperQuadric& p, Mdouble& distance, Vec3D& normal_return,
+bool SimpleDrumSuperquadrics::getDistanceNormalOverlapSuperquadric(const SuperQuadricParticle& p, Mdouble& distance, Vec3D& normal_return,
                                           Mdouble& overlap) const
 {
     Vec3D normalDirection = p.getPosition();

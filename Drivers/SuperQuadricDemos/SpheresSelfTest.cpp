@@ -24,7 +24,7 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Mercury3D.h"
-#include "Particles/SuperQuadric.h"
+#include "Particles/SuperQuadricParticle.h"
 #include "Species/LinearViscoelasticSpecies.h"
 #include "Math/ExtendedMath.h"
 
@@ -38,12 +38,12 @@ class SphericalSuperQuadricCollision : public Mercury3D
         species.setDissipation(25);
         speciesHandler.copyAndAddObject(species);
         
-        SuperQuadric p0;
+        SuperQuadricParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         //temporary hack:
         p0.setAxesAndExponents(1.0,1.0,1.0,1.0,1.0);
         p0.setInertia();
-        SuperQuadric p1 = *(p0.copy());
+        SuperQuadricParticle p1 = *(p0.copy());
     
         p0.setPosition(Vec3D(0, 0.0, 0.0));
         p1.setPosition(Vec3D(3, 0.0, 0.0));

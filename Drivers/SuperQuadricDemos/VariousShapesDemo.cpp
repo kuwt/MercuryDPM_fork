@@ -44,7 +44,7 @@ class ShapesDemo : public Mercury3D
         species.setDensity(constants::pi / 6);
         speciesHandler.copyAndAddObject(species);
         
-        SuperQuadric p;
+        SuperQuadricParticle p;
         //standard: sphere
         p.setSpecies(speciesHandler.getLastObject());
         p.setPosition({0,0,0});

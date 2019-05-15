@@ -99,12 +99,12 @@ void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, BaseParticle* p, Par
 }
 
 /*!
- * \brief Copies data from a SuperQuadric to an MPISuperQuadric class and returns this
+ * \brief Copies data from a SuperQuadricParticle to an MPISuperQuadric class and returns this
  * \details In order to create ghost particles on other processors, data of particles
  * have to be transmitted to other processors. Only the required data is
  * sent. The data is sent in an MPISuperQuadric data class and this function copies
  * the data from a particle into that class.
- * \param[in] p Pointer to a SuperQuadric particle from which data is copied
+ * \param[in] p Pointer to a SuperQuadricParticle particle from which data is copied
  * \return MPISuperQuadric class is returned filled with data from BaseParticle p
  */
 MPISuperQuadric copyDataFromParticleToMPIParticle(BaseParticle* p)
@@ -135,7 +135,7 @@ MPISuperQuadric copyDataFromParticleToMPIParticle(BaseParticle* p)
  * \param[in] particleHandler Pointer to the ParticleHandler required for creating a new particle
  * \todo MX: Maybe renamet his function to setParticleSpecies() or something
  */
-void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, SuperQuadric* p, ParticleHandler* particleHandler)
+void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, SuperQuadricParticle* p, ParticleHandler* particleHandler)
 {
     //Set the species of the particle, but before we can do that we have to set the handler
     p->setHandler(particleHandler);

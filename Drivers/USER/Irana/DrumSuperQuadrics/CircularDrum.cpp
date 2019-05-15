@@ -137,7 +137,7 @@ public:
         for (unsigned i = 0; i < numberBaseParticles; ++i)
         {
             BaseParticle* particle = particleHandler.getObject(i);
-            SuperQuadric particleSuperQuadric = SuperQuadric(*particle);
+            SuperQuadricParticle particleSuperQuadric = SuperQuadricParticle(*particle);
             particleHandler.copyAndAddObject(particleSuperQuadric);
         }
         for (int i = numberBaseParticles - 1; i >= 0; --i)
@@ -279,7 +279,7 @@ public:
         while ((numSphereToBeInserted > 0) || (numEllipsoidToBeInserted > 0))
         {
             bool isLargeParticle = false;
-            SuperQuadric P0;
+            SuperQuadricParticle P0;
             P0.setExponents(1, 1);
             //random to see if want to generate a large or small particles, helps makes the initial conditions homogenious
             if (random.getRandomNumber(1.0, numEllipsoidToBeInserted + numSphereToBeInserted) >

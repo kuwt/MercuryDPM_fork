@@ -26,7 +26,7 @@
 #include <Species/HertzianViscoelasticMindlinSpecies.h>
 #include <Walls/InfiniteWall.h>
 #include "Mercury3D.h"
-#include "Particles/SuperQuadric.h"
+#include "Particles/SuperQuadricParticle.h"
 #include "Species/LinearViscoelasticSpecies.h"
 #include "Math/ExtendedMath.h"
 
@@ -46,7 +46,7 @@ public:
     void setupInitialConditions() override
     {
         
-        SuperQuadric p0;
+        SuperQuadricParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setAxesAndExponents(1.0,1.0,1.0,1.0,1.0);
         p0.setInertia();

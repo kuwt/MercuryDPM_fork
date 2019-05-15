@@ -26,7 +26,7 @@
 #include "DPMBase.h"
 #include "BaseParticle.h"
 #include <cmath>
-#include "SuperQuadric.h"
+#include "SuperQuadricParticle.h"
 #include "InteractionHandler.h"
 #include "ParticleHandler.h"
 #include "SpeciesHandler.h"
@@ -35,13 +35,13 @@
  * \details calls the default constructor of BaseParticle, and creates an SuperEllipsoid with axes (1,1,1) and exponents
  * (2,2), so it creates a sphere with radius 1.
  */
-SuperQuadric::SuperQuadric()
+SuperQuadricParticle::SuperQuadricParticle()
         : BaseParticle()
 {
     axes_ = Vec3D(1.0, 1.0, 1.0);
     eps1_ = 1.0;
     eps2_ = 1.0;
-    logger(DEBUG, "SuperQuadric::SuperQuadric() finished");
+    logger(DEBUG, "SuperQuadricParticle::SuperQuadricParticle() finished");
 }
 
 /*!
@@ -52,7 +52,7 @@ SuperQuadric::SuperQuadric()
  *          that handles this particle. Use with care.
  * \param[in,out] p  Reference to the SuperQuad this one should become a copy of.
  */
-SuperQuadric::SuperQuadric(const SuperQuadric& p)
+SuperQuadricParticle::SuperQuadricParticle(const SuperQuadricParticle& p)
         : BaseParticle(p)
 {
     axes_ = p.axes_;
@@ -61,7 +61,7 @@ SuperQuadric::SuperQuadric(const SuperQuadric& p)
 }
 
 
-SuperQuadric::SuperQuadric(const BaseParticle& p) : BaseParticle(p)
+SuperQuadricParticle::SuperQuadricParticle(const BaseParticle& p) : BaseParticle(p)
 {
     Mdouble radius = p.getRadius();
     axes_ = Vec3D(radius, radius, radius);
@@ -73,13 +73,13 @@ SuperQuadric::SuperQuadric(const BaseParticle& p) : BaseParticle(p)
  * \details Destructor. It asks the ParticleHandler to check if this was the
  *          smallest or largest particle and adjust itself accordingly.
  */
-SuperQuadric::~SuperQuadric()
+SuperQuadricParticle::~SuperQuadricParticle()
 {
     if (getHandler() != nullptr)
     {
         getHandler()->checkExtremaOnDelete(this);
     }
-    logger(DEBUG, "SuperQuadric::~SuperQuadric() of particle % finished.", getId());
+    logger(DEBUG, "SuperQuadricParticle::SuperQuadricParticleParticle() of particle % finished.", getId());
     
 }
 
@@ -87,17 +87,17 @@ SuperQuadric::~SuperQuadric()
  * \details Copy method. Uses copy constructor to create a copy on the heap. Useful for polymorphism.
  * \return pointer to the particle's copy
  */
-SuperQuadric* SuperQuadric::copy() const
+SuperQuadricParticle* SuperQuadricParticle::copy() const
 {
-    return new SuperQuadric(*this);
+    return new SuperQuadricParticle(*this);
 }
 
 /*!
- * \details SuperQuadric print method, which accepts an std::ostream as input. It prints human readable SuperQuadric
+ * \details SuperQuadricParticle print method, which accepts an std::ostream as input. It prints human readable SuperQuadricParticle
  * information to the given output-stream.
  * \param[in,out] os    stream to which the info is written, e.g. a restart-file or std::cout.
  */
-void SuperQuadric::write(std::ostream& os) const
+void SuperQuadricParticle::write(std::ostream& os) const
 {
     BaseParticle::write(os);
     os << " axes " << axes_
@@ -106,12 +106,12 @@ void SuperQuadric::write(std::ostream& os) const
 }
 
 /*!
- * \details Returns the name of the object; in this case "SuperQuadric".
- * \return The std::string "SuperQuadric".
+ * \details Returns the name of the object; in this case "SuperQuadricParticle".
+ * \return The std::string "SuperQuadricParticle".
  */
-std::string SuperQuadric::getName() const
+std::string SuperQuadricParticle::getName() const
 {
-    return "SuperQuadric";
+    return "SuperQuadricParticle";
 }
 
 
@@ -119,7 +119,7 @@ std::string SuperQuadric::getName() const
  * \details Particle read function, which reads the axes_ and both epsilons from the given input-stream.
  * \param[in,out] is    input stream with particle properties, e.g. a restart-file.
  */
-void SuperQuadric::read(std::istream& is)
+void SuperQuadricParticle::read(std::istream& is)
 {
     BaseParticle::read(is);
     std::string dummy;
@@ -130,7 +130,7 @@ void SuperQuadric::read(std::istream& is)
 
 // Set and Get Functions
 
-void SuperQuadric::setAxesAndExponents(const Mdouble& a1, const Mdouble& a2, const Mdouble& a3, const Mdouble& eps1,
+void SuperQuadricParticle::setAxesAndExponents(const Mdouble& a1, const Mdouble& a2, const Mdouble& a3, const Mdouble& eps1,
                                        const Mdouble& eps2)
 {
     eps1_ = eps1;
@@ -141,7 +141,7 @@ void SuperQuadric::setAxesAndExponents(const Mdouble& a1, const Mdouble& a2, con
     setAxes(a1,a2,a3);
 }
 
-void SuperQuadric::setAxesAndExponents(const Vec3D& axes, const Mdouble& eps1, const Mdouble& eps2)
+void SuperQuadricParticle::setAxesAndExponents(const Vec3D& axes, const Mdouble& eps1, const Mdouble& eps2)
 {
     eps1_ = eps1;
     eps2_ = eps2;
@@ -151,7 +151,7 @@ void SuperQuadric::setAxesAndExponents(const Vec3D& axes, const Mdouble& eps1, c
     setAxes(axes);
 }
 
-void SuperQuadric::setAxes(const Vec3D& axes)
+void SuperQuadricParticle::setAxes(const Vec3D& axes)
 {
     axes_ = axes;
     setBoundingRadius();
@@ -161,12 +161,12 @@ void SuperQuadric::setAxes(const Vec3D& axes)
     }
 }
 
-void SuperQuadric::setAxes(const Mdouble& a1, const Mdouble& a2, const Mdouble& a3)
+void SuperQuadricParticle::setAxes(const Mdouble& a1, const Mdouble& a2, const Mdouble& a3)
 {
     setAxes({a1,a2,a3});
 }
 
-void SuperQuadric::setExponents(const Mdouble& eps1, const Mdouble& eps2)
+void SuperQuadricParticle::setExponents(const Mdouble& eps1, const Mdouble& eps2)
 {
     eps1_ = eps1;
     eps2_ = eps2;
@@ -179,17 +179,17 @@ void SuperQuadric::setExponents(const Mdouble& eps1, const Mdouble& eps2)
     }
 }
 
-Vec3D SuperQuadric::getAxes() const
+Vec3D SuperQuadricParticle::getAxes() const
 {
     return axes_;
 }
 
-Mdouble SuperQuadric::getExponentEps1() const
+Mdouble SuperQuadricParticle::getExponentEps1() const
 {
     return eps1_;
 }
 
-Mdouble SuperQuadric::getExponentEps2() const
+Mdouble SuperQuadricParticle::getExponentEps2() const
 {
     return eps2_;
 }
@@ -201,9 +201,9 @@ Mdouble SuperQuadric::getExponentEps2() const
  * However, the beta functions that are part of these expressions are approximations, see ExtendedMath.cc
  * \return The actual volume of this superquadric.
  */
-Mdouble SuperQuadric::getVolume() const
+Mdouble SuperQuadricParticle::getVolume() const
 {
-    logger.assert(getHandler() != nullptr, "[SuperQuadric::getVolume] no particle handler specified");
+    logger.assert(getHandler() != nullptr, "[SuperQuadricParticle::getVolume] no particle handler specified");
 
     return (2.0 * axes_.X * axes_.Y * axes_.Z * eps1_ * eps2_) * mathsFunc::beta(0.5 * eps1_ + 1.0, eps1_) *
            mathsFunc::beta(0.5 * eps2_, 0.5 * eps2_);
@@ -213,7 +213,7 @@ Mdouble SuperQuadric::getVolume() const
  * \details This function computes the principal moments of inertia for the superellipsoids. Again, the analytical
  * expressions are taken from Chapter 2 (pg. 36) of the book "Segmentation and Recovery of Superquadrics" by by <a href="https://homes.di.unimi.it/borghese/Teaching/DigitalAnimation/Old/DigitalAnimation_2002_2003/00_Superquadriche.pdf"> Jaklic et al </a>.
  */
-void SuperQuadric::setInertia()
+void SuperQuadricParticle::setInertia()
 {
     MatrixSymmetric3D inertia;
     
@@ -236,14 +236,12 @@ void SuperQuadric::setInertia()
     BaseParticle::setInertia(inertia);
 }
 
-void SuperQuadric::setRadius(const Mdouble radius)
+void SuperQuadricParticle::setRadius(const Mdouble radius)
 {
     logger(ERROR,"This function should not be used");
 }
 
-
-
-void SuperQuadric::setBoundingRadius()
+void SuperQuadricParticle::setBoundingRadius()
 {
     const Mdouble alpha = std::pow(axes_.Y / axes_.X, 2.0 / (2.0 / eps2_ - 2.0));
     const Mdouble help1 = std::pow(alpha, 2.0 / eps2_);
@@ -267,7 +265,7 @@ void SuperQuadric::setBoundingRadius()
  *                              assigned (if it is a new interaction).
  * \return                      A vector with size 1 (if there is an interaction) or 0 (if there is no interaction).
  */
-BaseInteraction* SuperQuadric::getInteractionWith(BaseParticle* const p, const unsigned timeStamp,
+BaseInteraction* SuperQuadricParticle::getInteractionWith(BaseParticle* const p, const unsigned timeStamp,
                                                                InteractionHandler* const interactionHandler)
 {
     //get the normal (from P away from the contact)
@@ -280,13 +278,13 @@ BaseInteraction* SuperQuadric::getInteractionWith(BaseParticle* const p, const u
     if (distanceSquared < (sumOfInteractionRadii * sumOfInteractionRadii))
     {
         //make a superquadric out of the particle.
-        SuperQuadric* pQuad = dynamic_cast<SuperQuadric*>(p);
+        SuperQuadricParticle* pQuad = dynamic_cast<SuperQuadricParticle*>(p);
         //if the dynamic casting of the particle pointer p is a null pointer, it implies that the p is a sphere.
         bool fromSphere = (pQuad == nullptr);
         // For the sake of simplicity, we make a superquadric out of it.
         if (fromSphere)
         {
-            pQuad = new SuperQuadric;
+            pQuad = new SuperQuadricParticle;
             pQuad->setAxes(p->getRadius(), p->getRadius(), p->getRadius());
         }
         
@@ -313,7 +311,7 @@ BaseInteraction* SuperQuadric::getInteractionWith(BaseParticle* const p, const u
  * \return                          A vector of Interaction* with size 1 (if there is an interaction) or 0
  *                                  (if there is no interaction).
  */
-BaseInteraction* SuperQuadric::getInteractionWithSuperQuad(SuperQuadric* const p, const unsigned timeStamp,
+BaseInteraction* SuperQuadricParticle::getInteractionWithSuperQuad(SuperQuadricParticle* const p, const unsigned timeStamp,
                                           InteractionHandler* const interactionHandler)
 {
     BaseInteraction* const C = interactionHandler->getInteraction(p, this, timeStamp);
@@ -361,7 +359,7 @@ BaseInteraction* SuperQuadric::getInteractionWithSuperQuad(SuperQuadric* const p
  * \return      A SmallVector of length 4, with the contact point and the lagrange-multiplier needed for Newton's method
  *              for finding the contact point.
  */
-SmallVector<4> SuperQuadric::getContactPoint(const SuperQuadric* const p, BaseInteraction* C) const
+SmallVector<4> SuperQuadricParticle::getContactPoint(const SuperQuadricParticle* const p, BaseInteraction* C) const
 {
     //Assuming contact between two spheres
     SmallVector<4> approximateContactPoint = getInitialGuessForContact(p, C);
@@ -382,8 +380,8 @@ SmallVector<4> SuperQuadric::getContactPoint(const SuperQuadric* const p, BaseIn
  * \param[in] normal        The normal direction of the contact.
  * \return Distance between contact-point and surface of this particle
  */
-Mdouble
-SuperQuadric::overlapFromContactPoint(const LabFixedCoordinates& contactPoint, const LabFixedCoordinates& normal) const
+Mdouble SuperQuadricParticle::overlapFromContactPoint(const LabFixedCoordinates& contactPoint,
+        const LabFixedCoordinates& normal) const
 {
     Mdouble alphaI = 0;
     LabFixedCoordinates xEdge = contactPoint + alphaI * normal;
@@ -425,7 +423,7 @@ SuperQuadric::overlapFromContactPoint(const LabFixedCoordinates& contactPoint, c
  * \return A guess for the initial contact: contact point X,Y,Z, lagrange multiplier. Note that these are given in the
  *          LAB-FIXED coordinates.
  */
-SmallVector<4> SuperQuadric::getInitialGuessForContact(const SuperQuadric* pQuad, BaseInteraction* const C) const
+SmallVector<4> SuperQuadricParticle::getInitialGuessForContact(const SuperQuadricParticle* pQuad, BaseInteraction* const C) const
 {
     SmallVector<4> approximateContactPoint;
     if (C == nullptr || C->getOverlap() < 1e-15)
@@ -463,7 +461,7 @@ SmallVector<4> SuperQuadric::getInitialGuessForContact(const SuperQuadric* pQuad
  * is provided in Section 2.3 of the article in Comp. Part. Mech. (2017) 4 : 101-118.
  * \return The value of the shape-function at the given (lab-fixed) coordinates.
  */
-Mdouble SuperQuadric::computeShape(const LabFixedCoordinates& labFixedCoordinates) const
+Mdouble SuperQuadricParticle::computeShape(const LabFixedCoordinates& labFixedCoordinates) const
 {
     BodyFixedCoordinates bodyFixedCoordinates = labFixedCoordinates - this->getPosition();
     getOrientation().rotateBack(bodyFixedCoordinates);
@@ -483,7 +481,7 @@ Mdouble SuperQuadric::computeShape(const LabFixedCoordinates& labFixedCoordinate
  * the lab-fixed coordinates, \nabla_X F(X)
  * \todo Come up with good expression for when x = y = 0 and n1 < n2
  */
-SmallVector<3> SuperQuadric::computeShapeGradientLabFixed(const LabFixedCoordinates& labFixedCoordinates) const
+SmallVector<3> SuperQuadricParticle::computeShapeGradientLabFixed(const LabFixedCoordinates& labFixedCoordinates) const
 {
     
     BodyFixedCoordinates bodyFixedCoordinates = labFixedCoordinates - this->getPosition();
@@ -516,7 +514,7 @@ SmallVector<3> SuperQuadric::computeShapeGradientLabFixed(const LabFixedCoordina
  * the lab-fixed coordinates, H_X (F)(X)
  * \todo Come up with good expression for when x = y = 0 and n1 < n2
  */
-SmallMatrix<3, 3> SuperQuadric::computeHessianLabFixed(const LabFixedCoordinates& labFixedCoordinates) const
+SmallMatrix<3, 3> SuperQuadricParticle::computeHessianLabFixed(const LabFixedCoordinates& labFixedCoordinates) const
 {
     SmallMatrix<3, 3> hessian;
     BodyFixedCoordinates bodyFixedCoordinates = labFixedCoordinates - this->getPosition();
@@ -556,9 +554,9 @@ SmallMatrix<3, 3> SuperQuadric::computeHessianLabFixed(const LabFixedCoordinates
  * \param[in] p2        Second particle for which we are looking for a contact with.
  * \return              Residual of the objective function.
  */
-SmallVector<4> SuperQuadric::computeResidualContactDetection(const SmallVector<4>& position,
-                                                             const SuperQuadric* const p1,
-                                                             const SuperQuadric* const p2) const
+SmallVector<4> SuperQuadricParticle::computeResidualContactDetection(const SmallVector<4>& position,
+                                                             const SuperQuadricParticle* const p1,
+                                                             const SuperQuadricParticle* const p2) const
 {
     LabFixedCoordinates labFixedCoordinates;
     labFixedCoordinates.X = position[0];
@@ -613,9 +611,9 @@ SmallVector<4> SuperQuadric::computeResidualContactDetection(const SmallVector<4
  * \return                  A 4x4 matrix with the Jacobian of computeResidualContactDetection.
  */
 SmallMatrix<4, 4>
-SuperQuadric::getJacobianOfContactDetectionObjective(const SmallVector<4>& contactPoint,
-                                                     const SuperQuadric* const p1,
-                                                     const SuperQuadric* const p2) const
+SuperQuadricParticle::getJacobianOfContactDetectionObjective(const SmallVector<4>& contactPoint,
+                                                     const SuperQuadricParticle* const p1,
+                                                     const SuperQuadricParticle* const p2) const
 {
     LabFixedCoordinates labFixedCoordinates;
     labFixedCoordinates.X = contactPoint[0];
@@ -654,7 +652,7 @@ SuperQuadric::getJacobianOfContactDetectionObjective(const SmallVector<4>& conta
  * \param[in] labFixedCoordinates position in lab fixed coordinate system
  * \return mean curvature of particle at labFixedCoordinates
  */
-Mdouble SuperQuadric::getCurvature(const LabFixedCoordinates& labFixedCoordinates) const
+Mdouble SuperQuadricParticle::getCurvature(const LabFixedCoordinates& labFixedCoordinates) const
 {
     SmallVector<3> gradientVec = computeShapeGradientLabFixed(labFixedCoordinates);
     SmallMatrix<3, 1> gradient = gradientVec;
@@ -675,16 +673,16 @@ Mdouble SuperQuadric::getCurvature(const LabFixedCoordinates& labFixedCoordinate
  * \param[in] p The particle for which we want to know if there is a contact
  * \return      True if there is a contact, false otherwise.
  */
-bool SuperQuadric::isInContactWith(const BaseParticle* const p) const
+bool SuperQuadricParticle::isInContactWith(const BaseParticle* const p) const
 {
     //make a superquadric out of the particle.
-    SuperQuadric* pQuad = dynamic_cast<SuperQuadric*>(p->copy());
+    SuperQuadricParticle* pQuad = dynamic_cast<SuperQuadricParticle*>(p->copy());
     //if the dynamic casting of the particle pointer p is a null pointer, it implies that the p is a sphere.
     bool fromSphere = (pQuad == nullptr);
     // For the sake of simplicity, we make a superquad out of it.
     if (fromSphere)
     {
-        pQuad = new SuperQuadric;
+        pQuad = new SuperQuadricParticle;
         pQuad->setAxes(p->getRadius(), p->getRadius(), p->getRadius());
     }
     
@@ -712,7 +710,7 @@ bool SuperQuadric::isInContactWith(const BaseParticle* const p) const
  * \param[in] pOther    Particle we want to know if the contact-point with
  * \return              The point where the shape-functions of both particles are minimised.
  */
-SmallVector<4> SuperQuadric::getContactPointPlanB(const SuperQuadric* const pOther, unsigned numberOfSteps) const
+SmallVector<4> SuperQuadricParticle::getContactPointPlanB(const SuperQuadricParticle* const pOther, unsigned numberOfSteps) const
 {
     logger(VERBOSE, "Number of iterations: %", numberOfSteps);
     // Step 1: Compute contact point for two volume equivalent spheres
@@ -746,8 +744,8 @@ SmallVector<4> SuperQuadric::getContactPointPlanB(const SuperQuadric* const pOth
     writeDebugMessageStep2(pOther, dAxesThis, dn11, dn12, dAxesOther, dn21, dn22);
     
     // Create two superquadrics with the above parameters for incrementally computing the contact point
-    SuperQuadric p1;
-    SuperQuadric p2;
+    SuperQuadricParticle p1;
+    SuperQuadricParticle p2;
     
     p1.setPosition(getPosition());
     p2.setPosition(pOther->getPosition());
@@ -808,8 +806,8 @@ SmallVector<4> SuperQuadric::getContactPointPlanB(const SuperQuadric* const pOth
  * \param[in] p2                The second particle of the contact we are looking for
  * \return                      Boolean for whether or not the contact-detection was successful.
  */
-bool SuperQuadric::computeContactPoint(SmallVector<4>& contactPoint, const SuperQuadric* const p1,
-                                       const SuperQuadric* const p2) const
+bool SuperQuadricParticle::computeContactPoint(SmallVector<4>& contactPoint, const SuperQuadricParticle* const p1,
+                                       const SuperQuadricParticle* const p2) const
 {
     // Damped Newton's method: (dampingFactor 1 is undamped)
     Mdouble dampingFactor = 1;
@@ -861,7 +859,7 @@ bool SuperQuadric::computeContactPoint(SmallVector<4>& contactPoint, const Super
     return (iteration != maxIterations);
 }
 
-void SuperQuadric::writeDebugMessageMiddleOfLoop(const SuperQuadric& p1, const SuperQuadric& p2,
+void SuperQuadricParticle::writeDebugMessageMiddleOfLoop(const SuperQuadricParticle& p1, const SuperQuadricParticle& p2,
                                                  SmallVector<4>& contactPointPlanB, const unsigned int& counter) const
 {
     logger(VERBOSE, "Position of particle 1 (p1): % \nPosition of particle 2 (p2): % \n",
@@ -883,7 +881,7 @@ void SuperQuadric::writeDebugMessageMiddleOfLoop(const SuperQuadric& p1, const S
 }
 
 void
-SuperQuadric::writeDebugMessageStep3(const Vec3D& axesThis, const Mdouble& n11, const Mdouble& n12,
+SuperQuadricParticle::writeDebugMessageStep3(const Vec3D& axesThis, const Mdouble& n11, const Mdouble& n12,
                                      const Vec3D& axesOther, const Mdouble& n21, const Mdouble& n22) const
 {
     logger(VERBOSE, "-----------------------------------");
@@ -907,7 +905,7 @@ SuperQuadric::writeDebugMessageStep3(const Vec3D& axesThis, const Mdouble& n11, 
 }
 
 void
-SuperQuadric::writeDebugMessageStep2(const SuperQuadric* pQuad, const Vec3D& dAxesThis, const Mdouble& dn11,
+SuperQuadricParticle::writeDebugMessageStep2(const SuperQuadricParticle* pQuad, const Vec3D& dAxesThis, const Mdouble& dn11,
                                      const Mdouble& dn12, const Vec3D& dAxesOther, const Mdouble& dn21,
                                      const Mdouble& dn22) const
 {
@@ -945,7 +943,7 @@ SuperQuadric::writeDebugMessageStep2(const SuperQuadric* pQuad, const Vec3D& dAx
     logger(VERBOSE, " ");
 }
 
-void SuperQuadric::writeDebugMessageStep1(const SuperQuadric* pQuad, const SmallVector<4>& contactPointPlanB) const
+void SuperQuadricParticle::writeDebugMessageStep1(const SuperQuadricParticle* pQuad, const SmallVector<4>& contactPointPlanB) const
 {
     logger(VERBOSE, "---------------------");
     logger(VERBOSE, "STEP 1");
@@ -968,7 +966,7 @@ void SuperQuadric::writeDebugMessageStep1(const SuperQuadric* pQuad, const Small
     logger(VERBOSE, "Analytical solution for two equivalent spheres in contact: % \n", contactPointPlanB);
 }
 
-Mdouble SuperQuadric::getInteractionRadius(const BaseParticle* particle) const
+Mdouble SuperQuadricParticle::getInteractionRadius(const BaseParticle* particle) const
 {
     const auto mixedSpecies = getSpecies()->getHandler()->getMixedObject(getSpecies(),particle->getSpecies());
     return getRadius() + 0.5 * mixedSpecies->getInteractionDistance();

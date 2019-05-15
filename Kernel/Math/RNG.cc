@@ -192,17 +192,17 @@ Mdouble RNG::getNormalVariate()
 
 Mdouble RNG::getNormalVariate(Mdouble mean, Mdouble stdev)
 {
-    if (stdev == 0)
-    {
+    if (stdev == 0) {
         logger(WARN,
                "[RNG::getNormalVariate(Mdouble, Mdouble)] Zero stdev?");
         return mean;
-    }
-    else if (stdev < 0)
+    } else if (stdev < 0) {
         logger(ERROR,
                "[RNG::getNormalVariate(Mdouble, Mdouble)] Negative stdev is not allowed.");
-    else
+        exit(-1);
+    } else {
         return getNormalVariate() * stdev + mean;
+    }
 }
 
 

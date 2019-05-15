@@ -29,8 +29,8 @@ public:
         // [GranularCollapse : initial]
         
         // [GranularCollapse : particles]
-        SuperQuadric* ParticleToCopy;
-        ParticleToCopy = new SuperQuadric;
+        SuperQuadricParticle* ParticleToCopy;
+        ParticleToCopy = new SuperQuadricParticle;
         ParticleToCopy->setSpecies(species);
         // [GranularCollapse : particles]
         

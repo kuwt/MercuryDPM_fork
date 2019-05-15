@@ -280,7 +280,7 @@ void InfiniteWall::writeVTK(VTKContainer& vtk) const
 
 
 bool
-InfiniteWall::getDistanceNormalOverlapSuperquadric(const SuperQuadric& p, Mdouble& distance, Vec3D& normal_return,
+InfiniteWall::getDistanceNormalOverlapSuperquadric(const SuperQuadricParticle& p, Mdouble& distance, Vec3D& normal_return,
                                                    Mdouble& overlap) const
 {
     //first check: if the bounding sphere does not touch the wall, there is no contact.

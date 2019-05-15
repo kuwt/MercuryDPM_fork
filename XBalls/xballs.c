@@ -180,7 +180,8 @@ int main(argc, argv)
             {
 				 sprintf(csystem,"more %s.txt",argv[0]);
 				 //sprintf(csystem,"more %s/xballs.txt",XBPATH);
-                 if (system(csystem));
+                 if (system(csystem))
+                     ;
                  exit(0);
                  /* return; */
             }
@@ -454,8 +455,7 @@ int main(argc, argv)
                    icube = 1;
 	else if ((strcmp("-fog", argv[count]) == 0) && (count + 1 <= argc))
                    ifog = uatoi(argv[++count]);
-        else
-        {
+	else {
 	   fprintf(stderr, 
               "Usage : xballs [-f filename|-] +Options (see xballs.txt) \n");
 	   exit(0);
@@ -2893,7 +2893,8 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                 if( ifilm == 2 )
                   sprintf(csystem,"import +screen -window %lu -border -scene %d %6.6d.%s \n",eng,icount,icount,coutfile); 
                 printf(csystem,"%s");
-                if (system(csystem)); //if-statement to remove compiler warning
+                if (system(csystem))
+                    ;//if-statement to remove compiler warning
                 icount++;
                }
 
@@ -3310,8 +3311,7 @@ int read_line( int inread, FILE *fp,
 
 while( icomp == 0 )
 {
-  if (fgets( cline, clength, fp ))
-  if( (icomp = strncmp( "#", cline, 1 )) != 0 )
+  if (fgets( cline, clength, fp ) && (icomp = strncmp( "#", cline, 1 )) != 0 )
   {
     if( inread == 6 )
     {
@@ -3382,8 +3382,7 @@ int read_header( int inread, FILE *fp,
  
 while( icomp == 0 )
 {
-  if(fgets( cline, clength, fp ))
-  if( (icomp = strncmp( "#", cline, 1 )) != 0 )
+  if(fgets( cline, clength, fp ) && (icomp = strncmp( "#", cline, 1 )) != 0 )
   {
     if(( inread == 3 ) || ( inread == 7 ) || ( inread == 14 ))
     {
