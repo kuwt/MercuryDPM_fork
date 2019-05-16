@@ -50,34 +50,6 @@ std::istream& operator>>(std::istream& is, BaseObject& o)
 }
 
 /*!
- * \details Initialises the member variables to zero.
- */
-BaseObject::BaseObject()
-{
-    index_ = 0;
-    id_ = 0;
-    logger(DEBUG, "BaseObject::BaseObject() finished");
-}
-
-/*!
- * \param[in] p
- */
-BaseObject::BaseObject(const BaseObject& p)
-{
-    index_ = p.index_;
-    id_ = p.id_;
-    logger(DEBUG, "BaseObject::BaseObject(const BaseObject &p) finished");
-}
-
-/*!
- *
- */
-BaseObject::~BaseObject()
-{
-    logger(DEBUG, "BaseObject::~BaseBoundary() finished");
-}
-
-/*!
  * \param[in] index 
  */
 void BaseObject::moveInHandler(const unsigned int index)

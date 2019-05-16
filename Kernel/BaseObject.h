@@ -53,17 +53,17 @@ public:
     /*!
      * \brief Default constructor
      */
-    BaseObject();
+    BaseObject() = default;
     
     /*!
      * \brief Copy constructor, copies all the objects BaseObject contains
      */
-    BaseObject(const BaseObject& p);
+    BaseObject(const BaseObject& p) = default;
     
     /*!
      * \brief virtual destructor
      */
-    virtual ~BaseObject();
+    virtual ~BaseObject()  = default;
     
     /*!
      * \brief A purely virtual method with an implementation which reads the index from the stream and assigns
@@ -124,17 +124,38 @@ public:
      */
     unsigned int getId() const
     { return id_; }
+    
+    /*!
+     * \see groupId_.
+     */
+    void setGroupId(unsigned groupId)
+    { groupId_ = groupId; }
+    
+    /*!
+     * \see groupId_.
+     */
+    unsigned getGroupId() const
+    { return groupId_; }
 
 private:
     /*!
      * \brief location in BaseHandler::objects_
      */
-    unsigned int index_;
+    unsigned int index_ = 0;
     
     /*!
      * \brief unique identifier within handler (remains constant even if particle is moved)
      */
-    unsigned int id_;
+    unsigned int id_ = 0;
+    
+    /*!
+     * \brief Identifier of a group within handler.
+     * \details Useful to define properties to particle or wall clusters, etc.
+     * E.g. one can apply an action to a specific group, visualise a specific group, coarse-grain a specific group, etc.
+     * \see BaseHandler::nextGroupId_
+     */
+    unsigned int groupId_ = 0;
+    
 };
 
 #endif

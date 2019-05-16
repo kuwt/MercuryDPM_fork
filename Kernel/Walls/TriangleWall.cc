@@ -206,6 +206,18 @@ void TriangleWall::setVertices(const Vec3D A, const Vec3D B, const Vec3D C)
     updateVertexAndNormal();
 }
 
+/*!
+ * \details Moves (displaces) the interacable a given distance.
+ *          Note, this just updates the position by the move.
+ * \param[in] move  Reference to Vec3D which is the distance to move the
+ *            interactable.
+ */
+void TriangleWall::move(const Vec3D& move)
+{
+    BaseInteractable::move(move);
+    updateVertexAndNormal();
+}
+
 void TriangleWall::setVertices(const Vec3D A, const Vec3D B, const Vec3D C, const Vec3D position)
 {
     setPosition(position);

@@ -101,7 +101,9 @@ public:
      *  - updateVertexAndNormal is called to set the remaining variables
      */
     void setVertices(Vec3D A, Vec3D B, Vec3D C);
-
+    
+    void move(const Vec3D& move);
+    
     /*!
      * \brief Same as #setVertices(A,B,C), but sets the position explicitly.
      * The position is important when you rotate the wall, as the wall will be rotated around this position.

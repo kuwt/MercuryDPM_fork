@@ -285,7 +285,13 @@ public:
     [[deprecated]]
     virtual void writeVTK() const
     {};
-
+    
+    /*!
+     * \brief Should be called each time you assign a groupId.
+     * Returns the value of nextGroupId_ and increases nextGroupId_ by one.
+     */
+    unsigned getNextGroupId() { return nextGroupId_++; }
+    
 protected:
     /*!
      * \brief The actual list of Object pointers
@@ -306,6 +312,13 @@ private:
      */
     unsigned int nextId_;
     
+    /*!
+     * \brief value of the next BaseObject::groupId_.
+     * Value increased by one each time a groupId is assigned.
+     * Default group is 0
+     */
+    unsigned nextGroupId_ = 1;
+
     /*!
      * \brief A pointer back to the DPMBase class.
      * 

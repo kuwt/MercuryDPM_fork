@@ -377,12 +377,14 @@ public:
     virtual bool isFixed() const =0;
 
     /*! returns the inverse mass. This value is zero for walls and gets overridden for particles that have finite mass*/
-    virtual Mdouble getInvMass() const { return 0.0; }
+    virtual Mdouble getInvMass() const
+    { return 0.0; }
 
     /*! returns the inverse radius, or curvature, of the surface. This value is zero for walls and gets overridden for particles that have finite radius
      * \todo should be wall-type dependent
      * */
-    virtual Mdouble getCurvature(const Vec3D& labFixedCoordinates) const { return 0.0; }
+    virtual Mdouble getCurvature(const Vec3D& labFixedCoordinates) const
+    { return 0.0; }
 
 private:
     /*!

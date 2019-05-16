@@ -337,8 +337,9 @@ void WallHandler::writeVTKBoundingBox() const
  * \param[in] species pointer to a species in the species handler that will be assigned to the walls
  * \param[in] scaleFactor allows the vertex positions to be scaled (necessary if the vtk file is written in different units than the Mercury implementation, e.g. if the stl file is given in mm, but the Mercury implementation uses meters)
  */
-void WallHandler::readTriangleWall(std::string filename, ParticleSpecies* species, Mdouble scaleFactor, Vec3D centerOfRotation, Vec3D velocity, Vec3D angularVelocity)
+unsigned WallHandler::readTriangleWall(std::string filename, ParticleSpecies* species, Mdouble scaleFactor, Vec3D centerOfRotation, Vec3D velocity, Vec3D angularVelocity)
 {
+    const unsigned groupId = getNextGroupId();
     std::string fileType = filename.substr(filename.find_last_of('.') + 1);
 
     //define a default triangle wall
@@ -346,6 +347,7 @@ void WallHandler::readTriangleWall(std::string filename, ParticleSpecies* specie
     triangleWall.setSpecies(species);
     triangleWall.setVelocity(velocity);
     triangleWall.setAngularVelocity(angularVelocity);
+    triangleWall.setGroupId(groupId);
 
     if (helpers::lower(fileType) == "vtk")
     {
@@ -388,7 +390,7 @@ void WallHandler::readTriangleWall(std::string filename, ParticleSpecies* specie
         //close file
         file.close();
 
-        logger(INFO, "Read in % walls", getSize() - n);
+        logger(INFO, "Read in % walls from %", getSize() - n,filename);
 
     }
     else if (helpers::lower(fileType) == "stl")
@@ -434,7 +436,7 @@ void WallHandler::readTriangleWall(std::string filename, ParticleSpecies* specie
 
         }
 
-        logger(INFO, "Read in % walls", numTriangles);
+        logger(INFO, "Read in % walls from %", numTriangles,filename);
 
     }
     else
@@ -443,4 +445,6 @@ void WallHandler::readTriangleWall(std::string filename, ParticleSpecies* specie
         logger(ERROR, "File type of % must be vtk or stl");
 
     }
+    
+    return groupId;
 }
