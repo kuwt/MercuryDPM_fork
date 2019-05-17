@@ -222,6 +222,11 @@ public:
     void setOrientationViaNormal(Vec3D normal);
     
     /*!
+     * \brief Sets the orientation of this BaseInteractable by defining the euler angles.
+     */
+    void setOrientationViaEuler(Vec3D eulerAngle);
+    
+    /*!
      * \brief Sets the orientation of this BaseInteractable.
      * \details Interpretation depends on which interactable is being considered
      * See also BaseInteractable::getOrientation.

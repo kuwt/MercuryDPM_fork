@@ -719,14 +719,12 @@ void BaseParticle::integrateBeforeForceComputation(double time, double timeStep)
     else
     {
 #ifdef MERCURY_USE_MPI
-        //For periodic particles in paralle the previous position is required
+        //For periodic particles in parallel the previous position is required
         setPreviousPosition(getPosition());
 #endif
         accelerate(getForce() * getInvMass() * 0.5 * timeStep);
-        ///\todo TW why do we store displacement? replace by temporary variable?
         const Vec3D displacement = getVelocity() * timeStep;
         move(displacement);
-        ///\todo TW getLength is very expensive (SpeedTestThomas: 0.2% of simulation time is spent here); can we store the old location and compute the difference to check hGrid updates instead of updating the displacement?
         DPMBase* const dpm = getHandler()->getDPMBase();
         if (!dpm->getHGridUpdateEachTimeStep())
         {

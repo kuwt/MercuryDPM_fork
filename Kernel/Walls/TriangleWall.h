@@ -120,12 +120,7 @@ public:
     
     void rotate(const Vec3D& angularVelocity) override;
     
-    bool isLocal(Vec3D& min, Vec3D& max) const override
-    {
-        min = vertexMin_;
-        max = vertexMax_;
-        return false;
-    }
+    bool isLocal(Vec3D& min, Vec3D& max) const override;
 
 private:
     

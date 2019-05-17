@@ -66,9 +66,9 @@ bool TriangleWall::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance
     }
     
     const Mdouble distanceMax2 = mathsFunc::square(p.getWallInteractionRadius(this));
-    const Vec3D edgeBranch0 = position - vertex_[0];
-    const Vec3D edgeBranch1 = position - vertex_[1];
-    const Vec3D edgeBranch2 = position - vertex_[2];
+    const Vec3D edgeBranch0 = position - vertexInLabFrame_[0];
+    const Vec3D edgeBranch1 = position - vertexInLabFrame_[1];
+    const Vec3D edgeBranch2 = position - vertexInLabFrame_[2];
     const Mdouble edgeDistance0 = Vec3D::dot(edgeBranch0, edgeNormal_[0]);
     const Mdouble edgeDistance1 = Vec3D::dot(edgeBranch1, edgeNormal_[1]);
     const Mdouble edgeDistance2 = Vec3D::dot(edgeBranch2, edgeNormal_[2]);
@@ -256,4 +256,11 @@ void TriangleWall::updateVertexAndNormal()
         edgeNormal_[i].normalise();
     }
     //logger(INFO,"vertex %,%,% edge %,%,% face %",vertex_[0],vertex_[1],vertex_[2],edgeNormal_[0],edgeNormal_[1],edgeNormal_[2],faceNormal_);
+}
+
+bool TriangleWall::isLocal(Vec3D& min, Vec3D& max) const
+{
+    min = vertexMin_;
+    max = vertexMax_;
+    return true;
 }

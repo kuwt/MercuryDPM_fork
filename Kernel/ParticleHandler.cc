@@ -756,7 +756,7 @@ Mdouble ParticleHandler::getSmallestInteractionRadius() const
  */
 Mdouble ParticleHandler::getLargestInteractionRadiusLocal() const
 {
-    if (!(getLargestParticle() == nullptr))
+    if (!(getLargestParticleLocal() == nullptr))
     {
         return getLargestParticle()->getMaxInteractionRadius();
     }

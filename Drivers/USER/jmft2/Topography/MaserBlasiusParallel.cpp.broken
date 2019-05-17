@@ -116,10 +116,10 @@ class MaserBlasiusParallel : public Mercury2D {
             */
 
             /* Prototypical particles */
-            particlePrototype = new BaseParticle();
+            particlePrototype = new SphericalParticle();
             particlePrototype->setSpecies(spec_particles);
             particlePrototype->setRadius(pars.at("particleRadius"));
-            basePrototype = new BaseParticle();
+            basePrototype = new SphericalParticle();
             // basePrototype->setSpecies(spec_base);
             basePrototype->setSpecies(spec_particles);
             basePrototype->setRadius(pars.at("baseRadius"));
@@ -201,7 +201,7 @@ class MaserBlasiusParallel : public Mercury2D {
             delb = boundaryHandler.copyAndAddObject(delb);
 
             /* CubeInsertionBoundary for introducing new particles */
-            BaseParticle* generandum = new BaseParticle;
+            BaseParticle* generandum = new SphericalParticle;
             generandum->setSpecies(spec_particles);
             generandum->setRadius(pars.at("particleRadius"));
             // double velvar = pars.at("reservoirTemperature") * sqrt(pars.at("g") * pars.at("particleRadius"));

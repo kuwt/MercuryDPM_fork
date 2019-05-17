@@ -611,7 +611,7 @@ void Mercury3D::computeWallForces(BaseWall* const w)
     
     // if wall is not local, use the non-hGrid version for finding wall contacts
     Vec3D min, max;
-    if (!w->isLocal(min, max))
+    if (w->isLocal(min, max)==false)
     {
         return DPMBase::computeWallForces(w);
     }

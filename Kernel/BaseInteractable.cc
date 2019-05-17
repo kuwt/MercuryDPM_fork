@@ -25,6 +25,7 @@
 
 
 #include "Particles/BaseParticle.h"
+#include "SpeciesHandler.h"
 
 /*!
  * \details Simply creates an empty BaseInteractable, with all vectors relating to the positions and motions of the current object 
@@ -110,7 +111,7 @@ BaseInteractable::~BaseInteractable()
  */
 void BaseInteractable::setSpecies(const ParticleSpecies* species)
 {
-    logger.assert(species->getHandler() != nullptr, "Error: Species is not part of any handler yet");
+    logger.assert(species->getHandler() != nullptr && species->getHandler()->getObject(species->getIndex())==species, "Error: Species is not part of any handler yet");
     species_ = species;
     indSpecies_ = species->getIndex();
 }
@@ -125,6 +126,11 @@ void BaseInteractable::setSpecies(const ParticleSpecies* species)
 void BaseInteractable::setOrientationViaNormal(const Vec3D normal)
 {
     orientation_.setOrientationViaNormal(normal);
+}
+
+void BaseInteractable::setOrientationViaEuler(const Vec3D eulerAngle)
+{
+    orientation_.setEuler(eulerAngle);
 }
 
 /*!

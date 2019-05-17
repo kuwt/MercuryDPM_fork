@@ -2207,6 +2207,7 @@ bool DPMBase::readDataFile(std::string fileName, unsigned int format)
         fileName = dataFile.getFullName();
     
     std::string oldFileName = dataFile.getName();
+    unsigned oldCounter = dataFile.getCounter();
     //Updates the name of the data file to the user-input from the argument.
     dataFile.setName(fileName);
     //opens a filestream of the input type
@@ -2226,6 +2227,7 @@ bool DPMBase::readDataFile(std::string fileName, unsigned int format)
     dataFile.setFileType(fileTypeData);
     dataFile.close();
     dataFile.setName(oldFileName);
+    dataFile.setCounter(oldCounter);
     return true;
 }
 
@@ -2479,192 +2481,183 @@ bool DPMBase::readNextDataFile(unsigned int format)
         //end case
     }
     //end if
+
     //checking if file contains valid data.
-    int N = -1;
-    Mdouble dummy;
-    unsigned indSpecies;
+    unsigned N = unsignedMax;
     dataFile.getFstream() >> N;
     //read first parameter and check if we reached the end of the file
-    if (N == -1)
+    if (N == unsignedMax)
     {
         //std::cout << "Reached the end of the data file" << std::endl;
         return false;
     }
     
-    //create particles if N is not fixed
-    if (particleHandler.getSize() != N)
-    {
-        if (particleHandler.getSize() == 0)
-        {
-            SphericalParticle p;
-            p.setSpecies(speciesHandler.getObject(0));
-            particleHandler.copyAndAddObject(p);
-            /** 
-             * A data file only contains radius, position and velocity 
-             * (and species); so the remaining properties (Is it a fixed 
-             * particle? Is it a (spherical) BaseParticle?) are kept 
-             * constant throughout the simulation. But, if the number of 
-             * particles changes, the reading algorithm needs to decide 
-             * what to do, so it assumes the particle is a non-fixed BaseParticle.
-             */
-            logger(WARN, "readNextDataFile: the data file contains more "
-                         "particles than are currently in the particleHandler. "
-                         "Newly created particles will be non-fixed spherical particles.");
-            if (!readSpeciesFromDataFile_)
-                logger(WARN, "Note: new particles are assumed to be of species zero. "
-                             "To read species information from the data file, "
-                             "set readSpeciesFromDataFile to true");
-            
-        }
-        if (particleHandler.getSize() > N)
-        {
-            while (particleHandler.getSize() != N)
-            {
-                particleHandler.removeLastObject();
-                //std::cout << "S" << particleHandler.getSize() << std::endl;
-            }
-        }
-        else
-        {
-            while (particleHandler.getSize() != N)
-            {
-                particleHandler.copyAndAddObject(particleHandler.getLastObject());
-                particleHandler.getLastObject()->unfix();
-                //std::cout << particleHandler.getSize() << N << std::endl;
-            }
-        }
+    //store the parameters you want to preserve
+    const size_t nHistory = std::min(N,particleHandler.getSize());
+    std::vector<const ParticleSpecies*> species(nHistory);
+    std::vector<bool> fix(nHistory);
+    for (size_t i=0; i<nHistory; ++i) {
+        const BaseParticle *p = particleHandler.getObject(i);
+        species[i] = p->getSpecies();
+        fix[i] = p->isFixed();
     }
-    //for (auto p: particleHandler)
-    //    std::cout << *p << std::endl;
-#ifdef DEBUG_OUTPUT
-    std::cout << "Number of particles read from file "<< N << std::endl;
-#endif
-    
-    //read all other data available for the time step
-    switch (format)
-    {
-        //@TODO: Can we move these unnamed constants to an enum class?
-        //This is the format_ that Stefan's and Vitaley's code saves in - note the axis rotation_
-        case 7:
-        {
-            //@TODO: Can we change this to the same order as case 8/14/15? min.x/y/z max.x/y/z instead of min.x max.x etc?
-            
-            std::stringstream line;
-            helpers::getLineFromStringStream(dataFile.getFstream(), line);
-            line >> time_ >> min_.x() >> min_.y() >> min_.z() >> max_.x() >> max_.y() >> max_.z();
-            Mdouble radius;
-            Vec3D position, velocity;
-            for (BaseParticle* p : particleHandler)
-            {
-                helpers::getLineFromStringStream(dataFile.getFstream(), line);
-                line >> position.X >> position.Z >> position.Y >> velocity.X >> velocity.Z
-                     >> velocity.Y >> radius
-                     >> dummy;
-                p->setPosition(position);
-                p->setVelocity(velocity);
-                p->setOrientation({1, 0, 0, 0});
-                p->setAngularVelocity(Vec3D(0.0, 0.0, 0.0));
-                p->setRadius(radius);
-                //particleHandler.copyAndAddObject(p);
-            } //end read new particles
-            
-            break;
-        }
-            //This is a 2D format_
-        case 8:
-        {
-            //@TODO: Check bounds or get rid of this function
-            std::stringstream line;
-            helpers::getLineFromStringStream(dataFile.getFstream(), line);
-            line >> time_ >> min_.x() >> min_.y() >> max_.x() >> max_.y();
-            min_.z() = 0.0; //For 2d functions we define Z to be of no interest
-            max_.z() = 0.0;
-            
-            Mdouble radius, psi;
-            Vec3D position, velocity, angularVelocity;
-            for (BaseParticle* p : particleHandler)
-            {
-                helpers::getLineFromStringStream(dataFile.getFstream(), line);
-                line >> position.X >> position.Y >> velocity.X >> velocity.Y >> radius >> psi
-                     >> angularVelocity.Z
-                     >> dummy;
-                Quaternion q;
-                q.setAngleZ(psi);
-                p->setPosition(position);
-                p->setVelocity(velocity);
-                p->setOrientation(q);
-                p->setAngularVelocity(-angularVelocity);
-                p->setRadius(radius);
-                //particleHandler.copyAndAddObject(p);
-            } //end for all particles
-            break;
-        }
-            //This is a 3D format_
-        case 14:
-        {
-            //@TODO: Check bounds or get rid of this function
-            std::stringstream line;
-            helpers::getLineFromStringStream(dataFile.getFstream(), line);
-            line >> time_ >> min_.x() >> min_.y() >> min_.z() >> max_.x() >> max_.y() >> max_.z();
-            Mdouble radius;
-            Vec3D position, velocity, angle, angularVelocity;
-            for (BaseParticle* p : particleHandler)
-            {
-                helpers::getLineFromStringStream(dataFile.getFstream(), line);
-                line >> position >> velocity >> radius >> angle >> angularVelocity >> indSpecies;
-#ifdef MERCURY_USE_MPI
-                //This is required for the CG tool. When reading the data file it is neseccary to know if a particle is an MPIParticle or not
 
-                bool isMPIParticle = false;
-                bool isPeriodicGhostParticle = false;
-                if (NUMBER_OF_PROCESSORS > 1)
-                {
-                    dataFile.getFstream() >> isMPIParticle >> isPeriodicGhostParticle; 
-                }
-#endif
-                Quaternion q;
-                q.setEuler(angle);
-                p->setPosition(position);
-                p->setVelocity(velocity);
-                p->setOrientation(q);
-                p->setAngularVelocity(angularVelocity);
-                p->setRadius(radius);
-                if (readSpeciesFromDataFile_) p->setSpecies(speciesHandler.getObject(indSpecies));
-#ifdef MERCURY_USE_MPI
-                if (NUMBER_OF_PROCESSORS)
-                {
-                    p->setMPIParticle(isMPIParticle);
-                    p->setPeriodicGhostParticle(isPeriodicGhostParticle);
-                }
-#endif
-                //particleHandler.copyAndAddObject(p);} //end read into existing particles logger(INFO, "read % particles", particleHandler.getNumberOfObjects());
-            }
-            break;
-        }
-            //This is a 3D format_
-        case 15:
-        {
-            
-            std::stringstream line;
+//    //create particles if N is not fixed
+//    if (particleHandler.getSize() != N)
+//    {
+//        if (particleHandler.getSize() == 0)
+//        {
+//            SphericalParticle p;
+//            p.setSpecies(speciesHandler.getObject(0));
+//            particleHandler.copyAndAddObject(p);
+//            /**
+//             * A data file only contains radius, position and velocity
+//             * (and species); so the remaining properties (Is it a fixed
+//             * particle? Is it a (spherical) BaseParticle?) are kept
+//             * constant throughout the simulation. But, if the number of
+//             * particles changes, the reading algorithm needs to decide
+//             * what to do, so it assumes the particle is a non-fixed BaseParticle.
+//             */
+//            logger(WARN, "readNextDataFile: the data file contains more "
+//                         "particles than are currently in the particleHandler. "
+//                         "Newly created particles will be non-fixed spherical particles.");
+//            if (!readSpeciesFromDataFile_)
+//                logger(WARN, "Note: new particles are assumed to be of species zero. "
+//                             "To read species information from the data file, "
+//                             "set readSpeciesFromDataFile to true");
+//
+//        }
+//        if (particleHandler.getSize() > N)
+//        {
+//            while (particleHandler.getSize() != N)
+//            {
+//                particleHandler.removeLastObject();
+//                //std::cout << "S" << particleHandler.getSize() << std::endl;
+//            }
+//        }
+//        else
+//        {
+//            while (particleHandler.getSize() != N)
+//            {
+//                particleHandler.copyAndAddObject(particleHandler.getLastObject());
+//                particleHandler.getLastObject()->unfix();
+//                //std::cout << particleHandler.getSize() << N << std::endl;
+//            }
+//        }
+//    }
+    BaseParticle* p;
+    if (particleHandler.getSize() == 0) {
+        logger.assert_always(speciesHandler.getSize()>0,"readData: species needs to be set first");
+        p = new SphericalParticle(speciesHandler.getObject(0));
+    } else {
+        p = particleHandler.getObject(0)->copy();
+    }
+    
+    //empty the particle handler
+    particleHandler.clear();
+    particleHandler.setStorageCapacity(N);
+    
+    //now fill it again with the read-in particles
+    std::stringstream line;
+    helpers::getLineFromStringStream(dataFile.getFstream(), line);
+    Mdouble radius;
+    Vec3D position, velocity, angle, angularVelocity;
+    size_t indSpecies;
+    //read all other data available for the time step
+    if (format==7) {
+        line >> time_ >> min_.x() >> min_.y() >> min_.z() >> max_.x() >> max_.y() >> max_.z();
+        for (size_t i = 0; i < N; ++i) {
             helpers::getLineFromStringStream(dataFile.getFstream(), line);
-            line >> time_ >> min_.x() >> min_.y() >> min_.z() >> max_.z() >> max_.y() >> max_.z();
-            Mdouble radius;
-            Vec3D position, velocity, angle, angularVelocity;
-            for (BaseParticle* p : particleHandler)
-            {
-                helpers::getLineFromStringStream(dataFile.getFstream(), line);
-                line >> position >> velocity >> radius >> angle >> angularVelocity >> dummy >> dummy;
-                Quaternion q;
-                q.setEuler(angle);
-                p->setPosition(position);
-                p->setVelocity(velocity);
-                p->setOrientation(q);
-                p->setAngularVelocity(angularVelocity);
-                p->setRadius(radius);                //particleHandler.copyAndAddObject(p);
-            } //end for all particles
-            break;
+            line >> position.X >> position.Z >> position.Y >> velocity.X >> velocity.Z
+                 >> velocity.Y >> radius
+                 >> indSpecies;
+            p->setPosition(position);
+            p->setVelocity(velocity);
+            p->setOrientation({1, 0, 0, 0});
+            p->setAngularVelocity({0.0, 0.0, 0.0});
+            p->setRadius(radius);
+            if (readSpeciesFromDataFile_)
+                p->setSpecies(speciesHandler.getObject(indSpecies));
+            else if (i < nHistory)
+                p->setSpecies(species[i]);
+            if (i < nHistory && fix[i])
+                p->fixParticle();
+            particleHandler.copyAndAddObject(*p);
         }
-    } //end switch statement
+    } else if (format==8) {
+        line >> time_ >> min_.x() >> min_.y() >> max_.x() >> max_.y();
+        min_.z() = 0.0; max_.z() = 0.0;//For 2d functions we define Z to be of no interest
+        for (size_t i = 0; i < N; ++i) {
+            helpers::getLineFromStringStream(dataFile.getFstream(), line);
+            line >> position.X >> position.Y >> velocity.X >> velocity.Y >> radius >> angle.Z >> angularVelocity.Z >> indSpecies;
+            Quaternion q;
+            q.setAngleZ(angle.Z);
+            p->setPosition(position);
+            p->setVelocity(velocity);
+            p->setOrientation(q);
+            p->setAngularVelocity(-angularVelocity);
+            p->setRadius(radius);
+            if (readSpeciesFromDataFile_) p->setSpecies(speciesHandler.getObject(indSpecies));
+            else if (i < nHistory) p->setSpecies(species[i]);
+            if (i < nHistory && fix[i]) p->fixParticle();
+            particleHandler.copyAndAddObject(*p);
+        } //end for all particles
+    } else if (format==14) {
+        //This is a 3D format_
+        //@TODO: Check bounds or get rid of this function
+        line >> time_ >> min_.x() >> min_.y() >> min_.z() >> max_.x() >> max_.y() >> max_.z();
+        for (size_t i = 0; i < N; ++i) {
+            helpers::getLineFromStringStream(dataFile.getFstream(), line);
+            line >> position >> velocity >> radius >> angle >> angularVelocity >> indSpecies;
+#ifdef MERCURY_USE_MPI
+            //This is required for the CG tool. When reading the data file it is neseccary to know if a particle is an MPIParticle or not
+            bool isMPIParticle = false;
+            bool isPeriodicGhostParticle = false;
+            if (NUMBER_OF_PROCESSORS > 1)
+            {
+                ///\todo TW should be checked it doesn't break marnix' code
+                line >> isMPIParticle >> isPeriodicGhostParticle;
+            }
+#endif
+            p->setPosition(position);
+            p->setVelocity(velocity);
+            p->setOrientationViaEuler(angle);
+            p->setAngularVelocity(angularVelocity);
+            p->setRadius(radius);
+            if (readSpeciesFromDataFile_)
+                p->setSpecies(speciesHandler.getObject(indSpecies));
+            else if (i < nHistory)
+                p->setSpecies(species[i]);
+            if (i < nHistory && fix[i])
+                p->fixParticle();
+#ifdef MERCURY_USE_MPI
+            if (NUMBER_OF_PROCESSORS)
+            {
+                p->setMPIParticle(isMPIParticle);
+                p->setPeriodicGhostParticle(isPeriodicGhostParticle);
+            }
+#endif
+            particleHandler.copyAndAddObject(*p);
+        } //end read into existing particles logger(INFO, "read % particles", particleHandler.getNumberOfObjects());
+    } else if (format==15) {
+        line >> time_ >> min_.x() >> min_.y() >> min_.z() >> max_.z() >> max_.y() >> max_.z();
+        for (size_t i = 0; i < N; ++i) {
+            helpers::getLineFromStringStream(dataFile.getFstream(), line);
+            line >> position >> velocity >> radius >> angle >> angularVelocity >> indSpecies >> indSpecies;
+            Quaternion q;
+            q.setEuler(angle);
+            p->setPosition(position);
+            p->setVelocity(velocity);
+            p->setOrientation(q);
+            p->setAngularVelocity(angularVelocity);
+            p->setRadius(radius);
+            if (readSpeciesFromDataFile_) p->setSpecies(speciesHandler.getObject(indSpecies));
+            else if (i < nHistory) p->setSpecies(species[i]);
+            if (i < nHistory && fix[i]) p->fixParticle();
+            particleHandler.copyAndAddObject(*p);
+        } //end for all particles
+    } //end if format
+    
     particleHandler.computeAllMasses();
     return true;
 }
@@ -2869,7 +2862,7 @@ int DPMBase::readRestartFile(std::string fileName)
 
 #ifdef MERCURY_USE_MPI
     //Correct for the processor number
-    if (NUMBER_OF_PROCESSORS > 1)
+    if (NUMBER_OF_PROCESSORS > 1 && !helpers::fileExists(fileName))
     {
         //Modify file name
         const unsigned int length = fileName.length();
@@ -3295,17 +3288,32 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
         os << " xBallsArguments " << getXBallsAdditionalArguments();
     os << '\n';
     //writes all species (including mixed species) to an output stream
+    
     speciesHandler.write(os);
-    //outputs the number of walls/boundaries  in the system
-    os << "Walls " << wallHandler.getNumberOfObjects() << '\n';
-    for (BaseWall* w : wallHandler)
-        os << (*w) << '\n';
-    os << "Boundaries " << boundaryHandler.getNumberOfObjects() << '\n';
-    for (BaseBoundary* b : boundaryHandler)
-        os << (*b) << '\n';
+    
+    //outputs the number of walls in the system
+    os << "Walls " << wallHandler.getNumberOfObjects() << std::endl;
+    if (writeAllParticles || wallHandler.getSize() < 9) {
+        for (BaseWall* w : wallHandler)
+            os << (*w) << std::endl;
+    } else {
+        for (int i=0; i<2; ++i)
+            os << *wallHandler.getObject(i) << std::endl;
+        os << "...\n";
+    }
+    
+    //outputs the number of boundaries in the system
+    os << "Boundaries " << boundaryHandler.getNumberOfObjects() << std::endl;
+    if (writeAllParticles || boundaryHandler.getSize() < 9) {
+        for (BaseBoundary* b : boundaryHandler)
+            os << (*b) << std::endl;
+    } else {
+        for (int i=0; i<2; ++i)
+            os << *boundaryHandler.getObject(i) << std::endl;
+        os << "...\n";
+    }
 
     int nToWrite = 4; // \todo JMFT: Don't hardcode this here, but put it in the argument
-
 
     if (writeAllParticles || particleHandler.getSize() < nToWrite)
     {
@@ -3473,8 +3481,8 @@ void DPMBase::read(std::istream& is)
             }
             else
             {
-                logger(INFO,"Reading a serial build file");
-                numberOfDomains_ = {1,1,1};
+                logger(INFO,"Reading a serial restart file");
+                //numberOfDomains_ = {1,1,1};
             }
 #endif
             
@@ -3716,7 +3724,9 @@ void DPMBase::decompose()
                                      numberOfDomains_[Direction::ZAXIS];
     if (NUMBER_OF_PROCESSORS != numberOfRequiredProcessors)
     {
-        logger(ERROR,"Expected % processors, but % are found", numberOfRequiredProcessors, NUMBER_OF_PROCESSORS);
+        logger(ERROR,"The domain decompositions expects % processors, but only % are requested.\n"
+                     "Either run your process using \"mpirun -np % [executable]\", "
+                     "or change the domain decomposition to e.g. setNumberOfDomains({%,1,1}).", numberOfRequiredProcessors, NUMBER_OF_PROCESSORS, numberOfRequiredProcessors, NUMBER_OF_PROCESSORS);
     }
 
     if (NUMBER_OF_PROCESSORS == 1) {return;}
@@ -3921,7 +3931,6 @@ void DPMBase::computeOneTimeStep()
     //Computes the half-time step velocity and full time step position and updates the particles accordingly
     logger(DEBUG, "about to call integrateBeforeForceComputation()");
     integrateBeforeForceComputation();
-    
     //New positions require the MPI and parallel periodic boundaries to do things
     logger(DEBUG, "about to call performGhostParticleUpdate()");
     performGhostParticleUpdate();

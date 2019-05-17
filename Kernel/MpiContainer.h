@@ -147,7 +147,7 @@ public:
      */
     void sync()
     {
-#if MERCURY_USE_MPI
+#ifdef MERCURY_USE_MPI
         MPI::Request::Waitall(pending_.size(),pending_.data());
         pending_.clear();
         communicator_.Barrier();

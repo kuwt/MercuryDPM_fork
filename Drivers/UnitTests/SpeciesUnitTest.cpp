@@ -34,8 +34,7 @@ public:
     }
     
     void setupInitialConditions() override {
-        auto species0 = new LinearViscoelasticSpecies;
-        speciesHandler.addObject(species0);
+        auto species0 = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
         species0->setDensity(6. / constants::pi);
 
         const double tc = 1e-2;

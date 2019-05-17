@@ -77,7 +77,8 @@ add_library(DPMBase STATIC
         ${Nurbs_SRC}
 
         CMakeDefinitions.cc
-        )
+
+)
 
 target_link_libraries(DPMBase LinearAlgebra)
 

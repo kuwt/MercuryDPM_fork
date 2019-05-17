@@ -276,7 +276,8 @@ public:
      *        3D or 2D data- see \ref xballs.
      */
     bool readNextDataFile(unsigned int format = 0);
-    
+    bool readNextDataFileMPI(unsigned int format = 0);
+
     /*!
      * \brief Reads the next fstat file.
      */

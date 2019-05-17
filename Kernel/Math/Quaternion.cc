@@ -457,7 +457,7 @@ Vec3D Quaternion::getEuler() const
             std::atan2(2 * (q0 * q3 + q1 * q2), 1 - 2 * (q2 * q2 + q3 * q3)));
 }
 
-void Quaternion::setEuler(Vec3D& e)
+void Quaternion::setEuler(const Vec3D& e)
 {
     Mdouble c = std::cos(0.5 * e.Y);
     Mdouble s = std::sin(0.5 * e.Y);

@@ -160,7 +160,7 @@ void PolydisperseInsertionBoundary::read(std::istream& is)
     /*
     for (int i = 0; i < generanda_.size(); i++)
     {
-        BaseParticle* particleToCopy = new BaseParticle;
+        BaseParticle* particleToCopy = new SphericalParticle;
         // BaseParticle::write writes the extra word 'BaseParticle', which will be
         // ignored by BaseParticle::read. To avoid an off-by-one error, we need to
         // get rid of this extra word first...

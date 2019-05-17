@@ -272,7 +272,7 @@ public:
      * \brief Convert Euler angles to a quaternion.
      *  See <a href="https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles">Wikipedia</a> for details.
      */
-    void setEuler(Vec3D& e);
+    void setEuler(const Vec3D& e);
     
     /*!
      * \brief Converts a quaternion to the rotation angle in the XY plane (for Mercury2D).
