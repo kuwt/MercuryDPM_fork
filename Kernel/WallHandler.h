@@ -46,12 +46,12 @@ public:
      * \brief Default constructor, it creates an empty WallHandler.
      */
     WallHandler();
-    
+
     /*!
      * \brief Constructor that copies a pointer to the DPMBase and all BaseWall in the given WallHandler.
      */
     WallHandler(const WallHandler& BH);
-    
+
     /*!
      * \brief Assignment operator that copies the pointer to the DPMBase and all BaseWall in the given WallHandler.
      */
@@ -61,32 +61,32 @@ public:
      * \brief Destructor, it destructs the WallHandler and all BaseWall it contains.
      */
     ~WallHandler() final;
-    
+
     /*!
      * \brief Adds a BaseWall to the WallHandler.
      */
     void addObject(BaseWall* W) final;
-    
+
     /*!
      * \brief Create a new wall, with the type given as a string (required for restarting).
      */
     static BaseWall* createObject(const std::string& type);
-    
+
     /*!
      * \brief Create a new wall, based on the information provided in a restart file.
      */
     BaseWall* readAndCreateObject(std::istream& is);
-    
+
     /*!
      * \brief Create a new wall in the WallHandler, based on the information provided in a restart file.
      */
     void readAndAddObject(std::istream& is) final;
-    
+
     /*!
      * \brief Returns the name of the handler, namely the string "WallHandler".
      */
     std::string getName() const final;
-    
+
     /**
      * \brief Reads triangulated walls from vtk or stl files, and converts them into a set of TriangleWalls
      */
@@ -94,17 +94,17 @@ public:
     unsigned readTriangleWall(std::string filename, ParticleSpecies* species, Mdouble scaleFactor = 1, Vec3D centerOfRotation = {0,0,0}, Vec3D velocity = {0,0,0}, Vec3D angularVelocity = {0,0,0});
 
 private:
-    
+
     /*!
      * \brief Create a new wall, based on the information from old-style restart data.
      */
     BaseWall* readAndCreateOldObject(std::istream& is);
-    
+
     /*!
      * \brief Writes a bounding box around the domain into a vtk file.
      */
     void writeVTKBoundingBox() const;
-    
+
 };
 
 #endif

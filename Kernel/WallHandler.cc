@@ -445,6 +445,6 @@ unsigned WallHandler::readTriangleWall(std::string filename, ParticleSpecies* sp
         logger(ERROR, "File type of % must be vtk or stl");
 
     }
-    
+
     return groupId;
 }
