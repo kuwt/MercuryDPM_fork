@@ -184,7 +184,7 @@ const std::string File::getFullName(unsigned counter) const
     lastName << name_;
     if (getFileType() == FileType::MULTIPLE_FILES)
     {
-        //lastName << "." << counter;
+        lastName << "." << counter;
     }
     else if (getFileType() == FileType::MULTIPLE_FILES_PADDED)
     {
