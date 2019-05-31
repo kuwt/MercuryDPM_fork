@@ -183,7 +183,7 @@ void ConstantMassFlowMaserBoundary::createPeriodicParticle(BaseParticle* p, Part
     if (isMaserParticle(p))
     {
         // check if particle is near the boundaries of the maser domain
-        if (getDistance(p) < p->getMaxInteractionRadius() + pH.getLargestParticleLocal()->getMaxInteractionRadius())
+        if (getDistance(p) < p->getInteractionRadius() + pH.getLargestParticleLocal()->getInteractionRadius())
         {
             BaseParticle* pGhost = createGhostCopy(p);
             
@@ -256,7 +256,7 @@ bool ConstantMassFlowMaserBoundary::checkBoundaryAfterParticleMoved(BaseParticle
         // Checks if the particle is closest to the right boundary.
         // If so, and if the Maser is turned on, then create a 'real'
         // equivalent and move it over to the outflow domain
-        if (isClosestToRightBoundary(p) && maserIsActivated_)
+        if (isClosestToRightBoundary(p) && isCopying())
         {
             BaseParticle* pCopy = p->copy();
             pCopy->setSpecies(speciesConversionMaserToNormal_.find(p->getSpecies())->second);
@@ -353,8 +353,11 @@ void ConstantMassFlowMaserBoundary::addParticleToMaser(BaseParticle* p)
 void ConstantMassFlowMaserBoundary::removeParticleFromMaser(BaseParticle* p)
 {
     auto conversion = speciesConversionMaserToNormal_.find(p->getSpecies());
-    p->setSpecies(conversion->second);
-    p->move(normal_ * gapSize_);
+    if (conversion != speciesConversionMaserToNormal_.end())
+    {
+        p->setSpecies(conversion->second);
+        p->move(normal_ * gapSize_);
+    }
 }
 
 /*!
@@ -415,6 +418,10 @@ void ConstantMassFlowMaserBoundary::activateMaser()
         distanceLeft_ -= gapSize_;
         distanceRight_ -= gapSize_;
         maserIsActivated_ = true;
+
+        turnOnCopying();
+
+        logger(INFO, "The Maser has been activated, and is now copying particles.");
     }
     else
     {
@@ -438,12 +445,39 @@ void ConstantMassFlowMaserBoundary::closeMaser()
         distanceLeft_ += gapSize_;
         distanceRight_ += gapSize_;
         maserIsActivated_ = false;
-        logger(INFO, "The Maser is no longer copying particles.");
+
+        turnOffCopying();
+
+        logger(INFO, "The Maser has been deactivated.");
     }
     else
     {
         logger(WARN, "Cannot close the maser if it is not active");
     }
+}
+
+bool ConstantMassFlowMaserBoundary::isActivated() const
+{
+    return maserIsActivated_;
+}
+
+void ConstantMassFlowMaserBoundary::turnOnCopying() 
+{
+    maserIsCopying_ = true;
+}
+
+void ConstantMassFlowMaserBoundary::turnOffCopying()
+{
+    maserIsCopying_ = false;
+}
+
+
+bool ConstantMassFlowMaserBoundary::isCopying() const
+{
+    if (!isActivated())
+        logger(WARN, "The Maser is closed, so isCopying() is irrelevant.");
+
+    return maserIsCopying_;
 }
 
 Mdouble ConstantMassFlowMaserBoundary::getDistanceLeft() const

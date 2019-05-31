@@ -51,11 +51,24 @@ class ParticleSpecies;
  * enter the gap between the periodic domain and the outflow domain, it gets
  * removed.
  *
- * \todo Add functionality which allows for opening the maser boundary after a certain time, being a normal periodic
- *       boundary until then
- * \todo Consider writing a destructor that closes the gap again
- * \todo Consider splitting it in 2 DPMBase instances, one for the periodic domain and one for the outflow domain
- * \todo Consider re-using the PeriodicBoundary by adding it as a data member
+ * There are two distinct properties of the state of the Maser. `Activated' or
+ * `closed' refer to whether the particles within the Maser have been set to the
+ * Maser species and whether they have been moved by the gapSize. Particles will
+ * be affected by the Maser (i.e. moved periodically) iff the Maser is
+ * activated.  On the other hand, `copying' refers to whether new particles are
+ * being produced by the Maser. Thus, a Maser that is activated but not copying
+ * behaves just as a periodic boundary.
+ *
+ * By default, activateMaser() also turns on copying. And when a Maser is
+ * closed, the value of isCopying() is irrelevant, although it is set to false
+ * for housekeeping.
+ *
+ * \todo Add functionality which allows for opening the maser boundary after a
+ * certain time, being a normal periodic boundary until then \todo Consider
+ * writing a destructor that closes the gap again \todo Consider splitting it in
+ * 2 DPMBase instances, one for the periodic domain and one for the outflow
+ * domain \todo Consider re-using the PeriodicBoundary by adding it as a data
+ * member
  *
  * The difference between SubcriticalMaserBoundary (formerly known as
  * MaserBoundaryOldStyle) and ConstantMassFlowMaserBoundary (formerly known
@@ -68,109 +81,117 @@ class ParticleSpecies;
  * flows, as the ConstantMassFlowMaserBoundary might generate "pulse-waves" in
  * those cases. 
  *
- * For a compact overview of the behaviour of ConstantMassFlowMaserBoundary, please
- * look at the output of ConstantMassFlowMaserSelfTest.
+ * For a compact overview of the behaviour of ConstantMassFlowMaserBoundary,
+ * please look at the output of ConstantMassFlowMaserSelfTest.
  *
- * \todo Which Maser is it used in Denissen2019?
- * To cite the Maser:
- *   I. F. C. Denissen, T. Weinhart, A. Te Voortwis, S. Luding, J. M. N. T. Gray
- *   and A. R. Thornton, Bulbous head formation in bidisperse shallow granular
- *   flow over an inclined plane. Journal of Fluid Mechanics, 866:263--297,
- *   mar 2019.
+ * \todo Which Maser is it used in Denissen2019?  To cite the Maser: I. F. C.
+ * Denissen, T. Weinhart, A. Te Voortwis, S. Luding, J. M. N. T. Gray and A. R.
+ * Thornton, Bulbous head formation in bidisperse shallow granular flow over an
+ * inclined plane. Journal of Fluid Mechanics, 866:263--297, mar 2019.
  */
-class ConstantMassFlowMaserBoundary : public BaseBoundary
-{
-public:
-    /*!
-     * \brief MaserBoundary constructor
+class ConstantMassFlowMaserBoundary : public BaseBoundary { public:
+    /*!  \brief MaserBoundary constructor
      */
     ConstantMassFlowMaserBoundary();
     
-    /*!
-     * \brief Maserboundary constructor that takes a periodic boundary, and converts it to a maser boundary
+    /*!  \brief Maserboundary constructor that takes a periodic boundary, and
+     * converts it to a maser boundary
      */
-    explicit ConstantMassFlowMaserBoundary(const PeriodicBoundary& periodicBoundary);
+    explicit ConstantMassFlowMaserBoundary(const PeriodicBoundary&
+            periodicBoundary);
     
-    /*!
-     * \brief Creates a copy of this maser on the heap.
+    /*!  \brief Creates a copy of this maser on the heap.
      */
     ConstantMassFlowMaserBoundary* copy() const override;
     
-    /*!
-     * \brief Sets all boundary properties at once and adds particles of the handler to the maser.
+    /*!  \brief Sets all boundary properties at once and adds particles of the
+     * handler to the maser.
      */
     void set(Vec3D normal, Mdouble distanceLeft, Mdouble distanceRight);
     
-    /*!
-     * \brief reads boundary properties from istream
+    /*!  \brief reads boundary properties from istream
      */
     void read(std::istream& is) override;
     
-    /*!
-     * \brief writes boundary properties to ostream
+    /*!  \brief writes boundary properties to ostream
      */
     void write(std::ostream& os) const override;
     
-    /*!
-     * \brief Returns the name of the object
+    /*!  \brief Returns the name of the object
      */
     std::string getName() const override;
     
-    /*!
-     * \brief Creates periodic particles when the particle is a maser particle
+    /*!  \brief Creates periodic particles when the particle is a maser particle
      * and is sufficiently close to one of the boundary walls.
      */
     void createPeriodicParticle(BaseParticle* p, ParticleHandler& pH) override;
     
     void createPeriodicParticles(ParticleHandler& pH) override;
     
-    /*!
-     * \brief Shifts the particle to its 'periodic' position if it is a maser particle
-     * and has crossed either of the walls. Creates a 'normal' particle at its current
-     * position if it is a maser particle which crossed the RIGHT boundary wall.
+    /*!  \brief Shifts the particle to its 'periodic' position if it is a maser
+     * particle and has crossed either of the walls. Creates a 'normal' particle
+     * at its current position if it is a maser particle which crossed the RIGHT
+     * boundary wall.
      */
     bool checkBoundaryAfterParticleMoved(BaseParticle* p, ParticleHandler& pH);
     
-    /*!
-     * \brief Evaluates what the particles have to do after they have changed position
+    /*!  \brief Evaluates what the particles have to do after they have changed
+     * position
      */
     void checkBoundaryAfterParticlesMove(ParticleHandler& pH) override;
     
-    /*!
-     * \brief Converts a 'normal' particle into a maser particle.
+    /*!  \brief Converts a 'normal' particle into a maser particle.
      */
     void addParticleToMaser(BaseParticle* p);
     
-    /*!
-     * \brief Convert a maser particle into a 'normal' particle
+    /*!  \brief Convert a maser particle into a 'normal' particle
      */
     void removeParticleFromMaser(BaseParticle* p);
     
-    /*!
-     * \brief Returns true if the particle is a Maser particle, and false otherwise.
+    /*!  \brief Returns true if the particle is a Maser particle, and false
+     * otherwise.
      */
     bool isMaserParticle(BaseParticle* p) const;
     
-    /*!
-     * \brief Returns true if the particle is a Normal particle, and false otherwise.
+    /*!  \brief Returns true if the particle is a Normal particle, and false
+     * otherwise.
      */
     bool isNormalParticle(BaseParticle* p) const;
     
-    /*!
-     * \brief Does everything that needs to be done for this boundary between setupInitialConditions and the time loop,
-     * in this case, it activates the maser.
+    /*!  \brief Does everything that needs to be done for this boundary between
+     * setupInitialConditions and the time loop, in this case, it activates the
+     * maser.
      */
     void actionsBeforeTimeLoop() override;
     
-    /*!
-     * \brief Opens the gap, and transforms particles to maser particles. Also calls turnOnCopying().
+    /*!  \brief Opens the gap, and transforms particles to maser particles. Also
+     * calls turnOnCopying().
      */
     void activateMaser();
     
-    /*!
-     * \brief Stops copying particles (and act merely as a chute)
+    /*!  \brief Stops copying particles (and act merely as a chute)
      */
     void closeMaser();
+
+    /*! 
+     * \brief Returns whether the Maser is activated or not. 
+     */
+    bool isActivated() const;
+
+    /*!
+     * \brief Start copying particles.
+     */
+    void turnOnCopying();
+
+    /*! 
+     * \brief Stop copying particles.
+     */
+    void turnOffCopying();
+
+    /*!
+     * \brief Returns whether the Maser is copying particles or not.
+     */
+    bool isCopying() const;
     
     Mdouble getDistanceLeft() const;
     
@@ -230,12 +251,15 @@ private:
     
     /*!
      * \brief distance between the right side of the periodic domain and the start of the outflow domain.
-     * \details I.e., each particle in the maser is moved -distanceToOutflowDomain_ * normal when it becomes part of the
-     *          maser, and moved distanceToOutflowDomain_ * normal when it is inserted in the outflow domain. Generally
-     *          this is 6 times the radius of the largest particle, so that the ghost particles do not touch each other:
-     *          the centre of the ghostparticle is at most 1 diameter (2 radii) away from the boundary, so a ghost
-     *          particle can extend at most 3 particle radii away from the domain. Do this on both sides, and it follows
-     *          that the gap should be at least 6 diameters wide.
+     * \details I.e., each particle in the maser is moved
+     * -distanceToOutflowDomain_ * normal when it becomes part of the maser, and
+     *  moved distanceToOutflowDomain_ * normal when it is inserted in the
+     *  outflow domain. Generally this is 6 times the radius of the largest
+     *  particle, so that the ghost particles do not touch each other: the
+     *  centre of the ghostparticle is at most 1 diameter (2 radii) away from
+     *  the boundary, so a ghost particle can extend at most 3 particle radii
+     *  away from the domain. Do this on both sides, and it follows that the gap
+     *  should be at least 6 diameters wide.
      * \todo JMFT: Do you mean 6 radii?
      */
     Mdouble gapSize_;
@@ -261,6 +285,11 @@ private:
      * \brief Flag whether or not the gap is created and particles transformed already.
      */
     bool maserIsActivated_;
+
+    /*!
+     * \brief Flag whether or not the Maser is copying particles.
+     */
+    bool maserIsCopying_;
     
 };
 
