@@ -184,7 +184,9 @@ void Polynomial<Coordinates>::computeCoefficients()
         std::cerr << "PolynomialType not known: " << polynomialType_ << std::endl;
         exit(-1);
     }
-    logger.assert(cutoff_ > 0, "Cutoff % should be positive", cutoff_);
+    if (!(cutoff_ > 0))
+        logger(ERROR, "Cutoff % should be positive", cutoff_);
+
     Coordinates::normalisePolynomialCoefficients(coefficients_, cutoff_);
     //std::cout << "X" << coefficients_[0] << " " <<  cutoff_ << std::endl; //exit(-1);
 }
