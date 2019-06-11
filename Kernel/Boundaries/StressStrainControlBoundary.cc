@@ -359,7 +359,7 @@ StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D& str
         LeesEdwardsBoundary leesEdwardsBoundary;
         leesEdwardsBoundary.setHandler(getHandler());
         leesEdwardsBoundary.set(
-                [this](Mdouble time UNUSED)
+                [*this](Mdouble time UNUSED)
                 { return integratedShift_; },
                 [](Mdouble time UNUSED)
                 { return 0; },
