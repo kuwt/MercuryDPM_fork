@@ -16,18 +16,6 @@ foreach(CPPFILE ${CPPFILES})
     target_link_libraries(${EXECNAME} MercuryBase)
 endforeach()
 
-
-#Part 2 : Make run test for each of the demo files
-##################################################
-
-file(GLOB TESTS "*demo.cpp")
-#for each demo add a test with the same name
-foreach (TEST ${TESTS})
-	get_filename_component(EXECNAME ${TEST} NAME_WE)
-	add_test(${EXECNAME} ${EXECNAME})
-endforeach()
-
-
 # JMFT: This line needs to come at the bottom, after Parts 1 and 2.
 # This is the other way round to the CMakeLists.txt file in other directories,
 # where it has to come at the top;
@@ -36,8 +24,6 @@ endforeach()
 # names end in 'demo', which need to be run _before_ outputs from them are
 # compared.
 # TODO: This naming should be changed to avoid this kludge.
-
-
 include(${CMAKE_SOURCE_DIR}/Configuration/MasterMake.cmake)
 
 
