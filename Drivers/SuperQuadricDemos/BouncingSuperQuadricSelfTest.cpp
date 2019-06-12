@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
     problem.setFileType(FileType::NO_FILE);
     problem.setMax(2,2,2);
     problem.setMin(0,0,1);
-    problem.setNumberOfDomains({1,1,2});
+    problem.setNumberOfDomains({1,1,NUMBER_OF_PROCESSORS});
     problem.test();
     return 0;
 }

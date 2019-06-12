@@ -521,12 +521,12 @@ private:
     /*!
      * \brief Container that keeps a list of MPIParticles that are being send to other domains
      */
-    std::vector<std::vector<MPISuperQuadric> > boundaryParticleDataSend_;
+    std::vector<std::vector<MPIParticle> > boundaryParticleDataSend_;
     
     /*!
      * \brief Container that keeps a list of MPIParticles that are being received by this domain
      */
-    std::vector<std::vector<MPISuperQuadric> > boundaryParticleDataReceive_;
+    std::vector<std::vector<MPIParticle> > boundaryParticleDataReceive_;
     
     /*!
      * \brief Container that keeps a list of MPIParticlePositions that are being send to other domains

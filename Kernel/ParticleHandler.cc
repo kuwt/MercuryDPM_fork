@@ -250,7 +250,7 @@ void ParticleHandler::addObject(int fromProcessor, BaseParticle* p)
     MPIContainer& communicator = MPIContainer::Instance();
 
     //The processor that contains the particle that needs to be copied needs to identify the target, and communicate this
-    MPISuperQuadric pInfo;
+    MPIParticle pInfo;
     if (communicator.getProcessorID() == fromProcessor)
     {
         pInfo = copyDataFromParticleToMPIParticle(p);
@@ -293,7 +293,7 @@ void ParticleHandler::addGhostObject(int fromProcessor, int toProcessor, BasePar
 
     //Create communication information object
     /// \todo MX: maybe implement a direct send here, which avoids the synch step later on.
-    MPISuperQuadric pInfo;
+    MPIParticle pInfo;
     int tag;
     if (communicator.getProcessorID() == fromProcessor)
     {

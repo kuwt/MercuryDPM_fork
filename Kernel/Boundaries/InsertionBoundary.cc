@@ -175,7 +175,7 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
              * that this doesn't actually add the particle to the handler). */
             if (NUMBER_OF_PROCESSORS > 1)
             {
-                MPISuperQuadric particle;
+                MPIParticle particle;
                 // 	//Every domain generates a particle (to get the species right etc)
 
                 //Send particle data from root to other processors to sync the particle properties

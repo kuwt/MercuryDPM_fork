@@ -4671,7 +4671,7 @@ void DPMBase::synchroniseParticle(BaseParticle* p, unsigned fromProcessor)
     MPIContainer& communicator = MPIContainer::Instance();
 
     //The processor that contains the particle that needs to be copied needs to identify the target, and communicate this
-    MPISuperQuadric pInfo;
+    MPIParticle pInfo;
     if (communicator.getProcessorID() == fromProcessor)
     {
         pInfo = copyDataFromParticleToMPIParticle(p);

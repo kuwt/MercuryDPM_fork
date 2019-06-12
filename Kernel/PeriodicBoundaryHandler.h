@@ -350,12 +350,12 @@ private:
     /*!
      * \brief Data container for particles that are being received from other processors
      */
-    std::vector<std::vector<MPISuperQuadric> > periodicGhostParticleReceive_;
+    std::vector<std::vector<MPIParticle> > periodicGhostParticleReceive_;
     
     /*!
      * \brief Data container for particles that are being send to other processors
      */
-    std::vector<std::vector<MPISuperQuadric> > periodicGhostParticleSend_;
+    std::vector<std::vector<MPIParticle> > periodicGhostParticleSend_;
     
     /*!
      * \brief Data container for periodic complexity that is being received from other processors

@@ -50,7 +50,7 @@ public:
     bool isMaser; //TODO 
     bool isFixed;
     
-    virtual ~MPIParticle() = default;
+    //virtual ~MPIParticle() = default;
 };
 
 class MPISuperQuadric : public MPIParticle
@@ -147,33 +147,17 @@ typedef MpiPeriodicParticleIDBase MpiPeriodicGhostParticleID;
 /*!
  * \brief Copies data from a BaseParticle to an MPIParticle class and returns this
  */
-MPISuperQuadric copyDataFromParticleToMPIParticle(BaseParticle* p);
+MPIParticle copyDataFromParticleToMPIParticle(BaseParticle* p);
 
 /*!
  * \brief Copies data from an MPIParticle class to a BaseParticle
  */
-void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, BaseParticle* p);
+void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p);
 
 /*!
  * \brief Copies data from an MPIParticle class to a BaseParticle
  */
-void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, BaseParticle* p, ParticleHandler* particleHandler);
-
-
-/*!
- * \brief Copies data from an MPIParticle class to a BaseParticle
- */
-void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, SuperQuadricParticle* p, ParticleHandler* particleHandler);
-
-/*!
- * \brief Copies data from a BaseParticle to an MPIParticle class and returns this
- */
-MPIParticleForce copyForceFromParticleToMPIParticle(BaseParticle* p);
-
-/*!
- * \brief Copies data from an MPIParticle class to a BaseParticle
- */
-void copyForceFromMPIParticleToParticle(MPIParticleForce* bP, BaseParticle* p);
+void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p, ParticleHandler* particleHandler);
 
 /*!
  * \brief Copies the position from a particle to an MPIParticlePosition class

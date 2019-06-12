@@ -44,7 +44,7 @@
  * \param[in] bP Pointer to an MPIParticle which contains data for a ghost particle
  * \param[in,out] p Pointer to BaseParticle, a ghost particle that will be added to the domain
  */
-void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, BaseParticle* p)
+void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p)
 {
     
     //Set important quantities
@@ -56,8 +56,8 @@ void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, BaseParticle* p)
     p->setOrientation(bP->orientation);
     p->setCommunicationComplexity(bP->communicationComplexity);
     
-    p->setAxes(bP->axes);
-    p->setExponents(bP->epsilon1, bP->epsilon2);
+//    p->setAxes(bP->axes);
+//    p->setExponents(bP->epsilon1, bP->epsilon2);
     
     //Set HGrid values
     p->setHGridNextObject(nullptr);
@@ -88,7 +88,7 @@ void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, BaseParticle* p)
  * \param[in] particleHandler Pointer to the ParticleHandler required for creating a new particle
  * \todo MX: Maybe renamet his function to setParticleSpecies() or something
  */
-void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, BaseParticle* p, ParticleHandler* particleHandler)
+void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p, ParticleHandler* particleHandler)
 {
     //Set the species of the particle, but before we can do that we have to set the handler
     p->setHandler(particleHandler);
@@ -99,23 +99,24 @@ void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, BaseParticle* p, Par
 }
 
 /*!
- * \brief Copies data from a SuperQuadricParticle to an MPISuperQuadric class and returns this
+ * \brief Copies data from a SuperQuadricParticle to an MPIParticle class and returns this
  * \details In order to create ghost particles on other processors, data of particles
  * have to be transmitted to other processors. Only the required data is
- * sent. The data is sent in an MPISuperQuadric data class and this function copies
+ * sent. The data is sent in an MPIParticle data class and this function copies
  * the data from a particle into that class.
  * \param[in] p Pointer to a SuperQuadricParticle particle from which data is copied
- * \return MPISuperQuadric class is returned filled with data from BaseParticle p
+ * \return MPIParticle class is returned filled with data from BaseParticle p
  */
-MPISuperQuadric copyDataFromParticleToMPIParticle(BaseParticle* p)
+MPIParticle copyDataFromParticleToMPIParticle(BaseParticle* p)
 {
-    MPISuperQuadric bP;
+    MPIParticle bP;
     
     bP.id = p->getId();
     bP.indSpecies = p->getIndSpecies();
-    bP.axes = p->getAxes();
-    bP.epsilon1 = p->getExponentEps1();
-    bP.epsilon2 = p->getExponentEps2();
+    bP.radius = p->getRadius();
+//    bP.axes = p->getAxes();
+//    bP.epsilon1 = p->getExponentEps1();
+//    bP.epsilon2 = p->getExponentEps2();
     bP.position = p->getPosition();
     bP.angularVelocity = p->getAngularVelocity();
     bP.velocity = p->getVelocity();
@@ -125,49 +126,6 @@ MPISuperQuadric copyDataFromParticleToMPIParticle(BaseParticle* p)
     bP.isMaser = p->isMaserParticle();
     bP.isFixed = p->isFixed();
     return bP;
-}
-
-
-/*!
- * \brief Copies data from an MPIParticle class to a BaseParticle and sets the particleHandler and species
- * \param[in] bP Pointer to an MPIParticle which contains data for a ghost particle
- * \param[in,out] p Pointer to BaseParticle, a ghost particle that will be added to the domain
- * \param[in] particleHandler Pointer to the ParticleHandler required for creating a new particle
- * \todo MX: Maybe renamet his function to setParticleSpecies() or something
- */
-void copyDataFromMPIParticleToParticle(MPISuperQuadric* bP, SuperQuadricParticle* p, ParticleHandler* particleHandler)
-{
-    //Set the species of the particle, but before we can do that we have to set the handler
-    p->setHandler(particleHandler);
-    //p->setIndSpecies(bP->indSpecies);
-    const ParticleSpecies* species = p->getHandler()->getDPMBase()->speciesHandler.getObject(bP->indSpecies);
-    p->setSpecies(species);
-    copyDataFromMPIParticleToParticle(bP, p);
-}
-
-/*!
- * \brief Copies data from a BaseParticle to an MPIParticle class and returns this
- * \param[in] p BaseParticle from which data is copied
- * \return MPIParticleForce data class is filled with the force data from BaseParticle
- */
-MPIParticleForce copyForceFromParticleToMPIParticle(BaseParticle* p)
-{
-    MPIParticleForce particleForce;
-    particleForce.force = p->getForce();
-    particleForce.torque = p->getTorque();
-    
-    return particleForce;
-}
-
-/*!
- * \brief Copies data from an MPIParticle class to a BaseParticle
- * \param[in] particleForce MPIDataClass containing the particle forces
- * \param[out] p BaseParticle that receives force data
- */
-void copyForceFromMPIParticleToParticle(MPIParticleForce* particleForce, BaseParticle* p)
-{
-    p->setForce(particleForce->force);
-    p->setTorque(particleForce->torque);
 }
 
 /*!
