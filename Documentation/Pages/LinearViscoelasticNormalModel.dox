@@ -1,0 +1,26 @@
+/*!
+\page LinearViscoelasticNormalModel Linear Spring Dashpot Model
+
+Linear spring dashpot model in MercuryDPM referred to as LinearViscoelasticNormalModel
+(LinearViscoelasticNormalSpecies, LinearViscoelasticInteraction).
+
+A very simple interaction law was presented by
+<a href="https://www.icevirtuallibrary.com/doi/abs/10.1680/geot.1979.29.1.47">Cundall and Strack </a>
+in 1971 for spherical particles, and remains the most commonly used law in DPM simulations.
+This is the linear spring dashpot model, which quantifies the normal force \f$ \vec{f}_{ij}^{n} = f_{ij}^{n} \vec{n}_{ij} \f$, with
+
+\f$ f_{ij}^{n} =
+\begin{cases}
+k_n \delta_{ij}^{n} + \gamma_n v_{ij}^{n} & \quad \text{if} \quad \delta_{ij}^{n} > 0 \\
+0 & \quad \text{else}
+\end{cases}
+\f$
+
+\code void LinearViscoelasticInteraction::computeNormalForce() \endcode
+
+with stiffness (or spring constant) \f$ k_n > 0 \f$ and damping coefficient \f$ \gamma_n \geq 0 \f$.
+
+The model parameters (e.g. normal stiffness, normal coefficient of restitution, etc) are set using LinearViscoelasticNormalSpecies member functions
+
+
+*/

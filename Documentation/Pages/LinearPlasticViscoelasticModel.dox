@@ -1,0 +1,52 @@
+/*!
+\page LinearPlasticViscoelasticNormalModel Elastoplastic Contact Forces
+
+Elastoplastic contact forces (including Dry cohesion and plasticity i.e. permanent deformation) in MercuryDPM referred to as LinearPlasticViscoelasticNormal
+(LinearPlasticViscoelasticNormalSpecies, LinearPlasticViscoelasticInteraction).
+
+
+\section Plasticity
+
+Plasticity models the permanent deformation of contacts due to compression. If the compression at a contact exceeds a certain yield strength, the
+contact area is plastically deformed. To implement this, we need to keep track of the deformation \f$ \delta_0 \f$ between the two contacts
+which depends on the highest state of compression a contact has been subjected to; thus plasticity is a hysteretic force.
+During unloading, the contact stiffness is lowered, reaching zero force when the overlap \f$ \delta \leq \delta_0 \f$
+To keep the contact models simple, we keep track of the plastic
+deformation during contact only; as soon as the contact ends, the particle is assumed to be spherical again.
+The normal force is written as:
+
+\f$
+f_{ij}^{n} = \gamma_{n} \nu_{ij}^{n} +
+\begin{cases}
+k_1 \delta_{ij}^{n} & \quad \text{if} \quad k_2 (\delta_{ij}^{n} - \delta^0) \geq k_1 \delta_{ij}^{n} \quad \text{(loading)}\\
+k_2 (\delta_{ij}^{n} - \delta^0) & \quad \text{if} \quad 0 \leq k_2 (\delta_{ij}^{n} - \delta^0) \leq k_1 \delta_{ij}^{n} \quad \text{(unloading)}\\
+0 & \quad \text{if} \quad k_2 (\delta_{ij}^{n} - \delta^0) < 0 \\
+\end{cases}
+\f$
+
+\section Dry cohesion
+
+For elasto-plastic contact forces, the dry cohesion increases with increasing plastic deformation,
+as the contact area gets larger. For the linear elasto-plastic model, cohesive forces can be added straightforwardly to the normal force itself.
+The force model is implemented by replacing the elasto-plastic normal force as follows:
+
+\f$
+f_{ij}^{n} = \gamma_{n} \nu_{ij}^{n} +
+\begin{cases}
+k_1 \delta_{ij}^{n} & \quad \text{if} \quad k_2 (\delta_{ij}^{n} - \delta^0) \geq k_1 \delta_{ij}^{n} \quad \text{(loading)}\\
+k_2 (\delta_{ij}^{n} - \delta^0) & \quad \text{if} \quad 0 \leq k_2 (\delta_{ij}^{n} - \delta^0) \leq k_1 \delta_{ij}^{n} \quad \text{(unloading, in contact)}\\
+- k_c \delta_{ij}^{n} & \quad \text{if} \quad 0 \leq k_2 (\delta_{ij}^{n} - \delta^0) \leq k_1 \delta_{ij}^{n} \quad \text{(unloading, contacts separated)}\\
+0 & \quad \text{if} \quad k_2 (\delta_{ij}^{n} - \delta^0) < 0 \quad \text{(fully separated)} \\
+\end{cases}
+\f$
+
+\code void LinearPlasticViscoelasticInteraction::computeNormalForce() \endcode
+
+The model parameters (e.g. normal loading stiffness, normal coefficient of restitution, etc) are set using LinearPlasticViscoelasticNormalSpecies member functions
+
+Reference: \n
+The implementation is based on the model by
+<a href="https://link.springer.com/article/10.1007/s10035-008-0099-x">S. Luding, Cohesive, frictional powders: Contact models for tension</a>
+
+
+*/

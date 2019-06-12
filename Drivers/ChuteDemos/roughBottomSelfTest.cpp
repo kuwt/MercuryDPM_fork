@@ -23,15 +23,19 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+//! [RB:headers]
 #include <sstream>
 #include <Species/LinearViscoelasticSpecies.h>
 #include "Chute.h"
+//! [RB:headers]
 
 /*!
  * This is a demo on how to implement a chute flow with a rough bottom. Note
  * that this is the same code as roughBottomSelfTest, but with a bigger
  * chute, a larger gravity and a longer simulation time.
  */
+
+//! [RB:main]
 int main()
 {
     //Print description
@@ -68,3 +72,4 @@ int main()
     //Solve the system
     roughBottomSelfTest.solve();
 }
+//! [RB:main]

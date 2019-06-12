@@ -23,10 +23,13 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+//! [Lees:headers]
 #include "Mercury2D.h"
 #include "Boundaries/LeesEdwardsBoundary.h"
 #include "Species/LinearViscoelasticSlidingFrictionSpecies.h"
+//! [Lees:headers]
 
+//! [Lees:class]
 class LeesEdwards : public Mercury2D
 {
 public:
@@ -87,7 +90,9 @@ public:
     }
 
 };
+//! [Lees:class]
 
+//! [Lees:main]
 int main(int argc UNUSED, char* argv[] UNUSED)
 {
     //instantiate the class
@@ -124,3 +129,4 @@ int main(int argc UNUSED, char* argv[] UNUSED)
      "ylabel('v_x');\n"
      "axis equal");
 }
+//! [Lees:main]

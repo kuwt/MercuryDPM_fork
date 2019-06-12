@@ -1,0 +1,26 @@
+/*!
+\page ReversibleAdhesionModel Dry Cohesion for Elastic Contact Forces (Linear Reversible Cohesive Force)
+
+Dry cohesion for elastic contact forces (linear reversible cohesive force) in MercuryDPM referred to as ReversibleAdhesive
+(ReversibleAdhesiveSpecies, ReversibleAdhesiveInteraction).
+
+Dry cohesion models the attractive forces due to van-der-Walls interactions between particles in
+contact or close proximity. They decrease rapidly with distance, so they are very short-ranged.
+For elastic contact forces, the dry cohesion is elastic as well. For simplicity, the elastic adhesive
+(i.e. acting opposite to the normal direction) force can be implemented as a linear force, as in Figure (add)
+
+\f$
+f_{ij}^{nc} =
+\begin{cases}
+-f_{max}^{nc} & \quad \text{if} \quad \delta{ij}^{n} > 0 \\
+-f_{max}^{nc} - k_c \delta_{ij}^{n} & \quad \text{if} \quad -f_{ij}^{nc, max}/k_c\leq \delta_{ij}^{n} < 0 \\
+0 & \quad \text{else}
+\end{cases}
+\f$
+
+\code void ReversibleAdhesiveInteraction::computeAdhesionForce() \endcode
+
+The model parameters are set using ReversibleAdhesiveSpecies member functions.
+
+
+*/

@@ -237,7 +237,8 @@ void SlidingFrictionSpecies::setCollisionTimeAndNormalAndTangentialRestitutionCo
         }
     }
     
-    //from Deen...Kuipers2006, eq. 43 and 30
+    // from: N. G. Deen et. al. https://doi.org/10.1016/j.ces.2006.08.014
+    // eq. 43 and 30
     setSlidingStiffness(2.0 / 7.0 * stiffness * (mathsFunc::square(constants::pi) + mathsFunc::square(log(beta))) /
                         (mathsFunc::square(constants::pi) + mathsFunc::square(log(eps))));
     if (beta != 0.0)
@@ -262,7 +263,8 @@ SlidingFrictionSpecies::setCollisionTimeAndNormalAndTangentialRestitutionCoeffic
         exit(-1);
     }
     species->setCollisionTimeAndRestitutionCoefficient(tc, eps, mass);
-    //from BeckerSchwagerPoeschel2008, eq. 56
+    // from: V. Becker et. al. https://doi.org/10.1103/PhysRevE.77.011304
+    // eq. 56
     setSlidingStiffness(2.0 / 7.0 * species->getStiffness() * mathsFunc::square(acos(-beta) / constants::pi));
     setSlidingDissipation(0);
 }

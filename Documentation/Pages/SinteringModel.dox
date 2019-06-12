@@ -1,0 +1,18 @@
+/*!
+\page SinteringModel Sintering (time- and temperature- dependent)
+
+Sintering model in MercuryDPM referred to as SinterNormal (SinterNormalSpecies, SinterInteraction).
+
+Force computation:
+
+\code void SinterInteraction::computeNormalForce() \endcode
+
+
+The model parameters are set using SinterNormalSpecies member functions
+
+Reference:
+\n
+<a href="https://www.epj-conferences.org/articles/epjconf/abs/2017/09/epjconf162460/epjconf162460.html"> R. Fuchs et. al., Initial stage sintering of polymer particles – Experiments and modelling of size-, temperature- and time-dependent contacts </a>
+
+
+*/

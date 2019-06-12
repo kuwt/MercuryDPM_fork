@@ -41,34 +41,9 @@
  */
 class CoilSelfTest : public Mercury3D
 {
-
 private:
-
     void setupInitialConditions() override
     {
-        //! [CST:initial]
-        // gravity, particle radius
-        setGravity(Vec3D(0.0, -9.8, 0.0));
-        const double particleRadius = 0.2;
-        
-        // set problem geometry
-        setXMax(1.0);
-        setYMax(5.0);
-        setZMax(2.0);
-        setXMin(-1.0);
-        setYMin(-1.0);
-        //! [CST:initial]
-        
-        //! [CST:species]
-        LinearViscoelasticSpecies species;
-        species.setDensity(1000);
-        const double tc = 0.05;
-        const double restitutionCoefficient = 0.8;
-        const double particleMass = pow(particleRadius, 3) * constants::pi * 4.0 / 3.0 * species.getDensity();
-        species.setCollisionTimeAndRestitutionCoefficient(tc, restitutionCoefficient, particleMass);
-        speciesHandler.copyAndAddObject(species);
-        //! [CST:species]
-        
         //! [CST:walls]
         InfiniteWall w;
         w.setSpecies(speciesHandler.getObject(0));
@@ -98,7 +73,7 @@ private:
         rightWall.set(Vec3D(0, 0, 1), getZMax(), 1.0);
         wallHandler.copyAndAddObject(rightWall);
         //! [CST:walls]
-        
+
         //! [CST:coil]
         // creation of the coil and setting of its properties
         Coil coil;
@@ -108,7 +83,7 @@ private:
         coil.set(Vec3D(0, 0, 0), 1.0, 1.0 - particleRadius, 2.0, -1.0, 0.5 * particleRadius);
         auto pCoil = wallHandler.copyAndAddObject(coil);
         //! [CST:coil]
-        
+
         //! [CST:particle]
         particleHandler.clear();
         SphericalParticle p0;
@@ -116,8 +91,6 @@ private:
         p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
         p0.setRadius(particleRadius);
         //! [CST:particle]
-
-        ///\todo What to do with the next block?
         /*
         //Single test case
         double distance;
@@ -128,18 +101,17 @@ private:
                 else
                         std::cout<<"No collision, distance screw="<<distance<<std::endl;
          */
-        
+
         //! [CST:placeparticles]
-        // Nx*Ny*Nz particles are created and placed on evenly spaced positions in 
-        // the domain [xMin_,xMax_]*[yMin_,yMax_]*[zMin_,zMax_] (unless their position 
+        // Nx*Ny*Nz particles are created and placed on evenly spaced positions in
+        // the domain [xMin_,xMax_]*[yMin_,yMax_]*[zMin_,zMax_] (unless their position
         // is already occupied by the coil).
         const unsigned int Nx = static_cast<unsigned int> (std::floor((getXMax() - getXMin()) / (2.1 * particleRadius)));
         const unsigned int Ny = static_cast<unsigned int> (std::floor((getYMax() - getYMin()) / (2.1 * particleRadius)));
         const unsigned int Nz = static_cast<unsigned int> (std::floor((getZMax() - getZMin()) / (2.1 * particleRadius)));
         Mdouble distance;
         Vec3D normal;
-        
-        // Place particles
+
         for (unsigned int i = 0; i < Nx; i++)
         {
             for (unsigned int j = 0; j < Ny; j++)
@@ -162,7 +134,6 @@ private:
         }
         //! [CST:placeparticles]
     }
-    
     //! [CST:beforetime]
     ///After t = 1, the coil turns every time step.
     void actionsBeforeTimeStep() override
@@ -171,13 +142,14 @@ private:
         {
             coil->move_time(getTimeStep());
         }
-
     }
     //! [CST:beforetime]
+
 public:
     ///\todo why is the coil public?
     // ! [CST:datamembers]
     Coil* coil;
+    Mdouble particleRadius;
     //! [CST:datamembers]
 };
 //! [CST:class]
@@ -188,18 +160,40 @@ int main(int argc UNUSED, char* argv[] UNUSED)
     
     // create CoilSelfTest object
     CoilSelfTest problem;
-    
+
     // set some basic problem properties
+    //! [CSTproblemSetup]
     problem.setName("CoilSelfTest");
     problem.setSystemDimensions(3);
-    problem.setTimeStep(0.02 * 0.05);
+    problem.setGravity(Vec3D(0.0, -9.8, 0.0));
+
+    // set problem geometry
+    problem.setXMax(1.0);
+    problem.setYMax(5.0);
+    problem.setZMax(2.0);
+    problem.setXMin(-1.0);
+    problem.setYMin(-1.0);
     problem.setTimeMax(0.5);
+    //! [CSTproblemSetup]
+    problem.particleRadius = 0.2;
+
+    //! [CST:species]
+    LinearViscoelasticSpecies species;
+    species.setDensity(1000);
+    Mdouble tc = 0.05;
+    Mdouble restitutionCoefficient = 0.8;
+
+    Mdouble particleMass = pow(problem.particleRadius, 3) * constants::pi * 4.0 / 3.0 * species.getDensity();
+    species.setCollisionTimeAndRestitutionCoefficient(tc, restitutionCoefficient, particleMass);
+    problem.speciesHandler.copyAndAddObject(species);
+    //! [CST:species]
+
+    //! [CST:solve]
+    problem.setTimeStep(0.02 * 0.05);
     problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(1000, problem.getTimeMax(),
                                                                                      problem.getTimeStep()));
-
-    // actually solving the problem
     problem.solve();
+    //! [CST:solve]
     
 }
 //! [CST:main]
-// the end

@@ -1,0 +1,21 @@
+/*!
+\page MindlinModel non-Linear Tangential Contact Forces (Mindlin)
+
+non-Linear Tangential contact forces in MercuryDPM implemented as MindlinSpecies, MindlinInteraction
+and MindlinRollingTorsionSpecies, MindlinRollingTorsionInteraction.
+
+
+Force computation:
+
+\code void MindlinInteraction::computeFrictionForce() \endcode
+
+The model parameters (e.g. sliding stiffness, rolling stiffness, tangential coefficient of restitution, etc) are set using MindlinSpecies
+(and MindlinRollingTorsionSpecies) member functions
+
+
+References:
+\n
+1- R.D. Mindlin. Compliance of elastic bodies in contact. J. of Appl. Mech., 16, 1949.\n
+2- <a href="https://doi.org/10.1016/j.ces.2003.09.037"> A. Di Renzo et. al.,Comparison of contact-force models for the simulation of collisions in DEM-based granular flow codes</a>
+
+*/

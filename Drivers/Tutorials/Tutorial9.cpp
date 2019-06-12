@@ -46,27 +46,27 @@ public:
     
     void setupInitialConditions() override {
         SphericalParticle p0;
-        
+
+        //sets the particle to species type-1
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setRadius(0.005);
         p0.setPosition(Vec3D(0.05 * getXMax(), 0.01 * getYMax(), getZMin() + p0.getRadius()));
         p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
         particleHandler.copyAndAddObject(p0);
         
-        // sets the particle to species type-2
+        //sets the particle to species type-2
         p0.setSpecies(speciesHandler.getObject(1));
         p0.setRadius(0.005);
         p0.setPosition(Vec3D(0.05 * getXMax(), 0.21 * getYMax(), getZMin() + p0.getRadius()));
         p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
         particleHandler.copyAndAddObject(p0);
         
-        // sets the particle to species type-3
+        //sets the particle to species type-3
         p0.setSpecies(speciesHandler.getObject(2));
         p0.setRadius(0.005);
         p0.setPosition(Vec3D(0.05 * getXMax(), 0.41 * getYMax(), getZMin() + p0.getRadius()));
         p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
         particleHandler.copyAndAddObject(p0);
-
 
         //! [T9:infiniteWalls]
         InfiniteWall w0;
@@ -75,9 +75,7 @@ public:
         w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0.0, 0.0, getZMin()));
         wallHandler.copyAndAddObject(w0);
         //! [T9:infiniteWalls]
-        
     }
-    
 };
 //! [T9:class]
 
@@ -86,7 +84,7 @@ int main(int argc, char* argv[])
 {
     
     // Problem setup
-    Tutorial9 problem; // instantiate an object of class Tutorial 9
+    Tutorial9 problem;//instantiate an object of class Tutorial 9
     
     double angle = constants::pi / 180.0 * 20.0;
     
@@ -97,54 +95,67 @@ int main(int argc, char* argv[])
     problem.setYMax(0.3);
     problem.setZMax(0.05);
     problem.setTimeMax(0.5);
-    
-    auto species0 = problem.speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
-    auto species1 = problem.speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
-    auto species2 = problem.speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
-    auto species01 = problem.speciesHandler.getMixedObject(species0, species1);
-    auto species02 = problem.speciesHandler.getMixedObject(species0, species2);
-    
+
     // The normal spring stiffness and normal dissipation is computed and set as
     // For collision time tc=0.005 and restitution coefficeint rc=0.88,
-    
-    species0->setDensity(2500.0); // sets the species type-0 density
-    species0->setStiffness(259.018);// sets the spring stiffness
-    species0->setSlidingStiffness(2.0 / 7.0 * species0->getStiffness());
-    species0->setRollingStiffness(2.0 / 5.0 * species0->getStiffness());
-    species0->setDissipation(0.0334);// sets the dissipation
-    species0->setSlidingFrictionCoefficient(0.0);
-    species0->setRollingFrictionCoefficient(0.0);
-    
-    species1->setDensity(2500.0); // sets the species type-1 density
-    species1->setStiffness(259.018);// sets the spring stiffness
-    species1->setDissipation(0.0334);// sets the dissipation
-    species1->setSlidingStiffness(2.0 / 7.0 * species1->getStiffness());
-    species1->setRollingStiffness(2.0 / 5.0 * species1->getStiffness());
-    species1->setSlidingFrictionCoefficient(0.5);
-    species1->setRollingFrictionCoefficient(0.0);
-    
-    species01->setStiffness(259.018);
-    species01->setDissipation(0.0334);// sets the dissipation
+
+    //Properties index 0
+    LinearViscoelasticFrictionSpecies species0;
+
+    species0.setDensity(2500.0);//sets the species type_0 density
+    species0.setStiffness(259.018);//sets the spring stiffness.
+    species0.setDissipation(0.0334);//sets the dissipation.
+    species0.setSlidingStiffness(2.0 / 7.0 * species0.getStiffness());
+    species0.setRollingStiffness(2.0 / 5.0 * species0.getStiffness());
+    species0.setSlidingFrictionCoefficient(0.0);
+    species0.setRollingFrictionCoefficient(0.0);
+    auto ptrToSp0=problem.speciesHandler.copyAndAddObject(species0);
+
+    //Properties index 1
+    LinearViscoelasticFrictionSpecies species1;
+
+    species1.setDensity(2500.0);//sets the species type-1 density
+    species1.setStiffness(259.018);//sets the spring stiffness
+    species1.setDissipation(0.0334);//sets the dissipation
+    species1.setSlidingStiffness(2.0 / 7.0 * species1.getStiffness());
+    species1.setRollingStiffness(2.0 / 5.0 * species1.getStiffness());
+    species1.setSlidingFrictionCoefficient(0.5);
+    species1.setRollingFrictionCoefficient(0.0);
+    auto ptrToSp1=problem.speciesHandler.copyAndAddObject(species1);
+
+    //Combination of properties index 0 and index 1
+    auto species01 = problem.speciesHandler.getMixedObject(ptrToSp0,ptrToSp1);
+
+    species01->setStiffness(259.018);//sets the spring stiffness
+    species01->setDissipation(0.0334);//sets the dissipation
     species01->setSlidingStiffness(2.0 / 7.0 * species01->getStiffness());
     species01->setRollingStiffness(2.0 / 5.0 * species01->getStiffness());
     species01->setSlidingFrictionCoefficient(0.5);
     species01->setRollingFrictionCoefficient(0.0);
-    
-    species2->setDensity(2500.0); // sets the species type-2 density
-    species2->setStiffness(258.5);// sets the spring stiffness
-    species2->setDissipation(0.0);// sets the dissipation
-    species2->setSlidingStiffness(2.0 / 7.0 * species2->getStiffness());
-    species2->setRollingStiffness(2.0 / 5.0 * species2->getStiffness());
-    species2->setSlidingFrictionCoefficient(0.5);
-    species2->setRollingFrictionCoefficient(0.5);
-    
-    species02->setStiffness(259.018);
-    species02->setDissipation(0.0334);// sets the dissipation
+
+    //Properties index 2
+    LinearViscoelasticFrictionSpecies species2;
+
+    species2.setDensity(2500.0);//sets the species type-2 density
+    species2.setStiffness(258.5);//sets the spring stiffness
+    species2.setDissipation(0.0);//sets the dissipation
+    species2.setSlidingStiffness(2.0 / 7.0 * species2.getStiffness());
+    species2.setRollingStiffness(2.0 / 5.0 * species2.getStiffness());
+    species2.setSlidingFrictionCoefficient(0.5);
+    species2.setRollingFrictionCoefficient(0.5);
+    auto ptrToSp2 = problem.speciesHandler.copyAndAddObject(species2);
+
+    //Combination of properties index 0 and index 2
+    auto species02 = problem.speciesHandler.getMixedObject(ptrToSp0, ptrToSp2);
+
+    species02->setStiffness(259.018);//sets the stiffness
+    species02->setDissipation(0.0334);//sets the dissipation
     species02->setSlidingStiffness(2.0 / 7.0 * species02->getStiffness());
     species02->setRollingStiffness(2.0 / 5.0 * species02->getStiffness());
     species02->setSlidingFrictionCoefficient(0.5);
     species02->setRollingFrictionCoefficient(0.5);
-    
+
+    //Output
     problem.setSaveCount(10);
     problem.dataFile.setFileType(FileType::ONE_FILE);
     problem.restartFile.setFileType(FileType::ONE_FILE);

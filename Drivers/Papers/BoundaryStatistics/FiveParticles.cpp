@@ -24,9 +24,13 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // This code generates the plot in boundary statistics paper
+
+//! [FP:headers]
 #include <Mercury3D.h>
 #include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
+//! [FP:headers]
 
+//! [FP:class]
 class FiveParticles : public Mercury3D
 {
 public:
@@ -83,13 +87,16 @@ public:
 		particleHandler.copyAndAddObject(p0);
 	}
 };
+//! [FP:class]
 
+//! [FP:main]
 int main(int argc, char *argv[])
 {
 	//instantiate the class
 	FiveParticles fiveParticles;
 	//set name
 	fiveParticles.setName("FiveParticles");
+
 	//set output and time stepping properties
 	fiveParticles.setTimeMax(20); //run until the situation is static
 	fiveParticles.setSaveCount(std::numeric_limits<unsigned >::max()); //save only the first and last time step
@@ -100,7 +107,7 @@ int main(int argc, char *argv[])
     helpers::writeToFile("FiveParticles.sh","../MercuryCG/fstatistics FiveParticles -stattype XZ -w 0.1 -h 0.05 -tmin 1 -tmax 30");
 
     logger(INFO,"Run 'FiveParticles.m' in MATLAB/octave to visualise the statistical output");
-    helpers::writeToFile("FiveParticles.m","addpath('../MercuryCG/')\n"
+    helpers::writeToFile("FiveParticles.m","addpath('../../MercuryCG/')\n"
      "data = loadstatistics('FiveParticles.stat');\n"
      "colormap(1-gray)\n"
      "contourf(data.x,data.z,data.Density,20,'EdgeColor','none')\n"
@@ -124,3 +131,4 @@ int main(int argc, char *argv[])
      "end\n"
      "hold off");
 }
+//! [FP:main]

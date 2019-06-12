@@ -174,7 +174,6 @@ int main(int argc, char *argv[])
     species->setTorsionStiffness(1.2e4);
     species->setSlidingDissipation(6.3e-2);
 
-
     //test normal forces
     Mdouble MinParticleMass = species->getDensity()*4.0 / 3.0 * constants::pi * mathsFunc::cubic(HG.MinParticleRadius);
     std::cout << "MinParticleMass =" << MinParticleMass << std::endl;

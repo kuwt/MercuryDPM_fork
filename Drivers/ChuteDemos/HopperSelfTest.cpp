@@ -23,16 +23,19 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+//! [CH:headers]
 #include <sstream>
 #include <iostream>
 #include <iomanip>
 #include <cmath>
 #include "Species/LinearViscoelasticSlidingFrictionSpecies.h"
 #include "ChuteWithHopper.h"
+//! [CH:headers]
 
 // A quasi-2D inclined plane with hopper inflow conditions, 
 // and deletion of particles when they exit the domain.
 
+//! [CH:main]
 int main() 
 {
    
@@ -85,3 +88,4 @@ int main()
     //solve
     problem.solve();
 }
+//! [CH:main]

@@ -65,13 +65,9 @@ public:
      * \brief Creates a copy of an object of this class. (Deep copy)
      */
     //BaseInteraction* copy() const;
+
     /*!
      * \brief Computes the normal forces due to linear plastic visco elastic interaction.
-     */
-    void computeLinearPlasticViscoelasticForce();
-    
-    /*!
-     * \brief Calls computeLinearPlasticViscoElasticForce().
      */
     void computeNormalForce();
     

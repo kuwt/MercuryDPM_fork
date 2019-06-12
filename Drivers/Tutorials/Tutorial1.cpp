@@ -34,9 +34,9 @@
 */
 
 //! [T1:headers]
+#include <Mercury3D.h>
 #include <Species/Species.h>
 #include <Species/LinearViscoelasticSpecies.h>
-#include <Mercury3D.h>
 //! [T1:headers]
 
 //! [T1:class]
@@ -51,7 +51,7 @@ public:
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setRadius(0.05); // sets particle radius
         p0.setPosition(Vec3D(0.1 * getXMax(), 0.1 * getYMax(), 0.1 * getZMax())); // sets particle position
-        p0.setVelocity(Vec3D(0.5, 0.1, 0.1));
+        p0.setVelocity(Vec3D(0.5, 0.1, 0.1));// sets particle velocity
         particleHandler.copyAndAddObject(p0);
 //! [T1:createParticle]
     }
@@ -75,12 +75,14 @@ int main(int argc, char* argv[])
 //! [T1:problemSetup]
 
 //! [T1:speciesProp]
-    // The normal spring stiffness and normal dissipation is computed and set as
-    // For collision time tc=0.005 and restitution coefficeint rc=1.0,
-    auto species = problem.speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
-    species->setDensity(2500.0); // sets the species type-0 density
-    species->setStiffness(258.5);// sets the spring stiffness
-    species->setDissipation(0.0);// sets the dissipation
+    //Set the species of particles and walls
+    //The normal spring stiffness and normal dissipation is computed and set as
+    //For collision time tc=0.005 and restitution coefficeint rc=1.0
+    LinearViscoelasticSpecies species;
+    species.setDensity(2500.0); //sets the species type_0 density
+    species.setStiffness(258.5);//sets the spring stiffness.
+    species.setDissipation(0.0); //sets the dissipation.
+    problem.speciesHandler.copyAndAddObject(species);
 //! [T1:speciesProp]
 
 //! [T1:output]
@@ -97,7 +99,7 @@ int main(int argc, char* argv[])
 //! [T1:visualOutput]
 
 //! [T1:solve]
-    problem.setTimeStep(.005 / 50.0); // (collision time)/50.0
+    problem.setTimeStep(0.005 / 50.0); // (collision time)/50.0
     problem.solve(argc, argv);
 //! [T1:solve]
     return 0;

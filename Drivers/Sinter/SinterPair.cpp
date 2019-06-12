@@ -23,13 +23,17 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+//! [St:headers]
 #include "Mercury3D.h"
 #include "Species/SinterSpecies.h"
+//! [St:headers]
+
 using std::cout;
 using std::endl;
 
 /// Single particle pair, sintered slowly.
 
+//! [St:class]
 class SinterPair : public Mercury3D
 {
 public:
@@ -55,6 +59,7 @@ public:
         const Mdouble restitutionCoefficient = 0.1;
         const Mdouble density = 1005;
 
+        //! [St:speciesProp]
         SinterSpecies s;
         s.setHandler(&speciesHandler);
         s.setDensity(density);
@@ -68,9 +73,11 @@ public:
         s.setSinterAdhesion(0.013*stiffness);
         //adhesiveForce = sinterAdhesion*radius;
         auto species = speciesHandler.copyAndAddObject(s);
+        //! [St:speciesProp]
 
         setTimeStep(0.02*collisionTime);
 
+        //! [St:createParticle]
         SphericalParticle p;
         p.setSpecies(species);
         p.setRadius(radius);
@@ -78,6 +85,7 @@ public:
         particleHandler.copyAndAddObject(p);
         p.setPosition(-p.getPosition());
         particleHandler.copyAndAddObject(p);
+        //! [St:createParticle]
     }
 
     void printTime() const override
@@ -91,16 +99,21 @@ public:
     }
 
 };
+//! [St:class]
 
+//! [St:main]
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
+    //! [St:problemSetup]
     SinterPair sp0(2e-6);
     sp0.solve();
     SinterPair sp1(1.5e-6);
     sp1.solve();
     SinterPair sp2(5e-7);
     sp2.solve();
+    //! [St:problemSetup]
 
+    //! [St:output]
     helpers::writeToFile("SinterPair.gnu",
                          "set xlabel 'time [s]'\n"
                           "set ylabel 'x/a'\n"
@@ -109,5 +122,6 @@ int main(int argc UNUSED, char *argv[] UNUSED)
                           "replot 'SinterPair2e-06.fstat' u ($1):(sqrt($7/2e-06)) w lp lt rgb 'sea-green'"
     );
     std::cout << "Execute 'gnuplot SinterPair.gnu' to view output" << std::endl;
-
+    //! [St:output]
 }
+//! [St:main]
