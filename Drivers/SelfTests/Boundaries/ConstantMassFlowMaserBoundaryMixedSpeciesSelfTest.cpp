@@ -76,17 +76,17 @@ public:
         setXMin(0.0);
         setYMin(0.0);
         setZMin(0.0);
-        setXMax(5.0);
+        setXMax(12.0);
         setYMax(2.0);
         setZMax(2.0);
     
         SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
-        p.setPosition(Vec3D(2.0,0.0,0.0));
+        p.setPosition(Vec3D(2.0,0.0,1.0));
         p.setVelocity(Vec3D(1.0,0.0,0.0));
         p.setRadius(0.5);
         particleHandler.copyAndAddObject(p);
-        p.setPosition(Vec3D(4.0,0.0,0.0));
+        p.setPosition(Vec3D(4.0,0.0,1.0));
         p.setSpecies(speciesHandler.getObject(1));
         particleHandler.copyAndAddObject(p);
         
