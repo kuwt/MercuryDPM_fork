@@ -11,26 +11,26 @@
 find_program(PYTHON_EXECUTABLE python)
 
 EXECUTE_PROCESS(
-    COMMAND "${PYTHON_EXECUTABLE}" -c "from distutils import sysconfig; print sysconfig.get_python_inc()"
+    COMMAND "${PYTHON_EXECUTABLE}" -c "from distutils import sysconfig; print(sysconfig.get_python_inc())"
     OUTPUT_VARIABLE PYTHON_INCLUDE_DIR
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
 
 EXECUTE_PROCESS(
-    COMMAND "${PYTHON_EXECUTABLE}" -c "from distutils import sysconfig; print sysconfig.get_python_version()"
+    COMMAND "${PYTHON_EXECUTABLE}" -c "from distutils import sysconfig; print(sysconfig.get_python_version())"
     OUTPUT_VARIABLE _CURRENT_VERSION
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
 EXECUTE_PROCESS (
-    COMMAND "${PYTHON_EXECUTABLE}" -c "from distutils import sysconfig; print sysconfig.get_config_var('LIBDIR')"
+    COMMAND "${PYTHON_EXECUTABLE}" -c "from distutils import sysconfig; print(sysconfig.get_config_var('LIBDIR'))"
     OUTPUT_VARIABLE _LIBDIR
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
 EXECUTE_PROCESS (
-    COMMAND "${PYTHON_EXECUTABLE}" -c "from distutils import sysconfig; print sysconfig.get_config_var('prefix')"
+    COMMAND "${PYTHON_EXECUTABLE}" -c "from distutils import sysconfig; print(sysconfig.get_config_var('prefix'))"
     OUTPUT_VARIABLE _PREFIX
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
