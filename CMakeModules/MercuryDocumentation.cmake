@@ -1,6 +1,7 @@
 cmake_policy(SET CMP0057 NEW)
-FIND_PACKAGE(Doxygen REQUIRED dot)
+FIND_PACKAGE(Doxygen)
 if (DOXYGEN_FOUND)
+    FIND_PACKAGE(Doxygen REQUIRED dot)
     option(Mercury_BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" ON)
 else()
     option(Mercury_BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" OFF)
