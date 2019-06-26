@@ -125,6 +125,11 @@ public:
      * return "true" when called for a wall (i.e. any BaseWall tyope object).
      */
     bool isFixed() const override;
+
+    /*! 
+     * \brief Slowly adjusts the force on a wall towards a specified goal, by adjusting (prescribing) the velocity of the wall.
+     */
+    void setForceControl(Vec3D forceGoal, Vec3D gainFactor, Vec3D baseVelocity={0,0,0});
     
     /*!
      * if isLocal returns true and the DPM class derived from MercuryBase, the hGrid will be used to find wall-particle contacts, using min/max.
@@ -175,20 +180,18 @@ public:
     void setVTKVisibility(bool vtkVisibility);
     
     /*!
-     * Takes the points provided and adds a triangle strip connecting these points to the vtk container
+     * \brief Takes the points provided and adds a triangle strip connecting these points to the vtk container
      */
     static void addToVTK(const std::vector<Vec3D>& points, VTKContainer& vtk);
     
     //todo how do i write a copy and add function?
     void addRenderedWall(BaseWall* w);
-    
+
     BaseWall* getRenderedWall(size_t i) const;
 
     void removeRenderedWalls();
 
     void renderWall(VTKContainer& vtk);
-
-    void setVelocityControl(Vec3D forceGoal, Vec3D gainFactor, Vec3D baseVelocity={0,0,0});
 
 private:
     /*!

@@ -190,6 +190,18 @@ bool BaseWall::isFixed() const
     return true;
 }
 
+/*!
+ * \param[in] forceGoal - the desired force on the wall
+ * \param[in] gainFactor - the rate at which the velocity of the wall should be adjusted
+ * \param[in] baseVelocity - the velocity that the wall should travel at when the forceGoal is reached
+ */
+void BaseWall::setForceControl(Vec3D forceGoal, Vec3D gainFactor, Vec3D baseVelocity) {
+    setPrescribedVelocity([this, forceGoal, gainFactor, baseVelocity] (double time){
+        auto dForce = getForce()-forceGoal;
+        return baseVelocity + gainFactor.multiplyElementwise(dForce);
+    });
+}
+
 // returns the point intersecting a wall (x-p).n=0 and a line x=p0+t(p1-p0)
 bool BaseWall::getLinePlaneIntersect(Vec3D& intersect, const Vec3D& p0, const Vec3D& p1, const Vec3D& n, const Vec3D& p)
 {
@@ -512,11 +524,4 @@ void BaseWall::renderWall(VTKContainer& vtk)
             }
         }
     }
-}
-
-void BaseWall::setVelocityControl(Vec3D forceGoal, Vec3D gainFactor, Vec3D baseVelocity) {
-    setPrescribedVelocity([this, forceGoal, gainFactor, baseVelocity] (double time){
-        auto dForce = getForce()-forceGoal;
-        return baseVelocity + gainFactor.multiplyElementwise(dForce);
-    });
 }
