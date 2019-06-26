@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name HopperSelfTest revision 3279 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
+MercuryDPM 0.14 name HopperSelfTest revision 3787 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
 dataFile    fileType ONE_FILE saveCount 51 counter 26 lastSavedTimeStep 1251
 fStatFile   fileType ONE_FILE saveCount 51 counter 26 lastSavedTimeStep 1251
 eneFile     fileType ONE_FILE saveCount 51 counter 26 lastSavedTimeStep 1251
@@ -17,7 +17,7 @@ InfiniteWall id 2 indSpecies 0 position 0 0 -0.000727272727272727 orientation 0.
 IntersectionOfWalls id 3 indSpecies 0 position 0 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 numIntersectionOfWalls 3 position 0 0 0.0211428330103571 orientation 0.17364817766693 0 0.984807753012208 0 position 0.0295442325903662 0 -0.0600292789067895 orientation 0.996194698091745 0 -0.0871557427476582 0 position 0.0189594510866257 0 0 orientation 0.933944001109067 0 -0.357419365441196 0
 IntersectionOfWalls id 4 indSpecies 0 position 0 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 numIntersectionOfWalls 3 position 0.0393923101204883 0 0.0280887601170343 orientation 1 0 -0 0 position 0.0393923101204883 0 -0.0582927971301202 orientation 0.0871557427476577 0 0.996194698091746 0 position 0.0273772354288139 0 0.00984807753012208 orientation 0.287132810912366 0 -0.957890781298976 0
 Boundaries 1
-HopperInsertionBoundary id 0 maxFailed 1 massInserted 265 volumeInserted 5.02049949236938e-08 numberOfParticlesInserted 265 isActivated 1 particleToCopy BaseParticle id 0 indSpecies 0 position 0 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 1 yMin 0 yMax 0.0016 radMin 0.00032 radMax 0.0004 chuteAngle 0.174532925199433 fixedParticleRadius 0.00036 isHopperCentred_ 0 hopperDim 1 hopperAngle 1.0471975511966 hopperLength 0.04 hopperExitLength 0.01 hopperHeight 0.0241139 lift 0 fillPercent 50
+HopperInsertionBoundary id 0 maxFailed 1 massInserted 265 volumeInserted 5.02049949236938e-08 numberOfParticlesInserted 265 isActivated 1 initialVolume 0 samplingInterval 0 variableCumulativeVolumeFlowRate 0 particleToCopy BaseParticle id 0 indSpecies 0 position 0 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 1 yMin 0 yMax 0.0016 radMin 0.00032 radMax 0.0004 chuteAngle 0.174532925199433 fixedParticleRadius 0.00036 isHopperCentred_ 0 hopperDim 1 hopperAngle 1.0471975511966 hopperLength 0.04 hopperExitLength 0.01 hopperHeight 0.0241139 lift 0 fillPercent 50
 Particles 375
 BaseParticle id 0 indSpecies 0 position 0.0193194510866257 0.00036 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.00036 invMass 0
 BaseParticle id 1 indSpecies 0 position 0.0193194510866257 0.00116 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.00036 invMass 0

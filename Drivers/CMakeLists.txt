@@ -22,6 +22,7 @@ add_subdirectory(Papers)
 add_subdirectory(Sinter)
 #add_subdirectory(Segregation)
 add_subdirectory(SpeedTest)
+add_subdirectory(Demos)
 
 add_subdirectory(ParallelDrum)
 

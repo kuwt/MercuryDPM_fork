@@ -204,7 +204,11 @@ void DeletionBoundary::read(std::istream& is)
     std::string dummy;
     is >> dummy >> normal_
        >> dummy >> scaleFactor_
-       >> dummy >> distance_;
+       >> dummy >> distance_
+       >> dummy >> numberOfParticlesDeleted_
+       >> dummy >> massDeleted_
+       >> dummy >> volumeDeleted_
+       >> dummy >> isActivated_;
 }
 
 /*!
@@ -227,8 +231,11 @@ void DeletionBoundary::write(std::ostream& os) const
     BaseBoundary::write(os);
     os << " normal " << normal_
        << " scaleFactor " << scaleFactor_
-       << " distance " << distance_;
-    logger(INFO, "DeletionBoundary, number deleted: %", numberOfParticlesDeleted_);
+       << " distance " << distance_
+       << " numberOfParticlesDeleted " << numberOfParticlesDeleted_
+       << " massDeleted " << massDeleted_
+       << " volumeDeleted " << volumeDeleted_
+       << " isActivated " << isActivated_;
 }
 
 /*!

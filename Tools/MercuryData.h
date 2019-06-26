@@ -119,17 +119,23 @@ std::istream& operator>>(std::istream& in, MercuryParticle<NDIMS>& part)
   for (i = 0; i < NDIMS; i++)
     in >> part.position[i];
   
-  for (i = 0; i < NDIMS; i++)
+  for (i = 0; i < NDIMS; i++) {
     in >> part.velocity[i];
-    
+    // convert velocities to float, because paraview cannot handle doubles
+    part.velocity[i] = (float)part.velocity[i];
+  }
+
   in >> part.radius;
   
   for (i = 0; i < NDIMS; i++)
     in >> part.rotation[i];
-    
-  for (i = 0; i < NDIMS; i++)
+
+  for (i = 0; i < NDIMS; i++) {
     in >> part.angularV[i];
-    
+    // convert velocities to float, because paraview cannot handle doubles
+    part.angularV[i] = (float)part.angularV[i];
+  }
+
   in >> part.speciesID;
   
   return in;

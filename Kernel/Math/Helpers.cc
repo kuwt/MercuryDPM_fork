@@ -885,6 +885,19 @@ bool helpers::compare(std::istream& is, std::string s)
     return true;
 }
 
+bool helpers::readFromCommandLine(int argc, char *argv[], std::string varName)
+{
+    for (unsigned i=0; i<argc-1; ++i) {
+        if (varName == argv[i]) {
+            logger(INFO, "readFromCommandLine: found argument %",varName);
+            return true;
+        }
+    }
+    //if the variable is not found
+    logger(INFO, "readFromCommandLine: argument % not found",varName);
+    return false;
+}
+
 void helpers::check(double real, double ideal, double error, std::string whatIsChecked)
 {
     logger.assert_always(mathsFunc::isEqual(real, ideal, error),

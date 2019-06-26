@@ -27,6 +27,7 @@
 #include <Math/Helpers.h>
 #include <Walls/BasicIntersectionOfWalls.h>
 #include <Walls/TriangleWall.h>
+#include <Walls/BasicUnionOfWalls.h>
 #include "WallHandler.h"
 #include "Walls/BaseWall.h"
 #include "Walls/CylindricalWall.h"
@@ -134,6 +135,10 @@ BaseWall* WallHandler::createObject(const std::string& type)
     else if (type == "BasicIntersectionOfWalls")
     {
         return new BasicIntersectionOfWalls;
+    }
+    else if (type == "BasicUnionOfWalls")
+    {
+        return new BasicUnionOfWalls;
     }
     else if (type == "InfiniteWall")
     {

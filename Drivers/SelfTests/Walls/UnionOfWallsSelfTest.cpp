@@ -27,31 +27,35 @@
 #include <Walls/BasicIntersectionOfWalls.h>
 #include <Walls/BasicUnionOfWalls.h>
 #include "Mercury3D.h"
-#include "Species/LinearPlasticViscoelasticSlidingFrictionSpecies.h"
+#include "Species/LinearViscoelasticBondedSpecies.h"
 using constants::pi;
 using mathsFunc::cubic;
 
 class UnionOfWalls : public Mercury3D {
 
     void setupInitialConditions() override {
+        logger(INFO,"Defining two halves of a drum, and a particle in it.");
+
         setName("UnionOfWallsSelfTest");
-        setTimeStep(1e-4);
+        setTimeStep(1e-5);
         setTimeMax(1);
-        setMin(-drumRadius*Vec3D(1,1,1));
-        setMax(+drumRadius*Vec3D(1,1,1));
+        Vec3D position={5,1,5};
+        setMin(position-drumRadius*Vec3D(1,1,1));
+        setMax(position+drumRadius*Vec3D(1,1,1));
         setSaveCount(getTimeMax()/getTimeStep()/100);
         fStatFile.writeFirstAndLastTimeStep();
         restartFile.writeFirstAndLastTimeStep();
         setXBallsAdditionalArguments("-solidf");
 
-        LinearPlasticViscoelasticSlidingFrictionSpecies species;
+        LinearViscoelasticBondedSpecies species;
         species.setDensity(6.0/pi);
-        species.setPlasticParameters(2e5,10e5,2e5,.5);
-        species.setDissipation(25);
-        species.setSlidingFrictionCoefficient(0.5);
-        species.setSlidingDissipation(2./7.*species.getDissipation());
-        species.setSlidingStiffness(2./7.*species.getLoadingStiffness());
+        species.setStiffnessAndRestitutionCoefficient(2e5,0.5,.5);
+        species.setBondForceMax(2e3);
+        //species.setSlidingFrictionCoefficient(0.5);
+        //species.setSlidingDissipation(2./7.*species.getDissipation());
+        //species.setSlidingStiffness(2./7.*species.getStiffness());
         auto s = speciesHandler.copyAndAddObject(species);
+
 
         //define drum
         AxisymmetricIntersectionOfWalls drum;
@@ -59,8 +63,8 @@ class UnionOfWalls : public Mercury3D {
         drum.setPosition(Vec3D(0,0,0));
         drum.setAxis(Vec3D(0,1,0));
         drum.addObject(Vec3D(1,0,0),Vec3D(drumRadius,0,0));
-        drum.setAngularVelocity(Vec3D(0,2.0*pi*100,0));
-        drum.setVelocity(Vec3D(0,0,1));
+        //drum.setAngularVelocity(Vec3D(0,2.0*pi,0));
+        //drum.setVelocity(Vec3D(0,0,1));
 
         //define upper half
         InfiniteWall upperHalf;
@@ -91,24 +95,30 @@ class UnionOfWalls : public Mercury3D {
         unionDrum.setSpecies(s);
         unionDrum.add(lowerDrum);
         unionDrum.add(upperDrum);
-        unionDrum.setAngularVelocity(Vec3D(0,2.0*pi*100,0));
-        unionDrum.setVelocity(Vec3D(0,0,1));
+        unionDrum.setPosition(position);
+        //unionDrum.setAngularVelocity(Vec3D(0,2.0*pi*100,0));
+        //unionDrum.setVelocity(Vec3D(0,0,1));
         auto l = wallHandler.copyAndAddObject(unionDrum);
 
         SphericalParticle particle;
         particle.setSpecies(s);
         particle.setRadius(0.5);
-        particle.setPosition(Vec3D(0,0,-drumRadius+particle.getRadius()));
-        //particle.setVelocity(Vec3D(0,0,100.0));
+        particle.setPosition(position+Vec3D(0,0,-drumRadius+particle.getRadius()));
+        particle.setVelocity(Vec3D(2*pi*(drumRadius-particle.getRadius()),0,0));
         auto p = particleHandler.copyAndAddObject(particle);
+
+        dynamic_cast<BondedInteraction*>(
+                interactionHandler.getInteraction(p,l,1))->bond();
     }
 
     Mdouble drumRadius = 10.0;
 };
 
-int main()
+int main(int argc, char *argv[])
 {
     UnionOfWalls dpm;
-    dpm.solve();
+    dpm.solve(argc,argv);
+
+
     return 0;
 }

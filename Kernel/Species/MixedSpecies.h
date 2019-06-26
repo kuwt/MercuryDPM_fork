@@ -174,6 +174,7 @@ void MixedSpecies<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies
     os << getName();
     os << " idA " << BaseObject::getId();
     os << " idB " << BaseObject::getIndex();
+    BaseSpecies::write(os);
     NormalForceSpecies::write(os);
     FrictionForceSpecies::write(os);
     AdhesiveForceSpecies::write(os);
@@ -194,6 +195,7 @@ void MixedSpecies<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies
     is >> dummy >> index;
     BaseObject::setId(id);
     BaseObject::setIndex(index);
+    BaseSpecies::read(is);
     NormalForceSpecies::read(is);
     FrictionForceSpecies::read(is);
     AdhesiveForceSpecies::read(is);

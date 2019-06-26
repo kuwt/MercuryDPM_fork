@@ -337,6 +337,17 @@ T readFromFile(std::string fileName, std::string varName, T value)
     return value;
 }
 
+/**
+ * Returns true if command line arguments contain varName, false else
+ * Usage example:
+ *    if (readFromCommandLine(argc, argv, '-verbose')) ...
+ * @param argc pass through number of command line arguments
+ * @param argv pass through values of command line arguments
+ * @param varName name of command line arguments that is required to return true
+ * @return true or false
+ */
+bool readFromCommandLine(int argc, char *argv[], std::string varName);
+
 template<typename T>
 T readFromCommandLine(int argc, char *argv[], std::string varName, T value)
 {

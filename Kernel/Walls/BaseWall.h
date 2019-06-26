@@ -184,6 +184,8 @@ public:
     
     BaseWall* getRenderedWall(size_t i) const;
 
+    void removeRenderedWalls();
+
     void renderWall(VTKContainer& vtk);
 
     void setVelocityControl(Vec3D forceGoal, Vec3D gainFactor, Vec3D baseVelocity={0,0,0});

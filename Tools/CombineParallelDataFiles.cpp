@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <File.h>
+#include <Math/Helpers.h>
 #include "Logger.h"
 #include "vector"
 #include "string"
@@ -158,7 +159,8 @@ int main (int argc, char *argv[])
     //std::string name = "../../parallel/Drivers/USER/MercuryLab/FE/GCG14"; 
     std::string name = getName(argc, argv);
     DataFiles dataFiles(name);
-    dataFiles.fileType = FileType::MULTIPLE_FILES_PADDED;
+    if (helpers::readFromCommandLine(argc,argv,"-multipleFiles"))
+        dataFiles.fileType = FileType::MULTIPLE_FILES_PADDED;
     dataFiles.write();
     return 0;
 }

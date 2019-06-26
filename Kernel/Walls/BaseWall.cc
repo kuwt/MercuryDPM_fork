@@ -482,6 +482,12 @@ void BaseWall::addRenderedWall(BaseWall* w)
     renderedWalls_.push_back(w);
 }
 
+void BaseWall::removeRenderedWalls() {
+    while (!renderedWalls_.empty()) {
+        renderedWalls_.pop_back();
+    }
+}
+
 BaseWall* BaseWall::getRenderedWall(size_t i) const
 {
     return renderedWalls_[i];

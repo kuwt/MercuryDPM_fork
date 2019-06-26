@@ -154,6 +154,16 @@ protected:
     
     void setInteractionDistance(Mdouble interactionDistance);
 
+    /*!
+     * \brief Sets the boolean constantRestitution_.
+     */
+    void write(std::ostream& os) const override;
+
+    /*!
+     * \param[in] is input stream (typically the restart file)
+     */
+    void read(std::istream& is) override;
+
 private:
     /*!
      * \brief A pointer to the handler to which this species belongs. It is 

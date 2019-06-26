@@ -131,6 +131,24 @@ void BaseSpecies::setConstantRestitution(bool constantRestitution) {
     constantRestitution_ = constantRestitution;
 }
 
+/*!
+ * \param[out] os output stream (typically the restart file)
+ */
+void BaseSpecies::write(std::ostream& os) const
+{
+    //BaseObject::write(os);
+    if (getConstantRestitution()) os << " constantRestitution " << getConstantRestitution();
+}
+
+/*!
+ * \param[in] is input stream (typically the restart file)
+ */
+void BaseSpecies::read(std::istream& is)
+{
+    //BaseObject::read(is);
+    helpers::readOptionalVariable(is, "constantRestitution", constantRestitution_);
+}
+
 /**
  * Sets BaseSpecies::interactionDistance_.
  * This function should not be called by the user, only by functions in classes derived from BaseSpecies (in particular, the adhesive-force species).

@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name roughBottomMultiLayer revision 3279 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
+MercuryDPM 0.14 name roughBottomMultiLayer revision 3787 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
 dataFile    fileType ONE_FILE saveCount 50 counter 21 lastSavedTimeStep 1000
 fStatFile   fileType ONE_FILE saveCount 50 counter 21 lastSavedTimeStep 1000
 eneFile     fileType ONE_FILE saveCount 50 counter 21 lastSavedTimeStep 1000
@@ -15,7 +15,7 @@ InfiniteWall id 0 indSpecies 0 position 0 0 0 orientation 0.707106781186548 0 0 
 InfiniteWall id 1 indSpecies 0 position 0 3 0 orientation 0.707106781186548 0 0 0.707106781186548 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0
 InfiniteWall id 2 indSpecies 0 position 0 0 -2.4 orientation 0.707106781186548 0 0.707106781186548 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0
 Boundaries 1
-ChuteInsertionBoundary id 0 maxFailed 1 massInserted 2 volumeInserted 1.0471975511966 numberOfParticlesInserted 2 isActivated 1 particleToCopy BaseParticle id 0 indSpecies 0 position 0 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 1 posMin 0 0 0 posMax 3 3 0.024 radMin 0.5 radMax 0.5 fixedParticleRadius 0.5 inflowVelocity 0.1 inflowVelocityVariance 0
+ChuteInsertionBoundary id 0 maxFailed 1 massInserted 2 volumeInserted 1.0471975511966 numberOfParticlesInserted 2 isActivated 1 initialVolume 0 samplingInterval 0 variableCumulativeVolumeFlowRate 0 particleToCopy BaseParticle id 0 indSpecies 0 position 0 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 1 posMin 0 0 0 posMax 3 3 0.024 radMin 0.5 radMax 0.5 fixedParticleRadius 0.5 inflowVelocity 0.1 inflowVelocityVariance 0
 Particles 15
 BaseParticle id 0 indSpecies 0 position 0.111556507749345 1.89233384315216 -0.106765053111823 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.5 invMass 0
 BaseParticle id 1 indSpecies 0 position 0.387881021228484 2.50659184345826 -0.84518491712507 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.5 invMass 0

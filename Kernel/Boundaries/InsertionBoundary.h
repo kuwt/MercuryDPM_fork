@@ -154,11 +154,7 @@ public:
     void setInitialVolume(Mdouble initialVolume);
 
     ///\see variableCumulativeVolumeFlowRate_
-    void setVariableVolumeFlowRate(std::vector<Mdouble> variableCumulativeVolumeFlowRate, Mdouble samplingInterval) {
-        logger.assert(samplingInterval>0,"sampling interval needs to be positive");
-        variableCumulativeVolumeFlowRate_ = variableCumulativeVolumeFlowRate;
-        samplingInterval_ = samplingInterval;
-    };
+    void setVariableVolumeFlowRate(std::vector<Mdouble> variableCumulativeVolumeFlowRate, Mdouble samplingInterval);
 
     bool insertParticle(Mdouble time);
 

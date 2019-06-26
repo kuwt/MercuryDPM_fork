@@ -52,16 +52,15 @@ void SphericalParticleVtkWriter::writeVTKVelocity(std::fstream& file) const
 {
     file << "  <DataArray type=\"Float32\" Name=\"Velocity\" NumberOfComponents=\"3\" format=\"ascii\">\n";
     // Add velocity
-    for (const auto& p: handler_)
-    {
+    for (const auto& p: handler_) {
 #ifdef MERCURY_USE_MPI
         if (particleMustBeWritten(p))
-      {
-        file << '\t' << p->getVelocity() << '\n';
-      }
-#else
-        file << '\t' << p->getVelocity() << '\n';
 #endif
+        {
+            file << ' ' << (float) p->getVelocity().X
+                 << ' ' << (float) p->getVelocity().Y
+                 << ' ' << (float) p->getVelocity().Z << '\n';
+        }
     }
     file << "  </DataArray>\n";
 }

@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name InsertionBoundarySelfTest revision 3279 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
+MercuryDPM 0.14 name InsertionBoundarySelfTest revision 3787 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
 dataFile    fileType ONE_FILE saveCount 10 counter 22 lastSavedTimeStep 201
 fStatFile   fileType ONE_FILE saveCount 20 counter 12 lastSavedTimeStep 201
 eneFile     fileType ONE_FILE saveCount 20 counter 12 lastSavedTimeStep 201
@@ -12,7 +12,7 @@ Species 1
 LinearViscoelasticSpecies id 0 density 2000 stiffness 10000 dissipation 0
 Walls 0
 Boundaries 1
-CubeInsertionBoundary id 0 maxFailed 1 massInserted 559 volumeInserted 0.131328525439285 numberOfParticlesInserted 559 isActivated 1 particleToCopy BaseParticle id 0 indSpecies 0 position 0 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 1 posMin 0 0 0 posMax 1 1 1 velMin 1 0 0 velMax 1 0 0 radMin 0.025 radMax 0.05 psd 0 distribution 0
+CubeInsertionBoundary id 0 maxFailed 1 massInserted 559 volumeInserted 0.131328525439285 numberOfParticlesInserted 559 isActivated 1 initialVolume 0 samplingInterval 0 variableCumulativeVolumeFlowRate 0 particleToCopy BaseParticle id 0 indSpecies 0 position 0 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 1 invMass 1 posMin 0 0 0 posMax 1 1 1 velMin 1 0 0 velMax 1 0 0 radMin 0.025 radMax 0.05 psd 0 distribution 0
 Particles 559
 BaseParticle id 0 indSpecies 0 position 0.482818009347822 0.451551026244135 0.84762122589385 orientation 1 0 0 0 velocity 1 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.0357408369791314 invMass 2.61449153013946
 BaseParticle id 1 indSpecies 0 position 0.433787151301476 0.0993150145753146 0.771077505526061 orientation 1 0 0 0 velocity 1 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.0471624199560262 invMass 1.13787132123194

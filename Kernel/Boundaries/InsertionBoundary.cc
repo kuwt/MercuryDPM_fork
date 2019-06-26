@@ -113,9 +113,15 @@ bool InsertionBoundary::insertParticle(Mdouble time) {
     if (variableCumulativeVolumeFlowRate_.size()==0) {
         return volumeInserted_ < getVolumeFlowRate() * time+ initialVolume_;
     } else {
-        Mdouble i = std::min(time/samplingInterval_,(Mdouble)variableCumulativeVolumeFlowRate_.size()-2);
-        size_t id = i;
-        Mdouble allowedVolume = variableCumulativeVolumeFlowRate_[id] + (variableCumulativeVolumeFlowRate_[id+1]-variableCumulativeVolumeFlowRate_[id])*(i-id);
+        const Mdouble iMax = (Mdouble) variableCumulativeVolumeFlowRate_.size()-2;
+        const Mdouble i = std::min(time/samplingInterval_,iMax);
+        if (i==iMax) {
+            static unsigned count = 0;
+            if (count==0) logger(WARN, "Reached end of volume flowrate function");
+            ++count;
+        }
+        const size_t id = i;
+        const Mdouble allowedVolume = variableCumulativeVolumeFlowRate_[id] + (variableCumulativeVolumeFlowRate_[id+1]-variableCumulativeVolumeFlowRate_[id])*(i-id);
         return volumeInserted_ < allowedVolume;
     }
 }
@@ -327,7 +333,19 @@ void InsertionBoundary::read(std::istream& is)
     is >> dummy >> volumeInserted_;
     is >> dummy >> numberOfParticlesInserted_;
     is >> dummy >> isActivated_;
-
+    ///\todo make theses reads non-optional
+    helpers::readOptionalVariable(is, "initialVolume", initialVolume_);
+    if (helpers::readOptionalVariable(is, "samplingInterval", samplingInterval_)) {
+        size_t n;
+        Mdouble flowRate;
+        is >> dummy >> n;
+        //variableCumulativeVolumeFlowRate_.clear();
+        variableCumulativeVolumeFlowRate_.reserve(n);
+        for (size_t i=0; i<n; ++i) {
+            is >> flowRate;
+            variableCumulativeVolumeFlowRate_.push_back(flowRate);
+        }
+    }
     is >> dummy;
     if (dummy!="noParticleToCopy") {
         delete particleToCopy_;
@@ -356,6 +374,12 @@ void InsertionBoundary::write(std::ostream& os) const
     os << " volumeInserted " << volumeInserted_;
     os << " numberOfParticlesInserted " << numberOfParticlesInserted_;
     os << " isActivated " << isActivated_;
+    os << " initialVolume " << initialVolume_;
+    os << " samplingInterval " << samplingInterval_;
+    os << " variableCumulativeVolumeFlowRate " << variableCumulativeVolumeFlowRate_.size();
+    for (const auto flowRate : variableCumulativeVolumeFlowRate_) {
+        os << ' ' << flowRate;
+    }
     if (particleToCopy_== nullptr)
         os << " noParticleToCopy";
     else {
@@ -383,3 +407,12 @@ void InsertionBoundary::setInitialVolume(Mdouble initialVolume)
     initialVolume_ = initialVolume;
     if (!std::isfinite(volumeFlowRate_)) volumeFlowRate_=0;
 }
+
+void InsertionBoundary::setVariableVolumeFlowRate(std::vector<Mdouble> variableCumulativeVolumeFlowRate, Mdouble samplingInterval) {
+    logger.assert(samplingInterval>0,"sampling interval needs to be positive");
+    const Mdouble endTime = variableCumulativeVolumeFlowRate.size() * samplingInterval;
+    logger(INFO,"variable flowrate is defined up to %",endTime);
+    logger.assert_always(getHandler()->getDPMBase()->getTimeMax()<endTime,"variable flowrate is defined up to %, but tMax is set to %",endTime, getHandler()->getDPMBase()->getTimeMax());
+    variableCumulativeVolumeFlowRate_ = variableCumulativeVolumeFlowRate;
+    samplingInterval_ = samplingInterval;
+};

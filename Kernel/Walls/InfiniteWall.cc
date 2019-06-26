@@ -178,14 +178,8 @@ bool InfiniteWall::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance
 void InfiniteWall::read(std::istream& is)
 {
     BaseWall::read(is);
-    std::string dummy;
-    is >> dummy;
-    if (dummy == "normal")
-    {
-        Vec3D normal;
-        is >> normal;
-        setNormal(normal);
-    }
+    Vec3D normal;
+    if (helpers::readOptionalVariable(is,"normal",normal)) setNormal(normal);
 }
 
 /*!

@@ -180,7 +180,7 @@ bool Screw::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wallInter
     Mdouble q; //Current guess
     Mdouble dd; //Derivative at current guess
     Mdouble ddd; //Second derivative at current guess
-    
+
     //Set initial q to the closest position on the screw with the same angle as A
     //The initial guess will be in the minimum of the sin closest to q0
     //Minima of the sin are at
@@ -202,10 +202,10 @@ bool Screw::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wallInter
         ddd = 8.0 * constants::sqr_pi * n_ * n_ * RSquared * cos(arg) + 2.0 * l_ * l_;
         q -= dd / ddd;
         if(++count>maxCount) {
-            logger(WARN,"Screw contact detection did not converge (err=%); continuing with approximate contact point",fabs(dd/ddd));
+            logger(WARN,"Screw % contact detection did not converge (err=%); continuing with approximate contact point",getId(),fabs(dd/ddd));
             break;
         }
-    } while (fabs(dd / ddd) > 2e-14);
+    } while (fabs(dd / ddd) > 5e-14);
     
     //Calculate r
     Mdouble r = R * cos(2.0 * constants::pi * (offset_ + n_ * q) - A);
@@ -238,10 +238,10 @@ bool Screw::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wallInter
                   2.0 * l_ * l_;
             q -= dd / ddd;
             if(++count>maxCount) {
-                logger(WARN,"Screw contact detection at left boundary did not converge (err=%); continuing with approximate contact point",fabs(dd/ddd));
+                logger(WARN,"Screw % contact detection at left boundary did not converge (err=%); continuing with approximate contact point",getId(),fabs(dd/ddd));
                 break;
             }
-        } while (fabs(dd / ddd) > 2e-14);
+        } while (fabs(dd / ddd) > 1e-13);
     }
     //Second possibility is that it occured before the start of after the end
     if (q < 0)

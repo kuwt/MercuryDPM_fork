@@ -68,9 +68,8 @@ void ParticleSpecies::write(std::ostream& os) const
     //note we inherit from BaseObject, not BaseParticle
     BaseObject::write(os);
     os << " density " << density_;
-    if (getConstantRestitution()) {
-        os << " constantRestitution " << getConstantRestitution();
-    }
+    BaseSpecies::write(os);
+    //todo flip the two values
 }
 
 /*!
@@ -78,13 +77,10 @@ void ParticleSpecies::write(std::ostream& os) const
  */
 void ParticleSpecies::read(std::istream& is)
 {
-    BaseSpecies::read(is);
+    BaseObject::read(is);
     std::string dummy;
-    bool constantRestitution;
     is >> dummy >> density_;
-    if (helpers::readOptionalVariable(is, "constantRestitution", constantRestitution)) {
-        setConstantRestitution(constantRestitution);
-    }
+    BaseSpecies::read(is);
 }
 
 /*!
