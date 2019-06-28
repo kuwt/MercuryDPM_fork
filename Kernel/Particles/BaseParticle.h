@@ -47,6 +47,8 @@ class PossibleContact;
 /*!
  * \class BaseParticle
  * \brief
+ * \details Since r3648, BaseParticle is an abstract class. Use
+ * SphericalParticle for a 'basic' particle.
  */
 class BaseParticle : public BaseInteractable
 {

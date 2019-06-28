@@ -225,6 +225,8 @@ BaseWall* WallHandler::readAndCreateObject(std::istream& is)
  * If it is a  finite wall, read the normal and position of each part and construct
  * an IntersectionOfWalls from it, which can then be added to the handler.
  * \param[in,out] is The input stream from which the information is read.
+ *
+ * \todo This is deprecated since r ~2360.
  */
 BaseWall* WallHandler::readAndCreateOldObject(std::istream& is)
 {
@@ -261,12 +263,17 @@ BaseWall* WallHandler::readAndCreateOldObject(std::istream& is)
 }
 
 /*!
+ * \details As we add the object into the handler, we need to make sure that the
+ * object keeps its existing ID. This is not always the same as the index, e.g.
+ * if walls have been removed during the simulation.
  * \param[in] is The input stream from which the information is read.
  */
 void WallHandler::readAndAddObject(std::istream& is)
 {
     BaseWall* o = readAndCreateObject(is);
+    unsigned int id = o->getId();
     addObject(o);
+    getLastObject()->setId(id);
 }
 
 /*!

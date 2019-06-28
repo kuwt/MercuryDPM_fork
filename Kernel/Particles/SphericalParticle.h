@@ -30,6 +30,8 @@
 
 /*!
  * \class SphericalParticle
+ * \brief A basic particle. 
+ * \details Before r3648, this SphericalParticle class was known as BaseParticle. 
  */
 class SphericalParticle final : public BaseParticle
 {
