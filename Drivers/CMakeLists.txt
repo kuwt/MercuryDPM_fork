@@ -24,8 +24,9 @@ add_subdirectory(Sinter)
 add_subdirectory(SpeedTest)
 add_subdirectory(Demos)
 
-add_subdirectory(ParallelDrum)
 
+add_subdirectory(ParallelDrum)
+add_subdirectory(SimpleDrum)
 
 #IFCD: If you want (a folder of) the USER directory to be built, mark it so in your ccmake or cmake-gui
 
