@@ -21,7 +21,7 @@ if iscell(filenames)
 		data{i} = load_file(filenames{i},opt);
 	end
 else 
-	if (isempty(strfind(filenames,'?'))&&isempty(strfind(filenames,'*'))) 
+	if (~contains(filenames,'?')&&~contains(filenames,'*')) 
         % if argument is a single filename, load_file is used for loading
 		data = load_file(filenames,opt);
     else
@@ -31,7 +31,7 @@ else
 	end
 end
 
-return
+end
 
 % load_file loads a single .stat or .data file
 function data = load_file(filename,opt)
@@ -59,7 +59,7 @@ else
         end
     end
 end
-return
+end
 
 %loads all variables stored in a stat file
 function data = load_stat_file(filename)
@@ -133,7 +133,7 @@ elseif ~doGradient
         data{i}.time = rawdata.data(index_time(i-1),1:2)';
         data{i}.variables = rawdata.data(index_time(i-1)+1:index_time(i)-1,4:end);
     end
-    disp(['multiple time steps (' VolumeFractionm2str(length(index_time)-1) '); creating cell output'])
+    disp(['multiple time steps (' num2str(length(index_time)-1) '); creating cell output'])
 else
     dataTemplate = data;
     data = cell(1,length(index_time)/4);
@@ -150,13 +150,13 @@ else
         data{i/4}.grady = rawdata.data(index_time(i-2)+1:index_time(i-1)-1,4:end);
         data{i/4}.gradz = rawdata.data(index_time(i-1)+1:index_time(i  )-1,4:end);
     end
-    disp(['multiple time steps (' VolumeFractionm2str(length(index_time)/4) '); creating cell output'])
+    disp(['multiple time steps (' num2str(length(index_time)/4) '); creating cell output'])
 end
 
 % \todo{why is this needed?}
-%data.description = ['Goldhirsch w/d=' VolumeFractionm2str(str2double(data.text{2})/1e-3)];
+%data.description = ['Goldhirsch w/d=' num2str(str2double(data.text{2})/1e-3)];
 
-return
+end
 
 %loads from data file the same variables that are present in the
 %stat file (for comparison to Stefan's code)
@@ -181,7 +181,7 @@ data.variable_names = { ...
 	'Dissipation'; ...
 	};
 text = textscan([rawdata.textdata{8} ' ' rawdata.textdata{9}],'%s ');
-data.text = [text{1}{5} VolumeFractionm2str(str2double(text{1}{9})*100)];
+data.text = [text{1}{5} num2str(str2double(text{1}{9})*100)];
 rho_text = textscan(rawdata.textdata{11},'%s ');
 rho = str2double(rho_text{1}{end});
 
@@ -203,7 +203,7 @@ data.variables = [VolumeFraction ...
 
 %data.description = ['Luding ' data.text];
 
-return
+end
 
 % rewrites coordinates and variables into n dimensional shape where n is
 % the VolumeFractionmber of dimensions in stattype (easy for plotting) 
@@ -257,7 +257,7 @@ if isfield(data,'Nu')
    data.VolumeFraction = data.Nu;
    data = rmfield(data,'Nu');
 end
-return
+end
 
 % extracts a load of extra variables (such as stress) from the basic
 % microscopic fields 
@@ -361,7 +361,7 @@ if (data.nz>1&&data.nx==1&&data.ny==1),
     end
 end
 
-return
+end
 
 % extracts extra variables that only exist for stattype Z
 function data = get_depth_variables(data)
@@ -404,7 +404,7 @@ else
   end
 end
 
-return
+end
 
 function [Vs, Ds] = dsort_ev(V, D)
     Ds=D;
@@ -443,7 +443,7 @@ function [Vs, Ds] = dsort_ev(V, D)
         Vs(:,3)=tmpvec;
     end
 
-return
+end
 
 function [remainder,maximum] = get_momentum_equation(data)
 if isfield(data,'VolumeFraction_dx'),
@@ -475,7 +475,7 @@ Traction = [data.TractionX data.TractionY data.TractionZ ];
 remainder = VelocityDotNablaMomentum -DensityGravity +NablaDotStress +Traction;
 
 maximum = max([max(VelocityDotNablaMomentum) max(DensityGravity) max(NablaDotStress)]);
-return
+end
 
 function data = read_ene(statname,data)
 
@@ -516,7 +516,7 @@ if exist(filename,'file'),
   data.Ene.ComZ = rawdata.data(:,8);
 end
 
-return
+end
 
 function data = read_restart(statname,data)
 
@@ -600,7 +600,7 @@ end
 if isfield(data,'d'), data.ParticleVolume = pi/6*data.d^3; end
 if isfield(data,'Domain'), data.DomainVolume = prod(data.Domain([2 4 6])-data.Domain([1 3 5])); end
 if isfield(data,'Gravity'), data.ChuteAngle = round(atand(-data.Gravity(1)/data.Gravity(3))*400)/400; end
-return
+end
 
 function NablaVariable = nabla(variable,x,y,z)
 
@@ -665,7 +665,7 @@ elseif size(variable,2)==6 %symmetric matrix
 else 
   disp('Error');
 end
-return
+end
 
 function NablaVariable = nablaCenter(variable,x,y,z)
 
@@ -730,4 +730,4 @@ elseif size(variable,2)==6 %symmetric matrix
 else 
   disp('Error');
 end
-return
+end
