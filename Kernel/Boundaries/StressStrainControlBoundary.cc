@@ -358,9 +358,10 @@ StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D& str
         // Lees Edwards bc in y direction & periodic boundary in x direction, simple shear boundary activated
         LeesEdwardsBoundary leesEdwardsBoundary;
         leesEdwardsBoundary.setHandler(getHandler());
+        double integratedShift = integratedShift_;
         leesEdwardsBoundary.set(
-                [*this](Mdouble time UNUSED)
-                { return integratedShift_; },
+                [integratedShift](Mdouble time UNUSED)
+                { return integratedShift; },
                 [](Mdouble time UNUSED)
                 { return 0; },
                 dpm->getXMin(), dpm->getXMax(), dpm->getYMin(), dpm->getYMax());
