@@ -102,7 +102,7 @@ public:
      */
     void setVertices(Vec3D A, Vec3D B, Vec3D C);
     
-    void move(const Vec3D& move);
+    void move(const Vec3D& move) override;
     
     /*!
      * \brief Same as #setVertices(A,B,C), but sets the position explicitly.
