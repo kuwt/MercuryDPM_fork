@@ -23,18 +23,48 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Mercury3D.h"
+#include <Mercury3D.h>
 
-class MyDriver: public Mercury3D{
+/*
+* This is our problem description. Everything is set up here.
+* We inherit from Mercury3D, since this gives full flexibility.
+* For more predefined problems (for instance, chutes), please see the
+* documentation.
+*/
+class MyProblem : public Mercury3D
+{
 public:
-  void setupInitialConditions(){
-    //create particle, wall, boundary conditions
-  }
+ /* We define our own 'setupInitialConditions' function here,
+  * which defines all the specifics about our simulation here.
+  */
+ void setupInitialConditions() override
+ {
+   //The first step: set any properties which are always true for your system.
+   // (for instance, if gravity remains constant, set it here)
+   
+   
+   //Now, decide what Species you need for your system.
+   
+   
+   //Add your walls below, and don't forget to set the species!
+   
+   
+   //Now, either add particles or Insertion/Deletion boundaries
+   
+   
+ }
+
 };
 
-int main() {
-  MyDriver problem;
-  // create species, dpm parameters
+int main(const int argc, const char** argv)
+{
+  MyProblem problem;
+  /* Make sure to add an (unique) name here */
+  problem.setName("MyProblemCode");
+
+  //Add any configuration which is modified often below...
+  
+  /* Now start the simulation */
   problem.solve();
   return 0;
 }
