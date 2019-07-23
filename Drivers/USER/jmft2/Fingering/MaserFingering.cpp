@@ -1,15 +1,16 @@
-/* PeriodicFingering - fingering experiments in a periodic domain. 
- * Particles are released by a reservoir and the depth is controlled by a gate. 
- * For best results, take quite a low coefficient of restitution and quite a
- * high coefficient of friction. This helps impose a no-slip condition.
+/* MaserFingering - fingering experiments in a periodic domain. 
+ * Particles are released from a Maser, which is initially closed to produce a
+ * segregated inflow. A finite quantity is released. 
  */
 #include "Species/Species.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Walls/InfiniteWall.h"
 #include "Walls/IntersectionOfWalls.h"
 #include "Mercury3D.h"
+#include "Particles/SphericalParticle.h"
 #include "Boundaries/PeriodicBoundary.h"
 #include "Boundaries/PolydisperseInsertionBoundary.h"
+#include "Boundaries/ConstantMassFlowMaserBoundary.h"
 #include "Math/RNG.h"
 #include <iostream>
 #include <fstream>
@@ -30,10 +31,10 @@ void terminationUncaughtException()
     exit(1);
 }
 
-class PeriodicFingering : public Mercury3D { 
+class MaserFingering : public Mercury3D { 
   public:
 
-    PeriodicFingering(string parsfile) {
+    MaserFingering(string parsfile) {
       /* Reading config file */
       ifstream file(parsfile);
       string name;
@@ -175,7 +176,7 @@ class PeriodicFingering : public Mercury3D {
 
     }
 
-    ~PeriodicFingering()
+    ~MaserFingering()
     {
         delete smallPrototype;
         delete largePrototype;
@@ -200,22 +201,19 @@ class PeriodicFingering : public Mercury3D {
 
       setXBallsAdditionalArguments("-noborder 4 -v0 -solidf");
       /* Set up walls */
-      auto backWall = new InfiniteWall();
+      backWall = new InfiniteWall();
       backWall->set(Vec3D(-1,0,0), Vec3D(-pars.at("reservoirLength"),0,0));
       backWall->setSpecies(basal_);
       backWall = wallHandler.copyAndAddObject(backWall);
+      blocker = new InfiniteWall();
+      blocker->set(Vec3D(1,0,0), Vec3D(0, 0, 0));
+      blocker->setSpecies(basal_);
+      blocker = wallHandler.copyAndAddObject(blocker);
+
       auto bottomWall = new InfiniteWall();
       bottomWall->set(Vec3D(0,0,-1),Vec3D(0,0,0));
       bottomWall->setSpecies(basal_);
       bottomWall = wallHandler.copyAndAddObject(bottomWall);
-
-      /* Set up initial confinement */
-      // Note, liftableGate is declared as a member of the driver class (so that it
-      // may be referred to in actionsAfterTimeStep).
-      liftableGate = new IntersectionOfWalls();
-      liftableGate->addObject(Vec3D(1,0,0),Vec3D(0,0,0));
-      liftableGate->setSpecies(basal_);
-      liftableGate = wallHandler.copyAndAddObject(liftableGate);
 
       auto endWall = new InfiniteWall();
       endWall->set(Vec3D(+1,0,0), Vec3D(pars.at("domainLength"), 0, 0));
@@ -242,42 +240,40 @@ class PeriodicFingering : public Mercury3D {
               PolydisperseInsertionBoundary());
       insb->setGeometry(pars.at("insbMaxFailed"),
               Vec3D( -pars.at("reservoirLength"), 0, 0 ),
-              Vec3D( 0, pars.at("domainWidth"), pars.at("reservoirHeight") ),
+              Vec3D( -2*pars.at("radius_large"), pars.at("domainWidth"), pars.at("reservoirHeight") ),
               Vec3D(0, 0, - sqrt(pars.at("g") * pars.at("reservoirHeight"))),
               Vec3D(0, 0, - sqrt(pars.at("g") * pars.at("reservoirHeight")))
               );
 
-      double probsmall = pars.at("ratio_small"); // TODO
+
+      double probsmall = pars.at("ratio_small"); // TODO by volume or by number?
       double problarge = 1 - probsmall;
       std::cout << "probsmall = " << probsmall << std::endl;
       insb->addGenerandum(smallPrototype, probsmall, pars.at("dispersitySmall") );
       insb->addGenerandum(largePrototype, problarge, pars.at("dispersityLarge") );
       insb->checkBoundaryBeforeTimeStep(this);
       stillFillingUp = true;
+
     }
 
-    void actionsOnRestart() 
+    void actionsOnRestart() override
     {
-        /* Set the pointer for liftableGate */
-        liftableGate = (IntersectionOfWalls*)wallHandler.getObjectById(2);
-        /* Check whether we have already lifted the gate or not, by examining
-         * the number of objects in the IntersectionOfWalls. */
-        switch(liftableGate->getNumberOfObjects())
-        {
-            case 1:
-                stillFillingUp = true;
-                break;
-            case 3:
-                stillFillingUp = false;
-                break;
-            default:
-                logger(ERROR, "liftableGate has % objects, which shouldn't happen. (Should be 1, if still filling up, or 3 if already filled.) Terminating.", 
-                        liftableGate->getNumberOfObjects());
-                break;
-        }
+        logger(WARN, "In actionsOnRestart()");
 
-        if (stillFillingUp)
+        stillFillingUp = false;
+
+        Mdouble volfracThreshold = pars.at("volfracThreshold");
+
+        // Volume fraction in the reservoir
+        Mdouble volfrac = particleHandler.getVolume() 
+            / ( pars.at("reservoirLength") * pars.at("domainWidth") * pars.at("reservoirHeight") );
+
+        if ( volfrac <= volfracThreshold && boundaryHandler.getNumberOfObjects() > 1 )
         {
+            stillFillingUp = true;
+            backWall = (InfiniteWall*) wallHandler.getObjectById(0);
+            blocker = (InfiniteWall*) wallHandler.getObjectById(1);
+
 #ifdef FILESWHILEFILLING
             eneFile.setFileType(FileType::ONE_FILE);
             fStatFile.setFileType(FileType::MULTIPLE_FILES);
@@ -287,8 +283,35 @@ class PeriodicFingering : public Mercury3D {
             fStatFile.setFileType(FileType::NO_FILE);
             dataFile.setFileType(FileType::NO_FILE);
 #endif
+
+            logger(WARN, "Read restart file. Still filling up; volfrac = %", volfrac);
+            return;
         }
         else
+        {
+            stillFillingUp = false;
+            masb = (ConstantMassFlowMaserBoundary*) boundaryHandler.getObjectById(1);
+            masb->activateMaser();
+            masb->turnOffCopying();
+            logger(WARN, "Read restart file. Done filling up; volfrac = %", volfrac);
+        }
+
+        if (!stillFillingUp 
+                && particleHandler.getVolume() < pars.at("totalVolume") 
+                && getTime() >= pars.at("timeToOpen"))
+        {
+            masb->turnOnCopying();
+            logger(WARN, "Reading restart file. Maser is copying. t = %", getTime());
+        }
+
+        if (!stillFillingUp 
+                && particleHandler.getVolume() >= pars.at("totalVolume") )
+        {
+            masb->turnOffCopying();
+            logger(WARN, "Reading restart file. Maser is not copying. t = %", getTime());
+        }
+
+        if (!stillFillingUp)
         {
             eneFile.setFileType(FileType::ONE_FILE);
 
@@ -360,130 +383,132 @@ class PeriodicFingering : public Mercury3D {
     void actionsAfterTimeStep() 
     {
 
-        /* If we're done filling up, no need to do anything here, just let
-         * things run. */
-        if (!stillFillingUp) 
-            return;
 
-        /* Otherwise... Have we met the conditions for the system to stop
-         * filling up, and start releasing? */
-
-        /* We shall say that the system has come to rest provided that the
-         * particles' r.m.s. speed is sufficiently low and the volume fraction
-         * exceeds a certain amount. */
 
         /* There are two separate conditions:
          *   After the volume fraction is high enough, remove the
          *   InsertionBoundary.
          *
-         *   After the particles' r.m.s. speed is low enough, open the gate.
+         *   After the Maser has run for long enough, activate it.
          * These are tested for separately.
          */
 
-        Mdouble rmsvelThreshold = pars.at("rmsvelThreshold");
-        Mdouble volfracThreshold = pars.at("volfracThreshold");
-
-        // Volume fraction in the reservoir
-        Mdouble volfrac = particleHandler.getVolume() 
-                            / ( pars.at("reservoirLength") * pars.at("domainWidth") * pars.at("reservoirHeight") );
-
-        if ( volfrac > volfracThreshold && boundaryHandler.getNumberOfObjects() > 1 )
+        if (stillFillingUp)
         {
-            /* We have introduced enough particles. */
+            Mdouble volfracThreshold = pars.at("volfracThreshold");
 
-            /* Get rid of all the InsertionBoundary that we used to introduce
-             * particles. Be careful --- we don't want to delete the
-             * PeriodicBoundary! */
-            boundaryHandler.clear();
-            /* Put the periodic sides back in */
-            auto sides = new PeriodicBoundary();
-            sides->set(Vec3D(0,1,0), 0, +pars.at("domainWidth"));
-            sides = boundaryHandler.copyAndAddObject(sides);
+            // Volume fraction in the reservoir
+            Mdouble volfrac = particleHandler.getVolume() 
+                / ( pars.at("reservoirLength") * pars.at("domainWidth") * pars.at("reservoirHeight") );
 
-            /* Turn on gravity */
-            setGravity(Vec3D(
-                        pars.at("g")*sin(pars.at("alpha")), 
-                        0, 
-                        -pars.at("g")*cos(pars.at("alpha")) 
-                        ));
-            /* Give particles some downwards impulse so that the rmsvelThreshold
-             * condition isn't broken first */
-            for (auto p : particleHandler)
-                p->setVelocity(Vec3D(0,0,-rmsvelThreshold * 1.1));
+            if ( volfrac > volfracThreshold && boundaryHandler.getNumberOfObjects() > 1 )
+            {
+                /* We have introduced enough particles. */
 
-            logger(INFO, 
-                    "t = %, removed all the InsertionBoundary. volume = %, volfrac = %",
-                    getTime(), particleHandler.getVolume(), volfrac);
+                /* Get rid of all the InsertionBoundary that we used to introduce
+                 * particles. Be careful --- we don't want to delete the
+                 * PeriodicBoundary! */
+                boundaryHandler.clear();
+                /* Put the periodic sides back in */
+                auto sides = new PeriodicBoundary();
+                sides->set(Vec3D(0,1,0), 0, +pars.at("domainWidth"));
+                sides = boundaryHandler.copyAndAddObject(sides);
+                logger(INFO, 
+                        "t = %, removed all the InsertionBoundary. volume = %, volfrac = %",
+                        getTime(), particleHandler.getVolume(), volfrac);
 
-            writeRestartFile();
-            setTime(0);
+
+                wallHandler.removeObject(backWall->getIndex());
+                wallHandler.removeObject(blocker->getIndex());
+
+                /* Put in the Maser (initially closed) */
+                /* We need to put the Maser in *after* inserting particles using the
+                 * PeriodicInsertionBoundary. Otherwise, the in-Maser species is not
+                 * set properly. */
+                masb = new ConstantMassFlowMaserBoundary();
+                masb->set(Vec3D(1,0,0),  - pars.at("reservoirLength"), 0);
+                masb = boundaryHandler.copyAndAddObject(masb);
+                masb->activateMaser();
+                masb->turnOffCopying();
+                logger(INFO, "Maser inserted and activated, but not copying yet.");
+
+
+                /* Turn on gravity */
+                setGravity(Vec3D(
+                            pars.at("g")*sin(pars.at("alpha")), 
+                            0, 
+                            -pars.at("g")*cos(pars.at("alpha")) 
+                            ));
+                /* Give particles some downwards impulse so that the rmsvelThreshold
+                 * condition isn't broken first */
+                /*
+                   for (auto p : particleHandler)
+                   p->setVelocity(Vec3D(0,0,-rmsvelThreshold * 1.1));
+                */
+
+                /* Set up particles for rough base. (Don't set them up during
+                 * the initial filling, or you waste time calculating them
+                 * (although they are static so it's fairly cheap.) 
+                 *
+                 * We need to put in the rough base after activating the Maser,
+                 * so that the basal particles don't get converted. (TODO would
+                 * that be important?) */
+                double basalConcentration;
+                if (pars.find("basalConcentration") != pars.end())
+                    basalConcentration = pars.at("basalConcentration");
+                else
+                {
+                    basalConcentration = 1;
+                    std::cout << "Set basalConcentration to default value 1" << std::endl;
+                }
+                int NBasalParticle = basalConcentration * pars.at("domainWidth") * pars.at("domainLength") 
+                    / (4 * pow(pars.at("radius_large"), 2));
+
+
+                /* The rough base should be generated according to a seed, so that
+                 * we can make the same rough base across different experiments
+                 * (assuming same domain length and width) */
+                if (pars.find("basalSeed") != pars.end())
+                {
+                    baseGenerator.setRandomSeed(pars.at("basalSeed"));
+                    std::cout << "Set the random seed for the rough base to be " << pars.at("basalSeed") << std::endl;
+                }
+                else
+                    std::cout << "basalSeed not set: didn't change the random seed for the rough base." << std::endl;
+
+                for (int n = 0; n < NBasalParticle; n++) 
+                {
+                    // double rand = baseGenerator.getRandomNumber(0,1);
+                    // double r = rand*pars.at("radius_small") + (1-rand)*pars.at("radius_large");
+                    double r = pars.at("radius_large");
+                    double x = baseGenerator.getRandomNumber(-pars.at("reservoirLength")-masb->getGapSize(), pars.at("domainLength"));
+                    double y = baseGenerator.getRandomNumber(0,1) * pars.at("domainWidth");
+                    double z = 0;
+
+                    SphericalParticle P;
+                    P.fixParticle();
+                    P.setRadius(r);
+                    P.setSpecies(basal_);
+                    P.setPosition(Vec3D(x,y,z));
+                    particleHandler.copyAndAddObject(P);
+                }
+                cout << NBasalParticle << " base particles are generated." << endl;
+
+                setTime(0);
+                forceWriteOutputFiles();
+
+                stillFillingUp = false;
+            }
         }
+
+        /* If we're no longer filling up... */
         
-        Mdouble rmsvel = sqrt(2*getKineticEnergy() / getTotalMass());
-
-        if ( rmsvel < rmsvelThreshold && volfrac > volfracThreshold 
-//                && boundaryHandler.getNumberOfObjects() == 1
-           )
+        /* Open up the Maser after some time */
+        if (!stillFillingUp && (masb->isActivated() && !masb->isCopying()) && particleHandler.getVolume() < pars.at("totalVolume") && getTime() > pars.at("timeToOpen"))
         {
-            /* We have allowed the particles to settle. */
+            masb->turnOnCopying();
+            logger(INFO, "t=%, maser is now copying", getTime());
 
-            /* Get rid of all residual velocity. (Not really that important? But
-             * useful for comparison between experiments?) */
-            for (auto p : particleHandler)
-                p->setVelocity(Vec3D(0,0,0));
-
-            /* Remove initial confinement after the particles come to rest */
-            liftableGate->addObject(Vec3D(0,0,1),
-                    Vec3D(0,0, pars.at("gateHeight")));
-            liftableGate->addObject(Vec3D(-1,0,0),
-                    Vec3D(2*pars.at("radius_large"),0,0));
-            stillFillingUp = false;
-            cout << "front wall is lifted." << endl;
-
-
-            /* Set up particles for rough base. (Don't set them up before the
-             * initial collapse, or you waste time calculating them (although they
-             * are static so it's fairly cheap.) */
-            double basalConcentration;
-            if (pars.find("basalConcentration") != pars.end())
-                basalConcentration = pars.at("basalConcentration");
-            else
-            {
-                basalConcentration = 1;
-                std::cout << "Set basalConcentration to default value 1" << std::endl;
-            }
-            int NBasalParticle = basalConcentration * pars.at("domainWidth") * pars.at("domainLength") 
-                / (4 * pow(pars.at("radius_large"), 2));
-
-
-            /* The rough base should be generated according to a seed, so that
-             * we can make the same rough base across different experiments
-             * (assuming same domain length and width) */
-            if (pars.find("basalSeed") != pars.end())
-            {
-                baseGenerator.setRandomSeed(pars.at("basalSeed"));
-                std::cout << "Set the random seed for the rough base to be " << pars.at("basalSeed") << std::endl;
-            }
-            else
-                std::cout << "basalSeed not set: didn't change the random seed for the rough base." << std::endl;
-
-            for (int n = 0; n < NBasalParticle; n++) 
-            {
-                // double rand = baseGenerator.getRandomNumber(0,1);
-                // double r = rand*pars.at("radius_small") + (1-rand)*pars.at("radius_large");
-                double r = pars.at("radius_large");
-                double x = baseGenerator.getRandomNumber(0,1) * pars.at("domainLength");
-                double y = baseGenerator.getRandomNumber(0,1) * pars.at("domainWidth");
-                double z = 0;
-
-                SphericalParticle P;
-                P.fixParticle();
-                P.setRadius(r);
-                P.setSpecies(basal_);
-                P.setPosition(Vec3D(x,y,z));
-                particleHandler.copyAndAddObject(P);
-            }
-            cout << NBasalParticle << " base particles are generated." << endl;
 
 
             /* Write the state */
@@ -523,22 +548,31 @@ class PeriodicFingering : public Mercury3D {
             forceWriteOutputFiles(); 
         }
 
+        /* Deactivate the Maser after enough particles have been released */
+        if (!stillFillingUp && (masb->isActivated() && masb->isCopying()) && particleHandler.getVolume() >= pars.at("totalVolume") )
+        {
+            masb->closeMaser();
+
+        }
+
     }
+
 
   private:
     LinearViscoelasticFrictionSpecies *small_, *large_, *basal_;
     RNG baseGenerator;
     map<string,double> pars;
     bool stillFillingUp;
-    IntersectionOfWalls* liftableGate;
-    BaseParticle *smallPrototype, *largePrototype;
+    InfiniteWall *backWall, *blocker;
+    ConstantMassFlowMaserBoundary *masb;
+    SphericalParticle *smallPrototype, *largePrototype;
 
 };
 
 int main(int argc, char *argv[]) {
     // set_terminate (terminationUncaughtException);
     if (argc > 1) {
-        PeriodicFingering* problem = new PeriodicFingering(argv[1]);
+        auto problem = new MaserFingering(argv[1]);
         argv[1] = argv[0];
         problem->solve(argc-1, argv+1);
         delete problem;
@@ -548,3 +582,4 @@ int main(int argc, char *argv[]) {
     }
     return 0;
 }
+
