@@ -6,22 +6,22 @@ To use MercuryDPM with Netbeans:
 - Click on <em>%File -> New Project</em>.
 - Select <em>C/C++ -> C/C++ Project With Existing Sources</em> and click <em>Next</em>.
 
-\image html Netbeans/netbeans1.png
+\image html Netbeans/netbeans1.png width=\textwidth
 
 - As source, specify the folder which contains the Mercury \b source files (e.g., <em>~/Mercury/MercurySource</em>).
   Because we want a separate Build and Source folder, we need to customise the cmake configuration.
   Therefore, select <em>Custom</em> configuration mode and click <em>Next</em>.
 
-\image html Netbeans/netbeans2.png
+\image html Netbeans/netbeans2.png width=\textwidth
 
 - In Step 3, change the directory "Run in Folder" from "MercurySource" to "MercuryBuild". \n
 
-\image html Netbeans/netbeans3.png
+\image html Netbeans/netbeans3.png width=\textwidth
 
 - Click <em> Next </em> for steps 3-7. Finally, click <em>finish</em>.
 Netbeans will now run cmake to create make files for compiling MercuryDPM, and a code analysis, so the IDE can help you navigate through the code.
 
-\image html Netbeans/netbeans4.png
+\image html Netbeans/netbeans4.png width=\textwidth
 
 - Now you are ready to go. Click the hammer symbol (Build Project) to compile MercuryDPM for the first time. This will take a few minutes.
 */

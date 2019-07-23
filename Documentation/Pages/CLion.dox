@@ -7,11 +7,11 @@ Setting up CLion is easy:
 - Install CLion from https://www.jetbrains.com/clion and apply for a academic licence.
 - Open the application.
 - Click on <em>Import Project from Sources</em>.
-\image html CLion/CLion1.png
+\image html CLion/CLion1.png width=\textwidth
 - Select the MercurySource directory.
-\image html CLion/CLion2.png
+\image html CLion/CLion2.png width=\textwidth
 - Click on <em>Open Project</em>
-\image html CLion/CLion3.png
+\image html CLion/CLion3.png width=\textwidth
 
 Now your project will be set up, which will take a few minutes. After that, you are ready to go.
 
