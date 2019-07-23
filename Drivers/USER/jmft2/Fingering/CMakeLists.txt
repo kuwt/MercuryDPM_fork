@@ -18,7 +18,7 @@ endforeach()
 
 #Part 2 : Copy example config file
 #########################################
-file(COPY test.config DESTINATION .)
+file(COPY exampleMaserFingeringConfigFiles DESTINATION .)
 
 #Part 3 : Copy all the tools
 #########################################
