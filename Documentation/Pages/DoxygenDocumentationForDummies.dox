@@ -1,5 +1,4 @@
-
-/*! \page Test Documenting with Doxygen for Dummies
+/*! \page Doxygen Documenting with Doxygen for Dummies
 
 ## Installing and Turning On Doxygen Documentation
 
@@ -30,7 +29,7 @@ The new file can then be edited at will.
 
 All Doxygen files should be started with a line that reads:
 
-<TT>/</TT><TT>*!</TT> <TT>/</TT><CODE>page [KEYWORD] [TITLE]</CODE>
+<TT>/</TT><TT>*!</TT> <TT>\</TT><CODE>page [KEYWORD] [TITLE]</CODE>
 
 and ended with:
 
