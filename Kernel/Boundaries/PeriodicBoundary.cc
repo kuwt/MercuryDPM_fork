@@ -39,7 +39,7 @@ PeriodicBoundary::PeriodicBoundary()
     distanceLeft_ = std::numeric_limits<double>::quiet_NaN();
     distanceRight_ = std::numeric_limits<double>::quiet_NaN();
     scaleFactor_ = std::numeric_limits<double>::quiet_NaN();
-    
+
     logger(DEBUG, "PeriodicBoundary::PeriodicBoundary() finished");
 }
 
@@ -52,11 +52,23 @@ PeriodicBoundary::~PeriodicBoundary()
 }
 
 /*!
- * \details Copy method; creates a copy on the heap and returns its pointer. 
+ * \details Copy method; creates a copy on the heap and returns its pointer.
  */
 PeriodicBoundary* PeriodicBoundary::copy() const
 {
     return new PeriodicBoundary(*this);
+}
+
+/*!
+ * \details Copy constructor
+ */
+PeriodicBoundary::PeriodicBoundary(const PeriodicBoundary& other)
+{
+    normal_ = other.normal_;
+    scaleFactor_ = other.scaleFactor_;
+    distanceLeft_ = other.distanceLeft_;
+    distanceRight_ = other.distanceRight_;
+    shift_ = other.shift_;
 }
 
 /*!
@@ -75,7 +87,7 @@ void PeriodicBoundary::set(Vec3D normal, Mdouble distanceLeft, Mdouble distanceR
     distanceLeft_ = distanceLeft * scaleFactor_;
     distanceRight_ = distanceRight * scaleFactor_;
     logger.assert_always(distanceRight_ > distanceLeft_,
-                         "PeriodicBoundary::set: left distance needs to be smaller than right distance");
+            "PeriodicBoundary::set: left distance needs to be smaller than right distance");
     shift_ = normal_ * (distanceRight_ - distanceLeft_);
 }
 
@@ -103,6 +115,16 @@ void PeriodicBoundary::set(Vec3D normal, Mdouble distanceLeft, Mdouble distanceR
     // factor is used to set shift vector to correct length
     scaleFactor_ = (distanceRight_ - distanceLeft_) * Vec3D::dot(shiftDirection, normal_);
     shift_ = shiftDirection * scaleFactor_;
+}
+
+/*!
+ * \details Sets the shift_ vector through setting the planewise shift.
+ * We delete the component of planewiseShift that is parallel to normal_. 
+ */
+void PeriodicBoundary::setPlanewiseShift(Vec3D planewiseShift)
+{
+    planewiseShift -= Vec3D::dot(planewiseShift, normal_) / Vec3D::dot(normal_, normal_) * normal_;
+    shift_ = normal_ * (distanceRight_ - distanceLeft_) + planewiseShift;
 }
 
 /*!
@@ -162,7 +184,7 @@ void PeriodicBoundary::moveRight(Mdouble distanceRight)
 }
 
 /*!
- * \details Returns the distance to the closest wall of the boundary to the particle.
+ * \details Returns the distance to the closest edge of the boundary to the particle.
  * Since this function should be called before calculating any Particle-Wall 
  * interactions, it can also be used to set the shift vector in case of curved walls.
  * Positive means that the particle is insid-> the periodic domain, negative means that it is
@@ -176,14 +198,15 @@ Mdouble PeriodicBoundary::getDistance(const BaseParticle& p) const
 }
 
 /*!
- * \details Returns the distance to the wall closest to the position
+ * \details Returns the distance to the edge closest to the position
  * \param[in] position  A reference to the position which distance to the periodic 
  *                      boundary is to be calculated
  */
 Mdouble PeriodicBoundary::getDistance(const Vec3D& position) const
 {
     Mdouble distanceFromPlaneThroughOrigin = Vec3D::dot(position, normal_);
-    return std::min(distanceFromPlaneThroughOrigin - distanceLeft_, distanceRight_ - distanceFromPlaneThroughOrigin);
+    return std::min(distanceFromPlaneThroughOrigin - distanceLeft_, 
+                    distanceRight_ - distanceFromPlaneThroughOrigin);
 }
 
 /*!
@@ -341,16 +364,16 @@ void PeriodicBoundary::createPeriodicParticle(BaseParticle* p, ParticleHandler& 
 void PeriodicBoundary::createGhostParticle(BaseParticle* pReal)
 {
     ParticleHandler& pH = getHandler()->getDPMBase()->particleHandler;
-    
+
     //Step 1: Copy the particle to new ghost particle.
     BaseParticle* pGhost = pReal->copy();
-    
+
     //Step 2: Copy the interactions of the ghost particle.
     pGhost->copyInteractionsForPeriodicParticles(*pReal);
-    
+
     //Step 3: Shift the ghost to the 'reflected' location.
     shiftPosition(pGhost);
-    
+
     //Step 4: If Particle is double shifted, get correct original particle
     BaseParticle* from = pReal;
     while (from->getPeriodicFromParticle() != nullptr)
@@ -389,7 +412,6 @@ void PeriodicBoundary::createPeriodicParticles(ParticleHandler& pH)
     }
 #endif
 }
-
 
 /*!
  * \details Loops through all particles to see if they have become ghosts. If that

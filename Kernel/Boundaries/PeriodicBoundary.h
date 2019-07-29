@@ -27,10 +27,9 @@
 #define PeriodicBoundary_H
 
 #include "BasePeriodicBoundary.h"
+#include "ParticleHandler.h"
 #include "Math/Vector.h"
 #include "MpiDataClass.h"
-
-class ParticleHandler;
 
 /*!
  * \brief Defines a pair of periodic walls. Inherits from BaseBoundary.
@@ -42,38 +41,54 @@ class ParticleHandler;
 class PeriodicBoundary : public BasePeriodicBoundary
 {
 public:
+
     /*!
      * \brief default constructor
      */
     PeriodicBoundary();
-    
+
     /*!
      * \brief destructor
      */
     ~PeriodicBoundary() override;
-    
+
     /*!
      * \brief copy method
      */
     PeriodicBoundary* copy() const override;
+
+    /*!
+     * \brief copy constructor
+     */
+    PeriodicBoundary(const PeriodicBoundary& other);
     
     /*!
-     * \brief Defines a periodic wall
+     * \brief Defines a PeriodicBoundary by its normal and positions
      */
     void set(Vec3D normal, Mdouble distanceLeft, Mdouble distanceRight);
-    
-    void set(Vec3D normal, Vec3D positionLeft, Vec3D positionRight);
-    
+
     /*!
-   * \brief For general parallelogramic domains, the direction of the shift vector can to be set manually.
-   */
+     * \brief As above, but by specifying two positions that the boundaries go
+     * through instead of distanceLeft and distanceRight.
+     */
+    void set(Vec3D normal, Vec3D positionLeft, Vec3D positionRight);
+
+    /*!
+     * \brief For general parallelogramic domains, the direction of the shift vector can to be set manually.
+     */
     void set(Vec3D normal, Mdouble distanceLeft, Mdouble distanceRight, Vec3D shiftDirection);
+
+    /*!
+     * \brief Set the planewise shift (projected onto the planewise
+     * direction, and zero by default).
+     */
+    void setPlanewiseShift(Vec3D planewiseShift);
     
     /*!
      * \brief returns the vector normal to the periodic boundary
      */
     Vec3D getNormal() const;
-    
+
     /*!
      * \brief Returns the distance of the left wall to the origin, in normal direction
      */
@@ -83,34 +98,34 @@ public:
      * \brief Returns the distance of the right wall to the origin, in normal direction
      */
     Mdouble getDistanceRight() const;
-    
+
     /*!
      * \brief Returns the vector going from the left to the right side of the periodic boundary
      */
     Vec3D getShift() const;
-    
+
     /*!
      * \brief Sets the distance from the origin of the 'left' periodic wall
      */
     void moveLeft(Mdouble distanceLeft);
-    
+
     /*!
      * \brief Sets the distance from the origin of the 'right' periodic wall
      */
     void moveRight(Mdouble distanceRight);
     
     /*!
-     * \brief Returns the distance of the wall to the particle
+     * \brief Returns the distance of the edge to the particle
      */
     Mdouble getDistance(const BaseParticle& p) const override;
-    
+
     /*!
      * \brief Returns the distance of the wall to the position
      */
     Mdouble getDistance(const Vec3D& position) const override;
-    
+
     /*!
-     * \brief shifts the particle 
+     * \brief shifts the particle
      * \param[in] p A pointer to the particle which will be shifted.
      */
     void shiftPosition(BaseParticle* p) const override;
@@ -120,19 +135,19 @@ public:
      * \brief shifts two positions
      */
     virtual void shiftPositions(Vec3D& postition1, Vec3D& postion2) const;
-    
+
     /*!
      * \brief Returns TRUE if particle checked is closest to the 'left' 
-     * wall, and FALSE if it is closest to the 'right' wall
+     * edge, and FALSE if it is closest to the 'right' edge
      */
     virtual bool isClosestToLeftBoundary(const BaseParticle& p) const;
-    
-    /*
+
+    /*!
      * \details Returns TRUE if position checked is closest to the 'left'
-     * wall, and FALSE if it is closest to the 'right' wall.
+     * edge, and FALSE if it is closest to the 'right' edge`.
      */
     bool isClosestToLeftBoundary(const Vec3D& p) const override;
-    
+
     /*!
      * \brief reads boundary properties from istream
      */
@@ -182,22 +197,25 @@ protected:
      */
     Vec3D normal_;
     /*!
-     * \brief position of left wall, s.t. normal*x=position_left
+     * \brief position of left edge, s.t. normal*x = distanceLeft_
      */
     Mdouble distanceLeft_;
+
     /*!
-     * \brief position of right wall, s.t. normal*x=position_right
+     * \brief position of right edge, s.t. normal*x = distanceRight_
      */
     Mdouble distanceRight_;
+
     /*!
      * \brief This is the normal to rescale the normal vector to a unit vectors.
      */
     Mdouble scaleFactor_;
+
     /*!
      * \brief shift from left to right boundary
      */
     Vec3D shift_;
-    
+
 };
 
 #endif
