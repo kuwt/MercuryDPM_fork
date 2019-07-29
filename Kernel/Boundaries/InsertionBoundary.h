@@ -103,18 +103,22 @@ public:
     double getVolumeOfParticlesInserted() const;
     
     void reset();
-    
+
     /*! 
      * \brief Turns on the InsertionBoundary.
      */
     void activate();
-    
+
     /*!
      * \brief Turns off the InsertionBoundary.
      */
     void deactivate();
-    
-    
+
+    /*!
+     * \brief Returns whether the InsertionBoundary is activated.
+     */
+    bool isActivated();
+
     /*!
      * \brief Sets the number of times that the wall may fail to insert a particle.
      */

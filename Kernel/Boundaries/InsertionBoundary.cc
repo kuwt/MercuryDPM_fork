@@ -135,11 +135,11 @@ bool InsertionBoundary::insertParticle(Mdouble time) {
 void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
 {
     logger(VERBOSE, "In InsertionBoundary::checkBoundaryBeforeTimeStep\n");
-    
+
     if (!isActivated_)
         return;
-    
-    /* Each time step, the InsertionBoundary attempts to fill up a region with
+
+    /* Each timestep, the InsertionBoundary attempts to fill up a region with
      * particles.
      *
      * It first calls generateParticle() to get a randomised particle, subject
@@ -156,9 +156,9 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
      *   * the failure counter is reset, and
      * the processes is repeated with a new generateParticle().
      *
-     * Otherwise, the processes terminates for this time step.
+     * Otherwise, the processes terminates for this timestep.
      * */
-    
+
     // Keep count of how many successive times we have failed to place a new
     // particle. 
     unsigned int failed = 0;
@@ -168,7 +168,7 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
         logger(VERBOSE, "about to call generateParticle\n");
         auto p0 = generateParticle(md->random);
         logger(VERBOSE, "generated a particle with intrinsics %", p0);
-        
+
         while (true) // 'placing' loop
         {
             /* Generate extrinsic properties (position and velocity) for this
@@ -206,7 +206,7 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
                 //Note: in parallel only one of the domains will actually add the particle
                 md->particleHandler.copyAndAddObject(p0);
                 failed = 0;
-                
+
                 ++numberOfParticlesInserted_;
                 massInserted_ += p0->getMass();
                 volumeInserted_ += p0->getVolume();
@@ -217,7 +217,7 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
                  * free it here. (Don't worry, the particle will have been copied to the
                  * particleHandler by this point iff we want it.) */
                 delete p0;
-                
+
                 break; // out of the 'placing' loop
             }
             else
@@ -225,7 +225,7 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
                 failed++;
                 logger(VERBOSE, "failed to place a particle; have failed % times", failed);
             }
-            
+
             if (failed > maxFailed_)
             {
                 logger(VERBOSE, "failed too many times; giving up");
@@ -246,12 +246,12 @@ unsigned int InsertionBoundary::getNumberOfParticlesInserted() const
     return numberOfParticlesInserted_;
 }
 
-double InsertionBoundary::getMassOfParticlesInserted() const
+Mdouble InsertionBoundary::getMassOfParticlesInserted() const
 {
     return massInserted_;
 }
 
-double InsertionBoundary::getVolumeOfParticlesInserted() const
+Mdouble InsertionBoundary::getVolumeOfParticlesInserted() const
 {
     return volumeInserted_;
 }
@@ -274,6 +274,11 @@ void InsertionBoundary::activate()
 void InsertionBoundary::deactivate()
 {
     isActivated_ = false;
+}
+
+bool InsertionBoundary::isActivated()
+{
+    return isActivated_;
 }
 
 /*!
