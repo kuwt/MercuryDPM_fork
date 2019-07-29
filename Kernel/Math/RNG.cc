@@ -31,6 +31,7 @@
  * \todo{Thomas: This code does sth. when min>max; I would prefer to throw an error.}
  * \todo{the random seed should be stored in restart}
  * */
+
 RNG::RNG()
 {
     randomSeedLinearCongruentialGenerator_ = 0;
@@ -42,10 +43,10 @@ RNG::RNG()
     q_ = 273;
     randomSeedLaggedFibonacciGenerator_.resize(p_);
     seedLaggedFibonacciGenerator();
-    
+
     haveSavedBoxMuller_ = false;
     savedBoxMuller_ = 0;
-    
+
 }
 
 void RNG::setRandomSeed(unsigned long int new_seed)
@@ -164,7 +165,7 @@ Mdouble RNG::getRandomNumber(Mdouble min, Mdouble max)
 Mdouble RNG::getNormalVariate()
 {
     static const double epsilon = std::numeric_limits<Mdouble>::min();
-    
+
     if (haveSavedBoxMuller_)
     {
         /* If we have already generated a normal variate, use it. */
@@ -183,7 +184,7 @@ Mdouble RNG::getNormalVariate()
         } while (radius <= epsilon);
         // make sure that the radius generated is not too small
         // (unlikely to happen, just a safety check)
-        
+
         savedBoxMuller_ = sqrt(-2.0 * log(radius)) * sin(theta);
         haveSavedBoxMuller_ = true;
         return sqrt(-2.0 * log(radius)) * cos(theta);
@@ -205,6 +206,28 @@ Mdouble RNG::getNormalVariate(Mdouble mean, Mdouble stdev)
     }
 }
 
+/*!
+ * \details This uses Knuth's algorithm for generating Poisson variates. It's
+ * simple but slow for large values of lambda --- beware. 
+ */
+unsigned int RNG::getPoissonVariate(Mdouble lambda)
+{
+    if (lambda > 50)
+    {
+        logger(WARN, "[RNG::getPoissonVariate(Mdouble)] Knuth's algorithm for Poissons may be slow for lambda = %", lambda);
+    }
+    unsigned int k = 0; 
+    Mdouble p = 1; 
+    Mdouble u;
+    do 
+    {
+        k++;
+        u = getRandomNumber(0, 1);
+        p *= u;
+    }
+    while (u > exp(-lambda));
+    return k-1;
+}
 
 /**
  * This is a basic Linear Congruential Generator Random
@@ -236,7 +259,6 @@ void RNG::seedLaggedFibonacciGenerator()
     {
         randomSeedLaggedFibonacciGenerator_[i] = getRandomNumberFromLinearCongruentialGenerator(0, 1.0);
     }
-    
 }
 
 /**
