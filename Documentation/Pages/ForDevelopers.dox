@@ -5,7 +5,7 @@ The sections below contain advice for developers of MercuryDPM Kernel features.
 
 - \subpage BranchesFD
 - \subpage MergingFD
-
+- \subpage ParallelFD
 
 
 \page BranchesFD Working in a Branch
@@ -45,6 +45,52 @@ To get changes made to the Trunk into your branch, follow the following steps:
 -# If you cannot resolve the issues, you can undo the merge using 'svn revert . -R' in your source directory.
 -# If you could resolve all issues (i.e. "make fullTest" returns "100% tests passed"), then commit your changes:
 \code svn commit -m "Merged Trunk changes into my local branch" \endcode
+
+\page ParallelFD Running simulations in parallel
+
+MercuryDPM can run simulations in parallel using MPI. The algorithm uses a simple domain decomposition, splitting the domain into \f$n_x \times n_y \times n_z\f$ subdomains and running each subdomain on a separate processor.
+
+To run simulations in parallel, you need to define all particles in setupInitialConditions and you need to define the domain size in main(). Generally, you should structure your driver code as follows:
+
+\code
+#include "Mercury3D.h"
+
+class Demo : public Mercury3D {
+  void setupInitialConditions() override {
+    //define walls, boundary conditions, particle positions here
+  }
+};
+
+int main() {
+  Demo problem;
+  //define contact law, time step, final time, domain size here
+  problem.solve();
+}
+\endcode
+
+
+To run your simulation in parallel, you need to compile the code with MPI. Use cmake and turn the flag Mercury_USE_MPI to ON. You can do this either by loading cmake-gui and changing the use USE_MPI flag to ON; or, alternatively you do it on the command line:
+
+\code
+cd MercuryBuild
+cmake . -DMercury_USE_MPI=ON
+\endcode
+
+You also need to tell your program about the decomposition it should use. To split your domain  setNumberOfDomains into \f$n_x \times n_y \times n_z\f$, add the following command in your main function, before solve():
+
+\code
+//Set the number of domains for parallel decomposition
+problem.setNumberOfDomains(Vec3D(nx,ny,nz));
+\endcode
+
+Now compile your code, and run it with mpirun. Make sure you use the correct number of processors (\f$n=n_x \cdot n_y \cdot n_z\f$) needed for the domain decomposition:
+
+\code
+//Set the number of domains for parallel decomposition
+mpirun -np n MyDriverCode
+\endcode
+
+For an example of an MPI-ready code, see Drivers/ParallelDrum/testDrum.cpp.
 
 
 */
