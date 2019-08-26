@@ -1198,9 +1198,9 @@ double DPMBase::getXBallsVectorScale() const
  *
  * \param[in] newXBArgs
  */
-void DPMBase::setXBallsAdditionalArguments(std::string newXBArgs)
+void DPMBase::setXBallsAdditionalArguments(std::string xBallsAdditionalArguments)
 {
-    xBallsAdditionalArguments_ = newXBArgs.c_str();
+    xBallsAdditionalArguments_ = xBallsAdditionalArguments.c_str();
 }
 
 /*!
