@@ -180,8 +180,7 @@ int main(argc, argv)
             {
 				 sprintf(csystem,"more %s.txt",argv[0]);
 				 //sprintf(csystem,"more %s/xballs.txt",XBPATH);
-                 if (system(csystem))
-                     ;
+                 if (system(csystem)) {};
                  exit(0);
                  /* return; */
             }
@@ -1319,7 +1318,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                             100+ialab, 100 );
              sprintf(rpm,"N = %d ",(NK));
              XDrawString( dpy, vlab, gcFont, 10, 20, rpm, strlen(rpm));
-             sprintf(rpm,"t = %f ",time);
+             sprintf(rpm,"t = %f s",time);
              XDrawString( dpy, vlab, gcFont, 10, 40, rpm, strlen(rpm));
             }
 
@@ -2893,8 +2892,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                 if( ifilm == 2 )
                   sprintf(csystem,"import +screen -window %lu -border -scene %d %6.6d.%s \n",eng,icount,icount,coutfile); 
                 printf(csystem,"%s");
-                if (system(csystem))
-                    ;//if-statement to remove compiler warning
+                if (system(csystem)) {};//if-statement to remove compiler warning
                 icount++;
                }
 
@@ -3311,7 +3309,8 @@ int read_line( int inread, FILE *fp,
 
 while( icomp == 0 )
 {
-  if (fgets( cline, clength, fp ) && (icomp = strncmp( "#", cline, 1 )) != 0 )
+  fgets( cline, clength, fp ) ;
+  if ((icomp = strncmp( "#", cline, 1 )) != 0 )
   {
     if( inread == 6 )
     {
@@ -3382,7 +3381,8 @@ int read_header( int inread, FILE *fp,
  
 while( icomp == 0 )
 {
-  if(fgets( cline, clength, fp ) && (icomp = strncmp( "#", cline, 1 )) != 0 )
+  fgets( cline, clength, fp );
+  if( (icomp = strncmp( "#", cline, 1 )) != 0 )
   {
     if(( inread == 3 ) || ( inread == 7 ) || ( inread == 14 ))
     {
