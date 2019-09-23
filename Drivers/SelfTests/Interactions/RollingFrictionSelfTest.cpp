@@ -31,7 +31,7 @@ using constants::pi;
 /**
  * This code tests the torsion force model, as published in Luding 2008.
  * A particle is squeezed in between two fixed particles, and rotated such that a torsional torque is created.
- * You should see that the torque is capped at torsionfriction*radius*normalForce, then oscillates and decays.
+ * You should see that the torque is capped at rollingFriction*radius*normalForce, then oscillates and decays.
  */
 class DPM : public Mercury3D{
 public:
@@ -41,29 +41,29 @@ public:
         //set parameters
         Mdouble collisionTime = 2e-2;
         Mdouble restitution = 0.7;
-        Mdouble torsionFriction = 0.1;
+        Mdouble rollingFriction = 0.1;
         Mdouble N = 1000;
 
         //define species
         auto species = speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
         species->setDensity(6.0 / pi);
         species->setCollisionTimeAndNormalAndTangentialRestitutionCoefficient(collisionTime,restitution,restitution,1);
-        species->setTorsionStiffness(0.4*species->getStiffness());
-        species->setTorsionDissipation(0.4*species->getDissipation());
-        species->setTorsionFrictionCoefficient(torsionFriction);
+        species->setRollingStiffness(0.4*species->getStiffness());
+        species->setRollingDissipation(0.4*species->getDissipation());
+        species->setRollingFrictionCoefficient(rollingFriction);
 
         setTimeStep(0.02*collisionTime);
         setTimeMax(10*collisionTime);
         setSaveCount(5);
 
-        setName("TorsionFrictionSelfTest");
+        setName("RollingFrictionSelfTest");
         setXBallsAdditionalArguments("-v0 -solidf -3dturn 1");
 
         SphericalParticle p(species);
         p.setRadius(0.5);
 
         p.setPosition({0,0,0});
-        p.setAngularVelocity({0,0,1});
+        p.setAngularVelocity({0,1,0});
         particleHandler.copyAndAddObject(p);
 
         p.fixParticle();
@@ -79,10 +79,10 @@ public:
 
     void actionsAfterTimeStep() override
     {
-        static std::ofstream ofile ("TorsionFrictionSelfTest.torque");
+        static std::ofstream ofile ("RollingFrictionSelfTest.torque");
         auto p = particleHandler.getLastObject();
         ofile << getTime()
-              << ' ' << p->getTorque().Z
+              << ' ' << p->getTorque().Y
               << ' ' << p->getForce().Z
               << '\n';
     }
@@ -94,10 +94,10 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     DPM dpm;
     dpm.solve();
 
-    logger(INFO,"Run gnuplot %.gnu --persist to view output; you should see that the torque is capped at torsionfriction*radius*normalForce, then oscillates and decays",dpm.getName());
+    logger(INFO,"Run gnuplot %.gnu --persist to view output; you should see that the torque is capped at rollingFriction*radius*normalForce, then oscillates and decays",dpm.getName());
     helpers::writeToFile(dpm.getName()+".gnu",
                          "set xlabel 'time'\n"
                          "set ylabel 'torque'\n"
-                         "p 'TorsionFrictionSelfTest.torque' u 1:2 w l t 'torque', '' u 1:(0.1*0.5*$3) w l t 'torsionfriction*radius*normalForce'"
+                         "p 'RollingFrictionSelfTest.torque' u 1:2 w l t 'torque', '' u 1:(0.1*0.5*$3) w l t 'rollingFriction*radius*normalForce'"
     );
 }
