@@ -63,6 +63,7 @@ PeriodicBoundary* PeriodicBoundary::copy() const
  * \details Copy constructor
  */
 PeriodicBoundary::PeriodicBoundary(const PeriodicBoundary& other)
+    : BasePeriodicBoundary(other)
 {
     normal_ = other.normal_;
     scaleFactor_ = other.scaleFactor_;

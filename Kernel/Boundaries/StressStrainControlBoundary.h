@@ -72,7 +72,9 @@ public:
     /// \brief Sets the inputs from user to initialize the boundaries
     void set(const Matrix3D& stressGoal, const Matrix3D& strainRate, const Matrix3D& gainFactor,
              bool isStrainRateControlled);
-    
+
+    void actionsBeforeTimeLoop() override;
+
     /// \brief Create the periodic particles after read in from a restart file to attain right information
     void createPeriodicParticles(ParticleHandler& particleHandler) override;
     
@@ -119,9 +121,6 @@ private:
 
     //Set each time step in checkBoundariesAfterParticlesMove
 
-    /// Stress components calculation variables
-    Matrix3D stressTotal_;
-    Matrix3D dstrainRate_;
     /// Box length in x-y-z
     Vec3D lengthBox_;
     /// Center position of the domain

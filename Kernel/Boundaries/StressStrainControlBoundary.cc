@@ -42,8 +42,6 @@ StressStrainControlBoundary::StressStrainControlBoundary()
     strainRate_.setZero();
     gainFactor_.setZero();
     isStrainRateControlled_ = true;
-    stressTotal_.setZero();
-    dstrainRate_.setZero();
     lengthBox_.setZero();
     centerBox_.setZero();
     relativeToCenter_.setZero();
@@ -174,42 +172,36 @@ void StressStrainControlBoundary::determineLengthAndCentre()
  */
 void StressStrainControlBoundary::computeStrainRate()
 {
-    //Set strainrate change tensor to zero
-    dstrainRate_.setZero();
-    
     //Get the timestep dt
     const Mdouble timeStep = getHandler()->getDPMBase()->getTimeStep();
-    
-    Matrix3D dstrainRate_;
     // calculate the stress total and average over the volume
-    Matrix3D stressTotal_ = getHandler()->getDPMBase()->getTotalStress();
-    
+    Matrix3D stressTotal = getHandler()->getDPMBase()->getTotalStress();
+
+    Mdouble dstrainRate;
+
+    // integral controller
     // amount by which the strainrate tensor has to be changed
     if (stressGoal_.XX != 0)
     {
-        dstrainRate_.XX = dstrainRate_.XX + gainFactor_.XX * timeStep * (stressTotal_.XX - stressGoal_.XX);
-        logger(VERBOSE, "StressXX = %",stressTotal_.XX);
+        strainRate_.XX += gainFactor_.XX * timeStep * (stressTotal.XX - stressGoal_.XX);
+        logger(VERBOSE, "StressXX = %",stressTotal.XX);
     }
     if (stressGoal_.YY != 0)
     {
-        dstrainRate_.YY = dstrainRate_.YY + gainFactor_.YY * timeStep * (stressTotal_.YY - stressGoal_.YY);
-        logger(VERBOSE, "StressYY = %",stressTotal_.YY);
+        strainRate_.YY +=  gainFactor_.YY * timeStep * (stressTotal.YY - stressGoal_.YY);
+        logger(VERBOSE, "StressYY = %",stressTotal.YY);
     }
     if (stressGoal_.ZZ != 0)
     {
-        dstrainRate_.ZZ = dstrainRate_.ZZ + gainFactor_.ZZ * timeStep * (stressTotal_.ZZ - stressGoal_.ZZ);
-        logger(VERBOSE, "StressZZ = %",stressTotal_.ZZ);
+        strainRate_.ZZ += gainFactor_.ZZ * timeStep * (stressTotal.ZZ - stressGoal_.ZZ);
+        logger(VERBOSE, "StressZZ = %",stressTotal.ZZ);
     }
     if (stressGoal_.XY != 0)
     {
-        dstrainRate_.XY = dstrainRate_.XY + gainFactor_.XY * timeStep * (stressTotal_.XY - stressGoal_.XY);
-        logger(VERBOSE, "dstrainRate.XY = %",dstrainRate_.XY);
-        logger(VERBOSE, "StressXY = %",stressTotal_.XY);
-        logger(VERBOSE, "StressYX = %",stressTotal_.YX);
+        strainRate_.XY += gainFactor_.XY * timeStep * (stressTotal.XY - stressGoal_.XY);
+        logger(VERBOSE, "StressXY = %",stressTotal.XY);
+        logger(VERBOSE, "StressYX = %",stressTotal.YX);
     }
-    
-    //  Update the strainrate tensor
-    strainRate_ = strainRate_ + dstrainRate_;
 }
 
 /*!
@@ -318,8 +310,7 @@ void StressStrainControlBoundary::determineStressControlledShearBoundaries()
  */
 void
 StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D& strainRate, const Matrix3D& gainFactor,
-                                 bool isStrainRateControlled)
-{
+                                 bool isStrainRateControlled) {
     periodicBoundaries_.clear();
     leesEdwardsBoundaries_.clear();
 
@@ -327,14 +318,32 @@ StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D& str
     stressGoal_ = stressGoal;
     strainRate_ = strainRate;
     gainFactor_ = gainFactor;
-    
-    logger.assert_always(getHandler() != nullptr,
-                         "you need to set the handler of this boundary before the parameters can be set");
-    const DPMBase* dpm = getHandler()->getDPMBase();
-    
-    // add sensible checks if parameters are valid
-    
-    if (stressGoal.XY == 0 && strainRate.XY == 0)
+
+    logger.assert_always(stressGoal.XZ == 0, "Shear stress in XZ cannot be controlled; use shear stress in XY instead");
+    logger.assert_always(stressGoal.ZX == 0, "Shear stress in ZX cannot be controlled; use shear stress in XY instead");
+    logger.assert_always(stressGoal.YZ == 0, "Shear stress in YZ cannot be controlled; use shear stress in XY instead");
+    logger.assert_always(stressGoal.ZY == 0, "Shear stress in ZY cannot be controlled; use shear stress in XY instead");
+    logger.assert_always(strainRate.XZ == 0, "Strain rate in XZ cannot be controlled; use strain rate in XY instead");
+    logger.assert_always(strainRate.ZX == 0, "Strain rate in ZX cannot be controlled; use strain rate in XY instead");
+    logger.assert_always(strainRate.YZ == 0, "Strain rate in YZ cannot be controlled; use strain rate in XY instead");
+    logger.assert_always(strainRate.ZY == 0, "Strain rate in ZY cannot be controlled; use strain rate in XY instead");
+    logger.assert_always(stressGoal.XZ != 0 ? gainFactor.XZ != 0 : true,
+                         "You need to set a gain factor in XZ in order to control stress");
+    logger.assert_always(stressGoal.XX != 0 ? gainFactor.XX != 0 : true,
+                         "You need to set a gain factor in XX in order to control stress");
+    logger.assert_always(stressGoal.YY != 0 ? gainFactor.YY != 0 : true,
+                         "You need to set a gain factor in YY in order to control stress");
+    logger.assert_always(stressGoal.ZZ != 0 ? gainFactor.ZZ != 0 : true,
+                         "You need to set a gain factor in ZZ in order to control stress");
+}
+
+void StressStrainControlBoundary::actionsBeforeTimeLoop()
+{
+    logger.assert_always(getHandler() != nullptr, "You need to set the handler of this boundary");
+    const DPMBase *dpm = getHandler()->getDPMBase();
+
+    // if there is no shear (compression only)
+    if (stressGoal_.XY == 0 && strainRate_.XY == 0)
     {
         logger(INFO, "Shear rate is zero, setting up three periodic boundaries");
         // Set up new box periodic boundaries, no simple shear activated
@@ -347,31 +356,25 @@ StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D& str
         boundary.set(Vec3D(0.0, 0.0, 1.0), dpm->getZMin(), dpm->getZMax());
         periodicBoundaries_.push_back(boundary);
     }
-    else if (stressGoal.XY != 0 || strainRate.XY != 0)
+    else
     {
         logger(INFO, "Shear rate is not zero, setting up Lees-Edwards in xy and a periodic boundary in z");
-        
+
         PeriodicBoundary boundary;
         boundary.setHandler(getHandler());
         boundary.set(Vec3D(0.0, 0.0, 1.0), dpm->getZMin(), dpm->getZMax());
         periodicBoundaries_.push_back(boundary);
+
         // Lees Edwards bc in y direction & periodic boundary in x direction, simple shear boundary activated
         LeesEdwardsBoundary leesEdwardsBoundary;
         leesEdwardsBoundary.setHandler(getHandler());
         double integratedShift = integratedShift_;
         leesEdwardsBoundary.set(
-                [&integratedShift](Mdouble time UNUSED)
-                { return integratedShift; },
-                [](Mdouble time UNUSED)
-                { return 0; },
+                [&integratedShift](Mdouble time UNUSED) { return integratedShift; },
+                [](Mdouble time UNUSED) { return 0; },
                 dpm->getXMin(), dpm->getXMax(), dpm->getYMin(), dpm->getYMax());
         leesEdwardsBoundaries_.push_back(leesEdwardsBoundary);
     }
-    else
-    {
-        logger(ERROR, "This should not happen; please check implementation of StressStrainControlBoundary::set");
-    }
-    
 }
 
 /*!
