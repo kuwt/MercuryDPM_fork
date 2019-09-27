@@ -1518,7 +1518,6 @@ bool DPMBase::areInContact(const BaseParticle* pI, const BaseParticle* pJ) const
  */
 void DPMBase::actionsBeforeTimeLoop()
 {
-    boundaryHandler.boundaryActionsBeforeTimeLoop();
 }
 
 /*!
@@ -3876,6 +3875,7 @@ void DPMBase::solve()
     //max_radius = getLargestParticle()->getRadius();
     
     actionsBeforeTimeLoop();
+    boundaryHandler.boundaryActionsBeforeTimeLoop();
     hGridActionsBeforeTimeLoop();
     
     // Performs a first force computation

@@ -73,7 +73,7 @@ public:
     void set(const Matrix3D& stressGoal, const Matrix3D& strainRate, const Matrix3D& gainFactor,
              bool isStrainRateControlled);
 
-    void actionsBeforeTimeLoop() override;
+    //void actionsBeforeTimeLoop() override;
 
     /// \brief Create the periodic particles after read in from a restart file to attain right information
     void createPeriodicParticles(ParticleHandler& particleHandler) override;

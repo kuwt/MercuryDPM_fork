@@ -177,8 +177,6 @@ void StressStrainControlBoundary::computeStrainRate()
     // calculate the stress total and average over the volume
     Matrix3D stressTotal = getHandler()->getDPMBase()->getTotalStress();
 
-    Mdouble dstrainRate;
-
     // integral controller
     // amount by which the strainrate tensor has to be changed
     if (stressGoal_.XX != 0)
@@ -309,8 +307,8 @@ void StressStrainControlBoundary::determineStressControlledShearBoundaries()
  * based on the user inputs.
  */
 void
-StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D& strainRate, const Matrix3D& gainFactor,
-                                 bool isStrainRateControlled) {
+StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D& strainRate, const Matrix3D& gainFactor, bool isStrainRateControlled)
+{
     periodicBoundaries_.clear();
     leesEdwardsBoundaries_.clear();
 
@@ -335,10 +333,10 @@ StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D& str
                          "You need to set a gain factor in YY in order to control stress");
     logger.assert_always(stressGoal.ZZ != 0 ? gainFactor.ZZ != 0 : true,
                          "You need to set a gain factor in ZZ in order to control stress");
-}
-
-void StressStrainControlBoundary::actionsBeforeTimeLoop()
-{
+//}
+//
+//void StressStrainControlBoundary::actionsBeforeTimeLoop()
+//{
     logger.assert_always(getHandler() != nullptr, "You need to set the handler of this boundary");
     const DPMBase *dpm = getHandler()->getDPMBase();
 

@@ -175,9 +175,9 @@ int main(int argc UNUSED, char* argv[] UNUSED)
     //set output and time stepping properties
     dpm.setTimeMax(0.1);
     dpm.eneFile.setSaveCount(1000);
-    dpm.dataFile.setFileType(FileType::NO_FILE);
-    dpm.restartFile.setFileType(FileType::ONE_FILE);
-    dpm.fStatFile.setFileType(FileType::NO_FILE);
+    //dpm.dataFile.setFileType(FileType::NO_FILE);
+    //dpm.restartFile.setFileType(FileType::ONE_FILE);
+    //dpm.fStatFile.setFileType(FileType::NO_FILE);
     dpm.eneFile.setFileType(FileType::ONE_FILE);
     //solve
     dpm.solve();
