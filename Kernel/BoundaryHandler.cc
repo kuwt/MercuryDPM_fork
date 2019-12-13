@@ -40,6 +40,9 @@
 #include "Boundaries/SubcriticalMaserBoundaryTEST.h"
 #include "Boundaries/FluxBoundary.h"
 #include "Boundaries/HeaterBoundary.h"
+#include "Boundaries/BaseClusterInsertionBoundary.h"
+#include "Boundaries/RandomClusterInsertionBoundary.h"
+#include "Boundaries/FixedClusterInsertionBoundary.h"
 #include "Boundaries/StressStrainControlBoundary.h"
 
 ///Constructor of the BoundaryHandler class. It creates and empty BoundaryHandler.
@@ -169,6 +172,18 @@ BaseBoundary* BoundaryHandler::createObject(const std::string& type)
     else if (type == "StressStrainControlBoundary")
     {
         return new StressStrainControlBoundary;
+    }
+    else if (type == "BaseClusterInsertionBoundary")
+    {
+        return new BaseClusterInsertionBoundary;
+    }
+    else if (type == "RandomClusterInsertionBoundary")
+    {
+        return new RandomClusterInsertionBoundary;
+    }
+    else if (type == "FixedClusterInsertionBoundary")
+    {
+        return new FixedClusterInsertionBoundary;
     }
     else if (type == "normal") //for backward compatibility (before svnversion ~2360)
     {

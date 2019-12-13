@@ -1,0 +1,87 @@
+Stiffness: 1) 1e3 2) 5e3 3)1e4 (valori per la loading stiffness: unloading = 5* loading, cohesion = 0.5 * loading)
+Friction: 1) 0.0 2) 0.25 3) 0.5 ( valori per la sliding, rolling = 0.5 * sliding, torsion = 0.0)
+Penetration: 1) 0.1 2) 0.2 3)0.3
+
+I file EdoTest sfruttano la feature StressStrainControlBoundary
+I file SPFNonPer utilizzano walls non periodici
+I file PerSPF utilizzano walls periodici senza muovere le particelle
+
+Le posizioni iniziali dei cluster sono:
+
+-4.12471e-06 1.50160e-10 -4.04206e-06
+1.17580e-05 -1.09613e-06 -2.49174e-06
+-1.17524e-05 1.17537e-05 -1.17564e-05
+-1.11593e-05 -1.17501e-05 4.23077e-06
+-2.22116e-07 -1.32469e-06 1.14160e-05
+4.21677e-06 1.17523e-05 3.33631e-06
+-1.17517e-05 1.13704e-05 4.23706e-06
+4.24337e-06 -1.17532e-05 -1.17548e-05
+-1.17544e-05 -1.17532e-05 -1.17562e-05
+1.17504e-05 -1.17523e-05 9.43951e-06
+9.52649e-06 1.17528e-05 -1.17554e-05
+
+1.14160e-05 highest position of the center
+1.94160e-05 highest position
+a = 3.95e-05 box size
+
+
+
+
+Intercluster2RelaxS1P1F1 è lo stesso ma aggiustato (c'erano dei typo)
+
+
+Per i single porosity:
+Radius 1) 5.5e-5   2) 5e-5
+Stiffness 0) 4e2   1) 6e2   2) 8e2    3) 1e3   4) 1.2e3
+TangStiff 1) 0.25*normal   2) 0.75*normal
+Friction 1) 0.0   2) 0.25   3) 0.5
+
+
+Speed1 : InterclusterNoRelaxS1P1F1 classic
+Speed2 : InterclusterNoRelaxS1P1F1 computing data analysis only 1 every save count times
+Speed3 : PerS1P1F1 classic but with isoStrainDot = 1e-7
+Speed4 : SinglePorosityR1S1F2 but with isoStrainDot = 1e-7
+Speed5 : SinglePorosityR2S3F3 but with isoStrainDot = 1e-7
+Speed6 : Intercluster2RelaxS1P1F1 but with isoStrainDot = 1e-7
+Speed7 : EdoTestS1P1F1 but with isoStrainDot = 1e-7 (without that fast thing)
+speed8 : superSpeed SinglePorosityR1S1F2 but with isoStrainDot = 1e-6
+Speed9 : InterclusterNoRelaxS1P1F1 classic but with isoStrainDot = 1e-7
+speed10: superSpeed InterclusterNoRelaxS1P1F1 but with isoStrainDot = 1e-6
+Speed11: superspeed EdoTestS1P1F1 but with isoStrainDot = 1e-6 (without that fast thing)
+
+
+Bayes test
+
+4 valori:
+il primo è la particle dispersity
+1) 2   2) 3.5   3) 5
+il secondo è la loading stiffness
+1) 4e2   2) 8e2   3) 1.2e3
+il terzo è la relative tangential stiffness (relative to the loading stiffness)
+1) 0.25   2) 0.5   3)0.85
+il quarto è la sliding friction
+1) 0.05   2)0.15   3) 0.25
+
+Il dominio dei valori è:
+[1.2, 10] x [1e2, 5e3] x [0, 1] x [0, 0.3]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

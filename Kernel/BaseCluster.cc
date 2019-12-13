@@ -488,7 +488,7 @@ void BaseCluster::setupInitialConditions()
      */
 
 #ifdef MERCURY_USE_MPI
-    maximumForceModulus_ = forceFactor_ * radiusParticle_ * 2 * sizeDispersityParticle_ / (1 + sizeDispersityParticle_) * deltaStar *
+    maximumForceModulus_ = radiusParticle_ * 2 * sizeDispersityParticle_ / (1 + sizeDispersityParticle_) * deltaStar *
                            particleSpecies_->getLoadingStiffness()
                            * (particleSpecies_->getConstantRestitution() ?
                               particleSpecies_->getMassFromRadius(radiusParticle_ * 2 * sizeDispersityParticle_ / (1 + sizeDispersityParticle_))
@@ -1015,13 +1015,7 @@ void BaseCluster::setDomainLimits()
     printDomainLimits << "Cubic size " << boxSize_ << std::endl;
     logger(VERBOSE, printDomainLimits.str());
 
-    setXMin(-0.5*boxSize_ + position_.X);
-    setYMin(-0.5*boxSize_ + position_.Y);
-    setZMin(-0.5*boxSize_ + position_.Z);
-
-    setXMax(0.5*boxSize_ + position_.X);
-    setYMax(0.5*boxSize_ + position_.Y);
-    setZMax(0.5*boxSize_ + position_.Z);
+    setDomain(-0.5*boxSize_*Vec3D(1,1,1) + position_, 0.5*boxSize_*Vec3D(1,1,1) + position_);
 }
 
 /*!

@@ -359,7 +359,7 @@ void BaseClusterInsertionBoundary::read(std::istream& is)
         is >> psd;
         psd_.push_back(psd);
     }
-    //is >> dummy >> distribution_;
+    is >> dummy >> distribution_;
 
 
     is >> dummy >> nClusterInserted_
@@ -398,7 +398,7 @@ void BaseClusterInsertionBoundary::write(std::ostream& os) const
     for (auto p : psd_) {
         os << ' ' << p;
     }
-    //os << " distribution " << distribution_ << std::endl;
+    os << " distribution " << distribution_;
 
     os << " nClusterInserted " << nClusterInserted_ <<
           " radiusParticle " << radiusParticle_ <<
@@ -433,4 +433,24 @@ void BaseClusterInsertionBoundary::write(std::ostream& os) const
 std::string BaseClusterInsertionBoundary::getName() const
 {
     return "BaseClusterInsertionBoundary";
+}
+
+/*!
+ * write to file
+ */
+std::ostream& operator<<(std::ostream& os, BaseClusterInsertionBoundary::Distribution type)
+{
+    os << static_cast<unsigned>(type);
+    return os;
+}
+
+/*!
+ * Read from file
+ */
+std::istream& operator>>(std::istream& is, BaseClusterInsertionBoundary::Distribution& type)
+{
+    unsigned uType;
+    is >> uType;
+    type = static_cast<BaseClusterInsertionBoundary::Distribution>(uType);
+    return is;
 }

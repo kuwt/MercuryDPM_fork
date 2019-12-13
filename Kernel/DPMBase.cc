@@ -2827,7 +2827,8 @@ bool DPMBase::readRestartFile()
 
 /*!
  * \details Reads in the name of a (.restart) file and then opens and reads in the data corresponding to this file using the
- * argument-less \ref readRestartFile() function
+ * argument-less \ref readRestartFile() function.
+ * Note that this function should be called before setupInitialConditions().
  * \param[in] fileName The name of the (.restart) file to be read in.
  * \return int
  */
