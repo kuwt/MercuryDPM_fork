@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include "Mercury3D.h"
-#include <Boundaries/RandomClusterInstertionBoundary.h>
+#include <Boundaries/RandomClusterInsertionBoundary.h>
 #include "Species/LinearPlasticViscoelasticFrictionSpecies.h"
 #include <Walls/InfiniteWall.h>
 

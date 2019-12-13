@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include "Mercury3D.h"
-#include "Boundaries/FixedClusterInstertionBoundary.h"
+#include "Boundaries/FixedClusterInsertionBoundary.h"
 #include "Boundaries/PeriodicBoundary.h"
 #include "Species/LinearPlasticViscoelasticFrictionSpecies.h"
 #include "Species/LinearViscoelasticSpecies.h"
