@@ -28,12 +28,15 @@
 
 #include "MercuryBase.h"
 
+class ClusterGenerator;
+
 /*!
  * \brief This adds on the hierarchical grid code for 3D problems.
  */
 class Mercury3D : public MercuryBase
 {
 public:
+
     /*!
      * \brief This is the default constructor. All it does is set sensible defaults.
      */
@@ -58,6 +61,8 @@ public:
      * \brief Returns all particles that have a contact with a given particle.
      */
     std::vector<BaseParticle*> hGridFindParticleContacts(const BaseParticle* obj) override;
+
+    ClusterGenerator* clusterGenerator;
 
 protected:
     /*!

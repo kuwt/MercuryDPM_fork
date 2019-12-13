@@ -126,7 +126,9 @@ void LinearPlasticViscoelasticInteraction::computeNormalForce()
         const LinearPlasticViscoelasticNormalSpecies* species = getSpecies();
 
         //calculate the overlap above which the max. unloading stiffness becomes active (the 'fluid branch')
-        const Mdouble effectiveDiameter = species->getConstantRestitution()?1.0:(2.0 * getEffectiveRadius());
+        //const Mdouble effectiveDiameter = species->getConstantRestitution()?1.0:(2.0 * getEffectiveRadius());
+        // Modified by Paolo
+        const Mdouble effectiveDiameter = 2.0 * getEffectiveRadius();
         const Mdouble deltaStar = (species->getUnloadingStiffnessMax()
                                    / (species->getUnloadingStiffnessMax() - species->getLoadingStiffness()))
                                   * species->getPenetrationDepthMax() * effectiveDiameter;
@@ -214,7 +216,9 @@ void LinearPlasticViscoelasticInteraction::setMaxOverlap(const Mdouble maxOverla
 Mdouble LinearPlasticViscoelasticInteraction::getUnloadingStiffness() const
 {
     const LinearPlasticViscoelasticNormalSpecies* species = getSpecies();
-    const Mdouble effectiveDiameter = species->getConstantRestitution()?1.0:(2.0 * getEffectiveRadius());
+    //const Mdouble effectiveDiameter = species->getConstantRestitution()?1.0:(2.0 * getEffectiveRadius());
+    // Modified by Paolo
+    const Mdouble effectiveDiameter = 2.0 * getEffectiveRadius();
     Mdouble deltaMaxFluid = species->getPenetrationDepthMax() * effectiveDiameter /
                             (1.0 - species->getLoadingStiffness() / species->getUnloadingStiffnessMax());
     if (getOverlap() > deltaMaxFluid)

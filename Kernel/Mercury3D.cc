@@ -463,6 +463,7 @@ bool Mercury3D::hGridHasContactsInTargetCell(int x, int y, int z, unsigned int l
                 return true;
             }
         }
+        //std::cout << "HERE!" << std::endl;
         p = p->getHGridNextObject();
     }
     return false;

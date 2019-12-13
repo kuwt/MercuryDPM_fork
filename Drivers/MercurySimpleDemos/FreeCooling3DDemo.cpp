@@ -116,6 +116,7 @@ int main(int argc UNUSED, char* argv[] UNUSED)
     problem.setHGridMaxLevels(1);
     problem.setHGridCellOverSizeRatio(1.2);
     problem.setHGridUpdateEachTimeStep(false);
+    problem.setNumberOfDomains({NUMBER_OF_PROCESSORS,1,1});
     problem.solve();
     
     logger(INFO, "Total time to run this simulation: % s", time.toc());

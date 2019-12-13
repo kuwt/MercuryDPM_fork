@@ -166,6 +166,16 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
     {
         /* Generate random *intrinsic* properties for the new particle. */
         logger(VERBOSE, "about to call generateParticle\n");
+
+
+
+
+        //! HERE
+
+
+
+
+
         auto p0 = generateParticle(md->random);
         logger(VERBOSE, "generated a particle with intrinsics %", p0);
 
@@ -173,6 +183,15 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
         {
             /* Generate extrinsic properties (position and velocity) for this
              * new particle. */
+
+
+
+            //! HERE
+
+
+
+
+
             placeParticle(p0, md->random);
             logger(VERBOSE, "attempting to place particle at %, vel %", p0->getPosition(), p0->getVelocity());
 

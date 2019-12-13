@@ -136,7 +136,7 @@ private:
         boundary.setHandler(&boundaryHandler);
         boundary.set(stressGoal_, strainRate_, gainFactor_, isStrainRateControlled_);
         boundaryHandler.copyAndAddObject(boundary);
-        
+
         
     }
     

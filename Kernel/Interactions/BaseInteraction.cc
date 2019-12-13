@@ -365,6 +365,21 @@ void BaseInteraction::setP(BaseInteractable* P)
 }
 
 /*!
+ * \details Set the first object involved in the interaction. This function differs from
+ *          BaseInteraction::setP(BaseInteractable* P) because no interactable is removed:
+ *          this is needed in DPMBase::importParticlesAs as in it there's no iteractable to remove
+ *          and using BaseInteraction::setP(BaseInteractable* P) would led to an output printing
+ *          overloaded with warnings.
+ * \param[in] P     BaseInteractable* The particle involved in the interaction.
+ */
+void BaseInteraction::importP(BaseInteractable *P)
+{
+    P_ = P;
+    P_->addInteraction(this);
+    identificationP_ = P_->getId();
+}
+
+/*!
  * \details Changes the second object involved in the interaction; often a
  *          general interactable not always a particle.
  *          Note, set is slightly misleading as it removed the interaction from
@@ -375,6 +390,21 @@ void BaseInteraction::setP(BaseInteractable* P)
 void BaseInteraction::setI(BaseInteractable* I)
 {
     I_->removeInteraction(this);
+    I_ = I;
+    I_->addInteraction(this);
+    identificationI_ = I_->getId();
+}
+
+/*!
+ * \details Changes the second object involved in the interaction. This function differs from
+ *          BaseInteraction::setI(BaseInteractable* I) because no interactable is removed:
+ *          this is needed in DPMBase::importParticlesAs as in it there's no iteractable to remove
+ *          and using BaseInteraction::setI(BaseInteractable* I) would led to an output printing
+ *          overloaded with warnings.
+ * \param[in] I     BaseInteractable* The particle involved in the interaction.
+ */
+void BaseInteraction::importI(BaseInteractable *I)
+{
     I_ = I;
     I_->addInteraction(this);
     identificationI_ = I_->getId();

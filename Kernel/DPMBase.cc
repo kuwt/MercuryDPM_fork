@@ -4558,6 +4558,34 @@ bool DPMBase::checkParticleForInteractionLocal(const BaseParticle& p)
 }
 
 /*!
+ * \details Copies particles, interactions assigning species from a local simulation to a global one; useful for the creation
+ *              of a cluster.
+ *
+ * \param[in] particleH: the particle handler from wich particles are copied,
+ * \param[in] particleH: the interaction handler from wich interactions are copied,
+ * \param[in] species: the species that will be assigned to the particle.
+ */
+void DPMBase::importParticlesAs(ParticleHandler& particleH, InteractionHandler& interactionH, const ParticleSpecies* species )
+{
+    int nParticlesPreviouslyIn = particleHandler.getSize();
+    int l = 0;
+    for (auto k = particleH.begin(); k != particleH.end(); ++k) {
+        auto p = particleHandler.copyAndAddObject( *k );
+        p->setSpecies(species);
+        l++;
+    }
+
+    for (std::vector<BaseInteraction*>::const_iterator i = interactionH.begin(); i != interactionH.end(); ++i) {
+        if ( (*i)->getP()->getInvMass() != 0.0 && (*i)->getI()->getInvMass() != 0.0 ) {
+            auto j = interactionHandler.copyAndAddObject(*i);
+            j->importP(particleHandler.getObject(nParticlesPreviouslyIn + j->getP()->getIndex()));
+            j->importI(particleHandler.getObject(nParticlesPreviouslyIn + j->getI()->getIndex()));
+            j->setTimeStamp(getNumberOfTimeSteps());
+        }
+    }
+}
+
+/*!
  *
  * \details Removes particles created by \ref checkAndDuplicatePeriodicParticles().
  *

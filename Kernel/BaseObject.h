@@ -117,7 +117,7 @@ public:
      */
     unsigned int getIndex() const
     { return index_; };
-    
+
     /*!
      * \brief Returns the unique identifier of any particular object.
      * \return id number of the current object

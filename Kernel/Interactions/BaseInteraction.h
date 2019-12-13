@@ -153,6 +153,16 @@ public:
      * \brief Sets the second object involved in the interaction (often particle or wall).
      */
     void setI(BaseInteractable* I);
+
+    /*!
+     * \brief Sets the first object involved in the interaction (normally a particle).
+     */
+    void importP(BaseInteractable *P);
+
+    /*!
+     * \brief Sets the second object involved in the interaction (often particle or wall).
+     */
+    void importI(BaseInteractable *I);
     
     /*!
      * returns the vector from I to P.

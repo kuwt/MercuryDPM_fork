@@ -74,7 +74,7 @@ public:
      * \brief Particle copy method. It calls to copy constructor of this Particle, useful for polymorfism
      */
     virtual BaseParticle* copy() const = 0;
-    
+
     /*!
      * \brief Get Particle volume function, which required a reference to the Species vector. It returns the volume of the Particle.
      */

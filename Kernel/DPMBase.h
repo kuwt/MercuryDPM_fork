@@ -70,6 +70,7 @@
 class DPMBase
 {
 public:
+    
     /*!
      * \brief A function which initialises the member variables to default values, so
      *        that the problem can be solved off the shelf; sets up a basic two dimensional
@@ -312,6 +313,12 @@ public:
     bool checkParticleForInteractionLocalPeriodic(const BaseParticle& P);
 
     void readSpeciesFromDataFile(bool read = true){readSpeciesFromDataFile_=read;}
+
+    /*!
+     * \brief Copies particles, interactions assigning species from a local simulation to a global one.
+     *        Useful for the creation of a cluster.
+     */
+    void importParticlesAs(ParticleHandler& particleHandler, InteractionHandler& interactionHandler, const ParticleSpecies* species );
 
     //getters and setters
     
@@ -1274,6 +1281,11 @@ public:
      * \brief An object of the class ParticleHandler, contains the pointers to all the particles created.
      */
     ParticleHandler particleHandler;
+
+    /*!
+     * \brief Fake particleHandler created by Paolo needed temporary by just Paolo.
+     */
+    ParticleHandler paoloParticleHandler;
     
     /*!
      * \brief An object of the class WallHandler. Contains pointers to all the walls created.

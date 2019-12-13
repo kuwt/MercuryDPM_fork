@@ -47,6 +47,7 @@ add_library(DPMBase STATIC
 
         BaseObject.cc
         BaseInteractable.cc
+	BaseCluster.cc
         Logger.cc
         File.cc
         DPMBase.cc
