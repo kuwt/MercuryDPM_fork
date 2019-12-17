@@ -47,7 +47,7 @@ add_library(DPMBase STATIC
 
         BaseObject.cc
         BaseInteractable.cc
-	BaseCluster.cc
+	    BaseCluster.cc
         Logger.cc
         File.cc
         DPMBase.cc
@@ -79,6 +79,12 @@ add_library(DPMBase STATIC
 
         CMakeDefinitions.cc
 
+        #note: added these files to the DPMBase as they are needed for the Cluster Generator
+        HGrid.cc
+        MercuryBase.cc
+        Mercury2D.cc
+        Mercury3D.cc
+        HGridOptimiser.cc
 )
 
 target_link_libraries(DPMBase LinearAlgebra)
