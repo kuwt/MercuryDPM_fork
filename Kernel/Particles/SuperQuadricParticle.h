@@ -274,6 +274,9 @@ public:
      */
     Mdouble getInteractionRadius(const BaseParticle* particle) const;
 
+    /// Computes the particle's (inverse) mass and inertia.
+    void computeMass(const ParticleSpecies& s) override;
+
 private:
     
     /*!\brief Get the radius of the sphere that fits precisely around the particle.

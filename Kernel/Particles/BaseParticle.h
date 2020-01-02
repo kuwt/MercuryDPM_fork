@@ -638,14 +638,21 @@ public:
     
     virtual void actionsAfterTimeStep()
     {};
+
+    virtual bool isSphericalParticle() const {return false;}
     
     //const HGridCell& getHGridCell() const;
     const HGridCell& getHGridCell() const
     { return hGridCell; }
 
+    virtual void computeMass(const ParticleSpecies& s);
+
 protected:
     
     Mdouble radius_; ///Particle radius_
+    Mdouble invMass_; ///Inverse Particle mass (for computation optimization)
+    MatrixSymmetric3D invInertia_; ///Inverse Particle inverse inertia (for computation optimization)
+
 
 private:
     
@@ -669,8 +676,6 @@ private:
     BaseParticle* hGridPrevObject_; ///Pointer to the previous Particle in the same HGrid cell
     
     ///Particle attributes
-    Mdouble invMass_; ///Inverse Particle mass (for computation optimization)
-    MatrixSymmetric3D invInertia_; ///Inverse Particle inverse inertia (for computation optimization)
     BaseParticle* periodicFromParticle_; ///Pointer to originating Particle
     
     //MPI particle attributes

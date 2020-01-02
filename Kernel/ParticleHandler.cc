@@ -207,7 +207,7 @@ void ParticleHandler::addObject(BaseParticle* P)
         P->getSpecies()->computeMass(P);
         //Check if this particle has new extrema
         checkExtrema(P);
-        if (dynamic_cast<SuperQuadricParticle*> (P) != nullptr)
+        if (!P->isSphericalParticle())
         {
             getDPMBase()->setRotation(true);
         }

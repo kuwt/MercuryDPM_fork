@@ -277,26 +277,17 @@ BaseInteraction* SuperQuadricParticle::getInteractionWith(BaseParticle* const p,
     const Mdouble sumOfInteractionRadii = getMaxInteractionRadius()+p->getMaxInteractionRadius();
     if (distanceSquared < (sumOfInteractionRadii * sumOfInteractionRadii))
     {
-        //make a superquadric out of the particle.
-        SuperQuadricParticle* pQuad = dynamic_cast<SuperQuadricParticle*>(p);
-        //if the dynamic casting of the particle pointer p is a null pointer, it implies that the p is a sphere.
-        bool fromSphere = (pQuad == nullptr);
-        // For the sake of simplicity, we make a superquadric out of it.
-        if (fromSphere)
+        if (p->isSphericalParticle())
         {
-            pQuad = new SuperQuadricParticle;
+            SuperQuadricParticle* pQuad = new SuperQuadricParticle;
             pQuad->setAxes(p->getRadius(), p->getRadius(), p->getRadius());
-        }
-        
-        BaseInteraction* contacts = getInteractionWithSuperQuad(pQuad, timeStamp, interactionHandler);
-        
-        if (fromSphere)
-        {
+            BaseInteraction* contacts = getInteractionWithSuperQuad(pQuad, timeStamp, interactionHandler);
             delete pQuad;
+            return contacts;
+        } else {
+            SuperQuadricParticle* pQuad = static_cast<SuperQuadricParticle*>(p);
+            return getInteractionWithSuperQuad(pQuad, timeStamp, interactionHandler);
         }
-        
-        return contacts;
-
     }
     return nullptr;
 }
@@ -675,21 +666,19 @@ Mdouble SuperQuadricParticle::getCurvature(const LabFixedCoordinates& labFixedCo
  */
 bool SuperQuadricParticle::isInContactWith(const BaseParticle* const p) const
 {
-    //make a superquadric out of the particle.
-    SuperQuadricParticle* pQuad = dynamic_cast<SuperQuadricParticle*>(p->copy());
-    //if the dynamic casting of the particle pointer p is a null pointer, it implies that the p is a sphere.
-    bool fromSphere = (pQuad == nullptr);
-    // For the sake of simplicity, we make a superquad out of it.
-    if (fromSphere)
+    SmallVector<4> approximateContactPoint;
+
+    if (p->isSphericalParticle())
     {
-        pQuad = new SuperQuadricParticle;
+        SuperQuadricParticle* pQuad = new SuperQuadricParticle;
         pQuad->setAxes(p->getRadius(), p->getRadius(), p->getRadius());
+        approximateContactPoint = getContactPoint(pQuad, nullptr);
+        delete pQuad;
+    } else {
+        const SuperQuadricParticle* pQuad = static_cast<const SuperQuadricParticle*>(p);
+        approximateContactPoint = getContactPoint(pQuad, nullptr);
     }
-    
-    const SmallVector<4> approximateContactPoint = getContactPoint(pQuad, nullptr);
-    
-    delete pQuad;
-    
+
     //set the new contact point:
     LabFixedCoordinates contactPoint;
     contactPoint.X = approximateContactPoint[0];
@@ -971,3 +960,31 @@ Mdouble SuperQuadricParticle::getInteractionRadius(const BaseParticle* particle)
     const auto mixedSpecies = getSpecies()->getHandler()->getMixedObject(getSpecies(),particle->getSpecies());
     return getRadius() + 0.5 * mixedSpecies->getInteractionDistance();
 }
+
+/// Computes the particle's (inverse) mass and inertia.
+void SuperQuadricParticle::computeMass(const ParticleSpecies& s) {
+    if (isFixed()) return;
+    if (getParticleDimensions()==3) {
+        Mdouble volume = getVolume();
+
+        Mdouble help1 = mathsFunc::beta(1.5 * eps2_, 0.5 * eps2_);
+        Mdouble help2 = mathsFunc::beta(0.5 * eps1_, 2.0 * eps1_ + 1.0);
+        Mdouble help3 = mathsFunc::beta(0.5 * eps2_, 0.5 * eps2_ + 1);
+        Mdouble help4 = mathsFunc::beta(1.5 * eps1_, eps1_ + 1.0);
+
+        invMass_ = 1.0 / (volume * s.getDensity());
+        invInertia_.XX = 1.0 / (s.getDensity() * (0.5 * axes_.X * axes_.Y * axes_.Z * eps1_ * eps2_) *
+                                   (axes_.Y * axes_.Y * help1 * help2
+                                    + 4.0 * axes_.Z * axes_.Z * help3 * help4));
+        invInertia_.XY = 0.0;
+        invInertia_.XZ = 0.0;
+        invInertia_.YY = 1.0 / (s.getDensity() * (0.5 * axes_.X * axes_.Y * axes_.Z * eps1_ * eps2_) *
+                                   (axes_.X * axes_.X * help1 * help2
+                                    + 4.0 * axes_.Z * axes_.Z * help3 * help4));
+        invInertia_.YZ = 0.0;
+        invInertia_.ZZ = 1.0 / (s.getDensity() * (0.5 * axes_.X * axes_.Y * axes_.Z * eps1_ * eps2_) *
+                                   (axes_.X * axes_.X + axes_.Y * axes_.Y) * help1 * help2);
+    } else {
+        logger(ERROR, "[SuperQuadricParticle::computeMass] SuperQuadricParticle cannot be two-dimensional (yet)");
+    }
+};

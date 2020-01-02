@@ -378,7 +378,7 @@ BaseWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHan
         c->setNormal(-normal);
         c->setDistance(distance);
         c->setOverlap(overlap);
-        if (dynamic_cast<SuperQuadricParticle*>(p) == nullptr)
+        if (p->isSphericalParticle())
         {
             ///\todo{DK: What is the contact point for interactions with walls}
             c->setContactPoint(p->getPosition() - (p->getRadius() - 0.5 * c->getOverlap()) * c->getNormal());
@@ -461,8 +461,7 @@ void BaseWall::setVTKVisibility(const bool vtkVisibility)
 bool BaseWall::getDistanceNormalOverlap(const BaseParticle& P, Mdouble& distance, Vec3D& normal_return,
                                         Mdouble& overlap) const
 {
-    auto superQuadric = dynamic_cast<const SuperQuadricParticle*>(&P);
-    if (superQuadric == nullptr)
+    if (P.isSphericalParticle())
     {
         bool isInContact = getDistanceAndNormal(P, distance, normal_return);
         overlap = P.getRadius() - distance;
@@ -470,6 +469,7 @@ bool BaseWall::getDistanceNormalOverlap(const BaseParticle& P, Mdouble& distance
     }
     else
     {
+        auto superQuadric = dynamic_cast<const SuperQuadricParticle*>(&P);
         return getDistanceNormalOverlapSuperquadric(*superQuadric, distance, normal_return, overlap);
     }
 }

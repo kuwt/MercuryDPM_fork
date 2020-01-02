@@ -78,6 +78,8 @@ public:
     
     void actionsAfterTimeStep() override;
 
+    bool isSphericalParticle() const override {return true;}
+
 private:
     
     /*!

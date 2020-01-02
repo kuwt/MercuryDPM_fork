@@ -71,7 +71,7 @@ public:
     std::string getName() const override {
         return "BaseParticle";
     }
-    
-    
+
+    bool isSphericalParticle() const override {return true;}
 };
 #endif

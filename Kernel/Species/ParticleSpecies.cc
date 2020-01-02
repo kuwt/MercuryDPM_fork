@@ -149,67 +149,7 @@ Mdouble ParticleSpecies::getVolumeFromRadius(const Mdouble radius) const
 /// this function is called, if BaseParticleHandler::addObject, SpeciesHandler::addObject, ParticleSpecies::setDensity, BaseParticle::setRadius or DPMBase::setParticleDimensions is called
 void ParticleSpecies::computeMass(BaseParticle* p) const
 {
-    if (!p->isFixed())
-    {
-        switch (p->getParticleDimensions())
-        {
-            case 3:
-            {
-                p->invMass_ = 1.0 / (4.0 / 3.0 * constants::pi * p->getRadius() * p->getRadius() * p->getRadius() *
-                                     getDensity());
-                p->invInertia_ =
-                        MatrixSymmetric3D(1, 0, 0, 1, 0, 1) / (.4 * p->getMass() * mathsFunc::square(p->getRadius()));
-                //
-                if (p->getName() == "SuperQuadricParticle")
-                {
-                    SuperQuadricParticle* SE = dynamic_cast<SuperQuadricParticle*>(p);
-                    Vec3D axes = SE->getAxes();
-                    Mdouble eps1 = SE->getExponentEps1();
-                    Mdouble eps2 = SE->getExponentEps2();
-                    Mdouble volume = SE->getVolume();
-                    
-                    Mdouble help1 = mathsFunc::beta(1.5 * eps2, 0.5 * eps2);
-                    Mdouble help2 = mathsFunc::beta(0.5 * eps1, 2.0 * eps1 + 1.0);
-                    Mdouble help3 = mathsFunc::beta(0.5 * eps2, 0.5 * eps2 + 1);
-                    Mdouble help4 = mathsFunc::beta(1.5 * eps1, eps1 + 1.0);
-                    
-                    p->invMass_ = 1.0 / (volume * getDensity());
-                    p->invInertia_.XX = 1.0 / (getDensity() * (0.5 * axes.X * axes.Y * axes.Z * eps1 * eps2) *
-                                               (axes.Y * axes.Y * help1 * help2
-                                                + 4.0 * axes.Z * axes.Z * help3 * help4));
-                    p->invInertia_.XY = 0.0;
-                    p->invInertia_.XZ = 0.0;
-                    p->invInertia_.YY = 1.0 / (getDensity() * (0.5 * axes.X * axes.Y * axes.Z * eps1 * eps2) *
-                                               (axes.X * axes.X * help1 * help2
-                                                + 4.0 * axes.Z * axes.Z * help3 * help4));
-                    p->invInertia_.YZ = 0.0;
-                    p->invInertia_.ZZ = 1.0 / (getDensity() * (0.5 * axes.X * axes.Y * axes.Z * eps1 * eps2) *
-                                               (axes.X * axes.X + axes.Y * axes.Y) * help1 * help2);
-                }
-                break;
-            }
-            
-            case 2:
-            {
-                p->invMass_ = 1.0 / (constants::pi * p->getRadius() * p->getRadius() * getDensity());
-                p->invInertia_ =
-                        MatrixSymmetric3D(1, 0, 0, 1, 0, 1) / (.5 * p->getMass() * mathsFunc::square(p->getRadius()));
-                break;
-            }
-            
-            case 1:
-            {
-                p->invMass_ = 1.0 / (2.0 * p->getRadius() * getDensity());
-                p->invInertia_ = MatrixSymmetric3D(1, 0, 0, 1, 0, 1) / std::numeric_limits<Mdouble>::quiet_NaN();
-                break;
-            }
-            
-            default:
-            {
-                logger(ERROR, "ParticleSpecies::computeMass()] the dimension of the particle is not set");
-            }
-        }
-    }
+    p->computeMass(*this);
 }
 
 const std::function<double(double)>& ParticleSpecies::getTemperatureDependentDensity() const

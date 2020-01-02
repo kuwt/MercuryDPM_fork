@@ -858,3 +858,15 @@ bool BaseParticle::isInContactWith(const BaseParticle* const P) const
     }
     return P->isInContactWith(this);
 }
+
+/// Computes the particle's (inverse) mass and inertia.
+void BaseParticle::computeMass(const ParticleSpecies& s) {
+    if (isFixed()) return;
+    if (getParticleDimensions()==3) {
+        invMass_ = 1.0 / (4.0 / 3.0 * constants::pi * getRadius() * getRadius() * getRadius() * s.getDensity());
+        invInertia_ = MatrixSymmetric3D(1, 0, 0, 1, 0, 1) / (.4 * getMass() * mathsFunc::square(getRadius()));
+    } else {
+        invMass_ = 1.0 / (constants::pi * getRadius() * getRadius() * s.getDensity());
+        invInertia_ = MatrixSymmetric3D(1, 0, 0, 1, 0, 1) / (.5 * getMass() * mathsFunc::square(getRadius()));
+    }
+};

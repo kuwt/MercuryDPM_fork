@@ -76,6 +76,8 @@ public:
     
     std::vector<Mdouble> getFieldVTK(unsigned i) const override;
 
+    bool isSphericalParticle() const override {return true;}
+
 private:
     
     Mdouble liquidVolume_;
