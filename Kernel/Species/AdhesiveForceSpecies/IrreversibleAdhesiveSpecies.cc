@@ -24,7 +24,7 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "IrreversibleAdhesiveSpecies.h"
-#include <Logger.h>
+#include "Logger.h"
 
 IrreversibleAdhesiveSpecies::IrreversibleAdhesiveSpecies()
         : ReversibleAdhesiveSpecies()

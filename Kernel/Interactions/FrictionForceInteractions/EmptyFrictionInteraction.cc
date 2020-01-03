@@ -130,7 +130,8 @@ const Vec3D EmptyFrictionInteraction::getTangentialForce() const
  */
 const EmptyFrictionSpecies* EmptyFrictionInteraction::getSpecies() const
 {
-    return dynamic_cast<const EmptyFrictionSpecies*>(getBaseSpecies());
+    return static_cast<const EmptyFrictionSpecies*>(getBaseSpecies()->getFrictionForce());
+;
 }
 
 /*!

@@ -24,7 +24,7 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "EmptyAdhesiveSpecies.h"
-#include <Logger.h>
+#include "Logger.h"
 
 EmptyAdhesiveSpecies::EmptyAdhesiveSpecies()
 {

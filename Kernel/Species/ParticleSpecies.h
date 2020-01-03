@@ -46,7 +46,7 @@ public:
     ParticleSpecies(const ParticleSpecies& p);
     
     ///\brief The default destructor.
-    ~ParticleSpecies() override;
+    ~ParticleSpecies();
     
     /*!
      * \brief Creates a deep copy of the object from which it is called.

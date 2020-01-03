@@ -181,7 +181,7 @@ void LinearPlasticViscoelasticInteraction::computeNormalForce()
 Mdouble LinearPlasticViscoelasticInteraction::getElasticEnergy() const
 {
     Mdouble energy = getOverlap() > 0 ? 0.5 * (getSpecies()->getLoadingStiffness() * mathsFunc::square(getOverlap())) : 0.0;
-    if (getSpecies()->getConstantRestitution()) energy *= 2.0*getEffectiveMass();
+    if (getBaseSpecies()->getNormalForce()->getConstantRestitution()) energy *= 2.0*getEffectiveMass();
     return energy;
     ///\todo TW this is not correct; we should count the return energy
 }
@@ -191,7 +191,8 @@ Mdouble LinearPlasticViscoelasticInteraction::getElasticEnergy() const
  */
 const LinearPlasticViscoelasticNormalSpecies* LinearPlasticViscoelasticInteraction::getSpecies() const
 {
-    return dynamic_cast<const LinearPlasticViscoelasticNormalSpecies*>(getBaseSpecies());
+    return static_cast<const LinearPlasticViscoelasticNormalSpecies*>(getBaseSpecies()->getNormalForce());
+;
 }
 
 /*!

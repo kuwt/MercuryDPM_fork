@@ -212,7 +212,7 @@ Mdouble HertzianSinterInteraction::getElasticEnergy() const
  */
 const HertzianSinterNormalSpecies* HertzianSinterInteraction::getSpecies() const
 {
-    return dynamic_cast<const HertzianSinterNormalSpecies*>(getBaseSpecies());
+    return static_cast<const HertzianSinterNormalSpecies*>(getBaseSpecies()->getNormalForce());
 }
 
 /*!

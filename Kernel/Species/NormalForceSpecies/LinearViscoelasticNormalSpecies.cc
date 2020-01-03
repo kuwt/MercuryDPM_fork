@@ -33,6 +33,7 @@
 class BaseInteractable;
 
 LinearViscoelasticNormalSpecies::LinearViscoelasticNormalSpecies()
+        : BaseNormalForce()
 {
     stiffness_ = 0.0;
     dissipation_ = 0.0;
@@ -45,6 +46,7 @@ LinearViscoelasticNormalSpecies::LinearViscoelasticNormalSpecies()
  * \param[in] the species that is copied
  */
 LinearViscoelasticNormalSpecies::LinearViscoelasticNormalSpecies(const LinearViscoelasticNormalSpecies& p)
+        : BaseNormalForce(p)
 {
     stiffness_ = p.stiffness_;
     dissipation_ = p.dissipation_;
@@ -259,6 +261,6 @@ void LinearViscoelasticNormalSpecies::setCollisionTimeAndRestitutionCoefficient(
 void
 LinearViscoelasticNormalSpecies::mix(LinearViscoelasticNormalSpecies* const S, LinearViscoelasticNormalSpecies* const T)
 {
-    stiffness_ = average(S->getStiffness(), T->getStiffness());
-    dissipation_ = average(S->getDissipation(), T->getDissipation());
+    stiffness_ = BaseSpecies::average(S->getStiffness(), T->getStiffness());
+    dissipation_ = BaseSpecies::average(S->getDissipation(), T->getDissipation());
 }

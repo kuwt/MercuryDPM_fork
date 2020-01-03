@@ -92,7 +92,7 @@ int main()
     insertionBoundary_problem.solve();
 
 
-    helpers::check(24, insertionBoundary_problem.particleHandler.getSize(), 0.1, "Number of particles check");
-    helpers::check(26, insertionBoundary_problem.interactionHandler.getSize(), 0.1, "Number of interactions check");
+    helpers::check(insertionBoundary_problem.particleHandler.getSize(), 24, 0.1, "Number of particles check");
+    helpers::check(insertionBoundary_problem.interactionHandler.getSize(), 26, 0.1, "Number of interactions check");
 }
 

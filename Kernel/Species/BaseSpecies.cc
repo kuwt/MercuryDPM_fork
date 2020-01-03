@@ -39,7 +39,6 @@ BaseSpecies::BaseSpecies()
         : BaseObject()
 {
     handler_ = nullptr;
-    constantRestitution_ = false;
     interactionDistance_ = 0;
     logger(DEBUG, "BaseSpecies::BaseSpecies() finished");
 }
@@ -51,7 +50,6 @@ BaseSpecies::BaseSpecies(const BaseSpecies& p)
         : BaseObject(p)
 {
     handler_ = p.handler_;
-    constantRestitution_ = p.constantRestitution_;
     interactionDistance_ = p.interactionDistance_;
     logger(DEBUG, "BaseSpecies::BaseSpecies(const BaseSpecies &p) finished");
 }
@@ -102,7 +100,7 @@ SpeciesHandler* BaseSpecies::getHandler() const
  * \param[in] a,b The two variables you want to average
  * \return The harmonic mean of a and b, \f$\frac{2}{1/a+1/b}\f$
  */
-Mdouble BaseSpecies::average(Mdouble a, Mdouble b) const
+Mdouble BaseSpecies::average(Mdouble a, Mdouble b)
 {
     //the second algorithm seems to have a better accuracy, at least for the case average(2e5,2e5)
     //return (a + b) != 0.0 ? (2. * (a * b) / (a + b)) : 0;
@@ -112,23 +110,12 @@ Mdouble BaseSpecies::average(Mdouble a, Mdouble b) const
 /*! 
  * \detail Returns the harmonic mean of two variables, returning inf if either is inf. 
  */
-Mdouble BaseSpecies::averageInf(Mdouble a, Mdouble b) const
+Mdouble BaseSpecies::averageInf(Mdouble a, Mdouble b)
 {
     if (a == inf || b == inf) 
         return inf;
     else
         return average(a, b);
-}
-
-
-/*!
- * \brief Sets the boolean constantRestitution_.
- */
-void BaseSpecies::setConstantRestitution(bool constantRestitution) {
-    logger.assert(constantRestitution_ == constantRestitution ||
-    dynamic_cast<LinearPlasticViscoelasticNormalSpecies*>(this)!= nullptr,
-    "ConstantRestitution is currently only implemented for the plastic contact law");
-    constantRestitution_ = constantRestitution;
 }
 
 /*!
@@ -137,7 +124,7 @@ void BaseSpecies::setConstantRestitution(bool constantRestitution) {
 void BaseSpecies::write(std::ostream& os) const
 {
     //BaseObject::write(os);
-    if (getConstantRestitution()) os << " constantRestitution " << getConstantRestitution();
+    if (normalForce_->getConstantRestitution()) os << " constantRestitution " << normalForce_->getConstantRestitution();
 }
 
 /*!
@@ -146,7 +133,10 @@ void BaseSpecies::write(std::ostream& os) const
 void BaseSpecies::read(std::istream& is)
 {
     //BaseObject::read(is);
-    helpers::readOptionalVariable(is, "constantRestitution", constantRestitution_);
+    bool constantRestitution;
+    if (helpers::readOptionalVariable(is, "constantRestitution", constantRestitution)) {
+        normalForce_->setConstantRestitution(constantRestitution);
+    }
 }
 
 /**

@@ -199,11 +199,11 @@ bool SlidingFrictionSpecies::getUseAngularDOFs() const
  */
 void SlidingFrictionSpecies::mix(SlidingFrictionSpecies* const S, SlidingFrictionSpecies* const T)
 {
-    slidingStiffness_ = average(S->getSlidingStiffness(), T->getSlidingStiffness());
-    slidingDissipation_ = average(S->getSlidingDissipation(), T->getSlidingDissipation());
-    slidingFrictionCoefficient_ = average(S->getSlidingFrictionCoefficient(),
+    slidingStiffness_ = BaseSpecies::average(S->getSlidingStiffness(), T->getSlidingStiffness());
+    slidingDissipation_ = BaseSpecies::average(S->getSlidingDissipation(), T->getSlidingDissipation());
+    slidingFrictionCoefficient_ = BaseSpecies::average(S->getSlidingFrictionCoefficient(),
                                           T->getSlidingFrictionCoefficient());
-    slidingFrictionCoefficientStatic_ = average(S->getSlidingFrictionCoefficientStatic(),
+    slidingFrictionCoefficientStatic_ = BaseSpecies::average(S->getSlidingFrictionCoefficientStatic(),
                                                 T->getSlidingFrictionCoefficientStatic());
 }
 

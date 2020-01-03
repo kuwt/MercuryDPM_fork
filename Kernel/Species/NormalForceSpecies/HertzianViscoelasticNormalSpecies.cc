@@ -25,15 +25,17 @@
 
 #include "HertzianViscoelasticNormalSpecies.h"
 #include "Interactions/BaseInteraction.h"
-#include<cmath>
-#include <Interactions/NormalForceInteractions/HertzianViscoelasticInteraction.h>
-#include <Logger.h>
+#include <cmath>
+#include "Interactions/NormalForceInteractions/HertzianViscoelasticInteraction.h"
+#include "Logger.h"
+#include "Species/BaseSpecies.h"
 
 class BaseParticle;
 
 class BaseInteractable;
 
 HertzianViscoelasticNormalSpecies::HertzianViscoelasticNormalSpecies()
+        : BaseNormalForce()
 {
     elasticModulus_ = 0;
     dissipation_ = 0;
@@ -46,6 +48,7 @@ HertzianViscoelasticNormalSpecies::HertzianViscoelasticNormalSpecies()
  * \param[in] the species that is copied
  */
 HertzianViscoelasticNormalSpecies::HertzianViscoelasticNormalSpecies(const HertzianViscoelasticNormalSpecies& p)
+        : BaseNormalForce(p)
 {
     elasticModulus_ = p.elasticModulus_;
     dissipation_ = p.dissipation_;
@@ -228,8 +231,8 @@ Mdouble HertzianViscoelasticNormalSpecies::getDissipation() const
 void HertzianViscoelasticNormalSpecies::mix(HertzianViscoelasticNormalSpecies* const S,
                                             HertzianViscoelasticNormalSpecies* const T)
 {
-    elasticModulus_ = average(S->getElasticModulus(), T->getElasticModulus());
-    dissipation_ = average(S->getDissipation(), T->getDissipation());
+    elasticModulus_ = BaseSpecies::average(S->getElasticModulus(), T->getElasticModulus());
+    dissipation_ = BaseSpecies::average(S->getDissipation(), T->getDissipation());
 }
 
 /**

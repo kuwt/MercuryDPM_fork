@@ -48,10 +48,10 @@ public:
     virtual ~ThermalSpecies();
     
     /// \brief Writes the species properties to an output stream.
-    void write(std::ostream& os) const override;
+    void write(std::ostream& os) const;
     
     /// \brief Reads the species properties from an input stream.
-    void read(std::istream& is) override;
+    void read(std::istream& is);
     
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;

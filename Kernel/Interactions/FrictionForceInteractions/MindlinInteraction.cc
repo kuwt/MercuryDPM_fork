@@ -397,7 +397,8 @@ const Mdouble MindlinInteraction::getTangentialForceDirection() const
  */
 const MindlinSpecies* MindlinInteraction::getSpecies() const
 {
-    return dynamic_cast<const MindlinSpecies*>(getBaseSpecies());
+    return static_cast<const MindlinSpecies*>(getBaseSpecies()->getFrictionForce());
+;
 }
 
 /*!

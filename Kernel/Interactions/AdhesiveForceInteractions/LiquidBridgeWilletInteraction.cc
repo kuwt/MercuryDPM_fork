@@ -134,7 +134,8 @@ Mdouble LiquidBridgeWilletInteraction::getElasticEnergy() const
  */
 const LiquidBridgeWilletSpecies* LiquidBridgeWilletInteraction::getSpecies() const
 {
-    return dynamic_cast<const LiquidBridgeWilletSpecies*>(getBaseSpecies());
+    return static_cast<const LiquidBridgeWilletSpecies*>(getBaseSpecies()->getAdhesiveForce());
+;
 }
 
 /*!

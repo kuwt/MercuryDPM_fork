@@ -35,6 +35,7 @@ class BaseParticle;
 class BaseInteractable;
 
 HertzianSinterNormalSpecies::HertzianSinterNormalSpecies()
+        : BaseNormalForce()
 {
     loadingModulus_ = 0.0;
     unloadingModulusMax_ = 0.0;
@@ -51,6 +52,7 @@ HertzianSinterNormalSpecies::HertzianSinterNormalSpecies()
  * \param[in] the species that is copied
  */
 HertzianSinterNormalSpecies::HertzianSinterNormalSpecies(const HertzianSinterNormalSpecies& p)
+        : BaseNormalForce(p)
 {
     loadingModulus_ = p.loadingModulus_;
     unloadingModulusMax_ = p.unloadingModulusMax_;
@@ -112,12 +114,12 @@ std::string HertzianSinterNormalSpecies::getBaseName() const
  */
 void HertzianSinterNormalSpecies::mix(HertzianSinterNormalSpecies* const S, HertzianSinterNormalSpecies* const T)
 {
-    loadingModulus_ = average(S->getLoadingModulus(), T->getLoadingModulus());
-    unloadingModulusMax_ = average(S->getUnloadingModulusMax(), T->getUnloadingModulusMax());
-    cohesionModulus_ = average(S->getCohesionModulus(), T->getCohesionModulus());
-    penetrationDepthMax_ = average(S->getPenetrationDepthMax(), T->getPenetrationDepthMax());
-    dissipation_ = average(S->getDissipation(), T->getDissipation());
-    sinterRate_ = average(S->getSinterRate(), T->getSinterRate());
+    loadingModulus_ = BaseSpecies::average(S->getLoadingModulus(), T->getLoadingModulus());
+    unloadingModulusMax_ = BaseSpecies::average(S->getUnloadingModulusMax(), T->getUnloadingModulusMax());
+    cohesionModulus_ = BaseSpecies::average(S->getCohesionModulus(), T->getCohesionModulus());
+    penetrationDepthMax_ = BaseSpecies::average(S->getPenetrationDepthMax(), T->getPenetrationDepthMax());
+    dissipation_ = BaseSpecies::average(S->getDissipation(), T->getDissipation());
+    sinterRate_ = BaseSpecies::average(S->getSinterRate(), T->getSinterRate());
 }
 
 /*!
@@ -216,7 +218,7 @@ Mdouble HertzianSinterNormalSpecies::computeTimeStep(Mdouble mass)
 //        return 0.02 * constants::pi / std::sqrt(2.0*stiffnessMax / mass);
 //    } else {
     std::cerr << "Warning: Dissipation is not taken into account when computing the time step" << std::endl;
-    ParticleSpecies* p = dynamic_cast<ParticleSpecies*>(this);
+    ParticleSpecies* p = dynamic_cast<ParticleSpecies*>(getBaseSpecies());
     assert(p);
     Mdouble radius = cbrt(mass * 3. / (4. * constants::pi * p->getDensity()));
     return 0.02 * constants::pi / std::sqrt(2.0 * getUnloadingModulusMax() * getPenetrationDepthMax() * radius / mass);

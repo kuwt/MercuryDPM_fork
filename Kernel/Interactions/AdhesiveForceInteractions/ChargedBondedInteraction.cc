@@ -208,8 +208,8 @@ void ChargedBondedInteraction::computeAdhesionForce()
 Mdouble ChargedBondedInteraction::getElasticEnergy() const
 {
     const ChargedBondedSpecies* species = getSpecies();
-    const auto pSpecies = dynamic_cast<const ChargedBondedSpecies*>(getP()->getSpecies());
-    const auto iSpecies = dynamic_cast<const ChargedBondedSpecies*>(getI()->getSpecies());
+    const auto pSpecies = static_cast<const ChargedBondedSpecies*>(getP()->getSpecies()->getAdhesiveForce());
+    const auto iSpecies = static_cast<const ChargedBondedSpecies*>(getI()->getSpecies()->getAdhesiveForce());
     assert(pSpecies);
     assert(iSpecies);
     const int pCharge = pSpecies->getCharge();
@@ -217,7 +217,7 @@ Mdouble ChargedBondedInteraction::getElasticEnergy() const
     
     const Mdouble k = species->getAdhesionStiffness();
     const Mdouble fMax = species->getAdhesionForceMax();
-    const Mdouble r = species->getInteractionDistance();
+    const Mdouble r = getBaseSpecies()->getInteractionDistance();
     
     const Mdouble kWaals = species->getVanDerWaalsStiffness();
     const Mdouble fMaxWaals = species->getVanDerWaalsForceMax();
@@ -283,7 +283,7 @@ Mdouble ChargedBondedInteraction::getElasticEnergy() const
  */
 const ChargedBondedSpecies* ChargedBondedInteraction::getSpecies() const
 {
-    return dynamic_cast<const ChargedBondedSpecies*> (getBaseSpecies()); //downcast
+    return static_cast<const ChargedBondedSpecies*> (getBaseSpecies()->getAdhesiveForce()); //downcast
 }
 
 /*!

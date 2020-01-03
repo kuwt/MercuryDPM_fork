@@ -250,7 +250,8 @@ Mdouble SinterInteraction::getElasticEnergy() const
  */
 const SinterNormalSpecies* SinterInteraction::getSpecies() const
 {
-    return dynamic_cast<const SinterNormalSpecies*>(getBaseSpecies());
+    return static_cast<const SinterNormalSpecies*>(getBaseSpecies()->getNormalForce());
+;
 }
 
 /*!

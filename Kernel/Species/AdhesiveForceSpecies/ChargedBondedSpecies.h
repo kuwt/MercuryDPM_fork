@@ -26,7 +26,7 @@
 #ifndef ChargedBondedSpecies_H
 #define ChargedBondedSpecies_H
 
-#include "Species/BaseSpecies.h"
+#include "Species/AdhesiveForceSpecies/BaseAdhesiveForce.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/AdhesiveForceInteractions/ChargedBondedInteraction.h"
 
@@ -34,7 +34,7 @@
  * \brief ChargedBondedSpecies contains the parameters used to describe a linear reversible short-range force.
  * \details See ChargedBondedInteraction::computeForce for a description of the force law.
  */
-class ChargedBondedSpecies : public virtual BaseSpecies
+class ChargedBondedSpecies : public BaseAdhesiveForce
 {
 public:
     ///\brief The correct Interaction type for this AdhesiveForceSpecies
@@ -47,13 +47,13 @@ public:
     ChargedBondedSpecies(const ChargedBondedSpecies& s);
     
     ///\brief The default constructor.
-    ~ChargedBondedSpecies() override = default;
+    ~ChargedBondedSpecies() = default;
     
     /// \brief Reads the species properties from an input stream.
-    void read(std::istream& is) override;
+    void read(std::istream& is);
     
     /// \brief Writes the species properties to an output stream.
-    void write(std::ostream& os) const override;
+    void write(std::ostream& os) const;
     
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;

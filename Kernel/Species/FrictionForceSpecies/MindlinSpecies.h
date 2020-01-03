@@ -26,7 +26,7 @@
 #ifndef MINDLINSPECIES_H
 #define MINDLINSPECIES_H
 
-#include "Species/BaseSpecies.h"
+#include "Species/FrictionForceSpecies/BaseFrictionForce.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/FrictionForceInteractions/MindlinInteraction.h"
 
@@ -34,7 +34,7 @@
  * \brief MindlinSpecies contains the parameters used to describe sliding friction.
  * \details See MindlinInteraction::computeForce for a description of the force law.
  */
-class MindlinSpecies : public virtual BaseSpecies
+class MindlinSpecies : public BaseFrictionForce
 {
 public:
     ///\brief The correct Interaction type for this FrictionForceSpecies
@@ -47,13 +47,13 @@ public:
     MindlinSpecies(const MindlinSpecies& s);
     
     ///\brief The default destructor.
-    ~MindlinSpecies() override;
+    ~MindlinSpecies();
     
     /// \brief Reads the species properties from an input stream.
-    void read(std::istream& is) override;
+    void read(std::istream& is);
     
     /// \brief Writes the species properties to an output stream.
-    void write(std::ostream& os) const override;
+    void write(std::ostream& os) const;
     
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     virtual std::string getBaseName() const;

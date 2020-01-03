@@ -118,7 +118,8 @@ void IrreversibleAdhesiveInteraction::computeAdhesionForce()
  */
 const IrreversibleAdhesiveSpecies* IrreversibleAdhesiveInteraction::getSpecies() const
 {
-    return dynamic_cast<const IrreversibleAdhesiveSpecies*>(getBaseSpecies());
+    return static_cast<const IrreversibleAdhesiveSpecies*>(getBaseSpecies()->getAdhesiveForce());
+;
 }
 
 /*!
@@ -140,10 +141,10 @@ Mdouble IrreversibleAdhesiveInteraction::getElasticEnergy() const
         return 0.0;
     else if (getOverlap() <= 0)
         return -0.5 * getSpecies()->getAdhesionStiffness() *
-               mathsFunc::square(getOverlap() + getSpecies()->getInteractionDistance());
+               mathsFunc::square(getOverlap() + getBaseSpecies()->getInteractionDistance());
     else
         return -getSpecies()->getAdhesionForceMax() * getOverlap()
-               - 0.5 * getSpecies()->getAdhesionStiffness() * mathsFunc::square(getSpecies()->getInteractionDistance());
+               - 0.5 * getSpecies()->getAdhesionStiffness() * mathsFunc::square(getBaseSpecies()->getInteractionDistance());
 }
 
 bool IrreversibleAdhesiveInteraction::getWasInContact() const

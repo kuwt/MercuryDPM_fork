@@ -26,9 +26,11 @@
 #ifndef SinterNormalSpecies_H
 #define SinterNormalSpecies_H
 
-#include "Species/BaseSpecies.h"
+#include "Species/NormalForceSpecies/BaseNormalForce.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/NormalForceInteractions/SinterInteraction.h"
+#include "Math/Helpers.h"
+
 
 enum class SINTERTYPE : unsigned char
 {
@@ -41,7 +43,7 @@ enum class SINTERTYPE : unsigned char
  * \brief SinterNormalSpecies contains the parameters used to describe a plastic-cohesive normal force (Stefan Ludings plastic-cohesive force model).
  * \details See SinterNormalInteraction::computeForce for a description of the force law.
  */
-class SinterNormalSpecies : public virtual BaseSpecies
+class SinterNormalSpecies : public BaseNormalForce
 {
 public:
     ///\brief The correct Interaction type for this FrictionForceSpecies
@@ -54,13 +56,13 @@ public:
     SinterNormalSpecies(const SinterNormalSpecies& p);
     
     ///\brief The default destructor.
-    ~SinterNormalSpecies() override;
+    ~SinterNormalSpecies();
     
     /// \brief Reads the species properties from an input stream.
-    void read(std::istream& is) override;
+    void read(std::istream& is);
     
     /// \brief Writes the species properties to an output stream.
-    void write(std::ostream& os) const override;
+    void write(std::ostream& os) const;
     
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;

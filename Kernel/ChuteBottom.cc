@@ -30,7 +30,7 @@
 #include "Species/FrictionForceSpecies/SlidingFrictionSpecies.h"
 #include "Boundaries/PeriodicBoundary.h"
 #include "Walls/InfiniteWall.h"
-#include <Logger.h>
+#include "Logger.h"
 
 /*!
  * \details Default constructor. Calls the constructor() method.
@@ -157,7 +157,7 @@ void ChuteBottom::makeRoughBottom(Chute& chute)
         species->setCollisionTimeAndRestitutionCoefficient(collisionTime, 0.343008, mass);
         setTimeStep(0.02 * 9.41823 * collisionTime);
         logger(INFO, "Time step: %", getTimeStep());
-        logger(INFO, "Species: %", *species);
+        //logger(INFO, "Species: %", *species);
     }
     else
     {

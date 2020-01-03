@@ -132,15 +132,15 @@ bool MindlinRollingTorsionSpecies::getUseAngularDOFs() const
  */
 void MindlinRollingTorsionSpecies::mix(MindlinRollingTorsionSpecies* const S, MindlinRollingTorsionSpecies* const T)
 {
-    //rollingStiffness_= average(S->getRollingStiffness(), T->getRollingStiffness());
-    rollingDissipation_ = average(S->getRollingDissipation(), T->getRollingDissipation());
-    rollingFrictionCoefficient_ = average(S->getRollingFrictionCoefficient(), T->getRollingFrictionCoefficient());
-    rollingFrictionCoefficientStatic_ = average(S->getRollingFrictionCoefficientStatic(),
+    //rollingStiffness_= BaseSpecies::average(S->getRollingStiffness(), T->getRollingStiffness());
+    rollingDissipation_ = BaseSpecies::average(S->getRollingDissipation(), T->getRollingDissipation());
+    rollingFrictionCoefficient_ = BaseSpecies::average(S->getRollingFrictionCoefficient(), T->getRollingFrictionCoefficient());
+    rollingFrictionCoefficientStatic_ = BaseSpecies::average(S->getRollingFrictionCoefficientStatic(),
                                                 T->getRollingFrictionCoefficientStatic());
-    //torsionStiffness_= average(S->getTorsionStiffness(), T->getTorsionStiffness());
-    torsionDissipation_ = average(S->getTorsionDissipation(), T->getTorsionDissipation());
-    torsionFrictionCoefficient_ = average(S->getTorsionFrictionCoefficient(), T->getTorsionFrictionCoefficient());
-    torsionFrictionCoefficientStatic_ = average(S->getTorsionFrictionCoefficientStatic(),
+    //torsionStiffness_= BaseSpecies::average(S->getTorsionStiffness(), T->getTorsionStiffness());
+    torsionDissipation_ = BaseSpecies::average(S->getTorsionDissipation(), T->getTorsionDissipation());
+    torsionFrictionCoefficient_ = BaseSpecies::average(S->getTorsionFrictionCoefficient(), T->getTorsionFrictionCoefficient());
+    torsionFrictionCoefficientStatic_ = BaseSpecies::average(S->getTorsionFrictionCoefficientStatic(),
                                                 T->getTorsionFrictionCoefficientStatic());
 }
 

@@ -142,7 +142,7 @@ void FrictionInteraction::computeFrictionForce()
             //Calculate test force acting on P including viscous force
             Vec3D rollingForce = -species->getRollingStiffness() * rollingSpring_ -
                                  species->getRollingDissipation() * rollingRelativeVelocity;
-            if (getSpecies()->getConstantRestitution()) rollingForce *=2.0*getEffectiveMass();
+            if (getBaseSpecies()->getNormalForce()->getConstantRestitution()) rollingForce *=2.0*getEffectiveMass();
 
             //tangential forces are modelled by a spring-damper of elasticity kt and viscosity dispt (sticking),
             //but the force is limited by Coulomb friction (rolling):
@@ -193,7 +193,7 @@ void FrictionInteraction::computeFrictionForce()
             //Calculate test force acting on P including viscous force
             Vec3D torsionForce = -species->getTorsionStiffness() * torsionSpring_ -
                                  species->getTorsionDissipation() * torsionRelativeVelocity;
-            if (getSpecies()->getConstantRestitution()) torsionForce *=2.0*getEffectiveMass();
+            if (getBaseSpecies()->getNormalForce()->getConstantRestitution()) torsionForce *=2.0*getEffectiveMass();
 
             //tangential forces are modelled by a spring-damper of elasticity kt and viscosity dispt (sticking),
             //but the force is limited by Coulomb friction (torsion):
@@ -238,7 +238,7 @@ void FrictionInteraction::integrate(Mdouble timeStep)
  */
 Mdouble FrictionInteraction::getElasticEnergy() const
 {
-    if (getSpecies()->getConstantRestitution()) {
+    if (getBaseSpecies()->getNormalForce()->getConstantRestitution()) {
         return SlidingFrictionInteraction::getElasticEnergy()
                + getEffectiveMass() * getSpecies()->getRollingStiffness() * rollingSpring_.getLengthSquared()
                + getEffectiveMass() * getSpecies()->getTorsionStiffness() * torsionSpring_.getLengthSquared();
@@ -254,7 +254,8 @@ Mdouble FrictionInteraction::getElasticEnergy() const
  */
 const FrictionSpecies* FrictionInteraction::getSpecies() const
 {
-    return dynamic_cast<const FrictionSpecies*>(getBaseSpecies());
+    return static_cast<const FrictionSpecies*>(getBaseSpecies()->getFrictionForce());
+;
 }
 
 /*!

@@ -24,7 +24,6 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <limits>
-#include <Logger.h>
 #include "Logger.h"
 #include "SphericalWall.h"
 #include "Particles/BaseParticle.h"

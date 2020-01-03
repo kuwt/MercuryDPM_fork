@@ -107,7 +107,7 @@ public:
 
 #include "Interactions/FrictionForceInteractions/SlidingFrictionInteraction.h"
 
-class SlidingFrictionSpecies : public virtual BaseSpecies
+class SlidingFrictionSpecies : public BaseNormalForce
 {
 public:
     typedef SlidingFrictionInteraction InteractionType;
@@ -122,7 +122,7 @@ public:
 
 #include "Interactions/FrictionForceInteractions/MindlinInteraction.h"
 
-class MindlinSpecies : public virtual BaseSpecies
+class MindlinSpecies : public BaseNormalForce
 {
 public:
     typedef MindlinInteraction InteractionType;

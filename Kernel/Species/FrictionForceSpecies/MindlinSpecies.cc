@@ -208,10 +208,10 @@ bool MindlinSpecies::getUseAngularDOFs() const
  */
 void MindlinSpecies::mix(MindlinSpecies* const SFrictional, MindlinSpecies* const TFrictional)
 {
-    slidingDissipation_ = average(SFrictional->getSlidingDissipation(), TFrictional->getSlidingDissipation());
-    slidingFrictionCoefficient_ = average(SFrictional->getSlidingFrictionCoefficient(),
+    slidingDissipation_ = BaseSpecies::average(SFrictional->getSlidingDissipation(), TFrictional->getSlidingDissipation());
+    slidingFrictionCoefficient_ = BaseSpecies::average(SFrictional->getSlidingFrictionCoefficient(),
                                           TFrictional->getSlidingFrictionCoefficient());
-    slidingFrictionCoefficientStatic_ = average(SFrictional->getSlidingFrictionCoefficientStatic(),
+    slidingFrictionCoefficientStatic_ = BaseSpecies::average(SFrictional->getSlidingFrictionCoefficientStatic(),
                                                 TFrictional->getSlidingFrictionCoefficientStatic());
 }
 

@@ -26,7 +26,7 @@
 #ifndef LINEARREVERSIBLEADHESIVESPECIES_H
 #define LINEARREVERSIBLEADHESIVESPECIES_H
 
-#include "Species/BaseSpecies.h"
+#include "Species/AdhesiveForceSpecies/BaseAdhesiveForce.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/AdhesiveForceInteractions/ReversibleAdhesiveInteraction.h"
 
@@ -34,7 +34,7 @@
  * \brief ReversibleAdhesiveSpecies contains the parameters used to describe a linear reversible short-range force.
  * \details See ReversibleAdhesiveInteraction::computeForce for a description of the force law.
  */
-class ReversibleAdhesiveSpecies : public virtual BaseSpecies
+class ReversibleAdhesiveSpecies : public BaseAdhesiveForce
 {
 public:
     ///\brief The correct Interaction type for this AdhesiveForceSpecies
@@ -47,13 +47,13 @@ public:
     ReversibleAdhesiveSpecies(const ReversibleAdhesiveSpecies& s);
     
     ///\brief The default constructor.
-    ~ReversibleAdhesiveSpecies() override;
+    ~ReversibleAdhesiveSpecies();
     
     /// \brief Reads the species properties from an input stream.
-    void read(std::istream& is) override;
+    void read(std::istream& is);
     
     /// \brief Writes the species properties to an output stream.
-    void write(std::ostream& os) const override;
+    void write(std::ostream& os) const;
     
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;

@@ -27,12 +27,14 @@
 #include "SinterNormalSpecies.h"
 #include "Interactions/NormalForceInteractions/SinterInteraction.h"
 #include "Logger.h"
+#include "Species/BaseSpecies.h"
 
 class BaseParticle;
 
 class BaseInteractable;
 
 SinterNormalSpecies::SinterNormalSpecies()
+        : BaseNormalForce()
 {
     sinterType_ = SINTERTYPE::PARHAMI_MCKEEPING;
     loadingStiffness_ = 0.0;
@@ -52,6 +54,7 @@ SinterNormalSpecies::SinterNormalSpecies()
  * \param[in] the species that is copied
  */
 SinterNormalSpecies::SinterNormalSpecies(const SinterNormalSpecies& p)
+        : BaseNormalForce(p)
 {
     sinterType_ = p.sinterType_;
     loadingStiffness_ = p.loadingStiffness_;
@@ -124,13 +127,13 @@ std::string SinterNormalSpecies::getBaseName() const
  */
 void SinterNormalSpecies::mix(SinterNormalSpecies* const S, SinterNormalSpecies* const T)
 {
-    loadingStiffness_ = average(S->getLoadingStiffness(), T->getLoadingStiffness());
-    unloadingStiffnessMax_ = average(S->getUnloadingStiffnessMax(), T->getUnloadingStiffnessMax());
-    cohesionStiffness_ = average(S->getCohesionStiffness(), T->getCohesionStiffness());
-    penetrationDepthMax_ = average(S->getPenetrationDepthMax(), T->getPenetrationDepthMax());
-    dissipation_ = average(S->getDissipation(), T->getDissipation());
-    inverseSinterViscosity_ = average(S->getInverseSinterViscosity(), T->getInverseSinterViscosity());
-    sinterAdhesion_ = average(S->getSinterAdhesion(), T->getSinterAdhesion());
+    loadingStiffness_ = BaseSpecies::average(S->getLoadingStiffness(), T->getLoadingStiffness());
+    unloadingStiffnessMax_ = BaseSpecies::average(S->getUnloadingStiffnessMax(), T->getUnloadingStiffnessMax());
+    cohesionStiffness_ = BaseSpecies::average(S->getCohesionStiffness(), T->getCohesionStiffness());
+    penetrationDepthMax_ = BaseSpecies::average(S->getPenetrationDepthMax(), T->getPenetrationDepthMax());
+    dissipation_ = BaseSpecies::average(S->getDissipation(), T->getDissipation());
+    inverseSinterViscosity_ = BaseSpecies::average(S->getInverseSinterViscosity(), T->getInverseSinterViscosity());
+    sinterAdhesion_ = BaseSpecies::average(S->getSinterAdhesion(), T->getSinterAdhesion());
 }
 
 /*!

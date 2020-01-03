@@ -26,7 +26,7 @@
 #ifndef LiquidBridgeWilletSpecies_H
 #define LiquidBridgeWilletSpecies_H
 
-#include "Species/BaseSpecies.h"
+#include "Species/AdhesiveForceSpecies/BaseAdhesiveForce.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/AdhesiveForceInteractions/LiquidBridgeWilletInteraction.h"
 
@@ -34,7 +34,7 @@
  * \brief LiquidBridgeWilletSpecies contains the parameters used to describe a short-range force caused by liquid bridges.
  * \details See LiquidBridgeWilletInteraction::computeForce for a description of the force law.
  */
-class LiquidBridgeWilletSpecies : public virtual BaseSpecies
+class LiquidBridgeWilletSpecies : public BaseAdhesiveForce
 {
 public:
     ///\brief The correct Interaction type for this AdhesiveForceSpecies
@@ -47,13 +47,13 @@ public:
     LiquidBridgeWilletSpecies(const LiquidBridgeWilletSpecies& s);
     
     ///\brief The default destructor.
-    ~LiquidBridgeWilletSpecies() override;
+    ~LiquidBridgeWilletSpecies();
     
     /// \brief Reads the species properties from an input stream.
-    void read(std::istream& is) override;
+    void read(std::istream& is);
     
     /// \brief Writes the species properties to an output stream.
-    void write(std::ostream& os) const override;
+    void write(std::ostream& os) const;
     
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;

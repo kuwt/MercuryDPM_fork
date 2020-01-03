@@ -26,6 +26,7 @@
 
 #include "LinearViscoelasticInteraction.h"
 #include "Species/NormalForceSpecies/LinearViscoelasticNormalSpecies.h"
+#include "Species/BaseSpecies.h"
 #include "BaseInteractable.h"
 #include "InteractionHandler.h"
 #include <iomanip>
@@ -144,7 +145,7 @@ Mdouble LinearViscoelasticInteraction::getElasticEnergy() const
 const LinearViscoelasticNormalSpecies* LinearViscoelasticInteraction::getSpecies() const
 {
     ///\todo you can remove this by adding the species to the Interaction instead of the base interaction
-    return dynamic_cast<const LinearViscoelasticNormalSpecies*>(getBaseSpecies());
+    return static_cast<const LinearViscoelasticNormalSpecies*>(getBaseSpecies()->getNormalForce());
 }
 
 Mdouble LinearViscoelasticInteraction::getElasticEnergyAtEquilibrium(Mdouble adhesiveForce) const

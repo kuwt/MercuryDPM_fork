@@ -24,7 +24,7 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "BondedSpecies.h"
-#include <Logger.h>
+#include "Logger.h"
 
 /*!
  * Default constructor for gluable species. Sets default values for all relevant parameters.
@@ -94,8 +94,8 @@ void BondedSpecies::read(std::istream& is)
  */
 void BondedSpecies::mix(BondedSpecies* const S, BondedSpecies* const T)
 {
-    bondForceMax_ = average(S->getBondForceMax(), T->getBondForceMax());
-    bondDissipation_ = average(S->getBondDissipation(), T->getBondDissipation());
+    bondForceMax_ = BaseSpecies::average(S->getBondForceMax(), T->getBondForceMax());
+    bondDissipation_ = BaseSpecies::average(S->getBondDissipation(), T->getBondDissipation());
 }
 
 ///Allows the spring constant to be accessed

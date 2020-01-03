@@ -110,7 +110,8 @@ void BondedInteraction::computeAdhesionForce()
  */
 const BondedSpecies* BondedInteraction::getSpecies() const
 {
-    return dynamic_cast<const BondedSpecies*>(getBaseSpecies());
+    return static_cast<const BondedSpecies*>(getBaseSpecies()->getAdhesiveForce());
+;
 }
 
 /*!

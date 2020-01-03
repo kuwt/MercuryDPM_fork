@@ -33,6 +33,7 @@ class BaseParticle;
 class BaseInteractable;
 
 LinearPlasticViscoelasticNormalSpecies::LinearPlasticViscoelasticNormalSpecies()
+        : BaseNormalForce()
 {
     loadingStiffness_ = 0.0;
     unloadingStiffnessMax_ = 0.0;
@@ -49,6 +50,7 @@ LinearPlasticViscoelasticNormalSpecies::LinearPlasticViscoelasticNormalSpecies()
  */
 LinearPlasticViscoelasticNormalSpecies::LinearPlasticViscoelasticNormalSpecies(
         const LinearPlasticViscoelasticNormalSpecies& p)
+        : BaseNormalForce(p)
 {
     loadingStiffness_ = p.loadingStiffness_;
     unloadingStiffnessMax_ = p.unloadingStiffnessMax_;
@@ -108,11 +110,11 @@ std::string LinearPlasticViscoelasticNormalSpecies::getBaseName() const
 void LinearPlasticViscoelasticNormalSpecies::mix(LinearPlasticViscoelasticNormalSpecies* const S,
                                                  LinearPlasticViscoelasticNormalSpecies* const T)
 {
-    loadingStiffness_ = average(S->getLoadingStiffness(), T->getLoadingStiffness());
-    unloadingStiffnessMax_ = average(S->getUnloadingStiffnessMax(), T->getUnloadingStiffnessMax());
-    cohesionStiffness_ = average(S->getCohesionStiffness(), T->getCohesionStiffness());
-    penetrationDepthMax_ = average(S->getPenetrationDepthMax(), T->getPenetrationDepthMax());
-    dissipation_ = average(S->getDissipation(), T->getDissipation());
+    loadingStiffness_ = BaseSpecies::average(S->getLoadingStiffness(), T->getLoadingStiffness());
+    unloadingStiffnessMax_ = BaseSpecies::average(S->getUnloadingStiffnessMax(), T->getUnloadingStiffnessMax());
+    cohesionStiffness_ = BaseSpecies::average(S->getCohesionStiffness(), T->getCohesionStiffness());
+    penetrationDepthMax_ = BaseSpecies::average(S->getPenetrationDepthMax(), T->getPenetrationDepthMax());
+    dissipation_ = BaseSpecies::average(S->getDissipation(), T->getDissipation());
 }
 
 /*!
@@ -336,7 +338,7 @@ Mdouble LinearPlasticViscoelasticNormalSpecies::computeBondNumberMax(Mdouble har
         const Mdouble plasticOverlapMax = penetrationDepthMax_ * harmonicMeanRadius;
         const Mdouble overlapMaxCohesion = plasticOverlapMax / (1 + cohesionStiffness_ / unloadingStiffnessMax_);
         const Mdouble cohesionForceMax = cohesionStiffness_ * overlapMaxCohesion;
-        auto species = dynamic_cast<const ParticleSpecies*>(this);
+        auto species = dynamic_cast<const ParticleSpecies*>(getBaseSpecies());
         logger.assert(species,"computeBondNumberMax: species needs to be a ParticleSpecies");
         const Mdouble gravitationalForce = gravitationalAcceleration * species->getMassFromRadius(harmonicMeanRadius);
         return cohesionForceMax / gravitationalForce;

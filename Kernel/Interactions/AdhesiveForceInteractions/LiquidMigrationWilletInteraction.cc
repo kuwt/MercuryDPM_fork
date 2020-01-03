@@ -486,7 +486,8 @@ Mdouble LiquidMigrationWilletInteraction::getElasticEnergy() const
  */
 const LiquidMigrationWilletSpecies* LiquidMigrationWilletInteraction::getSpecies() const
 {
-    return dynamic_cast<const LiquidMigrationWilletSpecies*>(getBaseSpecies());
+    return static_cast<const LiquidMigrationWilletSpecies*>(getBaseSpecies()->getAdhesiveForce());
+;
 }
 
 /*!

@@ -26,7 +26,7 @@
 #ifndef HertzianViscoelasticNormalSpecies_H
 #define HertzianViscoelasticNormalSpecies_H
 
-#include "Species/BaseSpecies.h"
+#include "Species/NormalForceSpecies/BaseNormalForce.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/NormalForceInteractions/HertzianViscoelasticInteraction.h"
 
@@ -34,7 +34,7 @@
  * \brief HertzianViscoelasticNormalSpecies contains the parameters used to describe a Hertzian normal force (The Mindlin model).
  * \details See HertzianViscoelasticNormalInteraction::computeForce for a description of the force law.
  */
-class HertzianViscoelasticNormalSpecies : public virtual BaseSpecies
+class HertzianViscoelasticNormalSpecies : public BaseNormalForce
 {
 public:
     ///\brief The correct Interaction type for this FrictionForceSpecies
@@ -47,13 +47,13 @@ public:
     HertzianViscoelasticNormalSpecies(const HertzianViscoelasticNormalSpecies& p);
     
     ///\brief The default destructor.
-    ~HertzianViscoelasticNormalSpecies() override;
+    ~HertzianViscoelasticNormalSpecies();
     
     /// \brief Reads the species properties from an input stream.
-    void read(std::istream& is) override;
+    void read(std::istream& is);
     
     /// \brief Writes the species properties to an output stream.
-    void write(std::ostream& os) const override;
+    void write(std::ostream& os) const;
     
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;

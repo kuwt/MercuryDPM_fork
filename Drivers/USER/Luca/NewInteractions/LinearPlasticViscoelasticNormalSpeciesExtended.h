@@ -25,7 +25,7 @@
 
 #ifndef LinearPlasticViscoelasticNormalSpeciesExtended_H
 #define LinearPlasticViscoelasticNormalSpeciesExtended_H
-#include "Species/BaseSpecies.h"
+#include "Species/NormalForceSpecies/BaseNormalForce.h"
 #include "Math/ExtendedMath.h"
 #include "LinearPlasticViscoelasticInteractionCutoff.h"
 
@@ -33,7 +33,7 @@
  * \brief LinearPlasticViscoelasticNormalSpeciesExtended contains the parameters used to describe a plastic-cohesive normal force (Stefan Ludings plastic-cohesive force model).
  * \details See LinearPlasticViscoelasticNormalInteraction::computeForce for a description of the force law.
  */
-class LinearPlasticViscoelasticNormalSpeciesExtended : public virtual BaseSpecies
+class LinearPlasticViscoelasticNormalSpeciesExtended : public BaseNormalForce
 {
 public:
     ///\brief The correct Interaction type for this FrictionForceSpecies

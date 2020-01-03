@@ -24,7 +24,7 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "LiquidMigrationWilletSpecies.h"
-#include <Logger.h>
+#include "Logger.h"
 
 LiquidMigrationWilletSpecies::LiquidMigrationWilletSpecies()
 {
@@ -96,16 +96,16 @@ std::string LiquidMigrationWilletSpecies::getBaseName() const
  */
 void LiquidMigrationWilletSpecies::mix(LiquidMigrationWilletSpecies* const S, LiquidMigrationWilletSpecies* const T)
 {
-    setLiquidBridgeVolumeMax(average(S->getLiquidBridgeVolumeMax(), T->getLiquidBridgeVolumeMax()));
-    distributionCoefficient_ = average(S->getDistributionCoefficient(), T->getDistributionCoefficient());
-    surfaceTension_ = average(S->getSurfaceTension(), T->getSurfaceTension());
-    contactAngle_ = average(S->getContactAngle(), T->getContactAngle());
+    setLiquidBridgeVolumeMax(BaseSpecies::average(S->getLiquidBridgeVolumeMax(), T->getLiquidBridgeVolumeMax()));
+    distributionCoefficient_ = BaseSpecies::average(S->getDistributionCoefficient(), T->getDistributionCoefficient());
+    surfaceTension_ = BaseSpecies::average(S->getSurfaceTension(), T->getSurfaceTension());
+    contactAngle_ = BaseSpecies::average(S->getContactAngle(), T->getContactAngle());
 }
 
 ///\return the maximum separation distance below which adhesive forces can occur (needed for contact detection)
 void LiquidMigrationWilletSpecies::setInteractionDistance()
 {
-    BaseSpecies::setInteractionDistance((1.0 + 0.5 * contactAngle_) * cbrt(liquidBridgeVolumeMax_));
+    getBaseSpecies()->setInteractionDistance((1.0 + 0.5 * contactAngle_) * cbrt(liquidBridgeVolumeMax_));
 }
 
 /*!

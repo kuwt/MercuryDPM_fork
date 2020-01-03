@@ -26,7 +26,7 @@
 #ifndef HertzianSinterNormalSpecies_H
 #define HertzianSinterNormalSpecies_H
 
-#include "Species/BaseSpecies.h"
+#include "Species/NormalForceSpecies/BaseNormalForce.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/NormalForceInteractions/HertzianSinterInteraction.h"
 
@@ -34,7 +34,7 @@
  * \brief HertzianSinterNormalSpecies contains the parameters used to describe a plastic-cohesive normal force (Stefan Ludings plastic-cohesive force model).
  * \details See SinterNormalInteraction::computeForce for a description of the force law.
  */
-class HertzianSinterNormalSpecies : public virtual BaseSpecies
+class HertzianSinterNormalSpecies : public BaseNormalForce
 {
 public:
     ///\brief The correct Interaction type for this FrictionForceSpecies
@@ -47,13 +47,13 @@ public:
     HertzianSinterNormalSpecies(const HertzianSinterNormalSpecies& p);
     
     ///\brief The default destructor.
-    ~HertzianSinterNormalSpecies() override;
+    ~HertzianSinterNormalSpecies();
     
     /// \brief Reads the species properties from an input stream.
-    void read(std::istream& is) override;
+    void read(std::istream& is);
     
     /// \brief Writes the species properties to an output stream.
-    void write(std::ostream& os) const override;
+    void write(std::ostream& os) const;
     
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;

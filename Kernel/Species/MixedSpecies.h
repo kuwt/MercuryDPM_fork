@@ -39,7 +39,7 @@ class BaseInteraction;
  * \details See Species for details. 
 */
 template<class NormalForceSpecies, class FrictionForceSpecies = EmptyFrictionSpecies, class AdhesiveForceSpecies = EmptyAdhesiveSpecies>
-class MixedSpecies final : public NormalForceSpecies, public FrictionForceSpecies, public AdhesiveForceSpecies
+class MixedSpecies final : public BaseSpecies, public NormalForceSpecies, public FrictionForceSpecies, public AdhesiveForceSpecies
 {
 public:
     
@@ -102,6 +102,12 @@ template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveFor
 MixedSpecies<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::MixedSpecies()
         : BaseSpecies(), NormalForceSpecies(), FrictionForceSpecies(), AdhesiveForceSpecies()
 {
+    normalForce_ = this;
+    frictionForce_ = this;
+    adhesiveForce_ = this;
+    normalForce_->setBaseSpecies(this);
+    frictionForce_->setBaseSpecies(this);
+    adhesiveForce_->setBaseSpecies(this);
     logger(DEBUG, "MixedSpecies::MixedSpecies() finished");
 }
 
@@ -109,6 +115,12 @@ template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveFor
 MixedSpecies<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::MixedSpecies(const MixedSpecies& s)
         : BaseSpecies(s), NormalForceSpecies(s), FrictionForceSpecies(s), AdhesiveForceSpecies(s)
 {
+    normalForce_ = this;
+    frictionForce_ = this;
+    adhesiveForce_ = this;
+    normalForce_->setBaseSpecies(this);
+    frictionForce_->setBaseSpecies(this);
+    adhesiveForce_->setBaseSpecies(this);
     logger(DEBUG, "MixedSpecies::MixedSpecies(const MixedSpecies &p) finished");
 }
 
@@ -117,6 +129,12 @@ MixedSpecies<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::Mi
         const Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>& s)
         : BaseSpecies(s), NormalForceSpecies(s), FrictionForceSpecies(s), AdhesiveForceSpecies(s)
 {
+    normalForce_ = this;
+    frictionForce_ = this;
+    adhesiveForce_ = this;
+    normalForce_->setBaseSpecies(this);
+    frictionForce_->setBaseSpecies(this);
+    adhesiveForce_->setBaseSpecies(this);
     logger(DEBUG, "MixedSpecies::MixedSpecies(const MixedSpecies &p) finished");
 }
 
@@ -280,8 +298,8 @@ void MixedSpecies<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies
 {
     logger.assert_always(T!= nullptr && S!= nullptr,"Arguments of mixAll cannot be null pointers");
 
-    logger.assert_always(S->getConstantRestitution() == T->getConstantRestitution(), "mixing two LinearPlasticViscoelasticNormalSpecies, but only one has constantRestitution");
-    NormalForceSpecies::setConstantRestitution(S->getConstantRestitution());
+    logger.assert_always(S->getNormalForce()->getConstantRestitution() == T->getNormalForce()->getConstantRestitution(), "mixing two LinearPlasticViscoelasticNormalSpecies, but only one has constantRestitution");
+    NormalForceSpecies::setConstantRestitution(S->getNormalForce()->getConstantRestitution());
 
     const auto TN = dynamic_cast<NormalForceSpecies*> (T);
     const auto TF = dynamic_cast<FrictionForceSpecies*> (T);

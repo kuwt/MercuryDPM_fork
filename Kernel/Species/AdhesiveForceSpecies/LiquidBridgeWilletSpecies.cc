@@ -24,7 +24,8 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "LiquidBridgeWilletSpecies.h"
-#include <Logger.h>
+#include "Logger.h"
+#include "Species/BaseSpecies.h"
 
 LiquidBridgeWilletSpecies::LiquidBridgeWilletSpecies()
 {
@@ -96,15 +97,15 @@ std::string LiquidBridgeWilletSpecies::getBaseName() const
  */
 void LiquidBridgeWilletSpecies::mix(LiquidBridgeWilletSpecies* const S, LiquidBridgeWilletSpecies* const T)
 {
-    setLiquidBridgeVolume(average(S->getLiquidBridgeVolume(), T->getLiquidBridgeVolume()));
-    surfaceTension_ = average(S->getSurfaceTension(), T->getSurfaceTension());
-    contactAngle_ = average(S->getContactAngle(), T->getContactAngle());
+    setLiquidBridgeVolume(BaseSpecies::average(S->getLiquidBridgeVolume(), T->getLiquidBridgeVolume()));
+    surfaceTension_ = BaseSpecies::average(S->getSurfaceTension(), T->getSurfaceTension());
+    contactAngle_ = BaseSpecies::average(S->getContactAngle(), T->getContactAngle());
 }
 
 ///\return the maximum separation distance below which adhesive forces can occur (needed for contact detection)
 void LiquidBridgeWilletSpecies::setInteractionDistance()
 {
-    BaseSpecies::setInteractionDistance((1.0 + 0.5 * contactAngle_) * cbrtLiquidBridgeVolume_);
+    getBaseSpecies()->setInteractionDistance((1.0 + 0.5 * contactAngle_) * cbrtLiquidBridgeVolume_);
 }
 
 /*!

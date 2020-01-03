@@ -26,15 +26,16 @@
 #ifndef LinearViscoelasticNormalSpecies_H
 #define LinearViscoelasticNormalSpecies_H
 
-#include "Species/BaseSpecies.h"
+#include "Species/NormalForceSpecies/BaseNormalForce.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/NormalForceInteractions/LinearViscoelasticInteraction.h"
+#include "Math/Helpers.h"
 
 /*!
  * \brief LinearViscoelasticNormalSpecies contains the parameters used to describe a linear elastic-dissipative normal force.
  * \details See LinearViscoelasticNormalInteraction::computeForce for a description of the force law.
  */
-class LinearViscoelasticNormalSpecies : public virtual BaseSpecies
+class LinearViscoelasticNormalSpecies : public BaseNormalForce
 {
 public:
     ///\brief The correct Interaction type for this FrictionForceSpecies
@@ -47,13 +48,13 @@ public:
     LinearViscoelasticNormalSpecies(const LinearViscoelasticNormalSpecies& p);
     
     ///\brief The default destructor.
-    ~LinearViscoelasticNormalSpecies() override;
+    ~LinearViscoelasticNormalSpecies();
     
     /// \brief Reads the species properties from an input stream.
-    void read(std::istream& is) override;
+    void read(std::istream& is);
     
     /// \brief Writes the species properties to an output stream.
-    void write(std::ostream& os) const override;
+    void write(std::ostream& os) const;
     
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;

@@ -26,7 +26,7 @@
 #ifndef PARHAMIMCMEEKINGSINTERSPECIES_H
 #define PARHAMIMCMEEKINGSINTERSPECIES_H
 
-#include "Species/BaseSpecies.h"
+#include "Species/AdhesiveForceSpecies/BaseAdhesiveForce.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/AdhesiveForceInteractions/ParhamiMcMeekingSinterInteraction.h"
 
@@ -34,7 +34,7 @@
  * \brief ParhamiMcMeekingSinterSpecies contains the parameters used to describe a linear reversible short-range force.
  * \details See ParhamiMcMeekingSinterInteraction::computeForce for a description of the force law.
  */
-class ParhamiMcMeekingSinterSpecies : public virtual BaseSpecies
+class ParhamiMcMeekingSinterSpecies : public BaseAdhesiveForce
 {
 public:
     ///\brief The correct Interaction type for this AdhesiveForceSpecies
@@ -47,13 +47,13 @@ public:
     ParhamiMcMeekingSinterSpecies(const ParhamiMcMeekingSinterSpecies& s);
     
     ///\brief The default constructor.
-    ~ParhamiMcMeekingSinterSpecies() override;
+    ~ParhamiMcMeekingSinterSpecies();
     
     /// \brief Reads the species properties from an input stream.
-    void read(std::istream& is) override;
+    void read(std::istream& is);
     
     /// \brief Writes the species properties to an output stream.
-    void write(std::ostream& os) const override;
+    void write(std::ostream& os) const;
     
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;

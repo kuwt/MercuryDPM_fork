@@ -24,7 +24,8 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ReversibleAdhesiveSpecies.h"
-#include <Logger.h>
+#include "Logger.h"
+#include "Species/BaseSpecies.h"
 
 ReversibleAdhesiveSpecies::ReversibleAdhesiveSpecies()
 {
@@ -89,15 +90,15 @@ std::string ReversibleAdhesiveSpecies::getBaseName() const
  */
 void ReversibleAdhesiveSpecies::mix(ReversibleAdhesiveSpecies* const S, ReversibleAdhesiveSpecies* const T)
 {
-    adhesionForceMax_ = average(S->getAdhesionForceMax(), T->getAdhesionForceMax());
-    adhesionStiffness_ = average(S->getAdhesionStiffness(), T->getAdhesionStiffness());
+    adhesionForceMax_ = BaseSpecies::average(S->getAdhesionForceMax(), T->getAdhesionForceMax());
+    adhesionStiffness_ = BaseSpecies::average(S->getAdhesionStiffness(), T->getAdhesionStiffness());
 }
 
 ///\return the maximum separation distance below which adhesive forces can occur (needed for contact detection)
 void ReversibleAdhesiveSpecies::setInteractionDistance()
 {
     logger.assert(adhesionStiffness_ != 0.0,"ReversibleAdhesiveSpecies::getInteractionDistance(): adhesionStiffness cannot be zero");
-    BaseSpecies::setInteractionDistance(adhesionForceMax_ / adhesionStiffness_);
+    getBaseSpecies()->setInteractionDistance(adhesionForceMax_ / adhesionStiffness_);
 }
 
 ///Allows the spring constant to be changed

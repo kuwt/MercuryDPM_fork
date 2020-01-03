@@ -29,6 +29,9 @@
 #include "BaseObject.h"
 #include "Math/ExtendedMath.h"
 #include "Math/Helpers.h"
+#include "Species/NormalForceSpecies/BaseNormalForce.h"
+#include "Species/FrictionForceSpecies/BaseFrictionForce.h"
+#include "Species/AdhesiveForceSpecies/BaseAdhesiveForce.h"
 
 class SpeciesHandler;// derived from BaseHandler<ParticleSpecies>
 //class BaseParticle; //
@@ -54,7 +57,7 @@ public:
     BaseSpecies(const BaseSpecies& p);
     
     ///\brief The default destructor.
-    ~BaseSpecies() override;
+    ~BaseSpecies();
     
     /*!
      * \brief Creates a deep copy of the object from which it is called.
@@ -84,10 +87,10 @@ public:
     SpeciesHandler* getHandler() const;
     
     ///\brief Returns the harmonic mean of two variables.
-    Mdouble average(Mdouble a, Mdouble b) const;
+    static Mdouble average(Mdouble a, Mdouble b);
 
     ///\brief Returns the harmonic mean of two variables, returning inf if either is inf.
-    Mdouble averageInf(Mdouble a, Mdouble b) const;
+    static Mdouble averageInf(Mdouble a, Mdouble b);
     
     ///\brief creates default values for mixed species
     /*!
@@ -129,16 +132,6 @@ public:
     
     virtual void deleteEmptyInteraction(BaseInteraction* interaction) const = 0;
 
-    /*!
-     * \brief Accesses the boolean constantRestitution_.
-     */
-    bool getConstantRestitution() const {return constantRestitution_;}
-
-    /*!
-     * \brief Sets the boolean constantRestitution_.
-     */
-    void setConstantRestitution(bool constantRestitution);
-    
     ///\brief returns the largest separation distance at which adhesive short-range forces can occur.
     /*!
      * \details returns the largest separation distance (negative overlap) at which
@@ -149,10 +142,16 @@ public:
      * used for MixedSpecies).
      */
     Mdouble getInteractionDistance() const {return interactionDistance_;}
-    
-protected:
-    
+
+    BaseNormalForce* getNormalForce() const {return normalForce_;}
+
+    BaseFrictionForce* getFrictionForce() const {return frictionForce_;}
+
+    BaseAdhesiveForce* getAdhesiveForce() const {return adhesiveForce_;}
+
     void setInteractionDistance(Mdouble interactionDistance);
+
+protected:
 
     /*!
      * \brief Sets the boolean constantRestitution_.
@@ -164,6 +163,27 @@ protected:
      */
     void read(std::istream& is) override;
 
+    /*!
+     * \brief A pointer to the normal force parameters
+     * \detail This pointer is used by the Interaction's to get a pointer to the species
+     * The pointer is set in the constructors of SPecies and MixedSpecies
+     */
+    BaseNormalForce* normalForce_;
+
+    /*!
+     * \brief A pointer to the friction force parameters
+     * \detail This pointer is used by the Interaction's to get a pointer to the species
+     * The pointer is set in the constructors of SPecies and MixedSpecies
+     */
+    BaseFrictionForce* frictionForce_;
+
+    /*!
+     * \brief A pointer to the adhesive force parameters
+     * \detail This pointer is used by the Interaction's to get a pointer to the species
+     * The pointer is set in the constructors of SPecies and MixedSpecies
+     */
+    BaseAdhesiveForce* adhesiveForce_;
+
 private:
     /*!
      * \brief A pointer to the handler to which this species belongs. It is 
@@ -172,10 +192,6 @@ private:
      */
     SpeciesHandler* handler_;
 
-    // If constantRestitution_ is true, the elastic and dissipative force is multiplied by the harmonic mean mass, making restitution and collision time independent of the particle mass.
-    // This is set to false by default.
-    bool constantRestitution_;
-    
     /**
      * Returns the distance between particles of this species below which adhesive forces can occur (needed for contact detection)
      * set by the adhesive species

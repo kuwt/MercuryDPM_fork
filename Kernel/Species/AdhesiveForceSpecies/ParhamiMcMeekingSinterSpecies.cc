@@ -24,7 +24,7 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ParhamiMcMeekingSinterSpecies.h"
-#include <Logger.h>
+#include "Logger.h"
 
 ///\todo: implement initial/read/write values
 ParhamiMcMeekingSinterSpecies::ParhamiMcMeekingSinterSpecies()
@@ -98,6 +98,6 @@ std::string ParhamiMcMeekingSinterSpecies::getBaseName() const
  */
 void ParhamiMcMeekingSinterSpecies::mix(ParhamiMcMeekingSinterSpecies* const S, ParhamiMcMeekingSinterSpecies* const T)
 {
-//    adhesionForceMax_ = average(S->getAdhesionForceMax(), T->getAdhesionForceMax());
-//    adhesionStiffness_ = average(S->getAdhesionStiffness(), T->getAdhesionStiffness());
+//    adhesionForceMax_ = BaseSpecies::average(S->getAdhesionForceMax(), T->getAdhesionForceMax());
+//    adhesionStiffness_ = BaseSpecies::average(S->getAdhesionStiffness(), T->getAdhesionStiffness());
 }

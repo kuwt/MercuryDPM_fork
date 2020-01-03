@@ -232,7 +232,8 @@ Mdouble MindlinRollingTorsionInteraction::getElasticEnergy() const
  */
 const MindlinRollingTorsionSpecies* MindlinRollingTorsionInteraction::getSpecies() const
 {
-    return dynamic_cast<const MindlinRollingTorsionSpecies*>(getBaseSpecies());
+    return static_cast<const MindlinRollingTorsionSpecies*>(getBaseSpecies()->getFrictionForce());
+;
 }
 
 /*!

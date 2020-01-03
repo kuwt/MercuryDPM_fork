@@ -26,6 +26,7 @@
 
 #include "HertzianViscoelasticInteraction.h"
 #include "Species/NormalForceSpecies/HertzianViscoelasticNormalSpecies.h"
+#include "Species/BaseSpecies.h"
 #include "BaseInteractable.h"
 #include "InteractionHandler.h"
 #include <iomanip>
@@ -162,7 +163,7 @@ Mdouble HertzianViscoelasticInteraction::getElasticEnergy() const
  */
 const HertzianViscoelasticNormalSpecies* HertzianViscoelasticInteraction::getSpecies() const
 {
-    return dynamic_cast<const HertzianViscoelasticNormalSpecies*>(getBaseSpecies());
+    return static_cast<const HertzianViscoelasticNormalSpecies*>(getBaseSpecies()->getNormalForce());
 }
 
 /*!

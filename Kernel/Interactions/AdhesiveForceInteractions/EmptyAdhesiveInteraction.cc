@@ -107,7 +107,8 @@ Mdouble EmptyAdhesiveInteraction::getElasticEnergy() const
  */
 const EmptyAdhesiveSpecies* EmptyAdhesiveInteraction::getSpecies() const
 {
-    return dynamic_cast<const EmptyAdhesiveSpecies*>(getBaseSpecies());
+    return static_cast<const EmptyAdhesiveSpecies*>(getBaseSpecies()->getAdhesiveForce());
+;
 }
 
 /*!

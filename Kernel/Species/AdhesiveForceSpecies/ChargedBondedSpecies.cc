@@ -24,7 +24,8 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ChargedBondedSpecies.h"
-#include <Logger.h>
+#include "Logger.h"
+#include "Species/BaseSpecies.h"
 
 /*!
  * Default constructor for charged species. Sets default values for all relevant parameters.
@@ -118,16 +119,16 @@ std::string ChargedBondedSpecies::getBaseName() const
 void ChargedBondedSpecies::mix(ChargedBondedSpecies* const S, ChargedBondedSpecies* const T)
 {
     //'mixing' properties relating to the charged force interactions between particles
-    setAdhesionForceMax(average(S->getAdhesionForceMax(), T->getAdhesionForceMax()));
-    setAdhesionStiffness(average(S->getAdhesionStiffness(), T->getAdhesionStiffness()));
+    setAdhesionForceMax(BaseSpecies::average(S->getAdhesionForceMax(), T->getAdhesionForceMax()));
+    setAdhesionStiffness(BaseSpecies::average(S->getAdhesionStiffness(), T->getAdhesionStiffness()));
     
     //ensuring that, in addition, bond properties are also 'mixed'
-    bondForceMax_ = average(S->getBondForceMax(), T->getBondForceMax());
-    bondDissipation_ = average(S->getBondDissipation(), T->getBondDissipation());
+    bondForceMax_ = BaseSpecies::average(S->getBondForceMax(), T->getBondForceMax());
+    bondDissipation_ = BaseSpecies::average(S->getBondDissipation(), T->getBondDissipation());
     
     //and that the van der Waals force also is computed correctly
-    vanDerWaalsForceMax_ = average(S->getVanDerWaalsForceMax(), T->getVanDerWaalsForceMax());
-    vanDerWaalsStiffness_ = average(S->getVanDerWaalsStiffness(), T->getVanDerWaalsStiffness());
+    vanDerWaalsForceMax_ = BaseSpecies::average(S->getVanDerWaalsForceMax(), T->getVanDerWaalsForceMax());
+    vanDerWaalsStiffness_ = BaseSpecies::average(S->getVanDerWaalsStiffness(), T->getVanDerWaalsStiffness());
     
     charge_ = 0; //note mixedSpecies dont need charge, it's a particle property.
 }
@@ -136,7 +137,7 @@ void ChargedBondedSpecies::mix(ChargedBondedSpecies* const S, ChargedBondedSpeci
 void ChargedBondedSpecies::setInteractionDistance()
 {
     logger.assert(adhesionStiffness_ != 0.0,"ChargedBondedSpecies::getInteractionDistance(): adhesionStiffness cannot be zero");
-    BaseSpecies::setInteractionDistance(adhesionForceMax_ / adhesionStiffness_);
+    getBaseSpecies()->setInteractionDistance(adhesionForceMax_ / adhesionStiffness_);
 }
 
 

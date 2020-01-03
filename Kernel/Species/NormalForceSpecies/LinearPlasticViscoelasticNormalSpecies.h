@@ -26,16 +26,18 @@
 #ifndef LinearPlasticViscoelasticNormalSpecies_H
 #define LinearPlasticViscoelasticNormalSpecies_H
 
-#include "Species/BaseSpecies.h"
+#include "Species/NormalForceSpecies/BaseNormalForce.h"
 #include "Math/ExtendedMath.h"
 #include "Interactions/NormalForceInteractions/LinearPlasticViscoelasticInteraction.h"
 #include "Species/FrictionForceSpecies/SlidingFrictionSpecies.h"
+#include "Math/Helpers.h"
+
 
 /*!
  * \brief LinearPlasticViscoelasticNormalSpecies contains the parameters used to describe a plastic-cohesive normal force (Stefan Ludings plastic-cohesive force model).
  * \details See LinearPlasticViscoelasticNormalInteraction::computeForce for a description of the force law.
  */
-class LinearPlasticViscoelasticNormalSpecies : public virtual BaseSpecies
+class LinearPlasticViscoelasticNormalSpecies : public BaseNormalForce
 {
 public:
     ///\brief The correct Interaction type for this FrictionForceSpecies
@@ -48,13 +50,13 @@ public:
     LinearPlasticViscoelasticNormalSpecies(const LinearPlasticViscoelasticNormalSpecies& p);
     
     ///\brief The default destructor.
-    ~LinearPlasticViscoelasticNormalSpecies() override;
+    ~LinearPlasticViscoelasticNormalSpecies();
     
     /// \brief Reads the species properties from an input stream.
-    void read(std::istream& is) override;
+    void read(std::istream& is);
     
     /// \brief Writes the species properties to an output stream.
-    void write(std::ostream& os) const override;
+    void write(std::ostream& os) const;
     
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;
