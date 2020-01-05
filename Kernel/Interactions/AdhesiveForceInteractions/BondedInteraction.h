@@ -80,7 +80,7 @@ public:
     void write(std::ostream& os) const override;
     
     /*!
-     * \brief A dynamic_cast of BaseSpecies type pointer to a pointer of type BondedSpecies.
+     * \brief Returns a pointer to the adhesive force species BondedSpecies.
      */
     const BondedSpecies* getSpecies() const;
     

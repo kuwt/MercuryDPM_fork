@@ -91,7 +91,7 @@ void ThermalInteraction<NormalForceInteraction>::computeNormalForce()
     NormalForceInteraction::computeNormalForce();
     Mdouble radius = 2.0 * NormalForceInteraction::getEffectiveRadius();
     Mdouble contactArea = constants::pi * radius * NormalForceInteraction::getOverlap();
-    const SpeciesType* species = dynamic_cast<const SpeciesType*>(NormalForceInteraction::getBaseSpecies());
+    const SpeciesType* species = static_cast<const SpeciesType*>(NormalForceInteraction::getBaseSpecies()->getNormalForce());
     ThermalParticle* pParticle = dynamic_cast<ThermalParticle*>(NormalForceInteraction::getP());
     ThermalParticle* iParticle = dynamic_cast<ThermalParticle*>(NormalForceInteraction::getI());
     // if both p and i are particles

@@ -73,7 +73,7 @@ public:
     typename std::enable_if<!std::is_pointer<typename U::MixedSpeciesType>::value, typename U::MixedSpeciesType*>::type
     getMixedObject(const U* S, const U* T)
     {
-        return dynamic_cast<typename U::MixedSpeciesType*>(getMixedObject(S->getIndex(), T->getIndex()));
+        return static_cast<typename U::MixedSpeciesType*>(getMixedObject(S->getIndex(), T->getIndex()));
     }
     
     /// \brief Gets the mixed object that is constructed from two given species.

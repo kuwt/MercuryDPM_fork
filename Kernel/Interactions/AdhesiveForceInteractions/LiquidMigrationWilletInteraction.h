@@ -93,7 +93,7 @@ public:
     Mdouble getElasticEnergy() const override;
     
     /*!
-     * \brief A dynamic_cast of BaseSpecies type pointer to a pointer of type LiquidMigrationWilletSpecies.
+     * \brief Returns a pointer to the adhesive force species LiquidMigrationWilletSpecies.
      */
     const LiquidMigrationWilletSpecies* getSpecies() const;
     

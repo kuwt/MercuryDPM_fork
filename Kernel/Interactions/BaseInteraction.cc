@@ -772,7 +772,7 @@ void BaseInteraction::actionsAfterTimeStep()
 void BaseInteraction::gatherContactStatistics()
 {
     auto* IParticle = dynamic_cast<BaseParticle*>(I_);
-    auto* PParticle = dynamic_cast<BaseParticle*>(P_);
+    auto* PParticle = static_cast<BaseParticle*>(P_);
     
     Vec3D tangentialForce = getTangentialForce();
     Mdouble tangentialOverlap = getTangentialOverlap();
@@ -793,7 +793,7 @@ void BaseInteraction::gatherContactStatistics()
     else
         centre = getP()->getPosition() - normal_ * (PParticle->getRadius() - overlap_);
     
-    if (PParticle != nullptr && !PParticle->isFixed())
+    if (!PParticle->isFixed())
     {
         getHandler()->getDPMBase()->gatherContactStatistics(
                 P_->getIndex(),

@@ -91,8 +91,7 @@ public:
     Mdouble getElasticEnergy() const override;
     
     /*!
-     * \brief A dynamic_cast of BaseSpecies pointer type to a pointer to an object of 
-     *        type EmptyAdhesiveSpecies.
+     * \brief Returns a pointer to the adhesive force species EmptyAdhesiveSpecies.
      */
     const EmptyAdhesiveSpecies* getSpecies() const;
     

@@ -116,7 +116,7 @@ Mdouble ReversibleAdhesiveInteraction::getElasticEnergy() const
  */
 const ReversibleAdhesiveSpecies* ReversibleAdhesiveInteraction::getSpecies() const
 {
-    return dynamic_cast<const ReversibleAdhesiveSpecies*> (getBaseSpecies()); //downcast
+    return static_cast<const ReversibleAdhesiveSpecies*> (getBaseSpecies()->getAdhesiveForce()); //downcast
 }
 
 /*!

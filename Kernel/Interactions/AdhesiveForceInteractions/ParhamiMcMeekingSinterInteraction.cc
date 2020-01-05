@@ -127,7 +127,7 @@ Mdouble ParhamiMcMeekingSinterInteraction::getElasticEnergy() const
  */
 const ParhamiMcMeekingSinterInteraction::SpeciesType* ParhamiMcMeekingSinterInteraction::getSpecies() const
 {
-    return dynamic_cast<const SpeciesType*> (getBaseSpecies()); //downcast
+    return static_cast<const SpeciesType*> (getBaseSpecies()->getAdhesiveForce()); //downcast
 }
 
 /*!

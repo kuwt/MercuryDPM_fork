@@ -144,8 +144,8 @@ void ChuteWithHopper::setupInitialConditions()
     b1.set(p1, getMaxFailed(), getYMin(), getYMax(), getMinInflowParticleRadius(), getMaxInflowParticleRadius(),
            getChuteAngle(), getFixedParticleRadius(), isHopperCentred_, hopperDimension_, hopperAngle_, hopperLength_,
            hopperExitLength_, hopperHeight_, hopperLift_, hopperFillingPercentage_);
-    boundaryHandler.copyAndAddObject(b1);
-    setInsertionBoundary(dynamic_cast<InsertionBoundary*>(boundaryHandler.getLastObject()));
+    InsertionBoundary* b1Added = boundaryHandler.copyAndAddObject(b1);
+    setInsertionBoundary(b1Added);
     
     // create the chute bottom
     createBottom();
