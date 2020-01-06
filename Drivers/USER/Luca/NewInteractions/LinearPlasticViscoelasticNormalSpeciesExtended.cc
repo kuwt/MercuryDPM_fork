@@ -26,6 +26,7 @@
 
 #include "LinearPlasticViscoelasticNormalSpeciesExtended.h"
 #include "LinearPlasticViscoelasticInteractionCutoff.h"
+#include "Species/BaseSpecies.h"
 
 class BaseParticle;
 class BaseInteractable;
@@ -108,12 +109,12 @@ std::string LinearPlasticViscoelasticNormalSpeciesExtended::getBaseName() const
  */
 void LinearPlasticViscoelasticNormalSpeciesExtended::mix(LinearPlasticViscoelasticNormalSpeciesExtended* const S, LinearPlasticViscoelasticNormalSpeciesExtended* const T)
 {
-    loadingStiffness_ = average(S->getLoadingStiffness(), T->getLoadingStiffness());
-    unloadingStiffnessMax_ = average(S->getUnloadingStiffnessMax(), T->getUnloadingStiffnessMax());
-    cohesionStiffness_ = average(S->getCohesionStiffness(), T->getCohesionStiffness());
-    penetrationDepthMax_ = average(S->getPenetrationDepthMax(), T->getPenetrationDepthMax());
-    dissipation_ = average(S->getDissipation(), T->getDissipation());
-    epsilon_ = average(S->getEpsilon(), T->getEpsilon());
+    loadingStiffness_ = BaseSpecies::average(S->getLoadingStiffness(), T->getLoadingStiffness());
+    unloadingStiffnessMax_ = BaseSpecies::average(S->getUnloadingStiffnessMax(), T->getUnloadingStiffnessMax());
+    cohesionStiffness_ = BaseSpecies::average(S->getCohesionStiffness(), T->getCohesionStiffness());
+    penetrationDepthMax_ = BaseSpecies::average(S->getPenetrationDepthMax(), T->getPenetrationDepthMax());
+    dissipation_ = BaseSpecies::average(S->getDissipation(), T->getDissipation());
+    epsilon_ = BaseSpecies::average(S->getEpsilon(), T->getEpsilon());
 }
 
 /*!

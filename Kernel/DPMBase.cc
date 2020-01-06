@@ -3698,7 +3698,7 @@ void DPMBase::writeOutputFiles()
                 writeXBallsScript();
             writeDataFile();
         } else {
-            setLastSavedTimeStep(numberOfTimeSteps_);
+            dataFile.setLastSavedTimeStep(numberOfTimeSteps_);
         }
         printTime();
         writeVTKFiles();

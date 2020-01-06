@@ -27,6 +27,7 @@
 #define LinearPlasticViscoelasticNormalSpeciesExtended_H
 #include "Species/NormalForceSpecies/BaseNormalForce.h"
 #include "Math/ExtendedMath.h"
+#include "Math/Helpers.h"
 #include "LinearPlasticViscoelasticInteractionCutoff.h"
 
 /*!

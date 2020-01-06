@@ -26,7 +26,7 @@
 #include "LinearSinterSpecies.h"
 
 LinearSinterSpecies::LinearSinterSpecies()
-    : BaseSpecies(), LinearPlasticViscoelasticNormalSpecies()
+    : LinearPlasticViscoelasticNormalSpecies()
 {
     neckGrowthRate_ = 0;
 #ifdef DEBUG_CONSTRUCTOR
@@ -35,7 +35,7 @@ LinearSinterSpecies::LinearSinterSpecies()
 }
 
 LinearSinterSpecies::LinearSinterSpecies(const LinearSinterSpecies &s)
-    : BaseSpecies(s), LinearPlasticViscoelasticNormalSpecies(s)
+    : LinearPlasticViscoelasticNormalSpecies(s)
 {
     neckGrowthRate_=s.neckGrowthRate_;
 #ifdef DEBUG_CONSTRUCTOR
