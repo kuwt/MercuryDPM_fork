@@ -1442,6 +1442,10 @@ Mdouble DPMBase::getRotationalEnergy() const
     return ene_rot;
 }
 
+Mdouble DPMBase::getTotalEnergy() const {
+    return getElasticEnergy()+getKineticEnergy()+getGravitationalEnergy()+getRotationalEnergy();
+}
+
 /*!
  * \return double
  */
@@ -3968,7 +3972,7 @@ void DPMBase::computeOneTimeStep()
     //Creates and updates interactions and computes forces based on these
     logger(DEBUG, "about to call computeAllForces()");
     computeAllForces();
-    
+
     logger(DEBUG, "about to call removeDuplicatePeriodicParticles()");
     removeDuplicatePeriodicParticles();
     

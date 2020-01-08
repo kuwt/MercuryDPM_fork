@@ -804,7 +804,9 @@ public:
      * \brief JMFT Returns the global rotational energy stored in the system.
      */
     Mdouble getRotationalEnergy() const;
-    
+
+    Mdouble getTotalEnergy() const;
+
     /*!
      * \brief JMFT: Return the total mass of the system, excluding fixed particles.
      */

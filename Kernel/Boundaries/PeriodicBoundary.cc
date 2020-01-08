@@ -433,6 +433,7 @@ void PeriodicBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
         if (getDistance((*p)->getPosition()) < 0)
         {
             shiftPosition(*p);
+            getHandler()->getDPMBase()->hGridUpdateParticle(*p);
         }
     }
 #ifdef MERCURY_USE_MPI
