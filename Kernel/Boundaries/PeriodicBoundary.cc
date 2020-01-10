@@ -29,6 +29,7 @@
 #include "MpiDataClass.h"
 #include "MpiContainer.h"
 #include "DPMBase.h"
+#include "MercuryBase.h"
 
 /*!
  * \details constructor
@@ -433,7 +434,7 @@ void PeriodicBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
         if (getDistance((*p)->getPosition()) < 0)
         {
             shiftPosition(*p);
-            getHandler()->getDPMBase()->hGridUpdateParticle(*p);
+            getHandler()->getDPMBase()->hGridUpdateMove(*p, shift_.getLengthSquared());
         }
     }
 #ifdef MERCURY_USE_MPI

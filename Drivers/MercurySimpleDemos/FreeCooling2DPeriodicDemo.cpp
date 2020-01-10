@@ -1,3 +1,4 @@
+
 //Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
@@ -31,6 +32,7 @@
 #include "Walls/InfiniteWall.h"
 #include <ctime>
 #include <Boundaries/PeriodicBoundary.h>
+#include <Boundaries/CubeInsertionBoundary.h>
 /// In this file 32^2 particles with the same velocity are placed in a bi-axial box. This makes them collide with the
 
 /*#ifdef WITHGPERFTOOLS
@@ -47,32 +49,23 @@ public:
         species->setDissipation(0.04);
         species->setStiffness(1e4);
 
-        int N1=static_cast<int>(sqrt(N))+1;
-        SphericalParticle p0;
-        p0.setSpecies(speciesHandler.getObject(0));
-        for (int i=0;i<N;i++)
-        {
-            int ix= i % N1;
-            int iy= i / N1;
-            
-            double x=(getXMax()-getXMin())*(ix+1)/(N1+1);
-            double y=(getYMax()-getYMin())*(iy+1)/(N1+1);
-            
-            double someRand1 = (rand()%10)/100.0;
-            double someRand2 = (rand()%10)/100.0;
+        SphericalParticle p;
+        p.setSpecies(speciesHandler.getObject(0));
+        p.setRadius(2e-4);
+        p.setVelocity(Vec3D(1,1,1)*1e-3);
 
-            //p0.setPosition(Vec3D(0.1*(someRand1-0.05)*x,0.1*(someRand2-0.05)*y,0.0));
-            p0.setPosition(Vec3D(x,y,0.0));
-            //p0.setVelocity(Vec3D(0.1,0.1,0.0));
-            p0.setVelocity(Vec3D(0.01*(someRand1-0.05),0.01*(someRand2-0.05),0.0));
-            p0.setRadius(0.0002);
-            p0.setSpecies(species);
-            particleHandler.copyAndAddObject(p0);
-        }
+        CubeInsertionBoundary insertionBoundary;
+        insertionBoundary.set(p,100,getMin(),getMax(),-p.getVelocity(),p.getVelocity(),p.getRadius(),p.getRadius());
+        insertionBoundary.setInitialVolume(p.getVolume()*N);
+        insertionBoundary.checkBoundaryBeforeTimeStep(this);
+        setMeanVelocity({0,0,0});
 
-        double mass  = species->getMassFromRadius(p0.getRadius());
+        double mass  = species->getMassFromRadius(p.getRadius());
         double rest = species->getRestitutionCoefficient(mass);
+        double tc = species->getCollisionTime(mass);
         logger(INFO,"Restitution %",rest);
+        logger(INFO,"Collision time %",tc);
+        logger(INFO,"N %",particleHandler.getNumberOfObjects());
 
         /*wallHandler.clear();
         InfiniteWall w0;

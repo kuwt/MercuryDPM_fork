@@ -682,7 +682,7 @@ BaseInteraction* BaseParticle::getInteractionWith(BaseParticle* const P, const u
     const Vec3D branchVector = P->getPosition() - getPosition();
     //Get the square of the distance between particle i and particle j
     const Mdouble distanceSquared = Vec3D::getLengthSquared(branchVector);
-    const auto species = interactionHandler->getDPMBase()->speciesHandler.getMixedObject(getSpecies(),P->getSpecies());
+    //const auto species = interactionHandler->getDPMBase()->speciesHandler.getMixedObject(getSpecies(),P->getSpecies());
     const Mdouble sumOfInteractionRadii = getSumOfInteractionRadii(P);
     if (distanceSquared < (sumOfInteractionRadii * sumOfInteractionRadii))
     {

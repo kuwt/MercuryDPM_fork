@@ -4796,6 +4796,22 @@ ParticleVtkWriter* DPMBase::getVtkWriter() const
     return vtkWriter_;
 }
 
+/*!
+ * \details The function first generates random velocities for every particle in the system and then
+ * injects the desired kinetic energy and sets the desired mean velocity in the system.
+ * \param[in] V_mean_goal The mean velocity you want to set after injecting energy
+ * \param[in] Ek_goal  The kinetic energy you want to inject into the system
+ */
+void DPMBase::setMeanVelocity(Vec3D V_mean_goal)
+{
+    Vec3D meanVelocity = getTotalMomentum() / getTotalMass();
+
+    //correct the mean velocity to zero
+    for (auto& p : particleHandler)
+    {
+        p->addVelocity(-meanVelocity);
+    }
+}
 
 /*!
  * \details The function first generates random velocities for every particle in the system and then

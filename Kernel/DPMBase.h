@@ -904,8 +904,10 @@ public:
      * \brief
      */
     virtual bool getHGridUpdateEachTimeStep() const;
-    
-    
+
+    /// \brief This function will help you set a fixed kinetic energy and mean velocity in your system.
+    void setMeanVelocity(Vec3D V_mean_goal);
+
     /// \brief This function will help you set a fixed kinetic energy and mean velocity in your system.
     void setMeanVelocityAndKineticEnergy(Vec3D V_mean_goal, Mdouble Ek_goal);
     
