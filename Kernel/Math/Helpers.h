@@ -370,6 +370,10 @@ void check(double real, double ideal, double error, std::string errorMessage);
 
 void check(Vec3D real, Vec3D ideal, double error, std::string errorMessage);
 
+void check(Matrix3D real, Matrix3D ideal, double error, std::string errorMessage);
+
+void check(MatrixSymmetric3D real, MatrixSymmetric3D ideal, double error, std::string errorMessage);
+
 std::string getPath();
 
 Mdouble getRealTime();

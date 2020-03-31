@@ -243,12 +243,12 @@ void SuperQuadricParticle::setRadius(const Mdouble radius)
 
 void SuperQuadricParticle::setBoundingRadius()
 {   
-    if( axes_.Y > axes_.X)
-    {
-        auto axesTemp = axes_.Y;
-        axes_.Y = axes_.X;
-        axes_.X =axesTemp;
-    }
+//    if( axes_.Y > axes_.X)
+//    {
+//        auto axesTemp = axes_.Y;
+//        axes_.Y = axes_.X;
+//        axes_.X =axesTemp;
+//    }
     const Mdouble alpha = std::pow(axes_.Y / axes_.X, 2.0 / (2.0 / eps2_ - 2.0));
     const Mdouble help1 = std::pow(alpha, 2.0 / eps2_);
     const Mdouble gamma = std::pow(1.0 + help1, eps2_ / eps1_ - 1.0);

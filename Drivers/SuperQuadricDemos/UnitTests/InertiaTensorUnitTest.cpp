@@ -45,29 +45,25 @@ public:
         inertia.XX = 8 * constants::pi / 15;
         inertia.YY = 8 * constants::pi / 15;
         inertia.ZZ = 8 * constants::pi / 15;
-        logger.assert_always(mathsFunc::isEqual(p.getInertia(), inertia, 1e-5),
-                             "inertia tensor of sphere radius 1, got %, need %", p.getInertia(), inertia);
-        
+        helpers::check(p.getInertia(), inertia, 1e-5,"inertia tensor of sphere radius 1");
+
         p.setAxesAndExponents(2, 2, 2, 1, 1);
         inertia.XX = 256 * constants::pi / 15;
         inertia.YY = 256 * constants::pi / 15;
         inertia.ZZ = 256 * constants::pi / 15;
-        logger.assert_always(mathsFunc::isEqual(p.getInertia(), inertia, 1e-5),
-                             "inertia tensor of sphere radius 2");
-        
+        helpers::check(p.getInertia(), inertia, 1e-5,"inertia tensor of sphere radius 2");
+
         p.setAxesAndExponents(2, 1, 1, 1, 1);
         inertia.XX = 16 * constants::pi / 15;
         inertia.YY = 8 * constants::pi / 3;
         inertia.ZZ = 8 * constants::pi / 3;
-        logger.assert_always(mathsFunc::isEqual(p.getInertia(), inertia, 1e-5),
-                             "inertia tensor of ellipsoid axes (2,1,1)");
-        
+        helpers::check(p.getInertia(), inertia, 1e-5,"inertia tensor of (2,1,1)-ellipsoid");
+
         p.setAxesAndExponents(1, 2, 3, 1, 1);
         inertia.XX = 104 * constants::pi / 5;
         inertia.YY = 16 * constants::pi;
         inertia.ZZ = 8 * constants::pi;
-        logger.assert_always(mathsFunc::isEqual(p.getInertia(), inertia, 1e-5),
-                             "inertia tensor of ellipsoid axes (1,2,3)");
+        helpers::check(p.getInertia(), inertia, 1e-5,"inertia tensor of (1,2,3)-ellipsoid");
         logger(INFO, "All tests pass.");
     }
     

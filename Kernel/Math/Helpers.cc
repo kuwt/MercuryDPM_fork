@@ -898,23 +898,33 @@ bool helpers::readFromCommandLine(int argc, char *argv[], std::string varName)
     return false;
 }
 
-void helpers::check(double real, double ideal, double error, std::string whatIsChecked)
+
+template<class T>
+void checkTemplate(T real, T ideal, double error, std::string whatIsChecked)
 {
     logger.assert_always(mathsFunc::isEqual(real, ideal, error),
                          whatIsChecked + ": % (should be %) ", real, ideal);
     logger(INFO, whatIsChecked + ": % (correct)", real);
 }
 
+void helpers::check(double real, double ideal, double error, std::string whatIsChecked)
+{
+    checkTemplate(real,ideal,error,whatIsChecked);
+}
+
 void helpers::check(Vec3D real, Vec3D ideal, double error, std::string whatIsChecked)
 {
-    //std::numeric_limits<double>::epsilon()
-    logger.assert_always(mathsFunc::isEqual(real.X, ideal.X, error),
-                         whatIsChecked + ": % (should be %) ", real, ideal);
-    logger.assert_always(mathsFunc::isEqual(real.Y, ideal.Y, error),
-                         whatIsChecked + ": % (should be %) ", real, ideal);
-    logger.assert_always(mathsFunc::isEqual(real.Z, ideal.Z, error),
-                         whatIsChecked + ": % (should be %) ", real, ideal);
-    logger(INFO, whatIsChecked + ": % (correct)", real);
+    checkTemplate(real,ideal,error,whatIsChecked);
+}
+
+void helpers::check(MatrixSymmetric3D real, MatrixSymmetric3D ideal, double error, std::string whatIsChecked)
+{
+    checkTemplate(real,ideal,error,whatIsChecked);
+}
+
+void helpers::check(Matrix3D real, Matrix3D ideal, double error, std::string whatIsChecked)
+{
+    checkTemplate(real,ideal,error,whatIsChecked);
 }
 
 std::string helpers::getPath()
