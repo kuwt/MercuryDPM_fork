@@ -24,37 +24,14 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-#ifndef MERCURY_VTKWRITER_H
-#define MERCURY_VTKWRITER_H
+#ifndef LinearPlasticViscoelasticSlidingFrictionLiquidMigrationWilletSpecies_H
+#define LinearPlasticViscoelasticSlidingFrictionLiquidMigrationWilletSpecies_H
 
-#include "VTKWriter/BaseVTKWriter.h"
-#include "ParticleHandler.h"
+#include "Species.h"
+#include "NormalForceSpecies/LinearPlasticViscoelasticNormalSpecies.h"
+#include "FrictionForceSpecies/SlidingFrictionSpecies.h"
+#include "AdhesiveForceSpecies/LiquidMigrationWilletSpecies.h"
 
-class ParticleVtkWriter : public BaseVTKWriter<ParticleHandler>
-{
-
-public:
-    
-    explicit ParticleVtkWriter(ParticleHandler& particleHandler) : BaseVTKWriter(particleHandler)
-    {}
-    
-    virtual ~ParticleVtkWriter() = default;
-    
-    virtual std::string getName() const = 0;
-
-protected:
-
-    void writeExtraFields(std::fstream& file) const;
-
-    void writeVTKIndSpecies(std::fstream& file) const;
-    
-    void writeVTKPositions(std::fstream& file) const;
-    
-    bool particleMustBeWritten(BaseParticle* particle) const
-    {
-        return !(particle->isMPIParticle() || particle->isPeriodicGhostParticle());
-    }
-};
-
-
-#endif //MERCURY_VTKWRITER_H
+typedef Species     <LinearPlasticViscoelasticNormalSpecies, SlidingFrictionSpecies, LiquidMigrationWilletSpecies> LinearPlasticViscoelasticSlidingFrictionLiquidMigrationWilletSpecies;
+typedef MixedSpecies<LinearPlasticViscoelasticNormalSpecies, SlidingFrictionSpecies, LiquidMigrationWilletSpecies> LinearPlasticViscoelasticSlidingFrictionLiquidMigrationWilletMixedSpecies;
+#endif

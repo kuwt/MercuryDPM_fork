@@ -184,13 +184,13 @@ Vec3D Matrix3D::operator*(const Vec3D& a) const
 Matrix3D Matrix3D::operator*(const Matrix3D& a) const
 {
     return Matrix3D(XX * a.XX + XY * a.YX + XZ * a.ZX,
-                    YX * a.XX + YY * a.YX + YZ * a.ZX,
-                    ZX * a.XX + ZY * a.YX + ZZ * a.ZX,
                     XX * a.XY + XY * a.YY + XZ * a.ZY,
-                    YX * a.XY + YY * a.YY + YZ * a.ZY,
-                    ZX * a.XY + ZY * a.YY + ZZ * a.ZY,
                     XX * a.XZ + XY * a.YZ + XZ * a.ZZ,
+                    YX * a.XX + YY * a.YX + YZ * a.ZX,
+                    YX * a.XY + YY * a.YY + YZ * a.ZY,
                     YX * a.XZ + YY * a.YZ + YZ * a.ZZ,
+                    ZX * a.XX + ZY * a.YX + ZZ * a.ZX,
+                    ZX * a.XY + ZY * a.YY + ZZ * a.ZY,
                     ZX * a.XZ + ZY * a.YZ + ZZ * a.ZZ
     );
 }

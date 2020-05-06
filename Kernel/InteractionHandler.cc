@@ -32,7 +32,7 @@
 #include "Species/BaseSpecies.h"
 #include "Interactions/BaseInteraction.h"
 #include "DPMBase.h"
-
+#include "MpiDataClass.h"
 /*!
  * Constructor of the ParticleHandler class. It creates and empty ParticleHandler.
  */
@@ -499,3 +499,12 @@ FileType InteractionHandler::getWriteVTK() const
 {
     return writeVTK_;
 }
+
+double InteractionHandler::getLiquidBridgeVolume() const {
+    double liquidVolume = 0;
+    for (auto i : objects_) {
+        auto j = dynamic_cast<LiquidMigrationWilletInteraction*>(i);
+        if (j and !static_cast<BaseParticle*>(j->getP())->isMPIParticle()) liquidVolume += j->getLiquidBridgeVolume();
+    }
+    return getMPISum(liquidVolume);
+};

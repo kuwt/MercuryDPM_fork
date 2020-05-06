@@ -25,6 +25,10 @@
 
 #include "MpiDataClass.h"
 #include "DPMBase.h"
+#include "Particles/LiquidFilmParticle.h"
+#include "Particles/SphericalParticle.h"
+#include "Particles/SuperQuadricParticle.h"
+#include "Logger.h"
 
 /*!
  * \brief Copies data from a BaseParticle to an MPIParticle class and returns this
@@ -44,41 +48,51 @@
  * \param[in] bP Pointer to an MPIParticle which contains data for a ghost particle
  * \param[in,out] p Pointer to BaseParticle, a ghost particle that will be added to the domain
  */
-void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p)
+void MPISphericalParticle::copyDataFromMPIParticleToParticle(BaseParticle* p)
 {
     
     //Set important quantities
-    p->setId(bP->id);
-    p->setRadius(bP->radius);
-    p->setPosition(bP->position);
-    p->setAngularVelocity(bP->angularVelocity);
-    p->setVelocity(bP->velocity);
-    p->setOrientation(bP->orientation);
-    p->setCommunicationComplexity(bP->communicationComplexity);
-    
-//    p->setAxes(bP->axes);
-//    p->setExponents(bP->epsilon1, bP->epsilon2);
-    
+    p->setId(id);
+    p->setRadius(radius);
+    p->setPosition(position);
+    p->setAngularVelocity(angularVelocity);
+    p->setVelocity(velocity);
+    p->setOrientation(orientation);
+    p->setCommunicationComplexity(communicationComplexity);
+
     //Set HGrid values
     p->setHGridNextObject(nullptr);
     p->setHGridPrevObject(nullptr);
     p->setHGridX(99999);
     p->setHGridY(99999);
     p->setHGridZ(99999);
-    p->setHGridLevel(bP->HGridLevel);
+    p->setHGridLevel(HGridLevel);
     
     //This is not a periodic particle
     p->setPeriodicFromParticle(nullptr);
     p->setInPeriodicDomain(false);
     
     //Fix maser if it is maser
-    p->setMaserParticle(bP->isMaser);
+    p->setMaserParticle(isMaser);
     
     //Fixed particles need to be fixed again
-    if (bP->isFixed)
+    if (isFixed)
     {
         p->fixParticle();
     }
+}
+
+void MPISuperQuadric::copyDataFromMPIParticleToParticle(BaseParticle* p)
+{
+    MPISphericalParticle::copyDataFromMPIParticleToParticle(p);
+    p->setAxes(axes);
+    p->setExponents(epsilon1, epsilon2);
+}
+
+void MPILiquidFilmParticle::copyDataFromMPIParticleToParticle(BaseParticle* p)
+{
+    MPISphericalParticle::copyDataFromMPIParticleToParticle(p);
+    static_cast<LiquidFilmParticle*>(p)->setLiquidVolume(liquidVolume);
 }
 
 /*!
@@ -95,7 +109,7 @@ void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p, Particl
     //p->setIndSpecies(bP->indSpecies);
     const ParticleSpecies* species = p->getHandler()->getDPMBase()->speciesHandler.getObject(bP->indSpecies);
     p->setSpecies(species);
-    copyDataFromMPIParticleToParticle(bP, p);
+    bP->copyDataFromMPIParticleToParticle(p);
 }
 
 /*!
@@ -110,22 +124,46 @@ void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p, Particl
 MPIParticle copyDataFromParticleToMPIParticle(BaseParticle* p)
 {
     MPIParticle bP;
-    
-    bP.id = p->getId();
-    bP.indSpecies = p->getIndSpecies();
-    bP.radius = p->getRadius();
-//    bP.axes = p->getAxes();
-//    bP.epsilon1 = p->getExponentEps1();
-//    bP.epsilon2 = p->getExponentEps2();
-    bP.position = p->getPosition();
-    bP.angularVelocity = p->getAngularVelocity();
-    bP.velocity = p->getVelocity();
-    bP.orientation = p->getOrientation();
-    bP.HGridLevel = p->getHGridLevel();
-    bP.communicationComplexity = p->getCommunicationComplexity();
-    bP.isMaser = p->isMaserParticle();
-    bP.isFixed = p->isFixed();
+    bP.copyDataFromParticleToMPIParticle(p);
     return bP;
+}
+
+void MPISphericalParticle::copyDataFromParticleToMPIParticle(BaseParticle* p) {
+    id = p->getId();
+    indSpecies = p->getIndSpecies();
+    radius = p->getRadius();
+    position = p->getPosition();
+    angularVelocity = p->getAngularVelocity();
+    velocity = p->getVelocity();
+    orientation = p->getOrientation();
+    HGridLevel = p->getHGridLevel();
+    communicationComplexity = p->getCommunicationComplexity();
+    isMaser = p->isMaserParticle();
+    isFixed = p->isFixed();
+}
+
+void MPISuperQuadric::copyDataFromParticleToMPIParticle(BaseParticle* p) {
+    MPISphericalParticle::copyDataFromParticleToMPIParticle(p);
+    axes = p->getAxes();
+    epsilon1 = p->getExponentEps1();
+    epsilon2 = p->getExponentEps2();
+}
+
+void MPILiquidFilmParticle::copyDataFromParticleToMPIParticle(BaseParticle* p) {
+    MPISphericalParticle::copyDataFromParticleToMPIParticle(p);
+    liquidVolume = static_cast<LiquidFilmParticle*>(p)->getLiquidVolume();
+}
+
+BaseParticle* MPISphericalParticle::newParticle () {
+    return new SphericalParticle;
+}
+
+BaseParticle* MPISuperQuadric::newParticle () {
+    return new SuperQuadricParticle;
+}
+
+BaseParticle* MPILiquidFilmParticle::newParticle () {
+    return new LiquidFilmParticle;
 }
 
 /*!
@@ -139,7 +177,8 @@ MPIParticlePosition copyPositionFrom(BaseParticle* particle)
     particlePosition.id = particle->getId();
     particlePosition.position = particle->getPosition();
     particlePosition.orientation = particle->getOrientation();
-    
+    if (std::is_base_of<MPILiquidFilmParticle,MPIParticle>())
+        particlePosition.liquidVolume = static_cast<LiquidFilmParticle*>(particle)->getLiquidVolume();
     return particlePosition;
 }
 
@@ -157,3 +196,30 @@ MPIParticleVelocity copyVelocityFrom(BaseParticle* particle)
     return particleVelocity;
 }
 
+Vec3D getMPISum(Vec3D& val)
+{
+#ifdef MERCURY_USE_MPI
+    //Sum up over all domains
+    Vec3D valGlobal = {0.0,0.0,0.0};
+    MPIContainer& communicator = MPIContainer::Instance();
+    communicator.allReduce(val.X, valGlobal.X, MPI_SUM);
+    communicator.allReduce(val.Y, valGlobal.Y, MPI_SUM);
+    communicator.allReduce(val.Z, valGlobal.Z, MPI_SUM);
+    return valGlobal;
+#else
+    return val;
+#endif
+}
+
+double getMPISum(double val)
+{
+#ifdef MERCURY_USE_MPI
+    //Sum up over all domains
+    double valGlobal = 0.0;
+    MPIContainer& communicator = MPIContainer::Instance();
+    communicator.allReduce(val, valGlobal, MPI_SUM);
+    return valGlobal;
+#else
+    return val;
+#endif
+}

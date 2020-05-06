@@ -26,6 +26,7 @@
 #ifndef MPIDATACLASS_H_
 #define MPIDATACLASS_H_
 
+#include <Particles/SphericalParticle.h>
 #include "Particles/BaseParticle.h"
 #include "ParticleHandler.h"
 
@@ -35,7 +36,7 @@ class SuperQuadricParticle;
  * \class MPIParticle
  * \brief Data class to send a particle over MPI
  */
-class MPIParticle
+class MPISphericalParticle
 {
 public:
     unsigned int id;
@@ -49,17 +50,37 @@ public:
     unsigned communicationComplexity;
     bool isMaser; //TODO 
     bool isFixed;
-    
-    //virtual ~MPIParticle() = default;
+    void copyDataFromMPIParticleToParticle(BaseParticle* p);
+    void copyDataFromParticleToMPIParticle(BaseParticle* p);
+    static BaseParticle* newParticle ();
 };
 
-class MPISuperQuadric : public MPIParticle
+class MPISuperQuadric : public MPISphericalParticle
 {
 public:
     Vec3D axes;
     Mdouble epsilon1;
     Mdouble epsilon2;
+    void copyDataFromMPIParticleToParticle(BaseParticle* p);
+    void copyDataFromParticleToMPIParticle(BaseParticle* p);
+    static BaseParticle* newParticle ();
 };
+
+class MPILiquidFilmParticle : public MPISphericalParticle
+{
+public:
+    Mdouble liquidVolume;
+    void copyDataFromMPIParticleToParticle(BaseParticle* p);
+    void copyDataFromParticleToMPIParticle(BaseParticle* p);
+    static BaseParticle* newParticle ();
+};
+
+/*!
+ * Define what type of particle is used in MPI
+ */
+class MPIParticle : public MPISphericalParticle {};
+//to run simulations with LiquidFilmParticles in parallel, uncomment the line below (and comment the line above).
+//class MPIParticle : public MPILiquidFilmParticle {};
 
 /*!
  * \class MPIParticlePosition
@@ -71,6 +92,7 @@ public:
     unsigned int id;
     Vec3D position;
     Quaternion orientation;
+    Mdouble liquidVolume;
 };
 
 /*!
@@ -152,11 +174,6 @@ MPIParticle copyDataFromParticleToMPIParticle(BaseParticle* p);
 /*!
  * \brief Copies data from an MPIParticle class to a BaseParticle
  */
-void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p);
-
-/*!
- * \brief Copies data from an MPIParticle class to a BaseParticle
- */
 void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p, ParticleHandler* particleHandler);
 
 /*!
@@ -168,5 +185,15 @@ MPIParticlePosition copyPositionFrom(BaseParticle* particle);
  * \brief Copies the velocity from a particle to an MPIParticleVelocity class
  */
 MPIParticleVelocity copyVelocityFrom(BaseParticle* particles);
+
+/**
+ * Sums the values over all processors using MPI_reduce
+ */
+Vec3D getMPISum(Vec3D& val);
+
+/**
+ * Sums the values over all processors using MPI_reduce
+ */
+double getMPISum(double val);
 
 #endif  /* MPIDATACLASS_H_ */

@@ -120,7 +120,7 @@ void ReversibleAdhesiveSpecies::setAdhesionForceMax(Mdouble adhesionForceMax)
 {
     logger.assert(adhesionForceMax >= 0,"Error in setAdhesionForceMax");
     adhesionForceMax_ = adhesionForceMax;
-    if (adhesionStiffness_>0) setInteractionDistance();
+    if (adhesionStiffness_!=0) setInteractionDistance();
 }
 
 ///Allows the spring constant to be accessed

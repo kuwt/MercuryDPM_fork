@@ -28,11 +28,12 @@
 using constants::pi;
 using mathsFunc::cubic;
 
-class ForceLaws : public Mercury3D {
+class ForceLawsMPI2Test : public Mercury3D {
 public:
 
-    ForceLaws() {
-        setName("ForceLaws");
+    //sets up name, domain, parallel decomposition, time step, repulsive-adhesive species
+    ForceLawsMPI2Test() {
+        setName("ForceLawsMPI2Test");
         setMin(-Vec3D(5,1,1));
         setMax(Vec3D(5,1,1));
         setNumberOfDomains({NUMBER_OF_PROCESSORS,1,1});
@@ -40,7 +41,9 @@ public:
         setTimeMax(1.0);
         setSaveCount((unsigned)(getTimeMax()/getTimeStep()/20.));
         //fStatFile.writeFirstAndLastTimeStep();
-        //restartFile.writeFirstAndLastTimeStep();
+        eneFile.setFileType(FileType::NO_FILE);
+        fStatFile.setFileType(FileType::NO_FILE);
+        restartFile.writeFirstAndLastTimeStep();
         setXBallsAdditionalArguments("-solidf");
 
         LinearPlasticViscoelasticFrictionIrreversibleAdhesiveSpecies species;
@@ -58,6 +61,7 @@ public:
 
     }
 
+    //sets up two particles with small overlap (such that forces are in equilibrium) at edge of domain, moving to the right
     void setupInitialConditions() override
     {
         auto s = speciesHandler.getLastObject();
@@ -77,6 +81,7 @@ public:
         write(std::cout,false);
     }
 
+    //set initial values of max overlap and sliding spring
     void actionsBeforeTimeStep() override
     {
         if (getNumberOfTimeSteps()==0) {
@@ -96,7 +101,7 @@ public:
         }
    }
 
-
+    //plot temporary values of max overlap and sliding spring as the contact moves across the domain
     void printTime() const override
     {
         if (interactionHandler.getSize()!=0) {
@@ -110,11 +115,26 @@ public:
             logger(INFO, "t % domain % middle %", getTime(), PROCESSOR_ID, domainHandler.getCurrentDomain()->getMiddle().X);
         }
     }
+
+    //check final values of max overlap and sliding spring after the contact moved from processor 0 to processor 1
+    void actionsAfterSolve() override
+    {
+        if (PROCESSOR_ID!=1) return;
+        logger.assert(interactionHandler.getSize()>0, "Contact was lost");
+        auto i = dynamic_cast<const LinearPlasticViscoelasticInteraction *>(interactionHandler.getLastObject());
+        logger.assert_always(i, "Interaction type needs to be LinearPlasticViscoelastic");
+        auto j = dynamic_cast<const FrictionInteraction *>(interactionHandler.getLastObject());
+        logger.assert_always(j, "Interaction type needs to be Friction");
+
+        helpers::check(i->getMaxOverlap(),1e-5,1e-10,"Checking whether max overlap was preserved by domain transition");
+        helpers::check(j->getSlidingSpring().X,8.7489e-06,1e-10,"Checking whether sliding spring was preserved by domain transition");
+    }
+
 };
 
 int main()
 {
-    ForceLaws dpm;
+    ForceLawsMPI2Test dpm;
     dpm.solve();
-    return 0;
+    //return 0;
 }

@@ -98,7 +98,7 @@ public:
     Mdouble getSurfaceTension() const;
     
     /*!
-     * \brief used to set the contact angle between particle and liquid bridge surface.
+     * \brief used to set the contact angle between particle and liquid bridge surface (in radians)
      */
     void setContactAngle(Mdouble contactAngle);
     

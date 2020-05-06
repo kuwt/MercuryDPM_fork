@@ -28,6 +28,7 @@
 #include <Walls/BasicIntersectionOfWalls.h>
 #include <Walls/TriangleWall.h>
 #include <Walls/BasicUnionOfWalls.h>
+#include <Walls/ScrewsymmetricIntersectionOfWalls.h>
 #include "WallHandler.h"
 #include "Walls/BaseWall.h"
 #include "Walls/CylindricalWall.h"
@@ -127,6 +128,10 @@ BaseWall* WallHandler::createObject(const std::string& type)
     else if (type == "AxisymmetricIntersectionOfWalls")
     {
         return new AxisymmetricIntersectionOfWalls;
+    }
+    else if (type == "ScrewsymmetricIntersectionOfWalls")
+    {
+        return new ScrewsymmetricIntersectionOfWalls;
     }
     else if (type == "IntersectionOfWalls")
     {

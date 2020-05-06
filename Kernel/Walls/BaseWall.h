@@ -193,6 +193,10 @@ public:
 
     void renderWall(VTKContainer& vtk);
 
+    void addParticlesAtWall(unsigned numElements = 50);
+
+    void setVelocityControl(Vec3D forceGoal, Vec3D gainFactor, Vec3D baseVelocity);
+
 private:
     /*!
      * A pointer to the WallHandler that handles this BaseWall.

@@ -10,7 +10,7 @@
 %   data=loadstatistics('*.stat');
 %   data=loadstatistics({'chuteDemo.stat','hopperDemo.stat'})
 % 
-function data=loadstatistics(filenames,opt)
+function data=loadStatistics(filenames,opt)
 if ~exist('opt','var'); opt=struct(); end
 
 if iscell(filenames) 
@@ -27,7 +27,7 @@ else
     else
         % if argument contains * or ?, run it through ls to procuce a cell
         % of filenames 
-		data = loadstatistics(strread(ls(filenames),'%s '),opt); 
+		data = loadStatistics(strread(ls(filenames),'%s '),opt); 
 	end
 end
 
@@ -133,7 +133,7 @@ elseif ~doGradient
         data{i}.time = rawdata.data(index_time(i-1),1:2)';
         data{i}.variables = rawdata.data(index_time(i-1)+1:index_time(i)-1,4:end);
     end
-    disp(['multiple time steps (' VolumeFractionm2str(length(index_time)-1) '); creating cell output'])
+    disp(['multiple time steps (' num2str(length(index_time)-1) '); creating cell output'])
 else
     dataTemplate = data;
     data = cell(1,length(index_time)/4);
@@ -150,11 +150,11 @@ else
         data{i/4}.grady = rawdata.data(index_time(i-2)+1:index_time(i-1)-1,4:end);
         data{i/4}.gradz = rawdata.data(index_time(i-1)+1:index_time(i  )-1,4:end);
     end
-    disp(['multiple time steps (' VolumeFractionm2str(length(index_time)/4) '); creating cell output'])
+    disp(['multiple time steps (' num2str(length(index_time)/4) '); creating cell output'])
 end
 
 % \todo{why is this needed?}
-%data.description = ['Goldhirsch w/d=' VolumeFractionm2str(str2double(data.text{2})/1e-3)];
+%data.description = ['Goldhirsch w/d=' num2str(str2double(data.text{2})/1e-3)];
 
 return
 
@@ -181,7 +181,7 @@ data.variable_names = { ...
 	'Dissipation'; ...
 	};
 text = textscan([rawdata.textdata{8} ' ' rawdata.textdata{9}],'%s ');
-data.text = [text{1}{5} VolumeFractionm2str(str2double(text{1}{9})*100)];
+data.text = [text{1}{5} num2str(str2double(text{1}{9})*100)];
 rho_text = textscan(rawdata.textdata{11},'%s ');
 rho = str2double(rho_text{1}{end});
 
@@ -206,7 +206,7 @@ data.variables = [VolumeFraction ...
 return
 
 % rewrites coordinates and variables into n dimensional shape where n is
-% the VolumeFractionmber of dimensions in stattype (easy for plotting) 
+% the number of dimensions in stattype (easy for plotting) 
 function [data] = make_readable(data)
 
 data.nx=length(data.coordinates(:,1))/sum(data.coordinates(:,1)==data.coordinates(1,1));
@@ -286,8 +286,8 @@ data.Temperature = (...
 	- (data.VelocityX.^2 + data.VelocityY.^2 + data.VelocityZ.^2) )/3;
 data.Temperature(isnan(data.Temperature)) = 0;
 
-data.CoordinationVolumeFractionmber=(data.FabricXX+data.FabricYY+data.FabricZZ)./data.VolumeFraction;
-data.CoordinationVolumeFractionmber(isnan(data.CoordinationVolumeFractionmber)) = 0;
+data.Coordinationnumber=(data.FabricXX+data.FabricYY+data.FabricZZ)./data.VolumeFraction;
+data.Coordinationnumber(isnan(data.Coordinationnumber)) = 0;
 
 if isfield(opt,'basic'); return; end
 
@@ -467,18 +467,18 @@ return
 
 function [remainder,maximum] = get_momentum_equation(data)
 if isfield(data,'VolumeFraction_dx'),
-  NablaMomentumX = data.ParticleDensity*[data.MomentumX_dx data.MomentumX_dy data.MomentumX_dz];
-  NablaMomentumY = data.ParticleDensity*[data.MomentumY_dx data.MomentumY_dy data.MomentumY_dz];
-  NablaMomentumZ = data.ParticleDensity*[data.MomentumZ_dx data.MomentumZ_dy data.MomentumZ_dz];
+  NablaMomentumX = data.ParticleDensity(1)*[data.MomentumX_dx data.MomentumX_dy data.MomentumX_dz];
+  NablaMomentumY = data.ParticleDensity(1)*[data.MomentumY_dx data.MomentumY_dy data.MomentumY_dz];
+  NablaMomentumZ = data.ParticleDensity(1)*[data.MomentumZ_dx data.MomentumZ_dy data.MomentumZ_dz];
   NablaDotStress = [...
       data.StressXX_dx+data.StressXY_dy+data.StressXZ_dz ...
       data.StressYX_dx+data.StressYY_dy+data.StressYZ_dz ...
       data.StressZX_dx+data.StressZY_dy+data.StressZZ_dz ];
 else
   disp('estimating gradient!')
-  NablaMomentumX = nabla(data.ParticleDensity*data.VolumeFraction.*data.VelocityX,data.x,data.y,data.z);
-  NablaMomentumY = nabla(data.ParticleDensity*data.VolumeFraction.*data.VelocityY,data.x,data.y,data.z);
-  NablaMomentumZ = nabla(data.ParticleDensity*data.VolumeFraction.*data.VelocityZ,data.x,data.y,data.z);
+  NablaMomentumX = nabla(data.ParticleDensity(1)*data.VolumeFraction.*data.VelocityX,data.x,data.y,data.z);
+  NablaMomentumY = nabla(data.ParticleDensity(1)*data.VolumeFraction.*data.VelocityY,data.x,data.y,data.z);
+  NablaMomentumZ = nabla(data.ParticleDensity(1)*data.VolumeFraction.*data.VelocityZ,data.x,data.y,data.z);
 
   NablaDotStress = nabla([data.StressXX data.StressXY data.StressXZ data.StressYY data.StressYZ data.StressZZ],data.x,data.y,data.z);
 end
@@ -488,7 +488,7 @@ VelocityDotNablaMomentum = [...
   sum([data.VelocityX data.VelocityX data.VelocityZ].*NablaMomentumY,2) ...
   sum([data.VelocityX data.VelocityX data.VelocityZ].*NablaMomentumZ,2) ];
 
-DensityGravity = data.ParticleDensity * data.VolumeFraction * data.Gravity;
+DensityGravity = data.ParticleDensity(1) * data.VolumeFraction * data.Gravity;
 
 Traction = [data.TractionX data.TractionY data.TractionZ ];
 
@@ -638,7 +638,7 @@ Z = zeros(n(end:-1:1));
 Z(:) = z;
 V = zeros(n(end:-1:1));
 
-% stores differentials (small VolumeFractionmber if X/Y/Z is constant)
+% stores differentials (small number if X/Y/Z is constant)
 dX = max(1e-60,(X(:,:,[2:end end])-X(:,:,:)));
 dY = max(1e-60,(Y(:,[2:end end],:)-Y(:,:,:)));
 dZ = max(1e-60,(Z([2:end end],:,:)-Z(:,:,:)));
@@ -703,7 +703,7 @@ Z = zeros(n(end:-1:1));
 Z(:) = z;
 V = zeros(n(end:-1:1));
 
-% stores differentials (small VolumeFractionmber if X/Y/Z is constant)
+% stores differentials (small number if X/Y/Z is constant)
 dX = max(1e-60,(X(:,:,[2:end end])-X(:,:,[1 1:end-1])));
 dY = max(1e-60,(Y(:,[2:end end],:)-Y(:,[1 1:end-1],:)));
 dZ = max(1e-60,(Z([2:end end],:,:)-Z([1 1:end-1],:,:)));

@@ -3968,7 +3968,7 @@ void DPMBase::computeOneTimeStep()
     
     logger(DEBUG, "about to call hGridActionsBeforeTimeStep()");
     hGridActionsBeforeTimeStep();
-    
+
     //Creates and updates interactions and computes forces based on these
     logger(DEBUG, "about to call computeAllForces()");
     computeAllForces();
@@ -4066,7 +4066,7 @@ void DPMBase::removeOldFiles() const
         filename << getName() << j << '.' << k;
         while (!remove(filename.str().c_str()))
         {
-            logger(INFO,"  File % successfully deleted",filename.str());
+            if (k<3) logger(INFO,"  File % successfully deleted",filename.str());
             filename.clear();
             filename << getName() << j << '.' << ++k;
         }
@@ -4076,7 +4076,7 @@ void DPMBase::removeOldFiles() const
         filename << getName() << j << '.' << to_string_padded(k);
         while (!remove(filename.str().c_str()))
         {
-            logger(INFO,"  File % successfully deleted",filename.str());
+            if (k<3) logger(INFO,"  File % successfully deleted",filename.str());
             filename.clear();
             filename << getName() << j << '.' << to_string_padded(++k);
         }
@@ -4101,7 +4101,7 @@ void DPMBase::removeOldFiles() const
         filename << getName() << j << k << ".vtu";
         while (!remove(filename.str().c_str()))
         {
-            logger(INFO,"  File % successfully deleted",filename.str());
+            if (k<3) logger(INFO,"  File % successfully deleted",filename.str());
             filename.str("");
             filename << getName() << j << ++k << ".vtu";
         }
@@ -4709,7 +4709,7 @@ void DPMBase::synchroniseParticle(BaseParticle* p, unsigned fromProcessor)
     MPIParticle pInfo;
     if (communicator.getProcessorID() == fromProcessor)
     {
-        pInfo = copyDataFromParticleToMPIParticle(p);
+        pInfo.copyDataFromParticleToMPIParticle(p);
     }
 
     //Broadcast from processor i
@@ -4767,10 +4767,63 @@ void DPMBase::setNumberOfDomains(std::vector<unsigned> numberOfDomains)
 {
 #ifdef MERCURY_USE_MPI
     numberOfDomains_ = numberOfDomains;
+    logger(INFO, "Split domain into a %x%x% grid",numberOfDomains[0],numberOfDomains[1],numberOfDomains[2]);
 #else
     logger(WARN, "Setting number of domains, but code is not compiled with MPI on");
 #endif
 }
+
+void DPMBase::splitDomain(DomainSplit domainSplit) {
+    //one-d problems
+    if (domainSplit == DomainSplit::X) {
+        setNumberOfDomains({NUMBER_OF_PROCESSORS,1,1});
+        return;
+    } else if (domainSplit == DomainSplit::Y) {
+        setNumberOfDomains({1,NUMBER_OF_PROCESSORS,1});
+        return;
+    } else if (domainSplit == DomainSplit::Z) {
+        setNumberOfDomains({1,1,NUMBER_OF_PROCESSORS});
+        return;
+    }
+    //two-d problems
+    // split into axb grid with a the largest integer that divides NUMBER_OF_PROCESSORS and is smaller than sqrt(NUMBER_OF_PROCESSORS)
+    unsigned a;
+    for (unsigned n = floor(sqrt(NUMBER_OF_PROCESSORS));n>0; n--) {
+        if (NUMBER_OF_PROCESSORS % n == 0) {
+            a = n;
+            break;
+        }
+    }
+    if (domainSplit == DomainSplit::XY) {
+        setNumberOfDomains({NUMBER_OF_PROCESSORS/a,a,1});
+        return;
+    } else if (domainSplit == DomainSplit::XZ) {
+        setNumberOfDomains({NUMBER_OF_PROCESSORS/a,1,a});
+        return;
+    } else if (domainSplit == DomainSplit::YZ) {
+        setNumberOfDomains({1,NUMBER_OF_PROCESSORS/a,a});
+        return;
+    }
+    //three-d problems
+    // split into axbxc grid with
+    //  - a the largest integer that divides NUMBER_OF_PROCESSORS and is smaller than cbrt(NUMBER_OF_PROCESSORS)
+    //  - b the largest integer that divides NUMBER_OF_PROCESSORS/a and is smaller than sqrt(NUMBER_OF_PROCESSORS/a)
+    unsigned b;
+    for (unsigned n = floor(cbrt(NUMBER_OF_PROCESSORS));n>0; n--) {
+        if (NUMBER_OF_PROCESSORS % n == 0) {
+            a = n;
+            break;
+        }
+    }
+    for (unsigned n = floor(sqrt(NUMBER_OF_PROCESSORS/a));n>0; n--) {
+        if (NUMBER_OF_PROCESSORS % (n*a) == 0) {
+            b = n;
+            break;
+        }
+    }
+    setNumberOfDomains({NUMBER_OF_PROCESSORS/a/b,a,b});
+}
+
 
 /*!
  * \brief returns the number of domains

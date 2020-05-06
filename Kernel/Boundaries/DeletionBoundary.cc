@@ -30,6 +30,8 @@
 #include "Particles/BaseParticle.h"
 #include <algorithm>
 #include "Domain.h"
+#include "BoundaryHandler.h"
+#include "DPMBase.h"
 
 /*!
  * \details Default constructor (calls the parent-constructor of BaseBoundary as well)
@@ -40,6 +42,7 @@ DeletionBoundary::DeletionBoundary()
     distance_ = std::numeric_limits<double>::quiet_NaN();
     scaleFactor_ = std::numeric_limits<double>::quiet_NaN();
     isActivated_ = true;
+    trackOutflow_ = false;
     numberOfParticlesDeleted_ = 0;
     massDeleted_ = 0;
     volumeDeleted_ = 0;
@@ -119,44 +122,59 @@ Mdouble DeletionBoundary::getDistance(const Vec3D& position) const
  */
 bool DeletionBoundary::checkBoundaryAfterParticleMoved(BaseParticle* p, ParticleHandler& pH)
 {
-#ifdef MERCURY_USE_MPI
     if (getDistance(p->getPosition()) < 0)
     {
-        //Check if the particle is in the mpi communication zone
-        if(p->isInMPIDomain())
-        {
-            //Add the particle to a list so we can flush it later on
-            //The particles are not deleted yet. This is done in dpmBase after this function is called
-            particlesToBeDeleted_.insert(p);
-            return false;
+        if (trackOutflow_) {
+            auto dpm = getHandler()->getDPMBase();
+            if (!tracker.is_open()) {
+                std::string name  = dpm->getName()
+                        + helpers::to_string(getIndex())
+                        + ".out" + (NUMBER_OF_PROCESSORS==1?"":std::to_string(PROCESSOR_ID));
+                logger(INFO,"Open file %",name);
+                tracker.open(name);
+                tracker << std::setw(12) << "Time"
+                        << std::setw(8) << "Species"
+                        << std::setw(8) << "ID"
+                        << std::setw(12) << "Radius"
+                        << std::setw(12) << "Mass"
+                        << '\n';
+            }
+            tracker << std::setw(12) << dpm->getTime()
+                    << std::setw(8) << p->getIndSpecies()
+                    << std::setw(8) << p->getId()
+                    << std::setw(12) << p->getRadius()
+                    << std::setw(12) << p->getMass()
+                    << '\n';
         }
-        else
-        {
-            pH.removeGhostObject(p->getIndex());
-            return true;
-        }
-    }
-    else
-    {
-        return false;
-    }
 
-#else
-    if (getDistance(p->getPosition()) < 0)
-    {
-        numberOfParticlesDeleted_++;
-        massDeleted_ += p->getMass();
-        volumeDeleted_ += p->getVolume();
-        pH.removeObject(p->getIndex());
-        pH.computeLargestParticle();
-        pH.computeSmallestParticle();
-        return true;
+        #ifdef MERCURY_USE_MPI
+            //Check if the particle is in the mpi communication zone
+            if(p->isInMPIDomain())
+            {
+                //Add the particle to a list so we can flush it later on
+                //The particles are not deleted yet. This is done in dpmBase after this function is called
+                particlesToBeDeleted_.insert(p);
+                return false;
+            }
+            else
+            {
+                pH.removeGhostObject(p->getIndex());
+                return true;
+            }
+        #else
+            numberOfParticlesDeleted_++;
+            massDeleted_ += p->getMass();
+            volumeDeleted_ += p->getVolume();
+            pH.removeObject(p->getIndex());
+            pH.computeLargestParticle();
+            pH.computeSmallestParticle();
+            return true;
+        #endif
     }
     else
     {
         return false;
     }
-#endif
 }
 
 void DeletionBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
@@ -208,7 +226,8 @@ void DeletionBoundary::read(std::istream& is)
        >> dummy >> numberOfParticlesDeleted_
        >> dummy >> massDeleted_
        >> dummy >> volumeDeleted_
-       >> dummy >> isActivated_;
+       >> dummy >> isActivated_
+       >> dummy >> trackOutflow_;
 }
 
 /*!
@@ -235,7 +254,8 @@ void DeletionBoundary::write(std::ostream& os) const
        << " numberOfParticlesDeleted " << numberOfParticlesDeleted_
        << " massDeleted " << massDeleted_
        << " volumeDeleted " << volumeDeleted_
-       << " isActivated " << isActivated_;
+       << " isActivated " << isActivated_
+       << " trackOutflow " << trackOutflow_;
 }
 
 /*!

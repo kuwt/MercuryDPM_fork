@@ -44,6 +44,8 @@ void SphericalParticleVtkWriter::writeVTK() const
     writeVTKVelocity(file);
     writeVTKRadius(file);
     writeVTKIndSpecies(file);
+    writeExtraFields(file);
+
     file << "</PointData>\n";
     writeVTKFooterAndClose(file);
 }

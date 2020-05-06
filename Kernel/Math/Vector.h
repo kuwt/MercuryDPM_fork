@@ -196,7 +196,17 @@ public:
      * \brief Calculates the pointwise minimum of two Vec3D
      */
     static Vec3D min(const Vec3D& a, const Vec3D& b);
-    
+
+    /*!
+     * \brief Calculates the maximum coordinate of vector a
+     */
+    static double max(const Vec3D& a) {return std::max(std::max(a.X,a.Y),a.Z);}
+
+    /*!
+     * \brief Calculates the minimum coordinate of vector a
+     */
+    static double min(const Vec3D& a) {return std::min(std::min(a.X,a.Y),a.Z);}
+
     /*!
      * \brief Calculates the pointwise square of a Vec3D
      */

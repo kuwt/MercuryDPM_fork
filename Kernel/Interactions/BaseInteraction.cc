@@ -321,7 +321,7 @@ void BaseInteraction::copySwitchPointer(const BaseInteractable* original, BaseIn
  */
 Mdouble BaseInteraction::getContactRadius() const
 {
-    return sqrt(2.0 * getEffectiveRadius() * getOverlap());
+    return getOverlap()<0.0?0.0:sqrt(2.0 * getEffectiveRadius() * getOverlap());
 }
 
 /*!

@@ -47,7 +47,15 @@ public:
      * \brief default constructor
      */
     DeletionBoundary();
-    
+
+    /*!
+     * \brief default copy constructor
+     */
+    DeletionBoundary(DeletionBoundary const &d)
+        : normal_(d.normal_), scaleFactor_(d.scaleFactor_), distance_(d.distance_),
+          numberOfParticlesDeleted_(d.numberOfParticlesDeleted_), massDeleted_(d.massDeleted_),
+          volumeDeleted_(d.volumeDeleted_), isActivated_(d.isActivated_), trackOutflow_(d.trackOutflow_) {}
+
     /*!
      * \brief destructor
      */
@@ -106,7 +114,12 @@ public:
      * \brief Turns off the DeletionBoundary.
      */
     void deactivate();
-    
+
+    /*!
+     * \brief Turns on the outflow tracker.
+     */
+    void trackOutflow(bool trackOutflow = true) {trackOutflow_ = trackOutflow;}
+
     /*!
      * \brief Reads some boundary properties from an std::istream.
      */
@@ -161,6 +174,11 @@ private:
      * DeletionBoundary is deactivated, then it deletes no particles.
      */
     bool isActivated_;
+
+    bool trackOutflow_;
+
+    std::ofstream tracker;
+
 };
 
 #endif

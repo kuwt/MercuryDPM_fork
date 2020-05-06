@@ -409,7 +409,7 @@ public:
     std::string getName() const override;
     
     /*!
-     * \brief Returns the number of real objects
+     * \brief Returns the number of real objects (on all processors)
      */
     unsigned int getNumberOfRealObjects() const;
     
@@ -435,6 +435,8 @@ public:
     unsigned int getNumberOfRealObjectsLocal() const;
     
     void actionsAfterTimeStep();
+
+    double getLiquidFilmVolume() const;
 
 private:
     

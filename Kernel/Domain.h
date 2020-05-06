@@ -46,7 +46,6 @@ class DomainHandler;
 class BaseParticle;
 
 class MPIParticle;
-class MPISuperQuadric;
 
 class MPIParticlePosition;
 
@@ -241,7 +240,11 @@ public:
      * \brief Function that check if a given particle should be added to the communication lists
      */
     void findNewMPIParticle(BaseParticle* particle);
-    
+
+    /*
+     * Checks whether a particle is in the list of new particles received by this thread
+     */
+    bool isInNewBoundaryParticleList(BaseParticle* object,int localIndex) const;
     /*!
      * \brief Finds interactions that have to be send over to another domain
      */
@@ -271,7 +274,12 @@ public:
      * \brief Processes the received interactions from newly added mpi particles    
      */
     void processReceivedInteractionData(unsigned index, std::vector<BaseParticle*>& newParticles);
-    
+
+    /*
+     * Writes a list of all MPI particles on each thread to the logger.
+     */
+    void debugInformation();
+
     /*!
      * \brief A symmetric communication between two domains exchanging a send/recieve count
      */

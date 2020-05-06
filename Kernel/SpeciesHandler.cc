@@ -53,6 +53,7 @@
 #include "Species/LinearPlasticViscoelasticSlidingFrictionIrreversibleAdhesiveSpecies.h"
 #include "Species/HertzianViscoelasticFrictionChargedBondedSpecies.h"
 #include "Species/LinearViscoelasticFrictionChargedBondedSpecies.h"
+#include "Species/LinearPlasticViscoelasticSlidingFrictionLiquidMigrationWilletSpecies.h"
 
 #include "Species/LinearViscoelasticReversibleAdhesiveSpecies.h"
 #include "Species/LinearPlasticViscoelasticReversibleAdhesiveSpecies.h"
@@ -152,10 +153,6 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
     std::string type;
     is >> type;
     logger(DEBUG, "SpeciesHandler::readAndAddObject(is): reading type %.", type);
-//    if (strncmp(type,"LinearViscoelastic",strlen("LinearViscoelastic")))
-//    {
-//        typedef LinearViscoelasticNormalSpecies NormalSpecies;
-//    }
     if (type == "LinearViscoelasticSpecies")
     {
         LinearViscoelasticSpecies species;
@@ -324,6 +321,12 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
         is >> species;
         copyAndAddObject(species);
     }
+    else if (type == "LinearPlasticViscoelasticSlidingFrictionLiquidMigrationWilletSpecies")
+    {
+        LinearPlasticViscoelasticSlidingFrictionLiquidMigrationWilletSpecies species;
+        is >> species;
+        copyAndAddObject(species);
+    }
     else if (type == "HertzianViscoelasticMindlinSpecies")
     {
         HertzianViscoelasticMindlinSpecies species;
@@ -367,11 +370,12 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
     }
     else
     {
-        std::stringstream line;
-        helpers::getLineFromStringStream(is, line);
-        logger(ERROR,
+        logger(WARN,
                "Species type % not understood in restart file: You need to add this species to SpeciesHandler::readObject.",
                type);
+        std::stringstream line;
+        helpers::getLineFromStringStream(is, line);
+        copyAndAddObject(LinearViscoelasticSpecies());
     }
     
     //remove the default mixed species
@@ -511,6 +515,12 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
             is >> species;
             mixedObjects_.push_back(species.copy());
         }
+        else if (type == "LinearPlasticViscoelasticSlidingFrictionLiquidMigrationWilletMixedSpecies")
+        {
+            LinearPlasticViscoelasticSlidingFrictionLiquidMigrationWilletMixedSpecies species;
+            is >> species;
+            mixedObjects_.push_back(species.copy());
+        }
         else if (type == "LinearViscoelasticReversibleAdhesiveMixedSpecies")
         {
             LinearViscoelasticReversibleAdhesiveMixedSpecies species;
@@ -588,21 +598,29 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
         {
             MixedSpecies<ThermalSpecies<SinterNormalSpecies>, SlidingFrictionSpecies> species;
             is >> species;
+            mixedObjects_.push_back(species.copy());
         }
         else if (type == "ThermalSinterFrictionMixedSpecies")
         {
             MixedSpecies<ThermalSpecies<SinterNormalSpecies>, FrictionSpecies> species;
             is >> species;
+            mixedObjects_.push_back(species.copy());
         }
-        else if (type == "k") //for backwards compatibility
+        else if (type == "ThermalSinterFrictionMixedSpecies")
         {
-            mixedObjects_.push_back(readOldObject(is));
+            MixedSpecies<ThermalSpecies<SinterNormalSpecies>, FrictionSpecies> species;
+            is >> species;
+            mixedObjects_.push_back(species.copy());
         }
         else
         {
-            logger(ERROR,
+            logger(WARN,
                    "Species type % not understood in restart file: You need to add this species to SpeciesHandler::readMixedObject.",
                    type);
+            std::stringstream line;
+            helpers::getLineFromStringStream(is, line);
+            LinearViscoelasticMixedSpecies species;
+            mixedObjects_.push_back(species.copy());
         }
     }
 }

@@ -100,7 +100,7 @@ void InteractionVTKWriter::writeVTKPointData(std::fstream& file) const
     file << "  </DataArray>\n";
     
     //check if this type of Interaction has extra fields
-    if (handler_.getLastObject() != nullptr)
+    if (handler_.getSize() != 0)
     {
         for (unsigned i = 0; i < handler_.getLastObject()->getNumberOfFieldsVTK(); i++)
         {

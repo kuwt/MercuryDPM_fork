@@ -132,7 +132,7 @@ void LiquidFilmParticle::addLiquidVolume(Mdouble liquidVolume)
 
 unsigned LiquidFilmParticle::getNumberOfFieldsVTK() const
 {
-    return 1;
+    return 3;
 }
 
 std::string LiquidFilmParticle::getTypeVTK(unsigned i) const
@@ -142,11 +142,25 @@ std::string LiquidFilmParticle::getTypeVTK(unsigned i) const
 
 std::string LiquidFilmParticle::getNameVTK(unsigned i) const
 {
-    return "liquidVolume";
-    
+    if (i==1)
+        return "liquidFilmVolume";
+    else if (i==2)
+        return "liquidBridgeVolume";
+    else
+        return "fullLiquidVolume";
 }
 
 std::vector<Mdouble> LiquidFilmParticle::getFieldVTK(unsigned i) const
 {
-    return std::vector<Mdouble>(1, liquidVolume_);
+    if (i==1) {
+        return std::vector<Mdouble>(1, liquidVolume_);
+    } else {
+        Mdouble fullLiquidVolume = (i==2)?0:liquidVolume_;
+        for (auto i : getInteractions()) {
+            auto j = dynamic_cast<LiquidMigrationWilletInteraction*>(i);
+            logger.assert(j,"All contacts need to be LiquidMigrationWilletInteraction");
+            fullLiquidVolume += 0.5*j->getLiquidBridgeVolume();
+        }
+        return std::vector<Mdouble>(1, fullLiquidVolume);
+    }
 }

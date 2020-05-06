@@ -34,6 +34,7 @@
 #include "DPMBase.h"
 #include "ParticleHandler.h"
 #include <set>
+#include <Particles/LiquidFilmParticle.h>
 #include "Logger.h"
 #include "Particles/SphericalParticle.h"
 
@@ -561,12 +562,12 @@ PeriodicBoundaryHandler::processReceivedGhostParticleData(int targetIndex, std::
     for (int j = 0; j < numberOfNewPeriodicGhostParticlesReceive_[targetIndex]; j++)
     {
         //Create the ghost particle and copy basic information
-        SphericalParticle particle;
+        BaseParticle* particle = MPIParticle::newParticle();
         copyDataFromMPIParticleToParticle(&(periodicGhostParticleReceive_[targetIndex][j]),
-                                          &particle, &(getDPMBase()->particleHandler));
+                                          particle, &(getDPMBase()->particleHandler));
         
         //Obtain real periodic complexity
-        std::vector<int> realPeriodicComplexity = computePeriodicComplexity(particle.getPosition());
+        std::vector<int> realPeriodicComplexity = computePeriodicComplexity(particle->getPosition());
         
         //Obtain and set the ghost periodic complexity
         std::vector<int> ghostPeriodicComplexity(getSize());
@@ -574,14 +575,14 @@ PeriodicBoundaryHandler::processReceivedGhostParticleData(int targetIndex, std::
         {
             ghostPeriodicComplexity[k] = periodicGhostComplexityReceive_[targetIndex][getSize() * j + k];
         }
-        particle.setPeriodicComplexity(ghostPeriodicComplexity);
+        particle->setPeriodicComplexity(ghostPeriodicComplexity);
         
         //Shift the ghost particle to it's correct positions and velocities
-        shiftParticle(&particle, ghostPeriodicComplexity);
+        shiftParticle(particle, ghostPeriodicComplexity);
         
         //Add particle to simulation
-        logger(VERBOSE, "Adding a ghost at position %", particle.getPosition());
-        getDPMBase()->particleHandler.copyAndAddGhostObject(particle);
+        logger(VERBOSE, "Adding a ghost at position %", particle->getPosition());
+        getDPMBase()->particleHandler.addGhostObject(particle);
         
         //Set the correct flags
         BaseParticle* pGhost = getDPMBase()->particleHandler.getLastObject();

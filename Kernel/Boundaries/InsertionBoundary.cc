@@ -206,7 +206,7 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
                 //Send particle data from root to other processors to sync the particle properties
                 if (PROCESSOR_ID == 0)
                 {
-                    particle = copyDataFromParticleToMPIParticle(p0);
+                    particle.copyDataFromParticleToMPIParticle(p0);
                 }
 
                 MPIContainer::Instance().broadcast(&particle,MercuryMPIType::PARTICLE);
@@ -223,12 +223,13 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
             if (md->checkParticleForInteraction(*p0))
             {
                 //Note: in parallel only one of the domains will actually add the particle
-                md->particleHandler.copyAndAddObject(p0);
+                auto p = md->particleHandler.copyAndAddObject(p0);
                 failed = 0;
 
                 ++numberOfParticlesInserted_;
-                massInserted_ += p0->getMass();
-                volumeInserted_ += p0->getVolume();
+                const double volume = p0->getVolume();
+                volumeInserted_ += volume;
+                massInserted_ += p0->getSpecies()->getDensity()*volume;
                 logger(VERBOSE, "successfully placed a particle %, with position: % after % fails.", p0,
                        p0->getPosition(), failed);
                 

@@ -161,15 +161,18 @@ BaseParticle* CubeInsertionBoundary::generateParticle(RNG& random)
         }
     } else {
         //static std::random_device rd(0);
+        //draw a number between 0 and 1, uniformly distributed
         static std::mt19937 gen(0);
         static std::uniform_real_distribution<Mdouble> dist(0, 1);
         const Mdouble probability = dist(gen);
+        //find the interval [low,high] of the psd in which the number sits
         auto high = std::lower_bound(psd_.begin(),psd_.end(),probability);
         auto low = std::max(psd_.begin(),high-1);
         Mdouble rMin = low->radius;
         Mdouble rMax = high->radius;
         Mdouble pMin = low->probability;
         Mdouble pMax = high->probability;
+        // interpolate linearly between [low.radius,high.radius]
         Mdouble a = (probability - low->probability)/(high->probability -low->probability);
         const Mdouble radius = a*low->radius + (1-a)*high->radius;
         P->setRadius(radius);

@@ -177,20 +177,11 @@ void LiquidMigrationWilletInteraction::form()
             liquidBridgeVolume_ = species->getLiquidBridgeVolumeMax();
             PParticle->setLiquidVolume(PParticle->getLiquidVolume() - species->getLiquidBridgeVolumeMax());
         }
+//        if (liquidBridgeVolume_) logger(INFO,"Forming liquid bridge of volume % between particles % and wall %",liquidBridgeVolume_,getP()->getId(),getI()->getId());
     }
     else if (PParticle == nullptr) //if P is a wall
     {
-        //consider max bridge volume and add the rest to particles
-        if (IParticle->getLiquidVolume() <= species->getLiquidBridgeVolumeMax())
-        {
-            liquidBridgeVolume_ = IParticle->getLiquidVolume();
-            IParticle->setLiquidVolume(0.0);
-        }
-        else
-        {
-            liquidBridgeVolume_ = species->getLiquidBridgeVolumeMax();
-            IParticle->setLiquidVolume(IParticle->getLiquidVolume() - species->getLiquidBridgeVolumeMax());
-        }
+        logger(ERROR,"Should not happen");
     }
     else //if P and I are particles
     {
@@ -207,7 +198,7 @@ void LiquidMigrationWilletInteraction::form()
         
         Mdouble distributableLiquidVolume =
                 PParticle->getLiquidVolume() + IParticleReal->getLiquidVolume();
-        //assign all liquid of the contacting particles to the bridge, 
+        //assign all liquid of the contacting particles to the bridge,
         //if the total volume does not exceed LiquidBridgeVolumeMax
         ///\todo: maybe we need to check ghost particles?
         if (distributableLiquidVolume <= 0)
@@ -236,6 +227,7 @@ void LiquidMigrationWilletInteraction::form()
                 IParticleReal->addLiquidVolume(-(1.0 - pFraction) * species->getLiquidBridgeVolumeMax());
             }
         }
+//        if (liquidBridgeVolume_) logger(INFO,"Forming liquid bridge of volume % between particles % and % (MPI %%, V % %, overlap %)",liquidBridgeVolume_,getP()->getId(),getI()->getId(),PParticle->isMPIParticle(),IParticle->isMPIParticle(),PParticle->getLiquidVolume(),IParticle->getLiquidVolume(),getOverlap());
     }
 }
 
@@ -260,7 +252,7 @@ void LiquidMigrationWilletInteraction::rupture()
     //if the bridge is already empty, do nothing
     if (getLiquidBridgeVolume() == 0.0)
         return;
-    
+
     //else rupture a bridge 
     const LiquidMigrationWilletSpecies* species = getSpecies();
     LiquidFilmParticle* IParticle = dynamic_cast<LiquidFilmParticle*>(getI());
@@ -277,6 +269,7 @@ void LiquidMigrationWilletInteraction::rupture()
             }
             
         }
+//        logger(INFO,"Rupturing liquid bridge of volume % between particles % and wall % (numContacts %)",liquidBridgeVolume_,getP()->getId(),getI()->getId(),numContactsP);
         if (numContactsP > 0)
         {
             // Updating new volume with distribution less than critical volume
@@ -325,52 +318,14 @@ void LiquidMigrationWilletInteraction::rupture()
     }
     else if (PParticle == nullptr) //if P is a wall
     {
-        int numContactsI = 0;
-        for (auto i : getI()->getInteractions())
-        {
-            LiquidMigrationWilletInteraction* j =
-                    dynamic_cast<LiquidMigrationWilletInteraction*>(i);
-            if (j != this && j != nullptr && j->getLiquidBridgeVolume() != 0.0)
-                numContactsI++;
-        }
-        if (numContactsI > 0)
-        {
-            // Updating new volume with distribution less than critical volume
-            Mdouble ExcessBridgeVolume = 0.0;
-            Mdouble newVolume = liquidBridgeVolume_ * species->getDistributionCoefficient() / (numContactsI);
-            for (auto i : getI()->getInteractions())
-            {
-                LiquidMigrationWilletInteraction* j =
-                        dynamic_cast<LiquidMigrationWilletInteraction*>(i);
-                if (j != this && j != nullptr && j->getLiquidBridgeVolume() != 0.0)
-                {
-                    j->setLiquidBridgeVolume(
-                            j->getLiquidBridgeVolume() + newVolume);
-                    if (j->getLiquidBridgeVolume() >=
-                        species->getLiquidBridgeVolumeMax())
-                    {
-                        ExcessBridgeVolume += j->getLiquidBridgeVolume()
-                                              - species->getLiquidBridgeVolumeMax();
-                        j->setLiquidBridgeVolume(species->getLiquidBridgeVolumeMax());
-                    }
-                }
-            }
-            IParticle->setLiquidVolume(IParticle->getLiquidVolume() + ExcessBridgeVolume +
-                                       liquidBridgeVolume_ * (1 - species->getDistributionCoefficient()));
-            
-            setLiquidBridgeVolume(0.0);
-        }
-        else
-        {
-            IParticle->setLiquidVolume(IParticle->getLiquidVolume() + liquidBridgeVolume_);
-        }
-        liquidBridgeVolume_ = 0.0;
+        logger(ERROR,"this should not happen");
     }
     else //if P and I are particles
     {
         //count interaction partners of p (this contact, ghosts and interaction without liquid bridge dont count)
         int numContactsP = getNumberOfContacts(getP());
-        if (numContactsP < 1) //if P has only one contact (the one that gets ruptured), pass the fluid into it)        
+//        logger(INFO,"Rupturing liquid bridge of volume % between particles % and % (numContacts %, MPI %%, overlap %)",liquidBridgeVolume_,getP()->getId(),getI()->getId(),numContactsP,PParticle->isMPIParticle(),IParticle->isMPIParticle(),getOverlap());
+        if (numContactsP < 1) //if P has only one contact (the one that gets ruptured), pass the fluid into it)
         {
             PParticle->addLiquidVolume(0.5 * liquidBridgeVolume_);
         }
@@ -404,7 +359,7 @@ void LiquidMigrationWilletInteraction::rupture()
                 }
             }
             Mdouble PParticle_fin = PParticle->getLiquidVolume();
-            
+
         }
         
         //count interaction partners of i (ghosts and interaction without liquid bridge dont count)

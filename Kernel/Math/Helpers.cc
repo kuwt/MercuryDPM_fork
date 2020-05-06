@@ -887,7 +887,7 @@ bool helpers::compare(std::istream& is, std::string s)
 
 bool helpers::readFromCommandLine(int argc, char *argv[], std::string varName)
 {
-    for (unsigned i=0; i<argc-1; ++i) {
+    for (unsigned i=0; i<argc; ++i) {
         if (varName == argv[i]) {
             logger(INFO, "readFromCommandLine: found argument %",varName);
             return true;

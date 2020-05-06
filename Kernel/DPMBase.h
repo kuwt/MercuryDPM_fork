@@ -879,7 +879,16 @@ public:
      * \brief Sets the number of domains in x-,y- and z-direction. Required for parallel computations
      */
     void setNumberOfDomains(std::vector<unsigned> direction);
-    
+
+    enum class DomainSplit {X, Y, Z, XY, XZ, YZ, XYZ};
+
+    /*!
+     * Splits domain as neatly as possible.
+     * e.g. splitDomain(XY) splits domain into a 6x5x1 grid for 30 processors, a 6x6x1 grid for 36 processors
+     * \todo the function needs improvement: for non-cubic domains (with different domain length in x,y,z), having a equal number of grid cell is not the best choice.
+     */
+    void splitDomain(DomainSplit domainSplit);
+
     /*!
      * \brief returns the number of domains
      */

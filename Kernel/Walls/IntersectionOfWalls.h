@@ -228,7 +228,8 @@ private:
      *  walls m and n, m<n.
      */
     std::vector<Vec3D> AB_;
-    
+
+protected:
     /*!
      * \brief A vector that stores the intersection point of three different InfiniteWall.
      * \details C[(n-2)*(n-1)*n/6+(m-1)*m/2+l] is a point intersecting walls 

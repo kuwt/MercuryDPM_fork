@@ -253,7 +253,7 @@ void ParticleHandler::addObject(int fromProcessor, BaseParticle* p)
     MPIParticle pInfo;
     if (communicator.getProcessorID() == fromProcessor)
     {
-        pInfo = copyDataFromParticleToMPIParticle(p);
+        pInfo.copyDataFromParticleToMPIParticle(p);
     }
 
     //Broadcast from processor i
@@ -297,7 +297,7 @@ void ParticleHandler::addGhostObject(int fromProcessor, int toProcessor, BasePar
     int tag;
     if (communicator.getProcessorID() == fromProcessor)
     {
-        pInfo = copyDataFromParticleToMPIParticle(p);
+        pInfo.copyDataFromParticleToMPIParticle(p);
         tag = fromProcessor*MAX_PROC*10 + toProcessor*10 + MercuryMPITag::PARTICLE_DATA;
         communicator.send(&pInfo, MercuryMPIType::PARTICLE, 1, toProcessor, tag);
     }
@@ -647,21 +647,6 @@ Vec3D ParticleHandler::getCentreOfMass() const
         return getMassTimesPosition() / m;
 }
 
-Vec3D getMPISum(Vec3D& val)
-{
-#ifdef MERCURY_USE_MPI
-    //Sum up over all domains
-    Vec3D valGlobal = {0.0,0.0,0.0};
-    MPIContainer& communicator = MPIContainer::Instance();
-    communicator.allReduce(val.X, valGlobal.X, MPI_SUM);
-    communicator.allReduce(val.Y, valGlobal.Y, MPI_SUM);
-    communicator.allReduce(val.Z, valGlobal.Z, MPI_SUM);
-    return valGlobal;
-#else
-    return val;
-#endif
-}
-
 Vec3D ParticleHandler::getMomentum() const
 {
     Vec3D momentum = {0, 0, 0};
@@ -710,9 +695,8 @@ BaseParticle* ParticleHandler::getFastestParticle() const
 {
 #ifdef MERCURY_USE_MPI
     logger(ERROR,"This function should not be used in parallel");
-#else
-    return getFastestParticleLocal();
 #endif
+    return getFastestParticleLocal();
 }
 
 /*
@@ -829,8 +813,8 @@ Mdouble ParticleHandler::getMeanRadius() const
 BaseParticle* ParticleHandler::getLowestPositionComponentParticleLocal(const int i) const
 {
 #ifdef MERCURY_USE_MPI
-    logger(INFO,"getLowestPositionComponentParticle() not implemented yet in parallel");
-#else
+    logger(ERROR,"getLowestPositionComponentParticle() not implemented yet in parallel");
+#endif
     if (getSize() == 0)
     {
         logger(WARN, "No getLowestPositionComponentParticle(const int i) since there are no particles.");
@@ -850,16 +834,14 @@ BaseParticle* ParticleHandler::getLowestPositionComponentParticleLocal(const int
         }
     }
     return p;
-#endif
 }
 
 BaseParticle* ParticleHandler::getLowestPositionComponentParticle(const int i) const
 {
 #ifdef MERCURY_USE_MPI
     logger(ERROR,"This function should not be used in parallel");
-#else
-    return getLowestPositionComponentParticleLocal(i);
 #endif
+    return getLowestPositionComponentParticleLocal(i);
 }
 
 /*!
@@ -894,10 +876,9 @@ BaseParticle* ParticleHandler::getHighestPositionComponentParticleLocal(const in
 BaseParticle* ParticleHandler::getHighestPositionComponentParticle(const int i) const
 {
 #ifdef MERCURY_USE_MPI
-    logger(ERROR,"This function should not be used in paralle");
-#else
-    return getHighestPositionComponentParticleLocal(i);
+    logger(ERROR,"This function should not be used in parallel");
 #endif
+    return getHighestPositionComponentParticleLocal(i);
 }
 
 /*!
@@ -931,10 +912,9 @@ BaseParticle* ParticleHandler::getLowestVelocityComponentParticleLocal(const int
 BaseParticle* ParticleHandler::getLowestVelocityComponentParticle(const int i) const
 {
 #ifdef MERCURY_USE_MPI
-
-#else
-    return getLowestVelocityComponentParticleLocal(i);
+    logger(ERROR,"This function should not be used in parallel");
 #endif
+    return getLowestVelocityComponentParticleLocal(i);
 }
 
 /*!
@@ -969,9 +949,8 @@ BaseParticle* ParticleHandler::getHighestVelocityComponentParticle(const int i) 
 {
 #ifdef MERCURY_USE_MPI
     logger(ERROR,"This function should not be used in parallel");
-#else
-    return getHighestVelocityComponentParticleLocal(i);
 #endif
+    return getHighestVelocityComponentParticleLocal(i);
 }
 
 /*!
@@ -1379,3 +1358,12 @@ void ParticleHandler::actionsAfterTimeStep()
         i->actionsAfterTimeStep();
     }
 }
+
+double ParticleHandler::getLiquidFilmVolume() const {
+    double liquidVolume = 0;
+    for (auto i : objects_) {
+        auto j = dynamic_cast<LiquidFilmParticle*>(i);
+        if (j and !j->isMPIParticle()) liquidVolume += j->getLiquidVolume();
+    }
+    return getMPISum(liquidVolume);
+};

@@ -63,3 +63,31 @@ void ParticleVtkWriter::writeVTKIndSpecies(std::fstream& file) const
     }
     file << "  </DataArray>\n";
 }
+
+void ParticleVtkWriter::writeExtraFields(std::fstream& file) const
+{
+    //check if this type of Interaction has extra fields
+    if (handler_.getSize() != 0)
+    {
+        for (unsigned i = 0; i < handler_.getLastObject()->getNumberOfFieldsVTK(); i++)
+        {
+            file << "  <DataArray type=\"" << handler_.getLastObject()->getTypeVTK(i) << "\" Name=\""
+                 << handler_.getLastObject()->getNameVTK(i) << "\" format=\"ascii\">\n";
+            // Add species type
+            for (const auto& p: handler_)
+            {
+                for (auto f : p->getFieldVTK(i)) {
+#ifdef MERCURY_USE_MPI
+                    if (particleMustBeWritten(p))
+                    {
+                        file << '\t' << f << '\n';
+                    }
+#else
+                    file << '\t' << f << '\n';
+#endif
+                }
+            }
+            file << "  </DataArray>\n";
+        }
+    }
+}

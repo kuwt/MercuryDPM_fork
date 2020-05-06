@@ -525,3 +525,44 @@ void BaseWall::renderWall(VTKContainer& vtk)
         }
     }
 }
+
+void BaseWall::setVelocityControl(Vec3D forceGoal, Vec3D gainFactor, Vec3D baseVelocity) {
+    setPrescribedVelocity([this, forceGoal, gainFactor, baseVelocity] (double time){
+        auto dForce = getForce()-forceGoal;
+        return baseVelocity + gainFactor.multiplyElementwise(dForce);
+    });
+}
+
+void BaseWall::addParticlesAtWall(unsigned numElements)
+{
+    auto& speciesHandler = getHandler()->getDPMBase()->speciesHandler;
+    logger.assert_always(speciesHandler.getSize()>0,"addParticlesAtWall: You need to define at least one species");
+
+    Vec3D max = getHandler()->getDPMBase()->getMax();
+    Vec3D min = getHandler()->getDPMBase()->getMin();
+    double h = Vec3D::min(max-min)/numElements;
+    double r = 0.5*h;
+
+    auto& particleHandler = getHandler()->getDPMBase()->particleHandler;
+    double numParticles0 = particleHandler.getSize();
+    SphericalParticle p;
+    p.setSpecies(speciesHandler.getObject(0));
+    Vec3D pos;
+    for (pos.X = min.X; pos.X <= max.X; pos.X += h)
+    for (pos.Y = min.Y; pos.Y <= max.Y; pos.Y += h)
+    for (pos.Z = min.Z; pos.Z <= max.Z; pos.Z += h)
+    {
+        Vec3D normal;
+        Mdouble distance;
+        p.setRadius(2.0*r);
+        p.setPosition(pos);
+        //if touching the wall
+        if (getDistanceAndNormal(p, distance, normal) && distance>=0)
+        {
+            p.setRadius(r);
+            p.setPosition(pos+(distance-r)*normal);
+            particleHandler.copyAndAddObject(p);
+        }
+    }
+    logger(INFO,"Inserted % particles that touch wall %", particleHandler.getNumberOfObjects()-numParticles0, getIndex());
+}

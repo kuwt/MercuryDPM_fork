@@ -25,6 +25,8 @@
 #ifndef INTERACTIONHANDLER_H
 #define INTERACTIONHANDLER_H
 
+#include <Interactions/AdhesiveForceInteractions/LiquidBridgeWilletInteraction.h>
+#include <Interactions/AdhesiveForceInteractions/LiquidMigrationWilletInteraction.h>
 #include "BaseHandler.h"
 #include "Interactions/BaseInteraction.h"
 #include "File.h"
@@ -156,6 +158,8 @@ public:
      * \brief Returns the name of the object
      */
     std::string getName() const override;
+
+    double getLiquidBridgeVolume() const;
 
 private:
     
