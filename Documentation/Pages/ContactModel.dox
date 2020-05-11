@@ -2,25 +2,31 @@
 \page ContactModel Contact Models in MercuryDPM
 \tableofcontents
 
-In MercuryDPM contact models consists of Species class and Interaction class.\n
-Species: contains the parameters of the contact law (plus the particle property density)\n
-Interaction: contains the functions to compute the forces\n
+A contact model defines the governing normal and tangential behaviours of particles. Different contact models are available
+in MercuryDPM. The developer can have access to them via a header. For instance:
 
-\n
+\snippet Drivers/UnitTests/LinearViscoelasticUnitTest.cpp T11:contactModel
 
-MercuryDPM contains following contact models:
+In MercuryDPM contact models consists of Species and Interaction classes. Species contains the parameters of the contact law (plus the particle property density),
+while Interaction contains the functions to compute the forces.\n
 
-- \subpage LinearViscoelasticNormalModel
-- \subpage TangentialContactForces
-- \subpage HertzianViscoelasticNormalModel
-- \subpage MindlinModel
-- \subpage LinearPlasticViscoelasticNormalModel
-- \subpage ReversibleAdhesionModel
-- \subpage WetCohesion
-- \subpage SinteringModel
+\dot
+    digraph example {
+    node [shape=record, fontname=Helvetica, fontsize=10];
+    a [ label="class Species" URL="\ref Species"];
+    f [ label="class Interaction" URL="\ref Interaction"];
+    a -> f [ arrowhead="open" ];
+    f -> a [ arrowhead="open" ];
+    }
+\enddot
 
-In MercuryDPM MixedSpecies is used to combine difference contact forces e.g. linear spring dashpot model with
-linear tangential forces ( LinearViscoelasticFrictionSpecies )
+MercuryDPM includes the interactions for:
 
-You can implement new contact model following the instruction: \subpage HowToCreateANewSpecies
+- \subpage Normal_forces
+- \subpage Friction_forces
+- \subpage Adhesive_forces
+
+The developer can use multiple interactions defining  MixedSpecies.
+
+You can find a procedure to implement a new contact model in: \subpage HowToCreateANewSpecies
 */

@@ -1,0 +1,31 @@
+/*!
+\page Adhesive_forces Adhesive forces
+
+As particle become sufficiently small, adhesion phenomena becomes important. The presence of significant adhesive forces can
+be established experimentally by the observation that the area of the contact region is larger than
+predicted by the Hertz theory and the observation that the contact region does not vanish when the load is removed.
+
+\image html ContactModels/AdhesiveForce.png Adhesive forces.
+
+To integrate the adhesive contribution into the contact interaction, the developer needs to combine species.
+
+\dot
+    digraph example {
+    node [shape=record, fontname=Helvetica, fontsize=10];
+    a [label= "Normal Force species" URL="\ref NormalForceSpecies"];
+    b [label= "Adhesive Force species" URL="\ref AdhesiveForceSpecies"];
+    c [label= "Normal Force Interaction" URL="\ref NormalForceInteraction"];
+    d [label= "Adhesive Force Interaction" URL="\ref AdhesiveForceInteraction"];
+    }
+\enddot
+
+The available models to compute the adhesive interaction are:
+
+- \subpage ReversibleAdhesionModel - Linear Reversible Cohesive Force
+- \subpage WetCohesion - Irreversible adhesive interaction
+- \subpage LiquidMigration_Interaction  - Irreversible adhesive interaction
+- \subpage ChargedBonded_Interaction
+- \subpage SinteringModel
+- \subpage PharmiMcMeeking_Interaction
+- \subpage EnhancedSintering_Interaction
+*/

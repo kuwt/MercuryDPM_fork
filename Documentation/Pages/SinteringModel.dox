@@ -3,16 +3,78 @@
 
 Sintering model in MercuryDPM referred to as SinterNormal (SinterNormalSpecies, SinterInteraction).
 
-Force computation:
+To model sintering, the elastoplastic and dissipative forces are linear functions of the effective, elastic
+overlap \f$ (\delta > \delta_p)\f$, and normal velocity \f$ \dot{\delta} \f$. This model assumes that the stiffness increases with the amount of plastic deformation, due to
+the increased contact surface,  with \f$ k = k_1 \f$ for zero plastic overlap up to maximum of \f$ k = k_{2}^{max}\f$ at
+maximum plastic overlap \f$ \delta_2^{max}\f$, which is set to avoid solid volume fractions above one.
 
+The unloading stiffness is updated according to
+
+\f$ \hat{k}_2 = k_1 + (k^{max}_2 - k_1)\frac{\delta_p}{\delta^{*}}
+\f$
+
+Header:
+\snippet Drivers/UnitTests/SinterForceUnitTest.cpp T11:contactModel
+
+
+Interaction function:
 \code void SinterInteraction::computeNormalForce() \endcode
 
+\b The algorithm to compute the normal force as a function of the plastic overlap is:
+<table>
+<tr><th> ::computeNormalForce
+<tr><td>1. Set the relative velocity <td> \ref relativeVelocity_
+<tr><td>2. Set the normal relative velocity <td> \ref setNormalRelativeVelocity_
+<tr><td>3. If overlap   <td> \f$ \delta^n > 0 \f$
+<tr><td>4. Calculate the effective diameter <td> <td> \f$ D_{ij} = 2R_{ij} \f$
+<tr><td>5. Maximum plastic flow limit overlap <td> <td> \f$ \delta^{*} = \phi_{penet} D_{ij} \f$
+<tr><td>6. Increase the maximum overlap if necessary <td> <td> \f$ \delta_p^{min} = min(\delta^{*},\delta) \f$
+<tr><td> <td> <td> \f$ \delta_p= max(\delta_p^{min},\delta_p) \f$
+<tr><td>7. Compute the unloading stiffness <td> <td> \f$ \hat{k}_2  = k_1 + (k_2^{max} - k_1)\frac{\delta_p}{\delta^{*}}  \f$
+<tr><td>8. Compute the normal force <td> <td> \f$ f^n = \hat{k}_2(\delta - \delta_p)  \f$
+<tr><td>9. Compute rate of plastic overlap <td> <td> <td> \f$ \dot{\delta_p} \f$
+<tr><td>10. Compute plastic overlap <td> <td> <td> \f$ \delta_p = \dot{\delta_p}  t \f$
+<tr><td>11. Set normal force <td> setAbsoluteNormalForce(std::abs(normalForce))
+<tr><td>12. Set force <td> setForce(getNormal() * normalForce)
+<tr><td>13. Set torque <td>  setTorque(Vec3D(0.0, 0.0, 0.0))
 
-The model parameters are set using SinterNormalSpecies member functions
+</table>
+
+Plastic overlap:
+
+\image html ContactModels/TwoParticleSintering.png sintering of two particles.
+
+In MercuryDPM, the solid state of sintering is modelled updating the plastic overlap.
+
+1. Frenkel
+    SINTERTYPE::CONSTANT_RATE
+
+    The viscous flow mechanism, which was proposed by Frenkel, can be operative in the sintering of viscoelastic materials
+    like glass and polymers. If the material follows the behaviour of a Newtonian fluid, the neck growth and shrinkage
+    kinetics are expressed as
+
+    \f$ a^2 = \frac{\gamma_s R}{\eta} t
+    \f$
+
+    where \f$ a \f$ is the contact radius,  \f$ \gamma_s  \f$ is the interfacial surface tension, \f$ \eta \f$ zero-shear
+    viscosity, \f$ t \f$ is time.
+
+    The characteristic sintering time is defined as
+
+    \f$ \tau = \frac{R \eta}{\gamma_s}
+    \f$
+
+    \f$ \tau \f$ highlights the importance influence of the particle radius, the smaller the particle, the faster the sintering process.
+
+2. Temperature dependent Frenkel
+    SINTERTYPE::TEMPERATURE_DEPENDENT_FRENKEL
+
+
+Unit test:
+SinterForceUnitTest.cpp
 
 Reference:
 \n
 <a href="https://www.epj-conferences.org/articles/epjconf/abs/2017/09/epjconf162460/epjconf162460.html"> R. Fuchs et. al., Initial stage sintering of polymer particles – Experiments and modelling of size-, temperature- and time-dependent contacts </a>
-
 
 */

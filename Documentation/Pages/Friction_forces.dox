@@ -1,0 +1,36 @@
+/*!
+\page Friction_forces Friction forces
+
+For the tangential degress of freedomm there are three different force- and torque laws to be implemented.
+
+(i) sliding friction \n
+(ii) rolling resistance \n
+(iii) torsion resistance \n
+
+This split into four forces and torques (including the normal force) is an attempt to make the three force laws objective \n
+
+\image html ContactModels/TangentialForce.png Tangential forces.
+
+To integrate the tangential contribution into the contact interaction, the developer needs to combine species.
+
+\dot
+    digraph example {
+    node [shape=record, fontname=Helvetica, fontsize=10];
+    a [label= "Normal Force species" URL="\ref NormalForceSpecies"];
+    b [label= "Friction Force species" URL="\ref FrictionForceSpecies"];
+    c [label= "Normal Force Interaction" URL="\ref NormalForceInteraction"];
+    d [label= "Friction Force Interaction" URL="\ref FrictionForceInteraction"];
+    }
+\enddot
+
+The available models to compute the tangential interaction are:
+
+- \subpage Sliding_Interaction
+- \subpage Friction_Interaction
+- \subpage MindlinModel
+
+Reference:
+\n
+<a href="https://link.springer.com/article/10.1007%2Fs10035-008-0099-x">S. Luding, Cohesive, frictional powders: Contact models for tension" </a>
+
+*/

@@ -4,12 +4,6 @@
 Linear Tangential contact forces in MercuryDPM implemented as FrictionSpecies, FrictionInteraction
 and SlidingFrictionSpecies, SlidingFrictionInteraction.
 
-For the tangential degrees of freedom, usually three different force- and torque-laws are considered:\n
-(i) sliding friction \n
-(ii) rolling resistance \n
-(iii) torsion resistance \n
-This split into four forces and torques (including the normal force) is an attempt to make the three force laws objective \n
-
 \n
 Force Computation:
 

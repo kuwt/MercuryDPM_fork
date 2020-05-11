@@ -1,0 +1,45 @@
+/*!
+\page Normal_forces Normal forces
+
+In mechanics, the normal force \f$ f^n \f$ is the component of a contact force that is perpendicular
+to the surface that a particle contacts. The following figure illustrates two particles colliding and the
+two normal forces at its common perpendicular direction.
+
+\image html ContactModels/NormalForce.png Normal contact modelling.
+
+The calculation of the normal forces between colliding particles is modeled by a linear spring
+and a dashpot. The linear spring models the material stiffness, and the dashpot models the energy
+dissipation that occurs during the real collision.
+
+\b The general Algorithm to compute any normal force in MercuryDPM is:
+<table>
+<tr><th> ::computeNormalForce
+<tr><td>1. Set the relative velocity <td> \ref relativeVelocity_
+<tr><td>2. Set the normal relative velocity <td> \ref setNormalRelativeVelocity_
+<tr><td>3. If overlap \f$ \delta^n > 0 \f$  <td> if (getOverlap() > 0)
+<tr><td>4. Normal force <td> normalForce = getStiffness()* getOverlap() - getDissipation()* getNormalRelativeVelocity()
+<tr><td>5. Set normal force <td> setAbsoluteNormalForce(std::abs(normalForce))
+<tr><td>6. Set force <td> setForce(getNormal() * normalForce)
+<tr><td>7. Set torque <td>  setTorque(Vec3D(0.0, 0.0, 0.0))
+</table>
+
+To integrate the normal contribution into the contact interaction, the developer needs to use the normal force species.
+
+\dot
+    digraph example {
+    node [shape=record, fontname=Helvetica, fontsize=10];
+    a [label= "Normal Force species" URL="\ref NormalForceSpecies"];
+    f [label= "Normal Force Interaction" URL="\ref NormalForceInteraction"];
+    a -> f [ arrowhead="open" ];
+    f -> a [ arrowhead="open" ];
+    }
+\enddot
+
+The available models to compute the normal interaction are:
+
+- \subpage LinearViscoelasticNormalModel
+- \subpage HertzianViscoelasticNormalModel
+- \subpage LinearPlasticViscoelasticNormalModel
+
+
+*/

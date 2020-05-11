@@ -24,6 +24,7 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "RNG.h"
+#include "Helpers.h"
 #include <limits>
 
 /**
@@ -332,8 +333,8 @@ Mdouble RNG::test()
                   << count[i] << " : " << (count[i] - expected) * (count[i] - expected) / expected << std::endl;
     }
     //end for loop over computing the chi-squared value.
-    std::cout << chi_cum << std::endl;
-    
+    std::cout << "chi_cum " << chi_cum << std::endl;
+
     return mathsFunc::chi_squared_prob(chi_cum, num_of_bins);
 }
 

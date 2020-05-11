@@ -96,55 +96,55 @@ public:
         setXMax((numRepetitions + 1) * lengthPeriodicChute);
         setYMax(numRepetitionsInWidth * widthPeriodicChute);
 
-<<<<<<< .mine
-	///Sets variable values for particles that are created at the inflow
-	void create_inflow_particle()
-	{
-		//~ cout << "create_inflow_particle" << endl;
-        	inflowParticle_.setRadius(random.getRandomNumber(getMinInflowParticleRadius(), getMaxInflowParticleRadius()));
-		inflowParticle_.computeMass();
-	        
-                double x,y,z,vx,vy,vz;
-                Vec3D posX,posY,posZ,velX,velY,velZ;
-                                 
-                // X coord of the particle position
-		x = (getXMin() + inflowParticle_.getRadius()*random.getRandomNumber(1.,0.5));
-		posX=Vec3D(x,0.,0.);//P0.Position.X = get_xmin() + P0.Radius*random(1.,5.);
-                // Y coord of the particle position
-		if ((getYMax()-getYMin())==2.0* getMaxInflowParticleRadius())
-		  {
-		    y=getYMin()+ inflowParticle_.getRadius();
-		    posY=Vec3D(0.0,y,0.0);//P0.Position.Y = get_ymin() + P0.Radius;
-                  }
-		else
-                  {
-                    y=random.getRandomNumber(getYMin() + inflowParticle_.getRadius(),getYMax() - inflowParticle_.getRadius());
-                    posY=Vec3D(0.0,y,0.0);//P0.Position.Y = random(get_ymin() + P0.Radius, get_ymax() - P0.Radius);
-                  }
-                //
-                z=random.getRandomNumber(getZMin()+ getFixedParticleRadius() + inflowParticle_.getRadius(),getZMax()- inflowParticle_.getRadius());
-		posZ=Vec3D(0.0,0.0,z);//P0.Position.Z = random(get_zmin() + FixedParticleRadius + P0.Radius, get_zmax() - P0.Radius);
-		//
-                Vec3D pos = posX + posY + posZ;
-		inflowParticle_.setPosition(pos);
-                //
-                // particle velocity
-                vx= getInflowVelocity() * random.getRandomNumber(-getInflowVelocityVariance(), getInflowVelocityVariance()) + getInflowVelocity();
-                vy= getInflowVelocity() * random.getRandomNumber(-getInflowVelocityVariance(), getInflowVelocityVariance());
-                vz= getInflowVelocity() * random.getRandomNumber(-getInflowVelocityVariance(), getInflowVelocityVariance());
-                //
-                Vec3D vel = Vec3D(vx,vy,vz);
-                inflowParticle_.setVelocity(vel);
-		//P0.Velocity.X = InflowVelocity * random(-InflowVelocityVariance,InflowVelocityVariance) + InflowVelocity;
-		//P0.Velocity.Y = InflowVelocity * random(-InflowVelocityVariance,InflowVelocityVariance);
-		//P0.Velocity.Z = InflowVelocity * random(-InflowVelocityVariance,InflowVelocityVariance);
-	}
-=======
+//<<<<<<< .mine
+//	///Sets variable values for particles that are created at the inflow
+//	void create_inflow_particle()
+//	{
+//		//~ cout << "create_inflow_particle" << endl;
+//        	inflowParticle_.setRadius(random.getRandomNumber(getMinInflowParticleRadius(), getMaxInflowParticleRadius()));
+//		inflowParticle_.computeMass();
+//
+//                double x,y,z,vx,vy,vz;
+//                Vec3D posX,posY,posZ,velX,velY,velZ;
+//
+//                // X coord of the particle position
+//		x = (getXMin() + inflowParticle_.getRadius()*random.getRandomNumber(1.,0.5));
+//		posX=Vec3D(x,0.,0.);//P0.Position.X = get_xmin() + P0.Radius*random(1.,5.);
+//                // Y coord of the particle position
+//		if ((getYMax()-getYMin())==2.0* getMaxInflowParticleRadius())
+//		  {
+//		    y=getYMin()+ inflowParticle_.getRadius();
+//		    posY=Vec3D(0.0,y,0.0);//P0.Position.Y = get_ymin() + P0.Radius;
+//                  }
+//		else
+//                  {
+//                    y=random.getRandomNumber(getYMin() + inflowParticle_.getRadius(),getYMax() - inflowParticle_.getRadius());
+//                    posY=Vec3D(0.0,y,0.0);//P0.Position.Y = random(get_ymin() + P0.Radius, get_ymax() - P0.Radius);
+//                  }
+//                //
+//                z=random.getRandomNumber(getZMin()+ getFixedParticleRadius() + inflowParticle_.getRadius(),getZMax()- inflowParticle_.getRadius());
+//		posZ=Vec3D(0.0,0.0,z);//P0.Position.Z = random(get_zmin() + FixedParticleRadius + P0.Radius, get_zmax() - P0.Radius);
+//		//
+//                Vec3D pos = posX + posY + posZ;
+//		inflowParticle_.setPosition(pos);
+//                //
+//                // particle velocity
+//                vx= getInflowVelocity() * random.getRandomNumber(-getInflowVelocityVariance(), getInflowVelocityVariance()) + getInflowVelocity();
+//                vy= getInflowVelocity() * random.getRandomNumber(-getInflowVelocityVariance(), getInflowVelocityVariance());
+//                vz= getInflowVelocity() * random.getRandomNumber(-getInflowVelocityVariance(), getInflowVelocityVariance());
+//                //
+//                Vec3D vel = Vec3D(vx,vy,vz);
+//                inflowParticle_.setVelocity(vel);
+//		//P0.Velocity.X = InflowVelocity * random(-InflowVelocityVariance,InflowVelocityVariance) + InflowVelocity;
+//		//P0.Velocity.Y = InflowVelocity * random(-InflowVelocityVariance,InflowVelocityVariance);
+//		//P0.Velocity.Z = InflowVelocity * random(-InflowVelocityVariance,InflowVelocityVariance);
+//	}
+//=======
         PeriodicBoundary* perw = static_cast<PeriodicBoundary*>(boundaryHandler.getObject(0));
         perw->set(Vec3D(0.0, 1.0, 1.0), getYMin(), getYMax());
         //set_NWallPeriodic(1);
         //WallsPeriodic[0].set(Vec3D( 0.0, 1.0, 0.0), getYMin(), getYMax());
->>>>>>> .r819
+//>>>>>>> .r819
 
         //set_NWall(get_NWall()+1);
         //Walls[get_NWall()-1].set(Vec3D( -1.0, 0.0, 0.0), -getXMin());

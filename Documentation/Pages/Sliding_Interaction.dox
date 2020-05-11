@@ -1,0 +1,27 @@
+/*!
+\page Sliding_Interaction Sliding interaction
+
+Sliding contact forces in MercuryDPM implemented as SlidingSpecies, SlidingInteraction
+
+Header:
+\code #include <Species/FrictionForceSpecies/SlidingFrictionSpecies.h> \endcode
+
+Interaction function:
+\code #include "Interactions/FrictionForceInteractions/SlidingFrictionInteraction.h" \endcode
+
+
+
+
+The user can use one of the following species into the main program:
+
+#include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
+
+#include <Species/LinearPlasticViscoelasticSlidingFrictionSpecies.h>
+
+#include <Species/HertzianViscoelasticSlidingFrictionSpecies.h>
+
+#include <Species/HertzianSinterSlidingFrictionSpecies.h>
+
+Unite Test: TangentialSpringUnitTest.cpp
+
+*/

@@ -39,15 +39,15 @@ public:
     {
         //Six solid walls on all sides
         InfiniteWall w0;
-        w0.set(Vec3D(-1.0, 0.0, 0.0), -getXMin());
+        w0.set(Vec3D(-1.0, 0.0, 0.0), getMin());
         wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(+1.0, 0.0, 0.0), +getXMax());
+        w0.set(Vec3D(+1.0, 0.0, 0.0), getMax());
         wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0, -1.0, 0.0), -getYMin());
+        w0.set(Vec3D(0.0, -1.0, 0.0), getMin());
         wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0, +1.0, 0.0), +getYMax());
+        w0.set(Vec3D(0.0, +1.0, 0.0), getMax());
         wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0, 0.0, -1.0), -getZMin());
+        w0.set(Vec3D(0.0, 0.0, -1.0), getMin());
         w0.setPrescribedPosition([this] (double time)
         {
             double t = getTime() - 1.0;
@@ -61,7 +61,7 @@ public:
             }
         });
         wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0, 0.0, +1.0), +getZMax());
+        w0.set(Vec3D(0.0, 0.0, +1.0), getMax());
         wallHandler.copyAndAddObject(w0);
 
         //Put the particles on a grid with small random velocities

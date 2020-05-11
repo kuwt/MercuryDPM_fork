@@ -26,7 +26,9 @@
 #include "DPMBase.h"
 #include <iostream>
 #include <vector>
+//! [T11:contactModel]
 #include <Species/SinterSpecies.h>
+//! [T11:contactModel]
 #include <Logger.h>
 
 

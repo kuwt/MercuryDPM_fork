@@ -1,0 +1,33 @@
+/*!
+\page Friction_Interaction Rolling and Torsion interactions
+
+Friction contact forces in MercuryDPM implemented as FrictionSpecies, FrictionInteraction
+
+Header:
+\code #include <Species/FrictionForceSpecies/FrictionSpecies.h> \endcode
+
+Interaction function:
+\code #include <Interaction/FrictionForceInteraction/FrictionInteraction.h> \endcode
+
+It contains, rolling friction and torsion friction.
+
+The user can use one of the following species into the main program:
+
+#include <Species/LinearViscoelasticFrictionSpecies.h>
+
+#include <Species/LinearPlasticViscoelasticFrictionSpecies.h>
+
+#include <Species/HertzianViscoelasticFrictionSpecies.h>
+
+#include <Species/HertzianSinterFrictionSpecies.h>
+
+Self Tests:
+
+TorsionFrictionSelfTest.cpp
+
+RollingFrictionSelfTest.cpp
+
+\image html ContactModels/TorqueFriction.png Torsion force model
+
+
+*/

@@ -160,7 +160,7 @@ void Funnel::create_funnel()
 {
 
     // Define standard fixed particle
-    BaseParticle F0;
+    SphericalParticle F0;
     F0.setRadius(getFixedParticleRadius());
     F0.setPosition(Vec3D(0., 0., 0.));
     const double* funh_ = get_funO();

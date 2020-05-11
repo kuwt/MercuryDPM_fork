@@ -1,0 +1,21 @@
+/*!
+\page ChargedBonded_Interaction Charged particles
+
+Charged bonded model in MercuryDPM referred to as ChargedBonded
+(ChargedBondedSpecies, ChargedBondedInteraction).
+
+Model:
+
+Header:
+\code #include "Species/AdhesiveForceSpecies/ChargedBondedSpecies.h" \endcode
+
+Interaction force:
+\code void ChargedBondedInteraction::getElasticEnergy() \endcode
+
+Unit test:
+ChargedBondedParticleUnitTest.cpp
+
+Self test:
+TwoBondedParticleElasticCollisionSelfTest.cpp
+
+*/

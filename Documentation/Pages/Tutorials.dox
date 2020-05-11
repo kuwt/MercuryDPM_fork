@@ -298,6 +298,15 @@ Return to tutorial \ref RoughBottomDemo
 \until the end
 Return to tutorial \ref RoughBottomDemo
 
+\section IsoCompressionCode Isotropic compression of a cuboidal REV (code)
+Return to tutorial \ref IsoCompression
+\includelineno Drivers/MercurySimpleDemos/REV_IsotropicCompression.cpp
+Return to tutorial \ref IsoCompression
+
+\section PureShearCode Pure shear (constant volume) of a cuboidal REV (code)
+Return to tutorial \ref PureShear
+\includelineno Drivers/MercurySimpleDemos/REV_PureShear.cpp
+Return to tutorial \ref PureShear
 
 \page WallTypes Different types of walls
 Walls are crucial in most of our problem setups and hence we have a variety of walls to suit the needs of our users.
@@ -360,6 +369,16 @@ illustrate the commonly used features of MercuryDPM:\n\n
     <th> Illustrated Features
 <tr><td>\subpage SinteringDemos <td> SinterPair.cpp
     <td> #Sinter
+</table>
+
+\b Deformations in a representative element volume \b (REV) Demos:
+<table>
+<tr><th> Description <th>%File Name
+    <th> Illustrated Features
+<tr><td>\subpage IsoCompression <td> REV_IsotropicCompression.cpp
+    <td> #StressStrainControlBoundary
+<tr><td>\subpage PureShear <td> REV_PureShear.cpp
+        <td> #StressStrainControlBoundary
 </table>
 
 \page CoilSelfTest Particles driven by a rotating coil
@@ -637,6 +656,103 @@ There are three different radii for this tutorial: 1.5e-6, 2.0e-6, 5.0e-7
 ### Reference:
 <a href="https://www.epj-conferences.org/articles/epjconf/abs/2017/09/epjconf162460/epjconf162460.html">Fuchs, R., Weinhart, T., Ye, M., Luding, S., Butt, H. J., & Kappl, M. (2017). Initial stage sintering of polymer particles–Experiments and modelling of size-, temperature-and time-dependent contacts. In EPJ Web of Conferences (Vol. 140, p. 13012). EDP Sciences.</a>
 
+
+(Return to \ref AdvancedOverview "Overview of advanced tutorials")
+
+
+\page IsoCompression Isotropic compression of a cuboidal REV
+
+#### Problem description
+This tutorial presents how to use the StressStrainControlBoundary to achieve isotropic compression in a 3D cuboidal representative element volume.
+The particle bed is initially inserted into the box in a loose packing and then isotropically compressed using a constant strainrate control.
+
+Here a short video of the code's output.
+\htmlonly
+<br><iframe width="600" height="600" src="https://www.youtube.com/embed/tCnbVvWyOek" frameborder="0" allowfullscreen></iframe>
+\endhtmlonly
+
+### Headers
+The following headers are included: \n
+\snippet Drivers/MercurySimpleDemos/REV_IsotropicCompression.cpp REV_ISO:headers
+These are the necessary headers to be included.
+
+### Before the main function
+
+Isotropic compression, like many of the previous tutorials, inherits from the Mercury3D class. \n
+\code class StressStrainControl : public Mercury3D \endcode
+The different components of the class will be explained in turn in the following.
+
+Step 1: Define the constructor: \n
+Here we first define the constructor that contains user inputs (target stress, strainrate, gainFactor and the switch Boolean key for strainrate control on particle movements) which will be inserted later on in the main function. Then we define here also the domain size and specie. \n
+\snippet Drivers/MercurySimpleDemos/REV_IsotropicCompression.cpp REV_ISO:construct
+
+Step 2: Set up initial conditions: \n
+Here we setup the system dimensions, timestepping and gravity, then add particles using the CubeInsertionBoundary. After we inserted 96 particles, we then setup the StressStrainControlBoundary using user inputs. For the current case, the final boundary consists of 3 Periodic boundaries in x, y, z directions, respectively. \n
+\snippet Drivers/MercurySimpleDemos/REV_IsotropicCompression.cpp REV_ISO:setIni
+
+Step 3: Declare private data members: \n
+REV_IsotropicCompression has three \b Matrix3D variables and one Boolean variable. These variables are used to pass the user inputs via the constructor. \n
+\snippet Drivers/MercurySimpleDemos/REV_IsotropicCompression.cpp REV_ISO:datamembers
+
+### Main Function
+
+In the main function, we first define the target stress tensor, strainrate tensor, gainFactor tensor (only used if stress tensor is non-zero), and the boolean variable isStrainRateControlled. \n
+Then a StressStrainControl object is created, after which some of its basic properties are set like its name, saveCount and outputs ON/OFF. Finally, the problem is actually solved by calling its \b solve() method.
+\snippet Drivers/MercurySimpleDemos/REV_IsotropicCompression.cpp REV_ISO:main
+
+### Reference:
+<a href="https://link.springer.com/article/10.1007%2Fs10035-019-0968-5"> Shi, H., Roy, S., Weinhart, T., Magnanimo, V., & Luding, S. (2020). Steady state rheology of homogeneous and inhomogeneous cohesive granular materials. Granular matter, 22(1), 14.</a>
+
+If you would like to know more about the definitions used in the StressStrainControlBoundary and various deformation possibilities,
+please click here (right click and open in a new tab if left click does not work): <a href="../../../Documentation/AdditionalDocumentation/StressStrainControlBoundary.pdf"> StressStrainControlBoundary.pdf </a>
+
+(Return to \ref AdvancedOverview "Overview of advanced tutorials")
+
+\page PureShear Pure shear (constant volume) of a cuboidal REV
+
+#### Problem description
+This tutorial presents how to use the StressStrainControlBoundary to achieve volume conserving pure shear in a 3D cuboidal representative element volume.
+The particle bed is initially inserted into the box in a loose packing and then dilated in x direction and compressed in y direction using a constant strainrate control.
+
+Here a short video of the code's output.
+\htmlonly
+<br><iframe width="600" height="600" src="https://www.youtube.com/embed/Egk16RW2Ur8" frameborder="0" allowfullscreen></iframe>
+\endhtmlonly
+
+### Headers
+The following headers are included: \n
+\snippet Drivers/MercurySimpleDemos/REV_PureShear.cpp REV_PUR:headers
+These are the necessary headers to be included.
+
+### Before the main function
+
+Like the previous example of isotropic compression, pure shear also inherits from the Mercury3D class. \n
+\code class StressStrainControl : public Mercury3D \endcode
+The different components of the class will be explained in turn in the following.
+
+Step 1: Define the constructor: \n
+Here we first define the constructor that contains user inputs (target stress, strainrate, gainFactor and the switch Boolean key for strainrate control on particle movements) which will be inserted later on in the main function. Then we define here also the domain size and specie. \n
+\snippet Drivers/MercurySimpleDemos/REV_PureShear.cpp REV_PUR:construct
+
+Step 2: Set up initial conditions: \n
+Here we setup the system dimensions, timestepping and gravity, then add particles using the CubeInsertionBoundary. After we inserted 96 particles, we then setup the StressStrainControlBoundary using user inputs. For the current case, the final boundary consists of 3 Periodic boundaries in x, y, z directions, respectively. \n
+\snippet Drivers/MercurySimpleDemos/REV_PureShear.cpp REV_PUR:setIni
+
+Step 3: Declare private data members: \n
+REV_IsotropicCompression has three \b Matrix3D variables and one Boolean variable. These variables are used to pass the user inputs via the constructor. \n
+\snippet Drivers/MercurySimpleDemos/REV_PureShear.cpp REV_PUR:datamembers
+
+### Main Function
+
+In the main function, we first define the target stress tensor, strainrate tensor, gainFactor tensor (only used if stress tensor is non-zero), and the boolean variable isStrainRateControlled. \n
+Then a StressStrainControl object is created, after which some of its basic properties are set like its name, saveCount and outputs ON/OFF. Finally, the problem is actually solved by calling its \b solve() method.
+\snippet Drivers/MercurySimpleDemos/REV_PureShear.cpp REV_PUR:main
+
+### Reference:
+<a href="https://www.jstage.jst.go.jp/article/kona/30/0/30_2013011/_article"> Imole, O. I., Kumar, N., Magnanimo, V., & Luding, S. (2013). Hydrostatic and shear behavior of frictionless granular assemblies under different deformation conditions. KONA Powder and Particle Journal, 30, 84-108.</a>
+
+If you would like to know more about the definitions used in the StressStrainControlBoundary and various deformation possibilities,
+please click here (right click and open in a new tab if left click does not work): <a href="../../../Documentation/AdditionalDocumentation/StressStrainControlBoundary.pdf"> StressStrainControlBoundary.pdf </a>
 
 (Return to \ref AdvancedOverview "Overview of advanced tutorials")
 

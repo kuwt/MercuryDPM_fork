@@ -65,7 +65,7 @@ public:
     //    HertzianViscoelasticInteraction* copy() const;
     //
     /*!
-     * \brief Computes the amount of normal force due to an Herztian visco-elastic interaction.
+     * \brief Computes the amount of normal force due to an Hertzian visco-elastic interaction.
      */
     void computeNormalForce();
     

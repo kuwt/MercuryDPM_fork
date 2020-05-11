@@ -75,7 +75,7 @@ public:
         fStatFile.setFileType(FileType::NO_FILE);
         eneFile.setSaveCount(500);
         restartFile.setSaveCount(5000);
-        getStatFile().setSaveCount(500);
+        statFile.setSaveCount(500);
         
         setHGridMaxLevels(1);
         

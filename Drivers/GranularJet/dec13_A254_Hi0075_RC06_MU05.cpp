@@ -57,8 +57,9 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 
  	species->setSlidingStiffness(species->getStiffness()*2.0/7.0);
  	species->setSlidingDissipation(species->getDissipation()*2.0/7.0);
-	
-    problem.setTimeStep(0.02 * helpers::computeCollisionTimeFromKAndDispAndEffectiveMass(species->getStiffness(),species->getDensity(),0.5*species->getMassFromRadius(0.5 * (problem.getMinInflowParticleRadius() + problem.getMaxInflowParticleRadius()))));
+
+    double mass = species->getMassFromRadius(0.5 * (problem.getMinInflowParticleRadius() + problem.getMaxInflowParticleRadius()));
+    problem.setTimeStep(0.02 * species->getCollisionTime(mass));
 	problem.setTimeMax(3);
 	problem.setSaveCount(100);
 	

@@ -137,14 +137,14 @@ void ChuteWithHopperAndInset::add_Inset()
     IntersectionOfWalls w0;
     temp = B - A;
     normal = Vec3D(temp.Z, 0.0, -temp.X) / sqrt(temp.getLengthSquared());
-    w0.addObject(normal, Vec3D::dot(normal, A)); //Walls[n].addObject(normal, Vec3D::Dot(normal, A));
+    w0.addObject(normal, A); //Walls[n].addObject(normal, Vec3D::Dot(normal, A));
     temp = C - B;
     normal = Vec3D(temp.Z, 0.0, -temp.X) / sqrt(temp.getLengthSquared());
-    w0.addObject(normal, Vec3D::dot(normal, B)); //Walls[n].addObject(normal, Vec3D::Dot(normal, B));
+    w0.addObject(normal, B); //Walls[n].addObject(normal, Vec3D::Dot(normal, B));
     temp = A - C;
     normal = Vec3D(temp.Z, 0.0, -temp.X) / sqrt(temp.getLengthSquared());
     //Walls[n].addObject(normal, Vec3D::Dot(normal, C));
-    w0.addObject(normal, Vec3D::dot(normal, C));
+    w0.addObject(normal, C);
     wallHandler.copyAndAddObject(w0);
 
     ///Define the three points between which the second finite wall is created

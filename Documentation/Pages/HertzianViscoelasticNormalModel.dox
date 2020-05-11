@@ -4,30 +4,57 @@
 Hertzian spring dashpot model in MercuryDPM referred to as HertzianViscoelasticNormalModel
 (HertzianViscoelasticNormalSpecies, HertzianViscoelasticInteraction).
 
-The Hertzian elastic force is based on the contact between perfectly elastic, spherical particles.
+The Hertzian nonlinear normal force is based on the contact between perfectly elastic, spherical particles
+initially proposed by <a href="https://doi.org/10.1209/0295-5075/94/50004">Hertz </a> in 1882.
 It is accurate for powders and very small deformations of larger granulars, as they
 appear e.g. in sound propagation experiments. In most other experiments, however, the choice
 of stiffness is either of little importance, as other effects (such as dissipation, friction or plasticity)
 become dominant.
 
-The Hertzian force model is given by:
+The Hertzian model force is given by:
 
-\f$ f_{ij}^{ela} = \frac{4}{3} E^* a_{ij}^{c} \delta_{ij}^{n} \f$
+\f$ f_{ij}^{n} = \underbrace{k_n \delta_{ij}^{n}}_{\text{Elastic}} + \underbrace{\gamma_n v_{ij}^{n}}_{\text{Dissipative}}\f$
 
-The stiffness \f$ k_n \f$ is a variable of the radius of the contact area \f$ a_c \f$.
-For small overlaps, \f$ a_c = \sqrt{2 R_{ij}^{eff} \delta_{ij}} \f$, where \f$ R_{ij}^{eff} = \frac{R_i R_j}{R_i + R_j} \f$ the effective radius.
-The stiffness also depends on the effective modulus: \f$ E_{ij}^{*} = [\frac{1-\nu_{i}^{2}}{E_i} + \frac{1-\nu_{j}^{2}}{E_j}]^{-1} \f$
+The normal force is subdivided into an elastic and dissipative (damping) part.
+
+For the elastic part the stiffness \f$ k_n = \frac{4}{3} E_{ij}^* \sqrt{R_{ij}^* \delta_{ij}^{n}} \f$ is a variable of the effective Young's modulus
+\f$ E_{ij}^{*} = [\frac{1-\nu_{i}^{2}}{E_i} + \frac{1-\nu_{j}^{2}}{E_j}]^{-1} \f$,
+the effective radius \f$ R_{ij}^{*} = \frac{R_i R_j}{R_i + R_j} \f$ and the overlap of object \f$ i \f$ and \f$ j \f$.
+
+For the dissipative part the viscoelastic dissipation coefficient \f$ \gamma_n = \varphi_{ij} \sqrt{ m_{ij}^{*} k_n} \f$ is a variable
+of the dissipation \f$ \varphi_{ij} \f$, the effective mass \f$ m_{ij}^{*} = \frac{m_i m_j}{m_i + m_j} \f$ as well as the stiffness
+and is computed such that there is a constant restitution.
+
+Header:
+
+\code #include <Species/HertzianViscoelasticSpecies.h> \endcode
+
+Interaction function:
 
 \code void HertzianViscoelasticInteraction::computeNormalForce() \endcode
 
-The model parameters (e.g. normal stiffness, normal coefficient of restitution, etc) are set using HertzianViscoelasticNormalSpecies member functions
+The model parameters are set using HertzianViscoelasticNormalSpecies member functions:
 
-\n
+\code
+ HertzianViscoelasticNormalSpecies species;
+    species.setElasticModulus();
+    species.setDissipation();
+    species.setElasticModulusAndRestitutionCoefficient();
+\endcode
+
+
+
+Unit Test:
+MindlinSelfTest.cpp
+
+Contact behaviour:
+
+\Todo create a UnitTest and include model behaviour
 
 References:
 \n
-1- Hertz, H.: Über die berührung fester elastischer körper (on the contact of elastic solids). J. Reine Angewandte Math. 94, 156–71.\n
+1- Hertz, H.: Über die Berührung fester elastischer Körper (on the contact of elastic solids). J. Reine Angewandte Math. 94, 156–71.\n
 (English translation in Miscellaneous Papers by Hertz, H. (ed.) Jones and Schott, London, Macmillan, 1896) (1882)\n
-2- <a href="http://people.ds.cam.ac.uk/jae1001/CUS/research/pfizer/Antypov_Elliott_EPL_2011.pdf"> D. Antypov et. al., On an analytical solution for the damped Hertzian spring </a>
+2- <a href="https://doi.org/10.1209/0295-5075/94/50004"> D. Antypov et. al., On an analytical solution for the damped Hertzian spring </a>
 
 */

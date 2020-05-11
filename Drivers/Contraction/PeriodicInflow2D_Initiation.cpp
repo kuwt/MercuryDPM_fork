@@ -23,7 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "../FlowRulePaper/SilbertPeriodic.h"
+#include "../Papers/FlowRulePaper/SilbertPeriodic.h"
 #include "ChuteBottom.h"
 using namespace std;
 

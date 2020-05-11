@@ -29,7 +29,7 @@
 #include "DPMBase.h"
 
 /**ChargedBondedParticleUnitTest
- * Two particles are bonded together and relaxed. Useful to test teh chaged bonded particles
+ * Two particles are bonded together and relaxed. Useful to test the changed bonded particles
  */
 class ChargedBondedParticleUnitTest : public DPMBase
 {

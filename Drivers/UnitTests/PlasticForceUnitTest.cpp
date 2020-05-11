@@ -26,7 +26,9 @@
 #include "DPMBase.h"
 #include <iostream>
 #include <vector>
+//! [T11:contactModel]
 #include <Species/LinearPlasticViscoelasticSpecies.h>
+//! [T11:contactModel]
 #include <Logger.h>
 
 
@@ -127,8 +129,9 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 
     std::cout << "Execute 'gnuplot PlasticForceUnitTest.gnu' to view output" << std::endl;
     helpers::writeToFile("PlasticForceUnitTest.gnu",
-                         "set xlabel 'displacement'\n"
-                         "set ylabel 'force'\n"
-                         "plot 'PlasticForceUnitTest1.1.fstat' u 7:9 w lp\n"
+                         "set xlabel 'displacement [{/Symbol d}]'\n"
+                         "set ylabel 'force [f^n]'\n"
+                         "set grid\n"
+                         "plot 'PlasticForceUnitTest0.34.fstat' u 7:9 w lp\n"
                          );
 }

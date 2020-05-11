@@ -30,6 +30,10 @@
 #include <Boundaries/StressStrainControlBoundary.h>
 #include "Boundaries/LeesEdwardsBoundary.h"
 
+///In this file, we create the selftest for the StressStrainControlBoundary
+///Note that here we load the restart file and only tested simple shear xy with strainrate control
+///There are multiple ways of defining the control modes, please check documentation for more details.
+
 class StressStrainControl : public Mercury3D
 {
 public:

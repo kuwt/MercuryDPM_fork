@@ -81,8 +81,8 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 	//Discretization parameters
 	//problem.setHGridMaxLevels(1);
 	//problem.setHGridNumberOfBucketsToPower(1e6); //automated
-    problem.setTimeStep(0.02 * helpers::computeCollisionTimeFromKAndDispAndEffectiveMass(species->getStiffness(),species->getDensity(),0.5*species->getMassFromRadius(0.5 * (problem.getMinInflowParticleRadius() + problem.getMaxInflowParticleRadius()))));
-
+	double mass = species->getMassFromRadius(0.5 * (problem.getMinInflowParticleRadius() + problem.getMaxInflowParticleRadius()));
+    problem.setTimeStep(0.02 * species->getCollisionTime(mass));
 	problem.setTimeMax(.5e-2);
 	problem.setSaveCount(10);
 

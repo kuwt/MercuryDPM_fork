@@ -4,13 +4,29 @@
 non-Linear Tangential contact forces in MercuryDPM implemented as MindlinSpecies, MindlinInteraction
 and MindlinRollingTorsionSpecies, MindlinRollingTorsionInteraction.
 
+Mindlin and Deresewicz developed a set of rules for the
 
-Force computation:
+Header:
+\code #include <Species/MindlinSpecies.h> \endcode
+
+Interaction function:
 
 \code void MindlinInteraction::computeFrictionForce() \endcode
 
-The model parameters (e.g. sliding stiffness, rolling stiffness, tangential coefficient of restitution, etc) are set using MindlinSpecies
-(and MindlinRollingTorsionSpecies) member functions
+The model parameters are set using MindlinSpecies
+(and MindlinRollingTorsionSpecies) member functions:
+
+\code
+ MindlinSpecies species;
+    species.setElasticModulus();
+    species.setDissipation();
+    species.setElasticModulusAndRestitutionCoefficient();
+\endcode
+
+Unit Test:
+
+Contact behaviour:
+
 
 
 References:

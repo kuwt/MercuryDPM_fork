@@ -1,0 +1,17 @@
+/*!
+\page EnhancedSintering_Interaction Enhanced sintering interaction
+
+Charged bonded model in MercuryDPM referred to as ChargedBonded
+(ChargedBondedSpecies, ChargedBondedInteraction).
+
+Model:
+
+Header:
+
+Interaction force:
+
+Unit test:
+
+Self test:
+
+*/

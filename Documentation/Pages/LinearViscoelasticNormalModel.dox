@@ -1,7 +1,7 @@
 /*!
 \page LinearViscoelasticNormalModel Linear Spring Dashpot Model
 
-Linear spring dashpot model in MercuryDPM referred to as LinearViscoelasticNormalModel
+The linear spring dashpot model in MercuryDPM referred to as LinearViscoelasticNormalModel
 (LinearViscoelasticNormalSpecies, LinearViscoelasticInteraction).
 
 A very simple interaction law was presented by
@@ -16,11 +16,21 @@ k_n \delta_{ij}^{n} + \gamma_n v_{ij}^{n} & \quad \text{if} \quad \delta_{ij}^{n
 \end{cases}
 \f$
 
+where, \f$ k \f$ is the particle stiffness, \f$ \gamma \f$ is the dissipation coefficient, \f$  \delta^{n} \f$ is the normal
+overlap, and \f$ v^{n} \f$ is the relative velocity.
+
+Header:
+\snippet Drivers/UnitTests/LinearViscoelasticUnitTest.cpp T11:contactModel
+
+Interaction function:
 \code void LinearViscoelasticInteraction::computeNormalForce() \endcode
 
-with stiffness (or spring constant) \f$ k_n > 0 \f$ and damping coefficient \f$ \gamma_n \geq 0 \f$.
+Unit Test:
+LinearViscoelasticUnitTest.cpp
 
-The model parameters (e.g. normal stiffness, normal coefficient of restitution, etc) are set using LinearViscoelasticNormalSpecies member functions
+Contact behaviour:
+\image html ContactModels/LinearViscoElasticUnitTest.png
+
 
 
 */

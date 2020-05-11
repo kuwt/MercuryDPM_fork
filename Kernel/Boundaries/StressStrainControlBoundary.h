@@ -36,108 +36,111 @@ class PeriodicBoundaryHandler;
 
 /*!
  * \class StressStrainControlBoundary
- * \brief Perodic boundary that can be strain/stress controlled and achieve different
- * deformation modes.
- * \details Inherits from BaseObject, this boundary take matricies inputs from user
- * and determine which boundaries should be combined together and therefore achieve
- * different deformation mode: e.g. triaxial, bi-aixial, uni-axial and simple shear.
+ * \brief A cuboid box consists of periodic boundaries that can be strain/stress controlled and achieve different
+ * deformation modes. User needs to define target stress/strainrate matrix, gain_factor
+ * and a boolean parameter isStrainRateControlled to True/False to activate/deactivate strainrate control.
+ * \details Inherits from BaseObject, combining the PeriodicBoundary and LeesEdwardsBoundary.
+ * This boundary takes matrices inputs from user and determine which boundaries should be combined together
+ * and therefore achieve different deformation mode: e.g. triaxial, bi-aixial, uni-axial and simple shear.
+ * The Lees-Edwards boundary is only activated when there is a target shear stress/strainrate set in the matrix.
+ * Note that the same component can only be set in either target stress matrix or strainrate matrix,
+ * i.e. if the target shear stress XY is set to a constant, the strainrate_XY has to be set to 0,
+ * or just leave it free, it is by default set to 0.
+ * Note also there are 9 components in the stress/strainrate tensor but we only support the following components
+ * due to the boundary inheritance: XX, YY, ZZ, XY
  */
 class StressStrainControlBoundary : public BaseBoundary
 {
 public:
-    /// \brief default constructor
+    /// \brief default constructor.
     StressStrainControlBoundary();
     
-    ///\brief copy constructor
+    ///\brief copy constructor.
     StressStrainControlBoundary(const StressStrainControlBoundary& b) = default;
     
-    /// \brief destructor
+    /// \brief destructor.
     virtual ~StressStrainControlBoundary() = default;
     
-    /// \brief Reads the object's id_ from given istream
+    /// \brief Reads the object's id_ from given istream.
     void read(std::istream& is) override;
     
-    /// \brief Adds object's id_ to given ostream
+    /// \brief Adds object's id_ to given ostream.
     void write(std::ostream& os) const override;
     
-    /// \brief Sets the name of the boundary
+    /// \brief Sets the name of the boundary.
     std::string getName() const override;
     
-    /// \brief Used to create a copy of the object
+    /// \brief Used to create a copy of the object.
     StressStrainControlBoundary* copy() const override;
     
     /// \brief Virtual function that does things to particles, each timestep after particles have moved.
     void checkBoundaryAfterParticlesMove(ParticleHandler& particleHandler) override;
-    
-    /// \brief Sets the inputs from user to initialize the boundaries
+
+    /*!  \brief Sets all boundary inputs at once and determines which deformation mode it is,
+     * then combine the right boundaries to assemble the cuboid box/domain.
+     */
     void set(const Matrix3D& stressGoal, const Matrix3D& strainRate, const Matrix3D& gainFactor,
              bool isStrainRateControlled);
 
-    //void actionsBeforeTimeLoop() override;
-
-    /// \brief Create the periodic particles after read in from a restart file to attain right information
+    /// \brief Create the periodic particles after read in from a restart file to attain right information.
     void createPeriodicParticles(ParticleHandler& particleHandler) override;
     
     //helper functions
     
-    /// \brief Call the boundary and update them based on the new domain size after the stress-control movement
+    /// \brief Call the boundary and update them based on the new domain size after the stress-control movement.
     void checkPeriodicLeesEdwardsBoundariesAfterParticlesMove(ParticleHandler& particleHandler);
     
-    /// \brief Determine the length in x,y,z and center location of domain
+    /// \brief Determine the length in x,y,z and center location of domain.
     void determineLengthAndCentre();
-    
-    /// \brief Activate the strainrate control based on user's boolean input
+
+    /// \brief Activate the strainrate control for particle movement based on user's boolean input.
     void activateStrainRateControl(const ParticleHandler& particleHandler);
     
-    /// \brief compute the change of strainrate tensor based on the stress difference and then update the tensor
+    /// \brief Compute the change of strainrate tensor based on the stress difference and then update the tensor.
     void computeStrainRate();
     
-    /// \brief Determines stress-controlled shear Lees-Edwards boundary in x-y direction and normal periodic in z direction
+    /// \brief Determines stress-controlled shear Lees-Edwards boundary in x-y direction and normal periodic in z direction.
     void determineStressControlledShearBoundaries();
 
-    /// \brief update the domain to new sizes
+    /// \brief Update the domain to new sizes.
     void updateDomainSize();
 
-    /// \brief accesses the strain rate tensor
+    /// \brief Accesses the strainrate tensor.
     Matrix3D getStrainRate() const {return strainRate_;}
 
-    /// \brief accesses the stressGoal_
+    /// \brief Accesses the target stress tensor.
     Matrix3D getStressGoal() const {return stressGoal_;}
 
-    /// \brief accesses the gainFactor
+    /// \brief Accesses the gainFactor.
     Matrix3D getGainFactor() const {return gainFactor_;}
 
 private:
 
-    //Set by the user
-
+    //Set by the user.
     /*!
      * \brief Stores the stress value the boundary should attain.
-     * \details Unused if the stressGoal values are set to zero.
+     * \details Unused if the all stressGoal values are set to zero.
      */
     Matrix3D stressGoal_, strainRate_, gainFactor_;
-    /// The boolean input, true means switch on the strain rate control
+
+    /// The boolean input, true means switch on the strain rate control for particles affine movements.
     bool isStrainRateControlled_;
 
-    //Set each time step in checkBoundariesAfterParticlesMove
-
-    /// Box length in x-y-z
+    /// Box length in x-y-z.
     Vec3D lengthBox_;
-    /// Center position of the domain
+    /// Center position of the domain.
     Vec3D centerBox_;
-    /// Particle position relative to the center of domain
+    /// Particle position relative to the center of domain.
     Vec3D relativeToCenter_;
 
-    // Set in the constructor, incremented in checkBoundariesAfterParticlesMove
-
-    /// Shift integrated for all the time when using Lees-Edwards Boundary
+    /// Shift integrated for all the time when using Lees-Edwards Boundary.
     Mdouble integratedShift_;
 
-    //Defined in the set function
+    //Defined in the set function.
 
-    /// Store boundaries into a vector for the pushback
-    /// Note, there is always either no LeesEdwardsBoundary and 3 PeriodicBoundary,
-    /// or 1 LeesEdwardsBoundary and 1 PeriodicBoundary
+    /// Store boundaries into a vector for the pushback.
+    /// Note, there is always either 0 LeesEdwardsBoundary (XY) and 3 PeriodicBoundary (XYZ),
+    /// or 1 LeesEdwardsBoundary (XY) and 1 PeriodicBoundary (Z).
     std::vector<LeesEdwardsBoundary> leesEdwardsBoundaries_;
     std::vector<PeriodicBoundary> periodicBoundaries_;
 };

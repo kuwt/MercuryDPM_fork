@@ -191,7 +191,7 @@ public:
             else
             {
                 p0.setRadius(particle_radius2);
-                p0.setIndSpecies(2);
+                p0.setSpecies(speciesHandler.getObject(2));
             }
             particleHandler.copyAndAddObject(p0);
         }

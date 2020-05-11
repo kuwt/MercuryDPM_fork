@@ -50,7 +50,7 @@ public:
         Mdouble restitutionCoefficient = 0.8;
 
         fStatFile.setFileType(FileType::NO_FILE);
-        getStatFile().setFileType(FileType::NO_FILE);
+        statFile.setFileType(FileType::NO_FILE);
 
         //dataFile.setFileType(FileType::NO_FILE);
         //restartFile.setFileType(FileType::NO_FILE);

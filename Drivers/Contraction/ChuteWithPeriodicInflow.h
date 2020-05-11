@@ -273,7 +273,7 @@ public:
         if (P1->isFixed() && P2->isFixed())
             return;
 >>>>>>> .r824
-        
+
         ///Tangential spring information is always store in the real particle with highest index
         ///When a Periodic contact is encountered it is always encoutered twice (for normal periodic walls), but the force is only applied to the real particle
         ///The tangential spring information for periodic particles is stored in the normal particle (and thus twice for normal periodic interactions)
@@ -713,7 +713,7 @@ public:
                 else
                     addElasticEnergy(0.25 * (pSpecies->getStiffness() * mathsFunc::square(deltan) + (TangentialSpring ? (pSpecies->getSlidingStiffness() * TangentialSpring->delta.getLengthSquared() + pSpecies->getRollingStiffness() * TangentialSpring->RollingSpring.getLengthSquared() + pSpecies->getTorsionStiffness() * TangentialSpring->TorsionSpring.getLengthSquared()) : 0.0)));
             }
-            if (fStatFile.getSaveCurrentTimeStep() || getStatFile().getSaveCurrentTimeStep() || getDoCGAlways())
+            if (fStatFile.getSaveCurrentTimeStep() || statFile.getSaveCurrentTimeStep() || getDoCGAlways())
             {
 
                 Mdouble fdott = forcet.getLength();
@@ -729,14 +729,14 @@ public:
 
                 if (!PI->isFixed())
                 {
-                    if (getStatFile().getSaveCurrentTimeStep() || getDoCGAlways())
+                    if (statFile.getSaveCurrentTimeStep() || getDoCGAlways())
                         gatherContactStatistics(PJreal->getIndex(), PI->getIndex(), centre, deltan, deltat_norm, fdotn, fdott, -normal, -(fdott ? forcet / fdott : forcet));
                     if (fStatFile.getSaveCurrentTimeStep())
                         fStatFile.getFstream() << getTime() << " " << PJreal->getIndex() << " " << PI->getIndex() << " " << centre << " " << radii_sum - dist << " " << deltat_norm << " " << fdotn << " " << fdott << " " << -normal << " " << -(fdott ? forcet / fdott : forcet) << std::endl;
                 }
                 if (!PJreal->isFixed() && !isPeriodic)
                 {
-                    if (getStatFile().getSaveCurrentTimeStep() || getDoCGAlways())
+                    if (statFile.getSaveCurrentTimeStep() || getDoCGAlways())
                         gatherContactStatistics(PI->getIndex(), PJreal->getIndex(), centre, deltan, deltat_norm, fdotn, fdott, normal, (fdott ? forcet / fdott : forcet));
                     if (fStatFile.getSaveCurrentTimeStep())
                         fStatFile.getFstream() << getTime() << " " << PI->getIndex() << " " << PJreal->getIndex() << " " << centre << " " << radii_sum - dist << " " << deltat_norm << " " << fdotn << " " << fdott << " " << normal << " " << (fdott ? forcet / fdott : forcet) << std::endl;

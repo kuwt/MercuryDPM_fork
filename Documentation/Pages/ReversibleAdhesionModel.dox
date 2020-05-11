@@ -1,5 +1,5 @@
 /*!
-\page ReversibleAdhesionModel Dry Cohesion for Elastic Contact Forces (Linear Reversible Cohesive Force)
+\page ReversibleAdhesionModel Dry Cohesion for Elastic Contact Forces
 
 Dry cohesion for elastic contact forces (linear reversible cohesive force) in MercuryDPM referred to as ReversibleAdhesive
 (ReversibleAdhesiveSpecies, ReversibleAdhesiveInteraction).
@@ -18,9 +18,18 @@ f_{ij}^{nc} =
 \end{cases}
 \f$
 
+Header:
+\code #include "Species/AdhesiveForceSpecies/ReversibleAdhesiveSpecies.h" \endcode
+
+Interaction force:
 \code void ReversibleAdhesiveInteraction::computeAdhesionForce() \endcode
 
 The model parameters are set using ReversibleAdhesiveSpecies member functions.
+
+Unit test:
+AdhesiveForceUnitTest.cpp
+
+\image html ContactModels/AdhesiveInteraction.png
 
 
 */

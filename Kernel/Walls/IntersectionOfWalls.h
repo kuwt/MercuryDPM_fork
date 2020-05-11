@@ -145,25 +145,29 @@ public:
     
     /*!
      * \brief Creates an open prism which is a polygon between the points, except the first and last point,
-     * and extends infinitely in the PrismAxis direction.
+     * and extends infinitely in the PrismAxis direction. Note that if you view from inside of your geometry,
+     * the shape formed by points has to be convex, otherwise it will not create the wall correctly.
      */
     void createOpenPrism(std::vector<Vec3D> points, Vec3D prismAxis);
     
     /*!
      * \brief Creates an open prism which is a polygon between the points and extends infinitely in the PrismAxis
-     * direction.
+     * direction. Note that if you view from inside of your geometry,
+     * the shape formed by points has to be convex, otherwise it will not create the wall correctly.
      */
     void createPrism(std::vector<Vec3D> points, Vec3D prismAxis);
     
     /*!
      * \brief Creates an open prism which is a polygon between the points, except the first and last point, and extends
-     * infinitely in the direction perpendicular to the first and second wall.
+     * infinitely in the direction perpendicular to the first and second wall. Note that if you view from inside of your geometry,
+     * the shape formed by points has to be convex, otherwise it will not create the wall correctly.
      */
     void createOpenPrism(std::vector<Vec3D> points);
     
     /*!
      * \brief Creates an open prism which is a polygon between the points and extends infinitely in the direction
-     * perpendicular to the first and second wall.
+     * perpendicular to the first and second wall. Note that if you view from inside of your geometry,
+     * the shape formed by points has to be convex, otherwise it will not create the wall correctly.
      */
     void createPrism(std::vector<Vec3D> points);
     

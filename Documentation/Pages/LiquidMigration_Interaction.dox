@@ -1,0 +1,45 @@
+/*!
+\page LiquidMigration_Interaction Liquid Migration
+
+Willet liquid bridge model in MercuryDPM referred to as LiquidBridgeWillet
+(LiquidBridgeWilletSpecies, LiquidBridgeWilletInteraction).
+and LiquidMigrationWillet (LiquidMigrationWilletSpecies, LiquidMigrationWilletInteraction)
+
+Wet cohesion is due to liquid bridges between particles in contact or close proximity. If the system
+is in the pendular regime (liquid fills less than 30 \% of void space), liquid bridges form between
+particle pairs only; for higher liquid fraction, the three-particle liquid bridges or suspensions
+need to be considered. Liquid bridges between particle pairs typically have a range smaller
+than a particle diameter, so they are short-ranged. The liquid bridges form from liquid on
+the particles surface when two particles come into contact, but require a certain separation
+distance to separate again, so these forces are irreversible (hysteretic).
+
+Complex liquid bridge model:
+
+\f$
+f_{ij}^{nc} = \frac{2\pi r_c \Gamma cos \theta}{ 1 + 1.05s \sqrt{r_c/V} + 2.5s^2 r_c/V}
+\f$
+
+where \f$ V \f$ is the bridge volume, \f$ r_c\f$ the average radius of curvature of the spheres, ,
+\f$ \Gamma\f$ the surface tnesion of the liquid air interface and \f$ s\f$ the separation, \f$ \theta\f$
+ is the contact angle.
+
+Header:
+\code #include "Species/AdhesiveForceSpecies/LiquidMigrationWilletSpecies.h" \endcode
+
+Interaction force:
+\code void LiquidBridgeWilletInteraction::computeAdhesionForce() \endcode
+
+Self Test:
+LiquidMigrationTwoSpeciesSelfTest.cpp
+
+References:
+
+<a href="https://link.springer.com/article/10.1007%2Fs10035-012-0387-3">
+1- R. Mani et. al., Liquid migration in sheared unsaturated granular media
+</a>
+
+<a href="https://doi.org/10.1103/PhysRevE.98.052906">
+2- S. Roy et. al., Liquid redistribution in sheared wet granular media
+</a>
+
+*/

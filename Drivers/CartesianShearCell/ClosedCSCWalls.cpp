@@ -85,11 +85,11 @@ public:
 
         //set walls
         InfiniteWall w;
-        w.set(Vec3D(0,0,-1), -getZMin());
+        w.set(Vec3D(0,0,-1), getMin());
         wallHandler.copyAndAddObject(w);
-        w.set(Vec3D(1,0,0), getXMax());
+        w.set(Vec3D(1,0,0), getMax());
         wallHandler.copyAndAddObject(w);
-        w.set(Vec3D(-1,0,0), -getXMin());
+        w.set(Vec3D(-1,0,0), getMin());
         wallHandler.copyAndAddObject(w);
 
         //remove wall thickness
@@ -168,7 +168,7 @@ public:
         std::cout << std::endl <<"Inserted " << n << " particles within z<" << a*getZMax() << std::endl;
         //set lid
         InfiniteWall w;
-        w.set(Vec3D(0,0,1), a*getZMax());
+        w.set(Vec3D(0,0,1), a*getMax());
         lid=wallHandler.copyAndAddObject(w);
     }
 

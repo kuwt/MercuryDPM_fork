@@ -38,7 +38,7 @@ public:
         setName("ClosedCSCStats");
         setFileType(FileType::NO_FILE);
         restartFile.setFileType(FileType::ONE_FILE);
-        getStatFile().setFileType(FileType::ONE_FILE);
+        statFile.setFileType(FileType::ONE_FILE);
         
         setNTimeAverageReset(100);
         setDoPeriodicWalls(false);

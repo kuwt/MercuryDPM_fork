@@ -47,7 +47,7 @@ class Funnel : public Chute {
 	//Funnel(Mercury3D& other) : MD(other), Mercury3D(other), Chute() {constructor();}
 
 	///This function prints all funnel data in human readable format
-	void write(std::ostream& os, bool writeAllParticles = false) const;
+	void write(std::ostream& os, bool writeAllParticles = false) const override;
 	
 	///This function reads all funnel data
 	void read(std::istream& is) override;
@@ -128,7 +128,7 @@ protected:
 	void set_funr(double funr_){funr=funr_;}
 
 	/// initialise particle position, velocity, radius
-	virtual void setupInitialConditions();
+	virtual void setupInitialConditions() override;
 	
 	///Sets variable values for particles that are created at the inflow
 	virtual void create_inflow_particle();
@@ -145,7 +145,7 @@ protected:
 	///Create or update the walls
 	virtual void create_walls();
 	
-	virtual bool readNextArgument(int& i, int argc, char *argv[]);
+	virtual bool readNextArgument(int& i, int argc, char *argv[]) override;
 
 	double funr; // Funnel radius.
 	double funO[2]; // Origin of the funnel is the (x,y) location of the center of the top of the funnel.

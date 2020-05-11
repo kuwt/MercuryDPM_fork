@@ -118,9 +118,10 @@ public:
 				p0.setSpecies(speciesHandler.getObject(1));
 			} else {
 				p0.setRadius(particle_radius);
-				p0.setIndSpecies(2);
+				p0.setSpecies(speciesHandler.getObject(2));
 			}
-			p0.setMass(0.163/1000);
+			///\todo check whether setMass is needed here
+			//p0.setMass(0.163/1000);
 			particleHandler.copyAndAddObject(p0);
 		}
 		setGravity(Vec3D(0.0,0.0,-9.81));

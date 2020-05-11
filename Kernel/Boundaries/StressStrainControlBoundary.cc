@@ -33,7 +33,7 @@
 #include "LeesEdwardsBoundary.h"
 
 /*!
- * \details constructor, set all the parameters to zero.
+ * \details constructor, set all the parameters that boundary needs as inputs to zero.
  */
 StressStrainControlBoundary::StressStrainControlBoundary()
         : BaseBoundary()
@@ -51,7 +51,7 @@ StressStrainControlBoundary::StressStrainControlBoundary()
 }
 
 /*!
- * \details Copy method; creates a copy on the heap and returns its pointer.
+ * \details Copy method; creates a copy on the boundary and returns its pointer.
  */
 StressStrainControlBoundary* StressStrainControlBoundary::copy() const
 {
@@ -59,8 +59,8 @@ StressStrainControlBoundary* StressStrainControlBoundary::copy() const
 }
 
 /*!
- * \details Writes boundary's properties to an ostream
- * \param[in] os    the ostream
+ * \details Writes boundary's properties to an ostream.
+ * \param[in] os    the ostream.
  */
 void StressStrainControlBoundary::write(std::ostream& os) const
 {
@@ -84,8 +84,8 @@ void StressStrainControlBoundary::write(std::ostream& os) const
 }
 
 /*!
- * \details Reads the boundary properties from an istream
- * \param[in] is      the istream
+ * \details Reads the boundary properties from an istream.
+ * \param[in] is      the istream.
  */
 void StressStrainControlBoundary::read(std::istream& is)
 {
@@ -100,8 +100,8 @@ void StressStrainControlBoundary::read(std::istream& is)
 }
 
 /*!
- * \details Returns the name of the object class
- * \return      the object class' name
+ * \details Returns the name of the object class.
+ * \return      the object class' name.
  */
 std::string StressStrainControlBoundary::getName() const
 {
@@ -110,8 +110,8 @@ std::string StressStrainControlBoundary::getName() const
 
 /*!
  * \details This is where the stress-strain control is implemented and
- * the boundary will be checked each timestep to make sure the target
- * stress/strain are achieved.
+ * the boundary will be checked at each timestep to make sure the target
+ * stress/strainrate are achieved.
  */
 void StressStrainControlBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& particleHandler)
 {
@@ -123,10 +123,11 @@ void StressStrainControlBoundary::checkBoundaryAfterParticlesMove(ParticleHandle
     
     determineLengthAndCentre();
     
-    //this activate only the stress control
+    //this checks if stressGoal matrix is non-zero and then activate only the stress control
     if (stressGoal_.XX != 0 || stressGoal_.YY != 0 || stressGoal_.ZZ != 0 ||
         stressGoal_.XY != 0)
     {
+        //the strainrate in the corresponding direction will be calculated
         computeStrainRate();
     }
     activateStrainRateControl(particleHandler);
@@ -168,7 +169,7 @@ void StressStrainControlBoundary::determineLengthAndCentre()
 
 /*!
  * \details This function is used to compute the new strainrate tensor based on
- * the stress differences between the actual and user set values.
+ * the stress differences between the actual and user set target values.
  */
 void StressStrainControlBoundary::computeStrainRate()
 {
@@ -204,7 +205,7 @@ void StressStrainControlBoundary::computeStrainRate()
 
 /*!
  * \details This function activate the strainrate control based on user inputs, it takes only
- * the strainRate_ tensor and move particles based on this tensor, also move boudnaries based
+ * the strainRate_ tensor and move particles based on this tensor, also move boundaries based
  * on the new domain size.
  */
 void StressStrainControlBoundary::activateStrainRateControl(const ParticleHandler& particleHandler)
@@ -267,7 +268,7 @@ void StressStrainControlBoundary::updateDomainSize()
 
 /*!
  * \details This function determines the boundary for stress-controlled shear situation.
- * In this case, the Lees-Edwards boundary in x-y directions and Normal periodic boundary
+ * In this case, the Lees-Edwards boundary in x-y directions and normal periodic boundary
  * in z direction are combined together as a cuboid shear box.
  */
 void StressStrainControlBoundary::determineStressControlledShearBoundaries()
@@ -305,9 +306,14 @@ void StressStrainControlBoundary::determineStressControlledShearBoundaries()
 /*!
  * \details This function sets the inputs for the whole StressStrainControlBoundary
  * based on the user inputs.
+ * \param[in] stressGoal        The target stress tensor that needs to achieve at the end of the deformation.
+ * \param[in] strainRate        The target strainrate tensor, cannot be set non-zero with target Stress,
+ *                              i.e. stressGoal.XX != 0, then strainRate.XX = 0.
+ * \param[in] gainFactor        The incremental factor for the stress control, usually a very small value ~ 0.0001.
+ * \param[in] isStrainRateControlled        The boolean key to determin whether particles are moved by
+ *                                          strainrate affine movement (true) or draged by boundary itself (false).
  */
-void
-StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D& strainRate, const Matrix3D& gainFactor, bool isStrainRateControlled)
+void StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D& strainRate, const Matrix3D& gainFactor, bool isStrainRateControlled)
 {
     periodicBoundaries_.clear();
     leesEdwardsBoundaries_.clear();
@@ -333,10 +339,7 @@ StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D& str
                          "You need to set a gain factor in YY in order to control stress");
     logger.assert_always(stressGoal.ZZ != 0 ? gainFactor.ZZ != 0 : true,
                          "You need to set a gain factor in ZZ in order to control stress");
-//}
-//
-//void StressStrainControlBoundary::actionsBeforeTimeLoop()
-//{
+
     logger.assert_always(getHandler() != nullptr, "You need to set the handler of this boundary");
     const DPMBase *dpm = getHandler()->getDPMBase();
 

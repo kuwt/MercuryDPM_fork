@@ -144,7 +144,7 @@ int main(int /*argc*/, char **/*argv[]*/)
     //problem.setTimeMax(1e5*problem.getTimeStep());
     problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(1000, problem.getTimeMax(), problem.getTimeStep()));
     //problem.set_number_of_saves(1000);
-	problem.getStatFile().setSaveCount(1);
+	problem.statFile.setSaveCount(1);
 	problem.setName("create_initial_conditions_pressure_controlled");		
 	problem.write(std::cout,false);
     

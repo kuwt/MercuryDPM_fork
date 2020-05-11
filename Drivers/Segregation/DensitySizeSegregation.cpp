@@ -282,7 +282,7 @@ void setupInitialConditions()
 //	Walls.resize(Walls.size()+1);
 //	Walls.back().addObject(Vec3D(0.0,0.0,-1.0),-(getZMin()-0.5));		
 	InfiniteWall w0;
-	w0.set(Vec3D(0.0,0.0,-1.0), -(getZMin()-0.5));
+	w0.set(Vec3D(0.0,0.0,-1.0), Vec3D(0,0,getZMin()-0.5));
         wallHandler.copyAndAddObject(w0);
 
 
@@ -310,7 +310,7 @@ void setupInitialConditions()
 			{
 			//Generate a large particle: set radius to large radius subtract one of the list of large particles to be generated
 			  inflowParticle_.setRadius(radius_2);
-			  inflowParticle_.setIndSpecies(2);
+			  inflowParticle_.setSpecies(speciesHandler.getObject(2));
 			  N2--;
 			}
 		

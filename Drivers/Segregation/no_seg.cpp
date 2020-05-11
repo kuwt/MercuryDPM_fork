@@ -49,11 +49,10 @@ int main(int argc, char *argv[])
     problem.setInflowParticleRadius(0.001);
 
     auto species = problem.speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
-    helpers::KAndDisp values = helpers::computeKAndDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(2.5e-3,0.8,0.5*species->getMassFromRadius(0.5*(problem.getMinInflowParticleRadius() + problem.getMaxInflowParticleRadius())));
-    species->setStiffnessAndDissipation(values);
-
+    double mass = 0.5*species->getMassFromRadius(0.5*(problem.getMinInflowParticleRadius() + problem.getMaxInflowParticleRadius()));
+    species->setCollisionTimeAndRestitutionCoefficient(2.5e-3,0.8,mass);
     species->setSlidingDissipation(0.0);
-    problem.setTimeStep(0.02 * helpers::computeCollisionTimeFromKAndDispAndEffectiveMass(species->getStiffness(),species->getDissipation(),0.5*species->getMassFromRadius(0.5 * (problem.getMinInflowParticleRadius() + problem.getMaxInflowParticleRadius()))));
+    problem.setTimeStep(0.02 * 2.5e-3);
 
     
     // Chute properties

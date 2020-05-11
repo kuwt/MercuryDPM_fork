@@ -100,9 +100,8 @@ int main()
     species->setDensity(2400.0);
 	
 	problem.setInflowParticleRadius(0.3e-3,0.60e-3);
-    helpers::KAndDisp values = helpers::computeKAndDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(4e-4,0.6,0.5*species->getMassFromRadius(0.5*(problem.getMinInflowParticleRadius() + problem.getMaxInflowParticleRadius())));
-    species->setStiffnessAndDissipation(values);
-
+    double mass = 0.5*species->getMassFromRadius(0.5*(problem.getMinInflowParticleRadius() + problem.getMaxInflowParticleRadius()));
+    species->setCollisionTimeAndRestitutionCoefficient(4e-4,0.6,mass);
 	species->setSlidingDissipation(species->getDissipation());
 	species->setSlidingFrictionCoefficient(0.8);
 	problem.setFixedParticleRadius(0.3e-3);
@@ -127,7 +126,7 @@ int main()
 	
 	//solve
 	//std::cout << "Maximum allowed speed of particles: " << problem.particleHandler.getSmallestParticle()->calculateMaximumVelocity() << std::endl; // speed allowed before particles move through each other!
-    problem.setTimeStep(0.02 * helpers::computeCollisionTimeFromKAndDispAndEffectiveMass(species->getStiffness(),species->getDissipation(),0.5*species->getMassFromRadius(0.5 * (problem.getMinInflowParticleRadius() + problem.getMaxInflowParticleRadius()))));
+    problem.setTimeStep(0.02 * species->getCollisionTime(mass));
     problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(25, problem.getTimeMax(),problem.getTimeStep()));
 
     std::cout << "dt=" << problem.getTimeStep() << std::endl;

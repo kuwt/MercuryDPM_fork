@@ -85,7 +85,7 @@ public:
         return true; //returns true if argv is found
     }
     
-    void actionsBeforeTimeLoop()
+    void actionsBeforeTimeLoop() override
     {
         write(std::cout, false);
         writeRestartFile();

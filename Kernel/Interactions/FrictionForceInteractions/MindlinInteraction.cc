@@ -428,7 +428,7 @@ void MindlinInteraction::rotateHistory(Matrix3D& rotationMatrix)
 
 //k_edit
 /*!
- * \details Return the absolve normal force. This is the magnitude of the normal
+ * \details Return the absolute normal force. This is the magnitude of the normal
  *          force.
  *          \todo Ant: Check this comment.
  * \return  Mdouble that contains the absolute norm (length) of the normal

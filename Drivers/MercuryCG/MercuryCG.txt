@@ -79,4 +79,11 @@ OPTIONS
         Specifies the name of the output file in which the cg fields are written.
         By default, the output file will be named 'name.stat'.
 
+    -restartAndAnalyse:
+        Restarts the code and analyses the running simulation instead of analysing the data files
+
+    -readFromRestart:
+        Uses the restart files instead of the data files for analysis
+
+
 For more information see http://docs.mercurydpm.org/Trunk/de/db6/MercuryCG.html

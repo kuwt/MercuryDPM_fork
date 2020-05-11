@@ -144,7 +144,7 @@ int main(int /*argc*/, char **/*argv[]*/)
     problem.setTimeStep(0.02 * helpers::computeCollisionTimeFromKAndDispAndEffectiveMass(problem.species->getStiffness(), problem.species->getDissipation(), 0.5 * mass));
     problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(10000, problem.getTimeMax(), problem.getTimeStep()));
     //problem.set_number_of_saves(10000);
-    problem.getStatFile().setSaveCount(1);
+    problem.statFile.setSaveCount(1);
     problem.setName("pure_shear_untill_jamming");
     problem.write(std::cout, false);
     problem.solve();
