@@ -456,6 +456,9 @@ void BaseCluster::setupInitialConditions()
         Mdouble eps0 = 0.58;
         // The number of particles (N) per cluster given the relative cluster radius (hatR) and penetration depth max (phi)
         // can be computed as: N = ( hatR / (1 - eps0*phi) )^3 * eps0.
+        // It is very important to notice that this formula is accurate only if sliding friction is set to 0.5 and relative
+        // tangential stiffness is set to 0.3 while creating the cluster. Different values do not guarantee accuracy.
+
         nParticles_ =
                 round (std::pow( hatR / (1.0 - eps0 * particleSpecies_->getPenetrationDepthMax() ), 3) * eps0);
         logger(VERBOSE, "Number of particles: %.\n", nParticles_);
@@ -468,6 +471,8 @@ void BaseCluster::setupInitialConditions()
         Mdouble eps0 = 0.58;
         // The radius of a single particle (r) composig the cluster given the cluster radius (R), penetration depth max (phi)
         // and the number of particles (N) can be obtained as: r = R / ( cbrt(N/eps0) * (1-eps0*phi) ).
+        // It is very important to notice that this formula is accurate only if sliding friction is set to 0.5 and relative
+        // tangential stiffness is set to 0.3 while creating the cluster. Different values do not guarantee accuracy.
         radiusParticle_ = radiusCluster_ / (cbrt(nParticles_/eps0) * (1-eps0*particleSpecies_->getPenetrationDepthMax()));
 
         logger(VERBOSE, "radius particle: %.\n", radiusParticle_);
@@ -730,9 +735,11 @@ void BaseCluster::actionsAfterSolve()
 
     makeDataAnalysis();
 
-    writeToCdatFile();
+    if ( isCdatOutputOn() )
+        writeToCdatFile();
 
-    writeToOverlFile();
+    if ( isOverlOutputOn() )
+        writeToOverlFile();
 
     if (stage_ == 3)
         logger(WARN, "Dissipation process not completed: final energyRatioTollerance_ = %."
@@ -954,7 +961,7 @@ void BaseCluster::printTime() const
               ", dMax = " << maxRelativeOverlap_ << ", centerOfMass = " << std::scientific << std::setprecision(5) << std::setw(13) << centerOfMass_.X
                           << std::setw(14) << centerOfMass_.Y << std::setw(14) << centerOfMass_.Z <<
               " nParticles: " << particleHandler.getSize();
-    logger(VERBOSE, printTime.str());
+    logger(INFO, printTime.str());
 }
 
 
@@ -1250,45 +1257,54 @@ void BaseCluster::makeDataAnalysis()
     centerOfMass_.setZero();
     //\brief vector in which it is saved the relative position of a particle from the center of mass
     Vec3D distanceFromCenterOfMass;
+    //\brief distance from the center of mass of the furthest particle
+    Mdouble furthestParticleDistance = 0;
+    // number of particles whose distance d from the center of mass is d > furthestParticleDistance - radiusParticle_
+    int counter = 0;
     Mdouble relativeOverlap = 0;
 
     meanClusterRadius_ = 0.0;
     meanCoordinationNumber_ = 0.0;
     maxRelativeOverlap_ = 0.0;
     meanRelativeOverlap_ = 0.0;
-    minRelativeOverlap_ = 2 * 2*sizeDispersityParticle_/(1+sizeDispersityParticle_);
+    minRelativeOverlap_ = 2 * 2 * sizeDispersityParticle_/(1+sizeDispersityParticle_);
 
-    // loops over each particle to compute mean coordination number, center of mass and mean cluster radius.
-    for (auto p = particleHandler.begin(); p != particleHandler.end(); ++p)
-    {
+    // loops over each particle to compute mean coordination number and center of mass.
+    for (auto p = particleHandler.begin(); p != particleHandler.end(); ++p) {
+
         meanCoordinationNumber_ += ((*p)->getInteractions()).size();
 
         centerOfMass_ += ((*p)->getVolume()) * ((*p)->getPosition());
-
-        distanceFromCenterOfMass = (*p) -> getPosition() - centerOfMass_;
-
-        if (distanceFromCenterOfMass.X > localMax.X)
-            localMax.X = distanceFromCenterOfMass.X;
-
-        if (distanceFromCenterOfMass.X < localMin.X)
-            localMin.X = distanceFromCenterOfMass.X;
-
-        if (distanceFromCenterOfMass.Y > localMax.Y)
-            localMax.Y = distanceFromCenterOfMass.Y;
-
-        if (distanceFromCenterOfMass.Y < localMin.Y)
-            localMin.Y = distanceFromCenterOfMass.Y;
-
-        if (distanceFromCenterOfMass.Z > localMax.Z)
-            localMax.Z = distanceFromCenterOfMass.Z;
-
-        if (distanceFromCenterOfMass.Z < localMin.Z)
-            localMin.Z = distanceFromCenterOfMass.Z;
     }
 
     meanCoordinationNumber_ /= particleHandler.getSize();
     centerOfMass_ /= totalParticleVolume_;
-    meanClusterRadius_ = (localMax.X - localMin.X + localMax.Y - localMin.Y + localMax.Z - localMin.Z)/6.0 + radiusParticle_;
+
+
+    // loops over each particle to compute the furthest particle from the center of mass.
+    for (auto p = particleHandler.begin(); p != particleHandler.end(); ++p) {
+
+        distanceFromCenterOfMass = (*p)->getPosition() - centerOfMass_;
+
+        if (distanceFromCenterOfMass.getLength() > furthestParticleDistance)
+            furthestParticleDistance = distanceFromCenterOfMass.getLength();
+
+    }
+
+    for (auto p = particleHandler.begin(); p != particleHandler.end(); ++p) {
+
+        distanceFromCenterOfMass = (*p)->getPosition() - centerOfMass_;
+
+        if (distanceFromCenterOfMass.getLength() > furthestParticleDistance - radiusParticle_) {
+            meanClusterRadius_ += distanceFromCenterOfMass.getLength();
+            counter++;
+        }
+
+    }
+
+    meanClusterRadius_ /= counter;
+    meanClusterRadius_ += radiusParticle_;
+
 
     /*
      * \details This is the radius used to compute solid fraction: it is smaller than the meanClusterRadius.
@@ -1300,11 +1316,12 @@ void BaseCluster::makeDataAnalysis()
      *          fraction is calculated. This value is less precise as the maximum penetration depth increases and more precise as the
      *          number of particle increases.
      */
-    for (int i=0; i<particleHandler.getSize(); i++)
+    for (auto p = particleHandler.begin(); p != particleHandler.end(); ++p)
     {
-        distanceFromCenterOfMass = particleHandler.getObject(i) -> getPosition() - centerOfMass_;
+        distanceFromCenterOfMass = (*p) -> getPosition() - centerOfMass_;
+
         if( distanceFromCenterOfMass.getLength() < radiusForSolidFraction_ )
-            solidVolumeInsideRadius += particleHandler.getObject(i) -> getVolume();
+            solidVolumeInsideRadius += (*p) -> getVolume();
     }
 
     solidFraction_ = 3 * solidVolumeInsideRadius / ( 4 * constants::pi * pow(radiusForSolidFraction_, 3) );
@@ -1449,8 +1466,8 @@ void BaseCluster::writeToOverlFile()
 
 /*!
  * \details This applies force on each particle. The force applied is proportional to the distance from force center
- *          (which is clusterPosition) and normalized by a ( 1/(2r) + 1/norm ) factor: this way even if a particle is
- *          very close to the origin (so -forceModulus * distanceFromForceCenter / (2 * r) ~ 0 )
+ *          (which is position_) and normalized by a ( 1/(2r) + 1/norm ) factor: this way even if a particle is
+ *          very close to the force center (so -forceModulus * distanceFromForceCenter / (2 * r) ~ 0 )
  *          a force F = -forceModulus * distanceFromForceCenter / norm is applied, which is the minimum guaranteed.
  *          (r is radiusParticle and norm is the 2-norm of distanceFromForceCenter vector).
  */
@@ -1458,25 +1475,15 @@ void BaseCluster::applyCentralForce()
 {
     for (auto p = particleHandler.begin(); p != particleHandler.end(); ++p)
     {
-        //\brief distance from the center of forces (which is the origin).
-        Vec3D distanceFromForceCenter = (*p) -> getPosition() - centerOfMass_;
+        //\brief distance from the center of forces (which is position_).
+        Vec3D distanceFromForceCenter = (*p) -> getPosition() - position_;
 
         //\brief norm of distanceFromForceCenter vector
         Mdouble norm = distanceFromForceCenter.getLength();
 
-        /*\details In the first half of the compression progress a small random component eps is added to
-         *          distanceFromForceCenter in order to help particles settle.
-         */
-        if (stage_ == 1 && (getTime()-t0_)/forceTuningDuration_ < 0.5){
-            //Vec3D eps = {random(fabs(-distanceFromForceCenter.X)/5,fabs(distanceFromForceCenter.X)/5),
-             //            random(fabs(-distanceFromForceCenter.Y)/5,fabs(distanceFromForceCenter.Y)/5),
-              //           random(fabs(-distanceFromForceCenter.Z)/5,fabs(distanceFromForceCenter.Z)/5)};
-              Vec3D eps = {0,0,0};
-            (*p) -> addForce( -forceModulus_ * (distanceFromForceCenter + eps) * (2*radiusParticle_ + norm) / (2*radiusParticle_*norm) );
+        (*p) -> addForce( -forceModulus_ * distanceFromForceCenter * (2*radiusParticle_ + norm) / (2*radiusParticle_*norm) );
+
         }
-        else
-            (*p) -> addForce( -forceModulus_ * distanceFromForceCenter * (2*radiusParticle_ + norm) / (2*radiusParticle_*norm) );
-    }
 }
 
 /*!
@@ -1580,7 +1587,8 @@ void BaseCluster::writeAmatFile()
 
 /*!
  * \details This computes the internal structure  and solid fraction of the cluster.
- *          A total number of particles (equal to nInternalStructurePoints_) is tried to be inserted inside a sphere
+ *          A total number of particles (equal to nInternalStructurePoints_) is tried to be inserted (with spherical
+ * 			coordinates	identical to the ones used for inserting the actual particles) inside a sphere
  *          having radius radiusForSolidFraction_. If no interaction is found, nothing happens, otherwise the counuter
  *          nPointsInsideComponentsForMCTest is incremented and the corresponding position is written down in the
  *          internal structure file.
@@ -1598,9 +1606,6 @@ void BaseCluster::computeInternalStructure()
     p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
     int nMonteCarloSamplingPoints = nInternalStructurePoints_;
     Mdouble nPointsInsideComponentsForMCTest = 0;
-
-    std::cout << nMonteCarloSamplingPoints << std::endl;
-    std::cout << nPointsInsideComponentsForMCTest << std::endl;
 
     makeIntenalStructureFile();
 
@@ -1627,15 +1632,16 @@ void BaseCluster::computeInternalStructure()
 
     }
 
-    std::cout << nPointsInsideComponentsForMCTest << std::endl;
-
-
     // Solid fraction (accordance between theoretical values and penetration depth max).
+    // It is very important to notice that this value is accurate only if sliding friction is set to 0.5 and relative
+    // tangential stiffness is set to 0.3 while creating the cluster. Different values do not guarantee accuracy.
     solidFractionIntStruct_ = nPointsInsideComponentsForMCTest/nMonteCarloSamplingPoints;
     Mdouble theoVal = 0.58 + 3*pow(0.58,2)*particleSpecies_->getPenetrationDepthMax();
     Mdouble diff = fabs(theoVal-solidFractionIntStruct_);
     Mdouble accordance = (theoVal - diff)/theoVal;
     // Solid fraction (accordance between theoretical values and average overlap).
+    // It is very important to notice that this value is accurate only if sliding friction is set to 0.5 and relative
+    // tangential stiffness is set to 0.3 while creating the cluster. Different values do not guarantee accuracy.
     solidFractionIntStruct_ = nPointsInsideComponentsForMCTest/nMonteCarloSamplingPoints;
     Mdouble theoValAvOverl = 0.58 + 3*pow(0.58,2)*meanRelativeOverlap_;
     Mdouble diffAvOverl = fabs(theoValAvOverl-solidFractionIntStruct_);
@@ -1643,16 +1649,23 @@ void BaseCluster::computeInternalStructure()
 
     intStructFile_ << "n_points_inside_boundary: " << std::scientific << nMonteCarloSamplingPoints << std::endl;
     intStructFile_ << "n_points_inside_components: " << nPointsInsideComponentsForMCTest << std::endl;
-    intStructFile_ << "solidFractionIntStruct_: " << std::fixed << std::setprecision(6) << solidFractionIntStruct_ <<
-                 ", accordance with theoretical values: " << 100*accordance << "%." << std::endl <<
-                 "Accordance with average overlap: " << 100*accordanceAvOverl << "%." << std::endl << std::endl;
+    intStructFile_ << "solidFractionIntStruct_: " << std::fixed << std::setprecision(6) << solidFractionIntStruct_
+                   << ", accordance with theoretical values: " << 100*accordance << "%." << std::endl
+                   << "Accordance with average overlap: " << 100*accordanceAvOverl << "%." << std::endl
+                   << "It is very important to notice that this formula is accurate only if sliding friction" << std::endl
+                   << "is set to 0.5 and relative tangential stiffness is set to 0.3 while creating the cluster." << std::endl
+                   << "Different values do not guarantee accuracy." << std::endl << std::endl;
+
     std::ostringstream printResults;
     printResults << "n_points_inside_boundary: " << std::scientific << nMonteCarloSamplingPoints << std::endl;
     printResults << "n_points_inside_components: " << nPointsInsideComponentsForMCTest << std::endl;
-    printResults << "solidFractionIntStruct_: " << std::fixed <<  std::setprecision(6) << solidFractionIntStruct_ <<
-                 ", accordance with theoretical values: " << 100*accordance << "%." << std::endl <<
-                 "Accordance with average overlap: " << 100*accordanceAvOverl << "%." << std::endl << std::endl;
-    logger(VERBOSE, printResults.str());
+    printResults << "solidFractionIntStruct_: " << std::fixed <<  std::setprecision(6) << solidFractionIntStruct_
+                 << ", accordance with theoretical values: " << 100*accordance << "%." << std::endl
+                 << "Accordance with average overlap: " << 100*accordanceAvOverl << "%." << std::endl
+                 << "It is very important to notice that this formula is accurate only if sliding friction" << std::endl
+                 << "is set to 0.5 and relative tangential stiffness is set to 0.3 while creating the cluster." << std::endl
+                 << "Different values do not guarantee accuracy." << std::endl << std::endl;
+    logger(INFO, printResults.str());
 }
 
 /*!

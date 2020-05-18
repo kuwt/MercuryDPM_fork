@@ -62,8 +62,6 @@ public:
      */
     std::vector<BaseParticle*> hGridFindParticleContacts(const BaseParticle* obj) override;
 
-    ClusterGenerator* clusterGenerator;
-
 protected:
     /*!
      * \brief Finds contacts between particles in the target cell.
