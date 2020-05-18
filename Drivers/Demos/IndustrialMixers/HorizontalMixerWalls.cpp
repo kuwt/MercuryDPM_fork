@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2014, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 #include "HorizontalMixer.h"
 

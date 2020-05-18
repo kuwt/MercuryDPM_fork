@@ -1,7 +1,4 @@
-
-#include "Math/Quaternion.h"
-
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -25,11 +22,12 @@
 //ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-////////////////////////////////////////////////////////////////////////////////////////////////////
-///This function outputs the location and velocity of the particle in a format the xballs progream can read  
-///////////////////////////////////////////////////////////////////////////////////////////////////
+
 //icc means included cc file
 
+#include "Math/Quaternion.h"
+
+///This function outputs the location and velocity of the particle in a format the xballs progream can read
 void DPMBase::outputXBallsDataParticle(unsigned int i, unsigned int format, std::ostream& os) const
 {
     const auto p = particleHandler.getObject(i);

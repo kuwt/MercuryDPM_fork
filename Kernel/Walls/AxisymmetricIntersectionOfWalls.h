@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -31,9 +31,9 @@
 #include "Math/Vector.h"
 
 /*!
- * \brief Use #AxisymmetricIntersectionOfWalls to define axisymmetric walls, such as cylinders, cones, etc
+ * \brief Use \ref AxisymmetricIntersectionOfWalls to \ref Screw Screw::read \ref Screw::read Screw#read define axisymmetric walls, such as cylinders, cones, etc
  *
- * \details An #AxisymmetricIntersectionOfWalls is equivalent to an #IntersectionOfWalls where the Cartesian coordinate system (x,y,z) is replaced by a cylindrical coordinate system \f$(\hat{r},\theta,\hat{z})\f$. The origin and orientation of the cylindrical coordinate system is defined by the position and orientation of the wall, respectively.
+ * \details An \ref AxisymmetricIntersectionOfWalls is equivalent to an \ref IntersectionOfWalls where the Cartesian coordinate system (x,y,z) is replaced by a cylindrical coordinate system \f$(\hat{r},\theta,\hat{z})\f$. The origin and orientation of the cylindrical coordinate system is defined by the position and orientation of the wall, respectively.
  *
  * In other words, a particle touches an #AxisymmetricIntersectionOfWalls, if it touches the #IntersectionOfWalls object in the \f$(r,\theta,z)\f$ coordinate system.
  *
