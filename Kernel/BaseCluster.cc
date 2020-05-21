@@ -935,6 +935,9 @@ void BaseCluster::actionsOnRestart()
  *          -maximum realative overlap,
  *          -center of mass,
  *          -number of particles.
+ *
+ *          printTime output is set to VERBOSE in order not to have too much output. If the user needs it, it is enough
+ *          to set it to INFO.
  */
 void BaseCluster::printTime() const
 {
@@ -961,7 +964,7 @@ void BaseCluster::printTime() const
               ", dMax = " << maxRelativeOverlap_ << ", centerOfMass = " << std::scientific << std::setprecision(5) << std::setw(13) << centerOfMass_.X
                           << std::setw(14) << centerOfMass_.Y << std::setw(14) << centerOfMass_.Z <<
               " nParticles: " << particleHandler.getSize();
-    logger(INFO, printTime.str());
+    logger(VERBOSE, printTime.str());
 }
 
 
@@ -1656,6 +1659,11 @@ void BaseCluster::computeInternalStructure()
                    << "is set to 0.5 and relative tangential stiffness is set to 0.3 while creating the cluster." << std::endl
                    << "Different values do not guarantee accuracy." << std::endl << std::endl;
 
+    /*
+     * computeInternalStructure output is set to VERBOSE in order not to have too much output. If the user needs it,
+     * it is enough to set it to INFO.
+     */
+
     std::ostringstream printResults;
     printResults << "n_points_inside_boundary: " << std::scientific << nMonteCarloSamplingPoints << std::endl;
     printResults << "n_points_inside_components: " << nPointsInsideComponentsForMCTest << std::endl;
@@ -1665,7 +1673,7 @@ void BaseCluster::computeInternalStructure()
                  << "It is very important to notice that this formula is accurate only if sliding friction" << std::endl
                  << "is set to 0.5 and relative tangential stiffness is set to 0.3 while creating the cluster." << std::endl
                  << "Different values do not guarantee accuracy." << std::endl << std::endl;
-    logger(INFO, printResults.str());
+    logger(VERBOSE, printResults.str());
 }
 
 /*!
