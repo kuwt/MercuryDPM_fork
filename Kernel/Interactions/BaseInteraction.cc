@@ -439,7 +439,10 @@ void BaseInteraction::writeToFStat(std::ostream& os, Mdouble time) const
     ///\todo MX The documentation mentions that the first variable is the time - this is incorrect, is is the timeStamp the interaction started
     auto* IParticle = dynamic_cast<BaseParticle*>(I_);
     auto* PParticle = dynamic_cast<BaseParticle*>(P_);
-    
+
+    // do not write fstat output if the force is an internal bond
+    if (isBonded()) return;
+
     Vec3D tangentialForce = getTangentialForce();
     Mdouble tangentialOverlap = getTangentialOverlap();
     

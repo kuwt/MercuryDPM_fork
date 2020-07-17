@@ -89,7 +89,7 @@ public:
 //        write(std::cout,false);
     }
 
-    void outputXBallsData(std::ostream& os) const
+    void outputXBallsData(std::ostream& os) const override
     {
         os << particleHandler.getSize()*2.0 + interactionHandler.getSize()
            << " " << getTime()

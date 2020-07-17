@@ -83,11 +83,12 @@ public:
      * \brief Returns the amount of Elastic energy involved in an interaction. Basically
      *        used in case you want to write the elastic energy into an output file. 
      */
+
     /*!
      * \brief Returns the elastic energy stored in the adhesive spring. 
      */
     Mdouble getElasticEnergy() const override;
-    
+
     /*!
      * \brief Returns a pointer to the adhesive force species ChargedBondedSpecies.
      */
@@ -109,6 +110,8 @@ public:
     void bond();
     
     void unbond();
+
+    bool isBonded() const override {return bonded_;}
 
 private:
     /*!

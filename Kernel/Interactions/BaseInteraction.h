@@ -485,6 +485,11 @@ public:
     
     bool isWallInteraction();
 
+    // returns true is the interaction is an 'internal' bond.
+    // This is used in BaseInteraction::writeToFstat to detect internal bonds;
+    // these internal forces are not written to fstat and thus don't contribute to fstatistics.
+    virtual bool isBonded() const {return false;}
+
 private:
     
     

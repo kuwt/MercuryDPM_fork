@@ -148,7 +148,9 @@ const LinearViscoelasticNormalSpecies* LinearViscoelasticInteraction::getSpecies
     return static_cast<const LinearViscoelasticNormalSpecies*>(getBaseSpecies()->getNormalForce());
 }
 
+
 Mdouble LinearViscoelasticInteraction::getElasticEnergyAtEquilibrium(Mdouble adhesiveForce) const
 {
-    return adhesiveForce * adhesiveForce / (2.0 * getSpecies()->getStiffness());
+    double equilibriumOverlap = adhesiveForce / getSpecies()->getStiffness();
+    return 0.5 * adhesiveForce * equilibriumOverlap;
 }
