@@ -26,7 +26,6 @@
 #include <Walls/Coil.h>
 #include <Mercury3D.h>
 #include <Species/LinearViscoelasticReversibleAdhesiveSpecies.h>
-#include <Walls/Screw.h>
 #include <Walls/TriangleWall.h>
 
 /**
@@ -71,6 +70,7 @@ public:
         Vec3D normal;
         Mdouble distance;
         Mdouble h = 0.01;
+        //pos.Y=0.5;
         std::ofstream file("GetDistanceAndNormalForTriangleWalls.out");
         file << "x\tz\td\tnx\tnz\n";
         for (pos.X = getXMin(); pos.X <= getXMax(); pos.X += h) {
@@ -102,24 +102,30 @@ public:
                 "contourf(x,z,d,20,'EdgeColor','none')\n"
                 "hold on\n"
                 "contour(x,z,d,[0 0],'EdgeColor','k')\n"
+                "plotGeometry\n"
                 "hold off\n"
                 "xlabel('x')\n"
                 "ylabel('y')\n"
                 "h=colorbar\n"
                 "%xlabel(h, 'distance')\n"
                 "title('distance')\n"
-                "saveas(gcf,'distanceScrew.png')\n"
+                "saveas(gcf,'distanceTriangleWalls.png')\n"
                 "\n"
                 "figure(2)\n"
                 "m=6;\n"
                 "quiver(x(1:m:end,1:m:end),z(1:m:end,1:m:end),nx(1:m:end,1:m:end),nz(1:m:end,1:m:end),0.5)\n"
                 "hold on\n"
                 "contour(x,z,d,[0 0],'EdgeColor','k')\n"
+                "plotGeometry\n"
                 "hold off\n"
                 "xlabel('x')\n"
                 "ylabel('y')\n"
                 "title('normal')\n"
-                "saveas(gcf,'normalScrew.png')\n"
+                "saveas(gcf,'normalTriangleWalls.png')\n"
+                "\n"
+                "function plotGeometry\n"
+                "plot(.5*[-1 1 -1 -1],.5*[-1 -1 1 -1],'k')\n"
+                "end"
                 );
         logger(INFO,"Written file");
         setWallsWriteVTK(true);

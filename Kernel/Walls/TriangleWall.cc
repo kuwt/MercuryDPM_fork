@@ -56,84 +56,52 @@ bool setDistance(Mdouble& distance, const Vec3D& branch, Mdouble distanceMax)
  */
 bool TriangleWall::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal) const
 {
-    const Vec3D position = p.getPosition();// - getPosition();
-    //getOrientation().rotateBack(position);
+    const Vec3D position = p.getPosition(); // note: no transfer to lab coordinates
+    const Mdouble distanceMax = p.getWallInteractionRadius(this);
+
+    // compute distance from face
     const Mdouble signedDistance = Vec3D::dot(position-vertex_[0], faceNormal_);
     distance = fabs(signedDistance);
-    if (distance >= p.getWallInteractionRadius(this))
-    {
-        return false;
-    }
-    
-    const Mdouble distanceMax2 = mathsFunc::square(p.getWallInteractionRadius(this));
-    const Vec3D edgeBranch0 = position - vertex_[0];
-    const Vec3D edgeBranch1 = position - vertex_[1];
-    const Vec3D edgeBranch2 = position - vertex_[2];
-    const Mdouble edgeDistance0 = Vec3D::dot(edgeBranch0, edgeNormal_[0]);
-    const Mdouble edgeDistance1 = Vec3D::dot(edgeBranch1, edgeNormal_[1]);
-    const Mdouble edgeDistance2 = Vec3D::dot(edgeBranch2, edgeNormal_[2]);
-    //logger(INFO,"n % d % P % E % e % % %",-faceNormal_,signedDistance, position,edgeNormal_[0],edgeDistance0,edgeDistance1,edgeDistance2);
-    if (edgeDistance0 > 0)
-    {
-        if (edgeDistance1 > 0)
-        {
-            //logger(INFO,"contact with vertex 1, dist % norm %");
-            const Mdouble distance2 = edgeBranch1.getLengthSquared();
-            if (distance2 > distanceMax2) return false;
-            distance = sqrt(distance2);
-            normal = edgeBranch1 / -distance;
-        }
-        else if (edgeDistance2 > 0)
-        {
-            //logger(INFO,"contact with vertex 0");
-            const Mdouble distance2 = edgeBranch0.getLengthSquared();
-            if (distance2 > distanceMax2) return false;
-            distance = sqrt(distance2);
-            normal = edgeBranch0 / -distance;
-        }
-        else
-        {
-            //logger(INFO,"contact with edge 0");
-            normal = edge_[0] * Vec3D::dot(edgeBranch0, edge_[0]) - edgeBranch0;
-            const Mdouble distance2 = normal.getLengthSquared();
-            if (distance2 > distanceMax2) return false;
-            distance = sqrt(distance2);
-            normal /= distance;
-        }
-    }
-    else if (edgeDistance1 > 0)
-    {
-        if (edgeDistance2 > 0)
-        {
-            //logger(INFO,"contact with vertex 2");
-            const Mdouble distance2 = edgeBranch2.getLengthSquared();
-            if (distance2 > distanceMax2) return false;
-            distance = sqrt(distance2);
-            normal = edgeBranch2 / -distance;
-        }
-        else
-        {
-            //logger(INFO,"contact with edge 1");
-            normal = edge_[1] * Vec3D::dot(edgeBranch1, edge_[1]) - edgeBranch1;
-            const Mdouble distance2 = normal.getLengthSquared();
-            if (distance2 > distanceMax2) return false;
-            distance = sqrt(distance2);
-            normal /= distance;
-        }
-    }
-    else if (edgeDistance2 > 0)
-    {
-        //logger(INFO,"contact with edge 2");
-        normal = edge_[2] * Vec3D::dot(edgeBranch2, edge_[2]) - edgeBranch2;
-        const Mdouble distance2 = normal.getLengthSquared();
-        if (distance2 > distanceMax2) return false;
-        distance = sqrt(distance2);
-        normal /= distance;
-    }
-    else
-    {
-        //logger(INFO,"contact with face");
+
+    // check if any contact is possible
+    if (distance >= distanceMax) return false;
+
+    // compute distance from edges
+    const std::array<Vec3D,3> edgeBranch {position - vertex_[0], position - vertex_[1], position - vertex_[2]};
+    const std::array<double,3> edgeDistance {Vec3D::dot(edgeBranch[0], edgeNormal_[0]), Vec3D::dot(edgeBranch[1], edgeNormal_[1]), Vec3D::dot(edgeBranch[2], edgeNormal_[2])};
+
+    // find edge with largest distance (this will be the edge if there is a edge contact)
+    const size_t id = (edgeDistance[1] > edgeDistance[2]) ?
+            (edgeDistance[0] > edgeDistance[1] ? 0 : 1) : (edgeDistance[0] > edgeDistance[2] ? 0 : 2);
+
+    // check if there will be contact
+    if (edgeDistance[id] > distanceMax) return false;
+
+    // determine if it is a face contact
+    if (edgeDistance[id] < 0) {
         normal = (signedDistance >= 0) ? -faceNormal_ : faceNormal_;
+        return true;
+    }
+
+    // determine if it is an edge or vertex contact
+    const double positionAlongEdge = Vec3D::dot(edgeBranch[id], edge_[id]);
+    if (positionAlongEdge < 0) {
+        //possible contact with left vertex
+        distance = edgeBranch[id].getLength();
+        if (distance > distanceMax) return false;
+        normal = edgeBranch[id] / -distance;
+    } else if (positionAlongEdge > edgeLength_[id]) {
+        //contact with right vertex
+        const size_t idRight = (id + 1) % 3;
+        distance = edgeBranch[idRight].getLength();
+        if (distance > distanceMax) return false;
+        normal = edgeBranch[idRight] / -distance;
+    } else {
+        // edge contact
+        normal = edge_[id] * positionAlongEdge - edgeBranch[id];
+        distance = normal.getLength();
+        if (distance > distanceMax) return false;
+        normal /= distance;
     }
     return true;
 }
@@ -252,7 +220,8 @@ void TriangleWall::updateVertexAndNormal()
     for (int i = 0; i < 3; i++)
     {
         edgeNormal_[i] = Vec3D::cross(edge_[i], faceNormal_);
-        edge_[i].normalise();
+        edgeLength_[i] = edge_[i].getLength();
+        edge_[i] /= edgeLength_[i];
         edgeNormal_[i].normalise();
     }
     //logger(INFO,"vertex %,%,% edge %,%,% face %",vertex_[0],vertex_[1],vertex_[2],edgeNormal_[0],edgeNormal_[1],edgeNormal_[2],faceNormal_);

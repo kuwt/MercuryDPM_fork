@@ -147,7 +147,8 @@ private:
      */
     std::array<Vec3D, 3> edgeNormal_;
     std::array<Vec3D, 3> edge_;
-    
+    std::array<double, 3> edgeLength_;
+
     /*!
      * stores the face normal, not rotated into the lab frame; thus, if the wall rotates, this normal has to be rotated as well
      */
