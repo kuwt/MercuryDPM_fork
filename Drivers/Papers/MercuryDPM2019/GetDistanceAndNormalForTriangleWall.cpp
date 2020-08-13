@@ -29,22 +29,22 @@
 #include <Walls/TriangleWall.h>
 
 /**
- * \brief Tests the contact detection between particles and a set of TriangleWalls.
+ * \brief Tests the contact detection between particles and a set of TriangleWall.
  * \detail In particular, distinguishing face, edge and vertex contacts is tricky.
  * The most difficult case is when a face is less or equal in size to a particle, so this is tested here.
  **/
-class GetDistanceAndNormalForTriangleWalls : public Mercury3D
+class GetDistanceAndNormalForTriangleWall : public Mercury3D
 {
 public:
     void setupInitialConditions() override
     {
-        setName("GetDistanceAndNormalForTriangleWalls");
+        setName("GetDistanceAndNormalForTriangleWall");
         setFileType(FileType::NO_FILE);
         dataFile.setFileType(FileType::ONE_FILE);
         setTimeStep(1e-6);
         setTimeMax(getTimeStep());
-        setMin(-1 * Vec3D(1, 1, 1));
-        setMax(1.001 * Vec3D(1, 1, 1));
+        setMin(-1*Vec3D(1,1,1));
+        setMax(1.001*Vec3D(1,1,1));
         setXBallsAdditionalArguments("-w 1100 -s 0.9");
 
         //use an adhesive species to visualise negative overlaps
@@ -57,27 +57,8 @@ public:
 
         TriangleWall wall;
         wall.setSpecies(s);
-        double x[3]{-.5, 0, .5};
-        double y = .5;
-        double z[3]{-.5, 0, .5};
-        Vec3D P[5]{{x[0], -y, z[0]},
-                   {x[0], -y, z[1]},
-                   {x[1], -y, z[1]},
-                   {x[2], -y, z[1]},
-                   {x[2], -y, z[2]}};
-        Vec3D Q[5]{{x[0], +y, z[0]},
-                   {x[0], +y, z[1]},
-                   {x[1], +y, z[1]},
-                   {x[2], +y, z[1]},
-                   {x[2], +y, z[2]}};
-
-        for (int i = 0; i < 4; i++) {
-            wall.setVertices(P[i], P[i+1], Q[i]);
-            wallHandler.copyAndAddObject(wall);
-            wall.setVertices(Q[i], P[i+1], Q[i+1]);
-            wallHandler.copyAndAddObject(wall);
-        }
-        auto w = wallHandler.getObject(2);
+        wall.setVertices({-.5,0,-.5},{.5,0,-.5},{-.5,0,.5});
+        auto w = wallHandler.copyAndAddObject(wall);
         logger(INFO,"wall %",*w);
 
         SphericalParticle particle;
@@ -90,7 +71,7 @@ public:
         Mdouble distance;
         Mdouble h = 0.01;
         //pos.Y=0.5;
-        std::ofstream file("GetDistanceAndNormalForTriangleWalls.out");
+        std::ofstream file("GetDistanceAndNormalForTriangleWall.out");
         file << "x\tz\td\tnx\tnz\n";
         for (pos.X = getXMin(); pos.X <= getXMax(); pos.X += h) {
             for (pos.Z = getZMin(); pos.Z <= getZMax(); pos.Z += h) {
@@ -106,9 +87,9 @@ public:
         }
         file.close();
 
-        helpers::writeToFile("GetDistanceAndNormalForTriangleWalls.m",
+        helpers::writeToFile("GetDistanceAndNormalForTriangleWall.m",
                 "clear variables\n"
-                "raw=importdata('GetDistanceAndNormalForTriangleWalls.out','\\t',1)\n"
+                "raw=importdata('GetDistanceAndNormalForTriangleWall.out','\\t',1)\n"
                 "n(1)=length(unique(raw.data(:,1)));\n"
                 "n(2)=length(unique(raw.data(:,2)));\n"
                 "x=reshape(raw.data(:,1),n);\n"
@@ -128,7 +109,7 @@ public:
                 "h=colorbar\n"
                 "%xlabel(h, 'distance')\n"
                 "title('distance')\n"
-                "saveas(gcf,'distanceTriangleWalls.png')\n"
+                "saveas(gcf,'distanceTriangleWall.png')\n"
                 "\n"
                 "figure(2)\n"
                 "m=6;\n"
@@ -140,10 +121,10 @@ public:
                 "xlabel('x')\n"
                 "ylabel('y')\n"
                 "title('normal')\n"
-                "saveas(gcf,'normalTriangleWalls.png')\n"
+                "saveas(gcf,'normalTriangleWall.png')\n"
                 "\n"
                 "function plotGeometry\n"
-                "plot(.5*[-1 -1 0 1 1],.5*[-1 0 0 0 1],'k')\n"
+                "plot(.5*[-1 1 -1 -1],.5*[-1 -1 1 -1],'k')\n"
                 "end"
                 );
         logger(INFO,"Written file");
@@ -155,6 +136,6 @@ public:
 
 int main(int argc, char* argv[])
 {
-    GetDistanceAndNormalForTriangleWalls().solve();
+    GetDistanceAndNormalForTriangleWall().solve();
     return 0;
 }
