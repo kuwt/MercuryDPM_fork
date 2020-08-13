@@ -57,6 +57,7 @@ public:
 
         TriangleWall wall;
         wall.setSpecies(s);
+        wall.setGroupId(1);
         double x[3]{-.5, 0, .5};
         double y = .5;
         double z[3]{-.5, 0, .5};
@@ -77,7 +78,7 @@ public:
             wall.setVertices(Q[i], P[i+1], Q[i+1]);
             wallHandler.copyAndAddObject(wall);
         }
-        auto w = wallHandler.getObject(2);
+        auto w = wallHandler.getObject(3);
         logger(INFO,"wall %",*w);
 
         SphericalParticle particle;
@@ -95,12 +96,27 @@ public:
         for (pos.X = getXMin(); pos.X <= getXMax(); pos.X += h) {
             for (pos.Z = getZMin(); pos.Z <= getZMax(); pos.Z += h) {
                 p->setPosition(pos);
+                double overlaps = 0;
+                Vec3D force {0,0,0};
+                unsigned count = 0;
+                double radius = 0.2;
+                for (auto wall : wallHandler) {
+                    wall->getDistanceAndNormal(*p, distance, normal);
+                    double overlap = std::max(radius-distance,0.0);
+                    overlaps += overlap;
+                    force += -normal*overlap;
+                    if (overlap>0) count++;
+                }
                 w->getDistanceAndNormal(*p, distance, normal);
                 file << pos.X
                      << '\t' << pos.Z
-                     << '\t' << distance
-                     << '\t' << normal.X
-                     << '\t' << normal.Z
+                        << '\t' << distance
+                        << '\t' << normal.X
+                        << '\t' << normal.Z
+                        << '\t' << overlaps
+                        << '\t' << force.X
+                        << '\t' << force.Z
+                        << '\t' << count
                      << '\n';
             }
         }
@@ -116,35 +132,77 @@ public:
                 "d=reshape(raw.data(:,3),n);\n"
                 "nx=reshape(raw.data(:,4),n);\n"
                 "nz=reshape(raw.data(:,5),n);\n"
+                "o=reshape(raw.data(:,6),n);\n"
+                "fx=reshape(raw.data(:,7),n);\n"
+                "fz=reshape(raw.data(:,8),n);\n"
+                "count=reshape(raw.data(:,9),n);\n"
                 "\n"
-                "figure(1)\n"
-                "contourf(x,z,d,20,'EdgeColor','none')\n"
+                "% figure(1)\n"
+                "% contourf(x,z,d,20,'EdgeColor','none')\n"
+                "% hold on\n"
+                "% contour(x,z,d,[0 0],'EdgeColor','k')\n"
+                "% plotGeometry\n"
+                "% hold off\n"
+                "% xlabel('x')\n"
+                "% ylabel('z')\n"
+                "% h=colorbar\n"
+                "% %xlabel(h, 'distance')\n"
+                "% title('distance')\n"
+                "% saveas(gcf,'distanceTriangleWalls.png')\n"
+                "% \n"
+                "% figure(2)\n"
+                "% m=6;\n"
+                "% quiver(x(1:m:end,1:m:end),z(1:m:end,1:m:end),nx(1:m:end,1:m:end),nz(1:m:end,1:m:end),0.5)\n"
+                "% hold on\n"
+                "% contour(x,z,d,[0 0],'EdgeColor','k')\n"
+                "% plotGeometry\n"
+                "% hold off\n"
+                "% xlabel('x')\n"
+                "% ylabel('z')\n"
+                "% title('normal')\n"
+                "% saveas(gcf,'normalTriangleWalls.png')\n"
+                "\n"
+                "figure(3)\n"
+                "contourf(x,z,o,20,'EdgeColor','none')\n"
                 "hold on\n"
-                "contour(x,z,d,[0 0],'EdgeColor','k')\n"
+                "contour(x,z,o,[0 0],'EdgeColor','k')\n"
                 "plotGeometry\n"
                 "hold off\n"
                 "xlabel('x')\n"
-                "ylabel('y')\n"
+                "ylabel('z')\n"
                 "h=colorbar\n"
                 "%xlabel(h, 'distance')\n"
                 "title('distance')\n"
-                "saveas(gcf,'distanceTriangleWalls.png')\n"
+                "saveas(gcf,'distanceMinTriangleWalls.png')\n"
                 "\n"
-                "figure(2)\n"
+                "figure(4)\n"
                 "m=6;\n"
-                "quiver(x(1:m:end,1:m:end),z(1:m:end,1:m:end),nx(1:m:end,1:m:end),nz(1:m:end,1:m:end),0.5)\n"
+                "quiver(x(1:m:end,1:m:end),z(1:m:end,1:m:end),fx(1:m:end,1:m:end),fz(1:m:end,1:m:end),0.5)\n"
                 "hold on\n"
                 "contour(x,z,d,[0 0],'EdgeColor','k')\n"
                 "plotGeometry\n"
                 "hold off\n"
                 "xlabel('x')\n"
-                "ylabel('y')\n"
+                "ylabel('z')\n"
                 "title('normal')\n"
-                "saveas(gcf,'normalTriangleWalls.png')\n"
+                "saveas(gcf,'normalMinTriangleWalls.png')\n"
+                "%%\n"
+                "figure(5)\n"
+                "m=6;\n"
+                "contourf(x,z,count,20)\n"
+                "hold on\n"
+                "plotGeometry\n"
+                "hold off\n"
+                "xlabel('x')\n"
+                "ylabel('z')\n"
+                "colormap('colorcube')\n"
+                "colorbar\n"
+                "title('count')\n"
+                "saveas(gcf,'countTriangleWalls.png')\n"
                 "\n"
                 "function plotGeometry\n"
                 "plot(.5*[-1 -1 0 1 1],.5*[-1 0 0 0 1],'k')\n"
-                "end"
+                "end\n"
                 );
         logger(INFO,"Written file");
         setWallsWriteVTK(true);
