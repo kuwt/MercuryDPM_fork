@@ -451,20 +451,36 @@ Vec3D Quaternion::applyCInverse(Quaternion q) const
 /// <a href="http://www.euclideanspace.com/maths/geometry/rotations/euler/examples/"> here </a>
 Vec3D Quaternion::getEuler() const
 {
+    Mdouble sinp = 2 * (q0 * q2 - q3 * q1);
+    Mdouble pitch;
+
+    if ((std::abs(sinp) < 1))
+    {
+        pitch = std::asin(sinp);
+    }
+    else
+    {
+        pitch = copysign(M_PI/2., sinp);
+    }
+
     return Vec3D(
             std::atan2(2 * (q0 * q1 + q2 * q3), 1 - 2 * (q1 * q1 + q2 * q2)),
-            std::asin(2 * (q0 * q2 - q3 * q1)),
+            pitch,
             std::atan2(2 * (q0 * q3 + q1 * q2), 1 - 2 * (q2 * q2 + q3 * q3)));
 }
 
 void Quaternion::setEuler(const Vec3D& e)
 {
-    Mdouble c = std::cos(0.5 * e.Y);
-    Mdouble s = std::sin(0.5 * e.Y);
-    q0 = c * std::cos(0.5 * (e.X + e.Z));
-    q1 = s * std::cos(0.5 * (e.X - e.Z));
-    q2 = s * std::sin(0.5 * (e.X - e.Z));
-    q3 = c * std::sin(0.5 * (e.X + e.Z));
+    Mdouble cp = std::cos(0.5 * e.Y);
+    Mdouble sp = std::sin(0.5 * e.Y);
+    Mdouble cr = std::cos(0.5 * e.X);
+    Mdouble sr = std::sin(0.5 * e.X);
+    Mdouble cy = std::cos(0.5 * e.Z);
+    Mdouble sy = std::sin(0.5 * e.Z);
+    q0 = cr * cp * cy + sr * sp * sy;
+    q1 = sr * cp * cy - cr * sp * sy;
+    q2 = cr * sp * cy + sr * cp * sy;
+    q3 = cr * cp * sy - sr * sp * cy;
 }
 
 Mdouble Quaternion::getAngleZ() const

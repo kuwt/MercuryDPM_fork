@@ -61,7 +61,7 @@ public:
                              "interaction radius of ellipsoid");
         
         //same axes but other epsilon1, epsilon2
-        /*p.setAxesAndExponents(1, 1, 1, 1, 0.5);
+        p.setAxesAndExponents(1, 1, 1, 1, 0.5);
         logger.assert_always(mathsFunc::isEqual(p.getMaxInteractionRadius(), 1.1892, 1e-2),
                              "interaction radius of epsilon2=0.5, equal axes. "
                                      "Expected % got %", 1.1892, p.getMaxInteractionRadius());
@@ -70,7 +70,7 @@ public:
         logger.assert_always(mathsFunc::isEqual(p.getMaxInteractionRadius(), 3.4711, 1e-2),
                              "interaction radius of epsilon2=0.125, unequal axes. "
                                      "Expected % got %", 3.4711, p.getMaxInteractionRadius());
-                                     */
+
         
         
         p.setAxesAndExponents(1, 1, 1, 0.5, 1);

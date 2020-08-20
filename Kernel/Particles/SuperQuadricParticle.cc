@@ -242,25 +242,36 @@ void SuperQuadricParticle::setRadius(const Mdouble radius)
 }
 
 void SuperQuadricParticle::setBoundingRadius()
-{   
-//    if( axes_.Y > axes_.X)
-//    {
-//        auto axesTemp = axes_.Y;
-//        axes_.Y = axes_.X;
-//        axes_.X =axesTemp;
-//    }
-    const Mdouble alpha = std::pow(axes_.Y / axes_.X, 2.0 / (2.0 / eps2_ - 2.0));
-    const Mdouble help1 = std::pow(alpha, 2.0 / eps2_);
-    const Mdouble gamma = std::pow(1.0 + help1, eps2_ / eps1_ - 1.0);
-    const Mdouble beta = std::pow(gamma * axes_.Z * axes_.Z / (axes_.X * axes_.X), 1.0 / (2.0 / eps1_ - 2.0));
-    const Mdouble xTilde = std::pow(std::pow(1 + help1, eps2_ / eps1_) + std::pow(beta, 2.0 / eps1_),
-                                    -eps1_ / 2.0);
-    //std::cout<<alpha<<" "<<help1<<" "<<help1<<" "<<gamma<<" "<<beta<<" "<<xTilde<<std::endl;
-    BaseParticle::setRadius(std::sqrt(mathsFunc::square(axes_.X * xTilde)
-                                      + mathsFunc::square(alpha * axes_.Y * xTilde)
-                                      + mathsFunc::square(beta * axes_.Z * xTilde)));
-}
+{
 
+    if(mathsFunc::isEqual(eps2_,1,std::numeric_limits<Mdouble>::epsilon()) && mathsFunc::isEqual(eps1_,1,std::numeric_limits<Mdouble>::epsilon()))
+    {
+        BaseParticle::setRadius(std::max(std::max(axes_.Y,axes_.X),axes_.Z));
+        return;
+    }else
+    {
+
+        const Mdouble axesX = std::max(axes_.X, axes_.Y);
+        const Mdouble axesY = std::min(axes_.X, axes_.Y);
+
+        Mdouble alpha;
+
+        const Mdouble eps1 = std::min(.96, eps1_);
+        const Mdouble eps2 = std::min(.96, eps2_);
+
+        alpha = std::pow(axesY / axesX, 2.0 / (2.0 / eps2 - 2.0));
+
+        const Mdouble help1 = std::pow(alpha, 2.0 / eps2);
+        const Mdouble gamma = std::pow(1.0 + help1, eps2 / eps1 - 1.0);
+        const Mdouble beta = std::pow(gamma * axes_.Z * axes_.Z / (axesX * axesX), 1.0 / (2.0 / eps1 - 2.0));
+        const Mdouble xTilde = std::pow(std::pow(1 + help1, eps2 / eps1) + std::pow(beta, 2.0 / eps1),
+                                        -eps1 / 2.0);
+        BaseParticle::setRadius(std::sqrt(mathsFunc::square(axesX * xTilde)
+                                          + mathsFunc::square(alpha * axesY * xTilde)
+                                          + mathsFunc::square(beta * axes_.Z * xTilde)));
+
+    }
+}
 
 /*!
  * \details Overwrites BaseInteractable::getInteractionWith. First checks if the bounding radii overlap, and if so,
