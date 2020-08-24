@@ -374,7 +374,47 @@ BaseWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHan
     
     if (getDistanceNormalOverlap(*p, distance, normal, overlap))
     {
-        BaseInteraction* c = interactionHandler->getInteraction(p, this, timeStamp);
+        // look for an existing interaction, or create a new one
+        BaseInteraction *c = nullptr;
+        // This if-statement deals with groups of walls. If a particle has multiple contacts with a group of walls, and if the contact areas of these contacts overlap, then we keep only the biggest of the overlapping contacts.
+        if (getGroupId() > 0 && p->getInteractions().size() > 0) {
+            // if there is a contact with a group of walls, and if p had at least one previously detected contact (in the last timestep or the current)
+            for (const auto i : p->getInteractions()) {
+                if (i->getI() == (BaseInteractable *) this) {
+                    // if there is an existing interaction with this wall, keep it
+                    i->setTimeStamp(timeStamp);
+                    c = i;
+                    break;
+                }
+                if (i->getI()->getGroupId() == getGroupId()) {
+                    // if another interaction with a wall of the same group is found
+                    double proj = Vec3D::dot(-normal, i->getNormal());
+                    // if the two contacts share a contact area, keep only the contact with the minimum distance
+                    if (distance >= i->getDistance()) {
+                        // if that other contact is closer to the particle than this one
+                        if (proj * distance > 0.999 * i->getDistance()) {
+                            //if one contact point is in the contact area of the other point
+                            //logger(INFO,"Ignoring contact with % because contact with % is closer",getId(),i->getI()->getId());
+                            return nullptr;
+                        }
+                    } else {
+                        // if this contact is closer to the particle than the other one
+                        if (proj * i->getDistance() >= 0.999 * distance) {
+                            //if the other contact point is in the contact area of this point, replace the other contact with this one
+                            i->setI(this);
+                            i->setTimeStamp(timeStamp);
+                            c = i;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if (c == nullptr) {
+            // look for an existing interaction, or create a new one
+            c = interactionHandler->getInteraction(p, this, timeStamp);
+        }
+
         c->setNormal(-normal);
         c->setDistance(distance);
         c->setOverlap(overlap);

@@ -68,7 +68,7 @@ public:
 
 	my_problem_HGRID(my_problem& other) : DPMBase(other), Mercury2D(other) {}
 	
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 	
 		int N=particleHandler.getSize();

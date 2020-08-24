@@ -51,16 +51,16 @@ public:
         LinearViscoelasticReversibleAdhesiveSpecies species;
         species.setDensity(1);
         species.setStiffness(1);
-        species.setAdhesionStiffness(.1);
-        species.setAdhesionForceMax(1);
+//        species.setAdhesionStiffness(.1);
+//        species.setAdhesionForceMax(1);
         auto s = speciesHandler.copyAndAddObject(species);
 
         TriangleWall wall;
         wall.setSpecies(s);
         wall.setGroupId(1);
-        double x[3]{-.5, 0, .5};
-        double y = .5;
-        double z[3]{-.5, 0, .5};
+        double x[3]{-.7, 0, .7};
+        double y = .9;
+        double z[3]{-.7, 0, .7};
         Vec3D P[5]{{x[0], -y, z[0]},
                    {x[0], -y, z[1]},
                    {x[1], -y, z[1]},
@@ -78,12 +78,12 @@ public:
             wall.setVertices(Q[i], P[i+1], Q[i+1]);
             wallHandler.copyAndAddObject(wall);
         }
-        auto w = wallHandler.getObject(3);
+        auto w = wallHandler.getObject(2);
         logger(INFO,"wall %",*w);
 
         SphericalParticle particle;
         particle.setSpecies(s);
-        particle.setRadius(0.5);
+        particle.setRadius(0.2);
         auto p = particleHandler.copyAndAddObject(particle);
 
         Vec3D pos;
@@ -93,21 +93,34 @@ public:
         //pos.Y=0.5;
         std::ofstream file("GetDistanceAndNormalForTriangleWalls.out");
         file << "x\tz\td\tnx\tnz\n";
+        unsigned t=0;
         for (pos.X = getXMin(); pos.X <= getXMax(); pos.X += h) {
             for (pos.Z = getZMin(); pos.Z <= getZMax(); pos.Z += h) {
                 p->setPosition(pos);
                 double overlaps = 0;
                 Vec3D force {0,0,0};
                 unsigned count = 0;
-                double radius = 0.2;
+                interactionHandler.clear();
+                t++;
                 for (auto wall : wallHandler) {
-                    wall->getDistanceAndNormal(*p, distance, normal);
-                    double overlap = std::max(radius-distance,0.0);
+                    wall->getInteractionWith(p, t, &interactionHandler);
+                }
+                for (auto i : interactionHandler) {
+                    distance = i->getDistance();
+                    normal = i->getNormal();
+                    double overlap = std::max(p->getRadius()-distance,0.0);
                     overlaps += overlap;
                     force += -normal*overlap;
                     if (overlap>0) count++;
                 }
-                w->getDistanceAndNormal(*p, distance, normal);
+                distance=0;
+                normal={0,0,0};
+                for (auto i : interactionHandler) {
+                    if (i->getI()->getId()==w->getId()) {
+                        distance = i->getDistance();
+                        normal = i->getNormal();
+                    }
+                }
                 file << pos.X
                      << '\t' << pos.Z
                         << '\t' << distance
@@ -137,30 +150,30 @@ public:
                 "fz=reshape(raw.data(:,8),n);\n"
                 "count=reshape(raw.data(:,9),n);\n"
                 "\n"
-                "% figure(1)\n"
-                "% contourf(x,z,d,20,'EdgeColor','none')\n"
-                "% hold on\n"
-                "% contour(x,z,d,[0 0],'EdgeColor','k')\n"
-                "% plotGeometry\n"
-                "% hold off\n"
-                "% xlabel('x')\n"
-                "% ylabel('z')\n"
-                "% h=colorbar\n"
-                "% %xlabel(h, 'distance')\n"
-                "% title('distance')\n"
-                "% saveas(gcf,'distanceTriangleWalls.png')\n"
-                "% \n"
-                "% figure(2)\n"
-                "% m=6;\n"
-                "% quiver(x(1:m:end,1:m:end),z(1:m:end,1:m:end),nx(1:m:end,1:m:end),nz(1:m:end,1:m:end),0.5)\n"
-                "% hold on\n"
-                "% contour(x,z,d,[0 0],'EdgeColor','k')\n"
-                "% plotGeometry\n"
-                "% hold off\n"
-                "% xlabel('x')\n"
-                "% ylabel('z')\n"
-                "% title('normal')\n"
-                "% saveas(gcf,'normalTriangleWalls.png')\n"
+                "figure(1)\n"
+                "contourf(x,z,d,20,'EdgeColor','none')\n"
+                "hold on\n"
+                "contour(x,z,d,[0 0],'EdgeColor','k')\n"
+                "plotGeometry\n"
+                "hold off\n"
+                "xlabel('x')\n"
+                "ylabel('z')\n"
+                "h=colorbar\n"
+                "%xlabel(h, 'distance')\n"
+                "title('distance')\n"
+                "saveas(gcf,'distanceTriangleWalls.png')\n"
+                "\n"
+                "figure(2)\n"
+                "m=6;\n"
+                "quiver(x(1:m:end,1:m:end),z(1:m:end,1:m:end),nx(1:m:end,1:m:end),nz(1:m:end,1:m:end),0.5)\n"
+                "hold on\n"
+                "contour(x,z,d,[0 0],'EdgeColor','k')\n"
+                "plotGeometry\n"
+                "hold off\n"
+                "xlabel('x')\n"
+                "ylabel('z')\n"
+                "title('normal')\n"
+                "saveas(gcf,'normalTriangleWalls.png')\n"
                 "\n"
                 "figure(3)\n"
                 "contourf(x,z,o,20,'EdgeColor','none')\n"
@@ -201,7 +214,7 @@ public:
                 "saveas(gcf,'countTriangleWalls.png')\n"
                 "\n"
                 "function plotGeometry\n"
-                "plot(.5*[-1 -1 0 1 1],.5*[-1 0 0 0 1],'k')\n"
+                "plot(.7*[-1 -1 0 1 1],.7*[-1 0 0 0 1],'k')\n"
                 "end\n"
                 );
         logger(INFO,"Written file");
