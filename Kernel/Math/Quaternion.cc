@@ -453,6 +453,7 @@ Vec3D Quaternion::getEuler() const
 {
     Mdouble sinp = 2 * (q0 * q2 - q3 * q1);
     Mdouble pitch;
+    const Mdouble pi = 3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117068;
 
     if ((std::abs(sinp) < 1))
     {
@@ -460,7 +461,7 @@ Vec3D Quaternion::getEuler() const
     }
     else
     {
-        pitch = copysign(M_PI/2., sinp);
+        pitch = copysign(pi/2., sinp);
     }
 
     return Vec3D(
