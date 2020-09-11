@@ -42,9 +42,10 @@ public:
         removeOldFiles();
         setFileType(FileType::NO_FILE);
         dataFile.setFileType(FileType::ONE_FILE);
+        fStatFile.setFileType(FileType::ONE_FILE);
         setWallsWriteVTK(true);
         setParticlesWriteVTK(true);
-        setSaveCount(25);
+        setSaveCount(2);
 
         setTimeStep(1e-3);
         setTimeMax(2.0);
@@ -56,8 +57,8 @@ public:
         LinearViscoelasticBondedSpecies species;
         species.setDensity(6.0/constants::pi);
         species.setStiffness(2e3);
-        species.setDissipation(2.5);
-        species.setBondForceMax(20);
+        species.setDissipation(0);
+        species.setBondForceMax(0);
         auto s = speciesHandler.copyAndAddObject(species);
 
         //eight triangles forming a plane
@@ -102,22 +103,17 @@ public:
         SphericalParticle particle;
         particle.setSpecies(s);
         particle.setRadius(0.5);
-        double eq = species.getBondForceMax()/species.getStiffness();
-        particle.setPosition({0,-0.5,0.5-eq});
-        particle.setVelocity({1,0,0});
+        double eq = particle.getMass() * -getGravity().getZ()/species.getStiffness();
+        particle.setPosition({2,-0.5,0.5-eq});
+        particle.setVelocity({-1,0,0});
         particleHandler.copyAndAddObject(particle);
     }
 
-    void actionsAfterTimeStep () override {
-        if (getNumberOfTimeSteps()==0) {
-            logger(INFO,"Bonding %",*particleHandler.getLastObject());
-            dynamic_cast<BondedInteraction*>(interactionHandler.getLastObject())->bond();
-        }
-    }
 };
 
 int main(int argc, char* argv[])
 {
     RollingOverTriangleWalls().solve();
+    logger(INFO,"Run \"p [0:2]  'RollingOverTriangleWalls.fstat' u 4:9\" to view force vs position");
     return 0;
 }

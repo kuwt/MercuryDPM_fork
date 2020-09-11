@@ -60,6 +60,7 @@ bool TriangleWall::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance
     const Mdouble distanceMax = p.getWallInteractionRadius(this);
 
     // compute distance from face
+    //get distance from particle position to the face
     const Mdouble signedDistance = Vec3D::dot(position-vertex_[0], faceNormal_);
     distance = fabs(signedDistance);
 
@@ -78,7 +79,8 @@ bool TriangleWall::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance
     if (edgeDistance[id] > distanceMax) return false;
 
     // determine if it is a face contact
-    if (edgeDistance[id] < 0) {
+    const Vec3D posProjected = position - signedDistance * faceNormal_;
+    if (edgeDistance[id] <= 0 && isInsideTriangle(posProjected)){
         normal = (signedDistance >= 0) ? -faceNormal_ : faceNormal_;
         return true;
     }
@@ -232,4 +234,19 @@ bool TriangleWall::isLocal(Vec3D& min, Vec3D& max) const
     min = vertexMin_;
     max = vertexMax_;
     return true;
+}
+
+bool TriangleWall::isInsideTriangle(const Vec3D &point) const
+{
+    const Vec3D branch0 = point - vertex_[0];
+    const Vec3D branch1 = point - vertex_[1];
+    const Vec3D branch2 = point - vertex_[2];
+
+    //compute total area
+    Mdouble s = sqrt(Vec3D::cross(vertex_[1] - vertex_[0], vertex_[2] - vertex_[1]).getLengthSquared());
+    //compute barycentric coordinates
+    Mdouble s0 = sqrt(Vec3D::cross(branch0, branch1).getLengthSquared())/s;
+    Mdouble s1 = sqrt(Vec3D::cross(branch1, branch2).getLengthSquared())/s;
+    Mdouble s2 = sqrt(Vec3D::cross(branch2, branch0).getLengthSquared())/s;
+    return (1 > s0 > 0 && 1 > s1 > 0 && 1 > s2 > 0);
 }

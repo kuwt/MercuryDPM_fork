@@ -117,10 +117,12 @@ public:
      * If there is a collision, also return the normal vector.
      */
     bool getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3D& normal_return) const override;
-    
+
     void rotate(const Vec3D& angularVelocity) override;
     
     bool isLocal(Vec3D& min, Vec3D& max) const override;
+
+    bool isInsideTriangle(const Vec3D &point) const;
 
 private:
     

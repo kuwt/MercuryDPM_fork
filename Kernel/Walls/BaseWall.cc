@@ -371,7 +371,7 @@ BaseWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHan
     Mdouble distance;
     Vec3D normal;
     Mdouble overlap;
-    
+
     if (getDistanceNormalOverlap(*p, distance, normal, overlap))
     {
         // look for an existing interaction, or create a new one
@@ -387,23 +387,44 @@ BaseWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHan
                     break;
                 }
                 if (i->getI()->getGroupId() == getGroupId()) {
+                    // update contact, otherwise the distance comparison iis not correct
+                    // (note this is costly and we should replace this with a quicker algorithm if possible)
+                    if (i->getTimeStamp() < timeStamp) {
+                        double distance, overlap;
+                        Vec3D normal;
+                        static_cast<BaseWall*>(i->getI())->getDistanceNormalOverlap(*p, distance, normal, overlap);
+                        i->setNormal(-normal);
+                        i->setDistance(distance);
+                        i->setOverlap(overlap);
+                    }
                     // if another interaction with a wall of the same group is found
                     double proj = Vec3D::dot(-normal, i->getNormal());
                     // if the two contacts share a contact area, keep only the contact with the minimum distance
                     if (distance >= i->getDistance()) {
                         // if that other contact is closer to the particle than this one
-                        if (proj * distance > 0.999 * i->getDistance()) {
+                        if (proj * distance > (1.0-1e-12) * i->getDistance()) {
                             //if one contact point is in the contact area of the other point
+                            //(I take the vector a=radius*n, project it onto the other normal ni: b=(a.ni)ni, and check that |a|>(r-delta_i), which is equivalent to checking whether position+a is a distance less than the contact radius from the normal vector ni )
                             //logger(INFO,"Ignoring contact with % because contact with % is closer",getId(),i->getI()->getId());
                             return nullptr;
                         }
+                        //else, continue to compute this contact
                     } else {
                         // if this contact is closer to the particle than the other one
-                        if (proj * i->getDistance() >= 0.999 * distance) {
+                        if (proj * i->getDistance() >= (1.0-1e-12) * distance) {
                             //if the other contact point is in the contact area of this point, replace the other contact with this one
                             i->setI(this);
-                            i->setTimeStamp(timeStamp);
                             c = i;
+                            // if the contact force has already been computed (with the other wall), undo the force/torque computation
+                            if (i->getTimeStamp() == timeStamp) {
+                                p->addForce(-i->getForce());
+                                this->addForce(i->getForce());
+                                if (getHandler()->getDPMBase()->getRotation()) {
+                                    p->addTorque(i->getTorque() + Vec3D::cross(p->getPosition() - i->getContactPoint(), i->getForce()));
+                                    this->addTorque(i->getTorque() - Vec3D::cross(this->getPosition() - i->getContactPoint(), i->getForce()));
+                                }
+                            }
+                            i->setTimeStamp(timeStamp);
                             break;
                         }
                     }
