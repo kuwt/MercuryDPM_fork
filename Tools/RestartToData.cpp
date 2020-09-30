@@ -49,6 +49,7 @@ int main(int argc, char *argv[])
     if (problem.readRestartFile(std::string(in)+".restart")) {
         problem.setName(out);
         problem.cgHandler.computeContactPoints();
+        problem.writeXBallsScript();
         problem.writeDataFile();
         problem.writeFStatFile();
         problem.writeEneFile();
@@ -61,6 +62,7 @@ int main(int argc, char *argv[])
             problem.dataFile.setCounter(problem.restartFile.getCounter() - 1);
             problem.fStatFile.setCounter(problem.restartFile.getCounter() - 1);
             problem.eneFile.setCounter(problem.restartFile.getCounter() - 1);
+            //problem.writeXBallsScript();
             problem.writeDataFile();
             problem.writeFStatFile();
             problem.writeEneFile();

@@ -82,7 +82,8 @@ std::fstream BaseVTKWriter<T>::makeVTKFileWithHeader() const
     //extract the word "Wall" or "Particle" from the VTK writer name
     std::string name = handler_.getName();
     name = name.substr(0, name.length() - 7);
-    
+
+    //determine name of output file
     std::string fileName;
 #ifdef MERCURY_USE_MPI
     if (NUMBER_OF_PROCESSORS > 1 && name != "Wall")
@@ -101,14 +102,16 @@ std::fstream BaseVTKWriter<T>::makeVTKFileWithHeader() const
                name + '_' +
                std::to_string(fileCounter++) + ".vtu";
 #endif
-    
+
+    //open output file
     std::fstream file;
     file.open(fileName.c_str(), std::ios_base::out);
     if (file.fail())
     {
         logger(WARN, "File % could not be opened", fileName);
     }
-    //
+
+    // write output file header
     file << "<?xml version=\"1.0\"?>\n";
     file << "<!-- time " << handler_.getDPMBase()->getTime() << "-->\n";
     file << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n";
@@ -119,6 +122,7 @@ std::fstream BaseVTKWriter<T>::makeVTKFileWithHeader() const
 template<typename T>
 void BaseVTKWriter<T>::writeVTKFooterAndClose(std::fstream& file) const
 {
+    // write output file footer
     file << "<Cells>\n";
     file << "  <DataArray type=\"Int32\" Name=\"connectivity\" format=\"ascii\">\n";
     file << "  </DataArray>\n";
@@ -130,6 +134,7 @@ void BaseVTKWriter<T>::writeVTKFooterAndClose(std::fstream& file) const
     file << "</Piece>\n";
     file << "</UnstructuredGrid>\n";
     file << "</VTKFile>\n";
+    // close output file
     file.close();
 }
 

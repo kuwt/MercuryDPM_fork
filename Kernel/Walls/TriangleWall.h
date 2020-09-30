@@ -101,7 +101,9 @@ public:
      *  - updateVertexAndNormal is called to set the remaining variables
      */
     void setVertices(Vec3D A, Vec3D B, Vec3D C);
-    
+
+    std::array<Vec3D,3> getVertices() const {return vertex_;}
+
     void move(const Vec3D& move) override;
     
     /*!

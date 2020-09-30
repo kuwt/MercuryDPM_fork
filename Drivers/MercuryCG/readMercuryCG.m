@@ -17,7 +17,12 @@ end
 function [raw, header1, header2] = getRawData(name)
 raw = importdata(name,' ',2);
 header1 = raw.textdata{1};
-header2 = raw.textdata{2};
+if size(raw.textdata,2)==1
+    header2 = textscan(raw.textdata{2},'%s');
+    header2 = header2{1};
+else
+    header2 = raw.textdata(2,:);
+end
 raw = raw.data;
 end
 
@@ -37,9 +42,7 @@ for i=1:length(coord)
 end
 end
 
-function data = getVariables(data,raw,header2,dim)
-names = textscan(header2,'%s');
-names = names{1};
+function data = getVariables(data,raw,names,dim)
 isVariable = contains(names,':');
 for i=1:length(names)
     if (isVariable(i))

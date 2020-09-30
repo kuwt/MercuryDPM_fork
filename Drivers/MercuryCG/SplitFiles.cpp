@@ -50,17 +50,21 @@ public:
 		//open in-streams
 		data_file.open(data_filename.str().c_str(), std::fstream::in);
 		fstat_file.open(fstat_filename.str().c_str(), std::fstream::in);
-		
-		if (data_file.fail() || fstat_file.fail())
+
+		if (data_file.fail())
 		{
-			std::cerr << "ERROR: Input file " << data_filename.str() << " or " << fstat_filename.str() << " not found" << std::endl;
-			data_file.close();
-			fstat_file.close();
+			std::cerr << "ERROR: Input file " << data_filename.str() << " not found" << std::endl;
 			exit(-1);
 		} else {
-			std::cout << "Files opened: " << data_filename.str() << " and " << fstat_filename.str() << std::endl;
+            if (fstat_file.fail()) {
+                std::cerr << "WARN: Input file " << fstat_filename.str() << " not found; only data files will be processed" << std::endl;
+                std::cout << "File opened: " << data_filename.str() << std::endl;
+            } else {
+                std::cout << "Files opened: " << data_filename.str() << " and " << fstat_filename.str() << std::endl;
+            }
 		}
-	}
+
+    }
 
 	///Destructor
 	~CFile() {
@@ -71,7 +75,10 @@ public:
 		
 	bool copy(unsigned int stepsize, unsigned int counter) {
 		//return copy_last_time_step();
-		return copy_data(stepsize,counter) && copy_fstat(stepsize,counter);
+        if (fstat_file.fail())
+            return copy_data(stepsize,counter);
+        else
+            return copy_data(stepsize,counter) && copy_fstat(stepsize,counter);
 	}
 
 	bool copy_data(unsigned int stepsize, unsigned int counter) {

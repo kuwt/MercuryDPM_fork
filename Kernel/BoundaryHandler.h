@@ -81,6 +81,13 @@ public:
     std::string getName() const final;
     
     void boundaryActionsBeforeTimeLoop();
+
+private:
+    bool writeVTK_;
+public:
+    void setWriteVTK(bool writeVTK) { writeVTK_ = writeVTK; }
+
+    bool getWriteVTK() const { return writeVTK_; }
 };
 
 #endif

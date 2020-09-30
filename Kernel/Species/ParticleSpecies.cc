@@ -209,7 +209,11 @@ void ParticleSpecies::setMaxInteractionDistance(Mdouble interactionDistance) {
         maxInteractionDistance_ = 0;
         int j = getIndex();
         for (int i=0; i<getHandler()->getSize(); ++i) {
-            maxInteractionDistance_ = std::max(maxInteractionDistance_,getHandler()->getMixedObject(i,j)->getInteractionDistance());
+            const auto mixedSpecies = getHandler()->getMixedObject(i,j);
+            if (mixedSpecies) { //this check is necessary because the mixed species handler might not yet be built fully
+                maxInteractionDistance_ = std::max(maxInteractionDistance_,
+                        mixedSpecies->getInteractionDistance());
+            }
         }
     }
 }

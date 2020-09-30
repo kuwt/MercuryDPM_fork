@@ -166,12 +166,18 @@ void LiquidMigrationWilletInteraction::form()
     LiquidFilmParticle* PParticle = dynamic_cast<LiquidFilmParticle*>(getP());
     if (IParticle == nullptr) //if I is a wall
     {
-        //consider max bridge volume and add the rest to particles
-        if (PParticle->getLiquidVolume() <= species->getLiquidBridgeVolumeMax())
+        //do not form bridge if the volume is below minimum
+        if (PParticle->getLiquidVolume() < species->getLiquidBridgeVolumeMin())
+        {
+            return;
+        }
+        //if below max bridge volume, move all liquid from film to volume
+        else if (PParticle->getLiquidVolume() <= species->getLiquidBridgeVolumeMax())
         {
             liquidBridgeVolume_ = PParticle->getLiquidVolume();
             PParticle->setLiquidVolume(0.0);
         }
+        //if above max bridge volume, fill the liquid bridge and keep the rest of the liquid in the particle
         else
         {
             liquidBridgeVolume_ = species->getLiquidBridgeVolumeMax();
@@ -201,7 +207,7 @@ void LiquidMigrationWilletInteraction::form()
         //assign all liquid of the contacting particles to the bridge,
         //if the total volume does not exceed LiquidBridgeVolumeMax
         ///\todo: maybe we need to check ghost particles?
-        if (distributableLiquidVolume <= 0)
+        if (distributableLiquidVolume <= species->getLiquidBridgeVolumeMin())
         {
             return;
         }

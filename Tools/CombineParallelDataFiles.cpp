@@ -164,3 +164,10 @@ int main (int argc, char *argv[])
     dataFiles.write();
     return 0;
 }
+
+/*
+ * Note: to merge muilti-file input data, use
+   for i in 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
+       echo $i && ls -1 -t -r name.data$i.* | xargs cat > name.data$i;
+   done
+ */

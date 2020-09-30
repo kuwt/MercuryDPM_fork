@@ -126,25 +126,45 @@ bool DeletionBoundary::checkBoundaryAfterParticleMoved(BaseParticle* p, Particle
     {
         if (trackOutflow_) {
             auto dpm = getHandler()->getDPMBase();
+            trackMassDeleted_ += p->getMass();
             if (!tracker.is_open()) {
                 std::string name  = dpm->getName()
                         + helpers::to_string(getIndex())
                         + ".out" + (NUMBER_OF_PROCESSORS==1?"":std::to_string(PROCESSOR_ID));
                 logger(INFO,"Open file %",name);
                 tracker.open(name);
-                tracker << std::setw(12) << "Time"
-                        << std::setw(8) << "Species"
-                        << std::setw(8) << "ID"
-                        << std::setw(12) << "Radius"
-                        << std::setw(12) << "Mass"
+                tracker << std::setw(13) << "Time "
+                        << std::setw(8) << "Species "
+                        << std::setw(8) << "ID "
+                        << std::setw(13) << "Position_x "
+                        << std::setw(13) << "Position_y "
+                        << std::setw(13) << "Position_z "
+                        << std::setw(13) << "Velocity_x "
+                        << std::setw(13) << "Velocity_y "
+                        << std::setw(13) << "Velocity_z "
+                        << std::setw(13) << "Radius "
+                        << std::setw(13) << "AnVelocity_x "
+                        << std::setw(13) << "AnVelocity_y "
+                        << std::setw(13) << "AnVelocity_z "
+                        << std::setw(13) << "Mass "
+                        << std::setw(13) << "TotalMass"
                         << '\n';
             }
-            tracker << std::setw(12) << dpm->getTime()
-                    << std::setw(8) << p->getIndSpecies()
-                    << std::setw(8) << p->getId()
-                    << std::setw(12) << p->getRadius()
-                    << std::setw(12) << p->getMass()
-                    << '\n';
+            tracker << std::setw(12) << dpm->getTime() << ' '
+                    << std::setw(8) << p->getIndSpecies() << ' '
+                    << std::setw(8) << p->getId() << ' '
+                    << std::setw(12) << p->getPosition().X << ' '
+                    << std::setw(12) << p->getPosition().Y << ' '
+                    << std::setw(12) << p->getPosition().Z << ' '
+                    << std::setw(12) << p->getVelocity().X << ' '
+                    << std::setw(12) << p->getVelocity().Y << ' '
+                    << std::setw(12) << p->getVelocity().Z << ' '
+                    << std::setw(12) << p->getRadius() << ' '
+                    << std::setw(12) << p->getAngularVelocity().X << ' '
+                    << std::setw(12) << p->getAngularVelocity().Y << ' '
+                    << std::setw(12) << p->getAngularVelocity().Z << ' '
+                    << std::setw(12) << p->getMass() << ' '
+                    << std::setw(12) << trackMassDeleted_ << '\n';
         }
 
         #ifdef MERCURY_USE_MPI

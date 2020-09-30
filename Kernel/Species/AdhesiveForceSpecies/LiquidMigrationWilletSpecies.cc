@@ -29,6 +29,7 @@
 LiquidMigrationWilletSpecies::LiquidMigrationWilletSpecies()
 {
     liquidBridgeVolumeMax_ = 0.0; //std::numeric_limits<double>::infinity();
+    liquidBridgeVolumeMin_ = 0.0;
     distributionCoefficient_ = 1.0;
     surfaceTension_ = 0.0;
     contactAngle_ = 0.0;
@@ -43,6 +44,7 @@ LiquidMigrationWilletSpecies::LiquidMigrationWilletSpecies()
 LiquidMigrationWilletSpecies::LiquidMigrationWilletSpecies(const LiquidMigrationWilletSpecies& s)
 {
     liquidBridgeVolumeMax_ = s.liquidBridgeVolumeMax_;
+    liquidBridgeVolumeMin_ = s.liquidBridgeVolumeMin_;
     distributionCoefficient_ = s.distributionCoefficient_;
     surfaceTension_ = s.surfaceTension_;
     contactAngle_ = s.contactAngle_;
@@ -63,7 +65,8 @@ LiquidMigrationWilletSpecies::~LiquidMigrationWilletSpecies()
  */
 void LiquidMigrationWilletSpecies::write(std::ostream& os) const
 {
-    os << " liquidBridgeVolume " << liquidBridgeVolumeMax_;
+    os << " liquidBridgeVolumeMax " << liquidBridgeVolumeMax_;
+    if (liquidBridgeVolumeMin_) os << " liquidBridgeVolumeMin " << liquidBridgeVolumeMin_;
     os << " distributionCoefficient " << distributionCoefficient_;
     os << " surfaceTension " << surfaceTension_;
     os << " contactAngle " << contactAngle_;
@@ -76,6 +79,7 @@ void LiquidMigrationWilletSpecies::read(std::istream& is)
 {
     std::string dummy;
     is >> dummy >> liquidBridgeVolumeMax_;
+    helpers::readOptionalVariable(is,"liquidBridgeVolumeMin",liquidBridgeVolumeMin_);
     is >> dummy >> distributionCoefficient_;
     is >> dummy >> surfaceTension_;
     is >> dummy >> contactAngle_;
@@ -97,6 +101,7 @@ std::string LiquidMigrationWilletSpecies::getBaseName() const
 void LiquidMigrationWilletSpecies::mix(LiquidMigrationWilletSpecies* const S, LiquidMigrationWilletSpecies* const T)
 {
     setLiquidBridgeVolumeMax(BaseSpecies::average(S->getLiquidBridgeVolumeMax(), T->getLiquidBridgeVolumeMax()));
+    setLiquidBridgeVolumeMin(BaseSpecies::average(S->getLiquidBridgeVolumeMin(), T->getLiquidBridgeVolumeMin()));
     distributionCoefficient_ = BaseSpecies::average(S->getDistributionCoefficient(), T->getDistributionCoefficient());
     surfaceTension_ = BaseSpecies::average(S->getSurfaceTension(), T->getSurfaceTension());
     contactAngle_ = BaseSpecies::average(S->getContactAngle(), T->getContactAngle());
@@ -113,16 +118,17 @@ void LiquidMigrationWilletSpecies::setInteractionDistance()
  */
 void LiquidMigrationWilletSpecies::setLiquidBridgeVolumeMax(Mdouble liquidBridgeVolumeMax)
 {
-    if (liquidBridgeVolumeMax >= 0)
-    {
-        liquidBridgeVolumeMax_ = liquidBridgeVolumeMax;
-        setInteractionDistance();
-    }
-    else
-    {
-        std::cerr << "Error in setLiquidBridgeVolumeMax: liquidBridgeVolumeMax=" << liquidBridgeVolumeMax << std::endl;
-        exit(-1);
-    }
+    logger.assert_always(liquidBridgeVolumeMax>=0,
+                         "Error in setLiquidBridgeVolumeMax: liquidBridgeVolumeMax=%", liquidBridgeVolumeMax);
+    liquidBridgeVolumeMax_ = liquidBridgeVolumeMax;
+    setInteractionDistance();
+}
+
+void LiquidMigrationWilletSpecies::setLiquidBridgeVolumeMin(Mdouble liquidBridgeVolumeMin)
+{
+    logger.assert_always(liquidBridgeVolumeMin>=0,
+            "Error in setLiquidBridgeVolumeMin: liquidBridgeVolumeMin=%", liquidBridgeVolumeMin);
+    liquidBridgeVolumeMin_ = liquidBridgeVolumeMin;
 }
 
 /*!
@@ -131,6 +137,11 @@ void LiquidMigrationWilletSpecies::setLiquidBridgeVolumeMax(Mdouble liquidBridge
 Mdouble LiquidMigrationWilletSpecies::getLiquidBridgeVolumeMax() const
 {
     return liquidBridgeVolumeMax_;
+}
+
+Mdouble LiquidMigrationWilletSpecies::getLiquidBridgeVolumeMin() const
+{
+    return liquidBridgeVolumeMin_;
 }
 
 /*!

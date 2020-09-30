@@ -90,6 +90,7 @@ struct PSD
                                                           const std::vector<double>& probability);
 
     // get quantile size
+    //todo the D0 and D100 should be fixed.
     static double getD0 (const std::vector<PSD>& psd){
         return 2.0*psd[0].radius;
     }

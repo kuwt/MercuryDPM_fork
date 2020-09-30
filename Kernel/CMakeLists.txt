@@ -54,6 +54,10 @@ add_library(DPMBase STATIC
         MpiContainer.cc
         MpiDataClass.cc
 
+	    HGrid.cc
+	    MercuryBase.cc
+        Mercury2D.cc
+        Mercury3D.cc
 
         BoundaryHandler.cc
         PeriodicBoundaryHandler.cc
@@ -107,11 +111,7 @@ endif ()
 
 #Could later create a 2D and 3D library seperatly, but sure how many we want to create
 add_library(MercuryBase STATIC
-        HGrid.cc
-        MercuryBase.cc
-        Mercury2D.cc
-        Mercury3D.cc
-        HGridOptimiser.cc)
+	HGridOptimiser.cc)
 
 target_link_libraries(MercuryBase DPMBase)
 

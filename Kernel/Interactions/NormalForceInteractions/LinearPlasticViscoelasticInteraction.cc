@@ -141,9 +141,10 @@ void LinearPlasticViscoelasticInteraction::computeNormalForce()
             setMaxOverlap(std::min(deltaStar, getOverlap()));
 
         //calculate the unloading stiffness
-        const Mdouble unloadingStiffness = species->getLoadingStiffness()
-                                           + (species->getUnloadingStiffnessMax() - species->getLoadingStiffness()) *
-                                             (getMaxOverlap() / deltaStar);
+        const Mdouble unloadingStiffness =
+                species->getDoConstantUnloadingStiffness()?species->getUnloadingStiffnessMax():
+                (species->getLoadingStiffness() +
+                 (species->getUnloadingStiffnessMax() - species->getLoadingStiffness()) * (getMaxOverlap() / deltaStar));
 
         //calculate the overlap where the force is zero
         const Mdouble equilibriumOverlap =

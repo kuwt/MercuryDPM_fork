@@ -104,7 +104,7 @@ Mdouble BaseSpecies::average(Mdouble a, Mdouble b)
 {
     //the second algorithm seems to have a better accuracy, at least for the case average(2e5,2e5)
     //return (a + b) != 0.0 ? (2. * (a * b) / (a + b)) : 0;
-    return (a + b) != 0.0 ? (2. / (1.0 / a + 1.0 / b)) : 0.0;
+    return (a==0||b==0) ? 0.0 : (2. / (1.0 / a + 1.0 / b));
 }
 
 /*! 

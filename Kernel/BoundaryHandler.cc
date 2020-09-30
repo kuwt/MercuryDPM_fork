@@ -44,10 +44,12 @@
 #include "Boundaries/RandomClusterInsertionBoundary.h"
 #include "Boundaries/FixedClusterInsertionBoundary.h"
 #include "Boundaries/StressStrainControlBoundary.h"
+#include "Boundaries/DropletBoundary.h"
 
 ///Constructor of the BoundaryHandler class. It creates and empty BoundaryHandler.
 BoundaryHandler::BoundaryHandler()
 {
+    writeVTK_ = false;
     logger(DEBUG, "BoundaryHandler::BoundaryHandler() finished");
 }
 
@@ -59,6 +61,7 @@ BoundaryHandler::BoundaryHandler()
 BoundaryHandler::BoundaryHandler(const BoundaryHandler& BH)
         : BaseHandler<BaseBoundary>()
 {
+    writeVTK_ = BH.writeVTK_;
     copyContentsFromOtherHandler(BH);
     logger(DEBUG, "BoundaryHandler::BoundaryHandler(const BoundaryHandler &BH) finished");
 }
@@ -184,6 +187,10 @@ BaseBoundary* BoundaryHandler::createObject(const std::string& type)
     else if (type == "FixedClusterInsertionBoundary")
     {
         return new FixedClusterInsertionBoundary;
+    }
+    else if (type == "DropletBoundary")
+    {
+        return new DropletBoundary;
     }
     else if (type == "normal") //for backward compatibility (before svnversion ~2360)
     {

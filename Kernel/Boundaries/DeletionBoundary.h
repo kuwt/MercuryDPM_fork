@@ -167,6 +167,7 @@ private:
      */
     unsigned int numberOfParticlesDeleted_;
     double massDeleted_;
+    double trackMassDeleted_;
     double volumeDeleted_;
     
     /*!

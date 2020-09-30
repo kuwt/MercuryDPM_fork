@@ -120,7 +120,8 @@ std::ostream& operator<<(std::ostream& os, DPMBase& md)
  * \param[in] other
  */
 DPMBase::DPMBase(const DPMBase& other) : wallVTKWriter_(other.wallVTKWriter_),
-                                         interactionVTKWriter_(other.interactionVTKWriter_)
+                                         interactionVTKWriter_(other.interactionVTKWriter_),
+                                         boundaryVTKWriter_(other.boundaryVTKWriter_)
 {
     setName(other.getName());
     runNumber_ = other.runNumber_;
@@ -188,7 +189,7 @@ DPMBase::DPMBase(const DPMBase& other) : wallVTKWriter_(other.wallVTKWriter_),
  * a simulation to be created 'off the shelf'. For full details of the parameters
  * initialised and their assigned values, see constructor()
  */
-DPMBase::DPMBase() : wallVTKWriter_(wallHandler), interactionVTKWriter_(interactionHandler)
+DPMBase::DPMBase() : wallVTKWriter_(wallHandler), interactionVTKWriter_(interactionHandler), boundaryVTKWriter_(boundaryHandler)
 {
     constructor();
 }
@@ -1984,9 +1985,11 @@ void DPMBase::writeEneTimeStep(std::ostream& os) const
 
 void DPMBase::writeVTKFiles() const
 {
-    if (getWallsWriteVTK() == FileType::ONE_FILE && getTime() == 0.0)
+    static bool writeWall = true;
+    if (getWallsWriteVTK() == FileType::ONE_FILE && writeWall)
     {
         wallVTKWriter_.writeVTK();
+        writeWall=false;
     } else if (getWallsWriteVTK() == FileType::MULTIPLE_FILES
         || getWallsWriteVTK() == FileType::MULTIPLE_FILES_PADDED) {
         wallVTKWriter_.writeVTK();
@@ -2001,7 +2004,12 @@ void DPMBase::writeVTKFiles() const
     {
         interactionVTKWriter_.writeVTK();
     }
-    
+
+    if (boundaryHandler.getWriteVTK())
+    {
+        boundaryVTKWriter_.writeVTK();
+    }
+
     //only write once
     bool writePython = getParticlesWriteVTK() || getWallsWriteVTK() != FileType::NO_FILE ||
                        interactionHandler.getWriteVTK() != FileType::NO_FILE;
@@ -3274,8 +3282,13 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
        << "systemDimensions " << getSystemDimensions()
        << " particleDimensions " << getParticleDimensions()
        << " gravity " << getGravity();
-    os << " writeVTK " << writeParticlesVTK_ << " " << writeWallsVTK_ << " " << interactionHandler.getWriteVTK();
-    os << " " << (vtkWriter_?vtkWriter_->getFileCounter():0) << " " << wallVTKWriter_.getFileCounter() << " " << interactionVTKWriter_.getFileCounter();
+    os << " writeVTK " << writeParticlesVTK_
+        << " " << writeWallsVTK_
+        << " " << interactionHandler.getWriteVTK()
+        << " " << (vtkWriter_?vtkWriter_->getFileCounter():0)
+        << " " << wallVTKWriter_.getFileCounter()
+        << " " << interactionVTKWriter_.getFileCounter()
+        << " " << boundaryVTKWriter_.getFileCounter();
     os << " random ";
     random.write(os);
 #ifdef MERCURY_USE_MPI
@@ -3460,13 +3473,16 @@ void DPMBase::read(std::istream& is)
             {
                 FileType writeInteractionsVTK = FileType::NO_FILE;
                 unsigned particlesCounter, wallCounter, interactionCounter;
-                line >> writeParticlesVTK_ >> writeWallsVTK_ >> writeInteractionsVTK >> particlesCounter >> wallCounter >> interactionCounter >> dummy;
+                bool writeBoundaryVTK;
+                line >> writeParticlesVTK_ >> writeWallsVTK_ >> writeInteractionsVTK >> writeBoundaryVTK >> particlesCounter >> wallCounter >> interactionCounter >> dummy;
                 setParticlesWriteVTK(writeParticlesVTK_);
                 setWallsWriteVTK(writeWallsVTK_);
                 interactionHandler.setWriteVTK(writeInteractionsVTK);
+                boundaryHandler.setWriteVTK(writeBoundaryVTK);
                 vtkWriter_->setFileCounter(particlesCounter);
                 wallVTKWriter_.setFileCounter(particlesCounter);
                 interactionVTKWriter_.setFileCounter(particlesCounter);
+                boundaryVTKWriter_.setFileCounter(particlesCounter);
             }
             if (!dummy.compare("random"))
             {
@@ -4431,7 +4447,6 @@ bool DPMBase::checkParticleForInteraction(const BaseParticle& p)
     }
     
     int localInteraction = checkParticleForInteractionLocal(p);
-
     //The root gathers all values and computes the global value
     int *interactionList = nullptr;
     if (PROCESSOR_ID == 0)

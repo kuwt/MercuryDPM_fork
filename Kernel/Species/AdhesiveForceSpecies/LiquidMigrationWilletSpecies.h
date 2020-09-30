@@ -76,7 +76,17 @@ public:
      * \brief used to access the Volume of the liquid bridge.
      */
     Mdouble getLiquidBridgeVolumeMax() const;
-    
+
+    /*!
+      * \brief used to set the Volume of the liquid bridge.
+      */
+    void setLiquidBridgeVolumeMin(Mdouble);
+
+    /*!
+     * \brief used to access the Volume of the liquid bridge.
+     */
+    Mdouble getLiquidBridgeVolumeMin() const;
+
     /*!
      * \brief used to set the distribution coefficient of the liquid.
      */
@@ -109,13 +119,15 @@ public:
 
 private:
     /*! 
-     * \brief Volume of the liquid bridge. 
-     * \details Currently, this is a Species property (i.e. all particles have 
-     * the same liquid bridge volume), but this should probably become a 
-     * Particle or Interaction property.
+     * \brief Max volume a liquid bridge gets during formation; any excess remains in the liquid film of the particle.
      */
     Mdouble liquidBridgeVolumeMax_;
-    
+
+    /*!
+     * \brief Minimum volume needed to form a liquid bridge.
+     */
+    Mdouble liquidBridgeVolumeMin_;
+
     /*! 
      * \brief distribution coefficient of the liquid
      * \details This is a variable that determines the fraction of the liquid that 

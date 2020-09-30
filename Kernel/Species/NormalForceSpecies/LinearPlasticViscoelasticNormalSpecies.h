@@ -166,6 +166,10 @@ public:
      */
     Mdouble computeBondNumberMax(Mdouble harmonicMeanRadius, Mdouble gravitationalAcceleration) const;
 
+    bool getDoConstantUnloadingStiffness() const {return doConstantUnloadingStiffness_;}
+
+    void setDoConstantUnloadingStiffness(bool doConstantUnloadingStiffness) {doConstantUnloadingStiffness_ = doConstantUnloadingStiffness;}
+
 private:
     ///(normal) spring constant (k_1)
     Mdouble loadingStiffness_;
@@ -181,6 +185,9 @@ private:
     
     ///linear dissipation coefficient
     Mdouble dissipation_;
+
+    //whether unloading stiffness is variable (Luding) or constant (WaltonBraun)
+    bool doConstantUnloadingStiffness_ = false;
 };
 
 #endif

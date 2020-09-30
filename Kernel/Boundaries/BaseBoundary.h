@@ -108,7 +108,9 @@ public:
     virtual void actionsBeforeTimeLoop();
     
     virtual void modifyGhostAfterCreation(BaseParticle* particle, int i);
-    
+
+    virtual void writeVTK(std::fstream& file) {}
+
     /*!
      * \brief Sets the boundary's BoundaryHandler
      */

@@ -58,6 +58,8 @@
 #include "VTKWriter/ParticleVtkWriter.h"
 #include "VTKWriter/WallVTKWriter.h"
 #include "VTKWriter/InteractionVTKWriter.h"
+#include "VTKWriter/BoundaryVTKWriter.h"
+
 
 /*!
  * \class DPMBase
@@ -1232,9 +1234,11 @@ private:
     ParticleVtkWriter* vtkWriter_;
     
     WallVTKWriter wallVTKWriter_;
-    
+
     InteractionVTKWriter interactionVTKWriter_;
-    
+
+    BoundaryVTKWriter boundaryVTKWriter_;
+
     //This is the private data that is only used by the xballs output
     
     /*!

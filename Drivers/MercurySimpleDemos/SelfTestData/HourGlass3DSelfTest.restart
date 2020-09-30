@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name HourGlass3DSelfTest revision 3544 repository https://svn.mercurydpm.org/SourceCode/Trunk
+MercuryDPM 0.14 name HourGlass3DSelfTest revision 4848 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
 dataFile    fileType ONE_FILE saveCount 500 counter 5 lastSavedTimeStep 1673
 fStatFile   fileType ONE_FILE saveCount 500 counter 5 lastSavedTimeStep 1673
 eneFile     fileType ONE_FILE saveCount 500 counter 5 lastSavedTimeStep 1673
@@ -7,7 +7,7 @@ statFile    fileType ONE_FILE saveCount 500 counter 0
 interactionFile fileType NO_FILE saveCount 0 counter 0
 xMin 0 xMax 0.1 yMin 0 yMax 0.1 zMin 0 zMax 0.6
 timeStep 5.97983663675478e-06 time 0.0100042666932903 ntimeSteps 1673 timeMax 0.01
-systemDimensions 3 particleDimensions 3 gravity 0 0 -9.8 writeVTK 1 ONE_FILE NO_FILE 5 1 0 random  0 1103515245 12345 1073741824 607 273 784607267 xBallsArguments -v0 -solidf
+systemDimensions 3 particleDimensions 3 gravity 0 0 -9.8 writeVTK 1 ONE_FILE NO_FILE 5 1 0 0 random  0 1103515245 12345 1073741824 607 273 784607267 xBallsArguments -v0 -solidf
 Species 1
 LinearViscoelasticFrictionSpecies id 0 density 2000 stiffness 100000 dissipation 0.63 slidingStiffness 12000 slidingDissipation 0.063 slidingFrictionCoefficient 0.5 slidingFrictionCoefficientStatic 0.5 rollingStiffness 12000 rollingDissipation 0.063 rollingFrictionCoefficient 0.2 rollingFrictionCoefficientStatic 0.2 torsionStiffness 12000 torsionDissipation 0 torsionFrictionCoefficient 0.1 torsionFrictionCoefficientStatic 0.1
 Walls 3

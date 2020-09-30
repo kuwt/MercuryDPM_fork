@@ -40,6 +40,7 @@ LinearPlasticViscoelasticNormalSpecies::LinearPlasticViscoelasticNormalSpecies()
     cohesionStiffness_ = 0.0;
     penetrationDepthMax_ = 0.0;
     dissipation_ = 0.0;
+    doConstantUnloadingStiffness_ = 0.0;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"LinearPlasticViscoelasticNormalSpecies::LinearPlasticViscoelasticNormalSpecies() finished"<<std::endl;
 #endif
@@ -57,6 +58,7 @@ LinearPlasticViscoelasticNormalSpecies::LinearPlasticViscoelasticNormalSpecies(
     cohesionStiffness_ = p.cohesionStiffness_;
     penetrationDepthMax_ = p.penetrationDepthMax_;
     dissipation_ = p.dissipation_;
+    doConstantUnloadingStiffness_ = p.doConstantUnloadingStiffness_;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"LinearPlasticViscoelasticNormalSpecies::LinearPlasticViscoelasticNormalSpecies(const LinearPlasticViscoelasticNormalSpecies &p) finished"<<std::endl;
 #endif
@@ -76,6 +78,7 @@ void LinearPlasticViscoelasticNormalSpecies::write(std::ostream& os) const
 {
     os << " loadingStiffness " << loadingStiffness_;
     os << " maxUnloadingStiffness " << unloadingStiffnessMax_;
+    if (doConstantUnloadingStiffness_) os << " doConstantUnloadingStiffness " << doConstantUnloadingStiffness_;
     os << " cohesionStiffness " << cohesionStiffness_;
     os << " maxPenetration " << penetrationDepthMax_;
     os << " dissipation " << dissipation_;
@@ -89,6 +92,7 @@ void LinearPlasticViscoelasticNormalSpecies::read(std::istream& is)
     std::string dummy;
     is >> dummy >> loadingStiffness_;
     is >> dummy >> unloadingStiffnessMax_;
+    helpers::readOptionalVariable<bool>(is,"doConstantUnloadingStiffness",doConstantUnloadingStiffness_);
     is >> dummy >> cohesionStiffness_;
     is >> dummy >> penetrationDepthMax_;
     is >> dummy >> dissipation_;
@@ -115,6 +119,8 @@ void LinearPlasticViscoelasticNormalSpecies::mix(LinearPlasticViscoelasticNormal
     cohesionStiffness_ = BaseSpecies::average(S->getCohesionStiffness(), T->getCohesionStiffness());
     penetrationDepthMax_ = BaseSpecies::average(S->getPenetrationDepthMax(), T->getPenetrationDepthMax());
     dissipation_ = BaseSpecies::average(S->getDissipation(), T->getDissipation());
+    logger.assert(S->doConstantUnloadingStiffness_==T->doConstantUnloadingStiffness_,"you cannot mix species where doConstantUnloadingStiffness is not the same");
+    doConstantUnloadingStiffness_ = S->doConstantUnloadingStiffness_;
 }
 
 /*!

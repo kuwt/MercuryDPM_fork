@@ -54,6 +54,7 @@
 #include "Species/HertzianViscoelasticFrictionChargedBondedSpecies.h"
 #include "Species/LinearViscoelasticFrictionChargedBondedSpecies.h"
 #include "Species/LinearPlasticViscoelasticSlidingFrictionLiquidMigrationWilletSpecies.h"
+#include "Species/LinearPlasticViscoelasticFrictionLiquidBridgeWilletSpecies.h"
 
 #include "Species/LinearViscoelasticReversibleAdhesiveSpecies.h"
 #include "Species/LinearPlasticViscoelasticReversibleAdhesiveSpecies.h"
@@ -61,6 +62,7 @@
 #include "Species/LinearViscoelasticSlidingFrictionReversibleAdhesiveSpecies.h"
 #include "Species/LinearPlasticViscoelasticFrictionReversibleAdhesiveSpecies.h"
 #include "Species/LinearPlasticViscoelasticSlidingFrictionReversibleAdhesiveSpecies.h"
+
 
 #include "Species/LinearViscoelasticFrictionLiquidBridgeWilletSpecies.h"
 #include "Species/LinearViscoelasticFrictionLiquidMigrationWilletSpecies.h"
@@ -364,6 +366,12 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
         is >> species;
         copyAndAddObject(species);
     }
+    else if (type == "LinearPlasticViscoelasticFrictionLiquidBridgeWilletSpecies")
+    {
+        LinearPlasticViscoelasticFrictionLiquidBridgeWilletSpecies species;
+        is >> species;
+        copyAndAddObject(species);
+    }
     else if (type == "k") //for backwards compatibility
     {
         addObject(readOldObject(is));
@@ -518,6 +526,12 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
         else if (type == "LinearPlasticViscoelasticSlidingFrictionLiquidMigrationWilletMixedSpecies")
         {
             LinearPlasticViscoelasticSlidingFrictionLiquidMigrationWilletMixedSpecies species;
+            is >> species;
+            mixedObjects_.push_back(species.copy());
+        }
+        else if (type == "LinearPlasticViscoelasticFrictionLiquidBridgeWilletMixedSpecies")
+        {
+            LinearPlasticViscoelasticFrictionLiquidBridgeWilletMixedSpecies species;
             is >> species;
             mixedObjects_.push_back(species.copy());
         }
@@ -740,16 +754,17 @@ BaseSpecies* SpeciesHandler::getMixedObject(const unsigned int id1, const unsign
     }
     else
     {
-        if (std::max(id1, id2) >= getNumberOfObjects())
+        const unsigned int mixedId = getMixedId(id1, id2);
+        if (mixedId>=mixedObjects_.size())
         {
-            logger(ERROR,
+            logger(WARN,
                    "In: Object* SpeciesHandler::getMixedObject(const unsigned int id) const. No Object exist with index %, number of objects is %",
                    std::max(id1, id2), getNumberOfObjects());
             return nullptr;
         }
         else
         {
-            return mixedObjects_[getMixedId(id1, id2)];
+            return mixedObjects_[mixedId];
         }
     }
 }

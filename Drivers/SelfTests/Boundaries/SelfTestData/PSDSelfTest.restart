@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name PSDSelfTest revision 4497 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
+MercuryDPM 0.14 name PSDSelfTest revision 4848 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
 dataFile    fileType ONE_FILE saveCount 10 counter 22 lastSavedTimeStep 201
 fStatFile   fileType ONE_FILE saveCount 20 counter 12 lastSavedTimeStep 201
 eneFile     fileType ONE_FILE saveCount 20 counter 12 lastSavedTimeStep 201
@@ -7,7 +7,7 @@ statFile    fileType ONE_FILE saveCount 20 counter 0
 interactionFile fileType NO_FILE saveCount 0 counter 0
 xMin 0 xMax 0.1 yMin 0 yMax 0.1 zMin 0 zMax 0.1
 timeStep 0.0001 time 0.0200999999999999 ntimeSteps 201 timeMax 0.02
-systemDimensions 3 particleDimensions 3 gravity 0 0 0 writeVTK 0 NO_FILE NO_FILE 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267
+systemDimensions 3 particleDimensions 3 gravity 0 0 0 writeVTK 0 NO_FILE NO_FILE 0 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267
 Species 1
 LinearViscoelasticSpecies id 0 density 2000 stiffness 10000 dissipation 0
 Walls 0

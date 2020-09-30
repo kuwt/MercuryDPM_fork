@@ -435,7 +435,10 @@ std::ostream& operator<<(std::ostream& os, const Vec3D& a)
  */
 std::istream& operator>>(std::istream& is, Vec3D& a)
 {
-    is >> a.X >> a.Y >> a.Z;
+    //TW: clearing the stream avoids the nasty problem that the failbit is set to true if numbers below DBL_MIN=1e-308 are read.
+    is >> a.X; is.clear();
+    is >> a.Y; is.clear();
+    is >> a.Z; is.clear();
     return is;
 }
 
