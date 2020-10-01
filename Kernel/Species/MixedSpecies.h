@@ -100,14 +100,8 @@ public:
 
 template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveForceSpecies>
 MixedSpecies<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::MixedSpecies()
-        : BaseSpecies(), NormalForceSpecies(), FrictionForceSpecies(), AdhesiveForceSpecies()
+        : BaseSpecies(this,this,this), NormalForceSpecies(), FrictionForceSpecies(), AdhesiveForceSpecies()
 {
-    normalForce_ = this;
-    frictionForce_ = this;
-    adhesiveForce_ = this;
-    normalForce_->setBaseSpecies(this);
-    frictionForce_->setBaseSpecies(this);
-    adhesiveForce_->setBaseSpecies(this);
     logger(DEBUG, "MixedSpecies::MixedSpecies() finished");
 }
 

@@ -202,14 +202,8 @@ public:
 
 template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveForceSpecies>
 Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::Species()
-        : ParticleSpecies(), NormalForceSpecies(), FrictionForceSpecies(), AdhesiveForceSpecies()
+        : ParticleSpecies(this,this,this), NormalForceSpecies(), FrictionForceSpecies(), AdhesiveForceSpecies()
 {
-    normalForce_ = this;
-    frictionForce_ = this;
-    adhesiveForce_ = this;
-    normalForce_->setBaseSpecies(this);
-    frictionForce_->setBaseSpecies(this);
-    adhesiveForce_->setBaseSpecies(this);
     logger(DEBUG, "Species::Species() finished");
 }
 
@@ -218,7 +212,7 @@ Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::Species
  */
 template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveForceSpecies>
 Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::Species(const Species& s)
-        : BaseSpecies(s), ParticleSpecies(s), NormalForceSpecies(s), FrictionForceSpecies(s), AdhesiveForceSpecies(s)
+        : ParticleSpecies(s), NormalForceSpecies(s), FrictionForceSpecies(s), AdhesiveForceSpecies(s)
 {
     normalForce_ = this;
     frictionForce_ = this;

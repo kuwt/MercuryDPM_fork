@@ -36,21 +36,28 @@ class BaseParticle;
 class BaseInteractable;
 
 BaseSpecies::BaseSpecies()
-        : BaseObject()
+        : BaseObject(), handler_(nullptr), interactionDistance_(0)
 {
-    handler_ = nullptr;
-    interactionDistance_ = 0;
     logger(DEBUG, "BaseSpecies::BaseSpecies() finished");
 }
+
+BaseSpecies::BaseSpecies(BaseNormalForce* normalForce, BaseFrictionForce* frictionForce, BaseAdhesiveForce* adhesiveForce)
+        : BaseObject(), normalForce_(normalForce), frictionForce_(frictionForce), adhesiveForce_(adhesiveForce),
+        handler_(nullptr), interactionDistance_(0)
+{
+    normalForce_->setBaseSpecies(this);
+    frictionForce_->setBaseSpecies(this);
+    adhesiveForce_->setBaseSpecies(this);
+    logger(DEBUG, "BaseSpecies::BaseSpecies() finished");
+}
+
 
 /*!
  * \param[in] p the species that is copied
  */
 BaseSpecies::BaseSpecies(const BaseSpecies& p)
-        : BaseObject(p)
+        : BaseObject(p), handler_(p.handler_), interactionDistance_(p.interactionDistance_)
 {
-    handler_ = p.handler_;
-    interactionDistance_ = p.interactionDistance_;
     logger(DEBUG, "BaseSpecies::BaseSpecies(const BaseSpecies &p) finished");
 }
 

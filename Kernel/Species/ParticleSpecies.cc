@@ -34,17 +34,27 @@ class BaseParticle;
 class BaseInteractable;
 
 ParticleSpecies::ParticleSpecies()
+    : BaseSpecies(), density_(1.0)
 {
-    density_ = 1.0;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"ParticleSpecies::ParticleSpecies() finished"<<std::endl;
 #endif
 }
 
+ParticleSpecies::ParticleSpecies(BaseNormalForce* normalForce, BaseFrictionForce* frictionForce, BaseAdhesiveForce* adhesiveForce)
+    : BaseSpecies(normalForce,frictionForce, adhesiveForce), density_(1.0)
+{
+#ifdef DEBUG_CONSTRUCTOR
+    std::cout<<"ParticleSpecies::ParticleSpecies(n,f,a) finished"<<std::endl;
+#endif
+}
+
+
 /*!
  * \param[in] p the species that is copied
  */
 ParticleSpecies::ParticleSpecies(const ParticleSpecies& p)
+    : BaseSpecies(p)
 {
     density_ = p.density_;
     temperatureDependentDensity_ = p.temperatureDependentDensity_;

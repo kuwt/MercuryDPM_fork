@@ -52,7 +52,9 @@ public:
     
     ///\brief The default constructor.
     BaseSpecies();
-    
+
+    BaseSpecies(BaseNormalForce* normalForce, BaseFrictionForce* frictionForce_, BaseAdhesiveForce* adhesiveForce);
+
     ///\brief The copy constructor.
     BaseSpecies(const BaseSpecies& p);
     

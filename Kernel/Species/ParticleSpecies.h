@@ -33,7 +33,7 @@
 class BaseInteractable;
 
 //Note the getVelocity can for some Species be dependent on which point on the Species is meant.
-class ParticleSpecies : public virtual BaseSpecies
+class ParticleSpecies : public BaseSpecies
 {
 public:
     typedef BaseInteraction InteractionType;
@@ -41,10 +41,12 @@ public:
     
     ///\brief The default constructor.
     ParticleSpecies();
-    
+
     ///\brief The default copy constructor.
     ParticleSpecies(const ParticleSpecies& p);
-    
+
+    ParticleSpecies(BaseNormalForce* normalForce, BaseFrictionForce* frictionForce, BaseAdhesiveForce* adhesiveForce);
+
     ///\brief The default destructor.
     ~ParticleSpecies();
     
