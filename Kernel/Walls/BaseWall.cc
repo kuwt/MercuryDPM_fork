@@ -406,7 +406,6 @@ BaseWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHan
                             //if one contact point is in the contact area of the other point
                             //(I take the vector a=radius*n, project it onto the other normal ni: b=(a.ni)ni, and check that |a|>(r-delta_i), which is equivalent to checking whether position+a is a distance less than the contact radius from the normal vector ni )
                             //logger(INFO,"Ignoring contact with % because contact with % is closer",getId(),i->getI()->getId());
-                            i->resetTriangleInterCorrectness();
                             return nullptr;
                         }
                         //else, continue to compute this contact
@@ -432,17 +431,11 @@ BaseWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHan
                 }
             }
         }
-        unsigned numWallInters = 0;
-        for (const auto i : p->getInteractions()) {
-            if (i->getI()->getName() == "TriangleWall" && i->getTimeStamp() == timeStamp) numWallInters++;
-        }
 
         if (c == nullptr) {
             // look for an existing interaction, or create a new one
             c = interactionHandler->getInteraction(p, this, timeStamp);
-            numWallInters++;
         }
-        p->setNumberOfTriangleContacts(numWallInters);
 
         c->setNormal(-normal);
         c->setDistance(distance);
@@ -465,7 +458,6 @@ BaseWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHan
             c->setContactPoint(contactPoint);
         }
         logger(DEBUG, "Particle contact with wall at %", c->getContactPoint());
-        c->resetTriangleInterCorrectness();
         return c;
     }
     return nullptr;
