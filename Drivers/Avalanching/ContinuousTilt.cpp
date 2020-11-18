@@ -31,55 +31,66 @@
 #include "Chute.h"
 #include "Walls/InfiniteWall.h"
 
-
-//nohup nice -19 sc/quick_run BegerSetup > BegerSetup.out &
-
 //used to simulate Dirk Begers LawinenBox
 class LawinenBox : public Chute {
 public:
 
     LawinenBox() {
-        auto S = speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
-        random.randomise();
-        //load Beger's bottom
-        readDataFile("../ini/Bottom.data");
-        //exchange x and y position
-        Vec3D P;
-        for (unsigned int i = 0; i < particleHandler.getNumberOfObjects(); i++) {
-            P = particleHandler.getObject(i)->getPosition();
-            particleHandler.getObject(i)->setPosition(Vec3D(P.Y, P.X, 0));
-        }
-        double xmax = getXMax();
-        setXMax(getYMax());
-        setYMax(xmax);
+        //different particle positions every time the code is run
+        //random.randomise();
 
-        setName("ContinuousTilt");
-        setXBallsAdditionalArguments("-v0 -solidf");
+        //define a new species (i.e. particle and contact properties); needs to be done before particles get inserted
+        auto species = speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
+
+        //load Beger's data; the base plate is constructed from randomly placed particles, making it more frictional than a flat base plate
+        logger.assert_always(readDataFile("Bottom.data"),"Input file could not be read");
+        //exchange x and y position
+        Vec3D pos;
+        for (unsigned int i = 0; i < particleHandler.getNumberOfObjects(); i++) {
+            pos = particleHandler.getObject(i)->getPosition();
+            particleHandler.getObject(i)->setPosition(Vec3D(pos.Y, pos.X, 0));
+        }
+        setXMax(getYMax());
+        setYMax(getXMax());
+        // fix particles to the floor
+        for (auto particle : particleHandler) {
+            particle->fixParticle();
+            particle->setSpecies(species);
+        }
+        // set fixed particle radius (not used, since we load the base plate from a data file)
         setFixedParticleRadius(particleHandler.getObject(0)->getRadius());
+
+        //set name of output files
+        setName("ContinuousTilt");
+        // options for xballs output
+        setXBallsAdditionalArguments("-v0 -solidf");
+
+        // make size of inserted particles equal to the size of the particles on the base plate
         setInflowParticleRadius(particleHandler.getObject(0)->getRadius());
-        S->setDensity(2500);
+        inflowParticle_.setSpecies(species);
+
+        // set particle density
+        species->setDensity(2500);
+        //set gravity (which is initially in downward direction)
         setGravity(Vec3D(0, 0, -9.8));
-        //collision time 5 ms
+        //set stiffness, dissipation of the particle contacts such that the collision time is 5 ms and the restitution is 0.95/0.44 in normal/tangential direction (these values come from experimental data for glass particles, I think the Luger paper)
         Mdouble tc = 50e-4;
         Mdouble eps = 0.97; //0.97;
         Mdouble beta = 0.44; //0.44;
-        Mdouble mass = S->getDensity() * mathsFunc::cubic(10e-3) * constants::pi / 6.;
-        S->setCollisionTimeAndNormalAndTangentialRestitutionCoefficient(tc, eps, beta, mass);
+        Mdouble mass = species->getDensity() * mathsFunc::cubic(10e-3) * constants::pi / 6.;
+        species->setCollisionTimeAndNormalAndTangentialRestitutionCoefficient(tc, eps, beta, mass);
+        // set an appropriate time step
         setTimeStep(tc / 50.);
-        S->setSlidingFrictionCoefficient(0.1);
-
-        S->setRollingStiffness(2. / 5. * S->getStiffness());
-        S->setRollingDissipation(2. / 5. * S->getDissipation());
-        S->setRollingFrictionCoefficient(S->getSlidingFrictionCoefficient() * 0.2);
-        S->setSlidingFrictionCoefficient(S->getSlidingFrictionCoefficient() - S->getRollingFrictionCoefficient());
-
-
-        nCreated_ = 0;
-
-        for (unsigned int i = 0; i < particleHandler.getNumberOfObjects(); i++)
-            particleHandler.getObject(i)->fixParticle();
+        // set rolling/sliding friction coefficients and tangential stiffness/dissipation
+        species->setSlidingFrictionCoefficient(0.1);
+        species->setRollingStiffness(2. / 5. * species->getStiffness());
+        species->setRollingDissipation(2. / 5. * species->getDissipation());
+        species->setRollingFrictionCoefficient(species->getSlidingFrictionCoefficient() * 0.2);
+        species->setSlidingFrictionCoefficient(species->getSlidingFrictionCoefficient() - species->getRollingFrictionCoefficient());
+        logger(INFO,"Species properties: %",*species);
     }
 
+    // this is outputted every time an output file is written
     void printTime() const override {
         std::cout
         << "t=" << std::setprecision(3) << std::left << std::setw(6) << getTime()
@@ -87,19 +98,20 @@ public:
         << std::endl;
     }
 
+    //this code is run before each time step of the simulation
     void actionsBeforeTimeStep() override {
+        // after an initial settling time, the gravity vector is tilted at a continuous rate
         if (getTime() < 10) return;
-
         const Mdouble rate = 0.02; //in degree/second
         //initially increase the angle 10 times quicker (using a smooth function)
         const Mdouble da = 15;
         Mdouble dt = 0.02 * da / rate;
         Mdouble x = std::min(1.0, (getTime() - 10) / dt);
         Mdouble angle = da * x * x * (3 - 2 * x);
-
         setChuteAngle(rate * (getTime() - 10) + angle);
     }
 
+    // determines what is written into the .ene output files
     void writeEneTimeStep(std::ostream &os) const override {
         Mdouble m = particleHandler.getMass();
         Vec3D mom = particleHandler.getMomentum();
@@ -115,11 +127,13 @@ public:
         << std::endl;
     }
 
+    // this defines the properties of the particles that are inserted
     void create_inflow_particle() {
+        //particle radius
         inflowParticle_.setRadius(random.getRandomNumber(getMinInflowParticleRadius(), getMaxInflowParticleRadius()));
-        //inflowParticle_.computeMass();
+        //particle velocity
         inflowParticle_.setVelocity(Vec3D(0, 0, 0));
-
+        //particle position
         Vec3D position;
         position.X = random.getRandomNumber(getXMin() + inflowParticle_.getRadius(),
                                             getXMax() - inflowParticle_.getRadius());
@@ -130,8 +144,11 @@ public:
         inflowParticle_.setPosition(position);
     }
 
+    // this code is run once at the beginning of the simulation
     void setupInitialConditions() override {
+        // add flat walls in x, y, and negative z direction
         InfiniteWall w0;
+        w0.setSpecies(speciesHandler.getLastObject());
         w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0.0, 0.0, getZMin()));
         wallHandler.copyAndAddObject(w0);
         w0.set(Vec3D(-1.0, 0.0, 0.0), Vec3D(getXMin(), 0.0, 0.0));
@@ -142,7 +159,9 @@ public:
         wallHandler.copyAndAddObject(w0);
         w0.set(Vec3D(0.0, 1.0, 0.0), Vec3D(0.0, getYMax(), 0.0));
         wallHandler.copyAndAddObject(w0);
-        //
+        logger(INFO,"Added Nw=% walls",wallHandler.getNumberOfObjects());
+
+        // use this code to make the simulation a periodic box, and remove the side walls
         //	WallsPeriodic.resize(0);
         //	Walls.resize(5);
         //	Walls[0].set(Vec3D( 0.0, 0.0,-1.0), -getZMin());
@@ -151,41 +170,37 @@ public:
         //	Walls[3].set(Vec3D( 0.0,-1.0, 0.0), -getYMin());
         //	Walls[4].set(Vec3D( 0.0, 1.0, 0.0),  getYMax());
 
-        //number of flowing particles
-        ///
-        int M = 10000;
-        particleHandler.setStorageCapacity(particleHandler.getNumberOfObjects() + M);
-        hGridActionsBeforeTimeLoop();
-        hGridActionsBeforeTimeStep();
-
-        while (getNCreated() < M) {
+        //add particles above the base plate
+        while (nCreated_ < numParticles) {
             create_inflow_particle();
             if (checkParticleForInteraction(inflowParticle_)) {
-                increaseNCreated();
+                particleHandler.copyAndAddObject(inflowParticle_);
+                nCreated_++;
             } else setZMax(getZMax() + 0.00001);
         };
+        logger(INFO,"Inserted N=% flowing and Nf=% fixed particles",particleHandler.getNumberOfObjects()-particleHandler.getNumberOfFixedObjects(),particleHandler.getNumberOfFixedObjects());
     }
 
-    int getNCreated() const {
-        return nCreated_;
-    }
-
-    void increaseNCreated() {
-        nCreated_++;
-    }
-
-    int nCreated_;
+    // how many particles to insert
+    int numParticles = 10000;
+    // track the number of inserted particles
+    int nCreated_ = 0;
+    // keep a default particle
     SphericalParticle inflowParticle_;
 };
 
 int main(int argc, char *argv[]) {
     LawinenBox md;
-    md.autoNumber();
+    // uncomment to add a unique number to the output files (so you can run the code repeatedly without overwriting the previous data)
+    //md.autoNumber();
+    // maximum duration of simulation
     md.setTimeMax(500); //actually finishes at 400
+    // how often to write output
     md.setSaveCount(5000); //every half second
     md.eneFile.setSaveCount(100); //to get good plotting resolution
+    // which output to write
     md.restartFile.setFileType(FileType::ONE_FILE);
     md.dataFile.setFileType(FileType::ONE_FILE);
+    // this starts the simulation
     md.solve(argc, argv);
-    md.writeRestartFile();
 }

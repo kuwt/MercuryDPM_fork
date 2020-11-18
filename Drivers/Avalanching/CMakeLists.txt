@@ -18,5 +18,6 @@ foreach(CPPFILE ${CPPFILES})
 	target_link_libraries(${EXECNAME}  Chute)
 endforeach()
 
+file(COPY ${CMAKE_SOURCE_DIR}/Drivers/Avalanching/run/ini/Bottom.data DESTINATION .)
 
 
