@@ -50,8 +50,7 @@ public:
             pos = particleHandler.getObject(i)->getPosition();
             particleHandler.getObject(i)->setPosition(Vec3D(pos.Y, pos.X, 0));
         }
-        setXMax(getYMax());
-        setYMax(getXMax());
+        setMax(Vec3D(getYMax(),getXMax(),getZMax()));
         // fix particles to the floor
         for (auto particle : particleHandler) {
             particle->fixParticle();
