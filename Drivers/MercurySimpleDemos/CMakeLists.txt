@@ -20,3 +20,9 @@ endforeach()
 
 #copy restart input for self tests into build
 file(COPY ${CMAKE_SOURCE_DIR}/Drivers/MercurySimpleDemos/InputData/StressStrainControlBoundarySelfTestInput.restart DESTINATION .)
+
+file(GLOB FILES  "*.STL")
+foreach(FILE ${FILES})
+	#message("copying " ${FILES})
+	file(COPY ${FILE} DESTINATION .)
+endforeach()
