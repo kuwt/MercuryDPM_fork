@@ -111,12 +111,24 @@ public:
      * incrementRunNumberInFile().
      */
     void autoNumber();
-    
+
     /*!
-     * \brief This turns a counter into two indices which is a very useful feature for performing two-dimensional parameter studies.
+     * \brief This turns a counter into 1 index, which is a useful feature for performing 1D parameter study.
+     * The index run from 1:size_x, while the study number starts at 0 (initially the counter=1 in COUNTER_DONOTDEL)
+     */
+    std::vector<int> get1DParametersFromRunNumber(int size_x);
+
+    /*!
+     * \brief This turns a counter into 2 indices which is a very useful feature for performing a 2D study.
      * The indices run from 1:size_x and 1:size_y, while the study number starts at 0 ( initially the counter=1 in COUNTER_DONOTDEL)
      */
     std::vector<int> get2DParametersFromRunNumber(int size_x, int size_y);
+
+    /*!
+     * \brief This turns a counter into 3 indices, which is a useful feature for performing a 3D parameter study.
+     * The indices run from 1:size_x, 1:size_y and 1:size_z, while the study number starts at 0 ( initially the counter=1 in COUNTER_DONOTDEL)
+     */
+    std::vector<int> get3DParametersFromRunNumber(int size_x, int size_y, int size_z);
     
     /*!
      * \brief This launches a code from within this code. Please pass the name of the code to run.

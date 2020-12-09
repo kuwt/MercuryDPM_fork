@@ -67,7 +67,6 @@
 #include "Species/LinearViscoelasticFrictionLiquidBridgeWilletSpecies.h"
 #include "Species/LinearViscoelasticFrictionLiquidMigrationWilletSpecies.h"
 #include "Species/HertzianViscoelasticSlidingFrictionParhamiMcMeekingSinterSpecies.h"
-
 #include "Species/NormalForceSpecies/ThermalSpecies.h"
 
 /*!

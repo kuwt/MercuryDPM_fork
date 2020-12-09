@@ -100,6 +100,14 @@ public:
     ///\brief Allows the spring constant to be accessed
     Mdouble getElasticModulus() const;
     
+    Mdouble computeElasticModulus(Mdouble shearModulus, Mdouble poissonRatio);
+    
+    ///\brief Allows the elastic modulus and the poisson ratio to be changed in order to compute the shear modulus
+    void setElasticModulusAndPoissonRatio(Mdouble elasticModulus, Mdouble poissonRatio);
+    
+    ///\brief Allows the elastic modulus and the shear modulus to be changed in order to compute the poisson ratio
+    void setElasticModulusAndShearModulus(Mdouble elasticModulus, Mdouble shearModulus);
+    
     ///\brief Allows the normal dissipation to be changed
     void setDissipation(Mdouble dissipation);
     

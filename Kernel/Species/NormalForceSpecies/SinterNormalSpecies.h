@@ -31,12 +31,12 @@
 #include "Interactions/NormalForceInteractions/SinterInteraction.h"
 #include "Math/Helpers.h"
 
-
 enum class SINTERTYPE : unsigned char
 {
     PARHAMI_MCKEEPING = 0,
     CONSTANT_RATE = 1,
-    TEMPERATURE_DEPENDENT_FRENKEL = 2
+    TEMPERATURE_DEPENDENT_FRENKEL = 2,
+    REGIME_SINTERING = 3
 };
 
 /*!
@@ -205,6 +205,22 @@ public:
     
     void setTemperatureDependentSinterRate(std::function<double(double temperature)> temperatureDependentSinterRate);
 
+    void setComplianceZero(Mdouble complianceZero);
+
+    Mdouble getComplianceZero() const;
+
+    void setSurfTension(Mdouble complianceZero);
+
+    Mdouble getSurfTension() const;
+
+    void setConstantC1(Mdouble constantC1_);
+
+    Mdouble getConstantC1() const;
+
+    void setSeparationDis(Mdouble separationDis);
+
+    Mdouble getSeparationDis() const;
+
 
 private:
     ///(normal) spring constant (k_1)
@@ -236,6 +252,28 @@ private:
      * Determines sinter rate: d(delta0)/dt = (fa+fep)/nu
      */
     Mdouble sinterRate_;
+
+    /*!
+    * Compliance 0, C_0, corresponds to the inverse of stiffness at the instantaneous time.
+    */
+    Mdouble complianceZero_;
+
+    /*!
+    * Material constant
+    */
+
+    Mdouble surfTension_;
+
+    /*!
+    * Material constant
+    */
+
+    Mdouble constantC1_;
+
+    /*!
+    * Separation distance comes from the fracture theory.
+    */
+    Mdouble separationDis_;
     
     /*!
      * \brief sinterType options determin how the rate of sintering, d(equilibriumOverlap)/dt is computed

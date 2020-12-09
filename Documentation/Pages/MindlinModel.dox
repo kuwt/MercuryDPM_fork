@@ -4,7 +4,38 @@
 non-Linear Tangential contact forces in MercuryDPM implemented as MindlinSpecies, MindlinInteraction
 and MindlinRollingTorsionSpecies, MindlinRollingTorsionInteraction.
 
-Mindlin and Deresewicz developed a set of rules for the
+Mindlin and Deresewicz developed a set of rules for general and oblique impact problems with an incremental procedure
+which also accounts for micro-slip. A plain (without micro-slip) and still accurate approach has been proposed
+by <a href="https://doi.org/10.1016/j.ces.2004.10.004"> Di Renzo and Di Maio </a> in 2005.
+
+The tangential model force is given by:
+
+\f$ f_{ij}^t = \underbrace{\frac{2}{3} k_t \delta_{ij}^t}_{\text{Elastic}} + \underbrace{\gamma_t v_{ij}^t}_{\text{Dissipative}}\f$
+
+The tangential force is subdivided into an elastic and dissipative (damping) part.
+
+The tangential spring stiffness \f$ k_t = 8 G_{ij}^* sqrt{R_{ij}^* \delta_{ij}^n} \f$ depends
+on the effective shear modulus for isotropic and homegeneous materials
+\f$ G_{ij}^* = (\frac{1-\nu_i}{G_i} + \frac{1-\nu_j}{G_j})^{-1} \f$, the effective radius
+\f$ R_{ij}^* = \frac{R_i R_j}{R_i + R_j} \f$ and the normal overlap \f$ \delta_{ij}^n \f$ of object \f$ i \f$ and \f$ j \f$.
+
+The tangential overlap \f$ \delta_{ij}^t = \int_{0}^{\tau} v_{ij}^t dt \f$ accounts for the tangential displacement by integrating
+their relative tangential velocity \f$ v_{ij}^t \f$ over the contact time.
+
+The elastic tangential force is limited by the Coulomb friction criterion \f$ \frac{2}{3} k_t \delta_{ij}^t \leq \mu f_{ij}^n \f$.
+As soon as the Coulomb criterion is met, the tangential forces are set to \f$ f_{ij}^t = f_{ij}^n \f$.
+
+The dissipative part of the model is calculated by multiplying the relative tangential velocity \f$ v_{ij}^{t} \f$ with the
+viscoelastic tangential damping constant \f$ \gamma_t = \varphi_{ij}^s \sqrt{m_{ij}^* k_t} \f$ which depends
+on the sliding dissipation coefficient \f$ \varphi_{ij}^s \f$ set by the user, the effective mass \f$ m_{ij}^* \f$
+as well as the tangential spring stiffness \f$ k_t \f$. This part of the tangential force is only added while
+the Coulomb criterion is not met \n (\f$ \frac{2}{3} k_t \delta_{ij}^t < \mu f_{ij}^n \f$).
+
+The sliding dissipation coefficient is different for certain simulation cases. However, some DEM-software developers
+(e.g. EDEM, LIGGGHTS, Yade) specify their sliding dissipation coefficient to
+\f$ \varphi_{ij}^s = 2\sqrt{\frac{5}{6}}\frac{\ln{e}}{\sqrt{\ln{e}^2 + \pi^2}}\f$ where \f$ e \f$ is the
+restitution coefficient.
+
 
 Header:
 \code #include <Species/MindlinSpecies.h> \endcode
@@ -18,20 +49,27 @@ The model parameters are set using MindlinSpecies
 
 \code
  MindlinSpecies species;
-    species.setElasticModulus();
-    species.setDissipation();
-    species.setElasticModulusAndRestitutionCoefficient();
+    species.setSlidingFrictionCoefficient;
+    species.setSlidingDissipation;
+    species.setPoissonRatio;
 \endcode
 
-Unit Test:
+Selftest:
+MindlinSelfTest.cpp
 
-Contact behaviour:
 
+Contact behaviour for an loading-unloading-reloading test:
 
+\image html ContactModels/MindlinSelfTest.png
+
+Contact behaviour for an oblique impact test:
+
+\image html ContactModels/ObliqueImpactSelfTest.png
 
 References:
 \n
-1- R.D. Mindlin. Compliance of elastic bodies in contact. J. of Appl. Mech., 16, 1949.\n
-2- <a href="https://doi.org/10.1016/j.ces.2003.09.037"> A. Di Renzo et. al.,Comparison of contact-force models for the simulation of collisions in DEM-based granular flow codes</a>
-
+1- Mindlin, R.D. and Deresiewicz, H. (1953), Elastic Spheres in Contact under Varying Oblique Force. Trans. ASME, J. Appl. Mech. 20, 327-344\n
+2- <a href="https://doi.org/10.1016/j.ces.2003.09.037"> Di Renzo, A. and Di Maio, F. P. (2004), Comparison of contact-force models for the simulation of collisions in DEM-based granular flow codes. Chem. Eng. Sci., vol. 59, no. 3</a> \n
+3- <a href="https://doi.org/10.1016/j.ces.2004.10.004"> Di Renzo, A. and Di Maio, F. P. (2005), An improved integral non-linear model for the contact of particles in distinct element simulations. Chem. Eng. Sci., vol. 60, no. 5</a> \n
+4- <a href="https://doi.org/10.1016/0032-5910(92)88030-L"> Tsuji, Y., Tanaka, T. and Ishida, T. (1992), Lagrangian numerical simulation of plug flow of cohesionless particles in a horizontal pipe. Powder Technology, vol. 71, no. 3, p. 239-250</a>
 */

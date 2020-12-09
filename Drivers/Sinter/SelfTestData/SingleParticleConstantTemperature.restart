@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name SingleParticleConstantTemperature revision 4848 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
+MercuryDPM 0.14 name SingleParticleConstantTemperature revision 3137 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
 dataFile    fileType ONE_FILE saveCount 10 counter 1553 lastSavedTimeStep 15514
 fStatFile   fileType ONE_FILE saveCount 10 counter 1553 lastSavedTimeStep 15514
 eneFile     fileType ONE_FILE saveCount 10 counter 1553 lastSavedTimeStep 15514
@@ -9,12 +9,12 @@ xMin -1e-06 xMax 1e-06 yMin -1e-06 yMax 1e-06 zMin -1e-06 zMax 1e-06
 timeStep 6.445950267993e-05 time 1.0000247245767 ntimeSteps 15514 timeMax 1
 systemDimensions 3 particleDimensions 3 gravity 0 0 -4.9e-06 writeVTK 0 NO_FILE NO_FILE 0 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267 xBallsArguments  -v0 -solidf -noborder 4 -p 1
 Species 1
-SinterSpecies id 0 density 1e+15 loadingStiffness 2000 maxUnloadingStiffness 2000 cohesionStiffness 2000 maxPenetration 0.16 dissipation 0.290012017823786 sinterAdhesion 1.2 inverseSinterViscosity 0 sinterRate_ 0.09 sinterType 1
+SinterSpecies id 0 density 1e+15 loadingStiffness 2000 maxUnloadingStiffness 2000 cohesionStiffness 2000 maxPenetration 0.16 dissipation 0.290012017823786 sinterAdhesion 1.2 inverseSinterViscosity 0 sinterRate 0.09 complianceZero 0 surfTension 0 constantC1 0 separationDis 0 sinterType 1
 Walls 0
 Boundaries 0
 Particles 2
-BaseParticle id 0 indSpecies 0 position 0 0 -1.60606894949513e-07 orientation 1 0 0 0 velocity 0 0 -5.08522967468618e-10 angularVelocity 0 0 0 force 0 0 -6.60242809566241e-09 torque 0 0 0 radius 1e-06 invMass 238.732414637843
-BaseParticle id 1 indSpecies 0 position 0 0 -2e-06 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 -1.39226439077909e-08 torque 0 0 0 radius 1e-06 invMass 0
+BaseParticle id 0 indSpecies 0 position 0 0 -1.8354606999996e-07 orientation 1 0 0 0 velocity 0 0 -1.83078760800482e-07 angularVelocity 0 0 0 force 0 0 5.42001824569246e-20 torque 0 0 0 radius 1e-06 invMass 238.732414637843
+BaseParticle id 1 indSpecies 0 position 0 0 -2e-06 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 -2.05250720035075e-08 torque 0 0 0 radius 1e-06 invMass 0
 Interactions 1
-SinterInteraction particleIds 0 1 timeStamp 15514 force 0 0 1.39226439077909e-08 torque 0 0 0 plasticOverlap 1.6e-07
+SinterInteraction particleIds 0 1 timeStamp 15514 force 0 0 2.05250720035075e-08 torque 0 0 0 plasticOverlap 1.82974156150252e-07
 hGrid method TOPDOWN distribution EXPONENTIAL cellOverSizeRatio 1 numberOfBuckets 10 cellSizes 2e-06 gridNeedsUpdate 0 updateEachTimeStep 1 currentMaxRelativeDisplacement 0 totalCurrentMaxRelativeDisplacement 0

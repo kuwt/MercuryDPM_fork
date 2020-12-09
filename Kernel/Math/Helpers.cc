@@ -709,7 +709,7 @@ void helpers::normalAndTangentialLoadingTest(const ParticleSpecies* species, Mdo
         {
             //setName("TangentialLoadingTest"+species->getName());
             setTimeMax(4.0 * tangentialDisplacement / velocity);
-            setTimeStep(2e-5 * getTimeMax());
+            setTimeStep(4e-4 * getTimeMax());
             setSaveCount(1);
             setFileType(FileType::NO_FILE);
             fStatFile.setFileType(FileType::ONE_FILE);
@@ -738,36 +738,19 @@ void helpers::normalAndTangentialLoadingTest(const ParticleSpecies* species, Mdo
             BaseParticle* p = particleHandler.getLastObject();
             assert(p);
             p->setAngularVelocity({0, 0, 0});
-
-            //Moving particle normally into surface
-            Mdouble time = getTime() / (tangentialDisplacement / velocity);
-            if (time <= 1.0)
-            {
-                p->setVelocity({velocity, 0, 0});
-                p->setPosition({velocity * getTime(), 0, radius - displacement});
-            }
-            else if (time <= 3.0)
+    
+            //Moving particle cyclically right and left between +-tangentialDisplacement
+            bool moveRight = static_cast<int>(getTime() / (2.0*tangentialDisplacement / velocity) +0.5)%2==0;
+            if (moveRight)
             {
                 p->setVelocity({-velocity, 0, 0});
-                p->setPosition({2.0 * tangentialDisplacement - velocity * getTime(), 0, radius - displacement
-                                                                                        +
-                                                                                        (0.0 * tangentialDisplacement -
-                                                                                         velocity * (getTime() -
-                                                                                                     (tangentialDisplacement /
-                                                                                                      velocity)))});
+                p->setPosition({tangentialDisplacement - velocity * getTime(), 0, radius - displacement});
             }
             else
             {
                 p->setVelocity({velocity, 0, 0});
-                p->setPosition({-4.0 * tangentialDisplacement + velocity * getTime(), 0, radius - displacement
-                                                                                         -
-                                                                                         (4.0 * tangentialDisplacement -
-                                                                                          velocity * (getTime() -
-                                                                                                      (tangentialDisplacement /
-                                                                                                       velocity)))});
-
+                p->setPosition({-2*tangentialDisplacement + velocity * getTime(), 0, radius - displacement});
             }
-
         }
 
     } test(species, displacement, tangentialDisplacement, velocity, radius);

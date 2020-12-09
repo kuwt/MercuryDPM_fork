@@ -29,7 +29,7 @@
 
 int main(int argc, char *argv[])
 {
-	Mdouble displacement=0.01;
+	Mdouble displacement=0.015;
 	Mdouble tangentialDisplacement=0.0025;
 	Mdouble velocity=0.01;
 	Mdouble radius=0.25;
@@ -38,9 +38,9 @@ int main(int argc, char *argv[])
 	//- for Hertz-Mindlin
 	HertzianViscoelasticMindlinSpecies species;
 	species.setDensity(6./constants::pi);
-	species.setElasticModulus(1e5);
+	species.setElasticModulusAndPoissonRatio(1e5, 0.3);
 	species.setDissipation(2.0);
-	species.setShearModulus(100000.0);
+//	species.setSlidingDissipation(4.0/7.0);
 	species.setSlidingFrictionCoefficient(0.1);
 
 	helpers::loadingTest(&species, displacement, velocity, radius, "MindlinSelfTestLoading");

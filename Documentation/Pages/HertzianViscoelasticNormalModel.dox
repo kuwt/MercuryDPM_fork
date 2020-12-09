@@ -19,11 +19,17 @@ The normal force is subdivided into an elastic and dissipative (damping) part.
 
 For the elastic part the stiffness \f$ k_n = \frac{4}{3} E_{ij}^* \sqrt{R_{ij}^* \delta_{ij}^{n}} \f$ is a variable of the effective Young's modulus
 \f$ E_{ij}^{*} = [\frac{1-\nu_{i}^{2}}{E_i} + \frac{1-\nu_{j}^{2}}{E_j}]^{-1} \f$,
-the effective radius \f$ R_{ij}^{*} = \frac{R_i R_j}{R_i + R_j} \f$ and the overlap of object \f$ i \f$ and \f$ j \f$.
+the effective radius \f$ R_{ij}^{*} = \frac{R_i R_j}{R_i + R_j} \f$ and the normal overlap \f$ \delta_{ij}^n \f$ of object \f$ i \f$ and \f$ j \f$.
 
-For the dissipative part the viscoelastic dissipation coefficient \f$ \gamma_n = \varphi_{ij} \sqrt{ m_{ij}^{*} k_n} \f$ is a variable
-of the dissipation \f$ \varphi_{ij} \f$, the effective mass \f$ m_{ij}^{*} = \frac{m_i m_j}{m_i + m_j} \f$ as well as the stiffness
-and is computed such that there is a constant restitution.
+For the dissipative part the relative normal velocity \f$ v_{ij}^{n} \f$ is multiplied with the viscoelastic normal dissipation
+coefficient \f$ \gamma_n = \varphi_{ij} \sqrt{ m_{ij}^{*} k_n} \f$ which is a variable
+of the dissipation coefficient \f$ \varphi_{ij} \f$ set by the user, the effective mass \f$ m_{ij}^{*} = \frac{m_i m_j}{m_i + m_j} \f$ as well as the stiffness
+and is calculated such that there is a constant restitution.
+
+The dissipation coefficient is different for certain simulation cases. However, some DEM-software developers
+(e.g. EDEM, LIGGGHTS, Yade) specify their dissipation coefficient to
+\f$ \varphi_{ij}= 2\sqrt{\frac{5}{6}}\frac{\ln{e}}{\sqrt{\ln{e}^2 + \pi^2}}\f$ where \f$ e \f$ is the
+restitution coefficient.
 
 Header:
 
@@ -38,23 +44,23 @@ The model parameters are set using HertzianViscoelasticNormalSpecies member func
 \code
  HertzianViscoelasticNormalSpecies species;
     species.setElasticModulus();
+    species.setPoissonNumber;
     species.setDissipation();
     species.setElasticModulusAndRestitutionCoefficient();
 \endcode
 
 
 
-Unit Test:
+Selftest:
 MindlinSelfTest.cpp
 
 Contact behaviour:
-
-\Todo create a UnitTest and include model behaviour
+\image html ContactModels/HertzianViscoElasticSelfTest.png
 
 References:
 \n
-1- Hertz, H.: Über die Berührung fester elastischer Körper (on the contact of elastic solids). J. Reine Angewandte Math. 94, 156–71.\n
-(English translation in Miscellaneous Papers by Hertz, H. (ed.) Jones and Schott, London, Macmillan, 1896) (1882)\n
-2- <a href="https://doi.org/10.1209/0295-5075/94/50004"> D. Antypov et. al., On an analytical solution for the damped Hertzian spring </a>
+1- Hertz, H. (1882) Über die Berührung fester elastischer Körper (on the contact of elastic solids). J. Reine Angewandte Math. 94, 156–71.\n
+(English translation in Miscellaneous Papers by Hertz, H. (ed.) Jones and Schott, London, Macmillan, 1896)\n
+2- <a href="https://doi.org/10.1209/0295-5075/94/50004"> D. Antypov et. al. (2011), On an analytical solution for the damped Hertzian spring.  EPL 94(5) </a>
 
 */

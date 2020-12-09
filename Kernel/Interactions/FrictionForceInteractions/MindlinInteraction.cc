@@ -207,6 +207,7 @@ Mdouble MindlinInteraction::getTangentialStiffness()
 //**************k_TODO at present, only valid for particle-wall interactions and/or interactions*********************
 //between similar particles; need to include the reduced parameters for dissimilar particles!
 //takes as arguments the relevant particle radius and the relevant shear modulus
+//2.0/3.0 as a factor from Di Renzo and Di Maio (2005) eqn (15)
 void MindlinInteraction::updateTangentialStiffnessZero(Mdouble rad, Mdouble shearMod)
 {
     //K_t0 = 8G_eq * sqrt(R_eq * delta_n) (Di Renzo and Di Maio)
@@ -310,33 +311,32 @@ void MindlinInteraction::computeFrictionForce()
             //This is identical for both unloading and loading (under constant normal force) and hence can
             //potentially later be moved for neatness/efficiency
             Mdouble r1 = 1.0 * getEffectiveRadius();
-            updateTangentialStiffnessZero(r1, species->getShearModulus());
+            Mdouble shearModulus = species->getShearModulus();
+            updateTangentialStiffnessZero(r1, shearModulus);
             
             //2) Calculating the relevant tangential dissipation constant based on the current stiffness (and other relevant parameters)
             Mdouble slidingDissipationCoefficient =
-                    species->getSlidingDissipation() * sqrt(8.0 * getEffectiveMass() * tangentialStiffnessZero_);
+                    species->getSlidingDissipation() * sqrt(getEffectiveMass() * tangentialStiffnessZero_);
             
             //3) Using the parameters determined above, calculating the tangential force as per Di Maio and Di Renzo eqn. (37)
-            tangentialForce_ = -tangentialStiffnessZero_ * slidingSpring_ -
-                               slidingDissipationCoefficient * tangentialRelativeVelocity;
+            tangentialForce_ = - 2.0/3.0 * tangentialStiffnessZero_ * slidingSpring_;
             
             //applying the Coulomb criterion (Di Maio and Di Renzo eqn. (36)) to ensure falsely large tangential forces are avoided
             //if all is OK, i.e. if tangential force is smaller than mu*f_n, we simply add the tangential force calculated.
             if (tangentialForce_.getLength() < (species->getSlidingFrictionCoefficient() * getAbsoluteNormalForce()))
             {
+                tangentialForce_ -= slidingDissipationCoefficient * tangentialRelativeVelocity;
                 addForce(tangentialForce_);
             }
                 //otherwise, we take the force as mu*f_n and recalculate the spring length accordingly
             else
             {
-                
                 tangentialForce_ *= species->getSlidingFrictionCoefficient() * getAbsoluteNormalForce() /
                                     tangentialForce_.getLength();
                 //adding the force as mu*f_n
                 addForce(tangentialForce_);
                 //updating the spring length accordingly
-                slidingSpring_ = -(tangentialForce_ + slidingDissipationCoefficient * tangentialRelativeVelocity) /
-                                 tangentialStiffnessZero_;
+                slidingSpring_ = -(tangentialForce_ / (2.0/3.0 * tangentialStiffnessZero_));
             }
         }
     }

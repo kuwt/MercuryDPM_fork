@@ -113,57 +113,74 @@ void SinterInteraction::computeNormalForce()
     if (getOverlap() > 0) //if contact forces
     {
         const SinterNormalSpecies* species = getSpecies();
+
         // calculate the effective diameter, equal to the radius for two equal-sized particles
         const Mdouble effectiveDiameter = 2.0 * getEffectiveRadius();
-        //calculate the overlap above which the max. unloading stiffness 
-        //becomes active (the 'fluid branch')
-        const Mdouble deltaStar = species->getPenetrationDepthMax() * effectiveDiameter;
-        //compute the rate d(k2/k1)/d(delta0)
-        const Mdouble dk = (species->getUnloadingStiffnessMax() / species->getLoadingStiffness() - 1.0) / deltaStar;
+
+        // [1] Calculate the overlap above which the max. unloading stiffness
+        //becomes active (the 'fluid branch'). In this interaction, it is the same than delta*
+
+        const Mdouble d_fluid_0 = (species->getUnloadingStiffnessMax()
+                                   / (species->getUnloadingStiffnessMax() - species->getLoadingStiffness()))
+                                  * species->getPenetrationDepthMax() * effectiveDiameter;
+
+        //const Mdouble deltaStar = species->getPenetrationDepthMax() * effectiveDiameter;
+
+        //[2] Compute the rate d(k2/k1)/d(delta0). To obtain this parameter, the linear relationship
+        //between unloading stiffness and maximum overlap is used.
+        const Mdouble dk = (species->getUnloadingStiffnessMax() / species->getLoadingStiffness() - 1.0) / d_fluid_0;
         
         //increase max overlap if necessary
-        //k2*(d-d0)=k1*d, k2=k1*(1+dk*d)
-        //(1+dk*d)*(d-d0)=d
-        //dk*d^2=(1+dk*d)*d0
-        //d0=d/(1+1/(dk*d))
-        const Mdouble minPlasticOverlap = std::min(getOverlap() / (1.0 + 1.0 / (dk * getOverlap())), deltaStar);
-        ///\todo basing the stiffness increase on the plastic overlap does not work:
-        ///k2*(d-d0)=k1*d, k2=k1*(1+dk*d0)
-        ///(1+dk*d0)*(d-d0)=d
-        ///d+dk*d*d0-d0-dk*d0*d0=d
-        ///-dk*d0^2+(dk*d-1)*d0+d=d
-        ///d0=(dk*d-1)/dk
-        //const Mdouble minPlasticOverlap = std::min(getOverlap()-1.0/dk,deltaStar);
-        //logger(INFO,"minPlasticOverlap % overlap % dk % M %",minPlasticOverlap,getOverlap(),dk, dk*getOverlap());
+        //Here, two relationships are used. The linear relationship between unloadingstiffness max and
+        //the equilibrium overlap based on the unloading stiffness.
+        //k2 = k1*(1+dk*d), k1*d = k2*(d-d0)
+        //k1*d = k1*(1 + dk*d)*(d-d0)
+        //d = d - d0 +dk*d^2 -dk*d*d0
+        //dk*d^2 = dk *d * d0 + d0
+        //dk*d^2 = (dk*d + 1)*d0
+        //dkd^2/(dk*d + 1) = d0
+        //d0 = d/(1 + 1/(dk*d))
+
+        //[3] Compute the equilibirum overlap is:
+        const Mdouble d0 = getOverlap()/(1.0 + 1.0/(dk*getOverlap()));
+
+        const Mdouble minPlasticOverlap = std::min(d0,d_fluid_0);
+
+        //[4] Determine the plastic overlap
         plasticOverlap_ = std::max(minPlasticOverlap, plasticOverlap_);
-        
-        //calculate the unloading stiffness (only linear in maxOverlap, not equilibriumOverlap))
+
+        //[5] Compute the unloading Stiffness \hat{k2}.
         const Mdouble unloadingStiffness = species->getLoadingStiffness() * (1.0 + dk * plasticOverlap_);
-        
-        //compute elastic force
+
+        //[6] Compute the elastic force
         Mdouble normalForce = unloadingStiffness * (getOverlap() - plasticOverlap_);
-        
-        //add cohesive forces (distinct from sintering)
+
+        //[7] Add the adhesive force (distinct from sintering)
         Mdouble nonSinterAdhesiveForce = -species->getCohesionStiffness() * getOverlap();
+
         if (normalForce < nonSinterAdhesiveForce)
         {
             plasticOverlap_ = (1.0 + species->getCohesionStiffness() / unloadingStiffness) * getOverlap();
             normalForce = nonSinterAdhesiveForce;
         }
-        
-        //add dissipative force (distinct from sintering)
+
+        //[[8] Add dissipative force (distinct from sintering)
         normalForce -= species->getDissipation() * getNormalRelativeVelocity();
-        
-        //Here comes the sintering effect:
+
+        //[9] Sintering effect:
         Mdouble adhesiveForce = species->getSinterAdhesion() * effectiveDiameter;
         
-        //now set the interaction force equal to this normal force (friction and adhesive forces will be added later)
+        //[10] Now set the interaction force equal to this normal force (friction and adhesive forces will be added later)
         setForce(getNormal() * ((normalForce - adhesiveForce)));
         setTorque(Vec3D(0.0, 0.0, 0.0));
         //used for tangential force calculations; don't add adhesive force components
         setAbsoluteNormalForce(std::abs(normalForce));
         
-        //increase plastic overlap due to sintering
+        //[11] Approaches - Increase plastic overlap due to sintering
+        const Mdouble baseNum = 9*constants::pi*species->getComplianceZero()*species->getSurfTension()/(effectiveDiameter);
+        const Mdouble a0_R = std::pow(baseNum,1.0/3.0);
+        const Mdouble realOverlap = std::sqrt(getOverlap()/effectiveDiameter);
+
         DPMBase* dpmBase = getHandler()->getDPMBase();
         Mdouble rateOverlap;
         // sinter adhesion force fa=sinterAdhesion_*radius in sinter rate:
@@ -190,12 +207,38 @@ void SinterInteraction::computeNormalForce()
             rateOverlap = 2.0 * normalForce * species->getTemperatureDependentSinterRate(temperature) /
                           species->getSinterAdhesion();
         }
+        else if (species->getSinterType() == SINTERTYPE::REGIME_SINTERING)
+        {
+            if (realOverlap < a0_R) {
+                //Here, Sintering rate has unit of [1/s]
+                rateOverlap = normalForce / species->getSinterAdhesion();
+                //rateOverlap = effectiveDiameter* species->getSinterRate();
+
+            }else {
+                const Mdouble val0 = std::pow((63 * pow(constants::pi, 3.0) / 16.0), 1.0 / 7.0);
+                const Mdouble val1 = pow((species->getSeparationDis()*10 / effectiveDiameter), 2.0 / 7.0);
+                const Mdouble val2 = (2.0 / 7.0) * (2.0 * species->getConstantC1() * species->getSurfTension() /
+                                                    (effectiveDiameter));
+                const Mdouble val3 = 1.0 / (std::pow(getOverlap(), 5.0 / 2.0));
+                const Mdouble val4 = std::pow(effectiveDiameter, 7.0 / 2.0);
+
+                rateOverlap = (std::pow(val0 * val1, 7.0) * val2 * val3 * val4) * normalForce / species->getSinterAdhesion();
+
+                const Mdouble aVisc_R = std::pow(63.0 * std::pow(constants::pi, 3.0), 1.0 / 5.0) *
+                                        std::pow((1.0 / 8.0) * (species->getSeparationDis()/33.0) / (effectiveDiameter), 2.0 / 5.0);
+
+                if (realOverlap > aVisc_R) {
+                    rateOverlap = 2.0*normalForce * species->getSinterRate() / species->getSinterAdhesion();
+//                    logger(INFO," RealOver % aVisc_R %",realOverlap,aVisc_R);
+                }
+            }
+        }
         else
         {
             rateOverlap = 0;
             //missing: add the sintering model 'modified Frenkel' of the Pokula paper
         }
-        plasticOverlap_ = std::max(0.0, std::min(deltaStar, plasticOverlap_ + rateOverlap * dpmBase->getTimeStep()));
+        plasticOverlap_ = std::max(0.0, std::min(d_fluid_0, plasticOverlap_ + rateOverlap * dpmBase->getTimeStep()));
         
         /*//change particle radius by dr
         Mdouble dr;

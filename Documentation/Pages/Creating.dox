@@ -1,40 +1,139 @@
 
 /*! \page creating Write Your Own Code
 
-Before you read about how to write your own code, we recommend you to work through the \ref Tutorials "Tutorials".
+\section Before Before you start
 
-You have now seen several MercuryDPM driver codes, so you are familiar with the code design. You also compiled, run and visualised simulations, so you know the general tools available to you. You are now ready to write your very first Driver code from scratch. The goal of this section will be to write a code that simulates a single particle bouncing around between two walls; we will call it PingPong.cpp. Some of you want to use the terminal and some others an IDE, so we will show you both ways.
+Before you read about how to write your own code, we recommend you to work through the \ref Tutorials "Tutorials".
+These tutorials explain the basic construction of the codes. After this, you will be familiar with the code design.
+You also will compile, run and visualise the simulations, so you will know the general tools available to you.
+
+To explain how to creat your own code, a single particle bouncing between two walls will be created from a scratch;
+we will call it PingPong.cpp. Some of you want to use the terminal and some others an IDE, so we will show you both ways.
 
 The first thing you need is a place to put your code. You can create your own code in one of the existing Driver directories, but we recommend you creating your own directory. This is how you do it:
--# Copy the directory Drivers/USER/Template and rename the copy to your own name, e.g. Drivers/USER/JohnDoe.
--# This directory contains a file called _ExampleCode.cpp_ which contains a basic MercuryDPM driver code. Rename the file to a fileName that describes the code you want to create, e.g. _PingPong.cpp_.
--# Your directory also contains a file called _CMakeLists.txt_ which tells cmake to create make files for compiling your driver code. The file tells cmake to create a make command for each cpp file in this directory. We use the fileName to name the make command, i.e. _make PingPong_ will compile the Driver _PingPong.cpp_.
- Therefore, the name of each cpp file has to be unique, otherwise _make_ does not know which file to compile.
-
--# Now that we have a new cpp file, we need to execute cmake to create a make command. You do this by executing cmake in the root of the build directory
-\code{.sh}
-~/MercuryBuild/Drivers/USER/JohnDoe$ cd ../../..
-~/MercuryBuild$ cmake .
--- Configuring done
--- Generating done
--- Build files have been written to: ~/MercuryBuild
-\endcode
-
--# Now you can compile and execute your new driver code:
-\code{.sh}
-~/MercuryBuild/Drivers/USER/JohnDoe$ make PingPong
-[100%] Built target DPMBase
-[100%] Built target FreeFallRestart
-~/MercuryBuild/Drivers/USER/JohnDoe$ ./PingPong
-Hello, World!
-\endcode
+These steps are also explained by the figure below, the numbers indicate the steps.
+-# Create the directory in which you want to put the driver code, for example Drivers/USER/myName.
+-# Copy the CMakeLists.txt and the TemplateDriver.cpp into the just created directory. Make sure that you rename the TemplateDriver.cpp to a file with a unique name (e.g. PingPong), otherwise make will generate an error.
+-# Now that we have a new cpp file, we need to execute cmake to create a make command. You do this by executing cmake in the root of the build directory (e.g. MercuryBuild).
+-# Build the executable by using the fileName of the cpp file, e.g. make PingPong
+\image html Images/CreateYourOwnCode.png
 
 Now let's take a look how we can implement the PingPong example.
 
-[TODO: WRITE]
+\subsection How How to write your own code
 
-# Further topics {#further}
- - \subpage WallTypes
- - \subpage Restart
+The basic steps to create a simple Mercury program are:
+
+\subsection Headers 0.0 Define headers
+Here the user includes the headers to use in the simulations. The first header calls <Mercury3D.h> is the base one.
+Furthermore, this pinpong tutorial must have walls and the type of model (species) to be used.
+
+\code{.sh}
+#include <Mercury3D.h>
+#include <Walls/InfiniteWall.h>
+#include <Species/LinearViscoelasticSpecies.h>
+\endcode
+
+There are different type of walls, you can find further information in \ref WallTypes.
+
+There are several contact models and species to interact with combined classes. You can find more information in \ref ContactModel.
+
+\subsection BeforeMain 1.0 Before the main function
+1.1.1 Constructor: General and unchangeable parameters during the simulation
+\code{.sh}
+class pingPongTest : public DPMBase {
+public:
+
+    explicit pingPongTesTest(Mdouble radius)
+\endcode
+
+- Output configuration and general specifications.
+\code{.sh}
+setName("PingPong")
+setFileType(FileType::ONE_FILE);
+setGravity(Vec3D(0.0, 0.0,0.0));
+\endcode
+
+- Particle species. Material properties and positions
+\code{.sh}
+
+// particle properties
+LinearViscoelasticSpecies sf;
+sf.setHandler(&speciesHandler);
+sf.setDensity(1000);
+const Mdouble mass = sf.getMassFromRadius(radius);
+sf.setStiffnessAndRestitutionCoefficient(1.0 * radius, 1.0, mass);
+const Mdouble collisionTime = sf.getCollisionTime(mass);
+auto species = speciesHandler.copyAndAddObject(sf);
+
+//Positions
+SphericalParticle P0, P1;
+P0.setSpecies(species);
+P1.setSpecies(species);
+
+P0.setRadius(radius);
+P1.setRadius(radius);
+
+P0.setPosition(Vec3D(-1.50 * radius, 0, 0));
+P0.setVelocity(Vec3D(0.001,0,0));
+P1.setPosition(-P0.getPosition());
+P1.setVelocity(-P0.getVelocity());
+
+particleHandler.copyAndAddObject(P0);
+particleHandler.copyAndAddObject(P1);
+\endcode
+
+- walls
+\code{.sh}
+InfiniteWall w0;
+
+w0.setSpecies(speciesHandler.getObject(0));
+w0.set(Vec3D(1.0, 0.0, 0.0), Vec3D(getXMax(), 0.0, 0.0));
+wallHandler.copyAndAddObject(w0);
+
+w0.set(Vec3D(-1.0, 0.0, 0.0), Vec3D(getXMin(), 0.0, 0.0));
+wallHandler.copyAndAddObject(w0);
+
+w0.set(Vec3D(0.0, 1.0, 0.0), Vec3D(0.0, getYMax(), 0.0));
+wallHandler.copyAndAddObject(w0);
+
+w0.set(Vec3D(0.0, -1.0, 0.0), Vec3D(0.0, getYMin(), 0.0));
+wallHandler.copyAndAddObject(w0);
+\endcode
+
+- time integration parameters
+\code{.sh}
+        setSaveCount(10000);
+        setTimeMax(10);
+        setTimeStep(0.0000005 * 50);
+\endcode
+
+1.1.1 Member functions
+- Time display, energy, etc.
+\code{.sh}
+    void printTime() const override {
+        std::cout << "t=" << std::setprecision(3) << std::left << std::setw(6) << getTime()
+                  << std::endl;
+    }
+\endcode
+
+\subsection Main 2.0 Main function
+2.1 User specifications
+
+\code{.sh}
+int main(int argc UNUSED, char *argv[] UNUSED)
+{
+    Mdouble radius = 0.01
+    pingPongTes sp0(radius);
+
+    sp0.solve();
+}
+\endcode
+
+If the user wants to implement a new contact model interaction (a new species), you could get more information of how clicking \ref HowToCreateANewSpecies "Creating a new species".
+
+\section RestartOp Using restart option
+The user can also write a program reading information from previous results or programs. For this, the restart option must be included in
+the main function. You could get further information in \ref Restart
 
 */

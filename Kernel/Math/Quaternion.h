@@ -45,7 +45,7 @@
 /*!
  * \class Quaternion
  * \brief This class contains the 4 components of a quaternion and the standard operators and functions needed for quaternion arithmetic.
- * \detailed
+ * \details
  * A quaternion is a four-dimensional vector q = (q0,q1,q2,q3) that satisfies |q|^2=q0^2+q1^2+q2^2+q3^2=1.
  * It can be used to describe the orientation of an object in space.
  * 

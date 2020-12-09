@@ -34,7 +34,7 @@
 /*!
  * \brief A TriangleWall is convex polygon defined as an intersection of InfiniteWall's.
  * \details It can be defined as the intersection of a set
- * of #InfiniteWalls, defined by the normal vector into the wall and a point on the wall:
+ * of \ref InfiniteWall's, defined by the normal vector into the wall and a point on the wall:
  * \code
  *   TriangleWall w;
  *   //for each wall, specify a normal and position vector

@@ -527,7 +527,11 @@ void DPMBase::setLastSavedTimeStep(unsigned int nextSavedTimeStep)
 void DPMBase::autoNumber()
 {
     setRunNumber(readRunNumberFromFile());
-    incrementRunNumberInFile();
+
+    if (!getRestarted())
+    {
+        incrementRunNumberInFile();
+    }
 }
 
 /*!
@@ -645,14 +649,41 @@ void DPMBase::incrementRunNumberInFile()
 }
 
 /*!
- * \details Let's say size_x = 2 and size_y = 5, counter stored in COUNTER_DONOTDEL =1. The study_size = 10.
- * Substituting these values into the below algorithm implies that study_num = 0 or 1, everytime the code is executed the counter gets incremented and hence determined
- * the values of study_num, i and j which is returned as a std::vector<int>
- * \param[in] size_x The (integer) number of values to be tested for one of the 2 parameters forming the 2D parameter space.
- * \param[in] size_y The (integer) number of values to be tested for the other of the 2 parameters forming the 2D parameter space.
+ * \details Let's say sizeX = 5, counter stored in COUNTER_DONOTDEL = 1.
+ * Substituting these values into the algorithm below implies that studyNum = 0 or 1. Everytime the code is executed the
+ * counter gets incremented and the values of studyNum and i are updated, which is returned as std::vector<int>
+ * \param[in] sizeX The (integer) number of values to be tested in 1D parameter space.
+ * \returns std::vector<int> The current study numbers.
+ */
+std::vector<int> DPMBase::get1DParametersFromRunNumber(int sizeX)
+{
+    // Declare a vector of integers capable of storing 2 values
+    std::vector<int> temp(2);
+
+    // Declare and initialise for the current simulation run number
+    int counter = getRunNumber();
+
+    // Give studyNum value 0 if study is incomplete, otherwise value > 0
+    int studyNum = (counter-1)/sizeX;
+    counter = counter - sizeX*studyNum;
+
+    int i = ((counter - 1) % sizeX) + 1;
+    logger(INFO,"StudyNum: % \t Counter: % \t i: %", studyNum, counter, i);
+    temp[0] = studyNum;
+    temp[1] = i;
+
+    return temp;
+}
+
+/*!
+ * \details Let's say sizeX = 2 and sizeY = 5, counter stored in COUNTER_DONOTDEL =1. The studySize = 10.
+ * Substituting these values into the below algorithm implies that studyNum = 0 or 1, everytime the code is executed the counter gets incremented and hence determined
+ * the values of studyNum, i and j which is returned as a std::vector<int>
+ * \param[in] sizeX The (integer) number of values to be tested for one of the 2 parameters forming the 2D parameter space.
+ * \param[in] sizeY The (integer) number of values to be tested for the other of the 2 parameters forming the 2D parameter space.
  * \returns std::vector<int>
  */
-std::vector<int> DPMBase::get2DParametersFromRunNumber(int size_x, int size_y)
+std::vector<int> DPMBase::get2DParametersFromRunNumber(int sizeX, int sizeY)
 {
     //declares a vector of integers capable of storing 3 values,
     std::vector<int> temp(3);
@@ -661,22 +692,61 @@ std::vector<int> DPMBase::get2DParametersFromRunNumber(int size_x, int size_y)
     int counter = getRunNumber();
     //calculates the total size of the study, i.e. the number of points
     //in the 2D parameter space explored
-    int study_size = size_x * size_y;
-    //(counter - 1) / study_size gives a fraction comparing the number of runs conducted so far
+    int studySize = sizeX * sizeY;
+    //(counter - 1) / studySize gives a fraction comparing the number of runs conducted so far
     //to the total size of the study, i.e. the total number of runs that need to be performed.
-    //since study_num is an integer, will declare zero until an adequate number of runs has been performed,
+    //since studyNum is an integer, will declare zero until an adequate number of runs has been performed,
     //at which point it will equal 1
-    int study_num = (counter - 1) / study_size;
-    
-    counter = counter - study_size * study_num;
-    int i = ((counter - 1) % size_x) + 1;
-    int j = (counter - i) / size_x + 1;
-    std::cout << "Counter: " << counter << " i: " << i << " j: " << j << std::endl;
-    
-    temp[0] = study_num;
+    int studyNum = (counter - 1) / studySize;
+
+    counter = counter - studySize * studyNum;
+    int i = ((counter - 1) % sizeX) + 1;
+    int j = ((counter - i) / sizeX) + 1;
+    logger(INFO,"StudyNum: % \t Counter: % \t i: % \t j: %", studyNum, counter, i, j);
+
+    temp[0] = studyNum;
     temp[1] = i;
     temp[2] = j;
-    
+
+    return (temp);
+}
+
+/*!
+ * \details Let's say sizeX = 2, sizeY = 5 and sizeZ = 3, counter stored in COUNTER_DONOTDEL =1. The studySize = 30.
+ * Substituting these values into the below algorithm implies that studyNum = 0 or 1, everytime the code is executed the counter gets incremented and hence determined
+ * the values of studyNum, i,j and k which is returned as a std::vector<int>
+ * \param[in] sizeX The (integer) number of values to be tested for one of the 3 parameters forming the 3D parameter space.
+ * \param[in] sizeY The (integer) number of values to be tested for one of the 3 parameters forming the 3D parameter space.
+ * \param[in] sizeZ The (integer) number of values to be tested for one of the 3 parameters forming the 3D parameter space.
+ * \returns std::vector<int>
+ */
+std::vector<int> DPMBase::get3DParametersFromRunNumber(int sizeX, int sizeY, int sizeZ)
+{
+    //declares a vector of integers capable of storing 4 values,
+    std::vector<int> temp(4);
+    //declares and initialises an integer variable named "counter"
+    //with the current counter number, runNumber_
+    int counter = getRunNumber();
+    //calculates the total size of the study, i.e. the number of points
+    //in the 3D parameter space explored
+    int studySize = sizeX * sizeY * sizeZ;
+    //(counter - 1) / studySize gives a fraction comparing the number of runs conducted so far
+    //to the total size of the study, i.e. the total number of runs that need to be performed.
+    //since studyNum is an integer, will declare zero until an adequate number of runs has been performed,
+    //at which point it will equal 1
+    int studyNum = (counter - 1) / studySize;
+
+    counter = counter - studySize * studyNum;
+    int i = ((counter-1) % sizeX) + 1;
+    int j = static_cast<int>(std::floor((counter-1)/sizeX)) % sizeY + 1;
+    int k = static_cast<int>(std::floor((counter-1)/(sizeX*sizeY))) % sizeZ + 1;
+    logger(INFO,"StudyNum: % \t Counter: % \t i: % \t j: % \t k: %", studyNum, counter, i, j, k);
+
+    temp[0] = studyNum;
+    temp[1] = i;
+    temp[2] = j;
+    temp[3] = k;
+
     return (temp);
 }
 

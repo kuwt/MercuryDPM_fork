@@ -310,7 +310,7 @@ extern LL<Log::VERBOSE> VERBOSE;
 extern LL<Log::DEBUG> DEBUG;
 
 /*!
- * \brief See \ref LoggerGuide for details on how to use the logger.
+ * \brief See \subpage LoggerGuide for details on how to use the logger.
  *
  * \arg L The log level. Messages of higher level are ignored
  * 

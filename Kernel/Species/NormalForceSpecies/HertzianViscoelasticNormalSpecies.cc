@@ -26,6 +26,7 @@
 #include "HertzianViscoelasticNormalSpecies.h"
 #include "Interactions/BaseInteraction.h"
 #include <cmath>
+#include <Species/FrictionForceSpecies/MindlinSpecies.h>
 #include "Interactions/NormalForceInteractions/HertzianViscoelasticInteraction.h"
 #include "Logger.h"
 #include "Species/BaseSpecies.h"
@@ -135,9 +136,59 @@ void HertzianViscoelasticNormalSpecies::setElasticModulusAndRestitutionCoefficie
     }
 }
 
+///Allows to change elastic modulus and poisson ratio to compute shear modulus
+void HertzianViscoelasticNormalSpecies::setElasticModulusAndPoissonRatio(Mdouble elasticModulus, Mdouble poissonRatio)
+{
+    if (elasticModulus < 0.0)
+        logger(ERROR,
+               "[HertzianViscoelasticNormalSpecies::setElasticModulusAndRestitutionCoefficient] elasticModulus % should be nonnegative",
+               elasticModulus);
+    
+    else if (poissonRatio < 0.0 || poissonRatio > 1.0)
+        logger(ERROR,
+               "[HertzianViscoelasticNormalSpecies::setElasticModulusAndRestitutionCoefficient] poissonRatio % should be between 0 and 1 (inclusive)",
+               poissonRatio);
+    else
+    {
+        elasticModulus_ = elasticModulus;
+        auto mindlin = dynamic_cast<MindlinSpecies*>(getBaseSpecies());
+        logger.assert(mindlin, "Please define HertzianViscoelasticMindlinSpecies to use this setter");
+        mindlin->setPoissonRatio(poissonRatio);
+        mindlin->computeShearModulus(elasticModulus, poissonRatio);
+    }
+}
+
+///Allows to change elastic modulus and shear modulus to compute poisson ratio
+void HertzianViscoelasticNormalSpecies::setElasticModulusAndShearModulus(Mdouble elasticModulus, Mdouble shearModulus)
+{
+    if (elasticModulus < 0.0)
+        logger(ERROR,
+               "[HertzianViscoelasticNormalSpecies::setElasticModulusAndShearModulus] elasticModulus % should be nonnegative",
+               elasticModulus);
+    
+    else if (shearModulus < 0.0)
+        logger(ERROR,
+               "[HertzianViscoelasticNormalSpecies::setElasticModulusAndShearModulus] shearModulus % should be nonnegative",
+               shearModulus);
+    else
+    {
+        elasticModulus_ = elasticModulus;
+        auto mindlin = dynamic_cast<MindlinSpecies*>(getBaseSpecies()->getFrictionForce());
+        logger.assert(mindlin, "Please define HertzianViscoelasticMindlinSpecies to use this setter");
+        mindlin->setShearModulus(shearModulus);
+        mindlin->computePoissonRatio(elasticModulus, shearModulus);
+    }
+}
+
 ///Allows the spring constant to be accessed
 Mdouble HertzianViscoelasticNormalSpecies::getElasticModulus() const
 {
+    return elasticModulus_;
+}
+
+Mdouble HertzianViscoelasticNormalSpecies::computeElasticModulus(Mdouble shearModulus, Mdouble poissonRatio)
+{
+    elasticModulus_ = 2 * shearModulus * (1 + poissonRatio);
     return elasticModulus_;
 }
 

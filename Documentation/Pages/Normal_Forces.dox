@@ -40,6 +40,7 @@ The available models to compute the normal interaction are:
 - \subpage LinearViscoelasticNormalModel
 - \subpage HertzianViscoelasticNormalModel
 - \subpage LinearPlasticViscoelasticNormalModel
-
+- \subpage SinteringModel
+- \subpage EnhancedSintering_Interaction
 
 */

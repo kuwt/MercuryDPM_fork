@@ -77,7 +77,7 @@ public:
         SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         for (Mdouble z = mid.Z + contractionHeight;
-            particleHandler.getNumberOfObjects() <= N; 
+            particleHandler.getNumberOfObjects() <= N;
             z += 2.0 * maxParticleRadius)
         {
             for (Mdouble r = halfWidth - maxParticleRadius; r > 0; r -= 1.999 * maxParticleRadius)

@@ -27,6 +27,7 @@
 #include <cstdlib> //needed to be cygwin compatible (system not found)
 #include "Logger.h"
 
+
 int main(int argc, char *argv[])
 {
     logger(INFO, "2D Running Hourglass Simulation until t=0.01");

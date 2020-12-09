@@ -77,6 +77,11 @@ int main()
     problem.setInflowVelocityVariance(0.02);        // particle inflow velocity variance (in ratio of the mean velocity)
     //! [ChuteDemo:inflow]
 
+
+    /*problem.setParticlesWriteVTK(true);
+    problem.setWallsWriteVTK(true);*/
+
+
     //solve
     problem.solve();
 } // the end

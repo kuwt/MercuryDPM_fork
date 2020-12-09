@@ -25,7 +25,5 @@ The available models to compute the adhesive interaction are:
 - \subpage WetCohesion - Irreversible adhesive interaction
 - \subpage LiquidMigration_Interaction  - Irreversible adhesive interaction
 - \subpage ChargedBonded_Interaction
-- \subpage SinteringModel
 - \subpage PharmiMcMeeking_Interaction
-- \subpage EnhancedSintering_Interaction
 */

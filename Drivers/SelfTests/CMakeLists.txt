@@ -19,8 +19,6 @@ endforeach()
 #Copy specific files to your build directory
 #file(COPY ${CMAKE_SOURCE_DIR}/Drivers/MercurySimpleDemos/TriangulatedWall.vtk DESTINATION .)
 
-#copy restart input for self tests into build
-file(COPY ${CMAKE_SOURCE_DIR}/Drivers/MercurySimpleDemos/InputData/StressStrainControlBoundarySelfTestInput.restart DESTINATION .)
 
 add_subdirectory(Interactions)
 add_subdirectory(Walls)

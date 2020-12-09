@@ -34,7 +34,7 @@
 /*!
  * \brief A IntersectionOfWalls is convex polygon defined as an intersection of InfiniteWall's.
  * \details It can be defined as the intersection of a set
- * of #InfiniteWalls, defined by the normal vector into the wall and a point on
+ * of \ref InfiniteWall's, defined by the normal vector into the wall and a point on
  * the wall.
  * For example, the following gives a cube |x|<1 and |y|<1:
  * \code

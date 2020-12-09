@@ -45,6 +45,10 @@ SinterNormalSpecies::SinterNormalSpecies()
     sinterAdhesion_ = 0.0;
     sinterRate_ = 0.0;
     inverseSinterViscosity_ = 0.0;
+    complianceZero_ = 0.0;
+    surfTension_ = 0.0;
+    constantC1_ = 0.0;
+    separationDis_ = 0.0;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"SinterNormalSpecies::SinterNormalSpecies() finished"<<std::endl;
 #endif
@@ -65,6 +69,10 @@ SinterNormalSpecies::SinterNormalSpecies(const SinterNormalSpecies& p)
     sinterAdhesion_ = p.sinterAdhesion_;
     inverseSinterViscosity_ = p.inverseSinterViscosity_;
     sinterRate_ = p.sinterRate_;
+    complianceZero_ = p.complianceZero_;
+    surfTension_ = p.surfTension_;
+    constantC1_ = p.constantC1_;
+    separationDis_ = p.separationDis_;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"SinterNormalSpecies::SinterNormalSpecies(const SinterNormalSpecies &p) finished"<<std::endl;
 #endif
@@ -89,7 +97,11 @@ void SinterNormalSpecies::write(std::ostream& os) const
     os << " dissipation " << dissipation_;
     os << " sinterAdhesion " << sinterAdhesion_;
     os << " inverseSinterViscosity " << inverseSinterViscosity_;
-    os << " sinterRate_ " << sinterRate_;
+    os << " sinterRate " << sinterRate_;
+    os << " complianceZero " << complianceZero_;
+    os << " surfTension " << surfTension_;
+    os << " constantC1 " << constantC1_;
+    os << " separationDis " << separationDis_;
     os << " sinterType " << (unsigned) sinterType_;
 }
 
@@ -107,6 +119,10 @@ void SinterNormalSpecies::read(std::istream& is)
     is >> dummy >> sinterAdhesion_;
     is >> dummy >> inverseSinterViscosity_;
     is >> dummy >> sinterRate_;
+    is >> dummy >> complianceZero_;
+    is >> dummy >> surfTension_;
+    is >> dummy >> constantC1_;
+    is >> dummy >> separationDis_;
     unsigned type;
     is >> dummy >> type;
     sinterType_ = (SINTERTYPE) type;
@@ -134,6 +150,11 @@ void SinterNormalSpecies::mix(SinterNormalSpecies* const S, SinterNormalSpecies*
     dissipation_ = BaseSpecies::average(S->getDissipation(), T->getDissipation());
     inverseSinterViscosity_ = BaseSpecies::average(S->getInverseSinterViscosity(), T->getInverseSinterViscosity());
     sinterAdhesion_ = BaseSpecies::average(S->getSinterAdhesion(), T->getSinterAdhesion());
+    complianceZero_ = BaseSpecies::average(S->getComplianceZero(), T->getComplianceZero());
+    surfTension_ = BaseSpecies::average(S->getSurfTension(), T->getSurfTension());
+    constantC1_= BaseSpecies::average(S->getConstantC1(), T->getConstantC1());
+    separationDis_ = BaseSpecies::average(S->getSeparationDis(), T->getSeparationDis());
+
 }
 
 /*!
@@ -277,6 +298,45 @@ void SinterNormalSpecies::setSinterRate(Mdouble sinterRate)
     sinterRate_ = sinterRate;
 }
 
+void SinterNormalSpecies::setComplianceZero(Mdouble complianceZero)
+{
+    if (complianceZero < 0)
+    {
+        logger(ERROR, "complianceZero(%)", complianceZero);
+    }
+    complianceZero_ = complianceZero;
+}
+
+void SinterNormalSpecies::setSurfTension(Mdouble surfTension)
+{
+    if (surfTension < 0)
+    {
+        logger(ERROR, "SurfTension(%)", surfTension);
+    }
+    surfTension_ = surfTension;
+}
+
+void SinterNormalSpecies::setConstantC1(Mdouble complianceOne)
+{
+    if (complianceOne < 0)
+    {
+        logger(ERROR, "ComplianceOne(%)", complianceOne);
+    }
+    constantC1_ = complianceOne;
+}
+
+void SinterNormalSpecies::setSeparationDis(Mdouble separationDis)
+{
+    if (separationDis < 0)
+    {
+        logger(ERROR, "SeparationDis(%)", separationDis);
+    }
+    separationDis_ = separationDis;
+}
+
+
+
+
 /*!
  * \details should be non-negative
  * \param[in] sinterAdhesion_
@@ -290,6 +350,8 @@ void SinterNormalSpecies::setSinterType(SINTERTYPE sinterType)
         logger(INFO, "Sintertype set to PARHAMI_MCKEEPING");
     else if (sinterType_ == SINTERTYPE::TEMPERATURE_DEPENDENT_FRENKEL)
         logger(INFO, "Sintertype set to TEMPERATURE_DEPENDENT_FRENKEL");
+    else if (sinterType_ == SINTERTYPE::REGIME_SINTERING)
+        logger(INFO, "Sintertype set to REGIME_SINTERING");
     else
         logger(ERROR, "Sintertype not understood");
 }
@@ -381,6 +443,26 @@ Mdouble SinterNormalSpecies::getInverseSinterViscosity() const
 Mdouble SinterNormalSpecies::getSinterRate() const
 {
     return sinterRate_;
+}
+
+Mdouble SinterNormalSpecies::getComplianceZero() const
+{
+    return complianceZero_;
+}
+
+Mdouble SinterNormalSpecies::getSurfTension() const
+{
+    return surfTension_;
+}
+
+Mdouble SinterNormalSpecies::getConstantC1() const
+{
+    return constantC1_;
+}
+
+Mdouble SinterNormalSpecies::getSeparationDis() const
+{
+    return separationDis_;
 }
 
 SINTERTYPE SinterNormalSpecies::getSinterType() const

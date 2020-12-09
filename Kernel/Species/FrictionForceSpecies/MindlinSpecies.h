@@ -70,14 +70,6 @@ public:
     //mu has to be set to allow tangential forces (sets dispt=disp as default)
     void setSlidingFrictionCoefficient(Mdouble new_mu);
     
-    //k_edit
-    //allows the shear modulus to be set / changed
-    void setShearModulus(Mdouble new_G);
-    
-    //k_edit
-    //allows the value of the shear modulus to be accessed
-    Mdouble getShearModulus() const;
-    
     ///Allows the (dynamic) Coulomb friction coefficient to be accessed
     Mdouble getSlidingFrictionCoefficient() const;
     
@@ -86,6 +78,26 @@ public:
     
     ///Allows the static Coulomb friction coefficient to be accessed
     Mdouble getSlidingFrictionCoefficientStatic() const;
+    
+    ///\brief Allows the poisson ratio to be changed
+    void setPoissonRatio(Mdouble poissonRatio);
+    
+    ///\brief Allows the poisson ratio to be accessed
+    Mdouble getPoissonRatio() const;
+    
+    Mdouble computePoissonRatio(Mdouble elasticModulus, Mdouble shearModulus);
+    
+    ///\brief allows the shear modulus and the poissonratio to be changed
+    void setShearModulusAndPoissonRatio(Mdouble shearModulus, Mdouble poissonRatio);
+    
+    ///\brief allows the shear modulus to be changed
+    void setShearModulus(Mdouble shearModulus);
+    
+    ///\brief Allows the shear modulus to be accessed
+    Mdouble getShearModulus() const;
+    
+    ///\brief allwos the shear modulus to be computed
+    Mdouble computeShearModulus(Mdouble elasticModulus, Mdouble poissonRatio);
     
     /*!
      * \brief Returns true if torques have to be calculated.
@@ -104,7 +116,6 @@ private:
      * (if the tangential and normal stiffnesses also have a ratio of 2/7). 
      * should always satisfy \f$4*dispt*dt<mass, dispt \approx disp\f$, otherwise 
      * the restitution is zero and the particles stick.
-     * \bug not used currently
      */
     Mdouble slidingDissipation_;
     
@@ -114,9 +125,11 @@ private:
     /// static Coulomb friction coefficient (by default set equal to mu)
     Mdouble slidingFrictionCoefficientStatic_;
     
-    //k_edit
-    // the shear modulus of a given particle. By default, set to zero;
+    ///\brief poisson ratio constant
+    Mdouble poissonRatio_;
+    
     Mdouble shearModulus_;
+    
     
 };
 

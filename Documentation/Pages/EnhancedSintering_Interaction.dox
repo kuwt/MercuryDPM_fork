@@ -1,17 +1,55 @@
 /*!
 \page EnhancedSintering_Interaction Enhanced sintering interaction
 
-Charged bonded model in MercuryDPM referred to as ChargedBonded
-(ChargedBondedSpecies, ChargedBondedInteraction).
+RegimeSinterInteraction model in MercuryDPM referred to as RegimeSinter
+(RegimeSinterSpecies, RegimeSinterInteraction).
 
-Model:
+This interaction models three different sintering mechanisms.
+
+1. Overlap occurs due to elastic Adhesive contact, which works in the JKR regime.
+2. Overlap drives by adhesive intersurface forces and accommodated by viscoelastic deformation.(Zipping)
+3. Overlap drives by surface tensions and accommodated by viscous flow. (streching)
+
+The following picture shows the sintering regime map.
+
+\image html ContactModels/SinteringTime.png
+
+If the time after particle contact is sufficiently short that the material is unrelaxed \f$ t< t_0 \f$
+the dimensionless contact radius is given by the JKR model as
+
+\f$
+    \frac{a_0}{R} = (\frac{18\pi C_0 \gamma}{R})^{1/3}
+\f$
+
+where \f$ R \f$ is the effective particle radius, \f$ C_0 \f$ instantaneus compliance, \f$ \gamma \f$ surface tension.
+
+For intermediate times in the interval \f$ t_0 < t < t_{visc}\f$, the dimensionless contact radius can be estimated by
+viscoelastic adhesive contact as:
+
+\f$
+    \frac{a_0}{R} = (63(\pi)^{3})^{1/7}(\frac{\delta_c}{R})^{2/7}(\frac{C_1\gamma}{R}t)^{1/7}
+\f$
+
+where \f$ \delta_c \f$ is the separation distance from the fracture theory.
+
+Finally, if the time is large enough \f$ t> t_{visc}\f$ the contact radius can be obtained using the approach developed by  Frenkel
+
+\f$
+    \frac{a_0}{R} = (\frac{8C_1 \gamma}{R}t)^{1/2}
+\f$
+
+The interaction force is computed in a similar form as \ref SinteringModel, where the rate of plastic overlap
+is calculated according to the three different mechanisms.
 
 Header:
+\code #include <Species/SinterSpecies.h> \endcode
 
 Interaction force:
+\code void SinterInteraction::computeNormalForce() \endcode
 
 Unit test:
+RegimeSinterForceUnitTest.cpp
 
-Self test:
+\image html ContactModels/RegimeSintering.png
 
 */

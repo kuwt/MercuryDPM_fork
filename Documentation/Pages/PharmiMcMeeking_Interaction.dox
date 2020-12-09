@@ -1,17 +1,20 @@
 /*!
 \page PharmiMcMeeking_Interaction Pharmi McMeeking sinter Interaction
 
-Charged bonded model in MercuryDPM referred to as ChargedBonded
-(ChargedBondedSpecies, ChargedBondedInteraction).
+Pharmi McMeeking model in MercuryDPM referred to as PharmiMcMeekingSintering
+( PharmiMcMeekingSinteringSpecies,  PharmiMcMeekingSinteringInteraction).
 
 Model:
 
 Header:
+\code #include <Species/AdhesiveForceSpecies/ParhamiMcMeekingSinterSpecies.h \endcode
 
 Interaction force:
-
-Unit test:
+\code ParhamiMcMeekingSinterInteraction::computeAdhesionForce() \endcode
 
 Self test:
+ParhamiMcKeepingParticlePairSelfTest.cpp
+
+\image html ContactModels/PharmiMcKeeping.png
 
 */
