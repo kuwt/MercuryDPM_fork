@@ -448,16 +448,16 @@ void BaseHandler<T>::addGhostObject(T* O)
     getLastObject()->setIndex(getSize() - 1);
 }
 
+//\todo should this function ever be used?
 template<class T>
 void BaseHandler<T>::removeIf(const std::function<bool(T*)> cond)
 {
-    //objects_.erase(std::remove_if(objects_.begin(), objects_.end(), cond, objects_.end()));
-    for (auto o = objects_.begin(); o != objects_.end(); ++o)
-    {
-        if (cond(*o))
+    for (int i = 0; i < objects_.size(); ++i) {
+        if (cond(objects_[i]))
         {
-            removeObject((*o)->getIndex());
-            --o;
+            //objects_(i)->actionsOnErase();
+            removeObject(i);
+            --i;
         }
     }
 }

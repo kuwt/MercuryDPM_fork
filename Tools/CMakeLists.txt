@@ -13,4 +13,8 @@ foreach(CPPFILE ${CPPFILES})
     add_executable(${EXECNAME} ${FILENAME})
     #All cpp folder and linked agaist DPMBase
     target_link_libraries(${EXECNAME}  MercuryBase)
+
+
+file(COPY ${CMAKE_SOURCE_DIR}/Tools/CombineMultiTimeStepAllDataFiles.sh DESTINATION .)
 endforeach()
+

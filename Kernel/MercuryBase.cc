@@ -101,9 +101,9 @@ void MercuryBase::hGridActionsBeforeTimeLoop()
  *          the given input stream, after that it reads the hGridMaxLevels_ and 
  *          the hGridCellOverSizeRatio_ from the input stream.
  */
-void MercuryBase::read(std::istream& is)
+void MercuryBase::read(std::istream& is, ReadOptions opt)
 {
-    DPMBase::read(is);
+    DPMBase::read(is, opt);
     
     std::stringstream line;
     helpers::getLineFromStringStream(is, line);

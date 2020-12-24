@@ -29,6 +29,22 @@
 using mathsFunc::square;
 using mathsFunc::cubic;
 
+void PSD::print (std::vector<PSD>& psd) {
+    if (psd.front().radius>1e-1) {
+        for (const auto p : psd) {
+            std::cout << p.radius << "m\t" << p.probability * 100 << "\%\n";
+        }
+    } else if (psd.front().radius>1e-4) {
+        for (const auto p : psd) {
+            std::cout << p.radius * 1000 << "mm\t" << p.probability * 100 << "\%\n";
+        }
+    } else {
+        for (const auto p : psd) {
+            std::cout << p.radius * 1e6 << "um\t" << p.probability * 100 << "\%\n";
+        }
+    }
+}
+
 // validate whether psd is a cumulative distribution
 void PSD::validateCumulativeDistribution (std::vector<PSD>& psd) {
     logger.assert_always(psd.size()>0,"psd vector is empty");
@@ -135,17 +151,18 @@ void PSD::convertCumulativeNumberToVolume (std::vector<PSD>& psd) {
     convertSubtractiveNumberToVolume(psd);
     convertSubtractiveToCumulative(psd);
 }
-// returns a cumulative number particle size distribution from a given volume particle size distribution
-std::vector<PSD> PSD::setFromVolumePSD (const std::vector<double>& radius,
-                                                      const std::vector<double>& probability) {
-    logger.assert_always(radius.size()==probability.size(),"Number of radius and probability values don't match");
-    std::vector<PSD> psd;
-    psd.reserve(radius.size());
-    for (int i = 0; i < radius.size(); ++i) {
-        psd.push_back({radius[i],probability[i]});
-    }
-    return psd;
-}
+//// returns a cumulative number particle size distribution from a given volume particle size distribution
+//std::vector<PSD> PSD::setFromVolumePSD (const std::vector<double>& radius,
+//                                                      const std::vector<double>& probability) {
+//    logger.assert_always(radius.size()==probability.size(),"Number of radius and probability values don't match");
+//    std::vector<PSD> psd;
+//    psd.reserve(radius.size());
+//    for (int i = 0; i < radius.size(); ++i) {
+//        psd.push_back({radius[i],probability[i]});
+//    }
+//    return psd;
+//    ///\todo why is there no conversion in this function?
+//}
 
 // get median size
 double PSD::getQuantile(std::vector<PSD> psd, double quantile) {
@@ -153,7 +170,10 @@ double PSD::getQuantile(std::vector<PSD> psd, double quantile) {
     convertCumulativeNumberToVolume(psd);
     auto high = std::lower_bound(psd.begin(),psd.end(),quantile);
     auto low = std::max(psd.begin(),high-1);
-    return low->radius + (high->radius-low->radius)*(quantile-low->probability)/(high->probability-low->probability);
+    if (high->probability==low->probability)
+        return high->radius;
+    else
+        return low->radius + (high->radius-low->radius)*(quantile-low->probability)/(high->probability-low->probability);
 }
 
 

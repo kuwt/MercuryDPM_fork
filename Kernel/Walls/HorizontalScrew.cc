@@ -348,7 +348,6 @@ void HorizontalScrew::writeVTK (VTKContainer& vtk) const
     unsigned nz = 180;
 
     unsigned nPoints = vtk.points.size();
-    vtk.points.reserve(nPoints+nr*nz);
     Vec3D contactPoint;
     for (unsigned iz=0; iz<nz; iz++) {
         double maxR = std::max(minR_,lowerR_+(double)iz/nz*diffR_);//todo: fix
@@ -371,7 +370,7 @@ void HorizontalScrew::writeVTK (VTKContainer& vtk) const
     }
 
     unsigned nCells = vtk.triangleStrips.size();
-    vtk.triangleStrips.reserve(nCells+(nz-1));
+    //vtk.triangleStrips.reserve(nCells+(nz-1));
     for (unsigned iz=0; iz<nz-1; iz++) {
         std::vector<double> cell;
         cell.reserve(2*nr);

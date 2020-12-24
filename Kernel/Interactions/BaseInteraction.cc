@@ -170,7 +170,10 @@ void BaseInteraction::write(std::ostream& os) const
     {
         os << " particleWallIds " << P_->getId() << " " << I_->getId();
     }
-    os << " timeStamp " << timeStamp_ << " force " << force_ << " torque " << torque_;
+    os << " timeStamp " << timeStamp_;
+    os << " contactPoint " << contactPoint_;
+    os << " force " << force_;
+    os << " torque " << torque_;
     //\todo add information that can recreate the contact information (necessary for CG)
     //	os <<" timeStamp "<<timeStamp_<< " contactPoint " << contactPoint_ << " overlap " << overlap_ << " force " << force_ << " torque " << torque_;
 }
@@ -186,6 +189,7 @@ void BaseInteraction::read(std::istream& is)
 {
     //the rest gets read by the interaction handler
     std::string dummy;
+    helpers::readOptionalVariable(is,"contactPoint",contactPoint_);
     is >> dummy >> force_;
     is >> dummy >> torque_;
 }

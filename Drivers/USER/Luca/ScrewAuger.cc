@@ -659,7 +659,6 @@ void ScrewAuger::writeVTK(VTKContainer& vtk) const
     unsigned nz = static_cast<unsigned int>(99 * fabs(numberOfTurns_));
     
     unsigned long nPoints = vtk.points.size();
-    vtk.points.reserve(nPoints + 2 * nr * nz);
     Vec3D contactPoint;
     // either one or two helices
     for (Mdouble offset = angularOffset_; offset<=angularOffset_; offset+=0.5)
@@ -692,7 +691,6 @@ void ScrewAuger::writeVTK(VTKContainer& vtk) const
     }
     
     unsigned long nCells = vtk.triangleStrips.size();
-    vtk.triangleStrips.reserve(nCells + (nz - 1));
     for (unsigned iz = 0; iz < nz-1; iz++)
     {
         //skip step that would connect the two screw parts

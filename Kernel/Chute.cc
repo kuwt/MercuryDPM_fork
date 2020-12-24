@@ -136,9 +136,9 @@ void Chute::constructor()
  * method determines which version this restart file is by itself.
  * \param[in,out] is    the istream from which is read, usually a restart file.
  */
-void Chute::read(std::istream& is)
+void Chute::read(std::istream& is, ReadOptions opt)
 {
-    MercuryBase::read(is);
+    MercuryBase::read(is, opt);
     //read out the full line first, so if there is an error it does not affect 
     //the read of the next line
     std::string line_string;

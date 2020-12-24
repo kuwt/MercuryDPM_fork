@@ -144,7 +144,11 @@ public:
       * \brief Allows the user to set the file counter according to his need. Sets File::counter_.
       */
     void setCounter(unsigned int counter);
-    
+
+    void increaseCounter() {counter_++;}
+
+    void decreaseCounter() {counter_--;}
+
     /*!
      * \brief Allows the user to know the file mode i.e. gets File::openMode_
      */

@@ -425,7 +425,7 @@ void helpers::getLineFromStringStream(std::istream& in, std::stringstream& out)
 {
     std::string line_string;
     getline(in, line_string);
-    out.str(line_string);
+    out.str(std::move(line_string));
     out.clear();
 }
 
@@ -872,12 +872,12 @@ bool helpers::readFromCommandLine(int argc, char *argv[], std::string varName)
 {
     for (unsigned i=0; i<argc; ++i) {
         if (varName == argv[i]) {
-            logger(INFO, "readFromCommandLine: found argument %",varName);
+            logger(INFO, "readFromCommandLine: % set to true",varName.substr(1));
             return true;
         }
     }
     //if the variable is not found
-    logger(INFO, "readFromCommandLine: argument % not found",varName);
+    logger(INFO, "readFromCommandLine: % set to default value false",varName.substr(1));
     return false;
 }
 
@@ -946,9 +946,8 @@ bool helpers::isNext(std::istream& is, const std::string name) {
     }
 }
 
-namespace helpers {
 template<>
-std::string readFromCommandLine<std::string>(int argc, char *argv[], std::string varName, std::string value)
+std::string helpers::readFromCommandLine<std::string>(int argc, char *argv[], std::string varName, std::string value)
 {
     for (unsigned i=0; i<argc-1; ++i) {
         if (varName == argv[i]) {
@@ -962,7 +961,7 @@ std::string readFromCommandLine<std::string>(int argc, char *argv[], std::string
     return value;
 }
 
-bool createDirectory(std::string path) {
+bool helpers::createDirectory(std::string path) {
     //see https://stackoverflow.com/questions/20358455/cross-platform-way-to-make-a-directory
     mode_t nMode = 0733; // UNIX style permissions
     int nError = 0;
@@ -976,4 +975,9 @@ bool createDirectory(std::string path) {
     }
     return false;
 }
+
+
+double helpers::round(double val, int prec) {
+    const double n = std::pow(10,prec);
+    return std::round(val*n)/n;
 }

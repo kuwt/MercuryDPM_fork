@@ -310,6 +310,7 @@ void LinearPlasticViscoelasticNormalSpecies::setRestitutionCoefficient(Mdouble e
 
 /** Calculates collision time for two copies of a particle of given disp, k, mass
  * If constant restitution is enabled, the collision time is mass-independent.
+ * \todo should this use unloading stiffness?
  */
 Mdouble LinearPlasticViscoelasticNormalSpecies::getCollisionTime(Mdouble mass) const
 {

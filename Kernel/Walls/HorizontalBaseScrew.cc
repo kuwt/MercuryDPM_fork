@@ -278,7 +278,6 @@ void HorizontalBaseScrew::writeVTK (VTKContainer& vtk) const
         //finally create the connectivity matri to plot shell-like triangle strips.
         unsigned nz = rzVec.size();
         unsigned nCells = vtk.triangleStrips.size();
-        vtk.triangleStrips.reserve(nCells+(nz-1));
         for (unsigned iz=0; iz<nz-1; iz++) {
             std::vector<double> cell;
             cell.reserve(2*nr+2);

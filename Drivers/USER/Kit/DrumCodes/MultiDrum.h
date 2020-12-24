@@ -115,7 +115,7 @@ public:
     *
     * \args in An std::istream where to read from
     */
-    void read(std::istream& in) override
+    void read(std::istream& in, ReadOptions opt = ReadOptions::ReadAll) override
     {
        particleHandler.clear();
        wallHandler.clear();
@@ -162,7 +162,7 @@ public:
        in >> _dummy >> drumRadius;
        in >> _dummy >> checkTime;
        
-       DPMBase::read( in );
+       DPMBase::read(in, opt);
     }
     
     /**

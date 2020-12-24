@@ -63,7 +63,7 @@ void Vec3D::setNaN()
  */
 bool Vec3D::isNaN() const
 {
-    return std::isnan(X) && std::isnan(Y) && std::isnan(Z);
+    return std::isnan(X) || std::isnan(Y) || std::isnan(Z);
 }
 
 /*!

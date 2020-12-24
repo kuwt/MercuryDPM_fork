@@ -26,6 +26,7 @@
 
 #include "BaseObject.h"
 #include "Logger.h"
+#include "Math/Helpers.h"
 
 /*!
  * \param[in,out] os
@@ -81,6 +82,7 @@ void BaseObject::read(std::istream& is)
 {
     std::string dummy;
     is >> dummy >> id_;
+    helpers::readOptionalVariable(is, "groupID", groupId_);
 }
 
 /*!
@@ -90,5 +92,6 @@ void BaseObject::write(std::ostream& os) const
 {
     os << getName();
     os << " id " << id_;
+    if (groupId_) os << " groupID " << groupId_;
 }
 

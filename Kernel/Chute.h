@@ -123,7 +123,7 @@ public:
     /*!
      * \brief Reads all chute properties from an istream
      */
-    void read(std::istream& is) override;
+    void read(std::istream& is, ReadOptions opt = ReadOptions::ReadAll) override;
     
     /*!
      * \brief This function writes the Chute properties to an ostream, and adds 

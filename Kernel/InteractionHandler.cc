@@ -413,6 +413,7 @@ void InteractionHandler::write(std::ostream& os) const
     MPIContainer& communicator = MPIContainer::Instance();
     unsigned int totalNumberOfInteractions = getNumberOfObjects();
     os << "Interactions " << totalNumberOfInteractions << '\n';
+    //logger(INFO,"% interactions",getNumberOfObjects());
     for (BaseInteraction* it : *this)
     {
     os << (*it) << '\n';
@@ -422,6 +423,35 @@ void InteractionHandler::write(std::ostream& os) const
     for (BaseInteraction* i : objects_)
         os << (*i) << '\n';
 #endif
+}
+
+/// \param[in] is The input stream from which the information is read.
+void InteractionHandler::read(std::istream& is)
+{
+    clear();
+    unsigned int N;
+    std::string dummy;
+    is >> dummy;
+    std::stringstream line;
+    helpers::getLineFromStringStream(is, line);
+    line >> N;
+    if (N > 1e5) logger(INFO, "Reading % %", N, dummy);
+    logger(VERBOSE, "In %::read(is): reading in % objects.", getName(), N);
+    setStorageCapacity(N);
+    // set map
+    particleById.clear();
+    for (BaseParticle* p : getDPMBase()->particleHandler) {
+        particleById[p->getId()] = p;
+    }
+    wallById.clear();
+    for (BaseWall* w : getDPMBase()->wallHandler) {
+        wallById[w->getId()] = w;
+    }
+    for (unsigned int i = 0; i < N; i++) {
+        readAndAddObject(is);
+    }
+    particleById.clear();
+    wallById.clear();
 }
 
 
@@ -435,16 +465,13 @@ void InteractionHandler::readAndAddObject(std::istream& is)
     Mdouble doubleTimeStamp;
     unsigned timeStamp;
     
-    std::stringstream line;
     /// \todo Ant This is a tmp fix as in some cases the line before has not be finished reading. This should be looked at again at a later date.
     is >> type;
     logger(DEBUG, "InteractionHandler::readAndAddObject(is): reading type %.", type);
-    helpers::getLineFromStringStream(is, line);
     Mdouble timeStampDouble;
-    line >> idType >> id0 >> id1 >> dummy >> timeStampDouble;
+    is >> idType >> id0 >> id1 >> dummy >> timeStampDouble;
     timeStamp = timeStampDouble; //in order to read old restart files
-    logger(VERBOSE, "InteractionHandler::readObject(is): reading type % % %", type, id0, id1);
-    
+
     ///\todo TW: Change identifier in restart file from id to index; is there any reason the id should be kept after restarting, once this is done? (Note, the id is set to the old one in the particle handler because interactions store id, not indices; also note id's are slow
     BaseInteraction* C;
 
@@ -460,8 +487,7 @@ void InteractionHandler::readAndAddObject(std::istream& is)
                 C = getInteraction(list0[p0],list1[p1], timeStamp);
                 if (C != nullptr)
                 {
-                   line >> *C;
-                     
+                   is >> *C;
                 }
             }
         }
@@ -475,19 +501,19 @@ void InteractionHandler::readAndAddObject(std::istream& is)
             C = getInteraction(list0[p0],getDPMBase()->wallHandler.getObjectById(id1), timeStamp);
             if (C != nullptr)
             {
-                line >> *C;
+                is >> *C;
             }
         }
     }
 #else
+    //this requires particleById/wallById to be set, which is done in the read() function
     if (idType == "particleIds")
-        C = getInteraction(getDPMBase()->particleHandler.getObjectById(id0),
-                           getDPMBase()->particleHandler.getObjectById(id1), timeStamp);
+        C = getInteraction(particleById[id0],particleById[id1],timeStamp);
     else
-        C = getInteraction(getDPMBase()->particleHandler.getObjectById(id0),
-                           getDPMBase()->wallHandler.getObjectById(id1), timeStamp);
-    line >> (*C);
+        C = getInteraction(particleById[id0],wallById[id1], timeStamp);
+    is >> (*C);
 #endif
+    is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
 void InteractionHandler::setWriteVTK(FileType fileType)

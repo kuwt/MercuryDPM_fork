@@ -323,6 +323,10 @@ void commandLineCG(Mercury3D &dpm, int argc, char **argv)
             logger.assert_always(i+1<argc,"% requires argument",argv[i]);
             dpm.setTimeMax(dpm.getTime()+atof(argv[i + 1]));
             logger(INFO, "Set evaluation time interval to %", argv[i + 1]);
+        } else if (!strcmp(argv[i], "-initialfilecounter")) {
+            logger.assert_always(i+1<argc,"% requires argument",argv[i]);
+            dpm.cgHandler.setInitialFileCounter(atoi(argv[i+1]));
+            logger(INFO, "Initial file counter set to %", argv[i + 1]);
         } else if (!strcmp(argv[i], "-timemax")) {
             logger(ERROR, "% is not a valid argument; use -tMax instead",argv[i]);
         } else if (!strcmp(argv[i], "-species")) {
@@ -333,11 +337,14 @@ void commandLineCG(Mercury3D &dpm, int argc, char **argv)
             logger.assert_always(i+1<argc,"% requires argument",argv[i]);
             cg->statFile.setName(argv[i + 1]);
             logger(INFO, "Set output file name to %", argv[i + 1]);
-        } else if (!strcmp(argv[i], "-coordinates") || !strcmp(argv[i], "-function") || !strcmp(argv[i], "-fields") || !strcmp(argv[i], "-restartandanalyse")) {
+        } else if (!strcmp(argv[i], "-coordinates") || !strcmp(argv[i], "-stattype") || !strcmp(argv[i], "-cgtype") || !strcmp(argv[i], "-function") || !strcmp(argv[i], "-fields") || !strcmp(argv[i], "-restartandanalyse")) {
             //these are commands with one argument that should be ignored here because they are read somewhere else
         } else if (!strcmp(argv[i], "-help") || !strcmp(argv[i], "-readfromrestart") || !strcmp(argv[i], "-timeaverage") || !strcmp(argv[i], "-timesmooth")) {
             //these are commands with no argument that should be ignored here because they are read somewhere else
             --i;
+        } else if (!strcmp(argv[i], "-timeaveragereset")) {
+            //these are commands with no argument that should be ignored here because they are read somewhere else
+            logger(WARN, "This fstatistics command has no equivalent yet in MercuryCG and will be ignored: %", argv[i]);
         } else {
             logger(ERROR, "Could not read argument %", argv[i]);
         }

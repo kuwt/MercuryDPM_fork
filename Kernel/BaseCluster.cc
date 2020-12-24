@@ -833,7 +833,7 @@ void BaseCluster::write(std::ostream& os, bool writeAllParticles) const
  * \details In this all variables needed by the program for restarting are read from a .restart file.
  *          As MercuryBase::write was included in ClusterDPM::write, here MercuryBase::read is included.
  */
-void BaseCluster::read(std::istream& is)
+void BaseCluster::read(std::istream& is, ReadOptions opt)
 {
     MercuryBase::read(is);
 

@@ -31,6 +31,7 @@
 #include "Interactions/BaseInteraction.h"
 #include "File.h"
 #include "MpiContainer.h"
+#include <map>
 
 class SpeciesHandler;
 
@@ -66,7 +67,10 @@ public:
      * \brief Adds an Interaction to the InteractionHandler.
      */
     void addObject(BaseInteraction* I) override;
-    
+
+    /// \param[in] is The input stream from which the information is read.
+    void read(std::istream& is);
+
     /*!
      * \brief Reads an Interaction into the InteractionHandler from restart data.
      */
@@ -164,6 +168,9 @@ public:
 private:
     
     FileType writeVTK_;
+
+    std::map<unsigned,BaseParticle*> particleById;
+    std::map<unsigned,BaseWall*> wallById;
 };
 
 #endif

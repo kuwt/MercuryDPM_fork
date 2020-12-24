@@ -109,9 +109,19 @@ public:
 				output_file << line << std::endl;
 			}
 			output_file.close();
-			data_file >> N;
+            double doubleN = -1;
+			data_file >> doubleN;
+            N = doubleN;
 
-			//step over some time steps
+            // converting N to an integer; skipping the line if there is a problem (this happens when there is a corrupt data file)
+			while (data_file.good() && doubleN != N) {
+                getline(data_file,line,'\n');
+                std::cerr << "Skipping bad line in data file: " << doubleN << std::endl;
+                data_file >> doubleN;
+                N = doubleN;
+            }
+
+            //step over some time steps
 			for(unsigned int j=1; j<stepsize; j++) {
 				for (unsigned int i=0; i<N+1; i++) getline(data_file,line);
 				data_file >> N;

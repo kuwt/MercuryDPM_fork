@@ -321,7 +321,7 @@ private:
     /*!
      * \brief Overrides DPMBase read(): in this all variables needed by the program for restarting are read.
      */
-    void read(std::istream& is) override;
+    void read(std::istream& is, ReadOptions opt = ReadOptions::ReadAll) override;
 
     /*!
      * \brief Overrides DPMBase actionsOnRestart(): in this all variables needed by the program for restarting

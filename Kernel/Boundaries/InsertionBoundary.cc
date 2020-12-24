@@ -46,6 +46,7 @@ InsertionBoundary::InsertionBoundary()
     volumeFlowRate_ = inf;
     initialVolume_ = 0;
     samplingInterval_ = 0;
+    checkParticleForInteraction_ = true;
 }
 
 /*!
@@ -62,6 +63,7 @@ InsertionBoundary::InsertionBoundary(const InsertionBoundary& other)
     initialVolume_ = other.initialVolume_;
     samplingInterval_ = other.samplingInterval_;
     variableCumulativeVolumeFlowRate_ = other.variableCumulativeVolumeFlowRate_;
+    checkParticleForInteraction_ = other.checkParticleForInteraction_;
 
     if (other.particleToCopy_ != nullptr)
     {
@@ -80,7 +82,6 @@ InsertionBoundary::InsertionBoundary(const InsertionBoundary& other)
  */
 InsertionBoundary::~InsertionBoundary()
 {
-    
     delete particleToCopy_;
 }
 
@@ -110,7 +111,7 @@ BaseParticle* InsertionBoundary::generateParticle(RNG& random)
 
 bool InsertionBoundary::insertParticle(Mdouble time) {
     // check if the flow rate limit has been reached
-    if (variableCumulativeVolumeFlowRate_.size()==0) {
+    if (variableCumulativeVolumeFlowRate_.empty()) {
         return volumeInserted_ < getVolumeFlowRate() * time+ initialVolume_;
     } else {
         const Mdouble iMax = (Mdouble) variableCumulativeVolumeFlowRate_.size()-2;
@@ -220,7 +221,7 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
 #endif
             p0->setHandler(&md->particleHandler);
             /* Check whether the particle has any interactions. */
-            if (md->checkParticleForInteraction(*p0))
+            if (!checkParticleForInteraction_ || md->checkParticleForInteraction(*p0))
             {
                 //Note: in parallel only one of the domains will actually add the particle
                 auto p = md->particleHandler.copyAndAddObject(p0);
@@ -359,6 +360,7 @@ void InsertionBoundary::read(std::istream& is)
     is >> dummy >> numberOfParticlesInserted_;
     is >> dummy >> isActivated_;
     ///\todo make theses reads non-optional
+    helpers::readOptionalVariable(is, "checkParticleForInteraction", checkParticleForInteraction_);
     helpers::readOptionalVariable(is, "initialVolume", initialVolume_);
     if (helpers::readOptionalVariable(is, "samplingInterval", samplingInterval_)) {
         size_t n;
@@ -399,6 +401,9 @@ void InsertionBoundary::write(std::ostream& os) const
     os << " volumeInserted " << volumeInserted_;
     os << " numberOfParticlesInserted " << numberOfParticlesInserted_;
     os << " isActivated " << isActivated_;
+    if (checkParticleForInteraction_==false) {
+        os << " checkParticleForInteraction " << checkParticleForInteraction_;
+    }
     os << " initialVolume " << initialVolume_;
     os << " samplingInterval " << samplingInterval_;
     os << " variableCumulativeVolumeFlowRate " << variableCumulativeVolumeFlowRate_.size();
@@ -433,7 +438,7 @@ void InsertionBoundary::setInitialVolume(Mdouble initialVolume)
     if (!std::isfinite(volumeFlowRate_)) volumeFlowRate_=0;
 }
 
-void InsertionBoundary::setVariableVolumeFlowRate(std::vector<Mdouble> variableCumulativeVolumeFlowRate, Mdouble samplingInterval) {
+void InsertionBoundary::setVariableVolumeFlowRate(const std::vector<Mdouble>& variableCumulativeVolumeFlowRate, Mdouble samplingInterval) {
     logger.assert(samplingInterval>0,"sampling interval needs to be positive");
     const Mdouble endTime = variableCumulativeVolumeFlowRate.size() * samplingInterval;
     logger(INFO,"variable flowrate is defined up to %",endTime);

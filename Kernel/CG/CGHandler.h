@@ -137,6 +137,16 @@ public:
     Mdouble getTimeMin();
     
     Mdouble getTimeMax();
+
+    void setInitialFileCounter(unsigned initialFileCounter) {
+        this->initialFileCounter = initialFileCounter;
+    }
+
+    unsigned getInitialFileCounter() const {
+        return initialFileCounter;
+    }
+
+    unsigned initialFileCounter = 0;
 };
 
 #endif

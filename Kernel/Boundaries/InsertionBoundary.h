@@ -158,9 +158,17 @@ public:
     void setInitialVolume(Mdouble initialVolume);
 
     ///\see variableCumulativeVolumeFlowRate_
-    void setVariableVolumeFlowRate(std::vector<Mdouble> variableCumulativeVolumeFlowRate, Mdouble samplingInterval);
+    void setVariableVolumeFlowRate(const std::vector<Mdouble>& variableCumulativeVolumeFlowRate, Mdouble samplingInterval);
 
     bool insertParticle(Mdouble time);
+
+    bool getCheckParticleForInteraction() const {
+        return checkParticleForInteraction_;
+    }
+
+    void setCheckParticleForInteraction(bool checkParticleForInteraction) {
+        checkParticleForInteraction_ = checkParticleForInteraction;
+    }
 
 protected:
     
@@ -221,6 +229,7 @@ protected:
     ///\see variableCumulativeVolumeFlowRate_
     Mdouble samplingInterval_;
 
+    bool checkParticleForInteraction_;
 
 };
 

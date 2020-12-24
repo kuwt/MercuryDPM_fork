@@ -149,7 +149,6 @@ void TriangleWall::write(std::ostream& os) const
 void TriangleWall::writeVTK(VTKContainer& vtk) const
 {
     const unsigned long s = vtk.points.size();
-    vtk.points.reserve(s + 3);
     for (auto v : vertex_)
     {
         vtk.points.push_back(v);

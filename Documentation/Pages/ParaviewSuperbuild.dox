@@ -91,4 +91,17 @@ $ make
 -# Apply plugin
 <br>When opening a *.vtu file with superquadric features, do "Apply" then go to Filters > Tensor Analysis > Superquadric Tensor Glyphs. Finally, do "Apply" again.
 
+# On MacOS
+
+On a Mac operating system I got that far:
+
+-# install the dependencies
+-# cmake the superbuild:
+ccmake ../paraview-superbuild/ -DCMAKE_OSX_SDK=macosx10.15 -DENABLE_qt5=TRUE -DENABLE_python=TRUE -DENABLE_python3=TRUE
+-# fix one error:
+https://stackoverflow.com/questions/59075526/error-qualified-reference-to-qfixed-is-a-constructor-name-rather-than-a-type
+-# This leaves me with a lot of errors when building qt5, though. This suggests I need the developers libraries of qt5, however, I could not make sense of it
+https://forum.qt.io/topic/109634/qt-cross-compilation-qith-paraview-the-opengl-functionality-tests-failed
+-# here the original install instructions:
+https://gitlab.kitware.com/paraview/paraview-superbuild/-/blob/master/README.md
 */

@@ -160,7 +160,7 @@ public:
     /*!
      * \brief Reads the MercuryBase from an input stream, for example a restart file.
      */
-    void read(std::istream& is) override;
+    void read(std::istream& is, ReadOptions opt = ReadOptions::ReadAll) override;
     
     /*!
      * \brief Writes the MercuryBase to an output stream, for example a restart file.

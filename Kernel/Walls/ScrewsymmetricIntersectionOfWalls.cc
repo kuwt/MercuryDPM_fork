@@ -364,7 +364,6 @@ void ScrewsymmetricIntersectionOfWalls::writeVTK(VTKContainer& vtk) const
         //finally create the connectivity matri to plot shell-like triangle strips.
         unsigned long nz = rzVec.size();
         unsigned long nCells = vtk.triangleStrips.size();
-        vtk.triangleStrips.reserve(nCells + (nz - 1));
         for (unsigned iz = 0; iz < nz - 1; iz++)
         {
             std::vector<double> cell;

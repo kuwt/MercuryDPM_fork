@@ -128,11 +128,15 @@ public:
     {
         return Vec3D(X - a.X, Y - a.Y, Z - a.Z);
     };
-    
+
     Vec3D multiplyElementwise(const Vec3D& a) const {
         return Vec3D(X*a.X, Y*a.Y, Z*a.Z);
     }
-    
+
+    Vec3D divideElementwise(const Vec3D& a) const {
+        return Vec3D(X/a.X, Y/a.Y, Z/a.Z);
+    }
+
     Vec3D signedSquare() const {
         return Vec3D(fabs(X)*X, fabs(Y)*Y, fabs(Z)*Z);
     }
@@ -166,7 +170,18 @@ public:
         Z += a.Z;
         return *this;
     }
-    
+
+    /*!
+     * \brief Checks if all coordinates satisfy this>=a
+     */
+    bool operator>=(const Vec3D& a) const {
+        return X>=a.X && Y>=a.Y && Z>=a.Z;
+    }
+
+    bool operator<(const Vec3D& a) const {
+        return X<a.X && Y<a.Y && Z<a.Z;
+    }
+
     /*!
      * \brief Subtracts another vector
      */

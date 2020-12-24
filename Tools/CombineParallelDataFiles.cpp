@@ -10,7 +10,7 @@
  * extracts the file name from the command line input
  */
 std::string getName(int argc, char *argv[]) {
-    logger.assert_always(argc>1,"Please provide file root name as input argument");
+    logger.assert_always(argc>1,"Please provide name of first data file as input argument");
     return std::string(argv[1]);
 }
 
@@ -26,45 +26,69 @@ class DataFiles {
     std::vector<IFile> iFiles;
     std::ofstream oFile;
     unsigned oCount = 0;
+    std::string ending = "";
 
 public:
 
     /**
      * opens the input and output data files
      */
-    DataFiles(std::string name) {
-        // opens the input data files
-        for(unsigned iCount = 0; true; ++iCount) {
-            std::string fileName = name + ".data" + std::to_string(iCount);
+    DataFiles(int argc, char *argv[])
+    {
+        std::string name = getName(argc, argv);
+
+        //check if there is an ending (the user might just specify the file root)
+        size_t dot = name.find_last_of('.');
+        // if no ending is found, assume .data0
+        if (dot==std::string::npos) {
+            name += ".data0";
+        }
+
+        //take off ending .0000 if necessary
+        dot = name.find_last_of('.');
+        char afterDot = name[dot + 1];
+        //if last ending is a number
+        if (afterDot >= '0' && afterDot <= '9') {
+            ending = name.substr(dot);
+            name.resize(dot);
+        }
+
+        // take off ending .data0
+        {
+            size_t dot = name.find_last_of('.');
+            name.resize(dot);
+        }
+
+        // opens the input data files, if they exist
+        for(unsigned processorID = 0; true; ++processorID) {
+            //get input file name
+            std::string fileName = name + ".data" + std::to_string(processorID) + ending;
             auto* file = new std::ifstream(fileName.c_str());
             if (file->fail()) {
                 break;
             } else {
                 iFiles.emplace_back(file,0);
+                logger(INFO,"Opened % for input",fileName);
             }
-            logger(INFO,"Opened % for input",fileName);
+        }
+        logger.assert_always(!iFiles.empty(),"No input file found with name % ",name + ".data0" + ending);
+
+        // opens output data file
+        std::string oFileName = name + ".data" + ending;
+        oFile.open(oFileName);
+        if (oFile.fail()) {
+            logger(ERROR,"% could not be opened",oFileName);
+        } else {
+            logger(INFO, "Opened % for output", oFileName);
         }
 
-        // opens the output data file
-        oFileName = name + ".data";
-        //logger.assert_always(!exist(oFileName),"File % already exists",oFileName);
-        logger.assert(fileType!=FileType::NO_FILE,"File type cannot be NO_FILE");
-        if (fileType==FileType::ONE_FILE) oFile.open(oFileName);
-        if (oFile.fail()) logger(ERROR,"% could not be opened",oFileName);
-        logger(INFO,"Opened % for output",oFileName);
-    }
-
-    bool exist(std::string fileName) {
-        std::ifstream file(fileName);
-        return !file.fail();
+        write();
     }
 
     /**
      * closes the input/output data files
      */
     ~DataFiles() {
-        // closes the input/output data files
-        //logger(INFO, "Closing % input files", iFiles.size());
         for (auto iFile : iFiles) {
             delete iFile.file;
         }
@@ -75,7 +99,7 @@ public:
      */
     void write() {
         while (writeTimeStep()) {};
-        logger(INFO,"Written % time steps",oCount);
+        if (oCount!=1) logger(INFO,"Written % time steps",oCount);
     }
 
 private:
@@ -84,17 +108,6 @@ private:
      * writes single timestep
      */
     bool writeTimeStep() {
-        // increase the file counter
-        if (fileType!=FileType::ONE_FILE) {
-            oFile.close();
-            if (fileType==FileType::MULTIPLE_FILES_PADDED) {
-                oFile.open(oFileName + '.' + to_string_padded(oCount));
-            } else if (fileType==FileType::MULTIPLE_FILES) {
-                oFile.open(oFileName + '.' + std::to_string(oCount));
-            }
-            if (oFile.fail()) logger(ERROR,"% could not be opened",oFileName);
-        }
-
         // read header line
         static Mdouble time = 0;
         unsigned n = 0;
@@ -128,10 +141,6 @@ private:
         }
         time *= 1.000000001; //so the next time step is surely bigger than the last
 
-        //debug output
-        //for(auto& iFile : iFiles) std::cout << iFile.time << ' ';
-        //std::cout << time << std::endl;
-
         //write header
         oFile << n << ' ' << time << line << '\n';
         logger(INFO,"Writing % %%",n,time,line);
@@ -145,23 +154,11 @@ private:
         ++oCount;
         return true;
     }
-
-    // base output file name (e.g. "problem.data")
-    std::string oFileName;
-
-public:
-    // type of output file (one_file or multiple_padded)
-    FileType fileType = FileType::ONE_FILE;
 };
 
 int main (int argc, char *argv[])
 {
-    //std::string name = "../../parallel/Drivers/USER/MercuryLab/FE/GCG14"; 
-    std::string name = getName(argc, argv);
-    DataFiles dataFiles(name);
-    if (helpers::readFromCommandLine(argc,argv,"-multipleFiles"))
-        dataFiles.fileType = FileType::MULTIPLE_FILES_PADDED;
-    dataFiles.write();
+    DataFiles dataFiles(argc,argv);
     return 0;
 }
 

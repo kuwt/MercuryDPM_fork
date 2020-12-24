@@ -28,6 +28,7 @@
 
 #include <fstream>
 #include <vector>
+#include "iostream"
 
 /**
  * Stores a radius and a cumulative number density:
@@ -60,6 +61,8 @@ struct PSD
 //        }
 //    }
 
+    static void print (std::vector<PSD>& psd);
+
     // validate whether psd is a cumulative distribution
     static void validateCumulativeDistribution (std::vector<PSD>& psd);
 
@@ -79,20 +82,63 @@ struct PSD
     // converts a cumulative number psd to a cumulative volume psd
     static void convertCumulativeVolumeToNumber (std::vector<PSD>& psd);
 
+    // converts a cumulative number psd to a cumulative volume psd and returns
+    static std::vector<PSD> getCumulativeNumberFromVolume (std::vector<PSD> psd) {
+        convertCumulativeVolumeToNumber (psd);
+        return psd;
+    }
+
+    //cuts off at given quantiles
+    static std::vector<PSD> cutoffCumulativeNumber (std::vector<PSD> psd, double quantileMin, double quantileMax, double minPolydispersity = 0.1) {
+        double radiusMin = getQuantile(psd,quantileMin);
+        double radiusMax = getQuantile(psd,quantileMax);
+        //to get a minimum polydispersity at the base
+        double radiusMinCut = std::min(radiusMin*(1+minPolydispersity),radiusMax);
+        //convert to volume psd
+        convertCumulativeNumberToVolume(psd);
+        //cut off min
+        while (psd.front().radius<=radiusMinCut) psd.erase(psd.begin());
+        psd.insert(psd.begin(),PSD{radiusMinCut,quantileMin});
+        psd.insert(psd.begin(),PSD{radiusMin,0});
+        //cut off max
+        while (psd.back().radius>=radiusMax) psd.pop_back();
+        psd.push_back(PSD{radiusMax,quantileMax});
+        psd.push_back(PSD{radiusMax,1});
+        //convert to number psd
+        convertCumulativeVolumeToNumber(psd);
+        return psd;
+    }
+
+    //cuts off at given quantiles
+    static std::vector<PSD> cutoffAndSqueezeCumulativeNumber (std::vector<PSD> psd, double quantileMin, double quantileMax, double squeeze, double minPolydispersity = 0.1) {
+        double r50 = 0.5*PSD::getD50(psd);
+        //cut off
+        psd = cutoffCumulativeNumber (psd, quantileMin, quantileMax, minPolydispersity);
+        //convert to volume psd
+        convertCumulativeNumberToVolume(psd);
+        //squeeze psd
+        for (auto& p : psd) {
+            p.radius = r50+(p.radius-r50)*squeeze;
+        }
+        //convert to number psd
+        convertCumulativeVolumeToNumber(psd);
+        return psd;
+    }
+
     // converts a subtractive number psd to a subtractive volume psd
     static void convertSubtractiveNumberToVolume (std::vector<PSD>& psd);
 
     // converts a cumulative number psd to a cumulative volume psd
     static void convertCumulativeNumberToVolume (std::vector<PSD>& psd);
 
-    // returns a cumulative number particle size distribution from a given volume particle size distribution
-    static std::vector<PSD> setFromVolumePSD (const std::vector<double>& radius,
-                                                          const std::vector<double>& probability);
+//    // returns a cumulative number particle size distribution from a given volume particle size distribution
+//    static std::vector<PSD> setFromVolumePSD (const std::vector<double>& radius,
+//                                                          const std::vector<double>& probability);
 
     // get quantile size
     //todo the D0 and D100 should be fixed.
     static double getD0 (const std::vector<PSD>& psd){
-        return 2.0*psd[0].radius;
+        return 2.0*getQuantile(psd,0.0);
     }
 
     static double getD10 (const std::vector<PSD>& psd){
@@ -108,11 +154,11 @@ struct PSD
     }
 
     static double getD100 (const std::vector<PSD>& psd){
-        return 2.0*psd.back().radius;
+        return 2.0*getQuantile(psd,1.0);
     }
 
 
-    // get median size
+    // get quantile of volume distribution, e.g. 2.0*getQuantile(psd,0.5) gets D50
     static double getQuantile(std::vector<PSD> psd, double quantile);
 
     // get radius r such that a monodisperse system has the same number of particles as a polydisperse system

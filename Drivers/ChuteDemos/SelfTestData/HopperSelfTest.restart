@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name HopperSelfTest revision 4848 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
+MercuryDPM 0.14 name HopperSelfTest revision 5000 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
 dataFile    fileType ONE_FILE saveCount 51 counter 26 lastSavedTimeStep 1251
 fStatFile   fileType ONE_FILE saveCount 51 counter 26 lastSavedTimeStep 1251
 eneFile     fileType ONE_FILE saveCount 51 counter 26 lastSavedTimeStep 1251
@@ -395,10 +395,10 @@ BaseParticle id 372 indSpecies 0 position 0.0128655643450022 0.00104277370585301
 BaseParticle id 373 indSpecies 0 position 0.0308693337451773 0.0012002733538612 0.0265080488741845 orientation 1 0 0 0 velocity 0.000211017265500854 0 -0.00119673838146043 angularVelocity 0 0 0 force 7.80380584781755e-07 0 -4.4257582228554e-06 torque 0 0 0 radius 0.000357303085366913 invMass 2180669.50193518
 BaseParticle id 374 indSpecies 0 position 0.0309001384112196 0.000467898868881884 0.0265783889547716 orientation 1 0 0 0 velocity 0.000156561196984504 0 -0.000887902670115807 angularVelocity 0 0 0 force 5.91733862932325e-07 0 -3.35588949890025e-06 torque 0 0 0 radius 0.000325819261888142 invMass 2875874.18557207
 Interactions 4
-LinearViscoelasticSlidingFrictionInteraction particleIds 181 348 timeStamp 1251 force -5.19021655253455e-07 -6.50272078943332e-06 4.26048524244038e-07 torque 0 0 0 slidingSpring 0 0 0
-LinearViscoelasticSlidingFrictionInteraction particleIds 199 339 timeStamp 1251 force -4.26985009951447e-06 -2.00201677212612e-06 6.30629938513997e-06 torque 0 0 0 slidingSpring 0 0 0
-LinearViscoelasticSlidingFrictionInteraction particleWallIds 359 0 timeStamp 1251 force -0 5.16608718925508e-05 0 torque 0 0 0 slidingSpring 0 0 0
-LinearViscoelasticSlidingFrictionInteraction particleIds 173 334 timeStamp 1251 force -2.2227458983722e-05 -2.14304030096314e-05 4.31887582518051e-05 torque 0 0 0 slidingSpring 0 0 0
+LinearViscoelasticSlidingFrictionInteraction particleIds 181 348 timeStamp 1251 contactPoint 0.0251869411551259 0.000842908313500633 0.0213280916531561 force -5.19021655253455e-07 -6.50272078943332e-06 4.26048524244038e-07 torque 0 0 0 slidingSpring 0 0 0
+LinearViscoelasticSlidingFrictionInteraction particleIds 199 339 timeStamp 1251 contactPoint 0.0121292584226884 0.00113563691150201 0.0220071135211796 force -4.26985009951447e-06 -2.00201677212612e-06 6.30629938513997e-06 torque 0 0 0 slidingSpring 0 0 0
+LinearViscoelasticSlidingFrictionInteraction particleWallIds 359 0 timeStamp 1251 contactPoint 0.0360870678656968 -1.76408525359934e-06 0.02645462935363 force -0 5.16608718925508e-05 0 torque 0 0 0 slidingSpring 0 0 0
+LinearViscoelasticSlidingFrictionInteraction particleIds 173 334 timeStamp 1251 contactPoint 0.0181376056881822 0.000985855637622724 0.0192735345278891 force -2.2227458983722e-05 -2.14304030096314e-05 4.31887582518051e-05 torque 0 0 0 slidingSpring 0 0 0
 hGrid method TOPDOWN distribution EXPONENTIAL cellOverSizeRatio 1 numberOfBuckets 1460 cellSizes 0.000692919531081431 0.000744408685235213 0.000799723872393627 gridNeedsUpdate 0 updateEachTimeStep 1 currentMaxRelativeDisplacement 0 totalCurrentMaxRelativeDisplacement 0
 FixedParticleRadius 0.00036 MinInflowParticleRadius 0.00032 MaxInflowParticleRadius 0.0004 RoughBottomType 0 ChuteAngle 0.174532925199433 MaxFailed 1 NumCreated 265 InflowVelocity 0.1 InflowVelocityVariance 0 InflowHeight 0.02
 0.01 0.01 0.04 1.0471975511966 0.0241139 0.0189594510866257 

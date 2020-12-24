@@ -81,7 +81,7 @@ add_library(DPMBase STATIC
 
         ${Nurbs_SRC}
 
-        CMakeDefinitions.cc
+        ${PROJECT_BINARY_DIR}/Kernel/CMakeDefinitions.cc
 
         #note: added these files to the DPMBase as they are needed for the Cluster Generator
         HGrid.cc

@@ -5,12 +5,16 @@ project (Mercury C CXX Fortran)
 set(Mercury_VERSION_MAJOR 0)
 set(Mercury_VERSION_MINOR 14)
 
-set(SVN_WC_REVISION 0)
+set(SVN_WC_REVISION "0")
 find_package(Subversion)
-if(Subversion_FOUND)
-	Subversion_WC_INFO(${PROJECT_SOURCE_DIR} SVN)
-	set(SVN_VERSION ${Project_WC_REVISION})
-    #message("Current revision is ${SVN_WC_URL}")
+if(EXISTS ${PROJECT_SOURCE_DIR}/.svn)
+	if(Subversion_FOUND)
+		Subversion_WC_INFO(${PROJECT_SOURCE_DIR} SVN)
+		set(SVN_VERSION ${Project_WC_REVISION})
+	endif()
+else()
+	message("This Mercury version in not in svn")
+	set(SVN_VERSION "0")
 endif()
 
 set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
@@ -58,18 +62,18 @@ add_subdirectory(XBalls)
 
 #Add the command fullTest, which rebuilds the cache, cleans the project and then compiles and tests everything.
 add_custom_target(fullTest
-    COMMAND make rebuild_cache
+    	COMMAND make rebuild_cache
 	COMMAND make clean
-	COMMAND make
-	COMMAND make test
+	COMMAND make -j 4
+	COMMAND make test -j 4
 	COMMENT "This will clean the project, rebuild and test." )
 
 #This section generates a configuration file that contains the CMake variables#
 #############################################
 configure_file(Configuration/CMakeDefinitions.cc
-	${PROJECT_SOURCE_DIR}/Kernel/CMakeDefinitions.cc)
+	Kernel/CMakeDefinitions.cc)
 configure_file(Configuration/CMakeDefinitions.h
-	${PROJECT_SOURCE_DIR}/Kernel/CMakeDefinitions.h)
+	Kernel/CMakeDefinitions.h)
 
 
 #This section is about the build of documentation#
@@ -78,6 +82,9 @@ configure_file(Configuration/CMakeDefinitions.h
 option(Mercury_BUILD_USER_DIR "Compile USER DIR in testing" OFF)
 
 
+
+###### These needs to be fixed as the new scripts line above will always create this, so the Python problem is back
+################################################
 
 FIND_PACKAGE(Python)
 configure_file(Configuration/fpdiff.py

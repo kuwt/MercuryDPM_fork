@@ -7,7 +7,7 @@ data = readHeader1(header1);
 data.name = name;
 disp(name)
 disp(header1)
-disp(header2)
+%disp(header2)
 dim = getDimension(data,raw);
 data = getCoordinates(data,raw,dim);
 data = getVariables(data,raw,header2,dim);

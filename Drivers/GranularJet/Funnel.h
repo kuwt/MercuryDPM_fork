@@ -50,7 +50,7 @@ class Funnel : public Chute {
 	void write(std::ostream& os, bool writeAllParticles = false) const override;
 	
 	///This function reads all funnel data
-	void read(std::istream& is) override;
+	void read(std::istream& is, ReadOptions opt = ReadOptions::ReadAll) override;
 	
 	///This is the actual constructor.
 	void constructor();

@@ -133,7 +133,7 @@ public:
      * \brief Reader for the custom restart files
      * \details This is the counterpart of ShearBox::read and is used when restarted. Changes in ShearBox::read should be mirroed here
      */
-    void read(std::istream& is) override
+    void read(std::istream& is, ReadOptions opt = ReadOptions::ReadAll) override
     {
         
         
@@ -157,7 +157,7 @@ public:
         std::cout << "The current time is " << checkTime <<std::endl;
         std::cout << "Small particle volume fraction is " << volfrac <<std::endl;
         
-        DPMBase::read(is);
+        DPMBase::read(is, opt);
         
         
         

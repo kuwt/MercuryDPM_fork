@@ -203,7 +203,7 @@ public:
     /*!
      * \brief Reads setup properties from an istream
      */
-    void read(std::istream& is) override;
+    void read(std::istream& is, ReadOptions opt = ReadOptions::ReadAll) override;
     
     /*!
      * \brief Writes setup properties to an ostream

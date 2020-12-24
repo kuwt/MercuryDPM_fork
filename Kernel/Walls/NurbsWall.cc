@@ -120,7 +120,6 @@ void NurbsWall::writeVTK (VTKContainer& vtk) const
 
     //create points
     size_t nPoints = vtk.points.size();
-    vtk.points.reserve(nPoints+(nu+1)*(nv+1));
     for (double u=0; u<=1; u+=1./nu) {
         for (double v=0; v<=1; v+=1./nv) {
             Vec3D p = nurbsSurface_.evaluate(u,v);
@@ -131,7 +130,7 @@ void NurbsWall::writeVTK (VTKContainer& vtk) const
     }
 
     //create connectivity matrix
-    vtk.triangleStrips.reserve(vtk.triangleStrips.size()+nu);
+    //vtk.triangleStrips.reserve(vtk.triangleStrips.size()+nu);
     for (unsigned i=0; i<nu; ++i) {
         std::vector<double> cell;
         cell.reserve(2*nv);

@@ -145,6 +145,7 @@ int main()
     normal.writeRestartFile();
     normal.restartFile.setFileType(FileType::MULTIPLE_FILES);
     normal.setName("FullRestartWithCounterSelfTest");
+    std::cout << normal.restartFile.getFullName();
     normal.writeRestartFile();
     
     FullRestartTest restart;
@@ -153,7 +154,7 @@ int main()
     restart.writeRestartFile();
     restart.write(std::cout);
     
-    restart.readRestartFile("FullRestartWithCounterSelfTest.restart.0");
+    restart.readRestartFile("FullRestartWithCounterSelfTest.restart.1");
     restart.setName("FullRestartWithCounterSelfTestRestarted");
     restart.writeRestartFile();
 }

@@ -36,7 +36,9 @@ int main(int argc, char *argv[])
     if (argc<2) logger(ERROR,manual);
 
     // first argument is used as prefix for the input
-    char* in = argv[1];
+    std::string in = argv[1];
+    //append .restart if necessary
+    if (in.find(".restart")==-1) in += ".restart";
     logger(INFO,"Reading from %", in);
 
     // if second argument is given, use it as prefix for the output; otherwise, use input prefix
@@ -46,7 +48,7 @@ int main(int argc, char *argv[])
 
     //read in from restart file and output data file
     Mercury3D problem;
-    if (problem.readRestartFile(std::string(in)+".restart")) {
+    if (problem.readRestartFile(in)) {
         problem.setName(out);
         problem.cgHandler.computeContactPoints();
         problem.writeXBallsScript();

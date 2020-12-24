@@ -141,12 +141,10 @@ void CGHandler::restart(std::string name)
         dpm->restartFile.setName(name);
     }
     
-    // set name
-    cgLogger(INFO, "Evaluating files named %", dpm->getName());
-    
     // read restart file
-    getDPMBase()->setReadInteractions(false);
-    if (!dpm->readRestartFile())
+    cgLogger(INFO, "Reading %", dpm->restartFile.getFullName());
+
+    if (!dpm->readRestartFile(DPMBase::ReadOptions::ReadNoInteractions))
     {
         if (dpm->speciesHandler.getNumberOfObjects() == 0)
         {
@@ -177,8 +175,8 @@ void CGHandler::restart(std::string name)
     {
         cgLogger(INFO, "Successfully restarted from %, t=%, Np=%, Nc=%", dpm->restartFile.getFullName(), dpm->getTime(),
                  dpm->particleHandler.getSize(), dpm->interactionHandler.getNumberOfObjects());
+        dpm->restartFile.decreaseCounter();
     }
-    getDPMBase()->setReadInteractions(true);
 }
 
 void CGHandler::restartAndEvaluateRestartFiles(const std::string& name)
@@ -290,8 +288,8 @@ bool CGHandler::evaluateRestartFiles()
     //call initialise to set up mesh, stat files, etc
     initialise();
     
-    // evaluate restart files, including the one already read
-    do
+    // evaluate restart files, starting with the one already read (since interactions where not read)
+    while (dpm->readRestartFile() && getDPMBase()->getTime() < timeMax)
     {
         cgLogger(INFO, "Read %, t=%, Np=%, Nc=%", dpm->restartFile.getFullName(), dpm->getTime(),
                  dpm->particleHandler.getSize(), dpm->interactionHandler.getNumberOfObjects());
@@ -306,7 +304,7 @@ bool CGHandler::evaluateRestartFiles()
         dpm->wallHandler.clear();
         
         //continue if the next restart file can be read and the max time has not been reached
-    } while (dpm->readRestartFile() && getDPMBase()->getTime() < timeMax);
+    }
     cgLogger(INFO, "Finished reading from %", dpm->dataFile.getFullName());
     
     finish();
@@ -337,8 +335,8 @@ bool CGHandler::evaluateDataFiles(bool evaluateFStatFiles)
     // reset counters so reading begins with the first data/fstat file
     DPMBase* const dpm = getDPMBase();
     //dpm->interactionHandler.clear();
-    dpm->dataFile.setCounter(0);
-    dpm->fStatFile.setCounter(0);
+    dpm->dataFile.setCounter(initialFileCounter);
+    dpm->fStatFile.setCounter(initialFileCounter);
     
     initialise();
     

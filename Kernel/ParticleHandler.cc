@@ -1002,8 +1002,7 @@ unsigned int ParticleHandler::getNumberOfUnfixedParticles() const
  */
 BaseParticle* ParticleHandler::createObject(const std::string& type)
 {
-    if (type == "BaseParticle" || type == "BP" || isdigit(type[0]) || isdigit(type[1]))
-    {
+    if (type == "BaseParticle") {
         //for backwards compatibility
         return new SphericalParticle;
     }
@@ -1039,24 +1038,11 @@ BaseParticle* ParticleHandler::readAndCreateObject(std::istream& is)
     BaseParticle* particle = nullptr;
     if (getStorageCapacity() > 0)
     {
-        std::stringstream line;
-        helpers::getLineFromStringStream(is, line);
-        logger(DEBUG, "particle line: %", line.str());
-        std::stringstream lineCopy(line.str());
-        line >> type;
+        is >> type;
         logger(DEBUG, "ParticleHandler::readAndCreateObject(is): type %", type);
-        if (isdigit(type[0]) || isdigit(type[1]))
-        {
-            particle = new SphericalParticle;
-            particle->setHandler(this);
-            particle->oldRead(lineCopy);
-        }
-        else
-        {
-            particle = createObject(type);
-            particle->setHandler(this);
-            particle->read(line);
-        }
+        particle = createObject(type);
+        particle->setHandler(this);
+        particle->read(is);
     }
     else //for insertion boundaries
     {

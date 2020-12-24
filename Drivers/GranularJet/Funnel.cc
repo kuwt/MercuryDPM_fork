@@ -77,9 +77,9 @@ void Funnel::write(std::ostream& os, bool writeAllParticles) const
 ///Reads the restart data for the funnel ///
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Funnel::read(std::istream& is)
+void Funnel::read(std::istream& is, ReadOptions opt)
 {
-    Chute::read(is);
+    Chute::read(is, opt);
     std::cout << "Funnel read: " << wallHandler.getNumberOfObjects() << std::endl;
     std::string dummy;
     double funOx, funOy;

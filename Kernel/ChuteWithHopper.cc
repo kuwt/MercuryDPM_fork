@@ -590,9 +590,9 @@ void ChuteWithHopper::setHopperShift(Mdouble hopperShift)
  * \details Reads the setup properties from an istream
  * \param[in,out] is    the istream
  */
-void ChuteWithHopper::read(std::istream& is)
+void ChuteWithHopper::read(std::istream& is, ReadOptions opt)
 {
-    Chute::read(is);
+    Chute::read(is,opt);
     is >> hopperExitLength_ >> hopperExitHeight_ >> hopperLength_
        >> hopperAngle_ >> hopperHeight_ >> hopperShift_;
 }

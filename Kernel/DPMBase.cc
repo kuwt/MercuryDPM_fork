@@ -470,6 +470,10 @@ void DPMBase::resetFileCounter()
     eneFile.setCounter(0);
     interactionFile.setCounter(0);
     setLastSavedTimeStep(NEVER);
+    if (vtkWriter_) vtkWriter_->setFileCounter(0);
+    boundaryVTKWriter_.setFileCounter(0);
+    interactionVTKWriter_.setFileCounter(0);
+    wallVTKWriter_.setFileCounter(0);
 }
 
 /*!
@@ -2563,16 +2567,23 @@ bool DPMBase::readNextDataFile(unsigned int format)
     }
     //end if
 
-    //checking if file contains valid data.
-    unsigned N = unsignedMax;
-    dataFile.getFstream() >> N;
-    //read first parameter and check if we reached the end of the file
-    if (N == unsignedMax)
-    {
-        //std::cout << "Reached the end of the data file" << std::endl;
-        return false;
+    // read in the particle number (as a double)
+    double doubleN = -1;
+    dataFile.getFstream() >> doubleN;
+
+    // If N cannot be read, we reached the end of the file
+    if (doubleN == -1) return false;
+
+    // converting N to an integer; skipping the line if there is a problem (this happens when there is a corrupt data file)
+    unsigned N = doubleN;
+    while (doubleN != N) {
+        std::string dummy;
+        getline(dataFile.getFstream(),dummy,'\n');
+        logger(WARN,"Skipping bad line in data file: % %",doubleN, dummy);
+        dataFile.getFstream() >> doubleN;
+        N = doubleN;
     }
-    
+
     //store the parameters you want to preserve
     const size_t nHistory = std::min(N,particleHandler.getSize());
     std::vector<const ParticleSpecies*> species(nHistory);
@@ -2705,9 +2716,13 @@ bool DPMBase::readNextDataFile(unsigned int format)
             p->setOrientationViaEuler(angle);
             p->setAngularVelocity(angularVelocity);
             p->setRadius(radius);
-            if (readSpeciesFromDataFile_)
-                p->setSpecies(speciesHandler.getObject(indSpecies));
-            else if (i < nHistory)
+            if (readSpeciesFromDataFile_) {
+                if (indSpecies<speciesHandler.getSize()) {
+                    p->setSpecies(speciesHandler.getObject(indSpecies));
+                } else {
+                    logger(WARN, "Read in bad species data; species is not set");
+                }
+            } else if (i < nHistory)
                 p->setSpecies(species[i]);
             if (i < nHistory && fix[i])
                 p->fixParticle();
@@ -2885,14 +2900,14 @@ void DPMBase::fillDomainWithParticles(unsigned N) {
  *
  * \return int
  */
-bool DPMBase::readRestartFile()
+bool DPMBase::readRestartFile(ReadOptions opt)
 {
     //Assuming a filename corresponding to "restartFile" has already been established,
     //opens an input filestream to the relevant file
     if (restartFile.open(std::fstream::in))
     {
         //reads the input stream line-by-line
-        read(restartFile.getFstream());
+        read(restartFile.getFstream(), opt);
         logger(INFO, "Loaded restart file %", restartFile.getFullName());
         restartFile.close();
         //sets the flag such that other functions can tell that the file has been restarted
@@ -2914,14 +2929,14 @@ bool DPMBase::readRestartFile()
  * \param[in] fileName The name of the (.restart) file to be read in.
  * \return int
  */
-int DPMBase::readRestartFile(std::string fileName)
+int DPMBase::readRestartFile(std::string fileName, ReadOptions opt)
 {
     //add ".restart" if necessary
     if (fileName.find(".restart") == std::string::npos)
     {
         fileName.append(".restart");
     }
-    
+
     //If padded or numbered files are used, we need to extract the counter and remove it from the filename
     //First find the last point in the restart name
     unsigned int pos = fileName.find('.');
@@ -2963,11 +2978,11 @@ int DPMBase::readRestartFile(std::string fileName)
         }
     }
 #endif
-    
+
     restartFile.setName(fileName);
-    
+
     logger(INFO, "Restarting from %", fileName);
-    return readRestartFile();
+    return readRestartFile(opt);
 }
 
 /*!
@@ -3019,11 +3034,11 @@ void DPMBase::computeInternalForce(BaseParticle* const P1, BaseParticle* const P
     if (i!= nullptr) {
         //calculates the force corresponding to the interaction
         i->computeForce();
-    
+
         //Applies the relevant calculated forces to PI and PJ
         PI->addForce(i->getForce());
         PJ->addForce(-i->getForce());
-    
+
         //checks if particle rotation is turned on...
         if (getRotation()) {
             //...and, if so, performs equivalent calculations for the torque as were
@@ -3063,18 +3078,18 @@ void DPMBase::computeForcesDueToWalls(BaseParticle* pI, BaseWall* w)
     //No need to compute interactions between periodic particle images and walls
     if (pI->getPeriodicFromParticle() != nullptr)
         return;
-    
+
     //Checks if the particle is interacting with the current wall
     BaseInteraction* i = w->getInteractionWith(pI, getNumberOfTimeSteps() + 1,
                                                                        &interactionHandler);
     if (i!=nullptr) {
         //...calculates the forces between the two objects...
         i->computeForce();
-        
+
         //...and applies them to each of the two objects (wall and particle).
         pI->addForce(i->getForce());
         w->addForce(-i->getForce());
-        
+
         //If the rotation flag is on, also applies the relevant torques
         //(getRotation() returns a boolean).
         if (getRotation()) // getRotation() returns a boolean.
@@ -3134,7 +3149,7 @@ void DPMBase::integrateBeforeForceComputation()
  */
 void DPMBase::checkInteractionWithBoundaries()
 {
-    
+
     //Cycling over all boundaries within the system...
     for (BaseBoundary* b : boundaryHandler)
     {
@@ -3268,10 +3283,10 @@ void DPMBase::computeAllForces()
 #ifdef DEBUG_OUTPUT
     std::cerr << "Have all forces set to zero " << std::endl;
 #endif
-    
-    
+
+
     ///Now loop over all particles contacts computing force contributions
-    
+
     for (BaseParticle* p : particleHandler)
     {
         //computing both internal forces (e.g. due to collisions)
@@ -3282,7 +3297,7 @@ void DPMBase::computeAllForces()
         // body forces
         computeExternalForces(p);
     }
-    
+
     // wall-forces
     for (BaseWall* w : wallHandler)
     {
@@ -3292,7 +3307,7 @@ void DPMBase::computeAllForces()
 #ifdef CONTACT_LIST_HGRID
     PossibleContact* Curr=possibleContactList.getFirstPossibleContact();
     while(Curr)
-    {   
+    {
         computeInternalForces(Curr->getP1(),Curr->getP2());
         Curr=Curr->getNext();
     }
@@ -3369,15 +3384,15 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
             << " numberOfDomains " << numberOfDomains_[Direction::XAXIS] << " " << numberOfDomains_[Direction::YAXIS] << " " << numberOfDomains_[Direction::ZAXIS];
     }
 #endif
-    
+
     //only write xBallsArguments if they are nonzero
     if (getXBallsAdditionalArguments().compare(""))
         os << " xBallsArguments " << getXBallsAdditionalArguments();
     os << '\n';
     //writes all species (including mixed species) to an output stream
-    
+
     speciesHandler.write(os);
-    
+
     //outputs the number of walls in the system
     os << "Walls " << wallHandler.getNumberOfObjects() << std::endl;
     if (writeAllParticles || wallHandler.getSize() < 9) {
@@ -3388,7 +3403,7 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
             os << *wallHandler.getObject(i) << std::endl;
         os << "...\n";
     }
-    
+
     //outputs the number of boundaries in the system
     os << "Boundaries " << boundaryHandler.getNumberOfObjects() << std::endl;
     if (writeAllParticles || boundaryHandler.getSize() < 9) {
@@ -3436,7 +3451,7 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
  * The data stream corresponding to the desired input file is passed as an argument.
  * \param[in] is The data stream from which the particle data will be read.
  */
-void DPMBase::read(std::istream& is)
+void DPMBase::read(std::istream& is, ReadOptions opt)
 {
 #ifdef MERCURY_USE_MPI
     int previousNumberOfProcessors;
@@ -3464,7 +3479,7 @@ void DPMBase::read(std::istream& is)
         {
             //reads in and saves the relevant values from the data file to the current instance of DPMBase
             std::stringstream line;
-            
+
             // Store path (if restart file is nonlocal)
             auto slash = restartFile.getName().rfind('/');
             std::string path;
@@ -3476,7 +3491,7 @@ void DPMBase::read(std::istream& is)
             {
                 logger(INFO, "Adding path information (%) to file names", path);
             }
-            
+
             //line 1
             helpers::getLineFromStringStream(is, line);
             //discards the whitespace (ws) at the start of the stream
@@ -3490,7 +3505,7 @@ void DPMBase::read(std::istream& is)
             //to read in the rest of the relevant information.
             line >> dummy >> name_;
             setName(name_);
-            
+
             //Read line 2-7 (definition of i/o files)
             helpers::getLineFromStringStream(is, line);
             line >> dummy >> dataFile;
@@ -3502,14 +3517,14 @@ void DPMBase::read(std::istream& is)
             line >> dummy >> restartFile;
             helpers::getLineFromStringStream(is, line);
             line >> dummy >> statFile;
-            
+
             // Add the file path from the restart file to the file names
             dataFile.setName(path + dataFile.getName());
             fStatFile.setName(path + fStatFile.getName());
             eneFile.setName(path + eneFile.getName());
             restartFile.setName(path + restartFile.getName());
             statFile.setName(path + statFile.getName());
-            
+
             // Get current position
             //check if the next line starts with 'interactionFile'; otherwise, skip interaction
             if (helpers::compare(is, "interactionFile"))
@@ -3518,7 +3533,7 @@ void DPMBase::read(std::istream& is)
                 line >> interactionFile;
                 interactionFile.setName(path + interactionFile.getName());
             }
-            
+
             helpers::getLineFromStringStream(is, line);
             line >> dummy >> min_.x()   ///\TODO: Bound checking
                  >> dummy >> max_.x()  ///\TODO: Same order as other file format, please?
@@ -3526,25 +3541,27 @@ void DPMBase::read(std::istream& is)
                  >> dummy >> max_.y()
                  >> dummy >> min_.z()
                  >> dummy >> max_.z();
-            
+
             helpers::getLineFromStringStream(is, line);
             line >> dummy >> timeStep_
                  >> dummy >> time_
                  >> dummy >> numberOfTimeSteps_
                  >> dummy >> timeMax_;
-            
+
             helpers::getLineFromStringStream(is, line);
             line >> dummy >> systemDimensions_
                  >> dummy >> particleDimensions_
                  >> dummy >> gravity_;
-            
+
             line >> dummy;
             if (!dummy.compare("writeVTK"))
             {
                 FileType writeInteractionsVTK = FileType::NO_FILE;
                 unsigned particlesCounter, wallCounter, interactionCounter;
                 bool writeBoundaryVTK;
-                line >> writeParticlesVTK_ >> writeWallsVTK_ >> writeInteractionsVTK >> writeBoundaryVTK >> particlesCounter >> wallCounter >> interactionCounter >> dummy;
+                line >> writeParticlesVTK_ >> writeWallsVTK_ >> writeInteractionsVTK >> writeBoundaryVTK >> particlesCounter >> wallCounter >> interactionCounter;
+                line.clear();//because the number of arguments  in writeVTK has changed
+                line >> dummy;
                 setParticlesWriteVTK(writeParticlesVTK_);
                 setWallsWriteVTK(writeWallsVTK_);
                 interactionHandler.setWriteVTK(writeInteractionsVTK);
@@ -3558,8 +3575,6 @@ void DPMBase::read(std::istream& is)
             {
                 random.read(line);
                 line >> dummy;
-                helpers::getLineFromStringStream(line, line);
-                setXBallsAdditionalArguments(line.str());
             }
 #ifdef MERCURY_USE_MPI
             if (!dummy.compare("numberOfProcessors"))
@@ -3575,14 +3590,18 @@ void DPMBase::read(std::istream& is)
                 //numberOfDomains_ = {1,1,1};
             }
 #endif
-            
+            if (!dummy.compare("xBallsArguments")) {
+                helpers::getLineFromStringStream(line, line);
+                setXBallsAdditionalArguments(line.str());
+            }
+
             speciesHandler.read(is);
 
 #ifdef MERCURY_USE_MPI
             //Initialise MPI structures and perform domain decomposition
             decompose();
 #endif
-            
+
             //reading in the various relevant handlers
             unsigned int N;
             is >> dummy >> N;
@@ -3596,7 +3615,7 @@ void DPMBase::read(std::istream& is)
                 helpers::getLineFromStringStream(is, line);
                 wallHandler.readAndAddObject(line);
             }
-            
+
             is >> dummy >> N;
             boundaryHandler.clear();
             boundaryHandler.setStorageCapacity(N);
@@ -3608,17 +3627,21 @@ void DPMBase::read(std::istream& is)
                 helpers::getLineFromStringStream(is, line);
                 boundaryHandler.readAndAddObject(line);
             }
-            
+
+            if (opt==ReadOptions::ReadNoParticlesAndInteractions) return;
             is >> dummy >> N;
-            if (dummy.compare("Particles"))
-                logger(ERROR, "DPMBase::read(is): Error during restart: 'Particles' argument could not be found. %",dummy);
+            is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            //display a message if a large amount o fparticles is read
+            if (N>2.5e5) logger(INFO, "Reading % particles (may take a while)",N);
+            logger.assert_always(dummy.compare("Particles")==0, "DPMBase::read(is): Error during restart: 'Particles' argument could not be found. %",dummy);
             particleHandler.clear();
             particleHandler.setStorageCapacity(N);
-            helpers::getLineFromStringStream(is, line);
             for (unsigned int i = 0; i < N; i++)
             {
-                helpers::getLineFromStringStream(is, line);
-                particleHandler.readAndAddObject(line);
+                //ParticleHandler::readAndCreateObject reads line-by-line
+                particleHandler.readAndAddObject(is);
+                //skip the remaining data in line
+                is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                 ///todo{Do we want to calculate the mass?}
                 //particleHandler.getLastObject()->computeMass();
             }
@@ -3636,8 +3659,8 @@ void DPMBase::read(std::istream& is)
             }
 #endif
             //Add interactions to particles and ghost particles
-            
-            if (getReadInteractions()) interactionHandler.read(is);
+            if (opt==ReadOptions::ReadNoInteractions) return;
+            interactionHandler.read(is);
         }
             //reading in for older versions of the Mercury restart file.
         else if (!restartVersion_.compare("3"))

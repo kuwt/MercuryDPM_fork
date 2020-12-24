@@ -447,7 +447,6 @@ bool TriangulatedWall::Face::getDistanceAndNormal(const BaseParticle& p, Mdouble
 void TriangulatedWall::writeVTK(VTKContainer& vtk) const
 {
     const int s = vtk.points.size();
-    vtk.points.reserve(s + vertex_.size());
     for (auto v : vertex_)
     {
         vtk.points.push_back(v);

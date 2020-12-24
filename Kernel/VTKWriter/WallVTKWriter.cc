@@ -29,19 +29,24 @@
 
 void WallVTKWriter::getVTKData(VTKContainer& vtk) const
 {
-    //set capacity of points and cells based on the previous time step
-    static unsigned int capacityPoints = 0;
-    static unsigned int capacityTriangleStrips = 0;
-    
+    // set capacity of points and cells based on the previous time step
+    // the initial values are based on the minimum, which is one triangle per wall
+    static unsigned int capacityPoints = 3*handler_.getSize();
+    static unsigned int capacityTriangleStrips = handler_.getSize();
     vtk.triangleStrips.reserve(capacityPoints);
     vtk.points.reserve(capacityTriangleStrips);
-    
+
     //add all wall data to the point and cell arrays
     for (const auto& w: handler_)
     {
         w->renderWall(vtk);
-        logger(DEBUG, "points: %, cells: %", vtk.points.size(), vtk.triangleStrips.size());
     }
+
+//    logger(INFO, "size (capacity) of points: % (%), cells: % (%)", vtk.points.size(), capacityPoints, vtk.triangleStrips.size(), capacityTriangleStrips);
+
+    //store from previous time step
+    capacityPoints = vtk.points.size();
+    capacityTriangleStrips = vtk.triangleStrips.size();
 }
 
 void WallVTKWriter::writeVTK() const
@@ -82,10 +87,7 @@ void WallVTKWriter::writeVTKCells(std::fstream& file, VTKContainer& vtk) const
     for (const std::vector<double>& c : vtk.triangleStrips)
     {
         file << '\t';
-        for (const double& i : c)
-        {
-            file << i << ' ';
-        }
+        for (const double& i : c) file << i << ' ';
         file << '\n';
     }
     file << "  </DataArray>\n";

@@ -14,4 +14,20 @@ foreach(CPPFILE ${CPPFILES})
 	add_executable(${EXECNAME} ${FILENAME})
     #All cpp folder and linked agaist MercuryBase
 	target_link_libraries(${EXECNAME} MercuryBase)
+
+	#Setup scripts directory
+	########################################################
+
+	#First create the directory if does not exist this stops the dir does not exist error in the next line
+	add_custom_command(TARGET ${EXECNAME} PRE_BUILD
+	COMMAND ${CMAKE_COMMAND} -E make_directory  ${CMAKE_CURRENT_BINARY_DIR}/Scripts/)
+	
+
+	#Copy and copy back
+	add_custom_command(TARGET ${EXECNAME} POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${CMAKE_CURRENT_BINARY_DIR}/Scripts/ ${CMAKE_CURRENT_SOURCE_DIR}/Scripts/
+	COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${CMAKE_CURRENT_SOURCE_DIR}/Scripts/ ${CMAKE_CURRENT_BINARY_DIR}/Scripts/)
+
 endforeach()
