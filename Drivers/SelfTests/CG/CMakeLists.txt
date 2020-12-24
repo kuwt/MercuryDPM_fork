@@ -12,7 +12,7 @@ foreach(CPPFILE ${CPPFILES})
 	#Make the exe
 	add_executable(${EXECNAME} ${FILENAME})
     #All cpp folder and linked agaist MercuryBase
-	target_link_libraries(${EXECNAME} Chute)
+	target_link_libraries(${EXECNAME} MercuryBase)
 endforeach()
 
 #Copy specific files to your build directory

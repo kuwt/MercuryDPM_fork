@@ -239,7 +239,7 @@ public:
     
 protected:
 
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {
         if (getTime() > switch_time) {
             shaker_amp = switch_amp;

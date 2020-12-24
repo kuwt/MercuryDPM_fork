@@ -26,7 +26,7 @@
 #include "PolydisperseInsertionBoundary.h"
 #include "Particles/BaseParticle.h"
 #include "Math/RNG.h"
-#include <cassert>
+//#include <cassert>
 
 /* Constructor */
 PolydisperseInsertionBoundary::PolydisperseInsertionBoundary()

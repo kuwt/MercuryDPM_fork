@@ -684,20 +684,19 @@ BaseInteraction* BaseParticle::getInteractionWith(BaseParticle* const P, const u
     const Mdouble distanceSquared = Vec3D::getLengthSquared(branchVector);
     //const auto species = interactionHandler->getDPMBase()->speciesHandler.getMixedObject(getSpecies(),P->getSpecies());
     const Mdouble sumOfInteractionRadii = getSumOfInteractionRadii(P);
-    if (distanceSquared < (sumOfInteractionRadii * sumOfInteractionRadii))
-    {
-        BaseInteraction* const C = interactionHandler->getInteraction(P, this, timeStamp);
-        const Mdouble distance = std::sqrt(distanceSquared);
-        C->setNormal(branchVector / distance);
-        C->setOverlap(P->getRadius() + getRadius() - distance);
-        C->setDistance(distance);
-        C->setContactPoint(P->getPosition() - (P->getRadius() - 0.5 * C->getOverlap()) * C->getNormal());
-        ///\todo We should consider setting the contact point to \author weinhartt
-        //Mdouble ratio=P->getRadius()/(getRadius()+P->getRadius());
-        //C->setContactPoint(P->getPosition() - (P->getRadius() - ratio * C->getOverlap()) * C->getNormal());
-        return C;
+    if (distanceSquared >= sumOfInteractionRadii * sumOfInteractionRadii) {
+        return nullptr;
     }
-    return nullptr;
+    BaseInteraction* const C = interactionHandler->getInteraction(P, this, timeStamp);
+    const Mdouble distance = std::sqrt(distanceSquared);
+    C->setNormal(branchVector / distance);
+    C->setOverlap(P->getRadius() + getRadius() - distance);
+    C->setDistance(distance);
+    C->setContactPoint(P->getPosition() - (P->getRadius() - 0.5 * C->getOverlap()) * C->getNormal());
+    ///\todo We should consider setting the contact point to \author weinhartt
+    //Mdouble ratio=P->getRadius()/(getRadius()+P->getRadius());
+    //C->setContactPoint(P->getPosition() - (P->getRadius() - ratio * C->getOverlap()) * C->getNormal());
+    return C;
 }
 
 /*!

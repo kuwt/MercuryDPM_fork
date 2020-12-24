@@ -13,6 +13,6 @@ foreach(CPPFILE ${CPPFILES})
 	#Make the exe
 	add_executable(${EXECNAME} ${FILENAME})
 	#All cpp folder and linked agaist DPMBase
-	target_link_libraries(${EXECNAME}  MercuryBase)
+	target_link_libraries(${EXECNAME} MercuryBase)
 endforeach()
 

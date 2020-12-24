@@ -23,6 +23,8 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#ifndef BinaryReader_H
+#define BinaryReader_H
 #include<fstream>
 #include<iostream>
 #include<string>
@@ -86,4 +88,4 @@ private:
     std::ifstream binaryFile_;
     
 };
-
+#endif

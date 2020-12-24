@@ -124,7 +124,7 @@ public:
      * \param[in] a     vector to be subtracted
      * \return          resulting vector
      */
-    Vec3D operator-(const Vec3D& a) const
+    inline Vec3D operator-(const Vec3D a) const
     {
         return Vec3D(X - a.X, Y - a.Y, Z - a.Z);
     };
@@ -154,8 +154,13 @@ public:
     
     /*!
      * \brief Divides by a scalar
+     * \details Divides each element by a scalar
+     * \param[in] a     the scalar to be divided by
+     * \return          resulting vector
      */
-    Vec3D operator/(Mdouble a) const;
+    Vec3D operator/(Mdouble a) const {
+        return Vec3D(X / a, Y / a, Z / a);
+    }
     
     /*!
      * \brief Adds another vector
@@ -184,19 +189,45 @@ public:
 
     /*!
      * \brief Subtracts another vector
+     * \details Subtracts a vector from itself
+     * \param[in] a     vector to be subtracted
+     * \return          (reference to) itself, i.e. resulting vector
      */
-    Vec3D& operator-=(const Vec3D& a);
-    
+    Vec3D& operator-=(const Vec3D& a)
+    {
+        X -= a.X;
+        Y -= a.Y;
+        Z -= a.Z;
+        return *this;
+    }
+
     /*!
      * \brief Multiplies by a scalar
-     */
-    Vec3D& operator*=(Mdouble a);
-    
+    * \details Multiplies each element by a scalar
+    * \param[in] a     scalar to be multiplied by
+    * \return          (reference to) itself, i.e. resulting vector
+    */
+    Vec3D& operator*=(Mdouble a) {
+        X *= a;
+        Y *= a;
+        Z *= a;
+        return *this;
+    }
+
     /*!
      * \brief Divides by a scalar
+     * \details Divides each element by a scalar
+     * \param[in] a     scalar to be divided by
+     * \return          (reference to) itself, i.e. resulting vector
      */
-    Vec3D& operator/=(Mdouble a);
-    
+    Vec3D& operator/=(const Mdouble a)
+    {
+        X /= a;
+        Y /= a;
+        Z /= a;
+        return *this;
+    }
+
     /*!
      * \brief Calculates the dot product of two Vec3D: \f$ a \cdot b\f$
      */
@@ -249,13 +280,26 @@ public:
     
     /*!
      * \brief Calculates the distance between two Vec3D: \f$ \sqrt{\left(a-b\right) \cdot \left(a-b\right)} \f$
+     * \details Calculates the square of the distance (i.e. the length of the difference)
+     * between two vectors.
+     * NB: this is a STATIC function!
+     * \param[in] a     the first vector
+     * \param[in] b     the second vector
+     * \return          the square of the distance between the two arguments.
      */
     static Mdouble getDistance(const Vec3D& a, const Vec3D& b);
     
     /*!
      * \brief Calculates the squared distance between two Vec3D: \f$ \left(a-b\right) \cdot \left(a-b\right) \f$
      */
-    static Mdouble getDistanceSquared(const Vec3D& a, const Vec3D& b);
+    static Mdouble getDistanceSquared(const Vec3D& a, const Vec3D& b) {
+        const double X = a.X-b.X;
+        const double Y = a.Y-b.Y;
+        const double Z = a.Z-b.Z;
+        return (X * X + Y * Y + Z * Z);
+        //return getLengthSquared(a - b);
+    }
+
     
     /*!
      * \brief Calculates the length of a Vec3D: \f$ \sqrt{a\cdot a} \f$
@@ -401,16 +445,27 @@ public:
     friend std::istream& operator>>(std::istream& is, Vec3D& a);
     
     /*!
-     * \brief Subtracts a vector 
+     * \brief Reverts the direction of a vector
      */
-    friend Vec3D operator-(const Vec3D& a);
+    inline friend Vec3D operator-(const Vec3D& a) {
+        return Vec3D(-a.X, -a.Y, -a.Z);
+    }
     
     /*!
      * \brief Multiplies all elements by a scalar
-     */
-    friend Vec3D operator*(Mdouble a, const Vec3D& b);
-    
-    
+    * \details Multiplies each element of a given vector (b) by a given scalar (a).
+    * NB: this is a global function and a friend of the Vec3D class. Gets called when
+    * a scalar multiplication of the form (Mdouble) * (Vec3D) is performed.
+    * \param[in] a     the scalar
+    * \param[in] b     the vector
+    * \return          the resulting vector
+    */
+    friend Vec3D operator*(Mdouble a, const Vec3D& b) {
+        return Vec3D(b.X * a, b.Y * a, b.Z * a);
+    }
+
+
+
 };
 
 #endif

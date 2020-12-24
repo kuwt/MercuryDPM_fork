@@ -67,55 +67,6 @@ bool Vec3D::isNaN() const
 }
 
 /*!
- * \details Divides each element by a scalar
- * \param[in] a     the scalar to be divided by
- * \return          resulting vector
- */
-Vec3D Vec3D::operator/(const Mdouble a) const
-{
-    return Vec3D(X / a, Y / a, Z / a);
-}
-
-/*!
- * \details Subtracts a vector from itself
- * \param[in] a     vector to be subtracted
- * \return          (reference to) itself, i.e. resulting vector
- */
-Vec3D& Vec3D::operator-=(const Vec3D& a)
-{
-    X -= a.X;
-    Y -= a.Y;
-    Z -= a.Z;
-    return *this;
-}
-
-/*!
- * \details Multiplies each element by a scalar
- * \param[in] a     scalar to be multiplied by
- * \return          (reference to) itself, i.e. resulting vector
- */
-Vec3D& Vec3D::operator*=(const Mdouble a)
-{
-    X *= a;
-    Y *= a;
-    Z *= a;
-    return *this;
-}
-
-/*!
- * \details Divides each element by a scalar
- * \param[in] a     scalar to be divided by
- * \return          (reference to) itself, i.e. resulting vector
- */
-Vec3D& Vec3D::operator/=(const Mdouble a)
-{
-    X /= a;
-    Y /= a;
-    Z /= a;
-    return *this;
-}
-
-/*!
  * \details Calculates the dot product of two vectors.
  * NB: this is a STATIC function!
  * \param[in] a     the first vector
@@ -224,19 +175,6 @@ Vec3D Vec3D::cross(const Vec3D& a, const Vec3D& b)
 Mdouble Vec3D::getDistance(const Vec3D& a, const Vec3D& b)
 {
     return std::sqrt(getDistanceSquared(a, b));
-}
-
-/*!
- * \details Calculates the square of the distance (i.e. the length of the difference)
- * between two vectors.
- * NB: this is a STATIC function!
- * \param[in] a     the first vector
- * \param[in] b     the second vector 
- * \return          the square of the distance between the two arguments.
- */
-Mdouble Vec3D::getDistanceSquared(const Vec3D& a, const Vec3D& b)
-{
-    return getLengthSquared(a - b);
 }
 
 /*!
@@ -441,32 +379,3 @@ std::istream& operator>>(std::istream& is, Vec3D& a)
     is >> a.Z; is.clear();
     return is;
 }
-
-/*!
- * \details Returns the negative of a given vector.
- * NB: this is a global function and a friend of the Vec3D class. Gets called when
- * a negation operation of the form - (Vec3D) is performed. 
- * \param[in] a     the vector to be negated
- * \return          the negated vector
- */
-Vec3D operator-(const Vec3D& a)
-{
-    return Vec3D(-a.X, -a.Y, -a.Z);
-}
-
-/*!
- * \details Multiplies each element of a given vector (b) by a given scalar (a).
- * NB: this is a global function and a friend of the Vec3D class. Gets called when
- * a scalar multiplication of the form (Mdouble) * (Vec3D) is performed.
- * \param[in] a     the scalar 
- * \param[in] b     the vector
- * \return          the resulting vector
- */
-Vec3D operator*(const Mdouble a, const Vec3D& b)
-{
-    return Vec3D(b.X * a, b.Y * a, b.Z * a);
-}
-
-//Vec3D::Vec3D(int i) {
-//
-//}

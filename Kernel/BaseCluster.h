@@ -45,7 +45,8 @@
  *          called inside BaseClusterInsertionBoundary::checkBoundaryBeforeTimeStep and
  *          FixedClusterInsertionBoundary::checkBoundaryBeforeTimeStep.
  */
-
+#ifndef BaseCluster_h
+#define BaseCluster_h
 class BaseCluster : public Mercury3D
 {
 public:
@@ -620,3 +621,4 @@ private:
     Mdouble forceDampingModulus_;
 
 };
+#endif

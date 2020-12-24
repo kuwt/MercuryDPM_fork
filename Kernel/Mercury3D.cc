@@ -132,7 +132,8 @@ void Mercury3D::hGridFindContactsWithTargetCell(int x, int y, int z, unsigned in
         //TW speedcheck revealed that this pre-check is cheaper than allowing computeInternalForces to sort out mismatches; even if a large number of hash cells (10*Np) is used.
         if (p->getHGridCell().equals(x, y, z, l))
         {
-            computeInternalForce(obj, p);
+            if (Vec3D::getDistanceSquared(p->getPosition(),obj->getPosition()) < mathsFunc::square(p->getMaxInteractionRadius()+obj->getMaxInteractionRadius()))
+                computeInternalForce(obj, p);
         }
     }
 }

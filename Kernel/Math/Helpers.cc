@@ -34,7 +34,7 @@
 #include <Walls/InfiniteWall.h>
 #include <Particles/BaseParticle.h>
 #include <Species/BaseSpecies.h>
-#include <cassert>
+//#include <cassert>
 #include "Math/ExtendedMath.h"
 #include <numeric>
 #include <chrono>
@@ -658,7 +658,7 @@ void helpers::loadingTest(const ParticleSpecies* species, Mdouble displacement, 
         void actionsBeforeTimeStep() override
         {
             BaseParticle* p = particleHandler.getLastObject();
-            assert(p);
+            logger.assert(p,"Empty particle handler");
             p->setAngularVelocity({0, 0, 0});
 
             //Moving particle normally into surface
@@ -736,7 +736,7 @@ void helpers::normalAndTangentialLoadingTest(const ParticleSpecies* species, Mdo
         void actionsBeforeTimeStep() override
         {
             BaseParticle* p = particleHandler.getLastObject();
-            assert(p);
+            logger.assert(p,"Empty particle handler");
             p->setAngularVelocity({0, 0, 0});
     
             //Moving particle cyclically right and left between +-tangentialDisplacement
@@ -814,8 +814,8 @@ void helpers::objectivenessTest(const ParticleSpecies* species, Mdouble displace
         {
             BaseParticle* p = particleHandler.getObject(0);
             BaseParticle* q = particleHandler.getLastObject();
-            assert(p);
-            assert(q);
+            logger.assert(p,"Empty particle handler");
+            logger.assert(q,"Empty particle handler");
 
             //Moving particle normally into surface
             if (getTime() <= tangentialDisplacement / velocity)
