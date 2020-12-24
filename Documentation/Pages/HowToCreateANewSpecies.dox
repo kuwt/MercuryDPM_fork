@@ -64,9 +64,19 @@ In the following, I will describe how MindlinSpecies was created, so developers 
 $ cd MercurySource/Kernel/Interactions/FrictionForceInteractions/
 $ svn cp SlidingFrictionInteraction.h MindlinInteraction.h
 $ svn cp SlidingFrictionInteraction.cc MindlinInteraction.cc
+$ cd ../../Species/FrictionalForceSpecies/
 $ svn cp SlidingFrictionSpecies.h MindlinSpecies.h
 $ svn cp SlidingFrictionSpecies.cc MindlinSpecies.cc
 \endcode
+Note in the above example we copied a frictional species; however, if you want a normal only species e.g. create the SPH species you should replace the septs with the following
+\code{.sh}
+$cd MercurySource/Kernel/Interactions/NormalForceInteractions
+$svn cp LinearViscoelasticInteraction.h SPHInteraction.h
+$svn cp LinearViscoelasticInteraction.cc SPHInteraction.cc
+$cd ../../Species/NormalForceSpecies
+$svn cp 
+$svn cp LinearViscoelasticNormalSpecies.cc SPHSpecies.cc
+$svn cp LinearViscoelasticNormalSpecies.h SPHSpecies.h 
 
 -# Rename the class SlidingFrictionInteraction and SlidingFrictionSpecies to MindlinInteraction and MindlinSpecies, respectively. This requires also changes to the header inclusion guards and typedefs. You can see the changes to the header files below:
 <br>`MercurySource/Kernel/Interactions/FrictionForceInteractions/SlidingFrictionInteraction.h`
@@ -115,6 +125,7 @@ public:
     SlidingFrictionSpecies();
 
 \endcode
+Please also correct the copy constructor, the empty constructor and destructor which are needed for MPI and other functions not shown here.
 `MercurySource/Kernel/Species/FrictionForceSpecies/MindlinSpecies.h`
 \code{.sh}
 #ifndef MINDLINSPECIES_H
@@ -129,14 +140,9 @@ public:
 
     MindlinSpecies();
 \endcode
+Please also correct the copy constructor and the empty constructor which are needed for MPI and other functions not shown here. Also there are various other places you need to make the same correct but this should be clear, so not fully documented here.
 
--# Now add the two new cc files to the CMakeLists file, so they get compiled:
-\code{.sh}
-$ cd MercurySource/Kernel
-$ svn diff CMakeLists.txt -r 1587:1588
-+	Interactions/FrictionForceInteractions/MindlinInteraction.cc
-+	Species/FrictionForceSpecies/MindlinSpecies.cc
-\endcode
+-# You do not need to add the new Species and Interaction to the CMakeList as this is built automatically; however, you do need to type 'make rebuild_cache', to rebuild these lists. Finally, it is advisable todo 'make fullTest' at the end to clear and rebuild these list and everything else from scratch.
 
 -# Create a new typedef for the new Hertz-Mindlin contact law in
 <br>`MercurySource/Kernel/Species/HertzianViscoelasticMindlinSpecies.h`
@@ -179,6 +185,10 @@ $ svn diff -r1587:1588 MercurySource/Kernel/SpeciesHandler.cc
 
 @@ -696,3 +708,4 @@
 +template HertzianViscoelasticMindlinSpecies::MixedSpeciesType* SpeciesHandler::getMixedObject(const HertzianViscoelasticMindlinSpecies*,const HertzianViscoelasticMindlinSpecies*);
+\endcode
+Do not forget to include the new species type to the species handler includes i.e add 
+\code{.sh}
+
 \endcode
 
 -# Now try out if your new contact law is ready to compile:
