@@ -116,6 +116,7 @@ void LinearViscoelasticInteraction::computeNormalForce()
         
         Mdouble normalForce =
                 species->getStiffness() * getOverlap() - species->getDissipation() * getNormalRelativeVelocity();
+        if (species->getConstantRestitution()) normalForce *= 2.0*getEffectiveMass();
         setAbsoluteNormalForce(std::abs(normalForce)); //used for further corce calculations;
         setForce(getNormal() * normalForce);
         setTorque(Vec3D(0.0, 0.0, 0.0));
@@ -133,9 +134,11 @@ void LinearViscoelasticInteraction::computeNormalForce()
  */
 Mdouble LinearViscoelasticInteraction::getElasticEnergy() const
 {
-    if (getOverlap() > 0)
-        return 0.5 * (getSpecies()->getStiffness() * mathsFunc::square(getOverlap()));
-    else
+    if (getOverlap() > 0){
+        Mdouble energy =0.5 * (getSpecies()->getStiffness() * mathsFunc::square(getOverlap()));
+        if (getBaseSpecies()->getNormalForce()->getConstantRestitution()) energy *= 2.0*getEffectiveMass();
+        return energy;
+    } else
         return 0.0;
 }
 
