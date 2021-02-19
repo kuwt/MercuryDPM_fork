@@ -51,6 +51,9 @@ public:
      */
     void setConstantRestitution(bool constantRestitution) {
         constantRestitution_ = constantRestitution;
+        logger(INFO,"You are using a constant restitution contact model; make sure you understand the implications this has on the stiffness and dissipation used by the contact model!");
+        //logger(INFO,"You are using a constant restitution contact model; if use setCollisionTime or setRestitutionCoefficient to set the parameters of your contact model, then these functions should be called AFTER calling setConstantRestitution!");
+        //For more info, see http://docs.mercurydpm.org/Trunk/d0/db6/ConstantRestitution.html
     }
 
 private:
