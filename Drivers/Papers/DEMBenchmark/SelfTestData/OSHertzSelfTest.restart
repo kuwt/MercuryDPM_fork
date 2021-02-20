@@ -1,0 +1,24 @@
+MercuryDPM 0.14 name OSHertzSelfTest revision 5237 repository https://svn.mercurydpm.org/SourceCode/Branches/OS
+dataFile    fileType ONE_FILE saveCount 1 counter 122 lastSavedTimeStep 121
+fStatFile   fileType ONE_FILE saveCount 4294967295 counter 2 lastSavedTimeStep 121
+eneFile     fileType ONE_FILE saveCount 1 counter 122 lastSavedTimeStep 121
+restartFile fileType ONE_FILE saveCount 4294967295 counter 2 lastSavedTimeStep 121
+statFile    fileType ONE_FILE saveCount 1 counter 0
+interactionFile fileType NO_FILE saveCount 0 counter 0
+xMin -0.001 xMax 0.001 yMin -0.001 yMax 0.001 zMin 0 zMax 0.0022
+timeStep 5e-07 time 6.04999999999999e-05 ntimeSteps 121 timeMax 6e-05
+systemDimensions 3 particleDimensions 3 gravity 0 0 0 writeVTK 0 NO_FILE NO_FILE 0 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267
+Species 3
+HertzianViscoelasticMindlinSpecies id 0 density 2500 elasticModulus 520833333.333333 dissipation 0.481769257764587 slidingDissipation 0 slidingFrictionCoefficient 0.3 slidingFrictionCoefficientStatic 0.3 shearModulus 115740740.740741
+HertzianViscoelasticMindlinSpecies id 1 density 2000 elasticModulus 260416666.666667 dissipation 0.626094546660686 slidingDissipation 0 slidingFrictionCoefficient 0.4 slidingFrictionCoefficientStatic 0.4 shearModulus 57870370.3703704
+HertzianViscoelasticMindlinMixedSpecies idA 1 idB 0 elasticModulus 347222222.222222 dissipation 0.550833338568049 slidingDissipation 0 slidingFrictionCoefficient 0.2 slidingFrictionCoefficientStatic 0.2 shearModulus 77160493.8271605
+HertzianViscoelasticMindlinSpecies id 2 density 7200 elasticModulus 109375000000 dissipation 0.358873362257385 slidingDissipation 0 slidingFrictionCoefficient 0.5 slidingFrictionCoefficientStatic 0.5 shearModulus 24305555555.5556
+HertzianViscoelasticMindlinMixedSpecies idA 2 idB 0 elasticModulus 1036729857.81991 dissipation 0.626094546660686 slidingDissipation 0 slidingFrictionCoefficient 0.2 slidingFrictionCoefficientStatic 0.2 shearModulus 230384412.848868
+HertzianViscoelasticMindlinMixedSpecies idA 2 idB 1 elasticModulus 519596199.524941 dissipation 0.626094546660686 slidingDissipation 0 slidingFrictionCoefficient 0.2 slidingFrictionCoefficientStatic 0.2 shearModulus 115465822.116653
+Walls 1
+InfiniteWall id 0 indSpecies 2 position 0 0 0 orientation 0.707106781186548 0 0.707106781186548 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0
+Boundaries 0
+Particles 1
+BaseParticle id 0 indSpecies 0 position 0 0 0.00100724021886788 orientation 1 0 0 0 velocity 0 0 0.40107538074925 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.001 invMass 95492.9658551372
+Interactions 0
+hGrid method TOPDOWN distribution EXPONENTIAL cellOverSizeRatio 1 numberOfBuckets 10 cellSizes 0.002 gridNeedsUpdate 0 updateEachTimeStep 1 currentMaxRelativeDisplacement 0 totalCurrentMaxRelativeDisplacement 0

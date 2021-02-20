@@ -80,25 +80,14 @@ public:
     Mdouble getSlidingFrictionCoefficientStatic() const;
     
     ///\brief Allows the poisson ratio to be changed
-    void setPoissonRatio(Mdouble poissonRatio);
-    
-    ///\brief Allows the poisson ratio to be accessed
-    Mdouble getPoissonRatio() const;
-    
-    Mdouble computePoissonRatio(Mdouble elasticModulus, Mdouble shearModulus);
-    
-    ///\brief allows the shear modulus and the poissonratio to be changed
-    void setShearModulusAndPoissonRatio(Mdouble shearModulus, Mdouble poissonRatio);
-    
+    MERCURY_DEPRECATED void setPoissonRatio(Mdouble poissonRatio);
+
     ///\brief allows the shear modulus to be changed
     void setShearModulus(Mdouble shearModulus);
     
     ///\brief Allows the shear modulus to be accessed
     Mdouble getShearModulus() const;
-    
-    ///\brief allwos the shear modulus to be computed
-    Mdouble computeShearModulus(Mdouble elasticModulus, Mdouble poissonRatio);
-    
+
     /*!
      * \brief Returns true if torques have to be calculated.
      */
@@ -124,10 +113,7 @@ private:
     
     /// static Coulomb friction coefficient (by default set equal to mu)
     Mdouble slidingFrictionCoefficientStatic_;
-    
-    ///\brief poisson ratio constant
-    Mdouble poissonRatio_;
-    
+
     Mdouble shearModulus_;
     
     

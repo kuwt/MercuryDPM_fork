@@ -117,10 +117,10 @@ void MindlinRollingTorsionInteraction::computeFrictionForce()
     if (species->getRollingFrictionCoefficient() != 0.0)
     {
         Mdouble rollingStiffness = tangentialStiffnessZero_;
-        Mdouble effectiveDiameter = 2.0 * getEffectiveRadius();
-        
+        double effectiveRadius = getEffectiveRadius();
+
         //From Luding2008, objective rolling velocity (eq 15) w/o 2.0!
-        Vec3D rollingRelativeVelocity = -effectiveDiameter *
+        Vec3D rollingRelativeVelocity = - effectiveRadius *
                                         Vec3D::cross(getNormal(),
                                                      getP()->getAngularVelocity() - getI()->getAngularVelocity());
         
@@ -160,7 +160,7 @@ void MindlinRollingTorsionInteraction::computeFrictionForce()
                              rollingStiffness;
         }
         //Add (virtual) rolling force to torque
-        addTorque(effectiveDiameter * Vec3D::cross(getNormal(), rollingForce));
+        addTorque(effectiveRadius * Vec3D::cross(getNormal(), rollingForce));
     } //end if rolling force
     
     if (species->getTorsionFrictionCoefficient() != 0.0)

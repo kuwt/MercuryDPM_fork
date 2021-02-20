@@ -124,7 +124,7 @@ private:
       * \brief rolling stiffness. 
       * \details Typically set to 2/5 of the stiffness of the normal force, as  
       * both the rolling and the normal spring have the same oscillation  
-      * frequency (and thus require the same timeStep)in this case. 
+      * frequency (and thus require the same timeStep) in this case.
       */
     Mdouble rollingStiffness_;
     

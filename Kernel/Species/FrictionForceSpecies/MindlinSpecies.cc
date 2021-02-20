@@ -39,7 +39,6 @@ MindlinSpecies::MindlinSpecies()
     slidingDissipation_ = 0;
     slidingFrictionCoefficient_ = 0;
     slidingFrictionCoefficientStatic_ = 0;
-    poissonRatio_ = 0;
     shearModulus_ = 0;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"MindlinSpecies::MindlinSpecies() finished"<<std::endl;
@@ -54,7 +53,6 @@ MindlinSpecies::MindlinSpecies(const MindlinSpecies& s)
     slidingDissipation_ = s.slidingDissipation_;
     slidingFrictionCoefficient_ = s.slidingFrictionCoefficient_;
     slidingFrictionCoefficientStatic_ = s.slidingFrictionCoefficientStatic_;
-    poissonRatio_ = s.poissonRatio_;
     shearModulus_ = s.shearModulus_;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"MindlinSpecies::MindlinSpecies(const MindlinSpecies &p) finished"<<std::endl;
@@ -78,7 +76,6 @@ void MindlinSpecies::write(std::ostream& os) const
     os << " slidingDissipation " << slidingDissipation_;
     os << " slidingFrictionCoefficient " << slidingFrictionCoefficient_;
     os << " slidingFrictionCoefficientStatic " << slidingFrictionCoefficientStatic_;
-    os << " poissonRatio " << poissonRatio_;
     os << " shearModulus " << shearModulus_;
 }
 
@@ -92,7 +89,6 @@ void MindlinSpecies::read(std::istream& is)
     is >> dummy >> slidingDissipation_;
     is >> dummy >> slidingFrictionCoefficient_;
     is >> dummy >> slidingFrictionCoefficientStatic_;
-    is >> dummy >> poissonRatio_;
     is >> dummy >> shearModulus_;
 }
 
@@ -162,76 +158,31 @@ void MindlinSpecies::setSlidingFrictionCoefficientStatic(Mdouble new_mu)
 ///Allows the poisson ratio to be changed
 void MindlinSpecies::setPoissonRatio(Mdouble poissonRatio)
 {
-    if (poissonRatio >= 0)
-    {
-        poissonRatio_ = poissonRatio;
-    }
-    else
-    {
-        std::cerr << "Error in setPoissonRatio(" << poissonRatio << ")" << std::endl;
-        exit(-1);
-    }
+    auto hertz = dynamic_cast<HertzianViscoelasticNormalSpecies*>(getBaseSpecies());
+    logger.assert(hertz, "setPoissonRatio only works with HertzianViscoelastic*Species.");
+    shearModulus_ = hertz->getElasticModulus() / 2 * (1 + poissonRatio);
+    logger(INFO,"Effective shear modulus set to %, based on effective elastic modulus % and Poisson's ratio %",getShearModulus(),hertz->getElasticModulus(),poissonRatio);
 }
 
-///Allows the poisson ratio to be accessed
-Mdouble MindlinSpecies::getPoissonRatio() const
-{
-    return poissonRatio_;
-}
-
-///Allows the poisson ratio to be computed by the elastic modulus and shear modulus
-Mdouble MindlinSpecies::computePoissonRatio(Mdouble elasticModulus, Mdouble shearModulus)
-{
-    poissonRatio_ = elasticModulus / (2 * shearModulus) - 1;
-    return poissonRatio_;
-}
-
-
-void MindlinSpecies::setShearModulusAndPoissonRatio(Mdouble shearModulus, Mdouble poissonRatio)
-{
-    if (shearModulus < 0.0)
-        logger(ERROR,
-               "[MindlinInteraction::setShearModulusAndPoissonRatio] shearModulus % should be nonnegative",
-               shearModulus);
-    
-    else if (poissonRatio < 0.0 || poissonRatio > 1.0)
-        logger(ERROR,
-               "[MindlinInteraction::setShearModulusAndPoissonRatio] rest % should be between 0 and 1 (inclusive)",
-               poissonRatio);
-    else
-    {
-        shearModulus_ = shearModulus;
-        poissonRatio_ = poissonRatio;
-        auto hertz = dynamic_cast<HertzianViscoelasticNormalSpecies*>(getBaseSpecies());
-        logger.assert(hertz, "Please define HertzianViscoelasticMindlinSpecies to use this setter");
-        hertz->computeElasticModulus(shearModulus, poissonRatio);
-    }
-}
+/////Allows the poisson ratio to be accessed
+//Mdouble MindlinSpecies::getPoissonRatio() const
+//{
+//    auto hertz = dynamic_cast<HertzianViscoelasticNormalSpecies*>(getBaseSpecies());
+//    logger.assert(hertz, "getPoissonRatio only works with HertzianViscoelastic*Species.");
+//    return 2. * shearModulus_ / hertz->getElasticModulus() - 1;
+//}
 
 ///Allows the shear modulus to be changed
 void MindlinSpecies::setShearModulus(Mdouble shearModulus)
 {
-    if (shearModulus > 0)
-    {
-        shearModulus_ = shearModulus;
-    }
-    else
-    {
-        std::cerr << "Error in setShearModulus(" << shearModulus << ")" << std::endl;
-        exit(-1);
-    }
+    logger.assert(shearModulus > 0,
+                  "setShearModulus(%): value needs to be positive",shearModulus);
+    shearModulus_ = shearModulus;
 }
 
 ///Allows the shear modulus to be accessed
 Mdouble MindlinSpecies::getShearModulus() const
 {
-    return shearModulus_;
-}
-
-///allows the shear modulus to be computed by the elastic modulus and poisson ratio
-Mdouble MindlinSpecies::computeShearModulus(Mdouble elasticModulus, Mdouble poissonRatio)
-{
-    shearModulus_ = elasticModulus / 2 * (1 + poissonRatio);
     return shearModulus_;
 }
 
@@ -260,13 +211,9 @@ bool MindlinSpecies::getUseAngularDOFs() const
  */
 void MindlinSpecies::mix(MindlinSpecies* const SFrictional, MindlinSpecies* const TFrictional)
 {
-    slidingDissipation_ = BaseSpecies::average(SFrictional->getSlidingDissipation(),
-                                TFrictional->getSlidingDissipation());
-    slidingFrictionCoefficient_ = BaseSpecies::average(SFrictional->getSlidingFrictionCoefficient(),
-                                        TFrictional->getSlidingFrictionCoefficient());
-    slidingFrictionCoefficientStatic_ = BaseSpecies::average(SFrictional->getSlidingFrictionCoefficientStatic(),
-                                                TFrictional->getSlidingFrictionCoefficientStatic());
-    poissonRatio_ = BaseSpecies::average(SFrictional->getPoissonRatio(), TFrictional->getPoissonRatio());
+    slidingDissipation_ = BaseSpecies::average(SFrictional->getSlidingDissipation(),TFrictional->getSlidingDissipation());
+    slidingFrictionCoefficient_ = BaseSpecies::average(SFrictional->getSlidingFrictionCoefficient(),TFrictional->getSlidingFrictionCoefficient());
+    slidingFrictionCoefficientStatic_ = BaseSpecies::average(SFrictional->getSlidingFrictionCoefficientStatic(),TFrictional->getSlidingFrictionCoefficientStatic());
     shearModulus_ = BaseSpecies::average(SFrictional->getShearModulus(), TFrictional->getShearModulus());
 }
 

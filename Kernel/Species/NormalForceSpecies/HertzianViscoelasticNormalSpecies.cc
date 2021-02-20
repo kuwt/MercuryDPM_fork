@@ -70,7 +70,7 @@ HertzianViscoelasticNormalSpecies::~HertzianViscoelasticNormalSpecies()
  */
 void HertzianViscoelasticNormalSpecies::write(std::ostream& os) const
 {
-    os << " stiffness " << elasticModulus_
+    os << " elasticModulus " << elasticModulus_
        << " dissipation " << dissipation_;
 }
 
@@ -130,9 +130,9 @@ void HertzianViscoelasticNormalSpecies::setElasticModulusAndRestitutionCoefficie
         }
         else
             dissipation_ = sqrt(5.0);
-        
-        logger(INFO, "Dissipation % set to match restitution coefficient % logE % sqrPi %", dissipation_, rest,
-               log(rest), constants::sqr_pi);
+
+        //logger(INFO, "Effective elastic modulus %", elasticModulus_);
+        //logger(INFO, "Set dissipation % to match restitution coefficient %", dissipation_, rest);
     }
 }
 
@@ -153,8 +153,7 @@ void HertzianViscoelasticNormalSpecies::setElasticModulusAndPoissonRatio(Mdouble
         elasticModulus_ = elasticModulus;
         auto mindlin = dynamic_cast<MindlinSpecies*>(getBaseSpecies());
         logger.assert(mindlin, "Please define HertzianViscoelasticMindlinSpecies to use this setter");
-        mindlin->setPoissonRatio(poissonRatio);
-        mindlin->computeShearModulus(elasticModulus, poissonRatio);
+        mindlin->setShearModulus(elasticModulus / 2 * (1 + poissonRatio));
     }
 }
 
@@ -176,19 +175,12 @@ void HertzianViscoelasticNormalSpecies::setElasticModulusAndShearModulus(Mdouble
         auto mindlin = dynamic_cast<MindlinSpecies*>(getBaseSpecies()->getFrictionForce());
         logger.assert(mindlin, "Please define HertzianViscoelasticMindlinSpecies to use this setter");
         mindlin->setShearModulus(shearModulus);
-        mindlin->computePoissonRatio(elasticModulus, shearModulus);
     }
 }
 
 ///Allows the spring constant to be accessed
 Mdouble HertzianViscoelasticNormalSpecies::getElasticModulus() const
 {
-    return elasticModulus_;
-}
-
-Mdouble HertzianViscoelasticNormalSpecies::computeElasticModulus(Mdouble shearModulus, Mdouble poissonRatio)
-{
-    elasticModulus_ = 2 * shearModulus * (1 + poissonRatio);
     return elasticModulus_;
 }
 
