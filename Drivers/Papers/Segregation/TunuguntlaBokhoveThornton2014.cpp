@@ -79,7 +79,8 @@ void write(std::ostream& os, bool print_all = false) const
 /// \bug This code is not non-dimensionalised at the moment, should do this shortly, but at the moment. Should swap this to Silbert particles shortly
 void setupInitialConditions()
 {
-	
+    setTime(4500.0);
+    logger(DEBUG,"Entering the Initial Conditions");
 	//Check if the run has been done before. If yes, skip and start next run
 	      if (helpers::fileExists(dataFile.getName()))
 		{
@@ -277,7 +278,7 @@ void setupInitialConditions()
 	//S01->setSlidingDissipation(speciesHandler.getMixedObject(1,0)->getDissipation());//  Set the tangential dissipation equal to the normal disipation for mixed collision
 	*/
 	//Setup the base i.e. the chute particles - This has to be done after the particle properties are set, but the inflow partilces are created.
-	Chute::setupInitialConditions();
+	//Chute::setupInitialConditions();
 
 //	Walls.resize(Walls.size()+1);
 //	Walls.back().addObject(Vec3D(0.0,0.0,-1.0),-(getZMin()-0.5));		
@@ -361,22 +362,25 @@ SphericalParticle inflowParticle_;
 
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
+    logger(DEBUG,"Start the code");
+
 	SegregationPeriodic problem;
+
 	
 	// Problem parameters, name tmax and two types of particles
 	problem.setName("DensitySizeSegregation");
 	//This should be set to 100 for full problems.
+	//Thomas increased the TMax to 50000 not sure why. Set it back to 100.
 	problem.setTimeMax(50000);
-	problem.speciesHandler.copyAndAddObject(problem.speciesHandler.getObject(0));
-	problem.speciesHandler.copyAndAddObject(problem.speciesHandler.getObject(0));
-	
+    //problem.setTimeMax(100);
+
 
 	
 	
 	// Chute properties
 	problem.setFixedParticleRadius(0.5);
 	problem.setRoughBottomType(MULTILAYER);
-    problem.setChuteAngleAndMagnitudeOfGravity(26.0, 1.0);
+    problem.setChuteAngleAndMagnitudeOfGravity(22.0, 1.0);
 	problem.setChuteLength(20);
 	problem.setChuteWidth(10);
 	problem.setZMax(70);
