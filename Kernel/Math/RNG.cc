@@ -148,12 +148,10 @@ Mdouble RNG::getRandomNumber()
 Mdouble RNG::getRandomNumber(Mdouble min, Mdouble max)
 {
     logger.assert(min <= max, "getRandomNumber: min cannot be larger than max");
-    switch (type_)
-    {
-        case RNGType::LINEAR_CONGRUENTIAL_GENERATOR:
-            return getRandomNumberFromLinearCongruentialGenerator(min, max);
-        case RNGType::LAGGED_FIBONACCI_GENERATOR:
-            return getRandomNumberFromLaggedFibonacciGenerator(min, max);
+    if (type_ == RNGType::LINEAR_CONGRUENTIAL_GENERATOR) {
+        return getRandomNumberFromLinearCongruentialGenerator(min, max);
+    } else {
+        return getRandomNumberFromLaggedFibonacciGenerator(min, max);
     }
 }
 

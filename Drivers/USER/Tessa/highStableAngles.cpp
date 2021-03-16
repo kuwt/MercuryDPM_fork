@@ -425,13 +425,13 @@ public:
         ///create a finite wall from B to A, from C to B and from A to C
         temp = B - A;
         normal = Vec3D(temp.Z, 0.0, -temp.X) / std::sqrt(temp.getLengthSquared());
-        w0.addObject(normal, Vec3D::dot(normal, A)); //Walls[n].addObject(normal, Dot(normal,A));
+        w0.addObject(normal, A); //Walls[n].addObject(normal, Dot(normal,A));
         temp = C - B;
         normal = Vec3D(temp.Z, 0.0, -temp.X) / std::sqrt(temp.getLengthSquared());
-        w0.addObject(normal, Vec3D::dot(normal, B)); //Walls[n].addObject(normal, Dot(normal,B));
+        w0.addObject(normal, B); //Walls[n].addObject(normal, Dot(normal,B));
         temp = A - C;
         normal = Vec3D(temp.Z, 0.0, -temp.X) / std::sqrt(temp.getLengthSquared());
-        w0.addObject(normal, Vec3D::dot(normal, C)); //Walls[n].addObject(normal,Dot(normal,C));
+        w0.addObject(normal, C); //Walls[n].addObject(normal,Dot(normal,C));
         wallHandler.copyAndAddObject(w0);
     }
     void removeExtraHopperWall()

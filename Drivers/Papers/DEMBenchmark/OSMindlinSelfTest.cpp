@@ -54,9 +54,6 @@ public:
         setMax(Vec3D(1e-3,1e-3,2.2e-3));
         setMin(Vec3D(-1e-3,-1e-3,0));
     
-        // define the material properties of M1, M2, steel (see MercuryOS.h)
-        auto[m1, m2, steel] = setMaterialProperties();
-
         // add particles
         SphericalParticle particle;
         particle.setSpecies(steel);

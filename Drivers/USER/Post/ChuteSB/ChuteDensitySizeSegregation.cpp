@@ -247,7 +247,7 @@ void setupInitialConditions()
 	Chute::createBottom();
 
 	InfiniteWall w0;
-	w0.set(Vec3D(0.0,0.0,-1.0), -(getZMin()-0.5));
+	w0.set(Vec3D(0.0,0.0,-1.0), getMin()-Vec3D(0,0,0.5));
         w0.setSpecies(S0);
         wallHandler.copyAndAddObject(w0);
 

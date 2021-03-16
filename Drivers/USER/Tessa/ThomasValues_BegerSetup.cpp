@@ -178,11 +178,11 @@ public:
                 wallHandler.copyAndAddObject(w0);
 		w0.set(Vec3D(-1.0, 0.0, 0.0), -getXMin());
                 wallHandler.copyAndAddObject(w0);
-		w0.set(Vec3D( 1.0, 0.0, 0.0),  getXMax());
+		w0.set(Vec3D( 1.0, 0.0, 0.0),  getMax());
                 wallHandler.copyAndAddObject(w0);
-		w0.set(Vec3D( 0.0,-1.0, 0.0), -getYMin());
+		w0.set(Vec3D( 0.0,-1.0, 0.0), getMin());
                 wallHandler.copyAndAddObject(w0);
-		w0.set(Vec3D( 0.0, 1.0, 0.0),  getYMax());
+		w0.set(Vec3D( 0.0, 1.0, 0.0),  getMax());
                 wallHandler.copyAndAddObject(w0);
 
 		//number of flowing particles

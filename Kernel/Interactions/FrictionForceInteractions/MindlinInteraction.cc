@@ -144,9 +144,10 @@ MindlinInteraction::MindlinInteraction(const MindlinInteraction& p)
  */
 MindlinInteraction::MindlinInteraction()
 {
-#ifdef MERCURY_USE_MPI
-    logger(FATAL,"MindlinInteractions are currently not implemented in parallel MercuryDPM");
-#endif
+    //I don't see why we are restricted in the use of interactions
+//#ifdef MERCURY_USE_MPI
+//    logger(FATAL,"MindlinInteractions are currently not implemented in parallel MercuryDPM");
+//#endif
 }
 
 /*!

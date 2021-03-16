@@ -39,7 +39,10 @@ class Penetration : public MercuryOS
 {
     /// whether 25k, 50k, or 100k particles are used for the bed
     std::string size_ = "25K";
-
+    
+    /// pointer to the steel particle
+    SphericalParticle* indenter = nullptr;
+    
 public:
     
     // returns the variable size_
@@ -84,13 +87,6 @@ public:
             eneFile.setFileType(FileType::ONE_FILE);
         }
         
-        // set domain for visualisation
-        setMax(Vec3D(0.05, 0.03, 0.2 - 0.090243));
-        setMin(Vec3D(-0.05, -0.03, -0.090243));
-    
-        // define the material properties of M1, M2, steel (see MercuryOS.h)
-        auto[m1, m2, steel] = setMaterialProperties();
-    
         // read particle positions and radii from file
         {
             // open file
@@ -119,7 +115,13 @@ public:
             particle.setRadius(0.01);
             particle.setPosition(Vec3D(0, 0, 0.06));
             particle.setVelocity(Vec3D(0, 0, -5));
-            particleHandler.copyAndAddObject(particle);
+            size_t n = particleHandler.getNumberOfRealObjectsLocal();
+            indenter = particleHandler.copyAndAddObject(particle);
+            // set indenter to null if the indenter is not in the MPI domain
+            if (n == particleHandler.getNumberOfRealObjectsLocal())
+            {
+                indenter = nullptr;
+            }
         }
         
         // add walls
@@ -161,9 +163,16 @@ public:
     // Write requested output to the ene file
     void writeEneTimeStep(std::ostream &os) const override
     {
-        if (eneFile.getCounter() == 1) os << "Time Position\n";
-        // time and z-position of steel particle
-        os << getTime() << ' ' << particleHandler.getLastObject()->getPosition().Z << std::endl;
+        if (eneFile.getCounter() == 1 && indenter)
+        {
+            os << "Time Position\n";
+        }
+        
+        if (indenter) // this check is required for MPI codes
+        {
+            // write time and z-position of steel particle
+            os << getTime() << ' ' << indenter->getPosition().Z << std::endl;
+        }
     }
     
     // Also write the ene information to the screen
@@ -178,6 +187,10 @@ int main(int argc, char **argv)
 {
     // create an instance of the Penetration class
     Penetration dpm;
+    // set domain and mpi split
+    dpm.setMax(Vec3D(0.05, 0.03, 0.2 - 0.090243));
+    dpm.setMin(Vec3D(-0.05, -0.03, -0.090243));
+    dpm.splitDomain(DPMBase::DomainSplit::XY);
     // command line arguments:
     // turn on additional output files for viewing/analysing the data
     dpm.writeOutput(helpers::readFromCommandLine(argc, argv, "-writeOutput"));

@@ -25,7 +25,6 @@
 
 #include <Walls/InfiniteWall.h>
 #include "Mercury3D.h"
-#include "CG/CG.h"
 #include "Species/LinearViscoelasticSpecies.h"
 
 /** A chain of 5 particles is settling under small gravity.
@@ -47,7 +46,7 @@ public:
         setSaveCount(250);
 
         //define a particle species
-        auto species = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());;
+        auto species = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
         species->setDensity(6.0 / constants::pi);
         species->setCollisionTimeAndRestitutionCoefficient(50e-4, 0.1, 1.0);
 
@@ -91,7 +90,9 @@ int main()
 
     logger(INFO,"\nCoarse-grain a select region (1<z<2)\n");
     std::string cmd = "./MercuryCG Chain -tMin 1 -timeAverage -z 1 2 -averageBeyondDomain 0";
-    system(cmd.c_str());
+    if (system(cmd.c_str())==-1) {
+        logger(WARN,"system call failed");
+    }
 
     logger(INFO,"\nRead in CG\n");
     std::ifstream statFile("Chain.stat");

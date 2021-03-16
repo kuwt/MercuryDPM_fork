@@ -56,15 +56,15 @@ void setupInitialConditions()
 		{
 		  boundaryHandler.clear();//set_NWallPeriodic(0);
 		  InfiniteWall w0;//set_NWall(3);
-               	  w0.set(Vec3D( 0.0,-1.0, 0.0), -getYMin());
+               	  w0.set(Vec3D( 0.0,-1.0, 0.0), getMin());
                   wallHandler.copyAndAddObject(w0);
-		  w0.set(Vec3D( 0.0, 1.0, 0.0),  getYMax());
+		  w0.set(Vec3D( 0.0, 1.0, 0.0),  getMax());
                   wallHandler.copyAndAddObject(w0);
 		
 		// ------------------------------
 		// extra wall:
 		// muur op xmin, en de create_inflow_particle functie houdt er al rekening mee dat de deeltjes niet in de muur geplaatst worden
-		  w0.set(Vec3D(-1.0, 0.0, 0.0), -getXMin() );
+		  w0.set(Vec3D(-1.0, 0.0, 0.0), getMin());
                   wallHandler.copyAndAddObject(w0);
 		// ------------------------------
 		}

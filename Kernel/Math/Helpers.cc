@@ -913,7 +913,9 @@ void helpers::check(Matrix3D real, Matrix3D ideal, double error, std::string wha
 std::string helpers::getPath()
 {
     char cCurrentPath[FILENAME_MAX];
-    GetCurrentDir(cCurrentPath, sizeof(cCurrentPath)); //if added to avoid compiler warning
+    if (not GetCurrentDir(cCurrentPath, sizeof(cCurrentPath))) {
+        logger(WARN, "Get current dir failed: %", cCurrentPath);
+    }
     return std::string(cCurrentPath);
 }
 

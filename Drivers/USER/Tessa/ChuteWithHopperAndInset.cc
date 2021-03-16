@@ -137,13 +137,13 @@ void ChuteWithHopperAndInset::add_Inset()
     IntersectionOfWalls w0;
     temp = B - A;
     normal = Vec3D(temp.Z, 0.0, -temp.X) / sqrt(temp.getLengthSquared());
-    w0.addObject(normal, A); //Walls[n].addObject(normal, Vec3D::Dot(normal, A));
+    w0.addObject(normal, A); //Walls[n].addObject(normal, A);
     temp = C - B;
     normal = Vec3D(temp.Z, 0.0, -temp.X) / sqrt(temp.getLengthSquared());
-    w0.addObject(normal, B); //Walls[n].addObject(normal, Vec3D::Dot(normal, B));
+    w0.addObject(normal, B); //Walls[n].addObject(normal, B);
     temp = A - C;
     normal = Vec3D(temp.Z, 0.0, -temp.X) / sqrt(temp.getLengthSquared());
-    //Walls[n].addObject(normal, Vec3D::Dot(normal, C));
+    //Walls[n].addObject(normal, C);
     w0.addObject(normal, C);
     wallHandler.copyAndAddObject(w0);
 
@@ -161,14 +161,14 @@ void ChuteWithHopperAndInset::add_Inset()
     IntersectionOfWalls w1;
     temp = B - A;
     normal = Vec3D(temp.Z, 0.0, -temp.X) / sqrt(temp.getLengthSquared());
-    w1.addObject(normal, Vec3D::dot(normal, A));
+    w1.addObject(normal, A);
 
     temp = C - B;
     normal = Vec3D(temp.Z, 0.0, -temp.X) / sqrt(temp.getLengthSquared());
-    w1.addObject(normal, Vec3D::dot(normal, B));
+    w1.addObject(normal, B);
     temp = A - C;
     normal = Vec3D(temp.Z, 0.0, -temp.X) / sqrt(temp.getLengthSquared());
-    w1.addObject(normal, Vec3D::dot(normal, C));
+    w1.addObject(normal, C);
     wallHandler.copyAndAddObject(w1);
 }
 
