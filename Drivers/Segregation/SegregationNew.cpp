@@ -33,6 +33,8 @@
 #include "Chute.h"
 #include "Walls/InfiniteWall.h"
 #include "Boundaries/PeriodicBoundary.h"
+#include "Boundaries/CubeInsertionBoundary.h"
+#include <CG/CG.h>
 
 class Chutebelt : public Chute
 {
@@ -46,8 +48,18 @@ public:
         //Number of small particles
         int Ns = num_small;
         int Nl = num_large;
+
+        setZMax(200.0*radius_l);
+
+
+        //Set up live statistics
+        CG<CGCoordinates::Z> cg; //declare a cg object
+        cg.setN(50); //set the CG to be 100 by 100.
+        cg.setWidth(5.0*radius_s);
+        cg.statFile.setSaveCount(200); //set parameters such as the output frequency
+        cgHandler.copyAndAddObject(cg); // add the CG object to the cgHandler
         
-        setInflowParticleRadius(radius_s, radius_l);
+        //setInflowParticleRadius(radius_s, radius_l);
         
         double rho = 6.0 / constants::pi;
         
@@ -116,12 +128,28 @@ public:
         std::cout << "Number of small particles:" << Ns << std::endl;
         
         Chute::setupInitialConditions();
-        
-      
+
         
         // Remove the two existing boundaries insertion and periodic and put the peroidic back if perodic else put
         boundaryHandler.clear();
         
+
+        
+        //Now add two extra solid walls at the end
+        //InfiniteWall w0;
+        gateLeft_ = new InfiniteWall;
+        //w0.set(Vec3D(-1.0, 0.0, 0.0), Vec3D(getXMin() + 2 * getFixedParticleRadius(),0,0));
+        //wallHandler.copyAndAddObject(w0);
+        gateLeft_->set(Vec3D(1.0, 0.0, 0.0), Vec3D(getXMax(),0,0));
+        gateLeft_->setSpecies(species0);
+        wallHandler.addObject(gateLeft_);
+
+        gateRight_ = new InfiniteWall;
+        gateRight_->set(Vec3D(-1.0, 0.0, 0.0), Vec3D(getXMin() ,0,0));
+        gateRight_->setSpecies(species0);
+        wallHandler.addObject(gateRight_);
+        //wallHandler.copyAndAddObject(w0);
+
         if (getIsPeriodic())
         {
             //Periodic in y
@@ -130,24 +158,33 @@ public:
             boundaryHandler.copyAndAddObject(b0);
 
             //Periodic in x
-            b0.set(Vec3D(1.0, 0.0, 0.0), getXMin(), getXMax());
-            boundaryHandler.copyAndAddObject(b0);
+           // b0.set(Vec3D(1.0, 0.0, 0.0), getXMin(), getXMax());
+           // boundaryHandler.copyAndAddObject(b0);
         }
-        
-        //Now add two extra solid walls at the end
-        //InfiniteWall w0;
-        //w0.set(Vec3D(-1.0, 0.0, 0.0), Vec3D(getXMin() + 2 * getFixedParticleRadius(),0,0));
-        //wallHandler.copyAndAddObject(w0);
-        //w0.set(Vec3D(1.0, 0.0, 0.0), Vec3D(getXMax() - 2 * getFixedParticleRadius(),0,0));
-        //wallHandler.copyAndAddObject(w0);
-       
-        
 
         
         
         // CREATE THE PARTICLES
-        SphericalParticle P0;
-        while ((Ns > 0) || (Nl > 0))
+
+        SphericalParticle p0;
+        smallInsertionBoundary = new CubeInsertionBoundary();
+        largeInsertionBoundary = new CubeInsertionBoundary();
+
+        double volumeToInsert=num_small*4.0/3.0*constants::pi*pow(1.0,3);
+
+        logger(INFO,"Need to insert a volume of % of each particle type",volumeToInsert);
+
+
+        smallInsertionBoundary->set(p0,1000000,Vec3D(getXMin(),getYMin(),getZMax()/2.0),Vec3D(getXMax(),getYMax(),getZMax()),Vec3D(0.0,0.0,0.0),Vec3D(0.0,0.0,0.0),1.0*0.95,1.0*1.05);
+        smallInsertionBoundary->setInitialVolume(volumeToInsert);
+        smallInsertionBoundary->deactivate();
+        boundaryHandler.addObject(smallInsertionBoundary);
+
+        largeInsertionBoundary->set(p0,1000000,Vec3D(getXMin(),getYMin(),getZMin()),Vec3D(getXMax(),getYMax(),getZMax()/2.0),Vec3D(0.0,0.0,0.0),Vec3D(0.0,0.0,0.0),2.0*0.95,2.0*1.05);
+        largeInsertionBoundary->setInitialVolume(volumeToInsert);
+        largeInsertionBoundary->deactivate();
+        boundaryHandler.addObject(largeInsertionBoundary);
+       /* while ((Ns > 0) || (Nl > 0))
         {
             
             //random to see if want to generate a large or small particles, helps makes the initial conditions homogenious
@@ -177,7 +214,7 @@ public:
              while (!checkParticleForInteraction(P0));
 	     particleHandler.copyAndAddObject(P0);
 
-        }
+        }*/
         
         std::cout << "Finished creating particles" << std::endl;
         
@@ -242,7 +279,66 @@ public:
         
         
     }
-    
+
+    void actionsAfterTimeStep()
+    {
+
+        switch (step)
+        {
+            case 0 :
+                logger(INFO,"Finished create base now moving to insert large particles");
+                setChuteAngle(0.0);
+                step++;
+                break;
+
+            case 1 :
+                largeInsertionBoundary->activate();
+                /// \todo Work out why the volume inserted is not what I expext
+                logger(DEBUG,"Inserted volume of % of larger particles, tagget is %",largeInsertionBoundary->getMassOfParticlesInserted(),largeInsertionBoundary->getInitialVolume());
+
+                if (getTime()>50.0)
+                {
+                    logger(INFO,"Moving on to insert small particles");
+                    largeInsertionBoundary->deactivate();
+                    smallInsertionBoundary->activate();
+                    step++;
+                }
+
+                break;
+
+            case 2:
+
+                if (getTime()>100.0)
+                {
+                    logger(INFO,"Now starting the simulations");
+                    step++;
+                    setTime(0.0);
+                    setZMax(100.0*radius_l);
+                    smallInsertionBoundary->deactivate();
+                    setChuteAngle(25.0);
+                    //To not clear hte boundary is this includes the periodic boundaries.
+                    //boundaryHandler.clear();
+                    //wallHandler.clear();
+
+                    wallHandler.removeObject(gateLeft_->getIndex());
+                    if (getIsPeriodic())
+                    {
+                        wallHandler.removeObject(gateRight_->getIndex());
+                        //Periodic in y
+                        PeriodicBoundary b0;
+                        //b0.set(Vec3D(0.0, 1.0, 0.0), getYMin(), getYMax());
+                        //boundaryHandler.copyAndAddObject(b0);
+
+                        //Periodic in x
+                        b0.set(Vec3D(1.0, 0.0, 0.0), getXMin(), getXMax());
+                        boundaryHandler.copyAndAddObject(b0);
+                    }
+                }
+                break;
+        }
+
+    }
+
     // MOVING BED
     void actionsBeforeTimeStep()
     {
@@ -354,10 +450,24 @@ private:
     int num_small;
     int num_large;
     double particleVolRatio;
-    
-    
-  
-    
+
+    InfiniteWall* gateLeft_;
+    InfiniteWall* gateRight_;
+
+    CubeInsertionBoundary* smallInsertionBoundary;
+    CubeInsertionBoundary* largeInsertionBoundary;
+    /**
+     * \brief Tracks where we are up to in setting the problem up
+     * \details
+     * Step 0 : Insert small particles at the bottom
+     * Step 1 : Insert large particles at the top.
+     * Both step 0 and 1 setup are done with a gate at the right but the correct chute angle
+     */
+    unsigned step=0;
+
+
+
+
 };
 
 int main(int argc, char *argv[])
@@ -368,25 +478,26 @@ int main(int argc, char *argv[])
     // Problem parameters
     Chutebelt problem;
     problem.setName("Segregation");
-    problem.setTimeMax(100.0);
+    problem.setTimeMax(500.0);
     problem.setTimeStep(1. / (200.0 * 50.0));
     
     problem.set_radiusLarge(2.0);
     problem.set_particle_number_volRatio(1.0); //volume ratio of large to small
     problem.set_particle_numbers(5000, 130); //Should be 5000 and 130
 
-    problem.setChuteAngleAndMagnitudeOfGravity(20.0, 1.0);
+    problem.setChuteAngleAndMagnitudeOfGravity(25.0, 1.0);
     problem.set_beltSpeed(0.0);
     
     // Chute properties : Simply remove the first line to add side walls.
     problem.makeChutePeriodic();
-    problem.setXMax(83.3);
+    problem.setXMax(100.0);
     problem.setYMax(5.0);
     
     problem.setZMin(0.0);
     problem.setZMax(250.0);
-    
-    problem.setFixedParticleRadius(0.4);
+
+    /// \todo change this to the mean particle size (not small particle size)
+    problem.setFixedParticleRadius(0.75);
     
     //Swap the next two lines to swap between the different type of rought bottoms.
     problem.setRoughBottomType(MULTILAYER);
