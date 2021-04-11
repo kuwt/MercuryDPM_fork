@@ -2584,7 +2584,7 @@ bool DPMBase::readNextDataFile(unsigned int format)
         N = doubleN;
     }
 
-    //store the parameters you want to preserve
+    //store the parameters you want to preserve:
     const size_t nHistory = std::min(N,particleHandler.getSize());
     std::vector<const ParticleSpecies*> species(nHistory);
     std::vector<bool> fix(nHistory);
@@ -2592,55 +2592,14 @@ bool DPMBase::readNextDataFile(unsigned int format)
         const BaseParticle *p = particleHandler.getObject(i);
         species[i] = p->getSpecies();
         fix[i] = p->isFixed();
+        //store from reading the restart file which particles are fixed and which species each particle has
     }
-
-//    //create particles if N is not fixed
-//    if (particleHandler.getSize() != N)
-//    {
-//        if (particleHandler.getSize() == 0)
-//        {
-//            SphericalParticle p;
-//            p.setSpecies(speciesHandler.getObject(0));
-//            particleHandler.copyAndAddObject(p);
-//            /**
-//             * A data file only contains radius, position and velocity
-//             * (and species); so the remaining properties (Is it a fixed
-//             * particle? Is it a (spherical) BaseParticle?) are kept
-//             * constant throughout the simulation. But, if the number of
-//             * particles changes, the reading algorithm needs to decide
-//             * what to do, so it assumes the particle is a non-fixed BaseParticle.
-//             */
-//            logger(WARN, "readNextDataFile: the data file contains more "
-//                         "particles than are currently in the particleHandler. "
-//                         "Newly created particles will be non-fixed spherical particles.");
-//            if (!readSpeciesFromDataFile_)
-//                logger(WARN, "Note: new particles are assumed to be of species zero. "
-//                             "To read species information from the data file, "
-//                             "set readSpeciesFromDataFile to true");
-//
-//        }
-//        if (particleHandler.getSize() > N)
-//        {
-//            while (particleHandler.getSize() != N)
-//            {
-//                particleHandler.removeLastObject();
-//                //std::cout << "S" << particleHandler.getSize() << std::endl;
-//            }
-//        }
-//        else
-//        {
-//            while (particleHandler.getSize() != N)
-//            {
-//                particleHandler.copyAndAddObject(particleHandler.getLastObject());
-//                particleHandler.getLastObject()->unfix();
-//                //std::cout << particleHandler.getSize() << N << std::endl;
-//            }
-//        }
-//    }
+    
     BaseParticle* p;
     if (particleHandler.getSize() == 0) {
         logger.assert_always(speciesHandler.getSize()>0,"readData: species needs to be set first");
         p = new SphericalParticle(speciesHandler.getObject(0));
+        p->unfix();
     } else {
         p = particleHandler.getObject(0)->copy();
     }
@@ -2675,6 +2634,7 @@ bool DPMBase::readNextDataFile(unsigned int format)
             if (i < nHistory && fix[i])
                 p->fixParticle();
             particleHandler.copyAndAddObject(*p);
+            p->unfix();
         }
     } else if (format==8) {
         line >> time_ >> min_.x() >> min_.y() >> max_.x() >> max_.y();
@@ -2693,6 +2653,7 @@ bool DPMBase::readNextDataFile(unsigned int format)
             else if (i < nHistory) p->setSpecies(species[i]);
             if (i < nHistory && fix[i]) p->fixParticle();
             particleHandler.copyAndAddObject(*p);
+            p->unfix();
         } //end for all particles
     } else if (format==14) {
         //This is a 3D format_
@@ -2734,6 +2695,7 @@ bool DPMBase::readNextDataFile(unsigned int format)
             }
 #endif
             particleHandler.copyAndAddObject(*p);
+            p->unfix();
         } //end read into existing particles logger(INFO, "read % particles", particleHandler.getNumberOfObjects());
     } else if (format==15) {
         line >> time_ >> min_.x() >> min_.y() >> min_.z() >> max_.z() >> max_.y() >> max_.z();
