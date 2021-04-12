@@ -103,12 +103,12 @@ public:
      * \brief Increment the run Number (counter value) stored in the file_counter (COUNTER_DONOTDEL) by 1 and store the new value
      * in the counter file
      */
-    void incrementRunNumberInFile();
+    static void incrementRunNumberInFile();
     
     /*!
      * \brief Read the run number or the counter from the counter file (COUNTER_DONOTDEL)
      */
-    int readRunNumberFromFile();
+    static int readRunNumberFromFile();
     
     /*!
      * \brief The autoNumber() function calls three functions: setRunNumber(), readRunNumberFromFile() and
@@ -120,19 +120,19 @@ public:
      * \brief This turns a counter into 1 index, which is a useful feature for performing 1D parameter study.
      * The index run from 1:size_x, while the study number starts at 0 (initially the counter=1 in COUNTER_DONOTDEL)
      */
-    std::vector<int> get1DParametersFromRunNumber(int size_x);
+    std::vector<int> get1DParametersFromRunNumber(int size_x) const;
 
     /*!
      * \brief This turns a counter into 2 indices which is a very useful feature for performing a 2D study.
      * The indices run from 1:size_x and 1:size_y, while the study number starts at 0 ( initially the counter=1 in COUNTER_DONOTDEL)
      */
-    std::vector<int> get2DParametersFromRunNumber(int size_x, int size_y);
+    std::vector<int> get2DParametersFromRunNumber(int size_x, int size_y) const;
 
     /*!
      * \brief This turns a counter into 3 indices, which is a useful feature for performing a 3D parameter study.
      * The indices run from 1:size_x, 1:size_y and 1:size_z, while the study number starts at 0 ( initially the counter=1 in COUNTER_DONOTDEL)
      */
-    std::vector<int> get3DParametersFromRunNumber(int size_x, int size_y, int size_z);
+    std::vector<int> get3DParametersFromRunNumber(int size_x, int size_y, int size_z) const;
     
     /*!
      * \brief This launches a code from within this code. Please pass the name of the code to run.
@@ -301,7 +301,6 @@ public:
      *        3D or 2D data- see \ref xballs.
      */
     bool readNextDataFile(unsigned int format = 0);
-    bool readNextDataFileMPI(unsigned int format = 0);
 
     /*!
      * \brief Reads the next fstat file.
@@ -517,7 +516,7 @@ public:
     /*!
      * \brief Sets File::logarithmicSaveCount_ for all files (ene, data, fstat, restart, stat)
      */
-    void setLogarithmicSaveCount(const Mdouble logarithmicSaveCountBase);
+    void setLogarithmicSaveCount(Mdouble logarithmicSaveCountBase);
 
 #ifdef CONTACT_LIST_HGRID
     /*!
@@ -855,7 +854,7 @@ public:
     /*!
      * \brief Checks if two particle are in contact or is there any positive overlap
      */
-    bool areInContact(const BaseParticle* pI, const BaseParticle* pJ) const;
+    static bool areInContact(const BaseParticle* pI, const BaseParticle* pJ);
 
     /// \bug Why are the hGRID actions public, this seems wrong. Someone please comment [Ant].
     /*!

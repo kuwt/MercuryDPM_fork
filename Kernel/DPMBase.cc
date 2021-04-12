@@ -22,47 +22,35 @@
 //ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
 #include "DPMBase.h"
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
-#include <cmath>
 #include <fstream>
 #include <cstdlib>
 #include <limits>
 #include <string>
-#include <sstream>
 #include <cstdio>
 ///todo strcmp relies on this, should be changed to more modern version
 #include <cstring>
-//This is only used to change the file permission of the xball script create, at some point this code may be moved from this file to a different file.
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
 #include <Boundaries/CubeInsertionBoundary.h>
 #include "Interactions/Interaction.h"
-
-#include "Species/Species.h"
-#include "Species/LinearViscoelasticSpecies.h"
 #include "Species/FrictionForceSpecies/SlidingFrictionSpecies.h"
-
-//This is part of this class and just separates out the stuff to do with xballs.
 #include "CMakeDefinitions.h"
-#include "DPMBaseXBalls.icc"
+#include "DPMBaseXBalls.icc" //This is part of this class and just separates out the stuff to do with xballs.
 #include "Logger.h"
 #include "Particles/SphericalParticle.h"
 #include "Walls/BaseWall.h"
 #include "Walls/InfiniteWall.h"
 #include "Boundaries/PeriodicBoundary.h"
+#include "VTKWriter/SuperQuadricParticleVtkWriter.h"
+#include "VTKWriter/SphericalParticleVtkWriter.h"
+
 //This is MPI related
 #include "MpiContainer.h"
 #include "MpiDataClass.h"
 #include "Domain.h"
-#include "VTKWriter/SuperQuadricParticleVtkWriter.h"
-#include "VTKWriter/SphericalParticleVtkWriter.h"
-
 #ifdef MERCURY_USE_MPI
 #include <mpi.h>
 #endif
@@ -70,10 +58,6 @@
 //This is OMP related
 #ifdef MERCURY_USE_OMP
 #include <omp.h>
-#else
-    int omp_get_num_threads() {return 1;}
-	int omp_get_thread_num() {return 0;}
-	//int omp_set_num_threads() {return 1}; // check this out, might be helpful
 #endif
 
 /*!
@@ -86,7 +70,7 @@
 /**
  * \deprecated
  */
-[[noreturn]] void logWriteAndDie(std::string module, std::string message)
+[[noreturn]] void logWriteAndDie(const std::string& module, std::string message)
 {
     std::cerr << "A fatal   error has occured"
               << "\n Module  :" << module
@@ -160,6 +144,7 @@ DPMBase::DPMBase(const DPMBase& other) : wallVTKWriter_(other.wallVTKWriter_),
     xBallsAdditionalArguments_ = other.xBallsAdditionalArguments_; // std::string where additional xballs argument can be specified (see xballs.txt)
     writeWallsVTK_ = other.writeWallsVTK_;
     writeParticlesVTK_ = other.writeParticlesVTK_;
+    readSpeciesFromDataFile_ = other.readSpeciesFromDataFile_;
 
 //effectively saying "if there exists a CONTACT_LIST_HGRID, copy it, if not, ignore.
 #ifdef CONTACT_LIST_HGRID
@@ -671,7 +656,7 @@ void DPMBase::incrementRunNumberInFile()
  * \param[in] sizeX The (integer) number of values to be tested in 1D parameter space.
  * \returns std::vector<int> The current study numbers.
  */
-std::vector<int> DPMBase::get1DParametersFromRunNumber(int sizeX)
+std::vector<int> DPMBase::get1DParametersFromRunNumber(int sizeX) const
 {
     // Declare a vector of integers capable of storing 2 values
     std::vector<int> temp(2);
@@ -699,7 +684,7 @@ std::vector<int> DPMBase::get1DParametersFromRunNumber(int sizeX)
  * \param[in] sizeY The (integer) number of values to be tested for the other of the 2 parameters forming the 2D parameter space.
  * \returns std::vector<int>
  */
-std::vector<int> DPMBase::get2DParametersFromRunNumber(int sizeX, int sizeY)
+std::vector<int> DPMBase::get2DParametersFromRunNumber(int sizeX, int sizeY) const
 {
     //declares a vector of integers capable of storing 3 values,
     std::vector<int> temp(3);
@@ -736,7 +721,7 @@ std::vector<int> DPMBase::get2DParametersFromRunNumber(int sizeX, int sizeY)
  * \param[in] sizeZ The (integer) number of values to be tested for one of the 3 parameters forming the 3D parameter space.
  * \returns std::vector<int>
  */
-std::vector<int> DPMBase::get3DParametersFromRunNumber(int sizeX, int sizeY, int sizeZ)
+std::vector<int> DPMBase::get3DParametersFromRunNumber(int sizeX, int sizeY, int sizeZ) const
 {
     //declares a vector of integers capable of storing 4 values,
     std::vector<int> temp(4);
@@ -923,8 +908,7 @@ void DPMBase::setParticlesWriteVTK(bool writeParticlesVTK)
     {
         writeSuperquadricParticlesVTK_ = false;
     }
-    if(vtkWriter_ != nullptr)
-        delete vtkWriter_;
+    delete vtkWriter_;
     vtkWriter_ = new SphericalParticleVtkWriter(particleHandler);
 }
 
@@ -938,8 +922,7 @@ void DPMBase::setSuperquadricParticlesWriteVTK(bool writeParticlesVTK)
     {
         writeParticlesVTK_ = false;
     }
-    if(vtkWriter_ != nullptr)
-        delete vtkWriter_;
+    delete vtkWriter_;
     vtkWriter_ = new SuperQuadricParticleVtkWriter(particleHandler);
 }
 
@@ -1323,7 +1306,7 @@ double DPMBase::getXBallsVectorScale() const
  */
 void DPMBase::setXBallsAdditionalArguments(std::string xBallsAdditionalArguments)
 {
-    xBallsAdditionalArguments_ = xBallsAdditionalArguments.c_str();
+    xBallsAdditionalArguments_ = xBallsAdditionalArguments;
 }
 
 /*!
@@ -1550,7 +1533,7 @@ Mdouble DPMBase::getGravitationalEnergy() const
     return gravitationalEnergy;
 }
 
-
+///\todo TW why is the ene_rot commented out
 Mdouble DPMBase::getRotationalEnergy() const
 {
     Mdouble ene_rot = 0;
@@ -1635,7 +1618,7 @@ Mdouble DPMBase::getInfo(const BaseParticle& p) const
  * \param[in] pJ A pointer to a second particle
  * \return bool (True or False) - lets the user know whether two particles are in contact
  */
-bool DPMBase::areInContact(const BaseParticle* pI, const BaseParticle* pJ) const
+bool DPMBase::areInContact(const BaseParticle* pI, const BaseParticle* pJ)
 {
     return (pI != pJ && pI->isInContactWith(pJ));
 }
@@ -2091,7 +2074,7 @@ void DPMBase::writeEneTimeStep(std::ostream& os) const
     const Vec3D com = particleHandler.getMassTimesPosition();
     //Ensure the numbers fit into a constant width column: for this we need the precision given by the operating system,
     //plus a few extra characters for characters like a minus and scientific notation.
-    const static long int width = os.precision() + 6;
+    const static int width = os.precision() + 6;
     os << std::setw(width) << getTime()
        << " " << std::setw(width) << -Vec3D::dot(getGravity(), com)
        << " " << std::setw(width) << particleHandler.getKineticEnergy()
@@ -4753,7 +4736,7 @@ bool DPMBase::checkParticleForInteractionLocal(const BaseParticle& p)
  */
 void DPMBase::importParticlesAs(ParticleHandler& particleH, InteractionHandler& interactionH, const ParticleSpecies* species )
 {
-    int nParticlesPreviouslyIn = particleHandler.getSize();
+    size_t nParticlesPreviouslyIn = particleHandler.getSize();
     int l = 0;
     for (auto k = particleH.begin(); k != particleH.end(); ++k) {
         auto p = particleHandler.copyAndAddObject( *k );

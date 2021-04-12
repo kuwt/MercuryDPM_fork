@@ -24,8 +24,13 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //icc means included cc file
-
 #include "Math/Quaternion.h"
+
+//to change xballs scripts to executables
+#ifdef UNIX
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif
 
 ///This function outputs the location and velocity of the particle in a format the xballs progream can read
 void DPMBase::outputXBallsDataParticle(unsigned int i, unsigned int format, std::ostream& os) const
