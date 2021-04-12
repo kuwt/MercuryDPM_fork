@@ -47,17 +47,18 @@ class Drum : public MercuryOS
     void setupInitialConditions() override
     {
         // name of the output files
-        setName("Drum");
+        setName(soft() ? "DrumSoft" : "Drum");
         
         // turn on gravity
         setGravity({0, 0, -9.8});
         
         // set time step and maximum simulation time
-        setTimeStep(8e-7);
+        setTimeStep(soft() ? 1e-4 : 8e-7);
         setTimeMax(5.);
-        
+    
         // output frequency
-        setSaveCount(static_cast<unsigned>(0.1 / getTimeStep()));
+        Mdouble outputPeriod = soft() ? 0.01 : 0.1;
+        setSaveCount(static_cast<unsigned>(outputPeriod / getTimeStep()));
         
         // remove files from previous run
         removeOldFiles();
@@ -89,7 +90,7 @@ class Drum : public MercuryOS
         setMin(Vec3D(-0.1, -0.03, -0.1));
         
         // define the material properties of M1, M2, steel (see MercuryOS.h)
-        auto[m1, m2, steel] = setMaterialProperties();
+        setMaterialProperties();
         
         // read particle positions and radii from file
         {
@@ -198,6 +199,8 @@ int main(int argc, char **argv)
     dpm.setNumberOfOMPThreads(helpers::readFromCommandLine(argc, argv, "-omp", 1));
     // turn on additional output files for viewing/analysing the data
     dpm.test(helpers::readFromCommandLine(argc, argv, "-test"));
+    // turn on additional output files for viewing/analysing the data
+    dpm.soft(helpers::readFromCommandLine(argc, argv, "-soft"));
     // turn on additional output files for viewing/analysing the data
     dpm.writeOutput(helpers::readFromCommandLine(argc, argv, "-writeOutput"));
     // use the command line argument -useMercuryWalls to turn on the smooth wall implementation

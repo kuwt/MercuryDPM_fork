@@ -120,9 +120,9 @@ void NurbsWall::writeVTK (VTKContainer& vtk) const
 
     //create points
     size_t nPoints = vtk.points.size();
-    for (double u=0; u<=1; u+=1./nu) {
-        for (double v=0; v<=1; v+=1./nv) {
-            Vec3D p = nurbsSurface_.evaluate(u,v);
+    for (double u=0; u<=nu; u++) {
+        for (double v=0; v<=nv; v++) {
+            Vec3D p = nurbsSurface_.evaluate(u/nu,v/nu);
             getOrientation().rotate(p);
             p += getPosition();
             vtk.points.push_back(p);

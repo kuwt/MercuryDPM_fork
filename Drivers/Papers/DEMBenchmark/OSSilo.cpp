@@ -131,7 +131,7 @@ public:
         setMin(Vec3D(-0.1, -0.1, -0.1));
         
         // define the material properties of M1, M2, steel (see MercuryOS.h)
-        auto[m1, m2, steel] = setMaterialProperties();
+        setMaterialProperties();
         
         // read particle positions from file
         {

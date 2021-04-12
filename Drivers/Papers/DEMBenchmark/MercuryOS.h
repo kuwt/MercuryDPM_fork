@@ -41,21 +41,11 @@ class MercuryOS : public Mercury3D
     bool test_ = false;
     // if true, smooth walls are used instead of the stl walls
     bool useMercuryWalls_ = false;
-
+    // if true, the simulation time is shortened
+    bool soft_ = false;
+    
 public:
     
-    // sets the variable writeOutput_
-    void test(bool test)
-    {
-        test_ = test;
-    }
-    
-    // returns the variable writeOutput_
-    bool test() const
-    {
-        return test_;
-    }
-
     // sets the variable writeOutput_
     void writeOutput(bool writeOutput)
     {
@@ -66,6 +56,30 @@ public:
     bool writeOutput() const
     {
         return writeOutput_;
+    }
+
+    // sets the variable test_
+    void test(bool test)
+    {
+        test_ = test;
+    }
+    
+    // returns the variable test_
+    bool test() const
+    {
+        return test_;
+    }
+    
+    // sets the variable soft_
+    void soft(bool soft)
+    {
+        soft_ = soft;
+    }
+    
+    // returns the variable soft_
+    bool soft() const
+    {
+        return soft_;
     }
     
     // sets the variable useMercuryWalls_
@@ -98,17 +112,25 @@ private:
         double G1 = E1 / 2 / (1 + v1), G2 = E2 / 2 / (1 + v2);
         return 1. / ((2 - v1) / G1 + (2 - v2) / G2);
     }
+    
+protected:
+    // pointers to the species
+    HertzianViscoelasticMindlinSpecies *m1, *m2, *steel;
 
 public:
     /**
      * Defines the material properties of M1, M2, steel.
      */
-    std::tuple<HertzianViscoelasticMindlinSpecies *, HertzianViscoelasticMindlinSpecies *, HertzianViscoelasticMindlinSpecies *>
-    setMaterialProperties()
+    void setMaterialProperties()
     {
         // Young's modulus and Poisson ratios of M1, M2, steel
         double E1 = 1e9, E2 = 0.5e9, ES = 210e9;
         double v1 = 0.2, v2 = 0.2, vS = 0.2;
+        
+        if (soft()) {
+            E1 = 2e6;
+            E2 = 1e6;
+        }
         
         // effective elastic and shear moduli
         double E11 = getEffectiveElasticModulus(E1, v1, E1, v1);
@@ -134,19 +156,19 @@ public:
         species.setShearModulus(G11);
         species.setSlidingFrictionCoefficient(mu11);
         species.setDensity(2500);
-        auto m1 = speciesHandler.copyAndAddObject(species);
+        m1 = speciesHandler.copyAndAddObject(species);
         
         species.setElasticModulusAndRestitutionCoefficient(E22, r22);
         species.setShearModulus(G22);
         species.setSlidingFrictionCoefficient(mu22);
         species.setDensity(2000);
-        auto m2 = speciesHandler.copyAndAddObject(species);
+        m2 = speciesHandler.copyAndAddObject(species);
         
         species.setElasticModulusAndRestitutionCoefficient(ESS, rSS);
         species.setShearModulus(GSS);
         species.setSlidingFrictionCoefficient(muSS);
         species.setDensity(7200);
-        auto steel = speciesHandler.copyAndAddObject(species);
+        steel = speciesHandler.copyAndAddObject(species);
         
         auto m12 = speciesHandler.getMixedObject(m1, m2);
         m12->setElasticModulusAndRestitutionCoefficient(E12, r12);
@@ -162,8 +184,6 @@ public:
         m2S->setElasticModulusAndRestitutionCoefficient(E2S, r2S);
         m2S->setShearModulus(G2S);
         m2S->setSlidingFrictionCoefficient(mu2S);
-        
-        return {m1, m2, steel};
     }
     
     
