@@ -71,6 +71,10 @@
  */
 class DPMBase
 {
+    /*!
+     *  A simple vector of vectors for collecting and ordering interactions in the OpenMP parallel environment
+     */
+
 public:
     
     /*!
@@ -698,6 +702,12 @@ public:
      */
     Mdouble getTimeStep() const;
 
+    /* Sets the number of omp threads */
+    void setNumberOfOMPThreads(int numberOfOMPThreads);
+
+    /* Returns the number of omp threads */
+    int getNumberOfOMPThreads() const;
+
     /*!
      * \brief Set the xballs output mode.
      */
@@ -1165,6 +1175,8 @@ protected:
     void performGhostVelocityUpdate();
 
 private:
+    /*The number of openmp (symmetric multiprocessing threads)*/
+    int numberOfOMPThreads_;
 
     /*!
      * \brief The dimensions of the simulation i.e. 2D or 3D
@@ -1349,8 +1361,8 @@ public:
 
 
     /*!
-      * \brief Object of the class cgHandler
-      */
+     * \brief Object of the class cgHandler
+     */
     CGHandler cgHandler;
 
     /*!

@@ -22,6 +22,10 @@
 //ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#ifdef MERCURY_USE_OMP
+#include <omp.h>
+#endif
+
 #include "CG/Functions/Gauss.h"
 #include "CG/Functions/Polynomial.h"
 #include "CG/Functions/Heaviside.h"
@@ -229,22 +233,32 @@ void CG<Coordinates, BaseFunction, Fields>::evaluateCommon()
     // no mpi/periodic particles,
     // fixed particles only if Fields::evaluateFixedParticles gives true
     // only if the function selectedParticle returns true for the given particle
-    for (const BaseParticle* const p : dpm->particleHandler)
-    {
-        //if p is (a) not a ghost,MPI, or fixed particle
-        if (!(p->isMPIParticle() || p->isPeriodicGhostParticle()) &&
-            (!p->isFixed() || Fields::evaluateFixedParticles()) &&
-            selectedParticle_(p))
-        {
-            evaluateParticle(*p);
+//#pragma omp parallel
+//    {
+        //int num_threads = omp_get_num_threads();
+        //logger(INFO,"Number of Particles =  % num_threads = %",dpm->particleHandler.getNumberOfObjects(),num_threads);
+
+        //#pragma omp parallel for
+        for (int k = 0; k < dpm->particleHandler.getNumberOfObjects(); ++k) {
+            //logger(INFO," Particle Index =  % thread_idx = %",k,thread_idx);
+            const BaseParticle *const p = dpm->particleHandler.getObject(k);
+            //if p is (a) not a ghost,MPI, or fixed particle
+            if (!(p->isMPIParticle() || p->isPeriodicGhostParticle()) &&
+                (!p->isFixed() || Fields::evaluateFixedParticles()) &&
+                selectedParticle_(p)) {
+                evaluateParticle(*p);
+            }
         }
-    }
+//    }
     
     // get contact statistics
     if (Fields::doInteractionStatistics())
     {
-        for (BaseInteraction* i : dpm->interactionHandler)
+        //#pragma omp parallel for
+        for (int k = 0; k < dpm->interactionHandler.getNumberOfObjects(); ++k)
+        //for (BaseInteraction* i : dpm->interactionHandler)
         {
+            const BaseInteraction* const i = dpm->interactionHandler.getObject(k);
             evaluateContact(*i);
         }
     }
@@ -360,10 +374,10 @@ void CG<Coordinates, BaseFunction, Fields>::evaluateParticle(const BaseParticle&
         minZ = static_cast<std::size_t>(std::max(0.0, idPos - idCutoff + 1));
         maxZ = std::min(nZ_, static_cast<std::size_t> (idPos + idCutoff +1));
     }
-
+    // BREAK THROUGH
     Fields currentInteraction;
     currentInteraction.setFields(p);
-    
+    //#pragma omp parallel for
     for (std::size_t i = minX; i < maxX; i++)
     {
         for (std::size_t j = minY; j < maxY; j++)
@@ -472,8 +486,8 @@ void CG<Coordinates, BaseFunction, Fields>::evaluateContact(const BaseInteractio
     const Mdouble cZ = function_.getCutoff() * invDeltaZ;
     const std::size_t minZ = (nZ_ == 1 ? 0 : static_cast<std::size_t>(std::max(0.0, std::min(pZ, iZ) - cZ + 1)));
     const std::size_t maxZ = (nZ_ == 1 ? 1 : std::min(nZ_, static_cast<std::size_t> (std::max(pZ, iZ) + cZ + 1)));
-    
-    
+    // BREAK THROUGH
+    //#pragma omp parallel for
     for (std::size_t i = minX; i < maxX; i++)
     {
         for (std::size_t j = minY; j < maxY; j++)

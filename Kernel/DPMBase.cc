@@ -67,6 +67,15 @@
 #include <mpi.h>
 #endif
 
+//This is OMP related
+#ifdef MERCURY_USE_OMP
+#include <omp.h>
+#else
+    int omp_get_num_threads() {return 1;}
+	int omp_get_thread_num() {return 0;}
+	//int omp_set_num_threads() {return 1}; // check this out, might be helpful
+#endif
+
 /*!
  * \details Warns the user of a fatal error and exits the program with a non-zero return
  * value to let the compiler know an error has occurred.
@@ -82,7 +91,7 @@
     std::cerr << "A fatal   error has occured"
               << "\n Module  :" << module
               << "\n Message :" << message << std::endl;
-    
+
     std::exit(-1);
 }
 
@@ -157,7 +166,7 @@ DPMBase::DPMBase(const DPMBase& other) : wallVTKWriter_(other.wallVTKWriter_),
     possibleContactList=other.possibleContactList;
 #endif
     random = other.random;
-    
+
     boundaryHandler.setDPMBase(this);
     particleHandler.setDPMBase(this);
     interactionHandler.setDPMBase(this);
@@ -168,7 +177,7 @@ DPMBase::DPMBase(const DPMBase& other) : wallVTKWriter_(other.wallVTKWriter_),
     //Initialise the handlers
     domainHandler.initialise();
     periodicBoundaryHandler.initialise();
-    
+
     //setting contents equal to the other handlers!
     speciesHandler = other.speciesHandler;
     particleHandler = other.particleHandler;
@@ -182,6 +191,7 @@ DPMBase::DPMBase(const DPMBase& other) : wallVTKWriter_(other.wallVTKWriter_),
     writeSuperquadricParticlesVTK_ = other.writeSuperquadricParticlesVTK_;
     writeParticlesVTK_ = other.writeParticlesVTK_;
     writeWallsVTK_ = other.writeWallsVTK_;
+    numberOfOMPThreads_ = other.numberOfOMPThreads_;
 }
 
 /*!
@@ -217,15 +227,15 @@ void DPMBase::constructor()
     //by default, the fileType of all files is ONE_FILE. However, by default we don't want an interaction file since it
     // is very large.
     interactionFile.setFileType(FileType::NO_FILE);
-    
+
     runNumber_ = 0;
-    
+
     //Decomposition direction for MPI
     numberOfDomains_ = {1, 1, 1};
-    
+
     //Check if MPI is already initialised
     initialiseMPI();
-    
+
     //This sets the maximum number of particles
     boundaryHandler.setDPMBase(this);
     periodicBoundaryHandler.setDPMBase(this);
@@ -239,48 +249,50 @@ void DPMBase::constructor()
     domainHandler.initialise();
     periodicBoundaryHandler.setDPMBase(this);
     periodicBoundaryHandler.initialise();
-    
+
     //set defaults for DPMBase parameters
     setSystemDimensions(3);
     setParticleDimensions(3);
     setRestarted(false);
     setGravity(Vec3D(0, 0, 0));
-    
+
     //This is the parameter of the numerical part
     setTime(0);
     numberOfTimeSteps_ = 0;
     setTimeMax(0);
     timeStep_ = 0; // needs to be user-specified, otherwise checkSettings throws error
     setSaveCount(20);
-    
+
     //This sets the default xballs domain
     min_ = Vec3D(0, 0, 0);
     max_ = Vec3D(0, 0, 0); // needs to be user-specified, otherwise checkSettings throws error
-    
+
     //sets the default write particles data in VTK format flag to false
     writeParticlesVTK_ = false;
     writeSuperquadricParticlesVTK_ = false;
     writeWallsVTK_ = FileType::NO_FILE;
     vtkWriter_ = nullptr;
-    
+
     //defines logger behaviour
     loggerOutput->onFatal = logWriteAndDie;
-    
+
     setName(""); // needs to be user-specified, otherwise checkSettings throws error
-    
+
     //Default mode is energy with no scale of the vectors
     xBallsColourMode_ = 0;
     xBallsVectorScale_ = -1;
     xBallsScale_ = -1;
     xBallsAdditionalArguments_ = "";
     setAppend(false);
-    
+
     //The default random seed is 0
     random.setRandomSeed(0);
-    
+
     logger(DEBUG, "DPMBase problem constructor finished");
-    
+
     readSpeciesFromDataFile_ = false;
+    
+    numberOfOMPThreads_ = 1;
 }
 
 /*!
@@ -545,7 +557,7 @@ void DPMBase::autoNumber()
 int DPMBase::readRunNumberFromFile()
 {
     int counter;
-    
+
     FILE* counter_file;
     //checking if there exists already a file named "COUNTER_DONOTDEL" which can be opened for
     //input and output (returns "true" if no such file exists).
@@ -588,7 +600,7 @@ int DPMBase::readRunNumberFromFile()
             return counter;
         }
     }
-    
+
 }
 
 /*!
@@ -648,7 +660,7 @@ void DPMBase::incrementRunNumberInFile()
     }
     //writes the new valuer of the counter to COUNTER_DONOTDEL
     counter_file2 << temp_counter;
-    
+
     counter_file2.close();
 }
 
@@ -853,7 +865,7 @@ void DPMBase::setTimeMax(Mdouble newTMax)
 }
 
 /*!
- * \return timeMax_ 
+ * \return timeMax_
  */
 Mdouble DPMBase::getTimeMax() const
 {
@@ -867,7 +879,7 @@ Mdouble DPMBase::getTimeMax() const
  */
 #ifdef CONTACT_LIST_HGRID
 PossibleContactList& DPMBase::getPossibleContactList()
-{   
+{
     return possibleContactList;
 }
 #endif
@@ -1023,7 +1035,7 @@ void DPMBase::setYMin(Mdouble newYMin)
  */
 void DPMBase::setZMin(Mdouble newZMin)
 {
-    
+
     if (newZMin <= getZMax())
     {
         min_.z() = newZMin;
@@ -1032,7 +1044,7 @@ void DPMBase::setZMin(Mdouble newZMin)
     {
         logger(WARN, "Warning in setZMin(%): zMax=%", newZMin, getZMax());
     }
-    
+
 }
 
 /*!
@@ -1063,7 +1075,7 @@ void DPMBase::setMax(const Vec3D& newMax)
 
 void DPMBase::setDomain(const Vec3D& min, const Vec3D& max)
 {
-    
+
     logger.assert(min.X <= max.X, "lower x-bound (%) is larger than upper x-bound (%)", min.X, max.X);
     logger.assert(min.Y <= max.Y, "lower x-bound (%) is larger than upper x-bound (%)", min.Y, max.Y);
     logger.assert(min.Z <= max.Z, "lower x-bound (%) is larger than upper x-bound (%)", min.Z, max.Z);
@@ -1130,7 +1142,7 @@ void DPMBase::setMax(const Mdouble xMax, const Mdouble yMax, const Mdouble zMax)
  */
 void DPMBase::setXMax(Mdouble newXMax)
 {
-    
+
     if (newXMax >= getXMin())
     {
         max_.x() = newXMax;
@@ -1139,7 +1151,7 @@ void DPMBase::setXMax(Mdouble newXMax)
     {
         logger(WARN, "Warning in setXMax(%): xMax=%", newXMax, getXMin());
     }
-    
+
 }
 
 /*!
@@ -1156,7 +1168,7 @@ void DPMBase::setXMax(Mdouble newXMax)
  */
 void DPMBase::setYMax(Mdouble newYMax)
 {
-    
+
     if (newYMax >= getYMin())
     {
         max_.y() = newYMax;
@@ -1165,7 +1177,7 @@ void DPMBase::setYMax(Mdouble newYMax)
     {
         logger(WARN, "Warning in setYMax(%): yMax=%", newYMax, getYMin());
     }
-    
+
 }
 
 /*!
@@ -1216,6 +1228,42 @@ void DPMBase::setTimeStep(Mdouble timeStep)
 Mdouble DPMBase::getTimeStep() const
 {
     return timeStep_;
+}
+
+
+/* Allows user to set the number of omp threads */
+void DPMBase::setNumberOfOMPThreads(int numberOfOMPThreads)
+{
+    logger.assert_always(numberOfOMPThreads>0, "Number of OMP threads must be positive");
+    numberOfOMPThreads_ = numberOfOMPThreads;
+    
+    #ifdef MERCURY_USE_OMP
+        if(numberOfOMPThreads > omp_get_max_threads()) {
+            logger(INFO, "Number of omp threads set to the maximum number of threads allowed: %",
+                   omp_get_max_threads());
+            numberOfOMPThreads_ = numberOfOMPThreads = omp_get_max_threads();
+        }
+        #pragma omp parallel num_threads(getNumberOfOMPThreads())
+        {
+            if (omp_get_thread_num()==0)
+                std::cout << "Using " << omp_get_num_threads() << " of " << omp_get_max_threads() << " omp threads; testing thread";
+        }
+        #pragma omp parallel num_threads(getNumberOfOMPThreads())
+        {
+            std::cout << ' ' + std::to_string(omp_get_thread_num());
+        }
+        std::cout << '\n';
+        
+    #else
+        logger(WARN, "You are setting the number of omp threads to %, but OMP is not turned on", getNumberOfOMPThreads());
+    #endif
+}
+
+/* Returns the number of omp threads */
+int DPMBase::getNumberOfOMPThreads() const
+{
+    //logger.assert(numberOfOMPThreads_,"You need to set the number of OMP threads");
+    return numberOfOMPThreads_;
 }
 
 /*!
@@ -1563,10 +1611,10 @@ Vec3D DPMBase::getTotalMomentum() const
 }
 
 /*!
- * \return double 
+ * \return double
  */
 /* JMFT: This information is placed on the last entry on each line of the .data
- * file. That space is, in general, reserved for 'additional' information. 
+ * file. That space is, in general, reserved for 'additional' information.
  */
 Mdouble DPMBase::getInfo(const BaseParticle& p) const
 {
@@ -1692,7 +1740,7 @@ bool DPMBase::mpiInsertParticleCheck(BaseParticle* P)
  */
 bool DPMBase::mpiIsInCommunicationZone(BaseParticle* particle)
 {
-    
+
     bool insideCommunicationZone = false;
 #ifdef MERCURY_USE_MPI
     MPIContainer& communicator = MPIContainer::Instance();
@@ -1746,10 +1794,10 @@ void DPMBase::insertGhostParticle(BaseParticle* particle)
         //Add the particle to the mpi domain
         domainHandler.getCurrentDomain()->addParticle(particle);
     }
-    
+
     //If periodic boundaries are present..
     if (periodicBoundaryHandler.getSize() > 0)
-    {   
+    {
         periodicBoundaryHandler.addNewParticle(particle);
     }
 #endif
@@ -1948,9 +1996,9 @@ void DPMBase::writeEneHeader(std::ostream& os) const
     //only write if we don't restart
     if (getAppend())
         return;
-    
+
     /// \todo JMFT: Get rid of aligned columns. They make things too wide. (changed back) */
-    
+
     /// \todo{Why is there a +6 here? TW: to get the numbers and title aligned}
     /// \todo Add number of particles to this file (change from Jonny to be added later)
     long width = os.precision() + 6;
@@ -1974,7 +2022,7 @@ void DPMBase::writeEneHeader(std::ostream& os) const
  */
 void DPMBase::writeFstatHeader(std::ostream& os) const
 {
-    
+
     // line #1: time, volume fraction
     // line #2: wall box: wx0, wy0, wz0, wx1, wy1, wz1
     // line #3: radii-min-max & moments: rad_min, rad_max, r1, r2, r3, r4
@@ -1992,7 +2040,7 @@ void DPMBase::writeFstatHeader(std::ostream& os) const
        << '\n';
     os << "#"
        << " ";
-    
+
     if (!(particleHandler.getSmallestParticleLocal() == nullptr))
     {
         os << particleHandler.getSmallestParticleLocal()->getRadius();
@@ -2010,7 +2058,7 @@ void DPMBase::writeFstatHeader(std::ostream& os) const
     {
         os << std::numeric_limits<double>::quiet_NaN();
     }
-    
+
     os << " " << 0
        << " " << 0
        << " " << 0
@@ -2038,7 +2086,7 @@ void DPMBase::writeEneTimeStep(std::ostream& os) const
     if (eneFile.getCounter() == 1 || eneFile.getFileType() == FileType::MULTIPLE_FILES ||
         eneFile.getFileType() == FileType::MULTIPLE_FILES_PADDED)
         writeEneHeader(os);
-    
+
     const Mdouble m = particleHandler.getMass();
     const Vec3D com = particleHandler.getMassTimesPosition();
     //Ensure the numbers fit into a constant width column: for this we need the precision given by the operating system,
@@ -2102,7 +2150,7 @@ void DPMBase::writePythonFileForVTKVisualisation() const
 #else
     logger(INFO, "Writing python script for paraview visualisation");
 #endif
-    
+
     std::string script = "#script to visualise the output of data2pvd of MercuryDPM in paraview.\n"
                          "#usage: change the path below to your own path, open paraview\n"
                          "#Tools->Python Shell->Run Script->VisualisationScript.py\n"
@@ -2157,7 +2205,7 @@ void DPMBase::writePythonFileForVTKVisualisation() const
 #else
         script += "\tDataSorted.append('./" + getName() + "Particle_' + " + "str(x)" + " + '.vtu')\n";
 #endif
-        
+
         script += "\n"
                   "#Load the data and visualise it in paraview\n"
                   "particles = XMLUnstructuredGridReader(FileName=DataSorted)\n"
@@ -2195,7 +2243,7 @@ void DPMBase::writePythonFileForVTKVisualisation() const
 #endif
     script += "Render()\n"
               "ResetCamera()\n";
-    
+
     helpers::writeToFile(getName() + ".py", script);
 #ifdef MERCURY_USE_MPI
     } // end of communicator is root statement
@@ -2208,10 +2256,10 @@ void DPMBase::writePythonFileForVTKVisualisation() const
  */
 void DPMBase::outputXBallsData(std::ostream& os) const
 {
-    
-    
+
+
     //Set the correct formation based of dimension if the formation is not specified by the user
-    
+
     unsigned int format;
     switch (getSystemDimensions())
     {
@@ -2252,7 +2300,7 @@ void DPMBase::outputXBallsData(std::ostream& os) const
            << " " << getZMax()
            << " " << std::endl;
     }
-    
+
     // This outputs the particle data
     for (unsigned int i = 0; i < particleHandler.getSize(); i++)
     {
@@ -2290,7 +2338,7 @@ bool DPMBase::readDataFile(std::string fileName, unsigned int format)
     //default value: dataFile.getFullName()
     if (!fileName.compare(""))
         fileName = dataFile.getFullName();
-    
+
     std::string oldFileName = dataFile.getName();
     unsigned oldCounter = dataFile.getCounter();
     //Updates the name of the data file to the user-input from the argument.
@@ -2304,7 +2352,7 @@ bool DPMBase::readDataFile(std::string fileName, unsigned int format)
         logger(WARN, "Loading data file % failed.", fileName);
         return false;
     }
-    
+
     //retrieves and saves the "FileType" of the file
     FileType fileTypeData = dataFile.getFileType();
     dataFile.setFileType(FileType::ONE_FILE);
@@ -2331,11 +2379,11 @@ bool DPMBase::readParAndIniFiles(const std::string fileName)
         //std::cout << "Loading par.ini file " << filename << " failed" << std::endl;
         return false;
     }
-    
+
     Mdouble doubleValue;
     int integerValue;
-    
-    // inputfile par.ini 
+
+    // inputfile par.ini
     // line 1 =============================================================
     // Example: 1 1 0
     //   1: integer (0|1) switches from non-periodic to periodic
@@ -2383,7 +2431,7 @@ bool DPMBase::readParAndIniFiles(const std::string fileName)
         wallHandler.copyAndAddObject(w0);
         w0.set(Vec3D(0, 1, 0), Vec3D(0, getYMax(), 0));
         wallHandler.copyAndAddObject(w0);
-        
+
     }
     else if (integerValue == 6)
     {
@@ -2400,27 +2448,27 @@ bool DPMBase::readParAndIniFiles(const std::string fileName)
         std::cerr << "Error in par.ini: line 1, value 1 is " << integerValue << std::endl;
         exit(-1);
     }
-    
+
     //   2: integer (0|1) dont use | use the search pattern for linked cells
     file >> integerValue; //ignore
-    
+
     //   3: real - gravity in z direction: positive points upwards
     file >> doubleValue;
     setGravity(Vec3D(0.0, 0.0, doubleValue));
-    
+
     // line 2 =============================================================
     // Example: -10000 .5e-2
     //   1: time end of simulation - (negative resets start time to zero
-    //                                and uses -time as end-time)	
+    //                                and uses -time as end-time)
     file >> doubleValue;
     if (doubleValue < 0)
         setTime(0);
     setTimeMax(fabs(doubleValue));
-    
+
     //   2: time-step of simulation
     file >> doubleValue;
     setTimeStep(doubleValue);
-    
+
     // line 3 =============================================================
     // Example: 1e-1 100
     file >> doubleValue;
@@ -2429,7 +2477,7 @@ bool DPMBase::readParAndIniFiles(const std::string fileName)
         //   1: time-step for output on time-series protocoll file  -> "ene"
         unsigned int savecount = static_cast<unsigned int>(round(doubleValue / getTimeStep()));
         setSaveCount(savecount);
-        
+
         //   2: time-step for output on film (coordinate) file      -> "c3d"
         //      (fstat-output is coupled to c3d-output time-step)
         file >> doubleValue;
@@ -2447,45 +2495,45 @@ bool DPMBase::readParAndIniFiles(const std::string fileName)
         std::cerr << "Error in par.ini: line 3, value 1 is " << doubleValue << std::endl;
         exit(-1);
     }
-    
+
     // line 4 =============================================================
     // Example: 2000 1e5 1e3 1e2
     //   1: particle density (mass=4/3*constants::pi*density*rad^3)
     file >> doubleValue;
-    
+
     //clear species handler
     speciesHandler.clear();
     auto S = new LinearViscoelasticSlidingFrictionSpecies;
     speciesHandler.addObject(S);
-    
+
     setParticleDimensions(3);
     S->setDensity(doubleValue);
-    
+
     //   2: linear spring constant
     file >> doubleValue;
     S->setStiffness(doubleValue);
-    
+
     //   3: linear dashpot constant
     file >> doubleValue;
     S->setDissipation(doubleValue);
-    
+
     //   4: background damping dashpot constant
     file >> doubleValue;
     if (doubleValue != 0.0)
         std::cerr << "Warning in par.ini: ignored background damping " << doubleValue << std::endl;
-    
+
     // line 5 =============================================================
     // Example: 0 0
     //   1: growth rate:  d(radius) = xgrow * dt
     file >> doubleValue;
     if (doubleValue != 0.0)
         std::cerr << "Warning in par.ini: ignored growth rate " << doubleValue << std::endl;
-    
+
     //   2: target volume_fraction
     file >> doubleValue;
     if (doubleValue != 0.0)
         std::cerr << "Warning in par.ini: ignored target volume_fraction " << doubleValue << std::endl;
-    
+
     file.close();
     //std::cout << "Loaded par.ini file " << filename << std::endl;
     return true;
@@ -2603,11 +2651,11 @@ bool DPMBase::readNextDataFile(unsigned int format)
     } else {
         p = particleHandler.getObject(0)->copy();
     }
-    
+
     //empty the particle handler
     particleHandler.clear();
     particleHandler.setStorageCapacity(N);
-    
+
     //now fill it again with the read-in particles
     std::stringstream line;
     helpers::getLineFromStringStream(dataFile.getFstream(), line);
@@ -2715,7 +2763,7 @@ bool DPMBase::readNextDataFile(unsigned int format)
             particleHandler.copyAndAddObject(*p);
         } //end for all particles
     } //end if format
-    
+
     particleHandler.computeAllMasses();
     return true;
 }
@@ -2992,7 +3040,7 @@ void DPMBase::computeInternalForce(BaseParticle* const P1, BaseParticle* const P
     //zero if not)
     //if statement above ensures that the PI has the lower id than PJ
     BaseInteraction* i = PJ->getInteractionWith(PI, getNumberOfTimeSteps() + 1,
-                                                                        &interactionHandler);
+                                                &interactionHandler);
     if (i!= nullptr) {
         //calculates the force corresponding to the interaction
         i->computeForce();
@@ -3043,7 +3091,7 @@ void DPMBase::computeForcesDueToWalls(BaseParticle* pI, BaseWall* w)
 
     //Checks if the particle is interacting with the current wall
     BaseInteraction* i = w->getInteractionWith(pI, getNumberOfTimeSteps() + 1,
-                                                                       &interactionHandler);
+                                               &interactionHandler);
     if (i!=nullptr) {
         //...calculates the forces between the two objects...
         i->computeForce();
@@ -3077,8 +3125,12 @@ void DPMBase::computeForcesDueToWalls(BaseParticle* pI, BaseWall* w)
 void DPMBase::integrateBeforeForceComputation()
 {
     //cycling through all particles, p, in the particleHandler
-    for_each(particleHandler.begin(), particleHandler.end(), [this](BaseParticle* p)
-    {
+    //for_each(particleHandler.begin(), particleHandler.end(), [this](BaseParticle* p)
+    //for (BaseParticle* p : particleHandler) {
+
+    #pragma omp parallel for num_threads(getNumberOfOMPThreads()) //schedule(dynamic)
+    for (int k = 0; k < particleHandler.getNumberOfObjects(); ++k) {
+        BaseParticle *p = particleHandler.getObject(k);
 #ifdef MERCURY_USE_MPI
         //MPI particles are not integrated, they are purely ghost particles and get their new velocity and position from an MPI update
         if (!(p->isMPIParticle() || p->isPeriodicGhostParticle()))
@@ -3090,14 +3142,19 @@ void DPMBase::integrateBeforeForceComputation()
         //to update the relevant parameters concerning the particle's position and motion
         p->integrateBeforeForceComputation(getTime(), getTimeStep());
 #endif
-    });
+    }
+    //});
     //cycling through all walls, w, in the wallHandler
-    for_each(wallHandler.begin(), wallHandler.end(), [this](BaseWall* w)
-    {
+    //for_each(wallHandler.begin(), wallHandler.end(), [this](BaseWall* w)
+    //for (BaseWall* w : wallHandler) {
+    #pragma omp parallel for num_threads(getNumberOfOMPThreads()) //schedule(dynamic)
+    for (int k = 0; k < wallHandler.getNumberOfObjects(); k++) {
+        BaseWall *w = wallHandler.getObject(k);
         //using the wall's internal "integrateBeforeForceComputation" function
         //to update the relevant parameters concerning its position and motion
         w->integrateBeforeForceComputation(getTime(), getTimeStep());
-    });
+    }
+    //});
 }
 
 /*!
@@ -3154,8 +3211,10 @@ void DPMBase::checkInteractionWithBoundaries()
 void DPMBase::integrateAfterForceComputation()
 {
     //cycling through all particles, p, in the particleHandler
-    for_each(particleHandler.begin(), particleHandler.end(), [this](BaseParticle* p)
-    {
+    //for_each(particleHandler.begin(), particleHandler.end(), [this](BaseParticle* p){
+    #pragma omp parallel for num_threads(getNumberOfOMPThreads()) //schedule(dynamic)
+    for (int k = 0; k < particleHandler.getNumberOfObjects(); ++k) {
+        BaseParticle *p = particleHandler.getObject(k);
 #ifdef MERCURY_USE_MPI
         //MPI particles do not require integration - they are updated by the communication step
         if (!(p->isMPIParticle() || p->isPeriodicGhostParticle()))
@@ -3167,14 +3226,18 @@ void DPMBase::integrateAfterForceComputation()
         //to update the relevant parameters concerning the particle's position and motion
         p->integrateAfterForceComputation(getTime(), getTimeStep());
 #endif
-    });
+    }
+    //});
     //cycling through all walls, w, in the wallHandler
-    for_each(wallHandler.begin(), wallHandler.end(), [this](BaseWall* w)
-    {
+    //for_each(wallHandler.begin(), wallHandler.end(), [this](BaseWall* w){
+    #pragma omp parallel for num_threads(getNumberOfOMPThreads()) //schedule(dynamic)
+    for (int k = 0; k < wallHandler.getNumberOfObjects(); k++) {
+        BaseWall *w = wallHandler.getObject(k);
         //using the wall's internal "integrateAfterForceComputation" function
         //to update the relevant parameters concerning its position and motion
         w->integrateAfterForceComputation(getTime(), getTimeStep());
-    });
+    }
+    //});
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3231,39 +3294,46 @@ void DPMBase::integrateAfterForceComputation()
 void DPMBase::computeAllForces()
 {
     //Resetting all forces on both particles and walls to zero
-    for (BaseParticle* const p : particleHandler)
+    #pragma omp parallel num_threads(getNumberOfOMPThreads())
     {
-        p->setForce(Vec3D(0.0, 0.0, 0.0));
-        p->setTorque(Vec3D(0.0, 0.0, 0.0));
+        #pragma omp for
+        for (int k = 0; k < particleHandler.getNumberOfObjects(); ++k) {
+            particleHandler.getObject(k)->resetForceTorque(getNumberOfOMPThreads());
+        }
+        #pragma omp for
+        for (int k = 0; k < wallHandler.getNumberOfObjects(); k++) {
+            wallHandler.getObject(k)->resetForceTorque(getNumberOfOMPThreads());
+        }
     }
-    for (BaseWall* const w : wallHandler)
+    logger(DEBUG,"All forces set to zero");
+    
+    // for omp simulations, reset the newObjects_ variable (used for reduction)
+    interactionHandler.resetNewObjectsOMP();
+
+    // compute all internal and external forces; for omp simulations, this can be done in parallel
+    #pragma omp parallel num_threads(getNumberOfOMPThreads())
     {
-        w->setForce(Vec3D(0.0, 0.0, 0.0));
-        w->setTorque(Vec3D(0.0, 0.0, 0.0));
-    } //end reset forces loop
+        //logger(INFO, "Number of omp threads = %", getNumberOfOMPThreads());
+        ///Now loop over all particles contacts computing force contributions
+        #pragma omp for schedule(dynamic)
+        for (int k = 0; k < particleHandler.getNumberOfObjects(); ++k) {
+            BaseParticle *p = particleHandler.getObject(k);
+            //computing both internal forces (e.g. due to collisions)
+            //and external forces (e.g. gravity)
+            //(compute internal forces compares the current particle p
+            //with all others in the handler!)
+            computeInternalForces(p);
+            // body forces
+            computeExternalForces(p);
+        }
 
-#ifdef DEBUG_OUTPUT
-    std::cerr << "Have all forces set to zero " << std::endl;
-#endif
+        // wall-forces
+        #pragma omp for schedule(dynamic)
+        for (int k = 0; k < wallHandler.getNumberOfObjects(); k++) {
+            BaseWall *w = wallHandler.getObject(k);
+            computeWallForces(w);
+        }
 
-
-    ///Now loop over all particles contacts computing force contributions
-
-    for (BaseParticle* p : particleHandler)
-    {
-        //computing both internal forces (e.g. due to collisions)
-        //and external forces (e.g. gravity)
-        //(compute internal forces compares the current particle p
-        //with all others in the handler!)
-        computeInternalForces(p);
-        // body forces
-        computeExternalForces(p);
-    }
-
-    // wall-forces
-    for (BaseWall* w : wallHandler)
-    {
-        computeWallForces(w);
     }
 
 #ifdef CONTACT_LIST_HGRID
@@ -3274,6 +3344,26 @@ void DPMBase::computeAllForces()
         Curr=Curr->getNext();
     }
 #endif
+    
+    // for omp simulations, sum up all forces and add all newObjects_ (needed since both are using reduction)
+    #ifdef MERCURY_USE_OMP
+    if (getNumberOfOMPThreads()>1) {
+        interactionHandler.addNewObjectsOMP();
+    }
+    //Resetting all forces on both particles and walls to zero
+    #pragma omp parallel num_threads(getNumberOfOMPThreads())
+    {
+        #pragma omp for
+        for (int k = 0; k < particleHandler.getNumberOfObjects(); k++) {
+            particleHandler.getObject(k)->sumForceTorqueOMP();
+        }
+        #pragma omp for
+        for (int k = 0; k < wallHandler.getNumberOfObjects(); k++) {
+            wallHandler.getObject(k)->sumForceTorqueOMP();
+        } //end reset forces loop
+    }
+    #endif
+    
     //end outer loop over contacts.
 }
 
@@ -3290,6 +3380,7 @@ void DPMBase::computeInternalForces(BaseParticle* i)
         computeInternalForce(i, *it);
     }
 }
+
 
 /*!
  * \details Writes out all relevant information - e.g. system dimensions, run duration, particle information -
@@ -3338,6 +3429,12 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
         << " " << boundaryVTKWriter_.getFileCounter();
     os << " random ";
     random.write(os);
+#ifdef MERCURY_USE_OMP
+    //Write number of OMP threads
+    if(getNumberOfOMPThreads() > 1) {
+        os << " numberOfOMPThreads " << getNumberOfOMPThreads();
+    }
+#endif
 #ifdef MERCURY_USE_MPI
     //Check if we are dealing with multiple cores
     if (NUMBER_OF_PROCESSORS > 1 )
@@ -3538,6 +3635,16 @@ void DPMBase::read(std::istream& is, ReadOptions opt)
                 random.read(line);
                 line >> dummy;
             }
+
+#ifdef MERCURY_USE_OMP
+            //Read the number of OMP threads
+            if (!dummy.compare("numberOfOMPThreads")) {
+                int numberOfOMPThreads;
+                line >> numberOfOMPThreads;
+                setNumberOfOMPThreads(numberOfOMPThreads);
+                //logger(INFO," Check the number of OMP threads = % ", getNumberOfOMPThreads());
+            }
+#endif
 #ifdef MERCURY_USE_MPI
             if (!dummy.compare("numberOfProcessors"))
             {
@@ -3591,6 +3698,7 @@ void DPMBase::read(std::istream& is, ReadOptions opt)
             }
 
             if (opt==ReadOptions::ReadNoParticlesAndInteractions) return;
+
             is >> dummy >> N;
             is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             //display a message if a large amount o fparticles is read
@@ -3650,7 +3758,7 @@ void DPMBase::readOld(std::istream& is)
     std::string dummy;
     is >> dummy >> dummy;
     setName(dummy);
-    
+
     unsigned int saveCountData, saveCountEne, saveCountStat, saveCountFStat;
     unsigned int fileTypeFstat, fileTypeData, fileTypeEne, fileTypeRestart;
     is >> dummy >> min_.x()
@@ -3675,11 +3783,11 @@ void DPMBase::readOld(std::istream& is)
     eneFile.setSaveCount(saveCountEne);
     statFile.setSaveCount(saveCountStat);
     fStatFile.setSaveCount(saveCountFStat);
-    
+
     fStatFile.setFileType(static_cast<FileType>(fileTypeFstat));
     dataFile.setFileType(static_cast<FileType>(fileTypeData));
     eneFile.setFileType(static_cast<FileType>(fileTypeEne));
-    
+
     //this is optional to allow restart files with and without restartFile.getFileType()
     is >> dummy;
     if (!strcmp(dummy.c_str(), "options_restart"))
@@ -3687,7 +3795,7 @@ void DPMBase::readOld(std::istream& is)
         is >> fileTypeRestart;
         restartFile.setFileType(static_cast<FileType>(fileTypeRestart));
     }
-    
+
     speciesHandler.read(is);
     wallHandler.read(is);
     boundaryHandler.read(is);
@@ -3717,7 +3825,7 @@ void DPMBase::checkSettings()
                          "Domain size not set: use setYMin() and setYMax()");
     logger.assert_always(systemDimensions_ == 3 ? (getZMax() > getZMin()) : (getZMax() >= getZMin()),
                          "Domain size not set: use setZMin() and setZMax()", systemDimensions_);
-    
+
     //check for species parameters
     logger.assert_always(speciesHandler.getNumberOfObjects() > 0,
                          "No species defined: use speciesHandler.copyAndAddObject()");
@@ -3759,7 +3867,7 @@ void DPMBase::writeOutputFiles()
     {
         writeFStatFile();
     }
-    
+
     //writing .ene data if .saveCurrentTimeStep(numberOfTimeSteps_) is true
     if (eneFile.saveCurrentTimeStep(numberOfTimeSteps_))
     {
@@ -3779,8 +3887,8 @@ void DPMBase::writeOutputFiles()
         writeVTKFiles();
     }
     cgHandler.evaluate();
-    
-    
+
+
     //write restart file last, otherwise the output counters are wrong
     if (restartFile.saveCurrentTimeStep(numberOfTimeSteps_))
     {
@@ -3794,7 +3902,7 @@ void DPMBase::writeOutputFiles()
 void DPMBase::decompose()
 {
 #ifdef MERCURY_USE_MPI
-    
+
     //If running in parallel build, but just running with one core - no domain decomposition required
     int numberOfRequiredProcessors = numberOfDomains_[Direction::XAXIS]*
                                      numberOfDomains_[Direction::YAXIS]*
@@ -3861,7 +3969,7 @@ void DPMBase::decompose()
 
 
 /*!
- * \details  - Initialises the time, sets up the initial conditions for the simulation by 
+ * \details  - Initialises the time, sets up the initial conditions for the simulation by
  *             calling the setupInitialConditions() and resets the counter using
  *             setNExtSavedTimeStep().
  *          -  HGrid operations which is the contact detection algorithm.
@@ -3871,7 +3979,7 @@ void DPMBase::decompose()
  *
  * Further details are included in the body of the code, below.
  * \todo Is it necessary to reset initial conditions here and in setTimeStepByParticle
- *       (i.e. should it be in constructor) Thomas: I agree, setTimeStepByParticle should be 
+ *       (i.e. should it be in constructor) Thomas: I agree, setTimeStepByParticle should be
  *       rewritten to work without calling setupInitialConditions
  */
 void DPMBase::solve()
@@ -3880,7 +3988,7 @@ void DPMBase::solve()
 #ifdef CONTACT_LIST_HGRID
     logger(INFO,"Using CONTACT_LIST_HGRID");
 #endif
-    
+
     /// Initialise the time and
     /// sets up the initial conditions for the simulation
     ///\todo Is it necessary to reset initial conditions here and in setTimeStepByParticle (i.e. should it be in constructor)?
@@ -3910,11 +4018,11 @@ void DPMBase::solve()
         // - run user-defined actionsOnRestart
         actionsOnRestart();
     }
-    
+
     // Check that the code has been correctly set up,
     // i.e. system dimensions, particles and time steps are sensibly implemented
     checkSettings();
-    
+
     // If the simulation is "new" and the runNumber is used, append the run number to the problem name
     if (getRunNumber() > 0 && !getRestarted())
     {
@@ -3922,7 +4030,7 @@ void DPMBase::solve()
         name << getName() << "." << getRunNumber();
         setName(name.str());
     }
-    
+
     //If append is true, files are appended, not overwritten
     if (getAppend())
     {
@@ -3934,28 +4042,28 @@ void DPMBase::solve()
     {
         setOpenMode(std::fstream::out);
     }
-    
+
     //sets the hgrid, writes headers to the .stat output file
     initialiseStatistics();
-    
+
     if (getInteractionFile().getFileType() == FileType::ONE_FILE)
     {
         logger(WARN, "Warning: interaction file will take up a lot of disk space!");
         getInteractionFile().open();
     }
-    
+
     // Sets the mass of all particle.
     /// \todo MX: Why does the mass get computed here? if a particle is assigned a radius, it automatically also computes its mass.
     /// IFCD: commenting out this line does not make any test fail on my system.
     particleHandler.computeAllMasses();
-    
+
     // Other initialisations
     //max_radius = getLargestParticle()->getRadius();
-    
+
     actionsBeforeTimeLoop();
     boundaryHandler.boundaryActionsBeforeTimeLoop();
     hGridActionsBeforeTimeLoop();
-    
+
     // Performs a first force computation
     checkAndDuplicatePeriodicParticles();
 
@@ -3968,13 +4076,13 @@ void DPMBase::solve()
         periodicBoundaryHandler.addNewParticles();
     }
 #endif
-    
+
     hGridActionsBeforeTimeStep();
     computeAllForces();
     removeDuplicatePeriodicParticles();
     interactionHandler.actionsAfterTimeStep();
     logger(DEBUG, "Have computed the initial values for the forces ");
-    
+
     // This is the main loop over advancing time
     while (getTime() < getTimeMax() && continueSolve())
     {
@@ -3982,13 +4090,13 @@ void DPMBase::solve()
     }
     //force writing of the last time step
     forceWriteOutputFiles();
-    
+
     //end loop over interaction count
     actionsAfterSolve();
-    
+
     //To make sure getTime gets the correct time for outputting statistics
     finishStatistics();
-    
+
     closeFiles();
 }
 
@@ -3999,30 +4107,31 @@ void DPMBase::solve()
 void DPMBase::computeOneTimeStep()
 {
     logger(DEBUG, "starting computeOneTimeStep()");
-    
+
     logger(DEBUG, "about to call writeOutputFiles()");
     writeOutputFiles(); //everything is written at the beginning of the time step!
-    
+
     logger(DEBUG, "about to call hGridActionsBeforeIntegration()");
     hGridActionsBeforeIntegration();
-    
+
     //Computes the half-time step velocity and full time step position and updates the particles accordingly
     logger(DEBUG, "about to call integrateBeforeForceComputation()");
+
     integrateBeforeForceComputation();
     //New positions require the MPI and parallel periodic boundaries to do things
     logger(DEBUG, "about to call performGhostParticleUpdate()");
     performGhostParticleUpdate();
-    
+
     /// \todo MX: this is not true anymore. all boundaries are handled here.
     /// particles have received a position update, so here the deletion boundary deletes particles
     ///\TODO add particles need a periodic check
-    
+
     logger(DEBUG, "about to call checkInteractionWithBoundaries()");
     checkInteractionWithBoundaries(); // INSERTION boundaries handled
-    
+
     logger(DEBUG, "about to call hGridActionsAfterIntegration()");
     hGridActionsAfterIntegration();
-    
+
     // Compute forces
     ///\bug{In chute particles are added in actions_before_time_set(), however they are not written to the xballs data yet, but can have a collision and be written to the fstat data}
     // INSERTION/DELETION boundary flag change
@@ -4030,13 +4139,13 @@ void DPMBase::computeOneTimeStep()
     {
         b->checkBoundaryBeforeTimeStep(this);
     }
-    
+
     logger(DEBUG, "about to call actionsBeforeTimeStep()");
     actionsBeforeTimeStep();
-    
+
     logger(DEBUG, "about to call checkAndDuplicatePeriodicParticles()");
     checkAndDuplicatePeriodicParticles();
-    
+
     logger(DEBUG, "about to call hGridActionsBeforeTimeStep()");
     hGridActionsBeforeTimeStep();
 
@@ -4046,24 +4155,24 @@ void DPMBase::computeOneTimeStep()
 
     logger(DEBUG, "about to call removeDuplicatePeriodicParticles()");
     removeDuplicatePeriodicParticles();
-    
+
     logger(DEBUG, "about to call actionsAfterTimeStep()");
     actionsAfterTimeStep();
-    
+
     //Computes new velocities and updates the particles accordingly
     logger(DEBUG, "about to call integrateAfterForceComputation()");
     integrateAfterForceComputation();
-    
+
     //erase interactions that have not been used during the last time step
-    logger(DEBUG, "about to call interactionHandler.eraseOldInteractions(getNumberOfTimeSteps())");
+    //logger(DEBUG, "about to call interactionHandler.eraseOldInteractions(getNumberOfTimeSteps())");
     interactionHandler.eraseOldInteractions(getNumberOfTimeSteps());
     logger(DEBUG, "about to call interactionHandler.actionsAfterTimeStep()");
     interactionHandler.actionsAfterTimeStep();
     particleHandler.actionsAfterTimeStep();
-    
+
     time_ += timeStep_;
     numberOfTimeSteps_++;
-    
+
     logger(DEBUG, "finished computeOneTimeStep()");
 }
 
@@ -4100,7 +4209,7 @@ bool DPMBase::readArguments(int argc, char* argv[])
         //if "isRead"is true and "readNextArgument" is also true...
         //(i.e. checking if any argument is false)
         isRead &= readNextArgument(i, argc, argv);
-        
+
         // If the read was unsuccessful, raise an error and quit. (JMFT: Used to just be a warning.)
         if (!isRead)
         {
@@ -4334,11 +4443,11 @@ bool DPMBase::readNextArgument(int& i, int argc, char* argv[])
 //    }
     else if (!strcmp(argv[i], "-restart") || !strcmp(argv[i], "-r"))
     {
-        ///-restart or -r loads a restart file. 
+        ///-restart or -r loads a restart file.
         ///By default, it loads <name>.restart.
         ///If an argument "arg" is given it loads the file "arg", or "arg".restart (if the ending is not given).
         std::string filename;
-        
+
         //use default filename if no argument is given
         if (i + 1 >= argc || argv[i + 1][0] == '-')
         {
@@ -4350,13 +4459,13 @@ bool DPMBase::readNextArgument(int& i, int argc, char* argv[])
         {
             filename = argv[i + 1];
         }
-        
+
         //add ".restart" if necessary
         if (filename.find(".restart") == std::string::npos)
         {
             filename = filename + ".restart";
         }
-        
+
         readRestartFile(filename);
     }
     else if (!strcmp(argv[i], "-clean") || !strcmp(argv[i], "-c"))
@@ -4500,7 +4609,7 @@ bool DPMBase::checkParticleForInteraction(const BaseParticle& p)
     {
         return checkParticleForInteractionLocalPeriodic(p);
     }
-    
+
     int localInteraction = checkParticleForInteractionLocal(p);
     //The root gathers all values and computes the global value
     int *interactionList = nullptr;
@@ -4596,7 +4705,7 @@ bool DPMBase::checkParticleForInteractionLocal(const BaseParticle& p)
 {
     Mdouble distance;
     Vec3D normal;
-    
+
     //Check if it has no collision with walls
     for (BaseWall* w : wallHandler)
     {
@@ -4613,7 +4722,7 @@ bool DPMBase::checkParticleForInteractionLocal(const BaseParticle& p)
             //std::cout<<"No collision with wall: "<<**it<<std::endl;
         }
     }
-    
+
     //Check if it has no collision with other particles
     for (BaseParticle* q : particleHandler)
     {
@@ -4695,6 +4804,20 @@ void DPMBase::removeDuplicatePeriodicParticles()
         }
         particleHandler.removeObject(i - 1);
     }
+
+    // OMP parallelism
+    /*#pragma omp parallel for num_threads(getNumberOfOMPThreads()) //schedule(dynamic)
+    for (unsigned int i = particleHandler.getSize(); i >= 1 ; i--)
+    {
+        if (particleHandler.getObject(i - 1)->getPeriodicFromParticle() != nullptr) {
+            while (!particleHandler.getObject(i - 1)->getInteractions().empty()) {
+                interactionHandler.removeObjectKeepingPeriodics(
+                        particleHandler.getObject(i - 1)->getInteractions().front()->getIndex());
+            }
+            particleHandler.removeObject(i - 1);
+        }
+    }*/
+
 #ifdef MERCURY_USE_MPI
     }
 #endif
@@ -4718,6 +4841,22 @@ void DPMBase::checkAndDuplicatePeriodicParticles()
         // this does nothing.)
         boundary->createPeriodicParticles(particleHandler);
     }
+
+    // OMP parallelism
+    /*#pragma omp parallel for num_threads(getNumberOfOMPThreads()) //schedule(dynamic)
+    for (int k = 0; k < boundaryHandler.getNumberOfObjects(); k++)
+    {
+        //Calls the createPeriodicParticles() function which checks if a particle is adequately
+        //close to a periodic particle that a periodic (ghost) particle should be created and,
+        //if so, creates one and adds it to the system (hence the necessity to keep "N" variable).
+        //
+        // (The loop is over all boundaries, but if a boundary is not a PeriodicBoundary, then
+        // this does nothing.)
+
+        BaseBoundary* boundary = boundaryHandler.getObject(k);
+        #pragma omp critical
+        boundary->createPeriodicParticles(particleHandler);
+    }*/
 }
 
 /*!
@@ -4755,11 +4894,11 @@ void DPMBase::deleteGhostParticles(std::set<BaseParticle*>& particlesToBeDeleted
         domainHandler.getCurrentDomain()->flushParticles(particlesToBeDeleted);
         periodicBoundaryHandler.flushParticles(particlesToBeDeleted);
     }
-    
+
     //Clean communication lists
     domainHandler.getCurrentDomain()->cleanCommunicationLists();
     periodicBoundaryHandler.cleanCommunicationLists();
-    
+
     //Delete the particles
     for (auto particle_it : particlesToBeDeleted)
     {
@@ -4947,13 +5086,13 @@ void DPMBase::setMeanVelocityAndKineticEnergy(Vec3D V_mean_goal, Mdouble Ek_goal
     Vec3D V_mean;
     Mdouble Ek_mean_goal = 0, Ek_fluct_factor = 0;
     RNG rng;
-    
+
     //assign random velocity to each particle
     for (auto& p : particleHandler)
     {
         p->setVelocity(Vec3D(rng.getRandomNumber(-1, 1), rng.getRandomNumber(-1, 1), rng.getRandomNumber(-1, 1)));
     }
-    
+
     //calculate the mean velocity in the system now
     Ek_mean_goal = 0.5 * getTotalMass() * V_mean_goal.getLengthSquared();
     V_mean = getTotalMomentum() / getTotalMass();
@@ -4961,27 +5100,27 @@ void DPMBase::setMeanVelocityAndKineticEnergy(Vec3D V_mean_goal, Mdouble Ek_goal
     logger.assert_always(0.5 * getTotalMass() * V_mean_goal.getLengthSquared() < Ek_goal,
                          "Too large mean velocity input, Kinetic energy from mean velocity part is larger than the "
                                  "total kinetic energy you want to set");
-    
+
     //correct the mean velocity to zero
     for (auto& p : particleHandler)
     {
         p->addVelocity(-V_mean);
     }
-    
+
     //set the new fluctuating velocity based on the goal fluctuating kinetic energy
     Ek_fluct_factor = std::sqrt((Ek_goal - Ek_mean_goal) / getKineticEnergy());
     for (auto& p : particleHandler)
     {
         p->setVelocity(Ek_fluct_factor * p->getVelocity());
     }
-    
+
     //correct the mean velocity finally to the user set values
     V_mean = getTotalMomentum() / getTotalMass();
     for (auto& p : particleHandler)
     {
         p->addVelocity(V_mean_goal - V_mean);
     }
-    
+
     //check the final mean velocity and kinetic energy
     logger(INFO, "In DPMBase::setMeanVelocityAndKineticEnergy,\nV_mean_final %\n Ek_final %\n",
            getTotalMomentum() / getTotalMass(), getKineticEnergy());
@@ -5003,14 +5142,14 @@ Matrix3D DPMBase::getKineticStress() const
 {
     Matrix3D F; //set the kinetic energy tensor, this is in terms of Sum(m*v^2)
     Vec3D J; //set the momentum tensor
-    
+
     //calculate stress for kinetic part
     for (const auto& p : particleHandler)
     {
         F += Matrix3D::dyadic(p->getVelocity(), p->getVelocity()) * p->getMass();
         J += p->getVelocity() * p->getMass();
     }
-    
+
     Matrix3D stressKinetic = F - Matrix3D::dyadic(J, J) / getTotalMass();
     stressKinetic /= getTotalVolume();
     return stressKinetic;
@@ -5025,13 +5164,13 @@ Matrix3D DPMBase::getStaticStress() const
 {
     //stress components calculation variables
     Matrix3D stressStatic;
-    
+
     //calculate the static stress tensor based on all the interactions
     for (const auto i : interactionHandler)
     {
         stressStatic += Matrix3D::dyadic(i->getForce(), i->getNormal()) * i->getDistance();
     }
-    
+
     stressStatic /= getTotalVolume();
     return stressStatic;
 }

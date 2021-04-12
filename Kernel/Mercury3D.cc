@@ -75,11 +75,15 @@ void Mercury3D::hGridFindContactsWithinTargetCell(int x, int y, int z, unsigned 
     HGrid* const hgrid = getHGrid();
     const unsigned int bucket = hgrid->computeHashBucketIndex(x, y, z, l);
     
+    ///\todo replace this generic check of the each bucket to checking only the object to avoid the critical
     //Check if this function is already applied to this bucket
-    if (hgrid->getBucketIsChecked(bucket))
+    bool bucketIsChecked;
+    #pragma omp critical
     {
-        return;
+        bucketIsChecked = hgrid->getBucketIsChecked(bucket);
+        hgrid->setBucketIsChecked(bucket);
     }
+    if (bucketIsChecked) return;
     
     BaseParticle* p1 = hgrid->getFirstBaseParticleInBucket(bucket);
     while (p1 != nullptr)
@@ -98,7 +102,6 @@ void Mercury3D::hGridFindContactsWithinTargetCell(int x, int y, int z, unsigned 
         }
         p1 = p1->getHGridNextObject();
     }
-    hgrid->setBucketIsChecked(bucket);
 }
 
 /*!
@@ -395,14 +398,15 @@ void Mercury3D::hGridUpdateParticle(BaseParticle* obj)
 #else
         const unsigned int bucket = hGrid->computeHashBucketIndex(x, y, z, l);
         
-        obj->setHGridNextObject(hGrid->getFirstBaseParticleInBucket(bucket));
-        obj->setHGridPrevObject(nullptr);
-        if (hGrid->getFirstBaseParticleInBucket(bucket))
+        // this needs to be defined as #pragma omp critical if MercuryBase::hGridActionsBeforeTimeStep is parallelised; however, parallelising it make the code slower, not faster.
         {
-            hGrid->getFirstBaseParticleInBucket(bucket)->setHGridPrevObject(obj);
+            obj->setHGridNextObject(hGrid->getFirstBaseParticleInBucket(bucket));
+            obj->setHGridPrevObject(nullptr);
+            if (hGrid->getFirstBaseParticleInBucket(bucket)) {
+                hGrid->getFirstBaseParticleInBucket(bucket)->setHGridPrevObject(obj);
+            }
+            hGrid->setFirstBaseParticleInBucket(bucket, obj);
         }
-        
-        hGrid->setFirstBaseParticleInBucket(bucket, obj);
         
         obj->setHGridX(x);
         obj->setHGridY(y);

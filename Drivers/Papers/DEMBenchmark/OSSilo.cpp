@@ -96,7 +96,7 @@ public:
         
         // set time step and maximum simulation time
         setTimeStep(useM1() ? 1.5e-6 : 2e-6);
-        setTimeMax(5);
+        setTimeMax(5.0);
         
         // set output frequency
         setSaveCount(static_cast<unsigned>(0.1 / getTimeStep()));
@@ -118,10 +118,20 @@ public:
             setFileType(FileType::NO_FILE);
             eneFile.setFileType(FileType::ONE_FILE);
         }
+    
+        //use a shortened simulation in test mode
+        if (test()) {
+            setSaveCount(20);
+            setTimeMax(200*getTimeStep());
+            logger(INFO,"Test mode, reduced timeMax to %",getTimeMax());
+        }
         
         // set domain for visualisation
         setMax(Vec3D(0.1, 0.1, 0.18));
         setMin(Vec3D(-0.1, -0.1, -0.1));
+        
+        // define the material properties of M1, M2, steel (see MercuryOS.h)
+        auto[m1, m2, steel] = setMaterialProperties();
         
         // read particle positions from file
         {
@@ -192,17 +202,12 @@ public:
         //compute the number of particles in the silo
         double particlesInSilo = 0;
         for (auto p : particleHandler) {
-            if (p->getPosition().Z > getOrificeHeight() && not p->isMPIParticle()) {
+            if (p->getPosition().Z > getOrificeHeight()) {
                 ++particlesInSilo;
             }
         }
-        // sum up over MPI processes
-        particlesInSilo = getMPISum(particlesInSilo);
-        if (PROCESSOR_ID==0)
-        {
-            if (eneFile.getCounter() == 1) os << "Time ParticleNumber\n";
-            os << std::setw(12) << getTime() << ' ' << particlesInSilo << std::endl;
-        }
+        if (eneFile.getCounter() == 1) os << "Time ParticleNumber\n";
+        os << getTime() << ' ' << particlesInSilo << std::endl;
     }
     
     // Also write the ene information to the screen
@@ -215,13 +220,12 @@ int main(int argc, char **argv)
 {
     // create an instance of the Silo class
     Silo dpm;
-    // set domain and mpi split
-    dpm.setMax(Vec3D(0.1, 0.1, 0.18));
-    dpm.setMin(Vec3D(-0.1, -0.1, -0.1));
-    dpm.splitDomain(DPMBase::DomainSplit::XY);
     // command line arguments:
+    dpm.setNumberOfOMPThreads(helpers::readFromCommandLine(argc, argv, "-omp", 1));
     // turn on additional output files for viewing/analysing the data
     dpm.writeOutput(helpers::readFromCommandLine(argc, argv, "-writeOutput"));
+    // turn on additional output files for viewing/analysing the data
+    dpm.test(helpers::readFromCommandLine(argc, argv, "-test"));
     // read from command line whether large or small orifice is used
     dpm.useSmallOrifice(helpers::readFromCommandLine(argc, argv, "-useSmallOrifice"));
     // read from command line whether large or small orifice is used

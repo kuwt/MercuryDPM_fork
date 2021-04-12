@@ -33,6 +33,10 @@
 #include "Interactions/BaseInteraction.h"
 #include "DPMBase.h"
 #include "MpiDataClass.h"
+#ifdef MERCURY_USE_OMP
+#include "omp.h"
+#endif
+
 /*!
  * Constructor of the ParticleHandler class. It creates and empty ParticleHandler.
  */
@@ -82,10 +86,12 @@ InteractionHandler::~InteractionHandler()
  */
 void InteractionHandler::addObject(BaseInteraction* I)
 {
-    //Puts the interaction in the Interaction list
-    BaseHandler<BaseInteraction>::addObject(I);
     //set the particleHandler pointer
     I->setHandler(this);
+    //Puts the interaction in the Interaction list
+    BaseHandler<BaseInteraction>::addObject(I);
+    I->getP()->addInteraction(I);
+    I->getI()->addInteraction(I);
 }
 
 /*!
@@ -97,11 +103,12 @@ BaseInteraction*
 InteractionHandler::getExistingInteraction(const BaseInteractable* const P, const BaseInteractable* const I) const
 {
     //for particle-particle collision it is assumed BaseInteractable P has a lower index then I, so we only have to check for I, not P
-    for (BaseInteraction* const i : P->getInteractions())
     {
-        if (i->getI() == I)
-        {
-            return i;
+        for (unsigned j = 0; j < P->getInteractions().size(); ++j) {
+            auto i = P->getInteractions()[j];
+            if (i->getI() == I) {
+                return i;
+            }
         }
     }
     return nullptr;
@@ -113,6 +120,21 @@ BaseInteraction* InteractionHandler::addInteraction(BaseInteractable* P, BaseInt
     BaseInteraction* C = species->getNewInteraction(P, I, timeStamp);
     addObject(C);
     return C;
+}
+
+void InteractionHandler::resetNewObjectsOMP() {
+    #ifdef MERCURY_USE_OMP
+    newObjects_.clear();
+    newObjects_.resize(getDPMBase()->getNumberOfOMPThreads());
+    #endif
+}
+
+void InteractionHandler::addNewObjectsOMP() {
+    for (auto objects : newObjects_) {
+        for (auto object : objects) {
+            addObject(object);
+        }
+    }
 }
 
 /*!
@@ -129,13 +151,19 @@ InteractionHandler::getInteraction(BaseInteractable* const P, BaseInteractable* 
     const BaseSpecies* const species = getDPMBase()->speciesHandler.getMixedObject(P->getIndSpecies(),
                                                                                    I->getIndSpecies());
     
-    //std::cout << "Trying to reconnect to BaseInteraction between P=" << P->getId() << " and " << I->getId() << std::endl;
     BaseInteraction* C = getExistingInteraction(P, I);
-    if (C == nullptr)
-    {
+    if (C == nullptr) {
         C = species->getNewInteraction(P, I, timeStamp);
+        #ifdef MERCURY_USE_OMP
+        if (omp_get_num_threads()>1) {
+            newObjects_[omp_get_thread_num()].push_back(C);
+            C->setHandler(this);
+        } else {
+            addObject(C);
+        }
+        #else
         addObject(C);
-        //std::cout << "Creating new interaction with index=" << getLastObject()->getIndex() << " id=" << getLastObject()->getId() << std::endl;
+        #endif
     }
     
     //set timeStamp

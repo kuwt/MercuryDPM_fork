@@ -84,6 +84,30 @@ public:
     
     BaseInteraction* addInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp);
     
+    /*
+     * This function is used in omp simulations to add new objects to the interactionHandler during computeOneTimeStep.
+     * It is step 1 of the add-by-reduction approach:
+     *  1. Declare an empty vector newObjects_, one element per thread.
+     *  2. When a new object needs to be added to the interactionHandler, don't add it immediately.
+     *     Add it to newObjects_[threadNum] instead
+     *  3. Add all objects in newObjects_ to teh interactionHandler.
+     * This reduction approach allows step 2 to be run in parallel, while step 3 needs to be done in sequence.
+     * It is efficient, since step 3 is much quicker than step 2.
+     */
+    void resetNewObjectsOMP();
+    
+    /*
+     * This function is used in omp simulations to add new objects to the interactionHandler during computeOneTimeStep.
+     * It is step 3 of the add-by-reduction approach:
+     *  1. Declare an empty vector newObjects_, one element per thread.
+     *  2. When a new object needs to be added to the interactionHandler, don't add it immediately.
+     *     Add it to newObjects_[threadNum] instead
+     *  3. Add all objects in newObjects_ to teh interactionHandler.
+     * This reduction approach allows step 2 to be run in parallel, while step 3 needs to be done in sequence.
+     * It is efficient, since step 3 is much quicker than step 2.
+     */
+    void addNewObjectsOMP();
+    
     /*!
      * \brief Returns the Interaction between the BaseInteractable's P and I.
      */
@@ -120,7 +144,7 @@ public:
     void getInteractionDetails(void* interactionData, unsigned int index, unsigned int& identificationP,
                                unsigned int& identificationI, bool& isWallInteraction, unsigned& timeStamp);
 
-/*!
+    /*!
      * \brief Returns the Interaction between the BaseInteractable's P and I closest to the contact point (should be used when multiple contacts are possible).
      */
     BaseInteraction* getInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp, const Vec3D& normal);
@@ -162,6 +186,18 @@ public:
      * \brief Returns the name of the object
      */
     std::string getName() const override;
+    
+    /*
+     * This variable is used in omp simulations to add new objects to the interactionHandler during computeOneTimeStep.
+     * Objects are added in three steps:
+     *  1. Declare an empty vector newObjects_, one element per thread.
+     *  2. When a new object needs to be added to the interactionHandler, don't add it immediately.
+     *     Add it to newObjects_[threadNum] instead
+     *  3. Add all objects in newObjects_ to teh interactionHandler.
+     * This reduction approach allows step 2 to be run in parallel, while step 3 needs to be done in sequence.
+     * It is efficient, since step 3 is much quicker than step 2.
+     */
+    std::vector<std::vector<BaseInteraction*>> newObjects_;
 
     double getLiquidBridgeVolume() const;
 

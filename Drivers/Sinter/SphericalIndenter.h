@@ -55,6 +55,7 @@ public:
     {
         std::cout << "Setting up indenter\n";
         
+        indenter_.setHandler(&particleHandler);
         indenter_.setRadius(0.5 * indenterDiameter_);
         indenter_.setSpecies(speciesHandler.getLastObject());
         indenter_.fixParticle();
@@ -119,7 +120,7 @@ public:
     /** add indenter forces */
     void actionsBeforeTimeStep() override
     {
-        indenter_.setForce({0, 0, 0});
+        indenter_.resetForceTorque(getNumberOfOMPThreads());
     }
 
     /** add indenter to xballs */
@@ -181,6 +182,8 @@ public:
 
     void actionsAfterTimeStep() override
     {
+        indenter_.sumForceTorqueOMP();
+        
         static Mdouble timeToRetract = 0;
         indenter_.move(indenter_.getVelocity() * getTimeStep());
 

@@ -24,9 +24,7 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Mercury3D.h"
-#include "Species/SinterFrictionReversibleAdhesiveSpecies.h"
 #include "Species/SinterFrictionSpecies.h"
-#include "Species/HertzianSinterFrictionSpecies.h"
 #include "Walls/InfiniteWall.h"
 #include "Boundaries/PeriodicBoundary.h"
 #include "Walls/AxisymmetricIntersectionOfWalls.h"

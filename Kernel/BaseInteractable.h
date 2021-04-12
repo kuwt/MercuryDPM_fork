@@ -168,8 +168,7 @@ public:
      * \param[in]   addForce    Vec3D incremental force which is added to the total
      * force of the interactable.
      */
-    void addForce(const Vec3D& addForce)
-    { force_ += addForce; }
+    void addForce(const Vec3D& addForce);
     
     /*!
      * \brief Adds an amount to the torque on this BaseInteractable.
@@ -178,8 +177,33 @@ public:
      * \param[in]   addTorque    Vec3D incremental force which is added to the total
      * torque of the interactable.
      */
-    void addTorque(const Vec3D& addTorque)
-    { torque_ += addTorque; }
+    void addTorque(const Vec3D& addTorque);
+    
+    /*
+     * This function sets the forces and torques acting on an interactable (particle/wall) to zero at teh beginning of computeOneTimeStep.
+     *
+     * For omp simulations, it further sets does the first step of summing up all forces (and torques) acting on an interactable.
+     * It is step 1 of the add-by-reduction approach:
+     *  1. Declare a vector forceOMP_, one element per thread, and set it to zero.
+     *  2. When a new force needs to be added to the interactable, don't add it immediately.
+     *     Add it to forceOMP_[threadNum] instead
+     *  3. Add all forces in forceOMP_ together to force_.
+     * This reduction approach allows step 2 to be run in parallel, while step 3 needs to be done in sequence.
+     * It is efficient, since step 3 is much quicker than step 2.
+     */
+    void resetForceTorque(int numberOfOMPthreads);
+    
+    /*
+     * This function does the last step of summing up all forces (and torques) acting on an interactable.
+     * It is step 3 of the add-by-reduction approach:
+     *  1. Declare a vector forceOMP_, one element per thread, and set it to zero.
+     *  2. When a new force needs to be added to the interactable, don't add it immediately.
+     *     Add it to forceOMP_[threadNum] instead
+     *  3. Add all forces in forceOMP_ together to force_.
+     * This reduction approach allows step 2 to be run in parallel, while step 3 needs to be done in sequence.
+     * It is efficient, since step 3 is much quicker than step 2.
+     */
+    void sumForceTorqueOMP();
     
     /*!
      * \brief Returns the position of this BaseInteractable.
@@ -438,10 +462,27 @@ private:
     Vec3D force_;
     
     /*!
-     * Stores the torque applied to the interactable. 
+     * Stores the torque applied to the interactable.
      */
     Vec3D torque_;
     
+    /*
+     * This variable is needed in omp simulations to sum up all forces (and torques) acting on an interactable.
+     * It is used in an add-by-reduction approach:
+     *  1. Declare a vector forceOMP_, one element per thread, and set it to zero.
+     *  2. When a new force needs to be added to the interactable, don't add it immediately.
+     *     Add it to forceOMP_[threadNum] instead
+     *  3. Add all forces in forceOMP_ together to force_.
+     * This reduction approach allows step 2 to be run in parallel, while step 3 needs to be done in sequence.
+     * It is efficient, since step 3 is much quicker than step 2.
+     */
+    std::vector<Vec3D> forceOMP_;
+    
+    /*!
+     * See #BaseInteractable::forceOMP_.
+     */
+    std::vector<Vec3D> torqueOMP_;
+
     /*!
      * Point to the ParticlesSpecies which stores density and other material
      * properties of the interactable. 

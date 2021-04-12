@@ -287,9 +287,6 @@ public:
      */
     Mdouble getAverageOverlap();
 
-
-private:
-
 /*
  * ----------------------------------------------------------------------
  *               FUNCTIONS: overridden mercury3D functions
@@ -334,9 +331,8 @@ private:
      * \brief Overrides DPMBase printTime(): this way variables of interest are shown.
      */
     void printTime() const override;
-
-
-
+    
+private:
     /*
      * ----------------------------------------------------------------------
      *           FUNCTIONS: functions inside setupInitialConditions

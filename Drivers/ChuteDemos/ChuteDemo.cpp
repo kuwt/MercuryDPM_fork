@@ -75,6 +75,9 @@ int main()
     problem.setInflowHeight(0.1);                   // particle inflow between 0 <= Z <= 0.1
     problem.setInflowVelocity(0.1);                 // particle inflow mean velocity
     problem.setInflowVelocityVariance(0.02);        // particle inflow velocity variance (in ratio of the mean velocity)
+    //Write paraview data
+    //problem.setParticlesWriteVTK(true);
+    //problem.setWallsWriteVTK(true);
     //! [ChuteDemo:inflow]
 
 

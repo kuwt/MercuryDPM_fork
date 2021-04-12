@@ -74,11 +74,15 @@ void Mercury2D::hGridFindContactsWithinTargetCell(int x, int y, unsigned int l)
     HGrid* hgrid = getHGrid();
     unsigned int bucket = hgrid->computeHashBucketIndex(x, y, l);
     
+    ///\todo replace this generic check of the each bucket to checking only the object to avoid the critical
     //Check if this function is already applied to this bucket
-    if (hgrid->getBucketIsChecked(bucket))
+    bool bucketIsChecked;
+    #pragma omp critical
     {
-        return;
+        bucketIsChecked = hgrid->getBucketIsChecked(bucket);
+        hgrid->setBucketIsChecked(bucket);
     }
+    if (bucketIsChecked) return;
     
     BaseParticle* p1 = hgrid->getFirstBaseParticleInBucket(bucket);
     while (p1 != nullptr)
@@ -97,7 +101,6 @@ void Mercury2D::hGridFindContactsWithinTargetCell(int x, int y, unsigned int l)
         }
         p1 = p1->getHGridNextObject();
     }
-    hgrid->setBucketIsChecked(bucket);
 }
 
 /*!

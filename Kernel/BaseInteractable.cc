@@ -27,6 +27,10 @@
 #include "Particles/BaseParticle.h"
 #include "SpeciesHandler.h"
 
+#ifdef MERCURY_USE_OMP
+    #include "omp.h"
+#endif
+
 /*!
  * \details Simply creates an empty BaseInteractable, with all vectors relating to the positions and motions of the current object 
  * initialised to zero and all pointers to null. 
@@ -99,6 +103,75 @@ BaseInteractable::~BaseInteractable()
         interactions_.front()->removeFromHandler();
     }
     logger(DEBUG, "BaseInteractable::~BaseInteractable() finished");
+}
+
+
+/*!
+ * \brief Adds an amount to the force on this BaseInteractable.
+ * \details Incremental version of BaseInteractable::setForce.
+ * Also see BaseInteraction::setForce for were this is used.
+ * \param[in]   addForce    Vec3D incremental force which is added to the total
+ * force of the interactable.
+ */
+void BaseInteractable::addForce(const Vec3D& addForce)
+{
+    if (OMP_THREAD_NUM==0) {
+        force_ += addForce;
+    } else {
+        forceOMP_[OMP_THREAD_NUM-1] += addForce;
+    }
+}
+
+/*!
+ * \brief Adds an amount to the torque on this BaseInteractable.
+ * \details Incremental version of BaseInteractable::setTorque.
+ * Also see BaseInteraction::setTorque for were this is used.
+ * \param[in]   addTorque    Vec3D incremental force which is added to the total
+ * torque of the interactable.
+ */
+void BaseInteractable::addTorque(const Vec3D& addTorque)
+{
+    if (OMP_THREAD_NUM==0) {
+        torque_ += addTorque;
+    } else {
+        torqueOMP_[OMP_THREAD_NUM-1] += addTorque;
+    }
+}
+
+void BaseInteractable::resetForceTorque(int numberOfOMPthreads)
+{
+    #ifdef MERCURY_USE_OMP
+    forceOMP_.resize(numberOfOMPthreads-1);
+    torqueOMP_.resize(numberOfOMPthreads-1);
+    for (auto& force : forceOMP_)
+    {
+        force.setZero();
+    }
+    
+    for (auto& torque : torqueOMP_)
+    {
+        torque.setZero();
+    }
+    #endif
+    
+    force_.setZero();
+    torque_.setZero();
+}
+
+
+void BaseInteractable::sumForceTorqueOMP()
+{
+    #ifdef MERCURY_USE_OMP
+    for (const auto force : forceOMP_)
+    {
+        force_ += force;
+    }
+    
+    for (const auto torque : torqueOMP_)
+    {
+        torque_ += torque;
+    }
+    #endif
 }
 
 /*!

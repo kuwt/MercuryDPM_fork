@@ -124,6 +124,6 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     RandomClusterInsertionBoundarySelfTest insertionBoundary_problem;
     insertionBoundary_problem.solve();
 
-    helpers::check(9, insertionBoundary_problem.particleHandler.getSize(), 0.1, "Number of particles check");
-    helpers::check(9, insertionBoundary_problem.interactionHandler.getSize(), 0.1, "Number of interactions check");
+    helpers::check(insertionBoundary_problem.particleHandler.getSize(), 9, 0.1, "Number of particles check");
+    helpers::check(insertionBoundary_problem.interactionHandler.getSize(), 9, 0.1, "Number of interactions check");
 }

@@ -76,6 +76,20 @@ class Drum : public MercuryOS
             setFileType(FileType::NO_FILE);
             eneFile.setFileType(FileType::ONE_FILE);
         }
+    
+        //use a shortened simulation in test mode
+        if (test()) {
+            setSaveCount(60);
+            setTimeMax(600*getTimeStep());
+            logger(INFO,"Test mode, reduced timeMax to %",getTimeMax());
+        }
+        
+        // set domain for visualisation
+        setMax(Vec3D(0.1, 0.03, 0.1));
+        setMin(Vec3D(-0.1, -0.03, -0.1));
+        
+        // define the material properties of M1, M2, steel (see MercuryOS.h)
+        auto[m1, m2, steel] = setMaterialProperties();
         
         // read particle positions and radii from file
         {
@@ -142,16 +156,10 @@ class Drum : public MercuryOS
     // Write requested output to the ene file
     void writeEneTimeStep(std::ostream &os) const override
     {
-        if (eneFile.getCounter() == 1 && PROCESSOR_ID==0)
-        {
-            os << "Time zone2mm4 zone1mm4 zone2mm2 zone1mm2\n";
-        }
+        if (eneFile.getCounter() == 1) os << "Time zone2mm4 zone1mm4 zone2mm2 zone1mm2\n";
         // count the zones
         unsigned zone2mm2 = 0, zone1mm2 = 0, zone2mm4 = 0, zone1mm4 = 0;
         for (auto particle : particleHandler) {
-            // ignore MPI particles
-            if (particle->isMPIParticle()) continue;
-            
             Vec3D pos = particle->getPosition();
             if (pos.X > 0 && pos.Z > 0) {
                 if (particle->getRadius() == 0.002) {
@@ -167,18 +175,11 @@ class Drum : public MercuryOS
                 }
             }
         }
-        // sum up MPI results
-        zone2mm2 = getMPISum(zone2mm2);
-        zone1mm2 = getMPISum(zone1mm2);
-        zone2mm4 = getMPISum(zone2mm4);
-        zone1mm4 = getMPISum(zone1mm4);
-        if (PROCESSOR_ID==0) {
-            os << getTime() << ' '
-               << zone2mm4 << ' '
-               << zone1mm4 << ' '
-               << zone2mm2 << ' '
-               << zone1mm2 << std::endl;
-        }
+        os << getTime() << ' '
+           << zone2mm4 << ' '
+           << zone1mm4 << ' '
+           << zone2mm2 << ' '
+           << zone1mm2 << std::endl;
     }
     
     // Also write the ene information to the screen
@@ -193,11 +194,10 @@ int main(int argc, char **argv)
 {
     // create an instance of the Drum class
     Drum dpm;
-    // set domain and mpi split
-    dpm.setMax(Vec3D(0.1, 0.03, 0.1));
-    dpm.setMin(Vec3D(-0.1, -0.03, -0.1));
-    dpm.splitDomain(DPMBase::DomainSplit::XZ);
     // command line arguments:
+    dpm.setNumberOfOMPThreads(helpers::readFromCommandLine(argc, argv, "-omp", 1));
+    // turn on additional output files for viewing/analysing the data
+    dpm.test(helpers::readFromCommandLine(argc, argv, "-test"));
     // turn on additional output files for viewing/analysing the data
     dpm.writeOutput(helpers::readFromCommandLine(argc, argv, "-writeOutput"));
     // use the command line argument -useMercuryWalls to turn on the smooth wall implementation

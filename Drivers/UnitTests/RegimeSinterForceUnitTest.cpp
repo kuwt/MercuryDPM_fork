@@ -93,8 +93,8 @@ public:
         auto species = speciesHandler.copyAndAddObject(sf);
 
         setTimeStep(0.02 * collisionTime);
-        setSaveCount(getTimeMax()/getTimeStep()/40);
         setTimeMax(3);
+        setSaveCount(getTimeMax()/getTimeStep()/40);
         //-------------------
         //Particle properties:
         SphericalParticle P0, P1;

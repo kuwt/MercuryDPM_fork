@@ -41,9 +41,7 @@ BaseInteraction::BaseInteraction(BaseInteractable* P, BaseInteractable* I, unsig
         : BaseObject()
 {
     P_ = P;
-    P->addInteraction(this);
     I_ = I;
-    I->addInteraction(this);
     normal_.setZero();
     contactPoint_.setNaN();
     overlap_ = 0;
@@ -313,8 +311,6 @@ void BaseInteraction::copySwitchPointer(const BaseInteractable* original, BaseIn
     C->I_ = ghost;
     
     //Add the the interaction to both original and the ghost
-    C->getP()->addInteraction(C);
-    C->getI()->addInteraction(C);
     handler_->addObject(C);
 }
 
@@ -378,6 +374,7 @@ void BaseInteraction::setP(BaseInteractable* P)
  */
 void BaseInteraction::importP(BaseInteractable *P)
 {
+    P_->removeInteraction(this);
     P_ = P;
     P_->addInteraction(this);
     identificationP_ = P_->getId();
@@ -409,6 +406,7 @@ void BaseInteraction::setI(BaseInteractable* I)
  */
 void BaseInteraction::importI(BaseInteractable *I)
 {
+    I_->removeInteraction(this);
     I_ = I;
     I_->addInteraction(this);
     identificationI_ = I_->getId();

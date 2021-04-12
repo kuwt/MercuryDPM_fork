@@ -49,6 +49,8 @@ endif(NOT CMAKE_BUILD_TYPE)
 
 include(CMakeModules/MercuryMPI.cmake)
 
+include(CMakeModules/MercuryOMP.cmake)
+
 include(CMakeModules/MercuryLogger.cmake)
 
 include(CMakeModules/MercuryBacktrace.cmake)

@@ -60,6 +60,12 @@ const unsigned unsignedMax = std::numeric_limits<unsigned>::max();
 #define PROCESSOR_ID 0
 #endif
 
+#ifdef MERCURY_USE_OMP
+#define OMP_THREAD_NUM omp_get_thread_num()
+#else
+#define OMP_THREAD_NUM 0
+#endif
+
 /*!
  * \brief An enum that indicates the direction in Cartesian coordinates
  * \details This is heavily used in the parallel code to avoid confusion with numbers 

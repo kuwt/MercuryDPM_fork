@@ -37,23 +37,25 @@ class MercuryOS : public Mercury3D
 {
     // if true, additional output files are written
     bool writeOutput_ = false;
+    // if true, the simulation time is shortened
+    bool test_ = false;
     // if true, smooth walls are used instead of the stl walls
     bool useMercuryWalls_ = false;
-    
-protected:
-    
-    // materials
-    HertzianViscoelasticMindlinSpecies* m1;
-    HertzianViscoelasticMindlinSpecies* m2;
-    HertzianViscoelasticMindlinSpecies* steel;
-    
+
 public:
     
-    MercuryOS() {
-        // define the material properties of M1, M2, steel (see MercuryOS.h)
-        setMaterialProperties();
+    // sets the variable writeOutput_
+    void test(bool test)
+    {
+        test_ = test;
     }
     
+    // returns the variable writeOutput_
+    bool test() const
+    {
+        return test_;
+    }
+
     // sets the variable writeOutput_
     void writeOutput(bool writeOutput)
     {
@@ -101,7 +103,8 @@ public:
     /**
      * Defines the material properties of M1, M2, steel.
      */
-    void setMaterialProperties()
+    std::tuple<HertzianViscoelasticMindlinSpecies *, HertzianViscoelasticMindlinSpecies *, HertzianViscoelasticMindlinSpecies *>
+    setMaterialProperties()
     {
         // Young's modulus and Poisson ratios of M1, M2, steel
         double E1 = 1e9, E2 = 0.5e9, ES = 210e9;
@@ -131,19 +134,19 @@ public:
         species.setShearModulus(G11);
         species.setSlidingFrictionCoefficient(mu11);
         species.setDensity(2500);
-        m1 = speciesHandler.copyAndAddObject(species);
+        auto m1 = speciesHandler.copyAndAddObject(species);
         
         species.setElasticModulusAndRestitutionCoefficient(E22, r22);
         species.setShearModulus(G22);
         species.setSlidingFrictionCoefficient(mu22);
         species.setDensity(2000);
-        m2 = speciesHandler.copyAndAddObject(species);
+        auto m2 = speciesHandler.copyAndAddObject(species);
         
         species.setElasticModulusAndRestitutionCoefficient(ESS, rSS);
         species.setShearModulus(GSS);
         species.setSlidingFrictionCoefficient(muSS);
         species.setDensity(7200);
-        steel = speciesHandler.copyAndAddObject(species);
+        auto steel = speciesHandler.copyAndAddObject(species);
         
         auto m12 = speciesHandler.getMixedObject(m1, m2);
         m12->setElasticModulusAndRestitutionCoefficient(E12, r12);
@@ -160,7 +163,7 @@ public:
         m2S->setShearModulus(G2S);
         m2S->setSlidingFrictionCoefficient(mu2S);
         
-        return;
+        return {m1, m2, steel};
     }
     
     
