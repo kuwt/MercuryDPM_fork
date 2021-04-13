@@ -61,10 +61,18 @@ void NurbsSurface::set(const std::vector<double>& knotsU, const std::vector<doub
     if ( controlPoints.size()<2 || controlPoints[0].size()<2 ) {
         logger(ERROR,"At least two control points are necessary");
     }
-
-    if (controlPoints.size() != weights.size() || controlPoints[0].size() != weights[0].size())
+    
+    if (std::any_of(controlPoints.begin(), controlPoints.end(),
+                    [controlPoints](auto v) { return v.size() != controlPoints[0].size(); }))
     {
-        logger(ERROR, "Numer of control points and weights must match");
+        logger(ERROR, "All rows of the control matrix must have the same size");
+    }
+
+    if (controlPoints.size() != weights.size() ||
+        std::any_of(weights.begin(), weights.end(),
+                    [controlPoints](auto v) { return v.size() != controlPoints[0].size(); }))
+    {
+        logger(ERROR, "Number of control points and weights must match");
     }
 
     if (knotsU.size() < 2 || knotsV.size() < 2)
