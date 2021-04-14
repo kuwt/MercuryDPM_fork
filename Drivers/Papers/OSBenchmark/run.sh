@@ -3,7 +3,7 @@
 # Simulation parameters
 # - Set the number of omp threads. E.g. 'opt=-omp 12' will use 12 threads per simulation.
 # - Use 'opt=-writeOutput' to make the code output additional data that can be used for visualisation and analysis.
-opt=-omp 12
+opt='-omp 12'
 
 # Run all simulations for the OS paper:
 
