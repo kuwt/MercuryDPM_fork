@@ -17,6 +17,6 @@ foreach(CPPFILE ${CPPFILES})
 	get_filename_component(EXECNAME ${CPPFILE} NAME_WE)
 	#Make the exe
 	add_executable(${EXECNAME} ${FILENAME})
-	#All cpp folder and linked agaist DPMBase
+	#All cpp folder and linked against DPMBase
 	target_link_libraries(${EXECNAME} Chute Funnel)
 endforeach()

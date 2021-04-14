@@ -16,6 +16,6 @@ foreach(CPPFILE ${CPPFILES})
     get_filename_component(EXECNAME ${CPPFILE} NAME_WE)
     #Make the exe
     add_executable(${EXECNAME} ${FILENAME})
-    #All cpp folder and linked agaist Chute
+    #All cpp folder and linked against Chute
     target_link_libraries(${EXECNAME}  BidispersedBelt)
 endforeach()

@@ -14,7 +14,7 @@ foreach(CPPFILE ${CPPFILES})
 	get_filename_component(EXECNAME ${CPPFILE} NAME_WE)
 	#Make the exe
 	add_executable(${EXECNAME} ${FILENAME})
-	#All cpp folder and linked agaist DPMBase
+	#All cpp folder and linked against DPMBase
 	target_link_libraries(${EXECNAME}  MercuryBase)
 endforeach()
 
@@ -34,7 +34,7 @@ endforeach()
 
 
 file(GLOB TESTDATAFILES "${CMAKE_CURRENT_SOURCE_DIR}/selftest_data/*.*")
-#for each file in the selftest_data folder create a test. Which checks the data agaist this old datai. The actually testing is done my the script self_test.
+#for each file in the selftest_data folder create a test. Which checks the data against this old datai. The actually testing is done my the script self_test.
 foreach(TESTFILE ${TESTDATAFILES})
 	get_filename_component(TESTNAME ${TESTFILE} NAME)
 	add_test(${TESTNAME} ${CMAKE_SOURCE_DIR}/scripts/self_test ${TESTFILE} ${TESTNAME})

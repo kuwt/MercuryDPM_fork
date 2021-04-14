@@ -11,7 +11,7 @@ foreach(CPPFILE ${CPPFILES})
 	get_filename_component(EXECNAME ${CPPFILE} NAME_WE)
 	#Make the exe
 	add_executable(${EXECNAME} ${FILENAME})
-    #All cpp folder and linked agaist MercuryBase
+    #All cpp folder and linked against MercuryBase
 	target_link_libraries(${EXECNAME} Chute)
 endforeach()
 
@@ -21,5 +21,5 @@ endforeach()
 #copy restart input for self tests into build
 #file(COPY ${CMAKE_SOURCE_DIR}/Drivers/MercurySimpleDemos/InputData/#StressStrainControlBoundarySelfTestInput.restart DESTINATION .)
 
-#copy directories
-file(COPY Drum Silo Penetration DESTINATION .)
+#copy input file directories and shell scripts to build directory
+file(COPY Drum Silo Penetration run.sh ompTest.sh DESTINATION .)

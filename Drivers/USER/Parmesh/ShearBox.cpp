@@ -898,7 +898,7 @@ public:
      * \param[in] length double which is the size of the box in the x-direction
      * \param[in] width double which is the size of the box in the y-direction
      * \details Set the horzontial dimension of the box to be from (0,length) and (0,width) in the x and y directions respectivly.
-     * Note the size of the box in the z-direction (height, agaist gravity) is automatically calculated based on this sizes and the number of partilces trying to be inserted.
+     * Note the size of the box in the z-direction (height, against gravity) is automatically calculated based on this sizes and the number of partilces trying to be inserted.
      * \todo Error checking needs adding
      */
     void setBoxDimensions(double length, double width)
