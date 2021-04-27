@@ -141,21 +141,21 @@ void StatisticsVector<T>::constructor()
     // is overwritten; thus the default is a nonsense value 
     w2 = 0.0;
     setCGTimeAveragingInterval(0);
-    setCGTimeMin(-inf);
-    setTimeMaxStat(inf);
+    setCGTimeMin(-constants::inf);
+    setTimeMaxStat(constants::inf);
     rmin = 0;
     hmax = 1e20;
     rmax = 1e20;
     indSpecies = -1; //all species
     
     //set default options - Not used it physially don't make sense i.e if ?max<?min
-    xMinStat = NaN;
-    xMaxStat = NaN;
-    yMinStat = NaN;
-    yMaxStat = NaN;
-    zMinStat = NaN;
-    zMaxStat = NaN;
-    tMaxStat = inf;
+    xMinStat = constants::NaN;
+    xMaxStat = constants::NaN;
+    yMinStat = constants::NaN;
+    yMaxStat = constants::NaN;
+    zMinStat = constants::NaN;
+    zMaxStat = constants::NaN;
+    tMaxStat = constants::inf;
     // set default options
     ignoreFixedParticles = true; //this should be true if you want statistics only of the flow
     StressTypeForFixedParticles = 1;
@@ -1534,7 +1534,7 @@ void StatisticsVector<T>::statistics_from_p3()
     //try to read data files; if data.0000 does not exist, try the next, up to .9999
     read_next_from_p3p_file();
     
-    if (getXMaxStat() == inf)
+    if (getXMaxStat() == constants::inf)
     {
         autoSetSystemDimensions();
     }

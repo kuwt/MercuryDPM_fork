@@ -115,12 +115,12 @@ Mdouble BaseSpecies::average(Mdouble a, Mdouble b)
 }
 
 /*! 
- * \detail Returns the harmonic mean of two variables, returning inf if either is inf. 
+ * \detail Returns the harmonic mean of two variables, returning inf if either is inf.
  */
 Mdouble BaseSpecies::averageInf(Mdouble a, Mdouble b)
 {
-    if (a == inf || b == inf) 
-        return inf;
+    if (a == constants::inf || b == constants::inf)
+        return constants::inf;
     else
         return average(a, b);
 }

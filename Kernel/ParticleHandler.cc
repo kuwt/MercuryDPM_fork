@@ -640,7 +640,7 @@ Vec3D ParticleHandler::getCentreOfMass() const
     Mdouble m = getMass();
     if (m == 0)
     {
-        Vec3D nanvec = {NaN, NaN, NaN};
+        Vec3D nanvec = {constants::NaN, constants::NaN, constants::NaN};
         return nanvec;
     }
     else

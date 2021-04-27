@@ -132,10 +132,10 @@ Domain::~Domain()
  */
 void Domain::constructor()
 {
-    rank_ = intMax;
+    rank_ = constants::intMax;
     domainHandler_ = nullptr;
-    domainMin_ = {-inf, -inf, -inf};
-    domainMax_ = {inf, inf, inf};
+    domainMin_ = {-constants::inf, -constants::inf, -constants::inf};
+    domainMax_ = {constants::inf, constants::inf, constants::inf};
     
     //A cube has 3^3=27 neighbours
     int numberOfNeighbours = 27;
@@ -225,12 +225,12 @@ void Domain::setRange(Direction direction, Mdouble min, Mdouble max)
     
     double maxClosed;
     double minClosed;
-    if (min == -inf)
+    if (min == -constants::inf)
     {
         minClosed = getHandler()->getDPMBase()->getMin().getComponent(direction);
     }
     
-    if (max == inf)
+    if (max == constants::inf)
     {
         maxClosed = getHandler()->getDPMBase()->getMax().getComponent(direction);
     }
@@ -279,12 +279,12 @@ void Domain::setBounds(std::vector<double> domainMin, std::vector<double> domain
         {
             minClosed = domainMin_[i];
             maxClosed = domainMax_[i];
-            if (domainMin_[i] == -inf)
+            if (domainMin_[i] == -constants::inf)
             {
                 minClosed = getHandler()->getDPMBase()->getMin().getComponent(i);
             }
             
-            if (domainMax_[i] == inf)
+            if (domainMax_[i] == constants::inf)
             {
                 maxClosed = getHandler()->getDPMBase()->getMax().getComponent(i);
             }

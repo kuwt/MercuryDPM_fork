@@ -981,7 +981,7 @@ void BaseCluster::printTime() const
 void BaseCluster::setRadii()
 {
     totalParticleVolume_ = 0;
-    smallestRadius_ = inf;
+    smallestRadius_ = constants::inf;
     for (int i = 0; i < nParticles_; ++i)
     {
         // This is the actual radius of the i-th particle

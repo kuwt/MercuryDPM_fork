@@ -380,7 +380,7 @@ bool CGHandler::evaluateDataFiles(bool evaluateFStatFiles)
 
 Mdouble CGHandler::getTimeMin()
 {
-    Mdouble time = inf;
+    Mdouble time = constants::inf;
     for (BaseCG* it : *this)
     {
         time = std::min(time, it->getTimeMin());
@@ -390,7 +390,7 @@ Mdouble CGHandler::getTimeMin()
 
 Mdouble CGHandler::getTimeMax()
 {
-    Mdouble time = -inf;
+    Mdouble time = -constants::inf;
     for (BaseCG* it : *this)
     {
         time = std::max(time, it->getTimeMax());

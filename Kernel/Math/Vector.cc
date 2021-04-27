@@ -52,9 +52,9 @@ void Vec3D::setZero()
  */
 void Vec3D::setNaN()
 {
-    X = NaN;
-    Y = NaN;
-    Z = NaN;
+    X = constants::NaN;
+    Y = constants::NaN;
+    Z = constants::NaN;
 }
 
 /*!

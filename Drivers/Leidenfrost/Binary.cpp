@@ -268,7 +268,7 @@ private:
     double shaker_freq;
 
     //second switch
-    double switch_time=inf;
+    double switch_time=constants::inf;
     double switch_amp;
 
 };

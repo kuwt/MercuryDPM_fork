@@ -221,7 +221,7 @@ Mdouble getEffectiveMass(Mdouble mass0, Mdouble mass1);
 
 std::vector<double> readArrayFromFile(std::string filename, int& n, int& m);
 
-void more(std::string filename, unsigned nLines = unsignedMax);
+void more(std::string filename, unsigned nLines = constants::unsignedMax);
 
 template<typename T>
 std::string to_string(const T& n)

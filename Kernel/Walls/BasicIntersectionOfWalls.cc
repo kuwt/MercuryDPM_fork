@@ -108,9 +108,9 @@ bool BasicIntersectionOfWalls::getDistanceAndNormal(const BaseParticle& p, Mdoub
         return false;
     }
     
-    distance = -inf; //distance of the closest wall
-    Mdouble distance2 = -inf; //distance of the second-closest wall
-    Mdouble distance3 = -inf; //distance of the third-closest wall
+    distance = -constants::inf; //distance of the closest wall
+    Mdouble distance2 = -constants::inf; //distance of the second-closest wall
+    Mdouble distance3 = -constants::inf; //distance of the third-closest wall
     Mdouble distanceCurrent; //distance of teh current wall
     Vec3D normal2; //normal of the second-closest wall
     Vec3D normal3; //normal of the third-closest wall

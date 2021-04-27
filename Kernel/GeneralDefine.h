@@ -38,10 +38,13 @@ typedef double Mdouble;
 
 #define UNUSED  __attribute__ ((__unused__))
 
-const Mdouble NaN = std::numeric_limits<Mdouble>::quiet_NaN();
-const Mdouble inf = std::numeric_limits<Mdouble>::infinity();
-const int intMax = std::numeric_limits<int>::max();
-const unsigned unsignedMax = std::numeric_limits<unsigned>::max();
+namespace constants
+{
+    const Mdouble NaN = std::numeric_limits<Mdouble>::quiet_NaN();
+    const Mdouble inf = std::numeric_limits<Mdouble>::infinity();
+    const int intMax = std::numeric_limits<int>::max();
+    const unsigned unsignedMax = std::numeric_limits<unsigned>::max();
+}
 
 //The number of digits are important for MAX_PROC, not the actual number. It is used to determine unique communication tags
 //IMPORTANT: Always take a value 10^a where a is a natural number above 0

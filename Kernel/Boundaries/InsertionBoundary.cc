@@ -43,7 +43,7 @@ InsertionBoundary::InsertionBoundary()
     particleToCopy_ = nullptr;
     maxFailed_ = 0;
     isActivated_ = true;
-    volumeFlowRate_ = inf;
+    volumeFlowRate_ = constants::inf;
     initialVolume_ = 0;
     samplingInterval_ = 0;
     checkParticleForInteraction_ = true;

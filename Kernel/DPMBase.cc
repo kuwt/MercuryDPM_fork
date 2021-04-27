@@ -2082,9 +2082,9 @@ void DPMBase::writeEneTimeStep(std::ostream& os) const
        << " " << std::setw(width) << getElasticEnergy()
        // we need to write x, y and z coordinates separately, otherwise the width of the columns is incorrect
        << " " << std::setw(width)
-       << (m == 0 ? NaN : com.X / m) //set to nan because 0/0 implementation in gcc and clang differs
-       << " " << std::setw(width) << (m == 0 ? NaN : com.Y / m)
-       << " " << std::setw(width) << (m == 0 ? NaN : com.Z / m)
+       << (m == 0 ? constants::NaN : com.X / m) //set to nan because 0/0 implementation in gcc and clang differs
+       << " " << std::setw(width) << (m == 0 ? constants::NaN : com.Y / m)
+       << " " << std::setw(width) << (m == 0 ? constants::NaN : com.Z / m)
        << std::endl;
 }
 

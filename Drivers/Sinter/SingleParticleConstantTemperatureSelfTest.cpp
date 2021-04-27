@@ -53,7 +53,7 @@ public:
         //restartFile.setFileType(FileType::NO_FILE);
         setXBallsAdditionalArguments(" -v0 -solidf -noborder 4 -p 1");
         setTimeMax(0);
-        restartFile.setSaveCount(intMax);
+        restartFile.setSaveCount(constants::intMax);
 
         //set gravity and density
         //setGravity(Vec3D(0, 0, -1e-6*238.732414637843e12));

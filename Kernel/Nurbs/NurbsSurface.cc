@@ -175,7 +175,7 @@ bool NurbsSurface::getDistance(Vec3D P, double radius, double& distance, Vec3D& 
     // find the closest control point
     double u;
     double v;
-    double minDist2 = inf;
+    double minDist2 = constants::inf;
     for (int i=0; i<controlPoints_.size(); ++i) {
         for (int j=0; j<controlPoints_[i].size(); ++j) {
             const double dist2 = Vec3D::getLengthSquared(controlPoints_[i][j] - P);

@@ -154,7 +154,7 @@ public:
     Mdouble evaluateCGFunctionDerivativeWithFD(const Vec3D& position, const Coordinates& r, const int i);
     
     Mdouble evaluateCylindricalCGFunction(const Vec3D& position, const CGCoordinates::R r)
-    { return NaN; }
+    { return constants::NaN; }
     
     /*!
      * \brief Evaluates the line integral needed for the calculation of stresses.
@@ -164,7 +164,7 @@ public:
     
     Mdouble evaluateCylindricalCGIntegral(const BaseInteraction& c, const CGCoordinates::R r,
                                           IntegralType type = IntegralType::I_TO_P)
-    { return NaN; }
+    { return constants::NaN; }
     
     /*!
      * \brief Evaluates the line integral needed for the calculation of stresses

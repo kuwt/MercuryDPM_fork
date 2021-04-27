@@ -84,7 +84,7 @@ void MercuryBase::constructor()
     hGridDistribution_ = EXPONENTIAL;
     hGridMethod_ = TOPDOWN;
     currentMaxRelativeDisplacement_ = 0.0;
-    totalCurrentMaxRelativeDisplacement_ = inf;
+    totalCurrentMaxRelativeDisplacement_ = constants::inf;
 }
 
 /*!

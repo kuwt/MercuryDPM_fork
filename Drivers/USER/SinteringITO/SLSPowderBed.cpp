@@ -260,7 +260,7 @@ public:
                 logger(INFO, "z=%",wallHandler.getObject(1)->getPosition().Z-rollerRadius_);
                 logger(INFO, "z=% %",compaction_,getZMax());
                 // make sure this is set only once
-                rollerTime = inf;
+                rollerTime = constants::inf;
             }
         }
     }

@@ -581,7 +581,7 @@ std::vector<double> helpers::readArrayFromFile(std::string filename, int& n, int
 
 void helpers::more(std::string filename, unsigned nLines)
 {
-    if (nLines != unsignedMax)
+    if (nLines != constants::unsignedMax)
         std::cout << "First " << nLines << " lines of " << filename << ":\n";
     std::fstream file;
     file.open(filename.c_str(), std::ios::in);

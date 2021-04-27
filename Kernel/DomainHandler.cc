@@ -157,9 +157,6 @@ void DomainHandler::createDomains(std::vector<Mdouble> domainMin, std::vector<Md
                                   std::vector<unsigned>& globalMeshIndex, std::vector<unsigned>& numberOfDomains,
                                   int dimCounter, std::vector<Mdouble>& meshSize, bool open)
 {
-    //For convenience
-    Mdouble inf = std::numeric_limits<Mdouble>::infinity();
-    
     //
     if (dimCounter == 0)
     {
@@ -184,12 +181,12 @@ void DomainHandler::createDomains(std::vector<Mdouble> domainMin, std::vector<Md
             domainMax[dimCounter] = boundLeft + (i + 1) * meshSize[dimCounter];
             if ((i == 0) && (open))
             {
-                domainMin[dimCounter] = -inf;
+                domainMin[dimCounter] = -constants::inf;
             }
             
             if ((i == numberOfDomains[dimCounter] - 1) && (open))
             {
-                domainMax[dimCounter] = inf;
+                domainMax[dimCounter] = constants::inf;
             }
             
             //Start recursively a new createDomains function
@@ -439,8 +436,8 @@ void DomainHandler::initialise()
     //Create a single domain
     Domain domain;
     domain.setHandler(this);
-    std::vector<double> domainBoundMin = {-inf, -inf, -inf};
-    std::vector<double> domainBoundMax = {inf, inf, inf};
+    std::vector<double> domainBoundMin = {-constants::inf, -constants::inf, -constants::inf};
+    std::vector<double> domainBoundMax = {constants::inf, constants::inf, constants::inf};
     domain.setBounds(domainBoundMin, domainBoundMax, false);
     this->copyAndAddObject(domain);
     currentDomainIndex_ = 0;

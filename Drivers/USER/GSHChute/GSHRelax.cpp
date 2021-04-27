@@ -39,7 +39,7 @@ public:
 
     GSHRelax(int i) {
         readRestartFile("GSHCompaction.restart."+helpers::to_string(i));
-        setTimeMax(inf);
+        setTimeMax(constants::inf);
         setFileType(FileType::NO_FILE);
         restartFile.setFileType(FileType::ONE_FILE);
         restartFile.setName("GSHRelax.restart."+i);
