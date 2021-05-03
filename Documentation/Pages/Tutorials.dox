@@ -25,6 +25,10 @@ This page contains the following tutorials: \n
 - \ref T9
 - \ref T11
 - \ref T12
+- \ref T13
+- \ref T13a
+- \ref T13b
+- \ref T13c
 
 \section T1 T1: Particle motion in outer space
 \image html Tutorials/T1/Tutorial1.jpg Particle moving with a constant velocity in outer space.
@@ -231,6 +235,8 @@ It is defined the object 'w0' as an instance of the class  InfiniteWall. For thi
 
 The main function of \ref Tutorial9.cpp presents how the elastic features of particles are defined. Also, a new function is added to combine features of different indexes: getMixedObject.
 
+
+
 \n
 \section T11 T11: Axisymmetric walls inside a cylindrical domain
 \image html Tutorials/T11/Tutorial11.png
@@ -324,6 +330,274 @@ At the end of the main function we call the solve function
 \snippet Drivers/Tutorials/Tutorial12.cpp T12: Solve Problem
 
 After solving the problem you can visualize the results and see the effect of the motion of the object on the trajectory of the particle.
+
+\n 
+
+\section T13 T13: Speeding up simulations by parallel execution
+MercuryDPM can run simulations in parallel on both symmetric multiprocessors (SMP's) and massively parallel processors (MPP's). The difference between the computer architectures is that SMP's use shared-memory, but MPP's (clusters) have distributed memory. We use have an OpenMP implementation to parallelise on shared-memory, and an MPI implementation for parallelising on distributed memory. The tutorials below show how to modify your code to use the OpenMP and/or MPI parallelisation.
+
+\subsection T13a T13a: Symmetric Multiprocessing with OpenMP
+
+To use the MercuryDPM-OpenMP framework, you need to include some code fragments in the main function, and some extra options during compiling and linking.
+
+To illustrate this, let us consider a "Demo" application that we want to run in parallel using the activated OpenMP environment. The driver code is structured as follows:
+
+\code
+#include "Mercury3D.h"
+
+class Demo : public Mercury3D {
+  void setupInitialConditions() override {
+    //define walls, boundary conditions, particle positions here
+  }
+};
+
+int main() {
+  Demo problem;
+  //define contact law, time step, final time, domain size here
+  problem.solve();
+}
+\endcode
+
+
+Firstly, the OpenMP parallel environment has to be activated using \c cmake, i.e., by turning the flag \c Mercury_USE_OpenMP to \c ON as follows:
+\code
+# enter your build directory
+cd MercuryBuild
+# use cmake to change the CMake configuration
+cmake . -D Mercury_USE_OpenMP=ON
+# Run fullTest with OpenMP activated
+make fullTest
+\endcode
+Alternatively you can use ccmake or cmake-gui to change the CMake configuration. Instructions for ccmake:
+\code
+# use ccmake or cmake-gui to change the CMake configuration
+ccmake ../MercurySource
+# Press [c] to configure
+# Set Mercury_USE_OpenMP --> ON
+# Press [c] twice to configure 2 times, then press [g] to generate
+\endcode
+
+Next, we set the number of threads to run in parallel for the program by calling the \c setNumberOfOMPThreads(n) function in the main function of the application, where \c n denotes the number of threads.
+
+\code
+
+...
+
+int main() {
+  Demo problem;
+  ...
+  //Set the number of threads (cores) for the identity-based OpenMP framework   
+  problem.setNumberOfOMPThreads(4);
+  problem.solve();
+}
+\endcode
+
+
+After adding the above modifications, the simulation will be executed in parallel, with only one additional line included to the main() function.
+
+Alternatively, you can set the number of OMP threads  using a command-line argument that is passed through helpers::readFromCommandLine(...) function:
+\code
+
+...
+
+int main() {
+  Demo problem;
+  ...
+  // command line arguments:
+  problem.setNumberOfOMPThreads(helpers::readFromCommandLine(argc, argv, "-omp",1));
+  problem.solve();
+}
+\endcode
+
+In that case, the number of threads is set at execution-time via the command line, as follows:
+
+\code
+time ./Demo -test -omp 4  
+\endcode
+
+For an example of an OpenMP-ready code, see /Drivers/MercurySimpleDemos/FreeCooling2DinWallsDemo.cpp.
+\image html Tutorials/T13/Tutorial10FCM2DWalls.png " " width=1600px
+
+### Performance
+
+The table below shows performance results of the MercuryDPM-OpenMP framework:
+\image html Tutorials/T13/Tutorial10FCM2DWallsOMPRuntime.png "Runtime and scalability of the MercuryDPM-OpenMP framework on a quad-core processor with up to 8 CPUs when hyperthreading" width=600px
+
+The performance was tested using 200,000-particle simulation of a cooling granular gas on a quad core processor, with a time step 5 x 10-5 and a save count = 100, simulated up to a maximum time = 0.1. The fully functional parallel program produced exactly the same output as the serial application. We see that the execution time decreases with the number of threads. The theoretical maximum speedup is based on Ahmdahl's law for 4 cores, assuming that 68% of the code can be parallelised.
+
+
+\subsection T13b T13b: Domain decomposition with MPI (For Massively Parallel Processors (MPPs))
+
+MercuryDPM can run also simulations in parallel using the message passing interface (MPI). The algorithm uses a basic domain decomposition, splitting the domain into \f$n_x \times n_y \times n_z\f$ subdomains and running each subdomain on a separate processor.
+
+In the figure below, we show an actual hourglass filled with sand, and a corresponding sketch of a (two-dimensional) hourglass simulation, depicting a spatial decomposition using a Cartesian grid of \f$3 \times 1 \times 3\f$, using a total of 9 threads. The decomposition splits the domain (defined via \a setMin and #setMax in MercuryDPM) into intervals of equal size in each Cartesian direction. It is worth noting that the subdomains on the boundary of the domain extend towards infinity, thus even particles outside the domain belong to one of the subdomains. MPI is a distributed memory-approach, meaning all particles located inside a domain are only known to the thread simulating that particular subdomain. Note, we only distribute the particles, not the walls and boundaries, since they consume considerably less storage than the particles. For more information, see \cite Marnix2019.
+
+\image html Tutorials/T13/Tutorial10ActualAndSimulatedSystem.png " " width=4000px
+
+To run simulations in parallel, you need to define all particles in setupInitialConditions and you need to define the domain size in main(). Assume your driver code is structured as follows:
+
+\code
+#include "Mercury3D.h"
+
+class Demo : public Mercury3D {
+  void setupInitialConditions() override {
+    //define walls, boundary conditions, particle positions here
+  }
+};
+
+int main() {
+  Demo problem;
+  //define contact law, time step, final time, domain size here
+  problem.solve();
+}
+\endcode
+
+
+To run your simulation in parallel, you need to compile the code with MPI. Use cmake and turn the flag Mercury_USE_MPI to ON. You can do this either by loading cmake-gui and changing the use USE_MPI flag to ON; or, alternatively you do it on the command line:
+
+\code
+cd MercuryBuild
+cmake . -DMercury_USE_MPI=ON
+\endcode
+
+You also need to tell your program about the decomposition it should use. To split your domain  setNumberOfDomains into \f$n_x \times n_y \times n_z\f$, add the following command in your main function before solve():
+
+\code
+//Set the number of domains for parallel decomposition
+problem.setNumberOfDomains(Vec3D(nx,ny,nz));
+\endcode
+
+Now compile your code, and run it with \a mpirun. Make sure you use the correct number of processors (\f$n=n_x \cdot n_y \cdot n_z\f$) needed for the domain decomposition:
+
+\code
+//Set the number of domains for parallel decomposition
+mpirun -np n MyDriverCode
+\endcode
+
+For an example of an MPI-ready code, see /Drivers/MercurySimpleDemos/HourGlass2DDemoMPI.cpp and Drivers/ParallelDrum/testDrum.cpp.
+\image html Tutorials/T13/ParallelRotatingDrum.png
+
+### Performance
+
+The performance of the MPI parallel algorithm has been tested for the case of a rotating drum of varying width; a snapshot of the simulations is shown in the above Figure. The serial algorithm shows
+a near-linear scaling of computing time with the number of particles (Figure (a) shown below). Weak scaling of the parallel implementation is shown by measuring the efficiency E = Tp/Ts , the ratio of
+computing time for the parallel and serial implementation, for a varying number of cores Nc, keeping the number of particles per core constant. On a single node, efficiency decreases slowly 
+with the number of cores, but levels off at around 40% for simulations that use hyperthreading (Figure (b) shown below). On multiple nodes, hyper-threading can be avoided, and the efficiency remains above 60% 
+(Figure (c) shown below). Thus, the algorithm performs efficiently for large simulations, if the computational load per core is homogeneous.
+
+\image html Tutorials/T13/MdpmMPIScalability.png
+
+\subsection T13c T13c: Parallel File Systems (PFSs) for the MercuryDPM-MPI parallel-processing framework
+
+### One File-Per-Process, FPP I/O model
+
+By default, MercuryDPM applications running in serial produce four main output files, in ASCII format. Each of the files carries the name of the code, followed by an
+extension, .restart, .data, .fstat and .ene. By including the command "problem.setFileType(FileType::ONE_FILE)" in the main method below, we explicitly tell the DPM solver to write these default files:
+
+
+\code
+#include "Mercury3D.h"
+
+class Demo : public Mercury3D {
+  void setupInitialConditions() override {
+    //define walls, boundary conditions, particle positions here
+  }
+};
+
+int main() {
+  Demo problem;
+  //define contact law, time step, final time, domain size here
+  
+  //call setup for the one file-per-process output model
+  problem.setFileType(FileType::ONE_FILE);
+
+  problem.solve();
+}
+\endcode
+
+ 
+Once the aforementioned spatial decomposition commands are included in the program, and the application is run in parallel using MPI, each process will write its own separate set of outout files (.restart.n, .data.n, .fstat.n and .ene.n, \a n being the processor id). This is the so-called one file-per-process I/O model.
+In teh figure below, we plot the .data.n output files for the abovementioned hourglass simulation simulated using MPI on 4 cores. We see separated parts of the entire hourglass simulation, since the .data.n files are written individually. This method requires no message-passing communications, and as a result it's quick. However, it can result into a large number of output files as the number of process/CPUs increases, that might be hard to manage and process.
+
+\image html Tutorials/T13/FFPModel.png
+
+### Shared Files, SF I/O model
+Due to the above noted issues associated with the one file-per-process model, it can be desirable to output the data to a common file, written by all processes while running the parallelised code. To do this, we set the file type to either MPI_SHARED_FILE_ASCII
+or MPI_SHARED_FILE_BINARY, for ASCII and binary formats respectively:
+
+\code
+#include "Mercury3D.h"
+
+class Demo : public Mercury3D {
+  void setupInitialConditions() override {
+    //define walls, boundary conditions, particle positions here
+  }
+};
+
+int main() {
+  Demo problem;
+  //define contact law, time step, final time, domain size here
+  
+  //shared-file output: comment or uncomment for processing either ASCII or Binary output
+  problem.setFileType(FileType::MPI_SHARED_FILE_ASCII);
+  //problem.setFileType(FileType::MPI_SHARED_FILE_BINARY);
+
+  problem.solve();
+}
+\endcode
+
+For the shared-file model, all processes open a common file and read or write different parts of the same file simultaneously.
+As demostrated in the Figure below, the shared-file approach maintains a single output file.
+
+\image html Tutorials/T13/SampleDATAFileMPIIO.png "HourGlass2DDemoMPI.data file, and the corresponding xballs output, for the 2D hourglass simulation, resulting from a 2-by-1-by-2 domain decomposition. Due to the fixed domain decomposition, a majority of the data is processed and written by only two of the four processes."
+
+The figure below visualizes the content of the .data.n files obtained from writing one-file-per-process (subplots a and b), and the content of the .data file obtained from writing a shared file (subplot c).
+
+\image html Tutorials/T13/InterpretedMPIIO.png
+
+### The MPI-IO Shared Restart Demo (MPI processes reading from a Common-File)
+
+Generally, in order to restart a simulation in MercuryDPM, we replace the simple solve command in the main function by solve(argc, argv), for reading in command-line arguments.
+Running the code with the command-line argument "-r" forces a restart; "-t [time]" can be used to reset the final time. When the MPI shared I/O model is enabled, the pallelised code is executed with the "mpirun" command as illustrated below:
+
+\code
+#include "Mercury3D.h"
+
+class Demo : public Mercury3D {
+  void setupInitialConditions() override {
+    //define walls, boundary conditions, particle positions here
+  }
+};
+
+//first run Demo using "./Demo"
+//then restart Demo using e.g. "mpirun -np 4 ./Demo -r -tmax 0.2"
+int main() {
+  Demo problem;
+  //define contact law, time step, final time, domain size here
+  
+  //shared-file output: comment or uncomment for processing either ASCII or Binary output
+  problem.setFileType(FileType::MPI_SHARED_FILE_ASCII);
+  //problem.setFileType(FileType::MPI_SHARED_FILE_BINARY);
+
+  problem.solve(argc,argv);
+}
+\endcode
+
+When restarting the application, all  processes in a parallel job will  read  the entire contents of the common, single restart file.
+For now, the parallel data readers are not smart enough to read-in only the portion of the data that they need. However, the collection of "actual data or information" that all
+processes require is accessible and simulations restart smoothly. Below are snapshot visualisations demonstrating the MPI-IO shared restart/read in action.
+
+\image html Tutorials/T13/RestartDemoMPIIO.png "Several restart-cases through the command: mpirun -np 4 ./# -r -tmax τ, for different values of the maximum simulation time, τ in seconds. The # symbolises the simulation label/name (\c HourGlass2DDemoMPI)."
+
+
+### Performance evaluation for the parallel file systems:
+
+Finally, some performance results for comparing the above parallel I/O models are provided in the table below:
+ 
+\image html Tutorials/T13/mpiioPerformance.png "Runtime for the one file-per-process (FPP) and collective (shared) I/O for the MercuryDPM-MPI code, when writing ASCII formatted-files for the Hour Glass 2D test application with 900 particles." width=600px
+
+\n
+\n
 
 \page Tcodes Codes for tutorials
 

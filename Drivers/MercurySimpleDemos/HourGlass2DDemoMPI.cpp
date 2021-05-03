@@ -194,6 +194,10 @@ int main(int argc, char *argv[])
     //Set output to paraview
     HG.setParticlesWriteVTK(true);
 
+    //Call setup for the shared-file output model: comment or uncomment for processing either ASCII or Binary output
+    //problem.setFileType(FileType::MPI_SHARED_FILE_ASCII);
+    //problem.setFileType(FileType::MPI_SHARED_FILE_BINARY);
+
     HG.solve(argc, argv);
 
     // Measure elapsed time

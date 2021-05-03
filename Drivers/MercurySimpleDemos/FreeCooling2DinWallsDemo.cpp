@@ -140,6 +140,8 @@ int main()
     problem.setFileType(FileType::ONE_FILE);
     problem.setParticlesWriteVTK(true);
     problem.setWallsWriteVTK(true);
+    //Uncomment to set the number of threads (cores) for the identity-based OpenMP framework
+    //problem.setNumberOfOMPThreads(4);
     problem.solve();
     //! [FCD_2D_Walls:solve]
 }
