@@ -57,10 +57,6 @@ file(GLOB Mercury_SRC
 add_library(MercuryBase STATIC ${Mercury_SRC})
 target_link_libraries(MercuryBase LinearAlgebra)
 
-#Basic library, all compiled at oonce
-add_library(MercuryAll STATIC All.cc)
-target_link_libraries(MercuryAll LinearAlgebra)
-
 if (Mercury_BACKTRACE_DEMANGLE)
     if (Mercury_BACKTRACE_LINK_DL)
         target_link_libraries(MercuryBase dl)
