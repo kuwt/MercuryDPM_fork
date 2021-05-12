@@ -78,7 +78,9 @@ public:
     ///\todo TW: should getMassFromRadius be removed? IFCD: it is used in at 
     /// least one driver (AxisymmetricHopper).
     Mdouble getMassFromRadius(Mdouble radius) const;
-    
+
+    Mdouble getMassFromRadius(const Mdouble radius,SpeciesHandler& speciesHandler);
+
     Mdouble getVolumeFromRadius(Mdouble radius) const;
     
     ///Allows density_ to be accessed

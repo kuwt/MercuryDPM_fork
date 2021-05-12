@@ -428,7 +428,7 @@ bool isNext(std::istream& is, const std::string name);
 
 bool createDirectory(std::string);
 
-double round(double val, int prec);
+Mdouble round(const Mdouble value, unsigned precision);
 }
 
 #endif

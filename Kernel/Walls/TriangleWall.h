@@ -113,7 +113,12 @@ public:
     void setVertices(Vec3D A, Vec3D B, Vec3D C, Vec3D position);
 
     void writeVTK(VTKContainer& vtk) const override;
-    
+
+    /*!
+     * \brief Returns the position of a vertex
+     */
+    const Vec3D& getVertex(unsigned i) const {return vertex_[i];}
+
     /*!
      * \brief Compute the distance from the wall for a given BaseParticle and return if there is a collision.
      * If there is a collision, also return the normal vector.

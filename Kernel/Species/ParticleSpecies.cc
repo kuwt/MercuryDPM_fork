@@ -124,6 +124,12 @@ Mdouble ParticleSpecies::getMassFromRadius(const Mdouble radius) const
     return getDensity() * getVolumeFromRadius(radius);
 }
 
+Mdouble ParticleSpecies::getMassFromRadius(const Mdouble radius,SpeciesHandler& speciesHandler)
+{
+    setHandler(&speciesHandler);
+    return getMassFromRadius(radius);
+}
+
 ///\todo this should depend on the particle shape; thus, it should be a static function of BaseParticle
 Mdouble ParticleSpecies::getVolumeFromRadius(const Mdouble radius) const
 {
