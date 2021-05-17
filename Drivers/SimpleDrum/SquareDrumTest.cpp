@@ -30,7 +30,7 @@
 #include <cmath>
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Walls/AxisymmetricIntersectionOfWalls.h"
-//#include "Walls/IntersectionOfWalls.h"
+#include "Walls/IntersectionOfWalls.h"
 #include "Walls/InfiniteWall.h"
 #include "Boundaries/PeriodicBoundary.h"
 #include <chrono>
@@ -178,16 +178,16 @@ public:
         //Add your walls below, and don't forget to set the species!
         Vec3D drumCenter = {0.0 , 0.0 , 0.0};
         wallHandler.clear();
-        InfiniteWall drumWall;
+        IntersectionOfWalls drumWall;
         drumWall.setAngularVelocity(Vec3D(0.0,RPSInitial*constants::pi*2.0 ,0.0));
         drumWall.setSpecies(speciesDrum);
-        drumWall. set(Vec3D(1,0,0),  Vec3D(drumRadius, 0.0 ,0.0));
+        drumWall.addObject(Vec3D(1,0,0),  Vec3D(drumRadius, 0.0 ,0.0));
         wallHandler.copyAndAddObject(drumWall);
-        drumWall.set(Vec3D(-1,0,0), Vec3D(-drumRadius,0.0,0.0));
+        drumWall.addObject(Vec3D(-1,0,0), Vec3D(-drumRadius,0.0,0.0));
         wallHandler.copyAndAddObject(drumWall);
-        drumWall.set(Vec3D(0,0,1), Vec3D(0.0,0.0,drumRadius));
+        drumWall.addObject(Vec3D(0,0,1), Vec3D(0.0,0.0,drumRadius));
         wallHandler.copyAndAddObject(drumWall);
-        drumWall.set(Vec3D(0,0,-1), Vec3D(0.0,0.0,-drumRadius));
+        drumWall.addObject(Vec3D(0,0,-1), Vec3D(0.0,0.0,-drumRadius));
         wallHandler.copyAndAddObject(drumWall);
 
 
