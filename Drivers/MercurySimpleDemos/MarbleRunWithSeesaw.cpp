@@ -183,9 +183,11 @@ public:
         if (bigSeesawFirstElement) {
             // branch vector of the COM
             Vec3D branch = bigSeesawCOM0-bigSeesawCOR;
-            bigSeesawFirstElement->getOrientation().rotate(branch);
+            // \todo gravity torque should act on rotated branch, but something's wrong
+            //bigSeesawFirstElement->getOrientation().rotate(branch);
             // torque due to gravity
-            Vec3D torque = Vec3D::cross(branch, bigSeesawMass * getGravity());
+            Vec3D torque = Vec3D::cross(branch, bigSeesawMass * 0.1 * getGravity());
+            Vec3D torque0 = torque;
             // add torques due to particle contacts
             for (auto w : wallHandler) {
                 if (w->getGroupId() == bigSeesawId) {
@@ -195,12 +197,17 @@ public:
             Vec3D angularAcceleration = bigSeesawInvInertia * torque;
             Vec3D angularVelocity = bigSeesawFirstElement->getAngularVelocity()
                 + angularAcceleration * getTimeStep();
-            
+    
             //limit angle around the z-axis [-pi,pi]
             double angleZ = bigSeesawFirstElement->getOrientation().getAngleZ();
-            if (angleZ<bigSeesawAngleZMin || angleZ>bigSeesawAngleZMax) {
-                angularVelocity = {0,0,0};
+            if (angleZ<bigSeesawAngleZMin && angularVelocity.Z>0) {
+                angularVelocity = -0.1*angularVelocity;
+                //logger(INFO,"Bump off left");
+            } else if (angleZ>bigSeesawAngleZMax && angularVelocity.Z<0) {
+                angularVelocity = -0.1*angularVelocity;
+                //logger(INFO,"Bump off right");
             }
+            //logger(INFO, "T % % V % A % B %",torque.Z-torque0.Z, torque0.Z, angularVelocity.Z, angleZ, branch);
             // apply angular velocity
             for (auto w : wallHandler) {
                 if (w->getGroupId() == bigSeesawId) {
