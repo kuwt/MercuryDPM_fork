@@ -64,6 +64,8 @@ public:
 
 protected:
     
+    void write(std::fstream& file, std::string name, std::function<double(BaseWall*)> f) const;
+    
     /**
      * writes the point data to the vtu file (i.e. the vertices of the mesh displayed in paraview)
      */

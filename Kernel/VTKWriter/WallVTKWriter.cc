@@ -61,14 +61,28 @@ void WallVTKWriter::writeVTK() const
          << "\">\n"
          << "<Points>\n";
     writeVTKPoints(file, vtk);
-    file << "</Points>\n"
-         << "<Cells>\n";
+    file << "</Points>\n";
+    // this cannot be done right now since we can't math Points/Cells and Walls
+    //    file << "<PointData  Vectors=\"vector\">\n";
+    //    write(file,"indSpecies",[](BaseWall* w){return w->getIndSpecies();});
+    //    file << "</PointData>\n";
+    file << "<Cells>\n";
     writeVTKCells(file, vtk);
     file << "</Cells>\n"
          << "</Piece>\n"
          << "</UnstructuredGrid>\n"
          << "</VTKFile>\n";
     file.close();
+}
+
+void WallVTKWriter::write(std::fstream& file, std::string name, std::function<double(BaseWall*)> f) const
+{
+    file << "  <DataArray type=\"Float32\" Name=\""+ name + "\" format=\"ascii\">\n";
+    for (const auto& p: handler_)
+    {
+        file << '\t' << f(p) << '\n';
+    }
+    file << "  </DataArray>\n";
 }
 
 void WallVTKWriter::writeVTKPoints(std::fstream& file, VTKContainer& vtk) const
