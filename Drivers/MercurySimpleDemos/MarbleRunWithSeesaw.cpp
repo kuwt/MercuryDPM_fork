@@ -123,6 +123,45 @@ public:
             }
         }
     }
+    
+    /// groupId of the small seesaw (so we can find all the triangles belonging to it)
+    unsigned smallSeesawId;
+    /// first element in the wallHandler belonging to the small seesaw
+    /// (so we can extract information that is equal for all seesaw triangles,
+    /// like getOrientation, getAngularVelocity)
+    BaseWall* smallSeesawFirstElement = nullptr;
+    /// mass
+    double smallSeesawMass = 145e-3;
+    /// initial center of mass
+    /// (use getOrientation.rotate(smallSeesawCOM0) to compute the current center of mass)
+    Vec3D smallSeesawCOM0 = {572.02e-3,208.62e-3,30e-3};
+    /// center of rotation
+    Vec3D smallSeesawCOR = {572.02e-3,208.62e-3,30e-3};
+    /// inertia around com
+    ///\todo apply the parallel axis theorem to compute the inertia around the center of roation instead of the center of mass: https://en.wikipedia.org/wiki/Parallel_axis_theorem
+    Matrix3D smallSeesawInvInertia = Matrix3D::inverse(
+        Matrix3D(77503.61, -50757.9, 0, -50757.9, 353140.21, 0, 0, 0, 327073.81)*1e-9
+    );
+    /// limits on the angle in the xy-plane the seesaw can make
+    /// (necessary to limit the seesaw movement, since inter-wall forces are not computed)
+    double smallSeesawAngleZMax = 6.0*constants::pi/180;
+    double smallSeesawAngleZMin = 0;
+    
+    /// Loads the stl file for the small seesaw,
+    /// sets the center of rotation to smallSeesawCOR,
+    /// sets smallSeesawId, smallSeesawFirstElement.
+    void loadSmallSeesaw() {
+        std::string stlFile = "Small Seasaw.STL";
+        Vec3D velocity {0,0,0};
+        Vec3D angularVelocity {0,0,0};
+        smallSeesawId = wallHandler.readTriangleWall(stlFile,speciesHandler.getLastObject(),1e-3,smallSeesawCOR, velocity, angularVelocity);
+        for (auto w : wallHandler) {
+            if (w->getGroupId() == smallSeesawId) {
+                smallSeesawFirstElement = w;
+                break;
+            }
+        }
+    }
 
     void includeInDomain(Vec3D pos) {
         if (pos.X<getXMin()) {
@@ -215,6 +254,43 @@ public:
                 }
             }
         }
+    
+        // if smallSeesaw is set
+        if (smallSeesawFirstElement) {
+            // branch vector of the COM
+            Vec3D branch = smallSeesawCOM0-smallSeesawCOR;
+            // \todo gravity torque should act on rotated branch, but something's wrong
+            //smallSeesawFirstElement->getOrientation().rotate(branch);
+            // torque due to gravity
+            Vec3D torque = Vec3D::cross(branch, smallSeesawMass * 0.1 * getGravity());
+            Vec3D torque0 = torque;
+            // add torques due to particle contacts
+            for (auto w : wallHandler) {
+                if (w->getGroupId() == smallSeesawId) {
+                    torque += w->getTorque();
+                }
+            }
+            Vec3D angularAcceleration = smallSeesawInvInertia * torque;
+            Vec3D angularVelocity = smallSeesawFirstElement->getAngularVelocity()
+                                    + angularAcceleration * getTimeStep();
+        
+            //limit angle around the z-axis [-pi,pi]
+            double angleZ = smallSeesawFirstElement->getOrientation().getAngleZ();
+            if (angleZ<smallSeesawAngleZMin && angularVelocity.Z>0) {
+                angularVelocity = -0.1*angularVelocity;
+                //logger(INFO,"Bump off left");
+            } else if (angleZ>smallSeesawAngleZMax && angularVelocity.Z<0) {
+                angularVelocity = -0.1*angularVelocity;
+                //logger(INFO,"Bump off right");
+            }
+            //logger(INFO, "T % % V % A % B %",torque.Z-torque0.Z, torque0.Z, angularVelocity.Z, angleZ, branch);
+            // apply angular velocity
+            for (auto w : wallHandler) {
+                if (w->getGroupId() == smallSeesawId) {
+                    w->setAngularVelocity(angularVelocity);
+                }
+            }
+        }
     }
 };
 
@@ -225,11 +301,13 @@ int main() {
     // Set name of output files
     dpm.setName("MarbleRun");
     // Set name of output files
-//    dpm.loadSTLFile("KnikkerbaanV12_compleet_without_seasaw.STL");
+    dpm.loadSTLFile("KnikkerbaanV12_compleet_without_seasaw.STL");
     dpm.loadBigSeesaw();
-//    dpm.loadSeesaw("Small Seasaw.STL");
+    dpm.loadSmallSeesaw();
     // Set physical particle properties
-    dpm.setParticlePosition(Vec3D(0.24,0.23,0.03));
+    dpm.setParticlePosition(Vec3D(0.6,0.8,0.03));
+    //dpm.setParticlePosition(Vec3D(0.24,0.23,0.03)); //position above big seesaw
+    //dpm.setParticlePosition(Vec3D(0.52,0.25,0.03)); //position above small seesaw
     dpm.setParticleRadius(0.01);
     // Set material particle properties
     dpm.setParticleDensity(1000);
