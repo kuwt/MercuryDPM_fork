@@ -178,17 +178,31 @@ public:
         //Add your walls below, and don't forget to set the species!
         Vec3D drumCenter = {0.0 , 0.0 , 0.0};
         wallHandler.clear();
-        IntersectionOfWalls drumWall;
-        drumWall.setAngularVelocity(Vec3D(0.0,RPSInitial*constants::pi*2.0 ,0.0));
-        drumWall.setSpecies(speciesDrum);
-        drumWall.addObject(Vec3D(1,0,0),  Vec3D(drumRadius, 0.0 ,0.0));
-        wallHandler.copyAndAddObject(drumWall);
-        drumWall.addObject(Vec3D(-1,0,0), Vec3D(-drumRadius,0.0,0.0));
-        wallHandler.copyAndAddObject(drumWall);
-        drumWall.addObject(Vec3D(0,0,1), Vec3D(0.0,0.0,drumRadius));
-        wallHandler.copyAndAddObject(drumWall);
-        drumWall.addObject(Vec3D(0,0,-1), Vec3D(0.0,0.0,-drumRadius));
-        wallHandler.copyAndAddObject(drumWall);
+        IntersectionOfWalls drumWall1;
+        drumWall1.setAngularVelocity(Vec3D(0.0,RPSInitial*constants::pi*2.0 ,0.0));
+        drumWall1.setSpecies(speciesDrum);
+        drumWall1.addObject(Vec3D(1,0,0),  Vec3D(drumRadius, 0.0 ,0.0));
+        wallHandler.copyAndAddObject(drumWall1);
+
+        IntersectionOfWalls drumWall2;
+        drumWall2.addObject(Vec3D(-1,0,0), Vec3D(-drumRadius,0.0,0.0));
+        drumWall1.setAngularVelocity(Vec3D(0.0,RPSInitial*constants::pi*2.0 ,0.0));
+        drumWall1.setSpecies(speciesDrum);
+        wallHandler.copyAndAddObject(drumWall2);
+
+
+        IntersectionOfWalls drumWall3;
+        drumWall2.addObject(Vec3D(0,0,1), Vec3D(0.0,0.0,drumRadius));
+        drumWall1.setAngularVelocity(Vec3D(0.0,RPSInitial*constants::pi*2.0 ,0.0));
+        drumWall1.setSpecies(speciesDrum);
+        wallHandler.copyAndAddObject(drumWall3);
+
+
+        IntersectionOfWalls drumWall4;
+        drumWall4.addObject(Vec3D(0,0,-1), Vec3D(0.0,0.0,-drumRadius));
+        drumWall1.setAngularVelocity(Vec3D(0.0,RPSInitial*constants::pi*2.0 ,0.0));
+        drumWall1.setSpecies(speciesDrum);
+        wallHandler.copyAndAddObject(drumWall4);
 
 
 
