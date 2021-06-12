@@ -208,7 +208,7 @@ class MaserFingeringPrefilled : public Mercury3D {
                     std::cout << x << " " << y  << " " << z << std::endl;
                     std::cout.flush();
 
-                    BaseParticle* particle;
+                    SphericalParticle* particle;
                     if (baseGenerator.getRandomNumber(0, 1) < prob) {
                         particle = smallPrototype;
                         // TODO dispersity 
@@ -219,7 +219,7 @@ class MaserFingeringPrefilled : public Mercury3D {
                     }
 
                     particle->setPosition(Vec3D(x, y, z));
-                    particle->setVelocity(Vec3D(0, 0, 0));
+                    particle->setVelocity(Vec3D(1, 0, 0));
                     particleHandler.copyAndAddObject(particle);
                 }
 
