@@ -72,13 +72,13 @@ class MaserFingeringPrefilled : public Mercury3D {
           eneFile.setFileType(FileType::NO_FILE);
 #endif
 
-          setXMin(pars.at("reservoirLength"));
+          setXMin(-pars.at("reservoirLength"));
           setXMax(pars.at("domainLength"));
           setYMin(0);
           setYMax(+pars.at("domainWidth"));
           setZMin(0);
-          setZMax(pars.at("reservoirHeight")); // This is about to be overwritten...
-          setNumberOfDomains({8,2,2});   //For hopper
+          setZMax(pars.at("reservoirHeight"));
+          setNumberOfDomains({8,2,2});
 
           /* JMFT: We must set up species in the constructor, or in any case before
            * we call setupInitialConditions(), if we want to use MPI. 
@@ -185,11 +185,6 @@ class MaserFingeringPrefilled : public Mercury3D {
         bottomWall->setSpecies(basal_);
         bottomWall = wallHandler.copyAndAddObject(bottomWall);
 
-        auto endWall = new InfiniteWall();
-        endWall->set(Vec3D(+1,0,0), Vec3D(pars.at("domainLength"), 0, 0));
-        endWall->setSpecies(basal_);
-        endWall = wallHandler.copyAndAddObject(endWall);
-
         /* Sides */
         auto sides = new PeriodicBoundary();
         sides->set(Vec3D(0,1,0), 0, pars.at("domainWidth"));
@@ -198,15 +193,18 @@ class MaserFingeringPrefilled : public Mercury3D {
         /* Probability of generating a small particle. Since ratio_small
          * specifies a proportion by volume, we need to convert this to
          * a ratio by number. */
-        double prob = pow(pars.at("radius_large") / pars.at("radius_small"), 3) * pars.at("ratio_small");
+        double r = pars.at("ratio_small") / (1 - pars.at("ratio_small")) 
+                    * pow(pars.at("radius_large") / pars.at("radius_small"), 3);
+        double prob = r / (1 + r);
+        std::cout << "Probability of generating a small particle is " << prob << std::endl;
         /* Space between particles */
-        double space = 3 * pars.at("radius_large") * (1 + pars.at("dispersityLarge"));
+        double space = 2.2 * pars.at("radius_large") * (1 + pars.at("dispersityLarge"));
         for (double z = 2 + space; z < pars.at("reservoirHeight") ; z += space) 
             for (double x = -pars.at("reservoirLength") + space; x < -space; x += space)
-                for (double y = space; y < pars.at("domainWidth") - space; y += space) 
+                for (double y = 0; y < pars.at("domainWidth") - space; y += space) 
                 {
-                    std::cout << x << " " << y  << " " << z << std::endl;
-                    std::cout.flush();
+                    // std::cout << x << " " << y  << " " << z << std::endl;
+                    // std::cout.flush();
 
                     SphericalParticle* particle;
                     if (baseGenerator.getRandomNumber(0, 1) < prob) {
@@ -219,7 +217,11 @@ class MaserFingeringPrefilled : public Mercury3D {
                     }
 
                     particle->setPosition(Vec3D(x, y, z));
-                    particle->setVelocity(Vec3D(1, 0, 0));
+                    particle->setVelocity(Vec3D(
+                        2 + baseGenerator.getRandomNumber(-0.5, 0.5), 
+                        baseGenerator.getRandomNumber(-0.5, 0.5), 
+                        -2 + baseGenerator.getRandomNumber(-0.5, 0.5)
+                    ));
                     particleHandler.copyAndAddObject(particle);
                 }
 
@@ -231,6 +233,7 @@ class MaserFingeringPrefilled : public Mercury3D {
         masb->set(Vec3D(1,0,0), -pars.at("reservoirLength"), 0);
         masb = boundaryHandler.copyAndAddObject(masb);
         masb->activateMaser();
+        masb->turnOffCopying();
         logger(INFO, "Maser inserted and activated, but not copying yet.");
 
 
@@ -244,14 +247,14 @@ class MaserFingeringPrefilled : public Mercury3D {
         makeRoughBase();
     }
 
+    /* Set up particles for rough base. (Don't set them up during
+     * the initial filling, or you waste time calculating them
+     * (although they are static so it's fairly cheap.) 
+     *
+     * We need to put in the rough base after activating the Maser,
+     * so that the basal particles don't get converted. (TODO would
+     * that be important?) */
     void makeRoughBase() {
-        /* Set up particles for rough base. (Don't set them up during
-         * the initial filling, or you waste time calculating them
-         * (although they are static so it's fairly cheap.) 
-         *
-         * We need to put in the rough base after activating the Maser,
-         * so that the basal particles don't get converted. (TODO would
-         * that be important?) */
         double basalConcentration;
         if (pars.find("basalConcentration") != pars.end())
             basalConcentration = pars.at("basalConcentration");
@@ -410,51 +413,57 @@ class MaserFingeringPrefilled : public Mercury3D {
         std::cout.flush();
     }
 
+    /* Turn on the Maser's copying, and reset time and indices to 0. */
+    void startSimulationProper()
+    {
+        masb->turnOnCopying();
+        logger(INFO, "t=%, maser is now copying", getTime());
+
+        /* Write the state */
+        // Change the name of the problem first, so that the written
+        // .restart file doesn't get overwritten. 
+        auto name = getName();
+        setName( name + ".layered" );
+        writeRestartFile();
+        // restore the original name
+        setName(name); 
+
+        /* The experiment has properly started! Start writing to .data. and
+         * .fstat. files, if the user wants them. */
+        setTime(0);
+        eneFile.setFileType(FileType::ONE_FILE);
+
+        if (pars.at("fStatFile")==0) {
+            fStatFile.setFileType(FileType::NO_FILE);
+            logger(WARN, ".fstat file will not be generated.");
+        }
+        else
+            fStatFile.setFileType(FileType::MULTIPLE_FILES);
+
+        if (pars.at("dataFile")==0) {
+            dataFile.setFileType(FileType::NO_FILE);
+            logger(WARN, ".data file will not be generated.");
+        }
+        else
+            dataFile.setFileType(FileType::MULTIPLE_FILES);
+
+#ifdef FILESWHILEFILLING
+        dataFile.setCounter(0);
+        fStatFile.setCounter(0);
+#endif
+        forceWriteOutputFiles(); 
+    }
+
     void actionsAfterTimeStep() override
     {
         /* After allowing the Maser to settle for a long enough time, 
          * open it. */
-        if ((masb->isActivated() && !masb->isCopying()) 
+        if (masb->isActivated() 
+                && !masb->isCopying()
                 && particleHandler.getVolume() < pars.at("totalVolume") 
                 && getTime() > pars.at("timeToOpen")
-        )
-        {
-            masb->turnOnCopying();
-            logger(INFO, "t=%, maser is now copying", getTime());
-
-            /* Write the state */
-            // Change the name of the problem first, so that the written
-            // .restart file doesn't get overwritten. 
-            auto name = getName();
-            setName( name + ".layered" );
-            writeRestartFile();
-            // restore the original name
-            setName(name); 
-
-            /* The experiment has properly started! Start writing to .data. and
-             * .fstat. files, if the user wants them. */
-            setTime(0);
-            eneFile.setFileType(FileType::ONE_FILE);
-
-            if (pars.at("fStatFile")==0) {
-                fStatFile.setFileType(FileType::NO_FILE);
-                logger(WARN, ".fstat file will not be generated.");
-            }
-            else
-                fStatFile.setFileType(FileType::MULTIPLE_FILES);
-
-            if (pars.at("dataFile")==0) {
-                dataFile.setFileType(FileType::NO_FILE);
-                logger(WARN, ".data file will not be generated.");
-            }
-            else
-                dataFile.setFileType(FileType::MULTIPLE_FILES);
-
-#ifdef FILESWHILEFILLING
-            dataFile.setCounter(0);
-            fStatFile.setCounter(0);
-#endif
-            forceWriteOutputFiles(); 
+        ) {
+            startSimulationProper();
         }
 
         /* Deactivate the Maser after enough particles have been released */
@@ -462,10 +471,10 @@ class MaserFingeringPrefilled : public Mercury3D {
             && masb->isCopying()
             && particleHandler.getVolume() >= pars.at("totalVolume")
         ) {
+            logger(INFO, "Released enough particles, so closing the Maser");
             masb->closeMaser();
         }
     }
-
 
   private:
     LinearViscoelasticFrictionSpecies *small_, *large_, *basal_;
