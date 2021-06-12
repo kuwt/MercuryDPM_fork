@@ -60,6 +60,8 @@ class MaserFingering : public Mercury3D {
 
       /* Initialization */
       setName(parsfile.erase(parsfile.find_last_of('.')));
+      stillFillingUp = false;
+      blocker = new InfiniteWall();
 
       if (pars.find("randomSeed") != pars.end())
       {
@@ -205,7 +207,6 @@ class MaserFingering : public Mercury3D {
       backWall->set(Vec3D(-1,0,0), Vec3D(-pars.at("reservoirLength"),0,0));
       backWall->setSpecies(basal_);
       backWall = wallHandler.copyAndAddObject(backWall);
-      blocker = new InfiniteWall();
       blocker->set(Vec3D(1,0,0), Vec3D(0, 0, 0));
       blocker->setSpecies(basal_);
       blocker = wallHandler.copyAndAddObject(blocker);
