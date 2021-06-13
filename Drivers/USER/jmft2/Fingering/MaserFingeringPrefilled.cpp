@@ -170,7 +170,29 @@ class MaserFingeringPrefilled : public Mercury3D {
         delete largePrototype;
     }
 
+
+    /* Only count the z component of gravity in calculating the
+     * potential energy, so that we can meaningfully compare this to the
+     * kinetic energy and use this to calculate a Froude number.
+     */
+    Mdouble getGravitationalEnergy() const override {
+        Mdouble gravitationalEnergy = 0;
+        for (const BaseParticle* const p : particleHandler)
+        {
+            if (!(p->isFixed()))
+            {
+                gravitationalEnergy += p->getMass() * Vec3D::dot(
+                    Vec3D(0, 0, -getGravity().getZ()), 
+                    p->getPosition()
+                );
+            }
+        }
+        return gravitationalEnergy;
+    }
+
     void setupInitialConditions() override {
+        startedProper = false;
+
         setTimeStep(pars.at("timeStep"));
         setTimeMax(pars.at("timeMax"));
         setSaveCount(int(pars.at("saveCount")));
@@ -181,7 +203,7 @@ class MaserFingeringPrefilled : public Mercury3D {
         /* Set up walls */
 
         auto bottomWall = new InfiniteWall();
-        bottomWall->set(Vec3D(0,0,-1),Vec3D(0,0,0));
+        bottomWall->set(Vec3D(0,0,-1), Vec3D(0,0,0));
         bottomWall->setSpecies(basal_);
         bottomWall = wallHandler.copyAndAddObject(bottomWall);
 
@@ -198,7 +220,7 @@ class MaserFingeringPrefilled : public Mercury3D {
         double prob = r / (1 + r);
         std::cout << "Probability of generating a small particle is " << prob << std::endl;
         /* Space between particles */
-        double space = 2.2 * pars.at("radius_large") * (1 + pars.at("dispersityLarge"));
+        double space = 2.1 * pars.at("radius_large") * (1 + pars.at("dispersityLarge"));
         for (double z = 2 + space; z < pars.at("reservoirHeight") ; z += space) 
             for (double x = -pars.at("reservoirLength") + space; x < -space; x += space)
                 for (double y = 0; y < pars.at("domainWidth") - space; y += space) 
@@ -452,15 +474,18 @@ class MaserFingeringPrefilled : public Mercury3D {
         fStatFile.setCounter(0);
 #endif
         forceWriteOutputFiles(); 
+
+        startedProper = true;
     }
 
     void actionsAfterTimeStep() override
     {
         /* After allowing the Maser to settle for a long enough time, 
          * open it. */
+
         if (masb->isActivated() 
                 && !masb->isCopying()
-                && particleHandler.getVolume() < pars.at("totalVolume") 
+                && !startedProper
                 && getTime() > pars.at("timeToOpen")
         ) {
             startSimulationProper();
@@ -469,6 +494,7 @@ class MaserFingeringPrefilled : public Mercury3D {
         /* Deactivate the Maser after enough particles have been released */
         if (masb->isActivated() 
             && masb->isCopying()
+            && startedProper
             && particleHandler.getVolume() >= pars.at("totalVolume")
         ) {
             logger(INFO, "Released enough particles, so closing the Maser");
@@ -481,6 +507,7 @@ class MaserFingeringPrefilled : public Mercury3D {
     RNG baseGenerator;
     map<string,double> pars;
     bool stillFillingUp;
+    bool startedProper;
     ConstantMassFlowMaserBoundary *masb;
     SphericalParticle *smallPrototype, *largePrototype;
 
