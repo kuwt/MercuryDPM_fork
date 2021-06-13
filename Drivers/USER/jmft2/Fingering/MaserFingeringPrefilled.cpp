@@ -175,7 +175,7 @@ class MaserFingeringPrefilled : public Mercury3D {
      * potential energy, so that we can meaningfully compare this to the
      * kinetic energy and use this to calculate a Froude number.
      */
-    Mdouble getGravitationalEnergy() const override {
+    Mdouble getGravitationalEnergy() const {
         Mdouble gravitationalEnergy = 0;
         for (const BaseParticle* const p : particleHandler)
         {
