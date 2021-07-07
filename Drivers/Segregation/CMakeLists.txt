@@ -15,3 +15,5 @@ foreach(CPPFILE ${CPPFILES})
 	#All cpp folder and linked against DPMBase
 	target_link_libraries(${EXECNAME}  Chute)
 endforeach()
+
+add_subdirectory(Scripts)

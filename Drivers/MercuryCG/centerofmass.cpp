@@ -26,6 +26,7 @@
 ///takes data and fstat files and splits them into *.data.???? and *.fstat.???? files
 
 #include <cstring>
+#include <string>
 #include <iomanip>
 #include <iostream>
 #include <fstream>
@@ -54,7 +55,7 @@ public:
 		{
 			std::cerr << "ERROR: Input file " << data_filename.str() << " not found" << std::endl;
 			data_file.close();
-			exit(-1);
+			std::exit(EXIT_FAILURE);
 		} else {
 			std::cout << "Files opened: " << data_filename.str() << std::endl;
 		}
@@ -66,7 +67,7 @@ public:
 		{
 			std::cerr << "ERROR: Output file " << com_filename.str() << " not found" << std::endl;
 			com_file.close();
-			exit(-1);
+			std::exit(EXIT_FAILURE);
 		} else {
 			std::cout << "Files opened: " << com_filename.str() << std::endl;
 		}
@@ -183,13 +184,13 @@ int main(int argc, char *argv[])
                         //std::cout << "hello" << std::endl; 
 			if (argc>4) {
 				files.splittinginfo = true;
-				files.info0 = atoi(argv[3]);
-				files.info1 = atoi(argv[4]);
+				files.info0 = std::atoi(argv[3]);
+				files.info1 = std::atoi(argv[4]);
 			} else {
 				std::cerr << "Please provide two info values" << std::endl;
 			}
 		} else {
-			files.splittingradius = atof(argv[2]);
+			files.splittingradius = std::atof(argv[2]);
 		}
 	}
 

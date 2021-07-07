@@ -53,11 +53,11 @@ public:
 
 
         //Set up live statistics
-        CG<CGCoordinates::Z> cg; //declare a cg object
-        cg.setN(50); //set the CG to be 100 by 100.
-        cg.setWidth(5.0*radius_s);
-        cg.statFile.setSaveCount(200); //set parameters such as the output frequency
-        cgHandler.copyAndAddObject(cg); // add the CG object to the cgHandler
+        //CG<CGCoordinates::Z> cg; //declare a cg object
+        //cg.setN(50); //set the CG to be 100 by 100.
+        //cg.setWidth(5.0*radius_s);
+        //cg.statFile.setSaveCount(200); //set parameters such as the output frequency
+        //cgHandler.copyAndAddObject(cg); // add the CG object to the cgHandler*/
         
         //setInflowParticleRadius(radius_s, radius_l);
         
@@ -283,6 +283,8 @@ public:
     void actionsAfterTimeStep()
     {
 
+        setParticlesWriteVTK(true);
+
         switch (step)
         {
             case 0 :
@@ -477,20 +479,22 @@ int main(int argc, char *argv[])
     
     // Problem parameters
     Chutebelt problem;
+
+    problem.autoNumber();
     problem.setName("Segregation");
-    problem.setTimeMax(500.0);
+    problem.setTimeMax(2000.0);
     problem.setTimeStep(1. / (200.0 * 50.0));
     
     problem.set_radiusLarge(2.0);
     problem.set_particle_number_volRatio(1.0); //volume ratio of large to small
-    problem.set_particle_numbers(5000, 130); //Should be 5000 and 130
+    problem.set_particle_numbers(2500, 130); //Should be 5000 and 130
 
     problem.setChuteAngleAndMagnitudeOfGravity(25.0, 1.0);
     problem.set_beltSpeed(0.0);
     
     // Chute properties : Simply remove the first line to add side walls.
     problem.makeChutePeriodic();
-    problem.setXMax(100.0);
+    problem.setXMax(150.0);
     problem.setYMax(5.0);
     
     problem.setZMin(0.0);
@@ -521,6 +525,7 @@ int main(int argc, char *argv[])
     }
     
     std::cout << problem.num_restart_small <<" " <<problem.num_restart_large << std::endl;
+
 
     problem.solve();
 
