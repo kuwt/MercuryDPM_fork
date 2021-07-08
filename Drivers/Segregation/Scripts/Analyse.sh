@@ -27,7 +27,7 @@ sleep 10s
 
 for num in 1; do
 #for num in 1 4 6 8 10; do
-  ../bin/centerofmass ../../Segregation.$num 0.5
+  ../bin/centerofmass ../../Segregation.$num 1.00001
   mv ../../Segregation.$num.com .
 
 echo
@@ -38,7 +38,7 @@ echo
 sleep 10s
 
 	../bin/fstatistics ../../Segregation.$num -stattype Z \
-	 -n 200 -tmin 90 -w 0.5 -z 0 100 -StressTypeForFixedParticles 1 \
+	 -n 200 -tmin 1500 -w 1.0 -z 0 100 -StressTypeForFixedParticles 1 \
 	 -o Segregation.$num.stat
 echo
 echo
@@ -47,8 +47,8 @@ echo
 echo
 	sleep 10s
 	 ../bin/fstatistics ../../Segregation.$num -stattype Z \
-	 -n 200 -tmin 90 -w 0.5 -z 0 100 -StressTypeForFixedParticles 1 \
-	 -rmin 0.5 -o Segregation.$num.large.stat
+	 -n 200 -tmin 1500 -w 1.0 -z 0 100 -StressTypeForFixedParticles 1 \
+	 -rmin 1.00001 -o Segregation.$num.large.stat
 echo
 echo
 echo Starting small particle stats ....
@@ -56,7 +56,7 @@ echo
 echo
 	sleep 10s
 	../bin/fstatistics ../../Segregation.$num -stattype Z \
-	 -n 200 -tmin 90 -w 0.5 -z 0 100 -StressTypeForFixedParticles 1 \
-	 -rmax 0.5 -o Segregation.$num.small.stat
+	 -n 200 -tmin 1500 -w 1.0 -z 0 100 -StressTypeForFixedParticles 1 \
+	 -rmax 1.00001 -o Segregation.$num.small.stat
 
 done
