@@ -982,3 +982,7 @@ bool helpers::createDirectory(std::string path) {
     }
     return false;
 }
+
+Mdouble helpers::getRayleighTime(Mdouble radius, Mdouble shearModulus, Mdouble poisson, Mdouble density) {
+    return constants::pi*radius*sqrt(density/shearModulus)/(0.1631*poisson+0.8766);
+}

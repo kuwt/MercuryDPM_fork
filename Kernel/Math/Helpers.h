@@ -429,6 +429,14 @@ bool isNext(std::istream& is, const std::string name);
 bool createDirectory(std::string);
 
 Mdouble round(const Mdouble value, unsigned precision);
+
+/*
+ * \brief Returns the Rayleigh time step for a Hertz contact law.
+ * \detailed An accepted time step for Hertz is 10-20% of the Rayleigh time step.
+ * See \cite Marigo2015
+ */
+Mdouble getRayleighTime(Mdouble radius, Mdouble shearModulus, Mdouble poisson, Mdouble density);
+
 }
 
 #endif
