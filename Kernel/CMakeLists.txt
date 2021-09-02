@@ -51,6 +51,7 @@ file(GLOB Mercury_SRC
         Species/*.cc
         Species/*/*.cc
         Nurbs/*.cc
+        Tools/*.cc
         )
 
 #Basic library

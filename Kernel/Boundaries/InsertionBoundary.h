@@ -27,10 +27,13 @@
 #define BOUNDARIES_INSERTIONBOUNDARY_H
 
 #include "BaseBoundary.h"
+#include <Math/PSD.h>
 
 class MD;
 
 class RNG;
+
+class PSD;
 
 /*!
  * \class InsertionBoundary
@@ -46,6 +49,18 @@ class RNG;
 class InsertionBoundary : public BaseBoundary
 {
 public:
+    
+    /*!
+     * \brief Defines a custom particle size distribution; distribution_ will always be used, unless particleSizeDistribution_ is non-empty
+     */
+    enum class Distribution
+    {
+        Uniform,
+        Normal_1_5
+        // TODO add LogNormal distribution to generateParticle()
+        // LogNormal
+    };
+    
     /*!
      * \brief Default constructor: set everything to 0/nullptr.
      */
@@ -71,7 +86,7 @@ public:
      * (species, radius) of one particle.
      * \param[in] random  Random number generator
      */
-    virtual BaseParticle* generateParticle(RNG& random)=0;
+    virtual BaseParticle* generateParticle(RNG& random);
     
     /*!
      * \brief Purely virtual function that generates the extrinsic properties
@@ -156,19 +171,51 @@ public:
     Mdouble getInitialVolume() const;
     
     void setInitialVolume(Mdouble initialVolume);
-
+    
+    /*!
+     * \brief Sets the range of particle radii that may be generated from a user defined PSD.
+     */
+    void setPSD(PSD psd);
+    
+    PSD getPSD();
+    
+    /*!
+     * \brief Sets the range of particle radii that may be generated to custom distributions.
+     */
+    void setDistribution(Distribution distribution);
+    
+    Distribution getDistribution();
+    
     ///\see variableCumulativeVolumeFlowRate_
-    void setVariableVolumeFlowRate(const std::vector<Mdouble>& variableCumulativeVolumeFlowRate, Mdouble samplingInterval);
-
+    void
+    setVariableVolumeFlowRate(const std::vector<Mdouble>& variableCumulativeVolumeFlowRate, Mdouble samplingInterval);
+    
     bool insertParticle(Mdouble time);
-
-    bool getCheckParticleForInteraction() const {
+    
+    bool getCheckParticleForInteraction() const
+    {
         return checkParticleForInteraction_;
     }
-
-    void setCheckParticleForInteraction(bool checkParticleForInteraction) {
+    
+    void setCheckParticleForInteraction(bool checkParticleForInteraction)
+    {
         checkParticleForInteraction_ = checkParticleForInteraction;
     }
+    
+    /*!
+     * \brief Set the flag for a manual PSD insertion routine
+     */
+    void setManualInsertion(bool manualInsertion);
+    
+    /*!
+     * \brief write Distribution class to file.
+     */
+    friend std::ostream& operator<<(std::ostream& os, InsertionBoundary::Distribution type);
+    
+    /*!
+     * \brief read Distribution class from file.
+     */
+    friend std::istream& operator>>(std::istream& is, InsertionBoundary::Distribution& type);
 
 protected:
     
@@ -217,7 +264,7 @@ protected:
 
     ///\see volumeFlowRate_
     Mdouble initialVolume_;
-
+    
     /*!
      * Defines a variable volume flow rate, taken at fixed sampling intervals; the values are cumulative; thus, we need to ensure the volume inserted before time t=n*samplingInterval is less than variableCumulativeVolumeFlowRate[n].
      *
@@ -225,12 +272,32 @@ protected:
      * \see volumeFlowRate_.
      */
     std::vector<Mdouble> variableCumulativeVolumeFlowRate_;
-
+    
     ///\see variableCumulativeVolumeFlowRate_
     Mdouble samplingInterval_;
-
+    
     bool checkParticleForInteraction_;
-
+    
+    /*!
+     * \brief Defines a particle size distribution as an object of the PSD class; if particleSizeDistribution_ is empty, distribution_ is
+     * used instead
+     */
+    PSD particleSizeDistribution_;
+    
+    /*!
+     * \brief Minimum and maximum radii of the generated particles
+     */
+    Mdouble radMin_, radMax_;
+    
+    /*!
+     * \brief defines a custom particle size distribution, which by default is uniform
+     */
+    Distribution distribution_ = Distribution::Uniform;
+    
+    /*!
+     * \brief A flag to enable a top-down class-by-class manual insertion of a PSD; default is FALSE
+     */
+    bool isManuallyInserting_;
 };
 
 #endif

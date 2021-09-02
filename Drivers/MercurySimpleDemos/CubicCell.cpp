@@ -80,7 +80,7 @@ public:
         BaseParticle* q;
         for (unsigned int i = 0; i < n * n * n; ++i)
         {
-            q=b.generateParticle(random);
+            q = b.generateParticle(random);
             if (checkParticleForInteraction(*q))
             {
                 particleHandler.copyAndAddObject(q);

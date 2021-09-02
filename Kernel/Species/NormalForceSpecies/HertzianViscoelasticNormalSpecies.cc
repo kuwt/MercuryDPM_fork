@@ -93,31 +93,31 @@ std::string HertzianViscoelasticNormalSpecies::getBaseName() const
 }
 
 ///Allows the spring constant to be changed
-void HertzianViscoelasticNormalSpecies::setElasticModulus(Mdouble elasticModulus)
+void HertzianViscoelasticNormalSpecies::setEffectiveElasticModulus(Mdouble elasticModulus)
 {
     if (elasticModulus >= 0)
         elasticModulus_ = elasticModulus;
     else
     {
-        std::cerr << "Error in setElasticModulus" << std::endl;
+        std::cerr << "Error in setEffectiveElasticModulus" << std::endl;
         exit(-1);
     }
 }
 
 ///Allows the spring constant to be changed
-void HertzianViscoelasticNormalSpecies::setElasticModulusAndRestitutionCoefficient(Mdouble elasticModulus, Mdouble rest)
+void HertzianViscoelasticNormalSpecies::setEffectiveElasticModulusAndRestitutionCoefficient(Mdouble elasticModulus, Mdouble rest)
 {
     // Here is a very nice paper describing contact modelling
     // http://people.ds.cam.ac.uk/jae1001/CUS/research/pfizer/Antypov_Elliott_EPL_2011.pdf
     // see also: https://answers.launchpad.net/yade/+question/235934
     if (elasticModulus < 0.0)
         logger(ERROR,
-               "[HertzianViscoelasticNormalSpecies::setElasticModulusAndRestitutionCoefficient] elasticModulus % should be nonnegative",
+               "[HertzianViscoelasticNormalSpecies::setEffectiveElasticModulusAndRestitutionCoefficient] elasticModulus % should be nonnegative",
                elasticModulus);
     
     else if (rest < 0.0 || rest > 1.0)
         logger(ERROR,
-               "[HertzianViscoelasticNormalSpecies::setElasticModulusAndRestitutionCoefficient] rest % should be between 0 and 1 (inclusive)",
+               "[HertzianViscoelasticNormalSpecies::setEffectiveElasticModulusAndRestitutionCoefficient] rest % should be between 0 and 1 (inclusive)",
                rest);
     
     else
@@ -137,49 +137,49 @@ void HertzianViscoelasticNormalSpecies::setElasticModulusAndRestitutionCoefficie
 }
 
 ///Allows to change elastic modulus and poisson ratio to compute shear modulus
-void HertzianViscoelasticNormalSpecies::setElasticModulusAndPoissonRatio(Mdouble elasticModulus, Mdouble poissonRatio)
+void HertzianViscoelasticNormalSpecies::setEffectiveElasticModulusAndPoissonRatio(Mdouble elasticModulus, Mdouble poissonRatio)
 {
     if (elasticModulus < 0.0)
         logger(ERROR,
-               "[HertzianViscoelasticNormalSpecies::setElasticModulusAndRestitutionCoefficient] elasticModulus % should be nonnegative",
+               "[HertzianViscoelasticNormalSpecies::setEffectiveElasticModulusAndRestitutionCoefficient] elasticModulus % should be nonnegative",
                elasticModulus);
     
     else if (poissonRatio < 0.0 || poissonRatio > 1.0)
         logger(ERROR,
-               "[HertzianViscoelasticNormalSpecies::setElasticModulusAndRestitutionCoefficient] poissonRatio % should be between 0 and 1 (inclusive)",
+               "[HertzianViscoelasticNormalSpecies::setEffectiveElasticModulusAndRestitutionCoefficient] poissonRatio % should be between 0 and 1 (inclusive)",
                poissonRatio);
     else
     {
         elasticModulus_ = elasticModulus;
         auto mindlin = dynamic_cast<MindlinSpecies*>(getBaseSpecies());
         logger.assert(mindlin, "Please define HertzianViscoelasticMindlinSpecies to use this setter");
-        mindlin->setShearModulus(elasticModulus / 2 * (1 + poissonRatio));
+        mindlin->setEffectiveShearModulus(elasticModulus / 2 * (1 + poissonRatio));
     }
 }
 
 ///Allows to change elastic modulus and shear modulus to compute poisson ratio
-void HertzianViscoelasticNormalSpecies::setElasticModulusAndShearModulus(Mdouble elasticModulus, Mdouble shearModulus)
+void HertzianViscoelasticNormalSpecies::setEffectiveElasticModulusAndEffectiveShearModulus(Mdouble elasticModulus, Mdouble shearModulus)
 {
     if (elasticModulus < 0.0)
         logger(ERROR,
-               "[HertzianViscoelasticNormalSpecies::setElasticModulusAndShearModulus] elasticModulus % should be nonnegative",
+               "[HertzianViscoelasticNormalSpecies::setEffectiveElasticModulusAndEffectiveShearModulus] elasticModulus % should be nonnegative",
                elasticModulus);
     
     else if (shearModulus < 0.0)
         logger(ERROR,
-               "[HertzianViscoelasticNormalSpecies::setElasticModulusAndShearModulus] shearModulus % should be nonnegative",
+               "[HertzianViscoelasticNormalSpecies::setEffectiveElasticModulusAndEffectiveShearModulus] shearModulus % should be nonnegative",
                shearModulus);
     else
     {
         elasticModulus_ = elasticModulus;
         auto mindlin = dynamic_cast<MindlinSpecies*>(getBaseSpecies()->getFrictionForce());
         logger.assert(mindlin, "Please define HertzianViscoelasticMindlinSpecies to use this setter");
-        mindlin->setShearModulus(shearModulus);
+        mindlin->setEffectiveShearModulus(shearModulus);
     }
 }
 
 ///Allows the spring constant to be accessed
-Mdouble HertzianViscoelasticNormalSpecies::getElasticModulus() const
+Mdouble HertzianViscoelasticNormalSpecies::getEffectiveElasticModulus() const
 {
     return elasticModulus_;
 }
@@ -274,7 +274,7 @@ Mdouble HertzianViscoelasticNormalSpecies::getDissipation() const
 void HertzianViscoelasticNormalSpecies::mix(HertzianViscoelasticNormalSpecies* const S,
                                             HertzianViscoelasticNormalSpecies* const T)
 {
-    elasticModulus_ = BaseSpecies::average(S->getElasticModulus(), T->getElasticModulus());
+    elasticModulus_ = BaseSpecies::average(S->getEffectiveElasticModulus(), T->getEffectiveElasticModulus());
     dissipation_ = BaseSpecies::average(S->getDissipation(), T->getDissipation());
 }
 
@@ -289,9 +289,9 @@ Mdouble HertzianViscoelasticNormalSpecies::getCollisionTime(Mdouble particleDiam
     // Here is a very nice paper describing contact modelling
     // http://people.ds.cam.ac.uk/jae1001/CUS/research/pfizer/Antypov_Elliott_EPL_2011.pdf
     //caution: this function assumes the contact is elastic (no dissipation)
-    //Mdouble omega0 = 2.0/constants::sqrt_pi*sqrt(getElasticModulus()/particleDensity)/relativeVelocity;
+    //Mdouble omega0 = 2.0/constants::sqrt_pi*sqrt(getEffectiveElasticModulus()/particleDensity)/relativeVelocity;
     //Mdouble omega1 = sqrt(omega0*omega0-getDissipation()*getDissipation());
-    return 2.214 * pow(mathsFunc::square(particleDensity / getElasticModulus()) / relativeVelocity, 0.2) *
+    return 2.214 * pow(mathsFunc::square(particleDensity / getEffectiveElasticModulus()) / relativeVelocity, 0.2) *
            particleDiameter;
 }
 

@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
     
     //setting the material properties of the particles
     species->setDensity(6. / constants::pi);
-    species->setElasticModulus(1000.0);
+    species->setEffectiveElasticModulus(1000.0);
     species->setSlidingFrictionCoefficient(0.0);
     species->setAdhesionForceMax(maximumForce);
     species->setAdhesionStiffness(adStiffness);

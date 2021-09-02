@@ -37,9 +37,6 @@ CubeInsertionBoundary::CubeInsertionBoundary() : InsertionBoundary()
     posMax_ = Vec3D(0.0, 0.0, 0.0);
     velMin_ = Vec3D(0.0, 0.0, 0.0);
     velMax_ = Vec3D(0.0, 0.0, 0.0);
-    radMin_ = 0;
-    radMax_ = 0;
-    //psd_
 }
 
 /*!
@@ -52,10 +49,6 @@ CubeInsertionBoundary::CubeInsertionBoundary(const CubeInsertionBoundary& other)
     posMax_ = other.posMax_;
     velMin_ = other.velMin_;
     velMax_ = other.velMax_;
-    radMin_ = other.radMin_;
-    radMax_ = other.radMax_;
-    psd_ = other.psd_;
-    distribution_ = other.distribution_;
 }
 
 /*!
@@ -125,7 +118,7 @@ void CubeInsertionBoundary::setGeometry(Vec3D posMin, Vec3D posMax, Vec3D velMin
 }
 
 /*!
- * \details Generates a particle with random position (although within the boundary,
+ * \details places a particle with random position (although within the boundary,
  * of course), velocity and radius and returns its pointer.
  * \param[in] random    Random number generator
  */
@@ -141,44 +134,9 @@ void CubeInsertionBoundary::setGeometry(Vec3D posMin, Vec3D posMax, Vec3D velMin
 // CubeInsertionBoundary. If the particle is wanted then it is copied into the
 // particleHandler.  In any case, the InsertionBoundary's version of the
 // particle (created here) gets deleted by the InsertionBoundary.
-BaseParticle* CubeInsertionBoundary::generateParticle(RNG& random)
-{
-    BaseParticle* P = getParticleToCopy()->copy();
-    if (psd_.empty()) {
-        if (distribution_==Distribution::Uniform) {
-            P->setRadius(random.getRandomNumber(radMin_, radMax_));
-        } else {
-            //normal distribution
-            static std::mt19937 gen(0);
-            Mdouble particleRadius = 0.5*(radMax_+radMin_);
-            Mdouble polydispersity = 0.5*(radMax_-radMin_);
-            static std::normal_distribution<> d(particleRadius, polydispersity);
-            static const Mdouble radiusMin = particleRadius-1.5*polydispersity;
-            static const Mdouble radiusMax = particleRadius+1.5*polydispersity;
-            Mdouble radius = d(gen);
-            while (radius > radiusMax || radius < radiusMin) radius = d(gen);
-            P->setRadius(radius);
-        }
-    } else {
-        //static std::random_device rd(0);
-        //draw a number between 0 and 1, uniformly distributed
-        static std::mt19937 gen(0);
-        static std::uniform_real_distribution<Mdouble> dist(0, 1);
-        const Mdouble probability = dist(gen);
-        //find the interval [low,high] of the psd in which the number sits
-        auto high = std::lower_bound(psd_.begin(),psd_.end(),probability);
-        auto low = std::max(psd_.begin(),high-1);
-        Mdouble rMin = low->radius;
-        Mdouble rMax = high->radius;
-        Mdouble pMin = low->probability;
-        Mdouble pMax = high->probability;
-        // interpolate linearly between [low.radius,high.radius]
-        Mdouble a = (probability - low->probability)/(high->probability -low->probability);
-        const Mdouble radius = a*low->radius + (1-a)*high->radius;
-        P->setRadius(radius);
-    }
-    return P;
-}
+//
+// TP: Generate Particle is not geometry specific (but sometimes distribution-modality/species specific; in that case
+// it can be overriden) and therefore moved to the Parent class.
 
 void CubeInsertionBoundary::placeParticle(BaseParticle* p, RNG& random)
 {
@@ -205,18 +163,8 @@ void CubeInsertionBoundary::read(std::istream& is)
        >> dummy >> posMax_;
     is >> dummy >> velMin_
        >> dummy >> velMax_;
-    is >> dummy >> radMin_;
-    is >> dummy >> radMax_;
-    
-    size_t n;
-    PSD psd;
-    is >> dummy >> n;
-    psd_.reserve(n);
-    for (size_t i=0; i<n; ++i) {
-        is >> psd;
-        psd_.push_back(psd);
-    }
-    is >> dummy >> distribution_;
+    is >> dummy >> radMin_
+       >> dummy >> radMax_;
 }
 
 /*!
@@ -247,14 +195,9 @@ void CubeInsertionBoundary::write(std::ostream& os) const
     os << " posMin " << posMin_
        << " posMax " << posMax_
        << " velMin " << velMin_
-       << " velMax " << velMax_;
-    os << " radMin " << radMin_
+       << " velMax " << velMax_
+       << " radMin " << radMin_
        << " radMax " << radMax_;
-    os << " psd " << psd_.size();
-    for (auto p : psd_) {
-        os << ' ' << p;
-    }
-    os << " distribution " << distribution_;
 }
 
 /*!
@@ -264,24 +207,4 @@ void CubeInsertionBoundary::write(std::ostream& os) const
 std::string CubeInsertionBoundary::getName() const
 {
     return "CubeInsertionBoundary";
-}
-
-/*!
- * write to file
- */
-std::ostream& operator<<(std::ostream& os, CubeInsertionBoundary::Distribution type)
-{
-    os << static_cast<unsigned>(type);
-    return os;
-}
-
-/*!
- * write from file
- */
-std::istream& operator>>(std::istream& is, CubeInsertionBoundary::Distribution& type)
-{
-    unsigned uType;
-    is >> uType;
-    type = static_cast<CubeInsertionBoundary::Distribution>(uType);
-    return is;
 }

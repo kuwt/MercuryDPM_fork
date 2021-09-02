@@ -200,10 +200,10 @@ void FixedClusterInsertionBoundary::placeParticle(BaseParticle* p, RNG& random)
 }
 
 //!\brief Sets cluster radii according to vector clusterRadii_.
-BaseParticle* FixedClusterInsertionBoundary::generateParticle(RNG &random)
+BaseParticle* FixedClusterInsertionBoundary::generateParticle(RNG& random)
 {
     BaseParticle* P = getParticleToCopy()->copy();
-    P -> setRadius(clusterRadii_[nClusterInserted_]);
+    P->setRadius(clusterRadii_[nClusterInserted_]);
     return P;
 }
 

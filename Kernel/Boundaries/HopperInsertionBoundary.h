@@ -74,10 +74,8 @@ public:
         double hopperHeight, double lift, double fillPercent);
     
     /*!
-     * \brief This creates an inflow particle in the top 50% of the hopper i.e. between gamma=0.5 and gamma=1.0
+     * \brief This places an inflow particle in the top 50% of the hopper i.e. between gamma=0.5 and gamma=1.0
      */
-    BaseParticle* generateParticle(RNG& random) override;
-    
     void placeParticle(BaseParticle* p, RNG& random) override;
     
     /*!
@@ -110,10 +108,6 @@ public:
      */
     double yMin_, yMax_;
     
-    /*!
-     * \brief Minimum and maximum radii of the inserted particles
-     */
-    double radMin_, radMax_;
     /*!
      * \brief Angle of the chute as compared to the horizontal plane
      */

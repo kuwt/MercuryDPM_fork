@@ -93,18 +93,18 @@ public:
 //setters and getters
     
     ///\brief Allows the spring constant to be changed
-    void setElasticModulus(Mdouble elasticModulus);
+    void setEffectiveElasticModulus(Mdouble elasticModulus);
     
-    void setElasticModulusAndRestitutionCoefficient(Mdouble elasticModulus, Mdouble rest);
+    void setEffectiveElasticModulusAndRestitutionCoefficient(Mdouble elasticModulus, Mdouble rest);
     
     ///\brief Allows the spring constant to be accessed
-    Mdouble getElasticModulus() const;
+    Mdouble getEffectiveElasticModulus() const;
     
     ///\brief Allows the elastic modulus and the poisson ratio to be changed in order to compute the shear modulus
-    void setElasticModulusAndPoissonRatio(Mdouble elasticModulus, Mdouble poissonRatio);
+    void setEffectiveElasticModulusAndPoissonRatio(Mdouble elasticModulus, Mdouble poissonRatio);
     
     ///\brief Allows the elastic modulus and the shear modulus to be changed in order to compute the poisson ratio
-    void setElasticModulusAndShearModulus(Mdouble elasticModulus, Mdouble shearModulus);
+    void setEffectiveElasticModulusAndEffectiveShearModulus(Mdouble elasticModulus, Mdouble shearModulus);
     
     ///\brief Allows the normal dissipation to be changed
     void setDissipation(Mdouble dissipation);

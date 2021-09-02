@@ -41,7 +41,7 @@ class Hertzian2DUnitTest : public Mercury2D
 
             auto spec = new HertzianViscoelasticFrictionSpecies();
             spec->setDensity(1);
-            spec->setElasticModulusAndRestitutionCoefficient(6e2, 0.80);
+            spec->setEffectiveElasticModulusAndRestitutionCoefficient(6e2, 0.80);
             spec = speciesHandler.copyAndAddObject(spec);
 
             /* Collision between fixed and movable */

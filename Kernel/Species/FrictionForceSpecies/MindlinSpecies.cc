@@ -160,8 +160,10 @@ void MindlinSpecies::setPoissonRatio(Mdouble poissonRatio)
 {
     auto hertz = dynamic_cast<HertzianViscoelasticNormalSpecies*>(getBaseSpecies());
     logger.assert(hertz, "setPoissonRatio only works with HertzianViscoelastic*Species.");
-    shearModulus_ = hertz->getElasticModulus() / 2 * (1 + poissonRatio);
-    logger(INFO,"Effective shear modulus set to %, based on effective elastic modulus % and Poisson's ratio %",getShearModulus(),hertz->getElasticModulus(),poissonRatio);
+    shearModulus_ = hertz->getEffectiveElasticModulus() / 2 * (1 + poissonRatio);
+    logger(INFO, "Effective shear modulus set to %, based on effective elastic modulus % and Poisson's ratio %",
+           getEffectiveShearModulus(),
+           hertz->getEffectiveElasticModulus(), poissonRatio);
 }
 
 /////Allows the poisson ratio to be accessed
@@ -169,19 +171,19 @@ void MindlinSpecies::setPoissonRatio(Mdouble poissonRatio)
 //{
 //    auto hertz = dynamic_cast<HertzianViscoelasticNormalSpecies*>(getBaseSpecies());
 //    logger.assert(hertz, "getPoissonRatio only works with HertzianViscoelastic*Species.");
-//    return 2. * shearModulus_ / hertz->getElasticModulus() - 1;
+//    return 2. * shearModulus_ / hertz->getEffectiveElasticModulus() - 1;
 //}
 
 ///Allows the shear modulus to be changed
-void MindlinSpecies::setShearModulus(Mdouble shearModulus)
+void MindlinSpecies::setEffectiveShearModulus(Mdouble shearModulus)
 {
     logger.assert(shearModulus > 0,
-                  "setShearModulus(%): value needs to be positive",shearModulus);
+                  "setEffectiveShearModulus(%): value needs to be positive",shearModulus);
     shearModulus_ = shearModulus;
 }
 
 ///Allows the shear modulus to be accessed
-Mdouble MindlinSpecies::getShearModulus() const
+Mdouble MindlinSpecies::getEffectiveShearModulus() const
 {
     return shearModulus_;
 }
@@ -214,6 +216,6 @@ void MindlinSpecies::mix(MindlinSpecies* const SFrictional, MindlinSpecies* cons
     slidingDissipation_ = BaseSpecies::average(SFrictional->getSlidingDissipation(),TFrictional->getSlidingDissipation());
     slidingFrictionCoefficient_ = BaseSpecies::average(SFrictional->getSlidingFrictionCoefficient(),TFrictional->getSlidingFrictionCoefficient());
     slidingFrictionCoefficientStatic_ = BaseSpecies::average(SFrictional->getSlidingFrictionCoefficientStatic(),TFrictional->getSlidingFrictionCoefficientStatic());
-    shearModulus_ = BaseSpecies::average(SFrictional->getShearModulus(), TFrictional->getShearModulus());
+    shearModulus_ = BaseSpecies::average(SFrictional->getEffectiveShearModulus(), TFrictional->getEffectiveShearModulus());
 }
 

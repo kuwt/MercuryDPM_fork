@@ -155,7 +155,7 @@ int main(int argc, char* argv[]) // [GranularCollapse : main]
     // [GranularCollapse : particle properties]
     
     // [GranularCollapse : contact properties]
-    problem.species->setElasticModulusAndRestitutionCoefficient(1.e7, 0.7); //1.e5
+    problem.species->setEffectiveElasticModulusAndRestitutionCoefficient(1.e7, 0.7); //1.e5
 //    //normal forces
 //    problem.species->setStiffness(2e4); //1e5; 2e4; 8e3; 1e4
 //    problem.species->setDissipation(0.5); //0.5; 0.25; 0.3; dissipation <= sqrt(2*stiffness*MinParticleMass) to avoid overdamping

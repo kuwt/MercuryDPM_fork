@@ -13,8 +13,8 @@ For example, if you want to use a the Hertz-Mindlin force law, then you have to 
 //defines a new species
 HertzianViscoelasticMindlinSpecies species;
 species.setDensity(density);
-species.setElasticModulusAndRestitutionCoefficient(elasticModulus, restitution);
-species.setShearModulus(0.5*elasticModulus/(1+poissonRatio));
+species.setEffectiveElasticModulusAndRestitutionCoefficient(elasticModulus, restitution);
+species.setEffectiveShearModulus(0.5*elasticModulus/(1+poissonRatio));
 species.setSlidingFrictionCoefficient(frictionCoefficient);
 
 Mercury3D dpm;
@@ -39,8 +39,8 @@ If there is more than one species defined, then MercuryDPM automatically creates
 //retrieves a pointer to the MixedSpecies containing the parameters for collisions between particles of species 0 and 1
 auto mixedSpecies = dpm.speciesHandler.getMixedObject(0,1);
 //redefines the contact law parameters
-mixedSpecies->setElasticModulusAndRestitutionCoefficient(elasticModulus, restitution);
-mixedSpecies->setShearModulus(0.5*elasticModulus/(1+poissonRatio));
+mixedSpecies->setEffectiveElasticModulusAndRestitutionCoefficient(elasticModulus, restitution);
+mixedSpecies->setEffectiveShearModulus(0.5*elasticModulus/(1+poissonRatio));
 mixedSpecies->setSlidingFrictionCoefficient(frictionCoefficient);
 \endcode
 

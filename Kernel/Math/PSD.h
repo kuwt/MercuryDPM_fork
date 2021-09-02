@@ -23,180 +23,275 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef MERCURY_PSD_H
-#define MERCURY_PSD_H
+#ifndef PSD_H
+#define PSD_H
 
 #include <fstream>
+#include <Logger.h>
 #include <vector>
+#include <Tools/csvReader.h>
+#include <random>
 #include "iostream"
+#include "ExtendedMath.h"
 
-/**
- * Stores a radius and a cumulative number density:
- * To be used as a vector, std::vector<PSD> psd
+using mathsFunc::square;
+using mathsFunc::cubic;
+
+/*!
+ * \brief Contains a vector with radii and probabilities of a user defined particle size distribution (PSD)
  *
- * Cumulative number density: nc_i is the number fraction of particles whose radius is less than r_i.
- * It requires vc_0=0, vc_end=1. This variable is used as psd in MercuryDPM, as it can be interpreted as the probability that a particle's radius is is less than r_i:
- *     p(r<r_i) = nc_i.
+ * \details Stores radii and probabilities of a particle size distribution (PSD) in a vector of type PSD::RadiusAndProbability and
+ * converts them to a PSD which can be used by insertionBoundaries which insert particles into a simulation:
  *
- * Cumulative volume density: vc_i is the volume fraction of particles whose radius is less than r_i. It requires vc_0=0, vc_end=1
+ * Cumulative distribution function (CDF): gives percentage of particles p_i whose radius r is less than
+ * a certain radius r_i. It requires p_0 = 0 and p_end = 1. The CDF's probabilities can be number, length, area or
+ * volume based. The cumulative number distribution function (CUMULATIVE_NUMBER_DISTRIBUTION) is used as PSD in MercuryDPM, as it can be
+ * interpreted as the probability that a particle's radius is less than r_i:
+ *     CDF(r<r_i) = p_i.
  *
- * Subtractive volume density: v_i is the volume fraction of particles whose radius is between r_i-1 and r_i. It requires v_0=0, sum(v_i)=1
+ * Probability density function (PDF): p_i is the percentage of particles whose radius is between r_i-1 and
+ * r_i. It requires p_0=0 and sum(p_i)=1. The PDF's probabilities can also be number, length, area or volume based.
+ * PDF's are utilized to convert any type of PDF to a probability number density function (PROBABILITYDENSITY_NUMBER_DISTRIBUTION) which in a next step
+ * are converted to the default CUMULATIVE_NUMBER_DISTRIBUTION.
  *
- * Sieve data: s_i is the volume fraction of particles whose radius is between r_i and r_i+1. It requires sum(s_i)=1. Property: s_i = v_i-1
+ * Sieve data: p_i is the percentage of particles whose radius is between r_i and r_i+1. It requires sum(p_i)=1.
+ * relation to PDF: p_i = p(PDF)_i-1. Sieve data is not yet used in this class.
+ *
+ * Default distribution is the CUMULATIVE_NUMBER_DISTRIBUTION.
  */
-struct PSD
+class PSD
 {
-//    // sets the psd from the probability values given in the file batch_materials_PSD.xlsx
-//    static void checkPSD (std::vector<PSD>& psd) {
-//        if (psd.empty()) {
-//            logger(ERROR,"psd is empty");
-//        }
-//        if (psd[0].probability!=0) {
-//            logger(WARN,"psd should start with a zero probability");
-//            psd.emplace(psd.begin(),PSD{psd[0].radius,0});
-//        }
-//        if (psd.back().probability!=1) {
-//            logger(WARN,"psd should end with a unit probability");
-//            psd.emplace_back(PSD{psd.back().radius,1});
-//        }
-//    }
 
-    static void print (std::vector<PSD>& psd);
-
-    // validate whether psd is a cumulative distribution
-    static void validateCumulativeDistribution (std::vector<PSD>& psd);
-
-    // combine vectors of radii and probabilities into psd vector
-    static std::vector<PSD> createPSDFromRadiiAndProbabilities (const std::vector<double>& radius,
-            const std::vector<double>& probability);
-
-    // converts a subtractive to a cumulative psd
-    static void convertSubtractiveToCumulative (std::vector<PSD>& psd);
-
-    // converst a single to a cumulative psd
-    static void convertCumulativeToSubtractive (std::vector<PSD>& psd);
-
-    // converts a subtractive number psd to a subtractive volume psd
-    static void convertSubtractiveVolumeToNumber (std::vector<PSD>& psd);
-
-    // converts a cumulative number psd to a cumulative volume psd
-    static void convertCumulativeVolumeToNumber (std::vector<PSD>& psd);
-
-    // converts a cumulative number psd to a cumulative volume psd and returns
-    static std::vector<PSD> getCumulativeNumberFromVolume (std::vector<PSD> psd) {
-        convertCumulativeVolumeToNumber (psd);
-        return psd;
-    }
-
-    //cuts off at given quantiles
-    static std::vector<PSD> cutoffCumulativeNumber (std::vector<PSD> psd, double quantileMin, double quantileMax, double minPolydispersity = 0.1) {
-        double radiusMin = getQuantile(psd,quantileMin);
-        double radiusMax = getQuantile(psd,quantileMax);
-        //to get a minimum polydispersity at the base
-        double radiusMinCut = std::min(radiusMin*(1+minPolydispersity),radiusMax);
-        //convert to volume psd
-        convertCumulativeNumberToVolume(psd);
-        //cut off min
-        while (psd.front().radius<=radiusMinCut) psd.erase(psd.begin());
-        psd.insert(psd.begin(),PSD{radiusMinCut,quantileMin});
-        psd.insert(psd.begin(),PSD{radiusMin,0});
-        //cut off max
-        while (psd.back().radius>=radiusMax) psd.pop_back();
-        psd.push_back(PSD{radiusMax,quantileMax});
-        psd.push_back(PSD{radiusMax,1});
-        //convert to number psd
-        convertCumulativeVolumeToNumber(psd);
-        return psd;
-    }
-
-    //cuts off at given quantiles
-    static std::vector<PSD> cutoffAndSqueezeCumulativeNumber (std::vector<PSD> psd, double quantileMin, double quantileMax, double squeeze, double minPolydispersity = 0.1) {
-        double r50 = 0.5*PSD::getD50(psd);
-        //cut off
-        psd = cutoffCumulativeNumber (psd, quantileMin, quantileMax, minPolydispersity);
-        //convert to volume psd
-        convertCumulativeNumberToVolume(psd);
-        //squeeze psd
-        for (auto& p : psd) {
-            p.radius = r50+(p.radius-r50)*squeeze;
-        }
-        //convert to number psd
-        convertCumulativeVolumeToNumber(psd);
-        return psd;
-    }
-
-    // converts a subtractive number psd to a subtractive volume psd
-    static void convertSubtractiveNumberToVolume (std::vector<PSD>& psd);
-
-    // converts a cumulative number psd to a cumulative volume psd
-    static void convertCumulativeNumberToVolume (std::vector<PSD>& psd);
-
-//    // returns a cumulative number particle size distribution from a given volume particle size distribution
-//    static std::vector<PSD> setFromVolumePSD (const std::vector<double>& radius,
-//                                                          const std::vector<double>& probability);
-
-    // get quantile size
-    //todo the D0 and D100 should be fixed.
-    static double getD0 (const std::vector<PSD>& psd){
-        return 2.0*getQuantile(psd,0.0);
-    }
-
-    static double getD10 (const std::vector<PSD>& psd){
-        return 2.0*getQuantile(psd,0.1);
-    }
-
-    static double getD50 (const std::vector<PSD>& psd){
-        return 2.0*getQuantile(psd,0.5);
-    }
-
-    static double getD90 (const std::vector<PSD>& psd){
-        return 2.0*getQuantile(psd,0.9);
-    }
-
-    static double getD100 (const std::vector<PSD>& psd){
-        return 2.0*getQuantile(psd,1.0);
-    }
-
-
-    // get quantile of volume distribution, e.g. 2.0*getQuantile(psd,0.5) gets D50
-    static double getQuantile(std::vector<PSD> psd, double quantile);
-
-    // get radius r such that a monodisperse system has the same number of particles as a polydisperse system
-    static double getVolumetricMean(std::vector<PSD> psd);
-
-    /**
-     * required to use std::lower_bound for finding when the probability is higher than a certain value
-     *   std::vector<PSD> psd;
-     *   double probability;
-     *   std::lower_bound(psd.begin(),psd.end(),probability);
-     * @param probability
-     * @return
+public:
+    /*!
+     * \brief Enum class which stores the possible types of CDFs and PDFs.
+     * Particle size distributions can be represented by different probabilities based on number of particles, length
+     * of particles, surface area of particles or volume of particles.
      */
-    bool operator<(const double probability) const
+    enum class TYPE
     {
-        return this->probability < probability;
-    }
+        CUMULATIVE_NUMBER_DISTRIBUTION,
+        CUMULATIVE_LENGTH_DISTRIBUTION,
+        CUMULATIVE_VOLUME_DISTRIBUTION,
+        CUMULATIVE_AREA_DISTRIBUTION,
+        PROBABILITYDENSITY_NUMBER_DISTRIBUTION,
+        PROBABILITYDENSITY_LENGTH_DISTRIBUTION,
+        PROBABILITYDENSITY_AREA_DISTRIBUTION,
+        PROBABILITYDENSITY_VOLUME_DISTRIBUTION
+    };
     
     /*!
-     * \brief Writes to output stream
+     * \brief Class which stores radii and probabilities of a PSD. This class should be used as a vector<PSD::RadiusAndProbability>.
      */
-    friend std::ostream& operator<<(std::ostream& os, const PSD& psd) {
-        os << psd.radius << ' ' << psd.probability;
-        return os;
-    }
+    class RadiusAndProbability
+    {
+    public:
+        Mdouble radius;
+        Mdouble probability;
+    };
     
     /*!
-     * \brief Reads from input stream
+     * \brief Constructor; sets everything to 0 or default.
      */
-    friend std::istream& operator>>(std::istream& is, PSD& psd) {
-        is >> psd.radius >> psd.probability;
-        return is;
-    }
+    PSD();
     
-    double radius;
-    double probability;
+    /*!
+     * \brief Copy constructor with deep copy.
+     */
+    PSD(const PSD& other);
+    
+    /*!
+     * \brief Destructor; default destructor.
+     */
+    ~PSD();
+    
+    /*!
+     * \brief Creates a copy on the heap and returns a pointer.
+     */
+    PSD* copy() const;
+    
+    /*!
+     * \brief Prints radii and probabilities of the PSD vector.
+     */
+    void printPSD();
+    
+    /*!
+     * \brief Draw a sample radius from a CUMULATIVE_NUMBER_DISTRIBUTION.
+     */
+    Mdouble drawSample();
+    
+    /*!
+     * \brief Draw sample radius manually per size class and check the volumeAllowed of each size class to insert the
+     * PSD as accurate as possible.
+     */
+    Mdouble insertManuallyByVolume(Mdouble volume);
+    
+    /*!
+     * \brief Validates if a CDF starts with zero and adds up to unity.
+    */
+    void validateCumulativeDistribution();
+    
+    /*!
+     * \brief Validates if the integral of the PDF equals to unity.
+     */
+    void validateProbabilityDensityDistribution();
+    
+    /*!
+     * \brief Deprecated version of reading in PSDs from a vector.
+     */
+    MERCURY_DEPRECATED
+    void setPSDFromVector(std::vector<RadiusAndProbability> psd, TYPE PSDType);
+    
+    /*!
+     * \brief read in the PSD vector with probabilities and radii saved in a .csv file.
+     */
+    void setPSDFromCSV(const std::string& fileName, TYPE PSDType, bool headings = false, Mdouble
+    unitScalingFactorRadii = 1.0);
+    
+    /*!
+     * \brief Converts a PDF to a CDF by integration.
+     */
+    void convertProbabilityDensityToCumulative();
+    
+    /*!
+     * \brief Converts a CDF to a PDF by derivation.
+     */
+    void convertCumulativeToProbabilityDensity();
+    
+    /*!
+     * \brief convert any PDF to a PROBABILITYDENSITY_NUMBER_DISTRIBUTION.
+     */
+    void convertProbabilityDensityToProbabilityDensityNumberDistribution(TYPE PDFType);
+    
+    /*!
+     * \brief convert a PROBABILITYDENSITY_NUMBER_DISTRIBUTION to a PROBABILITYDENSITY_VOLUME_DISTRIBUTION.
+     */
+    void convertProbabilityDensityNumberDistributionToProbabilityDensityVolumeDistribution();
+    
+    /*!
+     * \brief convert any other CDF to a CUMULATIVE_NUMBER_DISTRIBUTION.
+     */
+    void convertCumulativeToCumulativeNumberDistribution(TYPE CDFType);
+    
+    /*!
+     * \brief cutoff the PSD at given percentiles.
+     */
+    void cutoffCumulativeNumber(Mdouble percentileMin, Mdouble percentileMax, Mdouble minPolydispersity = 0.1);
+    
+    /*!
+     * \brief cutoff the PSD at given percentiles and make it less polydisperse by squeezing it.
+     */
+    void cutoffAndSqueezeCumulative(Mdouble percentileMin, Mdouble percentileMax, Mdouble squeeze,
+                                    Mdouble minPolydispersity = 0.1);
+    
+    /*!
+     * \brief Get smallest radius of the PSD.
+     */
+    Mdouble getMinRadius();
+    
+    /*!
+     * \brief Get largest radius of the PSD.
+     */
+    Mdouble getMaxRadius();
+    
+    /*!
+     * \brief Get the PSD vector.
+     */
+    const std::vector<RadiusAndProbability> getParticleSizeDistribution() const;
+    
+    /*!
+     * \brief Get the number of particles already inserted into the simulation.
+     */
+    int getInsertedParticleNumber();
+    
+    /*!
+     * \brief Calculate a certain diameter (e.g. D10, D50, D90, etc.) from a percentile of the PSD.
+     */
+    Mdouble getDx(Mdouble x);
+    
+    /*!
+     * \brief Calculate the percentile of the PSD.
+     */
+    Mdouble getRadiusByPercentile(Mdouble percentile);
+    
+    /*!
+     * \brief get a volumetric mean radius of the PSD.
+     */
+    Mdouble getVolumetricMeanRadius();
+    
+    /*!
+     * \brief compute raw momenta of the user defined PSD.
+     */
+    void computeRawMomenta();
+    
+    /*!
+     * \brief compute central momenta of the user defined PSD.
+     */
+    void computeCentralMomenta();
+    
+    /*!
+     * \brief compute standardised momenta of the user defined PSD.
+     */
+    void computeStandardisedMomenta();
+    
+    /*!
+     * \brief get momenta of the user defined PSD.
+     */
+    std::array<Mdouble, 6> getMomenta();
+    
+    /*!
+     * \brief determines if a certain value of the PSD vector is lower than another one. Used for std::lower_bound()
+     */
+    friend bool operator<(const PSD::RadiusAndProbability& l, const PSD::RadiusAndProbability& r);
+    
+    /*!
+     * \brief determines if a certain value of the PSD vector is lower than a double.
+     */
+    friend bool operator<(const PSD::RadiusAndProbability& l, Mdouble r);
+    
+    /*!
+     * \brief Writes to output stream.
+     */
+    friend std::ostream& operator<<(std::ostream& os, PSD::RadiusAndProbability& p);
+    
+    /*!
+     * \brief Reads from input stream.
+     */
+    friend std::istream& operator>>(std::istream& is, PSD::RadiusAndProbability& p);
+    
+    /*!
+     * \brief Determines if a certain value of the PSD vector is equal to a double.
+     */
+    friend Mdouble operator==(PSD::RadiusAndProbability l, Mdouble r);
+
+
+private:
+    /*!
+     * Vector of the PSD::RadiusAndProbability class which stores radii and probabilities of the PSD.
+     */
+    std::vector<RadiusAndProbability> particleSizeDistribution_;
+    
+    /*!
+     * Array of doubles which stores the moments of a user defined discrete PROBABILITYDENSITY_NUMBER_DISTRIBUTION.
+     */
+    std::array<Mdouble, 6> momenta_{};
+    
+    /*!
+     * Vector of integers which represents the number of inserted particles in each size class.
+     * The classes in this vector are defined to contain the particles between size r_i and r_i-1. (e.g. size class
+     * 12 consists of particles between size class 12 and 11 of the PDF)
+     */
+    std::vector<int> nParticlesPerClass_;
+    
+    /*!
+     * Vector of doubles which stores the volume of inserted particles for each size class. This vector is used in
+     * the insertManuallyByVolume() function to check if the volumeAllowed per class is exceeded and thus no further
+     * particles should be added to a certain class.
+     * The classes in this vector are defined to contain the volume of particles between size r_i and r_i-1. (e.g. size
+     * class 12 consists of the particles' volume between size class 12 and 11 of the PDF)
+     */
+    std::vector<Mdouble> volumePerClass_;
 };
 
 
-
-#endif //MERCURY_PSD_H
+#endif //PSD_H

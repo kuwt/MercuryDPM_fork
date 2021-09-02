@@ -46,12 +46,7 @@ class RNG;
 class BaseClusterInsertionBoundary : public InsertionBoundary
 {
 public:
-
-    enum class Distribution {
-        Uniform,
-        Normal_1_5
-    };
-
+    
     /*!
      * \brief Constructor; sets everything to 0.
      */
@@ -88,27 +83,7 @@ public:
     * \brief Sets the range of cluster radius that may be generated.
     */
     void setRadiusRange(Mdouble radMin, Mdouble radMax);
-
-    /*!
-     * \brief This sets the PSD used to generate clusters.
-     */
-    void setPSD(std::vector<PSD> psd);
-
-    /*!
-     * \brief Gets the PSD used.
-     */
-    std::vector<PSD> getPSD();
-
-    /*!
-     * \brief Sets the distribution used to generate clusters
-     */
-    void setDistribution(Distribution distribution);
-
-    /*!
-     * \brief Gets the distribution used to generate clusters
-     */
-    Distribution getDistribution();
-
+    
     /*!
      * \brief Sets the geometry (position and velocity distribution) of the
      * ClusterInsertionBoundary
@@ -142,13 +117,6 @@ public:
      */
     void setOutputClusterProperties(bool doCdatOutput, bool doOverlOutput, bool doAmatOutput, bool doIntStrucOutput,
                                     bool doVtkOutput, bool doRestartOutput, bool doFStatOutput, bool doEneOutput);
-
-
-
-    /*!
-     * \brief Generates a cluster with random radius
-     */
-    BaseParticle* generateParticle(RNG& random) override;
 
     /*!
      * \brief Generates a random position, velocity for the cluster p
@@ -239,10 +207,6 @@ protected:
      * and minimum and maximum velocity of the particles to be inserted.
      */
     Vec3D posMin_, posMax_, velMin_, velMax_;
-    /*
-     * \brief minimum and maximum radii of the particles to be inserted
-     */
-    double radMin_, radMax_;
 
     // Bool defining if the user has set the radius of a single particle composing the cluster OR the number of
     // particles inside the cluster.
@@ -251,12 +215,6 @@ protected:
     // Vectors defining cluster radii and position for class FixedClusterInsertionBoundary
      std::vector<Vec3D> clusterPositions_;
      std::vector<Mdouble> clusterRadii_;
-
-     /*
-     * Defines a particle size distribution; if psd is empty, distribution_ is used instead.
-     */
-    std::vector<PSD> psd_;
-    Distribution distribution_ = Distribution::Uniform;
 
     //Variable used to switch the randomise() process
     bool randomised_;

@@ -35,7 +35,7 @@
  * \details The problem consists of a stack of three equal-sized particles; the 
  * bottom particle is fixed, the two particles on top are pushed towards the fixed 
  * particles by gravity. The particles are stiff, so the overlap is less than 
- * 0.03% of the particles' diameter. The proplem is non-dimensionalised such that 
+ * 0.03% of the particles' diameter. The problem is non-dimensionalised such that
  * particle diameter, mass, and gravity are unity. 
  * 
  * This makes the bulk statistics very easy to compute: The bulk mass is 2 

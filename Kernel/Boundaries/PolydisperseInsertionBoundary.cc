@@ -28,6 +28,10 @@
 #include "Math/RNG.h"
 //#include <cassert>
 
+/*!
+ * \details Deprecated boundary which was used to insert PSDs into Mercury.
+ * \deprecated Should be gone by Mercury 2.0. Instead, use the PSD class.
+ */
 /* Constructor */
 PolydisperseInsertionBoundary::PolydisperseInsertionBoundary()
 {

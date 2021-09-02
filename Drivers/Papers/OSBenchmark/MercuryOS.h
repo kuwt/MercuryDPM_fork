@@ -152,37 +152,37 @@ public:
         double mu11 = 0.3, mu12 = 0.2, mu1S = 0.2, mu22 = 0.4, mu2S = 0.2, muSS = 0.5;
         
         HertzianViscoelasticMindlinSpecies species;
-        species.setElasticModulusAndRestitutionCoefficient(E11, r11);
-        species.setShearModulus(G11);
+        species.setEffectiveElasticModulusAndRestitutionCoefficient(E11, r11);
+        species.setEffectiveShearModulus(G11);
         species.setSlidingFrictionCoefficient(mu11);
         species.setDensity(2500);
         m1 = speciesHandler.copyAndAddObject(species);
-        
-        species.setElasticModulusAndRestitutionCoefficient(E22, r22);
-        species.setShearModulus(G22);
+    
+        species.setEffectiveElasticModulusAndRestitutionCoefficient(E22, r22);
+        species.setEffectiveShearModulus(G22);
         species.setSlidingFrictionCoefficient(mu22);
         species.setDensity(2000);
         m2 = speciesHandler.copyAndAddObject(species);
-        
-        species.setElasticModulusAndRestitutionCoefficient(ESS, rSS);
-        species.setShearModulus(GSS);
+    
+        species.setEffectiveElasticModulusAndRestitutionCoefficient(ESS, rSS);
+        species.setEffectiveShearModulus(GSS);
         species.setSlidingFrictionCoefficient(muSS);
         species.setDensity(7200);
         steel = speciesHandler.copyAndAddObject(species);
         
         auto m12 = speciesHandler.getMixedObject(m1, m2);
-        m12->setElasticModulusAndRestitutionCoefficient(E12, r12);
-        m12->setShearModulus(G12);
+        m12->setEffectiveElasticModulusAndRestitutionCoefficient(E12, r12);
+        m12->setEffectiveShearModulus(G12);
         m12->setSlidingFrictionCoefficient(mu12);
         
         auto m1S = speciesHandler.getMixedObject(m1, steel);
-        m1S->setElasticModulusAndRestitutionCoefficient(E1S, r1S);
-        m1S->setShearModulus(G1S);
+        m1S->setEffectiveElasticModulusAndRestitutionCoefficient(E1S, r1S);
+        m1S->setEffectiveShearModulus(G1S);
         m1S->setSlidingFrictionCoefficient(mu1S);
         
         auto m2S = speciesHandler.getMixedObject(m2, steel);
-        m2S->setElasticModulusAndRestitutionCoefficient(E2S, r2S);
-        m2S->setShearModulus(G2S);
+        m2S->setEffectiveElasticModulusAndRestitutionCoefficient(E2S, r2S);
+        m2S->setEffectiveShearModulus(G2S);
         m2S->setSlidingFrictionCoefficient(mu2S);
     }
     

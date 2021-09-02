@@ -83,10 +83,10 @@ public:
     MERCURY_DEPRECATED void setPoissonRatio(Mdouble poissonRatio);
 
     ///\brief allows the shear modulus to be changed
-    void setShearModulus(Mdouble shearModulus);
+    void setEffectiveShearModulus(Mdouble shearModulus);
     
     ///\brief Allows the shear modulus to be accessed
-    Mdouble getShearModulus() const;
+    Mdouble getEffectiveShearModulus() const;
 
     /*!
      * \brief Returns true if torques have to be calculated.
@@ -113,7 +113,8 @@ private:
     
     /// static Coulomb friction coefficient (by default set equal to mu)
     Mdouble slidingFrictionCoefficientStatic_;
-
+  
+    /// tangential spring constant
     Mdouble shearModulus_;
     
     

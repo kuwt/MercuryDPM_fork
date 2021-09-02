@@ -35,8 +35,6 @@ HopperInsertionBoundary::HopperInsertionBoundary() : InsertionBoundary()
 {
     yMin_ = 0.0;
     yMax_ = 0.0;
-    radMin_ = 0.0;
-    radMax_ = 0.0;
     chuteAngle_ = 0.0;
     fixedParticleRadius_ = 0.0;
     isHopperCentred__ = true;
@@ -57,8 +55,6 @@ HopperInsertionBoundary::HopperInsertionBoundary(const HopperInsertionBoundary& 
 {
     yMin_ = other.yMin_;
     yMax_ = other.yMax_;
-    radMin_ = other.radMin_;
-    radMax_ = other.radMax_;
     chuteAngle_ = other.chuteAngle_;
     fixedParticleRadius_ = other.fixedParticleRadius_;
     isHopperCentred__ = other.isHopperCentred__;
@@ -146,11 +142,11 @@ void HopperInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int max
 
 /*!
  * \details 
- * This function generates random particles inside the hopper. The space in which
- * the particles are generated is a (truncated) triangle in 2D, or a (truncated) pyramid
+ * This function places random particles inside the hopper. The space in which
+ * the particles are placed in a (truncated) triangle in 2D, or a (truncated) pyramid
  * in 3D. 
  * Some aspects of the hopper geometry and definitions which are useful in order 
- * to understand this particle generation code are:
+ * to understand this particle placement code are:
  *    * In the hopper simulation, the direction of the CHUTE is defined to be
  *      the X-direction, while the normal of the chute is defined to be the Z-direction.
  *      This means that gravity is NOT in the negative Z-direction, but is actually
@@ -165,7 +161,7 @@ void HopperInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int max
  *      (which defines the upper part of the hopper) down to a certain percentage 
  *      fillPercent_ of the hopper depth. fillPercent_=100 will fill entire inverted
  *      triangle/pyramid down to it tip (position A). 'gamma' is the random height 
- *      between the base and given fillPercent_ at which the generated particle is 
+ *      between the base and given fillPercent_ at which the particle is
  *      placed.  NB: 'down' in this case means negative AC (vertical) direction.
  * 
  * See also the images provided at the top of this class' documentation.
@@ -177,13 +173,9 @@ void HopperInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int max
  * \param[in] random    random number generator
  * \return              pointer to the particle generated
  */
-BaseParticle* HopperInsertionBoundary::generateParticle(RNG& random)
+void HopperInsertionBoundary::placeParticle(BaseParticle* p, RNG& random)
 {
-    // create particle and assign a random radius
-    BaseParticle* P = getParticleToCopy()->copy();
-    P->setRadius(random.getRandomNumber(radMin_, radMax_));
-    
-    //Define an orthogonal coordinate system this is useful in the hopper, see 
+    //Define an orthogonal coordinate system this is useful in the hopper, see
     //diagram in html documentation for details.
     static Mdouble s = mathsFunc::sin(chuteAngle_);
     static Mdouble c = mathsFunc::cos(chuteAngle_);
@@ -208,47 +200,40 @@ BaseParticle* HopperInsertionBoundary::generateParticle(RNG& random)
     if (hopperDim_ == 1)
     {
         /*!
-         * The 'one-dimensional' hopper has sloped walls in the AB extrema, 
+         * The 'one-dimensional' hopper has sloped walls in the AB extrema,
          * while the walls in the AD (Y) extrema are vertical.
          * 'delta' is the randomly generated Y-position of the particle and lies
-         * between yMin_ and yMax_ (with a particle radius distance from the 
+         * between yMin_ and yMax_ (with a particle radius distance from the
          * extrema on either side).
         */
         /// \bug for periodic walls this should be only minus one particle radius, this should be fixed at some point.
-        /// Thomas' response: using one particle radius gives problems when the wall is 
-        /// not orthogonal to the y-direction; the distance has to be slightly higher than one; 
+        /// Thomas' response: using one particle radius gives problems when the wall is
+        /// not orthogonal to the y-direction; the distance has to be slightly higher than one;
         /// if you can figure out the exact value, then correct it please.
-        /// \todo Thomas, could you check if this bug is still valid?  (BvdH)    
-        delta = random.getRandomNumber(-0.5, 0.5) * (yMax_ - yMin_ - 2.0 * P->getRadius());
-        
+        /// \todo Thomas, could you check if this bug is still valid?  (BvdH)
+        delta = random.getRandomNumber(-0.5, 0.5) * (yMax_ - yMin_ - 2.0 * p->getRadius());
+    
     }
     else
     {
         /*!
-         * The 'two-dimensional' hopper has sloped walls in the extrema of both (horizontal) 
-         * AB and AD directions. I.e., the HopperInsertionBoundary has the form of 
+         * The 'two-dimensional' hopper has sloped walls in the extrema of both (horizontal)
+         * AB and AD directions. I.e., the HopperInsertionBoundary has the form of
          * an inverted (and possibly truncated) pyramid.
-         * The possible Y-positions of the generated particle (i.e. delta) in 
-         * this case is dependent of both the vertical AC-position gamma, and the 
+         * The possible Y-positions of the generated particle (i.e. delta) in
+         * this case is dependent of both the vertical AC-position gamma, and the
          * hopper angle (in this case in the form of its cosine, Hc).
          */
-        delta = (random.getRandomNumber(-1.0, 1.0) * (0.5 * gamma * hopperLength_ - P->getRadius() / Hc));
+        delta = (random.getRandomNumber(-1.0, 1.0) * (0.5 * gamma * hopperLength_ - p->getRadius() / Hc));
     }
     //std::cout<<A<<" "<<AC<<" "<<AB<<" "<<AD<<" "<<Hc<<" "<<Ht<<"gamma="<<gamma<<" "<<hopperLength_<<" "<<delta<<std::endl;
-    P->setPosition(A
+    p->setPosition(A
                    + AC * (gamma * 0.5 * hopperLength_ / Ht)
-                   + AB * (random.getRandomNumber(-1.0, 1.0) * (0.5 * gamma * hopperLength_ - P->getRadius() / Hc))
+                   + AB * (random.getRandomNumber(-1.0, 1.0) * (0.5 * gamma * hopperLength_ - p->getRadius() / Hc))
                    + AD * delta);
     
-    P->move(Vec3D(0.0, 0.0, lift_));
-    P->setVelocity(Vec3D(0.0, 0.0, 0.0));
-    
-    return P;
-}
-
-void HopperInsertionBoundary::placeParticle(BaseParticle* p, RNG& random)
-{
-
+    p->move(Vec3D(0.0, 0.0, lift_));
+    p->setVelocity(Vec3D(0.0, 0.0, 0.0));
 }
 
 /*!

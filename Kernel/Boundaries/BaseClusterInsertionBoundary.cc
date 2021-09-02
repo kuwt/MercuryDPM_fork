@@ -83,8 +83,6 @@ BaseClusterInsertionBoundary::BaseClusterInsertionBoundary() : InsertionBoundary
     posMax_ = Vec3D(0.0, 0.0, 0.0);
     velMin_ = Vec3D(0.0, 0.0, 0.0);
     velMax_ = Vec3D(0.0, 0.0, 0.0);
-    radMin_ = 0;
-    radMax_ = 0;
 
     setRadiusParticleAndNotNumberOfParticles_ = true;
 
@@ -152,17 +150,9 @@ BaseClusterInsertionBoundary::BaseClusterInsertionBoundary(const BaseClusterInse
     posMax_ = other.posMax_;
     velMin_ = other.velMin_;
     velMax_ = other.velMax_;
-    radMin_ = other.radMin_;
-    radMax_ = other.radMax_;
 
     setRadiusParticleAndNotNumberOfParticles_ = other.setRadiusParticleAndNotNumberOfParticles_;
-
-
-
-
-    psd_ = other.psd_;
-    distribution_ = other.distribution_;
-
+    
     randomised_=other.randomised_;
 
 }
@@ -215,34 +205,6 @@ void BaseClusterInsertionBoundary::setRadiusRange(Mdouble radMin, Mdouble radMax
     radMax_ = radMax;
 }
 
-/*!
- * \brief Gets the range of particle radii that may be generated.
- */
-void BaseClusterInsertionBoundary::setPSD(std::vector<PSD> psd) {
-    psd_ = psd;
-}
-
-/*!
- * \brief Sets the range of particle radii that may be generated.
- */
-std::vector<PSD> BaseClusterInsertionBoundary::getPSD() {
-    return psd_;
-}
-
-/*!
- * \brief Sets the range of particle radii that may be generated.
- */
-void BaseClusterInsertionBoundary::setDistribution(Distribution distribution) {
-    distribution_ = distribution;
-}
-
-/*!
- * \brief Gets the range of particle radii that may be generated.
- */
-BaseClusterInsertionBoundary::Distribution BaseClusterInsertionBoundary::getDistribution() {
-    return distribution_;
-}
-
 void BaseClusterInsertionBoundary::setGeometry(Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax)
 {
     posMin_ = posMin;
@@ -279,46 +241,6 @@ void BaseClusterInsertionBoundary::setOutputClusterProperties(bool doCdatOutput,
 
 }
 
-/*!
- * \details Generates a particle with random radius and returns its pointer.
- * \param[in] random    Random number generator
- */
-BaseParticle* BaseClusterInsertionBoundary::generateParticle(RNG &random)
-{
-    BaseParticle* P = getParticleToCopy()->copy();
-    if (psd_.empty()) {
-        if (distribution_==Distribution::Uniform) {
-            P->setRadius(random.getRandomNumber(radMin_, radMax_));
-        } else {
-            //normal distribution
-            static std::mt19937 gen(0);
-            Mdouble particleRadius = 0.5*(radMax_+radMin_);
-            Mdouble polydispersity = 0.5*(radMax_-radMin_);
-            static std::normal_distribution<> d(particleRadius, polydispersity);
-            static const Mdouble radiusMin = particleRadius-1.5*polydispersity;
-            static const Mdouble radiusMax = particleRadius+1.5*polydispersity;
-            Mdouble radius = d(gen);
-            while (radius > radiusMax || radius < radiusMin) radius = d(gen);
-            P->setRadius(radius);
-        }
-    } else {
-        //static std::random_device rd(0);
-        static std::mt19937 gen(0);
-        static std::uniform_real_distribution<Mdouble> dist(0, 1);
-        const Mdouble probability = dist(gen);
-        auto high = std::lower_bound(psd_.begin(),psd_.end(),probability);
-        auto low = std::max(psd_.begin(),high-1);
-        Mdouble rMin = low->radius;
-        Mdouble rMax = high->radius;
-        Mdouble pMin = low->probability;
-        Mdouble pMax = high->probability;
-        Mdouble a = (probability - low->probability)/(high->probability -low->probability);
-        const Mdouble radius = a*low->radius + (1-a)*high->radius;
-        P->setRadius(radius);
-    }
-    return P;
-}
-
 //!\brief function overridden in children classes FixedClusterInsertionBoundary and RandomClusterInsertionBoundary
 void BaseClusterInsertionBoundary::placeParticle(BaseParticle* p, RNG& random)
 {
@@ -350,18 +272,7 @@ void BaseClusterInsertionBoundary::read(std::istream& is)
        >> dummy >> velMax_;
     is >> dummy >> radMin_;
     is >> dummy >> radMax_;
-
-    size_t n;
-    PSD psd;
-    is >> dummy >> n;
-    psd_.reserve(n);
-    for (size_t i=0; i<n; ++i) {
-        is >> psd;
-        psd_.push_back(psd);
-    }
-    is >> dummy >> distribution_;
-
-
+    
     is >> dummy >> nClusterInserted_
          >> dummy >> radiusParticle_;
     is >> dummy >> sizeDispersityParticle_
@@ -394,11 +305,6 @@ void BaseClusterInsertionBoundary::write(std::ostream& os) const
        << " velMax " << velMax_;
     os << " radMin " << radMin_
        << " radMax " << radMax_;
-    os << " psd " << psd_.size();
-    for (auto p : psd_) {
-        os << ' ' << p;
-    }
-    os << " distribution " << distribution_;
 
     os << " nClusterInserted " << nClusterInserted_ <<
           " radiusParticle " << radiusParticle_ <<
@@ -433,24 +339,4 @@ void BaseClusterInsertionBoundary::write(std::ostream& os) const
 std::string BaseClusterInsertionBoundary::getName() const
 {
     return "BaseClusterInsertionBoundary";
-}
-
-/*!
- * write to file
- */
-std::ostream& operator<<(std::ostream& os, BaseClusterInsertionBoundary::Distribution type)
-{
-    os << static_cast<unsigned>(type);
-    return os;
-}
-
-/*!
- * Read from file
- */
-std::istream& operator>>(std::istream& is, BaseClusterInsertionBoundary::Distribution& type)
-{
-    unsigned uType;
-    is >> uType;
-    type = static_cast<BaseClusterInsertionBoundary::Distribution>(uType);
-    return is;
 }

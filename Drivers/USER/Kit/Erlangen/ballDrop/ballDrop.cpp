@@ -164,7 +164,7 @@ public:
 	radMin = cbrt(rad / (sizeDistribution_ * sizeDistribution_ + 2*rad) / (sizeDistribution_ + 2*rad));
 	
 	//for safety, setting the species properties according to the smallest possible particle 
-        species->setElasticModulusAndRestitutionCoefficient(1e7, eps);
+        species->setEffectiveElasticModulusAndRestitutionCoefficient(1e7, eps);
 
 
 	//setting frictional properties

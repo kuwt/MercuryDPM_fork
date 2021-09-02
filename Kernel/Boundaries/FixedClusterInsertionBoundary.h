@@ -77,7 +77,7 @@ public:
     void placeParticle(BaseParticle* p, RNG& random) final;
 
     //!\brief Sets cluster radii according to vector clusterRadii_.
-    BaseParticle* generateParticle(RNG &random) final;
+    BaseParticle* generateParticle(RNG& random) final;
 
 private:
     /*!

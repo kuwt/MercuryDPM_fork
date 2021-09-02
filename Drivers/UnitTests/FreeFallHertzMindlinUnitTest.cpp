@@ -81,9 +81,9 @@ int main(int argc, char* argv[])
 	//Set the species of the particle and wall, and its properties
 	HertzianViscoelasticMindlinSpecies species;
 	species.setDensity(density);
-	species.setElasticModulusAndRestitutionCoefficient(elasticModulus, restitution);
+    species.setEffectiveElasticModulusAndRestitutionCoefficient(elasticModulus, restitution);
 	//https://en.wikipedia.org/wiki/Shear_modulus#References
-	species.setShearModulus(0.5*elasticModulus/(1+poissonRatio));
+    species.setEffectiveShearModulus(0.5 * elasticModulus / (1 + poissonRatio));
 	species.setSlidingFrictionCoefficient(1.0);
 	dpm.speciesHandler.copyAndAddObject(species);
 

@@ -38,7 +38,7 @@ int main(int argc UNUSED, char *argv[] UNUSED) {
     //add Species
     HertzianViscoelasticSlidingFrictionParhamiMcMeekingSinterSpecies s;
     s.setDensity(3950e18);
-    s.setElasticModulus(0); //?? This seems to correspond to dt~tc/50
+    s.setEffectiveElasticModulus(0); //?? This seems to correspond to dt~tc/50
     s.setDissipation(0); //?
     // mass 2e-21 => fg = 2e-20
     // k=1e-04 => del=fg/k = tiny

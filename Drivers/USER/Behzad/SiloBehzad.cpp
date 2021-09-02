@@ -129,13 +129,13 @@ public:
         Mdouble poisson = 0.4;
         Mdouble shearModulus = 1e8;
         Mdouble restitutionCoeff = 1e-4;
-        s.setElasticModulusAndRestitutionCoefficient(
+        s.setEffectiveElasticModulusAndRestitutionCoefficient(
                 shearModulus * (3 * poisson + 2 * shearModulus) / (poisson + shearModulus), restitutionCoeff);
 
         s.setSlidingFrictionCoefficient(.577);
         s.setRollingFrictionCoefficient(muRolling);
         s.setTorsionFrictionCoefficient(0);
-        s.setShearModulus(shearModulus);
+        s.setEffectiveShearModulus(shearModulus);
         ParticleSpecies* particleSpecies = speciesHandler.copyAndAddObject(s);
         ParticleSpecies* wallSpecies = speciesHandler.copyAndAddObject(s);
         dynamic_cast<HertzianViscoelasticMindlinRollingTorsionMixedSpecies*>(speciesHandler.getMixedObject(0,1))

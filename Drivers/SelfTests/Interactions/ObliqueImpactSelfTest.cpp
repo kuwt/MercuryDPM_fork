@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
     HertzianViscoelasticMindlinSpecies species;
     species.setDensity(6./constants::pi);
     ObliqueImpactSelfTestProblem.setParticleDimensions(3);
-    species.setElasticModulusAndPoissonRatio(1e5, 0.3);
+    species.setEffectiveElasticModulusAndPoissonRatio(1e5, 0.3);
 //    species.setDissipation(0.2);
 //    species.setSlidingDissipation(0.9);
     species.setSlidingFrictionCoefficient(0.1);

@@ -312,7 +312,7 @@ void MindlinInteraction::computeFrictionForce()
             //This is identical for both unloading and loading (under constant normal force) and hence can
             //potentially later be moved for neatness/efficiency
             Mdouble r1 = 1.0 * getEffectiveRadius();
-            Mdouble shearModulus = species->getShearModulus();
+            Mdouble shearModulus = species->getEffectiveShearModulus();
             updateTangentialStiffnessZero(r1, shearModulus);
             
             //2) Calculating the relevant tangential dissipation constant based on the current stiffness (and other relevant parameters)

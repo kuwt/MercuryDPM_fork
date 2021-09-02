@@ -28,7 +28,6 @@
 
 #include "InsertionBoundary.h"
 #include "Math/Vector.h"
-#include "Math/PSD.h"
 
 class BaseParticle;
 
@@ -43,11 +42,6 @@ class RNG;
 class CubeInsertionBoundary : public InsertionBoundary
 {
 public:
-    
-    enum class Distribution {
-        Uniform,
-        Normal_1_5
-    };
     
     /*!
      * \brief Constructor; sets everything to 0.
@@ -85,29 +79,10 @@ public:
     void setRadiusRange(Mdouble radMin, Mdouble radMax);
     
     /*!
-     * \brief Sets the range of particle radii that may be generated.
-     */
-    void setPSD(std::vector<PSD> psd) {
-        psd_ = psd;
-    }
-    
-    /*!
-     * \brief Sets the range of particle radii that may be generated.
-     */
-    void setDistribution(Distribution distribution) {
-        distribution_ = distribution;
-    }
-
-    /*!
      * \brief Sets the geometry (position and velocity distribution) of the
      * CubeInsertionBoundary
      */
     void setGeometry(Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax);
-    
-    /*!
-     * \brief Generates a particle with random radius
-     */
-    BaseParticle* generateParticle(RNG& random) override;
     
     /*!
      * \brief Generates a random position, velocity for the particle p
@@ -145,25 +120,6 @@ protected:
      * and minimum and maximum velocity of the particles to be inserted.
      */
     Vec3D posMin_, posMax_, velMin_, velMax_;
-    /*!
-     * \brief minimum and maximum radii of the particles to be inserted
-     */
-    double radMin_, radMax_;
-    /*!
-     * Defines a particle size distribution; if psd is empty, distribution_ is used instead.
-     */
-    std::vector<PSD> psd_;
-    Distribution distribution_ = Distribution::Uniform;
 };
-
-/*!
- * write to file
- */
-std::ostream& operator<<(std::ostream& os, CubeInsertionBoundary::Distribution type);
-
-/*!
- * write from file
- */
-std::istream& operator>>(std::istream& is, CubeInsertionBoundary::Distribution& type);
 
 #endif

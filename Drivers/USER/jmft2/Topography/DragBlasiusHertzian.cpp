@@ -102,7 +102,7 @@ class DragBlasiusHertzian : public Mercury2D {
 
             spec_particles = new HertzianViscoelasticFrictionSpecies();
             spec_particles->setDensity(pars.at("rho"));
-            spec_particles->setElasticModulusAndRestitutionCoefficient(
+            spec_particles->setEffectiveElasticModulusAndRestitutionCoefficient(
                     pars.at("elasticModulus"),
                     pars.at("restitutionCoefficient")
                     );

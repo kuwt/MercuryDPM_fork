@@ -61,11 +61,6 @@ public:
     set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, double radMin, double radMax,
         double fixedParticleRadius, double inflowVelocity, double inflowVelocityVariance);
     
-    /*!
-     * \brief Generates a random particle
-     */
-    BaseParticle* generateParticle(RNG& random) override;
-    
     void placeParticle(BaseParticle* p, RNG& random) override;
     
     /*!
@@ -95,11 +90,6 @@ private:
      * \brief The two extremal corners of the cuboidal insertion boundary
      */
     Vec3D posMin_, posMax_;
-    
-    /*!
-     * \brief Minimum and maximum radii of the generated particles
-     */
-    double radMin_, radMax_;
     
     /*!
      * \brief radius of the fixed bottom particles, mean particle velocity in 

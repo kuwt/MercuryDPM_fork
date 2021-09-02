@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 	//- for Hertz-Mindlin
 	HertzianViscoelasticMindlinSpecies species;
 	species.setDensity(6./constants::pi);
-	species.setElasticModulusAndPoissonRatio(1e5, 0.3);
+    species.setEffectiveElasticModulusAndPoissonRatio(1e5, 0.3);
 	species.setDissipation(2.0);
 //	species.setSlidingDissipation(4.0/7.0);
 	species.setSlidingFrictionCoefficient(0.1);
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 	 * //- for Hertz-SlidingFriction
 	HertzianViscoelasticSlidingFrictionSpecies species2;
 	species2.setDensity(6./constants::pi);
-	species2.setElasticModulus(1e5);
+	species2.setEffectiveElasticModulus(1e5);
 	species2.setDissipation(2.0);
 	species2.setSlidingStiffness(300.0);
 	species2.setSlidingFrictionCoefficient(1.0);

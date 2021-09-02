@@ -36,8 +36,6 @@ ChuteInsertionBoundary::ChuteInsertionBoundary() : InsertionBoundary()
 {
     posMax_ = Vec3D(0.0, 0.0, 0.0);
     posMin_ = Vec3D(0.0, 0.0, 0.0);
-    radMax_ = 0.0;
-    radMin_ = 0.0;
     fixedParticleRadius_ = 0.0;
     inflowVelocity_ = 0.0;
     inflowVelocityVariance_ = 0.0;
@@ -51,8 +49,6 @@ ChuteInsertionBoundary::ChuteInsertionBoundary(const ChuteInsertionBoundary& oth
 {
     posMax_ = other.posMax_;
     posMin_ = other.posMin_;
-    radMax_ = other.radMax_;
-    radMin_ = other.radMin_;
     fixedParticleRadius_ = other.fixedParticleRadius_;
     inflowVelocity_ = other.inflowVelocity_;
     inflowVelocityVariance_ = other.inflowVelocityVariance_;
@@ -111,7 +107,7 @@ void ChuteInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxF
 }
 
 /*!
- * \details Generates a particle within the boundary with random radius, position 
+ * \details place a particle within the boundary with random radius, position
  * and velocity (within the allowed intervals). 
  * Notable properties:
  *      * The minimal Z-position is fixedParticleRadius_ (the radius of the particles
@@ -123,15 +119,6 @@ void ChuteInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxF
  * \param[in] random        a random number generator
  * \return                  pointer to the generated particle
  */
-BaseParticle* ChuteInsertionBoundary::generateParticle(RNG& random)
-{
-    BaseParticle* P = getParticleToCopy()->copy();
-    
-    P->setRadius(random.getRandomNumber(radMin_, radMax_));
-    
-    return P;
-}
-
 void ChuteInsertionBoundary::placeParticle(BaseParticle* p, RNG& random)
 {
     Vec3D position, velocity;

@@ -39,22 +39,23 @@ public:
     void setupInitialConditions() override
     {
         //set general properties
-        setMin(Vec3D(-2,-1,-1)*radius_);
-        setMax(Vec3D(2,1,1)*radius_);
-
+        setMin(Vec3D(-2, -1, -1) * radius_);
+        setMax(Vec3D(2, 1, 1) * radius_);
+    
         //define material/contact properties
         HertzianViscoelasticMindlinRollingTorsionSpecies s;
         s.setDensity(950);
-
+    
         Mdouble poisson = 0.4;
         Mdouble shearModulus = 1e8;
         Mdouble restitutionCoeff = 1e-4;
-        s.setElasticModulusAndRestitutionCoefficient(shearModulus*(3*poisson+2*shearModulus)/(poisson+shearModulus),restitutionCoeff);
-
+        s.setEffectiveElasticModulusAndRestitutionCoefficient(
+                shearModulus * (3 * poisson + 2 * shearModulus) / (poisson + shearModulus), restitutionCoeff);
+    
         s.setSlidingFrictionCoefficient(.5);
         s.setRollingFrictionCoefficient(.1);
         s.setTorsionFrictionCoefficient(0);
-        s.setShearModulus(shearModulus);
+        s.setEffectiveShearModulus(shearModulus);
         //s.setRollingStiffness(s.getElasticModulus()*radius_/300.);
         //s.setTorsionStiffness(s.getElasticModulus()*radius_/300.);
         //s.setSlidingDissipation(s.getDissipation());

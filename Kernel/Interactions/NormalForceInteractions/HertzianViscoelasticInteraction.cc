@@ -118,7 +118,7 @@ void HertzianViscoelasticInteraction::computeNormalForce()
     {
         const HertzianViscoelasticNormalSpecies* species = getSpecies();
         
-        Mdouble stiffness = 4. / 3. * species->getElasticModulus() * std::sqrt(getEffectiveRadius() * getOverlap());
+        Mdouble stiffness = 4. / 3. * species->getEffectiveElasticModulus() * std::sqrt(getEffectiveRadius() * getOverlap());
         
         //calculating the current normal force
         //dissipation is computed such that the restitution is constant
@@ -149,7 +149,7 @@ Mdouble HertzianViscoelasticInteraction::getElasticEnergy() const
 {
     if (getOverlap() > 0)
     {
-        return 8. / 15. * getSpecies()->getElasticModulus() * std::sqrt(getEffectiveRadius() * getOverlap()) *
+        return 8. / 15. * getSpecies()->getEffectiveElasticModulus() * std::sqrt(getEffectiveRadius() * getOverlap()) *
                mathsFunc::square(getOverlap());
     }
     else
@@ -176,7 +176,7 @@ const HertzianViscoelasticNormalSpecies* HertzianViscoelasticInteraction::getSpe
 Mdouble HertzianViscoelasticInteraction::getElasticEnergyAtEquilibrium(Mdouble adhesiveForce) const
 {
     const HertzianViscoelasticNormalSpecies* species = getSpecies();
-    const Mdouble modulus = 4. / 3. * species->getElasticModulus() * std::sqrt(getEffectiveRadius());
+    const Mdouble modulus = 4. / 3. * species->getEffectiveElasticModulus() * std::sqrt(getEffectiveRadius());
     const Mdouble equilibriumOverlap = std::cbrt(mathsFunc::square(adhesiveForce / modulus));
     return 0.6 * adhesiveForce * equilibriumOverlap;//why not 0.4?
 }

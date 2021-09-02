@@ -40,7 +40,7 @@ class ShapesDemo : public Mercury3D
         setMin(-10, -10, 10);
         setMax(20, 20, 20);
         HertzianViscoelasticMindlinSpecies species;
-        species.setElasticModulusAndRestitutionCoefficient(20000, 0.8);
+        species.setEffectiveElasticModulusAndRestitutionCoefficient(20000, 0.8);
         species.setDensity(constants::pi / 6);
         speciesHandler.copyAndAddObject(species);
         

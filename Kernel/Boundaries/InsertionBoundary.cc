@@ -33,7 +33,7 @@
 #endif
 
 /*!
- * \details Default constructor, sets all data members to 0 or nullptr.
+ * \details Default constructor, sets all data members to 0, nullptr or default.
  */
 InsertionBoundary::InsertionBoundary()
 {
@@ -47,12 +47,16 @@ InsertionBoundary::InsertionBoundary()
     initialVolume_ = 0;
     samplingInterval_ = 0;
     checkParticleForInteraction_ = true;
+    radMin_ = 0;
+    radMax_ = 0;
+    isManuallyInserting_ = false;
 }
 
 /*!
  * \details Copy constructor
  */
 InsertionBoundary::InsertionBoundary(const InsertionBoundary& other)
+        : BaseBoundary(other)
 {
     numberOfParticlesInserted_ = other.numberOfParticlesInserted_;
     massInserted_ = other.massInserted_;
@@ -64,7 +68,12 @@ InsertionBoundary::InsertionBoundary(const InsertionBoundary& other)
     samplingInterval_ = other.samplingInterval_;
     variableCumulativeVolumeFlowRate_ = other.variableCumulativeVolumeFlowRate_;
     checkParticleForInteraction_ = other.checkParticleForInteraction_;
-
+    distribution_ = other.distribution_;
+    particleSizeDistribution_ = other.particleSizeDistribution_;
+    radMin_ = other.radMin_;
+    radMax_ = other.radMax_;
+    isManuallyInserting_ = other.isManuallyInserting_;
+    
     if (other.particleToCopy_ != nullptr)
     {
         particleToCopy_ = other.particleToCopy_->copy();
@@ -73,7 +82,6 @@ InsertionBoundary::InsertionBoundary(const InsertionBoundary& other)
     {
         particleToCopy_ = nullptr;
     }
-    
 }
 
 /*!
@@ -106,23 +114,71 @@ void InsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed
 BaseParticle* InsertionBoundary::generateParticle(RNG& random)
 {
     BaseParticle* P = getParticleToCopy()->copy();
+    if (particleSizeDistribution_.getParticleSizeDistribution().empty())
+    {
+        switch (distribution_)
+        {
+            default:
+                // default is a uniform distribution between radMin_ and radMax_
+                P->setRadius(random.getRandomNumber(radMin_, radMax_));
+                break;
+            case Distribution::Normal_1_5:
+                // normal distribution
+                /// \todo TP: can we add a variable seed here? Let the user choose a seed and for reproducible results you always take the same seed.
+                static std::mt19937 gen(0);
+                Mdouble particleRadius = 0.5 * (radMax_ + radMin_);
+                Mdouble polydispersity = 0.5 * (radMax_ - radMin_);
+                static std::normal_distribution<> d(particleRadius, polydispersity);
+                static const Mdouble radiusMin = particleRadius - 1.5 * polydispersity;
+                static const Mdouble radiusMax = particleRadius + 1.5 * polydispersity;
+                Mdouble radius = d(gen);
+                while (radius > radiusMax || radius < radiusMin) radius = d(gen);
+                P->setRadius(radius);
+                break;
+        }
+    }
+        // manual insertion routine to insert PSDs as accurate as possible into a given volume
+    else if (isManuallyInserting_)
+    {
+        logger.assert(initialVolume_ > 0.0, "Use setInitialVolume to define the particle insertion volume");
+        Mdouble radius;
+        // getVolumeFlowRate() * time + initialVolume_ - volumeInserted_ lead to more inaccurate results, therfore
+        // -volumeInserted was removed.
+        radius = particleSizeDistribution_.insertManuallyByVolume(getVolumeFlowRate() *
+                                                                  getHandler()->getDPMBase()->getTime() +
+                                                                  initialVolume_);
+        P->setRadius(radius);
+    }
+    else
+    {
+        Mdouble radius;
+        radius = particleSizeDistribution_.drawSample();
+        P->setRadius(radius);
+    }
     return P;
 }
 
-bool InsertionBoundary::insertParticle(Mdouble time) {
+bool InsertionBoundary::insertParticle(Mdouble time)
+{
     // check if the flow rate limit has been reached
-    if (variableCumulativeVolumeFlowRate_.empty()) {
-        return volumeInserted_ < getVolumeFlowRate() * time+ initialVolume_;
-    } else {
-        const Mdouble iMax = (Mdouble) variableCumulativeVolumeFlowRate_.size()-2;
-        const Mdouble i = std::min(time/samplingInterval_,iMax);
-        if (i==iMax) {
+    if (variableCumulativeVolumeFlowRate_.empty())
+    {
+        return volumeInserted_ < getVolumeFlowRate() * time + initialVolume_;
+    }
+    else
+    {
+        const Mdouble iMax = (Mdouble) variableCumulativeVolumeFlowRate_.size() - 2;
+        const Mdouble i = std::min(time / samplingInterval_, iMax);
+        if (i == iMax)
+        {
             static unsigned count = 0;
-            if (count==0) logger(WARN, "Reached end of volume flowrate function");
+            if (count == 0) logger(WARN, "Reached end of volume flowrate function");
             ++count;
         }
         const size_t id = i;
-        const Mdouble allowedVolume = variableCumulativeVolumeFlowRate_[id] + (variableCumulativeVolumeFlowRate_[id+1]-variableCumulativeVolumeFlowRate_[id])*(i-id);
+        const Mdouble allowedVolume = variableCumulativeVolumeFlowRate_[id] +
+                                      (variableCumulativeVolumeFlowRate_[id + 1] -
+                                       variableCumulativeVolumeFlowRate_[id]) * (i - id);
         return volumeInserted_ < allowedVolume;
     }
 }
@@ -136,10 +192,10 @@ bool InsertionBoundary::insertParticle(Mdouble time) {
 void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
 {
     logger(VERBOSE, "In InsertionBoundary::checkBoundaryBeforeTimeStep\n");
-
+    
     if (!isActivated_)
         return;
-
+    
     /* Each timestep, the InsertionBoundary attempts to fill up a region with
      * particles.
      *
@@ -159,7 +215,7 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
      *
      * Otherwise, the processes terminates for this timestep.
      * */
-
+    
     // Keep count of how many successive times we have failed to place a new
     // particle. 
     unsigned int failed = 0;
@@ -167,32 +223,44 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
     {
         /* Generate random *intrinsic* properties for the new particle. */
         logger(VERBOSE, "about to call generateParticle\n");
-
-
-
-
+    
+    
+    
+    
         //! HERE
-
-
-
-
-
+    
+    
+    
+    
         auto p0 = generateParticle(md->random);
+        // Important for particle generation with a particle size distribution as it generates a particle with zero
+        // radius. If a particle is not allowed to be inserted by the PSD criteria it will generate a particle with
+        // zero diameter. This if statement prevents inserting particles with zero radius, which would else be a problem.
+        /// \todo create a definition for zero-size particles. Right now the zero-size particle is only used as a stop criterion for the manual PSD insertion
+        if (p0->getRadius() == 0)
+        {
+            logger(VERBOSE, "The PSD for the specified volume is fully set");
+            // free up memory space
+            delete p0;
+            // out of the 'placing' loop
+            failed = maxFailed_ + 1;
+            continue;
+        }
         logger(VERBOSE, "generated a particle with intrinsics %", p0);
-
+    
         while (true) // 'placing' loop
         {
             /* Generate extrinsic properties (position and velocity) for this
              * new particle. */
-
-
-
+        
+        
+        
             //! HERE
-
-
-
-
-
+    
+    
+    
+    
+    
             placeParticle(p0, md->random);
             logger(VERBOSE, "attempting to place particle at %, vel %", p0->getPosition(), p0->getVelocity());
 
@@ -226,11 +294,11 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
                 //Note: in parallel only one of the domains will actually add the particle
                 auto p = md->particleHandler.copyAndAddObject(p0);
                 failed = 0;
-
+    
                 ++numberOfParticlesInserted_;
                 const double volume = p0->getVolume();
                 volumeInserted_ += volume;
-                massInserted_ += p0->getSpecies()->getDensity()*volume;
+                massInserted_ += p0->getSpecies()->getDensity() * volume;
                 logger(VERBOSE, "successfully placed a particle %, with position: % after % fails.", p0,
                        p0->getPosition(), failed);
                 
@@ -238,7 +306,7 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
                  * free it here. (Don't worry, the particle will have been copied to the
                  * particleHandler by this point iff we want it.) */
                 delete p0;
-
+    
                 break; // out of the 'placing' loop
             }
             else
@@ -246,7 +314,7 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
                 failed++;
                 logger(VERBOSE, "failed to place a particle; have failed % times", failed);
             }
-
+        
             if (failed > maxFailed_)
             {
                 logger(VERBOSE, "failed too many times; giving up");
@@ -353,28 +421,43 @@ void InsertionBoundary::read(std::istream& is)
     BaseBoundary::read(is);
     std::string dummy, type;
     is >> dummy >> maxFailed_ >> dummy;
-    if (dummy=="volumeFlowRate")
+    if (dummy == "volumeFlowRate")
         is >> volumeFlowRate_ >> dummy;
     is >> massInserted_;
     is >> dummy >> volumeInserted_;
     is >> dummy >> numberOfParticlesInserted_;
     is >> dummy >> isActivated_;
+    if (!particleSizeDistribution_.getParticleSizeDistribution().empty())
+    {
+        for (auto p : particleSizeDistribution_.getParticleSizeDistribution())
+        {
+            is >> dummy >> p.radius;
+            is >> dummy >> p.probability;
+        }
+    }
+    else
+    {
+        is >> dummy >> distribution_;
+    }
     ///\todo make theses reads non-optional
     helpers::readOptionalVariable(is, "checkParticleForInteraction", checkParticleForInteraction_);
     helpers::readOptionalVariable(is, "initialVolume", initialVolume_);
-    if (helpers::readOptionalVariable(is, "samplingInterval", samplingInterval_)) {
+    if (helpers::readOptionalVariable(is, "samplingInterval", samplingInterval_))
+    {
         size_t n;
         Mdouble flowRate;
         is >> dummy >> n;
         //variableCumulativeVolumeFlowRate_.clear();
         variableCumulativeVolumeFlowRate_.reserve(n);
-        for (size_t i=0; i<n; ++i) {
+        for (size_t i = 0; i < n; ++i)
+        {
             is >> flowRate;
             variableCumulativeVolumeFlowRate_.push_back(flowRate);
         }
     }
     is >> dummy;
-    if (dummy!="noParticleToCopy") {
+    if (dummy != "noParticleToCopy")
+    {
         delete particleToCopy_;
         particleToCopy_ = getHandler()->getDPMBase()->particleHandler.readAndCreateObject(is);
         // The .restart file records the index of the particle's species, but
@@ -401,18 +484,34 @@ void InsertionBoundary::write(std::ostream& os) const
     os << " volumeInserted " << volumeInserted_;
     os << " numberOfParticlesInserted " << numberOfParticlesInserted_;
     os << " isActivated " << isActivated_;
-    if (checkParticleForInteraction_==false) {
+    if (!particleSizeDistribution_.getParticleSizeDistribution().empty())
+    {
+        os << " psd " << particleSizeDistribution_.getParticleSizeDistribution().size();
+        for (auto p : particleSizeDistribution_.getParticleSizeDistribution())
+        {
+            os << " " << p.radius
+               << " " << p.probability;
+        }
+    }
+    else
+    {
+        os << " distribution " << distribution_;
+    }
+    if (checkParticleForInteraction_ == false)
+    {
         os << " checkParticleForInteraction " << checkParticleForInteraction_;
     }
     os << " initialVolume " << initialVolume_;
     os << " samplingInterval " << samplingInterval_;
     os << " variableCumulativeVolumeFlowRate " << variableCumulativeVolumeFlowRate_.size();
-    for (const auto flowRate : variableCumulativeVolumeFlowRate_) {
+    for (const auto flowRate : variableCumulativeVolumeFlowRate_)
+    {
         os << ' ' << flowRate;
     }
-    if (particleToCopy_== nullptr)
+    if (particleToCopy_ == nullptr)
         os << " noParticleToCopy";
-    else {
+    else
+    {
         os << " particleToCopy " << *particleToCopy_;
     }
 }
@@ -435,14 +534,78 @@ Mdouble InsertionBoundary::getInitialVolume() const
 void InsertionBoundary::setInitialVolume(Mdouble initialVolume)
 {
     initialVolume_ = initialVolume;
-    if (!std::isfinite(volumeFlowRate_)) volumeFlowRate_=0;
+    if (!std::isfinite(volumeFlowRate_)) volumeFlowRate_ = 0;
 }
 
-void InsertionBoundary::setVariableVolumeFlowRate(const std::vector<Mdouble>& variableCumulativeVolumeFlowRate, Mdouble samplingInterval) {
-    logger.assert(samplingInterval>0,"sampling interval needs to be positive");
+void InsertionBoundary::setVariableVolumeFlowRate(const std::vector<Mdouble>& variableCumulativeVolumeFlowRate,
+                                                  Mdouble samplingInterval)
+{
+    logger.assert(samplingInterval > 0, "sampling interval needs to be positive");
     const Mdouble endTime = variableCumulativeVolumeFlowRate.size() * samplingInterval;
-    logger(INFO,"variable flowrate is defined up to %",endTime);
-    logger.assert_always(getHandler()->getDPMBase()->getTimeMax()<endTime,"variable flowrate is defined up to %, but tMax is set to %",endTime, getHandler()->getDPMBase()->getTimeMax());
+    logger(INFO, "variable flowrate is defined up to %", endTime);
+    logger.assert_always(getHandler()->getDPMBase()->getTimeMax() < endTime,
+                         "variable flowrate is defined up to %, but tMax is set to %", endTime,
+                         getHandler()->getDPMBase()->getTimeMax());
     variableCumulativeVolumeFlowRate_ = variableCumulativeVolumeFlowRate;
     samplingInterval_ = samplingInterval;
-};
+}
+
+/*!
+ * \brief Sets the range of particle radii that may be generated to a PSD defined by the user.
+ */
+/// \todo TP: Consider std::move instead of a set function. This would result in a speedup + no one has to set the PSD for insertionBoundaries again as it is set when a PSD is inserted.
+void InsertionBoundary::setPSD(PSD psd)
+{
+    particleSizeDistribution_ = psd;
+}
+
+/*!
+ * \details gets the user defined particle size distribution
+ * \return a vector of the PSD::RadiusAndProbability class containing the particle size distribution
+ */
+PSD InsertionBoundary::getPSD()
+{
+    return particleSizeDistribution_;
+}
+
+/*!
+ * \details sets the isManuallyInserting_ to TRUE, resulting in a top-down class-by-class insertion routine to insert PSDs
+ * as accurate as possible.
+ */
+void InsertionBoundary::setManualInsertion(bool isManuallyInserting)
+{
+    isManuallyInserting_ = isManuallyInserting;
+}
+
+void InsertionBoundary::setDistribution(InsertionBoundary::Distribution distribution)
+{
+    distribution_ = distribution;
+}
+
+/*!
+ * \brief Gets the range of particle radii that may be generated.
+ */
+InsertionBoundary::Distribution InsertionBoundary::getDistribution()
+{
+    return distribution_;
+}
+
+/*!
+ * \details write distribution type variables to file.
+ */
+std::ostream& operator<<(std::ostream& os, InsertionBoundary::Distribution type)
+{
+    os << static_cast<unsigned>(type);
+    return os;
+}
+
+/*!
+ * \details write Distribution type variables from file.
+ */
+std::istream& operator>>(std::istream& is, InsertionBoundary::Distribution& type)
+{
+    unsigned uType;
+    is >> uType;
+    type = static_cast<InsertionBoundary::Distribution>(uType);
+    return is;
+}

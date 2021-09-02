@@ -35,7 +35,7 @@ public:
     void setupInitialConditions() override
     {
         HertzianViscoelasticMindlinSpecies species;
-        species.setElasticModulusAndRestitutionCoefficient(20000, 0.8);
+        species.setEffectiveElasticModulusAndRestitutionCoefficient(20000, 0.8);
         speciesHandler.copyAndAddObject(species);
         
         SuperQuadricParticle p0;

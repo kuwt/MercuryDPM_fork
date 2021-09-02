@@ -43,10 +43,10 @@ The model parameters are set using HertzianViscoelasticNormalSpecies member func
 
 \code
  HertzianViscoelasticNormalSpecies species;
-    species.setElasticModulus();
+    species.setEffectiveElasticModulus();
     species.setPoissonNumber;
     species.setDissipation();
-    species.setElasticModulusAndRestitutionCoefficient();
+    species.setEffectiveElasticModulusAndRestitutionCoefficient();
 \endcode
 
 
