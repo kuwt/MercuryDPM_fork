@@ -464,7 +464,7 @@ void PSD::convertCumulativeToProbabilityDensity()
 void PSD::convertProbabilityDensityToProbabilityDensityNumberDistribution(TYPE PDFType)
 {
     Mdouble sum = 0;
-    switch (PDFType)
+    switch  (PDFType)
     {
         default:
             logger(ERROR, "Wrong PDFType");
@@ -715,7 +715,7 @@ Mdouble PSD::getMaxRadius()
  * \details Gets the vector containing radii and probabilities of the PSD.
  * \return A vector containing radii and probabilities of the PSD.
  */
-const std::vector<PSD::RadiusAndProbability> PSD::getParticleSizeDistribution() const
+std::vector<PSD::RadiusAndProbability> PSD::getParticleSizeDistribution() const
 {
     return particleSizeDistribution_;
 }

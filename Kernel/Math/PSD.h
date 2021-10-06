@@ -197,7 +197,7 @@ public:
     /*!
      * \brief Get the PSD vector.
      */
-    const std::vector<RadiusAndProbability> getParticleSizeDistribution() const;
+    std::vector<RadiusAndProbability> getParticleSizeDistribution() const;
     
     /*!
      * \brief Get the number of particles already inserted into the simulation.

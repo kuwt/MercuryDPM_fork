@@ -41,7 +41,7 @@ public:
         //setWallsWriteVTK(FileType::MULTIPLE_FILES);
         //Set files
         dataFile.setFileType(FileType::ONE_FILE);
-        restartFile.setFileType(FileType::NO_FILE);
+        restartFile.setFileType(FileType::ONE_FILE);
         fStatFile.setFileType(FileType::NO_FILE);
         eneFile.setFileType(FileType::ONE_FILE);
         dataFile.setSaveCount(1000);
@@ -316,7 +316,6 @@ int main(int argc, char *argv[])
     // Set simulation time
     CPI.setTimeMax(10);
     CPI.cg = CPI.cgHandler.copyAndAddObject(CG<CGCoordinates::O>());
-    CPI.solve();
     // start the solver
     CPI.solve();
     return 0;

@@ -427,12 +427,16 @@ void InsertionBoundary::read(std::istream& is)
     is >> dummy >> volumeInserted_;
     is >> dummy >> numberOfParticlesInserted_;
     is >> dummy >> isActivated_;
-    if (!particleSizeDistribution_.getParticleSizeDistribution().empty())
+    size_t psdSize;
+    if (helpers::readOptionalVariable(is, "psd", psdSize))
     {
-        for (auto p : particleSizeDistribution_.getParticleSizeDistribution())
+        PSD::RadiusAndProbability radiusAndProbability;
+        particleSizeDistribution_.getParticleSizeDistribution().reserve(psdSize);
+        for (size_t i = 0; i < psdSize; ++i)
         {
-            is >> dummy >> p.radius;
-            is >> dummy >> p.probability;
+            is >> radiusAndProbability.radius;
+            is >> radiusAndProbability.probability;
+            particleSizeDistribution_.getParticleSizeDistribution().push_back(radiusAndProbability);
         }
     }
     else
