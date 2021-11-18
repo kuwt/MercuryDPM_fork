@@ -23,6 +23,7 @@
 #include <map>
 
 #define MAX_STRLEN 1024
+#define DEGREES (M_PI / 180.)
 
 void terminationUncaughtException()
 {
@@ -34,7 +35,7 @@ void terminationUncaughtException()
 class muICal3D : public Mercury3D
 {
     public:
-        muICal3D(std::string parsfile)
+        muICal3D(std::string parsfile, double thetaInDegrees)
         {
             std::ifstream file(parsfile);
             std::string name;
@@ -44,17 +45,17 @@ class muICal3D : public Mercury3D
                 pars[name] = var;
             }
 
-            setName(parsfile.erase(parsfile.find_last_of('.')));
+            theta = thetaInDegrees * DEGREES;
+            setName(parsfile.erase(parsfile.find_last_of('.')) + "-" + std::to_string(thetaInDegrees));
 
-            theta = M_PI * pars.at("theta") / 180.;
             std::cout << theta << std::endl;
 
-            double betaslide        = M_PI * pars.at("betaslide") / 180.;
-            double betaroll         = M_PI * pars.at("betaroll") / 180.;
-            double betators        = M_PI * pars.at("betators") / 180.;
-            double base_betaslide   = M_PI * pars.at("base_betaslide") / 180.;
-            double base_betaroll    = M_PI * pars.at("base_betaroll") / 180.;
-            double base_betators   = M_PI * pars.at("base_betators") / 180.;
+            double betaslide        = pars.at("betaslide") * DEGREES;
+            double betaroll         = pars.at("betaroll") * DEGREES;
+            double betators         = pars.at("betators") * DEGREES;
+            double base_betaslide   = pars.at("base_betaslide") * DEGREES;
+            double base_betaroll    = pars.at("base_betaroll") * DEGREES;
+            double base_betators    = pars.at("base_betators") * DEGREES;
 
             g = pars.at("g");
 
@@ -73,8 +74,8 @@ class muICal3D : public Mercury3D
             setZMin(0);
             setZMax(+pars.at("height"));
 
-            dataFile.setFileType(FileType::ONE_FILE);
-            fStatFile.setFileType(FileType::ONE_FILE);
+            dataFile.setFileType(FileType::NO_FILE);
+            fStatFile.setFileType(FileType::NO_FILE);
 
             /* Define species */
             speciesP = new LinearViscoelasticFrictionSpecies();
@@ -123,7 +124,7 @@ class muICal3D : public Mercury3D
             PeriodicBoundary xbounds, ybounds;
             xbounds.set(Vec3D(1, 0, 0), getXMin(), getXMax());
             ybounds.set(Vec3D(0, 1, 0), getYMin(), getYMax());
-            boundaryHandler.copyAndAddObject(ybounds);
+            boundaryHandler.copyAndAddObject(xbounds);
             boundaryHandler.copyAndAddObject(ybounds);
 
             /* Rough base */
@@ -149,17 +150,6 @@ class muICal3D : public Mercury3D
                 }
         }
 
-
-        /*
-         * Create a setup with the slope at the angle specified in radians.
-         */
-        muICal3D(std::string parsfile, double newTheta) : muICal3D(parsfile) 
-        {
-            theta = newTheta;
-            const double degrees = theta * 180. / M_PI;
-            setName(parsfile.erase(parsfile.find_last_of('.')) + "-" + std::to_string(degrees));
-        }
-
         void setupInitialConditions()
         {
             /* Start writing to the .muI file. */
@@ -167,7 +157,7 @@ class muICal3D : public Mercury3D
             snprintf(muICal3D_fn, MAX_STRLEN, "%s.muI", getName().c_str());
             muICal3D_f = fopen(muICal3D_fn, "w");
             setbuf(muICal3D_f, NULL);
-            fprintf(muICal3D_f, "time theta n depth mass xmom ke basfx basfy\n"); 
+            fprintf(muICal3D_f, "time theta n depth mass xmom ke basfx basfy basfz\n"); 
             fprintf(stderr, "Started writing to .muI file\n");
 
             setGravity(Vec3D(0, 0, -g));
@@ -203,14 +193,14 @@ class muICal3D : public Mercury3D
             lid->set(Vec3D(0,0,1), Vec3D(0, 0, getZMax()));
             lid = wallHandler.copyAndAddObject(lid);
 
-            not_yet_removed_insb = true;
+            notYetRemovedInsb = true;
         }
 
         void actionsOnRestart()
         {
             if (boundaryHandler.getNumberOfObjects() == 1)
             {
-                not_yet_removed_insb = false;
+                notYetRemovedInsb = false;
 
                 /* Continue writing to the .muI file. */
                 char muICal3D_fn[MAX_STRLEN];
@@ -224,21 +214,21 @@ class muICal3D : public Mercury3D
 
         void actionsAfterTimeStep()
         {
-            if (!not_yet_removed_insb)
+            if (!notYetRemovedInsb)
                 return;
 
             /* We remove the CubeInsertionBoundary so that it doesn't keep
              * giving new particles. After a few timesteps, it should have
              * saturated the system. */
             if (getNumberOfTimeSteps() >= dataFile.getSaveCount() / 2
-                    && getKineticEnergy() < getTotalMass()*1e-4)
+                    && particleHandler.getVolume() > getTotalVolume() * 0.5 )
             {
                 boundaryHandler.removeObject(insb->getIndex());
                 wallHandler.removeObject(lid->getIndex());
 
 
                 setGravity(Vec3D(g*sin(theta), 0, -g*cos(theta)));
-                not_yet_removed_insb = false;
+                notYetRemovedInsb = false;
                 logger(INFO, "time %, removed insb and lid", getTime());
 
                 /* Start writing to output files. */
@@ -265,44 +255,30 @@ class muICal3D : public Mercury3D
         void writeOutputFiles()
         {
             Mercury3D::writeOutputFiles();
-            // if (not_yet_removed_insb)
-            //     return;
+
+            if (notYetRemovedInsb)
+                return;
+
+            if (getNumberOfTimeSteps() % dataFile.getSaveCount() != 0)
+                return;
 
             // Calculate the forces on the basal particles and wall.
             Vec3D basalForce = calculateBasalForce();
 
-            /* Write all these details to the .muI file. */
+            // Write all these details to the .muI file.
             fprintf(
-                muICal3D_f, "%g %g %d %g %g %g %g %g %g\n",
+                muICal3D_f, "%g %g %d %g %g %g %g %g %g %g\n",
                 getTime(),
-                theta,
+                theta / DEGREES,
                 particleHandler.getNumberOfObjects(),
                 2*getCentreOfMass().Z,
                 getTotalMass(), 
                 getTotalMomentum().X,
                 getKineticEnergy(),
                 basalForce.X,
-                basalForce.Y
+                basalForce.Y,
+                basalForce.Z
             );
-        }
-
-        void printTime()
-        {
-            Mercury3D::printTime();
-            Vec3D basalForce = calculateBasalForce();
-            printf(
-                "%g %g %d %g %g %g %g %g %g\n",
-                getTime(),
-                theta,
-                particleHandler.getNumberOfObjects(),
-                2*getCentreOfMass().Z,
-                getTotalMass(), 
-                getTotalMomentum().X,
-                getKineticEnergy(),
-                basalForce.X,
-                basalForce.Y
-            );
-
         }
 
         void actionsAfterSolve()
@@ -321,7 +297,7 @@ class muICal3D : public Mercury3D
         CubeInsertionBoundary* insb;
         InfiniteWall*          dam;
         InfiniteWall*          lid;
-        bool not_yet_removed_insb;
+        bool notYetRemovedInsb;
         FILE * muICal3D_f;
 
         double g;
@@ -333,42 +309,9 @@ class muICal3D : public Mercury3D
 
 int main(int argc, char ** argv) 
 {
-    std::set_terminate(terminationUncaughtException);
-
-    auto problem = new muICal3D(argv[1], M_PI * atof(argv[2]) / 180.);
+    auto problem = new muICal3D(argv[1], atof(argv[2]));
     argv[2] = argv[0];
     problem->solve(argc-2, argv+2);
     delete problem;
     return 0;
 }
-
-#if 0
-    switch (argc)
-    {
-        case 2:
-            {
-                /* No angle has been specified, 
-                 * so choose from the pars file. */
-                auto problem = new muICal3D(argv[1]);
-                argv[1] = argv[0];
-                problem->solve(argc-1, argv+1);
-                delete problem;
-                break;
-            }
-        case 3:
-            {
-                /* An angle has been specified */
-                auto problem = new muICal3D(argv[1], M_PI * atof(argv[2]) / 180.);
-                argv[2] = argv[0];
-                problem->solve(argc-2, argv+2);
-                delete problem;
-                break;
-            }
-        default:
-            {
-                fprintf(stderr, "Usage: %s pars-file [angle]\n", argv[0]);
-                exit(-1);
-                break;
-            }
-    }
-#endif
