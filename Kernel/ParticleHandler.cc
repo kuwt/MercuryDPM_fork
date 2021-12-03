@@ -1292,13 +1292,13 @@ unsigned int ParticleHandler::getNumberOfRealObjects() const
  */
 unsigned int ParticleHandler::getNumberOfObjects() const
 {
-#ifdef MERCURY_USE_MPI
-    MPIContainer& communicator = MPIContainer::Instance();
-    if (communicator.getNumberOfProcessors() > 1)
-    {
-        logger(WARN,"When compiling with MPI please do not use getNumberOfObjects(). Instead use: getNumberOfRealObjectsLocal(), getNumberOfRealObjects() or getSize()");
-    }
-#endif
+//#ifdef MERCURY_USE_MPI
+//    MPIContainer& communicator = MPIContainer::Instance();
+//    if (communicator.getNumberOfProcessors() > 1)
+//    {
+//        logger(WARN,"When compiling with MPI please do not use getNumberOfObjects(). Instead use: getNumberOfRealObjectsLocal(), getNumberOfRealObjects() or getSize()");
+//    }
+//#endif
     return getSize();
 }
 
