@@ -216,6 +216,11 @@ public:
      */
     int getLocalIndex(std::vector<int> localMeshIndex);
     
+    /*!
+     * Does the inverse action of getLocalIndex (un-bundles the localIndex into the three dimensions)
+     */
+    std::vector<int> getLocalIndexInverse(int localMeshIndex);
+    
     /*! 
      * \brief Searches for a particle with a specific id in a list of particles
      */
@@ -225,6 +230,11 @@ public:
      * \brief This function finds if a given particle is close to a given boundary
      */
     std::vector<int> findNearbyBoundaries(BaseParticle* particle, Mdouble offset = 0);
+    
+    /*!
+     * checks whether the particle is in the localIndex zone.
+     */
+    bool inBoundary(BaseParticle* particle, int localIndex);
     
     /*!
      * \brief Function that adds the particles to the approriate boundary list

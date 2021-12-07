@@ -23,6 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <thread>
 #include "Mercury3D.h"
 #include "Species/LinearViscoelasticSlidingFrictionSpecies.h"
 using constants::pi;
@@ -41,7 +42,7 @@ public:
         setMin(-getMax());
         setNumberOfDomains({2,2,1});
         setTimeStep(1e-4);
-        setTimeMax(3e-4);
+        setTimeMax(4e-4);
         setSaveCount(1);
         eneFile.setFileType(FileType::NO_FILE);
         fStatFile.setFileType(FileType::NO_FILE);
@@ -53,7 +54,7 @@ public:
         species->setDensity(6.0/pi);
         double mass  = species->getMassFromRadius(0.5);
         species->setCollisionTimeAndNormalAndTangentialRestitutionCoefficient(1, 1, 1, mass);
-        species->setSlidingFrictionCoefficient(1e-3);
+        species->setSlidingFrictionCoefficient(1);
         speciesHandler.copyAndAddObject(species);
     }
 
@@ -69,8 +70,8 @@ public:
         SphericalParticle particle;
         particle.setSpecies(speciesHandler.getLastObject());
         particle.setRadius(0.5);
-        particle.setVelocity(Vec3D(0,1e2,0));
-        particle.setPosition(Vec3D(0.51,-0.015,0));
+        particle.setVelocity(Vec3D(0,100,0));
+        particle.setPosition(Vec3D(0.51,-0.025,0));
         particleHandler.copyAndAddObject(particle);
         particle.setVelocity(Vec3D(0,0,0));
         particle.setPosition(Vec3D(1.49,-0.005,0));
@@ -78,13 +79,26 @@ public:
     }
     
     void actionsAfterTimeStep() override {
-        logger(INFO,"#real % #ghost %", particleHandler.getNumberOfRealObjectsLocal(),
-               particleHandler.getNumberOfObjects()-particleHandler.getNumberOfRealObjectsLocal());
+        logger(INFO,"#time % #real % #ghost % #contacts %", getNumberOfTimeSteps(),
+               particleHandler.getNumberOfRealObjectsLocal(),
+               particleHandler.getNumberOfObjects()-particleHandler.getNumberOfRealObjectsLocal(),
+               interactionHandler.getNumberOfObjects());
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        for (auto c : interactionHandler) {
+            auto i = dynamic_cast<SlidingFrictionInteraction*>(c);
+            logger(INFO, "contact % % %", i->getP()->getId(), i->getI()->getId(), i->getTangentialOverlap());
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 };
 
 int main()
 {
-    TwoByTwoMPIDomainMPI4Test().solve();
+    TwoByTwoMPIDomainMPI4Test problem;
+    problem.solve();
+    for (auto c : problem.interactionHandler) {
+        auto i = dynamic_cast<SlidingFrictionInteraction*>(c);
+        helpers::check(i->getTangentialOverlap(), -0.0499896, 1e-6, "Tangential spring");
+    }
     return 0;
 }

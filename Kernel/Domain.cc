@@ -512,6 +512,11 @@ int Domain::getLocalIndex(const std::vector<int> localMeshIndex)
            9 * localMeshIndex[Direction::ZAXIS] + 13;
 }
 
+std::vector<int> Domain::getLocalIndexInverse(int localIndex) {
+    localIndex -= 13;
+    return {localIndex%3, (localIndex/3)%3, (localIndex/9)%3};
+}
+
 /*!
  * \brief Searches for a particle with a specific id in a list of particles
  * \details When interactions are copied over MPI from an MPI particle, the unique id of the particles they
@@ -568,6 +573,19 @@ std::vector<int> Domain::findNearbyBoundaries(BaseParticle* particle, Mdouble of
         }
     }
     return boundaryIndex;
+}
+
+bool Domain::inBoundary(BaseParticle* particle, int localIndex_) {
+    std::vector<int> boundaryIndex = findNearbyBoundaries(particle);
+    std::vector<int> localIndex = getLocalIndexInverse(localIndex_);
+    // if the particle is in the boundary zone into which we want to transmit
+    for (int i = 0; i < 3; ++i)
+    {
+        if (localIndex[i]!=0 && boundaryIndex[i]!=localIndex[i]) {
+            return false;
+        }
+    }
+    return true;
 }
 
 /*!
@@ -839,17 +857,22 @@ void Domain::findNewMPIInteractions()
                     else //is I a particle
                     {
                         //check if particle is in mpi domain OR (TODO) if it is in the newBoundaryParticleList_
-                        if (objectI->isInMPIDomain() || isInNewBoundaryParticleList(objectI, localIndex) ) {
-                            //Is the particle still interacting after the position update?
-                            Vec3D branchVector = particleP->getPosition() - objectI->getPosition();
-                            //Get the square of the distance between particle i and particle j
-                            Mdouble distanceSquared = Vec3D::getLengthSquared(branchVector);
-                            Mdouble sumOfInteractionRadii =
-                                    objectI->getSumOfInteractionRadii(particleP);
-                            if (distanceSquared < (sumOfInteractionRadii * sumOfInteractionRadii))
+                        if (objectI->isInMPIDomain() || isInNewBoundaryParticleList(objectI, localIndex))
+                        {
+                            // iff the interaction partner of the new particle is in the communication zone, transmit the interaction
+                            if (inBoundary(objectI,localIndex))
                             {
-                                //Add the interaction to the list
-                                newInteractionList_[localIndex].push_back(interaction);
+                                //Is the particle still interacting after the position update?
+                                Vec3D branchVector = particleP->getPosition() - objectI->getPosition();
+                                //Get the square of the distance between particle i and particle j
+                                Mdouble distanceSquared = Vec3D::getLengthSquared(branchVector);
+                                Mdouble sumOfInteractionRadii =
+                                    objectI->getSumOfInteractionRadii(particleP);
+                                if (distanceSquared < (sumOfInteractionRadii * sumOfInteractionRadii))
+                                {
+                                    //Add the interaction to the list
+                                    newInteractionList_[localIndex].push_back(interaction);
+                                }
                             }
                         }
                     }
@@ -1058,8 +1081,14 @@ void Domain::processReceivedInteractionData(const unsigned localIndex, std::vect
                 }
             }
             //Add the interaction
-            BaseInteraction* j = pGhost->getInteractionWith(otherParticle, timeStamp, &iH);
-            if (j!= nullptr) j->setMPIInteraction(interactionDataReceive_[localIndex], l, false);
+            // flipped order of other and ghost, so it is in the same order as received
+            BaseInteraction* j;
+            if (otherParticle->getId() < pGhost->getId()) {
+                j = pGhost->getInteractionWith(otherParticle, timeStamp, &iH);
+            } else {
+                j = otherParticle->getInteractionWith(pGhost, timeStamp, &iH);
+            }
+            if (j != nullptr) j->setMPIInteraction(interactionDataReceive_[localIndex], l, false);
         }
     }
 }
