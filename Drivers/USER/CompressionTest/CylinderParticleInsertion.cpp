@@ -19,13 +19,10 @@ public:
     {
         //-----------------
         //Global parameters
+        // Density
         std::string pD = helpers::to_string(particleDensity);
+        // Scale the cylinder to fit the maximum radius of the PSD cylScaling times into one cylinder diameter
         std::string cS = helpers::to_string(cylScaling);
-        //Calculate important properties
-        cylHeight_ /= cylScaling;
-        cylRad_ /= cylScaling;
-//        Mdouble particleBulkVolume = particleNumber_*cubic(2.0*particleRadius_);
-        cylVol_ = constants::pi * cylRad_ * cylRad_ * cylHeight_;
     
         setName("CylinderParticleInsertion_" + pD + "_" + cS);
     
@@ -37,6 +34,20 @@ public:
         /// \todo TP: add InputData automatically to the build folder (define in master cmake file)
         psd.setPSDFromCSV(getMercurySourceDir() + "/Drivers/USER/CompressionTest/InputData/CVDFLactose.csv",
                           PSD::TYPE::CUMULATIVE_VOLUME_DISTRIBUTION, false, 1000000.0);
+        // cut off size distribution if size ratio is too high
+        Mdouble SR = psd.getSizeRatio();
+        if (SR > 100)
+        {
+            logger(WARN, "Size ratio > 100; Cutting the PSD to avoid inaccurate results");
+            psd.cutoffCumulativeNumber(0.1, 0.9, 0.5);
+        }
+    
+        //Calculate important properties; scale cylinder by maximum PSD radius
+        cylHeight_ = cylScaling * psd.getMaxRadius();
+        cylRad_ = cylScaling * psd.getMaxRadius();
+//        Mdouble particleBulkVolume = particleNumber_*cubic(2.0*particleRadius_);
+        cylVol_ = constants::pi * cylRad_ * cylRad_ * cylHeight_;
+    
         //setParticlesWriteVTK(true);
         //setWallsWriteVTK(FileType::MULTIPLE_FILES);
         //Set files
@@ -60,7 +71,7 @@ public:
                         .getLength();
 //        const Mdouble k1 = 1 * minParticleRadius; //[Stiffness depends on particle radius]
         s1->setPlasticParameters(k1, k1, 0.0, 0.1);
-        s1->setDissipation(0.000001);
+        s1->setDissipation(0.00000001);
         s1->setDensity(particleDensity);
         s1->setSlidingStiffness(s1->getLoadingStiffness() * 2.0 / 7.0);
         s1->setSlidingDissipation(s1->getDissipation() * 2.0 / 5.0);
@@ -137,7 +148,7 @@ public:
         //set PSD
         insertionBoundary.setPSD(psd);
         insertionBoundary.setManualInsertion(true);
-        insertionBoundary.setInitialVolume(cylVol_);
+        insertionBoundary.setInitialVolume(1.1 * cylVol_);
 //        insertionBoundary.setInitialVolume(0.1*cylVol_);
         // fill the cylinder volume with a given flowrate
 //        insertionBoundary.setVolumeFlowRate(1000 * cylRad_);
@@ -252,21 +263,14 @@ public:
     
     void actionsBeforeTimeStep() override
     {
-        if (particleHandler.getKineticEnergy() < threshold_ * getElasticEnergy())
+        if (particleHandler.getKineticEnergy() / getElasticEnergy() < threshold_)
         {
             Mdouble bulkDensity = particleHandler.getMass() / cylVol_ * scaling_;
             Mdouble trueDensity = particleHandler.getMass() / particleHandler.getVolume();
             logger(INFO, "Bulk density = %, True Density = %, volume fraction = %", bulkDensity, trueDensity,
                    particleHandler.getVolume() / cylVol_);
-            exit(0);
-        }
-    }
-    
-    void actionsAfterTimeStep() override
-    {
-        if (particleHandler.getKineticEnergy() / getElasticEnergy() < threshold_)
-        {
             deleteParticles();
+            setTimeMax(getTime());
         }
     }
     
@@ -288,11 +292,11 @@ public:
 
 private:
     // Cylinder height
-    Mdouble cylHeight_ = 0.01275;
+    Mdouble cylHeight_;
     // Cylinder radius
-    Mdouble cylRad_ = 0.025;
+    Mdouble cylRad_;
     // Cylinder volume
-    Mdouble cylVol_ = constants::pi * cylRad_ * cylRad_ * cylHeight_;
+    Mdouble cylVol_;
     // threshold to end the simulation and here also delete particles above a certain limit
     Mdouble threshold_ = 1e-6;
     // scaling = 4 for quarter partitioning of simulation domain and scaling = 2 if only the half of the domain gets

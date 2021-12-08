@@ -113,7 +113,7 @@ public:
     /*!
      * \brief Prints radii and probabilities of the PSD vector.
      */
-    void printPSD();
+    void printPSD() const;
     
     /*!
      * \brief Draw a sample radius from a CUMULATIVE_NUMBER_DISTRIBUTION.
@@ -174,25 +174,25 @@ public:
     void convertCumulativeToCumulativeNumberDistribution(TYPE CDFType);
     
     /*!
-     * \brief cutoff the PSD at given percentiles.
+     * \brief cutoff the PSD at given quantiles.
      */
-    void cutoffCumulativeNumber(Mdouble percentileMin, Mdouble percentileMax, Mdouble minPolydispersity = 0.1);
+    void cutoffCumulativeNumber(Mdouble quantileMin, Mdouble quantileMax, Mdouble minPolydispersity = 0.1);
     
     /*!
-     * \brief cutoff the PSD at given percentiles and make it less polydisperse by squeezing it.
+     * \brief cutoff the PSD at given quantiles and make it less polydisperse by squeezing it.
      */
-    void cutoffAndSqueezeCumulative(Mdouble percentileMin, Mdouble percentileMax, Mdouble squeeze,
+    void cutoffAndSqueezeCumulative(Mdouble quantileMin, Mdouble quantileMax, Mdouble squeeze,
                                     Mdouble minPolydispersity = 0.1);
     
     /*!
      * \brief Get smallest radius of the PSD.
      */
-    Mdouble getMinRadius();
+    Mdouble getMinRadius() const;
     
     /*!
      * \brief Get largest radius of the PSD.
      */
-    Mdouble getMaxRadius();
+    Mdouble getMaxRadius() const;
     
     /*!
      * \brief Get the PSD vector.
@@ -202,22 +202,32 @@ public:
     /*!
      * \brief Get the number of particles already inserted into the simulation.
      */
-    int getInsertedParticleNumber();
+    int getInsertedParticleNumber() const;
     
     /*!
-     * \brief Calculate a certain diameter (e.g. D10, D50, D90, etc.) from a percentile of the PSD.
+     * \brief Calculate a certain diameter (e.g. D10, D50, D90, etc.) from a percentile x of the number based PSD.
      */
-    Mdouble getDx(Mdouble x);
+    Mdouble getNumberDx(Mdouble x) const;
     
     /*!
-     * \brief Calculate the percentile of the PSD.
+     * \brief Calculate a certain diameter (e.g. D10, D50, D90, etc.) from a percentile x of the volume based PSD.
      */
-    Mdouble getRadiusByPercentile(Mdouble percentile);
+    Mdouble getVolumeDx(Mdouble x) const;
+    
+    /*!
+     * \brief Calculate the quantile of the PSD.
+     */
+    Mdouble getRadiusByQuantile(Mdouble quantile) const;
     
     /*!
      * \brief get a volumetric mean radius of the PSD.
      */
-    Mdouble getVolumetricMeanRadius();
+    Mdouble getVolumetricMeanRadius() const;
+    
+    /*!
+     * \brief get the size ratio (width) of the PSD.
+     */
+    Mdouble getSizeRatio() const;
     
     /*!
      * \brief compute raw momenta of the user defined PSD.
@@ -237,7 +247,7 @@ public:
     /*!
      * \brief get momenta of the user defined PSD.
      */
-    std::array<Mdouble, 6> getMomenta();
+    std::array<Mdouble, 6> getMomenta() const;
     
     /*!
      * \brief determines if a certain value of the PSD vector is lower than another one. Used for std::lower_bound()
@@ -273,6 +283,7 @@ private:
     
     /*!
      * Array of doubles which stores the moments of a user defined discrete PROBABILITYDENSITY_NUMBER_DISTRIBUTION.
+     * \todo TW can we make this a local variable instead of a class variable?
      */
     std::array<Mdouble, 6> momenta_{};
     

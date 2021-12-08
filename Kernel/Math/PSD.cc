@@ -68,7 +68,7 @@ PSD* PSD::copy() const
  * \details Prints the radii [m] and probabilities [%] of the psd vector. It currently supports nanometers, micrometers,
  *          milimeters and meters as size units.
  */
-void PSD::printPSD()
+void PSD::printPSD() const
 {
     if (particleSizeDistribution_.front().radius > 1e-1)
     {
@@ -420,6 +420,7 @@ void PSD::setPSDFromCSV(const std::string& fileName, TYPE PSDType, bool headings
             convertProbabilityDensityToCumulative();
             break;
     }
+    logger(INFO, "A PSD with size ratio % is now ready to be set", getSizeRatio());
 }
 
 /*!
@@ -602,76 +603,97 @@ void PSD::convertCumulativeToCumulativeNumberDistribution(TYPE CDFType)
 }
 
 /*!
- * \details Cuts off the CDF at given minimum and maximum percentiles and applies a minimum polydispersity at the base.
- * \param[in] percentileMin                       undersize percentile to cut off the lower part of the CDF.
- * \param[in] percentileMax                       oversize percentile to cut off the upper part of the CDF.
+ * \details Cuts off the CDF at given minimum and maximum quantiles and applies a minimum polydispersity at the base.
+ * \param[in] quantileMin                       undersize quantile to cut off the lower part of the CDF.
+ * \param[in] quantileMax                       oversize quantile to cut off the upper part of the CDF.
  * \param[in] minPolydispersity                 Applies a minimum of polydispersity ([0,1]) at the base of the CDF.
  */
-void PSD::cutoffCumulativeNumber(Mdouble percentileMin, Mdouble percentileMax, Mdouble minPolydispersity)
+void PSD::cutoffCumulativeNumber(Mdouble quantileMin, Mdouble quantileMax, Mdouble minPolydispersity)
 {
-    Mdouble radiusMin = getRadiusByPercentile(percentileMin);
-    Mdouble radiusMax = getRadiusByPercentile(percentileMax);
+    Mdouble radiusMin = getRadiusByQuantile(quantileMin);
+    Mdouble radiusMax = getRadiusByQuantile(quantileMax);
     // to get a minimum polydispersity at the base
     Mdouble radiusMinCut = std::min(radiusMin * (1 + minPolydispersity), radiusMax);
     // cut off min
     while (particleSizeDistribution_.front().radius <= radiusMinCut)
+    {
         particleSizeDistribution_.erase(particleSizeDistribution_.begin());
-    particleSizeDistribution_.insert(particleSizeDistribution_.begin(),
-                                     particleSizeDistribution_[radiusMinCut, percentileMin]);
-    particleSizeDistribution_.insert(particleSizeDistribution_.begin(), particleSizeDistribution_[radiusMin, 0]);
+    }
+    particleSizeDistribution_.insert(particleSizeDistribution_.begin(), {radiusMinCut, quantileMin});
+    particleSizeDistribution_.insert(particleSizeDistribution_.begin(), {radiusMin, 0});
     // cut off max
-    while (particleSizeDistribution_.back().radius >= radiusMax) particleSizeDistribution_.pop_back();
-    particleSizeDistribution_.push_back(particleSizeDistribution_[radiusMax, percentileMax]);
-    particleSizeDistribution_.push_back(particleSizeDistribution_[radiusMax, 1]);
+    while (particleSizeDistribution_.back().radius >= radiusMax)
+    {
+        particleSizeDistribution_.pop_back();
+    }
+    Mdouble radiusMaxCut = std::max(radiusMax - (1 - minPolydispersity) * (radiusMax - particleSizeDistribution_.back()
+            .radius), radiusMin);
+    particleSizeDistribution_.push_back({radiusMaxCut, quantileMax});
+    particleSizeDistribution_.push_back({radiusMax, 1});
+    logger(INFO, "PSD was cut successfully and now has a size ratio of %", getSizeRatio());
 }
 
 /*!
- * \details Cuts off the CDF at given minimum and maximum percentiles, applies a minimum polydispersity at the base and
+ * \details Cuts off the CDF at given minimum and maximum quantiles, applies a minimum polydispersity at the base and
  * squeezes the distribution to make it less polydisperse.
- * \param[in] percentileMin                       undersize percentile to cut off the lower part of the CDF.
- * \param[in] percentileMax                       oversize percentile to cut off the upper part of the CDF.
+ * \param[in] quantileMin                       undersize quantile to cut off the lower part of the CDF.
+ * \param[in] quantileMax                       oversize quantile to cut off the upper part of the CDF.
  * \param[in] squeeze                           applies a squeezing factor ([0,1]) which determines the degree the
  *                                              PDF gets squeezed.
  * \param[in] minPolydispersity                 applies a minimum of polydispersity ([0,1]) at the base of the CDF.
  */
-void PSD::cutoffAndSqueezeCumulative(Mdouble percentileMin, Mdouble percentileMax, Mdouble squeeze, Mdouble
+void PSD::cutoffAndSqueezeCumulative(Mdouble quantileMin, Mdouble quantileMax, Mdouble squeeze, Mdouble
 minPolydispersity)
 {
-    Mdouble r50 = 0.5 * PSD::getDx(0.5);
+    Mdouble r50 = 0.5 * PSD::getNumberDx(50);
     // cut off
-    cutoffCumulativeNumber(percentileMin, percentileMax, minPolydispersity);
+    cutoffCumulativeNumber(quantileMin, quantileMax, minPolydispersity);
     // squeeze psd
-    for (auto& p : particleSizeDistribution_)
+    for (auto& p: particleSizeDistribution_)
     {
         p.radius = r50 + (p.radius - r50) * squeeze;
     }
 }
 
 /*!
- * \details Gets the diameter from a certain percentile of the PSD.
+ * \details Gets the diameter from a certain percentile of the number based PSD.
  * \return A double which is the diameter corresponding to a certain percentile.
  * \param[in] x                 double which determines the obtained diameter as a percentile of the PSD.
  */
-Mdouble PSD::getDx(Mdouble x)
+Mdouble PSD::getNumberDx(Mdouble x) const
 {
-    return 2.0 * getRadiusByPercentile(x / 100);
+    return 2.0 * getRadiusByQuantile(x / 100);
 }
 
 /*!
- * \details gets the radius from a certain percentile of the PSD
- * \return A double which is the radius corresponding to a certain percentile of the PSD.
- * \param[in] percentile                 double which determines the returned radius as a percentile of the PSD.
+ * \details Gets the diameter from a certain percentile of the volume based PSD.
+ * \return A double which is the diameter corresponding to a certain percentile.
+ * \param[in] x                 double which determines the obtained diameter as a percentile of the PSD.
  */
-Mdouble PSD::getRadiusByPercentile(Mdouble percentile)
+Mdouble PSD::getVolumeDx(Mdouble x) const
 {
-    logger.assert_always(percentile <= 1 && percentile >= 0, "percentile is not between 0 and 1");
-    // find the percentile corresponding to the PSD
-    auto high = std::lower_bound(particleSizeDistribution_.begin(), particleSizeDistribution_.end(), percentile);
+    PSD psd = *this;
+    psd.convertCumulativeToProbabilityDensity();
+    psd.convertProbabilityDensityNumberDistributionToProbabilityDensityVolumeDistribution();
+    psd.convertProbabilityDensityToCumulative();
+    return 2.0 * psd.getRadiusByQuantile(x / 100);
+}
+
+/*!
+ * \details gets the radius from a certain quantile of the PSD
+ * \return A double which is the radius corresponding to a certain quantile of the PSD.
+ * \param[in] quantile                 double which determines the returned radius as a quantile of the PSD.
+ */
+Mdouble PSD::getRadiusByQuantile(Mdouble quantile) const
+{
+    logger.assert_always(quantile <= 1 && quantile >= 0, "quantile is not between 0 and 1");
+    // find the quantile corresponding to the PSD
+    auto high = std::lower_bound(particleSizeDistribution_.begin(), particleSizeDistribution_.end(), quantile);
     auto low = std::max(particleSizeDistribution_.begin(), high - 1);
     if (high->probability == low->probability)
         return high->radius;
     else
-        return low->radius + (high->radius - low->radius) * (percentile - low->probability) /
+        return low->radius + (high->radius - low->radius) * (quantile - low->probability) /
                              (high->probability - low->probability);
 }
 
@@ -680,24 +702,34 @@ Mdouble PSD::getRadiusByPercentile(Mdouble percentile)
  * (i.e. mean += p_i * 0.5*(r_i^3 + r_i-1^3)
  * \return A double which corresponds to the volumetric mean radius.
  */
-Mdouble PSD::getVolumetricMeanRadius()
+Mdouble PSD::getVolumetricMeanRadius() const
 {
+    PSD psd = *this;
+    psd.convertCumulativeToProbabilityDensity();
+    psd.convertProbabilityDensityNumberDistributionToProbabilityDensityVolumeDistribution();
     Mdouble mean = 0;
-    convertCumulativeToProbabilityDensity();
-    convertProbabilityDensityNumberDistributionToProbabilityDensityVolumeDistribution();
     for (auto it = particleSizeDistribution_.begin() + 1; it != particleSizeDistribution_.end(); ++it)
         mean += it->probability * 0.5 * (cubic(it->radius) + cubic((it - 1)->radius));
     mean = pow(mean, 1. / 3.);
-    convertProbabilityDensityToProbabilityDensityNumberDistribution(TYPE::PROBABILITYDENSITY_VOLUME_DISTRIBUTION);
-    convertProbabilityDensityToCumulative();
     return mean;
+}
+
+/*!
+ * \details Gets the size ratio (width) of the PSD defined by the ratio of minimum to maximum particle radius.
+ * \return A double which corresponds to the size ratio of the PSD.
+ */
+Mdouble PSD::getSizeRatio() const
+{
+    Mdouble rMin = getMaxRadius();
+    Mdouble rMax = getMinRadius();
+    return rMin / rMax;
 }
 
 /*!
  * \details Gets the minimal radius of the PSD.
  * \return A double which corresponds to the minimal radius of the PSD.
  */
-Mdouble PSD::getMinRadius()
+Mdouble PSD::getMinRadius() const
 {
     return particleSizeDistribution_[0].radius;
 }
@@ -706,9 +738,9 @@ Mdouble PSD::getMinRadius()
  * \details Gets the maximum radius of the PSD.
  * \return A double which corresponds to the maximum radius of the PSD.
  */
-Mdouble PSD::getMaxRadius()
+Mdouble PSD::getMaxRadius() const
 {
-    return particleSizeDistribution_.back().radius;
+        return particleSizeDistribution_.back().radius;
 }
 
 /*!
@@ -725,7 +757,7 @@ std::vector<PSD::RadiusAndProbability> PSD::getParticleSizeDistribution() const
  * each class.
  * \return An integer containing the number of particles already inserted into the simulation.
  */
-int PSD::getInsertedParticleNumber()
+int PSD::getInsertedParticleNumber() const
 {
     int sum = 0;
     for (auto& it : nParticlesPerClass_)
@@ -788,7 +820,7 @@ void PSD::computeStandardisedMomenta()
  * \details Get momenta of the user defined particleSizeDistribution_ vector.
  * \return Array of momenta corresponding to the first six moments of the user defined PSD.
  */
-std::array<Mdouble, 6> PSD::getMomenta()
+std::array<Mdouble, 6> PSD::getMomenta() const
 {
     return momenta_;
 }
@@ -843,3 +875,4 @@ std::ostream& operator<<(std::ostream& os, PSD::RadiusAndProbability& p)
     os << p.radius << ' ' << p.probability << ' ';
     return os;
 }
+
