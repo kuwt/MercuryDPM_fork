@@ -1,9 +1,9 @@
 /* muICal3D - Drop some particles onto a base z=0, sloped at an angle
  * theta(t) to the horizontal. Let theta(t) vary slowly with time, so that the
  * flow may adjust to an equilibrium. Measure I (by measuring u and h) at
- * different times, and plot I against theta. 
+ * different times, and plot I against theta.
  * Then obtain the properties mu_1, mu_2 and I_0 by fitting an appropriate
- * curve. (This will be done externally, using Matlab.) 
+ * curve. (This will be done externally, using Matlab.)
  * */
 
 #include "Mercury3D.h"
@@ -15,22 +15,13 @@
 #include "Math/ExtendedMath.h"
 #include "File.h"
 #include <iostream>
-#include <cassert>
 #include <cstdlib>
-#include <cstring>
 #include <cmath>
-#include <fstream>
 #include <map>
 
 #define MAX_STRLEN 1024
 #define DEGREES (M_PI / 180.)
 
-void terminationUncaughtException()
-{
-    std::cout << "Uncaught exception!" << std::endl;
-    std::cout << "Perhaps your configuration file doesn't specify all the parameters?" << std::endl;
-    exit(1);
-}
 
 class muICal3D : public Mercury3D
 {
@@ -82,10 +73,10 @@ class muICal3D : public Mercury3D
             speciesP->setDensity(rho);
             speciesP->setCollisionTimeAndRestitutionCoefficient(
                     pars.at("collisionTime"),
-                    pars.at("restitutionCoefficient"), 
+                    pars.at("restitutionCoefficient"),
                     constants::pi*pow(particleRadius, 2) * rho
             );
-            speciesP->setSlidingFrictionCoefficient(tan(betaslide)); 
+            speciesP->setSlidingFrictionCoefficient(tan(betaslide));
             speciesP->setSlidingStiffness(2.0/7.0 * speciesP->getStiffness());
             speciesP->setSlidingDissipation(2.0/7.0 * speciesP->getDissipation());
             speciesP->setRollingFrictionCoefficient(tan(betaroll));
@@ -100,10 +91,10 @@ class muICal3D : public Mercury3D
             speciesB->setDensity(rho);
             speciesB->setCollisionTimeAndRestitutionCoefficient(
                     pars.at("collisionTime"),
-                    pars.at("restitutionCoefficient"), 
+                    pars.at("restitutionCoefficient"),
                     constants::pi*pow(baseRadius, 2) * rho
             );
-            speciesB->setSlidingFrictionCoefficient(tan(base_betaslide)); 
+            speciesB->setSlidingFrictionCoefficient(tan(base_betaslide));
             speciesB->setSlidingStiffness(2.0/7.0 * speciesB->getStiffness());
             speciesB->setSlidingDissipation(2.0/7.0 * speciesB->getDissipation());
             speciesB->setRollingFrictionCoefficient(tan(base_betaroll));
@@ -129,7 +120,7 @@ class muICal3D : public Mercury3D
 
             /* Rough base */
             if (pars.at("baseConc") > 0)
-                for (double xpos = getXMin(); 
+                for (double xpos = getXMin();
                     xpos <= getXMax();
                     xpos += 4*baseRadius / sqrt(pars.at("baseConc"))
                 ) {
@@ -150,16 +141,17 @@ class muICal3D : public Mercury3D
                 }
         }
 
-        void setupInitialConditions()
+        void setupInitialConditions() override
         {
             /* Start writing to the .muI file. */
             char muICal3D_fn[MAX_STRLEN];
             snprintf(muICal3D_fn, MAX_STRLEN, "%s.muI", getName().c_str());
             muICal3D_f = fopen(muICal3D_fn, "w");
-            setbuf(muICal3D_f, NULL);
-            fprintf(muICal3D_f, "time theta n depth mass xmom ke basfx basfy basfz\n"); 
+            setbuf(muICal3D_f, nullptr);
+            fprintf(muICal3D_f, "time theta n depth mass xmom ke basfx basfy basfz\n");
             fprintf(stderr, "Started writing to .muI file\n");
 
+            /* Gravity initially points downwards */
             setGravity(Vec3D(0, 0, -g));
 
             /* A CubeInsertionBoundary for introducing the particles. We will
@@ -187,7 +179,6 @@ class muICal3D : public Mercury3D
             insb = boundaryHandler.copyAndAddObject(insb);
             insb->insertParticles(this);
 
-            /* Dam and lid to block any initial flow */
             lid = new InfiniteWall;
             lid->setSpecies(speciesB);
             lid->set(Vec3D(0,0,1), Vec3D(0, 0, getZMax()));
@@ -196,7 +187,7 @@ class muICal3D : public Mercury3D
             notYetRemovedInsb = true;
         }
 
-        void actionsOnRestart()
+        void actionsOnRestart() override
         {
             if (boundaryHandler.getNumberOfObjects() == 1)
             {
@@ -206,26 +197,41 @@ class muICal3D : public Mercury3D
                 char muICal3D_fn[MAX_STRLEN];
                 snprintf(muICal3D_fn, MAX_STRLEN, "%s.muI", getName().c_str());
                 muICal3D_f = fopen(muICal3D_fn, "a");
-                setbuf(muICal3D_f, NULL);
+                setbuf(muICal3D_f, nullptr);
                 logger(INFO, "Continuing writing to .muI file\n");
-
             }
         }
 
-        void actionsAfterTimeStep()
+    Vec3D calculateBasalForce()
+    {
+        /* Calculate the forces on the basal particles
+         * and the basal wall. */
+        Vec3D basalForce;
+        for (auto p : particleHandler)
         {
-            if (!notYetRemovedInsb)
-                return;
+            if (p->isFixed())
+            {
+                basalForce += p->getForce();
+            }
+        }
+        basalForce += wallHandler.getObject(0)->getForce();
 
-            /* We remove the CubeInsertionBoundary so that it doesn't keep
-             * giving new particles. After a few timesteps, it should have
-             * saturated the system. */
-            if (getNumberOfTimeSteps() >= dataFile.getSaveCount() / 2
-                    && particleHandler.getVolume() > getTotalVolume() * 0.5 )
+        return basalForce;
+    }
+
+    void actionsAfterTimeStep() override
+    {
+        if (!notYetRemovedInsb)
+            return;
+
+        /* We remove the CubeInsertionBoundary so that it doesn't keep
+         * giving new particles. After a few timesteps, it should have
+         * saturated the system. */
+        if (getNumberOfTimeSteps() >= dataFile.getSaveCount() / 2
+            && particleHandler.getVolume() > getTotalVolume() * 0.5 )
             {
                 boundaryHandler.removeObject(insb->getIndex());
                 wallHandler.removeObject(lid->getIndex());
-
 
                 setGravity(Vec3D(g*sin(theta), 0, -g*cos(theta)));
                 notYetRemovedInsb = false;
@@ -237,22 +243,7 @@ class muICal3D : public Mercury3D
             }
         }
 
-        Vec3D calculateBasalForce()
-        {
-            Vec3D basalForce;
-            for (auto p : particleHandler)
-            {
-                if (p->isFixed())
-                {
-                    basalForce += p->getForce();
-                }
-            }
-            basalForce += wallHandler.getObject(0)->getForce();
-
-            return basalForce;
-        }
-
-        void writeOutputFiles()
+        void writeOutputFiles() override
         {
             Mercury3D::writeOutputFiles();
 
@@ -272,7 +263,7 @@ class muICal3D : public Mercury3D
                 theta / DEGREES,
                 particleHandler.getNumberOfObjects(),
                 2*getCentreOfMass().Z,
-                getTotalMass(), 
+                getTotalMass(),
                 getTotalMomentum().X,
                 getKineticEnergy(),
                 basalForce.X,
@@ -281,7 +272,7 @@ class muICal3D : public Mercury3D
             );
         }
 
-        void actionsAfterSolve()
+        void actionsAfterSolve() override
         {
             dataFile.setFileType(FileType::MULTIPLE_FILES);
             writeDataFile();
@@ -295,7 +286,6 @@ class muICal3D : public Mercury3D
         LinearViscoelasticFrictionSpecies* speciesP;
         LinearViscoelasticFrictionSpecies* speciesB;
         CubeInsertionBoundary* insb;
-        InfiniteWall*          dam;
         InfiniteWall*          lid;
         bool notYetRemovedInsb;
         FILE * muICal3D_f;
@@ -307,7 +297,7 @@ class muICal3D : public Mercury3D
 };
 
 
-int main(int argc, char ** argv) 
+int main(int argc, char ** argv)
 {
     auto problem = new muICal3D(argv[1], atof(argv[2]));
     argv[2] = argv[0];
