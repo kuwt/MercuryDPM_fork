@@ -216,7 +216,7 @@ void PolydisperseInsertionBoundary::write(std::ostream& os) const
     for (int i = 0; i < generanda_.size(); i++)
     {
         generanda_[i]->write(os);
-        os << " weight " << probabilitates_[i] << " sizeDispersity " << sizeDispersities_[i];
+        os << " weight " << probabilitates_[i] << " sizeDispersity " << sizeDispersities_[i] << " ";
     }
     os << " posMin " << posMin_ << " posMax " << posMax_
        << " velMin " << velMin_ << " velMax " << velMax_
