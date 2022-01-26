@@ -307,7 +307,7 @@ void CG<Coordinates, BaseFunction, Fields>::evaluateParticleAtPoint(Fields& curr
     Mdouble phi = function_.evaluateCGFunction(p.getPosition(), r.coordinates);
     //logger(INFO,"phi % %",phi,function_.getCutoff());
     r.addParticleStatistics(phi, currentInteraction);
-    
+
     //Compute derivatives if required
     if (CGFields::StandardFields::isDifferentialField())
     {
@@ -336,6 +336,9 @@ void CG<Coordinates, BaseFunction, Fields>::evaluateParticle(const BaseParticle&
     if (!Coordinates::isResolvedIn(0)) {
         minX = 0;
         maxX = (averageBeyondDomain_ || (pos.X>=min_.X && pos.X<=max_.X) )?1:0; // don't do anything if particle is beyond domain and should not be considered
+    } else if (max_.X == min_.X) {
+        minX = 0;
+        maxX = nZ_;
     } else {
         //Example
         // min.X=0, max.X=6, nX=3 => points[0,1,2]=1,3,5
@@ -354,6 +357,9 @@ void CG<Coordinates, BaseFunction, Fields>::evaluateParticle(const BaseParticle&
     if (!Coordinates::isResolvedIn(1)) {
         minY = 0;
         maxY = (averageBeyondDomain_ || (pos.Y>=min_.Y && pos.Y<=max_.Y) )?1:0;
+    } else if (max_.Y == min_.Y) {
+        minY = 0;
+        maxY = nY_;
     } else {
         const Mdouble invDelta = nY_ / (max_.Y - min_.Y);
         const Mdouble idPos = pos.Y * invDelta - 0.5;
@@ -367,6 +373,9 @@ void CG<Coordinates, BaseFunction, Fields>::evaluateParticle(const BaseParticle&
     if (!Coordinates::isResolvedIn(2)) {
         minZ = 0;
         maxZ = (averageBeyondDomain_ || (pos.Z>=min_.Z && pos.Z<=max_.Z) )?1:0;
+    } else if (max_.Z == min_.Z) {
+        minZ = 0;
+        maxZ = nZ_;
     } else {
         const Mdouble invDelta = nZ_ / (max_.Z - min_.Z);
         const Mdouble idPos = pos.Z * invDelta - 0.5;

@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name PSDManualInsertionSelfTest revision 5811 repository https://svn.mercurydpm.org/SourceCode/Branches/Timo
+MercuryDPM 0.14 name PSDManualInsertionSelfTest revision 6400 repository https://svn.mercurydpm.org/SourceCode/Trunk
 dataFile    fileType ONE_FILE saveCount 10 counter 14 lastSavedTimeStep 121
 fStatFile   fileType ONE_FILE saveCount 20 counter 8 lastSavedTimeStep 121
 eneFile     fileType ONE_FILE saveCount 20 counter 8 lastSavedTimeStep 121
@@ -7028,4 +7028,4 @@ BaseParticle id 7010 indSpecies 0 position 0.0547293305771243 0.0259848456988911
 BaseParticle id 7011 indSpecies 0 position 0.000242629979675835 0.00232974776049888 0.0783503674818102 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.00042467788431673 invMass 1558484.40097218
 BaseParticle id 7012 indSpecies 0 position 0.00724063671393243 0.0871630247158435 0.0729427640892699 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.000432485856509215 invMass 1475589.87590127
 Interactions 0
-hGrid method TOPDOWN distribution EXPONENTIAL cellOverSizeRatio 1 numberOfBuckets 20570 cellSizes 0.00362498002936577 0.00584991937412122 gridNeedsUpdate 0 updateEachTimeStep 1 currentMaxRelativeDisplacement 0 totalCurrentMaxRelativeDisplacement 0
+hGrid method TOPDOWN distribution EXPONENTIAL cellOverSizeRatio 1 numberOfBuckets 32680 cellSizes 0.00331715383759356 0.00584991937412122 gridNeedsUpdate 0 updateEachTimeStep 1 currentMaxRelativeDisplacement 0 totalCurrentMaxRelativeDisplacement 0

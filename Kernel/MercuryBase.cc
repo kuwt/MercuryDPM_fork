@@ -282,6 +282,12 @@ void MercuryBase::hGridRebuild()
             }
         }
     }
+
+//    //Make sure the cell size is at less 10 times the smallest number
+//    for (unsigned int i = 0; i < getHGridMaxLevels(); i++)
+//    {
+//        if (cellSizes[i]<(10+i)*std::numeric_limits<double>::min()) cellSizes[i]=(10+i)*std::numeric_limits<double>::min();
+//    }
     
     
     delete grid;
