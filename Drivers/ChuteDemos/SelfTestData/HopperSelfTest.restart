@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name HopperSelfTest revision 5628 repository https://svn.mercurydpm.org/SourceCode/Branches/Timo
+MercuryDPM 0.14 name HopperSelfTest revision 6400 repository https://svn.mercurydpm.org/SourceCode/Trunk
 dataFile    fileType ONE_FILE saveCount 51 counter 26 lastSavedTimeStep 1251
 fStatFile   fileType ONE_FILE saveCount 51 counter 26 lastSavedTimeStep 1251
 eneFile     fileType ONE_FILE saveCount 51 counter 26 lastSavedTimeStep 1251
@@ -452,6 +452,6 @@ LinearViscoelasticSlidingFrictionInteraction particleIds 227 382 timeStamp 1251 
 LinearViscoelasticSlidingFrictionInteraction particleIds 374 414 timeStamp 1251 contactPoint 0.0144921792204647 0.000422894487145659 0.0216594670867117 force 1.33733607258669e-05 1.0365122741306e-05 3.55599911099933e-05 torque 0 0 0 slidingSpring 0 0 0
 LinearViscoelasticSlidingFrictionInteraction particleIds 369 421 timeStamp 1251 contactPoint 0.0123151614198122 0.000370414973458288 0.0225360754453227 force -4.01129158303621e-05 5.18864786654971e-06 6.14601446227322e-05 torque 0 0 0 slidingSpring 0 0 0
 LinearViscoelasticSlidingFrictionInteraction particleWallIds 393 0 timeStamp 1251 contactPoint 0.0232786034133557 -8.62614713322148e-08 0.0198996241421068 force 0 3.04926129682957e-06 0 torque 0 0 0 slidingSpring 0 0 0
-hGrid method TOPDOWN distribution EXPONENTIAL cellOverSizeRatio 1 numberOfBuckets 2820 cellSizes 0.000689574503917881 0.000742682266498584 0.000799880137443654 gridNeedsUpdate 0 updateEachTimeStep 1 currentMaxRelativeDisplacement 0 totalCurrentMaxRelativeDisplacement 0
+hGrid method TOPDOWN distribution EXPONENTIAL cellOverSizeRatio 1 numberOfBuckets 2800 cellSizes 0.000689574503917881 0.000742682266498584 0.000799880137443654 gridNeedsUpdate 0 updateEachTimeStep 1 currentMaxRelativeDisplacement 0 totalCurrentMaxRelativeDisplacement 0
 FixedParticleRadius 0.00036 MinInflowParticleRadius 0.00032 MaxInflowParticleRadius 0.0004 RoughBottomType 0 ChuteAngle 0.174532925199433 MaxFailed 1 NumCreated 315 InflowVelocity 0.1 InflowVelocityVariance 0 InflowHeight 0.02
 0.01 0.01 0.04 1.0471975511966 0.0241139 0.0189594510866257 
