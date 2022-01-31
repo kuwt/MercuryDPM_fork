@@ -63,7 +63,7 @@ class muICal3D : public Mercury3D
             setYMin(0);
             setYMax(pars.at("width"));
             setZMin(0);
-            setZMax(+pars.at("height"));
+            setZMax(pars.at("height"));
 
             dataFile.setFileType(FileType::NO_FILE);
             fStatFile.setFileType(FileType::NO_FILE);
@@ -201,42 +201,42 @@ class muICal3D : public Mercury3D
                 logger(INFO, "Continuing writing to .muI file\n");
             }
         }
-
-    Vec3D calculateBasalForce()
-    {
-        /* Calculate the forces on the basal particles
-         * and the basal wall. */
-        Vec3D basalForce;
-        for (auto p : particleHandler)
+        
+        Vec3D calculateBasalForce()
         {
-            if (p->isFixed())
+            /* Calculate the forces on the basal particles
+             * and the basal wall. */
+            Vec3D basalForce;
+            for (auto p : particleHandler)
             {
-                basalForce += p->getForce();
+                if (p->isFixed())
+                {
+                    basalForce += p->getForce();
+                }
             }
+            basalForce += wallHandler.getObject(0)->getForce();
+            
+            return basalForce;
         }
-        basalForce += wallHandler.getObject(0)->getForce();
-
-        return basalForce;
-    }
-
-    void actionsAfterTimeStep() override
-    {
-        if (!notYetRemovedInsb)
-            return;
-
-        /* We remove the CubeInsertionBoundary so that it doesn't keep
-         * giving new particles. After a few timesteps, it should have
-         * saturated the system. */
-        if (getNumberOfTimeSteps() >= dataFile.getSaveCount() / 2
-            && particleHandler.getVolume() > getTotalVolume() * 0.5 )
+        
+        void actionsAfterTimeStep() override
+        {
+            if (!notYetRemovedInsb)
+                return;
+            
+            /* We remove the CubeInsertionBoundary so that it doesn't keep
+             * giving new particles. After a few timesteps, it should have
+             * saturated the system. */
+            if (getNumberOfTimeSteps() >= dataFile.getSaveCount() / 2
+                && particleHandler.getVolume() > getTotalVolume() * 0.5 )
             {
                 boundaryHandler.removeObject(insb->getIndex());
                 wallHandler.removeObject(lid->getIndex());
-
+                
                 setGravity(Vec3D(g*sin(theta), 0, -g*cos(theta)));
                 notYetRemovedInsb = false;
                 logger(INFO, "time %, removed insb and lid", getTime());
-
+                
                 /* Start writing to output files. */
                 setTime(0);
                 forceWriteOutputFiles();
