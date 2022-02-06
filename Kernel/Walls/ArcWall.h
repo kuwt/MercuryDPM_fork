@@ -36,11 +36,15 @@ class BaseParticle;
 class BaseWall;
 
 /*!
- * \brief A wall that is the inside of an arc of a cylinder.
+ * \brief A wall that is the inside (concave side) of an arc of a cylinder, like a pipe or half-pipe.
+ *
  * \details The ArcWall is specified by the cylinder's axis (in turn by a
  * position vector and a direction vector), its radius, a 'centreline direction'
- * (a unit vector normal to the direction vector) for the centreline of the arc,
- * and a semiangle. 
+ * (pointing from a point on the axis to a point on the middle of the arc), and
+ * the semiangle of the arc.
+ *
+ * The semiangle is stored and specified in radians.
+ *
  * For a wall that is the outside of an arc, use AxisymmetricIntersectionOfWalls
  * or Combtooth instead.
  */
@@ -63,18 +67,29 @@ public:
     ~ArcWall() override = default;
     
     /*!
-     * \brief Set
+     * \brief Set parameters of the ArcWall.
+     *
+     * \detail The axis vector is normalized. The centreline vector is
+     * also treated to remove any component parallel to the axis, and
+     * the remaining component is normalized.
+     *
+     * \param axis The lengthwise direction of the cylinder. For a 2D simulation this should be Vec3D(0, 0, 1).
+     * \param pos A position along the axis.
+     * \param radius The radius of the arc.
+     * \param centreline A vector pointing from the axis to the middle of the arc.
+     * \param semiangle The extent of the arc from either side of the centre, in radians. For a half-pipe this is pi/2 (90 degrees).
      */
     void set(Vec3D axis, Vec3D pos, Mdouble radius, Vec3D centreline, Mdouble semiangle);
     
     ArcWall* copy() const override;
     
     bool getDistanceAndNormal(const BaseParticle& p,
-                              Mdouble& distance, Vec3D& normal_return) const override;
+                              Mdouble& distance,
+                              Vec3D& normal) const override;
     
     BaseInteraction* getInteractionWith(BaseParticle* p,
-                                                     unsigned timeStamp,
-                                                     InteractionHandler* interactionHandler) override;
+                                        unsigned timeStamp,
+                                        InteractionHandler* interactionHandler) override;
     
     void read(std::istream& is) override;
     
@@ -88,7 +103,6 @@ private:
     Mdouble radius_;
     Vec3D centreline_;
     Mdouble semiangle_;
-    
 };
 
 #endif

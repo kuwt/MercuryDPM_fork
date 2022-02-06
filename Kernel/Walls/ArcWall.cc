@@ -34,7 +34,7 @@ ArcWall::ArcWall()
     pos_ = Vec3D(0, 1, 0);
     radius_ = 1;
     centreline_ = Vec3D(0, -1, 0);
-    semiangle_ = 20 * constants::pi / 180.;
+    semiangle_ = 20. * constants::degree;
 }
 
 ArcWall::ArcWall(const ArcWall& other) : BaseWall(other)
@@ -55,9 +55,9 @@ void ArcWall::set(Vec3D axis, Vec3D pos, Mdouble radius, Vec3D centreline, Mdoub
     semiangle_ = semiangle;
     
     /* Normalise axis_ and centreline_, and make centreline_ perpendicular to axis_ */
-    axis_ = axis_ / axis_.getLength();
+    axis_.normalise();
     centreline_ = centreline_ - Vec3D::dot(centreline_, axis_) * axis_;
-    centreline_ /= centreline_.getLength();
+    centreline_.normalise();
 }
 
 ArcWall* ArcWall::copy() const
@@ -66,35 +66,33 @@ ArcWall* ArcWall::copy() const
 }
 
 bool ArcWall::getDistanceAndNormal(const BaseParticle& p,
-                                   Mdouble& distance, Vec3D& normal_return) const
+                                   Mdouble& distance,
+                                   Vec3D& normal) const
 {
-    // distance between x0 and the *surface* (not the axis)
-    distance = radius_ - sqrt(
-            pow((p.getPosition() - pos_).getLength(), 2)
-            - pow(Vec3D::dot(p.getPosition() - pos_, axis_), 2)
-    );
+    Vec3D nearestPointOnAxis = pos_ + Vec3D::dot(p.getPosition() - pos_, axis_) * axis_;
+    Mdouble distanceFromAxis = (p.getPosition() - nearestPointOnAxis).getLength();
+    // distance between x0 and the surface
+    distance = radius_ - distanceFromAxis;
     if (distance >= p.getWallInteractionRadius(this))
         return false;
-    else
-    {
-        Vec3D axisContactPoint; // the point on the axis closest to the particle
-        axisContactPoint = pos_ + Vec3D::dot(p.getPosition() - pos_, axis_) * axis_;
-        // outward-pointing normal, for an inward-pointing force
-        normal_return = p.getPosition() - axisContactPoint;
-        normal_return /= normal_return.getLength();
-        
-        /* There is an interaction iff the interaction normal is within
-         * semiangle of the centreline. */
-        double angle_between = acos(Vec3D::dot(normal_return, centreline_));
-        if (angle_between < semiangle_ || semiangle_ >= constants::pi)
-            return true;
-        else
-            return false;
-    }
+    
+    // the normal points into the wall, i.e. out from the axis
+    normal = p.getPosition() - nearestPointOnAxis;
+    normal.normalise();
+    
+    // If the arc is actually a full circle then there is definitely an
+    // interaction, regardless of direction.
+    if (semiangle_ >= 180. * constants::degree)
+        return true;
+    
+    // Otherwise it depends on whether the interaction direction is
+    // sufficiently aligned with the centreline.
+    return acos(Vec3D::dot(normal, centreline_)) < semiangle_;
 }
 
 BaseInteraction* ArcWall::getInteractionWith(BaseParticle* p,
-                                                          unsigned timeStamp, InteractionHandler* interactionHandler)
+                                             unsigned timeStamp,
+                                             InteractionHandler* interactionHandler)
 {
     Mdouble distance;
     Vec3D normal;
