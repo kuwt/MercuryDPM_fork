@@ -92,18 +92,22 @@ namespace Detail
 #ifdef MERCURY_USE_MPI
 //convert integral data to the corresponding MPI type
 template<typename T>
-typename std::enable_if<std::is_integral<T>::value, MPI::Datatype>::type
+typename std::enable_if<std::is_integral<T>::value, MPI_Datatype>::type
 toMPIType(T t)
 {
-    return MPI::Datatype::Match_size(MPI_TYPECLASS_INTEGER,sizeof(T));
+    MPI_Datatype type;
+    MPI_Type_match_size(MPI_TYPECLASS_INTEGER, sizeof(T), &type);
+    return type;
 }
 
 //convert floating point data to the corresponding MPI type
 template<typename T>
-typename std::enable_if<std::is_floating_point<T>::value, MPI::Datatype>::type
+typename std::enable_if<std::is_floating_point<T>::value, MPI_Datatype>::type
 toMPIType(T t)
 {
-    return MPI::Datatype::Match_size(MPI_TYPECLASS_REAL,sizeof(T));
+    MPI_Datatype type;
+    MPI_Type_match_size(MPI_TYPECLASS_REAL,sizeof(T),&type);
+    return type;
 }
 #endif
 } /*detail*/
@@ -148,9 +152,9 @@ public:
     void sync()
     {
 #ifdef MERCURY_USE_MPI
-        MPI::Request::Waitall(pending_.size(),pending_.data());
+        MPI_Waitall(pending_.size(),pending_.data(),MPI_STATUSES_IGNORE);
         pending_.clear();
-        communicator_.Barrier();
+        MPI_Barrier(communicator_);
 #endif
     }
     
@@ -174,7 +178,10 @@ public:
         }
 #endif
 #ifdef MERCURY_USE_MPI
-        pending_.push_back(communicator_.Isend(&t, 1, Detail::toMPIType(t), to, tag ));
+        MPI_Request request;
+        MPI_Isend(&t, 1, Detail::toMPIType(t), to, tag, communicator_, &request);
+        pending_.push_back(request);
+
 #endif
     }
 
@@ -196,7 +203,10 @@ public:
         }
 #endif
 #ifdef MERCURY_USE_MPI
-        pending_.push_back(communicator_.Isend(t, count, Detail::toMPIType(*t), to, tag ));
+        MPI_Request request;
+        MPI_Isend(t, count, Detail::toMPIType(*t), to, tag, communicator_, &request);
+        pending_.push_back(request);
+
 #endif
     }
     
@@ -220,7 +230,10 @@ public:
         }
 #endif
 #ifdef MERCURY_USE_MPI
-        pending_.push_back(communicator_.Irecv(&t, 1, Detail::toMPIType(t), from, tag ));
+        MPI_Request request;
+        MPI_Irecv(&t, 1, Detail::toMPIType(t), from, tag, communicator_, &request);
+        pending_.push_back(request);
+
 #endif
     }
 
@@ -242,7 +255,10 @@ public:
         }
 #endif
 #ifdef MERCURY_USE_MPI
-        pending_.push_back(communicator_.Irecv(t, count, Detail::toMPIType(*t), from, tag ));
+        MPI_Request request;
+        MPI_Irecv(&t, count, Detail::toMPIType(*t), from, tag, communicator_, &request);
+        pending_.push_back(request);
+
 #endif
     }
     
@@ -272,7 +288,10 @@ public:
         }
 #endif
 #ifdef MERCURY_USE_MPI
-        pending_.push_back(communicator_.Isend(t, count, dataTypes_[type], to, tag ));
+        MPI_Request request;
+        MPI_Isend(t, count, dataTypes_[type], to, tag, communicator_, &request);
+        pending_.push_back(request);
+
 
 #endif
     }
@@ -302,7 +321,10 @@ public:
         }
 #endif
 #ifdef MERCURY_USE_MPI
-        pending_.push_back(communicator_.Irecv(t, count, dataTypes_[type], from, tag ));
+        MPI_Request request;
+        MPI_Irecv(t, count, dataTypes_[type], from, tag, communicator_, &request);
+        pending_.push_back(request);
+
 #endif
     }
     
@@ -331,7 +353,7 @@ public:
         }
 #endif
 #ifdef MERCURY_USE_MPI
-        communicator_.Ssend(&t, count, Detail::toMPIType(t), to, tag);
+        MPI_Ssend(&t, count, Detail::toMPIType(t), to, tag, communicator_);
 #endif
     }
     
@@ -352,7 +374,7 @@ public:
         }
 #endif
 #ifdef MERCURY_USE_MPI
-        communicator_.Ssend(t, count, dataTypes_[type], to, tag);
+        MPI_Ssend(t,count,dataTypes_[type], to, tag, communicator_);
 #endif
     }
     
@@ -381,7 +403,7 @@ public:
         }
 #endif
 #ifdef MERCURY_USE_MPI
-        communicator_.Recv(&t, count, Detail::toMPIType(t), from, tag);
+        MPI_Recv(&t, count, Detail::toMPIType(t), from, tag,communicator_, MPI_STATUS_IGNORE);
 #endif
     }
     
@@ -401,7 +423,7 @@ public:
         }
 #endif
 #ifdef MERCURY_USE_MPI
-        communicator_.Recv(t, count, dataTypes_[type], from, tag);
+        MPI_Recv(t, count, dataTypes_[type], from, tag, communicator_, MPI_STATUS_IGNORE);
 #endif
     }
     
@@ -416,7 +438,7 @@ public:
     void gather(T& send_t, T* receive_t)
     {
 #ifdef MERCURY_USE_MPI
-        communicator_.Gather(&send_t, 1, Detail::toMPIType(send_t), receive_t, 1, Detail::toMPIType(send_t), 0);
+        MPI_Gather(&send_t, 1, Detail::toMPIType(send_t), receive_t, 1, Detail::toMPIType(send_t), 0, communicator_);
 #endif
     }
     
@@ -429,7 +451,7 @@ public:
     broadcast(T& t, int fromProcessor = 0)
     {
 #ifdef MERCURY_USE_MPI
-        communicator_.Bcast(&t,1,Detail::toMPIType(t),fromProcessor);
+        MPI_Bcast(&t,1,Detail::toMPIType(t),fromProcessor,communicator_);
 #endif
     }
     
@@ -442,7 +464,8 @@ public:
     broadcast(T* t, int size, int fromProcessor)
     {
 #ifdef MERCURY_USE_MPI
-        communicator_.Bcast((void *)t,size, Detail::toMPIType(t[0]),fromProcessor);
+        MPI_Bcast((void *)t,size,Detail::toMPIType(t[0]),fromProcessor,communicator_);
+
 #endif
     }
     
@@ -454,7 +477,7 @@ public:
     void broadcast(T* t, MercuryMPIType type, int fromProcessor = 0)
     {
 #ifdef MERCURY_USE_MPI
-        communicator_.Bcast((void *)t,1,dataTypes_[type],fromProcessor);
+        MPI_Bcast((void *)t,1,dataTypes_[type],fromProcessor,communicator_);
 #endif
     }
     
@@ -471,16 +494,16 @@ public:
 #ifdef MERCURY_USE_MPI
     template<typename T>
     typename std::enable_if<std::is_scalar<T>::value, void>::type
-    reduce(T& t, MPI::Op operation, int id = 0)
+    reduce(T& t, MPI_Op operation, int id = 0)
     {
 
         if(id == getProcessorID())
         {
-            communicator_.Reduce(MPI::IN_PLACE, &t, 1, Detail::toMPIType(t), operation, id);
+            MPI_Reduce(MPI_IN_PLACE, &t, 1, Detail::toMPIType(t), operation, id, communicator_);
         }
         else
         {
-            communicator_.Reduce(&t, nullptr, 1, Detail::toMPIType(t), operation, id);
+            MPI_Reduce(&t, nullptr, 1, Detail::toMPIType(t), operation, id, communicator_);
         }
     }
 #endif
@@ -496,9 +519,9 @@ public:
 #ifdef MERCURY_USE_MPI
     template<typename T>
     typename std::enable_if<std::is_scalar<T>::value, void>::type
-    allReduce(T& send_t, T& receive_t, MPI::Op operation)
+    allReduce(T& send_t, T& receive_t, MPI_Op operation)
     {
-        communicator_.Allreduce(&send_t, &receive_t, 1, Detail::toMPIType(send_t), operation);  
+        MPI_Allreduce(&send_t, &receive_t, 1, Detail::toMPIType(send_t), operation,communicator_);  
     }
 #endif
     
@@ -516,8 +539,8 @@ public:
     typename std::enable_if<std::is_scalar<T>::value, void>::type
     allGather(T& send_t, int send_count, std::vector<T>& receive_t, int receive_count)
     {
-        communicator_.Allgather(&send_t, send_count, Detail::toMPIType(send_t),
-                                receive_t.data(), receive_count, Detail::toMPIType(receive_t[0]));  
+        MPI_Allgather(&send_t, send_count, Detail::toMPIType(send_t),
+                                receive_t.data(), receive_count, Detail::toMPIType(receive_t[0]),communicator_);  
     }
 #endif
     
@@ -535,7 +558,7 @@ public:
      * \brief Get the communicator used for MPI commands.
      */
 #ifdef MERCURY_USE_MPI
-    MPI::Intracomm& getComm();
+    MPI_Comm& getComm();
 #endif
     
     /*!
@@ -587,24 +610,24 @@ private:
     /*!
      * \brief The ID of the processor this class is running on
      */
-    std::size_t processorID_;
+    //std::size_t processorID_;
+    int processorID_;
     
     /*!
      * \brief The total number of processors in the communicator
      */
-    std::size_t numberOfProcessors_;
+    int numberOfProcessors_;
 
 #ifdef MERCURY_USE_MPI
     /*!
      * \brief List of send/receive requests that have not been resolved
      */
-    std::vector<MPI::Request> pending_;
+    std::vector<MPI_Request> pending_;
     
     /*!
      * \brief communicator that can send and recieve commands to other processors
      */
-    MPI::Intracomm communicator_;
-   
+    MPI_Comm communicator_;
     /*!
      * \brief vector that contains the MercuryMPIType MPIType objects
      */ 

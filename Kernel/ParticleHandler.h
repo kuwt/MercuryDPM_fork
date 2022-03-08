@@ -459,7 +459,8 @@ private:
      * and its Species and Radius gets set, even if it's not yet included in the 
      * particleHandler! This is necessary to check a not included particle for 
      * overlaps before inserting it into the handler. Not sure if this is a 
-     * sensible structure; to be discussed. 
+     * sensible structure; to be discussed.
+     * Note: these statistic now include mpi and ghost particles as well
      */
     BaseParticle* largestParticle_;
     

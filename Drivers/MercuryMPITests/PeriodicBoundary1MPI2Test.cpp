@@ -40,12 +40,12 @@ public:
         p0.setRadius(1.0);
     
         //Test 1: Particle moves through the corner of a periodic box
-        p0.setPosition(Vec3D(7.0,7.0,99.5));
-        p0.setVelocity(Vec3D(5.0, 0.0, 0.0));
+        //p0.setPosition(Vec3D(7.0,7.0,99.5));
+        //p0.setVelocity(Vec3D(5.0, 0.0, 0.0));
 
         //Test 2: Particle moving through periodic boundaries while in an mpi zone
-        //p0.setPosition(Vec3D(5.0,5.0,50.5));
-        //p0.setVelocity(Vec3D(5.0, 0.0, 0.0));
+        p0.setPosition(Vec3D(5.0,5.0,50.5));
+        p0.setVelocity(Vec3D(5.0, 0.0, 0.0));
 
         //Test 3: Particle moving through mpi boundaries while in a periodic zone
         //p0.setPosition(Vec3D(7.0,7.0,60.0));
@@ -140,7 +140,6 @@ int main(int argc, char *argv[])
     problem.setTimeStep(tc / 50.0);
     problem.setTimeMax(0.2);
     problem.setSaveCount(25); //used to be 500
-
     //Set output to paraview
     problem.setParticlesWriteVTK(true);
     

@@ -446,7 +446,7 @@ void ParticleHandler::computeSmallestParticle()
     smallestParticle_ = nullptr;
     for (BaseParticle* const particle : objects_)
     {
-        if (!(particle->isMPIParticle() || particle->isPeriodicGhostParticle()))
+        //if (!(particle->isMPIParticle() || particle->isPeriodicGhostParticle()))
         {
             if (particle->getMaxInteractionRadius() < min)
             {
@@ -469,7 +469,7 @@ void ParticleHandler::computeLargestParticle()
     largestParticle_ = nullptr;
     for (BaseParticle* const particle : objects_)
     {
-        if (!(particle->isMPIParticle() || particle->isPeriodicGhostParticle()))
+        //if (!(particle->isMPIParticle() || particle->isPeriodicGhostParticle()))
         {
             if (particle->getMaxInteractionRadius() > max)
             {
@@ -1277,7 +1277,7 @@ unsigned int ParticleHandler::getNumberOfRealObjects() const
 
     // \todo MX: use an allreduce here
     //Combine the total number of Particles into one number on processor 0
-    communicator.reduce(numberOfRealParticles, MPI::SUM);
+    communicator.reduce(numberOfRealParticles, MPI_SUM);
 
     //Broadcast new number to all the processorsi
     communicator.broadcast(numberOfRealParticles);

@@ -120,7 +120,7 @@ public:
     void actionsAfterSolve() override
     {
         if (PROCESSOR_ID!=1) return;
-        logger.assert(interactionHandler.getSize()>0, "Contact was lost");
+        logger.assert_always(interactionHandler.getSize()>0, "Contact should be there, but got lost; aborting");
         auto i = dynamic_cast<const LinearPlasticViscoelasticInteraction *>(interactionHandler.getLastObject());
         logger.assert_always(i, "Interaction type needs to be LinearPlasticViscoelastic");
         auto j = dynamic_cast<const FrictionInteraction *>(interactionHandler.getLastObject());

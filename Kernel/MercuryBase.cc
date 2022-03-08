@@ -292,7 +292,6 @@ void MercuryBase::hGridRebuild()
     
     delete grid;
     
-    
     grid = new HGrid(getHGridTargetNumberOfBuckets(), getHGridCellOverSizeRatio(), cellSizes);
     
     for (BaseParticle* const p : particleHandler)
@@ -604,7 +603,7 @@ bool MercuryBase::checkParticleForInteraction(const BaseParticle& p)
         //check locally and then collectively come to a global conclusion
         bool interactionLocal = checkParticleForInteractionLocal(p);
         
-        MPIContainer::Instance().allReduce(interactionLocal, interaction,  MPI::LAND);
+        MPIContainer::Instance().allReduce(interactionLocal, interaction,  MPI_LAND);
     }
 #else
     bool interaction = checkParticleForInteractionLocalPeriodic(p);

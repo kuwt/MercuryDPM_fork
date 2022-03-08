@@ -43,15 +43,19 @@
 MPIContainer::MPIContainer()
 {
 #ifdef MERCURY_USE_MPI
-    if(!MPI::Is_initialized())
+    int Mpi_init_flag = 0;
+    MPI_Initialized(&Mpi_init_flag);
+    if(!Mpi_init_flag)
     {
         logger(FATAL,"MPI should be initialised before calling the MPIContainer constructor");
     }
     //A personal communicator will be created to ensure we don't meddle with communicators of other libraries
-    MPI::Group groupID = MPI::COMM_WORLD.Get_group();
-    communicator_ = MPI::COMM_WORLD.Create( groupID );
-    processorID_ = communicator_.Get_rank();
-    numberOfProcessors_ = communicator_.Get_size();
+    MPI_Group groupID;
+    MPI_Comm_group(MPI_COMM_WORLD, &groupID);
+    MPI_Comm_create(MPI_COMM_WORLD,groupID,&communicator_);
+    MPI_Comm_rank(MPI_COMM_WORLD,&processorID_);
+    MPI_Comm_size(MPI_COMM_WORLD,&numberOfProcessors_);
+
 #else
     numberOfProcessors_ = 1;
     processorID_ = 0;
@@ -120,7 +124,7 @@ std::size_t MPIContainer::getProcessorID()
  * between processors
  * \return Returns the private MercuryDPM MPI communicator
  */
-MPI::Intracomm& MPIContainer::getComm()
+MPI_Comm& MPIContainer::getComm()
 {
     return communicator_;
 }
@@ -134,9 +138,11 @@ void initialiseMPI()
 {
 #ifdef MERCURY_USE_MPI
     //Check if MPI is already initialised
-    if (!MPI::Is_initialized())
+    int Mpi_init_flag = 0;
+    MPI_Initialized(&Mpi_init_flag);
+    if(!Mpi_init_flag)
     {
-        MPI::Init();
+        MPI_Init(NULL,NULL);
         MPIContainer& communicator = MPIContainer::Instance();
         if (PROCESSOR_ID  == 0)
         {
@@ -148,7 +154,7 @@ void initialiseMPI()
         {
             MPIContainer& communicator = MPIContainer::Instance();
             communicator.deleteMercuryMPITypes();
-            MPI::Finalize();
+            MPI_Finalize();
             if (PROCESSOR_ID == 0)
             {
                 std::cout << "MPI has been finalised" << std::endl;

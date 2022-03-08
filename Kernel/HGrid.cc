@@ -113,7 +113,7 @@ void HGrid::insertParticleToHgrid(BaseParticle* obj)
     }
     else
     {
-        logger(WARN, "WARNING: the HGrid needs to be rebuild before insertParticleToHgrid may be called!");
+        logger(WARN, "WARNING: the HGrid needs to be rebuilt before insertParticleToHgrid may be called!");
     }
 }
 
