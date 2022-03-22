@@ -140,7 +140,7 @@ BaseParticle* InsertionBoundary::generateParticle(RNG& random)
         // manual insertion routine to insert PSDs as accurate as possible into a given volume
     else if (isManuallyInserting_)
     {
-        logger.assert(initialVolume_ > 0.0, "Use setInitialVolume to define the particle insertion volume");
+        logger.assert_debug(initialVolume_ > 0.0, "Use setInitialVolume to define the particle insertion volume");
         Mdouble radius;
         // getVolumeFlowRate() * time + initialVolume_ - volumeInserted_ lead to more inaccurate results, therfore
         // -volumeInserted was removed.
@@ -544,7 +544,7 @@ void InsertionBoundary::setInitialVolume(Mdouble initialVolume)
 void InsertionBoundary::setVariableVolumeFlowRate(const std::vector<Mdouble>& variableCumulativeVolumeFlowRate,
                                                   Mdouble samplingInterval)
 {
-    logger.assert(samplingInterval > 0, "sampling interval needs to be positive");
+    logger.assert_debug(samplingInterval > 0, "sampling interval needs to be positive");
     const Mdouble endTime = variableCumulativeVolumeFlowRate.size() * samplingInterval;
     logger(INFO, "variable flowrate is defined up to %", endTime);
     logger.assert_always(getHandler()->getDPMBase()->getTimeMax() < endTime,

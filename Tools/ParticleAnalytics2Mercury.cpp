@@ -142,11 +142,11 @@ public:
             cFile_ >> id1 >> id2;
             BaseParticle* p1 = dpm.particleHandler.getObjectById(id1);
             BaseParticle* p2 = dpm.particleHandler.getObjectById(id2);
-            logger.assert(p1!=nullptr,"Particle % does not exist",id1);
-            logger.assert(p2!=nullptr,"Particle % does not exist",id1);
+            logger.assert_debug(p1!=nullptr,"Particle % does not exist",id1);
+            logger.assert_debug(p2!=nullptr,"Particle % does not exist",id1);
             Vec3D P1ToP2 = p2->getPosition()-p1->getPosition();
             BaseInteraction* c = p1->getInteractionWith(p2,time,&dpm.interactionHandler);
-            logger.assert(c!= nullptr,"Particle-particle interaction % % does not exist",p1,p2);
+            logger.assert_debug(c!= nullptr,"Particle-particle interaction % % does not exist",p1,p2);
             c->setDistance(P1ToP2.getLength());
             c->setNormal(P1ToP2/c->getDistance());
             c->setOverlap(c->getDistance()-p1->getRadius()-p2->getRadius());
@@ -190,9 +190,9 @@ public:
             Vec3D force, contact, particleToContact;
             wFile_ >> id;
             BaseParticle* p = dpm.particleHandler.getObjectById(id);
-            logger.assert(p!=nullptr,"Particle % does not exist",id);
+            logger.assert_debug(p!=nullptr,"Particle % does not exist",id);
             BaseInteraction* c = w->getInteractionWith(p,time,&dpm.interactionHandler);
-            logger.assert(c!= nullptr,"Particle-wall interaction % % does not exist",p,w);
+            logger.assert_debug(c!= nullptr,"Particle-wall interaction % % does not exist",p,w);
             if (version_==Version::P3) {
                 wFile_ >> force >> particleToContact;
                 contact = p->getPosition()-particleToContact;

@@ -75,7 +75,7 @@ SphericalWall* SphericalWall::copy() const
  */
 void SphericalWall::setRadius(Mdouble radius)
 {
-    logger.assert(radius >= 0, "radius=% cannot be negative", radius);
+    logger.assert_debug(radius >= 0, "radius=% cannot be negative", radius);
     radius_ = radius;
 }
 

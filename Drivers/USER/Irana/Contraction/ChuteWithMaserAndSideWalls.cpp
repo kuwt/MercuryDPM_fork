@@ -31,7 +31,7 @@ public:
     
     void setupInitialConditions() override
     {
-        logger.assert(!getIsPeriodic(), "Chute should not be periodic in y-direction");
+        logger.assert_debug(!getIsPeriodic(), "Chute should not be periodic in y-direction");
         setupSideWalls();
         PeriodicBoundary b0;
         b0.set(Vec3D(1.0,0.0,0.0), getXMin(), getXMax());

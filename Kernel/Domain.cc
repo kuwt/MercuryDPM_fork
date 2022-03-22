@@ -1126,9 +1126,9 @@ void Domain::debugInformation() {
             int tagReceive = globalIndexNeighbour * MAX_PROC + globalIndex_ * 10 + tag;
             int tagSend = globalIndex_ * MAX_PROC + globalIndexNeighbour * 10 + tag;
 
-            logger.assert(tagSend > 0, "Send tag is wrong. Tag: %", tagSend);
-            logger.assert(tagReceive > 0, "Receive tag is wrong. Tag: %", tagReceive);
-            logger.assert(processor >= 0, "Processor is wrong. processor: %", processor);
+            logger.assert_debug(tagSend > 0, "Send tag is wrong. Tag: %", tagSend);
+            logger.assert_debug(tagReceive > 0, "Receive tag is wrong. Tag: %", tagReceive);
+            logger.assert_debug(processor >= 0, "Processor is wrong. processor: %", processor);
 
             //Communicate the requests
             MPIContainer::Instance().receive(countReceive, processor, tagReceive);
@@ -1415,7 +1415,7 @@ void Domain::debugInformation() {
             unsigned int index = 0;
             for (BaseParticle* particle : boundaryParticleListNeighbour_[localIndex])
             {
-                logger.assert(particle->getId() == updatePositionDataReceive_[localIndex][index].id,
+                logger.assert_debug(particle->getId() == updatePositionDataReceive_[localIndex][index].id,
                               "MPI particle lists are not in sync");
 
                 //set position

@@ -248,8 +248,8 @@ void BaseCG::setH(Mdouble h)
 
 void BaseCG::setHX(Mdouble h)
 {
-    logger.assert(h > 0, "setHX(%): h has to be positive");
-    logger.assert(max_.X!=constants::inf && min_.X!=-constants::inf,
+    logger.assert_debug(h > 0, "setHX(%): h has to be positive");
+    logger.assert_debug(max_.X!=constants::inf && min_.X!=-constants::inf,
                   "setHX(%) can only be used after setting min and max values", h);
     setNX(static_cast<size_t>(std::ceil((max_.X - min_.X) / h)));
     logger.assert_always(getNX() > 0, "setHX(%) generated nX=% for %<x<%", h, getNX(), min_.X, max_.X);
@@ -257,8 +257,8 @@ void BaseCG::setHX(Mdouble h)
 
 void BaseCG::setHY(Mdouble h)
 {
-    logger.assert(h > 0, "setHY(%): h has to be positive");
-    logger.assert(max_.Y!=constants::inf && min_.Y!=-constants::inf,
+    logger.assert_debug(h > 0, "setHY(%): h has to be positive");
+    logger.assert_debug(max_.Y!=constants::inf && min_.Y!=-constants::inf,
                   "setHY(%) can only be used after setting min and max values", h);
     setNY(static_cast<size_t>(std::ceil((max_.Y - min_.Y) / h)));
     logger.assert_always(getNY() > 0, "setHY(%) generated nY=% for %<y<%", h, getNY(), min_.Y, max_.Y);
@@ -266,8 +266,8 @@ void BaseCG::setHY(Mdouble h)
 
 void BaseCG::setHZ(Mdouble h)
 {
-    logger.assert(h > 0, "setHZ(%): h has to be positive");
-    logger.assert(max_.Z!=constants::inf && min_.Z!=-constants::inf,
+    logger.assert_debug(h > 0, "setHZ(%): h has to be positive");
+    logger.assert_debug(max_.Z!=constants::inf && min_.Z!=-constants::inf,
                   "setHZ(%) can only be used after setting min and max values", h);
     setNZ(static_cast<size_t>(std::ceil((max_.Z - min_.Z) / h)));
     logger.assert_always(getNZ() > 0, "setHZ(%) generated nZ=% for %<z<%", h, getNZ(), min_.Z, max_.Z);

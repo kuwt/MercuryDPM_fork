@@ -117,7 +117,7 @@ void Mercury2D::hGridFindContactsWithinTargetCell(int x, int y, unsigned int l)
 void Mercury2D::hGridFindContactsWithTargetCell(int x, int y, unsigned int l, BaseParticle* obj)
 {
     //Check if the object is not in the same cell as being checked, CheckCell_current should handle these cases.
-    logger.assert(!obj->getHGridCell().equals(x, y, l),
+    logger.assert_debug(!obj->getHGridCell().equals(x, y, l),
                   "hGridFindContactsWithTargetCell should not be called if object is in the same cell");
     
     HGrid* const hgrid = getHGrid();

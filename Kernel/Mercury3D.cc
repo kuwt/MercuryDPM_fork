@@ -119,7 +119,7 @@ void Mercury3D::hGridFindContactsWithTargetCell(int x, int y, int z, unsigned in
 {
     //Check if the object is not in the same cell as being checked, CheckCell_current should handle these cases.
     //TW a speedcheck revealed that this check costs a 10% performance decrease; it's only a safety check, so I made it an assert.
-    logger.assert(!obj->getHGridCell().equals(x, y, z, l),
+    logger.assert_debug(!obj->getHGridCell().equals(x, y, z, l),
                   "hGridFindContactsWithTargetCell should not be called if object is in the same cell");
     
     HGrid* const hgrid = getHGrid();

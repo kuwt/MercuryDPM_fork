@@ -159,7 +159,7 @@ void MindlinSpecies::setSlidingFrictionCoefficientStatic(Mdouble new_mu)
 void MindlinSpecies::setPoissonRatio(Mdouble poissonRatio)
 {
     auto hertz = dynamic_cast<HertzianViscoelasticNormalSpecies*>(getBaseSpecies());
-    logger.assert(hertz, "setPoissonRatio only works with HertzianViscoelastic*Species.");
+    logger.assert_debug(hertz, "setPoissonRatio only works with HertzianViscoelastic*Species.");
     shearModulus_ = hertz->getEffectiveElasticModulus() / 2 * (1 + poissonRatio);
     logger(INFO, "Effective shear modulus set to %, based on effective elastic modulus % and Poisson's ratio %",
            getEffectiveShearModulus(),
@@ -170,14 +170,14 @@ void MindlinSpecies::setPoissonRatio(Mdouble poissonRatio)
 //Mdouble MindlinSpecies::getPoissonRatio() const
 //{
 //    auto hertz = dynamic_cast<HertzianViscoelasticNormalSpecies*>(getBaseSpecies());
-//    logger.assert(hertz, "getPoissonRatio only works with HertzianViscoelastic*Species.");
+//    logger.assert_debug(hertz, "getPoissonRatio only works with HertzianViscoelastic*Species.");
 //    return 2. * shearModulus_ / hertz->getEffectiveElasticModulus() - 1;
 //}
 
 ///Allows the shear modulus to be changed
 void MindlinSpecies::setEffectiveShearModulus(Mdouble shearModulus)
 {
-    logger.assert(shearModulus > 0,
+    logger.assert_debug(shearModulus > 0,
                   "setEffectiveShearModulus(%): value needs to be positive",shearModulus);
     shearModulus_ = shearModulus;
 }

@@ -42,7 +42,7 @@ $ make fullTest
 $ more file
 Feature finished: Mercury Logger
 -I have adapted the logger such that it works now fully as it should
--Asserts will be handled by the logger using logger.assert(..) and logger.assert_always(..)
+-Asserts will be handled by the logger using logger.assert_debug(..) and logger.assert_always(..)
 -Only ExtendedMath MatrixSymmetric and NumericalVector contained asserts, they have been rewritten to the logger.assert
 $ svn commit -F file
 \endcode

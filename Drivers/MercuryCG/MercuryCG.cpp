@@ -281,22 +281,22 @@ void commandLineCG(Mercury3D &dpm, int argc, char **argv)
             cg->setHZ(atof(argv[i + 1]));
             logger(INFO, "Set nz to % to satisfy hz=%", cg->getNZ(), argv[i + 1]);
         } else if (!strcmp(argv[i], "-x")) {
-            logger.assert(i+2<argc,"% requires two arguments",argv[i]);
+            logger.assert_debug(i+2<argc,"% requires two arguments",argv[i]);
             cg->setX(atof(argv[i + 1]), atof(argv[i + 2]));
             logger(INFO, "Set x to (%,%)", argv[i + 1], argv[i + 2]);
             ++i;
         } else if (!strcmp(argv[i], "-y")) {
-            logger.assert(i+2<argc,"% requires two arguments",argv[i]);
+            logger.assert_debug(i+2<argc,"% requires two arguments",argv[i]);
             cg->setY(atof(argv[i + 1]), atof(argv[i + 2]));
             logger(INFO, "Set y to (%,%)", argv[i + 1], argv[i + 2]);
             ++i;
         } else if (!strcmp(argv[i], "-z")) {
-            logger.assert(i+2<argc,"% requires two arguments",argv[i]);
+            logger.assert_debug(i+2<argc,"% requires two arguments",argv[i]);
             cg->setZ(atof(argv[i + 1]), atof(argv[i + 2]));
             logger(INFO, "Set z to (%,%)", argv[i + 1], argv[i + 2]);
             ++i;
         } else if (!strcmp(argv[i], "-t")) {
-            logger.assert(i+2<argc,"% requires two arguments",argv[i]);
+            logger.assert_debug(i+2<argc,"% requires two arguments",argv[i]);
             cg->setTimeMin(atof(argv[i + 1]));
             cg->setTimeMax(atof(argv[i + 2]));
             logger(INFO, "Set t to (%,%)", argv[i + 1], argv[i + 2]);

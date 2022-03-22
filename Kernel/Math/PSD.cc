@@ -277,7 +277,7 @@ void PSD::validateProbabilityDensityDistribution()
             sum += it.probability;
         }
     }
-    logger.assert(sum - 1 < 1e-6, "PDF is not valid: Integral of PDF is not equal to unity");
+    logger.assert_debug(sum - 1 < 1e-6, "PDF is not valid: Integral of PDF is not equal to unity");
 }
 
 /*!

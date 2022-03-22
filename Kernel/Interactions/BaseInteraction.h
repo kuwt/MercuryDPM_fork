@@ -268,7 +268,7 @@ public:
      */
     BaseInteractable* getP()
     {
-        logger.assert(P_ != nullptr, "First particle in interaction % is nullptr", getId());
+        logger.assert_debug(P_ != nullptr, "First particle in interaction % is nullptr", getId());
         return P_;
     }
     
@@ -279,7 +279,7 @@ public:
      */
     BaseInteractable* getI()
     {
-        logger.assert(I_ != nullptr, "Second particle in interaction % is nullptr", getId());
+        logger.assert_debug(I_ != nullptr, "Second particle in interaction % is nullptr", getId());
         return I_;
     }
     
@@ -291,7 +291,7 @@ public:
      */
     const BaseInteractable* getP() const
     {
-        logger.assert(P_ != nullptr, "First particle in interaction % is nullptr", getId());
+        logger.assert_debug(P_ != nullptr, "First particle in interaction % is nullptr", getId());
         return P_;
     }
     
@@ -302,7 +302,7 @@ public:
      */
     const BaseInteractable* getI() const
     {
-        logger.assert(I_ != nullptr, "Second particle in interaction % is nullptr", getId());
+        logger.assert_debug(I_ != nullptr, "Second particle in interaction % is nullptr", getId());
         return I_;
     }
     

@@ -112,8 +112,8 @@ void ChargedBondedInteraction::computeAdhesionForce()
     //involved in the interaction to allow for quick calculation
     const auto pSpecies = dynamic_cast<const ChargedBondedSpecies*>(getP()->getSpecies());
     const auto iSpecies = dynamic_cast<const ChargedBondedSpecies*>(getI()->getSpecies());
-    logger.assert(pSpecies,"No ChargedBondedSpecies");
-    logger.assert(iSpecies,"No ChargedBondedSpecies");
+    logger.assert_debug(pSpecies,"No ChargedBondedSpecies");
+    logger.assert_debug(iSpecies,"No ChargedBondedSpecies");
     const int pCharge = pSpecies->getCharge();
     const int iCharge = iSpecies->getCharge();
     
@@ -210,8 +210,8 @@ Mdouble ChargedBondedInteraction::getElasticEnergy() const
     const ChargedBondedSpecies* species = getSpecies();
     const auto pSpecies = static_cast<const ChargedBondedSpecies*>(getP()->getSpecies()->getAdhesiveForce());
     const auto iSpecies = static_cast<const ChargedBondedSpecies*>(getI()->getSpecies()->getAdhesiveForce());
-    logger.assert(pSpecies,"No ChargedBondedSpecies");
-    logger.assert(iSpecies,"No ChargedBondedSpecies");
+    logger.assert_debug(pSpecies,"No ChargedBondedSpecies");
+    logger.assert_debug(iSpecies,"No ChargedBondedSpecies");
     const int pCharge = pSpecies->getCharge();
     const int iCharge = iSpecies->getCharge();
     

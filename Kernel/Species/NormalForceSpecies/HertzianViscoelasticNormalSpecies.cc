@@ -152,7 +152,7 @@ void HertzianViscoelasticNormalSpecies::setEffectiveElasticModulusAndPoissonRati
     {
         elasticModulus_ = elasticModulus;
         auto mindlin = dynamic_cast<MindlinSpecies*>(getBaseSpecies());
-        logger.assert(mindlin, "Please define HertzianViscoelasticMindlinSpecies to use this setter");
+        logger.assert_debug(mindlin, "Please define HertzianViscoelasticMindlinSpecies to use this setter");
         mindlin->setEffectiveShearModulus(elasticModulus / 2 * (1 + poissonRatio));
     }
 }
@@ -173,7 +173,7 @@ void HertzianViscoelasticNormalSpecies::setEffectiveElasticModulusAndEffectiveSh
     {
         elasticModulus_ = elasticModulus;
         auto mindlin = dynamic_cast<MindlinSpecies*>(getBaseSpecies()->getFrictionForce());
-        logger.assert(mindlin, "Please define HertzianViscoelasticMindlinSpecies to use this setter");
+        logger.assert_debug(mindlin, "Please define HertzianViscoelasticMindlinSpecies to use this setter");
         mindlin->setEffectiveShearModulus(shearModulus);
     }
 }

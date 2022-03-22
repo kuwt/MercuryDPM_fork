@@ -187,7 +187,7 @@ void ParticleSpecies::setTemperatureDependentDensity(
 Mdouble ParticleSpecies::getLargestInverseParticleMassLocal() const
 {
     Mdouble maxInvMass = 0;
-    logger.assert(getHandler() != nullptr && getHandler()->getDPMBase() != nullptr,"speciesHandler must be set");
+    logger.assert_debug(getHandler() != nullptr && getHandler()->getDPMBase() != nullptr,"speciesHandler must be set");
     for (BaseParticle* const p : getHandler()->getDPMBase()->particleHandler)
     {
         if (p->getSpecies()==this && !(p->isFixed() || p->isMPIParticle() || p->isPeriodicGhostParticle()) && p->getInvMass() > maxInvMass)

@@ -216,8 +216,8 @@ void ParticleHandler::addObject(BaseParticle* P)
     }
     else
     {
-        logger.assert(!P->isMPIParticle(),"Can't add mpi particle as it does not exist");
-        logger.assert(!P->isPeriodicGhostParticle(),"Can't add mpi particle as it does not exist");
+        logger.assert_debug(!P->isMPIParticle(),"Can't add mpi particle as it does not exist");
+        logger.assert_debug(!P->isPeriodicGhostParticle(),"Can't add mpi particle as it does not exist");
         //Somehwere a really new particle has been added, so to keep the ID's globally unique, we also update
         //the unique value on all other processors
         BaseHandler<BaseParticle>::increaseId();
@@ -1257,7 +1257,7 @@ unsigned int ParticleHandler::getNumberOfRealObjectsLocal() const
         unsigned int numberOfFakeParticles = 0;
         numberOfFakeParticles += getDPMBase()->domainHandler.getCurrentDomain()->getNumberOfTrueMPIParticles();
         numberOfFakeParticles += getDPMBase()->periodicBoundaryHandler.getNumberOfPeriodicGhostParticles();
-        logger.assert(numberOfFakeParticles <= getSize(), "More fake particles than getSize()");
+        logger.assert_debug(numberOfFakeParticles <= getSize(), "More fake particles than getSize()");
         return (getSize() - numberOfFakeParticles);
     }
     else

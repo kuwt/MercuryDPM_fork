@@ -97,14 +97,14 @@ void ReversibleAdhesiveSpecies::mix(ReversibleAdhesiveSpecies* const S, Reversib
 ///\return the maximum separation distance below which adhesive forces can occur (needed for contact detection)
 void ReversibleAdhesiveSpecies::setInteractionDistance()
 {
-    logger.assert(adhesionStiffness_ != 0.0,"ReversibleAdhesiveSpecies::getInteractionDistance(): adhesionStiffness cannot be zero");
+    logger.assert_debug(adhesionStiffness_ != 0.0,"ReversibleAdhesiveSpecies::getInteractionDistance(): adhesionStiffness cannot be zero");
     getBaseSpecies()->setInteractionDistance(adhesionForceMax_ / adhesionStiffness_);
 }
 
 ///Allows the spring constant to be changed
 void ReversibleAdhesiveSpecies::setAdhesionStiffness(Mdouble adhesionStiffness)
 {
-    logger.assert(adhesionStiffness >= 0,"Error in setAdhesionStiffness");
+    logger.assert_debug(adhesionStiffness >= 0,"Error in setAdhesionStiffness");
     adhesionStiffness_ = adhesionStiffness;
     setInteractionDistance();
 }
@@ -118,7 +118,7 @@ Mdouble ReversibleAdhesiveSpecies::getAdhesionStiffness() const
 ///Allows the spring constant to be changed
 void ReversibleAdhesiveSpecies::setAdhesionForceMax(Mdouble adhesionForceMax)
 {
-    logger.assert(adhesionForceMax >= 0,"Error in setAdhesionForceMax");
+    logger.assert_debug(adhesionForceMax >= 0,"Error in setAdhesionForceMax");
     adhesionForceMax_ = adhesionForceMax;
     if (adhesionStiffness_!=0) setInteractionDistance();
 }

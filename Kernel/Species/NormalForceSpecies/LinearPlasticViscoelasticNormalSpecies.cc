@@ -119,7 +119,7 @@ void LinearPlasticViscoelasticNormalSpecies::mix(LinearPlasticViscoelasticNormal
     cohesionStiffness_ = BaseSpecies::average(S->getCohesionStiffness(), T->getCohesionStiffness());
     penetrationDepthMax_ = BaseSpecies::average(S->getPenetrationDepthMax(), T->getPenetrationDepthMax());
     dissipation_ = BaseSpecies::average(S->getDissipation(), T->getDissipation());
-    logger.assert(S->doConstantUnloadingStiffness_==T->doConstantUnloadingStiffness_,"you cannot mix species where doConstantUnloadingStiffness is not the same");
+    logger.assert_debug(S->doConstantUnloadingStiffness_==T->doConstantUnloadingStiffness_,"you cannot mix species where doConstantUnloadingStiffness is not the same");
     doConstantUnloadingStiffness_ = S->doConstantUnloadingStiffness_;
 }
 
@@ -227,7 +227,7 @@ Mdouble LinearPlasticViscoelasticNormalSpecies::computeTimeStep(Mdouble mass)
  */
 void LinearPlasticViscoelasticNormalSpecies::setDissipation(Mdouble dissipation)
 {
-    logger.assert(dissipation >= 0, "setDissipation(%): dissipation should be non-negative",dissipation);
+    logger.assert_debug(dissipation >= 0, "setDissipation(%): dissipation should be non-negative",dissipation);
     dissipation_ = dissipation;
 }
 
@@ -316,12 +316,12 @@ Mdouble LinearPlasticViscoelasticNormalSpecies::getCollisionTime(Mdouble mass) c
 {
     if (getConstantRestitution()) mass = 1;
 
-    logger.assert(mass > 0, "getCollisionTime(%): mass should be positive",mass);
+    logger.assert_debug(mass > 0, "getCollisionTime(%): mass should be positive",mass);
 
     Mdouble elasticContribution = loadingStiffness_ / (.5 * mass);
     Mdouble elastoDissipativeContribution = elasticContribution - mathsFunc::square(dissipation_ / mass);
 
-    logger.assert(elastoDissipativeContribution > -1e-8 * elasticContribution,
+    logger.assert_debug(elastoDissipativeContribution > -1e-8 * elasticContribution,
             "getCollisionTime(%): values for mass, stiffness and dissipation lead to an overdamped system: reduce dissipation",mass);
 
     return constants::pi / std::sqrt(elastoDissipativeContribution);
@@ -346,7 +346,7 @@ Mdouble LinearPlasticViscoelasticNormalSpecies::computeBondNumberMax(Mdouble har
         const Mdouble overlapMaxCohesion = plasticOverlapMax / (1 + cohesionStiffness_ / unloadingStiffnessMax_);
         const Mdouble cohesionForceMax = cohesionStiffness_ * overlapMaxCohesion;
         auto species = dynamic_cast<const ParticleSpecies*>(getBaseSpecies());
-        logger.assert(species,"computeBondNumberMax: species needs to be a ParticleSpecies");
+        logger.assert_debug(species,"computeBondNumberMax: species needs to be a ParticleSpecies");
         const Mdouble gravitationalForce = gravitationalAcceleration * species->getMassFromRadius(harmonicMeanRadius);
         return cohesionForceMax / gravitationalForce;
     }

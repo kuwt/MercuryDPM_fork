@@ -161,7 +161,7 @@ Mdouble LiquidBridgeWilletSpecies::getSurfaceTension() const
  */
 void LiquidBridgeWilletSpecies::setContactAngle(Mdouble contactAngle)
 {
-    logger.assert(contactAngle >= 0,"Error in setContactAngle");
+    logger.assert_debug(contactAngle >= 0,"Error in setContactAngle");
     contactAngle_ = contactAngle;
     setInteractionDistance();
 }

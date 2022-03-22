@@ -132,8 +132,8 @@ BaseInteraction::~BaseInteraction()
     else
     {
 #endif
-    logger.assert(P_ != nullptr, "Trying to destroy an interaction with P_ = nullptr");
-    logger.assert(I_ != nullptr, "Trying to destroy an interaction with I_ = nullptr");
+    logger.assert_debug(P_ != nullptr, "Trying to destroy an interaction with P_ = nullptr");
+    logger.assert_debug(I_ != nullptr, "Trying to destroy an interaction with I_ = nullptr");
     File& interactionFile = getHandler()->getDPMBase()->getInteractionFile();
     if (interactionFile.getFileType() == FileType::ONE_FILE)
     {
@@ -745,7 +745,7 @@ void BaseInteraction::rotateHistory(Matrix3D& rotationMatrix)
 Mdouble BaseInteraction::getEffectiveRadius() const
 {
     Mdouble invEffectiveRadius = getP()->getCurvature(contactPoint_) + getI()->getCurvature(contactPoint_);
-    logger.assert(invEffectiveRadius>0,
+    logger.assert_debug(invEffectiveRadius>0,
                   "getEffectiveRadius(): interaction % at % has infinite effective radius",getId(), getContactPoint());
     return 1.0 / invEffectiveRadius;
 }
@@ -762,7 +762,7 @@ Mdouble BaseInteraction::getEffectiveRadius() const
 Mdouble BaseInteraction::getEffectiveMass() const
 {
     Mdouble invEffectiveMass = getP()->getInvMass() + getI()->getInvMass();
-    logger.assert(invEffectiveMass>0,
+    logger.assert_debug(invEffectiveMass>0,
             "getEffectiveMass(): interaction % at % has infinite effective mass",getId(), getContactPoint());
     return 1.0 / invEffectiveMass;
 }

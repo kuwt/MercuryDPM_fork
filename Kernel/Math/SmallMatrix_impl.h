@@ -201,7 +201,7 @@ template<unsigned int numberOfRows, unsigned int numberOfColumns>
 SmallVector<numberOfRows> SmallMatrix<numberOfRows, numberOfColumns>::computeWedgeStuffVector() const
 {
     //copied from MiddleSizeMatrix to prevent constructing a temporary MiddleSizeMatrix
-    logger.assert(numberOfColumns == numberOfRows - 1,
+    logger.assert_debug(numberOfColumns == numberOfRows - 1,
                   "Matrix has wrong dimensions to construct the wedge stuff vector");
     SmallVector<numberOfRows> result;
     
@@ -260,7 +260,7 @@ SmallMatrix<numberOfRows, numberOfColumns> SmallMatrix<numberOfRows, numberOfCol
 template<unsigned int numberOfRows, unsigned int numberOfColumns>
 Mdouble SmallMatrix<numberOfRows, numberOfColumns>::determinant() const
 {
-    logger.assert(numberOfRows == numberOfColumns, "Matrix should be square to have a determinant!");
+    logger.assert_debug(numberOfRows == numberOfColumns, "Matrix should be square to have a determinant!");
     
     switch (numberOfRows)
     {
@@ -304,7 +304,7 @@ Mdouble SmallMatrix<numberOfRows, numberOfColumns>::determinant() const
 template<unsigned int numberOfRows, unsigned int numberOfColumns>
 SmallMatrix<numberOfRows, numberOfColumns> SmallMatrix<numberOfRows, numberOfColumns>::inverse() const
 {
-    logger.assert(numberOfRows == numberOfColumns, "Cannot invert a non-square matrix");
+    logger.assert_debug(numberOfRows == numberOfColumns, "Cannot invert a non-square matrix");
     SmallMatrix<numberOfRows, numberOfColumns> result = (*this);
     
     int nr = numberOfRows;
@@ -328,7 +328,7 @@ template<unsigned int numberOfRows, unsigned int numberOfColumns>
 template<unsigned int numberOfRightHandSideColumns>
 void SmallMatrix<numberOfRows, numberOfColumns>::solve(SmallMatrix<numberOfRows, numberOfRightHandSideColumns>& B) const
 {
-    logger.assert(numberOfRows == numberOfColumns, "can only solve for square matrixes");
+    logger.assert_debug(numberOfRows == numberOfColumns, "can only solve for square matrixes");
     
     int n = numberOfRows;
     int nrhs = numberOfRightHandSideColumns;
@@ -342,7 +342,7 @@ void SmallMatrix<numberOfRows, numberOfColumns>::solve(SmallMatrix<numberOfRows,
 template<unsigned int numberOfRows, unsigned int numberOfColumns>
 void SmallMatrix<numberOfRows, numberOfColumns>::solve(SmallVector<numberOfRows>& b) const
 {
-    logger.assert(numberOfRows == numberOfColumns, "can only solve for square matrixes");
+    logger.assert_debug(numberOfRows == numberOfColumns, "can only solve for square matrixes");
     
     int n = numberOfRows;
     int nrhs = 1;

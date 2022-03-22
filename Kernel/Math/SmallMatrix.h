@@ -77,7 +77,7 @@ public:
     SmallMatrix(const SmallVector<numberOfRows>& other)
             : data_()
     {
-        logger.assert(numberOfColumns == 1, "Trying to construct a matrix with more than 1 columns from a vector");
+        logger.assert_debug(numberOfColumns == 1, "Trying to construct a matrix with more than 1 columns from a vector");
         std::copy(other.data(), other.data() + numberOfRows, data_.begin());
     }
     
@@ -91,7 +91,7 @@ public:
     SmallMatrix(const std::initializer_list<SmallVector<numberOfRows>>& entries)
             : data_()
     {
-        logger.assert(entries.size() == numberOfColumns, "expected a matrix with % "
+        logger.assert_debug(entries.size() == numberOfColumns, "expected a matrix with % "
                                                          "columns, but got a matrix with % columns", numberOfColumns,
                       entries.size());
         unsigned int column = 0;
@@ -134,8 +134,8 @@ public:
     /// \brief defines the operator(n,m) to access the element on row n and column m
     Mdouble& operator()(unsigned int n, unsigned int m)
     {
-        logger.assert(n < numberOfRows, "Requested row number % for a matrix with only % rows", n, numberOfRows);
-        logger.assert(m < numberOfColumns, "Requested column number % for a matrix with only % columns", m,
+        logger.assert_debug(n < numberOfRows, "Requested row number % for a matrix with only % rows", n, numberOfRows);
+        logger.assert_debug(m < numberOfColumns, "Requested column number % for a matrix with only % columns", m,
                       numberOfColumns);
         return data_[n + m * numberOfRows];
     }
@@ -143,8 +143,8 @@ public:
     /// \brief defines the operator(n,m) to access the element on row n and column m
     const Mdouble& operator()(unsigned int n, unsigned int m) const
     {
-        logger.assert(n < numberOfRows, "Requested row number % for a matrix with only % rows", n, numberOfRows);
-        logger.assert(m < numberOfColumns, "Requested column number % for a matrix with only % columns", m,
+        logger.assert_debug(n < numberOfRows, "Requested row number % for a matrix with only % rows", n, numberOfRows);
+        logger.assert_debug(m < numberOfColumns, "Requested column number % for a matrix with only % columns", m,
                       numberOfColumns);
         return data_[n + m * numberOfRows];
     }
@@ -152,14 +152,14 @@ public:
     /// \brief Access the n linear element in the matrix.
     Mdouble& operator[](const unsigned int n)
     {
-        logger.assert(n < numberOfRows * numberOfColumns, "Requested entry % for a matrix with only % entries", n,
+        logger.assert_debug(n < numberOfRows * numberOfColumns, "Requested entry % for a matrix with only % entries", n,
                       numberOfRows * numberOfColumns);
         return data_[n];
     }
     
     const Mdouble& operator[](const unsigned int n) const
     {
-        logger.assert(n < numberOfRows * numberOfColumns, "Requested entry % for a matrix with only % entries", n,
+        logger.assert_debug(n < numberOfRows * numberOfColumns, "Requested entry % for a matrix with only % entries", n,
                       numberOfRows * numberOfColumns);
         return data_[n];
     }
@@ -303,14 +303,14 @@ public:
     /// \brief get the j^th column
     SmallVector<numberOfRows> getColumn(unsigned int j) const
     {
-        logger.assert(j < numberOfColumns, "Asked for column %, but there are only % columns", j, numberOfColumns);
+        logger.assert_debug(j < numberOfColumns, "Asked for column %, but there are only % columns", j, numberOfColumns);
         return SmallVector<numberOfRows>(data() + j * numberOfRows);
     }
     
     /// \brief get the i^th row
     SmallVector<numberOfColumns> getRow(unsigned int i) const
     {
-        logger.assert(i < numberOfRows, "Asked for row %, but there are only % rows", i, numberOfRows);
+        logger.assert_debug(i < numberOfRows, "Asked for row %, but there are only % rows", i, numberOfRows);
         SmallVector<numberOfColumns> result;
         for (unsigned int j = 0; j < numberOfColumns; ++j)
         {

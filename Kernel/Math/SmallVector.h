@@ -87,7 +87,7 @@ public:
     SmallVector(std::initializer_list<Mdouble> data)
             : data_()
     {
-        logger.assert(data.size() == numberOfRows, "provided array has size %, but should have size %",
+        logger.assert_debug(data.size() == numberOfRows, "provided array has size %, but should have size %",
                       data.size(), numberOfRows);
         std::copy(data.begin(), data.end(), data_.begin());
     }
@@ -208,25 +208,25 @@ public:
     
     Mdouble& operator[](unsigned int n)
     {
-        logger.assert(n < numberOfRows, "Requested entry %, but there are only % entries", n, numberOfRows);
+        logger.assert_debug(n < numberOfRows, "Requested entry %, but there are only % entries", n, numberOfRows);
         return data_[n];
     }
     
     const Mdouble& operator[](unsigned int n) const
     {
-        logger.assert(n < numberOfRows, "Requested entry %, but there are only % entries", n, numberOfRows);
+        logger.assert_debug(n < numberOfRows, "Requested entry %, but there are only % entries", n, numberOfRows);
         return data_[n];
     }
     
     Mdouble& operator()(unsigned int n)
     {
-        logger.assert(n < numberOfRows, "Requested entry %, but there are only % entries", n, numberOfRows);
+        logger.assert_debug(n < numberOfRows, "Requested entry %, but there are only % entries", n, numberOfRows);
         return data_[n];
     }
     
     const Mdouble& operator()(unsigned int n) const
     {
-        logger.assert(n < numberOfRows, "Requested entry %, but there are only % entries", n, numberOfRows);
+        logger.assert_debug(n < numberOfRows, "Requested entry %, but there are only % entries", n, numberOfRows);
         return data_[n];
     }
     

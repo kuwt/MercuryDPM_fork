@@ -200,7 +200,7 @@ void SinterInteraction::computeNormalForce()
         {
             ThermalParticle* tp = dynamic_cast<ThermalParticle*>(getP());
             ThermalParticle* ti = dynamic_cast<ThermalParticle*>(getI());
-            logger.assert(tp && ti,
+            logger.assert_debug(tp && ti,
                           "warning contact partners have to be ThermalParticle's if this sinter species is used");
             double temperature =
                     2.0 * tp->getTemperature() * ti->getTemperature() / (tp->getTemperature() + ti->getTemperature());

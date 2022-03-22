@@ -176,7 +176,7 @@ bool LiquidMigrationFields::doInteractionStatistics()
 void LiquidMigrationFields::setFields(const BaseInteraction& c, IntegralType type)
 {
     auto l = dynamic_cast<const LiquidMigrationWilletInteraction*>(&c);
-    logger.assert(l != nullptr,
+    logger.assert_debug(l != nullptr,
                   "LiquidMigrationFields::addParticleStatistics: "
                   "interaction type should be LiquidMigrationWilletInteraction");
     liquidBridgeVolume_ = l->getLiquidBridgeVolume();
@@ -203,7 +203,7 @@ void LiquidMigrationFields::setFields(const BaseInteraction& c, IntegralType typ
 void LiquidMigrationFields::setFields(const BaseParticle& p)
 {
     auto l = dynamic_cast<const LiquidFilmParticle*>(&p);
-    logger.assert(l != nullptr,
+    logger.assert_debug(l != nullptr,
                   "LiquidMigrationFields::addParticleStatistics: particle type should be LiquidFilmParticle");
     liquidFilmVolume_ = l->getLiquidVolume();
 }

@@ -118,7 +118,7 @@ void StressStrainControlBoundary::checkBoundaryAfterParticlesMove(ParticleHandle
     checkPeriodicLeesEdwardsBoundariesAfterParticlesMove(particleHandler);
     
     //Real Stress and StrainRate Control every time step
-    logger.assert(getHandler() != nullptr,
+    logger.assert_debug(getHandler() != nullptr,
                   "you need to set the handler of this boundary before the parameters can be set");
     
     determineLengthAndCentre();

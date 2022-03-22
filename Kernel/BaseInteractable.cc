@@ -184,7 +184,7 @@ void BaseInteractable::sumForceTorqueOMP()
  */
 void BaseInteractable::setSpecies(const ParticleSpecies* species)
 {
-    logger.assert(species->getHandler() != nullptr && species->getHandler()->getObject(species->getIndex())==species, "Error: Species is not part of any handler yet");
+    logger.assert_debug(species->getHandler() != nullptr && species->getHandler()->getObject(species->getIndex())==species, "Error: Species is not part of any handler yet");
     species_ = species;
     indSpecies_ = species->getIndex();
 }

@@ -471,7 +471,7 @@ void BaseHandler<T>::removeIf(const std::function<bool(T*)> cond)
 template<typename T>
 void BaseHandler<T>::removeObject(const unsigned int index)
 {
-    logger.assert(index < getSize(),
+    logger.assert_debug(index < getSize(),
                   "In: void %::removeObject(const unsigned int index) const, "
                   "no object exists with index %, number of objects is %",
                   getName(), index, getSize());
@@ -612,7 +612,7 @@ std::vector<T*> BaseHandler<T>::getObjectsById(const unsigned int id)
 template<typename T>
 T* BaseHandler<T>::getObject(const unsigned int index)
 {
-    logger.assert(index < getSize(),
+    logger.assert_debug(index < getSize(),
                   "[%::getObject()] Object couldn't be found because index (%) is higher than number of objects (%).",
                   getName(), index, getSize());
     return objects_[index];
@@ -623,7 +623,7 @@ T* BaseHandler<T>::getObject(const unsigned int index)
 template<typename T>
 const T* BaseHandler<T>::getObject(const unsigned int index) const
 {
-    logger.assert(index < getSize(),
+    logger.assert_debug(index < getSize(),
                   "[%::getObject() const] Object couldn't be found because index (%) is higher than number of objects (%).",
                   getName(), index, getSize());
     return objects_[index];

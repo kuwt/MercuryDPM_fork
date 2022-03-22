@@ -136,7 +136,7 @@ void ChargedBondedSpecies::mix(ChargedBondedSpecies* const S, ChargedBondedSpeci
 ///\return the maximum separation distance below which adhesive forces can occur (needed for contact detection)
 void ChargedBondedSpecies::setInteractionDistance()
 {
-    logger.assert(adhesionStiffness_ != 0.0,"ChargedBondedSpecies::getInteractionDistance(): adhesionStiffness cannot be zero");
+    logger.assert_debug(adhesionStiffness_ != 0.0,"ChargedBondedSpecies::getInteractionDistance(): adhesionStiffness cannot be zero");
     getBaseSpecies()->setInteractionDistance(adhesionForceMax_ / adhesionStiffness_);
 }
 

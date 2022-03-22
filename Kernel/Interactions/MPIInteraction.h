@@ -330,8 +330,8 @@ template<class NormalForceInteraction, class FrictionForceInteraction, class Adh
 void MPIInteraction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::copyFromInteraction(
         const Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>* interaction)
 {
-    //logger.assert(interaction->getP()->getId(),"Trying to copy an unreal interaction: P is not defined");
-    //logger.assert(interaction->getP()->getId(),"Trying to copy an unreal interaction: I is not defined");
+    //logger.assert_debug(interaction->getP()->getId(),"Trying to copy an unreal interaction: P is not defined");
+    //logger.assert_debug(interaction->getP()->getId(),"Trying to copy an unreal interaction: I is not defined");
     
     if (interaction->getP() == nullptr) logger(WARN, "P is not defined!!");
     if (interaction->getI() == nullptr) logger(WARN, "I is not defined!!");

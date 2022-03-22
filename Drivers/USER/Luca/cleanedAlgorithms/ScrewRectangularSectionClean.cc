@@ -261,7 +261,7 @@ ScrewRectangularSectionClean::getDistanceAndNormal(const BaseParticle& p, Mdoubl
             distance = deltaR;
             
             // if the distance is negative prints an error message
-            logger.assert(distance >= 0, "\nCOLLISION ERROR WITH THE SCREW SIDE: OVERLAP > PARTICLE RADIUS, ZONE 1");
+            logger.assert_debug(distance >= 0, "\nCOLLISION ERROR WITH THE SCREW SIDE: OVERLAP > PARTICLE RADIUS, ZONE 1");
             
             // the collision has no other component other than the radial vector
             normal_return = -radialVector;
@@ -280,7 +280,7 @@ ScrewRectangularSectionClean::getDistanceAndNormal(const BaseParticle& p, Mdoubl
                 return false;
             
             // if the distance is negative prints an error message
-            logger.assert(distance >= 0,
+            logger.assert_debug(distance >= 0,
                           "\nCOLLISION ERROR WITH THE SCREW EDGE: OVERLAP > PARTICLE RADIUS, ZONE 2");
 
             // the normal to the edge through the particle centre
@@ -304,7 +304,7 @@ ScrewRectangularSectionClean::getDistanceAndNormal(const BaseParticle& p, Mdoubl
         distance = deltaN;
         
         // if the distance is negative prints an error message
-        logger.assert(distance >= 0.0 || getHandler()->getDPMBase()->getTime() < 1e-2,
+        logger.assert_debug(distance >= 0.0 || getHandler()->getDPMBase()->getTime() < 1e-2,
                       "\nCOLLISION ERROR WITH THE SCREW SURFACE: OVERLAP > PARTICLE RADIUS, particle ID = %, ZONE 3",
                       p.getId());
         
@@ -324,7 +324,7 @@ ScrewRectangularSectionClean::getDistanceAndNormal(const BaseParticle& p, Mdoubl
             distance = deltaR;
             
             // if the distance is negative prints an error message
-            logger.assert(distance >= 0, "\nCOLLISION ERROR WITH THE SCREW SHAFT: OVERLAP > PARTICLE RADIUS, ZONE 4");
+            logger.assert_debug(distance >= 0, "\nCOLLISION ERROR WITH THE SCREW SHAFT: OVERLAP > PARTICLE RADIUS, ZONE 4");
             
             // the collision has no other component other than the radial vector
             normal_return = -radialVector;
@@ -343,7 +343,7 @@ ScrewRectangularSectionClean::getDistanceAndNormal(const BaseParticle& p, Mdoubl
             distance = p.getWallInteractionRadius(this) - distance;
             
             // if the distance is negative prints an error message
-            logger.assert(distance >= 0.0 || getHandler()->getDPMBase()->getTime() < 1e-2,
+            logger.assert_debug(distance >= 0.0 || getHandler()->getDPMBase()->getTime() < 1e-2,
                           "\nCOLLISION ERROR WITH THE SCREW CORNER: OVERLAP > PARTICLE RADIUS, particle ID = %, ZONE 5",
                           p.getId());
             

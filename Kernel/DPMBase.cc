@@ -1059,9 +1059,9 @@ void DPMBase::setMax(const Vec3D& newMax)
 void DPMBase::setDomain(const Vec3D& min, const Vec3D& max)
 {
 
-    logger.assert(min.X <= max.X, "lower x-bound (%) is larger than upper x-bound (%)", min.X, max.X);
-    logger.assert(min.Y <= max.Y, "lower x-bound (%) is larger than upper x-bound (%)", min.Y, max.Y);
-    logger.assert(min.Z <= max.Z, "lower x-bound (%) is larger than upper x-bound (%)", min.Z, max.Z);
+    logger.assert_debug(min.X <= max.X, "lower x-bound (%) is larger than upper x-bound (%)", min.X, max.X);
+    logger.assert_debug(min.Y <= max.Y, "lower x-bound (%) is larger than upper x-bound (%)", min.Y, max.Y);
+    logger.assert_debug(min.Z <= max.Z, "lower x-bound (%) is larger than upper x-bound (%)", min.Z, max.Z);
     min_ = min;
     max_ = max;
 }
@@ -1245,7 +1245,7 @@ void DPMBase::setNumberOfOMPThreads(int numberOfOMPThreads)
 /* Returns the number of omp threads */
 int DPMBase::getNumberOfOMPThreads() const
 {
-    //logger.assert(numberOfOMPThreads_,"You need to set the number of OMP threads");
+    //logger.assert_debug(numberOfOMPThreads_,"You need to set the number of OMP threads");
     return numberOfOMPThreads_;
 }
 

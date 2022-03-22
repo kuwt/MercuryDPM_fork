@@ -139,7 +139,7 @@ bool HorizontalBaseScrew::getDistanceAndNormal(const BaseParticle& p, Mdouble& d
         else //in this case the tangential vector is irrelevant
             logger(WARN, "Warning: Particle % is exactly on the symmetry axis of wall %", p.getIndex(), getIndex());
         normalReturn = normal.Z * axis + normal.X * radialDirection;
-        //logger.assert(normalReturn.Y==0,"Error");
+        //logger.assert_debug(normalReturn.Y==0,"Error");
         return true;
     }
 }

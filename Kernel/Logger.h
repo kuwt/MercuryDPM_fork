@@ -47,7 +47,7 @@
 
 #ifdef assert
 #undef assert
-//#error You included assert before the logger. Please use logger.assert() instead.
+//#error You included assert before the logger. Please use logger.assert_debug() instead.
 #endif
 
 #ifdef MERCURY_FORCE_ASSERTS
@@ -428,21 +428,21 @@ public:
     //the conversion from "" to a std::sting is so slow, it takes 50% of the total run time for a release build...
     template<typename... Args>
     typename std::enable_if<(ASSERTS) && (sizeof...(Args) >= 0), void>::type
-    assert(bool assertion, const char* format, Args&& ... arg)
+    assert_debug(bool assertion, const char* format, Args&& ... arg)
     {
         assert_always(assertion, format, arg...);
     }
     
     template<typename... Args>
     typename std::enable_if<!((ASSERTS) && sizeof...(Args) >= 0), void>::type
-    assert(bool assertion, const char* format, Args&& ... arg)
+    assert_debug(bool assertion, const char* format, Args&& ... arg)
     {
     }
     
     template<typename... Args>
-    void assert(bool assertion, const std::string format, Args&& ... arg)
+    void assert_debug(bool assertion, const std::string format, Args&& ... arg)
     {
-        assert(assertion, format.c_str(), arg...);
+        assert_debug(assertion, format.c_str(), arg...);
     }
     
     template<typename... Args>

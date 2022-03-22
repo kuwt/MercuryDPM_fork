@@ -34,7 +34,7 @@ The use of both functions in the logger is done as folows:
     // Condition is false so the code breaks
     logger.assert_always(test==2.0, "test is not 2.0 but %",test); 
     // When compiling at release, this following assert is ignored
-    logger.assert(false,"Although I'm false, I get ignored on release");
+    logger.assert_debug(false,"Although I'm false, I get ignored on release");
 \endcode
 
 

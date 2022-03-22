@@ -297,7 +297,7 @@ Mdouble mathsFunc::chebyshev(Mdouble x, const Mdouble coef[], int N)
     Mdouble b1 = 0, b2;
     int i = N - 1;
     
-    logger.assert(i > 0, "i is greater than 0");
+    logger.assert_debug(i > 0, "i is greater than 0");
     do
     {
         b2 = b1;

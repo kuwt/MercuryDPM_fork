@@ -114,7 +114,7 @@ public:
         static Time2Finish time(getTime(),getTimeMax());
         Matrix3D stress = getTotalStress();
         auto boundary = dynamic_cast<const StressStrainControlBoundary*>(boundaryHandler.getLastObject());
-        logger.assert(boundary,"No StressStrainControlBoundary");
+        logger.assert_debug(boundary,"No StressStrainControlBoundary");
         Mdouble strainRate = boundary->getStrainRate().YY;
         Mdouble shearRate = boundary->getStrainRate().XY;
         Mdouble solidFraction = particleHandler.getVolume()/getTotalVolume();

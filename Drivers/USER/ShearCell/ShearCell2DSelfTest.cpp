@@ -220,14 +220,14 @@ private:
         for (BaseParticle * const p : particleHandler)
         {
             LiquidFilmParticle* l = dynamic_cast<LiquidFilmParticle*>(p);
-            logger.assert(l,"Error in outputXBallsData");
+            logger.assert_debug(l,"Error in outputXBallsData");
             volTotP += l->getLiquidVolume();
         }
         Mdouble volTotI = 0.0;
         for (BaseInteraction* i : interactionHandler)
         {
             LiquidMigrationWilletInteraction* l = dynamic_cast<LiquidMigrationWilletInteraction*>(i);
-            logger.assert(l,"Error in outputXBallsData");
+            logger.assert_debug(l,"Error in outputXBallsData");
             volTotI += l->getLiquidBridgeVolume();
             if (l->getLiquidBridgeVolume() != 0.0)
                 nLB++;

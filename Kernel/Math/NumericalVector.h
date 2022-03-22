@@ -117,7 +117,7 @@ public:
     NumericalVector<T> operator+(const NumericalVector<T>& right) const
     {
         NumericalVector<T> result(*this);
-        logger.assert(data_.size() == right.data_.size(), "Vectors don't have the same size");
+        logger.assert_debug(data_.size() == right.data_.size(), "Vectors don't have the same size");
         for (std::size_t i = 0; i < data_.size(); i++)
             result.data_[i] += right.data_[i];
         return result;
@@ -126,7 +126,7 @@ public:
     NumericalVector<T> operator-(const NumericalVector<T>& right) const
     {
         NumericalVector<T> result(*this);
-        logger.assert(data_.size() == right.data_.size(), "Vectors don't have the same size");
+        logger.assert_debug(data_.size() == right.data_.size(), "Vectors don't have the same size");
         for (std::size_t i = 0; i < data_.size(); i++)
             result.data_[i] -= right.data_[i];
         return result;
@@ -143,7 +143,7 @@ public:
     
     T operator*(const NumericalVector& right) const
     {
-        logger.assert(data_.size() == right.data_.size(), "Vectors don't have equal length.");
+        logger.assert_debug(data_.size() == right.data_.size(), "Vectors don't have equal length.");
         T sum = 0;
         for (std::size_t i = 0; i < data_.size(); i++)
             sum += data_[i] * right.data_[i];
@@ -167,7 +167,7 @@ public:
     
     NumericalVector<T>& operator+=(const NumericalVector<T>& right)
     {
-        logger.assert(data_.size() == right.data_.size(), "Vectors don't have the same size");
+        logger.assert_debug(data_.size() == right.data_.size(), "Vectors don't have the same size");
         for (std::size_t i = 0; i < data_.size(); i++)
             data_[i] += right.data_[i];
         return *this;
@@ -176,7 +176,7 @@ public:
     
     NumericalVector<T>& operator-=(const NumericalVector<T>& right)
     {
-        logger.assert(data_.size() == right.data_.size(), "Vectors don't have the same size");
+        logger.assert_debug(data_.size() == right.data_.size(), "Vectors don't have the same size");
         for (std::size_t i = 0; i < data_.size(); i++)
             data_[i] -= right.data_[i];
         return *this;
@@ -191,25 +191,25 @@ public:
     
     T& operator[](std::size_t n)
     {
-        logger.assert(n < data_.size(), "Requested entry %, but there are only % entries", n, data_.size());
+        logger.assert_debug(n < data_.size(), "Requested entry %, but there are only % entries", n, data_.size());
         return data_[n];
     }
     
     const T& operator[](std::size_t n) const
     {
-        logger.assert(n < data_.size(), "Requested entry %, but there are only % entries", n, data_.size());
+        logger.assert_debug(n < data_.size(), "Requested entry %, but there are only % entries", n, data_.size());
         return data_[n];
     }
     
     T& operator()(std::size_t n)
     {
-        logger.assert(n < data_.size(), "Requested entry %, but there are only % entries", n, data_.size());
+        logger.assert_debug(n < data_.size(), "Requested entry %, but there are only % entries", n, data_.size());
         return data_[n];
     }
     
     const T& operator()(std::size_t n) const
     {
-        logger.assert(n < data_.size(), "Requested entry %, but there are only % entries", n, data_.size());
+        logger.assert_debug(n < data_.size(), "Requested entry %, but there are only % entries", n, data_.size());
         return data_[n];
     }
     

@@ -62,7 +62,7 @@ public:
         }
 
         species = dynamic_cast<SinterFrictionSpecies*>(speciesHandler.getObject(0));
-        logger.assert(species,"Species pointer not set");
+        logger.assert_debug(species,"Species pointer not set");
         species->setSinterRate(0.0);
         //species->setSinterAdhesion(0.0);
     }

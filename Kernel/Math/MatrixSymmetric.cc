@@ -299,7 +299,7 @@ MatrixSymmetric3D MatrixSymmetric3D::inverse() const
 {
     MatrixSymmetric3D result;
     Mdouble det = MatrixSymmetric3D::determinant(*this);
-    logger.assert(det != 0,
+    logger.assert_debug(det != 0,
                   "determinant is not zero"); //should be replaced by the condition number or sth. like fabs(det)>1e-5*norm.
     result.XX = (YY * ZZ - YZ * YZ) * det;
     result.XY = -(XY * ZZ - XZ * YZ) * det;

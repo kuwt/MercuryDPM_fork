@@ -219,7 +219,7 @@ Mdouble HertzianSinterNormalSpecies::computeTimeStep(Mdouble mass)
 //    } else {
     std::cerr << "Warning: Dissipation is not taken into account when computing the time step" << std::endl;
     ParticleSpecies* p = dynamic_cast<ParticleSpecies*>(getBaseSpecies());
-    logger.assert(p,"Empty particle handler");
+    logger.assert_debug(p,"Empty particle handler");
     Mdouble radius = cbrt(mass * 3. / (4. * constants::pi * p->getDensity()));
     return 0.02 * constants::pi / std::sqrt(2.0 * getUnloadingModulusMax() * getPenetrationDepthMax() * radius / mass);
 }

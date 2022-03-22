@@ -663,7 +663,7 @@ void helpers::loadingTest(const ParticleSpecies* species, Mdouble displacement, 
         void actionsBeforeTimeStep() override
         {
             BaseParticle* p = particleHandler.getLastObject();
-            logger.assert(p,"Empty particle handler");
+            logger.assert_debug(p,"Empty particle handler");
             p->setAngularVelocity({0, 0, 0});
 
             //Moving particle normally into surface
@@ -741,7 +741,7 @@ void helpers::normalAndTangentialLoadingTest(const ParticleSpecies* species, Mdo
         void actionsBeforeTimeStep() override
         {
             BaseParticle* p = particleHandler.getLastObject();
-            logger.assert(p,"Empty particle handler");
+            logger.assert_debug(p,"Empty particle handler");
             p->setAngularVelocity({0, 0, 0});
     
             //Moving particle cyclically right and left between +-tangentialDisplacement
@@ -819,8 +819,8 @@ void helpers::objectivenessTest(const ParticleSpecies* species, Mdouble displace
         {
             BaseParticle* p = particleHandler.getObject(0);
             BaseParticle* q = particleHandler.getLastObject();
-            logger.assert(p,"Empty particle handler");
-            logger.assert(q,"Empty particle handler");
+            logger.assert_debug(p,"Empty particle handler");
+            logger.assert_debug(q,"Empty particle handler");
 
             //Moving particle normally into surface
             if (getTime() <= tangentialDisplacement / velocity)

@@ -417,7 +417,7 @@ bool ScrewAuger::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wall
             distance = deltaR;
 
             // if the distance is negative prints an error message
-            logger.assert(distance >= 0.0, "\nCOLLISION ERROR WITH THE SCREW SIDE: OVERLAP > PARTICLE RADIUS, REGION 1");
+            logger.assert_debug(distance >= 0.0, "\nCOLLISION ERROR WITH THE SCREW SIDE: OVERLAP > PARTICLE RADIUS, REGION 1");
 
             // the collision has no other component other than the radial vector
             normal_return = getRadialVector(pInScrewReference, pInCylindricalScrewReference);
@@ -436,7 +436,7 @@ bool ScrewAuger::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wall
                 return false;
 
             // if the distance is negative prints an error message
-            logger.assert(distance >= 0.0, "\nCOLLISION ERROR WITH THE SCREW EDGE: OVERLAP > PARTICLE RADIUS, REGION 2");
+            logger.assert_debug(distance >= 0.0, "\nCOLLISION ERROR WITH THE SCREW EDGE: OVERLAP > PARTICLE RADIUS, REGION 2");
 
             // the collision has mixed radial and normal components
             normal_return = deltaN * getNormalVector(pInScrewReference, pInCylindricalScrewReference) + deltaR * getRadialVector(pInScrewReference, pInCylindricalScrewReference);
@@ -457,7 +457,7 @@ bool ScrewAuger::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wall
         distance = deltaN;
 
         // if the distance is negative prints an error message
-        logger.assert(distance >= 0.0, "\nCOLLISION ERROR WITH THE SCREW BLADE SURFACE: OVERLAP > PARTICLE RADIUS, REGION 3");
+        logger.assert_debug(distance >= 0.0, "\nCOLLISION ERROR WITH THE SCREW BLADE SURFACE: OVERLAP > PARTICLE RADIUS, REGION 3");
 
         // the collision has no other component other than the normal to the blade
         normal_return = getNormalVector(pInScrewReference, pInCylindricalScrewReference);
@@ -477,7 +477,7 @@ bool ScrewAuger::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wall
             distance = deltaR;
 
             // if the distance is negative prints an error message
-            logger.assert(distance >= 0.0, "\nCOLLISION ERROR WITH THE SCREW SHAFT: OVERLAP > PARTICLE RADIUS, REGION 4");
+            logger.assert_debug(distance >= 0.0, "\nCOLLISION ERROR WITH THE SCREW SHAFT: OVERLAP > PARTICLE RADIUS, REGION 4");
 
             // the collision has no other component other than the radial vector
             normal_return = getRadialVector(pInScrewReference, pInCylindricalScrewReference);
@@ -493,7 +493,7 @@ bool ScrewAuger::getDistanceAndNormalLabCoordinates(Vec3D position, Mdouble wall
             distance = wallInteractionRadius - distance;
 
             // if the distance is negative prints an error message
-            logger.assert(distance >= 0.0, "\nCOLLISION ERROR WITH THE SCREW CORNER: OVERLAP > PARTICLE RADIUS, REGION 5");
+            logger.assert_debug(distance >= 0.0, "\nCOLLISION ERROR WITH THE SCREW CORNER: OVERLAP > PARTICLE RADIUS, REGION 5");
 
             // the collision has mixed radial and normal components
             normal_return = fabs(deltaN - wallInteractionRadius) * getNormalVector(pInScrewReference, pInCylindricalScrewReference) + fabs(deltaR - wallInteractionRadius) * getRadialVector(pInScrewReference, pInCylindricalScrewReference);

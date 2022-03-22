@@ -892,7 +892,7 @@ void PeriodicBoundaryHandler::updateParticles()
                 {
                     //logger(VERBOSE,"i: %, numberOfParticles: %, dataIndex: %",i,numberOfParticles, dataIndex);
                     //Check if this particle really belongs to the data that is send
-                    logger.assert(pGhost->getId() == updatePositionDataReceive_[dataIndex][p].id,
+                    logger.assert_debug(pGhost->getId() == updatePositionDataReceive_[dataIndex][p].id,
                                   "Periodic particle lists are not in syc");
                     
                     //Add the real position and velocity of the particles

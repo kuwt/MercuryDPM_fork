@@ -203,7 +203,7 @@ Mdouble SuperQuadricParticle::getExponentEps2() const
  */
 Mdouble SuperQuadricParticle::getVolume() const
 {
-    logger.assert(getHandler() != nullptr, "[SuperQuadricParticle::getVolume] no particle handler specified");
+    logger.assert_debug(getHandler() != nullptr, "[SuperQuadricParticle::getVolume] no particle handler specified");
 
     return (2.0 * axes_.X * axes_.Y * axes_.Z * eps1_ * eps2_) * mathsFunc::beta(0.5 * eps1_ + 1.0, eps1_) *
            mathsFunc::beta(0.5 * eps2_, 0.5 * eps2_);
@@ -793,7 +793,7 @@ SmallVector<4> SuperQuadricParticle::getContactPointPlanB(const SuperQuadricPart
             return getContactPointPlanB(pOther, 2 * numberOfSteps);
         }
     }
-    logger.assert(p1.getAxes().X == getAxes().X, "In getContactPointPlanB, final particle for contact-detection not "
+    logger.assert_debug(p1.getAxes().X == getAxes().X, "In getContactPointPlanB, final particle for contact-detection not "
             "the same as original particle");
     
     logger(VERBOSE, "Plan B contact point: %", contactPointPlanB);

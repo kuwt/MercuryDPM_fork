@@ -219,11 +219,11 @@ void SlidingFrictionInteraction::computeSlidingSpringSuperQuadric(const Vec3D& t
         slidingSpring_ -= Vec3D::dot(slidingSpring_, getNormal()) * getNormal();
         slidingSpring_.normalise();
         slidingSpring_ *= springLength;
-        logger.assert(std::abs(slidingSpring_.getLength() - springLength) < 1e-10, "Spring length not the same after rotation");
+        logger.assert_debug(std::abs(slidingSpring_.getLength() - springLength) < 1e-10, "Spring length not the same after rotation");
     }
     logger(DEBUG, "sliding spring after rotation-step: %\n", slidingSpring_);
     slidingSpring_ += slidingSpringVelocity_ * getHandler()->getDPMBase()->getTimeStep();
-    logger.assert(std::abs(Vec3D::dot(slidingSpring_, getNormal())) < 1e-10, "sliding spring not perpendicular to normal");
+    logger.assert_debug(std::abs(Vec3D::dot(slidingSpring_, getNormal())) < 1e-10, "sliding spring not perpendicular to normal");
 }
 
 
