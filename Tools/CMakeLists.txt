@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 2.8)
-
 include(${CMAKE_SOURCE_DIR}/Configuration/MasterMake.cmake)
 
 file(GLOB CPPFILES  "*.cpp")
