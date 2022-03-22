@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # Perform Hilbert-Huang transform to the fingering.
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
 #For the list of developers, see <http://www.MercuryDPM.org/Team>.
 #

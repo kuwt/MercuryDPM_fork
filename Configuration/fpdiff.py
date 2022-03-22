@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #Please only edit the version in Configuration. Do not edit the version in the Scipts directory as that gets automatically replaced.
 
