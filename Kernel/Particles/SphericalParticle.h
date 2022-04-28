@@ -30,8 +30,8 @@
 
 /*!
  * \class SphericalParticle
- * \brief A basic particle. 
- * \details Before r3648, this SphericalParticle class was known as BaseParticle. 
+ * \brief A spherical particle is the most simple particle used in MercuryDPM.
+ * \details Other particle types are SuperQuadricParticle, LiquidFilmParticle, and ThermalParticle 
  */
 class SphericalParticle final : public BaseParticle
 {
