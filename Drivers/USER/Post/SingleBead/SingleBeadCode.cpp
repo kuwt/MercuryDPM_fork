@@ -426,10 +426,10 @@ int main(int argc, char *argv[])
 	double muT1 = 0.000;
 	double muT2 = 0.000;
 
-	double dimDrumRad = 45.0;
+	double dimDrumRad = 20.0;
 	double drumRad = dimDrumRad*0.0005; // 45 * smallest particle radius -> dimDrumRad particles fit in drum diameter
 	//the dimensionless drum length (L/d_l)
-	double dimDrumLength = 10.0;
+	double dimDrumLength = 9.0;
 	double drumLength = dimDrumLength*0.001; // dimDrumLength * smallest particle diameter
 
     // computes rpm based on froude number and drumRad
