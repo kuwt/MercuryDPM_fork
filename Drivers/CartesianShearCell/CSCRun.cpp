@@ -38,13 +38,13 @@ public:
         setName("CSCInit");
         std::cout << "Reading file " << restartFile.getName() << std::endl;
         readRestartFile();
-        //setRunNumber(0); //restart doesn't work with autonumbered init files
+        //setRunNumber(0); //otherwise, restart doesn't work with autonumbered init files
         setTimeMax(timeMax);
         setTime(0);
         setRestarted(false);
         setName("CSCRun");
         writeXBallsScript();
-        setXBallsAdditionalArguments("-v0 -solidf -3dturn 1");
+        setXBallsAdditionalArguments("-v0 -solidf -cmode 5");
         setFileType(FileType::ONE_FILE);
         //restartFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
         std::cout << "loaded " << particleHandler.getNumberOfObjects() <<
@@ -81,18 +81,9 @@ int main(int argc, char *argv[])
 {
     Mdouble shearVelocity = 1.0/40.0; //divide by 20 to get max inertial number
     CSCRun SC(shearVelocity);
-    if (false) {
-        //set to true to test the restarting
-        SC.setSaveCount(2);
-        SC.setMaxWallTime(10);
-        SC.setClusterCommand("");
-        SC.setTimeMax(1);
-    } else {
-        SC.setSaveCount(100);
-        SC.setMaxWallTime(20*3600);//*3600);//kill after 20 hours
-        SC.setClusterCommand("~/bin/sclusterscriptexecute");
-        SC.setTimeMax(4000.0);
-    }
+    SC.setSaveCount(100);
+    SC.setMaxWallTime(20*3600); //kill after 20 hours
+    SC.setTimeMax(4000.0);
     SC.solve(argc, argv);
     return 0;
 }

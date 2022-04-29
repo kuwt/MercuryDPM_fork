@@ -83,6 +83,7 @@ public:
 
         //set walls
         InfiniteWall w;
+        w.setSpecies(species)
         w.set(Vec3D(1,0,0), getMax());
         wallHandler.copyAndAddObject(w);
         w.set(Vec3D(-1,0,0), getMin());
@@ -138,7 +139,7 @@ public:
             position.Y = random.getRandomNumber(getYMin()+p.getRadius(), 
                                                 getYMax()-p.getRadius());
             position.Z = random.getRandomNumber(getZMin()+p.getRadius(), 
-                                                a*getZMax()-p.getRadius());
+                                                std::max(getZMin()+p.getRadius(),a*getZMax()-p.getRadius()));
             p.setPosition(position);
             if (checkParticleForInteraction(p)) {
                 //std::cout << i << std::endl;
