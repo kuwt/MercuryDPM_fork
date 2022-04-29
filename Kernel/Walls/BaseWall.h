@@ -175,6 +175,49 @@ public:
     BaseInteraction*
     getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHandler* interactionHandler) override;
     
+    /**
+     * \brief No implementation but can be overidden in its derived classes.
+     * \details This function is called by DPMBase::solve, if the simulation is
+     * restarted.     
+     */
+    virtual void actionsOnRestart() {}
+    
+    /**
+     * \brief No implementation but can be overidden in its derived classes.
+     * \details This function is called by WallHandler::actionsAfterParticleGhostUpdate,
+     * which is called by DPMBase::computeOneTimeStep directly after the ghost 
+     * particle update. It may be used to adjust wall properties based on the 
+     * changed wall positions (for an example, look e.g. at MeshTriangle).
+     */
+    virtual void actionsAfterParticleGhostUpdate() {}
+    
+    /**
+     * \brief Handles the addition of particles to the particleHandler
+     * \details This function is called by DPMBase::handleParticleAddition, whenever
+     * a particle is added to the particleHandler. It may be used to update 
+     * stored pointers to particles
+     *  \param[in] id The id of the removed particle.
+     *  \param[in] p A pointer to the particle.
+     */
+    virtual void handleParticleAddition(unsigned int id, BaseParticle* p) {}
+    
+    /*!
+     * \brief Handles the addition of particles to the particleHandler
+     * \details This function is called by DPMBase::handleParticleRemoval 
+     * whenever a (ghost-)particle is removed from the particleHandler. It may be
+     * used to update stored pointers to particles
+     * \param[in] id The id of the removed particle.
+     */
+    virtual void handleParticleRemoval(unsigned int id) {}
+    
+    /*!
+     * \brief Check if all interactions are valid 
+     * \details This function is called by DPMBase::computeAllForces. It may be
+     * used by a wall to check and modify interactions previously created during
+     * contact detection.
+     */
+    virtual void checkInteractions(InteractionHandler* interactionHandler, unsigned int timeStamp) {}
+    
     bool getVTKVisibility() const;
     
     void setVTKVisibility(bool vtkVisibility);

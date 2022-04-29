@@ -92,7 +92,11 @@ public:
      */
 
     unsigned readTriangleWall(std::string filename, ParticleSpecies* species, Mdouble scaleFactor = 1, Vec3D centerOfRotation = {0,0,0}, Vec3D velocity = {0,0,0}, Vec3D angularVelocity = {0,0,0});
-
+    
+    /**
+     * \brief Calls the method actionsAfterParticleGhostUpdate of every wall in the handler.
+     */
+    void actionsAfterParticleGhostUpdate();
 private:
 
     /*!
@@ -108,4 +112,3 @@ private:
 };
 
 #endif
-

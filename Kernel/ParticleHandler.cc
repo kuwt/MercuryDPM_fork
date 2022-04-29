@@ -200,6 +200,9 @@ void ParticleHandler::addObject(BaseParticle* P)
             getDPMBase()->hGridInsertParticle(P);
             //This computes where the particle currently is in the grid
             getDPMBase()->hGridUpdateParticle(P);
+            
+            // Broadcasts the existance of a new particle
+            getDPMBase()->handleParticleAddition(P->getId(), P);
         }
         //set the particleHandler pointer
         P->setHandler(this);
@@ -359,6 +362,9 @@ void ParticleHandler::addGhostObject(BaseParticle* P)
         getDPMBase()->hGridInsertParticle(P);
         //This computes where the particle currently is in the grid
         getDPMBase()->hGridUpdateParticle(P);
+        
+        // broadcast particle addition
+        getDPMBase()->handleParticleAddition(P->getId(), P);
     }
     //set the particleHandler pointer
     P->setHandler(this);
@@ -394,6 +400,8 @@ void ParticleHandler::removeObject(const unsigned int index)
     getDPMBase()->getPossibleContactList().remove_ParticlePosibleContacts(getObject(id));
 #endif
     getDPMBase()->hGridRemoveParticle(getObject(index));
+    // broadcast the particle removal
+    getDPMBase()->handleParticleRemoval(getObject(index)->getId());
     BaseHandler<BaseParticle>::removeObject(index);
 }
 
@@ -414,6 +422,8 @@ void ParticleHandler::removeGhostObject(const unsigned int index)
     getDPMBase()->getPossibleContactList().remove_ParticlePosibleContacts(getObject(id));
 #endif
     getDPMBase()->hGridRemoveParticle(getObject(index));
+    // broadcast the particle removal
+    getDPMBase()->handleParticleRemoval(getObject(index)->getId());
     BaseHandler<BaseParticle>::removeObject(index);
 #else
     logger(ERROR, "This function should only be used interally for mpi routines");
