@@ -46,6 +46,7 @@ file(GLOB Mercury_SRC
         Strings/*.cc
         VTKWriter/*.cc
         Walls/*.cc
+        Walls/*/*.cc
         Interactions/*.cc
         Interactions/*/*.cc
         Species/*.cc

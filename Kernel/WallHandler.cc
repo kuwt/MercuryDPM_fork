@@ -27,6 +27,7 @@
 #include <Math/Helpers.h>
 #include <Walls/BasicIntersectionOfWalls.h>
 #include <Walls/TriangleWall.h>
+#include <Walls/MeshTriangle.h>
 #include <Walls/BasicUnionOfWalls.h>
 #include <Walls/ScrewsymmetricIntersectionOfWalls.h>
 #include "WallHandler.h"
@@ -164,6 +165,10 @@ BaseWall* WallHandler::createObject(const std::string& type)
     else if (type == "TriangleWall")
     {
         return new TriangleWall;
+    }
+    else if (type == "MeshTriangle")
+    {
+        return new MeshTriangle;
     }
     else if (type == "VChute")
     {
@@ -464,4 +469,18 @@ unsigned WallHandler::readTriangleWall(std::string filename, ParticleSpecies* sp
     }
 
     return groupId;
+}
+
+/**
+ * \details This function is called by DPMBase::computeOneTimeStep directly after
+ * the ghost particle update. It may be used to adjust wall properties based on 
+ * the changed wall positions (for an example, look e.g. at MeshTriangle).
+ */
+void WallHandler::actionsAfterParticleGhostUpdate()
+{   
+    // #pragma omp parallel for //schedule(dynamic)
+    for (auto w: *this)
+    {
+        w->actionsAfterParticleGhostUpdate();
+    }
 }

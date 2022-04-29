@@ -960,6 +960,16 @@ public:
 
     /// \brief Calculate the total stress tensor in the system averaged over the whole volume.
     Matrix3D getTotalStress() const;
+    
+    /*!
+     * \brief Handles the removal of particles from the particleHandler
+     */
+    virtual void handleParticleRemoval(unsigned int id);
+    
+    /*!
+     * \briefHandles the addition of particles to the particleHandler
+     */
+    virtual void handleParticleAddition(unsigned int id, BaseParticle* p);
 
     //functions that should only be used in the class definitions
 protected:
@@ -1022,6 +1032,16 @@ protected:
      */
     virtual void actionsBeforeTimeStep();
 
+    /*!
+     * \brief A virtual function which allows to define operations to be executed
+     *       prior to the OMP force collect.
+     * \details no implementation but can be overidden in its derived classes.
+     * This function is called by DPMBase::computeAllForces. It may be used to add 
+     * additional user defined forces to any MercuryObject. Within this function,
+     * OMP parallelization may be used, as it is called prior to sumForceTorqueOMP.
+     */
+    virtual void computeAdditionalForces() {}
+    
     /*!
      * \brief A virtual function which allows to define operations to be executed after
      *       the solve().

@@ -3328,6 +3328,15 @@ void DPMBase::computeAllForces()
     }
 #endif
     
+    // Check wall forces
+    #pragma omp for schedule(dynamic)
+    for (int k = 0; k < wallHandler.getNumberOfObjects(); k++) {
+        BaseWall *w = wallHandler.getObject(k);
+        w->checkInteractions(&interactionHandler, getNumberOfTimeSteps() + 1);
+    }
+    
+    computeAdditionalForces();
+    
     // for omp simulations, sum up all forces and add all newObjects_ (needed since both are using reduction)
     #ifdef MERCURY_USE_OMP
     if (getNumberOfOMPThreads()>1) {
@@ -3998,6 +4007,13 @@ void DPMBase::solve()
     else
     {
         // If the simulation is "restarted" (i.e. not restarted):
+        
+        // - run wall-defined actionsOnRestart
+        for (auto w: wallHandler)
+        {
+            w->actionsOnRestart();
+        }
+        
         // - run user-defined actionsOnRestart
         actionsOnRestart();
     }
@@ -4104,7 +4120,9 @@ void DPMBase::computeOneTimeStep()
     //New positions require the MPI and parallel periodic boundaries to do things
     logger(DEBUG, "about to call performGhostParticleUpdate()");
     performGhostParticleUpdate();
-
+    // Some walls need to be aware of the new positions
+    wallHandler.actionsAfterParticleGhostUpdate();
+    
     /// \todo MX: this is not true anymore. all boundaries are handled here.
     /// particles have received a position update, so here the deletion boundary deletes particles
     ///\TODO add particles need a periodic check
@@ -5196,6 +5214,35 @@ void DPMBase::setLogarithmicSaveCount(const Mdouble logarithmicSaveCountBase)
     restartFile.setlogarithmicSaveCount(logarithmicSaveCountBase);
     statFile.setlogarithmicSaveCount(logarithmicSaveCountBase);
     eneFile.setlogarithmicSaveCount(logarithmicSaveCountBase);
+}
+
+/*!
+ * \details This function is called by ParticleHandler::removeObject and 
+ * ParticleHandler::removeGhostObject to broadcast the removal of a particle
+ * from the handler. It passes the information on to the walls in the wallHandler.
+ *  \param[in] id The id of the removed particle.
+ */
+void DPMBase::handleParticleRemoval(unsigned int id)
+{
+    for (auto w: wallHandler)
+    {
+        w->handleParticleRemoval(id);
+    }
+}
+
+/*!
+ * \details This function is called by ParticleHandler::addObject and 
+ * ParticleHandler::addGhostObject to broadcast the addition of a particle
+ * from the handler. It passes the information on to the walls in the wallHandler.
+ *  \param[in] id The id of the removed particle.
+ *  \param[in] p A pointer to the particle.
+ */
+void DPMBase::handleParticleAddition(unsigned int id, BaseParticle* p)
+{
+    for (auto w: wallHandler)
+    {
+        w->handleParticleAddition(id, p);
+    }
 }
 
 ///\todo When restarting the indexMax should be reset
