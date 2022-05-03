@@ -83,7 +83,7 @@ public:
 
         //set walls
         InfiniteWall w;
-        w.setSpecies(species)
+        w.setSpecies(species);
         w.set(Vec3D(1,0,0), getMax());
         wallHandler.copyAndAddObject(w);
         w.set(Vec3D(-1,0,0), getMin());
