@@ -30,6 +30,7 @@
 #include <time.h>
 #include <string.h>
 #include <sstream>
+#include <chrono>
 #include "GeneralDefine.h"
 
 /*!
@@ -54,6 +55,7 @@ public:
     void tic()
     {
         start = clock(); //clock tics
+        wallClockStart = std::chrono::high_resolution_clock::now();
     }
     
     /*!
@@ -64,9 +66,26 @@ public:
     Mdouble toc()
     {
         finish = clock();
+        wallClockFinish = std::chrono::high_resolution_clock::now();
+        return getWallTime();
+    }
+    
+    /*!
+     * Returns the time elapsed (in seconds) between tic and toc.
+     */
+    Mdouble getCPUTime()
+    {
         return (Mdouble(finish) - Mdouble(start)) / CLOCKS_PER_SEC;
     }
     
+    /*!
+     * Returns the time elapsed (in seconds) between tic and toc.
+     */
+    Mdouble getWallTime()
+    {
+        return std::chrono::duration<double>(wallClockFinish-wallClockStart).count();
+    }
+
     /*!
      * \brief Outputs the toc value and resets the start time
      */
@@ -82,11 +101,13 @@ private:
      * \brief Stores the number of clock ticks, called by Time::tic().
      */
     clock_t start;
+    std::chrono::time_point<std::chrono::high_resolution_clock> wallClockStart;
     
     /*!
      * \brief Stores the number of clock ticks, called by Time::toc().
      */
     clock_t finish;
+    std::chrono::time_point<std::chrono::high_resolution_clock> wallClockFinish;
 };
 
 /*!
