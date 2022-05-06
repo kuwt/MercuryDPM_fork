@@ -81,7 +81,7 @@ public:
         Mdouble gasConstant /*R_g*/ = 8.314459848;
         Mdouble thicknessDiffusionVacancy /*DB*/ =
                 thicknessDiffusion_ * exp(-activationEnergy_ / gasConstant / temperature_);
-        std::cout << thicknessDiffusionVacancy << "|" << thicknessDiffusion_ << std::endl;
+        logger(INFO, "%|%", thicknessDiffusionVacancy, thicknessDiffusion_);
         Mdouble diffusionParameter /*DeltaB*/ =
                 atomicVolume_ / boltzmannConstant / temperature_ * thicknessDiffusionVacancy;
         viscosityCoefficient_ = constants::pi / (2.0 * beta * diffusionParameter);

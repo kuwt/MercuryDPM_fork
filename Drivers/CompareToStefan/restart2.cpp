@@ -33,23 +33,26 @@ public:
 		
 	void setupInitialConditions()
 	{
-		if (readDataFile("c3d.ini",7) || readDataFile("../c3d.ini",7)) {
-			//~ for (vector<CParticle>::iterator it = Particles.begin(); it!=Particles.end(); ++it) {
-				//~ it->Position.Y =  it->Position.Z;
-				//~ it->Position.Z = 0.0;
-				//~ it->Velocity.Y =  it->Velocity.Z;
-				//~ it->Velocity.Z = 0.0;
-			//~ }
-			//setStiffnessAndRestitutionCoefficient(1e6, .9, Particles[0].get_mass());
-		        write(std::cout,true);
-                auto species = dynamic_cast<LinearViscoelasticFrictionSpecies*>(speciesHandler.getObject(0));
-                std::cout << "Mass: " << particleHandler.getObject(0)->getMass() << std::endl;
-		        std::cout << "Collision time: " << species->getCollisionTime(particleHandler.getObject(0)->getMass()) << std::endl;
-		        std::cout << "Restitution coefficient: " << species->getRestitutionCoefficient(particleHandler.getObject(0)->getMass()) << std::endl;
-		} else {
-		  std::cerr << "Input data not found exiting " << std::endl;
-			exit(-1);
-		}
+		if (readDataFile("c3d.ini", 7) || readDataFile("../c3d.ini", 7))
+        {
+            //~ for (vector<CParticle>::iterator it = Particles.begin(); it!=Particles.end(); ++it) {
+            //~ it->Position.Y =  it->Position.Z;
+            //~ it->Position.Z = 0.0;
+            //~ it->Velocity.Y =  it->Velocity.Z;
+            //~ it->Velocity.Z = 0.0;
+            //~ }
+            //setStiffnessAndRestitutionCoefficient(1e6, .9, Particles[0].get_mass());
+            write(std::cout, true);
+            auto species = dynamic_cast<LinearViscoelasticFrictionSpecies*>(speciesHandler.getObject(0));
+            logger(INFO, "Mass: %\n Collision time: %\n Restitution coefficient: %",
+                   particleHandler.getObject(0)->getMass(),
+                   species->getCollisionTime(particleHandler.getObject(0)->getMass()),
+                   species->getRestitutionCoefficient(particleHandler.getObject(0)->getMass()));
+        }
+        else
+        {
+            logger(ERROR, "Input data not found exiting");
+        }
 	}
 
 };

@@ -130,9 +130,8 @@ void ParticleHandler::addExistingObject(BaseParticle* P)
 {
     if (P->getSpecies() == nullptr)
     {
-        logger(WARN, "WARNING: The particle with ID % that is added in "
-                     "ParticleHandler::addObject does not have a species yet."
-                     "Please make sure that you have "
+        logger(WARN, "WARNING: The particle with ID % that is added in ParticleHandler::addObject does not have a "
+                     "species yet. Please make sure that you have "
                      "set the species somewhere in the driver code.", P->getId());
     }
     
@@ -172,7 +171,7 @@ void ParticleHandler::addObject(BaseParticle* P)
     if (P->getSpecies() == nullptr)
     {
         logger(WARN, "WARNING: The particle with ID % that is added in "
-                     "ParticleHandler::addObject does not have a species yet."
+                     "ParticleHandler::addObject does not have a species yet. "
                      "Please make sure that you have "
                      "set the species somewhere in the driver code.", P->getId());
     }
@@ -349,7 +348,7 @@ void ParticleHandler::addGhostObject(BaseParticle* P)
         logger(WARN, "[ParticleHandler::adGhostObject(BaseParticle*)] "
                 "WARNING: The particle with ID % that is added in "
                 "ParticleHandler::addObject does not have a species yet."
-                "Please make sure that you have "
+                " Please make sure that you have "
                 "set the species somewhere in the driver code.", P->getId());
     }
 
@@ -506,7 +505,8 @@ BaseParticle* ParticleHandler::getSmallestParticleLocal() const
 BaseParticle* ParticleHandler::getSmallestParticle() const
 {
 #ifdef MERCURY_USE_MPI
-    logger(ERROR,"getSmallestParticle should not be used in parallel; use getSmallestInteractionRadius or ParticleSpecies::getSmallestParticleMass instead");
+    logger(WARN,"getSmallestParticle should not be used in parallel; use getSmallestInteractionRadius or "
+             "ParticleSpecies::getSmallestParticleMass instead");
     return nullptr;
 #else
     return getSmallestParticleLocal();
@@ -528,7 +528,7 @@ BaseParticle* ParticleHandler::getLargestParticleLocal() const
 BaseParticle* ParticleHandler::getLargestParticle() const
 {
 #ifdef MERCURY_USE_MPIO
-    logger(ERROR,"getLargestParticle() should not be used in parallel; use getLargestInteractionRadius instead");
+    logger(WARN,"getLargestParticle() should not be used in parallel; use getLargestInteractionRadius instead");
     return nullptr;
 #else
     return getLargestParticleLocal();
@@ -1034,7 +1034,7 @@ BaseParticle* ParticleHandler::createObject(const std::string& type)
     }
     else
     {
-        logger(ERROR, "Particle type % not understood in restart file. Particle will not be read.", type);
+        logger(WARN, "Particle type % not understood in restart file. Particle will not be read.", type);
         return nullptr;
     }
 }

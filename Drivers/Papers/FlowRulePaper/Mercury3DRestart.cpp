@@ -53,8 +53,7 @@ class Mercury3DRestarter : public Mercury3DRestart
     		actionsAfterSolve();
     		finishStatistics();
     		closeFiles();
-            std::cout << "Exiting for restarting after "
-                << getWallTime() - getInitialWallTime() << "s" << std::endl;
+            logger(INFO, "Exiting for restarting after %s", getWallTime() - getInitialWallTime());
             
             //set the restart command
             std::stringstream com("");
@@ -62,19 +61,19 @@ class Mercury3DRestarter : public Mercury3DRestart
             com << getClusterCommand() << " ./Mercury3DRestart -r " << restartFile.getFullName();
             
             //std::cout << com << std::endl;        
-            std::cout << "system output:" << system(com.str().c_str()) << std::endl;        
-	        exit(0);
+            logger(INFO, "system output:%", system(com.str().c_str()));
     	}
     }
 };
 
 int main(int argc, char *argv[])
 {
-	if (argc<2) {
-		cout << "Please enter the name of the simulation you want to restart and, optionally, the name of the simulation after restart" << endl;
-		exit(-1);
-	}
- 	Mercury3DRestarter problem;
+    if (argc < 2)
+    {
+        logger(ERROR, "Please enter the name of the simulation you want to restart and, optionally, the name of the "
+                      "simulation after restart");
+    }
+    Mercury3DRestarter problem;
     problem.setSaveCount(2);
     problem.setMaxWallTime(10);
     problem.setClusterCommand("");

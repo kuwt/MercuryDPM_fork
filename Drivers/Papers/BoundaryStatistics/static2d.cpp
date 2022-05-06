@@ -36,20 +36,22 @@ public:
 	void set_particle_properties() {
 		auto species = speciesHandler.copyAndAddObject(LinearViscoelasticSlidingFrictionSpecies());
 		//define species
-		species->setDensity(6./constants::pi);
-		setGravity(Vec3D(0,0,-1));
-		setInflowParticleRadius(0.5);
-		setFixedParticleRadius(0.5);
-		//double mass = 4. / 3. * constants::pi * pow(getInflowParticleRadius(), 3.0) * S->getDensity();
-		species->setCollisionTimeAndRestitutionCoefficient(0.005,0.88, species->getMassFromRadius(getInflowParticleRadius()));
-		//~ setCollisionTimeAndRestitutionCoefficient(0.005,1);
-		species->setSlidingStiffness(2.0/7.0* species->getStiffness());
-		species->setSlidingDissipation(species->getDissipation());
-		species->setSlidingFrictionCoefficient(0.5);
-		setTimeStep(0.02 * species->getCollisionTime(species->getMassFromRadius(0.5 * (getMinInflowParticleRadius() + getMaxInflowParticleRadius()))));
-		std::cout << getTimeStep() << std::endl;
-		//fix_hgrid();
-	}
+        species->setDensity(6. / constants::pi);
+        setGravity(Vec3D(0, 0, -1));
+        setInflowParticleRadius(0.5);
+        setFixedParticleRadius(0.5);
+        //double mass = 4. / 3. * constants::pi * pow(getInflowParticleRadius(), 3.0) * S->getDensity();
+        species->setCollisionTimeAndRestitutionCoefficient(0.005, 0.88,
+                                                           species->getMassFromRadius(getInflowParticleRadius()));
+        //~ setCollisionTimeAndRestitutionCoefficient(0.005,1);
+        species->setSlidingStiffness(2.0 / 7.0 * species->getStiffness());
+        species->setSlidingDissipation(species->getDissipation());
+        species->setSlidingFrictionCoefficient(0.5);
+        setTimeStep(0.02 * species->getCollisionTime(
+                species->getMassFromRadius(0.5 * (getMinInflowParticleRadius() + getMaxInflowParticleRadius()))));
+        logger(INFO, "%", getTimeStep());
+        //fix_hgrid();
+    }
 	
 	void actionsBeforeTimeStep(){};
 	

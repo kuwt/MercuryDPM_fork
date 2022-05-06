@@ -101,8 +101,7 @@ void LocalExpansion::addLocalExpansionCoefficients(NumericalVector<std::complex<
 {
     if (localExpansionCoefficients.size() > localExpansionCoefficients_.size())
     {
-        std::cout << "Multipole expansion coefficient sizes are not correct." << std::endl;
-        std::exit(-1);
+        logger(ERROR, "Multipole expansion coefficient sizes are not correct.");
     }
     
     localExpansionCoefficients_ += localExpansionCoefficients;

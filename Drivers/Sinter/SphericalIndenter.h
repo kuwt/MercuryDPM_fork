@@ -40,36 +40,32 @@ public:
     : indenterDiameter_(indenterDiameter), indentationVelocity_(indentationVelocity),
     indentationForce_(indentationForce)
     {
-        std::cout << "Creating indenter with"
-            << " diameter " << indenterDiameter_
-            << " force " << indentationForce_
-            << " velocity " << indentationVelocity_
-            << std::endl;
-        logger.assert_always(indenterDiameter_ >= 0.0,"");
-        logger.assert_always(indentationVelocity_ >= 0.0,"");
-        logger.assert_always(indentationForce_ >= 0.0,"");
+        logger(INFO, "Creating indenter with"
+                     " diameter %"
+                     " force %"
+                     " velocity %", indenterDiameter_, indentationForce_, indentationVelocity_);
+        logger.assert_always(indenterDiameter_ >= 0.0, "");
+        logger.assert_always(indentationVelocity_ >= 0.0, "");
+        logger.assert_always(indentationForce_ >= 0.0, "");
     }
 
     /** first create particles and species before calling this */
     void setupInitialConditions() override
     {
-        std::cout << "Setting up indenter\n";
-        
+        logger(VERBOSE, "Setting up indenter\n");
+    
         indenter_.setHandler(&particleHandler);
         indenter_.setRadius(0.5 * indenterDiameter_);
         indenter_.setSpecies(speciesHandler.getLastObject());
         indenter_.fixParticle();
         indenter_.setIndex(particleHandler.getNumberOfObjects());
         indenter_.setId(particleHandler.getNumberOfObjects());
-        setIndenterVelocity(-10.0*indentationVelocity_);
-        logger(INFO,"Indentation Velocity %",getIndenterVelocity());
-
+        setIndenterVelocity(-10.0 * indentationVelocity_);
+        logger(INFO, "Indentation Velocity %", getIndenterVelocity());
+    
         setIndenterHeight(getBedHeight());
-        
-        std::cout << indenter_ << "\n";
-        std::cout << "H" << getIndenterHeight() << "\n";
-        std::cout << "H" << indenter_.getIndex() << "\n";
-        std::cout << "H" << indenter_.getId() << "\n";
+    
+        logger(INFO, "%\nH%\nH%\nH%", indenter_, getIndenterHeight(), indenter_.getIndex(), indenter_.getId());
     }
 
     Mdouble getIndentationForce() const
@@ -138,26 +134,27 @@ public:
             << indenter_.getVelocity() << " "
             << indenter_.getRadius() << "  0 0 0 0 0 0 0\n";
     }
-
-    void actionsBeforeTimeLoop() override 
+    
+    void actionsBeforeTimeLoop() override
     {
-        std::cout << std::setw(11) << "time"
-            << "\t" << std::setw(11)<< "displacement"
-            << "\t" << std::setw(8) << "relForce"
-            << "\t" << std::setw(9) << "direction"
-            << "\t" << std::setw(11) << "eneRatio"
-            << std::endl;
+        logger(INFO, "time\t"
+                     "displacement\t"
+                     "relForce\t"
+                     "direction\t"
+                     "eneRatio");
     }
+    
     /** creates custom console output */
     void printTime() const override
     {
         //writeEneTimeStep(std::cout);
-        std::cout << std::setw(11) << getTime()
-            << "\t" << std::setw(11)<< getIndenterHeight()
-            << "\t" << std::setw(11) << getForceOnIndenter() / indentationForce_
-            << "\t" << std::setw(9) << (getIndenterVelocity()<0?"down":(getIndenterVelocity()==0?"stop":"up"))
-            << "\t" << std::setw(11) << getKineticEnergy()/getElasticEnergy()
-            << std::endl;
+        logger(INFO, "%.11\t"
+                     "%.11\t"
+                     "%.11\t"
+                     "%.9\t"
+                     "%.11", getTime(), getIndenterHeight(), getForceOnIndenter() / indentationForce_,
+               (getIndenterVelocity() < 0 ? "down" : (getIndenterVelocity() == 0 ? "stop" : "up")),
+               getKineticEnergy() / getElasticEnergy());
     }
 
     /** creates custom ene header */
@@ -192,20 +189,20 @@ public:
             if (getForceOnIndenter() > 0 && getIndenterVelocity()!=-indentationVelocity_)
             {
                 setIndenterVelocity(-indentationVelocity_);
-                logger(INFO,"Lowering indentation velocity %",getIndenterVelocity());
+                logger(INFO, "Lowering indentation velocity %", getIndenterVelocity());
             }
             if (getForceOnIndenter() >= indentationForce_)
             {
                 setIndenterVelocity(0);
-                timeToRetract = 1.1*getTime();
-                std::cout << "stopping indenter" << std::endl;
+                timeToRetract = 1.1 * getTime();
+                logger(INFO, "stopping indenter");
             }
         }
         else if (getIndenterVelocity() == 0) 
         { //stopping
             if (getTime()>timeToRetract) {
                 setIndenterVelocity(indentationVelocity_);
-                std::cout << "retracting indenter" << std::endl;
+                logger(INFO, "retracting indenter");
                 measuredIndentationForce = getForceOnIndenter();
                 measuredIndentation = getIndenterHeight();
             }        
@@ -213,17 +210,21 @@ public:
         { //retracting
             if (measuredForceGradient==0 && getForceOnIndenter() < 0.5*measuredIndentationForce)
             {
-                measuredForceGradient = (0.5*measuredIndentationForce)/(getIndenterHeight()-measuredIndentation);
-                std::cout << "measured force gradient = " << measuredForceGradient << std::endl;
-            } else if (getForceOnIndenter() > 0) {
-                //std::cout << "stopping indenter" << std::endl;
-                setTimeMax(getTime()*1.2);
-            } else if (measuredElasticDisplacement==0){
-                measuredElasticDisplacement = getIndenterHeight()-measuredIndentation;
-                std::cout << "measured elastic displacement = " << measuredElasticDisplacement << std::endl;
-                std::cout << "measured Elasticity = " << 0.5*measuredForceGradient/sqrt(0.5*indenterDiameter_*measuredElasticDisplacement) << std::endl;
-                setIndenterVelocity(10.0*indentationVelocity_);
-                logger(INFO,"Increasing indentation velocity %",getIndenterVelocity());
+                measuredForceGradient = (0.5 * measuredIndentationForce) / (getIndenterHeight() - measuredIndentation);
+                logger(INFO, "measured force gradient = %", measuredForceGradient);
+            } else if (getForceOnIndenter() > 0)
+            {
+                //logger(INFO, "stopping indenter");
+                setTimeMax(getTime() * 1.2);
+            }
+            else if (measuredElasticDisplacement == 0)
+            {
+                measuredElasticDisplacement = getIndenterHeight() - measuredIndentation;
+                logger(INFO, "measured elastic displacement = %\n"
+                             "measured Elasticity = %", measuredElasticDisplacement, Flusher::NO_FLUSH,
+                       0.5 * measuredForceGradient / sqrt(0.5 * indenterDiameter_ * measuredElasticDisplacement));
+                setIndenterVelocity(10.0 * indentationVelocity_);
+                logger(INFO, "Increasing indentation velocity %", getIndenterVelocity());
             }
         }
     }
@@ -235,7 +236,7 @@ public:
         for (auto p : particleHandler)
             if (!p->isFixed())
                 bedHeight = std::max(bedHeight, p->getPosition().Z + p->getRadius());
-        std::cout << "bed height" << bedHeight << " N=" << particleHandler.getNumberOfObjects() << " \n";
+        logger(INFO, "bed height % N=%", bedHeight, particleHandler.getNumberOfObjects());
         //return 1;
         return bedHeight;
     }

@@ -139,20 +139,21 @@ public:
         Mdouble f = interactionHandler.getObject(0)->getForce().getLength();
         Mdouble r = particleHandler.getMeanRadius();
         Mdouble z = particleHandler.getObject(0)->getPosition().Z;
-
+    
         os << getTime() //time
            << "\t" << -z //displacement
-           << "\t" << sqrt(o/r) //relContactRadius x/d
-           << "\t" << sqrt(mo/r) //relPlasticContactRadius
-           << "\t" << f/(species->getSinterAdhesion()*particleHandler.getLastObject()->getRadius()) //force
+           << "\t" << sqrt(o / r) //relContactRadius x/d
+           << "\t" << sqrt(mo / r) //relPlasticContactRadius
+           << "\t" << f / (species->getSinterAdhesion() * particleHandler.getLastObject()->getRadius()) //force
            << std::endl;
-
-        std::cout << getTime() //time
-           << "\t" << -z //displacement
-         << "\t" << sqrt(o/r) //relContactRadius
-         << "\t" << sqrt(mo/r) //relPlasticContactRadius
-         << "\t" << f/(species->getSinterAdhesion()*particleHandler.getLastObject()->getRadius()) //force
-         << std::endl;
+    
+        logger(INFO, "%" //time
+                     "\t%" //displacement
+                     "\t%" //relContactRadius
+                     "\t%" //relPlasticContactRadius
+                     "\t%", //force
+               getTime(), -z, sqrt(o / r), sqrt(mo / r),
+               f / (species->getSinterAdhesion() * particleHandler.getLastObject()->getRadius()));
     }
 
     void scaleMass(Mdouble scale)

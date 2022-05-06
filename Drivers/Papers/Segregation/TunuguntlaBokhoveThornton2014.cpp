@@ -85,7 +85,7 @@ void setupInitialConditions()
 	      if (helpers::fileExists(dataFile.getName()))
 		{
 			//If it has move on to teh next run immedently
-			cout << "This run has been done " << endl;
+			logger(INFO, "This run has been done ");
 			//launch_new("density-size-segregation",true);
 			exit(0);
 		}
@@ -97,10 +97,10 @@ void setupInitialConditions()
 	
 	//If study 0 is complete quit
 		if (study_num[0] > 0)
-			{
-				cout << "Study is complete " << endl;
-				exit(0);
-			}
+        {
+            logger(VERBOSE, "Study is complete ");
+            exit(0);
+        }
 		else
 
 		//If the study is not complete save the data to disk and move on
@@ -321,32 +321,31 @@ void setupInitialConditions()
 		//inflowParticle_.computeMass();
 	
 		//randomize particle position, zero intial velocity
-		inflowParticle_.setPosition(Vec3D(random.getRandomNumber(getXMin(),getXMax()),
-				      random.getRandomNumber(getYMin(),getYMax()),
-				      random.getRandomNumber(getZMin(),getZMax())));
-				
-		inflowParticle_.setVelocity(Vec3D(0.0,0.0,0.0));
-		
-		
-		//Add the new particle to the list of current particles
-		//d	Particles.push_back (P0); 
-		particleHandler.copyAndAddObject(inflowParticle_);
-
-		cout << "Create a particle " << endl;
-
-		
-		}
-		
-		//Write the info to the screen and save a copy to the disk
-		
-		cout << "Finished creating particles" << endl;
-		
-	
-		
-		write(std::cout,false);
-		writeRestartFile();
-	
-}
+            inflowParticle_.setPosition(Vec3D(random.getRandomNumber(getXMin(), getXMax()),
+                                              random.getRandomNumber(getYMin(), getYMax()),
+                                              random.getRandomNumber(getZMin(), getZMax())));
+            
+            inflowParticle_.setVelocity(Vec3D(0.0, 0.0, 0.0));
+            
+            
+            //Add the new particle to the list of current particles
+            //d	Particles.push_back (P0);
+            particleHandler.copyAndAddObject(inflowParticle_);
+            
+            logger(VERBOSE, "Create a particle ");
+            
+            
+        }
+        
+        //Write the info to the screen and save a copy to the disk
+        
+        logger(VERBOSE, "Finished creating particles");
+        
+        
+        write(std::cout, false);
+        writeRestartFile();
+        
+    }
 
 private:
 double rho_0;
@@ -395,7 +394,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(20*60, problem.getTimeMax(), problem.getTimeStep()));
 	//problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(20*60,getTimeMax(),getTimeStep()));
 	//problem.setSaveCount(1);
-	cout << "dt=" << problem.getTimeStep() << endl;
+    logger(INFO, "dt=%", problem.getTimeStep());
 	
 	problem.autoNumber();
 

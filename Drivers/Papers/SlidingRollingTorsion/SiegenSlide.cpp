@@ -32,27 +32,27 @@ class Slide : public Siegen{
 public:
 
 	Slide(double NormalForce) : Siegen( NormalForce) {
-		// set problem name
-		setName("slide");
-
-		// fixed tangential velocity of the particle
-		TangentialVelocity = 1e-6*10; //m/s
-		
-		// set size of loop
-		double RadiusPrime = particleHandler.getObject(0)->getRadius()/(1+relOverlap);
-		RelLoopSize = 1e-6/RadiusPrime; //wrt Radius
-		LoopTime = (4*RelLoopSize*RadiusPrime)/TangentialVelocity;
-		std::cout << "LoopTime=" << LoopTime << std::endl;
-
-		//time stepping
-		setTimeMax(1.15*LoopTime);
-		setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(4000,getTimeMax(),getTimeStep()));
-		//eneFile.setSaveCount(1000000000);
-		//dataFile.setSaveCount(1000000000);
-		write(std::cout,true);
-		
-		//set wall
-		InfiniteWall w0;
+        // set problem name
+        setName("slide");
+        
+        // fixed tangential velocity of the particle
+        TangentialVelocity = 1e-6 * 10; //m/s
+        
+        // set size of loop
+        double RadiusPrime = particleHandler.getObject(0)->getRadius() / (1 + relOverlap);
+        RelLoopSize = 1e-6 / RadiusPrime; //wrt Radius
+        LoopTime = (4 * RelLoopSize * RadiusPrime) / TangentialVelocity;
+        logger(INFO, "LoopTime=%", LoopTime);
+        
+        //time stepping
+        setTimeMax(1.15 * LoopTime);
+        setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(4000, getTimeMax(), getTimeStep()));
+        //eneFile.setSaveCount(1000000000);
+        //dataFile.setSaveCount(1000000000);
+        write(std::cout, true);
+        
+        //set wall
+        InfiniteWall w0;
 		w0.set(Vec3D(0.0,-1.0,0.0), Vec3D(0,0,0));
 		wallHandler.copyAndAddObject(w0);
 	
@@ -99,7 +99,7 @@ public:
 		//reset spring constants
 		double NOverlap = particleHandler.getObject(0)->getRadius() 
 			*sqrt(mathsFunc::square(1+relOverlap)-1)/Radius;
-		std::cout << "N" << NOverlap << std::endl;
+        logger(INFO, "N %", NOverlap);
 		//~ Mdouble Mass = particleHandler.getObject(0)->getMass();
 		//~ setStiffnessAndRestitutionCoefficient(getStiffness()/NOverlap, 0.88, Mass);
         species->setStiffness(species->getStiffness() / NOverlap);
@@ -125,30 +125,28 @@ public:
 			}
 			PositionX += 2.0*Radius;
 		}
-		std::cout << "N" << particleHandler.getNumberOfObjects() << std::endl;
+        logger(INFO, "N %", particleHandler.getNumberOfObjects());
 	}
 
 };
 
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
-	///Start off my solving the default problem
-	Slide md(100e-6);
-	//md.create_rough_wall(.4e-7);
-	//md.speciesHandler.getObject()[0].setSlidingFrictionCoefficientStatic(.33);
-	md.solve(argc, argv);
-	std::cout << " " << std::setw(12) << md.Angle*180./constants::pi
-		<< " " << std::setw(12) << md.species->getRollingFrictionCoefficient()
-		<< " " << std::setw(12) << md.species->getTorsionFrictionCoefficient()
-		<< " " << std::setw(12) <<-md.wallHandler.getObject(0)->getForce().X/md.wallHandler.getObject(0)->getForce().Y
-		<< " " << std::setw(12) << md.wallHandler.getObject(0)->getForce().Y
-		<< " " << std::setw(12) << md.particleHandler.getObject(0)->getVelocity().X;
-	std::cout << std::endl;
-
-	Slide md2(100e-6);
+    ///Start off my solving the default problem
+    Slide md(100e-6);
+    //md.create_rough_wall(.4e-7);
+    //md.speciesHandler.getObject()[0].setSlidingFrictionCoefficientStatic(.33);
+    md.solve(argc, argv);
+    logger(INFO, " %.12 %.12 %.12 %.12 %.12 %.12",
+           md.Angle * 180. / constants::pi, md.species->getRollingFrictionCoefficient(),
+           md.species->getTorsionFrictionCoefficient(),
+           -md.wallHandler.getObject(0)->getForce().X / md.wallHandler.getObject(0)->getForce().Y,
+           md.wallHandler.getObject(0)->getForce().Y, md.particleHandler.getObject(0)->getVelocity().X);
+    
+    Slide md2(100e-6);
     //species->setForceType(ForceType::HERTZ_MINDLIN_DERESIEWICZ);
     //md2.species.setForceType(ForceType::HERTZ_MINDLIN_DERESIEWICZ);
-	md2.setName("slideHMD");	
-	md2.solve(argc, argv);
-
+    md2.setName("slideHMD");
+    md2.solve(argc, argv);
+    
 }

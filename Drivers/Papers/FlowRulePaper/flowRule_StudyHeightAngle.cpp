@@ -52,29 +52,26 @@ public:
         //    std::cout << "Run " << getName() << " has already been done " << std::endl;
 		//} else 
         {
-			//launch this code
+            //launch this code
             std::stringstream com("");
-			com << "echo started \tstudyNumber \t" 
-				 << studyNumber[0] << " " 
-				 << studyNumber[1] << " " 
-				 << studyNumber[2] << " \tname \t" 
-				 << getName() << " &>>ReportFlowRule";
-			//std::cout << system(com.str().c_str()) << std::endl;
-			std::cout << "started studyNumber " 
-				 << studyNumber[0] << " " 
-				 << studyNumber[1] << " " 
-				 << studyNumber[2] << ", name " 
-				  << getName() << std::endl;
-
-			solve();
-
-			com.str("");
-			com << "echo finished \tstudyNumber \t" 
-				 << studyNumber[0] << " " 
-				 << studyNumber[1] << " " 
-				 << studyNumber[2] << " \tname \t" 
-				 << getName() << " &>>ReportFlowRule";
-			//std::cout << system(com.str().c_str()) << std::endl;
+            com << "echo started \tstudyNumber \t"
+                << studyNumber[0] << " "
+                << studyNumber[1] << " "
+                << studyNumber[2] << " \tname \t"
+                << getName() << " &>>ReportFlowRule";
+            //std::cout << system(com.str().c_str()) << std::endl;
+            logger(INFO, "started studyNumber % % %, name %", studyNumber[0], studyNumber[1], studyNumber[2],
+                   getName());
+    
+            solve();
+    
+            com.str("");
+            com << "echo finished \tstudyNumber \t"
+                << studyNumber[0] << " "
+                << studyNumber[1] << " "
+                << studyNumber[2] << " \tname \t"
+                << getName() << " &>>ReportFlowRule";
+            //std::cout << system(com.str().c_str()) << std::endl;
 		}
 		
 		//~ //launch next code
@@ -108,19 +105,20 @@ int main(int argc, char *argv[])
     } 
     else
     {
-        std::cout << "Not enough input arguments given (./flowRule_StudyHeightAngle $study $height $angle); " << std::endl
-            << "using demo values (equivalent to ./flowRule_StudyHeightAngle 5 10 24 -tmax 0.01)" << std::endl;
-        studyNumber[0]=5;
-        studyNumber[1]=2;
-        studyNumber[2]=24;
+        logger(WARN, "Not enough input arguments given (./flowRule_StudyHeightAngle $study $height $angle); \n"
+                     "using demo values (equivalent to ./flowRule_StudyHeightAngle 5 10 24 -tmax 0.01)");
+        studyNumber[0] = 5;
+        studyNumber[1] = 2;
+        studyNumber[2] = 24;
         problem.setTimeMax(0.01);
         problem.dataFile.setFileType(FileType::ONE_FILE);
-        problem.setChuteLength(5); ///\todo make selftest smaller (currently 8 sec)); also CoilSelfTest (8s), LeesEdwardsSelfTest (13s), MaserSelfTest (14s)
+        problem.setChuteLength(
+                5); ///\todo make selftest smaller (currently 8 sec)); also CoilSelfTest (8s), LeesEdwardsSelfTest (13s), MaserSelfTest (14s)
         problem.setChuteWidth(5);
         //problem.setRoughBottomType(MULTILAYER);
         problem.setRoughBottomType(MONOLAYER_DISORDERED);
         //problem.setTimeMax(10);
-        problem.run(studyNumber,1,argv);
+        problem.run(studyNumber, 1, argv);
         problem.setName("flowRuleSelfTest");
         problem.writeRestartFile();
     }

@@ -131,14 +131,14 @@ void MercuryBase::read(std::istream& is, ReadOptions opt)
 }
 
 /*!
- * \param[in,out] os            The output stream to which this MercuryBase must
- *                              be written.
  * \param[in] writeAllParticles A boolean which indicates whether or not all BaseParticle
  *                              from the ParticleHandler must be written to the 
  *                              ostream. If it is set to true or if there are at 
  *                              most 4 BaseParticle, all BaseParticle are written.
  *                              If it is set to false, only the first two BaseParticle
  *                              are written, followed by ...
+ * \param[in] nToWrite          Number of particles below where a shorter version of the write() function is used.
+ *
  * \details Function that writes this MercuryBase to an output stream, for example
  *          a restart file. First writes the domain information, then the walls,
  *          followed by the boundaries and particles, and finally the HGrid information.

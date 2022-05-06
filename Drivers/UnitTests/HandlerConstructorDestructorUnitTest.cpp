@@ -55,20 +55,21 @@ public:
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
     {
-        std::cout<<"Creating base problem"<<std::endl;
+        logger(VERBOSE, "Creating base problem\n", Flusher::NO_FLUSH);
         my_problem problem;
         problem.setName("ParticleHandlerDestructorTest");
-        std::cout<<"Finished creating base problem"<<std::endl<<std::endl;
-        
-        std::cout<<"Adding a SphericalParticle, InfiniteWall and PeriodicBoundary to the base problem"<<std::endl;
+        logger(VERBOSE, "Finished creating base problem\n\n", Flusher::NO_FLUSH);
+    
+        logger(VERBOSE, "Adding a SphericalParticle, InfiniteWall and PeriodicBoundary to the base problem\n");
         problem.setupInitialConditions();
-        std::cout<<"Finished adding a SphericalParticle, InfiniteWall and PeriodicBoundary to the base problem"<<std::endl<<std::endl;
-        
-        std::cout<<"Copying base problem"<<std::endl;
+        logger(VERBOSE, "Finished adding a SphericalParticle, InfiniteWall and PeriodicBoundary to the base "
+                        "problem\n\n", Flusher::NO_FLUSH);
+    
+        logger(VERBOSE, "Copying base problem\n", Flusher::NO_FLUSH);
         //my_problem problem2(problem);
-        std::cout<<"Finished copying base problem"<<std::endl<<std::endl;
-        
-        std::cout<<"Starting to destruct everything"<<std::endl;
+        logger(VERBOSE, "Finished copying base problem\n\n", Flusher::NO_FLUSH);
+    
+        logger(VERBOSE, "Starting to destruct everything\n", Flusher::NO_FLUSH);
     }
-    std::cout << "Ready" << std::endl;
+    logger(VERBOSE, "Ready");
 }

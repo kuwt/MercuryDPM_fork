@@ -122,7 +122,7 @@ bool VChute::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Vec3
          * contact with a flat plane (z=0).
          * TODO try to make this more realistic
          */
-        std::cerr << "y0 == 0, dangerous" << std::endl;
+        logger(WARN, "y0 == 0, dangerous");
         q = 0;
         distanceSquared = pow(z0, 2);
     }

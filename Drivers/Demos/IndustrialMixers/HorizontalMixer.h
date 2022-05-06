@@ -187,7 +187,7 @@ public:
         p0.setRadius(particleRadius);
         p0.setPosition(p+Vec3D(0,0,particleRadius));
         particleHandler.copyAndAddObject(p0);
-        std::cout << "Inserted single particle " << std::endl;
+        logger(INFO, "Inserted single particle ");
     }
 
     void introduceParticlesAtWall() {
@@ -232,7 +232,7 @@ public:
                         counter++;
                     }
                 }
-        std::cout << "Inserted particles: " << counter << std::endl;
+        logger(INFO, "Inserted particles: %", counter);
     }
 
     void introduceParticlesInDomain(Mdouble polydispersity=1) {
@@ -272,14 +272,13 @@ public:
                         counter++;
                     }
                 }
-        std::cout << "Inserted particles: " << counter << std::endl;
+        logger(INFO, "Inserted particles: %", counter);
     }
 
-    void printTime () const override {
-        std::cout << "t=" << std::setprecision(3) << std::left << std::setw(6) << getTime()
-            << ", tmax=" << std::setprecision(3) << std::left << std::setw(6) << getTimeMax()
-            << ", EneRatio=" << std::setprecision(3) << std::left << std::setw(6) << getKineticEnergy()/getElasticEnergy()
-            << std::endl;
+    void printTime () const override
+    {
+        logger(INFO, "t=%3.6, tmax3.6=, EneRatio=%3.6", getTime(), getTimeMax(),
+               getKineticEnergy() / getElasticEnergy());
     }
 
     void actionsAfterTimeStep () override {

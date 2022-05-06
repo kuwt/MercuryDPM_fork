@@ -102,39 +102,44 @@ private:
 
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
-	std::cout << "First test the gamma function is working" <<std::endl;
-	std::cout << "---------------------------------------- \n" <<std::endl;
-	std::cout << "Gamma(4)   =  " << mathsFunc::gamma(4) << "  : Error " << mathsFunc::gamma(4)-6<<std::endl;
- 	std::cout << "Gamma(3.5) =  " << mathsFunc::gamma(3.5) << "  : Error" << mathsFunc::gamma(3.5)-3.323<<std::endl;
- 	
- 	std::cout << "Second test the chi-squared distribution is working" << std::endl;
- 	std::cout << "---------------------------------------------------" << std::endl;
- 	
- 	std::cout << "\nFirst test chi(1.07,1) = " <<mathsFunc::chi_squared_prob(1.07,1) << "   Error " <<mathsFunc::chi_squared_prob(1.07,1)-0.3 << std::endl;
- 	std::cout << "First test chi(1.07,1) = " <<mathsFunc::chi_squared_prob(6.25,3) << "   Error " <<mathsFunc::chi_squared_prob(6.25,3)-0.1 << std::endl;
- 	std::cout << "First test chi(1.07,1) = " <<mathsFunc::chi_squared_prob(3.07,6) << "   Error " <<mathsFunc::chi_squared_prob(3.07,6)-0.8 << std::endl;
- 	helpers::check(mathsFunc::chi_squared_prob(1.07,1)-0.3,0.0250886,1e-6,"Checking quality of chi-squared test");
-
-	///Start off my solving the default problem
- 	my_problem problem;
- 	
- 	problem.random.setRandomNumberGenerator(RNGType::LINEAR_CONGRUENTIAL_GENERATOR);
- 
- 	std::cout << "\nSecond test the actually random number generate : Linear Congruential Generator" << std::endl;
- 	std::cout << "----------------------------------------------" << std::endl;
-    std::cout << "First with the default parameters, prob numbers are from uniform = ";
-    helpers::check(problem.random.test(),0.467846,1e-6,"Checking test result");
-
- 	problem.random.setLinearCongruentialGeneratorParmeters(65539,0,1024*1024*1024*2-1);
- 	std::cout << "Third test, now with Stefans' the default parameters, prob numbers are from uniform = ";
-    helpers::check(problem.random.test(),0.131117,1e-6,"Checking test result");
-
- 	problem.random.setRandomNumberGenerator(RNGType::LAGGED_FIBONACCI_GENERATOR);
- 	problem.random.setLinearCongruentialGeneratorParmeters(1103515245,12345,1024*1024*1024);
- 	problem.random.setRandomSeed(0);
-
- 	std::cout << "\nForth test the actually random number generate : Lagged Fibonacci Generator" << std::endl;
- 	std::cout << "----------------------------------------------" << std::endl;
-    std::cout << "First with the default parameters, prob numbers are from uniform = ";
-    helpers::check(problem.random.test(),0.617585,1e-6,"Checking test result");
+    logger(INFO, "First test the gamma function is working\n"
+                 "---------------------------------------- \n\n"
+                 "Gamma(4)   =  %  : Error %\n"
+                 "Gamma(3.5) =  %  : Error %",
+           mathsFunc::gamma(4), mathsFunc::gamma(4) - 6, mathsFunc::gamma(3.5),
+           mathsFunc::gamma(3.5) - 3.323);
+    
+    logger(INFO, "Second test the chi-squared distribution is working\n"
+                 "---------------------------------------------------\n\n"
+                 "\nFirst test chi(1.07,1) = %   Error %\n"
+                 "First test chi(1.07,1) = %   Error %\n"
+                 "First test chi(1.07,1) = %   Error %",
+           mathsFunc::chi_squared_prob(1.07, 1), mathsFunc::chi_squared_prob(1.07, 1) - 0.3,
+           mathsFunc::chi_squared_prob(6.25, 3), mathsFunc::chi_squared_prob(6.25, 3) - 0.1,
+           mathsFunc::chi_squared_prob(3.07, 6), mathsFunc::chi_squared_prob(3.07, 6) - 0.8);
+    helpers::check(mathsFunc::chi_squared_prob(1.07, 1) - 0.3, 0.0250886, 1e-6, "Checking quality of chi-squared test");
+    
+    ///Start off my solving the default problem
+    my_problem problem;
+    
+    problem.random.setRandomNumberGenerator(RNGType::LINEAR_CONGRUENTIAL_GENERATOR);
+    
+    logger(INFO, "\nSecond test the actually random number generate : Linear Congruential Generator\n"
+                 "----------------------------------------------\n\n"
+                 "First with the default parameters, prob numbers are from uniform = ", Flusher::NO_FLUSH);
+    helpers::check(problem.random.test(), 0.467846, 1e-6, "Checking test result");
+    
+    problem.random.setLinearCongruentialGeneratorParmeters(65539, 0, 1024 * 1024 * 1024 * 2 - 1);
+    logger(INFO, "Third test, now with Stefans' the default parameters, prob numbers are from uniform = ",
+           Flusher::NO_FLUSH);
+    helpers::check(problem.random.test(), 0.131117, 1e-6, "Checking test result");
+    
+    problem.random.setRandomNumberGenerator(RNGType::LAGGED_FIBONACCI_GENERATOR);
+    problem.random.setLinearCongruentialGeneratorParmeters(1103515245, 12345, 1024 * 1024 * 1024);
+    problem.random.setRandomSeed(0);
+    
+    logger(INFO, "\nForth test the actually random number generate : Lagged Fibonacci Generator\n"
+                 "----------------------------------------------\n"
+                 "First with the default parameters, prob numbers are from uniform = ", Flusher::NO_FLUSH);
+    helpers::check(problem.random.test(), 0.617585, 1e-6, "Checking test result");
 }

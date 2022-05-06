@@ -34,6 +34,7 @@
 #include <sys/stat.h> 
 #include <cstdio>
 #include <cstdlib>
+#include <Logger.h>
 
 
 class CFile {
@@ -41,48 +42,54 @@ class CFile {
 public:
 
 	///Constructor
-	explicit CFile(std::string name) {
-		//set file names
-		data_filename.str("");
-		data_filename << name << ".data";
-		com_filename.str("");
-		com_filename << name << ".com";
-		
-		//open in-streams
-		data_file.open(data_filename.str().c_str(), std::fstream::in);
-		
-		if (data_file.fail())
-		{
-			std::cerr << "ERROR: Input file " << data_filename.str() << " not found" << std::endl;
-			data_file.close();
-			std::exit(EXIT_FAILURE);
-		} else {
-			std::cout << "Files opened: " << data_filename.str() << std::endl;
-		}
-
-		//open out-stream
-		com_file.open(com_filename.str().c_str(), std::fstream::out);
-		
-		if (com_file.fail())
-		{
-			std::cerr << "ERROR: Output file " << com_filename.str() << " not found" << std::endl;
-			com_file.close();
-			std::exit(EXIT_FAILURE);
-		} else {
-			std::cout << "Files opened: " << com_filename.str() << std::endl;
-		}
-
-		splittingradius=0;
-                splittinginfo=false;
-	}
+	explicit CFile(std::string name)
+    {
+        //set file names
+        data_filename.str("");
+        data_filename << name << ".data";
+        com_filename.str("");
+        com_filename << name << ".com";
+        
+        //open in-streams
+        data_file.open(data_filename.str().c_str(), std::fstream::in);
+        
+        if (data_file.fail())
+        {
+            logger(ERROR, "Input file % not found", data_filename.str());
+            data_file.close();
+            std::exit(EXIT_FAILURE);
+        }
+        else
+        {
+            logger(INFO, "Files opened: %\n", data_filename.str(), Flusher::NO_FLUSH);
+        }
+        
+        //open out-stream
+        com_file.open(com_filename.str().c_str(), std::fstream::out);
+        
+        if (com_file.fail())
+        {
+            logger(ERROR, "ERROR: Output file % not found", com_filename.str());
+            com_file.close();
+            std::exit(EXIT_FAILURE);
+        }
+        else
+        {
+            logger(INFO, "Files opened: %", com_filename.str());
+        }
+        
+        splittingradius = 0;
+        splittinginfo = false;
+    }
 
 	///Destructor
-	~CFile() {
-		data_file.close();
-		std::cout << "Files closed: " << data_filename.str() << std::endl;
-		com_file.close();
-		std::cout << "Files closed: " << com_filename.str() << std::endl;
-	}
+	~CFile()
+    {
+        data_file.close();
+        logger(INFO, "Files closed: %\n", data_filename.str(), Flusher::NO_FLUSH);
+        com_file.close();
+        logger(INFO, "Files closed: %", com_filename.str());
+    }
 		
 	bool copy() {
 		unsigned int N;
@@ -169,11 +176,10 @@ public:
 int main(int argc, char *argv[])
 {
 	if (argc<2) {
-		std::cerr << "Please enter problem name as first argument" << std::endl;
-		return -1;
+        logger(ERROR, "Please enter problem name as first argument");
 	}
 	std::string name(argv[1]);
-	std::cout << "Name: " << name << std::endl;
+    logger(INFO, "Name: %\n", name, Flusher::NO_FLUSH);
 	
 	CFile files(name);
 	
@@ -183,19 +189,23 @@ int main(int argc, char *argv[])
 		if (!strcmp(argv[2],"-info")) {
                         //std::cout << "hello" << std::endl; 
 			if (argc>4) {
-				files.splittinginfo = true;
-				files.info0 = std::atoi(argv[3]);
-				files.info1 = std::atoi(argv[4]);
-			} else {
-				std::cerr << "Please provide two info values" << std::endl;
-			}
-		} else {
-			files.splittingradius = std::atof(argv[2]);
-		}
-	}
-
-	
-	files.copy();
-	std::cout << "finished writing files: " << name << std::endl;
-	return 0;
+                files.splittinginfo = true;
+                files.info0 = std::atoi(argv[3]);
+                files.info1 = std::atoi(argv[4]);
+            }
+            else
+            {
+                logger(ERROR, "Please provide two info values");
+            }
+        }
+        else
+        {
+            files.splittingradius = std::atof(argv[2]);
+        }
+    }
+    
+    
+    files.copy();
+    logger(INFO, "finished writing files: %", name);
+    return 0;
 }

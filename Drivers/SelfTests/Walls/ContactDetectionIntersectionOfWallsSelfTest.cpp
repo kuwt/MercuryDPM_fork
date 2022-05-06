@@ -106,7 +106,7 @@ public:
                 }
             }
         }
-        std::cout << "Inserted particles: " << particleHandler.getNumberOfObjects() << std::endl;
+        logger(INFO, "Inserted particles: %", particleHandler.getNumberOfObjects());
     }
 
     void test()

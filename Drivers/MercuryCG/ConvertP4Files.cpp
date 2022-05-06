@@ -56,20 +56,22 @@ public:
         p4w.open(p4wName.c_str(), std::fstream::in);
 
 		if (p4p.fail() || p4c.fail() || p4w.fail())
-		{
+        {
             if (p4p.fail())
-                std::cerr << "ERROR: Input file " << p4pName << " not found" << std::endl;
+                logger(WARN, "Input file % not found", p4pName);
             if (p4c.fail())
-                std::cerr << "ERROR: Input file " << p4cName << " not found" << std::endl;
+                logger(WARN, "Input file % not found", p4cName);
             if (p4w.fail())
-                std::cerr << "ERROR: Input file " << p4wName << " not found" << std::endl;
-			p4p.close();
+                logger(WARN, "Input file % not found", p4wName);
+            p4p.close();
             p4c.close();
             p4w.close();
-			exit(-1);
-		} else {
-			std::cout << "Files opened: " << p4pName << " and " << p4cName << " and " << p4wName << std::endl;
-		}
+            exit(-1);
+        }
+        else
+        {
+            logger(INFO, "Files opened: % and % and %", p4pName, p4cName, p4wName);
+        }
 	}
 
 	///Destructor
@@ -77,11 +79,11 @@ public:
 		p4p.close();
         p4c.close();
         p4w.close();
-		std::cout << "Files closed: " << name_ << ".p4p/p4w/p4c" << std::endl;
+        logger(INFO, "Files closed: %.p4p/p4w/p4c", name_);
 	}
 		
 	void copy(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax, double timeMin, double timeMax, unsigned int periodic) {
-        std::cout << "copy(..)" << std::endl;
+        logger(INFO, "copy(..)");
         xmin_ = xmin;
         xmax_ = xmax;
         ymin_ = ymin;
@@ -93,7 +95,7 @@ public:
 	}
 
 	void writeP4P(double timeMin, double timeMax) {
-        std::cout << "writeP4P(..)" << std::endl;
+        logger(INFO, "writeP4P(..)");
 
 		unsigned int N;
 		std::string line;
@@ -111,38 +113,38 @@ public:
             p4p >> time >> N;
             getline(p4p,line);
             getline(p4p,line);
-
-            if (time>timeMax)
+    
+            if (time > timeMax)
             {
-                std::cout << "reading p4p (t " << time << " N " << N << "): timeMax reached; terminating" << std::endl;
+                logger(INFO, "reading p4p (t % N %): timeMax reached; terminating", time, N);
                 break;
             }
-            else if (time<timeMin)
+            else if (time < timeMin)
             {
-                std::cout << "reading p4p (t " << time << " N " << N << "): below timeMin; skipped" << std::endl;
-                for (unsigned int i=0; i<N; i++)
-                    getline(p4p,line);
+                logger(INFO, "reading p4p (t % N %): below timeMin; skipped", time, N);
+                for (unsigned int i = 0; i < N; i++)
+                    getline(p4p, line);
                 continue;
             }
-
-            std::cout << "reading p4p (t " << time << " N " << N << " timestep #" << counter << ")" << std::endl;
-
-			//open data/fstat file
+    
+            logger(INFO, "reading p4p (t % N % timestep #%)", time, N, counter);
+    
+            //open data/fstat file
             std::string dataName = getName("data", counter);
-			data.open(dataName.c_str(), std::fstream::out);
+            data.open(dataName.c_str(), std::fstream::out);
             std::string fstatName = getName("fstat", counter);
             fstat.open(fstatName.c_str(), std::fstream::out);
-            std::cout << "Files opened: " << dataName << " and " << fstatName << std::endl;
-
+            logger(INFO, "Files opened: % and %", dataName, fstatName);
+    
             //write data file
-            data<< N << " "
-                << time << " "
-                << xmin_ << " "
-                << ymin_ << " "
-                << zmin_ << " "
-                << xmax_ << " "
-                << ymax_ << " "
-                << zmax_ << std::endl;
+            data << N << " "
+                 << time << " "
+                 << xmin_ << " "
+                 << ymin_ << " "
+                 << zmin_ << " "
+                 << xmax_ << " "
+                 << ymax_ << " "
+                 << zmax_ << std::endl;
 
             position_.resize(N*1.1);
             id_.resize(N*1.1);
@@ -168,31 +170,31 @@ public:
                     >> Angular_Velocity_Y
                     >> Angular_Velocity_Z;
 				data << P.X << " "
-                    << P.Y << " "
-                    << P.Z << " "
-                    << VX << " "
-                    << VY << " "
-                    << VZ << " "
-                    << pow(6.0/constants::pi*VOLUME,1.0/3.0)/2.0 << " "
-                    << 0 << " "
-                    << 0 << " "
-                    << 0 << " "
-                    << Angular_Velocity_X << " "
-                    << Angular_Velocity_Y << " "
-                    << Angular_Velocity_Z << " "
-                    << 0 << std::endl;
-                //std::cout << ID << " ";
-			}
-            std::cout << "written " << dataName << std::endl;
-
+                     << P.Y << " "
+                     << P.Z << " "
+                     << VX << " "
+                     << VY << " "
+                     << VZ << " "
+                     << pow(6.0 / constants::pi * VOLUME, 1.0 / 3.0) / 2.0 << " "
+                     << 0 << " "
+                     << 0 << " "
+                     << 0 << " "
+                     << Angular_Velocity_X << " "
+                     << Angular_Velocity_Y << " "
+                     << Angular_Velocity_Z << " "
+                     << 0 << std::endl;
+                //logger(INFO, ID << " ";
+            }
+            logger(INFO, "written %", dataName);
+    
             writeP4C(fstat, time);
-            std::cout << "written " << fstatName << std::endl;
-
+            logger(INFO, "written %", fstatName);
+    
             //close data file
             data.close();
             fstat.close();
             ++counter;
-
+    
             p4p >> std::ws; //to make sure that p4p.good returns false at end of file
         }
         writeRestart(time, MASS/VOLUME);
@@ -210,27 +212,28 @@ public:
             //read header
             p4c >> dummy >> dummy;
             p4c >> time >> N;
-            getline(p4c,line);
-            getline(p4c,line);
-
-            if (time<timeData*0.999999)
+            getline(p4c, line);
+            getline(p4c, line);
+    
+            if (time < timeData * 0.999999)
             {
-                std::cout << "reading p4c (t " << time << " N " << N << "): below timeMin; skipped" << std::endl;
-                for (unsigned int i=0; i<N; i++)
-                    getline(p4c,line);
+                logger(INFO, "reading p4c (t % N %): below timeMin; skipped", time, N);
+                for (unsigned int i = 0; i < N; i++)
+                    getline(p4c, line);
                 continue;
             }
-
-            std::cout << "reading p4c (t " << time << " N " << N << ")" <<  std::endl;
-
+    
+            logger(INFO, "reading p4c (t % N %", time, N);
+    
             //write fstat file
             fstat << "# " << time << " " << N << std::endl;
             fstat << "# " << std::endl;
             fstat << "# " << std::endl;
             //double P1, P2, CX, CY, CZ, FX, FY, FZ;
             //time, i, j, x, y, z, delta, deltat, fn, ft, nx, ny, nz, tx, ty, tz
-
-            for (unsigned int i=0; i<N; i++) {
+    
+            for (unsigned int i = 0; i < N; i++)
+            {
                 p4c >> P1
                     >> P2
                     >> C1
@@ -328,28 +331,29 @@ public:
             //read header
             p4w >> dummy >> dummy;
             p4w >> time >> N;
-            getline(p4w,line);
-            getline(p4w,line);
-
-            if (time<timeData*0.999999)
+            getline(p4w, line);
+            getline(p4w, line);
+    
+            if (time < timeData * 0.999999)
             {
-                std::cout << "reading p4w (t " << time << " N " << N << "): below timeMin; skipped" << std::endl;
-                for (unsigned int i=0; i<N; i++)
-                    getline(p4w,line);
+                logger(INFO, "reading p4w (t % N %): below timeMin; skipped", time, N);
+                for (unsigned int i = 0; i < N; i++)
+                    getline(p4w, line);
                 continue;
             }
-
-            std::cout << "reading p4w (t " << time << " N " << N << ")" <<  std::endl;
-
-            for (unsigned int i=0; i<N; i++) {
+    
+            logger(INFO, "reading p4w (t % N %)", time, N);
+    
+            for (unsigned int i = 0; i < N; i++)
+            {
                 p4w >> P1
                     >> C
                     >> F;
-                delta=0.0;
-                deltat=0.0;
-                ft=0.0;
+                delta = 0.0;
+                deltat = 0.0;
+                ft = 0.0;
                 t.setZero();
-                fn=F.getLength();
+                fn = F.getLength();
                 n=F/fn;
                 fstat << time << " "
                     << id_[P1-1] << " "
@@ -368,7 +372,7 @@ public:
 
     void writeRestart(double timeData, double density)
     {
-        std::cout << "restart.0000 " << timeData << std::endl;
+        logger(INFO, "restart.0000 ", timeData);
         //open data/fstat file
         std::fstream restart;
         restart.open(name_ + ".restart", std::fstream::out);
@@ -448,20 +452,20 @@ int main(int argc, char *argv[])
     {
         if (argc < 2)
         {
-            std::cout << "no arguments given, so a test file is converted; to convert your own p4 files, use:" << std::endl;
-            std::cout << "convertP4Files.cpp name xmin xmax ymin ymax zmin zmax [timeMin [timeMax [periodic]]]" << std::endl;
-
+            logger(INFO, "no arguments given, so a test file is converted; to convert your own p4 files, use:\n"
+                         "convertP4Files.cpp name xmin xmax ymin ymax zmin zmax [timeMin [timeMax [periodic]]]");
+    
             helpers::writeToFile("test.p4p",
-                "TIMESTEP PARTICLES\n"
-                    "0  2\n"
-                    "ID GROUP VOLUME MASS PX PY PZ VX VY VZ Angular_Velocity_X Angular_Velocity_Y Angular_Velocity_Z\n"
-                    "1 1 0.52359877559 1 0.5 0.5 0.5 1 0 0 0 0 1\n"
-                    "3 1 0.52359877559 1 3.5 0.5 0.5 0 0 0 0 0 0\n"
-                    "TIMESTEP PARTICLES\n"
-                    "2  2\n"
-                    "ID GROUP VOLUME MASS PX PY PZ VX VY VZ Angular_Velocity_X Angular_Velocity_Y Angular_Velocity_Z\n"
-                    "1 1 0.52359877559 1 0.5 0.5 0.5 1 0 0 0 0 1\n"
-                    "3 1 0.52359877559 1 3.5 0.5 0.5 0 0 0 0 0 0\n"
+                                 "TIMESTEP PARTICLES\n"
+                                 "0  2\n"
+                                 "ID GROUP VOLUME MASS PX PY PZ VX VY VZ Angular_Velocity_X Angular_Velocity_Y Angular_Velocity_Z\n"
+                                 "1 1 0.52359877559 1 0.5 0.5 0.5 1 0 0 0 0 1\n"
+                                 "3 1 0.52359877559 1 3.5 0.5 0.5 0 0 0 0 0 0\n"
+                                 "TIMESTEP PARTICLES\n"
+                                 "2  2\n"
+                                 "ID GROUP VOLUME MASS PX PY PZ VX VY VZ Angular_Velocity_X Angular_Velocity_Y Angular_Velocity_Z\n"
+                                 "1 1 0.52359877559 1 0.5 0.5 0.5 1 0 0 0 0 1\n"
+                                 "3 1 0.52359877559 1 3.5 0.5 0.5 0 0 0 0 0 0\n"
             );
 
             helpers::writeToFile("test.p4c",
@@ -493,37 +497,39 @@ int main(int argc, char *argv[])
         }
         else
         {
-            std::cerr << "convertP4Files.cpp problem_name xmin xmax ymin ymax zmin zmax [timeMin [timeMax [periodic]]]" << std::endl;
-            return -1;
+            logger(ERROR, "convertP4Files.cpp problem_name xmin xmax ymin ymax zmin zmax [timeMin [timeMax "
+                          "[periodic]]]");
         }
     }
     else
     {
         std::string name(argv[1]);
-        std::cout << "converting " << name << std::endl;
+        logger(INFO, "converting %", name);
 
         double timeMin = -1;
         if (argc>8) {
             timeMin = atof(argv[8]);
-            std::cout << "timeMin " << timeMin << std::endl;
+            logger(INFO, "timeMin %", timeMin);
         }
 
         double timeMax = 1e20;
         if (argc>9) {
             timeMax = atof(argv[9]);
-            std::cout << "timeMax " << timeMax << std::endl;
+            logger(INFO, "timeMax %", timeMax);
         }
-
+    
         unsigned int periodic = 0;
-        if (argc>10) {
+        if (argc > 10)
+        {
             periodic = static_cast<unsigned int>(atoi(argv[10]));
-            std::cout << "periodic " << periodic << std::endl;
+            logger(INFO, "periodic %", periodic);
         }
-
+    
         CFile files(name);
-        files.copy(atof(argv[2]),atof(argv[3]),atof(argv[4]),atof(argv[5]),atof(argv[6]),atof(argv[7]),timeMin,timeMax,periodic);
-
-        std::cout << "finished converting " << name << std::endl;
+        files.copy(atof(argv[2]), atof(argv[3]), atof(argv[4]), atof(argv[5]), atof(argv[6]), atof(argv[7]), timeMin,
+                   timeMax, periodic);
+    
+        logger(INFO, "finished converting %", name);
     }
 }
 //./ConvertP4Files ~/Documents/Work/Carlos/silo -0.075 0.075 0 0.04 -0.00465405 0.231798 -1 1e20 2

@@ -66,7 +66,7 @@ public:
         std::string fileName = this->dataFile.getName();
         if (studyNum[0] > 0)
         {
-            std::cout << "Study is complete." << std::endl;
+            logger(INFO, "Study is complete.");
             std::exit(0);
         }
         else if (helpers::fileExists(fileName))
@@ -85,8 +85,7 @@ public:
     {
         if (studyNum[0] > 0)
         {
-            std::cout << "Study was already completed, no new simulations ran." << std::endl;
-            std::exit(0);
+            logger(ERROR, "Study was already completed, no new simulations ran.");
         }
         else
         {

@@ -106,47 +106,50 @@ int main()
 	species->setSlidingFrictionCoefficient(0.8);
 	problem.setFixedParticleRadius(0.3e-3);
 	problem.setRoughBottomType(MONOLAYER_DISORDERED);
-	
-	// Chute properties
-	problem.setChuteAngle(25.0);
-	problem.setChuteLength(600.0e-3);
-	problem.setChuteWidth(3e-3);
-	problem.setMaxFailed(6);
-	problem.makeChutePeriodic();
-	double ExitHeight = 12.0e-3, ExitLength = 1.0 * ExitHeight, hopperAngle_ = 60.0, hopperLength_ = 6.0 * ExitLength;
-	Mdouble hopperLowestPoint_ = ExitHeight - ExitLength * tan(problem.getChuteAngle());
-	Mdouble hopperHeight_=hopperLowestPoint_ + 1.1 * 0.5*(hopperLength_+ExitLength) / tan(hopperAngle_*constants::pi/180.0);
-	Mdouble HopperCornerHeight = hopperHeight_ - 0.5*(hopperLength_-ExitLength) / tan(hopperAngle_*constants::pi/180.0);
-	if (HopperCornerHeight<=0.0) 
-	  { 
-	    hopperHeight_ += -HopperCornerHeight + problem.getMaxInflowParticleRadius();
-	    HopperCornerHeight = problem.getMaxInflowParticleRadius();
-	  }
+    
+    // Chute properties
+    problem.setChuteAngle(25.0);
+    problem.setChuteLength(600.0e-3);
+    problem.setChuteWidth(3e-3);
+    problem.setMaxFailed(6);
+    problem.makeChutePeriodic();
+    double ExitHeight = 12.0e-3, ExitLength = 1.0 * ExitHeight, hopperAngle_ = 60.0, hopperLength_ = 6.0 * ExitLength;
+    Mdouble hopperLowestPoint_ = ExitHeight - ExitLength * tan(problem.getChuteAngle());
+    Mdouble hopperHeight_ =
+            hopperLowestPoint_ + 1.1 * 0.5 * (hopperLength_ + ExitLength) / tan(hopperAngle_ * constants::pi / 180.0);
+    Mdouble HopperCornerHeight =
+            hopperHeight_ - 0.5 * (hopperLength_ - ExitLength) / tan(hopperAngle_ * constants::pi / 180.0);
+    if (HopperCornerHeight <= 0.0)
+    {
+        hopperHeight_ += -HopperCornerHeight + problem.getMaxInflowParticleRadius();
+        HopperCornerHeight = problem.getMaxInflowParticleRadius();
+    }
     problem.setHopper(ExitLength, ExitHeight, hopperAngle_, hopperLength_, hopperHeight_);
-	
-	//solve
-	//std::cout << "Maximum allowed speed of particles: " << problem.particleHandler.getSmallestParticle()->calculateMaximumVelocity() << std::endl; // speed allowed before particles move through each other!
+    
+    //solve
+    //std::cout << "Maximum allowed speed of particles: " << problem.particleHandler.getSmallestParticle()->calculateMaximumVelocity() << std::endl; // speed allowed before particles move through each other!
     problem.setTimeStep(0.02 * species->getCollisionTime(mass));
-    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(25, problem.getTimeMax(),problem.getTimeStep()));
-
-    std::cout << "dt=" << problem.getTimeStep() << std::endl;
-	
-	problem.autoNumber();
-	problem.write(std::cout,false);
-	problem.writeRestartFile();
-	
-	//This set to colouring based of size and small vectors
-	problem.setXBallsColourMode(7);
-	problem.setXBallsVectorScale(1);
-	problem.setXBallsScale(20.0);
-	problem.setXBallsAdditionalArguments("-v0 -solidf");
-	
-	
-	problem.solve();
-	problem.write(std::cout);
-	//problem.HGRID_base::write(std::cout);
-	
-	
-	//std::cout << problem << std::endl;
-	problem.writeRestartFile();
+    problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(25, problem.getTimeMax(),
+                                                                                     problem.getTimeStep()));
+    
+    logger(INFO, "dt=%", problem.getTimeStep());
+    
+    problem.autoNumber();
+    problem.write(std::cout, false);
+    problem.writeRestartFile();
+    
+    //This set to colouring based of size and small vectors
+    problem.setXBallsColourMode(7);
+    problem.setXBallsVectorScale(1);
+    problem.setXBallsScale(20.0);
+    problem.setXBallsAdditionalArguments("-v0 -solidf");
+    
+    
+    problem.solve();
+    problem.write(std::cout);
+    //problem.HGRID_base::write(std::cout);
+    
+    
+    //std::cout << problem << std::endl;
+    problem.writeRestartFile();
 }

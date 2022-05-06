@@ -39,20 +39,19 @@ public:
     ClosedCSCRestart (Mdouble pressure)
     {
         initialTime = get_wall_time();
-        maxWallTime = 20*3600; //kill after 20 hours
-         setName("ClosedCSCRun");
-        std::cout << "Reading file " << restartFile.getName() << std::endl;
+        maxWallTime = 20 * 3600; //kill after 20 hours
+        setName("ClosedCSCRun");
+        logger(INFO, "Reading file %\n", restartFile.getName(), Flusher::NO_FLUSH);
         readRestartFile();
         restartFile.getFstream().precision(18);
         setAppend(true);
-
-        std::cout << "loaded " << particleHandler.getNumberOfObjects() << 
-            " fixed particles" << std::endl;
-
+    
+        logger(INFO, "loaded % fixed particles", particleHandler.getNumberOfObjects());
+    
         //calculate required lidForce and lidMass
-        lidForce = pressure*(getXMax()-getXMin())*(getYMax()-getYMin());
-        lidMass = pressure*(getXMax()-getXMin())*(getYMax()-getYMin());
-        lid = static_cast<InfiniteWall*>(wallHandler.getObject(wallHandler.getNumberOfObjects()-1));
+        lidForce = pressure * (getXMax() - getXMin()) * (getYMax() - getYMin());
+        lidMass = pressure * (getXMax() - getXMin()) * (getYMax() - getYMin());
+        lid = static_cast<InfiniteWall*>(wallHandler.getObject(wallHandler.getNumberOfObjects() - 1));
     }
     
     void writeOutputFiles()
@@ -86,17 +85,15 @@ public:
 
     void printTime() const
     {
-        std::cout << "t=" << getTime() 
-            << " Ene " << getKineticEnergy()/getElasticEnergy() 
-            << " lid velocity " << lid->getVelocity().Z 
-            << std::endl;
+        logger(INFO, "t=% Ene=% lid velocity=%",
+               getTime(), getKineticEnergy() / getElasticEnergy(), lid->getVelocity().Z);
     }
     
     void restart() 
     {
         std::stringstream com("");
         com << "/home/weinhartt/bin/sclusterscriptexecute ./ClosedCSCRestart";
-		std::cout << system(com.str().c_str()) << std::endl;	    
+        logger(INFO, "%", system(com.str().c_str()));
     }
 
     Mdouble lidForce;

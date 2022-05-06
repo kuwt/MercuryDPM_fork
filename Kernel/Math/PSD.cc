@@ -74,28 +74,28 @@ void PSD::printPSD() const
     {
         for (const auto p : particleSizeDistribution_)
         {
-            std::cout << p.radius << "m\t" << p.probability * 100 << "\%\n";
+           logger(INFO, "%m\t %\%", p.radius, p.probability * 100);
         }
     }
     else if (particleSizeDistribution_.front().radius > 1e-4)
     {
         for (const auto p : particleSizeDistribution_)
         {
-            std::cout << p.radius * 1000 << "mm\t" << p.probability * 100 << "\%\n";
+            logger(INFO, "%mm\t %\%", p.radius * 1000, p.probability * 100);
         }
     }
     else if (particleSizeDistribution_.front().radius > 1e-7)
     {
         for (const auto p : particleSizeDistribution_)
         {
-            std::cout << p.radius * 1e6 << "um\t" << p.probability * 100 << "\%\n";
+            logger(INFO, "%um\t %\%", p.radius * 1e6, p.probability * 100);
         }
     }
     else
     {
         for (const auto p : particleSizeDistribution_)
         {
-            std::cout << p.radius * 1e9 << "nm\t" << p.probability * 100 << "\%\n";
+            logger(INFO, "%nm\t %\%", p.radius * 1e9, p.probability * 100);
         }
     }
 }
@@ -216,7 +216,7 @@ void PSD::validateCumulativeDistribution()
     // check whether the distribution is cumulative
     for (auto it = particleSizeDistribution_.begin() + 1; it != particleSizeDistribution_.end(); ++it)
     {
-        logger.assert_always(it->probability >= (it - 1)->probability, "psd is not cumulative");
+        logger.assert_always(it->probability >= (it - 1)->probability, "psd is not cumulative", true);
     }
     // cdf needs to start with a probability of zero
     if (particleSizeDistribution_[0].probability != 0)
@@ -292,6 +292,7 @@ void PSD::validateProbabilityDensityDistribution()
  *                                              PROBABILITYDENSITY_AREA_DISTRIBUTION.
  * \deprecated This is the old way of inserting PSDs. In the future use setPSDFromCSV().
  */
+MERCURY_DEPRECATED
 void PSD::setPSDFromVector(std::vector<RadiusAndProbability> psdVector, TYPE PSDType)
 {
     particleSizeDistribution_ = psdVector;

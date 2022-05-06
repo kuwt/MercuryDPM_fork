@@ -134,8 +134,7 @@ void HertzianSinterNormalSpecies::setPlasticParameters(Mdouble loadingModulus, M
     if (loadingModulus <= 0 || unloadingModulusMax <= 1.000001 * (loadingModulus + cohesionModulus) ||
         cohesionModulus < 0 || penetrationDepthMax < 0)
     {
-        std::cerr << "Error: arguments of setPlasticParameters do not make sense" << std::endl;
-        exit(-1);
+        logger(ERROR, "Arguments of setPlasticParameters do not make sense");
     }
     setLoadingModulus(loadingModulus);
     setUnloadingModulusMax(unloadingModulusMax);
@@ -217,7 +216,7 @@ Mdouble HertzianSinterNormalSpecies::computeTimeStep(Mdouble mass)
 //        std::cerr << "Dissipation too high; max. allowed " << sqrt(2.0 * stiffnessMax * mass) << std::endl;
 //        return 0.02 * constants::pi / std::sqrt(2.0*stiffnessMax / mass);
 //    } else {
-    std::cerr << "Warning: Dissipation is not taken into account when computing the time step" << std::endl;
+    logger(WARN, "Warning: Dissipation is not taken into account when computing the time step");
     ParticleSpecies* p = dynamic_cast<ParticleSpecies*>(getBaseSpecies());
     logger.assert_debug(p,"Empty particle handler");
     Mdouble radius = cbrt(mass * 3. / (4. * constants::pi * p->getDensity()));
@@ -236,8 +235,7 @@ void HertzianSinterNormalSpecies::setDissipation(Mdouble dissipation)
     }
     else
     {
-        std::cerr << "Error in setDissipation(" << dissipation << ")" << std::endl;
-        exit(-1);
+        logger(ERROR, "setDissipation(%) argument has to be non-negative", dissipation);
     }
 }
 
@@ -253,8 +251,7 @@ void HertzianSinterNormalSpecies::setSinterRate(Mdouble sinterRate)
     }
     else
     {
-        std::cerr << "Error in setSinterRate(" << sinterRate << ")" << std::endl;
-        exit(-1);
+        logger(ERROR, "setSinterRate(%) argument has to be non-negative", sinterRate);
     }
 }
 

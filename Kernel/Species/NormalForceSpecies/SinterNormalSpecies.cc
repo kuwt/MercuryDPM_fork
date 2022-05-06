@@ -169,8 +169,7 @@ void SinterNormalSpecies::setPlasticParameters(Mdouble loadingStiffness, Mdouble
     if (loadingStiffness <= 0 || unloadingStiffnessMax < loadingStiffness || cohesionStiffness < 0 ||
         penetrationDepthMax < 0)
     {
-        std::cerr << "Error: arguments of setPlasticParameters do not make sense" << std::endl;
-        exit(-1);
+        logger(ERROR, "arguments of setPlasticParameters do not make sense");
     }
     setLoadingStiffness(loadingStiffness);
     setUnloadingStiffnessMax(unloadingStiffnessMax);
@@ -250,8 +249,7 @@ Mdouble SinterNormalSpecies::computeTimeStep(Mdouble mass)
 {
     if (unloadingStiffnessMax_ / (.5 * mass) < mathsFunc::square(dissipation_ / mass))
     {
-        std::cerr << "Dissipation too high; max. allowed " << sqrt(2.0 * unloadingStiffnessMax_ * mass) << std::endl;
-        exit(-1);
+        logger(ERROR, "Dissipation too high; max. allowed %", sqrt(2.0 * unloadingStiffnessMax_ * mass));
     }
     return 0.02 * constants::pi /
            std::sqrt(unloadingStiffnessMax_ / (.5 * mass) - mathsFunc::square(dissipation_ / mass));
@@ -265,8 +263,7 @@ void SinterNormalSpecies::setDissipation(Mdouble dissipation)
 {
     if (dissipation < 0)
     {
-        logger(ERROR, "setDissipation(%)", dissipation);
-        exit(-1);
+        logger(ERROR, "setDissipation(%) argument should be non-negative!", dissipation);
     }
     dissipation_ = dissipation;
 }
@@ -279,8 +276,7 @@ void SinterNormalSpecies::setSinterAdhesion(Mdouble sinterAdhesion)
 {
     if (sinterAdhesion < 0)
     {
-        logger(ERROR, "setSinterAdhesion(%)", sinterAdhesion);
-        exit(-1);
+        logger(ERROR, "setSinterAdhesion(%) argument should be non-negative!", sinterAdhesion);
     }
     sinterAdhesion_ = sinterAdhesion;
 }
@@ -293,7 +289,7 @@ void SinterNormalSpecies::setSinterRate(Mdouble sinterRate)
 {
     if (sinterRate < 0)
     {
-        logger(ERROR, "setSinterRate(%)", sinterRate);
+        logger(ERROR, "setSinterRate(%) argument should be non-negative!", sinterRate);
     }
     sinterRate_ = sinterRate;
 }
@@ -302,7 +298,7 @@ void SinterNormalSpecies::setComplianceZero(Mdouble complianceZero)
 {
     if (complianceZero < 0)
     {
-        logger(ERROR, "complianceZero(%)", complianceZero);
+        logger(ERROR, "complianceZero(%) argument should be non-negative!", complianceZero);
     }
     complianceZero_ = complianceZero;
 }
@@ -311,7 +307,7 @@ void SinterNormalSpecies::setSurfTension(Mdouble surfTension)
 {
     if (surfTension < 0)
     {
-        logger(ERROR, "SurfTension(%)", surfTension);
+        logger(ERROR, "SurfTension(%) argument should be non-negative!", surfTension);
     }
     surfTension_ = surfTension;
 }
@@ -320,7 +316,7 @@ void SinterNormalSpecies::setConstantC1(Mdouble complianceOne)
 {
     if (complianceOne < 0)
     {
-        logger(ERROR, "ComplianceOne(%)", complianceOne);
+        logger(ERROR, "ComplianceOne(%) argument should be non-negative!", complianceOne);
     }
     constantC1_ = complianceOne;
 }
@@ -329,7 +325,7 @@ void SinterNormalSpecies::setSeparationDis(Mdouble separationDis)
 {
     if (separationDis < 0)
     {
-        logger(ERROR, "SeparationDis(%)", separationDis);
+        logger(ERROR, "SeparationDis(%) argument should be non-negative!", separationDis);
     }
     separationDis_ = separationDis;
 }
@@ -365,7 +361,7 @@ void SinterNormalSpecies::setInverseSinterViscosity(Mdouble inverseSinterViscosi
     //assertOrDie(inverseSinterViscosity < 0, "inverseSinterViscosity should be non-negative!");
     if (inverseSinterViscosity < 0)
     {
-        logger(ERROR, "setInverseSinterViscosity(%)", inverseSinterViscosity);
+        logger(ERROR, "setInverseSinterViscosity(%) argument should be non-negative!", inverseSinterViscosity);
     }
     setSinterType(SINTERTYPE::PARHAMI_MCKEEPING);
     inverseSinterViscosity_ = inverseSinterViscosity;
@@ -536,32 +532,27 @@ Mdouble SinterNormalSpecies::getCollisionTime(Mdouble mass)
 {
     if (mass <= 0)
     {
-        std::cerr << "Error in getCollisionTime(" << mass
-                  << ") mass is not set or has an unexpected value, (getCollisionTime(" << mass << "))" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in getCollisionTime(%) mass is not set or has an unexpected value, (getCollisionTime(%))",
+               mass, mass);
     }
     if (loadingStiffness_ <= 0)
     {
-        std::cerr << "Error in getCollisionTime(" << mass << ") stiffness=" << loadingStiffness_
-                  << " is not set or has an unexpected value, (getCollisionTime(" << mass << "), with stiffness="
-                  << loadingStiffness_ << ")" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in getCollisionTime(%) stiffness=% is not set or has an unexpected value "
+                      "(getCollisionTime(%), with stiffness=%)",
+               mass, loadingStiffness_, mass, loadingStiffness_);
     }
     if (dissipation_ < 0)
     {
-        std::cerr << "Error in getCollisionTime(" << mass << ") dissipation=" << dissipation_
-                  << " is not set or has an unexpected value, (getCollisionTime(" << mass << "), with dissipation="
-                  << dissipation_ << ")" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in getCollisionTime(%) dissipation=%"
+                      " is not set or has an unexpected value, (getCollisionTime(%), with dissipation=%)",
+               mass, dissipation_, mass, dissipation_);
     }
     Mdouble tosqrt = loadingStiffness_ / (.5 * mass) - mathsFunc::square(dissipation_ / mass);
     if (tosqrt <= -1e-8 * loadingStiffness_ / (.5 * mass))
     {
-        std::cerr << "Error in getCollisionTime(" << mass
-                  << ") values for mass, stiffness and dissipation would lead to an overdamped system, (getCollisionTime("
-                  << mass << "), with stiffness=" << loadingStiffness_ << " and dissipation=" << dissipation_ << ")"
-                  << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in getCollisionTime(%) values for mass, stiffness and dissipation would lead to an "
+                      "overdamped system, (getCollisionTime(%), with stiffness=% and dissipation=%)",
+               mass, mass, loadingStiffness_, dissipation_);
     }
     return constants::pi / std::sqrt(tosqrt);
 }

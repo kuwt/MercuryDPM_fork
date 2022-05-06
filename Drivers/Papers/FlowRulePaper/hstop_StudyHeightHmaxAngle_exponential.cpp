@@ -36,58 +36,79 @@ public:
 
 	SilbertHstop() {
 		pointIsAboveCurve = true;
-		//~ setTimeStep(getTimeStep()/3.);
-		setSaveCount(1/getTimeStep()); 
-		setTimeMax(600);
-		fStatFile.setFileType(FileType::NO_FILE);
-		dataFile.setFileType(FileType::NO_FILE);
-	}
-
-	//Do not add or remove particles
-	//Initially tile by 30 degrees
-	void actionsBeforeTimeStep() override {
-		static double ChuteAngle = getChuteAngleDegrees();
-		if (getTime()<75) {
-			setChuteAngle(30);
-		} else {
-			setChuteAngle(ChuteAngle);
-		}
-	};
-	
-	double pointIsAboveCurve;
-
-	void actionAfterTimeStep()
-	{
-		SilbertHstop::actionAfterTimeStep();
-		double kineticEnergy=getKineticEnergy();
-		std::cout << "ene_kin/ene_ele=" << kineticEnergy/getElasticEnergy() << ", piac=" << pointIsAboveCurve << std::endl;
-		if (kineticEnergy/getElasticEnergy()<1e-5 && getTime()>10) pointIsAboveCurve=false;
-	}
-
-	bool continueSolve() const override {
-		if (ceil(getTime())!=ceil(getTime()+getTimeStep())) printTime();
-		if (pointIsAboveCurve) return true;
-		else return false;
-	}
-
-	bool IsAboveCurve() {
-		return IsAboveCurve(get_H(),getChuteAngle()/constants::pi*180.);
-	}
-
-	bool IsAboveCurve(Mdouble h, Mdouble a) {
-		Mdouble func = 40*(tan(a/180.*constants::pi)-tan(30./180.*constants::pi))/(tan(20./180.*constants::pi)-tan(30./180.*constants::pi));
-		//~ cout << " h=" << h << ", a=" << a << ", f=" << (h>func) << endl;
-		//~ cerr << " h=" << h << ", a=" << a << ", f=" << (h>func) << endl;
-		if (h>func) return true;
-		else return false;	
-	}
-
-	void solve_analytic() {
-		setRoughBottomType(MONOLAYER_DISORDERED);
-		setTimeMax(1e-4);
-		solve();
-		pointIsAboveCurve=(tan(getChuteAngle())<.2+.2*exp(getZMax()));
-		pointIsAboveCurve=(getZMax()>80-4*getChuteAngleDegrees());
+        //~ setTimeStep(getTimeStep()/3.);
+        setSaveCount(1 / getTimeStep());
+        setTimeMax(600);
+        fStatFile.setFileType(FileType::NO_FILE);
+        dataFile.setFileType(FileType::NO_FILE);
+    }
+    
+    //Do not add or remove particles
+    //Initially tile by 30 degrees
+    void actionsBeforeTimeStep() override
+    {
+        static double ChuteAngle = getChuteAngleDegrees();
+        if (getTime() < 75)
+        {
+            setChuteAngle(30);
+        }
+        else
+        {
+            setChuteAngle(ChuteAngle);
+        }
+    };
+    
+    double pointIsAboveCurve;
+    
+    void actionAfterTimeStep()
+    {
+        SilbertHstop::actionAfterTimeStep();
+        double kineticEnergy = getKineticEnergy();
+        logger(INFO, "ene_kin/ene_ele=%, piac=%", kineticEnergy / getElasticEnergy(), pointIsAboveCurve);
+        if (kineticEnergy / getElasticEnergy() < 1e-5 && getTime() > 10)
+        {
+            pointIsAboveCurve = false;
+        }
+    }
+    
+    bool continueSolve() const override
+    {
+        if (ceil(getTime()) != ceil(getTime() + getTimeStep()))
+        {
+            printTime();
+        }
+        if (pointIsAboveCurve)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
+    bool IsAboveCurve()
+    {
+        return IsAboveCurve(get_H(), getChuteAngle() / constants::pi * 180.);
+    }
+    
+    bool IsAboveCurve(Mdouble h, Mdouble a)
+    {
+        Mdouble func = 40 * (tan(a / 180. * constants::pi) - tan(30. / 180. * constants::pi)) /
+                       (tan(20. / 180. * constants::pi) - tan(30. / 180. * constants::pi));
+        //~ cout << " h=" << h << ", a=" << a << ", f=" << (h>func) << endl;
+        //~ cerr << " h=" << h << ", a=" << a << ", f=" << (h>func) << endl;
+        if (h > func) return true;
+        else return false;
+    }
+    
+    void solve_analytic()
+    {
+        setRoughBottomType(MONOLAYER_DISORDERED);
+        setTimeMax(1e-4);
+        solve();
+        pointIsAboveCurve = (tan(getChuteAngle()) < .2 + .2 * exp(getZMax()));
+        pointIsAboveCurve = (getZMax() > 80 - 4 * getChuteAngleDegrees());
 	};
 
 };
@@ -95,30 +116,33 @@ public:
 std::fstream ReportFile;
 
 bool PointIsAboveCurve(int argc, char *argv[], Mdouble h, Mdouble a, int study_num) {
-  std::cout << "PointIsAboveCurve(" << study_num << ", h=" << h << ", a=" << a << ")" << std::endl;
-	SilbertHstop problem;
-	problem.setInflowHeight(h) ;
-	problem.setChuteAngle(a);
-	problem.set_study(study_num);
-	std::stringstream name;
-	name << "H" << problem.getInflowHeight() 
-		 << "A" << problem.getChuteAngleDegrees() 
-		 << "L" << round(100.*problem.getFixedParticleRadius()*2.)/100.
-	     << "M" << problem.species->getSlidingFrictionCoefficient()
-		 << "B" << problem.getSlidingFrictionCoefficientBottom();
-	problem.setName(name.str().c_str());
-	std::cout << "starting " << name.str().c_str() << std::endl;
-	problem.writeRestartFile();
-	if ((argc>5) && (!strcmp(argv[5],"-test"))) {
-		// for test runs:
-		problem.solve_analytic();
-	} else {
-		// for real runs:
-		problem.solve();
-	}
-	std::stringstream com;
-	ReportFile   << problem.getInflowHeight() 
-		 << "\t" << problem.getChuteAngleDegrees() 
+    logger(INFO, "PointIsAboveCurve(%, h=%, a=%)", study_num, h, a);
+    SilbertHstop problem;
+    problem.setInflowHeight(h);
+    problem.setChuteAngle(a);
+    problem.set_study(study_num);
+    std::stringstream name;
+    name << "H" << problem.getInflowHeight()
+         << "A" << problem.getChuteAngleDegrees()
+         << "L" << round(100. * problem.getFixedParticleRadius() * 2.) / 100.
+         << "M" << problem.species->getSlidingFrictionCoefficient()
+         << "B" << problem.getSlidingFrictionCoefficientBottom();
+    problem.setName(name.str().c_str());
+    logger(INFO, "starting %", name.str().c_str());
+    problem.writeRestartFile();
+    if ((argc > 5) && (!strcmp(argv[5], "-test")))
+    {
+        // for test runs:
+        problem.solve_analytic();
+    }
+    else
+    {
+        // for real runs:
+        problem.solve();
+    }
+    std::stringstream com;
+    ReportFile << problem.getInflowHeight()
+               << "\t" << problem.getChuteAngleDegrees()
 		 << "\t" << round(100.*problem.getFixedParticleRadius()*2.)/100.
 		 << "\t" << problem.species->getSlidingFrictionCoefficient()
 		 << "\t" << problem.getSlidingFrictionCoefficientBottom()
@@ -129,7 +153,7 @@ bool PointIsAboveCurve(int argc, char *argv[], Mdouble h, Mdouble a, int study_n
 
 int HstopCurve(int argc, char *argv[], int study_num, Mdouble h, Mdouble hMax, Mdouble a)
 {
-  std::cout << "restart at study_num=" << study_num << ", h=" << h << ", a=" << a << std::endl;
+    logger(INFO, "restart at study_num=%, h=%, a=%", study_num, h, a);
 	
   std::stringstream name;
 	name << "Report" << study_num;
@@ -139,28 +163,33 @@ int HstopCurve(int argc, char *argv[], int study_num, Mdouble h, Mdouble hMax, M
 	ReportFile.close();
 
 	//now increase height gradually; decrease angle if flow starts
-	if (h<hMax) {
-		//exponential
-		if (piac) a-=.5;
-		else {h*=pow(2.,.25); a+=.25;}
-		//linear		
-		//if (piac) a-=.5;
-		//else h+=2;
-		//write arg file
-		std::stringstream command;
-		command << "echo " << study_num << " " << h << " " << hMax << " " << a << " > arg";
-		std::cout << command.str() << std::endl;
-		return system (command.str().c_str());
-	} else {
+	if (h<hMax)
+    {
+        //exponential
+        if (piac) a -= .5;
+        else
+        {
+            h *= pow(2., .25);
+            a += .25;
+        }
+        //linear
+        //if (piac) a-=.5;
+        //else h+=2;
+        //write arg file
+        std::stringstream command;
+        command << "echo " << study_num << " " << h << " " << hMax << " " << a << " > arg";
+        logger(INFO, "%", command.str());
+        return system(command.str().c_str());
+    } else {
 		return 0;	
 	}
 }
 
 int main(int argc, char *argv[])
 {
-	if (argc<4) { 
-	  std::cout << "Please specify Study, Height, max. Height and Angle" << std::endl; 
-		exit(-1); 
-	}
-	HstopCurve(argc,argv,atoi(argv[1]),atof(argv[2]),atof(argv[3]),atof(argv[4]));	
+    if (argc < 4)
+    {
+        logger(ERROR, "Please specify Study, Height, max. Height and Angle");
+    }
+    HstopCurve(argc, argv, atoi(argv[1]), atof(argv[2]), atof(argv[3]), atof(argv[4]));
 }

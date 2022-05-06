@@ -172,7 +172,10 @@ bool InsertionBoundary::insertParticle(Mdouble time)
         if (i == iMax)
         {
             static unsigned count = 0;
-            if (count == 0) logger(WARN, "Reached end of volume flowrate function");
+            if (count == 0)
+            {
+                logger(WARN, "Reached end of volume flowrate function");
+            }
             ++count;
         }
         const size_t id = i;

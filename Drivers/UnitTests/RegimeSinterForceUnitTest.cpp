@@ -120,12 +120,13 @@ public:
     }
 
     void printTime() const override {
-        std::cout << "t=" << std::setprecision(3) << std::left << std::setw(6) << getTime()
-                  << ", tmax=" << std::setprecision(3) << std::left << std::setw(6) << getTimeMax()
-                  << ", r=" << std::setprecision(3) << std::left << std::setw(6)
-                  << " Ene " << std::setw(12) << getKineticEnergy()/getElasticEnergy()
-                  << " X/a " << std::setw(12) << getMeanRelativeContactRadius()
-                  << std::endl;
+        logger(INFO, "t=%3.6"
+                     ", tmax=%3.6"
+                     ", r=%3.6"
+                     ", Ene=%.12"
+                     ", X/a=%.12",
+               getTime(), getTimeMax(), particleHandler.getMeanRadius(), getKineticEnergy() / getElasticEnergy(),
+               getMeanRelativeContactRadius());
     }
 };
 
@@ -135,7 +136,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     sp0.solve();
 
     //This helper is to see the Fn vs Overlap, rate of overlap.
-    std::cout << "Execute 'gnuplot RegimeSinterForceUnitTest.gnu' to view output" << std::endl;
+    logger(INFO, "Execute 'gnuplot RegimeSinterForceUnitTest.gnu' to view output");
     helpers::writeToFile("RegimeSinterForceUnitTest.gnu",
                          "set xlabel 'time [s]'\n"
                          "set ylabel 'a(t)/R'\n"

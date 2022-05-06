@@ -42,7 +42,7 @@ public:
         initialTime = get_wall_time();
         maxWallTime = 20*3600; //kill after 20 hours
         setName("CSCRun");
-        std::cout << "Reading file " << restartFile.getName() << std::endl;
+        logger(INFO, "Reading file %", restartFile.getName());
         readRestartFile();
         restartFile.getFstream().precision(18);
         setAppend(true);
@@ -63,17 +63,16 @@ public:
 
     void printTime() const
     {
-        std::cout << "t=" << getTime() 
-            << " Ene " << getKineticEnergy()/getElasticEnergy()
-            << " wallTime " << get_wall_time()-initialTime << std::endl;
-
+        logger(INFO, "t=% Ene=% wallTime=%",
+               getTime(), getKineticEnergy() / getElasticEnergy(), get_wall_time() - initialTime);
+    
     }
     
     void restart() 
     {
         std::stringstream com("");
         com << "/home/weinhartt/bin/sclusterscriptexecute ./CSCRestart";
-		std::cout << system(com.str().c_str()) << std::endl;	    
+        logger(INFO, "%", system(com.str().c_str()));
     }
 
     double maxWallTime;

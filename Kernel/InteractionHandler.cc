@@ -463,19 +463,25 @@ void InteractionHandler::read(std::istream& is)
     std::stringstream line;
     helpers::getLineFromStringStream(is, line);
     line >> N;
-    if (N > 1e5) logger(INFO, "Reading % %", N, dummy);
+    if (N > 1e5)
+    {
+        logger(INFO, "Reading % %", N, dummy);
+    }
     logger(VERBOSE, "In %::read(is): reading in % objects.", getName(), N);
     setStorageCapacity(N);
     // set map
     particleById.clear();
-    for (BaseParticle* p : getDPMBase()->particleHandler) {
+    for (BaseParticle* p: getDPMBase()->particleHandler)
+    {
         particleById[p->getId()] = p;
     }
     wallById.clear();
-    for (BaseWall* w : getDPMBase()->wallHandler) {
+    for (BaseWall* w: getDPMBase()->wallHandler)
+    {
         wallById[w->getId()] = w;
     }
-    for (unsigned int i = 0; i < N; i++) {
+    for (unsigned int i = 0; i < N; i++)
+    {
         readAndAddObject(is);
     }
     particleById.clear();

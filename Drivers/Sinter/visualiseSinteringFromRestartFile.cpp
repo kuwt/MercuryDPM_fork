@@ -30,30 +30,33 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    if (argc<2) {
-        cout << "Please enter the name of the simulation you want to restart and, optionally, the name of the simulation after restart" << endl;
-        exit(-1);
-    } else {
-        cout << "restart data: " << argv[1] << ".restart" << endl;
+    if (argc < 2)
+    {
+        logger(ERROR, "Please enter the name of the simulation you want to restart and, optionally, the name of the "
+                      "simulation after restart");
     }
-
+    else
+    {
+        logger(INFO, "restart data: %.restart", argv[1]);
+    }
+    
     Mercury3D dpm;
     dpm.setName(argv[1]);
     dpm.readRestartFile();
     dpm.setRestarted(false);
     dpm.setTimeMax(dpm.getTimeStep());
     dpm.restartFile.setFileType(FileType::NO_FILE);
-
-    logger(INFO,"Writing file %.tex",std::string(argv[1]));
-    ofstream os(std::string(argv[1]) + ".tex" );
+    
+    logger(INFO, "Writing file %.tex", std::string(argv[1]));
+    ofstream os(std::string(argv[1]) + ".tex");
     os << "\\documentclass[11pt]{standalone}\n"
-     "\\usepackage{tikz,graphics,multirow,multicol,tabularx, tabu,xcolor}\n"
-     "\n"
-     "\\begin{document}\n"
-     "\\begin{tikzpicture}[\n"
-     "pf/.style ={fill=yellow!50,draw=none},%fill particle\n"
-     "pd/.style ={draw=black} %draw particle\n"
-     "]\n";
+          "\\usepackage{tikz,graphics,multirow,multicol,tabularx, tabu,xcolor}\n"
+          "\n"
+          "\\begin{document}\n"
+          "\\begin{tikzpicture}[\n"
+          "pf/.style ={fill=yellow!50,draw=none},%fill particle\n"
+          "pd/.style ={draw=black} %draw particle\n"
+          "]\n";
 
     os << "%draw particles' inside\n";
     for (auto p : dpm.particleHandler)

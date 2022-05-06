@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
     startClock = std::chrono::system_clock::now();
 
   
-    std::cout << "Hourglass Simulation" << std::endl;
+    logger(INFO, "Hourglass Simulation");
     // note: this code is based on stefan's implementation, see
     // /storage2/usr/people/sluding/COMPUTERS/hpc01/sluding/MDCC/MDCLR/DEMO/W7
     // however, it is scaled to SI units by the scaling factors
@@ -172,24 +172,27 @@ int main(int argc, char *argv[])
     species->setTorsionFrictionCoefficient(0.1);
     species->setTorsionStiffness(1.2e4);
     species->setSlidingDissipation(6.3e-2);
- 
-
-
+    
+    
+    
     //test normal forces
-    Mdouble MinParticleMass = species->getDensity()*4.0 / 3.0 * constants::pi * mathsFunc::cubic(HG.MinParticleRadius);
-    std::cout << "MinParticleMass =" << MinParticleMass << std::endl;
+    Mdouble MinParticleMass =
+            species->getDensity() * 4.0 / 3.0 * constants::pi * mathsFunc::cubic(HG.MinParticleRadius);
+    logger(INFO, "MinParticleMass =%\n", MinParticleMass, Flusher::NO_FLUSH);
     Mdouble tc = species->getCollisionTime(MinParticleMass);
-    std::cout << "tc  =" << tc << std::endl;
-    std::cout << "r   =" << species->getRestitutionCoefficient(MinParticleMass) << std::endl;
-    std::cout << "vmax=" << species->getMaximumVelocity(HG.MinParticleRadius, MinParticleMass) << std::endl;
-
+    logger(INFO, "tc  =%\n"
+                 "r   =%\n"
+                 "vmax=%\n",
+           tc, species->getRestitutionCoefficient(MinParticleMass),
+           species->getMaximumVelocity(HG.MinParticleRadius, MinParticleMass), Flusher::NO_FLUSH);
+    
     //set other simulation parameters
     HG.setTimeStep(tc / 50.0);
     HG.setTimeMax(0.5);//run until 3.0 to see full simulation
     HG.setSaveCount(500); //used to be 500
     HG.setXBallsAdditionalArguments("-v0 -solidf");
     HG.N = 900; //number of particles
-    std::cout << "N   =" << HG.N << std::endl;
+    logger(INFO, "N   = %", HG.N);
     
     //Set output to paraview
     HG.setParticlesWriteVTK(true);
@@ -204,7 +207,6 @@ int main(int argc, char *argv[])
     endClock = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = endClock - startClock;
     logger(INFO, "Elapsed time for solving the PDE: % s", elapsed_seconds.count());
-
     
     
     return 0;

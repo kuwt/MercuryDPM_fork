@@ -327,39 +327,38 @@ class RotatingDrum : public Mercury3D
             }
 
             if (particleHandler.getSmallestParticleLocal())
-            { 
+            {
                 if (particleHandler.getSmallestParticleLocal()->getMaxInteractionRadius() < minVal)
                 {
                     minVal = particleHandler.getSmallestParticleLocal()->getMaxInteractionRadius();
                     hGridRebuild();
                     nRebuild++;
-                } 
-            }   
+                }
+            }
     
             //if (particleHandler.getSize() % 100 == 0)
             //{ 
-                //hGridRebuild();
+            //hGridRebuild();
             //}
-            
+    
         }
-        logger(INFO,"nRebuild: %",nRebuild);
-
-		std::cout << "Finished creating particles" << std::endl;
-		std::cout << "Number of S1 particles inserted" << numS1Inserted << std::endl;
-		std::cout << "Number of S2 particles inserted" << numS2Inserted << std::endl;
-
-		//hGridRebuild();
-
-		if ( (numS1ToBeInserted==0) && (numS2ToBeInserted==0) )
-		{
-			step = 2;
-			std::cout << "\n \n \n";
-			std::cout << "Particles settling down" << std::endl;
-			std::cout << "--------------------------" << std::endl;
-			std::cout << "\n\n\n";
-			checkTime = getTime() + 5.0;
-		}		
-	}
+        logger(INFO, "nRebuild: %\n"
+                     "Finished creating particles\n"
+                     "Number of S1 particles inserted %\n"
+                     "Number of S2 particles inserted %", nRebuild, numS1Inserted, numS2Inserted);
+        
+        //hGridRebuild();
+        
+        if ((numS1ToBeInserted == 0) && (numS2ToBeInserted == 0))
+        {
+            step = 2;
+            logger(INFO, "\n \n \n"
+                         "Particles settling down\n"
+                         "--------------------------"
+                         "\n\n\n");
+            checkTime = getTime() + 5.0;
+        }
+    }
 
 	void actionsBeforeTimeStep() override {
 
@@ -367,43 +366,44 @@ class RotatingDrum : public Mercury3D
 		{
 			if (getTime() > checkTime)
 			{
-				std::cout << "Current KE" << getKineticEnergy() << std::endl;	
-				if (getKineticEnergy() < (10.0))
-				{
-					step = 3;
-					double drumStartTime = getTime();
-					std::cout << "\n \n \n";
-					std::cout << "Start the drum rotation" << std::endl;
-					std::cout << "--------------------------" << std::endl;
-					std::cout << "\n\n\n";
-					// rotate the drum
-					wallHandler.getObject(0)->setAngularVelocity(Vec3D(0.0,revolutionsPerSecond*constants::pi*2.0,0.0));
-					wallHandler.getObject(1)->setAngularVelocity(Vec3D(0.0,revolutionsPerSecond*constants::pi*2.0,0.0));
-					wallHandler.getObject(2)->setAngularVelocity(Vec3D(0.0,revolutionsPerSecond*constants::pi*2.0,0.0));
-
-					/*
-					for (int i = 0; i < particleHandler.getNumberOfObjects();i++)
-					{
-						BaseParticle* P0 = particleHandler.getObject(i);
-						if (P0->getIndSpecies() == 1)
-		                {
-							P0->setSpecies(speciesS1);
-							P0->setForce(Vec3D(0,0,0));
-							P0->setTorque(Vec3D(0,0,0));
-                 		}
-						else
-						{
-							P0->setSpecies(speciesS2);
-							P0->setForce(Vec3D(0,0,0));
-							P0->setTorque(Vec3D(0,0,0));
-						}
-					}
-					*/	
-				}
-				else
-				{
-					checkTime = getTime() + 1.0;
-				}
+                logger(INFO, "Current KE %", getKineticEnergy());
+                if (getKineticEnergy() < (10.0))
+                {
+                    step = 3;
+                    double drumStartTime = getTime();
+                    logger(INFO, "\n \n \n Start the drum rotation\n"
+                                 "--------------------------\n\n\n");
+                    // rotate the drum
+                    wallHandler.getObject(0)->setAngularVelocity(
+                            Vec3D(0.0, revolutionsPerSecond * constants::pi * 2.0, 0.0));
+                    wallHandler.getObject(1)->setAngularVelocity(
+                            Vec3D(0.0, revolutionsPerSecond * constants::pi * 2.0, 0.0));
+                    wallHandler.getObject(2)->setAngularVelocity(
+                            Vec3D(0.0, revolutionsPerSecond * constants::pi * 2.0, 0.0));
+                    
+                    /*
+                    for (int i = 0; i < particleHandler.getNumberOfObjects();i++)
+                    {
+                        BaseParticle* P0 = particleHandler.getObject(i);
+                        if (P0->getIndSpecies() == 1)
+                        {
+                            P0->setSpecies(speciesS1);
+                            P0->setForce(Vec3D(0,0,0));
+                            P0->setTorque(Vec3D(0,0,0));
+                         }
+                        else
+                        {
+                            P0->setSpecies(speciesS2);
+                            P0->setForce(Vec3D(0,0,0));
+                            P0->setTorque(Vec3D(0,0,0));
+                        }
+                    }
+                    */
+                }
+                else
+                {
+                    checkTime = getTime() + 1.0;
+                }
 			}
 		}
 	}

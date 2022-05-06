@@ -145,7 +145,7 @@ int main()
     normal.writeRestartFile();
     normal.restartFile.setFileType(FileType::MULTIPLE_FILES);
     normal.setName("FullRestartWithCounterSelfTest");
-    std::cout << normal.restartFile.getFullName();
+    logger(INFO, "%", normal.restartFile.getFullName());
     normal.writeRestartFile();
     
     FullRestartTest restart;

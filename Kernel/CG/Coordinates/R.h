@@ -161,8 +161,8 @@ spaceEvenly(Vec3D min, Vec3D max, std::vector<std::size_t> nAll, std::vector<T>&
             start = -max.X;
             delta = (-min.X - start) / n;
         }
-        std::cerr << "Warning: r should be positive, but x-limits are not;"
-                     "grid is set within " << start << "<r<" << start + delta * (n + 1) << std::endl;
+        logger(WARN, "r should be positive, but x-limits are not;"
+                     "grid is set within % <r<%", start, start + delta * (n + 1));
     }
     start += 0.5 * delta;
     points.resize(n);

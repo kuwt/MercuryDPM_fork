@@ -35,17 +35,16 @@ public:
     
     void setupInitialConditions() override
     {
-        logger(INFO, "Entering the solve now what happens");
-        logger(INFO, "Problem name %", getName());
+        logger(INFO, "Entering the solve now what happens\nProblem name %", getName());
         
         //Setup the base i.e. the chute particles
         ChuteWithHopper::setupInitialConditions();
     }
     
     void actionsOnRestart() override
-    {        
+    {
         logger.assert_always(getTimeMax() > getTime(), "Problem has been run and is complete: About to quit");
-        logger(INFO, "Problem AirySavageHutter is not complete, will restart shortly. Current status:");        
+        logger(INFO, "Problem AirySavageHutter is not complete, will restart shortly. Current status:");
         write(std::cout, false);
     }
     

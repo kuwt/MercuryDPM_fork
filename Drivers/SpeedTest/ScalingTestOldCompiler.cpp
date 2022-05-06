@@ -201,7 +201,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
         scalingTestRun.solve();
         clock_t end = std::clock();
         double diff = double(end - begin) / CLOCKS_PER_SEC * 1000;
-        std::cout << "N="<<scalingTestRun.particleHandler.getNumberOfObjects()<<" T=" << std::scientific << std::setprecision(5) << diff << " ms" << std::endl;
+        logger(INFO, "N=% T=%%5 ms", scalingTestRun.particleHandler.getNumberOfObjects(), std::scientific, diff);
     }
     
 }

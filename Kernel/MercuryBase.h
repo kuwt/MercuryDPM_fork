@@ -163,9 +163,9 @@ public:
     void read(std::istream& is, ReadOptions opt = ReadOptions::ReadAll) override;
     
     /*!
-     * \brief Writes the MercuryBase to an output stream, for example a restart file.
+     * \brief Writes all data into a restart file
      */
-    void write(std::ostream& os, bool writeAllParticles = true) const override;
+    virtual void write(std::ostream& os, bool writeAllParticles = true) const;
     
     /*!
      * \brief Returns hGridCurrentMaxRelativeDisplacement_.

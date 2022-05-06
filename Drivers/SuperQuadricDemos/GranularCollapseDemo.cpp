@@ -108,14 +108,14 @@ public:
             if (((getTime() < stopInsert && getTime() + getTimeStep() > stopInsert) ||
                  particleHandler.getNumberOfObjects() >= nMax) && !once)
             {
-                std::cout << "Ending particle insertion" << std::endl;
+                logger(INFO, "Ending particle insertion");
                 boundaryHandler.removeLastObject();
                 once = true;
             }
         }
         if (getTime() < openGate && getTime() + getTimeStep() > openGate)
         {
-            std::cout << "Shifting right wall rightward" << std::endl;
+            logger(INFO, "Shifting right wall rightward");
             dynamic_cast<InfiniteWall*>(wallHandler.getLastObject())->set(Vec3D(0, 1, 0), Vec3D(0, 2 + getYMax(), 0));
             //dynamic_cast<InfiniteWall*>(wallHandler.getLastObject())->setVelocity(Vec3D(0,0.1,0));
         }
@@ -133,7 +133,7 @@ int main(int argc, char* argv[]) // [GranularCollapse : main]
 {
     GranularCollapse problem;
     problem.setName("granular_collapse_sqellipsoids");
-    std::cout << "Modified from 'MercurySimpleDemos/InsertionBoundarySelfTest.cpp'" << std::endl;
+    logger(INFO, "Modified from 'MercurySimpleDemos/InsertionBoundarySelfTest.cpp'");
     
     // [GranularCollapse : particle properties]
     problem.species->setDensity(950); // 2000;
@@ -147,8 +147,8 @@ int main(int argc, char* argv[]) // [GranularCollapse : main]
     }
     problem.nMax = input1;
     problem.radScale = input2;
-    std::cout << "Number of particles = " << problem.nMax << std::endl;
-    std::cout << "Half-length scale = " << problem.radScale << std::endl;
+    logger(INFO, "Number of particles = %\n"
+                 "Half-length scale = %", problem.nMax, problem.radScale);
     
     problem.radMax = 5.e-3; //1.e-3; 4.5e-3; 4.e-3
     problem.radMin = problem.radMax / problem.radScale / std::sqrt(problem.radScale);
@@ -174,23 +174,18 @@ int main(int argc, char* argv[]) // [GranularCollapse : main]
     // [GranularCollapse : contact properties]
     
     // [GranularCollapse : test normal forces]
-    //set cout parameters
-    std::cout.precision(3);
-    std::cout << std::scientific;
     //(from 'MercurySimpleDemos/HourGlass3DDemo.cpp')
     //Calculates collision time for two copies of a particle of given dissipation_, k, effective mass
     double MinParticleMass = problem.species->getDensity() * 4. / 3. * constants::pi * mathsFunc::cubic(problem.radMin);
-    std::cout << "MinParticleMass = " << MinParticleMass << std::endl;
+    logger(INFO, "MinParticleMass = %%3\n", std::scientific, MinParticleMass, Flusher::NO_FLUSH);
     //Calculates collision time for two copies of a particle of given dissipation_, k, effective mass
     double tc = problem.species->getCollisionTime(2 * problem.radMin, problem.species->getDensity(), 1.0);
-    std::cout << "tc = " << tc << std::endl;
+    logger(INFO, "tc = %%", tc, std::defaultfloat);
 //    //Calculates restitution coefficient for two copies of given dissipation_, k, effective mass
 //    double r = problem.species->getRestitutionCoefficient(MinParticleMass);
 //    std::cout << "r = " << r << std::endl;
     //Calculates the maximum relative velocity allowed for a normal collision of two particles of radius r and particle mass m (for higher velocities particles could pass through each other)
     //std::cout << "vmax=" << helpers::getMaximumVelocity(species->getStiffness(), HGgetSpecies(0)->getDissipation(), HG.MinParticleRadius, MinParticleMass) << std::endl;
-    //unset cout parameters
-    std::cout << std::defaultfloat;
     // [GranularCollapse : test normal forces]
     
     // [GranularCollapse : time parameters]

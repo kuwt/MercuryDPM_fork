@@ -815,20 +815,19 @@ void SpeciesHandler::removeObject(unsigned const int index)
 }
 
 /*!
- * \param[in] os The output stream where the object needs to be written to.
  * \details First write "Species" and the amount of species in this handler,
  * then write all ParticleSpecies and MixedSpecies.
  */
 void SpeciesHandler::write(std::ostream& os) const
 {
-    os << "Species " << getNumberOfObjects() << std::endl;
+    os << "Species " << getNumberOfObjects() << "\n";
     unsigned idMixed = 0;
     for (const ParticleSpecies* species : objects_)
     {
-        os << *species << std::endl;
+        os << *species << "\n";
         for (unsigned int id2 = 0; id2 < species->getIndex(); id2++)
         {
-            os << *mixedObjects_[idMixed] << std::endl;
+            os << *mixedObjects_[idMixed] << "\n";
             idMixed++;
         }
     }

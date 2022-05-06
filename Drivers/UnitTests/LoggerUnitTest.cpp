@@ -35,29 +35,33 @@
 Logger<HG_LOGLEVEL_SELFTEST> unitLogger("UnitTester");
 
 /* Since we're testing the logger, lets not use the logger itself... */
-void assertOrDie(bool condition, std::string message) {
-  if (!condition) {
-    std::cerr << "Assert failed: " << message << std::endl;
-    std::exit(1);
-  }
+void assertOrDie(bool condition, std::string message)
+{
+    if (!condition)
+    {
+        std::cerr << "Assert failed: " << message << std::endl;
+        std::exit(1);
+    }
 }
 
-int main() {
+int main()
+{
     int x = 3;
     bool hasLogged = false;
     std::string lastMessage;
     std::string lastModule;
-    auto tmpLogger = [&](std::string module, std::string msg) {
-      lastMessage = msg;
-      lastModule = module;
-      hasLogged = true;
+    auto tmpLogger = [&](std::string module, std::string msg, Flusher doFlush)
+    {
+        lastMessage = msg;
+        lastModule = module;
+        hasLogged = true;
     };
-    loggerOutput->onFatal   = tmpLogger;
-    loggerOutput->onError   = tmpLogger;
-    loggerOutput->onWarn    = tmpLogger;
-    loggerOutput->onInfo    = tmpLogger;
+    loggerOutput->onFatal = tmpLogger;
+    loggerOutput->onError = tmpLogger;
+    loggerOutput->onWarn = tmpLogger;
+    loggerOutput->onInfo = tmpLogger;
     loggerOutput->onVerbose = tmpLogger;
-    loggerOutput->onDebug   = tmpLogger;
+    loggerOutput->onDebug = tmpLogger;
     
     //Basic usage cases:
     unitLogger(ERROR, "Oopsie!"); //An error!

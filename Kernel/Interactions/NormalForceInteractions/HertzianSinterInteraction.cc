@@ -128,7 +128,7 @@ void HertzianSinterInteraction::computeSinterForce()
         if (getOverlap() > getMaxOverlap())
         {
             setMaxOverlap(getOverlap());
-            std::cout << "," << getHandler()->getDPMBase()->getTime();
+            logger(INFO, ",%", getHandler()->getDPMBase()->getTime(), Flusher::NO_FLUSH);
         }
         //limit max overlap if necessary
         if (getMaxOverlap() > deltaStar)
@@ -151,7 +151,7 @@ void HertzianSinterInteraction::computeSinterForce()
         if (getOverlap() < minOverlap)
         {
             //decrease max overlap if in cohesive range
-            std::cout << "." << getHandler()->getDPMBase()->getTime();
+            logger(INFO, ".%", getHandler()->getDPMBase()->getTime(), Flusher::NO_FLUSH);
             setMaxOverlap(getOverlap() / factor);
         }
         else

@@ -79,39 +79,40 @@ public:
 
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
-	std::cout<<"In this file 32^2 particles with the same velocity are placed "
-	"in a bi-axial box. This makes them collide with the walls and eachother. "
-	"Afterwards the same run is performed with hgrid on. It tests the working "
-	"(and speedup) of the hgrid."<<std::endl;
-	
-	///Start off my solving the default problem
- 	my_problem_HGRID problem;
-    auto species = problem.speciesHandler.copyAndAddObject(LinearViscoelasticSlidingFrictionReversibleAdhesiveSpecies());
+    logger(INFO, "In this file 32^2 particles with the same velocity are placed "
+                 "in a bi-axial box. This makes them collide with the walls and eachother. "
+                 "Afterwards the same run is performed with hgrid on. It tests the working "
+                 "(and speedup) of the hgrid.");
+    
+    ///Start off my solving the default problem
+    my_problem_HGRID problem;
+    auto species = problem.speciesHandler.copyAndAddObject(
+            LinearViscoelasticSlidingFrictionReversibleAdhesiveSpecies());
     species->setDensity(2000);
     species->setDissipation(0.01);
     species->setStiffness(1e4);
     species->setSlidingFrictionCoefficient(0.1);
     species->setDensity(2000);
-    species->setAdhesionStiffness(0.05* species->getStiffness());
-    species->setAdhesionForceMax(1.1e-4*0.05* species->getStiffness());
-
- 	problem.N=25;
- 	problem.setName("FreeCoolingAdhesiveDemo");
+    species->setAdhesionStiffness(0.05 * species->getStiffness());
+    species->setAdhesionForceMax(1.1e-4 * 0.05 * species->getStiffness());
+    
+    problem.N = 25;
+    problem.setName("FreeCoolingAdhesiveDemo");
     problem.setXMax(0.0018);
     problem.setYMax(0.0018);
- 	problem.setGravity(Vec3D(0.0,0.0,0.0));
+    problem.setGravity(Vec3D(0.0, 0.0, 0.0));
     problem.setTimeStep(3e-6);
-	problem.setSaveCount(50);
- 	problem.setTimeMax(0.05);
+    problem.setSaveCount(50);
+    problem.setTimeMax(0.05);
     problem.setHGridMaxLevels(1);
-	//problem.setHGridCellOverSizeRatio(1.2);
-	problem.setHGridUpdateEachTimeStep(true);
-
-        
+    //problem.setHGridCellOverSizeRatio(1.2);
+    problem.setHGridUpdateEachTimeStep(true);
+    
+    
     problem.dataFile.setFileType(FileType::ONE_FILE);
     problem.fStatFile.setFileType(FileType::NO_FILE);
     problem.solve();
-    std::cout << problem.particleHandler.getObject(0)->getRadius() << std::endl;
-    std::cout << problem.particleHandler.getObject(0)->getMaxInteractionRadius() << std::endl;
+    logger(INFO, "%", problem.particleHandler.getObject(0)->getRadius());
+    logger(INFO, "%", problem.particleHandler.getObject(0)->getMaxInteractionRadius());
     return 0;
 }

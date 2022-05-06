@@ -283,37 +283,38 @@ void testCGHandler(DPMBase& problem)
     Mdouble totalMass;
     Vec3D momentumBalance;
     
-    std::cout << "Analysing #0: spatially averaged statistics rho(t) at t=1" << std::endl;
+    logger(INFO, "Analysing #0: spatially averaged statistics rho(t) at t=1");
     // cg0 stores the last available time step for analysis
-    CG<CGCoordinates::O>& cg0 = 
-        *dynamic_cast<CG<CGCoordinates::O>*>(problem.cgHandler.getObject(0));
+    CG<CGCoordinates::O>& cg0 =
+            *dynamic_cast<CG<CGCoordinates::O>*>(problem.cgHandler.getObject(0));
     cg0.writeAll(std::cout);
     
     //check total mass
     totalMass = cg0.getPoint(0).getDensity() - 0.8;
-    momentumBalance = cg0.getPoint(0).getInteractionForceDensity() 
-        + cg0.getPoint(0).getDensity() * problem.getGravity();
-    std::cout << "Error in totalMass=" << totalMass << std::endl;
-    std::cout << "Error in momentumBalance=" << Vec3D::getLength(momentumBalance) << std::endl;
+    momentumBalance = cg0.getPoint(0).getInteractionForceDensity()
+                      + cg0.getPoint(0).getDensity() * problem.getGravity();
+    logger(INFO, "Error in totalMass=%\n"
+                 "Error in momentumBalance=%", totalMass, Vec3D::getLength(momentumBalance));
     
     //case B: z-statistics
-    CG<CGCoordinates::Z>& cgB = 
-        *dynamic_cast<CG<CGCoordinates::Z>*>(problem.cgHandler.getObject(1));
-    cgB.writeAll(std::cout); std::cout << std::endl;
+    CG<CGCoordinates::Z>& cgB =
+            *dynamic_cast<CG<CGCoordinates::Z>*>(problem.cgHandler.getObject(1));
+    cgB.writeAll(std::cout);
+    std::cout << std::endl;
     totalMass = 0.0;
     momentumBalance.setZero();
     for (auto& p: cgB.getPoints())
     {
-        std::cout << "z=" << p.coordinates.getZ() << std::endl;
+        logger(INFO, "z=%", p.coordinates.getZ());
         totalMass += p.getDensity();
-        momentumBalance += p.getInteractionForceDensity() 
-        + p.getDensity() * problem.getGravity();
+        momentumBalance += p.getInteractionForceDensity()
+                           + p.getDensity() * problem.getGravity();
     }
-    totalMass = totalMass/cgB.getPoints().size() - 0.8;
+    totalMass = totalMass / cgB.getPoints().size() - 0.8;
     momentumBalance /= cgB.getPoints().size();
-    std::cout << "Error in totalMass=" << totalMass << std::endl;
-    std::cout << "Error in momentumBalance=" << Vec3D::getLength(momentumBalance) << std::endl;
- 
+    logger(INFO, "Error in totalMass=%\n"
+                 "Error in momentumBalance=%", totalMass, Vec3D::getLength(momentumBalance));
+    
     
 }
 

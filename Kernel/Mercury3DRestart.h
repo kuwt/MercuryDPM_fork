@@ -84,17 +84,17 @@ public:
             std::size_t found = getName().find(".restart");
             if (found == std::string::npos)
             {
-                std::cout << "Reading file " << restartFile.getName() << std::endl;
+                logger(INFO, "Reading file %\n", Flusher::NO_FLUSH, restartFile.getName());
                 readRestartFile();
             }
             else
             {
-                std::cout << "Reading file " << argv[i + 1] << std::endl;
+                logger(INFO, "Reading file %\n", Flusher::NO_FLUSH, argv[i + 1]);
                 readRestartFile(argv[i + 1]);
                 //setName(getName().substr(0,found));
-                std::cout << "Read file " << getName() << std::endl;
+                logger(INFO, "Read file %\n", Flusher::NO_FLUSH, getName());
             }
-            std::cout << "tmax= " << getTimeMax() << std::endl;
+            logger(INFO, "tmax= %", getTimeMax());
             //restartFile.getFstream().precision(18);
             setAppend(true);
             printTime();
@@ -113,7 +113,7 @@ public:
         struct timeval time;
         if (gettimeofday(&time, NULL))
         {
-            std::cerr << "Error in getWallTime: Wall time could not be read" << std::endl;
+            logger(WARN, "Error in getWallTime: Wall time could not be read");
             return 0;
         }
         return (double) time.tv_sec + (double) time.tv_usec * .000001;
@@ -134,8 +134,7 @@ private:
             actionsAfterSolve();
             finishStatistics();
             closeFiles();
-            std::cout << "Exiting for restarting after "
-                      << getWallTime() - initialWallTime_ << "s" << std::endl;
+            logger(INFO, "Exiting for restarting after %s\n", Flusher::NO_FLUSH, getWallTime() - initialWallTime_);
             
             //set the restart command
             std::stringstream com("");
@@ -151,7 +150,7 @@ private:
                 com << clusterCommand_ << " ./" << getName().substr(0, found) << " -r " << getName();
             }
             //std::cout << com << std::endl;        
-            std::cout << "system output:" << system(com.str().c_str()) << std::endl;
+            logger(INFO, "system output:%", system(com.str().c_str()));
             exit(0);
         }
     }

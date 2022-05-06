@@ -119,21 +119,21 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     sf.solve();
     sf.writeRestartFile();
     
-    std::cout << "Execute 'gnuplot SinterForceUnitTest.gnu' to view output" << std::endl;
+    logger(INFO, "Execute 'gnuplot SinterForceUnitTest.gnu' to view output");
     helpers::writeToFile("SinterForceUnitTest.gnu",
                          "set xlabel 'displacement'\n"
                          "set ylabel 'force'\n"
                          "plot 'SinterForceUnitTest1.05.fstat' u 7:9 w lp\n"
-                         );
+    );
     
-    std::cout << "Execute 'gnuplot LongSinterForceUnitTest.gnu' to view output" << std::endl;
+    logger(INFO, "Execute 'gnuplot LongSinterForceUnitTest.gnu' to view output");
     helpers::writeToFile("LongSinterForceUnitTest.gnu",
                          "sinterRate = 1000\n"
                          "radius = 2e-6\n"
                          "set xlabel 'time'\n"
                          "set ylabel 'displacement'\n"
                          "plot 'LongSinterForceUnitTest.fstat' u 1:(sqrt(2.0*$7/radius)), sqrt((sinterRate*x)+0.5**2)\n"
-                         //"plot 'LongSinterForceUnitTest.fstat' u 1:(sqrt(2.0*$7/radius)), sqrt((2.0/radius*sinterRate*x)+0.77**2)\n"
-                         //"plot 'LongSinterForceUnitTest.fstat' u 1:(sqrt(2.0*$7/radius)), sqrt(sinterRate*x)\n"
-                         );
+            //"plot 'LongSinterForceUnitTest.fstat' u 1:(sqrt(2.0*$7/radius)), sqrt((2.0/radius*sinterRate*x)+0.77**2)\n"
+            //"plot 'LongSinterForceUnitTest.fstat' u 1:(sqrt(2.0*$7/radius)), sqrt(sinterRate*x)\n"
+    );
 }

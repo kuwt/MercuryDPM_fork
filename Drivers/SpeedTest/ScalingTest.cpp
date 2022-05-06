@@ -200,7 +200,8 @@ int main(int argc UNUSED, char *argv[] UNUSED)
         scalingTestRun.solve();
         auto end = std::chrono::steady_clock::now();
         auto diff = end - start;
-        std::cout << "N="<<scalingTestRun.particleHandler.getNumberOfObjects()<<" T=" << std::scientific << std::setprecision(5) << std::chrono::duration<double, std::milli>(diff).count() << " ms" << std::endl;
+        logger(INFO, "N=% T=%%%5 ms", scalingTestRun.particleHandler.getNumberOfObjects(), std::scientific,
+               std::chrono::duration<double, std::milli>(diff).count());
     }
     
 }

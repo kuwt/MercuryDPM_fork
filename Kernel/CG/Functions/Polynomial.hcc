@@ -51,8 +51,7 @@ std::ostream& operator<<(std::ostream& os, PolynomialType polynomialType)
         os << "Lucy";
     else
     {
-        std::cerr << "PolynomialType not recognized" << std::endl;
-        exit(-1);
+        logger(ERROR, "PolynomialType not recognized");
     }
     return os;
 }
@@ -69,8 +68,7 @@ std::istream& operator>>(std::istream& is, PolynomialType& type)
         type = PolynomialType::LUCY;
     else
     {
-        std::cerr << "PolynomialType not recognized" << std::endl;
-        exit(-1);
+        logger(ERROR, "PolynomialType not recognized");
     }
     return is;
 }
@@ -84,7 +82,7 @@ Polynomial<Coordinates>::Polynomial()
     eps_ = 1e-6;
     currentInteraction_ = 9999;
 #ifdef DEBUG_CONSTRUCTOR
-    std::cerr << "Polynomial::Polynomial() finished" << std::endl;
+    logger(ERROR, "Polynomial::Polynomial() finished");
 #endif
 }
 
@@ -181,8 +179,7 @@ void Polynomial<Coordinates>::computeCoefficients()
     }
     else
     {
-        std::cerr << "PolynomialType not known: " << polynomialType_ << std::endl;
-        exit(-1);
+        logger(ERROR, "PolynomialType not known: %", polynomialType_);
     }
     if (!(cutoff_ > 0))
         logger(ERROR, "Cutoff % should be positive", cutoff_);
@@ -389,8 +386,7 @@ Polynomial<Coordinates>::evaluateCGIntegral(const BaseInteraction& c, const Coor
         case 1:
             break;
         default:
-            std::cerr << "Error: no rules set for high-order polynomials" << std::endl;
-            exit(-1);
+            logger(ERROR, "Error: no rules set for high-order polynomials");
     }
     double A = iNormal / t;
     double B = pNormal / t;
@@ -476,8 +472,7 @@ Polynomial<Coordinates>::evaluateCGIntegral1D(const BaseInteraction& c, const Co
         case 1:
             break;
         default:
-            std::cerr << "Error: no rules set for high-order polynomials" << std::endl;
-            exit(-1);
+            logger(ERROR, "Error: no rules set for high-order polynomials");
     }
     return value1 * cutoff_ / currentDistance;
 }

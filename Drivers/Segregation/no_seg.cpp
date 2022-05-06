@@ -37,8 +37,9 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     //Print description
-    cout << endl << "Description: A quasi-2D inclined plane with inflow conditions on the left boundary, and deletion of particles when they exit the domain." << endl;
- 
+    logger(INFO, "\nDescription: A quasi-2D inclined plane with inflow conditions on the left boundary, and deletion of"
+                 " particles when they exit the domain.");
+    
     // Problem parameters
     Chute problem;
     problem.setName("chute_demo");
@@ -47,7 +48,7 @@ int main(int argc, char *argv[])
     // Particle properties
     problem.setFixedParticleRadius(0.001);
     problem.setInflowParticleRadius(0.001);
-
+    
     auto species = problem.speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
     double mass = 0.5*species->getMassFromRadius(0.5*(problem.getMinInflowParticleRadius() + problem.getMaxInflowParticleRadius()));
     species->setCollisionTimeAndRestitutionCoefficient(2.5e-3,0.8,mass);

@@ -53,7 +53,7 @@ public:
 
 int main(int argc, char *argv[])
 {
-	std::cout<<"Single particle bouncing vertically on the bottom plate"<<std::endl;
+    logger(INFO, "Single particle bouncing vertically on the bottom plate");
 	///Start off my solving the default problem
 	FreeFallInteractionSelfTest freeFallInteractionSelfTestProblem;
     auto species = new LinearViscoelasticSpecies;

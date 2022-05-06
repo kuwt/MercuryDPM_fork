@@ -80,7 +80,7 @@ public:
     void printTime() const override
     {
         DPMBase::printTime();
-        std::cout << " total energy: " << std::setprecision(10) << getRotationalEnergy() + getElasticEnergy() << '\n' << '\n';
+        logger(INFO, "total energy: %10\n", getRotationalEnergy() + getElasticEnergy());
     }
 };
 

@@ -182,14 +182,15 @@ public:
     //Print varaibles in the console/terminal
     void printTime()const override
     {
-        std::cout << "t=" << std::setprecision(3) << std::left<< getTime()
-                  << ", tmax=" << std::setprecision(3) << std::left<< getTimeMax()
-                  << ", # Particles inserted=" << std::setprecision(3) << std::left << setNumParticles - partDel
-                  << ", # Particles deleted=" << std::setprecision(3) << std::left << partDel
-                  << ", Volume inserted=" << std::setprecision(3) << std::left << std::setw(6)<< vol_inserted
-                  << ", WallForce=" << std::setprecision(3) << std::left << std::setw(6) << wallForce
-                  << ", WallPressure=" << std::setprecision(3) << std::left << std::setw(6) << wallPressure
-                  << std::endl;
+        logger(INFO, "t=%3, "
+                     "tmax=%3, "
+                     "# Particles inserted=%3, "
+                     "# Particles deleted=%3, "
+                     "Volume inserted=%3.6, "
+                     "WallForce=%3.6, "
+                     "WallPressure=%3.6",
+               getTime(), getTimeMax(), setNumParticles - partDel, partDel, vol_inserted, wallForce,
+               wallPressure);
     }
 
     //Write variables in the fstat file
@@ -234,22 +235,24 @@ private:
 int main(int argc, char* argv[])
 {
     //Helper
-    std::cout << "Write in the terminal after the compilation'./protectiveWall -Np 500 -r 0.01 -h 0.1 -w 0.25 -l 1.0 -s 15.0 -t 20.0' to run the program" << std::endl;
-
+    logger(INFO,
+           "Write in the terminal after the compilation'./protectiveWall -Np 500 -r 0.01 -h 0.1 -w 0.25 -l 1.0 -s 15.0 -t "
+           "20.0' to run the program");
+    
     //! [AT_PW:setUp]
-    int Nump = helpers::readFromCommandLine(argc,argv,"-Np",50); //50 particles
-    Mdouble pRadius = helpers::readFromCommandLine(argc,argv,"-r",0.01); //0.01 [m]
-    Mdouble height = helpers::readFromCommandLine(argc,argv,"-h",0.1); //0.1 [m]
-    Mdouble width = helpers::readFromCommandLine(argc,argv,"-w",0.25);  //0.25 [m]
-    Mdouble length = helpers::readFromCommandLine(argc,argv,"-l",1.0); //1.0 [m]
-    Mdouble slopeAngle = helpers::readFromCommandLine(argc,argv,"-s",15.0); //15 grades
-
-    protectiveWall problem(Nump,pRadius,height,width,length,slopeAngle); //Object
-
-    Mdouble simTime = helpers::readFromCommandLine(argc,argv,"-t",5.0); // 5.0 [s]
+    int Nump = helpers::readFromCommandLine(argc, argv, "-Np", 50); //50 particles
+    Mdouble pRadius = helpers::readFromCommandLine(argc, argv, "-r", 0.01); //0.01 [m]
+    Mdouble height = helpers::readFromCommandLine(argc, argv, "-h", 0.1); //0.1 [m]
+    Mdouble width = helpers::readFromCommandLine(argc, argv, "-w", 0.25);  //0.25 [m]
+    Mdouble length = helpers::readFromCommandLine(argc, argv, "-l", 1.0); //1.0 [m]
+    Mdouble slopeAngle = helpers::readFromCommandLine(argc, argv, "-s", 15.0); //15 grades
+    
+    protectiveWall problem(Nump, pRadius, height, width, length, slopeAngle); //Object
+    
+    Mdouble simTime = helpers::readFromCommandLine(argc, argv, "-t", 5.0); // 5.0 [s]
     problem.setTimeMax(simTime);
     //! [AT_PW:setUp]
-
+    
     problem.setSaveCount(10);
     problem.setTimeStep(0.005 / 50.0); // (collision time)/50.0
     problem.removeOldFiles();

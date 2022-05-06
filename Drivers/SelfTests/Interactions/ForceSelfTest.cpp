@@ -185,140 +185,174 @@ public:
 
 void particleParticleTest()
 {
-	std::cout << std::endl << "testing particle-particle collisions ..." << std::endl << std::endl;
-
-	ParticleParticleCollision problem;
-
-	problem.random.setRandomSeed(5);
-
-	problem.setupInitialConditions();
-	Mdouble normalRelativeVelocity, tangentialRelativeVelocity, analyticTangentialRelativeVelocity;
-
-	std::cout << "5: without tangential forces" << std::endl;
-	problem.setName("ForceSelfTest5");
-	problem.solve();
-	problem.getRelativeVelocityComponents(normalRelativeVelocity, tangentialRelativeVelocity);
-	std::cout << "tangentialRelativeVelocity: analytic=" << problem.initialTangentialRelativeVelocity << ", simulation=" << tangentialRelativeVelocity << std::endl;
-	std::cout << "normalRelativeVelocity: analytic:" << -problem.en*problem.initialNormalRelativeVelocity << ", simulation=" << normalRelativeVelocity << std::endl;
-
-	//problem.setAppend_to_files(true);
-
-	std::cout << "6: with Coulomb friction" << std::endl;
-	Mdouble mu = problem.random.getRandomNumber(0.0,1.0);
-	problem.species->setSlidingFrictionCoefficient(mu);
-	problem.species->setSlidingDissipation(1e20);
-	//problem.species->setSlidingStiffness(0.0);
-	problem.setName("ForceSelfTest6");
-	problem.solve();
-	problem.getRelativeVelocityComponents(normalRelativeVelocity, tangentialRelativeVelocity);
-	analyticTangentialRelativeVelocity = std::max(0.0,problem.initialTangentialRelativeVelocity + mu*3.5*(1+problem.en)*problem.initialNormalRelativeVelocity);
-	std::cout << "tangentialRelativeVelocity: analytic=" << analyticTangentialRelativeVelocity << ", simulation=" << tangentialRelativeVelocity << std::endl;
-	std::cout << "normalRelativeVelocity: analytic:" << -problem.en*problem.initialNormalRelativeVelocity << ", simulation=" << normalRelativeVelocity << std::endl;
-
-	std::cout << "7: with Coulomb friction, spring activated" << std::endl;
-	problem.species->setSlidingStiffness(1.0);
-	//problem.species->setSlidingDissipation(1);
-	problem.setName("ForceSelfTest7");
-	problem.solve();
-	std::cout << "tangentialRelativeVelocity: analytic=" << analyticTangentialRelativeVelocity << ", simulation=" << tangentialRelativeVelocity << std::endl;
-	std::cout << "normalRelativeVelocity: analytic:" << -problem.en*problem.initialNormalRelativeVelocity << ", simulation=" << normalRelativeVelocity << std::endl;
-
-	std::cout << "8: with tangential viscous force" << std::endl;
-	Mdouble et = problem.random.getRandomNumber(-1.0,0.0);
-	problem.species->setSlidingFrictionCoefficient(1e20);
-	problem.species->setSlidingDissipation(-log(-et)/(2.0*problem.tc) /3.5 * 2.0 * problem.m12);
-	problem.species->setSlidingStiffness(0.0);
-	problem.setName("ForceSelfTest8");
-	problem.solve();
-	problem.getRelativeVelocityComponents(normalRelativeVelocity, tangentialRelativeVelocity);
-	analyticTangentialRelativeVelocity = problem.initialTangentialRelativeVelocity * exp(-2.0*3.5*problem.species->getSlidingDissipation()/(2.0*problem.m12) * problem.getCollisionTime(2.0*problem.m12));
-	std::cout << "tangentialRelativeVelocity: analytic=" << analyticTangentialRelativeVelocity << ", simulation=" << tangentialRelativeVelocity << std::endl;
-	std::cout << "normalRelativeVelocity: analytic:" << -problem.en*problem.initialNormalRelativeVelocity << ", simulation=" << normalRelativeVelocity << std::endl;
-
-	std::cout << "9: with tangential elastic force" << std::endl;
-	Mdouble et2 = problem.random.getRandomNumber(0.0,1.0);
-	problem.species->setSlidingFrictionCoefficient(1e20);
-	problem.species->setSlidingDissipation(0.0);
-	problem.species->setSlidingStiffness(problem.species->getStiffness()/3.5*mathsFunc::square(acos(-et2)/constants::pi));
-	problem.setName("ForceSelfTest9");
-	problem.solve();
-	problem.getRelativeVelocityComponents(normalRelativeVelocity, tangentialRelativeVelocity);
-	analyticTangentialRelativeVelocity = problem.initialTangentialRelativeVelocity * cos(sqrt(problem.species->getSlidingStiffness()/problem.m12*3.5)* problem.getCollisionTime(2.0*problem.m12));
-	std::cout << "tangentialRelativeVelocity: analytic=" << analyticTangentialRelativeVelocity << ", simulation=" << tangentialRelativeVelocity << std::endl;
-	std::cout << "normalRelativeVelocity: analytic:" << -problem.en*problem.initialNormalRelativeVelocity << ", simulation=" << normalRelativeVelocity << std::endl;
-
+    logger(INFO, "\ntesting particle-particle collisions ...\n\n", Flusher::NO_FLUSH);
+    
+    ParticleParticleCollision problem;
+    
+    problem.random.setRandomSeed(5);
+    
+    problem.setupInitialConditions();
+    Mdouble normalRelativeVelocity, tangentialRelativeVelocity, analyticTangentialRelativeVelocity;
+    
+    logger(INFO, "5: without tangential forces");
+    problem.setName("ForceSelfTest5");
+    problem.solve();
+    problem.getRelativeVelocityComponents(normalRelativeVelocity, tangentialRelativeVelocity);
+    logger(INFO, "tangentialRelativeVelocity: analytic=%, simulation=%\n",
+           problem.initialTangentialRelativeVelocity, tangentialRelativeVelocity, Flusher::NO_FLUSH);
+    logger(INFO, "normalRelativeVelocity: analytic=%, simulation=%",
+           -problem.en * problem.initialNormalRelativeVelocity, normalRelativeVelocity);
+    
+    //problem.setAppend_to_files(true);
+    
+    logger(INFO, "6: with Coulomb friction");
+    Mdouble mu = problem.random.getRandomNumber(0.0, 1.0);
+    problem.species->setSlidingFrictionCoefficient(mu);
+    problem.species->setSlidingDissipation(1e20);
+    //problem.species->setSlidingStiffness(0.0);
+    problem.setName("ForceSelfTest6");
+    problem.solve();
+    problem.getRelativeVelocityComponents(normalRelativeVelocity, tangentialRelativeVelocity);
+    analyticTangentialRelativeVelocity = std::max(0.0, problem.initialTangentialRelativeVelocity +
+                                                       mu * 3.5 * (1 + problem.en) *
+                                                       problem.initialNormalRelativeVelocity);
+    logger(INFO, "tangentialRelativeVelocity: analytic=%, simulation=%\n",
+           analyticTangentialRelativeVelocity, tangentialRelativeVelocity, Flusher::NO_FLUSH);
+    logger(INFO, "normalRelativeVelocity: analytic=%, simulation=%",
+           -problem.en * problem.initialNormalRelativeVelocity, normalRelativeVelocity);
+    
+    logger(INFO, "7: with Coulomb friction, spring activated");
+    problem.species->setSlidingStiffness(1.0);
+    //problem.species->setSlidingDissipation(1);
+    problem.setName("ForceSelfTest7");
+    problem.solve();
+    logger(INFO, "tangentialRelativeVelocity: analytic=%, simulation=%\n",
+           analyticTangentialRelativeVelocity, tangentialRelativeVelocity, Flusher::NO_FLUSH);
+    logger(INFO, "normalRelativeVelocity: analytic=%, simulation=%",
+           -problem.en * problem.initialNormalRelativeVelocity, normalRelativeVelocity);
+    
+    logger(INFO, "8: with tangential viscous force");
+    Mdouble et = problem.random.getRandomNumber(-1.0, 0.0);
+    problem.species->setSlidingFrictionCoefficient(1e20);
+    problem.species->setSlidingDissipation(-log(-et) / (2.0 * problem.tc) / 3.5 * 2.0 * problem.m12);
+    problem.species->setSlidingStiffness(0.0);
+    problem.setName("ForceSelfTest8");
+    problem.solve();
+    problem.getRelativeVelocityComponents(normalRelativeVelocity, tangentialRelativeVelocity);
+    analyticTangentialRelativeVelocity = problem.initialTangentialRelativeVelocity *
+                                         exp(-2.0 * 3.5 * problem.species->getSlidingDissipation() /
+                                             (2.0 * problem.m12) * problem.getCollisionTime(2.0 * problem.m12));
+    logger(INFO, "tangentialRelativeVelocity: analytic=%, simulation=%\n",
+           analyticTangentialRelativeVelocity, tangentialRelativeVelocity, Flusher::NO_FLUSH);
+    logger(INFO, "normalRelativeVelocity: analytic=%, simulation=%",
+           -problem.en * problem.initialNormalRelativeVelocity, normalRelativeVelocity);
+    
+    logger(INFO, "9: with tangential elastic force");
+    Mdouble et2 = problem.random.getRandomNumber(0.0, 1.0);
+    problem.species->setSlidingFrictionCoefficient(1e20);
+    problem.species->setSlidingDissipation(0.0);
+    problem.species->setSlidingStiffness(
+            problem.species->getStiffness() / 3.5 * mathsFunc::square(acos(-et2) / constants::pi));
+    problem.setName("ForceSelfTest9");
+    problem.solve();
+    problem.getRelativeVelocityComponents(normalRelativeVelocity, tangentialRelativeVelocity);
+    analyticTangentialRelativeVelocity = problem.initialTangentialRelativeVelocity *
+                                         cos(sqrt(problem.species->getSlidingStiffness() / problem.m12 * 3.5) *
+                                             problem.getCollisionTime(2.0 * problem.m12));
+    logger(INFO, "tangentialRelativeVelocity: analytic=%, simulation=%\n",
+           analyticTangentialRelativeVelocity, tangentialRelativeVelocity, Flusher::NO_FLUSH);
+    logger(INFO, "normalRelativeVelocity: analytic=%, simulation=%",
+           -problem.en * problem.initialNormalRelativeVelocity, normalRelativeVelocity);
 }
 
 void wallParticleTest()
 {
-	std::cout << std::endl << "testing wall-particle collisions ..." << std::endl << std::endl;
-
-	srand(5);
-
-	WallParticleCollision problem;
-	problem.setupInitialConditions();
-
-	Mdouble normalRelativeVelocity, tangentialRelativeVelocity, analyticTangentialRelativeVelocity;
-
-	//problem.setAppend_to_files(true);
-
-	std::cout << "0: without tangential forces" << std::endl;
-	problem.setName("ForceSelfTest0");
-	problem.solve();
-
-	problem.getRelativeVelocityComponents(normalRelativeVelocity, tangentialRelativeVelocity);
-	std::cout << "tangentialRelativeVelocity: analytic=" << problem.initialTangentialRelativeVelocity << ", simulation=" << tangentialRelativeVelocity << std::endl;
-	std::cout << "normalRelativeVelocity: analytic:" << -problem.en*problem.initialNormalRelativeVelocity << ", simulation=" << normalRelativeVelocity << std::endl;
-
-	std::cout << "1: with Coulomb friction" << std::endl;
-	Mdouble mu = problem.random.getRandomNumber(0.0,1.0);
-	problem.species->setSlidingFrictionCoefficient(mu);
-	problem.species->setSlidingDissipation(1e20);
-	problem.species->setSlidingStiffness(0.0);
-	problem.setName("ForceSelfTest1");
-	problem.solve();
-	problem.getRelativeVelocityComponents(normalRelativeVelocity, tangentialRelativeVelocity);
-	analyticTangentialRelativeVelocity = std::max(0.0,problem.initialTangentialRelativeVelocity + mu*3.5*(1+problem.en)*problem.initialNormalRelativeVelocity);
-	std::cout << "tangentialRelativeVelocity: analytic=" << analyticTangentialRelativeVelocity << ", simulation=" << tangentialRelativeVelocity << std::endl;
-	std::cout << "normalRelativeVelocity: analytic:" << -problem.en*problem.initialNormalRelativeVelocity << ", simulation=" << normalRelativeVelocity << std::endl;
-
-	std::cout << "2: with Coulomb friction, spring activated" << std::endl;
-	problem.species->setSlidingStiffness(1.0);
-	problem.setName("ForceSelfTest2");
-	problem.solve();
-	std::cout << "tangentialRelativeVelocity: analytic=" << analyticTangentialRelativeVelocity << ", simulation=" << tangentialRelativeVelocity << std::endl;
-	std::cout << "normalRelativeVelocity: analytic:" << -problem.en*problem.initialNormalRelativeVelocity << ", simulation=" << normalRelativeVelocity << std::endl;
-
-	std::cout << "3: with tangential viscous force" << std::endl;
-	Mdouble et = problem.random.getRandomNumber(-1.0,0.0);
-	problem.species->setSlidingFrictionCoefficient(1e20);
-	problem.species->setSlidingDissipation(-log(-et)/(2.0*problem.tc) /3.5 * 2.0 * problem.m12);
-	problem.species->setSlidingStiffness(0.0);
-	problem.setName("ForceSelfTest3");
-	problem.solve();
-	problem.getRelativeVelocityComponents(normalRelativeVelocity, tangentialRelativeVelocity);
-	analyticTangentialRelativeVelocity = problem.initialTangentialRelativeVelocity * exp(-2.0*3.5*problem.species->getSlidingDissipation()/(2.0*problem.m12) * problem.getCollisionTime(2.0*problem.m12));
-	std::cout << "tangentialRelativeVelocity: analytic=" << analyticTangentialRelativeVelocity << ", simulation=" << tangentialRelativeVelocity << std::endl;
-	std::cout << "normalRelativeVelocity: analytic:" << -problem.en*problem.initialNormalRelativeVelocity << ", simulation=" << normalRelativeVelocity << std::endl;
-
-	std::cout << "4: with tangential elastic force" << std::endl;
-	Mdouble et2 = problem.random.getRandomNumber(0.0,1.0);
-	problem.species->setSlidingFrictionCoefficient(1e20);
-	problem.species->setSlidingDissipation(0.0);
-	problem.species->setSlidingStiffness(problem.species->getStiffness()/3.5*mathsFunc::square(acos(-et2)/constants::pi));
-	problem.setName("ForceSelfTest4");
-	problem.solve();
-	problem.getRelativeVelocityComponents(normalRelativeVelocity, tangentialRelativeVelocity);
-	analyticTangentialRelativeVelocity = problem.initialTangentialRelativeVelocity * cos(sqrt(problem.species->getSlidingStiffness()/problem.m12*3.5)* problem.getCollisionTime(2.0*problem.m12));
-	std::cout << "tangentialRelativeVelocity: analytic=" << analyticTangentialRelativeVelocity << ", simulation=" << tangentialRelativeVelocity << std::endl;
-	std::cout << "normalRelativeVelocity: analytic:" << -problem.en*problem.initialNormalRelativeVelocity << ", simulation=" << normalRelativeVelocity << std::endl;
+    logger(INFO, "\ntesting wall-particle collisions ...\n");
+    
+    srand(5);
+    
+    WallParticleCollision problem;
+    problem.setupInitialConditions();
+    
+    Mdouble normalRelativeVelocity, tangentialRelativeVelocity, analyticTangentialRelativeVelocity;
+    
+    //problem.setAppend_to_files(true);
+    
+    logger(INFO, "0: without tangential forces");
+    problem.setName("ForceSelfTest0");
+    problem.solve();
+    
+    problem.getRelativeVelocityComponents(normalRelativeVelocity, tangentialRelativeVelocity);
+    logger(INFO, "tangentialRelativeVelocity: analytic=%, simulation=%\n",
+           problem.initialTangentialRelativeVelocity, tangentialRelativeVelocity, Flusher::NO_FLUSH);
+    logger(INFO, "normalRelativeVelocity: analytic=%, simulation=%",
+           -problem.en * problem.initialNormalRelativeVelocity, normalRelativeVelocity);
+    
+    logger(INFO, "1: with Coulomb friction");
+    Mdouble mu = problem.random.getRandomNumber(0.0, 1.0);
+    problem.species->setSlidingFrictionCoefficient(mu);
+    problem.species->setSlidingDissipation(1e20);
+    problem.species->setSlidingStiffness(0.0);
+    problem.setName("ForceSelfTest1");
+    problem.solve();
+    problem.getRelativeVelocityComponents(normalRelativeVelocity, tangentialRelativeVelocity);
+    analyticTangentialRelativeVelocity = std::max(0.0, problem.initialTangentialRelativeVelocity +
+                                                       mu * 3.5 * (1 + problem.en) *
+                                                       problem.initialNormalRelativeVelocity);
+    logger(INFO, "tangentialRelativeVelocity: analytic=%, simulation=%\n",
+           analyticTangentialRelativeVelocity, tangentialRelativeVelocity, Flusher::NO_FLUSH);
+    logger(INFO, "normalRelativeVelocity: analytic=%, simulation=%",
+           -problem.en * problem.initialNormalRelativeVelocity, normalRelativeVelocity);
+    
+    logger(INFO, "2: with Coulomb friction, spring activated");
+    problem.species->setSlidingStiffness(1.0);
+    problem.setName("ForceSelfTest2");
+    problem.solve();
+    logger(INFO, "tangentialRelativeVelocity: analytic=%, simulation=%\n",
+           problem.initialTangentialRelativeVelocity, tangentialRelativeVelocity, Flusher::NO_FLUSH);
+    logger(INFO, "normalRelativeVelocity: analytic=%, simulation=%",
+           -problem.en * problem.initialNormalRelativeVelocity, normalRelativeVelocity);
+    
+    logger(INFO, "3: with tangential viscous force");
+    Mdouble et = problem.random.getRandomNumber(-1.0, 0.0);
+    problem.species->setSlidingFrictionCoefficient(1e20);
+    problem.species->setSlidingDissipation(-log(-et) / (2.0 * problem.tc) / 3.5 * 2.0 * problem.m12);
+    problem.species->setSlidingStiffness(0.0);
+    problem.setName("ForceSelfTest3");
+    problem.solve();
+    problem.getRelativeVelocityComponents(normalRelativeVelocity, tangentialRelativeVelocity);
+    analyticTangentialRelativeVelocity = problem.initialTangentialRelativeVelocity *
+                                         exp(-2.0 * 3.5 * problem.species->getSlidingDissipation() /
+                                             (2.0 * problem.m12) * problem.getCollisionTime(2.0 * problem.m12));
+    logger(INFO, "tangentialRelativeVelocity: analytic=%, simulation=%\n",
+           problem.initialTangentialRelativeVelocity, tangentialRelativeVelocity, Flusher::NO_FLUSH);
+    logger(INFO, "normalRelativeVelocity: analytic=%, simulation=%",
+           -problem.en * problem.initialNormalRelativeVelocity, normalRelativeVelocity);
+    
+    logger(INFO, "4: with tangential elastic force");
+    Mdouble et2 = problem.random.getRandomNumber(0.0, 1.0);
+    problem.species->setSlidingFrictionCoefficient(1e20);
+    problem.species->setSlidingDissipation(0.0);
+    problem.species->setSlidingStiffness(
+            problem.species->getStiffness() / 3.5 * mathsFunc::square(acos(-et2) / constants::pi));
+    problem.setName("ForceSelfTest4");
+    problem.solve();
+    problem.getRelativeVelocityComponents(normalRelativeVelocity, tangentialRelativeVelocity);
+    analyticTangentialRelativeVelocity = problem.initialTangentialRelativeVelocity *
+                                         cos(sqrt(problem.species->getSlidingStiffness() / problem.m12 * 3.5) *
+                                             problem.getCollisionTime(2.0 * problem.m12));
+    logger(INFO, "tangentialRelativeVelocity: analytic=%, simulation=%\n",
+           problem.initialTangentialRelativeVelocity, tangentialRelativeVelocity, Flusher::NO_FLUSH);
+    logger(INFO, "normalRelativeVelocity: analytic=%, simulation=%",
+           -problem.en * problem.initialNormalRelativeVelocity, normalRelativeVelocity);
 }
 
-int main() {
-
-	std::cout << std::endl << "note: analytic values are only asymptotically correct as delta->0" << std::endl;
-	particleParticleTest();
-	wallParticleTest();
-	return 0;
+int main()
+{
+    
+    logger(INFO, "\nnote: analytic values are only asymptotically correct as delta->0");
+    particleParticleTest();
+    wallParticleTest();
+    return 0;
 }
 

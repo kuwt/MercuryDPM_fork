@@ -153,8 +153,7 @@ void LiquidMigrationWilletSpecies::setDistributionCoefficient(Mdouble distributi
         distributionCoefficient_ = distributionCoefficient;
     else
     {
-        std::cerr << "Error in setDistributionCoefficient" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setDistributionCoefficient");
     }
 }
 
@@ -176,8 +175,7 @@ void LiquidMigrationWilletSpecies::setSurfaceTension(Mdouble surfaceTension)
         surfaceTension_ = surfaceTension;
     else
     {
-        std::cerr << "Error in setSurfaceTension" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setSurfaceTension");
     }
 }
 
@@ -201,8 +199,7 @@ void LiquidMigrationWilletSpecies::setContactAngle(Mdouble contactAngle)
     }
     else
     {
-        std::cerr << "Error in setContactAngle" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setContactAngle");
     }
 }
 

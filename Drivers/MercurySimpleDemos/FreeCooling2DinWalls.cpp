@@ -91,27 +91,27 @@ public:
 
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
-
-	std::cout<<"In this file 32^2 particles with the same velocity are placed "
-	"in a bi-axial box. This makes them collide with the walls and eachother. "
-	"Afterwards the same run is performed with hgrid on. It tests the working "
-	"(and speedup) of the hgrid."<<std::endl;
-
-	FreeCooling2DinWalls problem;
-	problem.setName("FreeCooling2DinWalls");
-
-    problem.N=100;
-
-    problem.setGravity(Vec3D(0.0,0.0,0.0));
+    
+    logger(INFO, "In this file 32^2 particles with the same velocity are placed "
+                 "in a bi-axial box. This makes them collide with the walls and eachother. "
+                 "Afterwards the same run is performed with hgrid on. It tests the working "
+                 "(and speedup) of the hgrid.");
+    
+    FreeCooling2DinWalls problem;
+    problem.setName("FreeCooling2DinWalls");
+    
+    problem.N = 100;
+    
+    problem.setGravity(Vec3D(0.0, 0.0, 0.0));
     problem.setTimeStep(5e-5);
     problem.setSaveCount(2000);
     problem.setTimeMax(1000.0);
-    problem.setMax({0.01,0.01,0.01});
-
-
+    problem.setMax({0.01, 0.01, 0.01});
+    
+    
     problem.setHGridMaxLevels(1);
-	problem.setHGridCellOverSizeRatio(1.2);
-	problem.setHGridUpdateEachTimeStep(false);
+    problem.setHGridCellOverSizeRatio(1.2);
+    problem.setHGridUpdateEachTimeStep(false);
     problem.setFileType(FileType::ONE_FILE);
 
 	problem.solve();

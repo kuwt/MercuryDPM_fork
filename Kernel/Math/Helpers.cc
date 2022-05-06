@@ -382,10 +382,9 @@ unsigned int helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(unsigne
     else
     {
         logger(ERROR,
-               "[Helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep()] numberOfSaves: %, timeMax: %, timestep: %",
+               "[Helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep()] numberOfSaves: %, timeMax: %, "
+               "timestep: %\n Arguments need to be positive",
                numberOfSaves, timeMax, timeStep);
-        logger(ERROR, " Arguments need to be positive");
-        exit(-1);
     }
 }
 
@@ -488,7 +487,7 @@ bool helpers::addToFile(std::string filename, std::string filecontent)
     file.open(filename.c_str(), std::ios::app);
     if (file.fail())
     {
-        std::cerr << "Error in writeToFile: file could not be opened" << std::endl;
+        logger(INFO, "Error in writeToFile: file could not be opened");
         return false;
     }
     file << filecontent;
@@ -564,8 +563,7 @@ std::vector<double> helpers::readArrayFromFile(std::string filename, int& n, int
     file.open(filename.c_str(), std::ios::in);
     if (file.fail())
     {
-        std::cerr << "Error in readArrayFromFile: file could not be opened" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in readArrayFromFile: file could not be opened");
     }
     file >> n >> m;
     std::vector<double> v;
@@ -582,7 +580,7 @@ std::vector<double> helpers::readArrayFromFile(std::string filename, int& n, int
 void helpers::more(std::string filename, unsigned nLines)
 {
     if (nLines != constants::unsignedMax)
-        std::cout << "First " << nLines << " lines of " << filename << ":\n";
+        logger(INFO, "First % lines of %:\n", Flusher::NO_FLUSH, nLines, filename);
     std::fstream file;
     file.open(filename.c_str(), std::ios::in);
     if (file.fail())
@@ -592,7 +590,7 @@ void helpers::more(std::string filename, unsigned nLines)
     {
         if (file.eof()) break;
         getline(file, line);
-        std::cout << " " << line << '\n';
+        logger(INFO, " %\n", line);
     }
     file.close();
 }
@@ -867,8 +865,8 @@ bool helpers::compare(std::istream& is, std::string s)
     if (dummy != s)
     {
         is.seekg(len, std::ios_base::beg);
-        return false;
         logger(INFO, "helpers::compare: Next stream value (%) is not %", dummy, s);
+        return false;
     }
     return true;
 }

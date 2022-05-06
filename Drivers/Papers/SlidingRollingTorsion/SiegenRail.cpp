@@ -61,28 +61,30 @@ public:
 	}
 	
 	void set_Walls(Mdouble Angle) {
-		std::cout << "Walls " << std::endl;
-		Mdouble c = cos(Angle);
-		Mdouble s = sin(Angle);
-		Mdouble Radius = particleHandler.getObject(0)->getRadius()/(1+relOverlap);
-		std::cout << "Angle " << Angle*180/constants::pi;
-		std::cout << "Radius " << particleHandler.getObject(0)->getRadius();
-		std::cout << "RadiusPrime " << Radius << std::endl;
-		setYMin(0);
-		setYMax(Radius*(1.+1./c));
-		setZMin(-2.*Radius);
-		setZMax(+2.*Radius);
-		if (Angle==0.0) {
+        logger(VERBOSE, "Walls ");
+        Mdouble c = cos(Angle);
+        Mdouble s = sin(Angle);
+        Mdouble Radius = particleHandler.getObject(0)->getRadius() / (1 + relOverlap);
+        logger(INFO, "Angle % Radius % RadiusPrime %",
+               Angle * 180 / constants::pi, particleHandler.getObject(0)->getRadius(), Radius);
+        setYMin(0);
+        setYMax(Radius * (1. + 1. / c));
+        setZMin(-2. * Radius);
+        setZMax(+2. * Radius);
+        if (Angle == 0.0)
+        {
             InfiniteWall w;
-			w.set(Vec3D(0., 1., 0.), getMax());
+            w.set(Vec3D(0., 1., 0.), getMax());
             wallHandler.copyAndAddObject(w);
-			w.set(Vec3D(0.,-1., 0.), Vec3D(0,0,0));
+            w.set(Vec3D(0., -1., 0.), Vec3D(0, 0, 0));
             wallHandler.copyAndAddObject(w);
-		} else {
+        }
+        else
+        {
             InfiniteWall w;
-			w.set(Vec3D(0., 1., 0.), getMax());
+            w.set(Vec3D(0., 1., 0.), getMax());
             wallHandler.copyAndAddObject(w);
-			w.set(Vec3D(0., -c, -s), Vec3D(0,0,0));
+            w.set(Vec3D(0., -c, -s), Vec3D(0, 0, 0));
             wallHandler.copyAndAddObject(w);
 			w.set(Vec3D(0., -c,  s), Vec3D(0,0,0));
             wallHandler.copyAndAddObject(w);
@@ -150,12 +152,15 @@ int main(int argc UNUSED, char *argv[] UNUSED)
  		md.solve(argc, argv);
 		fprintf(counter_file, "%f %.10e %.10e\n",a,md.wallHandler.getObject(0)->getForce().X,md.wallHandler.getObject(0)->getForce().Y);
  	}
-	for (Mdouble a=0; a<71; a+=8) {
-		Slide md(a);
-        sprintf (buffer, "rail%f", a); md.setName(buffer);
-        std::cout << buffer << std::endl;
-		md.solve(argc, argv);
-		fprintf(counter_file, "%f %.10e %.10e\n",a,md.wallHandler.getObject(0)->getForce().X,md.wallHandler.getObject(0)->getForce().Y);
-	}
+	for (Mdouble a=0; a<71; a+=8)
+    {
+        Slide md(a);
+        sprintf(buffer, "rail%f", a);
+        md.setName(buffer);
+        logger(INFO, "%", buffer);
+        md.solve(argc, argv);
+        fprintf(counter_file, "%f %.10e %.10e\n", a, md.wallHandler.getObject(0)->getForce().X,
+                md.wallHandler.getObject(0)->getForce().Y);
+    }
 	fclose(counter_file);
 }

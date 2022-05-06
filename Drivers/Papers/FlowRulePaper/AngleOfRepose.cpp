@@ -46,19 +46,22 @@ public:
 		wallHandler.copyAndAddObject(w0);
 		
 		//clean up chute
-		for (unsigned int i=0;i<particleHandler.getNumberOfObjects();)
-		{
-			if (mathsFunc::square(particleHandler.getObject(i)->getPosition().X-getChuteLength()*0.5) + mathsFunc::square(particleHandler.getObject(i)->getPosition().Y-getChuteLength()*0.5) > mathsFunc::square(getChuteLength()*0.5)) 
-				particleHandler.removeObject(i);
-			else i++;
-		}
-		
-		
-		particleHandler.setStorageCapacity(static_cast<unsigned>(std::min(getXMax()*getYMax()*getZMax()/mathsFunc::cubic(2.0*getInflowParticleRadius()),1e6)));
-		//setHGridNumberOfBucketsToPower(particleHandler.getStorageCapacity());
-		write(std::cout,false);
-		nCreated_=0;
-	}	
+        for (unsigned int i = 0; i < particleHandler.getNumberOfObjects();)
+        {
+            if (mathsFunc::square(particleHandler.getObject(i)->getPosition().X - getChuteLength() * 0.5) +
+                mathsFunc::square(particleHandler.getObject(i)->getPosition().Y - getChuteLength() * 0.5) >
+                mathsFunc::square(getChuteLength() * 0.5))
+                particleHandler.removeObject(i);
+            else i++;
+        }
+        
+        
+        particleHandler.setStorageCapacity(static_cast<unsigned>(std::min(
+                getXMax() * getYMax() * getZMax() / mathsFunc::cubic(2.0 * getInflowParticleRadius()), 1e6)));
+        //setHGridNumberOfBucketsToPower(particleHandler.getStorageCapacity());
+        write(std::cout, false);
+        nCreated_ = 0;
+    }
 	
 	void create_inflow_particle()
 	{
@@ -158,47 +161,49 @@ public:
 	Mdouble get_H() {return getInflowHeight();}
 
 	void run(int study_num)
-	{
-		//Set up a parameter study
-		set_study(study_num);
-		
-		std::stringstream name;
-		name << "AngleOfRepose"
-			 << "L" << round(100.*getFixedParticleRadius()*2.)/100.
-		     << "M" << species->getSlidingFrictionCoefficient()
-			 << "B" << getSlidingFrictionCoefficientBottom();
-		setName(name.str().c_str());
-		
-		//Save the info to disk
-		writeRestartFile();
-
-		//Check if the run has been done before
-		if (helpers::fileExists(dataFile.getName())) {
-			//If it has move on to teh next run immedently
-		  std::cout << "Run " << getName() << " has already been done " << std::endl;
-		} else {
-			//launch this code
-		  std::stringstream com("");
-			com << "echo started \tstudy_num \t" 
-				 << study_num << " \tname \t" 
-				 << getName() << " &>>Report_AngleOfRepose";
-			///todo{Change this line to have some meaningfull behaviour}
-			if(system(com.str().c_str())){}
-			std::cout << "started study_num " 
-				 << study_num << ", name " 
-			     << getName() << std::endl;
-
-			restartFile.setFileType(FileType::ONE_FILE);
-			dataFile.setFileType(FileType::ONE_FILE);
-			fStatFile.setFileType(FileType::ONE_FILE);
-			eneFile.setFileType(FileType::ONE_FILE);
-			setSaveCount(10000);
-			solve();
-
-			com.str("");
-			com << "echo finished \tstudy_num \t" 
-				 << study_num << " \tname \t" 
-				 << getName() << " &>>Report_AngleOfRepose";
+    {
+        //Set up a parameter study
+        set_study(study_num);
+        
+        std::stringstream name;
+        name << "AngleOfRepose"
+             << "L" << round(100. * getFixedParticleRadius() * 2.) / 100.
+             << "M" << species->getSlidingFrictionCoefficient()
+             << "B" << getSlidingFrictionCoefficientBottom();
+        setName(name.str().c_str());
+        
+        //Save the info to disk
+        writeRestartFile();
+        
+        //Check if the run has been done before
+        if (helpers::fileExists(dataFile.getName()))
+        {
+            //If it has move on to the next run immediately
+            logger(INFO, "Run % has already been done\n", Flusher::NO_FLUSH, getName());
+        }
+        else
+        {
+            //launch this code
+            std::stringstream com("");
+            com << "echo started \tstudy_num \t"
+                << study_num << " \tname \t"
+                << getName() << " &>>Report_AngleOfRepose";
+            ///todo{Change this line to have some meaningfull behaviour}
+            if (system(com.str().c_str()))
+            {}
+            logger(INFO, "started study_num %, name %", study_num, getName());
+            
+            restartFile.setFileType(FileType::ONE_FILE);
+            dataFile.setFileType(FileType::ONE_FILE);
+            fStatFile.setFileType(FileType::ONE_FILE);
+            eneFile.setFileType(FileType::ONE_FILE);
+            setSaveCount(10000);
+            solve();
+            
+            com.str("");
+            com << "echo finished \tstudy_num \t"
+                << study_num << " \tname \t"
+                << getName() << " &>>Report_AngleOfRepose";
 			///todo{Change this line to have some meaningfull behaviour}
 			if(system(com.str().c_str())){}
 		}
@@ -232,11 +237,12 @@ public:
 			species->setSlidingFrictionCoefficient(0.5);
 			setSlidingFrictionCoefficientBottom(MuBottom[study_num-9]);
 			setFixedParticleRadius(0.5);
-		} else {
-			//If study_num is complete quit
-		  std::cout << "Study is complete " << std::endl;
-			exit(0);
-		}
+		} else
+        {
+            //If study_num is complete quit
+            logger(INFO, "Study is complete");
+            exit(0);
+        }
 		//Note make sure h and a is defined
 		set_study(); 
 	}
@@ -299,10 +305,10 @@ int main(int argc, char *argv[])
 	int study_num;
 	if (argc>1) {
 		study_num=atoi(argv[1]);
-	} else {
-		study_num=0;
-		std::cout << "Please enter study number" << std::endl;
-		exit(-1);
-	}
+	} else
+    {
+        study_num = 0;
+        logger(ERROR, "Please enter study number");
+    }
 	problem.run(study_num);
 }

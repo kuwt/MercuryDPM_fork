@@ -43,36 +43,39 @@ public:
 	}
 
 	void writeToLocalFolder() {
-		//keep file name but create files in the local directory, i.e. remove folder
-	  std::string name = getName();
-		size_t found=name.find_last_of("/\\");
-		setName(name.substr(found+1).c_str());
-		std::cout << "new name: " << getName() << std::endl;
-	}
+        //keep file name but create files in the local directory, i.e. remove folder
+        std::string name = getName();
+        size_t found = name.find_last_of("/\\");
+        setName(name.substr(found + 1).c_str());
+        logger(INFO, "new name: %", getName());
+    }
 
 };
 
 int main(int argc, char *argv[])
 {
-	if (argc<2) {
-	  std::cout << "snapshot.exe problemname [args]" << std::endl;
-		exit(-1);
-	} else {
-	  std::cout << "restart data: " << argv[1] << ".restart" << std::endl;
-	}
- 	ChutePeriodic problem;
- 	problem.setName(argv[1]);
-	problem.readRestartFile();
-	problem.writeToLocalFolder();
-	problem.setXBallsScale(1.7/problem.getZMax());
-	//problem.setXBallsColourMode(10);
-	problem.setXBallsAdditionalArguments("-v0 -solidf -h 900 -w 1450 -o 120 -noborder 4 -rgbb 60 -rgbg 60 -rgbr 60 -rgbs 90");
-	problem.readArguments(argc-1, argv+1);
-	problem.solve();
-	
-	std::stringstream command("");
-	command << "./" << problem.getName() << ".disp -of " << problem.getName() << ".pdf -die";
-	int out = system (command.str().c_str());
-	std::cout<<"The return value by system ="<<out<<std::endl;
-
+    if (argc < 2)
+    {
+        logger(ERROR, "snapshot.exe problemname [args]");
+    }
+    else
+    {
+        logger(INFO, "restart data: %.restart", argv[1]);
+    }
+    ChutePeriodic problem;
+    problem.setName(argv[1]);
+    problem.readRestartFile();
+    problem.writeToLocalFolder();
+    problem.setXBallsScale(1.7 / problem.getZMax());
+    //problem.setXBallsColourMode(10);
+    problem.setXBallsAdditionalArguments(
+            "-v0 -solidf -h 900 -w 1450 -o 120 -noborder 4 -rgbb 60 -rgbg 60 -rgbr 60 -rgbs 90");
+    problem.readArguments(argc - 1, argv + 1);
+    problem.solve();
+    
+    std::stringstream command("");
+    command << "./" << problem.getName() << ".disp -of " << problem.getName() << ".pdf -die";
+    int out = system(command.str().c_str());
+    logger(INFO, "The return value by system =%", out);
+    
 }

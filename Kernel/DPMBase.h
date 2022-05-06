@@ -262,18 +262,18 @@ public:
 //     */
 //    void statisticsFromRestartData(const char *name);
 ///\todo what to do with statisticsFromRestartData?
-
+    
     /*!
      * \brief Writes all data into a restart file
      */
-    virtual void write(std::ostream& os, bool writeAllParticles = true) const;
-
+    virtual void write(std::ostream& os, bool writeAllParticles = true, int nToWrite = 4) const;
+    
     /*!
      * \brief Reads all data from a restart file, e.g. domain data and particle data
      * \todo warning: hides non-virtual function from the class 'Files'.
      */
     virtual void read(std::istream& is, ReadOptions opt = ReadOptions::ReadAll);
-
+    
     /*!
      * \brief Allows you to read in a wall defined in a Driver directory; see USER/Luca/ScrewFiller
      */
