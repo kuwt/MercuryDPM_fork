@@ -633,7 +633,7 @@ private:
         // only suppress flushing if Mercury is not in CMAKE_BUILD_TYPE "Debug" and if the user defined loglevel from
         // cMake is below VERBOSE/DEBUG (<=5)
 #ifndef MERCURY_DEBUG
-        if (arg != Flusher::FLUSH && MERCURY_LOGLEVEL <= 5)
+        if (arg != Flusher::FLUSH && MERCURY_LOGLEVEL <= Log::VERBOSE)
         {
             doFlush_ = Flusher::NO_FLUSH;
         }
