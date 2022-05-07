@@ -267,15 +267,18 @@ void DPMBase::constructor()
     xBallsScale_ = -1;
     xBallsAdditionalArguments_ = "";
     setAppend(false);
-
+    
     //The default random seed is 0
     random.setRandomSeed(0);
-
+    
     logger(DEBUG, "DPMBase problem constructor finished");
-
+    
     readSpeciesFromDataFile_ = false;
     
     numberOfOMPThreads_ = 1;
+    
+    //Set number of elements to write to the screen if a user wants to output write information to the terminal
+    nToWrite_ = 4;
 }
 
 /*!
@@ -825,10 +828,32 @@ void DPMBase::setTime(Mdouble time)
     Mdouble diff = time_ - time;
     time_ = time;
     //this sets the interaction timestamp, so each interaction has the right time
-    for (auto i : interactionHandler)
+    for (auto i: interactionHandler)
     {
         i->setTimeStamp(i->getTimeStamp() - diff);
     }
+}
+
+
+/*!
+ * \details sets nToWrite_. If a user wants to output e.g. particle information to the screen we limit the number of
+ * outputs to nToWrite elements to not get an overflow of information in the terminal.
+ * \param[in] nToWrite          Number of elements to write to the screen
+ */
+void DPMBase::setNToWrite(int nToWrite)
+{
+    nToWrite_ = nToWrite;
+}
+
+/*!
+ * \details Gets nToWrite. If a user wants to output e.g. particle information to the screen we limit the number of
+ * outputs to nToWrite elements to not get an overflow of information in the terminal.
+ * \param[out] nToWrite_          Number of elements to write to the screen
+ */
+
+int DPMBase::getNToWrite() const
+{
+    return nToWrite_;
 }
 
 /*!
@@ -3374,7 +3399,7 @@ void DPMBase::computeInternalForces(BaseParticle* i)
  * to the output file. (Otherwise, only a small number of particles are printed.)
  * \param[in] nToWrite
  */
-void DPMBase::write(std::ostream& os, bool writeAllParticles, int nToWrite) const
+void DPMBase::write(std::ostream& os, bool writeAllParticles) const
 {
     os << "MercuryDPM " << getVersion();
     //which outputs basic information regarding the various files  (.data, .fstat etc. etc.)
@@ -3428,7 +3453,6 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles, int nToWrite) cons
             << " numberOfDomains " << numberOfDomains_[Direction::XAXIS] << " " << numberOfDomains_[Direction::YAXIS] << " " << numberOfDomains_[Direction::ZAXIS];
     }
 #endif
-
     //only write xBallsArguments if they are nonzero
     if (getXBallsAdditionalArguments().compare(""))
         os << " xBallsArguments " << getXBallsAdditionalArguments();
@@ -3447,19 +3471,22 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles, int nToWrite) cons
             os << *wallHandler.getObject(i) << std::endl;
         os << "...\n";
     }
-
+    
     //outputs the number of boundaries in the system
     os << "Boundaries " << boundaryHandler.getNumberOfObjects() << std::endl;
-    if (writeAllParticles || boundaryHandler.getSize() < 9) {
-        for (BaseBoundary* b : boundaryHandler)
+    if (writeAllParticles || boundaryHandler.getSize() < 9)
+    {
+        for (BaseBoundary* b: boundaryHandler)
             os << (*b) << std::endl;
-    } else {
-        for (int i=0; i<2; ++i)
+    }
+    else
+    {
+        for (int i = 0; i < 2; ++i)
             os << *boundaryHandler.getObject(i) << std::endl;
         os << "...\n";
     }
-
-    if (writeAllParticles || particleHandler.getSize() < nToWrite)
+    
+    if (writeAllParticles || particleHandler.getSize() < getNToWrite())
     {
         //if the "writeAllParticles" bool == true, or there are fewer than 4 particles
         //calls the particleHandler version of the "write" function and also
@@ -3470,19 +3497,19 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles, int nToWrite) cons
     {
         //otherwise, only prints out limited information
         os << "Particles " << particleHandler.getSize() << '\n';
-        for (unsigned int i = 0; i < nToWrite; i++)
+        for (unsigned int i = 0; i < getNToWrite(); i++)
             os << *(particleHandler.getObject(i)) << '\n';
         os << "..." << '\n';
     }
     // Similarly, print out interaction details (all of them, or up to nToWrite of them)
-    if (writeAllParticles || interactionHandler.getNumberOfObjects() < nToWrite)
+    if (writeAllParticles || interactionHandler.getNumberOfObjects() < getNToWrite())
     {
         interactionHandler.write(os);
     }
     else
     {
         os << "Interactions " << interactionHandler.getNumberOfObjects() << '\n';
-        for (unsigned int i = 0; i < nToWrite; i++)
+        for (unsigned int i = 0; i < getNToWrite(); i++)
             os << *(interactionHandler.getObject(i)) << '\n';
         os << "..." << '\n';
     }
@@ -5241,5 +5268,6 @@ void DPMBase::handleParticleAddition(unsigned int id, BaseParticle* p)
         w->handleParticleAddition(id, p);
     }
 }
+
 
 ///\todo When restarting the indexMax should be reset

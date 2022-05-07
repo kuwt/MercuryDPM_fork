@@ -165,7 +165,7 @@ public:
     /*!
      * \brief Writes all data into a restart file
      */
-    virtual void write(std::ostream& os, bool writeAllParticles = true) const;
+    void write(std::ostream& os, bool writeAllParticles = true) const override;
     
     /*!
      * \brief Returns hGridCurrentMaxRelativeDisplacement_.

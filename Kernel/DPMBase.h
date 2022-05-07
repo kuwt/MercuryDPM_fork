@@ -266,7 +266,7 @@ public:
     /*!
      * \brief Writes all data into a restart file
      */
-    virtual void write(std::ostream& os, bool writeAllParticles = true, int nToWrite = 4) const;
+    virtual void write(std::ostream& os, bool writeAllParticles = true) const;
     
     /*!
      * \brief Reads all data from a restart file, e.g. domain data and particle data
@@ -465,7 +465,8 @@ public:
      * \brief Sets File::openMode_ for all files (ene, data, fstat, restart, stat)
      */
     void setOpenMode(std::fstream::openmode openMode);
-
+    
+    
     //other member functions
 
     /*!
@@ -508,16 +509,26 @@ public:
      * \brief Sets a new value for the maximum simulation duration.
      */
     void setTimeMax(Mdouble newTMax);
-
+    
     /*!
      * \brief Returns the maximum simulation duration.
      */
     Mdouble getTimeMax() const;
-
+    
     /*!
      * \brief Sets File::logarithmicSaveCount_ for all files (ene, data, fstat, restart, stat)
      */
     void setLogarithmicSaveCount(Mdouble logarithmicSaveCountBase);
+    
+    /*!
+     * \brief set the number of elements to write to the screen
+     */
+    void setNToWrite(int nToWrite);
+    
+    /*!
+     * \brief get the number of elements to write to the
+     */
+    int getNToWrite() const;
 
 #ifdef CONTACT_LIST_HGRID
     /*!
@@ -525,7 +536,7 @@ public:
      */
         PossibleContactList& getPossibleContactList();
 #endif
-
+    
     /*!
      * \todo{these functions should also update the mixed species}
      */
@@ -861,7 +872,8 @@ public:
      * \brief
      */
     double getWallTime() { return clock_.getWallTime(); }
-
+    
+    
     /*!
      * \brief Checks if two particle are in contact or is there any positive overlap
      */
@@ -1331,24 +1343,28 @@ private:
      * \brief the name of the problem, used, e.g., for the output files
      */
     std::string name_;
-
+    
     // defines a Macro for creating an instance of class PossibleContactList. See PossibleContactList.h
 #ifdef CONTACT_LIST_HGRID
     PossibleContactList possibleContactList;
 #endif
-
+    
     /*!
      * \brief Determines if the last column of the data file is interpreted as the info parameter during restart
      */
     bool readSpeciesFromDataFile_;
-
+    
+    /*!
+     * \brief number of elements to write to a screen
+     */
+    int nToWrite_;
 
 public:
     /*!
      * \brief A handler to that stores the species type i.e. LinearViscoelasticSpecies, etc.
      */
     SpeciesHandler speciesHandler;
-
+    
     /*!
      * \brief This is a random generator, often used for setting up the initial conditions etc...
      */
