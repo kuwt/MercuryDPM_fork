@@ -59,7 +59,7 @@ public:
     BaseParticle();
     
     /*!
-     * \brief Particle copy constructor, which accepts as input a reference to a Particle. It creates a copy of this Particle and all it's information. Usually it is better to use the copy() function for polymorfism.
+     * \brief Particle copy constructor, which accepts as input a reference to a Particle. It creates a copy of this Particle and all it's information. Usually it is better to use the copy() function for polymorphism.
      */
     BaseParticle(const BaseParticle& p);
     
@@ -71,7 +71,7 @@ public:
     ~BaseParticle() override;
     
     /*!
-     * \brief Particle copy method. It calls to copy constructor of this Particle, useful for polymorfism
+     * \brief Particle copy method. It calls to copy constructor of this Particle, useful for polymorphism
      */
     virtual BaseParticle* copy() const = 0;
 
@@ -321,6 +321,9 @@ public:
      */
     Mdouble getMass() const
     { return 1.0 / invMass_; }
+
+    Mdouble getSurfaceArea() const
+    { return 4.0*constants::pi*getRadius()*getRadius(); }
     
     Vec3D getMomentum() const
     { return getVelocity() / invMass_; }

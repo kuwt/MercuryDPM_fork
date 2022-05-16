@@ -28,6 +28,7 @@
 #include <Math/Helpers.h>
 #include <Particles/SphericalParticle.h>
 #include <Particles/ThermalParticle.h>
+#include <Particles/HeatFluidCoupledParticle.h>
 #include "ParticleHandler.h"
 #include "DPMBase.h"
 #include "SpeciesHandler.h"
@@ -1031,6 +1032,10 @@ BaseParticle* ParticleHandler::createObject(const std::string& type)
     else if (type == "ThermalParticle")
     {
         return new ThermalParticle;
+    }
+    else if (type == "HeatFluidCoupledParticle")
+    {
+        return new HeatFluidCoupledParticle;
     }
     else
     {

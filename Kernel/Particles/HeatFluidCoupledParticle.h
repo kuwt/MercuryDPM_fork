@@ -23,117 +23,140 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef LiquidFilmParticle_H
-#define LiquidFilmParticle_H
+#ifndef HeatFluidCoupledParticle_H
+#define HeatFluidCoupledParticle_H
 
-#include "BaseParticle.h"
+#include "ThermalParticle.h"
 
 /*!
- * \class LiquidFilmParticle
+ * \class HeatFluidCoupledParticle
  * \brief
  */
-class LiquidFilmParticle final : public BaseParticle
+class HeatFluidCoupledParticle final : public ThermalParticle
 {
 public:
     /*!
-     * \brief Basic Particle constructor, creates an Particle at (0,0,0) with radius, mass and inertia equal to 1.
-     * \details default constructor
+     * \details HeatFluidCoupledParticle constructor creates a HeatFluidCoupledParticle at (0,0,0) with radius,
+     * mass and inertia equal to 1.
      */
-    LiquidFilmParticle()
+    HeatFluidCoupledParticle()
     {
         liquidVolume_ = 0;
     }
-    
+
     /*!
-     * \brief Particle copy constructor, which accepts as input a reference to a Particle. It creates a copy of this Particle and all it's information. Usually it is better to use the copy() function for polymorfism.
+     * \brief HeatFluidCoupledParticle copy constructor, which accepts as input a reference to a HeatFluidCoupledParticle.
+     * It creates a copy of this HeatFluidCoupledParticle and all it's information.
+     * Usually it is better to use the copy() function for polymorphism.
      * \details Constructor that copies most of the properties of the given particle.
      *          Please note that not everything is copied, for example the position
      *          in the HGrid is not determined yet by the end of this constructor.
      *          It also does not copy the interactions and the pointer to the handler
      *          that handles this particle. Use with care.
-     * \param[in,out] p  Reference to the LiquidFilmParticle this one should become a copy of.
+     * \param[in,out] p  Reference to the HeatFluidCoupledParticle this one should become a copy of.
      */
-    LiquidFilmParticle(const LiquidFilmParticle& p) : BaseParticle(p)
+    HeatFluidCoupledParticle(const HeatFluidCoupledParticle& p)
     {
         liquidVolume_ = p.liquidVolume_;
     }
-    
+
     /*!
-     * \brief Particle destructor, needs to be implemented and checked if it removes tangential spring information
-     * \details Destructor. It asks the ParticleHandler to check if this was the
-     *          smallest or largest particle and adjust itself accordingly.
+     * \brief HeatFluidCoupledParticle destructor, needs to be implemented and checked if it removes tangential spring information.
+     * \details Destructor. It asks the ParticleHandler to check if this was the smallest or largest particle and adjust itself accordingly.
      */
-    ~LiquidFilmParticle() override
+    ~HeatFluidCoupledParticle() override
     = default;
-    
+
     /*!
-     * \brief Particle copy method. It calls to copy constructor of this Particle, useful for polymorfism
-     * \details Copy method. Uses copy constructor to create a copy on the heap.
-     *          Useful for polymorphism.
-     * \return pointer to the particle's copy
+     * \brief HeatFluidCoupledParticle copy method. Use copy constructor of this HeatFluidCoupledParticle to create a copy on the heap,
+     * useful for polymorphism.
+     * @return pointer to the particle's copy.
      */
-    LiquidFilmParticle* copy() const override
+    HeatFluidCoupledParticle* copy() const override
     {
-        return new LiquidFilmParticle(*this);
+        return new HeatFluidCoupledParticle(*this);
     }
 
     /*!
-     * \details LiquidFilmParticle print method, which accepts an os std::ostream as
-     *          input. It prints human readable LiquidFilmParticle information to the
+     * \details HeatFluidCoupledParticle print method, which accepts an os std::ostream as
+     *          input. It prints human readable HeatFluidCoupledParticle information to the
      *          std::ostream.
-     * \param[in,out] os    stream to which the info is written
+     * \param[in,out] os    stream to which the info is written.
      */
     void write(std::ostream& os) const override
     {
-        BaseParticle::write(os);
+        ThermalParticle::write(os);
         os << " liquidVolume " << liquidVolume_;
     }
 
     /*!
-     * \details Returns the name of the object; in this case 'LiquidFilmParticle'.
-     * \return The object name.
+     * \details Returns the name of the object; in this case 'HeatFluidCoupledParticle'.
+     * @return The object name.
      */
     std::string getName() const override
     {
-        return "LiquidFilmParticle";
+        return "HeatFluidCoupledParticle";
     }
-    
+
+    /*!
+     * \brief HeatFluidCoupledParticle read function, which accepts an std::istream as input.
+     */
     void read(std::istream& is) override;
-    
+
+    /*!
+     * \brief Returns the volume of the Liquid.
+     * @return The actual volume of the liquid.
+     */
     Mdouble getLiquidVolume() const
     {
         return liquidVolume_;
     }
-    
+
+    /*!
+     * \brief Sets the volume of the Liquid.
+     */
     void setLiquidVolume(Mdouble liquidVolume)
     {
         liquidVolume_ = liquidVolume;
     }
-    
+
+    /*!
+     * \brief Adds the volume of the Liquid.
+     */
     void addLiquidVolume(Mdouble liquidVolume)
     {
         liquidVolume_ += liquidVolume;
     }
-    
+
     unsigned getNumberOfFieldsVTK() const override
     {
-        return 3;
+        return 4;
     }
-    
+
     std::string getTypeVTK(unsigned i) const override
     {
         return "Float32";
     }
-    
+
     std::string getNameVTK(unsigned i) const override;
-    
+
     std::vector<Mdouble> getFieldVTK(unsigned i) const override;
 
     bool isSphericalParticle() const override {return true;}
 
+    void actionsAfterTimeStep() override;
+
 private:
-    
+
+    /// f1 is used in Runge–Kutta method.
+    double f1(double liquidVolume,double temperature);
+
+    /// f2 is used in Runge–Kutta method.
+    double f2(double liquidVolume,double temperature);
+
+    //Volume of the liquid
     Mdouble liquidVolume_;
+
 };
 
 #endif

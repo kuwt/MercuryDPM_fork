@@ -32,47 +32,95 @@
  * \class ThermalParticle
  * \brief
  */
-class ThermalParticle final : public BaseParticle
+class ThermalParticle : public BaseParticle
 {
 public:
     /*!
-     * \brief Basic Particle constructor, creates a particle at (0,0,0) with radius, mass and inertia equal to 1
+     * \brief Basic Particle constructor, creates a particle at (0,0,0) with radius, mass and inertia equal to 1.
+     * \details default constructor
      */
-    ThermalParticle();
+    ThermalParticle()
+    {
+        temperature_ = 0;
+        //temperatureDependentDensity_
+    }
     
     /*!
-     * \brief Particle copy constructor, which accepts as input a reference to a Particle. It creates a copy of this Particle and all it's information. Usually it is better to use the copy() function for polymorfism.
+     * \brief Particle copy constructor, which accepts as input a reference to a Particle. It creates a copy of this Particle and all it's information. Usually it is better to use the copy() function for polymorphism.
+     * \details Constructor that copies most of the properties of the given particle.
+     *          Please note that not everything is copied, for example the position
+     *          in the HGrid is not determined yet by the end of this constructor.
+     *          It also does not copy the interactions and the pointer to the handler
+     *          that handles this particle. Use with care.
+     * \param[in,out] p  Reference to the ThermalParticle this one should become a copy of.
      */
-    ThermalParticle(const ThermalParticle& p);
+    ThermalParticle(const ThermalParticle& p) : BaseParticle(p)
+    {
+        temperature_ = p.temperature_;
+        timeDependentTemperature_ = p.timeDependentTemperature_;
+    }
     
     /*!
      * \brief Particle destructor, needs to be implemented and checked if it removes tangential spring information
+     * \details Destructor. It asks the ParticleHandler to check if this was the
+     *          smallest or largest particle and adjust itself accordingly.
      */
-    ~ThermalParticle() override;
+    ~ThermalParticle() override
+    = default;
     
     /*!
      * \brief Particle copy method. It calls to copy constructor of this Particle, useful for polymorfism
+     * \details Copy method. Uses copy constructor to create a copy on the heap.
+     *          Useful for polymorphism.
+     * \return pointer to the particle's copy
      */
-    ThermalParticle* copy() const override;
+    ThermalParticle* copy() const override
+    {
+        return new ThermalParticle(*this);
+    }
+
+    /*!
+     * \details ThermalParticle print method, which accepts an os std::ostream as
+     *          input. It prints human readable ThermalParticle information to the
+     *          std::ostream.
+     * \param[in,out] os    stream to which the info is written
+     */
+    void write(std::ostream& os) const override
+    {
+        BaseParticle::write(os);
+        os << " temperature " << temperature_;
+    }
     
-    
-    void write(std::ostream& os) const override;
-    
-    std::string getName() const override;
+    std::string getName() const override
+    {
+        return "ThermalParticle";
+    }
     
     void read(std::istream& is) override;
     
-    Mdouble getTemperature() const;
+    Mdouble getTemperature() const
+    {
+        return temperature_;
+    }
     
-    void setTemperature(Mdouble temperature);
+    void setTemperature(Mdouble temperature)
+    {
+        temperature_ = temperature;
+    }
     
-    void addTemperature(Mdouble temperature);
+    void addTemperature(Mdouble temperature)
+    {
+        temperature_ += temperature;
+    }
     
     void setTemperatureDependentDensity(const std::function<double(double)>& temperatureDependentDensity);
     
     const std::function<double(double)>& getTemperatureDependentDensity() const;
     
-    const std::function<double(double)>& getTimeDependentTemperature() const;
+    const std::function<double(double)>& getTimeDependentTemperature() const
+    {
+        return timeDependentTemperature_;
+    }
     
     void setTimeDependentTemperature(const std::function<double(double)>& timeDependentTemperature);
     
@@ -86,7 +134,8 @@ private:
      * Change this function to let the temperature be time-dependent.
      */
     std::function<double(double temperature)> timeDependentTemperature_;
-    
+
+protected:
     Mdouble temperature_;
 };
 
