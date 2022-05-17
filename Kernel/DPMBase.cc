@@ -3112,7 +3112,7 @@ void DPMBase::integrateBeforeForceComputation()
     //for (BaseParticle* p : particleHandler) {
 
     #pragma omp parallel for num_threads(getNumberOfOMPThreads()) //schedule(dynamic)
-    for (int k = 0; k < particleHandler.getNumberOfObjects(); ++k) {
+    for (int k = 0; k < particleHandler.getSize(); ++k) {
         BaseParticle *p = particleHandler.getObject(k);
 #ifdef MERCURY_USE_MPI
         //MPI particles are not integrated, they are purely ghost particles and get their new velocity and position from an MPI update
@@ -3131,7 +3131,7 @@ void DPMBase::integrateBeforeForceComputation()
     //for_each(wallHandler.begin(), wallHandler.end(), [this](BaseWall* w)
     //for (BaseWall* w : wallHandler) {
     #pragma omp parallel for num_threads(getNumberOfOMPThreads()) //schedule(dynamic)
-    for (int k = 0; k < wallHandler.getNumberOfObjects(); k++) {
+    for (int k = 0; k < wallHandler.getSize(); k++) {
         BaseWall *w = wallHandler.getObject(k);
         //using the wall's internal "integrateBeforeForceComputation" function
         //to update the relevant parameters concerning its position and motion
@@ -3196,7 +3196,7 @@ void DPMBase::integrateAfterForceComputation()
     //cycling through all particles, p, in the particleHandler
     //for_each(particleHandler.begin(), particleHandler.end(), [this](BaseParticle* p){
     #pragma omp parallel for num_threads(getNumberOfOMPThreads()) //schedule(dynamic)
-    for (int k = 0; k < particleHandler.getNumberOfObjects(); ++k) {
+    for (int k = 0; k < particleHandler.getSize(); ++k) {
         BaseParticle *p = particleHandler.getObject(k);
 #ifdef MERCURY_USE_MPI
         //MPI particles do not require integration - they are updated by the communication step
@@ -3214,7 +3214,7 @@ void DPMBase::integrateAfterForceComputation()
     //cycling through all walls, w, in the wallHandler
     //for_each(wallHandler.begin(), wallHandler.end(), [this](BaseWall* w){
     #pragma omp parallel for num_threads(getNumberOfOMPThreads()) //schedule(dynamic)
-    for (int k = 0; k < wallHandler.getNumberOfObjects(); k++) {
+    for (int k = 0; k < wallHandler.getSize(); k++) {
         BaseWall *w = wallHandler.getObject(k);
         //using the wall's internal "integrateAfterForceComputation" function
         //to update the relevant parameters concerning its position and motion
@@ -3280,11 +3280,11 @@ void DPMBase::computeAllForces()
     #pragma omp parallel num_threads(getNumberOfOMPThreads())
     {
         #pragma omp for
-        for (int k = 0; k < particleHandler.getNumberOfObjects(); ++k) {
+        for (int k = 0; k < particleHandler.getSize(); ++k) {
             particleHandler.getObject(k)->resetForceTorque(getNumberOfOMPThreads());
         }
         #pragma omp for
-        for (int k = 0; k < wallHandler.getNumberOfObjects(); k++) {
+        for (int k = 0; k < wallHandler.getSize(); k++) {
             wallHandler.getObject(k)->resetForceTorque(getNumberOfOMPThreads());
         }
     }
@@ -3299,7 +3299,7 @@ void DPMBase::computeAllForces()
         //logger(INFO, "Number of omp threads = %", getNumberOfOMPThreads());
         ///Now loop over all particles contacts computing force contributions
         #pragma omp for schedule(dynamic)
-        for (int k = 0; k < particleHandler.getNumberOfObjects(); ++k) {
+        for (int k = 0; k < particleHandler.getSize(); ++k) {
             BaseParticle *p = particleHandler.getObject(k);
             //computing both internal forces (e.g. due to collisions)
             //and external forces (e.g. gravity)
@@ -3312,7 +3312,7 @@ void DPMBase::computeAllForces()
 
         // wall-forces
         #pragma omp for schedule(dynamic)
-        for (int k = 0; k < wallHandler.getNumberOfObjects(); k++) {
+        for (int k = 0; k < wallHandler.getSize(); k++) {
             BaseWall *w = wallHandler.getObject(k);
             computeWallForces(w);
         }
@@ -3346,11 +3346,11 @@ void DPMBase::computeAllForces()
     #pragma omp parallel num_threads(getNumberOfOMPThreads())
     {
         #pragma omp for
-        for (int k = 0; k < particleHandler.getNumberOfObjects(); k++) {
+        for (int k = 0; k < particleHandler.getSize(); k++) {
             particleHandler.getObject(k)->sumForceTorqueOMP();
         }
         #pragma omp for
-        for (int k = 0; k < wallHandler.getNumberOfObjects(); k++) {
+        for (int k = 0; k < wallHandler.getSize(); k++) {
             wallHandler.getObject(k)->sumForceTorqueOMP();
         } //end reset forces loop
     }
@@ -4082,11 +4082,18 @@ void DPMBase::solve()
     interactionHandler.actionsAfterTimeStep();
     logger(DEBUG, "Have computed the initial values for the forces ");
 
+    // Can be used to measure simulation time
+    clock_.tic();
+    
     // This is the main loop over advancing time
     while (getTime() < getTimeMax() && continueSolve())
     {
         computeOneTimeStep();
     }
+    
+    // Can be used to measure simulation time
+    clock_.toc();
+    
     //force writing of the last time step
     forceWriteOutputFiles();
 

@@ -59,6 +59,7 @@
 #include "VTKWriter/WallVTKWriter.h"
 #include "VTKWriter/InteractionVTKWriter.h"
 #include "VTKWriter/BoundaryVTKWriter.h"
+#include "MercuryTime.h"
 
 
 /*!
@@ -852,6 +853,16 @@ public:
     Vec3D getTotalMomentum() const;
 
     /*!
+     * \brief
+     */
+    double getCPUTime() { return clock_.getCPUTime(); }
+    
+    /*!
+     * \brief
+     */
+    double getWallTime() { return clock_.getWallTime(); }
+
+    /*!
      * \brief Checks if two particle are in contact or is there any positive overlap
      */
     static bool areInContact(const BaseParticle* pI, const BaseParticle* pJ);
@@ -1418,7 +1429,8 @@ public:
     /*!
      * \brief record when the simulation started
      */
-
+    Time clock_;
+    
     void writePythonFileForVTKVisualisation() const;
 };
 

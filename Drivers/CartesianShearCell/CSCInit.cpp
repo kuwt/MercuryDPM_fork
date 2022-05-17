@@ -38,7 +38,7 @@ public:
         readRestartFile();
         setRestarted(false);
         setName("CSCInit");
-        setXBallsAdditionalArguments("-v0 -solidf -3dturn 0");
+        setXBallsAdditionalArguments("-v0 -solidf");
         writeXBallsScript();
         species = speciesHandler.getObject(0);
         std::cout << "loaded " << particleHandler.getNumberOfObjects() 
@@ -125,7 +125,7 @@ public:
 
 int main(int argc, char *argv[]) {
     CSCInit SC;
-    SC.autoNumber();
+    //SC.autoNumber();
     SC.random.randomise();
     SC.solve(argc, argv);
     SC.save();
