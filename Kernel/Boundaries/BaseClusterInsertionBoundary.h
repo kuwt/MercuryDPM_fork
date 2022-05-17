@@ -78,17 +78,12 @@ public:
 
     //!\brief this sets the radius of the micro particle composing the cluster.
     void setRadiusMicroParticle(Mdouble rMP);
-
-    /*!
-    * \brief Sets the range of cluster radius that may be generated.
-    */
-    void setRadiusRange(Mdouble radMin, Mdouble radMax);
     
     /*!
      * \brief Sets the geometry (position and velocity distribution) of the
      * ClusterInsertionBoundary
      */
-    void setGeometry(Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax);
+    void setGeometry(Vec3D posMin, Vec3D posMax);
 
     /*!
      * \brief Sets the velocity range of the ClusterInsertionBoundary
@@ -218,18 +213,7 @@ protected:
 
     //Variable used to switch the randomise() process
     bool randomised_;
-
 };
-
-/*
- * write to file
- */
-std::ostream& operator<<(std::ostream& os, BaseClusterInsertionBoundary::Distribution type);
-
-/*
- * read from file
- */
-std::istream& operator>>(std::istream& is, BaseClusterInsertionBoundary::Distribution& type);
 
 #endif
 

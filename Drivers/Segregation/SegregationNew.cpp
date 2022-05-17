@@ -100,12 +100,12 @@ public:
         species2->setSlidingDissipation(species2->getDissipation());
         species2->setSlidingStiffness(species2->getStiffness()*2.0/7.0);
         species2->setSlidingFrictionCoefficient(0.5);
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
         //
         //////////
         //
@@ -114,30 +114,30 @@ public:
                 species01->getDissipation()); //  Set the tangential dissipation equal to the normal disipation for mixed collision
         species01->setSlidingFrictionCoefficient(0.5);
         species01->setSlidingStiffness(species01->getStiffness() * 2.0 / 7.0);
-    
+
         species02->setCollisionTimeAndRestitutionCoefficient(tc, r, mass_small, mass_large);
         species02->setSlidingDissipation(
                 species01->getDissipation()); //  Set the tangential dissipation equal to the normal disipation
         species02->setSlidingFrictionCoefficient(0.5);
         species02->setSlidingStiffness(species02->getStiffness() * 2.0 / 7.0);
-    
+
         species12->setCollisionTimeAndRestitutionCoefficient(tc, r, mass_small, mass_large);
         species12->setSlidingDissipation(
                 species01->getDissipation()); //  Set the tangential dissipation equal to the normal disipation
         species12->setSlidingFrictionCoefficient(0.5);
         species12->setSlidingStiffness(species12->getStiffness() * 2.0 / 7.0);
-    
+
         logger(INFO, "Number of large particles:%\n", Flusher::NO_FLUSH, Nl);
         logger(INFO, "Number of small particles:%", Ns);
-    
+
         Chute::setupInitialConditions();
-    
-    
+
+
         // Remove the two existing boundaries insertion and periodic and put the peroidic back if perodic else put
         boundaryHandler.clear();
-    
-    
-    
+
+
+
         //Now add two extra solid walls at the end
         //InfiniteWall w0;
         gateLeft_ = new InfiniteWall;
@@ -162,34 +162,37 @@ public:
 
             //Periodic in x
            // b0.set(Vec3D(1.0, 0.0, 0.0), getXMin(), getXMax());
-           // boundaryHandler.copyAndAddObject(b0);
+            // boundaryHandler.copyAndAddObject(b0);
         }
 
-        
-        
+
+
         // CREATE THE PARTICLES
 
         SphericalParticle p0;
         smallInsertionBoundary = new CubeInsertionBoundary();
         largeInsertionBoundary = new CubeInsertionBoundary();
 
-        double volumeToInsert=num_small*4.0/3.0*constants::pi*pow(1.0,3);
+        double volumeToInsert = num_small * 4.0 / 3.0 * constants::pi * pow(1.0, 3);
 
-        logger(INFO,"Need to insert a volume of % of each particle type",volumeToInsert);
+        logger(INFO, "Need to insert a volume of % of each particle type", volumeToInsert);
 
 
-        smallInsertionBoundary->set(p0,1000000,Vec3D(getXMin(),getYMin(),getZMax()/2.0),Vec3D(getXMax(),getYMax(),getZMax()),Vec3D(0.0,0.0,0.0),Vec3D(0.0,0.0,0.0),1.0*0.95,1.0*1.05);
+        smallInsertionBoundary->set(p0, 1000000, Vec3D(getXMin(), getYMin(), getZMax() / 2.0),
+                                    Vec3D(getXMax(), getYMax(), getZMax()), Vec3D(0.0, 0.0, 0.0), Vec3D(0.0, 0.0, 0.0));
         smallInsertionBoundary->setInitialVolume(volumeToInsert);
         smallInsertionBoundary->deactivate();
         boundaryHandler.addObject(smallInsertionBoundary);
 
-        largeInsertionBoundary->set(p0,1000000,Vec3D(getXMin(),getYMin(),getZMin()),Vec3D(getXMax(),getYMax(),getZMax()/2.0),Vec3D(0.0,0.0,0.0),Vec3D(0.0,0.0,0.0),2.0*0.95,2.0*1.05);
+        largeInsertionBoundary->set(p0, 1000000, Vec3D(getXMin(), getYMin(), getZMin()),
+                                    Vec3D(getXMax(), getYMax(), getZMax() / 2.0), Vec3D(0.0, 0.0, 0.0),
+                                    Vec3D(0.0, 0.0, 0.0));
         largeInsertionBoundary->setInitialVolume(volumeToInsert);
         largeInsertionBoundary->deactivate();
         boundaryHandler.addObject(largeInsertionBoundary);
         /* while ((Ns > 0) || (Nl > 0))
          {
-             
+
              //random to see if want to generate a large or small particles, helps makes the initial conditions homogenious
              if (random.getRandomNumber(1.0, Nl + Ns) > Nl)
              {
@@ -212,15 +215,15 @@ public:
                              random.getRandomNumber(getYMin() + radius_l, getYMax() - radius_l),
                              random.getRandomNumber(getZMin() + radius_l, getZMax() - radius_l)));
                  P0.setVelocity(Vec3D(0.0, 0.0, 0.0));
-             
+
                   }
               while (!checkParticleForInteraction(P0));
           particleHandler.copyAndAddObject(P0);
- 
+
          }*/
-    
+
         logger(INFO, "Finished creating particles");
-    
+
         for (int i = 0; i < particleHandler.getNumberOfObjects(); i++)
         {
             BaseParticle* P0 = particleHandler.getObject(i);
@@ -234,21 +237,21 @@ public:
     
     void actionsOnRestart()
     {
-    
+
         int Ns = num_restart_small;
         int Nl = num_restart_large;
-    
+
         auto species0 = speciesHandler.getObject(0);
         auto species1 = speciesHandler.getObject(1);
         auto species2 = speciesHandler.getObject(2);
-    
+
         logger(INFO, "Restarting and adding % small particles and % large particles", Ns, Nl);
-    
-    
+
+
         SphericalParticle P0;
         while ((Ns > 0) || (Nl > 0))
         {
-        
+
             //random to see if want to generate a large or small particles, helps makes the initial conditions homogenious
             if (random.getRandomNumber(1.0, Nl + Ns) > Nl)
             {
@@ -271,15 +274,15 @@ public:
                                      random.getRandomNumber(getYMin() + radius_l, getYMax() - radius_l),
                                      random.getRandomNumber(getZMin() + radius_l, getZMax() - radius_l)));
                 P0.setVelocity(Vec3D(0.0, 0.0, 0.0));
-    
+
             } while (!checkParticleForInteraction(P0));
             particleHandler.copyAndAddObject(P0);
-        
+
         }
-    
+
         logger(INFO, "Finished adding new particles. Now simulation will restart");
-    
-    
+
+
     }
 
     void actionsAfterTimeStep()
@@ -391,7 +394,7 @@ public:
     }
     void set_particle_numbers(int new_num_small, int new_num_large)
     {
-    
+
         if (new_num_small > 0)
         {
             num_small = new_num_small;
@@ -400,7 +403,7 @@ public:
         {
             logger(ERROR, "Please give a positive number if small particles");
         }
-    
+
         if (new_num_large > 0)
         {
             num_large = new_num_large;
@@ -427,7 +430,7 @@ public:
     
     void set_radiusLarge(double new_large_radius)
     {
-    
+
         if (new_large_radius > 0)
         {
             radius_l = new_large_radius;

@@ -143,11 +143,12 @@ public:
 		if (adding_particles) {
 			//cout<<"Adding particle"<<endl;
 			if (get_create_in_hopper()) {
-				//cout<<"Adding particles in hopper"<<endl;
-				HopperInsertionBoundary b1;
-                b1.set(new SphericalParticle, getMaxFailed(), getYMin(), getYMax(), getMinInflowParticleRadius(), getMaxInflowParticleRadius(),
-                       getChuteAngle(), getFixedParticleRadius(), getIsHopperCentred(), getHopperDimension(), getHopperAngle(), getHopperLength(),
-                       getHopperExitLength(),getHopperHeight(), getHopperLift(), getHopperFillingPercentage());
+                //cout<<"Adding particles in hopper"<<endl;
+                HopperInsertionBoundary b1;
+                b1.set(new SphericalParticle, getMaxFailed(), getYMin(), getYMax(), getChuteAngle(),
+                       getFixedParticleRadius(), getIsHopperCentred(), getHopperDimension(), getHopperAngle(),
+                       getHopperLength(), getHopperExitLength(), getHopperHeight(), getHopperLift(),
+                       getHopperFillingPercentage());
                 boundaryHandler.copyAndAddObject(b1);
                 setInsertionBoundary(dynamic_cast<InsertionBoundary*>(boundaryHandler.getLastObject()));
 
@@ -157,17 +158,22 @@ public:
 //						failed = 0; 
 //						num_created++;
 //					} else failed++;
-				};
-			} else {
-				//cout<<"Adding particles in triangle"<<endl;
-				while (failed_triangle <= max_failed_triangle && num_created_triangle < max_created_triangle) {
-					create_inflow_particle_triangle();
-					if (checkParticleForInteraction(P0)) {
-						failed_triangle = 0;
-						num_created_triangle++;
-					} else failed_triangle++;
-				};	
-			}
+            };
+        }
+        else
+        {
+            //cout<<"Adding particles in triangle"<<endl;
+            while (failed_triangle <= max_failed_triangle && num_created_triangle < max_created_triangle)
+            {
+                create_inflow_particle_triangle();
+                if (checkParticleForInteraction(P0))
+                {
+                    failed_triangle = 0;
+                    num_created_triangle++;
+                }
+                else failed_triangle++;
+            };
+        }
 		}
 	
 	void actionsBeforeTimeStep(){

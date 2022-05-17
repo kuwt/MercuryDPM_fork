@@ -78,28 +78,26 @@ RandomClusterInsertionBoundary* RandomClusterInsertionBoundary::copy() const
  * \param[in] posMax            Second defining corner of cuboidal insertion boundary
  * \param[in] velMin            Minimum velocity of inserted particles
  * \param[in] velMax            Maximum velocity of inserted particles
- * \param[in] radMin            Minimum radius of inserted particles
- * \param[in] radMax            Maximum radius of inserted particles
  * \param[in] rMicroParticle    Radius of the single particle composing the cluster.
  */
-void RandomClusterInsertionBoundary::set(BaseParticle *particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
-                                       Vec3D velMin, Vec3D velMax, Mdouble radMin, Mdouble radMax,
-                                       Mdouble rMicroParticle)
+void RandomClusterInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin,
+                                         Vec3D posMax,
+                                         Vec3D velMin, Vec3D velMax, Mdouble rMicroParticle)
 {
     setParticleToCopy(particleToCopy);
-    setRadiusRange(radMin, radMax);
-
-    setMaxFailed(maxFailed);
-    setGeometry(posMin, posMax, velMin, velMax);
-
+    velMin_ = velMin;
+    velMax_ = velMax;
+    maxFailed_ = maxFailed;
+    setGeometry(posMin, posMax);
+    
     setRadiusMicroParticle(rMicroParticle);
 }
 
-void RandomClusterInsertionBoundary::set(BaseParticle &particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
-                                       Vec3D velMin, Vec3D velMax, Mdouble radMin, Mdouble radMax,
-                                       Mdouble rMicroParticle)
+void RandomClusterInsertionBoundary::set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin,
+                                         Vec3D posMax,
+                                         Vec3D velMin, Vec3D velMax, Mdouble rMicroParticle)
 {
-    set(&particleToCopy, maxFailed, posMin, posMax, velMin, velMax, radMin, radMax, rMicroParticle);
+    set(&particleToCopy, maxFailed, posMin, posMax, velMin, velMax, rMicroParticle);
 }
 
 /*!
@@ -116,31 +114,29 @@ void RandomClusterInsertionBoundary::set(BaseParticle &particleToCopy, unsigned 
  * \param[in] nParticlesPerCluster      Number of particles composing the cluster.
  * \param[in] velMin                    Minimum velocity of inserted particles
  * \param[in] velMax                    Maximum velocity of inserted particles
- * \param[in] radMin                    Minimum radius of inserted particles
- * \param[in] radMax                    Maximum radius of inserted particles
  *
  * Important: this function differs from the class above because gives the possiblity to set the number of particles
  *              instead of the radius of the micro particle.
  */
 
-void RandomClusterInsertionBoundary::set(BaseParticle *particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
-                                         unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax,
-                                         Mdouble radMin, Mdouble radMax)
+void RandomClusterInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin,
+                                         Vec3D posMax,
+                                         unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax)
 {
     setParticleToCopy(particleToCopy);
-    setRadiusRange(radMin, radMax);
-
-    setMaxFailed(maxFailed);
-    setGeometry(posMin, posMax, velMin, velMax);
-
+    velMin_ = velMin;
+    velMax_ = velMax;
+    maxFailed_ = maxFailed;
+    setGeometry(posMin, posMax);
+    
     setNumberOfParticlesPerCluster(nParticlesPerCluster);
 }
 
-void RandomClusterInsertionBoundary::set(BaseParticle &particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
-                                         unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax,
-                                         Mdouble radMin, Mdouble radMax)
+void RandomClusterInsertionBoundary::set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin,
+                                         Vec3D posMax,
+                                         unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax)
 {
-    set(&particleToCopy, maxFailed, posMin, posMax, nParticlesPerCluster, velMin, velMax, radMin, radMax);
+    set(&particleToCopy, maxFailed, posMin, posMax, nParticlesPerCluster, velMin, velMax);
 }
 
 void RandomClusterInsertionBoundary::setNumberOfParticlesPerCluster(unsigned int nParticlesPeCluster)

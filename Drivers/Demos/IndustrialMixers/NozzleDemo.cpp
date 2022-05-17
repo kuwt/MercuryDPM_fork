@@ -91,7 +91,8 @@ class NozzleDemo : public Mercury3D {
         logger(INFO,"Insertion volume: %", insertionVolume);
 
         particle.setSpecies(speciesHandler.getObject(0));
-        boundary.set(particle, 1000, Vec3D(0.018,0.003,0), Vec3D(0.053,0.05,0.085),Vec3D(0,0,0),Vec3D(0,0,0),radius, radius);
+        particle.setRadius(radius);
+        boundary.set(particle, 1000, Vec3D(0.018,0.003,0), Vec3D(0.053,0.05,0.085),Vec3D(0,0,0),Vec3D(0,0,0));
         boundary.setInitialVolume(insertionVolume);
         insertionBoundary = boundaryHandler.copyAndAddObject(boundary);
 

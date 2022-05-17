@@ -81,7 +81,7 @@ PolydisperseInsertionBoundary* PolydisperseInsertionBoundary::copy() const
 
 void PolydisperseInsertionBoundary::setGeometry(int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax)
 {
-    setMaxFailed(maxFailed);
+    maxFailed_ = maxFailed;
     posMin_ = posMin;
     posMax_ = posMax;
     velMin_ = velMin;
@@ -218,7 +218,7 @@ void PolydisperseInsertionBoundary::write(std::ostream& os) const
         generanda_[i]->write(os);
         os << " weight " << probabilitates_[i] << " sizeDispersity " << sizeDispersities_[i] << " ";
     }
-    os << " posMin " << posMin_ << " posMax " << posMax_
+    os << "posMin " << posMin_ << " posMax " << posMax_
        << " velMin " << velMin_ << " velMax " << velMax_
        << " ";
 }

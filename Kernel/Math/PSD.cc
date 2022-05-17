@@ -31,8 +31,8 @@
  */
 PSD::PSD()
 {
-    for (auto& p : momenta_)
-        p = 0;
+    for (auto& momenta: momenta_)
+        momenta = 0;
 }
 
 /*!
@@ -272,12 +272,68 @@ void PSD::validateProbabilityDensityDistribution()
     if (sum - 1 > 1e-6)
     {
         sum = 0;
-        for (auto& it : particleSizeDistribution_)
+        for (auto& it: particleSizeDistribution_)
         {
             sum += it.probability;
         }
     }
     logger.assert_debug(sum - 1 < 1e-6, "PDF is not valid: Integral of PDF is not equal to unity");
+}
+
+/*!
+ * \details sets the particle size distribution to a discretised uniform (linear) cumulative number distribution
+ * \param[in] radMin            Double representing The smallest particle radius of the particle size distribution
+ * \param[in] radMax            Double representing the biggest particle radius of the particle size distribution
+ * \param[in] numberOfBins      Integer determining the number of bins (aka. particle size classes or resolution) of the
+ *                              particle size distribution
+ */
+void PSD::setDistributionUniform(Mdouble radMin, Mdouble radMax, int numberOfBins)
+{
+    if (!particleSizeDistribution_.empty())
+    {
+        particleSizeDistribution_.clear();
+    }
+    std::vector<Mdouble> probabilities = helpers::linspace(0.0, 1.0, numberOfBins);
+    std::vector<Mdouble> radii = helpers::linspace(radMin, radMax, numberOfBins);
+    // combine radii and probabilities
+    for (int i = 0; i < radii.size(); ++i)
+    {
+        particleSizeDistribution_.push_back({radii[i], probabilities[i]});
+    }
+    validateCumulativeDistribution();
+}
+
+/*!
+ * \details sets the particle size distribution to a discretised normal (gaussian) cumulative number distribution,
+ * which covers the range of 3 * standardDeviation (99,73% of all values covered).
+ * \param[in] mean                  Double representing the mean of the particle size distribution
+ * \param[in] standardDeviation     Double representing the standard deviation of the particle size distribution
+ * \param[in] numberOfBins          Integer determining the number of bins (aka. particle size classes or resolution)
+ *                                  of the particle size distribution
+ */
+void PSD::setDistributionNormal(Mdouble mean, Mdouble standardDeviation, int numberOfBins)
+{
+    logger.assert_always(mean > 3 * standardDeviation,
+                         "Reduce standardDeviation of your normal distribution to avoid negative radii; The mean "
+                         "should be greater than 3*standardDeviation");
+    if (!particleSizeDistribution_.empty())
+    {
+        particleSizeDistribution_.clear();
+    }
+    Mdouble radMin = mean - 3 * standardDeviation;
+    Mdouble radMax = mean + 3 * standardDeviation;
+    std::vector<Mdouble> radii = helpers::linspace(radMin, radMax, numberOfBins);
+    std::vector<Mdouble> probabilities;
+    for (int i = 0; i < radii.size(); i++)
+    {
+        Mdouble probability = 0.5 * (1 + erf((radii[i] - mean) / (sqrt(2) * standardDeviation)));
+        probabilities.push_back(probability);
+    }
+    for (int j = 0; j < radii.size(); j++)
+    {
+        particleSizeDistribution_.push_back({radii[j], probabilities[j]});
+    }
+    validateCumulativeDistribution();
 }
 
 /*!
@@ -727,6 +783,20 @@ Mdouble PSD::getSizeRatio() const
 }
 
 /*!
+ * \details Checks if the Size ratio of the PSD is too high and cuts the PSD at head and tail by 10 percent to avoid
+ * inaccurate results.
+ */
+void PSD::cutHighSizeRatio()
+{
+    Mdouble SR = getSizeRatio();
+    if (SR > 100)
+    {
+        logger(WARN, "Size ratio > 100; Cutting the PSD to avoid inaccurate results");
+        cutoffCumulativeNumber(0.1, 0.9, 0.5);
+    }
+}
+
+/*!
  * \details Gets the minimal radius of the PSD.
  * \return A double which corresponds to the minimal radius of the PSD.
  */
@@ -754,6 +824,15 @@ std::vector<PSD::RadiusAndProbability> PSD::getParticleSizeDistribution() const
 }
 
 /*!
+ * \details sets the PSD from a vector of the PSD::RadiusAndProbability class; used to read in PSDs from a restart file.
+ * \param[in] particleSizeDistribution      vector containing the radii and probabilities specifying the PSD.
+ */
+void PSD::setParticleSizeDistribution(std::vector<PSD::RadiusAndProbability> particleSizeDistribution)
+{
+    particleSizeDistribution_ = particleSizeDistribution;
+}
+
+/*!
  * \details Gets the number of particles already inserted into the simulation by summing up the particles inserted in
  * each class.
  * \return An integer containing the number of particles already inserted into the simulation.
@@ -761,7 +840,7 @@ std::vector<PSD::RadiusAndProbability> PSD::getParticleSizeDistribution() const
 int PSD::getInsertedParticleNumber() const
 {
     int sum = 0;
-    for (auto& it : nParticlesPerClass_)
+    for (auto& it: nParticlesPerClass_)
         sum += it;
     return sum;
 }
@@ -818,7 +897,7 @@ void PSD::computeStandardisedMomenta()
 }
 
 /*!
- * \details Get momenta of the user defined particleSizeDistribution_ vector.
+ * \details Get momenta of the user defined particleSizeDistributionVector_ vector.
  * \return Array of momenta corresponding to the first six moments of the user defined PSD.
  */
 std::array<Mdouble, 6> PSD::getMomenta() const

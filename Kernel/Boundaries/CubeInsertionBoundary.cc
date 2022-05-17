@@ -35,8 +35,6 @@ CubeInsertionBoundary::CubeInsertionBoundary() : InsertionBoundary()
 {
     posMin_ = Vec3D(0.0, 0.0, 0.0);
     posMax_ = Vec3D(0.0, 0.0, 0.0);
-    velMin_ = Vec3D(0.0, 0.0, 0.0);
-    velMax_ = Vec3D(0.0, 0.0, 0.0);
 }
 
 /*!
@@ -47,8 +45,6 @@ CubeInsertionBoundary::CubeInsertionBoundary(const CubeInsertionBoundary& other)
 {
     posMin_ = other.posMin_;
     posMax_ = other.posMax_;
-    velMin_ = other.velMin_;
-    velMax_ = other.velMax_;
 }
 
 /*!
@@ -71,50 +67,64 @@ CubeInsertionBoundary* CubeInsertionBoundary::copy() const
 }
 
 /*!
- * \details Sets all the properties of the cuboidal insertion boundary. 
- * \param[in] particleToCopy    Pointer to the BaseParticle which is used as a basis
- *                              for the particles to be inserted
- * \param[in] maxFailed         The maximum number of times the insertion of a 
+ * \details Sets all the properties of the cuboidal insertion boundary.
+ * \param[in] particleToCopy    vector of pointers to the BaseParticles which are used as a basis
+ *                              for the particle types (species) to be inserted
+ * \param[in] maxFailed         The maximum number of times the insertion of a
  *                              particle may be tried and failed before the insertion
  *                              of particles is considered done
- *                              NB: this property is used in the parent's 
+ *                              NB: this property is used in the parent's
  *                              InsertionBoundary::checkBoundaryBeforeTimeStep().
  * \param[in] posMin            First defining corner of cuboidal insertion boundary
  * \param[in] posMax            Second defining corner of cuboidal insertion boundary
  * \param[in] velMin            Minimum velocity of inserted particles
  * \param[in] velMax            Maximum velocity of inserted particles
- * \param[in] radMin            Minimum radius of inserted particles
- * \param[in] radMax            Maximum radius of inserted particles
  */
-void CubeInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
-                                Vec3D velMin, Vec3D velMax, double radMin, double radMax)
+void CubeInsertionBoundary::set(std::vector<BaseParticle*> particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D
+posMax, Vec3D velMin, Vec3D velMax)
 {
+    velMin_ = velMin;
+    velMax_ = velMax;
+    maxFailed_ = maxFailed;
     setParticleToCopy(particleToCopy);
-    setRadiusRange(radMin, radMax);
-    
-    setMaxFailed(maxFailed);
-    setGeometry(posMin, posMax, velMin, velMax);
+    setGeometry(posMin, posMax);
 }
 
-void
-CubeInsertionBoundary::set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax,
-    double radMin, double radMax) {
-    set(&particleToCopy, maxFailed, posMin, posMax, velMin, velMax, radMin, radMax);
-}
-
-
-void CubeInsertionBoundary::setRadiusRange(Mdouble radMin, Mdouble radMax)
+/*!
+ * \details Sets all the properties of the cuboidal insertion boundary.
+ * \param[in] particleToCopy    Pointer to the BaseParticle which is used as a basis
+ *                              for the particles to be inserted
+ * \param[in] maxFailed         The maximum number of times the insertion of a
+ *                              particle may be tried and failed before the insertion
+ *                              of particles is considered done
+ *                              NB: this property is used in the parent's
+ *                              InsertionBoundary::checkBoundaryBeforeTimeStep().
+ * \param[in] posMin            First defining corner of cuboidal insertion boundary
+ * \param[in] posMax            Second defining corner of cuboidal insertion boundary
+ * \param[in] velMin            Minimum velocity of inserted particles
+ * \param[in] velMax            Maximum velocity of inserted particles
+ */
+void CubeInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D
+posMax, Vec3D velMin, Vec3D velMax)
 {
-    radMin_ = radMin;
-    radMax_ = radMax;
+    velMin_ = velMin;
+    velMax_ = velMax;
+    maxFailed_ = maxFailed;
+    setParticleToCopy(particleToCopy);
+    setGeometry(posMin, posMax);
 }
 
-void CubeInsertionBoundary::setGeometry(Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax)
+void CubeInsertionBoundary::set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
+                                Vec3D velMin, Vec3D velMax)
+{
+    set(&particleToCopy, maxFailed, posMin, posMax, velMin, velMax);
+}
+
+
+void CubeInsertionBoundary::setGeometry(Vec3D posMin, Vec3D posMax)
 {
     posMin_ = posMin;
     posMax_ = posMax;
-    velMin_ = velMin;
-    velMax_ = velMax;
 }
 
 /*!
@@ -163,26 +173,6 @@ void CubeInsertionBoundary::read(std::istream& is)
        >> dummy >> posMax_;
     is >> dummy >> velMin_
        >> dummy >> velMax_;
-    is >> dummy >> radMin_
-       >> dummy >> radMax_;
-}
-
-/*!
- * \details Deprecated version of read().
- * \deprecated Should be gone by Mercury 2.0. Instead, use CubeInsertionBoundary::read().
- */
-void CubeInsertionBoundary::oldRead(std::istream& is)
-{
-    unsigned int maxFailed;
-    std::string dummy;
-    is >> dummy >> maxFailed
-       >> dummy >> posMin_
-       >> dummy >> posMax_
-       >> dummy >> velMin_
-       >> dummy >> velMax_
-       >> dummy >> radMin_
-       >> dummy >> radMax_;
-    setMaxFailed(maxFailed);
 }
 
 /*!
@@ -195,9 +185,7 @@ void CubeInsertionBoundary::write(std::ostream& os) const
     os << " posMin " << posMin_
        << " posMax " << posMax_
        << " velMin " << velMin_
-       << " velMax " << velMax_
-       << " radMin " << radMin_
-       << " radMax " << radMax_;
+       << " velMax " << velMax_;
 }
 
 /*!

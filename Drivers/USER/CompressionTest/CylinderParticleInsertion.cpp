@@ -4,8 +4,8 @@
 #include <Walls/AxisymmetricIntersectionOfWalls.h>
 #include <CG/Coordinates/O.h>
 #include <CG/CG.h>
-#include <Boundaries/DeletionBoundary.h>
 #include <CMakeDefinitions.h>
+#include <Boundaries/CubeDeletionBoundary.h>
 
 
 class CylinderParticleInsertion : public Mercury3D
@@ -35,12 +35,7 @@ public:
         psd.setPSDFromCSV(getMercurySourceDir() + "/Drivers/USER/CompressionTest/InputData/CVDFLactose.csv",
                           PSD::TYPE::CUMULATIVE_VOLUME_DISTRIBUTION, false, 1000000.0);
         // cut off size distribution if size ratio is too high
-        Mdouble SR = psd.getSizeRatio();
-        if (SR > 100)
-        {
-            logger(WARN, "Size ratio > 100; Cutting the PSD to avoid inaccurate results");
-            psd.cutoffCumulativeNumber(0.1, 0.9, 0.5);
-        }
+        psd.cutHighSizeRatio();
     
         //Calculate important properties; scale cylinder by maximum PSD radius
         cylHeight_ = cylScaling * psd.getMaxRadius();
@@ -48,8 +43,8 @@ public:
 //        Mdouble particleBulkVolume = particleNumber_*cubic(2.0*particleRadius_);
         cylVol_ = constants::pi * cylRad_ * cylRad_ * cylHeight_;
     
-        //setParticlesWriteVTK(true);
-        //setWallsWriteVTK(FileType::MULTIPLE_FILES);
+        setParticlesWriteVTK(true);
+        setWallsWriteVTK(FileType::MULTIPLE_FILES);
         //Set files
         dataFile.setFileType(FileType::ONE_FILE);
         restartFile.setFileType(FileType::ONE_FILE);
@@ -144,7 +139,7 @@ public:
         unsigned maxFail = 1000;
         double radMin = 1;
         double radMax = 2;
-        insertionBoundary.set(particle, maxFail, posMin, posMax, velMin, velMax, radMin, radMax);
+        insertionBoundary.set(particle, maxFail, posMin, posMax, velMin, velMax);
         //set PSD
         insertionBoundary.setPSD(psd);
         insertionBoundary.setManualInsertion(true);
@@ -276,10 +271,11 @@ public:
     
     void deleteParticles()
     {
-        DeletionBoundary deletionBoundary;
-        deletionBoundary.set({0, 0, 1}, cylHeight_);
-        boundaryHandler.copyAndAddObject(deletionBoundary);
-        logger(INFO, "Boundary %: deletionBoundary", boundaryHandler.getSize() - 1);
+        CubeDeletionBoundary cubedeletionBoundary;
+        cubedeletionBoundary.set({-cylRad_, -cylRad_, cylHeight_}, {cylRad_, cylRad_, 2 * cylHeight_});
+        boundaryHandler.copyAndAddObject(cubedeletionBoundary);
+        checkInteractionWithBoundaries();
+        logger(INFO, "Boundary %: CubedeletionBoundary", boundaryHandler.getSize() - 1);
     }
     
     

@@ -54,27 +54,31 @@ public:
     void setupInitialConditions() override {
         setName("InsertionBoundarySelfTestMPI");
         setSystemDimensions(3);
-        setGravity(Vec3D(0.0,0.0,0.0));
+        setGravity(Vec3D(0.0, 0.0, 0.0));
         setTimeStep(1e-4);
         dataFile.setSaveCount(1);
         setTimeMax(1);
         setHGridMaxLevels(2);
-
+    
         BaseParticle* insertionBoundaryParticle = new SphericalParticle;
         insertionBoundaryParticle->setSpecies(speciesHandler.getObject(0));
-
+    
+        PSD psd;
+        psd.setDistributionUniform(0.025, 0.05, 50);
+    
         //CubeInsertionBoundary
         auto insertionBoundary = new CubeInsertionBoundary; //delete is done in boundaryHandler
+        insertionBoundary->setPSD(psd);
         boundaryHandler.addObject(insertionBoundary);
-        insertionBoundary->set(insertionBoundaryParticle,1,getMin(),getMax(),Vec3D(1,0,0),Vec3D(1,0,0),0.025,0.05);
-
+        insertionBoundary->set(insertionBoundaryParticle, 1, getMin(), getMax(), Vec3D(1, 0, 0), Vec3D(1, 0, 0));
+    
         /*
         //ChuteInsertionBoundary
         auto insertionBoundary = new ChuteInsertionBoundary;
         boundaryHandler.addObject(insertionBoundary);
         insertionBoundary->set(insertionBoundaryParticle,10,Vec3D(-0.5,-0.5,-0.5),Vec3D(0.5,0.5,0.5),0.1,0.2,0.1,1.0,0.2);
         */
-
+    
         //HopperInsertionBoundary
         /*
         auto insertionBoundary = new HopperInsertionBoundary;

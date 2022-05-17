@@ -2895,7 +2895,7 @@ void DPMBase::fillDomainWithParticles(unsigned N) {
     SphericalParticle p(s);
     CubeInsertionBoundary b;
     Mdouble r = cbrt(getTotalVolume())/N;
-    b.set(p,100,getMin(),getMax(),{0,0,0},{0,0,0},r,r);
+    b.set(p, 100, getMin(), getMax(), {0, 0, 0}, {0, 0, 0});
     b.insertParticles(this);
     logger(INFO,"Inserted % particles",particleHandler.getSize());
     //setTimeMax(0);

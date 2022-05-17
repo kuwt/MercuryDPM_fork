@@ -75,7 +75,7 @@ public:
         unsigned maxFail = 1; //insert as quick as possible: try every time step, until you maxFail=1 particle fails to be insertable (overlaps with another particle or wall)
         double radMin = 1;
         double radMax = 2;
-        insertionBoundary.set(&templateParticle, maxFail, posMin, posMax, velMin, velMax, radMin, radMax);
+        insertionBoundary.set(&templateParticle, maxFail, posMin, posMax, velMin, velMax);
     
         // DEPRECATED INSERTION; instead use a .csv file
         // The psd is given by a vector of size and probability values (r_i, p_i); it means p_i is the probability of inserting a particle of radius less than r_i.
@@ -140,7 +140,6 @@ public:
     
         //add the insertion boundary to the handler
         boundaryHandler.copyAndAddObject(insertionBoundary);
-    
     }
     
     void printTime() const override

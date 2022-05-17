@@ -348,11 +348,14 @@ public:
                 {
                     setStartFillHopperTime(getTime());
                     currStatus = fillHopper;
-                    
+    
                     HopperInsertionBoundary b1;
                     BaseParticle* hopperInsertionParticle = new SphericalParticle;
                     hopperInsertionParticle->setSpecies(species);
-                    b1.set(hopperInsertionParticle, getMaxFailed(), getYMin(), getYMax(), getMinInflowParticleRadius(), getMaxInflowParticleRadius(), getChuteAngle(), getFixedParticleRadius(), getIsHopperCentred(), getHopperDimension(), getHopperAngle(), getHopperLength(), getHopperExitLength(), getHopperHeight(), getHopperLift(), getHopperFillingPercentage());
+                    b1.set(hopperInsertionParticle, getMaxFailed(), getYMin(), getYMax(), getChuteAngle(),
+                           getFixedParticleRadius(), getIsHopperCentred(), getHopperDimension(), getHopperAngle(),
+                           getHopperLength(), getHopperExitLength(), getHopperHeight(), getHopperLift(),
+                           getHopperFillingPercentage());
                     boundaryHandler.copyAndAddObject(b1);
                 }
                 break;

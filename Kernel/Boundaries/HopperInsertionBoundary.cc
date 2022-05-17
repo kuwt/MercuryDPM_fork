@@ -80,6 +80,62 @@ HopperInsertionBoundary* HopperInsertionBoundary::copy() const
 }
 
 /*!
+ * \details Sets all the properties of the chute insertion boundary.
+ * See also the images provided at the top of this class' documentation.
+ *
+ * \param[in] particleToCopy    Vector of pointers to the BaseParticles which are used as a basis
+ *                              for the particles to be inserted
+ * \param[in] maxFailed         The maximum number of times the insertion of a
+ *                              particle may be tried and failed before the insertion
+ *                              of particles is considered done.
+ *                              NB: this property is used in the parent's
+ *                              InsertionBoundary::checkBoundaryBeforeTimeStep().
+ * \param[in] yMin              The minimum y-position of the particle for a hopper
+ *                              with vertical walls in the y-direction ('1D hopper')
+ * \param[in] yMax              The maximum y-position of the particle for a hopper
+ *                              with vertical walls in the y-direction ('1D hopper')
+ * \param[in] chuteAngle            Angle of the chute as compared to the horizontal plane
+ * \param[in] fixedParticleRadius
+ * \param[in] isHopperCentred_
+ * \param[in] hopperDim         Either 1 or 2. If 1, the insertion boundary has
+ *                              vertical walls in the y extrema. This is used
+ *                              e.g. for a hopper with periodic walls in the y-direction.
+ *                              If 2, the insertion boundary has the form of
+ *                              an inverted (truncated) pyramid, with equally inclined
+ *                              walls in both AB and Y directions.
+ * \param[in] hopperAngle       The angle of the hopper walls relative to the vertical (AC).
+ * \param[in] hopperLength      The horizontal (AB-dir.) width at the top of the hopper
+ * \param[in] hopperExitLength  The horizontal (AB-dir.) width at the square exit of the hopper
+ * \param[in] hopperHeight      The vertical (AC-dir.) height of the hopper, measured
+ *                              from the top of the hopper to the start of the chute.
+ * \param[in] lift
+ * \param[in] fillPercent       Percentage of the height of the insertion boundary
+ *                              up to which it should be filled. The part to be filled
+ *                              reaches from the top of the hopper down to
+ *                              {fillPercent * (top - 'position A')}.
+ */
+void HopperInsertionBoundary::set(std::vector<BaseParticle*> particleToCopy, unsigned int maxFailed, double yMin,
+                                  double yMax, double chuteAngle, double fixedParticleRadius, bool isHopperCentred_,
+                                  int hopperDim, double hopperAngle, double hopperLength, double hopperExitLength,
+                                  double hopperHeight, double lift, double fillPercent)
+{
+    setParticleToCopy(particleToCopy);
+    maxFailed_ = maxFailed;
+    yMin_ = yMin;
+    yMax_ = yMax;
+    chuteAngle_ = chuteAngle;
+    fixedParticleRadius_ = fixedParticleRadius;
+    isHopperCentred__ = isHopperCentred_;
+    hopperDim_ = hopperDim;
+    hopperAngle_ = hopperAngle;
+    hopperLength_ = hopperLength;
+    hopperExitLength_ = hopperExitLength;
+    hopperHeight_ = hopperHeight;
+    lift_ = lift;
+    fillPercent_ = fillPercent;
+}
+
+/*!
  * \details Sets all the properties of the chute insertion boundary. 
  * See also the images provided at the top of this class' documentation.
  * 
@@ -94,8 +150,6 @@ HopperInsertionBoundary* HopperInsertionBoundary::copy() const
  *                              with vertical walls in the y-direction ('1D hopper')
  * \param[in] yMax              The maximum y-position of the particle for a hopper
  *                              with vertical walls in the y-direction ('1D hopper')
- * \param[in] radMin            Minimum radius of inserted particles
- * \param[in] radMax            Maximum radius of inserted particles
  * \param[in] chuteAngle            Angle of the chute as compared to the horizontal plane
  * \param[in] fixedParticleRadius   
  * \param[in] isHopperCentred_      
@@ -117,17 +171,14 @@ HopperInsertionBoundary* HopperInsertionBoundary::copy() const
  *                              {fillPercent * (top - 'position A')}. 
  */
 void HopperInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, double yMin,
-                                  double yMax, double radMin, double radMax, double chuteAngle,
-                                  double fixedParticleRadius,
-                                  bool isHopperCentred_, int hopperDim, double hopperAngle, double hopperLength,
-                                  double hopperExitLength, double hopperHeight, double lift, double fillPercent)
+                                  double yMax, double chuteAngle, double fixedParticleRadius, bool isHopperCentred_,
+                                  int hopperDim, double hopperAngle, double hopperLength, double hopperExitLength,
+                                  double hopperHeight, double lift, double fillPercent)
 {
     setParticleToCopy(particleToCopy);
-    setMaxFailed(maxFailed);
+    maxFailed_ = maxFailed;
     yMin_ = yMin;
     yMax_ = yMax;
-    radMin_ = radMin;
-    radMax_ = radMax;
     chuteAngle_ = chuteAngle;
     fixedParticleRadius_ = fixedParticleRadius;
     isHopperCentred__ = isHopperCentred_;
@@ -246,8 +297,6 @@ void HopperInsertionBoundary::read(std::istream& is)
     std::string dummy;
     is >> dummy >> yMin_
        >> dummy >> yMax_
-       >> dummy >> radMin_
-       >> dummy >> radMax_
        >> dummy >> chuteAngle_
        >> dummy >> fixedParticleRadius_
        >> dummy >> isHopperCentred__
@@ -258,32 +307,6 @@ void HopperInsertionBoundary::read(std::istream& is)
        >> dummy >> hopperHeight_
        >> dummy >> lift_
        >> dummy >> fillPercent_;
-}
-
-/*!
- * \details Deprecated version of read().
- * \deprecated Should be gone by Mercury 2.0. Instead, use CubeInsertionBoundary::read().
- */
-void HopperInsertionBoundary::oldRead(std::istream& is)
-{
-    int maxFailed;
-    std::string dummy;
-    is >> dummy >> maxFailed
-       >> dummy >> yMin_
-       >> dummy >> yMax_
-       >> dummy >> radMin_
-       >> dummy >> radMax_
-       >> dummy >> chuteAngle_
-       >> dummy >> fixedParticleRadius_
-       >> dummy >> isHopperCentred__
-       >> dummy >> hopperDim_
-       >> dummy >> hopperAngle_
-       >> dummy >> hopperLength_
-       >> dummy >> hopperExitLength_
-       >> dummy >> hopperHeight_
-       >> dummy >> lift_
-       >> dummy >> fillPercent_;
-    setMaxFailed(maxFailed);
 }
 
 /*!
@@ -295,8 +318,6 @@ void HopperInsertionBoundary::write(std::ostream& os) const
     InsertionBoundary::write(os);
     os << " yMin " << yMin_
        << " yMax " << yMax_
-       << " radMin " << radMin_
-       << " radMax " << radMax_
        << " chuteAngle " << chuteAngle_
        << " fixedParticleRadius " << fixedParticleRadius_
        << " isHopperCentred_ " << isHopperCentred__

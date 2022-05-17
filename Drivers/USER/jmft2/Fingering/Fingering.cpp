@@ -207,27 +207,23 @@ class Fingering : public Mercury3D {
        * they don't 'block' the InsertionBoundary. */
       for (int layer = 0; layer < nlayers; layer++)
       {
-          insb->set(smallPrototype, 1, 
-                  Vec3D(
-                      -pars["length"], -pars["width"]/2, 
-                      pars["height"]/nlayers * layer),
-                  Vec3D( 
-                      0, pars["width"]/2, 
-                      pars["height"]/nlayers * (layer + pars["ratio_small"])),
-                  Vec3D(0.4,0,0), Vec3D(0.4,0,0),
-                  pars["radius_small"] * pars["dispersity_min"],
-                  pars["radius_small"] * pars["dispersity_max"]);
+          insb->set(smallPrototype, 1,
+                    Vec3D(
+                            -pars["length"], -pars["width"] / 2,
+                            pars["height"] / nlayers * layer),
+                    Vec3D(
+                            0, pars["width"] / 2,
+                            pars["height"] / nlayers * (layer + pars["ratio_small"])),
+                    Vec3D(0.4, 0, 0), Vec3D(0.4, 0, 0));
           boundaryHandler.copyAndAddObject(insb);
-          insb->set(largePrototype, 1, 
-                  Vec3D(
-                      -pars["length"], -pars["width"]/2, 
-                      pars["height"]/nlayers * (layer + pars["ratio_small"])),
-                  Vec3D(
-                      0, pars["width"]/2, 
-                      pars["height"]/nlayers * (layer + 1)),
-                  Vec3D(0.4,0,0), Vec3D(0.4,0,0),
-                  pars["radius_small"] * pars["dispersity_min"],
-                  pars["radius_small"] * pars["dispersity_max"]);
+          insb->set(largePrototype, 1,
+                    Vec3D(
+                            -pars["length"], -pars["width"] / 2,
+                            pars["height"] / nlayers * (layer + pars["ratio_small"])),
+                    Vec3D(
+                            0, pars["width"] / 2,
+                            pars["height"] / nlayers * (layer + 1)),
+                    Vec3D(0.4, 0, 0), Vec3D(0.4, 0, 0));
           boundaryHandler.copyAndAddObject(insb);
       }
 

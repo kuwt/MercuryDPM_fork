@@ -884,6 +884,21 @@ bool helpers::readFromCommandLine(int argc, char *argv[], std::string varName)
     return false;
 }
 
+std::vector<Mdouble> helpers::linspace(Mdouble Min, Mdouble Max, int numberOfBins)
+{
+    Mdouble dx = (Max - Min) / static_cast<Mdouble>(numberOfBins - 1);
+    Mdouble val;
+    std::vector<Mdouble> linearVector(numberOfBins);
+    typename std::vector<Mdouble>::iterator x;
+    for (x = linearVector.begin(), val = Min; x != linearVector.end(); ++x, val += dx)
+    {
+        *x = val;
+    }
+    // ensure that last value is equal to Max.
+    linearVector.pop_back();
+    linearVector.push_back(Max);
+    return linearVector;
+}
 
 template<class T>
 void checkTemplate(T real, T ideal, double error, std::string whatIsChecked)

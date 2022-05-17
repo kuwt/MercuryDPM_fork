@@ -67,11 +67,16 @@ public:
     /*!
      * \brief Sets all boundary properties at once.
      */
-    void
-    set(BaseParticle* particleToCopy, unsigned int maxFailed, double yMin, double yMax, double radMin, double radMax,
-        double chuteAngle, double fixedParticleRadius, bool isHopperCentred_, int hopperDim, double hopperAngle,
-        double hopperLength, double hopperExitLength,
-        double hopperHeight, double lift, double fillPercent);
+    void set(std::vector<BaseParticle*> particleToCopy, unsigned int maxFailed, double yMin, double yMax,
+             double chuteAngle, double fixedParticleRadius, bool isHopperCentred_, int hopperDim, double hopperAngle,
+             double hopperLength, double hopperExitLength, double hopperHeight, double lift, double fillPercent);
+    
+    /*!
+     * \brief Sets all boundary properties at once.
+     */
+    void set(BaseParticle* particleToCopy, unsigned int maxFailed, double yMin, double yMax, double chuteAngle,
+             double fixedParticleRadius, bool isHopperCentred_, int hopperDim, double hopperAngle, double
+             hopperLength, double hopperExitLength, double hopperHeight, double lift, double fillPercent);
     
     /*!
      * \brief This places an inflow particle in the top 50% of the hopper i.e. between gamma=0.5 and gamma=1.0
@@ -82,12 +87,6 @@ public:
      * \brief reads boundary properties from istream
      */
     void read(std::istream& is) override;
-    
-    /*!
-     * \brief deprecated version of CubeInsertionBoundary::read().
-     */
-    MERCURY_DEPRECATED
-    void oldRead(std::istream& is);
     
     /*!
      * \brief writes boundary properties to ostream

@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <map>
+#include <valarray>
 #include "Math/RNG.h"
 #include "Math/ExtendedMath.h"
 #include "File.h"
@@ -185,14 +186,11 @@ class TimeDependentBlasius : public Mercury2D {
             generandum->setRadius(pars.at("particleRadius"));
             auto insb = new CubeInsertionBoundary;
             insb->set(
-                generandum, 40, 
+                    generandum, 40,
                     Vec3D(0, 0, 0),
                     Vec3D(pars.at("length"), pars.at("height"), 0),
-                    Vec3D(0, - sqrt(pars.at("g") * pars.at("height")), 0),
-                    Vec3D(0, - sqrt(pars.at("g") * pars.at("height")), 0),
-                    pars.at("particleRadius") * (1 - pars.at("dispersity")),
-                    pars.at("particleRadius") * (1 + pars.at("dispersity"))
-                );
+                    Vec3D(0, -sqrt(pars.at("g") * pars.at("height")), 0),
+                    Vec3D(0, -sqrt(pars.at("g") * pars.at("height")), 0));
             insb = boundaryHandler.copyAndAddObject(insb);
             insb->checkBoundaryBeforeTimeStep(this);
             stillFillingUp = true;

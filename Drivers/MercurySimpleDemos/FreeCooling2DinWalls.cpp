@@ -48,25 +48,25 @@ public:
         species->setDensity(10000);
         species->setDissipation(0.04);
         species->setStiffness(1e4);
-
+    
         SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setRadius(2e-4);
-        p.setVelocity(Vec3D(1,1,1)*1e-3);
-
+        p.setVelocity(Vec3D(1, 1, 1) * 1e-3);
+    
         CubeInsertionBoundary insertionBoundary;
-        insertionBoundary.set(p,100,getMin(),getMax(),-p.getVelocity(),p.getVelocity(),p.getRadius(),p.getRadius());
-        insertionBoundary.setInitialVolume(p.getVolume()*N);
+        insertionBoundary.set(p, 100, getMin(), getMax(), -p.getVelocity(), p.getVelocity());
+        insertionBoundary.setInitialVolume(p.getVolume() * N);
         insertionBoundary.checkBoundaryBeforeTimeStep(this);
-        setMeanVelocity({0,0,0});
-
-        double mass  = species->getMassFromRadius(p.getRadius());
+        setMeanVelocity({0, 0, 0});
+    
+        double mass = species->getMassFromRadius(p.getRadius());
         double rest = species->getRestitutionCoefficient(mass);
         double tc = species->getCollisionTime(mass);
-        logger(INFO,"Restitution %",rest);
-        logger(INFO,"Collision time %",tc);
-        logger(INFO,"N %",particleHandler.getNumberOfObjects());
-
+        logger(INFO, "Restitution %", rest);
+        logger(INFO, "Collision time %", tc);
+        logger(INFO, "N %", particleHandler.getNumberOfObjects());
+    
         /*wallHandler.clear();
         InfiniteWall w0;
         w0.setSpecies(speciesHandler.getObject(0));

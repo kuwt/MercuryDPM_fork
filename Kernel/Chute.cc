@@ -267,15 +267,14 @@ void Chute::setupInitialConditions()
     {
         logger(ERROR, "There is not yet a species defined");
     }
-    
+    PSD psd;
+    psd.setDistributionUniform(getMinInflowParticleRadius(), getMaxInflowParticleRadius(), 50);
     // set up the insertion boundary and add to handler
     ChuteInsertionBoundary b1;
-    b1.set(particleToInsert, maxFailed_,
-           Vec3D(getXMin(), getYMin(), getZMin()),
-           Vec3D(getXMax(), getYMax(), getZMax()),
-           minInflowParticleRadius_, maxInflowParticleRadius_, fixedParticleRadius_,
-           inflowVelocity_, inflowVelocityVariance_
-    );
+    b1.set(particleToInsert, maxFailed_, Vec3D(getXMin(), getYMin(), getZMin()),
+           Vec3D(getXMax(), getYMax(), getZMax()), fixedParticleRadius_, inflowVelocity_,
+           inflowVelocityVariance_);
+    b1.setPSD(psd);
     insertionBoundary_ = boundaryHandler.copyAndAddObject(b1);
     
     //creates the bottom of the chute

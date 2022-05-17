@@ -81,17 +81,14 @@ public:
         insb = new CubeInsertionBoundary;
         SphericalParticle particles;
         particles.setSpecies(particleSpecies);
-
+    
         insb->set(
                 &particles,
                 1,
-                Vec3D(0.9*getXMax(),  0.45*getYMax(), getZMax() + 0.97*setParticleHeight), //Minimum position
-                Vec3D(getXMax(), 0.55*getYMax(), getZMax() + setParticleHeight), //Maximum position
+                Vec3D(0.9 * getXMax(), 0.45 * getYMax(), getZMax() + 0.97 * setParticleHeight), //Minimum position
+                Vec3D(getXMax(), 0.55 * getYMax(), getZMax() + setParticleHeight), //Maximum position
                 Vec3D(0, 0, 0), //Minimum velocity
-                Vec3D(0, 0, 0), //Maximum velocity
-                pRadius*0.98, //Minimum particle radius
-                pRadius*1.1 //Maximum particle radius
-        );
+                Vec3D(0, 0, 0));
         insb = boundaryHandler.copyAndAddObject(insb);
         //! [AT_PW:particles]
 
