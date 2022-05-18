@@ -11,10 +11,13 @@ pipelines:
       - step:
           name: Test
           script:
-            - make fullTest
+            - mkdir build
+            - cd build
+            - cmake -DCMAKE_BUILD_TYPE=Debug -G 'CodeBlocks - Unix Makefiles' ../Trunk
           artifacts:
             - error_log.txt
           after-script:
+            - make fullTest
             - pipe: atlassian/slack-notify:2.0.0
               variables:
                 WEBHOOK_URL: 'https://hooks.slack.com/services/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'
