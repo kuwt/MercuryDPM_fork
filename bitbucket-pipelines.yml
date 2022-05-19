@@ -4,7 +4,10 @@
 # The workflow allows running tests and code linting on the default branch.
 
 
-image: plath/mercurydpm
+image:
+  name: plath/mercurydpm:latest
+  username: $DOCKER_HUB_USERNAME
+  password: $DOCKER_HUB_PASSWORD
 
 pipelines:
   default:
