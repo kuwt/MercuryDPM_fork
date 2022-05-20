@@ -14,7 +14,7 @@ pipelines:
           script:
             - mkdir MercuryBuild
             - cd MercuryBuild
-            - cmake -DCMAKE_BUILD_TYPE=Debug -G 'CodeBlocks - Unix Makefiles' ../
+            - cmake -DCMAKE_BUILD_TYPE=Debug -DMercury_BUILD_USER_DIR=ON -G 'Unix Makefiles' ../
           artifacts:
             - error_log.txt
           after-script:
