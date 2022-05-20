@@ -5,7 +5,7 @@
 
 
 image:
-  name: sha256:666062cd0dbe98f9cac342ea5987dfc00808c4b43d3f27b7d4b201a563336bc5
+  name: plath/mercurydpm@sha256:666062cd0dbe98f9cac342ea5987dfc00808c4b43d3f27b7d4b201a563336bc5
 
 pipelines:
   default:
