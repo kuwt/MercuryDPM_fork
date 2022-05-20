@@ -18,7 +18,7 @@ pipelines:
           artifacts:
             - error_log.txt
           after-script:
-            - ls -a
+            - cd $BUILD_DIR/MercuryBuild
             - make fullTest
             - pipe: atlassian/slack-notify:2.0.0
               variables:
