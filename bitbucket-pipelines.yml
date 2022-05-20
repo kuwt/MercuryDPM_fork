@@ -5,7 +5,7 @@
 
 
 image:
-  name: plath/mercurydpm@sha256:d2ef7bf5336d82abd1540dc1d2cc0182c2e77573888f83486e19346010652db7
+  name: sha256:666062cd0dbe98f9cac342ea5987dfc00808c4b43d3f27b7d4b201a563336bc5
 
 pipelines:
   default:
@@ -14,7 +14,6 @@ pipelines:
           script:
             - mkdir MercuryBuild
             - cd MercuryBuild
-            - sudo apt-get install build-essential
             - cmake -DCMAKE_BUILD_TYPE=Debug -G 'CodeBlocks - Unix Makefiles' ../
           artifacts:
             - error_log.txt
