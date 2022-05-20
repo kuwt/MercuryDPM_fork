@@ -16,6 +16,7 @@ pipelines:
           script:
             - mkdir build
             - cd build
+            - sudo apt-get install build-essential
             - cmake -DCMAKE_BUILD_TYPE=Debug -G 'CodeBlocks - Unix Makefiles' ../Trunk
           artifacts:
             - error_log.txt
