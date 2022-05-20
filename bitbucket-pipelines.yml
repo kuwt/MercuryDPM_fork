@@ -15,11 +15,11 @@ pipelines:
             - mkdir MercuryBuild
             - cd MercuryBuild
             - cmake -DCMAKE_BUILD_TYPE=Debug -DMercury_BUILD_USER_DIR=ON -G 'Unix Makefiles' ../
+            - make fullTest
+            - make doc
           artifacts:
             - error_log.txt
           after-script:
-            - cd $BUILD_DIR/MercuryBuild
-            - make fullTest
             - pipe: atlassian/slack-notify:2.0.0
               variables:
                 WEBHOOK_URL: 'https://hooks.slack.com/services/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'
