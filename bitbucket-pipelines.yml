@@ -14,9 +14,8 @@ pipelines:
           script:
             - mkdir MercuryBuild
             - cd MercuryBuild
-            - cmake -DCMAKE_BUILD_TYPE=Debug -DMercury_BUILD_USER_DIR=ON -G 'Unix Makefiles' ../
+            - cmake -DCMAKE_BUILD_TYPE=Debug -DMercury_BUILD_USER_DIR=ON -DMercury_BUILD_DOCUMENTATION=ON -G 'Unix Makefiles' ../
             - make fullTest
-            - make doc
           artifacts:
             - error_log.txt
           after-script:
