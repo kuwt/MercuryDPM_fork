@@ -1,0 +1,29 @@
+# Template C++ Application
+
+# This template allows you to validate your C++ application.
+# The workflow allows running tests and code linting on the default branch.
+
+
+image:
+  name: ubuntu@sha256:0c3a7d0cdc38d191cc245d324089d17e7dd5252cd17952bb5807446c02fc946a
+  username: $DOCKER_HUB_USERNAME
+  password: $DOCKER_HUB_PASSWORD
+
+pipelines:
+  default:
+      - step:
+          name: Test
+          script:
+            - mkdir build
+            - cd build
+            - cmake -DCMAKE_BUILD_TYPE=Debug -G 'CodeBlocks - Unix Makefiles' ../Trunk
+          artifacts:
+            - error_log.txt
+          after-script:
+            - make fullTest
+            - pipe: atlassian/slack-notify:2.0.0
+              variables:
+                WEBHOOK_URL: 'https://hooks.slack.com/services/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'
+                PRETEXT: 'Checking commit; make fullTest running for $BITBUCKET_REPO_SLUG, branch: $BITBUCKET_BRANCH'
+                MESSAGE: '"[${ENVIRONMENT_NAME}] build has exited with status $build_status; $([[ -s error_log.txt ]] && cat error_log.txt || echo All tests passed!)"'
+                DEBUG: 'true'
