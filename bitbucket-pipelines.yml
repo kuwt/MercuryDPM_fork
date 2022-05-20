@@ -5,9 +5,7 @@
 
 
 image:
-  name: ubuntu@sha256:0c3a7d0cdc38d191cc245d324089d17e7dd5252cd17952bb5807446c02fc946a
-  username: $DOCKER_HUB_USERNAME
-  password: $DOCKER_HUB_PASSWORD
+  name: plath/mercurydpm@sha256:0c3a7d0cdc38d191cc245d324089d17e7dd5252cd17952bb5807446c02fc946a
 
 pipelines:
   default:
