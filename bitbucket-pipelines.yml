@@ -17,7 +17,7 @@ pipelines:
             - cmake -DCMAKE_BUILD_TYPE=Debug -DMercury_BUILD_USER_DIR=ON -DMercury_BUILD_DOCUMENTATION=ON -G 'Unix Makefiles' ../
             - make fullTest
           artifacts:
-            - error_log.txt
+            - error_log2.txt
           after-script:
             - pipe: atlassian/slack-notify:2.0.0
               variables:
