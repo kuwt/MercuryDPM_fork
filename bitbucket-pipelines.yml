@@ -12,9 +12,9 @@ pipelines:
       - step:
           name: Test
           script:
-            - mkdir build
-            - cd build
-            - cmake -DCMAKE_BUILD_TYPE=Debug -G 'CodeBlocks - Unix Makefiles' ../Trunk
+            - mkdir MercuryBuild
+            - cd MercuryBuild
+            - cmake -DCMAKE_BUILD_TYPE=Debug -G 'CodeBlocks - Unix Makefiles' ../
           artifacts:
             - error_log.txt
           after-script:
