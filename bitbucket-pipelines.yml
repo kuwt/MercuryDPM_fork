@@ -12,6 +12,10 @@ pipelines:
       - step:
           name: Test
           script:
+            - pipe: atlassian/slack-notify:2.0.0
+              variables:
+                WEBHOOK_URL: 'https://hooks.slack.com/services/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'
+                MESSAGE: 'Checking commit [${BITBUCKET_COMMIT}] of User ${BITBUCKET_STEP_TRIGGERER_UUID} \n make fullTest running for $BITBUCKET_REPO_SLUG/$BITBUCKET_BRANCH'
             - mkdir MercuryBuild
             - cd MercuryBuild
             - cmake -DCMAKE_BUILD_TYPE=Debug -DMercury_BUILD_USER_DIR=ON -DMercury_BUILD_DOCUMENTATION=ON -G 'Unix Makefiles' ../
@@ -19,9 +23,17 @@ pipelines:
           artifacts:
             - error_log2.txt
           after-script:
+            - if [${BITBUCKET_EXIT_CODE} == 0] ; then
             - pipe: atlassian/slack-notify:2.0.0
               variables:
                 WEBHOOK_URL: 'https://hooks.slack.com/services/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'
-                PRETEXT: 'Checking commit; make fullTest running for $BITBUCKET_REPO_SLUG, branch: $BITBUCKET_BRANCH'
-                MESSAGE: '"[${ENVIRONMENT_NAME}] build has exited with status $build_status; $([[ -s error_log.txt ]] && cat error_log.txt || echo All tests passed!)"'
+                MESSAGE: '"build has exited with status $BITBUCKET_EXIT_CODE; $([[ -s error_log.txt ]] && cat error_log.txt || echo All tests passed!)"'
                 DEBUG: 'true'
+            - fi
+            - if [${BITBUCKET_EXIT_CODE} != 0] ; then
+            - pipe: atlassian/slack-notify:2.0.0
+              variables:
+                WEBHOOK_URL: 'https://hooks.slack.com/services/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'
+                MESSAGE: '"build has exited with status $BITBUCKET_EXIT_CODE;"'
+                DEBUG: 'true'
+            - fi
