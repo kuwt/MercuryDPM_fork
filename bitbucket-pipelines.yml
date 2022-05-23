@@ -13,6 +13,7 @@ pipelines:
           name: Test
           script:
             - export BITBUCKET_TRIGGERER_USERNAME=$(curl -X GET -g "https://api.bitbucket.org/2.0/users/${BITBUCKET_STEP_TRIGGERER_UUID}" | tac | tac | jq --raw-output '.display_name')
+            - echo Hello World
             - echo $BITBUCKET_TRIGGERER_USERNAME
             - pipe: atlassian/slack-notify:2.0.0
               variables:
