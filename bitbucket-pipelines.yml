@@ -12,10 +12,11 @@ pipelines:
       - step:
           name: Test
           script:
+            - export BITBUCKET_TRIGGERER_USERNAME=$(curl -X GET -g "https://api.bitbucket.org/2.0/users/${BITBUCKET_STEP_TRIGGERER_UUID}" | jq --raw-output '.display_name')
             - pipe: atlassian/slack-notify:2.0.0
               variables:
                 WEBHOOK_URL: 'https://hooks.slack.com/services/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'
-                MESSAGE: 'Checking commit [${BITBUCKET_COMMIT}] of User ${BITBUCKET_STEP_TRIGGERER_UUID} \n make fullTest running for $BITBUCKET_REPO_SLUG/$BITBUCKET_BRANCH'
+                MESSAGE: 'Checking commit [${BITBUCKET_COMMIT}] of User ${BITBUCKET_TRIGGERER_USERNAME} \n make fullTest running for $BITBUCKET_REPO_SLUG/$BITBUCKET_BRANCH'
             - mkdir MercuryBuild
             - cd MercuryBuild
             - cmake -DCMAKE_BUILD_TYPE=Debug -DMercury_BUILD_USER_DIR=ON -DMercury_BUILD_DOCUMENTATION=ON -G 'Unix Makefiles' ../
@@ -23,17 +24,10 @@ pipelines:
           artifacts:
             - error_log2.txt
           after-script:
-            - if [${BITBUCKET_EXIT_CODE} == 0] ; then
+            - echo $BITBUCKET_EXIT_CODE
+            - if [$BITBUCKET_EXIT_CODE != 0] ; then BUILD_STATUS="failed" ; fi
             - pipe: atlassian/slack-notify:2.0.0
               variables:
                 WEBHOOK_URL: 'https://hooks.slack.com/services/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'
-                MESSAGE: '"build has exited with status $BITBUCKET_EXIT_CODE; $([[ -s error_log.txt ]] && cat error_log.txt || echo All tests passed!)"'
+                MESSAGE: '"build has exited with status [$BUILD_STATUS];"'
                 DEBUG: 'true'
-            - fi
-            - if [${BITBUCKET_EXIT_CODE} != 0] ; then
-            - pipe: atlassian/slack-notify:2.0.0
-              variables:
-                WEBHOOK_URL: 'https://hooks.slack.com/services/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'
-                MESSAGE: '"build has exited with status $BITBUCKET_EXIT_CODE;"'
-                DEBUG: 'true'
-            - fi
