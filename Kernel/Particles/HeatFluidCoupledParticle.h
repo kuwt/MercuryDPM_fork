@@ -30,14 +30,20 @@
 
 /*!
  * \class HeatFluidCoupledParticle
- * \brief
+ * \brief Class that implements particles which store both temperature/heat capacity and liquid content
+ *        which is adapted for the CFD-DEM studies.
+ * \details In some CFD-DEM studies, a drying process needs to be simulated.
+ *          Therefore, we selected the drying model of Azmir et al. (2018), which considers heat and mass transfer.
+ *          Their model considers convection, conduction, radiation, and evaporation.
+ *          Conduction and convection had already been implemented in ThermalParticle class.
+ *          This class implements evaporation model.
  */
 class HeatFluidCoupledParticle final : public ThermalParticle
 {
 public:
     /*!
-     * \details HeatFluidCoupledParticle constructor creates a HeatFluidCoupledParticle at (0,0,0) with radius,
-     * mass and inertia equal to 1.
+     * \breif HeatFluidCoupledParticle constructor creates a HeatFluidCoupledParticle at (0,0,0) with radius,
+     *        mass and inertia equal to 1.
      */
     HeatFluidCoupledParticle()
     {
@@ -46,8 +52,8 @@ public:
 
     /*!
      * \brief HeatFluidCoupledParticle copy constructor, which accepts as input a reference to a HeatFluidCoupledParticle.
-     * It creates a copy of this HeatFluidCoupledParticle and all it's information.
-     * Usually it is better to use the copy() function for polymorphism.
+     *        It creates a copy of this HeatFluidCoupledParticle and all it's information.
+     *        Usually it is better to use the copy() function for polymorphism.
      * \details Constructor that copies most of the properties of the given particle.
      *          Please note that not everything is copied, for example the position
      *          in the HGrid is not determined yet by the end of this constructor.
@@ -62,15 +68,15 @@ public:
 
     /*!
      * \brief HeatFluidCoupledParticle destructor, needs to be implemented and checked if it removes tangential spring information.
-     * \details Destructor. It asks the ParticleHandler to check if this was the smallest or largest particle and adjust itself accordingly.
+     * \details Destructor that asks the ParticleHandler to check if this was the smallest or largest particle and adjust itself accordingly.
      */
     ~HeatFluidCoupledParticle() override
     = default;
 
     /*!
      * \brief HeatFluidCoupledParticle copy method. Use copy constructor of this HeatFluidCoupledParticle to create a copy on the heap,
-     * useful for polymorphism.
-     * @return pointer to the particle's copy.
+     *        useful for polymorphism.
+     *\return pointer to the particle's copy.
      */
     HeatFluidCoupledParticle* copy() const override
     {
@@ -78,9 +84,10 @@ public:
     }
 
     /*!
-     * \details HeatFluidCoupledParticle print method, which accepts an os std::ostream as
-     *          input. It prints human readable HeatFluidCoupledParticle information to the
-     *          std::ostream.
+     * \brief HeatFluidCoupledParticle write function, writes HeatFluidCoupledParticle information to the given output-stream,
+     *        for example a restart-file.
+     * \details HeatFluidCoupledParticle print method, which accepts an os std::ostream as input.
+     *          It prints human readable HeatFluidCoupledParticle information to the std::ostream.
      * \param[in,out] os    stream to which the info is written.
      */
     void write(std::ostream& os) const override
@@ -90,8 +97,8 @@ public:
     }
 
     /*!
-     * \details Returns the name of the object; in this case 'HeatFluidCoupledParticle'.
-     * @return The object name.
+     * \breif Returns the name of the object; in this case "HeatFluidCoupledParticle".
+     * \return The object name.
      */
     std::string getName() const override
     {
@@ -99,13 +106,14 @@ public:
     }
 
     /*!
-     * \brief HeatFluidCoupledParticle read function, which accepts an std::istream as input.
+     * \brief HeatFluidCoupledParticle read function, reads in the information for this HeatFluidCoupledParticle from the given input-stream,
+     *        for example a restart file.
      */
     void read(std::istream& is) override;
 
     /*!
      * \brief Returns the volume of the Liquid.
-     * @return The actual volume of the liquid.
+     * \return The actual volume of the liquid.
      */
     Mdouble getLiquidVolume() const
     {
