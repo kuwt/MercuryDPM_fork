@@ -5,10 +5,12 @@
 A contact model defines the governing normal and tangential behaviours of particles. Different contact models are available
 in MercuryDPM. The developer can have access to them via a header. For instance:
 
-\snippet Drivers/UnitTests/LinearViscoelasticUnitTest.cpp T11:contactModel
+\snippet Drivers/Tutorials/Tutorial1.cpp T11:ContactModel
 
-In MercuryDPM contact models consists of Species and Interaction classes. Species contains the parameters of the contact law (plus the particle property density),
+In MercuryDPM contact models consists of Species class and Interaction class. Species contains the parameters of the contact law (plus the particle property density)\n
 while Interaction contains the functions to compute the forces.\n
+
+MercuryDPM contains following contact models:
 
 \dot
     digraph example {

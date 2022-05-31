@@ -137,7 +137,7 @@ public:
 		//Case 39 set hertzian = true
 		//Case 40, 41, 42: set Foerster glass, Lorenz steel, Lorenz glassv
 		//Case 43, 44, 45, 46: set Silbert, Foerster glass, Lorenz steel, Lorenz glass with rolling friction
-	  std::cout << "Study " << study_num << std::endl;
+	  logger(INFO, "Study %", study_num);
 		
 		if (study_num < 6) {
 			// set mu_all = 0.5, vary lambda
@@ -190,7 +190,7 @@ public:
 			setSlidingFrictionCoefficientBottom(MuBottom[study_num-29]);
 			setFixedParticleRadius(0);
 		} else if (study_num < 37) { //Case 33-36
-		  std::cout << "S" << study_num << std::endl;
+            logger(INFO, "S %", study_num);
 			// set lambda = 1, mu_b = 0.5, vary mu
 			Mdouble Mu[] = {1e20,1,1./64,0};
 			species->setSlidingFrictionCoefficient(Mu[study_num-33]);
@@ -204,13 +204,14 @@ public:
 			Mdouble eps = 0.97;
 			species->setStiffnessAndRestitutionCoefficient(species->getStiffness(), eps, 1);
 			species->setSlidingDissipation(species->getDissipation());			
-		} else if (study_num < 40) { //Case 39
-			// set hertzian = true
-		  std::cout << "Hertzian implementation has been changed" << std::endl;
-			exit(-1);
-			//set_Hertzian(true);
-			///\todo Thomas: Hertzian does not  appear in the restart file
-		} else if (study_num < 43) { //Case 40, 41, 42
+		} else if (study_num < 40)
+        { //Case 39
+            // set hertzian = true
+            logger(INFO, "Hertzian implementation has been changed");
+            exit(-1);
+            //set_Hertzian(true);
+            ///\todo Thomas: Hertzian does not  appear in the restart file
+        } else if (study_num < 43) { //Case 40, 41, 42
 			// set Foerster glass, Lorenz steel, Lorenz glass
 			Mdouble eps[] = {0.97 , 0.95 , 0.972};
 			Mdouble beta[]= {0.44 , 0.32 , 0.25 };
@@ -247,20 +248,21 @@ public:
 		} else if (study_num < 53) { //Case 52
 			///\todo turn on rolling friction only at the wall
 		} else if (study_num < 54) { //Case 53
-		    std::cout << "using mu=0.3, r=0.1" << std::endl;			
+            logger(INFO, "using mu=0.3, r=0.1");
             species->setSlidingFrictionCoefficient(0.3);
             species->setCollisionTimeAndNormalAndTangentialRestitutionCoefficient
                      (50.*getTimeStep(),0.1,0.1,1);
  		} else if (study_num < 55) { //Case 54
-		    std::cout << "using mu=0.3, r=0.88" << std::endl;			
+            logger(INFO, "using mu=0.3, r=0.88");
             species->setSlidingFrictionCoefficient(0.3);
             species->setCollisionTimeAndNormalAndTangentialRestitutionCoefficient
                      (50.*getTimeStep(),0.88,0.88,1);
-        } else {
-			//If study_num is complete quit
-		    std::cout << "Study is complete " << std::endl;
-			exit(0);
-		}
+        } else
+        {
+            //If study_num is complete quit
+            logger(VERBOSE, "Study is complete ");
+            exit(0);
+        }
 		//Note make sure h and a is defined
 		if (study_num < 37 || (study_num>=53&&study_num<=55)) 
 		{
@@ -302,28 +304,28 @@ public:
 			w0.set(Vec3D(0,0,-1), Vec3D(0,0,-3.4* getMaxInflowParticleRadius()));
 		} else {
 			w0.set(Vec3D(0,0,-1), Vec3D(0,0,0));
-		}
-		wallHandler.copyAndAddObject(w0);
-
-		PeriodicBoundary b0;
-		b0.set(Vec3D(1.0,0.0,0.0), getXMin(), getXMax());
-		boundaryHandler.copyAndAddObject(b0);
-		b0.set(Vec3D(0.0,1.0,0.0), getYMin(), getYMax());
-		boundaryHandler.copyAndAddObject(b0);
-		
-		add_flow_particles();
-
-		std::cout << std::endl << "Status before solve:" << std::endl;
+        }
+        wallHandler.copyAndAddObject(w0);
+        
+        PeriodicBoundary b0;
+        b0.set(Vec3D(1.0, 0.0, 0.0), getXMin(), getXMax());
+        boundaryHandler.copyAndAddObject(b0);
+        b0.set(Vec3D(0.0, 1.0, 0.0), getYMin(), getYMax());
+        boundaryHandler.copyAndAddObject(b0);
+        
+        add_flow_particles();
+        
+        logger(INFO, "\nStatus before solve:");
 //		std::cout
 //			<< "tc=" << getCollisionTime()
 //			<< ", eps="	<< getRestitutionCoefficient()
 //			<< ", vmax=" << getInflowParticle()->calculateMaximumVelocity(getSpecies())
 //			<< ", inflowHeight/zMax=" << getInflowHeight()/getZMax()
 //			<< std::endl << std::endl;
-		//~ timer.set(t,tmax);
-
-		//optimize number of buckets
-		std::cout << "Nmax" << particleHandler.getStorageCapacity() << std::endl;
+        //~ timer.set(t,tmax);
+        
+        //optimize number of buckets
+        logger(INFO, "Nmax %", particleHandler.getStorageCapacity());
 		//setHGridNumberOfBucketsToPower(particleHandler.getNumberOfObjects()*1.5);
 	}
 
@@ -375,52 +377,65 @@ public:
 	//defines type of flow particles	
 	void create_inflow_particle()
 	{
-		inflowParticle_.setRadius(random.getRandomNumber(getMinInflowParticleRadius(),getMaxInflowParticleRadius()));
-		//inflowParticle_.computeMass();
-		
+        inflowParticle_.setRadius(random.getRandomNumber(getMinInflowParticleRadius(), getMaxInflowParticleRadius()));
+        //inflowParticle_.computeMass();
+        
         //The position components are first stored in a Vec3D, because if you pass them directly into setPosition the compiler is allowed to change the order in which the numbers are generated
         Vec3D position;
-		position.X = random.getRandomNumber(getXMin(),getXMax());
-		position.Y = random.getRandomNumber(getYMin(),getYMax());
-		position.Z = random.getRandomNumber(getZMin()+inflowParticle_.getRadius(),getInflowHeight());
+        position.X = random.getRandomNumber(getXMin(), getXMax());
+        position.Y = random.getRandomNumber(getYMin(), getYMax());
+        position.Z = random.getRandomNumber(getZMin() + inflowParticle_.getRadius(), getInflowHeight());
         inflowParticle_.setPosition(position);
-		inflowParticle_.setVelocity(Vec3D(getInflowVelocity(),0.0,0.0));
-		if (randomiseSpecies) {
-			int indSpecies = floor(random.getRandomNumber(0,speciesHandler.getNumberOfObjects()-1e-200));
-			inflowParticle_.setSpecies(speciesHandler.getObject(indSpecies));
-		}
-	}
-
-	//set approximate height of flow
-	void set_H(Mdouble new_) {setInflowHeight(new_); setZMax(getInflowHeight());}
-	Mdouble get_H() {return getInflowHeight();}
-
-	void printTime() const {
-	  std::cout << "t=" << std::setprecision(3) << std::left << std::setw(6) << getTime() 
-		    << ", tmax=" << std::setprecision(3) << std::left << std::setw(6) << getTimeMax()
-		    << ", N=" << std::setprecision(3) << std::left << std::setw(6) << particleHandler.getNumberOfObjects()
-		    << ", theta=" << std::setprecision(3) << std::left << std::setw(6) << getChuteAngleDegrees()
-			//<< ", time left=" << setprecision(3) << left << setw(6) << timer.getTime2Finish(t)
-			//~ << ", finish by " << setprecision(3) << left << setw(6) << timer.getFinishTime(t)
-		    << ". " << std::endl;
-	}
-	
-	bool readNextArgument(int& i, int argc, char *argv[]) {
-		if (!strcmp(argv[i],"-muBottom")) {
-			setSlidingFrictionCoefficientBottom(atof(argv[i+1]));
-			std::cout << "muB=" << getSlidingFrictionCoefficientBottom() << std::endl;
-		} else if (!strcmp(argv[i],"-oldValues")) {
-		  species->setSlidingDissipation(species->getDissipation());
-		  std::cout << "getSlidingDissipation()=" << species->getSlidingDissipation() << std::endl;
-		} else return Chute::readNextArgument(i, argc, argv); //if argv[i] is not found, check the commands in Chute
-		return true; //returns true if argv[i] is found
-	}
-
+        inflowParticle_.setVelocity(Vec3D(getInflowVelocity(), 0.0, 0.0));
+        if (randomiseSpecies)
+        {
+            int indSpecies = floor(random.getRandomNumber(0, speciesHandler.getNumberOfObjects() - 1e-200));
+            inflowParticle_.setSpecies(speciesHandler.getObject(indSpecies));
+        }
+    }
+    
+    //set approximate height of flow
+    void set_H(Mdouble new_)
+    {
+        setInflowHeight(new_);
+        setZMax(getInflowHeight());
+    }
+    
+    Mdouble get_H()
+    { return getInflowHeight(); }
+    
+    void printTime() const
+    {
+        logger(INFO, "t=%3.6"
+                     ", tmax=%3.6"
+                     ", N=%3.6"
+                     ", theta=%3.6",
+               getTime(), getTimeMax(), particleHandler.getNumberOfObjects(), getChuteAngleDegrees());
+        //<< ", time left=" << setprecision(3) << left << setw(6) << timer.getTime2Finish(t)
+        //~ << ", finish by " << setprecision(3) << left << setw(6) << timer.getFinishTime(t)
+    }
+    
+    bool readNextArgument(int& i, int argc, char* argv[])
+    {
+        if (!strcmp(argv[i], "-muBottom"))
+        {
+            setSlidingFrictionCoefficientBottom(atof(argv[i + 1]));
+            logger(INFO, "muB=%", getSlidingFrictionCoefficientBottom());
+        }
+        else if (!strcmp(argv[i], "-oldValues"))
+        {
+            species->setSlidingDissipation(species->getDissipation());
+            logger(INFO, "getSlidingDissipation()=%", species->getSlidingDissipation());
+        }
+        else return Chute::readNextArgument(i, argc, argv); //if argv[i] is not found, check the commands in Chute
+        return true; //returns true if argv[i] is found
+    }
+    
     int getNCreated() const
     {
         return nCreated_;
     }
-
+    
     void increaseNCreated()
     {
         nCreated_++;

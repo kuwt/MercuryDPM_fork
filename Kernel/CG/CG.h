@@ -112,7 +112,6 @@ public:
     
     /*!
      * \brief Writes class content, except for the points, into an output stream.
-     * \todo TW write should be renamed writeHeader, writeAll should be renamed write.
      */
     void write(std::ostream& os) const override;
     

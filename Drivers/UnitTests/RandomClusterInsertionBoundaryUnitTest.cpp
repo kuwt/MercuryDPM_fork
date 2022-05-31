@@ -89,11 +89,12 @@ public:
         //spherical particle needed for the insertion
         SphericalParticle insertionBoundaryParticle;
         insertionBoundaryParticle.setSpecies(speciesHandler.getObject(0));
+        insertionBoundaryParticle.setRadius(0.05);
 
         //setting insertion boundary properties
         RandomClusterInsertionBoundary insertionBoundary;
         insertionBoundary.set(&insertionBoundaryParticle, 100, {-0.4, -0.01, 0.2}, {-0.2, 0.01, 0.4}, Vec3D(0.2, 0, 0),
-                              Vec3D(0.2, 0, 0), 0.05, 0.05, radiusParticle);
+                              Vec3D(0.2, 0, 0), radiusParticle);
         insertionBoundary.setRandomised(false);
         boundaryHandler.copyAndAddObject(insertionBoundary);
 

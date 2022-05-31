@@ -100,16 +100,13 @@ class IncidentOntoRoughness : public Mercury2D {
             double velvar = pars.reservoirTemperature * sqrt(pars.g * pars.particleRadius);
             insb = new CubeInsertionBoundary();
             insb->set(
-                generandum, 100, 
-                    Vec3D(pars.xmin - pars.reservoirLength + pars.particleRadius, 
+                    generandum, 100,
+                    Vec3D(pars.xmin - pars.reservoirLength + pars.particleRadius,
                           0, 0),
-                    Vec3D(pars.xmin - 2*pars.particleRadius, 
+                    Vec3D(pars.xmin - 2 * pars.particleRadius,
                           pars.reservoirHeight, 0),
                     Vec3D(pars.reservoirVel - velvar, -pars.reservoirVel - velvar, 0),
-                    Vec3D(pars.reservoirVel + velvar, -pars.reservoirVel + velvar, 0),
-                    pars.particleRadius * (1 - pars.dispersity),
-                    pars.particleRadius * (1 + pars.dispersity)
-                );
+                    Vec3D(pars.reservoirVel + velvar, -pars.reservoirVel + velvar, 0));
             insb = boundaryHandler.copyAndAddObject(insb);
 
             /* Flux boundaries for measuring flow rates. */

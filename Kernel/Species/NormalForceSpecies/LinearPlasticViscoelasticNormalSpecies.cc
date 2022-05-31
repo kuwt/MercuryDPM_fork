@@ -136,8 +136,7 @@ LinearPlasticViscoelasticNormalSpecies::setPlasticParameters(Mdouble loadingStif
     if (loadingStiffness <= 0 || unloadingStiffnessMax < loadingStiffness || cohesionStiffness < 0 ||
         penetrationDepthMax < 0 || penetrationDepthMax > 1)
     {
-        std::cerr << "Error: arguments of setPlasticParameters do not make sense" << std::endl;
-        exit(-1);
+        logger(ERROR, "Arguments of setPlasticParameters do not make sense");
     }
     setLoadingStiffness(loadingStiffness);
     setUnloadingStiffnessMax(unloadingStiffnessMax);

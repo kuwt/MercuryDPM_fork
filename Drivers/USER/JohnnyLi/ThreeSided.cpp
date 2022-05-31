@@ -38,26 +38,26 @@ int main()
     LinearViscoelasticSpecies* s = dpm.speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
     Mdouble radius = 10;
     Mdouble collisionTime = 5e-2;
-    s->setCollisionTimeAndRestitutionCoefficient(collisionTime,0.5,s->getMassFromRadius(radius));
-    logger(INFO,"k % gam %",s->getStiffness(),s->getDissipation());
+    s->setCollisionTimeAndRestitutionCoefficient(collisionTime, 0.5, s->getMassFromRadius(radius));
+    logger(INFO, "k % gam %", s->getStiffness(), s->getDissipation());
     // Set time step, max time, domain size, savecount
-    Vec3D centerOfRotation = {2240,1480,50};
-    Vec3D halfWidth = {120,110,50};
+    Vec3D centerOfRotation = {2240, 1480, 50};
+    Vec3D halfWidth = {120, 110, 50};
     dpm.setTimeMax(20);
-    dpm.setTimeStep(collisionTime/15);
-    dpm.setDomain(centerOfRotation-halfWidth,centerOfRotation+halfWidth);
-    dpm.setSaveCount(dpm.getTimeMax()/dpm.getTimeStep()/100);
-    dpm.setGravity({0,-1,0});
+    dpm.setTimeStep(collisionTime / 15);
+    dpm.setDomain(centerOfRotation - halfWidth, centerOfRotation + halfWidth);
+    dpm.setSaveCount(dpm.getTimeMax() / dpm.getTimeStep() / 100);
+    dpm.setGravity({0, -1, 0});
     // create a level set wall of type fourSided
     // give the wall angular velocity
-    dpm.wallHandler.readTriangleWall("3S.stl",s,1,centerOfRotation,{0,0,0},{0,0,-0.05});
+    dpm.wallHandler.readTriangleWall("3S.stl", s, 1, centerOfRotation, {0, 0, 0}, {0, 0, -0.05});
     // add walls on the domain boundary
-    dpm.wallHandler.copyAndAddObject(InfiniteWall({-1,0,0},dpm.getMin(),s));
-    dpm.wallHandler.copyAndAddObject(InfiniteWall({ 1,0,0},dpm.getMax(),s));
-    dpm.wallHandler.copyAndAddObject(InfiniteWall({0,-1,0},dpm.getMin(),s));
+    dpm.wallHandler.copyAndAddObject(InfiniteWall({-1, 0, 0}, dpm.getMin(), s));
+    dpm.wallHandler.copyAndAddObject(InfiniteWall({1, 0, 0}, dpm.getMax(), s));
+    dpm.wallHandler.copyAndAddObject(InfiniteWall({0, -1, 0}, dpm.getMin(), s));
     //dpm.wallHandler.copyAndAddObject(InfiniteWall({0, 1,0},dpm.getMax(),s));
-    dpm.wallHandler.copyAndAddObject(InfiniteWall({0,0,-1},dpm.getMin(),s));
-    dpm.wallHandler.copyAndAddObject(InfiniteWall({0,0, 1},dpm.getMax(),s));
+    dpm.wallHandler.copyAndAddObject(InfiniteWall({0, 0, -1}, dpm.getMin(), s));
+    dpm.wallHandler.copyAndAddObject(InfiniteWall({0, 0, 1}, dpm.getMax(), s));
     // make the walls at teh domain boundary invisible
     //for (unsigned i=dpm.wallHandler.getNumberOfObjects()-2; i<dpm.wallHandler.getNumberOfObjects(); ++i) {
     //    dpm.wallHandler.getObject(i)->setVTKVisibility(false);
@@ -65,9 +65,10 @@ int main()
     // add particles in a limited region
     CubeInsertionBoundary b;
     SphericalParticle p(s);
-    b.set(p,1000,dpm.getMin()+Vec3D(0,2*halfWidth.Y,0),dpm.getMax()+Vec3D(0,.5*halfWidth.Y,0),{0,0,0},{0,0,0},radius,radius);
+    b.set(p, 1000, dpm.getMin() + Vec3D(0, 2 * halfWidth.Y, 0), dpm.getMax() + Vec3D(0, .5 * halfWidth.Y, 0), {0, 0, 0},
+          {0, 0, 0});
     b.insertParticles(&dpm);
-    logger(INFO,"#particles %",dpm.particleHandler.getNumberOfObjects());
+    logger(INFO, "#particles %", dpm.particleHandler.getNumberOfObjects());
     // turn on vtk output
     dpm.setWallsWriteVTK(FileType::MULTIPLE_FILES);
     dpm.setParticlesWriteVTK(true);

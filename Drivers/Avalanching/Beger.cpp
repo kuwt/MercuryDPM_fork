@@ -83,14 +83,11 @@ public:
                         ene_kin += .5 * particleHandler.getObject(i)->getMass() *
                                    particleHandler.getObject(i)->getVelocity().getLengthSquared();
                 rotate = ene_kin < 1e-5; //stop rotating if the kinetic energy increases
-                std::cout << "Ene_kin=" << ene_kin
-                << ", RotationSpeed=" << RotationSpeed
-                << ", rotate=" << rotate
-                << ", t=" << getTime()
-                << ", theta=" << std::setprecision(6) << Angle
-                << std::endl;
-                if (Angle > 60) {
-                    std::cout << "60 degree reached; exiting" << std::endl;
+                logger(INFO, "Ene_kin=%, RotationSpeed=%, rotate =%, t=%, theta=%6", ene_kin, RotationSpeed, rotate,
+                       getTime(), Angle);
+                if (Angle > 60)
+                {
+                    logger(INFO, "60 degree reached; exiting");
                     setTimeMax(getTime());
                 } //end program
             }
@@ -118,10 +115,7 @@ public:
             if (!particleHandler.getObject(i)->isFixed())
                 ene_kin += .5 * particleHandler.getObject(i)->getMass() *
                            particleHandler.getObject(i)->getVelocity().getLengthSquared();
-        std::cout << "t=" << std::setprecision(3) << std::left << std::setw(6) << getTime()
-        << ", tmax=" << std::setprecision(3) << std::left << std::setw(6) << getTimeMax()
-        << ", enekin=" << std::setprecision(3) << std::left << std::setw(6) << ene_kin
-        << std::endl;
+        logger(INFO, "t=%3.6, tmax= %3.6, enekin=%3.6", getTime(), getTimeMax(), ene_kin);
     }
 
     void setupInitialConditions() override {

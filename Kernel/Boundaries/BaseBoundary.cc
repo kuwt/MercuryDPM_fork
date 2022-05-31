@@ -83,7 +83,7 @@ void BaseBoundary::createPeriodicParticle(BaseParticle* p UNUSED, ParticleHandle
 }
 
 /*!
- * \details Used to create periodic copies of particles in classes which 
+ * \details Used to create periodic copies of particles in classes which
  * implement periodic boundary conditions
  * NB: virtual function
  * \param[in] pH   the particle handler
@@ -93,7 +93,7 @@ void BaseBoundary::createPeriodicParticles(ParticleHandler& pH UNUSED)
 }
 
 /*!
- * \details What this does depends on the type of boundary. 
+ * \details What this does depends on the type of boundary.
  * For example, an InsertionBoundary introduces new particles (and how it does
  * that in turn depends on the type of InsertionBoundary).
  * \param[in] md    the problem's DPMBase object

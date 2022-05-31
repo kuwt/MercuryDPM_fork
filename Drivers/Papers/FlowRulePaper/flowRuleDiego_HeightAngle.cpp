@@ -99,15 +99,15 @@ public:
     }
 
 	void set_study(int study_num) {
-	    std::cout << "using mu=0, r=0.5" << std::endl;			
-	    species->setCollisionTimeAndRestitutionCoefficient
-	             (50.*getTimeStep(),0.5,1);
-	  	std::stringstream name;
-		name << "H" << getInflowHeight() 
-			 << "A" << getChuteAngleDegrees() 
-			 << "L" << round(100.*getFixedParticleRadius()*2.)/100.;
-		setName(name.str().c_str());
-	}
+        logger(INFO, "using mu=0, r=0.5");
+        species->setCollisionTimeAndRestitutionCoefficient
+                (50. * getTimeStep(), 0.5, 1);
+        std::stringstream name;
+        name << "H" << getInflowHeight()
+             << "A" << getChuteAngleDegrees()
+             << "L" << round(100. * getFixedParticleRadius() * 2.) / 100.;
+        setName(name.str().c_str());
+    }
 
 	//Do not add or remove particles
 	void actionsBeforeTimeStep() override { };
@@ -122,41 +122,44 @@ public:
 		//cout << "correct fixed" << endl;
 		if (speciesHandler.getNumberOfObjects()>1) {
 			for (unsigned int i=0; i<particleHandler.getNumberOfObjects(); i++)
-				if (particleHandler.getObject(i)->isFixed()) 
-					particleHandler.getObject(i)->setSpecies(speciesHandler.getObject(1));
-		}
-
+				if (particleHandler.getObject(i)->isFixed())
+                    particleHandler.getObject(i)->setSpecies(speciesHandler.getObject(1));
+        }
+        
         ///todo{I(Dinant) had to clear the WallHandler to prevent it from inserting the same wall twice, why?}
-		wallHandler.clear();
-		InfiniteWall w0;
-		if (getFixedParticleRadius()) {
-			w0.set(Vec3D(0,0,-1), Vec3D(0,0,-3.4* getMaxInflowParticleRadius()));
-		} else {
-			w0.set(Vec3D(0,0,-1), Vec3D(0,0,0));
-		}
-		wallHandler.copyAndAddObject(w0);
-
-		PeriodicBoundary b0;
-		b0.set(Vec3D(1.0,0.0,0.0), getXMin(), getXMax());
-		boundaryHandler.copyAndAddObject(b0);
-		b0.set(Vec3D(0.0,1.0,0.0), getYMin(), getYMax());
-		boundaryHandler.copyAndAddObject(b0);
-		
-		add_flow_particles();
-
-		std::cout << std::endl << "Status before solve:" << std::endl;
+        wallHandler.clear();
+        InfiniteWall w0;
+        if (getFixedParticleRadius())
+        {
+            w0.set(Vec3D(0, 0, -1), Vec3D(0, 0, -3.4 * getMaxInflowParticleRadius()));
+        }
+        else
+        {
+            w0.set(Vec3D(0, 0, -1), Vec3D(0, 0, 0));
+        }
+        wallHandler.copyAndAddObject(w0);
+        
+        PeriodicBoundary b0;
+        b0.set(Vec3D(1.0, 0.0, 0.0), getXMin(), getXMax());
+        boundaryHandler.copyAndAddObject(b0);
+        b0.set(Vec3D(0.0, 1.0, 0.0), getYMin(), getYMax());
+        boundaryHandler.copyAndAddObject(b0);
+        
+        add_flow_particles();
+        
+        logger(INFO, "\nStatus before solve:");
 //		std::cout
 //			<< "tc=" << getCollisionTime()
 //			<< ", eps="	<< getRestitutionCoefficient()
 //			<< ", vmax=" << getInflowParticle()->calculateMaximumVelocity(getSpecies())
 //			<< ", inflowHeight/zMax=" << getInflowHeight()/getZMax()
 //			<< std::endl << std::endl;
-		//~ timer.set(t,tmax);
-
-		//optimize number of buckets
-		std::cout << "Nmax" << particleHandler.getStorageCapacity() << std::endl;
-		//setHGridNumberOfBucketsToPower(particleHandler.getNumberOfObjects()*1.5);
-	}
+        //~ timer.set(t,tmax);
+        
+        //optimize number of buckets
+        logger(INFO, "Nmax %", particleHandler.getStorageCapacity());
+        //setHGridNumberOfBucketsToPower(particleHandler.getNumberOfObjects()*1.5);
+    }
 
 	//add flow particles
 	void add_flow_particles() 
@@ -216,31 +219,40 @@ public:
 		position.Z = random.getRandomNumber(getZMin()+inflowParticle_.getRadius(),getInflowHeight());
         inflowParticle_.setPosition(position);
 		inflowParticle_.setVelocity(Vec3D(getInflowVelocity(),0.0,0.0));
-		if (randomiseSpecies) {
-			const unsigned int indSpecies = floor(random.getRandomNumber(0, speciesHandler.getNumberOfObjects() - 1e-200));
-			inflowParticle_.setSpecies(speciesHandler.getObject(indSpecies));
-		}
-	}
-
-	//set approximate height of flow
-	void set_H(Mdouble new_) {setInflowHeight(new_); setZMax(getInflowHeight());}
-	Mdouble get_H() {return getInflowHeight();}
-
-	void printTime() const override {
-	  std::cout << "t=" << std::setprecision(3) << std::left << std::setw(6) << getTime() 
-		    << ", tmax=" << std::setprecision(3) << std::left << std::setw(6) << getTimeMax()
-		    << ", N=" << std::setprecision(3) << std::left << std::setw(6) << particleHandler.getNumberOfObjects()
-		    << ", theta=" << std::setprecision(3) << std::left << std::setw(6) << getChuteAngleDegrees()
-			//<< ", time left=" << setprecision(3) << left << setw(6) << timer.getTime2Finish(t)
-			//~ << ", finish by " << setprecision(3) << left << setw(6) << timer.getFinishTime(t)
-		    << ". " << std::endl;
-	}
-	
+        if (randomiseSpecies)
+        {
+            const unsigned int indSpecies = floor(
+                    random.getRandomNumber(0, speciesHandler.getNumberOfObjects() - 1e-200));
+            inflowParticle_.setSpecies(speciesHandler.getObject(indSpecies));
+        }
+    }
+    
+    //set approximate height of flow
+    void set_H(Mdouble new_)
+    {
+        setInflowHeight(new_);
+        setZMax(getInflowHeight());
+    }
+    
+    Mdouble get_H()
+    { return getInflowHeight(); }
+    
+    void printTime() const override
+    {
+        logger(INFO, "t=%3.6"
+                     ", tmax=%3.6"
+                     ", N=%3.6"
+                     ", theta=3.6",
+               getTime(), getTimeMax(), particleHandler.getNumberOfObjects(), getChuteAngleDegrees());
+        //<< ", time left=" << setprecision(3) << left << setw(6) << timer.getTime2Finish(t)
+        //~ << ", finish by " << setprecision(3) << left << setw(6) << timer.getFinishTime(t)
+    }
+    
     int getNCreated() const
     {
         return nCreated_;
     }
-
+    
     void increaseNCreated()
     {
         nCreated_++;
@@ -279,30 +291,27 @@ public:
         //    std::cout << "Run " << getName() << " has already been done " << std::endl;
 		//} else 
         {
-			//launch this code
+            //launch this code
             std::stringstream com("");
-			com << "echo started \tstudyNumber \t" 
-				 << studyNumber[0] << " " 
-				 << studyNumber[1] << " " 
-				 << studyNumber[2] << " \tname \t" 
-				 << getName() << " &>>ReportFlowRule";
-			//std::cout << system(com.str().c_str()) << std::endl;
-			std::cout << "started studyNumber " 
-				 << studyNumber[0] << " " 
-				 << studyNumber[1] << " " 
-				 << studyNumber[2] << ", name " 
-				  << getName() << std::endl;
-
-			solve();
-
-			com.str("");
-			com << "echo finished \tstudyNumber \t" 
-				 << studyNumber[0] << " " 
-				 << studyNumber[1] << " " 
-				 << studyNumber[2] << " \tname \t" 
-				 << getName() << " &>>ReportFlowRule";
-			//std::cout << system(com.str().c_str()) << std::endl;
-		}
+            com << "echo started \tstudyNumber \t"
+                << studyNumber[0] << " "
+                << studyNumber[1] << " "
+                << studyNumber[2] << " \tname \t"
+                << getName() << " &>>ReportFlowRule";
+            //std::cout << system(com.str().c_str()) << std::endl;
+            logger(INFO, "started studyNumber % % %, name %",
+                   studyNumber[0], studyNumber[1], studyNumber[2], getName());
+            
+            solve();
+            
+            com.str("");
+            com << "echo finished \tstudyNumber \t"
+                << studyNumber[0] << " "
+                << studyNumber[1] << " "
+                << studyNumber[2] << " \tname \t"
+                << getName() << " &>>ReportFlowRule";
+            //std::cout << system(com.str().c_str()) << std::endl;
+        }
 	}
 };
 
@@ -325,17 +334,17 @@ int main(int argc, char *argv[])
     } 
     else
     {
-        std::cout << "Not enough input arguments given (./flowRule_StudyHeightAngle $study $height $angle); " << std::endl
-            << "using demo values (equivalent to ./flowRule_StudyHeightAngle 5 10 24 -tmax 0.01)" << std::endl;
-        studyNumber[0]=5;
-        studyNumber[1]=2;
-        studyNumber[2]=24;
+        logger(WARN, "Not enough input arguments given (./flowRule_StudyHeightAngle $study $height $angle); \n"
+                     "using demo values (equivalent to ./flowRule_StudyHeightAngle 5 10 24 -tmax 0.01)");
+        studyNumber[0] = 5;
+        studyNumber[1] = 2;
+        studyNumber[2] = 24;
         problem.setTimeMax(0.01);
         problem.dataFile.setFileType(FileType::ONE_FILE);
         problem.setChuteLength(5);
         problem.setChuteWidth(5);
         //problem.setRoughBottomType(MULTILAYER);
-        problem.run(studyNumber,1,argv);
+        problem.run(studyNumber, 1, argv);
         problem.setName("flowRuleSelfTest");
         problem.writeRestartFile();
     }

@@ -238,7 +238,7 @@ public:
                         counter++;
                     }
                 }
-        std::cout << "Inserted particles: " << counter << std::endl;
+        logger(INFO, "Inserted particles: %", counter);
     }
 
     void addParticles() {

@@ -64,25 +64,26 @@ public:
     CubeInsertionBoundary* copy() const override;
     
     /*!
-     * \brief Sets the properties of the CubeInsertionBoundary
+     * \brief Sets the properties of the InsertionBoundary for mutliple different particle types
      */
     void
-    set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax,
-        double radMin, double radMax);
-
+    set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax);
+    
     void
-    set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax,
-        double radMin, double radMax);
+    set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax);
+    
     /*!
-     * \brief Sets the range of particle radii that may be generated.
+     * \brief Sets the properties of the InsertionBoundary for a single particle type
      */
-    void setRadiusRange(Mdouble radMin, Mdouble radMax);
+    void
+    set(std::vector<BaseParticle*> particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin,
+        Vec3D velMax);
     
     /*!
      * \brief Sets the geometry (position and velocity distribution) of the
      * CubeInsertionBoundary
      */
-    void setGeometry(Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax);
+    void setGeometry(Vec3D posMin, Vec3D posMax);
     
     /*!
      * \brief Generates a random position, velocity for the particle p
@@ -93,12 +94,6 @@ public:
      * \brief reads boundary properties from istream
      */
     void read(std::istream& is) override;
-    
-    /*!
-     * \brief deprecated version of CubeInsertionBoundary::read().
-     */
-    MERCURY_DEPRECATED
-    void oldRead(std::istream& is);
     
     /*!
      * \brief writes boundary properties to ostream
@@ -119,7 +114,7 @@ protected:
      * \brief Minimal and maximal positions defining the boundary's boundaries,
      * and minimum and maximum velocity of the particles to be inserted.
      */
-    Vec3D posMin_, posMax_, velMin_, velMax_;
+    Vec3D posMin_, posMax_;
 };
 
 #endif

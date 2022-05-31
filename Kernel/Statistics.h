@@ -38,7 +38,7 @@
 void Statistics(int argc, char* argv[])
 {
     if (argc > 1 && strcmp(argv[1], "-help"))
-        std::cout << std::endl << "Get statistics for " << argv[1] << std::endl;
+        logger(INFO, "\nGet statistics for %", argv[1]);
     
     /* Check for the '-stattype' flag */
     StatType T = O; //default value
@@ -76,99 +76,98 @@ void Statistics(int argc, char* argv[])
                 T = O;
             else
             {
-                std::cerr << "stattype unknown" << std::endl;
-                exit(-1);
+                logger(ERROR, "stattype unknown");
             }
         }
     }
     if (T == XY)
     { // averaging in z-direction
-        std::cout << "averaging in z-direction" << std::endl;
+        logger(INFO, "averaging in z-direction");
         StatisticsVector<XY> stats(argc, argv);
         stats.setDoPeriodicWalls(false);
         stats.statistics_from_fstat_and_data();
     }
     else if (T == XZ)
     { // averaging in y-direction
-        std::cout << "averaging in y-direction" << std::endl;
+        logger(INFO, "averaging in y-direction");
         StatisticsVector<XZ> stats(argc, argv);
         stats.setDoPeriodicWalls(false);
         stats.statistics_from_fstat_and_data();
     }
     else if (T == YZ)
     { // averaging in x-direction
-        std::cout << "averaging in x-direction" << std::endl;
+        logger(INFO, "averaging in x-direction");
         StatisticsVector<YZ> stats(argc, argv);
         stats.setDoPeriodicWalls(false);
         stats.statistics_from_fstat_and_data();
     }
     else if (T == X)
     { // averaging in yz-direction
-        std::cout << "averaging in yz-direction" << std::endl;
+        logger(INFO, "averaging in yz-direction");
         StatisticsVector<X> stats(argc, argv);
         stats.setDoPeriodicWalls(false);
         stats.statistics_from_fstat_and_data();
     }
     else if (T == Y)
     { // averaging in yz-direction
-        std::cout << "averaging in xz-direction" << std::endl;
+        logger(INFO, "averaging in xz-direction");
         StatisticsVector<Y> stats(argc, argv);
         stats.setDoPeriodicWalls(false);
         stats.statistics_from_fstat_and_data();
     }
     else if (T == Z)
     { // averaging in yz-direction
-        std::cout << "averaging in xy-direction" << std::endl;
+        logger(INFO, "averaging in xy-direction");
         StatisticsVector<Z> stats(argc, argv);
         stats.setDoPeriodicWalls(false);
         stats.statistics_from_fstat_and_data();
     }
     else if (T == O)
     { // averaging in all directions
-        std::cout << "averaging in xyz-direction" << std::endl;
+        logger(INFO, "averaging in xyz-direction");
         StatisticsVector<O> stats(argc, argv);
         stats.setDoPeriodicWalls(false);
         stats.statistics_from_fstat_and_data();
     }
     else if (T == RAZ)
     { //no averaging
-        std::cout << "cylindrical, no averaging" << std::endl;
+        logger(INFO, "cylindrical, no averaging");
         StatisticsVector<RAZ> stats(argc, argv);
         stats.statistics_from_fstat_and_data();
     }
     else if (T == RA)
     { //no averaging
-        std::cout << "cylindrical, Z averaging" << std::endl;
+        logger(INFO, "cylindrical, Z averaging");
         StatisticsVector<RA> stats(argc, argv);
         stats.statistics_from_fstat_and_data();
     }
     else if (T == RZ)
     { //no averaging
-        std::cout << "cylindrical, A averaging" << std::endl;
+        logger(INFO, "cylindrical, A averaging");
         StatisticsVector<RZ> stats(argc, argv);
         stats.statistics_from_fstat_and_data();
     }
     else if (T == AZ)
     { //no averaging
-        std::cout << "cylindrical, R averaging" << std::endl;
+        logger(INFO, "cylindrical, R averaging");
         StatisticsVector<AZ> stats(argc, argv);
         stats.statistics_from_fstat_and_data();
     }
     else if (T == A)
     { //no averaging
-        std::cout << "cylindrical, RZ averaging" << std::endl;
+        logger(INFO, "cylindrical, RZ averaging");
         StatisticsVector<A> stats(argc, argv);
         stats.statistics_from_fstat_and_data();
     }
     else if (T == R)
     { //no averaging
-        std::cout << "cylindrical, AZ averaging" << std::endl;
+        logger(INFO, "cylindrical, AZ averaging");
         StatisticsVector<R> stats(argc, argv);
         stats.statistics_from_fstat_and_data();
     }
     else if (T == XYZ)
     { //no averaging
-        std::cout << "no spatial averaging" << std::endl;
+        logger(INFO, "no spatial averaging");
         StatisticsVector<XYZ> stats(argc, argv);
         stats.statistics_from_fstat_and_data();
     }

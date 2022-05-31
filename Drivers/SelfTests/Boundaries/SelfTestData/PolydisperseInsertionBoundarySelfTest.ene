@@ -1,4 +1,4 @@
-            time     gravitEnergy traKineticEnergy rotKineticEnergy    elasticEnergy    centerOfMassX    centerOfMassY    centerOfMassZ
+           time    gravitEnergy traKineticEnergy rotKineticEnergy   elasticEnergy   centerOfMassX   centerOfMassY   centerOfMassZ
                0               -0                0                0                0              nan              nan              nan
             0.02               -0    0.00521166346                0  5.608356549e-05      0.535744807     0.4259247964                0
             0.04               -0   0.006532991563                0  0.0002724308639      0.509283273     0.4545466271                0

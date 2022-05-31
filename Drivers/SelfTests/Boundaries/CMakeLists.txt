@@ -15,6 +15,11 @@ foreach(CPPFILE ${CPPFILES})
 	target_link_libraries(${EXECNAME} Chute)
 endforeach()
 
+# copy all stl files to the build directory
+file(GLOB STLFILES  "*.stl")
+file(COPY ${STLFILES}  DESTINATION .)
+
+
 #Copy specific files to your build directory
 #file(COPY ${CMAKE_SOURCE_DIR}/Drivers/MercurySimpleDemos/TriangulatedWall.vtk DESTINATION .)
 

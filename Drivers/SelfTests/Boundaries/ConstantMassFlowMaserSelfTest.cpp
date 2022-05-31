@@ -76,11 +76,12 @@ public:
         const double radMax = radMin;
         SphericalParticle particleToCopy;
         particleToCopy.setSpecies(speciesHandler.getObject(0));
+        particleToCopy.setRadius(0.5);
         CubeInsertionBoundary cubeInsertionBoundary;
         cubeInsertionBoundary.set(&particleToCopy, 500, Vec3D(radMax, radMax, radMax),
                                   Vec3D(5.0 - radMax, getYMax() - radMax, getZMax() - radMax),
                                   Vec3D(getXMin(), getYMin(), getZMin()),
-                                  Vec3D(0.0, 0.0, 0.0), radMin, radMax);
+                                  Vec3D(0.0, 0.0, 0.0));
         cubeInsertionBoundary.checkBoundaryBeforeTimeStep(this);
 
         //set the bottom of the chute: a solid (smooth) wall

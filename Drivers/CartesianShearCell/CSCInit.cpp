@@ -33,7 +33,7 @@ public:
         eneTolerance = 1;
         sizeDistribution = cbrt(2.0);
 
-        std::cout << "Reading file CSCWalls.restart" << std::endl;
+        logger(INFO, "Reading file CSCWalls.restart\n", Flusher::NO_FLUSH);
         setName("CSCWalls");
         readRestartFile();
         setRestarted(false);
@@ -41,8 +41,7 @@ public:
         setXBallsAdditionalArguments("-v0 -solidf");
         writeXBallsScript();
         species = speciesHandler.getObject(0);
-        std::cout << "loaded " << particleHandler.getNumberOfObjects() 
-            << " fixed particles" << std::endl;
+        logger(INFO, "loaded % fixed particles", particleHandler.getNumberOfObjects());
     }
 
     bool continueSolve() const
@@ -59,8 +58,7 @@ public:
 
     void printTime() const
     {
-        std::cout << "t=" << getTime() 
-            << " Ene " << getKineticEnergy()/getElasticEnergy() << std::endl;
+        logger(INFO, "t=% Ene=%", getTime(), getKineticEnergy() / getElasticEnergy());
     }
 
     //add flow particles
@@ -69,30 +67,30 @@ public:
         //hGridRebuild();
         //exit(-1);
         //number of particles to be inserted
-        unsigned int n=(getXMax()-getXMin())
-            *(getYMax()-getYMin())*(getZMax()-getZMin());
-        std::cout << "Inserting " << n << " particles" << std::endl;
+        unsigned int n = (getXMax() - getXMin())
+                         * (getYMax() - getYMin()) * (getZMax() - getZMin());
+        logger(INFO, "Inserting % particles", n, Flusher::NO_FLUSH);
         //try to find new insertable particles
         unsigned int i = 0;
         SphericalParticle p;
         p.setSpecies(species);
         Mdouble s = sizeDistribution;
-        Mdouble rMin=cbrt(0.5/(s*s + 1.0)/(s + 1.0));
-        p.setRadius(s*rMin);
-        std::cout << "Particle sizes from " << rMin << " to " << s*rMin 
-            << " (sizeDistribution " << sizeDistribution << ")" << std::endl;
+        Mdouble rMin = cbrt(0.5 / (s * s + 1.0) / (s + 1.0));
+        p.setRadius(s * rMin);
+        logger(INFO, "Particle sizes from % to %  (sizeDistribution %)", rMin, s * rMin, sizeDistribution);
         Vec3D position;
-        Mdouble a=0.0;
-        while (i<n){
-            position.X = random.getRandomNumber(getXMin()+p.getRadius(), 
-                                                getXMax()-p.getRadius());
-            position.Y = random.getRandomNumber(getYMin()+p.getRadius(), 
-                                                getYMax()-p.getRadius());
-            position.Z = random.getRandomNumber(getZMin()+p.getRadius(), 
-                                                a*getZMax()-p.getRadius());
+        Mdouble a = 0.0;
+        while (i < n)
+        {
+            position.X = random.getRandomNumber(getXMin() + p.getRadius(),
+                                                getXMax() - p.getRadius());
+            position.Y = random.getRandomNumber(getYMin() + p.getRadius(),
+                                                getYMax() - p.getRadius());
+            position.Z = random.getRandomNumber(getZMin() + p.getRadius(),
+                                                a * getZMax() - p.getRadius());
             p.setPosition(position);
             if (checkParticleForInteraction(p)) {
-                //std::cout << i << std::endl;
+                //logger(INFO, "%", i);
                 particleHandler.copyAndAddObject(p);
                 p.setRadius(random.getRandomNumber(rMin, s*rMin));
                 i++;
@@ -100,13 +98,12 @@ public:
                 a += 0.01/n;
             }
         }
-        std::cout << "Inserted " << n << " particles" << std::endl;
+        logger(INFO, "Inserted % particles", n);
     }
 
     void save()
     {
-        std::cout << "Save " << particleHandler.getNumberOfObjects() 
-            << " particles" << std::endl;
+        logger(INFO, "Save % particles", particleHandler.getNumberOfObjects());
 
         //save data and restart file of first time step
         dataFile.open();

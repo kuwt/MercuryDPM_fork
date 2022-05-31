@@ -226,8 +226,7 @@ public:
     {
         if (FunnelHeight < new_)
         {
-            cout << "error: FunnelInflowHeight=" << new_ << " < FunnelHeight=" << FunnelHeight << endl;
-            exit(-1);
+            logger(ERROR, "FunnelInflowHeight=% < FunnelHeight=%", new_);
         }
         FunnelInflowHeight = new_;
     }

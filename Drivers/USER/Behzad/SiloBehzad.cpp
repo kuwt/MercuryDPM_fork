@@ -45,53 +45,65 @@ const Mdouble settlingTime = 0.2;
  */
 class BehzadInsertionBoundary : public InsertionBoundary
 {
+public:
     BaseParticle* generateParticle(RNG& random)
     {
         DPMBase& dpm = *getHandler()->getDPMBase();
-        BaseParticle* P = getParticleToCopy()->copy();
-
-        P->setRadius(0.5 * diameter[dpm.particleHandler.getSize()%diameter.size()]*scaleup);
-
+        BaseParticle* P = getParticleToCopy().front()->copy();
+        
+        P->setRadius(0.5 * diameter[dpm.particleHandler.getSize() % diameter.size()] * scaleup);
+        
         return P;
     }
 
     void placeParticle(BaseParticle* p, RNG& random)
     {
         DPMBase& dpm = *getHandler()->getDPMBase();
-        Vec3D min(dpm.getXMin()+p->getRadius(),dpm.getYMin(),dpm.getZMax());
-        Vec3D max(dpm.getXMax()-p->getRadius(),dpm.getYMax(),1.3*dpm.getZMax());
+        Vec3D min(dpm.getXMin() + p->getRadius(), dpm.getYMin(), dpm.getZMax());
+        Vec3D max(dpm.getXMax() - p->getRadius(), dpm.getYMax(), 1.3 * dpm.getZMax());
         Vec3D pos;
         pos.X = random.getRandomNumber(min.X, max.X);
         pos.Y = random.getRandomNumber(min.Y, max.Y);
         pos.Z = random.getRandomNumber(min.Z, max.Z);
         p->setPosition(pos);
     }
-
-    void checkBoundaryBeforeTimeStep(DPMBase* md) {
+    
+    void set(BaseParticle* particleToCopy, unsigned int maxFailed)
+    {
+        if (particleToCopy != nullptr)
+            particleToCopy_[0] = particleToCopy->copy();
+        maxFailed_ = maxFailed;
+    }
+    
+    void checkBoundaryBeforeTimeStep(DPMBase* md)
+    {
         unsigned int failed = 0;
         DPMBase& dpm = *getHandler()->getDPMBase();
-        unsigned long size = std::min(1.0,dpm.getTime()/fillTime_)*33000/scaleup/scaleup/scaleup;
-        if (dpm.getTime()==0) logger(INFO,"Number of particles to insert %", 33000/scaleup/scaleup/scaleup);
+        unsigned long size = std::min(1.0, dpm.getTime() / fillTime_) * 33000 / scaleup / scaleup / scaleup;
+        if (dpm.getTime() == 0) logger(INFO, "Number of particles to insert %", 33000 / scaleup / scaleup / scaleup);
         //setting a max rate of 1/40 per time step
         //try max_failed times to find new insertable particle
-        while (failed <= maxFailed_ && dpm.particleHandler.getNumberOfObjects()<size) {
+        while (failed <= maxFailed_ && dpm.particleHandler.getNumberOfObjects() < size)
+        {
             BaseParticle* p0 = generateParticle(md->random);
             p0->setHandler(&md->particleHandler);
-
-            if (md->checkParticleForInteraction(*p0)) {
-                BaseParticle *added = md->particleHandler.copyAndAddObject(p0);
+            
+            if (md->checkParticleForInteraction(*p0))
+            {
+                BaseParticle* added = md->particleHandler.copyAndAddObject(p0);
                 added->setSpecies(md->speciesHandler.getObject(
                         added->getIndSpecies()
                 ));
                 failed = 0;
                 ++numberOfParticlesInserted_;
-            } else {
+            }
+            else
+            {
                 failed++;
             }
         }
     }
-
-public:
+    
     BehzadInsertionBoundary* copy() const {
         return new BehzadInsertionBoundary(*this);
     }

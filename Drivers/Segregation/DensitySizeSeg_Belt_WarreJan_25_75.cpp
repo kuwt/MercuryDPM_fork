@@ -60,19 +60,19 @@ void actionsBeforeTimeStep(){};
 ///This is the info call
 void write(std::ostream& os, bool print_all = false) const
 {
-	os << "This is a density size-segregation chute code problem" << endl;
-	os << "\n \n \n"<< endl;
-	
-		
-	 MercuryBase::write(os, print_all); 
-	 os << "particle specie-0 size : " << radius_0 << endl;		 
-	 os << "particle specie-1 size : " << radius_1 << endl;
-	 os << "particle specie-2 size : " << radius_2 << endl;
-	 os << "particle specie-0 rho  : " << rho_0 << endl;		
-	 os << "particle specie-1 rho  : " << rho_1 << endl;
-	 os << "particle specie-2 rho  : " << rho_2 << endl;
-	 os << "particle size-ratio    : " << radius_2/radius_1 << endl;
-	 os << "particle density-ratio : " << rho_2/rho_1 << endl;
+    os << "This is a density size-segregation chute code problem" << "\n";
+    os << "\n \n \n" << "\n";
+    
+    
+    MercuryBase::write(os, print_all);
+    os << "particle specie-0 size : " << radius_0 << "\n";
+    os << "particle specie-1 size : " << radius_1 << "\n";
+    os << "particle specie-2 size : " << radius_2 << "\n";
+    os << "particle specie-0 rho  : " << rho_0 << "\n";
+    os << "particle specie-1 rho  : " << rho_1 << "\n";
+    os << "particle specie-2 rho  : " << rho_2 << "\n";
+    os << "particle size-ratio    : " << radius_2 / radius_1 << "\n";
+    os << "particle density-ratio : " << rho_2 / rho_1 << endl;
 }
 
 /// This setup the intial conditions, generates volume fraction of particle 1. 
@@ -350,7 +350,7 @@ void setupInitialConditions()
 
 
 		//Write the info to the screen and save a copy to the disk
-		write(std::cout,false);
+        write(std::cout, false);
 
         writeRestartFile();
 
@@ -432,7 +432,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(20*60, problem.getTimeMax(), problem.getTimeStep()));
 	//problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(20*60,getTimeMax(),getTimeStep()));
 	//problem.setSaveCount(1);
-	cout << "dt=" << problem.getTimeStep() << endl;
+    logger(INFO, "dt=%", problem.getTimeStep());
 	
 	//problem.autoNumber();
 

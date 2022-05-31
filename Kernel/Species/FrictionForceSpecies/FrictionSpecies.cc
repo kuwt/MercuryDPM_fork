@@ -153,8 +153,7 @@ void FrictionSpecies::setRollingStiffness(Mdouble new_kt)
     }
     else
     {
-        std::cerr << "Error in setRollingStiffness" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setRollingStiffness");
     }
 }
 
@@ -171,8 +170,7 @@ void FrictionSpecies::setRollingDissipation(Mdouble new_dispt)
         rollingDissipation_ = new_dispt;
     else
     {
-        std::cerr << "Error in setRollingDissipation" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setRollingDissipation");
     }
 }
 
@@ -228,8 +226,7 @@ void FrictionSpecies::setTorsionStiffness(Mdouble new_kt)
     }
     else
     {
-        std::cerr << "Error in setTorsionStiffness" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setTorsionStiffness");
     }
 }
 
@@ -246,8 +243,7 @@ void FrictionSpecies::setTorsionDissipation(Mdouble new_dispt)
         torsionDissipation_ = new_dispt;
     else
     {
-        std::cerr << "Error in setTorsionDissipation" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setTorsionDissipation");
     }
 }
 
@@ -268,8 +264,7 @@ void FrictionSpecies::setTorsionFrictionCoefficient(Mdouble new_mu)
     }
     else
     {
-        std::cerr << "Error in setSlidingFrictionCoefficient" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setSlidingFrictionCoefficient");
     }
 }
 
@@ -288,8 +283,7 @@ void FrictionSpecies::setTorsionFrictionCoefficientStatic(Mdouble new_mu)
     }
     else
     {
-        std::cerr << "Error in setSlidingFrictionCoefficientStatic" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setSlidingFrictionCoefficientStatic");
     }
 }
 

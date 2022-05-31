@@ -57,9 +57,15 @@ public:
     /*!
      * \brief Sets all boundary properties at once.
      */
+    void set(std::vector<BaseParticle*> particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, double
+    fixedParticleRadius, double inflowVelocity, double inflowVelocityVariance);
+    
+    /*!
+     * \brief Sets all boundary properties at once.
+     */
     void
-    set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, double radMin, double radMax,
-        double fixedParticleRadius, double inflowVelocity, double inflowVelocityVariance);
+    set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, double fixedParticleRadius,
+        double inflowVelocity, double inflowVelocityVariance);
     
     void placeParticle(BaseParticle* p, RNG& random) override;
     
@@ -67,12 +73,6 @@ public:
      * \brief reads boundary properties from istream
      */
     void read(std::istream& is) override;
-    
-    /*!
-     * \brief deprecated version of CubeInsertionBoundary::read().
-     */
-    MERCURY_DEPRECATED
-    void oldRead(std::istream& is);
     
     /*!
      * \brief writes boundary properties to ostream

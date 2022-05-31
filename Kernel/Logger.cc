@@ -45,9 +45,9 @@
 #include <iostream>
 #include <csignal>
 
-/*
- *  We need these to actually exists. These are used as tags in the template metaprogramming for
- *  the Logger class.
+/*!
+ *  \brief Definition of the different loglevels by its wrapper class LL. These are used as tags in template
+ *  metaprogramming for the Logger class.
  */
 LL<Log::FATAL> FATAL;
 LL<Log::ERROR> ERROR;
@@ -57,41 +57,77 @@ LL<Log::DEFAULT> DEFAULT;
 LL<Log::VERBOSE> VERBOSE;
 LL<Log::DEBUG> DEBUG;
 
+
+/*!
+ *  \brief Definition of different loggers with certain modules. A user can define its own custom logger here.
+ */
 /* Actual definition of the default logger. */
 Logger<MERCURY_LOGLEVEL> logger("MercuryKernel");
 /* Actual definition of the default logger. */
 Logger<CG_LOGLEVEL> cgLogger("MercuryCG");
 
-
-// Default implementation for logging basic information
-static void printInfo(std::string module, std::string msg)
+/*!
+ * \brief Prints messages of loglevel INFO.
+ *
+ * \param[in] module        The module name of the current logger invocation.
+ * \param[in] msg           formatted message to be printed.
+ * \param[in] doFlush       Flusher enum class object to enable/disable flushing of the output.
+ */
+static void printInfo(std::string module, std::string msg, Flusher doFlush)
 {
 #ifdef MERCURY_USE_MPI
     //Check if MPI is initialised
     initialiseMPI();
     MPIContainer& communicator = MPIContainer::Instance();
-    std::cout << "[Process: " << communicator.getProcessorID() << "]: " << msg << std::endl;
+    std::cout << "[Process: " << communicator.getProcessorID() << "]: " << msg;
+    if (doFlush == Flusher::FLUSH)
+    {
+        std::cout << std::endl;
+    }
 #else
-    std::cout << msg << std::endl;
+    std::cout << msg;
+    if (doFlush == Flusher::FLUSH)
+    {
+        std::cout << std::endl;
+    }
 #endif
 }
 
-// Default implementation for logging warnings / messages
-static void printMessage(std::string module, std::string msg)
+/*!
+ * \brief Prints messages of loglevel WARN.
+ *
+ * \param[in] module        The module name of the current logger invocation.
+ * \param[in] msg           formatted message to be printed.
+ * \param[in] doFlush       Flusher enum class object to enable/disable flushing of the output.
+ */
+static void printMessage(std::string module, std::string msg, Flusher doFlush)
 {
 #ifdef MERCURY_USE_MPI
     //Check if MPI is initialised
     initialiseMPI();
     MPIContainer& communicator = MPIContainer::Instance();
-    std::cout << "\033[1;33mModule " << module << ":\033[0m\n" << "[Processor: " << communicator.getProcessorID() << "]" << msg << std::endl;
+    std::cout << "\033[1;33mModule " << module << ":\033[0m\n" << "[Processor: " << communicator.getProcessorID() << "]" << msg;
+    if (doFlush)
+    {
+        std::cout << std::endl;
+    }
 #else
-    std::cout << "\033[1;33mMessage " << module << ":\033[0m\n" << msg << std::endl;
+    std::cout << "\033[1;33mMessage " << module << ":\033[0m\n" << msg;
+    if (doFlush == Flusher::FLUSH)
+    {
+        std::cout << std::endl;
+    }
 #endif
 }
 
-// Default implementation for logging errors / fatals 
-// [[noreturn]] indicates this function may not return
-[[noreturn]] static void printError(std::string module, std::string msg)
+/*!
+ * \brief Prints messages of loglevel ERROR.
+ *
+ * \param[in] module        The module name of the current logger invocation.
+ * \param[in] msg           formatted message to be printed.
+ * \param[in] doFlush       Flusher enum class object to enable/disable flushing of the output.
+ */
+[[noreturn]] static void printError(std::string module, std::string msg, Flusher doFlush)
 {
 #ifdef MERCURY_USE_MPI
     //Check if MPI is initialised
@@ -99,7 +135,9 @@ static void printMessage(std::string module, std::string msg)
     MPIContainer& communicator = MPIContainer::Instance();
     std::cout << "\033[1;33mError " << module << ":\033[0m\n" << "[Processor: " << communicator.getProcessorID() << "]" << msg << std::endl;
 #else
-    std::cout << "\033[1;31mError " << module << ":\033[0m\n" << msg << std::endl;
+    std::cout << "\033[1;31mAn error has occured"
+              << "\n\033[1;31mModule  :" << module
+              << "\n\033[1;31mMessage :" << msg << std::endl;
 #endif
 #ifdef MERCURY_STACKTRACE_SHOW
     std::cerr << "\n-----------------[Stack Trace]-----------------\n";
@@ -152,11 +190,88 @@ static void printMessage(std::string module, std::string msg)
 #endif
     //send a signal first, in case a debugger can catch it
     std::raise(SIGTERM);
-    std::exit(2);
+    //call exit() for the specific loglevel
+    std::exit(static_cast<int>(Log::ERROR));
+}
+
+/*!
+ * \brief Prints messages of loglevel FATAL.
+ *
+ * \param[in] module        The module name of the current logger invocation.
+ * \param[in] msg           formatted message to be printed.
+ * \param[in] doFlush       Flusher enum class object to enable/disable flushing of the output.
+ */
+// Default implementation for logging errors / fatals
+// [[noreturn]] indicates this function may not return
+[[noreturn]] static void printFatalError(const std::string& module, const std::string& msg, Flusher doFlush)
+{
+#ifdef MERCURY_USE_MPI
+    //Check if MPI is initialised
+    initialiseMPI();
+    MPIContainer& communicator = MPIContainer::Instance();
+    std::cout << "\033[1;33mError " << module << ":\033[0m\n" << "[Processor: " << communicator.getProcessorID() << "]" << msg << std::endl;
+#else
+    std::cout << "\033[1;31mA fatal error has occured"
+              << "\n\033[1;31mModule  :" << module
+              << "\n\033[1;31mMessage :" << msg << std::endl;
+#endif
+#ifdef MERCURY_STACKTRACE_SHOW
+    std::cerr << "\n-----------------[Stack Trace]-----------------\n";
+    
+    void* stackBuffer[64]; //This should be enough for all purposes..
+    //First, we retrieve the addresses of the entire stack...
+    int nStackFrames = backtrace(stackBuffer, 64);
+#ifndef MERCURY_STACKTRACE_DEMANGLE
+    //We don't have the demangling infra, so just use backtrace_symbols.
+    char** functionNames = backtrace_symbols(stackBuffer, nStackFrames);
+    for( int i = 0; i < nStackFrames; i++ )
+    {
+        std::cerr << '\t' << functionNames[i] << '\n';
+    }
+    std::cerr << "Exiting.\n" << std::endl;
+
+    //DO NOT USE DELETE HERE. THIS SHOULD BE free()'d!
+    // -- dducks
+    free(functionNames);
+#else
+    //We request the symbol information ourselves, in order to be able to demangle it.
+    //And request the function names using dladdr.
+    Dl_info infoStruct;
+    for (int i = 4; i < nStackFrames; i++)
+    {
+        if (dladdr(stackBuffer[i], &infoStruct))
+        { // We succesfully loaded the address...
+            int demangleStatus;
+            char* fnDemangled = abi::__cxa_demangle(infoStruct.dli_sname, NULL, NULL, &demangleStatus);
+            if (infoStruct.dli_sname == nullptr)
+                continue;
+            
+            //We even succesfully demangled the symbol...
+            if (demangleStatus == 0)
+            {
+                std::cerr << fnDemangled << " +" << (void*) ((char*) stackBuffer[i] - (char*) infoStruct.dli_saddr) << "\t(" << infoStruct.dli_fname << ")\n";
+                free(fnDemangled);
+            }
+            else
+            { //Well, we tried. Lets output at least our raw symbol name.
+                std::cerr << infoStruct.dli_sname << " +" << (void*) ((char*) stackBuffer[i] - (char*) infoStruct.dli_saddr) << "\t(" << infoStruct.dli_fname << ")\n";
+            }
+        }
+        else
+        { //Name lookup failed.
+            std::cerr << stackBuffer[i] << ": ?????" << std::endl;
+        }
+    }
+#endif
+#endif
+    //send a signal first, in case a debugger can catch it
+    std::raise(SIGTERM);
+    //call exit for the specific loglevel
+    std::exit(static_cast<int>(Log::FATAL));
 }
 
 // Default output methods.
-LoggerOutput loggerOutputDefaultImpl = {printError, //onFatal
+LoggerOutput loggerOutputDefaultImpl = {printFatalError, //onFatal
                                         printError, //onError
                                         printMessage, //onWarn
                                         printInfo, //onInfo

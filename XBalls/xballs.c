@@ -17,14 +17,14 @@
  * Modified: Stefan Luding  2006 
  * Modified: Stefan Luding  2007 
  * Modified: Stefan Luding  2008 
- * Modified: JMFT, 2016 April
+ * Modified: Stefan Luding  2020 
  * 
  * Permission to use, copy, modify and distribute without charge this software,
  * documentation, images, etc. is granted, provided that this comment and the
  * author's name is retained.  The author assumes no responsibility for lost
  * sleep as a consequence of use of this software.
  * 
- * Send any comments, bug reports, etc. to: lui@ica1.uni-stuttgart.de
+ * Send any comments, bug reports, etc. to: s.luding@utwente.nl
  * 
  */
 
@@ -41,8 +41,8 @@
 #include "patchlevel.h"
 #include "functions.h"
 
-
-//#define XBPATH "/home/luding/XBALLS"
+/* #define XBPATH "/home/luding/XBALLS"
+   #define XBPATH "~/XBALLS" */
 #define	PI 3.141592654
 
 #define NKMAX 1300000
@@ -56,7 +56,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile);
 void  Draw_Contacts( float xy0, int h_offset, int v_offset,
                      float xskal, float yskal, float xleft, 
                      float xright, float xbottom, float xtop,
-                     int NK, float *px, const float *pz, const float *prad );
+                     int NK, float *px, float *pz, float *prad );
 
 void  Draw_Walls( float xy0, int h_offset, int v_offset,
                   float xskal, float yskal, float xleft, 
@@ -85,7 +85,8 @@ int             xtrace, xmtrace, ifformat, isort, iii, icb;
 int             inread, iredraw, nredraw;
 int             coll_hist, iscounter;
 float           tmin, tmax, cskal, dskal, xdummy, r0rred, fpower, vpower; 
-float           cdirmin, cdirmax, xtop0, xright0, inputmass12;
+float           cdirmin, cdirmax, inputmass12;
+float           xtop0, xfront0, xright0, xbottom0, xrear0, xleft0;
 float           time_step, time_last, xyskal, coffset, drwmin, drwmax;
 float           rotr, rotphi, rotphi0, rottheta, rottheta0, unidist, dist, distxz;
 float           drotr, drotphi, drottheta, dunidist, eyepos, deyepos;
@@ -96,7 +97,7 @@ int             mmax101, ifilm, invert, ivector, ivv;
 long int        ipause, xpause, jpause, jpnext, jpstep;
 int             nodel, noddel, iwelo, ivelo, idie, iscale;
 float           drfnskal;
-float           vqskal,vvskal,tempx,ivskal;
+float           vqskal,vvskal,tempx,ivskal,xilines;
 int             isq, ixxxstep, istep, ilines, mfont, iwnum;
 int             ix12, ifog;
 float           xg12[NKMAX];
@@ -178,11 +179,15 @@ int main(argc, argv)
     { 
 	if ((strcmp("help", argv[count]) == 0) && (count + 1 <= argc))
             {
-				 sprintf(csystem,"more %s.txt",argv[0]);
-				 //sprintf(csystem,"more %s/xballs.txt",XBPATH);
+                 /* OLD
+                    sprintf(csystem,"more %s/xballs.txt",XBPATH); 
+                    system(csystem); */
+                 /* return; */
+
+                 /* this should print the help-file, how to achieve ??? */
+                 sprintf(csystem,"more %s.txt",argv[0]);
                  if (system(csystem)) {};
                  exit(0);
-                 /* return; */
             }
 	else if ((strcmp("-f", argv[count]) == 0) && (count + 1 <= argc))
 		c2dfile = argv[++count];
@@ -399,6 +404,14 @@ int main(argc, argv)
                    {
                       ilines = uatoi(argv[++count]);
                       cskal = 200;
+          	   /* set scaling from 10^3 to 10^5 if negative input on ilines */
+                      xilines=1000;
+                      if( ilines < 0 )
+                      {
+		          xilines=100000;
+                          ilines=-ilines;
+                      }
+                      /* printf(" ilines = %d ... \n", ilines); */
                    }
 	else if ((strcmp("-cmode", argv[count]) == 0) && (count + 1 <= argc))
                   {
@@ -454,7 +467,8 @@ int main(argc, argv)
                    icube = 1;
 	else if ((strcmp("-fog", argv[count]) == 0) && (count + 1 <= argc))
                    ifog = uatoi(argv[++count]);
-	else {
+        else
+        {
 	   fprintf(stderr, 
               "Usage : xballs [-f filename|-] +Options (see xballs.txt) \n");
 	   exit(0);
@@ -547,7 +561,7 @@ int main(argc, argv)
     }
 
     Create_Colors();
-    printf("Create_Color_Map %d %p \n",1,gcMap[1]); 
+    printf("Create_Color_Map %d %d \n",1,gcMap[1]); 
 
     if (i03d == 1)
     {
@@ -589,20 +603,27 @@ int main(argc, argv)
        XSetForeground(dpy, gcFont, bg);
 
 /* Font-File : helvB24 = XLoadQueryFont(dpy,"xeng_iso");*/
-/* Use Standard X-Font from directory /usr/lib/X11/fonts/iso_8859.1/75dpi  */
-       helvB24 = XLoadQueryFont(dpy,"timR18");     
+/* Use Standard X-Font from directory /usr/X11/lib/X11/fonts/75dpi */
+       /* helvB24 = XLoadQueryFont(dpy,"helvB24"); */
+       /* helvB24 = XLoadQueryFont(dpy,"/usr/X11/lib/X11/fonts/75dpi/helvB18.pcf"); */
+/* comment to speed up
+       helvB24 = XLoadQueryFont(dpy,"8x13");
        if( helvB24 != NULL )
            XSetFont(dpy,gcFont,helvB24->fid);
        else
            printf("Error: Font timR18 not found \n");
+*/
 
        gcSFont = XCreateGC(dpy, lab, 0, 0);
        XSetForeground(dpy, gcSFont, bg);
-       helvB24 = XLoadQueryFont(dpy,"timR12");     
+       /* helvB24 = XLoadQueryFont(dpy,"fixed"); */
+/* comment to speed up
+       helvB24 = XLoadQueryFont(dpy,"6x8");
        if( helvB24 != NULL )
            XSetFont(dpy,gcSFont,helvB24->fid);
        else
            printf("Error: Font timR12 not found \n");
+*/
     }
     else
     {
@@ -610,7 +631,11 @@ int main(argc, argv)
      {
        gcFont = XCreateGC(dpy, lab, 0, 0);
        XSetForeground(dpy, gcFont, bg);
-       helvB24 = XLoadQueryFont(dpy,"/isr/lib/X11/fonts/misc/stan");     
+/* comment to speed up
+       helvB24 = XLoadQueryFont(dpy,"/usr/X11/lib/X11/fonts/misc/stan");     
+       helvB24 = XLoadQueryFont(dpy,"/usr/X11/lib/X11/fonts/misc/olgl14");
+*/
+       /* TODO - how to get control over the fonts - this does not work */
        XSetFont(dpy,gcFont,helvB24->fid);
 
        gcSFont = XCreateGC(dpy, lab, 0, 0);
@@ -619,7 +644,7 @@ int main(argc, argv)
     }
 
 /* Write the Name in the Top-Bar */
-    XStoreName (dpy, eng, "XBalls v2.01 (3D) luii - 16.09.08");
+    XStoreName (dpy, eng, "XBalls v2.03 (3D) lui - 20.05.2022");
 
 /* Select the window, from which Input is expected */
     XSelectInput (dpy, eng, ExposureMask);
@@ -642,7 +667,6 @@ int main(argc, argv)
     }
 
     XFlush(dpy);
-
 
 /* Interval timer start	 */
     XtAddTimeOut(1u, Cycle(), NULL );
@@ -695,7 +719,7 @@ XtTimerCallbackProc Cycle()
 void Draw_Contacts( float xy0, int h_offset, int v_offset,
                     float xskal, float yskal, float xleft, 
                     float xright, float xbottom, float xtop,
-                    int NK, float *px, const float *pz, const float *prad )
+                    int NK, float *px, float *pz, float *prad )
 {
   FILE *fpw;
   int ierr, icolor;
@@ -748,7 +772,8 @@ void Draw_Contacts( float xy0, int h_offset, int v_offset,
                    */
 
                    muf0=drft/(drfn-drf0);
-                   p12dist= sqrtf((px[ip2]-px[ip1])*(px[ip2]-px[ip1])+(pz[ip2]-pz[ip1])*(pz[ip2]-pz[ip1]));
+                   /* changed sqrt -> sqrtf from mDPM */
+                   p12dist=sqrtf((px[ip2]-px[ip1])*(px[ip2]-px[ip1])+(pz[ip2]-pz[ip1])*(pz[ip2]-pz[ip1]));
                    linex1 = 1+(int)(xskal*p12dist*muf0);
                    linez1 = 1+(int)(yskal*p12dist*muf0);
 
@@ -822,14 +847,14 @@ void Draw_Walls( float xy0, int h_offset, int v_offset,
 #define IWMAX 1000
 
   FILE *fpw;
-  int iwall, ierr;
+  int iwall, ierr, ierr2;
   float xwtyp,nx,ny,nz,x0,y0,z0;
   float linex0, linex1, linez0, linez1;
-  float xwleft,xwright;
-  //float xL=xright-xleft;
-  //float yL=xtop-xbottom;
-  //float xyL=xL/yL;
-  float sx0, sx1, sz0, sz1, an, anx, any, anz;
+  float xwleft,xwright,xwbottom,xwtop,xwrear,xwfront;
+  float xL=xright-xleft; 
+  float yL=xtop-xbottom;
+  float xyL=xL/yL;
+  float sx, sz, sx0, sx1, sz0, sz1, an, anx, any, anz;
   short xa, ya;
   short a1, a2;
   unsigned short ixrad, iyrad;
@@ -988,7 +1013,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
 {
 
    FILE  *fp, *fpp;
-   int   NK, NK0, NK1, NK2, NKdy, ierr, ierr6, i, j, iistep;
+   int   NK, NK0, NK1, NK2, NKdy, ierr, ierr6, i, j, j0, iistep;
    int   v_offset, h_offset;
    int   *ipp;
    float *x1,*x2,*x3,*xrad,*unif,*unig,*x4;
@@ -1006,14 +1031,19 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
    float densmax, velomax, wradmax;
    float hdensmax, hvelomax, hwradmax;
    float xradius, time, timedy, time0f, xnewrad;
-   float xd, xx1, xx2, xx12;
+   float xd, xx1, xx2, xx12, xx3, xx4;
    float xy1, xy2, xy3, xy4;
    float cmaxskal, srp, crp;
    int   ichnext, ichcolor;
    int   ixcenter, ixradius;
    int   icolor, jcolor, isqcolor;
    int   sum_add, vsum_add, wsum_add;
+   int   ifperr;
+   int   isnap = 0;
+   float exx,eyy,ezz,eV;
+   float Vol_p, Vol_sys, phi_3D;
    float ixmax, ixmean, ncoll_max;
+   float pmax, pmin, pval, pval0, pvalj, pvalk;
 
    int   ixrad, iyrad;
    int   bx1, by1; 
@@ -1022,7 +1052,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
    int   NKOLD = -1;
    int   icount = 0;
    float radmax, radmin;
-   char	 rpm[20],repm[40];
+   char	 rpm[60],repm[60];
 
    void  fill_dens();
    void  fill_velo();
@@ -1055,9 +1085,9 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
             iicmean[i]=0;
          }
 
-         printf("# xballs v1.97 3D (c) by lui \n");
+         printf("# xballs v2.03 3D (c) by lui \n");
 
-         if ( !strcmp(cfile,"-" ))
+         if ( !strcmp(cfile,"-" ) )
          {
             fp = stdin;
          }
@@ -1080,17 +1110,22 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
              /* printf("read %d %f %d %d %f %f\n",iistep,time,NK,ierr6,xright,xtop); */
 
              if(xtop0<=0) xtop0=xtop;
+             if(xfront0<=0) xfront0=xfront;
              if(xright0<=0) xright0=xright;
+             if(xbottom0>=0) xbottom0=xbottom;
+             if(xrear0>=0) xrear0=xrear;
+             if(xleft0>=0) xleft0=xleft;
+
              time_step=time-time_last;
              time_last=time;
              ixmax=0.0;
              ixmean=0.0;
              vabsmin=1.e10;
-             vabsmax=-1.10;
+             vabsmax=-1.e10;
              vabsmean=0.;
              x12min=1.e10;
              x12max=-1.e10;
-             radmax=0.;
+             radmax=0.0;
              radmin=1.e10;
              NK0=NK;
 
@@ -1216,12 +1251,18 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
 	     {
         /* read the data from File */
 
+              isnap=isnap+1;
+              Vol_p=0.;
               for ( i=1; i<=NK; i++)
               {
         /* read x,y,vx,rad,vy */
                 ierr=read_line( inread, fp, 
                              &x1[i], &x2[i], &x3[i], &x4[i], &xrad[i], &x6[i], &x7[i], &ix[i],
                              &x12[i], &x32[i], &x61[i], &x62[i], &x71[i], &x72[i] );
+                  x1[i]=x1[i]+trx;
+                  x12[i]=x12[i]+try;
+                  x2[i]=x2[i]+trz;
+                  Vol_p=Vol_p+4.*M_PI/3.*xrad[i]*xrad[i]*xrad[i];
 
         /* read x,y,vx,vy,rad,r,w,ncoll */
                 if ( ierr < 1 )
@@ -1272,6 +1313,9 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                   ierr=read_line( inread, fp,
                              &x1[i], &x2[i], &x3[i], &x4[i], &xrad[i], &x6[i], &x7[i], &ix[i],
                              &x12[i], &x32[i], &x61[i], &x62[i], &x71[i], &x72[i] );
+                  x1[i]=x1[i]+trx;
+                  x12[i]=x12[i]+try;
+                  x2[i]=x2[i]+trz;
 
         /* read x,y,vx,vy,rad,r,w,ncoll */
                  if ( ierr < 1 )
@@ -1341,7 +1385,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
         /* draw walls */
                v_offset = offset;
                h_offset = hoffset;
-               if( strcmp(wallfile, "-") != 0)
+               if( strcmp(wallfile, "-") != 0 )
                  Draw_Walls( xy0, h_offset, v_offset, xskal, yskal,
                              xleft, xright, xbottom, xtop );
 
@@ -1418,15 +1462,30 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                {
                 if( ietime > 0 )
                 {
-                  sprintf(repm,"ezz =%8.4f   exx =%8.4f   eV =%8.4f",1-xtop/xtop0,1-xright/xright0,1-xright*xtop/(xright0*xtop0));
-                  XDrawString( dpy, vandy, gcFont, ietime, ietime, repm, strlen(repm));
+                  /* engineering strain - changed to true strain 10.10.2020 ... */
+                  /* sprintf(repm,"ezz=%8.4f, eyy=%8.4f, exx=%8.4f, eV =%8.4f",1-xtop/xtop0,1-xfront/xfrong0,1-xright/xright0,1-xright*xtop*xfront/(xright0*xtop0*xfront0)); */
+                  /* true strain */
+                  exx=-log((xright-xleft)/(xright0-xleft0));
+                  eyy=-log((xfront-xrear)/(xfront0-xrear0));
+                  ezz=-log((xtop-xbottom)/(xtop0-xbottom0));
+                  eV=exx+eyy+ezz;
+                  /* printf("ezz=%8.4f, eyy=%8.4f, exx=%8.4f, eV=%8.4f \n",ezz,eyy,exx,eV); */
+                  sprintf(repm,"ezz=%8.5f, eyy=%8.5f, exx=%8.5f, eV=%8.5f",ezz,eyy,exx,eV);
+                  XFillRectangle(dpy, vandy, gcWhite, -4, ietime-15, 460, 20 );
+                  XDrawString( dpy, vandy, gcFont, 10, ietime, repm, strlen(repm));
                 }
+
+                Vol_sys=(xtop-xbottom)*(xright-xleft)*(xfront-xrear);
+                phi_3D=Vol_p/Vol_sys;
+                printf("t = %8.4g s, phi = %7.5f, #snap = %4.4d \n",time,phi_3D,isnap);
+                sprintf(rpm,"t = %8.4g s, phi = %7.5f, #snap = %4.4d ",time,phi_3D,isnap);
                 if( i0time > 0 )
-                  XDrawString( dpy, vandy, gcFont, i0time, i0time, rpm, strlen(rpm));
+                   XFillRectangle(dpy, vandy, gcWhite, i0time-14, i0time-15, 400, 20 );
+                   XDrawString( dpy, vandy, gcFont, i0time, i0time, rpm, strlen(rpm));
                 if( i0time < 0 )
                 {
-                  sprintf(rpm,"t =%7.3f s",time);
-                  XDrawString( dpy, vandy, gcSFont, -i0time, -i0time, rpm, strlen(rpm));
+                   XFillRectangle(dpy, vandy, gcWhite, i0time-14, i0time-15, 400, 20 );
+                   XDrawString( dpy, vandy, gcSFont, -i0time, -i0time, rpm, strlen(rpm));
                 }
                 if(( i0tposx > 0 ) || ( i0tposy > 0 ))
                 {
@@ -1521,12 +1580,17 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
 
         /* read the data from File and draw to output */
               if( iredraw == 1 )
+               isnap=isnap+1;
+               Vol_p=0.;
                for ( i=1; i<=NK+NK1; i++)
                {
                 if( i <= NK )
+                {
                    ierr=read_line( inread, fp,
                         &x1[i],&x2[i],&x3[i],&x4[i],&xrad[i],&x6[i],&x7[i],&ix[i],
                         &x12[i],&x32[i],&x61[i],&x62[i],&x71[i],&x72[i] );
+                   Vol_p=Vol_p+4.*M_PI/3.*xrad[i]*xrad[i]*xrad[i];
+                }
                 else
                 {
                    ierr=read_line( inread, fpp,
@@ -1534,6 +1598,10 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                         &x12[i], &x32[i], &x61[i], &x62[i], &x71[i], &x72[i] );
                    xrad[i]=xrad[i]*r0rred;
                 }
+
+                  x1[i]=x1[i]+trx;
+                  x12[i]=x12[i]+try;
+                  x2[i]=x2[i]+trz;
                   /* printf(" ierr=%d ", ierr); */
 
                /* read x,y,vx,vy,rad,r,w,ncoll */
@@ -1713,7 +1781,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                    else if(ivmode == 110 )
                    {
                       vabs[i] = x71[i]*x71[i]+x7[i]*x7[i]+x72[i]*x72[i]-coffset;
-                      /* printf(" %d %f %f %f \n", i, x71[i], x7[i], x72[i] ); */
+                      /* printf(" %d %g %g %g %g\n", i, x71[i], x7[i], x72[i], vabs[i] ); */
                    }
                    else if(ivmode == 111 )
                       vabs[i] = x71[i]-coffset;
@@ -1724,7 +1792,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                    else if(ivmode == 120 )
                    {
                       vabs[i] = x61[i]*x61[i]+x6[i]*x6[i]+x62[i]*x62[i]-coffset;
-                      /* printf(" %d %f %f %f \n", i, x71[i], x7[i], x72[i] ); */
+                      /* printf(" %d %g %g %g %g \n", i, x61[i], x6[i], x62[i], vabs[i] ); */
                    }
                    else if(ivmode == 121 )
                       vabs[i] = x61[i]-coffset;
@@ -1735,7 +1803,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                    else if(ivmode == -8 )
                    {
                       vabs[i] = ix[i]+inputmass12*
-                                              sqrtf(x3[i]*x3[i]+x4[i]*x4[i])-coffset;
+                                sqrtf(x3[i]*x3[i]+x4[i]*x4[i])-coffset;
                    }
                    else if(ivmode == 8 )
                       { 
@@ -1885,10 +1953,10 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                                 xx12=x12[i]-x12[j];
                              else
                                 xx12=0.;
-                             xd= sqrtf(xx1*xx1+xx2*xx2+xx12*xx12);
-                             if ( xd < (float) (ilines)*(xrad[i]+xrad[j])/1000. )
+                             xd=sqrtf(xx1*xx1+xx2*xx2+xx12*xx12);
+                             if ( xd < (float) (ilines)*(xrad[i]+xrad[j])/xilines )
                              {
-                               vabs000=xd/(xrad[i]+xrad[j])/ilines*1000.;
+                               vabs000=xd/(xrad[i]+xrad[j])/ilines*xilines;
 
                                icolor = - (int) (50.*cskal*log10((double)(vabs000)));
 
@@ -1936,8 +2004,8 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                     0 * 64, 360 * 64);
                   dx=(x1[i]-x10[i])*(ivskal/100.);
                   dy=(x2[i]-x20[i])*(ivskal/100.);
-                  if((fabsf(x1[i]-x10[i]) < (xright-xleft)/2. ) &&
-                     (fabsf(x2[i]-x20[i]) < (xtop-xbottom)/2. ))
+                  if(( (fabs)(x1[i]-x10[i]) < (xright-xleft)/2. ) && 
+                     ( (fabs)(x2[i]-x20[i]) < (xtop-xbottom)/2. ))
                      XDrawLine(dpy, vandy, gcMap[icolor],
                       (int) ( xy0+x1[i]*xskal ) - h_offset, height -v_offset - (int) ( xy0+x2[i]*yskal ),
                       (int) ( xy0+(x1[i]-dx)*xskal ) - h_offset, height -v_offset - (int) ( xy0+(x2[i]-dy)*yskal ));
@@ -1959,20 +2027,19 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                 if((rotr!=1.0)||(rottheta!=0.0)||(rotphi!=0.0)||(unidist!=0.0)||
                    (drotr!=0.0)||(drottheta!=0.0)||(drotphi!=0.0)||(dunidist!=0.0))
                 {
-                    /* Apply the rotation matrix */
               /* printf("Start rotating ... \n"); */
-                 R11=rotr* cosf(rotphi)* cosf(rottheta);
-                 R22=rotr* cosf(rottheta);
-                 R33=rotr* cosf(rotphi);
+                 R11=rotr*cosf(rotphi)*cosf(rottheta);
+                 R22=rotr*cosf(rottheta);
+                 R33=rotr*cosf(rotphi);
 
-                 R12=rotr* cosf(rotphi)* sinf(rottheta);
-                 R21=-rotr* sinf(rottheta);
+                 R12=rotr*cosf(rotphi)*sinf(rottheta);
+                 R21=-rotr*sinf(rottheta);
 
-                 R13=-rotr* sinf(rotphi);
-                 R31=rotr* sinf(rotphi)* cosf(rottheta);
+                 R13=-rotr*sinf(rotphi);
+                 R31=rotr*sinf(rotphi)*cosf(rottheta);
 
                  R23=0.0;
-                 R32=rotr* sinf(rotphi)* sinf(rottheta);
+                 R32=rotr*sinf(rotphi)*sinf(rottheta);
                  /* printf(" %f %f %f \n", R11, R12, R13 );
                     printf(" %f %f %f \n", R21, R22, R23 );
                     printf(" %f %f %f \n", R31, R32, R33 ); */
@@ -1988,9 +2055,9 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                    if( unidist != 0.0 )
                    {
                      distxz=eyepos-x12[i];
-                     dist= sqrtf(x1[i]*x1[i]+x2[i]*x2[i]+distxz*distxz);
+                     dist=sqrtf(x1[i]*x1[i]+x2[i]*x2[i]+distxz*distxz);
                      if(dist>1.e-12*unidist) 
-                        unif[i]=unidist/xrad[i]* tanf(asinf(xrad[i]/dist));
+                        unif[i]=unidist/xrad[i]*tanf(asinf(xrad[i]/dist));
                      else
                         unif[i]=1;
                      unig[i]=1;
@@ -2001,9 +2068,13 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                   /* printf(" %d %f %f %f %f %f %f %f \n",i,unidist,dist,unif[i],unidist-x12[i],x1[i],x2[i],x12[i]); */
                    }
 
+                   /* old - 23.09.2011 
                    x1[i]=x1[i]+trx;
                    x2[i]=x2[i]+trz;
-                   x12[i]=x12[i]+try;
+                   x12[i]=x12[i]+try;  */
+                   x1[i]=x1[i];
+                   x2[i]=x2[i];
+                   x12[i]=x12[i];
                    x1dumy=R11*x1[i]+R12*x2[i]+R13*x12[i];
                    x2dumy=R21*x1[i]+R22*x2[i]+R23*x12[i];
                    x12[i]=R31*x1[i]+R32*x2[i]+R33*x12[i];
@@ -2227,8 +2298,8 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
             /* Draw an ellipse instead of a circle */
                        if(( xellipse > 0 ) && ( i>NK ))
                        {
-                          srp= sinf(rotphi0);
-                          crp= cosf(rottheta0);
+                          srp=sinf(rotphi0);
+                          crp=cosf(rottheta0);
                           if( srp < 0 ) srp=-srp;
                           if( crp < 0 ) crp=-crp;
                           ixrad = (int)(2.*xrad[i] * xskal *unif[i] *srp);
@@ -2260,7 +2331,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                            gcColor=gcMap[icolor];
                         else
                         {  /* set greyscales on the color as function of distance from the viewer */
-                           ix12=(int)(25.0+5.*ifog* powf((x12max-x12[i])/(x12max-x12min),fpower));
+                           ix12=(int)(25.0+5.*ifog*powf((x12max-x12[i])/(x12max-x12min),fpower));
                            if( ix12 < 0 )  ix12=0;
                            if( ix12 > 99 ) ix12=99;
                            gcColor=gcMapGrey[icolor][ix12];
@@ -2319,7 +2390,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                       isqcolor=1;
                       if(isq==1) 
                       {
-                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal* log10f(x6[i])));
+                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal*log10f(x6[i])));
                         if( isqcolor < 2 ) isqcolor = 2;
                         if( isqcolor > mmax101 ) isqcolor = mmax101+1;
                       }
@@ -2327,7 +2398,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                       {
                         if( x7[i] < 0. ) x7[i]=-x7[i];
                         if( x7[i] == 0. ) x7[i]=1.e-20;
-                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal* log10f(x7[i])));
+                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal*log10f(x7[i])));
                         if( isqcolor < 2 ) isqcolor = 2;
                         if( isqcolor > mmax101 ) isqcolor = mmax101+1;
                       }
@@ -2335,7 +2406,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                       {
                         if( ix[i] < 0. ) ix[i]=-ix[i];
                         if( ix[i] == 0. ) ix[i]=1.e-20;
-                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal* log10f(ix[i])));
+                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal*log10f(ix[i])));
                         if( isqcolor < 2 ) isqcolor = 2;
                         if( isqcolor > mmax101 ) isqcolor = mmax101+1;
                       }
@@ -2344,7 +2415,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                         tempx=x6[i]-x3[i]*x3[i];
                         if( tempx < 0. ) tempx=-tempx;
                         if( tempx == 0. ) tempx=1.e-20;
-                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal* log10f(tempx)));
+                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal*log10f(tempx)));
                         if( isqcolor < 2 ) isqcolor = 2;
                         if( isqcolor > mmax101 ) isqcolor = mmax101+1;
                       }
@@ -2353,7 +2424,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                         tempx=x7[i]-x4[i]*x4[i];
                         if( tempx < 0. ) tempx=-tempx;
                         if( tempx == 0. ) tempx=1.e-20;
-                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal* log10f(tempx)));
+                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal*log10f(tempx)));
                         if( isqcolor < 2 ) isqcolor = 2;
                         if( isqcolor > mmax101 ) isqcolor = mmax101+1;
                       }
@@ -2362,14 +2433,14 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                         tempx=x6[i]-x3[i]*x3[i]+x7[i]-x4[i]*x4[i];
                         if( tempx < 0. ) tempx=-tempx;
                         if( tempx == 0. ) tempx=1.e-20;
-                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal* log10f(tempx)));
+                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal*log10f(tempx)));
                         if( isqcolor < 2 ) isqcolor = 2;
                         if( isqcolor > mmax101 ) isqcolor = mmax101+1;
                       }
                       else
                       {
                         if( vabs[i] == 0. ) vabs[i]=1.e-20;
-                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal* log10f(vabs[i])));
+                        isqcolor=(int) (dskal*(60.*mmax101/101+cskal*log10f(vabs[i])));
                         if( isqcolor < 2 ) isqcolor = 2;
                         if( isqcolor > mmax101 ) isqcolor = mmax101+1;
                       }
@@ -2837,7 +2908,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                }
 
         /* draw contacts */
-               if( strcmp(drfile, "-") != 0)
+               if( strcmp(drfile, "-") != 0 )
                {
                  /* clear graphics-windows */
                  if( noddel > 0 )
@@ -2856,16 +2927,19 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                {
                 if( ietime > 0 )
                 {
-                  sprintf(repm,"ezz =%8.4f   exx =%8.4f   eV =%8.4f",1-xtop/xtop0,1-xright/xright0,1-xright*xtop/(xright0*xtop0));
+                  /* commented - old 2D - not sure why this is two times ? */
+                  /* sprintf(repm,"ezz = %8.4f, exx = %8.4f, eV = %8.4f",1-xtop/xtop0,1-xright/xright0,1-xright*xtop/(xright0*xtop0)); */
                   XDrawString( dpy, vandy, gcFont, ietime, ietime, repm, strlen(repm));
                 }
+                Vol_sys=(xtop-xbottom)*(xright-xleft)*(xfront-xrear);
+                phi_3D=Vol_p/Vol_sys;
+                /* printf("Vp = %7.3f s, V = %7.4f, #snap = %5.5d ",Vol_p,Vol_sys,isnap); */
+                XFillRectangle(dpy, vandy, gcWhite, i0time-14, i0time-15, 400, 20 );
+                sprintf(rpm,"t = %8.4g s, phi = %7.5f, #snap = %4.4d ",time,phi_3D,isnap);
                 if( i0time > 0 )
                   XDrawString( dpy, vandy, gcFont, i0time, i0time, rpm, strlen(rpm));
                 if( i0time < 0 )
-                {
-                  sprintf(rpm,"t =%7.3f s",time);
                   XDrawString( dpy, vandy, gcSFont, -i0time, -i0time, rpm, strlen(rpm));
-                }
                 if(( i0tposx > 0 ) || ( i0tposy > 0 ))
                 {
                   sprintf(rpm,"c");
@@ -2891,8 +2965,8 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                   sprintf(csystem,"import +screen -window %lu -scene %d %6.6d.%s \n",andy,icount,icount,coutfile); 
                 if( ifilm == 2 )
                   sprintf(csystem,"import +screen -window %lu -border -scene %d %6.6d.%s \n",eng,icount,icount,coutfile); 
-                printf(csystem,"%s");
-                if (system(csystem)) {};//if-statement to remove compiler warning
+                printf("%s \n",csystem);
+                system(csystem); 
                 icount++;
                }
 
@@ -3001,6 +3075,7 @@ void Standard_Parameters()
    isq = -1;
    istep = 1;
    ilines = 0;
+   xilines = 1000;
    isort = 0;
    ivector = 0;
    ivv = 0;
@@ -3029,7 +3104,11 @@ void Standard_Parameters()
    i03d = 4;
 
    xtop0=-1.e10;
+   xfront0=-1.e10;
    xright0=-1.e10;
+   xbottom0=1.e10;
+   xrear0=1.e10;
+   xleft0=1.e10;
 
    time_step=1.;
    time_last=-1.;
@@ -3227,7 +3306,7 @@ void fill_dens( ixcenter, ixradius, dens )
    int   j, jj;
 
    xx0 = sqrtf((float)(ixradius*ixradius))+
-           sqrtf((float)(ixradius*ixradius - 1));
+         sqrtf((float)(ixradius*ixradius - 1));
 
    for ( j=ixcenter-ixradius; j<ixcenter+ixradius; j++ )
    {
@@ -3253,7 +3332,7 @@ void fill_velo( ixcenter, ixradius, vdens, vaver )
    int   j, jj;
 
    xx0 = sqrtf((float)(ixradius*ixradius))+
-           sqrtf((float)(ixradius*ixradius - 1));
+         sqrtf((float)(ixradius*ixradius - 1));
 
    for ( j=ixcenter-ixradius; j<ixcenter+ixradius; j++ )
    {
@@ -3279,7 +3358,7 @@ void fill_wrad( ixcenter, ixradius, vdens, vaver )
    int   j, jj;
 
    xx0 = sqrtf((float)(ixradius*ixradius))+
-           sqrtf((float)(ixradius*ixradius - 1));
+         sqrtf((float)(ixradius*ixradius - 1));
 
    for ( j=ixcenter-ixradius; j<ixcenter+ixradius; j++ )
    {
@@ -3302,15 +3381,16 @@ int read_line( int inread, FILE *fp,
                float *xr12, float *xr32, float *xr61, float *xr62,
                float *xr71, float *xr72 )
 {
-  int ierr = 0;
+  int i, ierr = 0;
   int clength = 450;
   char cline[450];
   int icomp=0;
+  float xcont=0.;
 
 while( icomp == 0 )
 {
-  fgets( cline, clength, fp ) ;
-  if ((icomp = strncmp( "#", cline, 1 )) != 0 )
+  fgets( cline, clength, fp );
+  if( (icomp = strncmp( "#", cline, 1 )) != 0 )
   {
     if( inread == 6 )
     {

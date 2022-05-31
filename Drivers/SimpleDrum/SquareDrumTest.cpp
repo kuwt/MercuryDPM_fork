@@ -272,30 +272,30 @@ public:
 
                     failCounter++;
                     if (failCounter==1000) break;
-
+    
                 } while (checkParticleForInteraction(P0));
-
-
+    
+    
                 numS2ToBeInserted--;
                 numS2Inserted++;
             }
             particleHandler.copyAndAddObject(P0);
-
+    
             hGridRebuild();
         }
-        std::cout << "Finished creating particles" << std::endl;
-        std::cout << "Number of S1 particles inserted" << numS1Inserted << std::endl;
-        std::cout << "Number of S2 particles inserted" << numS2Inserted << std::endl;
-
+        logger(INFO, "Finished creating particles\n"
+                     "Number of S1 particles inserted %\n"
+                     "Number of S2 particles inserted %", numS1Inserted, numS2Inserted);
+    
         //hGridRebuild();
-
-        if ( (numS1ToBeInserted==0) && (numS2ToBeInserted==0) )
+    
+        if ((numS1ToBeInserted == 0) && (numS2ToBeInserted == 0))
         {
             step = 2;
-            std::cout << "\n \n \n";
-            std::cout << "Particles settling down" << std::endl;
-            std::cout << "--------------------------" << std::endl;
-            std::cout << "\n\n\n";
+            logger(INFO, "\n \n \n"
+                         "Particles settling down"
+                         "--------------------------"
+                         "\n\n\n");
             checkTime = getTime() + 1.0;
         }
     }
@@ -305,21 +305,24 @@ public:
         {
             if (getTime() > checkTime)
             {
-                std::cout << "Current KE" << getKineticEnergy() << std::endl;
+                logger(INFO, "Current KE %", getKineticEnergy());
                 if (getKineticEnergy() < (10.0))
                 {
                     step = 3;
                     double drumStartTime = getTime();
-                    std::cout << "\n \n \n";
-                    std::cout << "Start the drum rotation" << std::endl;
-                    std::cout << "--------------------------" << std::endl;
-                    std::cout << "\n\n\n";
+                    logger(INFO, "\n \n \n"
+                                 "Start the drum rotation"
+                                 "--------------------------"
+                                 "\n\n\n");
                     // rotate the drum
-                    wallHandler.getObject(0)->setAngularVelocity(Vec3D(0.0,revolutionsPerSecond*constants::pi*2.0,0.0));
-                    wallHandler.getObject(1)->setAngularVelocity(Vec3D(0.0,revolutionsPerSecond*constants::pi*2.0,0.0));
-                    wallHandler.getObject(2)->setAngularVelocity(Vec3D(0.0,revolutionsPerSecond*constants::pi*2.0,0.0));
-
-
+                    wallHandler.getObject(0)->setAngularVelocity(
+                            Vec3D(0.0, revolutionsPerSecond * constants::pi * 2.0, 0.0));
+                    wallHandler.getObject(1)->setAngularVelocity(
+                            Vec3D(0.0, revolutionsPerSecond * constants::pi * 2.0, 0.0));
+                    wallHandler.getObject(2)->setAngularVelocity(
+                            Vec3D(0.0, revolutionsPerSecond * constants::pi * 2.0, 0.0));
+    
+    
                 }
                 else
                 {
@@ -499,7 +502,7 @@ int main(int argc, char *argv[])
     problem.setTimeStep(1.0/(2000.0 * 50.0));
     double froudeNumber = 0.22; //was 0.22
     double rotRate = 20; //pow(froudeNumber*9.81/drumRad,0.5);
-    std::cout<< "rotRate = " << rotRate << std::endl;
+    logger(INFO, "rotRate = %", rotRate);
 
     //*******************Setting Up Filename******************************************
 

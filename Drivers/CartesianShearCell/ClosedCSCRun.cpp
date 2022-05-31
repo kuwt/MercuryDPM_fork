@@ -31,7 +31,7 @@ class ClosedCSCRun : public Mercury3D {
 public:
     ClosedCSCRun (Mdouble shearVelocity, Mdouble pressure)
     {
-        std::cout << "Reading file ClosedCSCWall.restart" << std::endl;
+        logger(INFO, "Reading file ClosedCSCWall.restart\n", Flusher::NO_FLUSH);
         setName("ClosedCSCWalls");
         readRestartFile();
         setRestarted(false);
@@ -40,8 +40,7 @@ public:
         setXBallsAdditionalArguments("-v0 -solidf -3dturn 0");
         setFileType(FileType::ONE_FILE);
         //restartFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
-        std::cout << "loaded " << particleHandler.getNumberOfObjects() << 
-            " fixed particles" << std::endl;
+        logger(INFO, "loaded % fixed particles\n", particleHandler.getNumberOfObjects(), false);
 
         //calculate required lidForce and lidMass
         lidForce = pressure*(getXMax()-getXMin())*(getYMax()-getYMin());
@@ -51,18 +50,17 @@ public:
         //setWall velocity
         for (BaseParticle* p: particleHandler)
         {
-            if ( p->isFixed() ) 
+            if (p->isFixed())
             {
-                if (p->getPosition().X>0.0)
-                    p->setVelocity(Vec3D(0.0,0.5*shearVelocity,0.0));
+                if (p->getPosition().X > 0.0)
+                    p->setVelocity(Vec3D(0.0, 0.5 * shearVelocity, 0.0));
                 else
-                    p->setVelocity(Vec3D(0.0,-0.5*shearVelocity,0.0));
+                    p->setVelocity(Vec3D(0.0, -0.5 * shearVelocity, 0.0));
             }
         }
-        std::cout << "shear velocity " << shearVelocity << std::endl;
-        setSaveCount(0.25/shearVelocity/getTimeStep());
-        std::cout << "saving every " << dataFile.getSaveCount()*getTimeStep()
-            << " time units" << std::endl;
+        logger(INFO, "shear velocity %\n", shearVelocity, Flusher::NO_FLUSH);
+        setSaveCount(0.25 / shearVelocity / getTimeStep());
+        logger(INFO, "saving every % time units", dataFile.getSaveCount() * getTimeStep());
     }
 
     void actionsAfterTimeStep()
@@ -85,10 +83,8 @@ public:
     
     void printTime() const
     {
-        std::cout << "t=" << getTime() 
-            << " Ene " << getKineticEnergy()/getElasticEnergy() 
-            << " lid velocity " << lid->getVelocity().Z 
-            << std::endl;
+        logger(INFO, "t=% Ene=% lid velocity=%",
+               getTime(), getKineticEnergy() / getElasticEnergy(), lid->getVelocity().Z);
     }
 
     //add flow particles

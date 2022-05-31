@@ -37,26 +37,20 @@ public:
 
 	void setupInitialConditions()
 	{
-		
-		if (readDataFile("c3d.ini",7))
-			{
-			  PeriodicBoundary b0;
-			  b0.set(Vec3D(1,0,0), getXMin(), getXMax());
-                          boundaryHandler.copyAndAddObject(b0);
-                          b0.set(Vec3D(0,1,0), getYMin(), getYMax());
-			  boundaryHandler.copyAndAddObject(b0);
-			  std::cout << " Problem setup, about to solve" << std::endl;
-			
-			}
-			
-			else
-			
-			{
-			  std::cerr << "Input data not found exiting " << std::endl;
-				exit(-1);
-			}
-		
-	}
+        if (readDataFile("c3d.ini", 7))
+        {
+            PeriodicBoundary b0;
+            b0.set(Vec3D(1, 0, 0), getXMin(), getXMax());
+            boundaryHandler.copyAndAddObject(b0);
+            b0.set(Vec3D(0, 1, 0), getYMin(), getYMax());
+            boundaryHandler.copyAndAddObject(b0);
+            logger(INFO, " Problem setup, about to solve");
+        }
+        else
+        {
+            logger(ERROR, "Input data not found exiting ");
+        }
+    }
 
 private:
 	void computeExternalForces(BaseParticle* P){}

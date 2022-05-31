@@ -14,6 +14,7 @@
 #include "Math/ExtendedMath.h"
 #include "File.h"
 #include <map>
+#include <valarray>
 
 class BrokenMaserMinimalExample : public Mercury2D {
     public:
@@ -159,16 +160,13 @@ class BrokenMaserMinimalExample : public Mercury2D {
             double velvar = 0;
             insb = new CubeInsertionBoundary();
             insb->set(
-                generandum, 0, 
-                    Vec3D(pars.at("xmin") - pars.at("reservoirLength"), 
+                    generandum, 0,
+                    Vec3D(pars.at("xmin") - pars.at("reservoirLength"),
                           0, 0),
-                    Vec3D(pars.at("xmin"), 
+                    Vec3D(pars.at("xmin"),
                           pars.at("reservoirHeight"), 0),
-                    Vec3D(0, - sqrt(pars.at("reservoirHeight")), 0),
-                    Vec3D(0, - sqrt(pars.at("reservoirHeight")), 0),
-                    pars.at("particleRadius"),
-                    pars.at("particleRadius")
-                );
+                    Vec3D(0, -sqrt(pars.at("reservoirHeight")), 0),
+                    Vec3D(0, -sqrt(pars.at("reservoirHeight")), 0));
             insb = boundaryHandler.copyAndAddObject(insb);
             insb->checkBoundaryBeforeTimeStep(this);
 

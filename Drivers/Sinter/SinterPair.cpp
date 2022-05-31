@@ -28,9 +28,6 @@
 #include "Species/SinterSpecies.h"
 //! [St:headers]
 
-using std::cout;
-using std::endl;
-
 /// Single particle pair, sintered slowly.
 
 //! [St:class]
@@ -90,12 +87,8 @@ public:
 
     void printTime() const override
     {
-        std::cout << "t=" << std::setprecision(3) << std::left << std::setw(6) << getTime()
-                  << ", tmax=" << std::setprecision(3) << std::left << std::setw(6) << getTimeMax()
-         << ", r=" << std::setprecision(3) << std::left << std::setw(6) << particleHandler.getLastObject()->getRadius()
+        logger(INFO, "t=%3, tmax=%3, r=%3", getTime(), getTimeMax(), particleHandler.getLastObject()->getRadius());
          //<< ", Ekin=" << std::setprecision(3) << std::left << std::setw(6) << getKineticEnergy()/getElasticEnergy()
-                  << std::endl;
-        std::cout.flush();
     }
 
 };
@@ -116,12 +109,12 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     //! [St:output]
     helpers::writeToFile("SinterPair.gnu",
                          "set xlabel 'time [s]'\n"
-                          "set ylabel 'x/a'\n"
-                          "plot [0:200] 'SinterPair5e-07.fstat' u ($1):(sqrt($7/5e-07)) w lp lt rgb 'royalblue'\n"
-                          "replot 'SinterPair1.5e-06.fstat' u ($1):(sqrt($7/1.5e-06)) w lp lt rgb 'light-red'\n"
-                          "replot 'SinterPair2e-06.fstat' u ($1):(sqrt($7/2e-06)) w lp lt rgb 'sea-green'"
+                         "set ylabel 'x/a'\n"
+                         "plot [0:200] 'SinterPair5e-07.fstat' u ($1):(sqrt($7/5e-07)) w lp lt rgb 'royalblue'\n"
+                         "replot 'SinterPair1.5e-06.fstat' u ($1):(sqrt($7/1.5e-06)) w lp lt rgb 'light-red'\n"
+                         "replot 'SinterPair2e-06.fstat' u ($1):(sqrt($7/2e-06)) w lp lt rgb 'sea-green'"
     );
-    std::cout << "Execute 'gnuplot SinterPair.gnu' to view output" << std::endl;
+    logger(INFO, "Execute 'gnuplot SinterPair.gnu' to view output");
     //! [St:output]
 }
 //! [St:main]

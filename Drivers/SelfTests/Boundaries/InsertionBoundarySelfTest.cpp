@@ -46,20 +46,24 @@ public:
 
         setMin(Vec3D(0, 0, 0));
         setMax(Vec3D(1, 1, 1));
-
+    
         LinearViscoelasticSpecies species;
         species.setDensity(2000);
         species.setStiffness(10000);
         speciesHandler.copyAndAddObject(species);
-
-
+    
+    
         SphericalParticle insertionBoundaryParticle;
         insertionBoundaryParticle.setSpecies(speciesHandler.getObject(0));
-
+    
+        PSD psd;
+        psd.setDistributionUniform(0.025, 0.05, 50);
+    
         CubeInsertionBoundary insertionBoundary;
-        insertionBoundary.set(&insertionBoundaryParticle,1,getMin(),getMax(),Vec3D(1,0,0),Vec3D(1,0,0),0.025,0.05);
+        insertionBoundary.setPSD(psd);
+        insertionBoundary.set(&insertionBoundaryParticle, 1, getMin(), getMax(), Vec3D(1, 0, 0), Vec3D(1, 0, 0));
         boundaryHandler.copyAndAddObject(insertionBoundary);
-
+    
     }
 
     void printTime() const override

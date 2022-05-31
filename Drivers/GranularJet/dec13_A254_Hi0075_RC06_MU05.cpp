@@ -53,7 +53,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 
 	//problem.setStiffness(1e5*4/3*pi*problem.getInflowParticleRadius()*9.81*problem.getDensity());
 	//problem.set_disp(50*sqrt(9.81/(2*problem.getInflowParticleRadius());
-	std::cout << "Setting k to " << species->getStiffness() << " and disp to " << species->getDissipation() << std::endl;
+    logger(INFO, "Setting k to % and disp to %", species->getStiffness(), species->getDissipation());
 
  	species->setSlidingStiffness(species->getStiffness()*2.0/7.0);
  	species->setSlidingDissipation(species->getDissipation()*2.0/7.0);
@@ -67,30 +67,29 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 	problem.setChuteWidth(0.25);
 	problem.setChuteAngle(25.4);
 	problem.setRoughBottomType(MONOLAYER_DISORDERED);
-	
-
-
-	double funx = problem.getXMin()+0.5*(problem.getXMax()-problem.getXMin());
-	
-
-	problem.set_funa(60.0);
-	problem.set_funD(0.015);
-	problem.set_funHf(0.075+(problem.getXMax()-funx)*sin(problem.getChuteAngle()));
-	problem.set_funnz(50.0);
-	problem.set_funO(-funx, 0.5*(problem.getYMax()-problem.getYMin()));
-	problem.set_funfr(0.3);
-	
-	problem.setInflowVelocity(0);
-	problem.setInflowVelocityVariance(0.01);
-	problem.setMaxFailed(1);
-	
-
-	
-	//solve
-	//cout << "Maximum allowed speed of particles: " << problem.getMaximumVelocity() << endl; // speed allowed before particles move through each other!
-	
-
-	std::cout << "dt=" << problem.getTimeStep() << std::endl;
-	problem.solve();
-	problem.writeRestartFile();
+    
+    
+    double funx = problem.getXMin() + 0.5 * (problem.getXMax() - problem.getXMin());
+    
+    
+    problem.set_funa(60.0);
+    problem.set_funD(0.015);
+    problem.set_funHf(0.075 + (problem.getXMax() - funx) * sin(problem.getChuteAngle()));
+    problem.set_funnz(50.0);
+    problem.set_funO(-funx, 0.5 * (problem.getYMax() - problem.getYMin()));
+    problem.set_funfr(0.3);
+    
+    problem.setInflowVelocity(0);
+    problem.setInflowVelocityVariance(0.01);
+    problem.setMaxFailed(1);
+    
+    
+    
+    //solve
+    //cout << "Maximum allowed speed of particles: " << problem.getMaximumVelocity() << endl; // speed allowed before particles move through each other!
+    
+    
+    logger(INFO, "dt=%", problem.getTimeStep());
+    problem.solve();
+    problem.writeRestartFile();
 }

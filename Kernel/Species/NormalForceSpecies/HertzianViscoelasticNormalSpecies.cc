@@ -99,8 +99,7 @@ void HertzianViscoelasticNormalSpecies::setEffectiveElasticModulus(Mdouble elast
         elasticModulus_ = elasticModulus;
     else
     {
-        std::cerr << "Error in setEffectiveElasticModulus" << std::endl;
-        exit(-1);
+        logger(ERROR, "setEffectiveElasticModulus(%) argument has to be non-negative!", elasticModulus);
     }
 }
 
@@ -193,8 +192,7 @@ void HertzianViscoelasticNormalSpecies::setDissipation(Mdouble dissipation)
     }
     else
     {
-        std::cerr << "Error in setDissipation(" << dissipation << ")" << std::endl;
-        exit(-1);
+        logger(ERROR, "setDissipation(%) argument has to be non-negative!", dissipation);
     }
 }
 

@@ -279,7 +279,9 @@ void TriangulatedWall::write(std::ostream& os) const
 {
     os << "Vertices " << vertex_.size();
     for (const auto& vertex: vertex_)
+    {
         os << "  " << vertex;
+    }
     os << std::endl;
     //os << "Faces " << face_.size() << std::endl;
     unsigned counter = 0;

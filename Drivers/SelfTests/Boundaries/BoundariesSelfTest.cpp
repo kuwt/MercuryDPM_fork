@@ -50,48 +50,50 @@ class BoundariesSelfTest : public Mercury2D
             setTimeStep(1e-3);
             setTimeMax(3.00);
             setSaveCount(1);
-            
+    
             speciesP = speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
             speciesP->setDensity(1);
-
+    
             speciesP->setCollisionTimeAndRestitutionCoefficient(
                     5e-1,
                     0.5,
-                    (4.0/3.0)*constants::pi*pow(0.05, 3)*1
+                    (4.0 / 3.0) * constants::pi * pow(0.05, 3) * 1
             );
-
+    
             speciesP->setSlidingFrictionCoefficient(tan(34 * constants::pi / 180));
-            speciesP->setSlidingStiffness(2.0/7.0 * speciesP->getStiffness());
-            speciesP->setSlidingDissipation(2.0/7.0 * speciesP->getDissipation());
+            speciesP->setSlidingStiffness(2.0 / 7.0 * speciesP->getStiffness());
+            speciesP->setSlidingDissipation(2.0 / 7.0 * speciesP->getDissipation());
             speciesP->setRollingFrictionCoefficient(0);
-            speciesP->setRollingStiffness(2.0/5.0 * speciesP->getStiffness());
-            speciesP->setRollingDissipation(2.0/5.0 * speciesP->getDissipation());
+            speciesP->setRollingStiffness(2.0 / 5.0 * speciesP->getStiffness());
+            speciesP->setRollingDissipation(2.0 / 5.0 * speciesP->getDissipation());
             speciesP->setTorsionFrictionCoefficient(0);
-            speciesP->setTorsionStiffness(2.0/5.0 * speciesP->getStiffness());
-            speciesP->setTorsionDissipation(2.0/5.0 * speciesP->getDissipation());
-
+            speciesP->setTorsionStiffness(2.0 / 5.0 * speciesP->getStiffness());
+            speciesP->setTorsionDissipation(2.0 / 5.0 * speciesP->getDissipation());
+    
             /* Introduce the InsertionBoundary */
             insb = new CubeInsertionBoundary;
             BaseParticle* insertionBoundaryParticle = new SphericalParticle; // Possibly evil!
             insertionBoundaryParticle->setSpecies(speciesP);
+    
+            PSD psd;
+            psd.setDistributionUniform(0.05 * 0.9, 0.05 * 1.1, 50);
+    
             insb->set(
                     insertionBoundaryParticle,
                     10,
                     Vec3D(0, 0, 0),
                     Vec3D(0, 1, 0),
-                    Vec3D(-0.2,0,0),
-                    Vec3D(0.2,0,0),
-                    0.05 * 0.9, 
-                    0.05 * 1.1 
-            );
+                    Vec3D(-0.2, 0, 0),
+                    Vec3D(0.2, 0, 0));
+            insb->setPSD(psd);
             insb = boundaryHandler.copyAndAddObject(insb);
             not_yet_deleted_insb = true;
-
+    
             /* Introduce the DeletionBoundary */
             delb = new DeletionBoundary;
-            delb->set(Vec3D(1,0,0), 1);
+            delb->set(Vec3D(1, 0, 0), 1);
             delb = boundaryHandler.copyAndAddObject(delb);
-
+    
             /* Introduce the FluxBoundary */
             fluxb = new FluxBoundary;
             fluxb->set(Vec3D(1,0,0), 0.5);

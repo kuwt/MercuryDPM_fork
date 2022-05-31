@@ -35,83 +35,85 @@ public:
 
 	//We define the particle properties for the siegen experiments and insert one particle
 	Siegen(double NormalForce_=1000e-6) : DPMBase() {
-		// User input: problem name
-		setName("Siegen");
-		NormalForce=NormalForce_;
-		
-		// User input: material parameters
-		// radius of the particle
-		Mdouble RadiusPrime = 10e-6; //m
-		//calculate rel overlap
-		Mdouble E1=179e9;
-        Mdouble E2=71e9;
-        Mdouble nu1=0.17;
-        Mdouble nu2=0.17;
-        Mdouble Estar = 1/( (1-nu1*nu1)/E1 + (1-nu2*nu2)/E2 );
-
-        Mdouble G1 = E1/2/(1+nu1);
-        Mdouble G2 = E2/2/(1+nu2);
-        Mdouble Gstar = 1/( (2-nu1)/G1 + (2-nu2)/G2 );
+        // User input: problem name
+        setName("Siegen");
+        NormalForce = NormalForce_;
+        
+        // User input: material parameters
+        // radius of the particle
+        Mdouble RadiusPrime = 10e-6; //m
+        //calculate rel overlap
+        Mdouble E1 = 179e9;
+        Mdouble E2 = 71e9;
+        Mdouble nu1 = 0.17;
+        Mdouble nu2 = 0.17;
+        Mdouble Estar = 1 / ((1 - nu1 * nu1) / E1 + (1 - nu2 * nu2) / E2);
+        
+        Mdouble G1 = E1 / 2 / (1 + nu1);
+        Mdouble G2 = E2 / 2 / (1 + nu2);
+        Mdouble Gstar = 1 / ((2 - nu1) / G1 + (2 - nu2) / G2);
         //Mdouble Estar = 52.3488827e9;
-		//Mdouble Poisson = 0.17;
-		//Mdouble Gstar = 11.871e9;
-		std::cout << "Estar=" << Estar << std::endl;
-		std::cout << "Gstar=" << Gstar << std::endl;
-		Gstar = 1.2138e9;
-		// relative overlap for given normal force
-		Mdouble Overlap=0;
-		for (int i=0; i<10; i++) {
-			Overlap = pow(3./4.*NormalForce/Estar/sqrt(RadiusPrime+Overlap),2./3.);
-		}
-		relOverlap = Overlap/RadiusPrime; //wrt RadiusPrime
-		relOverlap = 0.001; //wrt RadiusPrime
-		Mdouble Radius = RadiusPrime*(1+relOverlap);
-		std::cout << "relOverlap=" << relOverlap << std::endl;
-		std::cout << "overlap=" << relOverlap*RadiusPrime << std::endl;
-		std::cout << "contact radius=" << sqrt(relOverlap)*RadiusPrime << std::endl;
-		std::cout << "rel contact radius=" << sqrt(relOverlap) << std::endl;
-		//density of SiO2
-
+        //Mdouble Poisson = 0.17;
+        //Mdouble Gstar = 11.871e9;
+        logger(INFO, "Estar=%\n"
+                     "Gstar=%", Estar, Gstar);
+        Gstar = 1.2138e9;
+        // relative overlap for given normal force
+        Mdouble Overlap = 0;
+        for (int i = 0; i < 10; i++)
+        {
+            Overlap = pow(3. / 4. * NormalForce / Estar / sqrt(RadiusPrime + Overlap), 2. / 3.);
+        }
+        relOverlap = Overlap / RadiusPrime; //wrt RadiusPrime
+        relOverlap = 0.001; //wrt RadiusPrime
+        Mdouble Radius = RadiusPrime * (1 + relOverlap);
+        logger(INFO, "relOverlap=%\n"
+                     "overlap=%\n"
+                     "contact radius=%\n"
+                     "rel contact radius=%",
+               relOverlap, relOverlap * RadiusPrime, sqrt(relOverlap) * RadiusPrime, sqrt(relOverlap));
+        //density of SiO2
+        
         species = speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
-        species->setDensity(2648/mathsFunc::cubic(1+relOverlap)); //kg/m^3
+        species->setDensity(2648 / mathsFunc::cubic(1 + relOverlap)); //kg/m^3
         //(dynamic) sliding friction
-		//setSlidingFrictionCoefficient(.23);
+        //setSlidingFrictionCoefficient(.23);
         species->setSlidingFrictionCoefficient(0.23); //rough
-		//species->setSlidingFrictionCoefficientStatic(.7); //rough
-		//rolling friction
+        //species->setSlidingFrictionCoefficientStatic(.7); //rough
+        //rolling friction
         species->setRollingFrictionCoefficient(.00103);
-		//torsion friction
+        //torsion friction
         species->setTorsionFrictionCoefficient(.005);
-		//restitution coefficient
-		Mdouble Restitution=0.99;
-                
-		//insert particle and get mass
-
-		setParticleDimensions(3);
+        //restitution coefficient
+        Mdouble Restitution = 0.99;
+        
+        //insert particle and get mass
+        
+        setParticleDimensions(3);
         setSystemDimensions(3);
 		BaseParticle* p0 = particleHandler.copyAndAddObject(SphericalParticle());
         p0->setRadius(Radius);
         Mdouble Mass = p0->getMass();
-
+        
         //define material properties
-		//set normal force
+        //set normal force
         //setStiffnessAndRestitutionCoefficient(NormalForce/(relOverlap*RadiusPrime), Restitution, Mass);
-        species->setStiffnessAndRestitutionCoefficient(NormalForce/relOverlap/RadiusPrime, Restitution, Mass);
+        species->setStiffnessAndRestitutionCoefficient(NormalForce / relOverlap / RadiusPrime, Restitution, Mass);
         //set dt accordingly
         Mdouble tc = species->getCollisionTime(Mass);
         //setTimeStep(tc/50.);
         setTimeStep(7.399163453192103488e-08);
-        std::cout << "Mass=" << Mass << std::endl;
-		std::cout << "tc=" << std::setprecision(19)<< tc << std::endl;
-		std::cout << "dt=" << getTimeStep() << std::endl;
-		std::cout << "tmax=" << getTimeMax() << std::endl;
-		//set elastic tangential sliding force
-		species->setCollisionTimeAndNormalAndTangentialRestitutionCoefficient(tc,Restitution,Restitution, Mass);
-		//set elastic tangential rolling/torsion force
-		Mdouble factor=Gstar/Estar; //0.4 is for equal oscillation frequency
-		factor=0.4; //0.4 is for equal oscillation frequency
-        species->setRollingStiffness(factor*species->getStiffness());
-        species->setTorsionStiffness(factor*species->getStiffness());
+        logger(INFO, "Mass=%\n"
+                     "tc=%19\n"
+                     "dt=%\n"
+                     "tmax=%", Mass, tc, getTimeStep(), getTimeMax());
+        //set elastic tangential sliding force
+        species->setCollisionTimeAndNormalAndTangentialRestitutionCoefficient(tc, Restitution, Restitution, Mass);
+        //set elastic tangential rolling/torsion force
+        Mdouble factor = Gstar / Estar; //0.4 is for equal oscillation frequency
+        factor = 0.4; //0.4 is for equal oscillation frequency
+        species->setRollingStiffness(factor * species->getStiffness());
+        species->setTorsionStiffness(factor * species->getStiffness());
 
 //		if (false) { //Hertz-Mindlin
 //            species->setStiffness(Estar);

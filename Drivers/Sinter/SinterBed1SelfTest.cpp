@@ -135,7 +135,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     s.species->setSinterType(SINTERTYPE::CONSTANT_RATE);
     s.solve();
 
-    std::cout << "Run with ./SinterBed1 >out; the execute 'gnuplot SinterBed1.gnu' to view output" << std::endl;
+    logger(INFO, "Run with ./SinterBed1 >out; the execute 'gnuplot SinterBed1.gnu' to view output");
 
     //if I add friction (10,1), it creates ruptures
     return 0;

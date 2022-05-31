@@ -143,7 +143,7 @@ void Chute::read(std::istream& is, ReadOptions opt)
     //the read of the next line
     std::string line_string;
     std::getline(is, line_string);
-    std::cout << "Chuteline=" << line_string << std::endl;
+    logger(INFO, "Chuteline=%", line_string);
     std::stringstream line;
     line << line_string;
     
@@ -196,7 +196,7 @@ void Chute::read(std::istream& is, ReadOptions opt)
  *          as the ostream.
  * \param[in] os                    the ostream to which the properties have
  *                                  to be written.
- * \param[in] writeAllParticles     If TRUE, the properties of ALL particles in the 
+ * \param[in] writeAllParticles     If TRUE, the properties of ALL particles in the
  *                                  particleHandler are written to the ostream. If 
  *                                  FALSE, only the properties of the first two 
  *                                  particles in the handler are written to the 
@@ -230,17 +230,10 @@ void Chute::actionsBeforeTimeStep()
 /*!
  * \details Prints the current simulation time, the maximum simulation time, and 
  * the current number of particles in the chute.
- * \todo currently, this is going to cout. Do we want to make it a logger message?
  */
 void Chute::printTime() const
 {
-    std::cout << "\rt=" << std::setprecision(3) << std::left << std::setw(6)
-              << getTime()
-              << ", tmax=" << std::setprecision(3) << std::left << std::setw(6) << getTimeMax()
-              << ", N=" << std::setprecision(3) << std::left << std::setw(6)
-              << particleHandler.getNumberOfObjects()
-              << std::endl;
-    std::cout.flush();
+    logger(INFO, "\rt=%3, tmax=%3, N=%3", getTime(), getTimeMax(), particleHandler.getNumberOfObjects());
 }
 
 /*!
@@ -272,17 +265,16 @@ void Chute::setupInitialConditions()
     }
     else
     {
-        std::cerr << "There is not yet a species defined" << std::endl;
+        logger(ERROR, "There is not yet a species defined");
     }
-    
+    PSD psd;
+    psd.setDistributionUniform(getMinInflowParticleRadius(), getMaxInflowParticleRadius(), 50);
     // set up the insertion boundary and add to handler
     ChuteInsertionBoundary b1;
-    b1.set(particleToInsert, maxFailed_,
-           Vec3D(getXMin(), getYMin(), getZMin()),
-           Vec3D(getXMax(), getYMax(), getZMax()),
-           minInflowParticleRadius_, maxInflowParticleRadius_, fixedParticleRadius_,
-           inflowVelocity_, inflowVelocityVariance_
-    );
+    b1.set(particleToInsert, maxFailed_, Vec3D(getXMin(), getYMin(), getZMin()),
+           Vec3D(getXMax(), getYMax(), getZMax()), fixedParticleRadius_, inflowVelocity_,
+           inflowVelocityVariance_);
+    b1.setPSD(psd);
     insertionBoundary_ = boundaryHandler.copyAndAddObject(b1);
     
     //creates the bottom of the chute

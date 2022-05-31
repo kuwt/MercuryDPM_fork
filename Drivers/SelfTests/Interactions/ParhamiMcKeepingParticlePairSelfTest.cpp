@@ -63,27 +63,27 @@ int main(int argc UNUSED, char *argv[] UNUSED) {
     //add second particle
     p.setPosition(p.getRadius() * Vec3D(0, 0, -1.0));
     ps.particleHandler.copyAndAddObject(p);
-
+    
     //set time-stepping and output parameters
     ps.setFileType(FileType::ONE_FILE);
     ps.setXBallsAdditionalArguments(" -v0 -solidf ");
-    ps.setGravity(Vec3D(0,0,0));
+    ps.setGravity(Vec3D(0, 0, 0));
     ps.setTimeStep(1e-4);
     ps.setSaveCount(1000);
     ps.setTimeMax(10);
-    ps.setMin(50e-9*Vec3D(-1,-1,-2));
-    ps.setMax(50e-9*Vec3D(1,1,2));
+    ps.setMin(50e-9 * Vec3D(-1, -1, -2));
+    ps.setMax(50e-9 * Vec3D(1, 1, 2));
     ps.setName("ParhamiMcKeepingParticlePairSelfTest");
-
+    
     //run
     ps.solve();
-
-    std::cout << "Execute 'gnuplot ParhamiMcKeepingParticlePairSelfTest.gnu' to view output" << std::endl;
+    
+    logger(INFO, "Execute 'gnuplot ParhamiMcKeepingParticlePairSelfTest.gnu' to view output");
     helpers::writeToFile("ParhamiMcKeepingParticlePairSelfTest.gnu",
                          "set xlabel 't [s]'\n"
                          "set ylabel 'delta/d'\n"
                          "p 'ParhamiMcKeepingParticlePairSelfTest.fstat' u 1:($7/1e-7) every 5::3 w lp\n"
-                         );
-
-
+    );
+    
+    
 }

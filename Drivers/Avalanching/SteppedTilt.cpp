@@ -110,11 +110,7 @@ public:
                 NextIncrease = CheckInterval + getTime();
                 ChuteAngle = getChuteAngleDegrees();
             }
-            std::cout
-            << " t=" << getTime()
-            << " theta=" << getChuteAngleDegrees()
-            << " Ene_kin=" << ene_kin
-            << std::endl;
+            logger(INFO, "t=%3 theta=%3 enekin=%3", getTime(), getChuteAngleDegrees(), ene_kin);
         }
     }
 

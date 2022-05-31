@@ -67,6 +67,39 @@ ChuteInsertionBoundary* ChuteInsertionBoundary::copy() const
 }
 
 /*!
+ * \details Sets all the properties of the chute insertion boundary.
+ * \param[in] particleToCopy            vector of pointers to the BaseParticles which are used as a basis
+ *                                      for the particles to be inserted
+ * \param[in] maxFailed                 The maximum number of times the insertion of a
+ *                                      particle may be tried and failed before the insertion
+ *                                      of particles is considered done.
+ *                                      NB: this property is used in the parent's
+ *                                      InsertionBoundary::checkBoundaryBeforeTimeStep().
+ * \param[in] posMin                    First defining corner of the chute insertion boundary
+ * \param[in] posMax                    Second defining corner of the chute insertion boundary
+ * \param[in] fixedParticleRadius       radius of the fixed bottom (i.e., positioned
+ *                                      at the minimal Z-position) particles
+ * \param[in] inflowVelocity            the mean particle velocity, which is in the X-direction
+ * \param[in] inflowVelocityVariance    value of minimum (minus ~) and maximum added
+ *                                      velocities which are added to the given mean
+ *                                      in each of the three dimensions. Expressed
+ *                                      as a percentage of inflowVelocity_.
+ *                                      See also the documentation of ChuteInsertionBoundary::generateParticle().
+ */
+void ChuteInsertionBoundary::set(std::vector<BaseParticle*> particleToCopy, unsigned int maxFailed, Vec3D posMin,
+                                 Vec3D posMax, double fixedParticleRadius, double inflowVelocity, double
+                                 inflowVelocityVariance)
+{
+    setParticleToCopy(particleToCopy);
+    posMin_ = posMin;
+    posMax_ = posMax;
+    maxFailed_ = maxFailed;
+    fixedParticleRadius_ = fixedParticleRadius;
+    inflowVelocity_ = inflowVelocity;
+    inflowVelocityVariance_ = inflowVelocityVariance;
+}
+
+/*!
  * \details Sets all the properties of the chute insertion boundary. 
  * \param[in] particleToCopy        Pointer to the BaseParticle which is used as a basis
  *                                  for the particles to be inserted
@@ -77,8 +110,6 @@ ChuteInsertionBoundary* ChuteInsertionBoundary::copy() const
  *                                  InsertionBoundary::checkBoundaryBeforeTimeStep().
  * \param[in] posMin                First defining corner of the chute insertion boundary
  * \param[in] posMax                Second defining corner of the chute insertion boundary
- * \param[in] radMin                Minimum radius of inserted particles
- * \param[in] radMax                Maximum radius of inserted particles
  * \param[in] fixedParticleRadius       radius of the fixed bottom (i.e., positioned 
  *                                      at the minimal Z-position) particles
  * \param[in] inflowVelocity            the mean particle velocity, which is in the X-direction
@@ -89,18 +120,13 @@ ChuteInsertionBoundary* ChuteInsertionBoundary::copy() const
  *                                      See also the documentation of ChuteInsertionBoundary::generateParticle().
  */
 void ChuteInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
-                                 double radMin, double radMax, double fixedParticleRadius, double inflowVelocity,
+                                 double fixedParticleRadius, double inflowVelocity,
                                  double inflowVelocityVariance)
 {
-    if (particleToCopy != nullptr)
-    {
-        setParticleToCopy(particleToCopy);
-    }
-    setMaxFailed(maxFailed);
+    setParticleToCopy(particleToCopy);
     posMin_ = posMin;
     posMax_ = posMax;
-    radMin_ = radMin;
-    radMax_ = radMax;
+    maxFailed_ = maxFailed;
     fixedParticleRadius_ = fixedParticleRadius;
     inflowVelocity_ = inflowVelocity;
     inflowVelocityVariance_ = inflowVelocityVariance;
@@ -125,14 +151,13 @@ void ChuteInsertionBoundary::placeParticle(BaseParticle* p, RNG& random)
     
     position.X = posMin_.X + p->getRadius();
     
-    if (mathsFunc::isEqual(posMax_.Y - posMin_.Y, 2.0 * radMax_, 1e-10))
-    {
-        position.Y = posMin_.Y + p->getRadius();
-    }
-    else
-    {
-        position.Y = random.getRandomNumber(posMin_.Y - p->getRadius(), posMax_.Y + p->getRadius());
-    }
+    ///\todo change to driver level (ask Thomas)
+//    if (mathsFunc::isEqual(posMax_.Y - posMin_.Y, 2.0 * radMax_, 1e-10))
+//    {
+//        position.Y = posMin_.Y + p->getRadius();
+//    }
+    
+    position.Y = random.getRandomNumber(posMin_.Y - p->getRadius(), posMax_.Y + p->getRadius());
     position.Z = random.getRandomNumber(posMin_.Z - p->getRadius(), posMax_.Z + p->getRadius() + fixedParticleRadius_);
     
     // The velocity components are first stored in a Vec3D, because if you pass them 
@@ -159,30 +184,9 @@ void ChuteInsertionBoundary::read(std::istream& is)
     std::string dummy;
     is >> dummy >> posMin_
        >> dummy >> posMax_
-       >> dummy >> radMin_
-       >> dummy >> radMax_
        >> dummy >> fixedParticleRadius_
        >> dummy >> inflowVelocity_
        >> dummy >> inflowVelocityVariance_;
-}
-
-/*!
- * \details Deprecated version of read().
- * \deprecated Should be gone by Mercury 2.0. Instead, use CubeInsertionBoundary::read().
- */
-void ChuteInsertionBoundary::oldRead(std::istream& is)
-{
-    unsigned int maxFailed;
-    std::string dummy;
-    is >> dummy >> maxFailed
-       >> dummy >> posMin_
-       >> dummy >> posMax_
-       >> dummy >> radMin_
-       >> dummy >> radMax_
-       >> dummy >> fixedParticleRadius_
-       >> dummy >> inflowVelocity_
-       >> dummy >> inflowVelocityVariance_;
-    setMaxFailed(maxFailed);
 }
 
 /*!
@@ -194,12 +198,9 @@ void ChuteInsertionBoundary::write(std::ostream& os) const
     InsertionBoundary::write(os);
     os << " posMin " << posMin_
        << " posMax " << posMax_
-       << " radMin " << radMin_
-       << " radMax " << radMax_
        << " fixedParticleRadius " << fixedParticleRadius_
        << " inflowVelocity " << inflowVelocity_
        << " inflowVelocityVariance " << inflowVelocityVariance_;
-    
 }
 
 /*!

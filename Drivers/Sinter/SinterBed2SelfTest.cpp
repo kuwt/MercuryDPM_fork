@@ -30,8 +30,6 @@
 #include "Boundaries/PeriodicBoundary.h"
 #include "Walls/AxisymmetricIntersectionOfWalls.h"
 #include "Logger.h"
-using std::cout;
-using std::endl;
 using helpers::readFromFile;
 using helpers::to_string;
 using helpers::writeToFile;
@@ -102,7 +100,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     //i.setParticlesWriteVTK(true);
     i.solve();
     
-    std::cout << "Execute 'gnuplot SinterBed2.gnu' to view output" << std::endl;
+    logger(INFO, "Execute 'gnuplot SinterBed2.gnu' to view output");
 
     return 0;
 }

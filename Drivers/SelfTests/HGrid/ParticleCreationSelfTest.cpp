@@ -41,7 +41,6 @@ public:
     ParticleCreation(Mdouble width, Mdouble length, Mdouble height, Mdouble sizeDistribution) :
             sizeDistribution_(sizeDistribution)
     {
-
         setXMin(0);
         setXMax(width);
         setYMin(0);
@@ -52,7 +51,7 @@ public:
 
 
         logger(INFO, "Creating flat-wall box of width [%,%], length [%,%] height [%,%]",
-                        getXMin(), getXMax(), getYMin(),getYMax(), getZMin(), getZMax());
+               getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax(), Flusher::NO_FLUSH);
 
         //create new species
         species = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
@@ -112,8 +111,8 @@ public:
             p.setPosition(position);
             if (checkParticleForInteraction(p)) //there is no interaction
             {
-                logger(DEBUG, "insert r= %, N=%, R=%, %, %", p.getRadius() ,particleHandler.getNumberOfObjects(),
-                    particleHandler.getLargestParticle()->getRadius(), particleHandler.getLargestParticle(), &p);
+                logger(DEBUG, "insert r= %, N=%, R=%, %, %", p.getRadius(), particleHandler.getNumberOfObjects() + 1,
+                       particleHandler.getLargestParticle()->getRadius(), particleHandler.getLargestParticle(), &p);
                 particleHandler.copyAndAddObject(p);
                 if (hGridNeedsRebuilding())
                 {

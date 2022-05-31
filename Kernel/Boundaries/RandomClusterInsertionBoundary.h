@@ -54,36 +54,36 @@ public:
      * \brief Destructor: default destructor.
      */
     ~RandomClusterInsertionBoundary() override;
-
+    
     /*!
      * \brief Creates a copy on the heap and returns a pointer.
      */
     RandomClusterInsertionBoundary* copy() const override;
-
+    
     /*!
      * \brief Sets the properties of the ClusterInsertionBoundary
      */
-    void set(BaseParticle *particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
-             Vec3D velMin, Vec3D velMax, Mdouble radMin, Mdouble radMax, Mdouble rMicroParticle);
-
-    void set(BaseParticle &particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
-             Vec3D velMin, Vec3D velMax, Mdouble radMin, Mdouble radMax, Mdouble rMicroParticle);
-
+    void set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
+             Vec3D velMin, Vec3D velMax, Mdouble rMicroParticle);
+    
+    void set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
+             Vec3D velMin, Vec3D velMax, Mdouble rMicroParticle);
+    
     /*!
      * \brief Sets the properties of the ClusterInsertionBoundary
      */
-    void set(BaseParticle *particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
-            unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax, Mdouble radMin, Mdouble radMax);
-
-    void set(BaseParticle &particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
-            unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax, Mdouble radMin, Mdouble radMax);
-
+    void set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
+             unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax);
+    
+    void set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
+             unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax);
+    
     //!\brief sets the number of particles per cluster
     void setNumberOfParticlesPerCluster(unsigned int nParticlesPeCluster);
-
+    
     //!\brief inserts cluster, if no interactions are detected.
     void checkBoundaryBeforeTimeStep(DPMBase* md) override;
-
+    
     //!\brief sets random position and velocity for the cluster.
     void placeParticle(BaseParticle* p, RNG& random) override;
 

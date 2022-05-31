@@ -35,50 +35,50 @@ public:
     {
         eneTolerance = 1.0;
         sizeDistribution = cbrt(2.0);
-
-        setXMin(-width/2-wallThickness);
-        setXMax( width/2+wallThickness);
+    
+        setXMin(-width / 2 - wallThickness);
+        setXMax(width / 2 + wallThickness);
         setYMin(0);
         setYMax(length);
         setZMin(-wallThickness);
         setZMax(height);
-
-        std::cout << "Creating flat-wall box of"
-        " width ["  << getXMin() << ", " << getXMax() << "],"
-        " length [" << getYMin() << ", " << getYMax() << "],"
-        " height [" << getZMin() << ", " << getZMax() << "]." << std::endl;
-
+    
+        logger(INFO, "Creating flat-wall box of"
+                     " width [%, %]"
+                     " length [%, %]"
+                     " height [%, %]\n", Flusher::NO_FLUSH, getXMin(), getXMax(), getYMin(), getYMax(), getZMin(),
+               getZMax());
+    
         //set default name
         setName("CSCWalls");
         setXBallsAdditionalArguments("-v0 -solidf -3dturn 0");
-
+    
         //set gravity (extra strong since we have few particle layers)
-        setGravity(Vec3D(0.0,0.0,-1));
-
+        setGravity(Vec3D(0.0, 0.0, -1));
+    
         //create new species
-        species =speciesHandler.copyAndAddObject(LinearViscoelasticSlidingFrictionSpecies());
-        species->setDensity(6.0/constants::pi);
-
+        species = speciesHandler.copyAndAddObject(LinearViscoelasticSlidingFrictionSpecies());
+        species->setDensity(6.0 / constants::pi);
+    
         //set inter-particle contact properties
-        species->setStiffness(2e5/100.0);
-        species->setDissipation(25.0/10.0);
-        species->setSlidingStiffness(2.0/7.0* species->getStiffness());
+        species->setStiffness(2e5 / 100.0);
+        species->setDissipation(25.0 / 10.0);
+        species->setSlidingStiffness(2.0 / 7.0 * species->getStiffness());
         species->setSlidingDissipation(species->getDissipation());
         species->setSlidingFrictionCoefficient(0.5);
-
-        setTimeStep(0.02*species->getCollisionTime(species->getMassFromRadius(0.5)));
-        std::cout << "recommended time step: " << getTimeStep() << std::endl;
+    
+        setTimeStep(0.02 * species->getCollisionTime(species->getMassFromRadius(0.5)));
+        logger(INFO, "recommended time step: %\n", getTimeStep(), Flusher::NO_FLUSH);
         setTimeStep(5.0 * getTimeStep());
-        std::cout << "time step use for creating initial conditions: " 
-            << getTimeStep() << std::endl;
- 
+        logger(INFO, "time step use for creating initial conditions: %", getTimeStep());
+    
         //set time step
         setTimeMax(1e20);
         setSaveCount(2000);
-
+    
         //set boundaries
         PeriodicBoundary b;
-        b.set(Vec3D(0,1,0),getYMin(),getYMax());
+        b.set(Vec3D(0, 1, 0), getYMin(), getYMax());
         boundaryHandler.copyAndAddObject(b);
 
         //set walls
@@ -111,88 +111,91 @@ public:
 
     void printTime() const
     {
-        std::cout << "t=" << getTime() 
-            << " Ene " << getKineticEnergy()/getElasticEnergy() << std::endl;
+        logger(INFO, "t=% Ene=%", getTime(), getKineticEnergy() / getElasticEnergy());
     }
 
     //add flow particles
-    void setupInitialConditions() 
+    void setupInitialConditions()
     {
         //number of particles to be inserted
-        unsigned int n=(getXMax()-getXMin())*(getYMax()-getYMin())
-            *1.8*(getZMax()-getZMin());
-        std::cout << "Inserting " << n << " particles" << std::endl;
+        unsigned int n = (getXMax() - getXMin()) * (getYMax() - getYMin())
+                         * 1.8 * (getZMax() - getZMin());
+        logger(INFO, "Inserting % particles\n", n, Flusher::NO_FLUSH);
         //try to find new insertable particles
         unsigned int i = 0;
         SphericalParticle p;
         p.setSpecies(species);
         Mdouble s = sizeDistribution;
-        Mdouble rMin=cbrt(0.5/(s*s + 1.0)/(s + 1.0));
-        p.setRadius(s*rMin);
-        std::cout << "Particle sizes from " << rMin << " to " << s*rMin 
-            << " (sizeDistribution " << sizeDistribution << ")" << std::endl;
+        Mdouble rMin = cbrt(0.5 / (s * s + 1.0) / (s + 1.0));
+        p.setRadius(s * rMin);
+        logger(INFO, "Particle sizes from % to %  (sizeDistribution %)\n",
+               Flusher::NO_FLUSH, rMin, s * rMin, sizeDistribution);
         Vec3D position;
-        Mdouble a=0.0;
-        while (i<n){
-            position.X = random.getRandomNumber(getXMin()+p.getRadius(), 
-                                                getXMax()-p.getRadius());
-            position.Y = random.getRandomNumber(getYMin()+p.getRadius(), 
-                                                getYMax()-p.getRadius());
-            position.Z = random.getRandomNumber(getZMin()+p.getRadius(), 
-                                                std::max(getZMin()+p.getRadius(),a*getZMax()-p.getRadius()));
+        Mdouble a = 0.0;
+        while (i < n)
+        {
+            position.X = random.getRandomNumber(getXMin() + p.getRadius(),
+                                                getXMax() - p.getRadius());
+            position.Y = random.getRandomNumber(getYMin() + p.getRadius(),
+                                                getYMax() - p.getRadius());
+            position.Z = random.getRandomNumber(getZMin() + p.getRadius(),
+                                                std::max(getZMin() + p.getRadius(), a * getZMax() - p.getRadius()));
             p.setPosition(position);
-            if (checkParticleForInteraction(p)) {
-                //std::cout << i << std::endl;
+            if (checkParticleForInteraction(p))
+            {
+                //logger(INFO, "%", i);
                 particleHandler.copyAndAddObject(p);
-                p.setRadius(random.getRandomNumber(rMin, s*rMin));
+                p.setRadius(random.getRandomNumber(rMin, s * rMin));
                 i++;
-                if (particleHandler.getNumberOfObjects()%100==0) { 
-                    std::cout << " " << particleHandler.getNumberOfObjects()/100; 
-                    std::flush(std::cout);
+                if (particleHandler.getNumberOfObjects() % 100 == 0)
+                {
+                    logger(INFO, " %", particleHandler.getNumberOfObjects() / 100);
                 }
-                
-            } else { 
+            
+            }
+            else
+            {
                 a += 0.00001;
             }
         }
-        std::cout << std::endl <<"Inserted " << n << " particles within z<" << a*getZMax() << std::endl;
+        logger(INFO, "\nInserted % particles within z<%", n, a * getZMax());
     }
 
     void saveWalls()
     {
-        std::cout << "Creating flat-wall box of"
-        " width ["  << getXMin() << ", " << getXMax() << "],"
-        " length [" << getYMin() << ", " << getYMax() << "],"
-        " height [" << getZMin() << ", " << getZMax() << "]." << std::endl;
-
+        logger(INFO, "Creating flat-wall box of"
+                     " width [%, %]"
+                     " length [%, %]"
+                     " height [%, %]\n",
+               Flusher::NO_FLUSH, getXMin(), getXMax(), getYMin(), getYMax(), getZMin(), getZMax());
+    
         //only keep wall particles
         for (BaseParticle* p: particleHandler)
         {
             Mdouble x = p->getPosition().X;
             Mdouble z = p->getPosition().Z;
-            if ( x > getXMax() || x < getXMin() || z < getZMin() ) 
+            if (x > getXMax() || x < getXMin() || z < getZMin())
             {
-                if (z<getZMax())
+                if (z < getZMax())
                 {
                     p->fixParticle();
                 }
             }
         }
-        for (int i = particleHandler.getNumberOfObjects()-1; i>=0; i--)
+        for (int i = particleHandler.getNumberOfObjects() - 1; i >= 0; i--)
         {
             if (!particleHandler.getObject(i)->isFixed())
                 particleHandler.removeObject(i);
         }
         interactionHandler.clear();
-
-        std::cout << "kept " << particleHandler.getNumberOfObjects() 
-            << " fixed particles" << std::endl;
-
+    
+        logger(INFO, "kept % fixed particles", particleHandler.getNumberOfObjects());
+    
         //save data and restart file of last time step
         dataFile.open();
         outputXBallsData(dataFile.getFstream());
         dataFile.close();
-        
+    
         restartFile.open();
         writeRestartFile();
         restartFile.close();

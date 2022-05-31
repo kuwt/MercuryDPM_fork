@@ -195,8 +195,7 @@ void ChargedBondedInteraction::computeAdhesionForce()
         //if none of the above are satisfied, something must have gone very wrong!
     else
     {
-        std::cerr << "Error: Particle charge has erroneous value" << std::endl;
-        exit(-1);
+        logger(ERROR, "Particle charge has erroneous value");
     }
 }
 

@@ -166,7 +166,7 @@ struct VerticalMixer : public Mercury3D{
         SphericalParticle p;
         p.setSpecies(speciesHandler.getLastObject());
         CubeInsertionBoundary c; //delete is done in boundaryHandler
-        c.set(&p,0,getMin(),getMax(),Vec3D(0,0,0),Vec3D(0,0,0),0.65*particleRadius_-initialParticleOverlap_,1.3*particleRadius_-initialParticleOverlap_);
+        c.set(&p, 0, getMin(), getMax(), Vec3D(0, 0, 0), Vec3D(0, 0, 0));
         c.setHandler(&boundaryHandler);
         while (particleHandler.getSize()<particleNumber_) {
             c.checkBoundaryBeforeTimeStep(this);

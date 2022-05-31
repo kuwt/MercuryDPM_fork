@@ -43,11 +43,11 @@ void Box::addPanel(int level, Panel* panel)
 
 void Box::upwardPass()
 {
-    std::cout << "============================" << std::endl;
-    std::cout << "Starting the upward pass." << std::endl;
     // Perform a multipole expansion about the centre of all panels located on the finest mesh
-    std::cout << "Computing multipole expansion on finest level." << std::endl;
-    for (Panel* panel : levels_[maxLevel_])
+    logger(INFO, "============================\n"
+                 "Starting the upward pass\n"
+                 "Computing multipole expansion on finest level\n", Flusher::NO_FLUSH);
+    for (Panel* panel: levels_[maxLevel_])
     {
         panel->computeMultipoleExpansion();
     }
@@ -55,24 +55,23 @@ void Box::upwardPass()
     // Perform an upward pass, each level combine the previous level multipole expansions by shifting them to the centre of the current panel
     for (int iL = maxLevel_ - 1; iL >= 0; iL--)
     {
-        std::cout << "Shifting multipole expansions on level " << iL << "." << std::endl;
-        for (Panel* panel : levels_[iL])
+        logger(INFO, "Shifting multipole expansions on level %.\n", iL, Flusher::NO_FLUSH);
+        for (Panel* panel: levels_[iL])
         {
             panel->translateMultipoleExpansion();
         }
     }
-    std::cout << "Finished upward pass." << std::endl;
+    logger(INFO, "Finished upward pass.");
     
 }
 
 void Box::downwardPass()
 {
-    std::cout << "============================" << std::endl;
-    std::cout << "Starting the downward pass." << std::endl;
-    
+    logger(INFO, "============================\n"
+                 "Starting the downward pass.\n", Flusher::NO_FLUSH);
     //Set the first part of the local expansion to zero: everything is in the interaction list or closer
     NumericalVector<std::complex<Mdouble>> localExpansionCoefficients;
-    for (Panel* panel : levels_[1])
+    for (Panel* panel: levels_[1])
     {
         panel->setLocalExpansionZero();
     }
@@ -80,30 +79,30 @@ void Box::downwardPass()
     // Compute all local expansions for intermediate levels
     for (int iL = 1; iL < maxLevel_; iL++)
     {
-        std::cout << "Computing nearby Local Expansions on level " << iL << "." << std::endl;
-        for (Panel* panel : levels_[iL])
+        logger(INFO, "Computing nearby Local Expansions on level %.\n", iL, Flusher::NO_FLUSH);
+        for (Panel* panel: levels_[iL])
         {
             panel->computePartialLocalExpansion();
             panel->computeLocalExpansion();
             
         }
         
-        std::cout << "Translating local expansions to children" << std::endl;
-        for (Panel* panel : levels_[iL])
+        logger(INFO, "Translating local expansions to children\n", Flusher::NO_FLUSH);
+        for (Panel* panel: levels_[iL])
         {
             panel->translateLocalExpansion();
         }
     }
     
     // Compute local expansions for the remaining  interaction list on the finest level
-    std::cout << "Computing nearby local expansions on finest level " << std::endl;
+    logger(INFO, "Computing nearby local expansions on finest level\n", Flusher::NO_FLUSH);
     for (Panel* panel : levels_[maxLevel_])
     {
         panel->computePartialLocalExpansion();
         panel->computeLocalExpansion();
     }
     
-    std::cout << "Finished downward pass." << std::endl;
+    logger(INFO, "Finished downward pass.");
 }
 
 void Box::computeFlow(int k)
@@ -114,7 +113,7 @@ void Box::computeFlow(int k)
     
     // The first step is to add dipoles with correct location and strengths in the domain
     // All dipoles in the domain are now expanded into multipoles
-    std::cout << "Initialising spheres" << std::endl;
+    logger(INFO, "Initialising spheres");
     upwardPass();
     downwardPass();
     

@@ -36,28 +36,30 @@ public:
 	void set_particle_properties() {
 		//define species
         auto species = speciesHandler.copyAndAddObject(LinearViscoelasticSlidingFrictionSpecies());
-        species->setDensity(6./constants::pi);
-		setGravity(Vec3D(0,0,-1));
-		setInflowParticleRadius(0.5);
-		setFixedParticleRadius(0.5);
-		//double mass = 4. / 3. * constants::pi * pow(getInflowParticleRadius(), 3.0) * S->getDensity();
-                species->setCollisionTimeAndRestitutionCoefficient(0.005,0.88, species->getMassFromRadius(getInflowParticleRadius()));
-		//~ setCollisionTimeAndRestitutionCoefficient(0.005,1);
-		species->setSlidingStiffness(2.0/7.0* species->getStiffness());
-		species->setSlidingDissipation(species->getDissipation());
-		species->setSlidingFrictionCoefficient(0.5);
-		setTimeStep(0.02 * species->getCollisionTime(species->getMassFromRadius(0.5 * (getMinInflowParticleRadius() + getMaxInflowParticleRadius()))));
-		std::cout << getTimeStep() << std::endl;
-
-		//		setDensity(6./constants::pi);
-		//setGravity(Vec3D(0,0,-1));
-		//setInflowParticleRadius(0.5);
-		//setFixedParticleRadius(0.5);
-		//
-		//setCollisionTimeAndRestitutionCoefficient(0.005,0.88);
-		//~ setCollisionTimeAndRestitutionCoefficient(0.005,1);
-		//setSlidingStiffness(2.0/7.0*getStiffness());
-		//setSlidingDissipation(getDissipation());
+        species->setDensity(6. / constants::pi);
+        setGravity(Vec3D(0, 0, -1));
+        setInflowParticleRadius(0.5);
+        setFixedParticleRadius(0.5);
+        //double mass = 4. / 3. * constants::pi * pow(getInflowParticleRadius(), 3.0) * S->getDensity();
+        species->setCollisionTimeAndRestitutionCoefficient(0.005, 0.88,
+                                                           species->getMassFromRadius(getInflowParticleRadius()));
+        //~ setCollisionTimeAndRestitutionCoefficient(0.005,1);
+        species->setSlidingStiffness(2.0 / 7.0 * species->getStiffness());
+        species->setSlidingDissipation(species->getDissipation());
+        species->setSlidingFrictionCoefficient(0.5);
+        setTimeStep(0.02 * species->getCollisionTime(
+                species->getMassFromRadius(0.5 * (getMinInflowParticleRadius() + getMaxInflowParticleRadius()))));
+        logger(INFO, "%", getTimeStep());
+        
+        //		setDensity(6./constants::pi);
+        //setGravity(Vec3D(0,0,-1));
+        //setInflowParticleRadius(0.5);
+        //setFixedParticleRadius(0.5);
+        //
+        //setCollisionTimeAndRestitutionCoefficient(0.005,0.88);
+        //~ setCollisionTimeAndRestitutionCoefficient(0.005,1);
+        //setSlidingStiffness(2.0/7.0*getStiffness());
+        //setSlidingDissipation(getDissipation());
 		//setSlidingFrictionCoefficient(0.5);
 		//setTimeStep();
 		//std::cout << getTimeStep() << std::endl;
@@ -139,29 +141,35 @@ public:
 			p1.setPosition(Vec3D(1.5,0.5,3));
 			p1.setVelocity(Vec3D(random.getRandomNumber(-.1,.1),0,random.getRandomNumber(-.1,.1)));
 			particleHandler.copyAndAddObject(p1);
-
-			p1.setRadius(getInflowParticleRadius()*1.5);
-			
-			p1.setPosition(Vec3D(1,0.5,3.25));
-			p1.setVelocity(Vec3D(random.getRandomNumber(-.1,.1),0,random.getRandomNumber(-.1,.1)));
-			particleHandler.copyAndAddObject(p1);
-			p1.setPosition(Vec3D(2,0.5,3.25));
-			p1.setVelocity(Vec3D(random.getRandomNumber(-.1,.1),0,random.getRandomNumber(-.1,.1)));
-			particleHandler.copyAndAddObject(p1);
-			p1.setPosition(Vec3D(3,0.5,3.25));
-			p1.setVelocity(Vec3D(random.getRandomNumber(-.1,.1),0,random.getRandomNumber(-.1,.1)));
-			particleHandler.copyAndAddObject(p1);
-			p1.setPosition(Vec3D(4,0.5,3.25));
-			p1.setVelocity(Vec3D(random.getRandomNumber(-.1,.1),0,random.getRandomNumber(-.1,.1)));
-			particleHandler.copyAndAddObject(p1);
-			p1.setPosition(Vec3D(1.5,0.5,4));
-			p1.setVelocity(Vec3D(random.getRandomNumber(-.1,.1),0,random.getRandomNumber(-.1,.1)));
-			particleHandler.copyAndAddObject(p1);
-
-		}
-		if (particleHandler.getNumberOfObjects()<10) write(std::cout,true);
-		else write(std::cout,false);
-	}
+            
+            p1.setRadius(getInflowParticleRadius() * 1.5);
+            
+            p1.setPosition(Vec3D(1, 0.5, 3.25));
+            p1.setVelocity(Vec3D(random.getRandomNumber(-.1, .1), 0, random.getRandomNumber(-.1, .1)));
+            particleHandler.copyAndAddObject(p1);
+            p1.setPosition(Vec3D(2, 0.5, 3.25));
+            p1.setVelocity(Vec3D(random.getRandomNumber(-.1, .1), 0, random.getRandomNumber(-.1, .1)));
+            particleHandler.copyAndAddObject(p1);
+            p1.setPosition(Vec3D(3, 0.5, 3.25));
+            p1.setVelocity(Vec3D(random.getRandomNumber(-.1, .1), 0, random.getRandomNumber(-.1, .1)));
+            particleHandler.copyAndAddObject(p1);
+            p1.setPosition(Vec3D(4, 0.5, 3.25));
+            p1.setVelocity(Vec3D(random.getRandomNumber(-.1, .1), 0, random.getRandomNumber(-.1, .1)));
+            particleHandler.copyAndAddObject(p1);
+            p1.setPosition(Vec3D(1.5, 0.5, 4));
+            p1.setVelocity(Vec3D(random.getRandomNumber(-.1, .1), 0, random.getRandomNumber(-.1, .1)));
+            particleHandler.copyAndAddObject(p1);
+            
+        }
+        if (particleHandler.getNumberOfObjects() < 10)
+        {
+            write(std::cout, true);
+        }
+        else
+        {
+            write(std::cout, false);
+        }
+    }
 
 };
 

@@ -12,6 +12,7 @@
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
+#include <valarray>
 #include "Math/RNG.h"
 #include "Math/ExtendedMath.h"
 #include "File.h"
@@ -227,17 +228,14 @@ class CappedHeatedBlasius : public Mercury2D {
             double velvar = 0;
             insb = new CubeInsertionBoundary();
             insb->set(
-                generandum, 0, 
+                    generandum, 0,
                     Vec3D(pars.at("xmin") - pars.at("reservoirLength"), // + 6*pars.at("particleRadius"), 
-                          // pars.at("reservoirHeight") - 8*pars.at("particleRadius"), 
+                            // pars.at("reservoirHeight") - 8*pars.at("particleRadius"),
                           0, 0),
                     Vec3D(pars.at("xmin"), // - 6*pars.at("particleRadius"), 
                           pars.at("reservoirHeight"), 0),
-                    Vec3D(0, - sqrt(pars.at("g") * pars.at("reservoirHeight")), 0),
-                    Vec3D(0, - sqrt(pars.at("g") * pars.at("reservoirHeight")), 0),
-                    pars.at("particleRadius") * (1 - pars.at("dispersity")),
-                    pars.at("particleRadius") * (1 + pars.at("dispersity"))
-                );
+                    Vec3D(0, -sqrt(pars.at("g") * pars.at("reservoirHeight")), 0),
+                    Vec3D(0, -sqrt(pars.at("g") * pars.at("reservoirHeight")), 0));
             insb = boundaryHandler.copyAndAddObject(insb);
             insb->checkBoundaryBeforeTimeStep(this);
             stillFillingUp = true;

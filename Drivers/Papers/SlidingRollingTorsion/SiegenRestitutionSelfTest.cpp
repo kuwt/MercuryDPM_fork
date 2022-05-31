@@ -34,20 +34,20 @@ public:
 
 	Slide() : Siegen()
 	{
-		setName("SiegenRestitutionSelfTest");
-		
-		// set size of loop
-		double Radius = particleHandler.getObject(0)->getRadius();
-		LoopTime = sqrt(2.*100.*0.1*Radius/10.);
-		std::cout << "LoopTime=" << LoopTime << std::endl;
-
-		//time stepping
-		setTimeMax(LoopTime);
-		setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(200, getTimeMax(), getTimeStep()));
-
+        setName("SiegenRestitutionSelfTest");
+        
+        // set size of loop
+        double Radius = particleHandler.getObject(0)->getRadius();
+        LoopTime = sqrt(2. * 100. * 0.1 * Radius / 10.);
+        logger(INFO, "LoopTime=%", LoopTime);
+        
+        //time stepping
+        setTimeMax(LoopTime);
+        setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(200, getTimeMax(), getTimeStep()));
+        
         //set wall
-		InfiniteWall w;
-        w.set(Vec3D(0., -1., 0.), Vec3D(0,0,0));
+        InfiniteWall w;
+        w.set(Vec3D(0., -1., 0.), Vec3D(0, 0, 0));
         wallHandler.copyAndAddObject(w);
 
 		//set_Particle

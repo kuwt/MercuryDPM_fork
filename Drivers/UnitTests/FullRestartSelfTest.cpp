@@ -42,6 +42,7 @@
 #include "Boundaries/LeesEdwardsBoundary.h"
 
 #include "Species/LinearViscoelasticSpecies.h"
+#include "Species/LinearPlasticViscoelasticSpecies.h"
 
 class FullRestartTest : public DPMBase
 {
@@ -50,6 +51,7 @@ public:
     void setupInitialConditions() override
     {
         LinearViscoelasticSpecies* s = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
+        LinearViscoelasticSpecies* s2 = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
         
         Coil coil(Vec3D(0.1, 0.2, 0.3), 0.4, 0.5, 0.6, 0.7, 0.8);
         coil.setSpecies(speciesHandler.getObject(0));
@@ -75,10 +77,10 @@ public:
         InfiniteWallWithHole infiniteWallWithHole;
         infiniteWallWithHole.setSpecies(speciesHandler.getObject(0));
         infiniteWallWithHole.set(Vec3D(0.1, 0.2, 0.3), 0.4, 0.5);
-        
+    
         Screw screw(Vec3D(0.1, 0.2, 0.3), 0.4, 0.5, 0.6, 0.7, 0.8);
         screw.setSpecies(speciesHandler.getObject(0));
-        
+    
         wallHandler.copyAndAddObject(coil);
         wallHandler.copyAndAddObject(cylindricalWall);
         wallHandler.copyAndAddObject(axisymmetricIntersectionOfWalls);
@@ -86,27 +88,40 @@ public:
         wallHandler.copyAndAddObject(infiniteWall);
         wallHandler.copyAndAddObject(infiniteWallWithHole);
         wallHandler.copyAndAddObject(screw);
-        
+    
+        SphericalParticle baseParticle;
+        baseParticle.setSpecies(speciesHandler.getObject(0));
+        particleHandler.copyAndAddObject(baseParticle);
+        SphericalParticle baseParticle2;
+        baseParticle.setSpecies(speciesHandler.getObject(1));
+        particleHandler.copyAndAddObject(baseParticle2);
+    
+    
         AngledPeriodicBoundary angledPeriodicBoundary;
         angledPeriodicBoundary.set(Vec3D(0.1, 0.2, 0.3), Vec3D(0.4, 0.5, 0.6), Vec3D(0.7, 0.8, 0.9));
-        
+    
         ChuteInsertionBoundary chuteInsertionBoundary;
-        chuteInsertionBoundary.set(new SphericalParticle, 13, Vec3D(0.1, 0.2, 0.3), Vec3D(0.4, 0.5, 0.6), 0.33, 0.44, 0.55,
+        chuteInsertionBoundary.set(new SphericalParticle, 13, Vec3D(0.1, 0.2, 0.3), Vec3D(0.4, 0.5, 0.6), 0.55,
                                    1.1, 1.2);
-        
+    
         CubeInsertionBoundary cubeInsertionBoundary;
-        cubeInsertionBoundary.set(new SphericalParticle, 13, Vec3D(0.1, 0.2, 0.3), Vec3D(0.4, 0.5, 0.6),
-                                  Vec3D(0.11, 0.22, 0.33), Vec3D(0.44, 0.55, 0.66), 0.77, 0.88);
-        
+        cubeInsertionBoundary.set({&baseParticle, &baseParticle2}, 13, Vec3D(0.1, 0.2, 0.3), Vec3D(0.4, 0.5, 0.6),
+                                  Vec3D(0.11, 0.22, 0.33), Vec3D(0.44, 0.55, 0.66));
+        PSD psd;
+        psd.setDistributionUniform(0.1, 1, 50);
+        PSD psd2;
+        psd2.setDistributionUniform(0.01, 0.1, 50);
+        cubeInsertionBoundary.setPSD({psd, psd2}, {0.5, 0.5});
+    
         HopperInsertionBoundary hopperInsertionBoundary;
-        hopperInsertionBoundary.set(new SphericalParticle, 13, 0.2, 0.3, 0.66, 0.77, 3.1, 0.69, false, 3, 0.11, 0.21, 0.09,
+        hopperInsertionBoundary.set(new SphericalParticle, 13, 0.2, 0.3, 3.1, 0.69, false, 3, 0.11, 0.21, 0.09,
                                     2.31, 0.001, 30);
-        
+    
         PeriodicBoundary periodicBoundary;
         periodicBoundary.set(Vec3D(0.1, 0.2, 0.3), 1.1, 2.2, Vec3D(0.4, 0.5, 0.6));
-        
+    
         CircularPeriodicBoundary circularPeriodicBoundary(0.3);
-        
+    
         DeletionBoundary deletionBoundary;
         deletionBoundary.set(Vec3D(0.1, 0.2, 0.3), 3.14);
         
@@ -131,9 +146,6 @@ public:
         boundaryHandler.copyAndAddObject(deletionBoundary);
         boundaryHandler.copyAndAddObject(leesEdwardsBoundary);
         
-        SphericalParticle baseParticle;
-        baseParticle.setSpecies(speciesHandler.getObject(0));
-        particleHandler.copyAndAddObject(baseParticle);
     }
 };
 
@@ -145,7 +157,7 @@ int main()
     normal.writeRestartFile();
     normal.restartFile.setFileType(FileType::MULTIPLE_FILES);
     normal.setName("FullRestartWithCounterSelfTest");
-    std::cout << normal.restartFile.getFullName();
+    logger(INFO, "%", normal.restartFile.getFullName());
     normal.writeRestartFile();
     
     FullRestartTest restart;

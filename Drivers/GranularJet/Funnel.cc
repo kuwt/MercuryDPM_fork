@@ -80,14 +80,14 @@ void Funnel::write(std::ostream& os, bool writeAllParticles) const
 void Funnel::read(std::istream& is, ReadOptions opt)
 {
     Chute::read(is, opt);
-    std::cout << "Funnel read: " << wallHandler.getNumberOfObjects() << std::endl;
+    logger(INFO, "Funnel read: %\n", Flusher::NO_FLUSH, wallHandler.getNumberOfObjects());
     std::string dummy;
     double funOx, funOy;
     is >> dummy >> funa >> dummy >> funD >> dummy >> funHf >> dummy >> funnz >> dummy >> funOx >> dummy >> funOy >> dummy >> funfr;
     set_funO(funOx, funOy);
 
     //Calculate additional information
-    std::cout << "In Funnel::read, calling update_funnel()" << std::endl;
+    logger(INFO, "In Funnel::read, calling update_funnel()");
     update_funnel();
 }
 
@@ -136,7 +136,7 @@ void Funnel::create_inflow_particle()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void Funnel::setupInitialConditions()
 {
-    std::cout << " in Funnel::setupInitialConditions " << std::endl;
+    logger(DEBUG, " in Funnel::setupInitialConditions ");
 
     //check funnel
     check_funnel();
@@ -215,15 +215,15 @@ void Funnel::create_funnel()
 
         if (zc < (Chute::getInflowHeight() - get_funH()) + getFixedParticleRadius())
         {
-            std::cout << "Lst funr_ = " << funr_ << " with zc = " << zc << std::endl;
+            logger(INFO, "Lst funr_ = % with zc = %", funr_, zc);
             isdone = true;
         }
 
         if (funr_ <= (1.0 / 2.0 * get_funD()))
         {
-            std::cout << "Lst funr_ = " << funr_ << std::endl;
+            logger(INFO, "Lst funr_ = %\n", Flusher::NO_FLUSH, funr_);
             funr_ = 1.0 / 2.0 * get_funD() + 2.0 * F0.getRadius();
-            std::cerr << "Warning: Funnel is closing! \n";
+            logger(WARN, "Warning: Funnel is closing! ");
             isdone = true;
         }
 
@@ -237,19 +237,21 @@ void Funnel::create_funnel()
 
 #ifdef DEBUG_OUTPUT
     //Print funnel info to console:
-    std::cout << "Current zmax = " << getZMax()
-    << "\nCurrent inflowheight = " << Chute::getInflowHeight()
-    << "\nFunnel D = " << get_funD()
-    << "\nFunnel R = " << get_funr()
-    << "\nFunnel A = " << get_funa()/constants::pi*180
-    << "\nFunnel HF = " << get_funHf()
-    << "\nFunnel H = " << get_funH()
-    << "\nFunnel rmax = " << get_funrmax()
-    << "\nFunnel diag = " << get_fundiag()
-    << "\nFunnel fr = " << get_funfr()
-    << "\nFunnel Oy = " << get_funOy()
-    << "\nFunnel Ox = " << get_funOx()
-    << "\nCurrent number of particles = " << get_NmaxR() << std::endl;
+    logger(INFO, "Current zmax = %"
+    "\nCurrent inflowheight = %"
+    "\nFunnel D = %"
+    "\nFunnel R = %"
+    "\nFunnel A = %"
+    "\nFunnel HF = %"
+    "\nFunnel H = %"
+    "\nFunnel rmax = %"
+    "\nFunnel diag = %"
+    "\nFunnel fr = %"
+    "\nFunnel Oy = %"
+    "\nFunnel Ox = %"
+    "\nCurrent number of particles = %", getZMax(), Chute::getInflowHeight(), get_funD(), get_funr(), get_funa()
+    /constants::pi*180, get_funHf(), get_funH(), get_funrmax(), get_fundiag(), get_funfr(), get_funOy(), get_funOx(),
+    get_NmaxR());
 #endif
 }
 
@@ -259,7 +261,7 @@ void Funnel::create_funnel()
 
 void Funnel::update_funnel()
 {
-    std::cout << " in Funnel::update_funnel()" << std::endl;
+    logger(DEBUG, " in Funnel::update_funnel() ");
     //set_funnz(get_funnz()*(1.0+get_funfr()));
     set_funH(funnz * cos(funa) * 2 * getFixedParticleRadius());
     Chute::setInflowHeight(funHf + funH);
@@ -283,26 +285,26 @@ void Funnel::check_funnel()
     {
         double oldxmax = getXMax();
         setXMax(get_funr() + get_funOx());
-        std::cerr << "Funnel did not fit in boundaries, changed xmax from " << oldxmax << " to " << getXMax() << std::endl;
+        logger(WARN, "Funnel did not fit in boundaries, changed xmax from % to %", oldxmax, getXMax());
     }
     if ((get_funOx() - get_funr()) < getXMin())
     {
         double oldxmin = getXMin();
         setXMin(get_funOx() - get_funr());
-        std::cerr << "Funnel did not fit in boundaries, changed xmin from " << oldxmin << " to " << getXMin() << std::endl;
+        logger(WARN, "Funnel did not fit in boundaries, changed xmin from % to %", oldxmin, getXMin());
     }
 
     if ((get_funOy() + get_funr()) > getYMax())
     {
         double oldymax = getYMax();
         setYMax(get_funOy() + get_funr());
-        std::cerr << "Funnel did not fit in boundaries, changed ymax from " << oldymax << " to " << getYMax() << std::endl;
+        logger(WARN, "Funnel did not fit in boundaries, changed ymax from % to %", oldymax, getYMax());
     }
     if ((get_funOy() - get_funr()) < getYMin())
     {
         double oldymin = getYMin();
         setYMin(get_funOy() - get_funr());
-        std::cerr << "Funnel did not fit in boundaries, changed ymin from " << oldymin << " to " << getYMin() << std::endl;
+        logger(WARN, "Funnel did not fit in boundaries, changed ymin from % to %", oldymin, getYMin());
     }
 
     update_funnel();

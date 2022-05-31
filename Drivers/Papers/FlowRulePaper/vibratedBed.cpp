@@ -45,7 +45,7 @@ public:
         std::stringstream ss;
         ss << "vibratedBed" << getName() << "A" << amplitude_ << "F" << frequency_;
         setName(ss.str());
-        std::cout << "File name: " << getName() << std::endl;
+        logger(INFO, "File name: %", getName());
         readArguments(argc, argv);
 		writeRestartFile();
         solve();
@@ -70,25 +70,27 @@ public:
         //S=A*A*w*w
         frequency_ = std::sqrt(S/amplitude_/amplitude_);
     }
-
+    
     void setFrequency(Mdouble frequency)
     {
         frequency_ = frequency;
     }
-
+    
     void setAmplitude(Mdouble amplitude)
     {
         amplitude_ = amplitude;
     }
-
-    void printTime() const override {
-        std::cout << "t=" << std::setprecision(3) << std::left << std::setw(6) << getTime()
-            << ", tmax="  << std::setprecision(3) << std::left << std::setw(6) << getTimeMax()
-            << ", N="     << std::setprecision(3) << std::left << std::setw(6) << particleHandler.getNumberOfObjects()
-            << ", theta=" << std::setprecision(3) << std::left << std::setw(6) << getChuteAngleDegrees()
-            << ", Ene="   << std::setprecision(3) << std::left << std::setw(6) << getKineticEnergy() / getElasticEnergy()
-            //~ << ", finish by " << setprecision(3) << left << setw(6) << timer.getFinishTime(t)
-            << ". " << std::endl;
+    
+    void printTime() const override
+    {
+        logger(INFO, "t=%3.6"
+                     ", tmax=%3.6"
+                     ", N=%3.6"
+                     ", theta=%3.6"
+                     ", Ene=%3.6. ",
+               getTime(), getTimeMax(), particleHandler.getNumberOfObjects(), getChuteAngleDegrees(),
+               getKineticEnergy() / getElasticEnergy());
+        //~ << ", finish by " << setprecision(3) << left << setw(6) << timer.getFinishTime(t)
     }
 
 private:
@@ -121,20 +123,20 @@ int main(int argc, char *argv[])
     }
     else
     {
-        std::cout << "Not enough input arguments given (./vibratedBed $study $height $angle $amplitude $frequency); " << std::endl
-            << "using demo values (equivalent to ./vibratedBed 4 5 10 0.02 1 -tmax 1000 -dt 0.001)" << std::endl;
-        studyNumber[0]=4;
-        studyNumber[1]=0.1;
-        studyNumber[2]=10;
+        logger(ERROR, "Not enough input arguments given (./vibratedBed $study $height $angle $amplitude $frequency);\n"
+                      "using demo values (equivalent to ./vibratedBed 4 5 10 0.02 1 -tmax 1000 -dt 0.001)");
+        studyNumber[0] = 4;
+        studyNumber[1] = 0.1;
+        studyNumber[2] = 10;
         problem.setAmplitude(0.01);
         problem.setFrequency(1.0);
         problem.setRoughBottomType(MONOLAYER_DISORDERED);
-
-        problem.setTimeStep(problem.getTimeStep()*10.0);
+        
+        problem.setTimeStep(problem.getTimeStep() * 10.0);
         problem.setTimeMax(2.0);
         problem.setSaveCount(1e1);
         problem.eneFile.setSaveCount(1e2);
         problem.dataFile.setFileType(FileType::ONE_FILE);
-        problem.run(studyNumber,1,argv);
+        problem.run(studyNumber, 1, argv);
     }
 }

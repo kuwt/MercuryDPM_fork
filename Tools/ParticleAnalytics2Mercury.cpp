@@ -142,42 +142,48 @@ public:
             cFile_ >> id1 >> id2;
             BaseParticle* p1 = dpm.particleHandler.getObjectById(id1);
             BaseParticle* p2 = dpm.particleHandler.getObjectById(id2);
-            logger.assert_debug(p1!=nullptr,"Particle % does not exist",id1);
-            logger.assert_debug(p2!=nullptr,"Particle % does not exist",id1);
-            Vec3D P1ToP2 = p2->getPosition()-p1->getPosition();
-            BaseInteraction* c = p1->getInteractionWith(p2,time,&dpm.interactionHandler);
-            logger.assert_debug(c!= nullptr,"Particle-particle interaction % % does not exist",p1,p2);
+            logger.assert_debug(p1 != nullptr, "Particle % does not exist", id1);
+            logger.assert_debug(p2 != nullptr, "Particle % does not exist", id1);
+            Vec3D P1ToP2 = p2->getPosition() - p1->getPosition();
+            BaseInteraction* c = p1->getInteractionWith(p2, time, &dpm.interactionHandler);
+            logger.assert_debug(c != nullptr, "Particle-particle interaction % % does not exist", p1, p2);
             c->setDistance(P1ToP2.getLength());
-            c->setNormal(P1ToP2/c->getDistance());
-            c->setOverlap(c->getDistance()-p1->getRadius()-p2->getRadius());
-            if (version_==Version::P3) {
+            c->setNormal(P1ToP2 / c->getDistance());
+            c->setOverlap(c->getDistance() - p1->getRadius() - p2->getRadius());
+            if (version_ == Version::P3)
+            {
                 cFile_ >> force;
-                contact = p1->getPosition()-P1ToP2*((p1->getRadius()-0.5*c->getOverlap())/c->getDistance());
-            } else {
+                contact = p1->getPosition() - P1ToP2 * ((p1->getRadius() - 0.5 * c->getOverlap()) / c->getDistance());
+            }
+            else
+            {
                 cFile_ >> contact >> force;
             }
             std::getline(cFile_, line);
             c->setContactPoint(contact);
             c->setForce(force);
-            if (i%(N/10)==0) {std::cout << "\r " << std::round((double)i/N*100) << '%'; std::cout.flush();}
+            if (i % (N / 10) == 0)
+            {
+                logger(INFO, "\r %", std::round((double) i / N * 100));
+            }
         }
-        std::cout << '\n';
-
+        logger(INFO, "");
+    
         //read first line p3w
         std::getline(wFile_, line);
         if (!line.compare(""))
             return false;
-
+    
         //read second line p3w
         wFile_ >> time >> N;
-        if (fabs(dpm.getTime()/time-1)>0.01)
-            logger(ERROR,"Timesteps in p3w and p3p do not agree");
+        if (fabs(dpm.getTime() / time - 1) > 0.01)
+            logger(ERROR, "Timesteps in p3w and p3p do not agree");
         dpm.interactionHandler.setStorageCapacity(N);
         std::getline(wFile_, line);
-
+    
         //read third line p3w
         std::getline(wFile_, line);
-
+    
         //create wall
         InfiniteWall wall;
         wall.setSpecies(dpm.speciesHandler.getObject(0));

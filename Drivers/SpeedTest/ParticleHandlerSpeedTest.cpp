@@ -36,25 +36,27 @@ int main()
     auto species = dpm.speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
     SphericalParticle particle(species);
     CubeInsertionBoundary insertionBoundary;
-    insertionBoundary.set(particle,1e6,{0,0,0},{10000,10000,10000},{0,0,0},{0,0,0},.5,.5);
-    insertionBoundary.setInitialVolume(1e5*constants::pi/6.);
+    insertionBoundary.set(particle, 1e6, {0, 0, 0}, {10000, 10000, 10000}, {0, 0, 0}, {0, 0, 0});
+    insertionBoundary.setInitialVolume(1e5 * constants::pi / 6.);
     insertionBoundary.checkBoundaryBeforeTimeStep(&dpm);
     size_t n = dpm.particleHandler.getSize();
-    logger(INFO,"Number of particles: %",n);
-    logger(INFO,"Size of particles: % bytes, % doubles",sizeof(particle),sizeof(particle)/sizeof(double));
-
+    logger(INFO, "Number of particles: %", n);
+    logger(INFO, "Size of particles: % bytes, % doubles", sizeof(particle), sizeof(particle) / sizeof(double));
+    
     // create a data vector
-    std::vector<std::array<double,82>> dataVector(n);
-    for (int i = 0; i < n; ++i) {
+    std::vector<std::array<double, 82>> dataVector(n);
+    for (int i = 0; i < n; ++i)
+    {
         dataVector[i][0] = dpm.particleHandler.getObject(i)->getPosition().X;
     }
-
+    
     // create a small data vector
-    std::vector<std::array<double,8>> smallDataVector(n);
-    for (int i = 0; i < n; ++i) {
+    std::vector<std::array<double, 8>> smallDataVector(n);
+    for (int i = 0; i < n; ++i)
+    {
         smallDataVector[i][0] = dpm.particleHandler.getObject(i)->getPosition().X;
     }
-
+    
     // create a particle vector
     std::vector<SphericalParticle> particleVector(n);
     for (int i = 0; i < n; ++i) {

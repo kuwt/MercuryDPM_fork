@@ -36,12 +36,12 @@ CubeDeletionBoundary::CubeDeletionBoundary() : DeletionBoundary()
 {
     posMin_ = Vec3D(0, 0, 0);
     posMax_ = Vec3D(0, 0, 0);
-    logger(DEBUG, "CubeDeletionBoundary::CubeDeletionBoundary() finished");
+    logger(DEBUG, "CubeDeletionBoundary::CubeDeletionBoundary() finished", true);
 }
 
 CubeDeletionBoundary::~CubeDeletionBoundary()
 {
-    logger(DEBUG, "CubeDeletionBoundary::~CubeDeletionBoundary() finished");
+    logger(DEBUG, "CubeDeletionBoundary::~CubeDeletionBoundary() finished", true);
 }
 
 void CubeDeletionBoundary::set(Vec3D posMin, Vec3D posMax)

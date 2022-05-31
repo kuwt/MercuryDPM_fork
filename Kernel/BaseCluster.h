@@ -314,7 +314,7 @@ public:
     /*!
      * \brief Overrides DPMBase write(): in this all variables needed by the program for restarting are written.
      */
-    void write(std::ostream& os, bool writeAllParticles ) const override;
+    void write(std::ostream& os, bool writeAllParticles) const override;
 
     /*!
      * \brief Overrides DPMBase read(): in this all variables needed by the program for restarting are read.

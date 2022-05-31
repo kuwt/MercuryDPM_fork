@@ -50,7 +50,7 @@ ConstantMassFlowMaserBoundary::ConstantMassFlowMaserBoundary()
 ConstantMassFlowMaserBoundary::ConstantMassFlowMaserBoundary(const PeriodicBoundary& periodicBoundary) : BaseBoundary(
         periodicBoundary)
 {
-    logger(INFO, "Constructor ConstantMassFlowMaserBoundary(const PeriodicBoundary&) started");
+    logger(INFO, "Constructor ConstantMassFlowMaserBoundary(const PeriodicBoundary&) started\n", Flusher::NO_FLUSH);
     distanceLeft_ = periodicBoundary.getDistanceLeft();
     distanceRight_ = periodicBoundary.getDistanceRight();
     normal_ = periodicBoundary.getNormal();
@@ -116,8 +116,8 @@ void ConstantMassFlowMaserBoundary::read(std::istream& is)
         speciesConversionMaserToNormal_[speciesHandler.getObject(value)] = speciesHandler.getObject(key);
     }
     logger(DEBUG, "Finished reading ConstantMassFlowMaserBoundary. \nNormal: % \nDistanceLeft: % \nDistanceRight: % "
-                  "\nGapsize: % \nMaserIsActivated: %", normal_, distanceLeft_, distanceRight_, gapSize_,
-           maserIsActivated_);
+                  "\nGapsize: % \nMaserIsActivated: %",
+           normal_, distanceLeft_, distanceRight_, gapSize_, maserIsActivated_);
 }
 
 /*!
@@ -321,16 +321,17 @@ void ConstantMassFlowMaserBoundary::addParticleToMaser(BaseParticle* p)
                 std::pair<const ParticleSpecies*, const ParticleSpecies*>(p->getSpecies(), newSpecies));
         speciesConversionMaserToNormal_.insert(
                 std::pair<const ParticleSpecies*, const ParticleSpecies*>(newSpecies, p->getSpecies()));
-        logger(INFO, "[ConstantMassFlowMaserBoundary::addParticleToMaser()] New species conversion created");
+        logger(INFO, "[ConstantMassFlowMaserBoundary::addParticleToMaser()] New species conversion created\n",
+               Flusher::NO_FLUSH);
         logger(INFO, "Original species ID: %, new species ID: %", p->getSpecies()->getId(), newSpecies->getId());
-        
+    
         //Copy over the mixed species. The delete is necessary here since it is overwritten with a copy of the old mixed
         //species, and otherwise the properties are not copied over correctly.
         //
         //setId and setIndex refer to the two different species which are present in this mixed species.
         //The highest species-index should appear first andis therefore the ID, while the second species-index is the
         //"index" of the mixed species.
-        for (const BaseSpecies* const s : speciesHandler)
+        for (const BaseSpecies* const s: speciesHandler)
         {
             if (s->getId() != newSpecies->getId() && s->getId() != p->getSpecies()->getId())
             {
@@ -402,11 +403,12 @@ void ConstantMassFlowMaserBoundary::activateMaser()
 {
     if (!maserIsActivated_)
     {
-        logger(INFO, "Going to add particles to the maser and shift the periodic maser boundaries");
+        logger(INFO, "Going to add particles to the maser and shift the periodic maser boundaries\n",
+               Flusher::NO_FLUSH);
         ParticleHandler& pH = getHandler()->getDPMBase()->particleHandler;
         gapSize_ = 6 * pH.getLargestParticleLocal()->getRadius();
         logger(INFO, "just before particle loop");
-        for (BaseParticle* const p : pH)
+        for (BaseParticle* const p: pH)
         {
             if (getDistance(p) > 0)
             {

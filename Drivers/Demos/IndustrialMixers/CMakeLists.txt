@@ -17,3 +17,7 @@ foreach(CPPFILE ${CPPFILES})
 	#All cpp folder and linked against MercuryBase
 	target_link_libraries(${EXECNAME} MercuryBase)
 endforeach()
+
+# copy all stl files to the build directory
+file(GLOB STLFILES  "*.stl")
+file(COPY ${STLFILES}  DESTINATION .)

@@ -159,7 +159,7 @@ public:
         
         if (fabs(time_ - t) < 1.e-9)
         {
-            std::cout << "Choose an other value for t" << std::endl;
+            logger(WARN, "Choose an other value for t");
             return 0;
         }
         else

@@ -31,7 +31,7 @@ foreach (TEST ${UNITTESTS} ${SELFTESTS})
 	get_filename_component(EXECNAME ${TEST} NAME_WE)
 	add_test(${EXECNAME} ${EXECNAME})
     #Set a 30 second timeout for each test.
-    set_tests_properties(${EXECNAME} PROPERTIES TIMEOUT 30)
+    set_tests_properties(${EXECNAME} PROPERTIES TIMEOUT 80)
 endforeach()
 
 if (Mercury_USE_MPI)
@@ -40,7 +40,7 @@ if (Mercury_USE_MPI)
             get_number_of_cores(${EXECNAME} NUMCORES)
         	add_test(${EXECNAME} mpiexec -n ${NUMCORES} ./${EXECNAME})
             #Set a 30 second timeout for each test.
-            set_tests_properties(${EXECNAME} PROPERTIES TIMEOUT 30)
+            set_tests_properties(${EXECNAME} PROPERTIES TIMEOUT 80)
 	endforeach()
 endif()
 

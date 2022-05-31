@@ -160,7 +160,9 @@ public:
     {
         nz = new_;
         if (getSystemDimensions() < 3)
-            std::cerr << "Warning in set_nz: dimension less than 3" << std::endl;
+        {
+            logger(WARN, "Warning in set_nz: dimension less than 3");
+        }
     }
     
     /*!

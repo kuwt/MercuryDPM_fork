@@ -150,9 +150,12 @@ void HGrid::clearFirstBaseParticleInBucket()
 ///\todo use logger everywhere
 void HGrid::info() const
 {
-    logger(INFO, "  numberOfBuckets %", numberOfBuckets_);
-    logger(INFO, "  cellOverSizeRatio %", cellOverSizeRatio_);
-    std::cout << "  cellSizes";
-    for (auto p: cellSizes_) std::cout << " " << p;
-    std::cout << '\n';
+    logger(INFO, "  numberOfBuckets %\n", Flusher::NO_FLUSH, numberOfBuckets_);
+    logger(INFO, "  cellOverSizeRatio %\n", Flusher::NO_FLUSH, cellOverSizeRatio_);
+    logger(INFO, "  cellSizes\n", Flusher::NO_FLUSH);
+    for (auto p: cellSizes_)
+    {
+        logger(INFO, " %\n", p, Flusher::NO_FLUSH);
+    }
+    logger(INFO, "");
 }

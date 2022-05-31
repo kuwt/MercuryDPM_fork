@@ -149,6 +149,16 @@ public:
     unitScalingFactorRadii = 1.0);
     
     /*!
+     * \brief create a PSD vector for a uniform distribution.
+     */
+    void setDistributionUniform(Mdouble radMin, Mdouble radMax, int numberOfBins);
+    
+    /*!
+     * \brief create a PSD vector for a normal distribution.
+     */
+    void setDistributionNormal(Mdouble mean, Mdouble standardDeviation, int numberOfBins);
+    
+    /*!
      * \brief Converts a PDF to a CDF by integration.
      */
     void convertProbabilityDensityToCumulative();
@@ -200,6 +210,11 @@ public:
     std::vector<RadiusAndProbability> getParticleSizeDistribution() const;
     
     /*!
+     * \brief set the PSD by a suitable vector.
+     */
+    void setParticleSizeDistribution(std::vector<RadiusAndProbability>);
+    
+    /*!
      * \brief Get the number of particles already inserted into the simulation.
      */
     int getInsertedParticleNumber() const;
@@ -228,6 +243,11 @@ public:
      * \brief get the size ratio (width) of the PSD.
      */
     Mdouble getSizeRatio() const;
+    
+    /*!
+     * \brief Check if the size ratio is too high and cut it
+     */
+    void cutHighSizeRatio();
     
     /*!
      * \brief compute raw momenta of the user defined PSD.
@@ -273,7 +293,6 @@ public:
      * \brief Determines if a certain value of the PSD vector is equal to a double.
      */
     friend Mdouble operator==(PSD::RadiusAndProbability l, Mdouble r);
-
 
 private:
     /*!

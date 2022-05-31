@@ -65,8 +65,7 @@ std::ostream& operator<<(std::ostream& os, FileType fileType)
         os << "MULTIPLE_FILES_PADDED";
     else
     {
-        std::cerr << "FileType not recognized" << std::endl;
-        exit(-1);
+        logger(ERROR, "FileType not recognized");
     }
     return os;
 }

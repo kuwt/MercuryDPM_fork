@@ -108,8 +108,7 @@ void MindlinSpecies::setSlidingDissipation(Mdouble new_dispt)
         slidingDissipation_ = new_dispt;
     else
     {
-        std::cerr << "Error in setSlidingDissipation" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setSlidingDissipation");
     }
 }
 
@@ -130,8 +129,7 @@ void MindlinSpecies::setSlidingFrictionCoefficient(Mdouble new_mu)
     }
     else
     {
-        std::cerr << "Error in setSlidingFrictionCoefficient" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setSlidingFrictionCoefficient");
     }
 }
 
@@ -150,8 +148,7 @@ void MindlinSpecies::setSlidingFrictionCoefficientStatic(Mdouble new_mu)
     }
     else
     {
-        std::cerr << "Error in setSlidingFrictionCoefficientStatic" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setSlidingFrictionCoefficientStatic");
     }
 }
 

@@ -8,7 +8,7 @@ using constants::pi;
 using mathsFunc::cubic;
 
 /**
- * A new test for the insertiion of liquid droplets.
+ * A new test for the insertion of liquid droplets.
  * Note, you need to create a species for the droplets that has liquidVolumeMax-0
  */
 int main()

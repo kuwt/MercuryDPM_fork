@@ -58,34 +58,37 @@ public:
 		setTimeMax(2000);
 		restartFile.setFileType(FileType::MULTIPLE_FILES);
 		dataFile.setFileType(FileType::NO_FILE);
-		fStatFile.setFileType(FileType::NO_FILE);
-                eneFile.setFileType(FileType::ONE_FILE);
-		//restartFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
-		//dataFile.setFileType(FileType::NO_FILE);
-		//fStatFile.setFileType(FileType::NO_FILE);
-		//eneFile.setFileType(FileType::ONE_FILE);
-
-		//1 is the base species
-		NumberFraction = 0.5;
-		createBaseSpecies();
-		setPolydispersity(1);
-		setDensityVariation(1);
-		
-		readArguments(argc, argv);
-		setName();
-	
-		//Save the info to disk
-		writeRestartFile();
-
-		//Check if the run has been done before
-		if (helpers::fileExists(dataFile.getName())) {
-			//If it has move on to the next run immedently
-		  std::cout << "Run " << getName() << " has already been done " << std::endl;
-		} else {
-			//launch this code
-			solve();
-		}
-	}
+        fStatFile.setFileType(FileType::NO_FILE);
+        eneFile.setFileType(FileType::ONE_FILE);
+        //restartFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
+        //dataFile.setFileType(FileType::NO_FILE);
+        //fStatFile.setFileType(FileType::NO_FILE);
+        //eneFile.setFileType(FileType::ONE_FILE);
+        
+        //1 is the base species
+        NumberFraction = 0.5;
+        createBaseSpecies();
+        setPolydispersity(1);
+        setDensityVariation(1);
+        
+        readArguments(argc, argv);
+        setName();
+        
+        //Save the info to disk
+        writeRestartFile();
+        
+        //Check if the run has been done before
+        if (helpers::fileExists(dataFile.getName()))
+        {
+            //If it has move on to the next run immedently
+            logger(INFO, "Run % has already been done", getName());
+        }
+        else
+        {
+            //launch this code
+            solve();
+        }
+    }
 	
 	///Sets variable values for particles that are created at the inflow
 	///Chooses between small species 0 and large species 1 according to the number fraction
@@ -111,33 +114,41 @@ public:
 	  inflowParticle_.setPosition(position);
 	  inflowParticle_.setVelocity(Vec3D(0.0,0.0,0.0));
 	}
-	
-	/// Sets radii such that the total volume remains constant, and rmax/rmin = Polydispersity
-	/// Also sets FixedParticleRadius to MinInflowParticleRadius to avoid Particles falling through
-	void setPolydispersity(double Polydispersity) {
-		if (Polydispersity>=1.) {
-		  setMinInflowParticleRadius(getFixedParticleRadius()*std::pow((NumberFraction+mathsFunc::cubic(Polydispersity)*(1-NumberFraction)),-1./3.));
-			setMaxInflowParticleRadius(getMinInflowParticleRadius()*Polydispersity);
-			setFixedParticleRadius(getMinInflowParticleRadius());
-			std::cout 
-			<< "r0=" << getMinInflowParticleRadius()
-			<< "r1=" << getMaxInflowParticleRadius()
-			<< "Numberfraction=" << NumberFraction
-			<< std::endl;
-	} else {
-		  std::cerr<<"Error: polydispersity " << Polydispersity << " needs to be >=1"<<std::endl; exit(1);
-		}
-	}
-
-	/// Changes density of (small) species 0
-	void setDensityVariation(double Densityvariation) {
-	  if (Densityvariation>0) speciesHandler.getObject(0)->setDensity(speciesHandler.getObject(1)->getDensity()*Densityvariation);
-		else {std::cerr<<"Error: densityvariation needs to be positive"<<std::endl; exit(-1);}
-		std::cout 
-		  << "rho0=" << speciesHandler.getObject(0)->getDensity()
-		  << "rho1=" << speciesHandler.getObject(1)->getDensity()
-		<< std::endl;
-	}
+    
+    /// Sets radii such that the total volume remains constant, and rmax/rmin = Polydispersity
+    /// Also sets FixedParticleRadius to MinInflowParticleRadius to avoid Particles falling through
+    void setPolydispersity(double Polydispersity)
+    {
+        if (Polydispersity >= 1.)
+        {
+            setMinInflowParticleRadius(getFixedParticleRadius() * std::pow(
+                    (NumberFraction + mathsFunc::cubic(Polydispersity) * (1 - NumberFraction)), -1. / 3.));
+            setMaxInflowParticleRadius(getMinInflowParticleRadius() * Polydispersity);
+            setFixedParticleRadius(getMinInflowParticleRadius());
+            logger(INFO, "r0=% r1=% Numberfraction=%", getMinInflowParticleRadius(), getMaxInflowParticleRadius(),
+                   NumberFraction);
+        }
+        else
+        {
+            logger(ERROR, "Polydispersity % needs to be >=1", Polydispersity);
+        }
+    }
+    
+    /// Changes density of (small) species 0
+    void setDensityVariation(double Densityvariation)
+    {
+        if (Densityvariation > 0)
+        {
+            speciesHandler.getObject(0)->setDensity(speciesHandler.getObject(1)->getDensity()
+                                                    * Densityvariation);
+        }
+        else
+        {
+            logger(ERROR, "Densityvariation needs to be positive");
+        }
+        logger(INFO, "rho0=% rho1=%", speciesHandler.getObject(0)->getDensity(),
+               speciesHandler.getObject(1)->getDensity());
+    }
 
         double getDensityVariation(){return speciesHandler.getObject(0)->getDensity()/speciesHandler.getObject(1)->getDensity();}
 	

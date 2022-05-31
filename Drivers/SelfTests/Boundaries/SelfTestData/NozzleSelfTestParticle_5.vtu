@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!-- time 1.00013-->
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="3" NumberOfCells="0">
+<Points>
+  <DataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii">
+	-0.0209654 -0.063084 0.0730341
+	-0.0157924 -0.0649514 0.0297762
+	-0.022367 -0.0625035 0.0121096
+  </DataArray>
+</Points>
+<PointData  Vectors="vector">
+  <DataArray type="Float32" Name="Velocity" NumberOfComponents="3" format="ascii">
+ 0.177379 -0.0520928 -0.0124891
+ 0.0447639 -0.0400479 0.0304677
+ 0.0316687 -0.0104024 0.0322543
+  </DataArray>
+  <DataArray type="Float32" Name="Radius" format="ascii">
+	0.008
+	0.008
+	0.008
+  </DataArray>
+  <DataArray type="Float32" Name="speciesType" format="ascii">
+	0
+	0
+	0
+  </DataArray>
+  <DataArray type="Float32" Name="fullLiquidVolume" format="ascii">
+	3.10831e-07
+	2.6147e-07
+	3.50989e-07
+  </DataArray>
+  <DataArray type="Float32" Name="liquidFilmVolume" format="ascii">
+	3.05831e-07
+	2.5647e-07
+	3.45989e-07
+  </DataArray>
+  <DataArray type="Float32" Name="liquidBridgeVolume" format="ascii">
+	5e-09
+	5e-09
+	5e-09
+  </DataArray>
+</PointData>
+<Cells>
+  <DataArray type="Int32" Name="connectivity" format="ascii">
+  </DataArray>
+  <DataArray type="Int32" Name="offsets" format="ascii">
+  </DataArray>
+  <DataArray type="UInt8"  Name="types" format="ascii">
+  </DataArray>
+</Cells>
+</Piece>
+</UnstructuredGrid>
+</VTKFile>

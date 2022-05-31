@@ -53,9 +53,12 @@ int main(int argc, char *argv[]) {
 			else if (!strcmp(argv[i+1],"XY")) T = XY;
 			else if (!strcmp(argv[i+1],"X")) T = X;
 			else if (!strcmp(argv[i+1],"Y")) T = Y;
-			else if (!strcmp(argv[i+1],"Z")) T = Z;
-			else if (!strcmp(argv[i+1],"O")) T = O;
-			else {std::cerr << "stattype unknown" << std::endl; exit(-1);}
+			else if (!strcmp(argv[i + 1], "Z")) T = Z;
+            else if (!strcmp(argv[i + 1], "O")) T = O;
+            else
+            {
+                logger(ERROR, "stattype unknown");
+            }
 		}
 	}
  	if (T==XY) { // averaging in z-direction
@@ -117,12 +120,18 @@ int main(int argc, char *argv[]) {
 // 		std::cout << "cylindrical, AZ averaging" << std::endl;
 // 		StatisticsVector<R> stats(argc, argv);
 // 		stats.statistics_from_p3();
-	} else if (T==XYZ) { //no averaging
-		logger(INFO, "Creating non-averaged statistics");
-		StatisticsVector<XYZ> stats(argc, argv);
-		//std::cout << "stats" << std::endl;
-		stats.statistics_from_p3();
-	} else {std::cerr << "stattype not found" << std::endl; exit(-1); }
+    }
+    else if (T == XYZ)
+    { //no averaging
+        logger(INFO, "Creating non-averaged statistics");
+        StatisticsVector<XYZ> stats(argc, argv);
+        //std::cout << "stats" << std::endl;
+        stats.statistics_from_p3();
+    }
+    else
+    {
+        logger(ERROR, "stattype not found");
+    }
 	return 0;
 }
 	

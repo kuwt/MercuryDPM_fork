@@ -67,21 +67,18 @@ void HGridOptimiser::initialise(const MercuryBase& problem, unsigned int numberO
     
     if (verbosity > 0)
     {
-        std::cout << "rMin=" << rMin_ << " rMax=" << rMax_ << " NParticles=" << numParticles << std::endl;
+        logger(INFO, "rMin=% rMax=% NParticles=%\n", Flusher::NO_FLUSH, rMin_, rMax_, numParticles);
         for (unsigned int i = 0; i < cellN_.size(); i++)
         {
-            std::cout << "From" << std::setw(8) << cell2Min(i) << " to" << std::setw(8) << cell2Max(i) << " number="
-                      << std::setw(5) << cellN_[i] << std::endl;
+            logger(INFO, "From %.8 to %.8 number=%.5\n", Flusher::NO_FLUSH, cell2Min(i), cell2Max(i), cellN_[i]);
         }
-        std::cout << "Domain size [" << problem.getXMin() << "," << problem.getXMax() << "]x[" << problem.getYMin()
-                  << "," << problem.getYMax() << "]x[" << problem.getZMin() << "," << problem.getZMax() << "]"
-                  << std::endl;
-        
+        logger(INFO, "Domain size [%,%]x[%,%]x[%,%]\n",
+               Flusher::NO_FLUSH, problem.getXMin(), problem.getXMax(), problem.getYMin(), problem.getYMax(), problem
+                       .getZMin(), problem.getZMax());
         for (unsigned int i = 0; i < intCellN.size() - 1; i++)
         {
-            std::cout << "From" << std::setw(8) << intCell2Min(i) << " to" << std::setw(8) << intCell2Max(i)
-                      << " linear from " << std::setw(8) << intCellN[i] << " to " << std::setw(8) << intCellN[i + 1]
-                      << std::endl;
+            logger(INFO, "From %.8 to %.8 linear from %.8 to %.8",
+                   intCell2Min(i), intCell2Max(i), intCellN[i], intCellN[i + 1]);
         }
         /*std::cout<<"["<<cellN_[0];
          for (unsigned int i=1;i<cellN_.size();i++)
@@ -144,18 +141,16 @@ HGridOptimiser::initialisePolyFunc(double omega, std::vector<double>& coeff, uns
     
     if (verbosity > 0)
     {
-        std::cout << "rMin=" << rMin_ << " rMax=" << rMax_ << std::endl;
+        logger(INFO, "rMin=% rMax=%\n", Flusher::NO_FLUSH, rMin_, rMax_);
         for (unsigned int i = 0; i < cellN_.size(); i++)
         {
-            std::cout << "From" << std::setw(8) << cell2Min(i) << " to" << std::setw(8) << cell2Max(i) << " number="
-                      << std::setw(5) << cellN_[i] << std::endl;
+            logger(INFO, "From %.8 to %.8 number=%.5\n", Flusher::NO_FLUSH, cell2Min(i), cell2Max(i), cellN_[i]);
         }
         
         for (unsigned int i = 0; i < intCellN.size() - 1; i++)
         {
-            std::cout << "From" << std::setw(8) << intCell2Min(i) << " to" << std::setw(8) << intCell2Max(i)
-                      << " linear from " << std::setw(8) << intCellN[i] << " to " << std::setw(8) << intCellN[i + 1]
-                      << std::endl;
+            logger(INFO, "From %.8 to %.8 linear from %.8 to %.8",
+                   intCell2Min(i), intCell2Max(i), intCellN[i], intCellN[i + 1]);
         }
     }
 }
@@ -473,16 +468,13 @@ HGridOptimiser::calculateDiffWork(std::vector<double>& hGridCellSizes, std::vect
     
     if (verbosity > 0)
     {
-        std::cout << "Length scale=" << length_ << std::endl;
-    }
-    if (verbosity > 0)
-    {
-        std::cout << "Level sizes:";
+        logger(INFO, "Length scale=%\n", Flusher::NO_FLUSH, length_);
+        logger(INFO, "Level sizes:", Flusher::NO_FLUSH);
         for (unsigned int i = 0; i < NParams; i++)
         {
-            std::cout << " " << hGridCellSizes[i];
+            logger(INFO, " %", hGridCellSizes[i], Flusher::NO_FLUSH);
         }
-        std::cout << std::endl;
+        logger(INFO, "");
     }
     
     std::vector<double> particlesPerLevel;
@@ -496,12 +488,12 @@ HGridOptimiser::calculateDiffWork(std::vector<double>& hGridCellSizes, std::vect
     }
     if (verbosity > 0)
     {
-        std::cout << "Particles per level: ";
+        logger(INFO, "Particles per level:\n", Flusher::NO_FLUSH);
         for (unsigned int i = 0; i < NLevels; i++)
         {
-            std::cout << " " << particlesPerLevel[i];
+            logger(INFO, " %", particlesPerLevel[i], Flusher::NO_FLUSH);
         }
-        std::cout << std::endl;
+        logger(INFO, "");
     }
     
     //How changes particlesPerLeve[i] when hGridCellSize[j] is changed
@@ -524,14 +516,14 @@ HGridOptimiser::calculateDiffWork(std::vector<double>& hGridCellSizes, std::vect
     }
     if (verbosity > 0)
     {
-        std::cout << "Diff Particles per level: " << std::endl;
+        logger(INFO, "Diff Particles per level: \n", Flusher::NO_FLUSH);
         for (unsigned int i = 0; i < NLevels; i++)
         {
             for (unsigned int j = 0; j < NParams; j++)
             {
-                std::cout << " " << std::setw(12) << diffParticlesPerLevel[i][j];
+                logger(INFO, " %.12", diffParticlesPerLevel[i][j], Flusher::NO_FLUSH);
             }
-            std::cout << std::endl;
+            logger(INFO, "");
         }
     }
     
@@ -542,15 +534,15 @@ HGridOptimiser::calculateDiffWork(std::vector<double>& hGridCellSizes, std::vect
     }
     if (verbosity > 0)
     {
-        std::cout << "Cells per level: ";
+        logger(INFO, "Cells per level:", Flusher::NO_FLUSH);
         for (unsigned int i = 0; i < NLevels; i++)
         {
-            std::cout << " " << cellsPerLevel[i];
+            logger(INFO, " %", cellsPerLevel[i], Flusher::NO_FLUSH);
         }
-        std::cout << std::endl;
+        logger(INFO, "");
     }
     
-    //How changes cellsPerLevel[i] when hGridCellSize[j] is changed    
+    //How changes cellsPerLevel[i] when hGridCellSize[j] is changed
     std::vector<std::vector<double> > diffCellsPerLevel;
     diffCellsPerLevel.resize(hGridCellSizes.size());
     for (unsigned int i = 0; i < NLevels; i++)
@@ -570,14 +562,14 @@ HGridOptimiser::calculateDiffWork(std::vector<double>& hGridCellSizes, std::vect
     }
     if (verbosity > 0)
     {
-        std::cout << "Diff Cells per level: " << std::endl;
+        logger(INFO, "Diff Cells per level: \n", Flusher::NO_FLUSH);
         for (unsigned int i = 0; i < NLevels; i++)
         {
             for (unsigned int j = 0; j < NParams; j++)
             {
-                std::cout << " " << std::setw(12) << diffCellsPerLevel[i][j];
+                logger(INFO, " %.12", diffCellsPerLevel[i][j], Flusher::NO_FLUSH);
             }
-            std::cout << std::endl;
+            logger(INFO, "");
         }
     }
     
@@ -588,15 +580,15 @@ HGridOptimiser::calculateDiffWork(std::vector<double>& hGridCellSizes, std::vect
     }
     if (verbosity > 0)
     {
-        std::cout << "Particles per cell: ";
+        logger(INFO, "Particles per cell:", Flusher::NO_FLUSH);
         for (double i : particlesPerCell)
         {
-            std::cout << " " << i;
+            logger(INFO, " %", i, Flusher::NO_FLUSH);
         }
-        std::cout << std::endl;
+        logger(INFO, "");
     }
     
-    //How changes particlesPerCell[i] when hGridCellSize[j] is changed    
+    //How changes particlesPerCell[i] when hGridCellSize[j] is changed
     std::vector<std::vector<double> > diffParticlesPerCell;
     diffParticlesPerCell.resize(NLevels);
     for (unsigned int i = 0; i < NLevels; i++)
@@ -610,14 +602,14 @@ HGridOptimiser::calculateDiffWork(std::vector<double>& hGridCellSizes, std::vect
     }
     if (verbosity > 0)
     {
-        std::cout << "Diff Particles per Cell: " << std::endl;
+        logger(INFO, "Diff Particles per Cell: \n", Flusher::NO_FLUSH);
         for (unsigned int i = 0; i < NLevels; i++)
         {
             for (unsigned int j = 0; j < NParams; j++)
             {
-                std::cout << " " << std::setw(12) << diffParticlesPerCell[i][j];
+                logger(INFO, " %.12", diffParticlesPerCell[i][j], Flusher::NO_FLUSH);
             }
-            std::cout << std::endl;
+            logger(INFO, "");
         }
     }
     
@@ -704,27 +696,27 @@ HGridOptimiser::calculateDiffWork(std::vector<double>& hGridCellSizes, std::vect
     }
     if (verbosity > 0)
     {
-        std::cout << "Contact work: " << contactWork << std::endl;
-        std::cout << "Overhead work: " << cellCheckOverContactCheckRatio_ * overheadWork << std::endl;
-        std::cout << "Sum work: " << contactWork + cellCheckOverContactCheckRatio_ * overheadWork << std::endl;
-        std::cout << "diff Contactwork: ";
+        logger(INFO, "Contact work: %\n"
+                     "Overhead work: %\n"
+                     "Sum work: %\n",
+               contactWork, cellCheckOverContactCheckRatio_ * overheadWork,
+               contactWork + cellCheckOverContactCheckRatio_ * overheadWork, Flusher::NO_FLUSH);
         for (unsigned int j = 0; j < NParams; j++)
         {
-            std::cout << " " << diffContactWork[j];
+            logger(INFO, "diff Contactwork: %", diffContactWork[j], Flusher::NO_FLUSH);
         }
-        std::cout << std::endl;
-        std::cout << "diff Overheadwork: ";
+        logger(INFO, "\ndiff Overheadwork: ", Flusher::NO_FLUSH);
         for (unsigned int j = 0; j < NParams; j++)
         {
-            std::cout << " " << cellCheckOverContactCheckRatio_ * diffOverheadWork[j];
+            logger(INFO, " %", cellCheckOverContactCheckRatio_ * diffOverheadWork[j], Flusher::NO_FLUSH);
         }
-        std::cout << std::endl;
-        std::cout << "diff sum: ";
+        logger(INFO, "\ndiff sum: ", Flusher::NO_FLUSH);
         for (unsigned int j = 0; j < NParams; j++)
         {
-            std::cout << " " << diffContactWork[j] + cellCheckOverContactCheckRatio_ * diffOverheadWork[j];
+            logger(INFO, " %", diffContactWork[j] + cellCheckOverContactCheckRatio_ * diffOverheadWork[j],
+                   Flusher::NO_FLUSH);
         }
-        std::cout << std::endl;
+        logger(INFO, "");
     }
     dfdx.clear();
     for (unsigned int j = 0; j < NParams; j++)
@@ -740,16 +732,16 @@ double HGridOptimiser::calculateWork(std::vector<double>& hGridCellSizes, HGridM
     
     if (verbosity > 1)
     {
-        std::cout << "Length scale=" << length_ << std::endl;
+        logger(INFO, "Length scale=%", length_);
     }
     if (verbosity > 0)
     {
-        std::cout << "Level sizes:" << std::endl;
+        logger(INFO, "Level sizes:\n", Flusher::NO_FLUSH);
         for (unsigned int i = 0; i < NParams; i++)
         {
-            std::cout << std::setw(10) << hGridCellSizes[i] << " ";
+            logger(INFO, "%.10 ", hGridCellSizes[i], Flusher::NO_FLUSH);
         }
-        std::cout << std::endl;
+        logger(INFO, "");
     }
     
     std::vector<double> particlesPerLevel;
@@ -763,12 +755,12 @@ double HGridOptimiser::calculateWork(std::vector<double>& hGridCellSizes, HGridM
     }
     if (verbosity > 0)
     {
-        std::cout << "Particles per level:" << std::endl;
+        logger(INFO, "Particles per level:\n", Flusher::NO_FLUSH);
         for (unsigned int i = 0; i < NLevels; i++)
         {
-            std::cout << std::setw(10) << particlesPerLevel[i] << " ";
+            logger(INFO, "%.10 ", particlesPerLevel[i], Flusher::NO_FLUSH);
         }
-        std::cout << std::endl;
+        logger(INFO, "");
     }
     
     std::vector<double> cellsPerLevel;
@@ -778,12 +770,12 @@ double HGridOptimiser::calculateWork(std::vector<double>& hGridCellSizes, HGridM
     }
     if (verbosity > 1)
     {
-        std::cout << "Cells per level:" << std::endl;
+        logger(INFO, "Cells per level:\n", Flusher::NO_FLUSH);
         for (unsigned int i = 0; i < NLevels; i++)
         {
-            std::cout << std::setw(10) << cellsPerLevel[i] << " ";
+            logger(INFO, "%.10 ", cellsPerLevel[i], Flusher::NO_FLUSH);
         }
-        std::cout << std::endl;
+        logger(INFO, "");
     }
     
     std::vector<double> particlesPerCell;
@@ -793,12 +785,12 @@ double HGridOptimiser::calculateWork(std::vector<double>& hGridCellSizes, HGridM
     }
     if (verbosity > 1)
     {
-        std::cout << "Particles per cell:" << std::endl;
+        logger(INFO, "Particles per cell:\n", Flusher::NO_FLUSH);
         for (double i : particlesPerCell)
         {
-            std::cout << std::setw(10) << i << " ";
+            logger(INFO, "%.10 ", i, Flusher::NO_FLUSH);
         }
-        std::cout << std::endl;
+        logger(INFO, "");
     }
     
     std::vector<std::vector<double> > contactWork;
@@ -860,25 +852,25 @@ double HGridOptimiser::calculateWork(std::vector<double>& hGridCellSizes, HGridM
     
     if (verbosity > 0)
     {
-        std::cout << "Contact work: " << totalContactWork << std::endl;
+        logger(INFO, "Contact work: %\n", Flusher::NO_FLUSH, totalContactWork);
         for (unsigned int i = 0; i < NLevels; i++)
         {
             for (unsigned int j = 0; j < NLevels; j++)
             {
-                std::cout << std::setw(10) << contactWork[i][j] << " ";
+                logger(INFO, "%.10 ", contactWork[i][j], Flusher::NO_FLUSH);
             }
-            std::cout << std::endl;
+            logger(INFO, "");
         }
-        std::cout << "Overhead work: " << totalOverheadWork << std::endl;
+        logger(INFO, "Overhead work: %\n", Flusher::NO_FLUSH, totalOverheadWork);
         for (unsigned int i = 0; i < NLevels; i++)
         {
             for (unsigned int j = 0; j < NLevels; j++)
             {
-                std::cout << std::setw(10) << overheadWork[i][j] << " ";
+                logger(INFO, "%.10 ", overheadWork[i][j], Flusher::NO_FLUSH);
             }
-            std::cout << std::endl;
+            logger(INFO, "");
         }
-        std::cout << "Total work: " << totalContactWork + totalOverheadWork << std::endl;
+        logger(INFO, "Total work: %", totalContactWork + totalOverheadWork);
     }
     return totalContactWork + cellCheckOverContactCheckRatio_ * totalOverheadWork;
 }
@@ -888,7 +880,7 @@ void HGridOptimiser::calcDfDx(std::vector<double>& hGridCellSizes, std::vector<d
 {
     if (verbosity > 0)
     {
-        std::cout << "calcDfDx" << std::endl;
+        logger(VERBOSE, "calcDfDx\n", Flusher::NO_FLUSH);
     }
     double W = calculateWork(hGridCellSizes, method, verbosity - 1);
     double dx = 1e-7;
@@ -902,8 +894,7 @@ void HGridOptimiser::calcDfDx(std::vector<double>& hGridCellSizes, std::vector<d
         hGridCellSizes[i] -= dx;
         if (verbosity > 0)
         {
-            std::cout << "i=" << i << " Value=" << hGridCellSizes[i] << " Change=" << nW - W << " dfdx=" << dfdx.back()
-                      << std::endl;
+            logger(INFO, "i= Value=% Change=% dfdx=%", i, hGridCellSizes[i], nW - W, dfdx.back());
         }
     }
 }
@@ -912,7 +903,7 @@ double HGridOptimiser::checkLimit(std::vector<double>& hGridCellSizes, std::vect
 {
     if (verbosity > 0)
     {
-        std::cout << "checkLimits part 1 remove levels" << std::endl;
+        logger(VERBOSE, "checkLimits part 1 remove levels");
     }
     
     dfdx[0] = 0;
@@ -925,7 +916,7 @@ double HGridOptimiser::checkLimit(std::vector<double>& hGridCellSizes, std::vect
             {
                 if (verbosity > 0)
                 {
-                    std::cout << "Remove level" << i << std::endl;
+                    logger(INFO, "Remove level %", Flusher::NO_FLUSH, i);
                 }
                 if (i > 0.5 * hGridCellSizes.size())
                 {
@@ -944,10 +935,10 @@ double HGridOptimiser::checkLimit(std::vector<double>& hGridCellSizes, std::vect
     
     if (verbosity > 0)
     {
-        std::cout << "checkLimits part 2 calculate limit" << std::endl;
+        logger(VERBOSE, "checkLimits part 2 calculate limit\n", Flusher::NO_FLUSH);
         for (unsigned int i = 0; i < hGridCellSizes.size(); i++)
         {
-            std::cout << "i=" << i << " Value=" << hGridCellSizes[i] << " dfdx=" << dfdx[i] << std::endl;
+            logger(INFO, "i=% Value=% dfdx=%\n", Flusher::NO_FLUSH, i, hGridCellSizes[i], dfdx[i]);
         }
     }
     double maxStepSize = -std::numeric_limits<double>::max();
@@ -957,8 +948,8 @@ double HGridOptimiser::checkLimit(std::vector<double>& hGridCellSizes, std::vect
         nmax = (hGridCellSizes[i - 1] - hGridCellSizes[i]) / (dfdx[i] - dfdx[i - 1]);
         if (verbosity > 0)
         {
-            std::cout << "Max f=" << nmax << " because otherwise " << hGridCellSizes[i - 1] << "+x*" << dfdx[i - 1]
-                      << ">" << hGridCellSizes[i] << "+x*" << dfdx[i] << std::endl;
+            logger(INFO, "Max f=% because otherwise %+x*% > %+x*%\n", Flusher::NO_FLUSH,
+                   nmax, hGridCellSizes[i - 1], dfdx[i - 1], hGridCellSizes[i], dfdx[i]);
         }
         if (nmax < 0)
         {
@@ -967,7 +958,7 @@ double HGridOptimiser::checkLimit(std::vector<double>& hGridCellSizes, std::vect
     }
     if (verbosity > 0)
     {
-        std::cout << "maxStepSize=" << maxStepSize << std::endl;
+        logger(INFO, "maxStepSize=%", maxStepSize);
     }
     return maxStepSize;
 }
@@ -977,15 +968,14 @@ void HGridOptimiser::applyStep(std::vector<double>& hGridCellSizes, std::vector<
 {
     if (verbosity > 0)
     {
-        std::cout << "Apply step:" << std::endl;
+        logger(VERBOSE, "Apply step:\n", Flusher::NO_FLUSH);
     }
     for (unsigned int i = 0; i < hGridCellSizes.size() - 1; i++)
     {
         hGridCellSizes[i] += stepsize * dfdx[i];
         if (verbosity > 0)
         {
-            std::cout << "hGridCellSizes[i]" << "+" << stepsize << "*" << dfdx[i] << "=" << hGridCellSizes[i]
-                      << std::endl;
+            logger(INFO, "hGridCellSizes[i]+%*%=%", stepsize, dfdx[i], hGridCellSizes[i]);
         }
     }
 }
@@ -1024,8 +1014,7 @@ HGridOptimiser::goldenSectionSearch(std::vector<double>& startHGridCellSizes, st
     double xWork = calculateWork(xHGridCellSizes, method, 0);
     if (verbosity > 0)
     {
-        std::cout << "min=" << min << " max=" << max << " cur=" << cur << " curWork=" << curWork << " x=" << x
-                  << " xWork=" << xWork << std::endl;
+        logger(INFO, "min=% max=% cur=% curWork=% x=% xWork=%", min, max, cur, curWork, x, xWork);
     }
     if (xWork < curWork) //x is better
     {
@@ -1076,7 +1065,7 @@ void HGridOptimiser::getOptimalDistribution(std::vector<double>& hGridCellSizes,
         {
             if (verbosity > 1)
             {
-                std::cout << stepNumber << " Bad step, trying closer search range" << std::endl;
+                logger(INFO, "% Bad step, trying closer search range\n", Flusher::NO_FLUSH, stepNumber);
             }
             applyStep(hGridCellSizes, dfdx, -step, verbosity - 3);
             max /= 2;
@@ -1087,20 +1076,19 @@ void HGridOptimiser::getOptimalDistribution(std::vector<double>& hGridCellSizes,
         ++stepNumber;
         if (verbosity > 1)
         {
-            std::cout << stepNumber << " Correct step: old work=" << oW << " new work=" << W << " difference=" << oW - W
-                      << " step=" << step / max << std::endl;
+            logger(INFO, "% Correct step: old work=% new work=% difference=& step=%\n", Flusher::NO_FLUSH,
+                   stepNumber, oW, W, oW - W, step / max);
         }
     } while (oW - W > 1e-13 && stepNumber);
     calculateDiffWork(hGridCellSizes, dfdx, method, verbosity - 2);
     if (verbosity > 0)
     {
-        std::cout << "Work=" << W << std::endl;
-        std::cout << "Optimal cell sizes:";
+        logger(INFO, "Work=%\nOptimal cell sizes:", W, Flusher::NO_FLUSH);
         for (double hGridCellSize : hGridCellSizes)
         {
-            std::cout << " " << hGridCellSize;
+            logger(INFO, " %", hGridCellSize, Flusher::NO_FLUSH);
         }
-        std::cout << std::endl;
+        logger(INFO, "");
     }
 }
 
@@ -1127,12 +1115,13 @@ void HGridOptimiser::histNumberParticlesPerCell(std::vector<double>& hGridCellSi
     for (unsigned int i = 0; i < NLevels; i++)
     {
         double l = particlesPerLevel[i] / cellsPerLevel[i];
-        std::cout << "Histogram for level " << i << ":";
+        logger(INFO, "Histogram for level %:", i, Flusher::NO_FLUSH);
         for (unsigned int k = 0; k <= 10; k++)
         {
-            std::cout << " " << std::setw(8)
-                      << std::floor(std::pow(l, k) * std::exp(-l) / mathsFunc::factorial(k) * 1e4 * cellsPerLevel[i]);
+            logger(INFO, " %.8",
+                   std::floor(std::pow(l, k) * std::exp(-l) / mathsFunc::factorial(k) * 1e4 * cellsPerLevel[i]),
+                   Flusher::NO_FLUSH);
         }
-        std::cout << std::endl;
+        logger(INFO, "");
     }
 }

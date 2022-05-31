@@ -19,7 +19,7 @@ void DropletBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
         d.position += dt*d.velocity;
     }
     // check for interaction with particles; this is costly, so we only do iit every 50 time steps
-    if (dpm->getNumberOfTimeSteps()%50==0) {
+    if (dpm->getNumberOfTimeSteps()%checkCount==0) {
         LiquidFilmParticle p;
         p.setSpecies(dpm->speciesHandler.getLastObject());
         for (auto &d : droplets_) {
@@ -34,8 +34,21 @@ void DropletBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
                 }
                 d.radius = 0;
             }
-
+            // check for interactions with walls
+            for (BaseWall* w : dpm->wallHandler) {
+                Mdouble distance;
+                Vec3D normal_return;
+                double overlap;
+                //Checks if the particle is interacting with the current wall
+                bool inContact = w->getDistanceNormalOverlap(p, distance, normal_return, overlap);
+                // if there is a wall interacting with the droplet
+                if (inContact) {
+                    //set droplet radius to zero
+                    d.radius = 0;
+                }
+            }
         }
+        // erase all droplets of radius 0
         droplets_.erase(std::remove_if(droplets_.begin(), droplets_.end(),
                                        [](const Droplet &d) { return d.radius == 0; }), droplets_.end());
     }
@@ -52,6 +65,7 @@ void DropletBoundary::read(std::istream& is)
     size_t n;
     Vec3D position, velocity;
     double radius;
+    is >> dummy >> checkCount;
     is >> dummy >> n;
     droplets_.reserve(n);
     droplets_.resize(0);
@@ -68,6 +82,7 @@ void DropletBoundary::read(std::istream& is)
 void DropletBoundary::write(std::ostream& os) const
 {
     BaseBoundary::write(os);
+    os << " checkCount " << checkCount;
     os << " n " << droplets_.size();
     for (auto& d : droplets_) {
         os << " " << d.position;

@@ -210,7 +210,7 @@ Mdouble mathsFunc::goldenSectionSearch(Mdouble(* function)(const Mdouble), Mdoub
     {
         return 0.5 * (min + max);
     }
-    std::cout << "Min=" << min << " Max=" << max << " diff=" << max - min << std::endl;
+    logger(INFO, "Min=% Max=% diff= %", min, max, max - min);
     Mdouble resphi = 2 - 0.5 * (1 + std::sqrt(5));
     Mdouble x;
     if (max - cur > cur - min)

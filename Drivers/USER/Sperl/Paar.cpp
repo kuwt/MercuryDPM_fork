@@ -202,7 +202,7 @@ public:
         dif.Z = 0.1*(getMax().Z-getMin().Z);
         double insertedFraction;
         do {
-            b.set(p, 10000, min, min+dif, {0, 0, 0}, {0, 0, 0}, rMin, rMax);
+            b.set(p, 10000, min, min + dif, {0, 0, 0}, {0, 0, 0});
             // Choose a volume of particles that fills the cylinder to the filling height when settled
             // (assuming a solid volume fraction of 0.64)
             b.setInitialVolume(0.9*0.64 * constants::pi * mathsFunc::square(cylinderRadius) * fillingHeight);

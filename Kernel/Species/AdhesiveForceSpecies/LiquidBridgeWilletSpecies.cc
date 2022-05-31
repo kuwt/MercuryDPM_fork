@@ -121,8 +121,7 @@ void LiquidBridgeWilletSpecies::setLiquidBridgeVolume(Mdouble liquidBridgeVolume
     }
     else
     {
-        std::cerr << "Error in setLiquidBridgeVolume(" << liquidBridgeVolume << ")" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setLiquidBridgeVolume(%)", liquidBridgeVolume);
     }
 }
 
@@ -143,8 +142,7 @@ void LiquidBridgeWilletSpecies::setSurfaceTension(Mdouble surfaceTension)
         surfaceTension_ = surfaceTension;
     else
     {
-        std::cerr << "Error in setSurfaceTension" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setSurfaceTension");
     }
 }
 

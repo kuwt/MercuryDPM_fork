@@ -32,16 +32,16 @@
 
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
-    std::cout << "Running HelperFunctionsUnitTest" << std::endl;
-
-    std::cout << "  Testing getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep" << std::endl;
+    logger(VERBOSE, "Running HelperFunctionsUnitTest\n"
+                    "  Testing getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep");
+    
     unsigned int saveCount = helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(21, 10, 0.001);
     if (saveCount != 501)
     {
         logger(ERROR, "save count is %, but should be %", saveCount, 501);
     }
-
-    std::cout << "  Testing getLineFromStringStream" << std::endl;
+    
+    logger(VERBOSE, "  Testing getLineFromStringStream");
     std::stringstream is("1.0\n2.000000000000001\n3.0");
     std::stringstream line;
     helpers::getLineFromStringStream(is, line);
@@ -58,21 +58,21 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     {
         logger(ERROR, "value is %, but should be %", value, 2.000000000000001);
     }
-
-    std::cout << "  Testing writeToFile, open" << std::endl;
+    
+    logger(VERBOSE, "  Testing writeToFile, open");
     helpers::writeToFile("HelperFunctionsUnitTest.ini",
                          "1 0 0 0 0 1 1 1\n"
                          "0.5 0.5 0  0 0 0.5  0  0 0 0  0 0 0  0\n");
     std::fstream file;
-    helpers::openFile(file,"HelperFunctionsUnitTest.ini",std::fstream::in);
-    value=0.0;
+    helpers::openFile(file, "HelperFunctionsUnitTest.ini", std::fstream::in);
+    value = 0.0;
     file >> value;
     if (value != 1.0)
     {
         logger(ERROR, "value is %, but should be %", value, 1.0);
     }
-
-    std::cout << "  Testing writeToFile, open" << std::endl;
+    
+    logger(VERBOSE, "  Testing writeToFile, open");
     bool fileExists = helpers::fileExists("HelperFunctionsUnitTest.ini");
     if (fileExists != true)
     {
@@ -83,16 +83,16 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     {
         logger(ERROR, "HelperFunctionsUnitTest.out does not exist, but is detected");
     }
-
-    std::cout << "  Testing getEffectiveMass" << std::endl;
-    Mdouble effectiveMass = helpers::getEffectiveMass(1.0,2.0);
-    if (!mathsFunc::isEqual(effectiveMass, 2.0/3.0, 1e-10))
-    {
-        logger(ERROR, "effective mass is %, but should be %", effectiveMass, 2.0/3.0);
-    }
-
     
-    std::cout << "Running LinearViscoelasticSpecies helper functions unit test" << std::endl;
+    logger(VERBOSE, "  Testing getEffectiveMass");
+    Mdouble effectiveMass = helpers::getEffectiveMass(1.0, 2.0);
+    if (!mathsFunc::isEqual(effectiveMass, 2.0 / 3.0, 1e-10))
+    {
+        logger(ERROR, "effective mass is %, but should be %", effectiveMass, 2.0 / 3.0);
+    }
+    
+    
+    logger(VERBOSE, "Running LinearViscoelasticSpecies helper functions unit test");
     Mdouble realStiffness = 2e5;
     Mdouble realDissipation = 25.0;
     Mdouble mass = 1.0; //particle mass
@@ -100,20 +100,20 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     Mdouble realCollisionTime = 0.004971179385062563;
     Mdouble realRestitution = 0.883132984295725;
     Mdouble realMaximumVelocity = 316.227766016838;
-
+    
     LinearViscoelasticSpecies species0;
     species0.setStiffness(realStiffness);
     species0.setDissipation(realDissipation);
-
-    std::cout << "  Testing getMaximumVelocity" << std::endl;
+    
+    logger(VERBOSE, "  Testing getMaximumVelocity");
     Mdouble maximumVelocity = species0.getMaximumVelocity(radius, mass);
     //std::cout << std::setprecision(16) << maximumVelocity << std::endl;
     if (!mathsFunc::isEqual(maximumVelocity, realMaximumVelocity, 1e-10))
     {
         logger(ERROR, "maximum velocity is %, but should be %", maximumVelocity, realMaximumVelocity);
     }
-
-    std::cout << "  Testing getCollisionTime, getRestitutionCoefficient" << std::endl;
+    
+    logger(VERBOSE, "  Testing getCollisionTime, getRestitutionCoefficient");
     Mdouble collisionTime = species0.getCollisionTime(mass);
     Mdouble restitution = species0.getRestitutionCoefficient(mass);
     if (!mathsFunc::isEqual(collisionTime, realCollisionTime, 1e-10))
@@ -124,8 +124,8 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     {
         logger(ERROR, "restitution coefficient is %, but should be %", restitution, realRestitution);
     }
-
-    std::cout << "  Testing setStiffnessAndRestitutionCoefficient" << std::endl;
+    
+    logger(VERBOSE, "  Testing setStiffnessAndRestitutionCoefficient");
     species0.setStiffnessAndRestitutionCoefficient(realStiffness, realRestitution, mass);
     if (!mathsFunc::isEqual(species0.getStiffness(), realStiffness, 1e-10))
     {
@@ -135,8 +135,8 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     {
         logger(ERROR, "dissipation is %, but should be %", species0.getDissipation(), realDissipation);
     }
-
-    std::cout << "  Testing setCollisionTimeAndRestitutionCoefficient" << std::endl;
+    
+    logger(VERBOSE, "  Testing setCollisionTimeAndRestitutionCoefficient");
     species0.setCollisionTimeAndRestitutionCoefficient(realCollisionTime, realRestitution, mass);
     if (!mathsFunc::isEqual(species0.getStiffness(), realStiffness, 1e-10))
     {
@@ -146,8 +146,8 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     {
         logger(ERROR, "dissipation is %, but should be %", species0.getDissipation(), realDissipation);
     }
-
-    std::cout << "  Testing setCollisionTimeAndRestitutionCoefficient for two masses" << std::endl;
+    
+    logger(VERBOSE, "  Testing setCollisionTimeAndRestitutionCoefficient for two masses");
     species0.setCollisionTimeAndRestitutionCoefficient(realCollisionTime, realRestitution, mass, mass);
     if (!mathsFunc::isEqual(species0.getStiffness(), realStiffness, 1e-10))
     {
@@ -157,8 +157,8 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     {
         logger(ERROR, "dissipation is %, but should be %", species0.getDissipation(), realDissipation);
     }
-
-    std::cout << "  Testing copy constructor" << std::endl;
+    
+    logger(VERBOSE, "  Testing copy constructor");
     LinearViscoelasticSpecies species1 = species0;
     if (!mathsFunc::isEqual(species1.getStiffness(), realStiffness, 1e-10))
     {
@@ -168,8 +168,8 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     {
         logger(ERROR, "dissipation is %, but should be %", species1.getDissipation(), realDissipation);
     }
-
-    std::cout << "  Testing mix" << std::endl;
+    
+    logger(VERBOSE, "  Testing mix");
     LinearViscoelasticMixedSpecies species2;
     species2.mixAll(&species0, &species1);
     if (!mathsFunc::isEqual(species2.getStiffness(), realStiffness, 1e-10))
@@ -180,11 +180,11 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     {
         logger(ERROR, "dissipation is %, but should be %", species2.getDissipation(), realDissipation);
     }
-
-    std::cout << "Running LinearPlasticViscoelasticSpecies helper functions unit test" << std::endl;
+    
+    logger(VERBOSE, "Running LinearPlasticViscoelasticSpecies helper functions unit test");
     LinearPlasticViscoelasticSpecies species3;
-
-    std::cout << "  Testing setPlasticParameters" << std::endl;
+    
+    logger(VERBOSE, "  Testing setPlasticParameters");
     species3.setPlasticParameters(realStiffness, 2.0 * realStiffness, 0.5 * realStiffness, 0.5);
     if (!mathsFunc::isEqual(species3.getLoadingStiffness(), realStiffness, 1e-10))
     {
@@ -192,18 +192,20 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     }
     if (!mathsFunc::isEqual(species3.getUnloadingStiffnessMax(), 2.0 * realStiffness, 1e-10))
     {
-        logger(ERROR, "max. unloading stiffness is %, but should be %", species3.getUnloadingStiffnessMax(), 2.0 * realStiffness);
+        logger(ERROR, "max. unloading stiffness is %, but should be %", species3.getUnloadingStiffnessMax(),
+               2.0 * realStiffness);
     }
     if (!mathsFunc::isEqual(species3.getCohesionStiffness(), 0.5 * realStiffness, 1e-10))
     {
-        logger(ERROR, "max. unloading stiffness is %, but should be %", species3.getCohesionStiffness(), 0.5 * realStiffness);
+        logger(ERROR, "max. unloading stiffness is %, but should be %", species3.getCohesionStiffness(),
+               0.5 * realStiffness);
     }
     if (!mathsFunc::isEqual(species3.getPenetrationDepthMax(), 0.5, 1e-10))
     {
         logger(ERROR, "dissipation is %, but should be %", species3.getPenetrationDepthMax(), 0.5);
     }
-
-    std::cout << "  Testing setCollisionTimeAndRestitutionCoefficient" << std::endl;
+    
+    logger(VERBOSE, "  Testing setCollisionTimeAndRestitutionCoefficient");
     species3.setCollisionTimeAndRestitutionCoefficient(realCollisionTime, realRestitution, mass);
     if (!mathsFunc::isEqual(species3.getLoadingStiffness(), realStiffness, 1e-10))
     {
@@ -211,14 +213,15 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     }
     if (!mathsFunc::isEqual(species3.getUnloadingStiffnessMax(), realStiffness, 1e-10))
     {
-        logger(ERROR, "max. unloading stiffness is %, but should be %", species3.getUnloadingStiffnessMax(), realStiffness);
+        logger(ERROR, "max. unloading stiffness is %, but should be %", species3.getUnloadingStiffnessMax(),
+               realStiffness);
     }
     if (!mathsFunc::isEqual(species3.getDissipation(), realDissipation, 1e-10))
     {
         logger(ERROR, "dissipation is %, but should be %", species3.getDissipation(), realDissipation);
     }
-
-    std::cout << "  Testing computeTimeStep" << std::endl;
+    
+    logger(VERBOSE, "  Testing computeTimeStep");
     Mdouble timeStep = species3.computeTimeStep(mass);
     if (!mathsFunc::isEqual(timeStep, 0.02 * realCollisionTime, 1e-10))
     {

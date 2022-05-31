@@ -87,10 +87,10 @@ public:
         P0.setVelocity(Vec3D(0.001,0,0));
         P1.setPosition(-P0.getPosition());
         P1.setVelocity(-P0.getVelocity());
-
+    
         particleHandler.copyAndAddObject(P0);
         particleHandler.copyAndAddObject(P1);
-
+    
         //------------------
         // Time
         setSaveCount(10000);
@@ -98,10 +98,10 @@ public:
         setTimeStep(0.0000005 * 50);
         //------------------
     }
-
-    void printTime() const override {
-        std::cout << "t=" << std::setprecision(3) << std::left << std::setw(6) << getTime()
-                  << std::endl;
+    
+    void printTime() const override
+    {
+        logger(INFO, "t=%3.6", getTime());
     }
 };
 
@@ -111,7 +111,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     sp0.solve();
 
     //This helper is to see the Fn vs Overlap, rate of overlap.
-    std::cout << "Execute 'load LinearViscoElasticUnitTest.gnu' to view output" << std::endl;
+    logger(INFO, "Execute 'load LinearViscoElasticUnitTest.gnu' to view output");
     helpers::writeToFile("LinearViscoElasticUnitTest.gnu",
                          "set xlabel 'displacement [{/Symbol d}]'\n"
                          "set ylabel 'force [f^n]'\n"

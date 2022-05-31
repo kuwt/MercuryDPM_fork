@@ -139,6 +139,7 @@ void MercuryBase::read(std::istream& is, ReadOptions opt)
  *                              most 4 BaseParticle, all BaseParticle are written.
  *                              If it is set to false, only the first two BaseParticle
  *                              are written, followed by ...
+ *
  * \details Function that writes this MercuryBase to an output stream, for example
  *          a restart file. First writes the domain information, then the walls,
  *          followed by the boundaries and particles, and finally the HGrid information.

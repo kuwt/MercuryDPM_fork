@@ -57,20 +57,20 @@ public:
         periodicBoundary[1] = boundaryHandler.copyAndAddObject(boundary);
         periodicBoundary[2] = boundaryHandler.copyAndAddObject(boundary);
         setPeriodicBoundaries();
-
+    
         LinearViscoelasticSlidingFrictionSpecies species;
-        species.setDensity(6.0/pi);
+        species.setDensity(6.0 / pi);
         species.setStiffness(2e5);
         species.setDissipation(25);
         species.setSlidingFrictionCoefficient(0.5);
-        species.setSlidingDissipation(2./7.*species.getDissipation());
-        species.setSlidingStiffness(2./7.*species.getStiffness());
+        species.setSlidingDissipation(2. / 7. * species.getDissipation());
+        species.setSlidingStiffness(2. / 7. * species.getStiffness());
         auto s = speciesHandler.copyAndAddObject(species);
-
-		SphericalParticle p(s);
+    
+        SphericalParticle p(s);
         CubeInsertionBoundary insertionBoundary;
-        insertionBoundary.set(p,NEVER,getMin(),getMax(),Vec3D(0,0,0),Vec3D(0,0,0),0.475,0.525);
-        insertionBoundary.setInitialVolume((double)n*pi/6.0);
+        insertionBoundary.set(p, NEVER, getMin(), getMax(), Vec3D(0, 0, 0), Vec3D(0, 0, 0));
+        insertionBoundary.setInitialVolume((double) n * pi / 6.0);
         insertionBoundary.insertParticles(this);
     }
 

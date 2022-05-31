@@ -69,7 +69,7 @@ void BidisperseCubeInsertionBoundary::set(BaseParticle* particleToCopyA, BasePar
     particleToCopyB_ = particleToCopyB;
     probA_ = probA;
     CubeInsertionBoundary::set(particleToCopyA, maxFailed,
-                               posMin, posMax, velMin, velMax, 0, 0);
+                               posMin, posMax, velMin, velMax);
 }
 
 BaseParticle* BidisperseCubeInsertionBoundary::getParticleToCopyA() const

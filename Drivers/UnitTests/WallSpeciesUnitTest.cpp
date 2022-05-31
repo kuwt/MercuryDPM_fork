@@ -88,15 +88,16 @@ public:
 
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
-	std::cout << std::endl << "Simulation of one particle, d=0.1, interacting with walls with different coefficient of restitution" << std::endl;
-	std::cout << std::endl << "The purpose of the test is to check walls species information is correctly picked up" << std::endl;
-	WallSpecies problem;
-	problem.setFileType(FileType::NO_FILE); //comment if you want file output
-	problem.setName("WallSpecies");
-	problem.solve();
-	const Vec3D v = problem.particleHandler.getObject(0)->getVelocity();
-	logger(INFO,"v_x(t_max)=% should be ~0.5",v.X);
-	logger(INFO,"v_z(t_max)=% should be ~0.25",v.Z);
-	helpers::check(v.Z,0.23642946655364,1e-7,"v_z");
-	helpers::check(v.X,0.49298992225767,1e-7,"v_x");
+    logger(VERBOSE, "\nSimulation of one particle, d=0.1, interacting with walls with different coefficient of "
+                    "restitution\n\n"
+                    "The purpose of the test is to check walls species information is correctly picked up");
+    WallSpecies problem;
+    problem.setFileType(FileType::NO_FILE); //comment if you want file output
+    problem.setName("WallSpecies");
+    problem.solve();
+    const Vec3D v = problem.particleHandler.getObject(0)->getVelocity();
+    logger(INFO, "v_x(t_max)=% should be ~0.5", v.X);
+    logger(INFO, "v_z(t_max)=% should be ~0.25", v.Z);
+    helpers::check(v.Z, 0.23642946655364, 1e-7, "v_z");
+    helpers::check(v.X, 0.49298992225767, 1e-7, "v_x");
 }
