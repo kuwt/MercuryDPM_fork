@@ -44,12 +44,12 @@ class PSD;
  *   Fransen, S. Gonzalez, O. Bokhove, O. Imole, and T. Weinhart. A review of
  *   recent work on the discrete particle method at the University of Twente: An
  *   introduction to the open-source package MercuryDPM. DEM6 - International
- *   Conference on DEMs, 2013. 
+ *   Conference on DEMs, 2013.
  */
 class InsertionBoundary : public BaseBoundary
 {
 public:
-    
+
     ///\todo think about making both possible; a discrete distribution and a continuous which is more accurate
 //    /*!
 // * \brief Defines a custom particle size distribution; distribution_ will always be used, unless particleSizeDistributionVector_ is non-empty
@@ -61,8 +61,8 @@ public:
 //        // TODO add LogNormal distribution
 //        // LogNormal
 //    };
-    
-    
+
+
     /*!
      * \brief Default constructor: set everything to 0/nullptr.
      */
@@ -97,7 +97,7 @@ public:
      * \param[in] random  Random number generator
      */
     virtual BaseParticle* generateParticle(RNG& random);
-    
+
     /*!
      * \brief Purely virtual function that generates the extrinsic properties
      * (position, velocity) of a particle.
@@ -107,17 +107,17 @@ public:
      * CubeInsertionBoundary, as the implementation will be geometry-dependent.
      */
     virtual void placeParticle(BaseParticle* p, RNG& random) = 0;
-    
+
     /*!
      * \brief Fills the boundary with particles.
      */
     void checkBoundaryBeforeTimeStep(DPMBase* md) override;
-    
+
     /*!
      * \brief Fill a certain domain with particles.
      */
     void insertParticles(DPMBase* md);
-    
+
     /*!
      * \brief Gets the number of particles inserted by the boundary.
      */
@@ -126,32 +126,34 @@ public:
     /*!
      * \brief Gets the mass of particles inserted by the boundary.
      */
-    double getMassOfParticlesInserted() const;
-    
+    Mdouble getMassOfParticlesInserted() const;
+
     /*!
      * \brief Gets the volume of particles inserted by the boundary.
      */
-    double getVolumeOfParticlesInserted() const;
-    
+   Mdouble getVolumeOfParticlesInserted() const;
+
     /*!
      * \brief resets particle property counter variables.
      */
     void reset();
-    
+
     /*! 
      * \brief Turns on the InsertionBoundary.
      */
     void activate();
-    
+
     /*!
      * \brief Turns off the InsertionBoundary.
      */
     void deactivate();
-    
+
     /*!
      * \brief Returns whether the InsertionBoundary is activated.
      */
     bool isActivated();
+
+
     
     /*!
      * \brief Gets the number of times that the boundary may fail to insert a particle.
@@ -162,7 +164,7 @@ public:
      * \brief Sets multiple different particles that will be inserted through the insertion boundary.
      */
     void setParticleToCopy(std::vector<BaseParticle*> particleToCopy);
-    
+
     /*!
      * \brief Sets the particle that will be inserted through the insertion boundary.
      */
@@ -182,64 +184,64 @@ public:
      * \brief Writes the boundary's id_ and maxFailed_.
      */
     void write(std::ostream& os) const override;
-    
+
     /*!
      * \brief Gets the volume flow rate of the insertion routine.
      */
     Mdouble getVolumeFlowRate() const;
-    
+
     /*!
      * \brief Sets the volume flow rate of the insertion routine.
      */
     void setVolumeFlowRate(Mdouble volumeFlowRate_);
-    
+
     /*!
      * \brief Gets the initialVolume() .
      */
     Mdouble getInitialVolume() const;
-    
+
     /*!
      * \brief Gets the Volume which should be inserted by the insertion routine.
      */
     void setInitialVolume(Mdouble initialVolume);
-    
+
     /*!
      * \brief Sets the range of particle radii that may be generated from a user defined PSD.
      */
     void setPSD(const PSD psd);
-    
+
     /*!
      * \brief Sets the ranges of particle radii that may be generated from user defined PSDs.
      */
     void setPSD(std::vector<PSD> psd, std::vector<Mdouble> probability);
-    
+
     /*!
      * \brief Gets the particle size distributions set by the user.
      */
     std::vector<PSD> getPSD();
-    
+
     /*!
      * \brief Sets a variable volume flow rate.
      * \see variableCumulativeVolumeFlowRate_
      */
     void
     setVariableVolumeFlowRate(const std::vector<Mdouble>& variableCumulativeVolumeFlowRate, Mdouble samplingInterval);
-    
+
     /*!
      * \brief Checks the inserted total volume and returns if a particle is still allowed to be inserted.
      */
     bool insertParticle(Mdouble time);
-    
+
     /*!
      * \brief Gets the variable that checks if a particle has an interaction.
      */
     bool getCheckParticleForInteraction() const;
-    
+
     /*!
      * \brief Sets the variable that checks if a particle has an interaction.
      */
     void setCheckParticleForInteraction(bool checkParticleForInteraction);
-    
+
     /*!
      * \brief Set the flag for a manual PSD insertion routine
      */
@@ -256,7 +258,7 @@ public:
 //    friend std::istream& operator>>(std::istream& is, InsertionBoundary::Distribution& type);
 
 protected:
-    
+
     /*!
      * \brief Particle that will be inserted through the insertion boundary.
      */
@@ -271,22 +273,23 @@ protected:
      * \brief Number of particles that are already inserted.
      */
     unsigned int numberOfParticlesInserted_;
-    
+
     /*!
      * \brief Total mass of particles inserted
      */
     Mdouble massInserted_;
-    
+
     /*!
      * \brief Total volume of particles inserted
      */
     Mdouble volumeInserted_;
-    
-    /*!
-     * \brief The InsertionBoundary is activated by default. If the
-     * InsertionBoundary is deactivated, then it introduces no particles (useful
-     * for trying to maintain a certain insertion rate).
-     */
+
+  /*! 
+   * \brief The InsertionBoundary is activated by default. If the
+   * InsertionBoundary is deactivated, then it introduces no particles (useful
+   * for trying to maintain a certain insertion rate).
+   * \todo JMFT: This is currently not saved to .restart files.
+   */
     bool isActivated_;
 
     /*!
@@ -302,7 +305,7 @@ protected:
 
     ///\see volumeFlowRate_
     Mdouble initialVolume_;
-    
+
     /*!
      * Defines a variable volume flow rate, taken at fixed sampling intervals; the values are cumulative; thus, we need to ensure the volume inserted before time t=n*samplingInterval is less than variableCumulativeVolumeFlowRate[n].
      *
@@ -310,36 +313,36 @@ protected:
      * \see volumeFlowRate_.
      */
     std::vector<Mdouble> variableCumulativeVolumeFlowRate_;
-    
+
     ///\see variableCumulativeVolumeFlowRate_
     Mdouble samplingInterval_;
-    
+
     /*!
      * \brief Checks if a particle has an interaction with a wall or other particles.
      */
     bool checkParticleForInteraction_;
-    
+
     /*!
      * \brief Defines a particle size distribution as an object of the PSD class; if particleSizeDistributionVector_ is empty, distribution_ is
      * used instead
      */
     std::vector<PSD> particleSizeDistributionVector_;
-    
+
     /*!
      * \brief Minimum and maximum velocity of the particles to be inserted.
      */
     Vec3D velMin_, velMax_;
-    
+
     /*!
      * \brief A flag to enable a top-down class-by-class manual insertion of a PSD; default is FALSE
      */
     bool isManuallyInserting_;
-    
+
     /*!
      * \brief vector of probabilities in range [0,1] which determine the mixing ratio of partice size distributions.
      */
     std::vector<Mdouble> probability_;
-    
+
 };
 
 #endif
