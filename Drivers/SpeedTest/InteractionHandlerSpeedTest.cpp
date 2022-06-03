@@ -105,22 +105,23 @@ int main()
         dpm0.wallHandler.copyAndAddObject(wall);
         wall.set(Vec3D(0,1,0), dpm0.getMax());
         dpm0.wallHandler.copyAndAddObject(wall);
-        wall.set(Vec3D(0,-1,0), dpm0.getMin());
+        wall.set(Vec3D(0, -1, 0), dpm0.getMin());
         dpm0.wallHandler.copyAndAddObject(wall);
-        wall.set(Vec3D(1,0,0), dpm0.getMax());
+        wall.set(Vec3D(1, 0, 0), dpm0.getMax());
         dpm0.wallHandler.copyAndAddObject(wall);
-        wall.set(Vec3D(-1,0,0), dpm0.getMin());
+        wall.set(Vec3D(-1, 0, 0), dpm0.getMin());
         dpm0.wallHandler.copyAndAddObject(wall);
         // create particles
         SphericalParticle particle(species);
         CubeInsertionBoundary insertionBoundary;
-        insertionBoundary.set(particle, 1e6, dpm0.getMin(), dpm0.getMax(), {0, 0, 0}, {0, 0, 0}, .47, .53);
-        insertionBoundary.setInitialVolume((n-0.5)*constants::pi/6.);
+        insertionBoundary.set(particle, 1e6, dpm0.getMin(), dpm0.getMax(), {0, 0, 0}, {0, 0, 0});
+        insertionBoundary.setInitialVolume((n - 0.5) * constants::pi / 6.);
         insertionBoundary.checkBoundaryBeforeTimeStep(&dpm0);
         logger(INFO, "Number of particles: %", dpm0.particleHandler.getSize());
         //solve
         dpm0.solve();
-        if (!dpm.readRestartFile("InteractionHandlerSpeedTestInit")) {
+        if (!dpm.readRestartFile("InteractionHandlerSpeedTestInit"))
+        {
             logger(ERROR, "Restart file could not be created");
         }
     }

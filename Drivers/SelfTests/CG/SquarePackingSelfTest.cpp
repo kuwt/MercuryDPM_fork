@@ -37,26 +37,26 @@ class SquarePacking : public StatisticsVector<O> {
 public:
 
 	void setupInitialConditions() override {
-		// make sure the number of particles is right
-		std::cout << "Creating a cubic packing of " << N << "^3 particles" << std::endl;
-		double Radius = .5;
-		
-		//set Particles' position, radius, velocity and bounding box
-		setDomain({0,0,-0.5},{5,5,0.5});
-
-		SphericalParticle P0;
+        // make sure the number of particles is right
+        logger(INFO, "Creating a cubic packing of %^3 particles", N);
+        double Radius = .5;
+        
+        //set Particles' position, radius, velocity and bounding box
+        setDomain({0, 0, -0.5}, {5, 5, 0.5});
+        
+        SphericalParticle P0;
         P0.setSpecies(speciesHandler.getObject(0));
-		for (int i=0;i<N;i++)
-            for (int j=0;j<N;j++)
+        for (int i = 0; i < N; i++)
+            for (int j = 0; j < N; j++)
             {
-
+                
                 P0.setRadius(Radius);
-                P0.setVelocity(Vec3D(0.0,0.0,0.0));
-                P0.setPosition(Radius*Vec3D(1.+2.*i,1.+2.*j,0.0));
+                P0.setVelocity(Vec3D(0.0, 0.0, 0.0));
+                P0.setPosition(Radius * Vec3D(1. + 2. * i, 1. + 2. * j, 0.0));
                 //setXMax(std::max(getXMax(),P0.getPosition().X+Radius));
                 //setYMax(std::max(getYMax(),P0.getPosition().Y+Radius));
                 particleHandler.copyAndAddObject(P0);
-
+                
             }	
 
 		//set walls
@@ -78,45 +78,45 @@ public:
 
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
-	SquarePacking problem;
-	problem.setName("SquarePackingSelfTest");
-    auto species=problem.speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
+    SquarePacking problem;
+    problem.setName("SquarePackingSelfTest");
+    auto species = problem.speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
     //set the number of particles
-    problem.N=5;
+    problem.N = 5;
     problem.setSystemDimensions(2);
-	problem.setParticleDimensions(2);
-    species->setDensity(6.0/constants::pi*2./3.);
+    problem.setParticleDimensions(2);
+    species->setDensity(6.0 / constants::pi * 2. / 3.);
     //species->setDensity(1.9098593*2/3);
-	problem.setGravity(Vec3D(0.,-1,0.));
-	species->setCollisionTimeAndRestitutionCoefficient(.01,.1,1.);
+    problem.setGravity(Vec3D(0., -1, 0.));
+    species->setCollisionTimeAndRestitutionCoefficient(.01, .1, 1.);
     problem.setTimeStep(.0002);
-	problem.setTimeMax(1.0);
-	problem.setSaveCount(1000);
-
-    problem.setCGTimeMin(problem.getTimeMax()*.98);
+    problem.setTimeMax(1.0);
+    problem.setSaveCount(1000);
+    
+    problem.setCGTimeMin(problem.getTimeMax() * .98);
     problem.setTimeMaxStat(1e20);
-
-    std::cout << "Relax the packing" << std::endl;
-	problem.solve();
-
-	std::cout << "Get statistics" << std::endl;
-	StatisticsVector<Y> stats("SquarePackingSelfTest");
+    
+    logger(INFO, "Relax the packing");
+    problem.solve();
+    
+    logger(INFO, "Get statistics");
+    StatisticsVector<Y> stats("SquarePackingSelfTest");
     stats.statFile.setName("SquarePackingSelfTest.Y.stat");
-	double n = 500;
-	stats.setN(n);
-	stats.setCGWidth(.1);
-	stats.setCGTimeMin(problem.getTimeMax()*.98);
-	stats.setTimeMaxStat(1e20);
-	//stats.verbose();
-	//stats.set_boundedDomain(true);
-	stats.statistics_from_fstat_and_data();
-
-	std::cout << "Get fully averaged statistics" << std::endl;
-	StatisticsVector<O> statsO("SquarePackingSelfTest");
-	statsO.statFile.setName("SquarePackingSelfTest.O.stat");
-    statsO.setCGTimeMin(problem.getTimeMax()*.98);
+    double n = 500;
+    stats.setN(n);
+    stats.setCGWidth(.1);
+    stats.setCGTimeMin(problem.getTimeMax() * .98);
+    stats.setTimeMaxStat(1e20);
+    //stats.verbose();
+    //stats.set_boundedDomain(true);
+    stats.statistics_from_fstat_and_data();
+    
+    logger(INFO, "Get fully averaged statistics");
+    StatisticsVector<O> statsO("SquarePackingSelfTest");
+    statsO.statFile.setName("SquarePackingSelfTest.O.stat");
+    statsO.setCGTimeMin(problem.getTimeMax() * .98);
     statsO.setTimeMaxStat(1e20);
-	statsO.statistics_from_fstat_and_data();
-	// should give you Density 1
+    statsO.statistics_from_fstat_and_data();
+    // should give you Density 1
 }
 

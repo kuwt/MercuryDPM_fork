@@ -37,17 +37,20 @@ public:
 
 int main(int argc, char *argv[])
 {
-	if (argc<2) {
-		cout << "Please enter the name of the simulation you want to restart and, optionally, the name of the simulation after restart" << endl;
-		exit(-1);
-	} else {
-		cout << "restart data: " << argv[1] << ".restart" << endl;
-	}
- 	Mercury3DRestart problem;
- 	problem.setName(argv[1]);
-	problem.readRestartFile();
-	problem.setRestarted(false);
-	problem.time = problem.getTime();
-	problem.write(std::cout,false);
-	problem.solve(argc-1, argv+1);
+    if (argc < 2)
+    {
+        logger(ERROR, "Please enter the name of the simulation you want to restart and, optionally, the name of the "
+                      "simulation after restart");
+    }
+    else
+    {
+        logger(INFO, "restart data: %.restart", argv[1]);
+    }
+    Mercury3DRestart problem;
+    problem.setName(argv[1]);
+    problem.readRestartFile();
+    problem.setRestarted(false);
+    problem.time = problem.getTime();
+    problem.write(std::cout, false);
+    problem.solve(argc - 1, argv + 1);
 }

@@ -113,7 +113,7 @@ public:
     Mdouble getDissipation() const;
 
 private:
-    ///\brief normal spring constant
+    ///\brief The effective elastic modulus
     Mdouble elasticModulus_;
     
     ///\brief normal dissipation constant

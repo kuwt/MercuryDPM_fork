@@ -44,15 +44,14 @@ public:
               boundaryHandler.copyAndAddObject(b0);
               b0.set(Vec3D(0,1,0), getYMin(), getYMax());
 			  boundaryHandler.copyAndAddObject(b0);
-			  std::cout << " Problem setup, about to solve" << std::endl;
+                logger(INFO, " Problem setup, about to solve");
 			
 			}
 			
 			else
 			
 			{
-			  std::cerr << "Input data not found exiting " << std::endl;
-				exit(-1);
+                logger(ERROR, "Input data not found exiting ");
 			}
 		
 	}

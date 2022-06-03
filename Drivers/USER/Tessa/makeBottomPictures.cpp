@@ -242,12 +242,15 @@ public:
 			case wait2:
 				if (calc_EKin()<get_EKinThresholdTurning()) 
 				{
-					set_StartFillHopperTime(getTime());
-					currStatus=fillHopper;
-					HopperInsertionBoundary b1;
-                    b1.set(new SphericalParticle, getMaxFailed(), getYMin(), getYMax(), getMinInflowParticleRadius(), getMaxInflowParticleRadius(), getChuteAngle(), getFixedParticleRadius(), getIsHopperCentred(), getHopperDimension(), getHopperAngle(), getHopperLength(), getHopperExitLength(), getHopperHeight(), getHopperLift(), getHopperFillingPercentage());
+                    set_StartFillHopperTime(getTime());
+                    currStatus = fillHopper;
+                    HopperInsertionBoundary b1;
+                    b1.set(new SphericalParticle, getMaxFailed(), getYMin(), getYMax(), getChuteAngle(),
+                           getFixedParticleRadius(), getIsHopperCentred(), getHopperDimension(), getHopperAngle(),
+                           getHopperLength(), getHopperExitLength(), getHopperHeight(), getHopperLift(),
+                           getHopperFillingPercentage());
                     boundaryHandler.copyAndAddObject(b1);
-				}
+                }
 				break;
 			case fillHopper:
 				{

@@ -70,7 +70,7 @@ public:
 
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
-    std::cout << "Test if the LinearViscoelasticReversibleAdhesiveInteraction conserves energy" << std::endl;
+    logger(INFO, "Test if the LinearViscoelasticReversibleAdhesiveInteraction conserves energy");
     EnergyUnitTest energyUnitTest;
     energyUnitTest.setName("ReversibleAdhesiveEnergyUnitTest");
     LinearViscoelasticReversibleAdhesiveSpecies species1;
@@ -85,13 +85,14 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     energyUnitTest.setTimeMax(0.4);
     energyUnitTest.speciesHandler.copyAndAddObject(species1);
     energyUnitTest.solve();
-    Mdouble lostEnergy = mathsFunc::square(0.7)-energyUnitTest.getElasticEnergy()-energyUnitTest.getKineticEnergy();
+    Mdouble lostEnergy = mathsFunc::square(0.7) - energyUnitTest.getElasticEnergy() - energyUnitTest.getKineticEnergy();
     if (!mathsFunc::isEqual(lostEnergy, 0.0, 1e-6))
     {
         logger(ERROR, "energy loss is %, but should be %", lostEnergy, 0.0);
     }
-
-    std::cout << "Test if the LinearViscoelasticIrreversibleAdhesiveInteraction looses the right amount of energy" << std::endl;
+    
+    logger(INFO, "Test if the LinearViscoelasticIrreversibleAdhesiveInteraction looses the right amount of energy\n",
+           Flusher::NO_FLUSH);
     EnergyUnitTest energyUnitTest2;
     energyUnitTest2.setName("IrreversibleAdhesiveEnergyUnitTest");
     LinearViscoelasticIrreversibleAdhesiveSpecies species2;
@@ -99,10 +100,10 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     species2.setStiffness(500);
     species2.setAdhesionStiffness(100);
     species2.setAdhesionForceMax(10);
-    std::cout << "maxVelocity=" << species2.getMaximumVelocity(0.5, 1.0) << std::endl;
+    logger(INFO, "maxVelocity=%\n", species2.getMaximumVelocity(0.5, 1.0), Flusher::NO_FLUSH);
     //this test is 10 times more accurate than the previous one, as the error is so much bigger.
     energyUnitTest2.setTimeStep(0.0002 * species2.getCollisionTime(1.0));
-    std::cout << "timeStep=" << energyUnitTest2.getTimeStep() << std::endl;
+    logger(INFO, "timeStep=%\n", energyUnitTest2.getTimeStep());
     energyUnitTest2.setSaveCount(3);
     energyUnitTest2.setTimeMax(0.2);
     energyUnitTest2.speciesHandler.copyAndAddObject(species2);

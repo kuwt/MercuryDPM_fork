@@ -46,12 +46,9 @@ void load(Archive& ar, ParticleHandler& handl) {
     SphericalParticle p;
     
     for (int i = 0; i < size; i++) {
-        ar ( p );
-        std::cout << "Particle:"
-                  << "\n\tPOS: " << p.getPosition()
-                  << "\n\tVEL: " << p.getVelocity()
-                  << "\n\tRAD: " << p.getRadius() << std::endl;
-        handl.copyAndAddObject( p );
+        ar(p);
+        logger(INFO, "Particle: \n\tPOS: % \n\tVEL: % \n\tRAD: %", p.getPosition(), p.getVelocity(), p.getRadius());
+        handl.copyAndAddObject(p);
     }
 }
 

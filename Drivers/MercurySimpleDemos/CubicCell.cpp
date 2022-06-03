@@ -74,7 +74,7 @@ public:
         b.set(&p, 100,
               Vec3D(getXMin(), getYMin(), getZMin()),
               Vec3D(getXMax(), getYMax(), getZMax()),
-              Vec3D(0, 0, 0), Vec3D(0, 0, 0), .5, 1.0);
+              Vec3D(0, 0, 0), Vec3D(0, 0, 0));
         ///\todo Periodic walls are still not checked in checkParticleForInteraction!
         
         BaseParticle* q;

@@ -125,10 +125,10 @@ public:
 			double Lambdas[] = {0, 3./6., 4./6., 5./6., 1, 2};
 			setFixedParticleRadius(Lambdas[study_num]/2.);
 		} else {
-			//If study_num is complete quit
-		  std::cout << "Study is complete " << std::endl;
-			exit(0);
-		}
+            //If study_num is complete quit
+            logger(VERBOSE, "Study is complete ");
+            exit(0);
+        }
 		//Note make sure h and a is defined
 		set_study(); 
 	}
@@ -220,34 +220,44 @@ public:
 		//inflowParticle_.computeMass();
 		Vec3D position;
 		position.X = random.getRandomNumber(getXMin()+2.0*inflowParticle_.getRadius(),getXMax());
-		position.Y = random.getRandomNumber(getYMin()+2.0*inflowParticle_.getRadius(),getYMax());
-		position.Z = random.getRandomNumber(getZMin()+2.0*inflowParticle_.getRadius(),getInflowHeight());
-		inflowParticle_.setPosition(position);
-		inflowParticle_.setVelocity(Vec3D(0.0,0.0,0.0));
-	}
-
-	//set approximate height of flow
-	void set_H(double new_) {setInflowHeight(new_); setZMax(getInflowHeight());}
-	double get_H() {return getInflowHeight();}
-
-	void printTime() const {
-	  std::cout << "t=" << std::setprecision(3) << std::left << std::setw(6) << getTime() 
-		     << ", tmax=" << std::setprecision(3) << std::left << std::setw(6) << getTimeMax()
-		     << ", N=" << std::setprecision(3) << std::left << std::setw(6) << particleHandler.getNumberOfObjects()
-			//<< ", time left=" << setprecision(3) << left << setw(6) << timer.getTime2Finish(t)
-			//~ << ", finish by " << setprecision(3) << left << setw(6) << timer.getFinishTime(t)
-		     << ". " << std::endl;
-	}
-	
-	bool readNextArgument(int& i, int argc, char *argv[]) {
-		if (!strcmp(argv[i],"-muBottom")) {
-			setSlidingFrictionCoefficientBottom(atof(argv[i+1]));
-			std::cout << "muB=" << getSlidingFrictionCoefficientBottom() << std::endl;
-		} else return Chute::readNextArgument(i, argc, argv); //if argv[i] is not found, check the commands in Chute
-		return true; //returns true if argv[i] is found
-	}
-
-	int getNCreated() const
+        position.Y = random.getRandomNumber(getYMin() + 2.0 * inflowParticle_.getRadius(), getYMax());
+        position.Z = random.getRandomNumber(getZMin() + 2.0 * inflowParticle_.getRadius(), getInflowHeight());
+        inflowParticle_.setPosition(position);
+        inflowParticle_.setVelocity(Vec3D(0.0, 0.0, 0.0));
+    }
+    
+    //set approximate height of flow
+    void set_H(double new_)
+    {
+        setInflowHeight(new_);
+        setZMax(getInflowHeight());
+    }
+    
+    double get_H()
+    { return getInflowHeight(); }
+    
+    void printTime() const
+    {
+        logger(INFO, "t=%3.6"
+                     ", tmax=%3.6"
+                     ", N=%3.6",
+               getTime(), getTimeMax(), particleHandler.getNumberOfObjects());
+        //<< ", time left=" << setprecision(3) << left << setw(6) << timer.getTime2Finish(t)
+        //~ << ", finish by " << setprecision(3) << left << setw(6) << timer.getFinishTime(t)
+    }
+    
+    bool readNextArgument(int& i, int argc, char* argv[])
+    {
+        if (!strcmp(argv[i], "-muBottom"))
+        {
+            setSlidingFrictionCoefficientBottom(atof(argv[i + 1]));
+            logger(INFO, "muB=%", getSlidingFrictionCoefficientBottom());
+        }
+        else return Chute::readNextArgument(i, argc, argv); //if argv[i] is not found, check the commands in Chute
+        return true; //returns true if argv[i] is found
+    }
+    
+    int getNCreated() const
 	{
 	    return nCreated_;
 	}

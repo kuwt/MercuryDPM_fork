@@ -54,28 +54,33 @@ public:
      * \brief Destructor: default destructor.
      */
     ~FixedClusterInsertionBoundary() override;
-
+    
     /*!
      * \brief Creates a copy on the heap and returns a pointer.
      */
     FixedClusterInsertionBoundary* copy() const override;
-
+    
     /*!
      * \brief Sets the properties of the ClusterInsertionBoundary
      */
-    void set(BaseParticle *particleToCopy,
-             std::vector<Vec3D> positions, std::vector<Mdouble> radii,
+    void set(std::vector<BaseParticle*> particleToCopy, std::vector<Vec3D> positions, std::vector<Mdouble> radii,
              Vec3D velMin, Vec3D velMax, Mdouble rMicroParticle);
-
+    
+    /*!
+     * \brief Sets the properties of the ClusterInsertionBoundary
+     */
+    void set(BaseParticle* particleToCopy, std::vector<Vec3D> positions, std::vector<Mdouble> radii, Vec3D velMin,
+             Vec3D velMax, Mdouble rMicroParticle);
+    
     //!\brief this sets positions and radii of the desired clusters.
     void setPositionsAndRadii(std::vector<Vec3D> clusterPositions, std::vector<Mdouble> clusterRadii);
-
+    
     //!\brief inserts cluster: differently from RandomClusterInsertionBoundary, here no check for interaction is computed.
     void checkBoundaryBeforeTimeStep(DPMBase* md) final;
-
+    
     //!\brief Places particles according to vector clusterPositions_ and sets a random velocity, if required.
     void placeParticle(BaseParticle* p, RNG& random) final;
-
+    
     //!\brief Sets cluster radii according to vector clusterRadii_.
     BaseParticle* generateParticle(RNG& random) final;
 

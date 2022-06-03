@@ -42,8 +42,8 @@ int main()
            << c << " "
            << s << "\n";
     }
-    std::cout << "Execute 'gnuplot MathCheck.gnu' to view output" << std::endl;
-    helpers::writeToFile("MathCheck.data",ss.str());
+    logger(INFO, "Execute 'gnuplot MathCheck.gnu' to view output");
+    helpers::writeToFile("MathCheck.data", ss.str());
     helpers::writeToFile("MathCheck.gnu",
                          "set xlabel 'x'\n"
                          "p 'MathCheck.data' u 1:(log($2)) t 'log(Exp(x))',"
@@ -53,6 +53,7 @@ int main()
                          "\n");
     //WARNING: sin and cos are really bad outside (-pi,pi)
     Mdouble d = 1e-15;
-    std::cout << "Accuracy of sin: " << mathsFunc::sin(constants::pi-d)-mathsFunc::sin(constants::pi+d) << std::endl;
-    std::cout << "Accuracy of cos: " << mathsFunc::cos(constants::pi)+1 << std::endl;
+    logger(INFO, "Accuracy of sin: %\n"
+                 "Accuracy of cos: %",
+           mathsFunc::sin(constants::pi - d) - mathsFunc::sin(constants::pi + d), mathsFunc::cos(constants::pi) + 1);
 }

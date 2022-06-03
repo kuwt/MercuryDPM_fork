@@ -83,7 +83,7 @@ int main()
 
     //'time step ratio': size of minimum particle over maximum distance travelled 
     // by any particle per time step (i.e., should be >> 1 )
-    std::cout << "time step ratio: " << problem.getTimeStepRatio() << std::endl;
+    logger(INFO, "time step ratio: %", problem.getTimeStepRatio());
     
     //solve
     problem.solve();

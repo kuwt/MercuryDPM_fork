@@ -62,6 +62,28 @@ FixedClusterInsertionBoundary* FixedClusterInsertionBoundary::copy() const
 
 /*!
  * \details Sets all the properties of the cuboidal insertion boundary.
+ * \param[in] particleToCopy       Vector of pointers to the BaseParticles which are used as a basis
+ *                                 for clusters to be inserted
+ * \param[in] positions            Vector containing all clusters positions
+ * \param[in] radii                Vector containing all clusters radii
+ * \param[in] velMin               Minimum velocity of inserted particles
+ * \param[in] velMax               Maximum velocity of inserted particles
+ * \param[in] rMicroParticle       Radius of the single particle composing the cluster.
+ */
+void FixedClusterInsertionBoundary::set(std::vector<BaseParticle*> particleToCopy,
+                                        std::vector<Vec3D> positions, std::vector<Mdouble> radii,
+                                        Vec3D velMin, Vec3D velMax, Mdouble rMicroParticle)
+{
+    setParticleToCopy(particleToCopy);
+    
+    setPositionsAndRadii(positions, radii);
+    setVelocityRange(velMin, velMax);
+    
+    setRadiusMicroParticle(rMicroParticle);
+}
+
+/*!
+ * \details Sets all the properties of the cuboidal insertion boundary.
  * \param[in] particleToCopy       Pointer to the BaseParticle which is used as a basis
  *                                 for clusters to be inserted
  * \param[in] positions            Vector containing all clusters positions
@@ -202,7 +224,7 @@ void FixedClusterInsertionBoundary::placeParticle(BaseParticle* p, RNG& random)
 //!\brief Sets cluster radii according to vector clusterRadii_.
 BaseParticle* FixedClusterInsertionBoundary::generateParticle(RNG& random)
 {
-    BaseParticle* P = getParticleToCopy()->copy();
+    BaseParticle* P = particleToCopy_[0]->copy();
     P->setRadius(clusterRadii_[nClusterInserted_]);
     return P;
 }

@@ -50,16 +50,18 @@ class InsertionBoundary : public BaseBoundary
 {
 public:
     
-    /*!
-     * \brief Defines a custom particle size distribution; distribution_ will always be used, unless particleSizeDistribution_ is non-empty
-     */
-    enum class Distribution
-    {
-        Uniform,
-        Normal_1_5
-        // TODO add LogNormal distribution to generateParticle()
-        // LogNormal
-    };
+    ///\todo think about making both possible; a discrete distribution and a continuous which is more accurate
+//    /*!
+// * \brief Defines a custom particle size distribution; distribution_ will always be used, unless particleSizeDistributionVector_ is non-empty
+// */
+//    enum class Distribution
+//    {
+//        Uniform,
+//        Normal_1_5
+//        // TODO add LogNormal distribution
+//        // LogNormal
+//    };
+    
     
     /*!
      * \brief Default constructor: set everything to 0/nullptr.
@@ -75,11 +77,19 @@ public:
      * \brief Destructor: delete the particle that has to be copied at every insertion.
      */
     ~InsertionBoundary() override;
-    
-    /*!
-     * \brief Sets the particle that will be inserted and the maximum number of times for which insertion may fail.
-     */
-    void set(BaseParticle* particleToCopy, unsigned int maxFailed);
+
+
+//    /*!
+//     * \brief Sets the properties of the InsertionBoundary for mutliple different particle types
+//     */
+//    virtual void set(std::vector<BaseParticle*> particleToCopy, unsigned int maxFailed, Vec3D velMin, Vec3D velMax,
+//                    double radMin, double radMax)=0;
+//
+//    /*!
+//     * \brief Sets the properties of the InsertionBoundary for a single particle type
+//     */
+//    virtual void set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D velMin, Vec3D velMax, double radMin,
+//                  double radMax)=0;
     
     /*!
      * \brief Virtual function that generates the intrinsic properties
@@ -96,48 +106,52 @@ public:
      * \details This should be implemented by the children such as
      * CubeInsertionBoundary, as the implementation will be geometry-dependent.
      */
-    virtual void placeParticle(BaseParticle* p, RNG& random)=0;
+    virtual void placeParticle(BaseParticle* p, RNG& random) = 0;
     
     /*!
      * \brief Fills the boundary with particles.
      */
     void checkBoundaryBeforeTimeStep(DPMBase* md) override;
-
-    void insertParticles(DPMBase* md) {
-        checkBoundaryBeforeTimeStep(md);
-        logger(INFO,"Inserted % particles",getNumberOfParticlesInserted());
-    }
-
+    
+    /*!
+     * \brief Fill a certain domain with particles.
+     */
+    void insertParticles(DPMBase* md);
+    
     /*!
      * \brief Gets the number of particles inserted by the boundary.
      */
     unsigned int getNumberOfParticlesInserted() const;
     
+    /*!
+     * \brief Gets the mass of particles inserted by the boundary.
+     */
     double getMassOfParticlesInserted() const;
     
+    /*!
+     * \brief Gets the volume of particles inserted by the boundary.
+     */
     double getVolumeOfParticlesInserted() const;
     
+    /*!
+     * \brief resets particle property counter variables.
+     */
     void reset();
-
+    
     /*! 
      * \brief Turns on the InsertionBoundary.
      */
     void activate();
-
+    
     /*!
      * \brief Turns off the InsertionBoundary.
      */
     void deactivate();
-
+    
     /*!
      * \brief Returns whether the InsertionBoundary is activated.
      */
     bool isActivated();
-
-    /*!
-     * \brief Sets the number of times that the wall may fail to insert a particle.
-     */
-    void setMaxFailed(unsigned int maxFailed);
     
     /*!
      * \brief Gets the number of times that the boundary may fail to insert a particle.
@@ -145,14 +159,19 @@ public:
     unsigned int getMaxFailed() const;
     
     /*!
+     * \brief Sets multiple different particles that will be inserted through the insertion boundary.
+     */
+    void setParticleToCopy(std::vector<BaseParticle*> particleToCopy);
+    
+    /*!
      * \brief Sets the particle that will be inserted through the insertion boundary.
      */
     void setParticleToCopy(BaseParticle* particleToCopy);
     
     /*!
-     * \brief Gets the particle that will be inserted through the insertion boundary.
+     * \brief Gets the particles that will be inserted through the insertion boundary.
      */
-    BaseParticle* getParticleToCopy() const;
+    std::vector<BaseParticle*> getParticleToCopy();
     
     /*!
      * \brief Reads the boundary's id_ and maxFailed_.
@@ -164,65 +183,84 @@ public:
      */
     void write(std::ostream& os) const override;
     
+    /*!
+     * \brief Gets the volume flow rate of the insertion routine.
+     */
     Mdouble getVolumeFlowRate() const;
     
+    /*!
+     * \brief Sets the volume flow rate of the insertion routine.
+     */
     void setVolumeFlowRate(Mdouble volumeFlowRate_);
     
+    /*!
+     * \brief Gets the initialVolume() .
+     */
     Mdouble getInitialVolume() const;
     
+    /*!
+     * \brief Gets the Volume which should be inserted by the insertion routine.
+     */
     void setInitialVolume(Mdouble initialVolume);
     
     /*!
      * \brief Sets the range of particle radii that may be generated from a user defined PSD.
      */
-    void setPSD(PSD psd);
-    
-    PSD getPSD();
+    void setPSD(const PSD psd);
     
     /*!
-     * \brief Sets the range of particle radii that may be generated to custom distributions.
+     * \brief Sets the ranges of particle radii that may be generated from user defined PSDs.
      */
-    void setDistribution(Distribution distribution);
+    void setPSD(std::vector<PSD> psd, std::vector<Mdouble> probability);
     
-    Distribution getDistribution();
+    /*!
+     * \brief Gets the particle size distributions set by the user.
+     */
+    std::vector<PSD> getPSD();
     
-    ///\see variableCumulativeVolumeFlowRate_
+    /*!
+     * \brief Sets a variable volume flow rate.
+     * \see variableCumulativeVolumeFlowRate_
+     */
     void
     setVariableVolumeFlowRate(const std::vector<Mdouble>& variableCumulativeVolumeFlowRate, Mdouble samplingInterval);
     
+    /*!
+     * \brief Checks the inserted total volume and returns if a particle is still allowed to be inserted.
+     */
     bool insertParticle(Mdouble time);
     
-    bool getCheckParticleForInteraction() const
-    {
-        return checkParticleForInteraction_;
-    }
+    /*!
+     * \brief Gets the variable that checks if a particle has an interaction.
+     */
+    bool getCheckParticleForInteraction() const;
     
-    void setCheckParticleForInteraction(bool checkParticleForInteraction)
-    {
-        checkParticleForInteraction_ = checkParticleForInteraction;
-    }
+    /*!
+     * \brief Sets the variable that checks if a particle has an interaction.
+     */
+    void setCheckParticleForInteraction(bool checkParticleForInteraction);
     
     /*!
      * \brief Set the flag for a manual PSD insertion routine
      */
     void setManualInsertion(bool manualInsertion);
-    
-    /*!
-     * \brief write Distribution class to file.
-     */
-    friend std::ostream& operator<<(std::ostream& os, InsertionBoundary::Distribution type);
-    
-    /*!
-     * \brief read Distribution class from file.
-     */
-    friend std::istream& operator>>(std::istream& is, InsertionBoundary::Distribution& type);
+
+//    /*!
+//     * \brief write Distribution class to file.
+//     */
+//    friend std::ostream& operator<<(std::ostream& os, InsertionBoundary::Distribution type);
+//
+//    /*!
+//     * \brief read Distribution class from file.
+//     */
+//    friend std::istream& operator>>(std::istream& is, InsertionBoundary::Distribution& type);
 
 protected:
     
     /*!
      * \brief Particle that will be inserted through the insertion boundary.
      */
-    BaseParticle* particleToCopy_;
+    std::vector<BaseParticle*> particleToCopy_;
     
     /*!
      * \brief Number of times that the wall may fail to insert a particle.
@@ -276,28 +314,32 @@ protected:
     ///\see variableCumulativeVolumeFlowRate_
     Mdouble samplingInterval_;
     
+    /*!
+     * \brief Checks if a particle has an interaction with a wall or other particles.
+     */
     bool checkParticleForInteraction_;
     
     /*!
-     * \brief Defines a particle size distribution as an object of the PSD class; if particleSizeDistribution_ is empty, distribution_ is
+     * \brief Defines a particle size distribution as an object of the PSD class; if particleSizeDistributionVector_ is empty, distribution_ is
      * used instead
      */
-    PSD particleSizeDistribution_;
+    std::vector<PSD> particleSizeDistributionVector_;
     
     /*!
-     * \brief Minimum and maximum radii of the generated particles
+     * \brief Minimum and maximum velocity of the particles to be inserted.
      */
-    Mdouble radMin_, radMax_;
-    
-    /*!
-     * \brief defines a custom particle size distribution, which by default is uniform
-     */
-    Distribution distribution_ = Distribution::Uniform;
+    Vec3D velMin_, velMax_;
     
     /*!
      * \brief A flag to enable a top-down class-by-class manual insertion of a PSD; default is FALSE
      */
     bool isManuallyInserting_;
+    
+    /*!
+     * \brief vector of probabilities in range [0,1] which determine the mixing ratio of partice size distributions.
+     */
+    std::vector<Mdouble> probability_;
+    
 };
 
 #endif

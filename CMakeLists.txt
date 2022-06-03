@@ -36,16 +36,21 @@ if (WIN32)
 endif(WIN32)
 
 if (CYGWIN)
-	message("You are using CYGWIN; which is no longer supported. However the code should still work")
-	add_definitions( -DCYGWIN )
-endif(CYGWIN)
+    message("You are using CYGWIN; which is no longer supported. However the code should still work")
+    add_definitions(-DCYGWIN)
+endif (CYGWIN)
 
 #If user has not given build type set it to Release
-if(NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE "Release" CACHE
-			STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
-			FORCE)
-endif(NOT CMAKE_BUILD_TYPE)
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE
+            STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel."
+            FORCE)
+endif (NOT CMAKE_BUILD_TYPE)
+
+#If cMake builds in debug mode add the MERCURY_DEBUG flag
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_definitions(-DMERCURY_DEBUG)
+endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 include(CMakeModules/MercuryMPI.cmake)
 

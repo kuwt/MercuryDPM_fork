@@ -126,16 +126,26 @@ int main(int argc, char *argv[])
     Vec3D position = OverlapProblem.particleHandler.getObject(0)->getPosition();
     Vec3D positionToCompare = Vec3D(0, -0.0004900098000491, 0.004008957617341);
     if (!position.isEqualTo(positionToCompare, 1e-10))
-        logger(FATAL,"Large particle is in the wrong position. It is at % and should be %",position,positionToCompare);
+    {
+        logger(FATAL, "Large particle is in the wrong position. It is at % and should be %", position,
+               positionToCompare);
+    }
     else
-        std::cout << "Test passed" << std::endl;
+    {
+        logger(INFO, "Test passed");
+    }
     position = OverlapProblem.particleHandler.getObject(1)->getPosition();
     positionToCompare = Vec3D(0, -0.0004900098000491, 0.009004578797915);
     //std::cout.precision(13); std::cout << position << std::endl;
     if (!position.isEqualTo(positionToCompare, 1e-10))
-        logger(FATAL,"Large particle is in the wrong position. It is at % and should be %",position,positionToCompare);
+    {
+        logger(FATAL, "Large particle is in the wrong position. It is at % and should be %", position,
+               positionToCompare);
+    }
     else
-        std::cout << "Test passed" << std::endl;
+    {
+        logger(INFO, "Test passed");
+    }
 
     return 0;
 }

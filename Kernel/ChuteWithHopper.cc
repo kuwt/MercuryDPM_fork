@@ -138,12 +138,17 @@ void ChuteWithHopper::setupInitialConditions()
     setupSideWalls();
     
     // create insertion boundary for the hopper and set a fill percentage
-    HopperInsertionBoundary b1;
     SphericalParticle* p1 = new SphericalParticle();
     p1->setSpecies(speciesHandler.getObject(0));
-    b1.set(p1, getMaxFailed(), getYMin(), getYMax(), getMinInflowParticleRadius(), getMaxInflowParticleRadius(),
-           getChuteAngle(), getFixedParticleRadius(), isHopperCentred_, hopperDimension_, hopperAngle_, hopperLength_,
+    
+    PSD psd;
+    psd.setDistributionUniform(getMinInflowParticleRadius(), getMaxInflowParticleRadius(), 50);
+    
+    HopperInsertionBoundary b1;
+    b1.set(p1, getMaxFailed(), getYMin(), getYMax(), getChuteAngle(),
+           getFixedParticleRadius(), isHopperCentred_, hopperDimension_, hopperAngle_, hopperLength_,
            hopperExitLength_, hopperHeight_, hopperLift_, hopperFillingPercentage_);
+    b1.setPSD(psd);
     InsertionBoundary* b1Added = boundaryHandler.copyAndAddObject(b1);
     setInsertionBoundary(b1Added);
     

@@ -113,16 +113,16 @@ int main(int argc, char *argv[])
     // Start measuring elapsed time
     std::chrono::time_point<std::chrono::system_clock> startClock, endClock;
     startClock = std::chrono::system_clock::now();
-
-    std::cout << "Hourglass Simulation" << std::endl;
+    
+    logger(INFO, "Hourglass Simulation");
     // note: this code is based on stefan's implementation, see
     // /storage2/usr/people/sluding/COMPUTERS/hpc01/sluding/MDCC/MDCLR/DEMO/W7
     // however, it is scaled to SI units by the scaling factors
     // d=1e-3, m=1e-6, g=1
-
+    
     //all parameters should be set in the main file
     //here, we use SI units (generally, other, scaled units are possible)
-
+    
     //create an instance of the class and name it
     HourGlass2D HG;
     HG.setName("HourGlass2D");
@@ -173,15 +173,18 @@ int main(int argc, char *argv[])
     species->setTorsionFrictionCoefficient(0.1);
     species->setTorsionStiffness(1.2e4);
     species->setSlidingDissipation(6.3e-2);
-
+    
     //test normal forces
-    Mdouble MinParticleMass = species->getDensity()*4.0 / 3.0 * constants::pi * mathsFunc::cubic(HG.MinParticleRadius);
-    std::cout << "MinParticleMass =" << MinParticleMass << std::endl;
+    Mdouble MinParticleMass =
+            species->getDensity() * 4.0 / 3.0 * constants::pi * mathsFunc::cubic(HG.MinParticleRadius);
+    logger(INFO, "MinParticleMass =%\n", MinParticleMass, Flusher::NO_FLUSH);
     Mdouble tc = species->getCollisionTime(MinParticleMass);
-    std::cout << "tc  =" << tc << std::endl;
-    std::cout << "r   =" << species->getRestitutionCoefficient(MinParticleMass) << std::endl;
-    std::cout << "vmax=" << species->getMaximumVelocity(HG.MinParticleRadius, MinParticleMass) << std::endl;
-
+    logger(INFO, "tc  =%\n"
+                 "r   =%\n"
+                 "vmax=%\n",
+           tc, species->getRestitutionCoefficient(MinParticleMass),
+           species->getMaximumVelocity(HG.MinParticleRadius, MinParticleMass), Flusher::NO_FLUSH);
+    
     //set other simulation parameters
     HG.setTimeStep(tc / 50.0);
     HG.setTimeMax(2.0);//run until 3.0 to see full simulation
@@ -189,10 +192,10 @@ int main(int argc, char *argv[])
     HG.setXBallsAdditionalArguments("-v0 -solidf");
     //uncomment next two line 2 to create paraview files
     HG.setParticlesWriteVTK(true);
-	HG.setWallsWriteVTK(FileType::ONE_FILE);	
-
+    HG.setWallsWriteVTK(FileType::ONE_FILE);
+    
     HG.N = 100; //number of particles
-    logger(INFO, "N   = %",  HG.N);
+    logger(INFO, "N   = %", HG.N);
 
     HG.solve(argc, argv);
     

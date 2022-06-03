@@ -109,8 +109,7 @@ void SlidingFrictionSpecies::setSlidingStiffness(Mdouble new_kt)
     }
     else
     {
-        std::cerr << "Error in setSlidingStiffness" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setSlidingStiffness");
     }
 }
 
@@ -127,8 +126,7 @@ void SlidingFrictionSpecies::setSlidingDissipation(Mdouble new_dispt)
         slidingDissipation_ = new_dispt;
     else
     {
-        std::cerr << "Error in setSlidingDissipation" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setSlidingDissipation");
     }
 }
 
@@ -149,8 +147,7 @@ void SlidingFrictionSpecies::setSlidingFrictionCoefficient(Mdouble new_mu)
     }
     else
     {
-        std::cerr << "Error in setSlidingFrictionCoefficient" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setSlidingFrictionCoefficient");
     }
 }
 
@@ -169,8 +166,7 @@ void SlidingFrictionSpecies::setSlidingFrictionCoefficientStatic(Mdouble new_mu)
     }
     else
     {
-        std::cerr << "Error in setSlidingFrictionCoefficientStatic" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setSlidingFrictionCoefficientStatic");
     }
 }
 
@@ -231,9 +227,9 @@ void SlidingFrictionSpecies::setCollisionTimeAndNormalAndTangentialRestitutionCo
         }
         else
         {
-            logger(ERROR, 
-                "SlidingFrictionSpecies::setCollisionTimeAndNormalAndTangentialRestitutionCoefficient only works for LinearViscoelasticSlidingFrictionSpecies or LinearPlasticViscoelasticSlidingFrictionSpecies"
-                );
+            logger(ERROR,
+                   "SlidingFrictionSpecies::setCollisionTimeAndNormalAndTangentialRestitutionCoefficient only works for "
+                   "LinearViscoelasticSlidingFrictionSpecies or LinearPlasticViscoelasticSlidingFrictionSpecies");
         }
     }
     
@@ -257,10 +253,8 @@ SlidingFrictionSpecies::setCollisionTimeAndNormalAndTangentialRestitutionCoeffic
     LinearViscoelasticNormalSpecies* species = dynamic_cast<LinearViscoelasticNormalSpecies*>(this);
     if (species == nullptr)
     {
-        std::cerr
-                << "SlidingFrictionSpecies::setCollisionTimeAndNormalAndTangentialRestitutionCoefficient only works for LinearViscoelasticSlidingFrictionSpecies"
-                << std::endl;
-        exit(-1);
+        logger(ERROR, "SlidingFrictionSpecies::setCollisionTimeAndNormalAndTangentialRestitutionCoefficient only "
+                      "works for LinearViscoelasticSlidingFrictionSpecies");
     }
     species->setCollisionTimeAndRestitutionCoefficient(tc, eps, mass);
     // from: V. Becker et. al. https://doi.org/10.1103/PhysRevE.77.011304

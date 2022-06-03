@@ -173,8 +173,7 @@ public:
 #if MERCURY_ASSERTS
         if (to == processorID_)
         {
-            std::cout << "[MPI FATAL]: Sending data to self!" << std::endl;
-            std::exit(-1);
+            logger(FATAL, "[MPI FATAL]: Sending data to self!");
         }
 #endif
 #ifdef MERCURY_USE_MPI
@@ -193,13 +192,12 @@ public:
 #if MERCURY_ASSERTS
         if (to == processorID_)
         {
-            std::cout << "[MPI FATAL]: Sending data to self!" << std::endl;
-            std::exit(-1);
+            logger(FATAL, "[MPI FATAL]: Sending data to self!");
         }
         
         if (count == 0)
         {
-            std::cout << "[MPI ERROR]: Sending zero data" << std::endl;
+            logger(WARN, "[MPI ERROR]: Sending zero data");
         }
 #endif
 #ifdef MERCURY_USE_MPI
@@ -225,8 +223,7 @@ public:
 #if MERCURY_ASSERTS
         if (from == processorID_)
         {
-            std::cout << "[MPI FATAL]: Receiving data from self!" << std::endl;
-            std::exit(-1);
+            logger(FATAL, "[MPI FATAL]: Receiving data from self!");
         }
 #endif
 #ifdef MERCURY_USE_MPI
@@ -245,13 +242,12 @@ public:
 #if MERCURY_ASSERTS
         if (from == processorID_)
         {
-            std::cout << "[MPI FATAL]: Receiving data fromself!" << std::endl;
-            std::exit(-1);
+            logger(FATAL, "[MPI FATAL]: Receiving data fromself!");
         }
         
         if (count == 0)
         {
-            std::cout << "[MPI ERROR]: Receiving zero data" << std::endl;
+            logger(WARN, "[MPI ERROR]: Receiving zero data");
         }
 #endif
 #ifdef MERCURY_USE_MPI
@@ -278,13 +274,12 @@ public:
 #if MERCURY_ASSERTS
         if (to == processorID_)
         {
-            std::cout << "[MPI FATAL]: Sending data to self!" << std::endl;
-            std::exit(-1);
+            logger(FATAL, "[MPI FATAL]: Sending data to self!");
         }
         
         if (count == 0)
         {
-            std::cout << "[MPI ERROR]: Sending zero data" << std::endl;
+            logger(WARN, "[MPI ERROR]: Sending zero data");
         }
 #endif
 #ifdef MERCURY_USE_MPI
@@ -311,13 +306,12 @@ public:
 #if MERCURY_ASSERTS
         if (from == processorID_)
         {
-            std::cout << "[MPI FATAL]: Receiving data to self!" << std::endl;
-            std::exit(-1);
+            logger(FATAL, "[MPI FATAL]: Receiving data to self!");
         }
         
         if (count == 0)
         {
-            std::cout << "[MPI ERROR]: Receiving zero data" << std::endl;
+            logger(WARN, "[MPI ERROR]: Receiving zero data");
         }
 #endif
 #ifdef MERCURY_USE_MPI
@@ -343,13 +337,12 @@ public:
 #if MERCURY_ASSERTS
         if (to == processorID_)
         {
-            std::cout << "[MPI FATAL]: Sending data to self!" << std::endl;
-            std::exit(-1);
+            logger(FATAL, "[MPI FATAL]: Sending data to self!");
         }
         
         if (count == 0)
         {
-            std::cout << "[MPI ERROR]: Sending zero data" << std::endl;
+            logger(WARN, "[MPI ERROR]: Sending zero data");
         }
 #endif
 #ifdef MERCURY_USE_MPI
@@ -364,13 +357,12 @@ public:
 #if MERCURY_ASSERTS
         if (to == processorID_)
         {
-            std::cout << "[MPI FATAL]: Sending data to self!" << std::endl;
-            std::exit(-1);
+            logger(FATAL, "[MPI FATAL]: Sending data to self!");
         }
         
         if (count == 0)
         {
-            std::cout << "[MPI ERROR]: Sending zero data" << std::endl;
+            logger(WARN, "[MPI ERROR]: Sending zero data");
         }
 #endif
 #ifdef MERCURY_USE_MPI
@@ -393,13 +385,12 @@ public:
 #if MERCURY_ASSERTS
         if (from == processorID_)
         {
-            std::cout << "[MPI FATAL]: Receiving data from self!" << std::endl;
-            std::exit(-1);
+            logger(FATAL, "[MPI FATAL]: Receiving data from self!");
         }
         
         if (count == 0)
         {
-            std::cout << "[MPI ERROR]: Receiving zero data" << std::endl;
+            logger(WARN, "[MPI ERROR]: Receiving zero data");
         }
 #endif
 #ifdef MERCURY_USE_MPI
@@ -413,13 +404,12 @@ public:
 #if MERCURY_ASSERTS
         if (from == processorID_)
         {
-            std::cout << "[MPI FATAL]: Receiving data to self!" << std::endl;
-            std::exit(-1);
+            logger(FATAL, "[MPI FATAL]: Receiving data to self!");
         }
         
         if (count == 0)
         {
-            std::cout << "[MPI ERROR]: Receiving zero data" << std::endl;
+            logger(WARN, "[MPI ERROR]: Receiving zero data");
         }
 #endif
 #ifdef MERCURY_USE_MPI

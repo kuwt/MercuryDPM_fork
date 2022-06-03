@@ -191,8 +191,7 @@ void ChargedBondedSpecies::setCharge(int newCharge)
         charge_ = newCharge;
     else
     {
-        std::cerr << "Error in setCharge - charge must be +1, -1 or zero" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setCharge - charge must be +1, -1 or zero");
     }
 }
 
@@ -211,8 +210,7 @@ void ChargedBondedSpecies::setBondForceMax(Mdouble new_f0)
     }
     else
     {
-        std::cerr << "Error in setBondForceMax" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setBondForceMax");
     }
 }
 
@@ -231,8 +229,7 @@ void ChargedBondedSpecies::setBondDissipation(Mdouble disp)
         bondDissipation_ = disp;
     else
     {
-        std::cerr << "Error in setAdhesionDissipation" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setAdhesionDissipation");
     }
 }
 
@@ -258,8 +255,7 @@ void ChargedBondedSpecies::setVanDerWaalsForceMax(Mdouble fMax)
 {
     if (fMax < 0)
     {
-        std::cerr << "Error in setVanDerWaalsForceMax." << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setVanDerWaalsForceMax.");
     }
     else
     {

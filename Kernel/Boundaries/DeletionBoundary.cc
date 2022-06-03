@@ -47,7 +47,7 @@ DeletionBoundary::DeletionBoundary()
     massDeleted_ = 0;
     volumeDeleted_ = 0;
     
-    logger(DEBUG, "DeletionBoundary::DeletionBoundary() finished");
+    logger(DEBUG, "DeletionBoundary::DeletionBoundary() finished", true);
 }
 
 /*!
@@ -55,7 +55,7 @@ DeletionBoundary::DeletionBoundary()
  */
 DeletionBoundary::~DeletionBoundary()
 {
-    logger(DEBUG, "DeletionBoundary::~DeletionBoundary() finished");
+    logger(DEBUG, "DeletionBoundary::~DeletionBoundary() finished", true);
 }
 
 /*!
@@ -131,7 +131,7 @@ bool DeletionBoundary::checkBoundaryAfterParticleMoved(BaseParticle* p, Particle
                 std::string name  = dpm->getName()
                         + helpers::to_string(getIndex())
                         + ".out" + (NUMBER_OF_PROCESSORS==1?"":std::to_string(PROCESSOR_ID));
-                logger(INFO,"Open file %",name);
+                logger(INFO, "Open file %", name);
                 tracker.open(name);
                 tracker << std::setw(13) << "Time "
                         << std::setw(8) << "Species "

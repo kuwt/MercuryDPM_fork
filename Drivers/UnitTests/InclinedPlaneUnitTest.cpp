@@ -50,7 +50,7 @@ public:
 
 int main(int argc, char *argv[])
 {
-	std::cout<<"Single particle rolling on a bottom plate"<<std::endl;
+	logger(INFO, "Single particle rolling on a bottom plate");
 	///Start off my solving the default problem
 	InclinedPlane problem;
     

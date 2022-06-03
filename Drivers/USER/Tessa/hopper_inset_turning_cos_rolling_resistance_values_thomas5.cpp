@@ -204,24 +204,25 @@ public:
 		if (addingParticles) {
 			//cout<<"Adding particle"<<endl;
 			if (get_CreateInHopper()) {
-				//cout<<"Adding particles in hopper"<<endl;
+                //cout<<"Adding particles in hopper"<<endl;
                 HopperInsertionBoundary b1;
-                b1.set(new SphericalParticle, getMaxFailed(), getYMin(), getYMax(), getMinInflowParticleRadius(), getMaxInflowParticleRadius(),
-                       getChuteAngle(), getFixedParticleRadius(), getIsHopperCentred(), getHopperDimension(), getHopperAngle(), getHopperLength(),
-                       getHopperExitLength(),getHopperHeight(), getHopperLift(), getHopperFillingPercentage());
+                b1.set(new SphericalParticle, getMaxFailed(), getYMin(), getYMax(),
+                       getChuteAngle(), getFixedParticleRadius(), getIsHopperCentred(), getHopperDimension(),
+                       getHopperAngle(), getHopperLength(),
+                       getHopperExitLength(), getHopperHeight(), getHopperLift(), getHopperFillingPercentage());
                 boundaryHandler.copyAndAddObject(b1);
                 setInsertionBoundary(dynamic_cast<InsertionBoundary*>(boundaryHandler.getLastObject()));
-				
-				/*
-				while (failed<=max_failed){
-					create_inflow_particle();
-					if (IsInsertable(P0)) {
-						failed = 0; 
-						num_created++;
-					} else failed++;
-				};
-				*/
-			} else {
+                
+                /*
+                while (failed<=max_failed){
+                    create_inflow_particle();
+                    if (IsInsertable(P0)) {
+                        failed = 0;
+                        num_created++;
+                    } else failed++;
+                };
+                */
+            } else {
 				//cout<<"Adding particles in triangle"<<endl;
 				while (failedTriangle <= maxFailedTriangle && numCreatedTriangle < maxCreatedTriangle) {
 					create_inflow_particle_triangle();

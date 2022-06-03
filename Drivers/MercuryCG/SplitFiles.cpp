@@ -33,6 +33,7 @@
 #include <sys/stat.h> 
 #include <cstdio>
 #include <cstdlib>
+#include <Logger.h>
 
 
 class CFile {
@@ -53,25 +54,30 @@ public:
 
 		if (data_file.fail())
 		{
-			std::cerr << "ERROR: Input file " << data_filename.str() << " not found" << std::endl;
-			exit(-1);
-		} else {
-            if (fstat_file.fail()) {
-                std::cerr << "WARN: Input file " << fstat_filename.str() << " not found; only data files will be processed" << std::endl;
-                std::cout << "File opened: " << data_filename.str() << std::endl;
-            } else {
-                std::cout << "Files opened: " << data_filename.str() << " and " << fstat_filename.str() << std::endl;
+            logger(ERROR, "Input file % not found", data_filename.str());
+		} else
+        {
+            if (fstat_file.fail())
+            {
+                logger(WARN, "WARN: Input file % not found; only data files will be processed", fstat_filename.str()
+                );
+                logger(INFO, "File opened: %", data_filename.str());
             }
-		}
+            else
+            {
+                logger(INFO, "Files opened: % and %", data_filename.str(), fstat_filename.str());
+            }
+        }
 
     }
 
 	///Destructor
-	~CFile() {
-		data_file.close();
-		fstat_file.close();
-		std::cout << "Files closed: " << data_filename.str() << " and " << fstat_filename.str() << std::endl;
-	}
+	~CFile()
+    {
+        data_file.close();
+        fstat_file.close();
+        logger(INFO, "Files closed: % and %", data_filename.str(), fstat_filename.str());
+    }
 		
 	bool copy(unsigned int stepsize, unsigned int counter) {
 		//return copy_last_time_step();
@@ -92,31 +98,33 @@ public:
 			//set output_filename
 			std::stringstream output_filename("");
 			output_filename << data_filename.str() << ".";
-			if (counter<1000) output_filename << "0";
-			if (counter<100) output_filename << "0";
-			if (counter<10) output_filename << "0";
-			output_filename << counter;
-			counter ++;
-			//std::cout << "Outputfile: " << output_filename.str() << std::endl;
-			
-			//open, write, close output file
-			output_file.open(output_filename.str().c_str(), std::fstream::out);
-			getline(data_file,line);
-			output_file << N << line << std::endl;
-			std::cout << N << line << std::endl;
-			for (unsigned int i=0; i<N; i++) {
-				getline(data_file,line);
-				output_file << line << std::endl;
-			}
-			output_file.close();
+            if (counter < 1000) output_filename << "0";
+            if (counter < 100) output_filename << "0";
+            if (counter < 10) output_filename << "0";
+            output_filename << counter;
+            counter++;
+            //logger(INFO, "Outputfile: %", output_filename.str());
+            
+            //open, write, close output file
+            output_file.open(output_filename.str().c_str(), std::fstream::out);
+            getline(data_file, line);
+            output_file << N << line << std::endl;
+            logger(INFO, "%%", N, line);
+            for (unsigned int i = 0; i < N; i++)
+            {
+                getline(data_file, line);
+                output_file << line << std::endl;
+            }
+            output_file.close();
             double doubleN = -1;
-			data_file >> doubleN;
+            data_file >> doubleN;
             N = doubleN;
-
+            
             // converting N to an integer; skipping the line if there is a problem (this happens when there is a corrupt data file)
-			while (data_file.good() && doubleN != N) {
-                getline(data_file,line,'\n');
-                std::cerr << "Skipping bad line in data file: " << doubleN << std::endl;
+			while (data_file.good() && doubleN != N)
+            {
+                getline(data_file, line, '\n');
+                logger(WARN, "Skipping bad line in data file: %", doubleN);
                 data_file >> doubleN;
                 N = doubleN;
             }
@@ -138,29 +146,30 @@ public:
 		
 		getline(fstat_file,line);
 		while (fstat_file.good()) {
-			//set output_filename
-			output_filename.str("");
-			output_filename << fstat_filename.str() << ".";
-			if (counter<1000) output_filename << "0";
-			if (counter<100) output_filename << "0";
-			if (counter<10) output_filename << "0";
-			output_filename << counter;
-			counter ++;
-
-			//open, write, close output file
-			output_file.open(output_filename.str().c_str(), std::fstream::out);
-			std::cout << line << std::endl;
-			output_file << line << std::endl;
-			getline(fstat_file,line); 
-			output_file << line << std::endl;
-			getline(fstat_file,line); 
-			output_file << line << std::endl;
-			getline(fstat_file,line);
-			while (line.c_str()[0] != '#'&&fstat_file.good()) {
-				getline(fstat_file,line);
-				output_file << line << std::endl;
-			}
-			output_file.close();
+            //set output_filename
+            output_filename.str("");
+            output_filename << fstat_filename.str() << ".";
+            if (counter < 1000) output_filename << "0";
+            if (counter < 100) output_filename << "0";
+            if (counter < 10) output_filename << "0";
+            output_filename << counter;
+            counter++;
+            
+            //open, write, close output file
+            output_file.open(output_filename.str().c_str(), std::fstream::out);
+            logger(INFO, "%", line);
+            output_file << line << std::endl;
+            getline(fstat_file, line);
+            output_file << line << std::endl;
+            getline(fstat_file, line);
+            output_file << line << std::endl;
+            getline(fstat_file, line);
+            while (line.c_str()[0] != '#' && fstat_file.good())
+            {
+                getline(fstat_file, line);
+                output_file << line << std::endl;
+            }
+            output_file.close();
 
 			//step over some time steps
 			for(unsigned int j=1; j<stepsize; j++) {
@@ -189,21 +198,21 @@ private:
 int main(int argc, char *argv[])
 {
 	if (argc<2) {
-		std::cerr << "split_files problem_name [stepsize [initial_counter]]" << std::endl;
+        logger(WARN, "split_files problem_name [stepsize [initial_counter]]");
 		return -1;
 	}
 	std::string name(argv[1]);
-	std::cout << "Name: " << name << std::endl;
-	
-	unsigned int stepsize = 1;
-	if (argc>2) stepsize = static_cast<unsigned int>(atoi(argv[2]));
-	
-	//defines the initial counter
-	unsigned int counter = 0;
-	if (argc>3) counter = static_cast<unsigned int>(atoi(argv[3]));
-
-	CFile files(name);
-	files.copy(stepsize,counter);
-	std::cout << "finished writing split files: " << name << std::endl;
-	return 0;
+    logger(INFO, "Name: %", name);
+    
+    unsigned int stepsize = 1;
+    if (argc > 2) stepsize = static_cast<unsigned int>(atoi(argv[2]));
+    
+    //defines the initial counter
+    unsigned int counter = 0;
+    if (argc > 3) counter = static_cast<unsigned int>(atoi(argv[3]));
+    
+    CFile files(name);
+    files.copy(stepsize, counter);
+    logger(INFO, "finished writing split files: %", name);
+    return 0;
 }

@@ -48,25 +48,25 @@ public:
         species->setDensity(10000);
         species->setDissipation(0.04);
         species->setStiffness(1e4);
-
+    
         SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setRadius(2e-4);
-        p.setVelocity(Vec3D(1,1,1)*1e-3);
-
+        p.setVelocity(Vec3D(1, 1, 1) * 1e-3);
+    
         CubeInsertionBoundary insertionBoundary;
-        insertionBoundary.set(p,100,getMin(),getMax(),-p.getVelocity(),p.getVelocity(),p.getRadius(),p.getRadius());
-        insertionBoundary.setInitialVolume(p.getVolume()*N);
+        insertionBoundary.set(p, 100, getMin(), getMax(), -p.getVelocity(), p.getVelocity());
+        insertionBoundary.setInitialVolume(p.getVolume() * N);
         insertionBoundary.checkBoundaryBeforeTimeStep(this);
-        setMeanVelocity({0,0,0});
-
-        double mass  = species->getMassFromRadius(p.getRadius());
+        setMeanVelocity({0, 0, 0});
+    
+        double mass = species->getMassFromRadius(p.getRadius());
         double rest = species->getRestitutionCoefficient(mass);
         double tc = species->getCollisionTime(mass);
-        logger(INFO,"Restitution %",rest);
-        logger(INFO,"Collision time %",tc);
-        logger(INFO,"N %",particleHandler.getNumberOfObjects());
-
+        logger(INFO, "Restitution %", rest);
+        logger(INFO, "Collision time %", tc);
+        logger(INFO, "N %", particleHandler.getNumberOfObjects());
+    
         /*wallHandler.clear();
         InfiniteWall w0;
         w0.setSpecies(speciesHandler.getObject(0));
@@ -91,27 +91,27 @@ public:
 
 int main(int argc UNUSED, char *argv[] UNUSED)
 {
-
-	std::cout<<"In this file 32^2 particles with the same velocity are placed "
-	"in a bi-axial box. This makes them collide with the walls and eachother. "
-	"Afterwards the same run is performed with hgrid on. It tests the working "
-	"(and speedup) of the hgrid."<<std::endl;
-
-	FreeCooling2DinWalls problem;
-	problem.setName("FreeCooling2DinWalls");
-
-    problem.N=100;
-
-    problem.setGravity(Vec3D(0.0,0.0,0.0));
+    
+    logger(INFO, "In this file 32^2 particles with the same velocity are placed "
+                 "in a bi-axial box. This makes them collide with the walls and eachother. "
+                 "Afterwards the same run is performed with hgrid on. It tests the working "
+                 "(and speedup) of the hgrid.");
+    
+    FreeCooling2DinWalls problem;
+    problem.setName("FreeCooling2DinWalls");
+    
+    problem.N = 100;
+    
+    problem.setGravity(Vec3D(0.0, 0.0, 0.0));
     problem.setTimeStep(5e-5);
     problem.setSaveCount(2000);
     problem.setTimeMax(1000.0);
-    problem.setMax({0.01,0.01,0.01});
-
-
+    problem.setMax({0.01, 0.01, 0.01});
+    
+    
     problem.setHGridMaxLevels(1);
-	problem.setHGridCellOverSizeRatio(1.2);
-	problem.setHGridUpdateEachTimeStep(false);
+    problem.setHGridCellOverSizeRatio(1.2);
+    problem.setHGridUpdateEachTimeStep(false);
     problem.setFileType(FileType::ONE_FILE);
 
 	problem.solve();

@@ -46,11 +46,14 @@ public:
 	
 	void actionAfterTimeStep()
 	{
-		SilbertHstop::actionAfterTimeStep();
-		double kineticEnergy=getKineticEnergy();
-		std::cout << "ene_kin/ene_ele=" << kineticEnergy/getElasticEnergy() << ", piac=" << pointIsAboveCurve << std::endl;
-		if (kineticEnergy/getElasticEnergy()<1e-5 && getTime()>10) pointIsAboveCurve=false;
-	}
+        SilbertHstop::actionAfterTimeStep();
+        double kineticEnergy = getKineticEnergy();
+        logger(INFO, "ene_kin/ene_ele=%, piac=%", kineticEnergy / getElasticEnergy(), pointIsAboveCurve);
+        if (kineticEnergy / getElasticEnergy() < 1e-5 && getTime() > 10)
+        {
+            pointIsAboveCurve = false;
+        }
+    }
 
 	bool continueSolve() const override {
 		if (ceil(getTime())!=ceil(getTime()+getTimeStep())) printTime();
@@ -83,29 +86,29 @@ public:
 std::fstream ReportFile;
 
 bool PointIsAboveCurve(double h, double a, int study_num) {
-        std::cout << "PointIsAboveCurve(" << study_num << ", h=" << h << ", a=" << a << ")" << std::endl;
-	SilbertHstop problem;
-	problem.setInflowHeight(h) ;
-	problem.setChuteAngle(a);
-	problem.set_study(study_num);
-	std::stringstream name;
-	name << "H" << problem.getInflowHeight() 
-		 << "A" << problem.getChuteAngleDegrees() 
-		 << "L" << round(100.*problem.getFixedParticleRadius()*2.)/100.
-	     << "M" << problem.species->getSlidingFrictionCoefficient()
-		 << "B" << problem.getSlidingFrictionCoefficientBottom();
-	problem.setName(name.str().c_str());
-	std::cout << "starting " << name.str().c_str() << std::endl;
-	// if you want more restart output, use these options
-	//problem.restartFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
-	// for real runs:
-	///\todo TWnow: add Hertz again
-	//problem.speciesHandler.getObject(0)->setForceType(ForceType::HERTZ);
-	problem.solve();
-	// for test runs:
-	//problem.solve_analytic();
-	std::stringstream com;
-	ReportFile   << problem.getInflowHeight() 
+    logger(INFO, "PointIsAboveCurve(%, h=%, a=%)", study_num, h, a);
+    SilbertHstop problem;
+    problem.setInflowHeight(h);
+    problem.setChuteAngle(a);
+    problem.set_study(study_num);
+    std::stringstream name;
+    name << "H" << problem.getInflowHeight()
+         << "A" << problem.getChuteAngleDegrees()
+         << "L" << round(100. * problem.getFixedParticleRadius() * 2.) / 100.
+         << "M" << problem.species->getSlidingFrictionCoefficient()
+         << "B" << problem.getSlidingFrictionCoefficientBottom();
+    problem.setName(name.str().c_str());
+    logger(INFO, "starting %", name.str().c_str());
+    // if you want more restart output, use these options
+    //problem.restartFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
+    // for real runs:
+    ///\todo TWnow: add Hertz again
+    //problem.speciesHandler.getObject(0)->setForceType(ForceType::HERTZ);
+    problem.solve();
+    // for test runs:
+    //problem.solve_analytic();
+    std::stringstream com;
+    ReportFile << problem.getInflowHeight()
 		 << "\t" << problem.getChuteAngleDegrees() 
 		 << "\t" << round(100.*problem.getFixedParticleRadius()*2.)/100.
 		 << "\t" << problem.species->getSlidingFrictionCoefficient()
@@ -117,7 +120,7 @@ bool PointIsAboveCurve(double h, double a, int study_num) {
 
 int HstopCurve(std::string cmd UNUSED, int study_num, double h, double hMax, double a)
 {
-  std::cout << "restart at study_num=" << study_num << ", h=" << h << ", a=" << a << std::endl;
+    logger(INFO, "restart at study_num=%, h=%, a=%", study_num, h, a);
 	
   std::stringstream name;
 	name << "Report" << study_num;
@@ -135,7 +138,7 @@ int HstopCurve(std::string cmd UNUSED, int study_num, double h, double hMax, dou
 		command << "nohup nice -18 ../hstopHertz_StudyHeightHmaxAngle.exe " << study_num << " " << h << " " << hMax << " " << a << " &>>outS" << study_num << "H" << h << "HMax" << hMax << "A" << a << " &";
 		// for einder:
 		//command << "name="<<cmd<<" && cd ${name/hstop_StudyHeightHmaxAngle.exe/} && ~/clusterscriptexecute $name " << study_num << " " << h << " " << hMax << " " << a << "&";
-		std::cout << command.str() << std::endl;
+        logger(INFO, "%", command.str());
 		return system (command.str().c_str());
 	} else {
 		return 0;	
@@ -144,6 +147,9 @@ int HstopCurve(std::string cmd UNUSED, int study_num, double h, double hMax, dou
 
 int main(int argc, char *argv[])
 {
-  if (argc<4) { std::cout << "Please specify Study, Height, max. Height and Angle" << std::endl; exit(-1); }
-	HstopCurve(argv[0],atoi(argv[1]),atof(argv[2]),atof(argv[3]),atof(argv[4]));	
+    if (argc < 4)
+    {
+        logger(ERROR, "Please specify Study, Height, max. Height and Angle");
+    }
+    HstopCurve(argv[0], atoi(argv[1]), atof(argv[2]), atof(argv[3]), atof(argv[4]));
 }

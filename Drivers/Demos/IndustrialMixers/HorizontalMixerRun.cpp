@@ -23,19 +23,19 @@ int main()
     Mdouble mass = s->getMassFromRadius(particleRadius);
     s->setCollisionTimeAndRestitutionCoefficient(0.01, 0.5, mass);
     s->setSlidingFrictionCoefficient(0.5);
-    s->setSlidingStiffness(2.0/7.0*s->getStiffness());
-    s->setSlidingDissipation(2.0/7.0*s->getDissipation());
-
+    s->setSlidingStiffness(2.0 / 7.0 * s->getStiffness());
+    s->setSlidingDissipation(2.0 / 7.0 * s->getDissipation());
+    
     //set timestep
     mixer.setTimeStep(0.2 * s->getCollisionTime(mass));
     //save every 2 collision times for smooth viewable output
-    mixer.setSaveCount((unsigned)(200.0*s->getCollisionTime(mass)/mixer.getTimeStep()));
-    std::cout << "Savecount: " << mixer.dataFile.getSaveCount() << std::endl;
-
+    mixer.setSaveCount((unsigned) (200.0 * s->getCollisionTime(mass) / mixer.getTimeStep()));
+    logger(INFO, "Savecount: %", mixer.dataFile.getSaveCount());
+    
     mixer.setTimeMax(100);
     mixer.writeScript();
-
+    
     mixer.solve();
-
+    
     return 0;
 }

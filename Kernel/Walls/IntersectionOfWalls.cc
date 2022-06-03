@@ -193,8 +193,8 @@ void IntersectionOfWalls::addTetraSTL(Vec3D PointA, Vec3D PointB, Vec3D PointC, 
     //Check if wall coordinates  inline, if true Do not build wall and give error message. But keep continuing
     if (WallNormal.getLengthSquared() == 0.0)
     {
-        std::cout << "Error Building Plate number " << wallidentifier
-                  << "out of 3 coordinates. Coordinates are in line, Wall not constructed." << std::endl;
+        logger(WARN, "Error Building Plate number % out of 3 coordinates. Coordinates are in line, Wall not "
+                     "constructed", wallidentifier);
     }
     else
     {
@@ -300,8 +300,8 @@ IntersectionOfWalls::addPlate(const Vec3D& PointA, const Vec3D& PointB, const Ve
     //Check if walls coordinates  inline, if true Do not build wall and give error message. But keep continuing
     if (WallNormal.getLengthSquared() == 0.0)
     {
-        std::cout << "Error Building Plate number " << wallidentifier
-                  << "out of 3 coordinates. Coordinates are in line, Wall not constructed." << std::endl;
+        logger(WARN, "Error Building Plate number % out of 3 coordinates. Coordinates are in line, Wall not "
+                     "constructed.", wallidentifier);
     }
     else
     {

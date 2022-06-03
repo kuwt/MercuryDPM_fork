@@ -404,39 +404,40 @@ std::vector<T> readVectorFromCommandLine(int argc, char *argv[], std::string var
     }
     //if the variable is not found
     std::stringstream out;
-    for (auto& v : values) out << v << ' ';
+    for (auto& v: values) out << v << ' ';
     logger(INFO, "readFromCommandLine: % set to default value % ", varName.substr(1), out.str());
     return values;
 }
-
-template<>
-std::string readFromCommandLine<std::string>(int argc, char *argv[], std::string varName, std::string value);
-
-void check(double real, double ideal, double error, std::string errorMessage);
-
-void check(Vec3D real, Vec3D ideal, double error, std::string errorMessage);
-
-void check(Matrix3D real, Matrix3D ideal, double error, std::string errorMessage);
-
-void check(MatrixSymmetric3D real, MatrixSymmetric3D ideal, double error, std::string errorMessage);
-
-std::string getPath();
-
-Mdouble getRealTime();
-
-bool isNext(std::istream& is, const std::string name);
-
-bool createDirectory(std::string);
-
-Mdouble round(const Mdouble value, unsigned precision);
+    
+    
+    template<>
+    std::string readFromCommandLine<std::string>(int argc, char* argv[], std::string varName, std::string value);
+    
+    void check(double real, double ideal, double error, std::string errorMessage);
+    
+    void check(Vec3D real, Vec3D ideal, double error, std::string errorMessage);
+    
+    void check(Matrix3D real, Matrix3D ideal, double error, std::string errorMessage);
+    
+    void check(MatrixSymmetric3D real, MatrixSymmetric3D ideal, double error, std::string errorMessage);
+    
+    std::string getPath();
+    
+    Mdouble getRealTime();
+    
+    bool isNext(std::istream& is, const std::string name);
+    
+    bool createDirectory(std::string);
+    
+    Mdouble round(const Mdouble value, unsigned precision);
 
 /*
  * \brief Returns the Rayleigh time step for a Hertz contact law.
  * \detailed An accepted time step for Hertz is 10-20% of the Rayleigh time step.
  * See \cite Marigo2015
  */
-Mdouble getRayleighTime(Mdouble radius, Mdouble shearModulus, Mdouble poisson, Mdouble density);
-
+    Mdouble getRayleighTime(Mdouble radius, Mdouble shearModulus, Mdouble poisson, Mdouble density);
+    
+    std::vector<Mdouble> linspace(Mdouble a, Mdouble b, int N);
 }
-
 #endif

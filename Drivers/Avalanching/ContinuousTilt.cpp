@@ -91,10 +91,7 @@ public:
 
     // this is outputted every time an output file is written
     void printTime() const override {
-        std::cout
-        << "t=" << std::setprecision(3) << std::left << std::setw(6) << getTime()
-        << " a=" << std::setprecision(3) << std::left << std::setw(6) << getChuteAngleDegrees()
-        << std::endl;
+        logger(INFO, "t=%3.6 a=%3.6", getTime(), getChuteAngleDegrees());
     }
 
     //this code is run before each time step of the simulation

@@ -96,8 +96,7 @@ void LinearViscoelasticNormalSpecies::setStiffness(Mdouble new_k)
         stiffness_ = new_k;
     else
     {
-        std::cerr << "Error in set_k" << std::endl;
-        exit(-1);
+        logger(ERROR, "setStiffness(%) argument has to be non-negative!", new_k);
     }
 }
 
@@ -123,8 +122,7 @@ void LinearViscoelasticNormalSpecies::setDissipation(Mdouble dissipation)
     }
     else
     {
-        std::cerr << "Error in setDissipation(" << dissipation << ")" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setDissipation(%)", dissipation);
     }
 }
 
@@ -141,28 +139,27 @@ Mdouble LinearViscoelasticNormalSpecies::getCollisionTime(Mdouble mass) const
     if (getConstantRestitution()) mass = 1;
     if (mass <= 0)
     {
-        std::cerr << "Warning in getCollisionTime(" << mass
-                  << ") mass is not set or has an unexpected value, (getCollisionTime(" << mass << "))" << std::endl;
+        logger(ERROR, "Warning in getCollisionTime(%) mass is not set or has an unexpected value, "
+                      "(getCollisionTime(%)", mass, mass);
     }
     if (stiffness_ <= 0)
     {
-        std::cerr << "Warning in getCollisionTime(" << mass << ") stiffness=" << stiffness_
-                  << " is not set or has an unexpected value, (getCollisionTime(" << mass << "), with stiffness="
-                  << stiffness_ << ")" << std::endl;
+        logger(ERROR, "Error in getCollisionTime(%) stiffness=% is not set or has an unexpected value "
+                      "(getCollisionTime(%), with stiffness=%)",
+               mass, stiffness_, mass, stiffness_);
     }
     if (dissipation_ < 0)
     {
-        std::cerr << "Warning in getCollisionTime(" << mass << ") dissipation=" << dissipation_
-                  << " is not set or has an unexpected value, (getCollisionTime(" << mass << "), with dissipation="
-                  << dissipation_ << ")" << std::endl;
+        logger(ERROR, "Error in getCollisionTime(%) dissipation=% is not set or has an unexpected value "
+                      "(getCollisionTime(%), with dissipation=%)",
+               mass, dissipation_, mass, dissipation_);
     }
     Mdouble tosqrt = stiffness_ / (.5 * mass) - mathsFunc::square(dissipation_ / mass);
     if (tosqrt <= 0)
     {
-        std::cerr << "Warning in getCollisionTime(" << mass
-                  << ") values for mass, stiffness and dissipation would lead to an overdamped system, (getCollisionTime("
-                  << mass << "), with stiffness=" << stiffness_ << " and dissipation=" << dissipation_ << ")"
-                  << std::endl;
+        logger(ERROR, "Warning in getCollisionTime(%) values for mass, stiffness and dissipation would lead to an "
+                      "overdamped system, (getCollisionTime(%), with stiffness=% and dissipation=%",
+               mass, mass, stiffness_, dissipation_);
     }
     return constants::pi / std::sqrt(tosqrt);
 }

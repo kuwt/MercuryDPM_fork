@@ -112,26 +112,28 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 	for (int i=0; i<4; i++)
     {
         logger(INFO, "Running for chi=%",chi[i]);
-		PlasticForceUnitTestProblem.set_chi(chi[i]);
-		std::stringstream ss("");
-		ss << "PlasticForceUnitTest" << PlasticForceUnitTestProblem.get_chi();
-		PlasticForceUnitTestProblem.setName(ss.str().c_str());
-		PlasticForceUnitTestProblem.solve();
+        PlasticForceUnitTestProblem.set_chi(chi[i]);
+        std::stringstream ss("");
+        ss << "PlasticForceUnitTest" << PlasticForceUnitTestProblem.get_chi();
+        PlasticForceUnitTestProblem.setName(ss.str().c_str());
+        PlasticForceUnitTestProblem.solve();
         //PlasticForceUnitTestProblem.writeRestartFile();
-
+    
         //Now check the particles are in the right place for each of the 4 cases
         auto pIt = PlasticForceUnitTestProblem.particleHandler.begin();
         if (!(*pIt)->getPosition().isEqualTo(leftFinalPosition[i], 1e-10))
-                logger(FATAL,"Left particle is in the wrong position. It is at % and should be %",(*pIt)->getPosition(),leftFinalPosition[i]);
-        if (!(*pIt)->getVelocity().isEqualTo(leftFinalVecloity[i]  , 1e-10))
-                logger(FATAL,"Left particle has the wrong velocity. It is at % and should be %",(*pIt)->getVelocity(),leftFinalVecloity[i]);
+            logger(FATAL, "Left particle is in the wrong position. It is at % and should be %", (*pIt)->getPosition(),
+                   leftFinalPosition[i]);
+        if (!(*pIt)->getVelocity().isEqualTo(leftFinalVecloity[i], 1e-10))
+            logger(FATAL, "Left particle has the wrong velocity. It is at % and should be %", (*pIt)->getVelocity(),
+                   leftFinalVecloity[i]);
     }
-
-    std::cout << "Execute 'gnuplot PlasticForceUnitTest.gnu' to view output" << std::endl;
+    
+    logger(INFO, "Execute 'gnuplot PlasticForceUnitTest.gnu' to view output");
     helpers::writeToFile("PlasticForceUnitTest.gnu",
                          "set xlabel 'displacement [{/Symbol d}]'\n"
                          "set ylabel 'force [f^n]'\n"
                          "set grid\n"
                          "plot 'PlasticForceUnitTest0.34.fstat' u 7:9 w lp\n"
-                         );
+    );
 }

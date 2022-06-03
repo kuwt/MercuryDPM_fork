@@ -67,14 +67,15 @@ void load(Archive& ar, WallHandler& w) {
     ar ( cereal::make_size_tag(count));
     
     //Due to inheritance etc etc, we need to create pointers here.
-    std::cout << "WallHandler" << std::endl;
-    for (int i = 0; i < count; i++) {
+    logger(VERBOSE, "WallHandler");
+    for (int i = 0; i < count; i++)
+    {
         SerializationWrappers::Wrapper<BaseWall> wall;
-        std::cout << " Pass " << i << " / " << count << std::endl;
-        ar ( wall );
-        std::cout << " Adding..." << std::endl;
-        w.copyAndAddObject( wall.data );
-        std::cout << " Done. " << std::endl;
+        logger(INFO, " Pass % / %\n", i, count, Flusher::NO_FLUSH);
+        ar(wall);
+        logger(INFO, " Adding...\n", Flusher::NO_FLUSH);
+        w.copyAndAddObject(wall.data);
+        logger(INFO, " Done. ");
     }
 }
 
@@ -98,19 +99,23 @@ void save(Archive& ar, const SerializationWrappers::Wrapper<BaseWall> w ) {
 }
 
 template<class Archive>
-void load(Archive& ar, SerializationWrappers::Wrapper<BaseWall> & b ) {
-    std::cout << "In load Generic Wall!" << std::endl;
+void load(Archive& ar, SerializationWrappers::Wrapper<BaseWall> & b )
+{
+    logger(DEBUG, "In load Generic Wall!");
     std::string type;
-    ar( cereal::make_nvp("type", type));
-    std::cout << "Type = " << type << std::endl;
-    if (type == "InfiniteWall") {
+    ar(cereal::make_nvp("type", type));
+    logger(INFO, "Type = %", type);
+    if (type == "InfiniteWall")
+    {
         b.data = new InfiniteWall();
         //ar( cereal::make_nvp("value", dynamic_cast<InfiniteWall*>(b)));
-        load( ar, *(dynamic_cast<InfiniteWall*>(b.data)));
-   /* } else if (type == "FiniteWall") {
-        b = new InfiniteWall();
-        ar( cereal::make_nvp("value", dynamic_cast<FiniteWall*>(b)));*/
-    } else if (type == "InfiniteWallWithHole") {
+        load(ar, *(dynamic_cast<InfiniteWall*>(b.data)));
+        /* } else if (type == "FiniteWall") {
+             b = new InfiniteWall();
+             ar( cereal::make_nvp("value", dynamic_cast<FiniteWall*>(b)));*/
+    }
+    else if (type == "InfiniteWallWithHole")
+    {
         b.data = new InfiniteWallWithHole();
         //ar( cereal::make_nvp("value", dynamic_cast<InfiniteWallWithHole*>(b)));
     } else if (type == "CylindricalWall") {

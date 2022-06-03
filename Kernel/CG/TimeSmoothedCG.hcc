@@ -182,8 +182,7 @@ void TimeSmoothedCG<Coordinates, BaseFunction, Fields>::evaluate()
             if (itPoint == CG<Coordinates, BaseFunction, Fields>::points_.end())
             {
                 ///\todo Make proper error messages
-                std::cerr << "Error" << std::endl;
-                exit(-1);
+                logger(ERROR, "Error");
             }
             else
             {

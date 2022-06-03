@@ -85,7 +85,7 @@ void DPMBase::outputXBallsDataParticle(unsigned int i, unsigned int format, std:
         } //end case 3
         default:
         {
-            std::cerr << "format not found" << std::endl;
+            logger(WARN, "format not found");
             break;
         }
     } //end switch statement

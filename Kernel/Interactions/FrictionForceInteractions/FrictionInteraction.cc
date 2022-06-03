@@ -166,8 +166,7 @@ void FrictionInteraction::computeFrictionForce()
         }
         else //if no spring stiffness is set
         {
-            std::cerr << "FrictionInteraction::computeFrictionForce(): Rolling stiffness is zero" << std::endl;
-            exit(-1);
+            logger(ERROR, "FrictionInteraction::computeFrictionForce(): Rolling friction is zero");
         }
     } //end if rolling force
     
@@ -217,8 +216,7 @@ void FrictionInteraction::computeFrictionForce()
         }
         else //if no spring stiffness is set
         {
-            std::cerr << "FrictionInteraction::computeFrictionForce(): Torsion stiffness is zero" << std::endl;
-            exit(-1);
+            logger(ERROR, "FrictionInteraction::computeFrictionForce(): Torsion stiffness is zero");
         }
     } //end if torsion force
 }

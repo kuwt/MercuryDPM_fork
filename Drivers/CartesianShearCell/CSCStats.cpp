@@ -32,7 +32,7 @@ public:
     {
         setName("CSCRun");
         //restartFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
-        std::cout << "Reading file " << restartFile.getFullName() << std::endl;
+        logger(INFO, "Reading file %", restartFile.getFullName());
         readRestartFile();
         setRestarted(false);
         setName("CSCStats");
@@ -52,8 +52,7 @@ public:
 
     void printTime() const
     {
-        std::cout << "t=" << getTime() 
-            << " Ene " << getKineticEnergy()/getElasticEnergy() << std::endl;
+        logger(INFO, "t=% Ene=%", getTime(), getKineticEnergy() / getElasticEnergy());
     }
 
     //add flow particles

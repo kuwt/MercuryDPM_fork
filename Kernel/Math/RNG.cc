@@ -199,7 +199,6 @@ Mdouble RNG::getNormalVariate(Mdouble mean, Mdouble stdev)
     } else if (stdev < 0) {
         logger(ERROR,
                "[RNG::getNormalVariate(Mdouble, Mdouble)] Negative stdev is not allowed.");
-        exit(-1);
     } else {
         return getNormalVariate() * stdev + mean;
     }
@@ -327,11 +326,11 @@ Mdouble RNG::test()
     for (unsigned int i = 0; i < num_of_bins; i++)
     {
         chi_cum = chi_cum + (count[i] - expected) * (count[i] - expected) / expected;
-        std::cout << i << " : "
-                  << count[i] << " : " << (count[i] - expected) * (count[i] - expected) / expected << std::endl;
+        logger(INFO, "% : % : %\n", Flusher::NO_FLUSH, i, count[i], (count[i] - expected) * (count[i] - expected) /
+                                                                    expected);
     }
     //end for loop over computing the chi-squared value.
-    std::cout << "chi_cum " << chi_cum << std::endl;
+    logger(INFO, "chi_cum %", chi_cum);
 
     return mathsFunc::chi_squared_prob(chi_cum, num_of_bins);
 }

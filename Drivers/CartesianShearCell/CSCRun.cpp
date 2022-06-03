@@ -36,7 +36,7 @@ public:
     {
         Mdouble timeMax = getTimeMax();
         setName("CSCInit");
-        std::cout << "Reading file " << restartFile.getName() << std::endl;
+        logger(INFO, "Reading file %\n", restartFile.getName()), Flusher::NO_FLUSH;
         readRestartFile();
         //setRunNumber(0); //otherwise, restart doesn't work with autonumbered init files
         setTimeMax(timeMax);
@@ -47,8 +47,7 @@ public:
         setXBallsAdditionalArguments("-v0 -solidf -cmode 5");
         setFileType(FileType::ONE_FILE);
         //restartFile.setFileType(FileType::MULTIPLE_FILES_PADDED);
-        std::cout << "loaded " << particleHandler.getNumberOfObjects() <<
-            " fixed particles" << std::endl;
+        logger(INFO, "loaded % fixed particles", particleHandler.getNumberOfObjects());
 
         //setWall velocity
         for (BaseParticle* p : particleHandler) {
@@ -69,9 +68,8 @@ public:
 
     void printTime() const
     {
-        std::cout << "t=" << getTime()
-            << " ene " << getKineticEnergy() / getElasticEnergy()
-            << " wallTime " << getWallTime() - getInitialWallTime() << std::endl;
+        logger(INFO, "t=% ene=% wallTime=%",
+               getTime(), getKineticEnergy() / getElasticEnergy(), getWallTime() - getInitialWallTime());
     }
     
     Mdouble shearVelocity_;

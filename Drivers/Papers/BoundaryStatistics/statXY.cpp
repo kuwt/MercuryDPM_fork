@@ -41,8 +41,7 @@ template <StatType T> class statistics_while_running : public StatisticsVector<T
 	
 	void printTime() const {
 		static Mdouble tint = getTimeMax()-getTime();
-		std::cout << "\r" << std::setprecision(2) << std::setw(5) << static_cast<int>(100.*(1-(getTimeMax()-getTime())/tint)) << "%\r";
-		std::cout.flush();
+		logger(INFO, "\r2.5%%\r", static_cast<int>(100. * (1 - (getTimeMax() - getTime()) / tint)));
 	}
 
 	// allows getZMax() to be set to the height of the highest particle
@@ -68,109 +67,123 @@ template <StatType T> class statistics_while_running : public StatisticsVector<T
 
 int main(int argc, char *argv[])
 {
-	//select file name to restart from
-  std::string name;
-	if (argc>1) {name=argv[1]; argv++; argc--;} else exit(-1);
-	//select time interval
-	Mdouble tint=.2; if (argc>1) {tint=atof(argv[1]); argv++; argc--; std::cout << "tint=" << tint << std::endl;}
-	argv--; argc++;
-	std::cout << "restart data: " << name << ".restart" << std::endl;
-	
-	//load restart data
-	std::cout << "XY averaging" << std::endl;
- 	statistics_while_running<XY> problem;
- 	problem.setName(name.c_str());
-	problem.readRestartFile();//load_restart_data();
-	problem.setFixedParticleRadius(problem.particleHandler.getObject(0)->getRadius());
-	problem.setInflowParticleRadius(problem.particleHandler.getObject(0)->getRadius());
-	problem.restartFile.setFileType(FileType::ONE_FILE);//restartFile.setFileType(FileType::ONE_FILE);
-	problem.writeRestartFile();
-	problem.auto_set_domain();
-	//keep file name but create files in the local directory, i.e. remove folder
-	std::cout << "old name: " << problem.getName() << std::endl;
-	size_t found=name.find_last_of("/\\");
-	problem.setName(name.substr(found+1).c_str());
-	std::cout << "new name: " << problem.getName() << std::endl;
-	//set output to minimum
-        problem.dataFile.setFileType(FileType::NO_FILE);
-        problem.restartFile.setFileType(FileType::NO_FILE);
-        problem.fStatFile.setFileType(FileType::NO_FILE);
-        problem.eneFile.setFileType(FileType::ONE_FILE);
-	//set statistical parameters
-        problem.setDoPeriodicWalls(false);
- 	//~ problem.setZMinStat(-1);
- 	problem.setN(50);
- 	problem.setCGWidth(.1);
-	problem.setSaveCount(25);
-	problem.setStressTypeForFixedParticles(3);
- 	problem.setCGTimeMin(problem.getTime());
-	problem.setTimeMax(problem.getTime()+tint);
-	//solve and create live statistics
-	problem.readStatArguments(argc, argv);
-	//~ problem.Chute::write(cout, true);
-	//~ cout << endl << problem.StatisticsVector<XY>::write() << endl;
-	problem.solve();
-
-	std::cout << std::endl << "Y averaging" << std::endl;
- 	statistics_while_running<Y> problemY;
- 	problemY.setName(name.c_str());
-	problemY.readRestartFile();//load_restart_data();
-	problemY.setFixedParticleRadius(problemY.particleHandler.getObject(0)->getRadius());
-	problemY.setInflowParticleRadius(problemY.particleHandler.getObject(0)->getRadius());
-        problemY.restartFile.setFileType(FileType::ONE_FILE);
-	problemY.writeRestartFile();
-	problemY.auto_set_domain();
-	//keep file name but create files in the local directory, i.e. remove folder
-	std::cout << "old name: " << problemY.getName() << std::endl;
-	std::stringstream ss;
-	ss << name.substr(found+1).c_str() << "Y";
-	problemY.setName(ss.str().c_str());
-	std::cout << "new name: " << problemY.getName() << std::endl;
-	//set output to minimum
-        problemY.dataFile.setFileType(FileType::NO_FILE);
-        problemY.restartFile.setFileType(FileType::ONE_FILE);
-        problemY.fStatFile.setFileType(FileType::NO_FILE);
-        problemY.eneFile.setFileType(FileType::ONE_FILE);
-	//set statistical parameters
-        problemY.setDoPeriodicWalls(false);
- 	//~ problemY.setZMinStat(-1);
- 	problemY.setN(50);
- 	problemY.setCGWidth(.1);
-	problemY.setSaveCount(25);
-	problemY.setStressTypeForFixedParticles(3);
- 	problemY.setCGTimeMin(problemY.getTime());
-	problemY.setTimeMax(problemY.getTime()+tint);
-	//solve and create live statistics
-	problemY.readStatArguments(argc, argv);
-	//~ problemY.Chute::write(cout, true);
-	//~ cout << endl << problemY.StatisticsVector<Y>::write() << endl;
-	problemY.solve();
-
-
-	std::cout << std::endl << "X averaging" << std::endl;
- 	statistics_while_running<X> problemX;
- 	problemX.setName(name.c_str());
-	problemX.readRestartFile();//load_restart_data();
-	problemX.setFixedParticleRadius(problemX.particleHandler.getObject(0)->getRadius());
-	problemX.setInflowParticleRadius(problemX.particleHandler.getObject(0)->getRadius());
-	problemX.restartFile.setFileType(FileType::ONE_FILE);
-	problemX.writeRestartFile();
-	problemX.auto_set_domain();
-	//keep file name but create files in the local directory, i.e. remove folder
-	std::cout << "old name: " << problemX.getName() << std::endl;
-	ss << name.substr(found+1).c_str() << "X";
-	problemX.setName(ss.str().c_str());
-	std::cout << "new name: " << problemX.getName() << std::endl;
-	//set output to minimum
-        problemX.dataFile.setFileType(FileType::NO_FILE);
-        problemX.restartFile.setFileType(FileType::ONE_FILE);
-        problemX.fStatFile.setFileType(FileType::NO_FILE);
-        problemX.eneFile.setFileType(FileType::ONE_FILE);
-
-	  //problemX.dataFile.setFileType(FileType::NO_FILE);
-	  //problemX.restartFile.setFileType(FileType::ONE_FILE);
-	  //problemX.fStatFile.setFileType(FileType::NO_FILE);
-	  //problemX.eneFile.setFileType(FileType::ONE_FILE);
+    //select file name to restart from
+    std::string name;
+    if (argc > 1)
+    {
+        name = argv[1];
+        argv++;
+        argc--;
+    }
+    else exit(-1);
+    //select time interval
+    Mdouble tint = .2;
+    if (argc > 1)
+    {
+        tint = atof(argv[1]);
+        argv++;
+        argc--;
+        logger(INFO, "tint=%\n", tint, Flusher::NO_FLUSH);
+    }
+    argv--;
+    argc++;
+    logger(INFO, "restart data: %.restart\n", name, Flusher::NO_FLUSH);
+    
+    //load restart data
+    logger(INFO, "XY averaging\n", Flusher::NO_FLUSH);
+    statistics_while_running<XY> problem;
+    problem.setName(name.c_str());
+    problem.readRestartFile();//load_restart_data();
+    problem.setFixedParticleRadius(problem.particleHandler.getObject(0)->getRadius());
+    problem.setInflowParticleRadius(problem.particleHandler.getObject(0)->getRadius());
+    problem.restartFile.setFileType(FileType::ONE_FILE);//restartFile.setFileType(FileType::ONE_FILE);
+    problem.writeRestartFile();
+    problem.auto_set_domain();
+    //keep file name but create files in the local directory, i.e. remove folder
+    logger(INFO, "old name: %\n", problem.getName(), Flusher::NO_FLUSH);
+    size_t found = name.find_last_of("/\\");
+    problem.setName(name.substr(found + 1).c_str());
+    logger(INFO, "new name: %", problem.getName());
+    //set output to minimum
+    problem.dataFile.setFileType(FileType::NO_FILE);
+    problem.restartFile.setFileType(FileType::NO_FILE);
+    problem.fStatFile.setFileType(FileType::NO_FILE);
+    problem.eneFile.setFileType(FileType::ONE_FILE);
+    //set statistical parameters
+    problem.setDoPeriodicWalls(false);
+    //~ problem.setZMinStat(-1);
+    problem.setN(50);
+    problem.setCGWidth(.1);
+    problem.setSaveCount(25);
+    problem.setStressTypeForFixedParticles(3);
+    problem.setCGTimeMin(problem.getTime());
+    problem.setTimeMax(problem.getTime() + tint);
+    //solve and create live statistics
+    problem.readStatArguments(argc, argv);
+    //~ problem.Chute::write(cout, true);
+    //~ cout << endl << problem.StatisticsVector<XY>::write() << endl;
+    problem.solve();
+    
+    logger(INFO, "\nY averaging\n", Flusher::NO_FLUSH);
+    statistics_while_running<Y> problemY;
+    problemY.setName(name.c_str());
+    problemY.readRestartFile();//load_restart_data();
+    problemY.setFixedParticleRadius(problemY.particleHandler.getObject(0)->getRadius());
+    problemY.setInflowParticleRadius(problemY.particleHandler.getObject(0)->getRadius());
+    problemY.restartFile.setFileType(FileType::ONE_FILE);
+    problemY.writeRestartFile();
+    problemY.auto_set_domain();
+    //keep file name but create files in the local directory, i.e. remove folder
+    logger(INFO, "old name: %\n", problemY.getName(), Flusher::NO_FLUSH);
+    std::stringstream ss;
+    ss << name.substr(found + 1).c_str() << "Y";
+    problemY.setName(ss.str().c_str());
+    logger(INFO, "new name: %", problemY.getName());
+    //set output to minimum
+    problemY.dataFile.setFileType(FileType::NO_FILE);
+    problemY.restartFile.setFileType(FileType::ONE_FILE);
+    problemY.fStatFile.setFileType(FileType::NO_FILE);
+    problemY.eneFile.setFileType(FileType::ONE_FILE);
+    //set statistical parameters
+    problemY.setDoPeriodicWalls(false);
+    //~ problemY.setZMinStat(-1);
+    problemY.setN(50);
+    problemY.setCGWidth(.1);
+    problemY.setSaveCount(25);
+    problemY.setStressTypeForFixedParticles(3);
+    problemY.setCGTimeMin(problemY.getTime());
+    problemY.setTimeMax(problemY.getTime() + tint);
+    //solve and create live statistics
+    problemY.readStatArguments(argc, argv);
+    //~ problemY.Chute::write(cout, true);
+    //~ cout << endl << problemY.StatisticsVector<Y>::write() << endl;
+    problemY.solve();
+    
+    
+    logger(INFO, "\nX averaging\n", Flusher::NO_FLUSH);
+    statistics_while_running<X> problemX;
+    problemX.setName(name.c_str());
+    problemX.readRestartFile();//load_restart_data();
+    problemX.setFixedParticleRadius(problemX.particleHandler.getObject(0)->getRadius());
+    problemX.setInflowParticleRadius(problemX.particleHandler.getObject(0)->getRadius());
+    problemX.restartFile.setFileType(FileType::ONE_FILE);
+    problemX.writeRestartFile();
+    problemX.auto_set_domain();
+    //keep file name but create files in the local directory, i.e. remove folder
+    logger(INFO, "old name: %\n", problemX.getName(), Flusher::NO_FLUSH);
+    ss << name.substr(found + 1).c_str() << "X";
+    problemX.setName(ss.str().c_str());
+    logger(INFO, "new name: %", problemX.getName());
+    //set output to minimum
+    problemX.dataFile.setFileType(FileType::NO_FILE);
+    problemX.restartFile.setFileType(FileType::ONE_FILE);
+    problemX.fStatFile.setFileType(FileType::NO_FILE);
+    problemX.eneFile.setFileType(FileType::ONE_FILE);
+    
+    //problemX.dataFile.setFileType(FileType::NO_FILE);
+    //problemX.restartFile.setFileType(FileType::ONE_FILE);
+    //problemX.fStatFile.setFileType(FileType::NO_FILE);
+    //problemX.eneFile.setFileType(FileType::ONE_FILE);
 	//set statistical parameters
         problemX.setDoPeriodicWalls(false);
  	//~ problemX.setZMinStat(-1);

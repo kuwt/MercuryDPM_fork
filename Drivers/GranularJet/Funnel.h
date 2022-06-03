@@ -66,9 +66,15 @@ class Funnel : public Chute {
 	
 	///Set the filling ratio
 	void set_funfr(double funfr_){
-	  if (funfr_<0.0 || funfr_>1.0) {std::cerr << "Filling Ratio is below 0 or above 1, default value of 0.33 is used!"<<std::endl; }
-		else {funfr=funfr_;}
-	}
+        if (funfr_ < 0.0 || funfr_ > 1.0)
+        {
+            logger(WARN, "Filling Ratio is below 0 or above 1, default value of 0.33 is used!");
+        }
+        else
+        {
+            funfr = funfr_;
+        }
+    }
 	
 	///Get the filling ratio
 	double get_funfr() const {return funfr;}

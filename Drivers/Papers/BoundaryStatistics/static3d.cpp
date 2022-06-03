@@ -28,104 +28,123 @@
 #include <iostream>
 #include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
 
-class Cstatic3D : public Chute {
+class Cstatic3D : public Chute
+{
 public:
-	
-	void set_particle_properties() {
+    
+    void set_particle_properties()
+    {
         auto species = speciesHandler.copyAndAddObject(LinearViscoelasticSlidingFrictionSpecies());
         //define species
-	        species->setDensity(6./constants::pi);
-		setGravity(Vec3D(sin(20.*constants::pi/180.),0,-cos(20.*constants::pi/180.)));
-		setInflowParticleRadius(0.5);
-		setFixedParticleRadius(0.5);
-		//double mass = 4. / 3. * constants::pi * pow(getInflowParticleRadius(), 3.0) * S->getDensity();
-                species->setCollisionTimeAndRestitutionCoefficient(0.005,0.88, species->getMassFromRadius(getInflowParticleRadius()));
-		//~ setCollisionTimeAndRestitutionCoefficient(0.005,1);
-		species->setSlidingStiffness(2.0/7.0* species->getStiffness());
-		species->setSlidingDissipation(species->getDissipation());
-		species->setSlidingFrictionCoefficient(0.5);
-		setTimeStep(0.02 * species->getCollisionTime(species->getMassFromRadius(0.5 * (getMinInflowParticleRadius() + getMaxInflowParticleRadius()))));
-		std::cout << getTimeStep() << std::endl;
-
-		//		setDensity(6./pi);
-		//setGravity(Vec3D(sin(20.*pi/180.),0,-cos(20.*pi/180.)));
-		//setInflowParticleRadius(0.5);
-		//setFixedParticleRadius(0.5);
-		//setCollisionTimeAndRestitutionCoefficient(0.005,0.88);
-		//~ setCollisionTimeAndRestitutionCoefficient(0.005,1);
-		//setSlidingStiffness(2.0/7.0*getStiffness());
-		//setSlidingDissipation(getDissipation());
-		//setSlidingFrictionCoefficient(0.5);
-		//setTimeStep();
-		//cout << getTimeStep() << endl;
-		//fix_hgrid();
-	}
-	
-	void actionsBeforeTimeStep(){};
-	
-	void setupInitialConditions()
-	{
-		if (false) {
-			// a single moving particle
-			//set_NWall(0);
-			setZMax(2);
-			setYMax(1);
-			setXMax(2);
-			//set_N(2);
-			SphericalParticle p0;
-			p0.setPosition(Vec3D(1,0.5,0.5));
-                        particleHandler.copyAndAddObject(p0);
-			p0.setPosition(Vec3D(1,0.5,0.5)-Vec3D(sin(20.*constants::pi/180.),0,-cos(20.*constants::pi/180.)));
-			particleHandler.copyAndAddObject(p0);
-			particleHandler.getObject(0)->setVelocity(Vec3D(0.,0.,0.));
-			particleHandler.getObject(1)->setVelocity(Vec3D(0.,0.,0.));
-			particleHandler.getObject(0)->setRadius(0.5);
-			particleHandler.getObject(1)->setRadius(0.5);
-			particleHandler.getObject(0)->fixParticle();
-		} else if (false) {
-			// a two particles on two fixed ones
-			//set_NWall(0);
-			setZMax(2);
-			setYMax(1);
-			setXMax(2);
-			//set_N(4);
-			SphericalParticle p0;
-		        p0.setPosition(Vec3D(0.5,0.5,0.5));
-                        particleHandler.copyAndAddObject(p0);                       
-		        p0.setPosition(Vec3D(1.5,0.5,0.5));
-                        particleHandler.copyAndAddObject(p0);
- 		        p0.setPosition(Vec3D(1,0.5,0.5+sqrt(0.75)));
-                        particleHandler.copyAndAddObject(p0);
-			p0.setPosition(Vec3D(1,0.5,0.5+sqrt(0.75))-Vec3D(sin(20.*constants::pi/180.),0,-cos(20.*constants::pi/180.)));
-                        particleHandler.copyAndAddObject(p0);
-			particleHandler.getObject(0)->setVelocity(Vec3D(0.,0.,0.));
-                        particleHandler.getObject(1)->setVelocity(Vec3D(0.,0.,0.));
-                        particleHandler.getObject(2)->setVelocity(Vec3D(0.,0.,0.));
-                        particleHandler.getObject(3)->setVelocity(Vec3D(0.,0.,0.));
-			//particleHandler.getObject(1)->getVelocity().set_zero();
-			//Particles[2].Velocity.set_zero();
-			//Particles[3].Velocity.set_zero();
-			particleHandler.getObject(0)->setRadius(getInflowParticleRadius());
-			particleHandler.getObject(1)->setRadius(getInflowParticleRadius());
-                        particleHandler.getObject(2)->setRadius(getInflowParticleRadius());
-                        particleHandler.getObject(3)->setRadius(getInflowParticleRadius());
-			particleHandler.getObject(0)->fixParticle();
-			particleHandler.getObject(1)->fixParticle();
-		} else {
-			readRestartFile("/storage/usr/people/weinhartt/DRIVERS/FlowRulePaper/run/full_runs/restart_flowrule/H10A24L1M0.5B0.5.restart"); 
-			setName("static3d"); 
-                   	dataFile.setFileType(FileType::ONE_FILE);
-                       	restartFile.setFileType(FileType::ONE_FILE);
-                	fStatFile.setFileType(FileType::ONE_FILE);
-	                eneFile.setFileType(FileType::ONE_FILE);
-                                   
-			setTime(0.);
-			setTimeMax(.5);
-		}
-		if (particleHandler.getNumberOfObjects()<10) write(std::cout,true);
-		else write(std::cout,false);
-	}
-
+        species->setDensity(6. / constants::pi);
+        setGravity(Vec3D(sin(20. * constants::pi / 180.), 0, -cos(20. * constants::pi / 180.)));
+        setInflowParticleRadius(0.5);
+        setFixedParticleRadius(0.5);
+        //double mass = 4. / 3. * constants::pi * pow(getInflowParticleRadius(), 3.0) * S->getDensity();
+        species->setCollisionTimeAndRestitutionCoefficient(0.005, 0.88,
+                                                           species->getMassFromRadius(getInflowParticleRadius()));
+        //~ setCollisionTimeAndRestitutionCoefficient(0.005,1);
+        species->setSlidingStiffness(2.0 / 7.0 * species->getStiffness());
+        species->setSlidingDissipation(species->getDissipation());
+        species->setSlidingFrictionCoefficient(0.5);
+        setTimeStep(0.02 * species->getCollisionTime(
+                species->getMassFromRadius(0.5 * (getMinInflowParticleRadius() + getMaxInflowParticleRadius()))));
+        logger(INFO, "%", getTimeStep());
+        
+        //		setDensity(6./pi);
+        //setGravity(Vec3D(sin(20.*pi/180.),0,-cos(20.*pi/180.)));
+        //setInflowParticleRadius(0.5);
+        //setFixedParticleRadius(0.5);
+        //setCollisionTimeAndRestitutionCoefficient(0.005,0.88);
+        //~ setCollisionTimeAndRestitutionCoefficient(0.005,1);
+        //setSlidingStiffness(2.0/7.0*getStiffness());
+        //setSlidingDissipation(getDissipation());
+        //setSlidingFrictionCoefficient(0.5);
+        //setTimeStep();
+        //cout << getTimeStep() << endl;
+        //fix_hgrid();
+    }
+    
+    void actionsBeforeTimeStep()
+    {
+    };
+    
+    void setupInitialConditions()
+    {
+        if (false)
+        {
+            // a single moving particle
+            //set_NWall(0);
+            setZMax(2);
+            setYMax(1);
+            setXMax(2);
+            //set_N(2);
+            SphericalParticle p0;
+            p0.setPosition(Vec3D(1, 0.5, 0.5));
+            particleHandler.copyAndAddObject(p0);
+            p0.setPosition(
+                    Vec3D(1, 0.5, 0.5) - Vec3D(sin(20. * constants::pi / 180.), 0, -cos(20. * constants::pi / 180.)));
+            particleHandler.copyAndAddObject(p0);
+            particleHandler.getObject(0)->setVelocity(Vec3D(0., 0., 0.));
+            particleHandler.getObject(1)->setVelocity(Vec3D(0., 0., 0.));
+            particleHandler.getObject(0)->setRadius(0.5);
+            particleHandler.getObject(1)->setRadius(0.5);
+            particleHandler.getObject(0)->fixParticle();
+        }
+        else if (false)
+        {
+            // a two particles on two fixed ones
+            //set_NWall(0);
+            setZMax(2);
+            setYMax(1);
+            setXMax(2);
+            //set_N(4);
+            SphericalParticle p0;
+            p0.setPosition(Vec3D(0.5, 0.5, 0.5));
+            particleHandler.copyAndAddObject(p0);
+            p0.setPosition(Vec3D(1.5, 0.5, 0.5));
+            particleHandler.copyAndAddObject(p0);
+            p0.setPosition(Vec3D(1, 0.5, 0.5 + sqrt(0.75)));
+            particleHandler.copyAndAddObject(p0);
+            p0.setPosition(Vec3D(1, 0.5, 0.5 + sqrt(0.75)) -
+                           Vec3D(sin(20. * constants::pi / 180.), 0, -cos(20. * constants::pi / 180.)));
+            particleHandler.copyAndAddObject(p0);
+            particleHandler.getObject(0)->setVelocity(Vec3D(0., 0., 0.));
+            particleHandler.getObject(1)->setVelocity(Vec3D(0., 0., 0.));
+            particleHandler.getObject(2)->setVelocity(Vec3D(0., 0., 0.));
+            particleHandler.getObject(3)->setVelocity(Vec3D(0., 0., 0.));
+            //particleHandler.getObject(1)->getVelocity().set_zero();
+            //Particles[2].Velocity.set_zero();
+            //Particles[3].Velocity.set_zero();
+            particleHandler.getObject(0)->setRadius(getInflowParticleRadius());
+            particleHandler.getObject(1)->setRadius(getInflowParticleRadius());
+            particleHandler.getObject(2)->setRadius(getInflowParticleRadius());
+            particleHandler.getObject(3)->setRadius(getInflowParticleRadius());
+            particleHandler.getObject(0)->fixParticle();
+            particleHandler.getObject(1)->fixParticle();
+        }
+        else
+        {
+            readRestartFile(
+                    "/storage/usr/people/weinhartt/DRIVERS/FlowRulePaper/run/full_runs/restart_flowrule/H10A24L1M0.5B0.5.restart");
+            setName("static3d");
+            dataFile.setFileType(FileType::ONE_FILE);
+            restartFile.setFileType(FileType::ONE_FILE);
+            fStatFile.setFileType(FileType::ONE_FILE);
+            eneFile.setFileType(FileType::ONE_FILE);
+            
+            setTime(0.);
+            setTimeMax(.5);
+        }
+        if (particleHandler.getNumberOfObjects() < 10)
+        {
+            write(std::cout, true);
+        }
+        else
+        {
+            write(std::cout, false);
+        }
+    }
 };
 
 int main(int argc UNUSED, char *argv[] UNUSED)

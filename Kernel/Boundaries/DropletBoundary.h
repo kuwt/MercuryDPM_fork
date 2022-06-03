@@ -81,6 +81,8 @@ public:
 
     void writeVTK(std::fstream& file) override;
 
+    // this is the number of timesteps between checks whether the droplet is in contact with a particle or wall.
+    unsigned checkCount = 3;
 };
 
 #endif

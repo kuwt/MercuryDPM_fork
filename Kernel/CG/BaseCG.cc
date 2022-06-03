@@ -45,7 +45,7 @@ BaseCG::BaseCG()
 
 void BaseCG::clear()
 {
-    std::cout << "BaseCG::clear(), this function shouldn't be called" << std::endl;
+    logger(WARN, "BaseCG::clear(), this function shouldn't be called");
 }
 
 

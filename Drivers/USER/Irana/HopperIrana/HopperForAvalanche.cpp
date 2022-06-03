@@ -61,7 +61,7 @@ public:
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setRadius(0.5);
         CubeInsertionBoundary insertionBoundary;
-        insertionBoundary.set(&p0, 50, {-20, 0, 30}, {5, 10, 35}, {0,0,0}, {0,0,0}, 0.475, 0.525);
+        insertionBoundary.set(&p0, 50, {-20, 0, 30}, {5, 10, 35}, {0, 0, 0}, {0, 0, 0});
         boundaryHandler.copyAndAddObject(insertionBoundary);
     
         setMin(0,0,-10);

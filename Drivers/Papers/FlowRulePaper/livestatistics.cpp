@@ -45,8 +45,7 @@ template <StatType T> class CLiveStatistics : public StatisticsVector<T>, public
 	
 	void printTime() const override {
 		static double tint = getTimeMax()-getTime();
-		std::cout << "\r" << std::setprecision(2) << (int)100.*(1-(getTimeMax()-getTime())/tint) << "%\r";
-		std::cout.flush();
+		logger(INFO, "\r%2%\r", (int) 100. * (1 - (getTimeMax() - getTime()) / tint));
 	}
 	
 	void getLiveStatistics() {
@@ -73,51 +72,61 @@ template <StatType T> class CLiveStatistics : public StatisticsVector<T>, public
 };
 
 
-int main(int argc, char *argv[]) {	
-	
-  if (argc>1&&strcmp(argv[1],"-help") != 0) std::cout << std::endl << "Get statistics for " << argv[1] << std::endl;
-
-	//check for '-stattype' option
-	StatType T = XYZ;
-	for (int i = 2; i<argc; i++) {
-		if (!strcmp(argv[i],"-stattype")) {
-			if (!strcmp(argv[i+1],"XYZ")) T = XYZ;
-			else if (!strcmp(argv[i+1],"XY")) T = XY;
-			else if (!strcmp(argv[i+1],"XZ")) T = XZ;
-			else if (!strcmp(argv[i+1],"YZ")) T = YZ;
-			else if (!strcmp(argv[i+1],"X")) T = X;
-			else if (!strcmp(argv[i+1],"Y")) T = Y;
-			else if (!strcmp(argv[i+1],"Z")) T = Z;
-			else {std::cerr << "stattype unknown" << std::endl; exit(-1);}
-		}
-	}
-	if (T==XY) { // averaging in z-direction
-	  std::cout << "averaging in z-direction" << std::endl;
+int main(int argc, char* argv[])
+{
+    
+    if (argc > 1 && strcmp(argv[1], "-help") != 0)
+    {
+        logger(INFO, "\nGet statistics for %", argv[1]);
+    }
+    
+    //check for '-stattype' option
+    StatType T = XYZ;
+    for (int i = 2; i < argc; i++)
+    {
+        if (!strcmp(argv[i], "-stattype"))
+        {
+            if (!strcmp(argv[i + 1], "XYZ")) T = XYZ;
+            else if (!strcmp(argv[i + 1], "XY")) T = XY;
+            else if (!strcmp(argv[i + 1], "XZ")) T = XZ;
+            else if (!strcmp(argv[i + 1], "YZ")) T = YZ;
+            else if (!strcmp(argv[i + 1], "X")) T = X;
+            else if (!strcmp(argv[i + 1], "Y")) T = Y;
+            else if (!strcmp(argv[i + 1], "Z")) T = Z;
+            else
+            {
+                logger(ERROR, "stattype unknown");
+            }
+        }
+    }
+    if (T == XY)
+    { // averaging in z-direction
+        logger(INFO, "averaging in z-direction");
 		CLiveStatistics<XY> stats(argc, argv);
 		stats.setDoPeriodicWalls(false);
 		stats.getLiveStatistics();
 	} else if (T==XZ) { // averaging in x-direction
-	  std::cout << "averaging in y-direction" << std::endl;
+        logger(INFO, "averaging in y-direction");
 		CLiveStatistics<XZ> stats(argc, argv);
 		stats.setDoPeriodicWalls(false);
 		stats.getLiveStatistics();
 	} else if (T==YZ) { // averaging in x-direction
-	  std::cout << "averaging in x-direction" << std::endl;
+        logger(INFO, "averaging in x-direction");
 		CLiveStatistics<YZ> stats(argc, argv);
 		stats.setDoPeriodicWalls(false);
 		stats.getLiveStatistics();
 	} else if (T==X) { // averaging in yz-direction
-	  std::cout << "averaging in yz-direction" << std::endl;
+        logger(INFO, "averaging in yz-direction");
 		CLiveStatistics<X> stats(argc, argv);
 		stats.setDoPeriodicWalls(false);
 		stats.getLiveStatistics();
 	} else if (T==Y) { // averaging in yz-direction
-	  std::cout << "averaging in xz-direction" << std::endl;
+        logger(INFO, "averaging in xz-direction");
 		CLiveStatistics<Y> stats(argc, argv);
 		stats.setDoPeriodicWalls(false);
 		stats.getLiveStatistics();
 	} else if (T==Z) { // averaging in yz-direction
-	  std::cout << "averaging in xy-direction" << std::endl;
+        logger(INFO, "averaging in xy-direction");
 		CLiveStatistics<Z> stats(argc, argv);
 		stats.setDoPeriodicWalls(false);
 		stats.getLiveStatistics();

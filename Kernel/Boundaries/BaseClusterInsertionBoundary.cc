@@ -199,18 +199,10 @@ void BaseClusterInsertionBoundary::setRadiusMicroParticle(Mdouble radiusMicroPar
     }
 }
 
-void BaseClusterInsertionBoundary::setRadiusRange(Mdouble radMin, Mdouble radMax)
-{
-    radMin_ = radMin;
-    radMax_ = radMax;
-}
-
-void BaseClusterInsertionBoundary::setGeometry(Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax)
+void BaseClusterInsertionBoundary::setGeometry(Vec3D posMin, Vec3D posMax)
 {
     posMin_ = posMin;
     posMax_ = posMax;
-    velMin_ = velMin;
-    velMax_ = velMax;
 }
 
 void BaseClusterInsertionBoundary::setVelocityRange(Vec3D velMin, Vec3D velMax)
@@ -270,8 +262,6 @@ void BaseClusterInsertionBoundary::read(std::istream& is)
        >> dummy >> posMax_;
     is >> dummy >> velMin_
        >> dummy >> velMax_;
-    is >> dummy >> radMin_;
-    is >> dummy >> radMax_;
     
     is >> dummy >> nClusterInserted_
          >> dummy >> radiusParticle_;
@@ -303,8 +293,6 @@ void BaseClusterInsertionBoundary::write(std::ostream& os) const
        << " posMax " << posMax_
        << " velMin " << velMin_
        << " velMax " << velMax_;
-    os << " radMin " << radMin_
-       << " radMax " << radMax_;
 
     os << " nClusterInserted " << nClusterInserted_ <<
           " radiusParticle " << radiusParticle_ <<

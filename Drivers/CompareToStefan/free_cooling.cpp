@@ -46,13 +46,13 @@ public:
             auto species = dynamic_cast<LinearViscoelasticFrictionSpecies*>(speciesHandler.getObject(0));
             if (species!= nullptr)
             {
-                std::cout << "Mass: " << particleHandler.getObject(0)->getMass() << std::endl;
-                std::cout << "Collision time: " << species->getCollisionTime(particleHandler.getObject(0)->getMass()) << std::endl;
-                std::cout << "Restitution coefficient: " << species->getRestitutionCoefficient(particleHandler.getObject(0)->getMass()) << std::endl;
+                logger(INFO, "Mass: %\n Collision time: %\n Restitution coefficient: %",
+                       particleHandler.getObject(0)->getMass(),
+                       species->getCollisionTime(particleHandler.getObject(0)->getMass()),
+                       species->getRestitutionCoefficient(particleHandler.getObject(0)->getMass()));
             }
 		} else {
-		  std::cerr << "Input data not found exiting " << std::endl;
-			exit(-1);
+            logger(ERROR, "Input data not found exiting");
 		}
 	}
 

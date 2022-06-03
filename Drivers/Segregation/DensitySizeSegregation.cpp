@@ -59,19 +59,19 @@ void actionsBeforeTimeStep(){};
 ///This is the info call
 void write(std::ostream& os, bool print_all = false) const
 {
-	os << "This is a density size-segregation chute code problem" << endl;
-	os << "\n \n \n"<< endl;
-	
-		
-	 MercuryBase::write(os, print_all); 
-	 os << "particle specie-0 size : " << radius_0 << endl;		 
-	 os << "particle specie-1 size : " << radius_1 << endl;
-	 os << "particle specie-2 size : " << radius_2 << endl;
-	 os << "particle specie-0 rho  : " << rho_0 << endl;		
-	 os << "particle specie-1 rho  : " << rho_1 << endl;
-	 os << "particle specie-2 rho  : " << rho_2 << endl;
-	 os << "particle size-ratio    : " << radius_2/radius_1 << endl;
-	 os << "particle density-ratio : " << rho_2/rho_1 << endl;
+    os << "This is a density size-segregation chute code problem" << "\n";
+    os << "\n \n \n" << "\n";
+    
+    
+    MercuryBase::write(os, print_all);
+    os << "particle specie-0 size : " << radius_0 << "\n";
+    os << "particle specie-1 size : " << radius_1 << "\n";
+    os << "particle specie-2 size : " << radius_2 << "\n";
+    os << "particle specie-0 rho  : " << rho_0 << "\n";
+    os << "particle specie-1 rho  : " << rho_1 << "\n";
+    os << "particle specie-2 rho  : " << rho_2 << "\n";
+    os << "particle size-ratio    : " << radius_2 / radius_1 << "\n";
+    os << "particle density-ratio : " << rho_2 / rho_1 << endl;
 }
 
 /// This setup the intial conditions, generates volume fraction of particle 1. 
@@ -84,7 +84,7 @@ void setupInitialConditions()
 	      if (helpers::fileExists(dataFile.getName()))
 		{
 			//If it has move on to teh next run immedently
-			cout << "This run has been done " << endl;
+            logger(INFO, "This run has been done ");
 			//launch_new("density-size-segregation",true);
 			exit(0);
 		}
@@ -96,10 +96,10 @@ void setupInitialConditions()
 	
 	//If study 0 is complete quit
 		if (study_num[0] > 0)
-			{
-				cout << "Study is complete " << endl;
-				exit(0);
-			}
+        {
+            logger(INFO, "Study is complete ");
+            exit(0);
+        }
 		else
 
 		//If the study is not complete save the data to disk and move on
@@ -284,68 +284,67 @@ void setupInitialConditions()
 	InfiniteWall w0;
 	w0.set(Vec3D(0.0,0.0,-1.0), Vec3D(0,0,getZMin()-0.5));
         wallHandler.copyAndAddObject(w0);
-
-
-	PeriodicBoundary b0;
-        b0.set(Vec3D(1.0,0.0,0.0), getXMin(), getXMax());
+        
+        
+        PeriodicBoundary b0;
+        b0.set(Vec3D(1.0, 0.0, 0.0), getXMin(), getXMax());
         boundaryHandler.copyAndAddObject(b0);
-	
+
 //	set_NWallPeriodic(2);
 //	WallsPeriodic[1].set(Vec3D( 1.0, 0.0, 0.0), getXMin(), getXMax());
-	
-	// CREATE THE PARTICLES
-	while ((N1>0) && (N2>0))
-		{
-	
-
-		//random to see if want to generate a large or small particles, helps makes the initial conditions homogenious 
-		if (random.getRandomNumber(1.0,N1+N2) > N2)
-			{
-			//Generate a small particle: set radius to small radius subtract one off the list of small particles to be generated
-			  inflowParticle_.setRadius(radius_1);
-			  inflowParticle_.setSpecies(speciesHandler.getObject(1));
-			  N1--;
-			}
-		else
-			{
-			//Generate a large particle: set radius to large radius subtract one of the list of large particles to be generated
-			  inflowParticle_.setRadius(radius_2);
-			  inflowParticle_.setSpecies(speciesHandler.getObject(2));
-			  N2--;
-			}
-		
-		
-		//P0.get_Angle().set_zero();
-		//P0.setAngularVelocity(Vec3D(0.0,0.0,0.0));
-		//inflowParticle_.computeMass();
-	
-		//randomize particle position, zero intial velocity
-		inflowParticle_.setPosition(Vec3D(random.getRandomNumber(getXMin(),getXMax()),
-				      random.getRandomNumber(getYMin(),getYMax()),
-				      random.getRandomNumber(getZMin(),getZMax())));
-				
-		inflowParticle_.setVelocity(Vec3D(0.0,0.0,0.0));
-		
-		
-		//Add the new particle to the list of current particles
-		//d	Particles.push_back (P0); 
-		particleHandler.copyAndAddObject(inflowParticle_);
-
-		cout << "Create a particle " << endl;
-
-		
-		}
-		
-		//Write the info to the screen and save a copy to the disk
-		
-		cout << "Finished creating particles" << endl;
-		
-	
-		
-		write(std::cout,false);
-		writeRestartFile();
-	
-}
+        
+        // CREATE THE PARTICLES
+        while ((N1 > 0) && (N2 > 0))
+        {
+            
+            
+            //random to see if want to generate a large or small particles, helps makes the initial conditions homogenious
+            if (random.getRandomNumber(1.0, N1 + N2) > N2)
+            {
+                //Generate a small particle: set radius to small radius subtract one off the list of small particles to be generated
+                inflowParticle_.setRadius(radius_1);
+                inflowParticle_.setSpecies(speciesHandler.getObject(1));
+                N1--;
+            }
+            else
+            {
+                //Generate a large particle: set radius to large radius subtract one of the list of large particles to be generated
+                inflowParticle_.setRadius(radius_2);
+                inflowParticle_.setSpecies(speciesHandler.getObject(2));
+                N2--;
+            }
+            
+            
+            //P0.get_Angle().set_zero();
+            //P0.setAngularVelocity(Vec3D(0.0,0.0,0.0));
+            //inflowParticle_.computeMass();
+            
+            //randomize particle position, zero intial velocity
+            inflowParticle_.setPosition(Vec3D(random.getRandomNumber(getXMin(), getXMax()),
+                                              random.getRandomNumber(getYMin(), getYMax()),
+                                              random.getRandomNumber(getZMin(), getZMax())));
+            
+            inflowParticle_.setVelocity(Vec3D(0.0, 0.0, 0.0));
+            
+            
+            //Add the new particle to the list of current particles
+            //d	Particles.push_back (P0);
+            particleHandler.copyAndAddObject(inflowParticle_);
+            
+            logger(INFO, "Create a particle ");
+            
+            
+        }
+        
+        //Write the info to the screen and save a copy to the disk
+        
+        logger(INFO, "Finished creating particles");
+        
+        
+        write(std::cout, false);
+        writeRestartFile();
+        
+    }
 
 private:
 double rho_0;
@@ -391,7 +390,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(20*60, problem.getTimeMax(), problem.getTimeStep()));
 	//problem.setSaveCount(helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(20*60,getTimeMax(),getTimeStep()));
 	//problem.setSaveCount(1);
-	cout << "dt=" << problem.getTimeStep() << endl;
+    logger(INFO, "dt=%", problem.getTimeStep());
 	
 	problem.autoNumber();
 

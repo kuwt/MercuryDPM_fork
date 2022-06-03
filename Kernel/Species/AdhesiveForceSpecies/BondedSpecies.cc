@@ -111,8 +111,7 @@ void BondedSpecies::setBondForceMax(Mdouble new_f0)
         bondForceMax_ = new_f0;
     else
     {
-        std::cerr << "Error in setBondForceMax" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setBondForceMax");
     }
 }
 
@@ -123,8 +122,7 @@ void BondedSpecies::setBondDissipation(Mdouble disp)
         bondDissipation_ = disp;
     else
     {
-        std::cerr << "Error in setBondDissipation" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setBondDissipation");
     }
 }
 

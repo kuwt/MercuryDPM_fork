@@ -100,41 +100,44 @@ public:
         species2->setSlidingDissipation(species2->getDissipation());
         species2->setSlidingStiffness(species2->getStiffness()*2.0/7.0);
         species2->setSlidingFrictionCoefficient(0.5);
-        
 
-        
-   
-        
-      
+
+
+
+
+
         //
         //////////
         //
         species01->setCollisionTimeAndRestitutionCoefficient(tc, r, mass_small, mass_small);
-        species01->setSlidingDissipation(species01->getDissipation()); //  Set the tangential dissipation equal to the normal disipation for mixed collision
+        species01->setSlidingDissipation(
+                species01->getDissipation()); //  Set the tangential dissipation equal to the normal disipation for mixed collision
         species01->setSlidingFrictionCoefficient(0.5);
-        species01->setSlidingStiffness(species01->getStiffness()*2.0/7.0);
-                
+        species01->setSlidingStiffness(species01->getStiffness() * 2.0 / 7.0);
+
         species02->setCollisionTimeAndRestitutionCoefficient(tc, r, mass_small, mass_large);
-        species02->setSlidingDissipation(species01->getDissipation()); //  Set the tangential dissipation equal to the normal disipation
+        species02->setSlidingDissipation(
+                species01->getDissipation()); //  Set the tangential dissipation equal to the normal disipation
         species02->setSlidingFrictionCoefficient(0.5);
-        species02->setSlidingStiffness(species02->getStiffness()*2.0/7.0);
-                
+        species02->setSlidingStiffness(species02->getStiffness() * 2.0 / 7.0);
+
         species12->setCollisionTimeAndRestitutionCoefficient(tc, r, mass_small, mass_large);
-        species12->setSlidingDissipation(species01->getDissipation()); //  Set the tangential dissipation equal to the normal disipation
+        species12->setSlidingDissipation(
+                species01->getDissipation()); //  Set the tangential dissipation equal to the normal disipation
         species12->setSlidingFrictionCoefficient(0.5);
-        species12->setSlidingStiffness(species12->getStiffness()*2.0/7.0);
-                
-        std::cout << "Number of large particles:" << Nl << std::endl;
-        std::cout << "Number of small particles:" << Ns << std::endl;
-        
+        species12->setSlidingStiffness(species12->getStiffness() * 2.0 / 7.0);
+
+        logger(INFO, "Number of large particles:%\n", Flusher::NO_FLUSH, Nl);
+        logger(INFO, "Number of small particles:%", Ns);
+
         Chute::setupInitialConditions();
 
-        
+
         // Remove the two existing boundaries insertion and periodic and put the peroidic back if perodic else put
         boundaryHandler.clear();
-        
 
-        
+
+
         //Now add two extra solid walls at the end
         //InfiniteWall w0;
         gateLeft_ = new InfiniteWall;
@@ -159,93 +162,96 @@ public:
 
             //Periodic in x
            // b0.set(Vec3D(1.0, 0.0, 0.0), getXMin(), getXMax());
-           // boundaryHandler.copyAndAddObject(b0);
+            // boundaryHandler.copyAndAddObject(b0);
         }
 
-        
-        
+
+
         // CREATE THE PARTICLES
 
         SphericalParticle p0;
         smallInsertionBoundary = new CubeInsertionBoundary();
         largeInsertionBoundary = new CubeInsertionBoundary();
 
-        double volumeToInsert=num_small*4.0/3.0*constants::pi*pow(1.0,3);
+        double volumeToInsert = num_small * 4.0 / 3.0 * constants::pi * pow(1.0, 3);
 
-        logger(INFO,"Need to insert a volume of % of each particle type",volumeToInsert);
+        logger(INFO, "Need to insert a volume of % of each particle type", volumeToInsert);
 
 
-        smallInsertionBoundary->set(p0,1000000,Vec3D(getXMin(),getYMin(),getZMax()/2.0),Vec3D(getXMax(),getYMax(),getZMax()),Vec3D(0.0,0.0,0.0),Vec3D(0.0,0.0,0.0),1.0*0.95,1.0*1.05);
+        smallInsertionBoundary->set(p0, 1000000, Vec3D(getXMin(), getYMin(), getZMax() / 2.0),
+                                    Vec3D(getXMax(), getYMax(), getZMax()), Vec3D(0.0, 0.0, 0.0), Vec3D(0.0, 0.0, 0.0));
         smallInsertionBoundary->setInitialVolume(volumeToInsert);
         smallInsertionBoundary->deactivate();
         boundaryHandler.addObject(smallInsertionBoundary);
 
-        largeInsertionBoundary->set(p0,1000000,Vec3D(getXMin(),getYMin(),getZMin()),Vec3D(getXMax(),getYMax(),getZMax()/2.0),Vec3D(0.0,0.0,0.0),Vec3D(0.0,0.0,0.0),2.0*0.95,2.0*1.05);
+        largeInsertionBoundary->set(p0, 1000000, Vec3D(getXMin(), getYMin(), getZMin()),
+                                    Vec3D(getXMax(), getYMax(), getZMax() / 2.0), Vec3D(0.0, 0.0, 0.0),
+                                    Vec3D(0.0, 0.0, 0.0));
         largeInsertionBoundary->setInitialVolume(volumeToInsert);
         largeInsertionBoundary->deactivate();
         boundaryHandler.addObject(largeInsertionBoundary);
-       /* while ((Ns > 0) || (Nl > 0))
-        {
-            
-            //random to see if want to generate a large or small particles, helps makes the initial conditions homogenious
-            if (random.getRandomNumber(1.0, Nl + Ns) > Nl)
-            {
-                P0.setRadius(radius_s);
-                P0.setSpecies(species1);
-                Ns--;
-            }
-            else
-            {
-                P0.setRadius(radius_l);
-                P0.setSpecies(species2);
-                Nl--;
-            }
-            //randomise particle position, zero intial velocity
-	    do 
-                {
-                P0.setPosition(
-                    Vec3D(random.getRandomNumber(getXMin() + radius_l + 2 * getFixedParticleRadius(),
-                            getXMax() - radius_l - 2 * getFixedParticleRadius()),
-                            random.getRandomNumber(getYMin() + radius_l, getYMax() - radius_l),
-                            random.getRandomNumber(getZMin() + radius_l, getZMax() - radius_l)));
-                P0.setVelocity(Vec3D(0.0, 0.0, 0.0));
-            
-                 }
-             while (!checkParticleForInteraction(P0));
-	     particleHandler.copyAndAddObject(P0);
+        /* while ((Ns > 0) || (Nl > 0))
+         {
 
-        }*/
-        
-        std::cout << "Finished creating particles" << std::endl;
-        
+             //random to see if want to generate a large or small particles, helps makes the initial conditions homogenious
+             if (random.getRandomNumber(1.0, Nl + Ns) > Nl)
+             {
+                 P0.setRadius(radius_s);
+                 P0.setSpecies(species1);
+                 Ns--;
+             }
+             else
+             {
+                 P0.setRadius(radius_l);
+                 P0.setSpecies(species2);
+                 Nl--;
+             }
+             //randomise particle position, zero intial velocity
+         do
+                 {
+                 P0.setPosition(
+                     Vec3D(random.getRandomNumber(getXMin() + radius_l + 2 * getFixedParticleRadius(),
+                             getXMax() - radius_l - 2 * getFixedParticleRadius()),
+                             random.getRandomNumber(getYMin() + radius_l, getYMax() - radius_l),
+                             random.getRandomNumber(getZMin() + radius_l, getZMax() - radius_l)));
+                 P0.setVelocity(Vec3D(0.0, 0.0, 0.0));
+
+                  }
+              while (!checkParticleForInteraction(P0));
+          particleHandler.copyAndAddObject(P0);
+
+         }*/
+
+        logger(INFO, "Finished creating particles");
+
         for (int i = 0; i < particleHandler.getNumberOfObjects(); i++)
         {
             BaseParticle* P0 = particleHandler.getObject(i);
             if (P0->getIndSpecies() == 0)
             {
-                BedParticles.push_back(P0); 
+                BedParticles.push_back(P0);
             }
         }
-        std::cout << "Finished storing bed particles" << std::endl;
+        logger(INFO, "Finished storing bed particles");
     }
     
     void actionsOnRestart()
     {
-        
-        int Ns=num_restart_small;
-        int Nl=num_restart_large;
-        
-        auto species0=speciesHandler.getObject(0);
-        auto species1=speciesHandler.getObject(1);
-        auto species2=speciesHandler.getObject(2);
-        
-        std::cout << "Restarting and adding " << Ns << " small particles and " << Nl <<" large particles" << std::endl;
-        
-        
+
+        int Ns = num_restart_small;
+        int Nl = num_restart_large;
+
+        auto species0 = speciesHandler.getObject(0);
+        auto species1 = speciesHandler.getObject(1);
+        auto species2 = speciesHandler.getObject(2);
+
+        logger(INFO, "Restarting and adding % small particles and % large particles", Ns, Nl);
+
+
         SphericalParticle P0;
         while ((Ns > 0) || (Nl > 0))
         {
-            
+
             //random to see if want to generate a large or small particles, helps makes the initial conditions homogenious
             if (random.getRandomNumber(1.0, Nl + Ns) > Nl)
             {
@@ -268,16 +274,15 @@ public:
                                      random.getRandomNumber(getYMin() + radius_l, getYMax() - radius_l),
                                      random.getRandomNumber(getZMin() + radius_l, getZMax() - radius_l)));
                 P0.setVelocity(Vec3D(0.0, 0.0, 0.0));
-                
-            }
-            while (!checkParticleForInteraction(P0));
+
+            } while (!checkParticleForInteraction(P0));
             particleHandler.copyAndAddObject(P0);
-            
+
         }
-        
-        std::cout << "Finished adding new particles. Now simulation will restart" << std::endl;
-        
-        
+
+        logger(INFO, "Finished adding new particles. Now simulation will restart");
+
+
     }
 
     void actionsAfterTimeStep()
@@ -355,7 +360,7 @@ public:
                     BedParticles.push_back(P0);
                 }
             }
-            std::cout << "Finished storing bed particles" << std::endl;
+            logger(INFO, "Finished storing bed particles");
         }
         
         if (getTime() > 1.0)
@@ -389,23 +394,23 @@ public:
     }
     void set_particle_numbers(int new_num_small, int new_num_large)
     {
-        
+
         if (new_num_small > 0)
         {
             num_small = new_num_small;
         }
         else
-        {           
-            std::cerr << "Please give a positive numnber if small particles" << std::endl;
+        {
+            logger(ERROR, "Please give a positive number if small particles");
         }
-        
+
         if (new_num_large > 0)
         {
             num_large = new_num_large;
         }
         else
-        {           
-            std::cerr << "Please give a positive numnber if small particles" << std::endl;
+        {
+            logger(ERROR, "Please give a positive number if small particles");
         }
         
     }
@@ -418,21 +423,21 @@ public:
         }
         else
         {
-            std::cerr << "Please give a positve number of particels" << std::endl;
+            logger(ERROR, "Please give a positive number of particles");
         }
         
     }
     
     void set_radiusLarge(double new_large_radius)
     {
-        
+
         if (new_large_radius > 0)
-        {           
-            radius_l = new_large_radius;    
+        {
+            radius_l = new_large_radius;
         }
         else
-        {           
-            std::cerr << "Radius must be greater than zero" << std::endl;
+        {
+            logger(ERROR, "Radius must be greater than zero");
         }
     }
     
@@ -475,7 +480,7 @@ private:
 int main(int argc, char *argv[])
 {
     //Print description
-    std::cout << std::endl << "Description: A quasi-2D moving-bed channel with walls on the left and right boundary." << std::endl;
+    logger(INFO, "\nDescription: A quasi-2D moving-bed channel with walls on the left and right boundary.");
     
     // Problem parameters
     Chutebelt problem;
@@ -524,7 +529,7 @@ int main(int argc, char *argv[])
         problem.num_restart_small=0;
     }
     
-    std::cout << problem.num_restart_small <<" " <<problem.num_restart_large << std::endl;
+    logger(INFO, "% %", problem.num_restart_small, problem.num_restart_large);
 
 
     problem.solve();

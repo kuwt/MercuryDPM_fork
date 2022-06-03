@@ -40,28 +40,28 @@ class DrumRot : public Mercury3D
 
 	void setupInitialConditions() override
 	{
-		radiusS1 = 0.0005; // 1mm diameter
-
-		rhoS1 = 2500.0;
-
-		massS1 = 4 / 3 * constants::pi * pow(radiusS1, 3.0) * rhoS1;
-
-		double fillVolume = drumFillFraction*constants::pi*pow(drumRadius,2.0)*(std::abs(getYMax()-getYMin()));
-		numS1 = (fillVolume )/(4./3. * constants::pi*pow(radiusS1,3.0)); // Drum volume - volume large particles
-		//std::cout << "fillVolume" << fillVolume << "total particle volume" << numS1*4 / 3 * constants::pi * pow(radiusS1, 3.0) + numS2*4 / 3 * constants::pi * pow(radiusS2, 3.0) << std::endl;
+        radiusS1 = 0.0005; // 1mm diameter
+        
+        rhoS1 = 2500.0;
+        
+        massS1 = 4 / 3 * constants::pi * pow(radiusS1, 3.0) * rhoS1;
+        
+        double fillVolume = drumFillFraction * constants::pi * pow(drumRadius, 2.0) * (std::abs(getYMax() - getYMin()));
+        numS1 = (fillVolume) / (4. / 3. * constants::pi * pow(radiusS1, 3.0)); // Drum volume - volume large particles
+        //std::cout << "fillVolume" << fillVolume << "total particle volume" << numS1*4 / 3 * constants::pi * pow(radiusS1, 3.0) + numS2*4 / 3 * constants::pi * pow(radiusS2, 3.0) << std::endl;
         //std::cout<< "fillVolume = " << fillVolume << ", drumFillFraction = "<< drumFillFraction << ", S2Volume = " << S2Volume << std::endl;
-        std::cout<< "Expected numS1 = "<<numS1<<std::endl;
-		numS1ToBeInserted = numS1;
-
-		//std::cout << " mass " << massS1 << " " << massS2 << std::endl;
-
-		tc = 1 / 4000.0;
-		//original value
-		//tc = 0.005;
-
-		speciesHandler.clear();
-
-		auto speciesDrum = speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
+        logger(INFO, "Expected numS1 = %", numS1);
+        numS1ToBeInserted = numS1;
+        
+        //std::cout << " mass " << massS1 << " " << massS2 << std::endl;
+        
+        tc = 1 / 4000.0;
+        //original value
+        //tc = 0.005;
+        
+        speciesHandler.clear();
+        
+        auto speciesDrum = speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
 		auto speciesS1 =  speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
 
 		double RPSInitial = 0.0;
@@ -157,17 +157,17 @@ class DrumRot : public Mercury3D
             numS1Inserted++;
             hGridRebuild();
 		}
-		std::cout << "Number of S1 particles inserted" << numS1Inserted << std::endl;
-
-		if (numS1Inserted == numS1)
-		{
-			step = 2;
-			checkTime = getTime() + 1.0;
-			std::cout << "\n \n \n";
-			std::cout << "Particles settling down, checkTime = " << checkTime << std::endl;
-			std::cout << "--------------------------" << std::endl;
-			std::cout << "\n\n\n";
-		}
+        logger(INFO, "Number of S1 particles inserted %", numS1Inserted);
+        
+        if (numS1Inserted == numS1)
+        {
+            step = 2;
+            checkTime = getTime() + 1.0;
+            logger(INFO, "\n \n \n"
+                         "Particles settling down, checkTime = %"
+                         "--------------------------"
+                         "\n\n\n", checkTime);
+        }
 	}
 
 	void actionsBeforeTimeStep() override
@@ -180,26 +180,29 @@ class DrumRot : public Mercury3D
 		{
 			if (getTime() > checkTime)
 			{
-				std::cout << "Current KE" << getKineticEnergy() << std::endl;
-				if (getKineticEnergy() < (10.0))
-				{
-					step = 3;
+                logger(INFO, "Current KE %", getKineticEnergy());
+                if (getKineticEnergy() < (10.0))
+                {
+                    step = 3;
                     setTime(0.0);
                     setSaveCount(2000);
-					double drumStartTime = getTime();
-					std::cout << "\n \n \n";
-					std::cout << "Start the drum rotation, rpm = " << revolutionsPerSecond*60.0 << std::endl;
-					std::cout << "--------------------------" << std::endl;
-					std::cout << "\n\n\n";
-					// rotate the drum
-					wallHandler.getObject(0)->setAngularVelocity(Vec3D(0.0,revolutionsPerSecond*constants::pi*2.0,0.0));
-					wallHandler.getObject(1)->setAngularVelocity(Vec3D(0.0,revolutionsPerSecond*constants::pi*2.0,0.0));
-					wallHandler.getObject(2)->setAngularVelocity(Vec3D(0.0,revolutionsPerSecond*constants::pi*2.0,0.0));
-
-					//wallHandler.getObject(0)->setOrientation(Vec3D(0.0,1.0,0.0));
-					//wallHandler.getObject(1)->setOrientation(Vec3D(0.0,-1.0,0.0));
-					//wallHandler.getObject(2)->setOrientation(Vec3D(0.0,1.0,0.0));
-				}
+                    double drumStartTime = getTime();
+                    logger(INFO, "\n \n \n"
+                                 "Start the drum rotation, rpm = %"
+                                 "--------------------------"
+                                 "\n\n\n", revolutionsPerSecond * 60.0);
+                    // rotate the drum
+                    wallHandler.getObject(0)->setAngularVelocity(
+                            Vec3D(0.0, revolutionsPerSecond * constants::pi * 2.0, 0.0));
+                    wallHandler.getObject(1)->setAngularVelocity(
+                            Vec3D(0.0, revolutionsPerSecond * constants::pi * 2.0, 0.0));
+                    wallHandler.getObject(2)->setAngularVelocity(
+                            Vec3D(0.0, revolutionsPerSecond * constants::pi * 2.0, 0.0));
+                    
+                    //wallHandler.getObject(0)->setOrientation(Vec3D(0.0,1.0,0.0));
+                    //wallHandler.getObject(1)->setOrientation(Vec3D(0.0,-1.0,0.0));
+                    //wallHandler.getObject(2)->setOrientation(Vec3D(0.0,1.0,0.0));
+                }
 				else
 				{
 					checkTime = getTime() + 0.1;
@@ -207,22 +210,23 @@ class DrumRot : public Mercury3D
 			}
 		}
 	}
-
-	void actionsOnRestart() override
-	{
-
+    
+    void actionsOnRestart() override
+    {
+        
         //setTimeMax(200.0);
-	    setSaveCount(2000);
-
-	    std::cout << "\n \n \n";
-		std::cout << "Set drum rotation speed (rpm) to " << revolutionsPerSecond*60.0 << std::endl;
-		std::cout << "--------------------------" << std::endl;
-		std::cout << "\n\n\n";
-
-        wallHandler.getObject(0)->setAngularVelocity(Vec3D(0.0,revolutionsPerSecond*constants::pi*2.0,0.0)); //rad/s
-		wallHandler.getObject(1)->setAngularVelocity(Vec3D(0.0,revolutionsPerSecond*constants::pi*2.0,0.0));
-		wallHandler.getObject(2)->setAngularVelocity(Vec3D(0.0,revolutionsPerSecond*constants::pi*2.0,0.0));
-	}
+        setSaveCount(2000);
+        
+        logger(INFO, "\n \n \n"
+                     "set drum rotation speed (rpm) to %"
+                     "--------------------------"
+                     "\n\n\n", revolutionsPerSecond * 60.0);
+        
+        wallHandler.getObject(0)->setAngularVelocity(
+                Vec3D(0.0, revolutionsPerSecond * constants::pi * 2.0, 0.0)); //rad/s
+        wallHandler.getObject(1)->setAngularVelocity(Vec3D(0.0, revolutionsPerSecond * constants::pi * 2.0, 0.0));
+        wallHandler.getObject(2)->setAngularVelocity(Vec3D(0.0, revolutionsPerSecond * constants::pi * 2.0, 0.0));
+    }
 
 	void setDrumRadius (double radius)
 	{
@@ -361,7 +365,7 @@ int main(int argc, char *argv[])
 	problem.setTimeStep(1.0/(4000.0 * 50.0));
 	double froudeNumber = 0.22;
 	double rotRate = pow(froudeNumber*9.81/drumRad,0.5);//*(60.0/(2.0*3.1415926535));
-    std::cout<< "rotRate = " << rotRate << std::endl;
+    logger(INFO, "rotRate = %", rotRate);
 	//Set the number of domains for parallel decomposition
 	//problem.setNumberOfDomains({2,1,1});
 

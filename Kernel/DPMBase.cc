@@ -70,12 +70,13 @@
 /**
  * \deprecated
  */
+MERCURY_DEPRECATED
 [[noreturn]] void logWriteAndDie(const std::string& module, std::string message)
 {
     std::cerr << "A fatal   error has occured"
               << "\n Module  :" << module
               << "\n Message :" << message << std::endl;
-
+    
     std::exit(-1);
 }
 
@@ -258,9 +259,6 @@ void DPMBase::constructor()
     writeWallsVTK_ = FileType::NO_FILE;
     vtkWriter_ = nullptr;
 
-    //defines logger behaviour
-    loggerOutput->onFatal = logWriteAndDie;
-
     setName(""); // needs to be user-specified, otherwise checkSettings throws error
 
     //Default mode is energy with no scale of the vectors
@@ -269,15 +267,18 @@ void DPMBase::constructor()
     xBallsScale_ = -1;
     xBallsAdditionalArguments_ = "";
     setAppend(false);
-
+    
     //The default random seed is 0
     random.setRandomSeed(0);
-
+    
     logger(DEBUG, "DPMBase problem constructor finished");
-
+    
     readSpeciesFromDataFile_ = false;
     
     numberOfOMPThreads_ = 1;
+    
+    //Set number of elements to write to the screen if a user wants to output write information to the terminal
+    nToWrite_ = 4;
 }
 
 /*!
@@ -827,10 +828,32 @@ void DPMBase::setTime(Mdouble time)
     Mdouble diff = time_ - time;
     time_ = time;
     //this sets the interaction timestamp, so each interaction has the right time
-    for (auto i : interactionHandler)
+    for (auto i: interactionHandler)
     {
         i->setTimeStamp(i->getTimeStamp() - diff);
     }
+}
+
+
+/*!
+ * \details sets nToWrite_. If a user wants to output e.g. particle information to the screen we limit the number of
+ * outputs to nToWrite elements to not get an overflow of information in the terminal.
+ * \param[in] nToWrite          Number of elements to write to the screen
+ */
+void DPMBase::setNToWrite(int nToWrite)
+{
+    nToWrite_ = nToWrite;
+}
+
+/*!
+ * \details Gets nToWrite. If a user wants to output e.g. particle information to the screen we limit the number of
+ * outputs to nToWrite elements to not get an overflow of information in the terminal.
+ * \param[out] nToWrite_          Number of elements to write to the screen
+ */
+
+int DPMBase::getNToWrite() const
+{
+    return nToWrite_;
 }
 
 /*!
@@ -1217,29 +1240,30 @@ Mdouble DPMBase::getTimeStep() const
 /* Allows user to set the number of omp threads */
 void DPMBase::setNumberOfOMPThreads(int numberOfOMPThreads)
 {
-    logger.assert_always(numberOfOMPThreads>0, "Number of OMP threads must be positive");
+    logger.assert_always(numberOfOMPThreads > 0, "Number of OMP threads must be positive");
     numberOfOMPThreads_ = numberOfOMPThreads;
-    
-    #ifdef MERCURY_USE_OMP
-        if(numberOfOMPThreads > omp_get_max_threads()) {
-            logger(INFO, "Number of omp threads set to the maximum number of threads allowed: %",
-                   omp_get_max_threads());
-            numberOfOMPThreads_ = numberOfOMPThreads = omp_get_max_threads();
-        }
-        #pragma omp parallel num_threads(getNumberOfOMPThreads())
-        {
-            if (omp_get_thread_num()==0)
-                std::cout << "Using " << omp_get_num_threads() << " of " << omp_get_max_threads() << " omp threads; testing thread";
-        }
-        #pragma omp parallel num_threads(getNumberOfOMPThreads())
-        {
-            std::cout << ' ' + std::to_string(omp_get_thread_num());
-        }
-        std::cout << '\n';
-        
-    #else
-        logger(WARN, "You are setting the number of omp threads to %, but OMP is not turned on", getNumberOfOMPThreads());
-    #endif
+
+#ifdef MERCURY_USE_OMP
+    if(numberOfOMPThreads > omp_get_max_threads()) {
+        logger(INFO, "Number of omp threads set to the maximum number of threads allowed: %",
+               omp_get_max_threads());
+        numberOfOMPThreads_ = numberOfOMPThreads = omp_get_max_threads();
+    }
+#pragma omp parallel num_threads(getNumberOfOMPThreads())
+    {
+        if (omp_get_thread_num()==0)
+            logger(INFO, "Using % of % omp threads; testing thread",
+                   omp_get_num_threads(), omp_get_max_threads(), Flusher::NO_FLUSH);
+    }
+#pragma omp parallel num_threads(getNumberOfOMPThreads())
+    {
+        logger(INFO) " %", std::to_string(omp_get_thread_num(), Flusher::NO_FLUSH);
+    }
+    logger(INFO,"");
+
+#else
+    logger(WARN, "You are setting the number of omp threads to %, but OMP is not turned on", getNumberOfOMPThreads());
+#endif
 }
 
 /* Returns the number of omp threads */
@@ -1934,10 +1958,7 @@ void DPMBase::printTime() const
     if (communicator.getProcessorID() == 0)
     {
 #endif
-    std::cout << "t=" << std::setprecision(3) << std::left << std::setw(6) << getTime()
-              << ", tmax=" << std::setprecision(3) << std::left << std::setw(6) << getTimeMax()
-              << std::endl;
-    std::cout.flush();
+    logger(INFO, "t=%3.6, tmax=%3.6", getTime(), getTimeMax());
 #ifdef MERCURY_USE_MPI
     }
 #endif
@@ -2253,8 +2274,7 @@ void DPMBase::outputXBallsData(std::ostream& os) const
             format = 14;
             break;
         default:
-            std::cerr << "Unknown system dimension" << std::endl;
-            exit(-1);
+            logger(ERROR, "Unknown system dimension");
     }
 
     unsigned int numberOfParticles = particleHandler.getNumberOfRealObjectsLocal();
@@ -2297,7 +2317,7 @@ void DPMBase::outputXBallsData(std::ostream& os) const
 #endif
     }
 #ifdef DEBUG_OUTPUT
-    std::cerr << "Have output the properties of the problem to disk " << std::endl;
+    logger(DEBUG, "Have output the properties of the problem to disk ");
 #endif
 }
 
@@ -2428,8 +2448,7 @@ bool DPMBase::readParAndIniFiles(const std::string fileName)
     }
     else
     {
-        std::cerr << "Error in par.ini: line 1, value 1 is " << integerValue << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in par.ini: line 1, value 1 is ", integerValue);
     }
 
     //   2: integer (0|1) dont use | use the search pattern for linked cells
@@ -2475,8 +2494,7 @@ bool DPMBase::readParAndIniFiles(const std::string fileName)
         //   2: requires initial log-output time
         //   3: negative number is multiplied to the previous film-output-time
         //   4: requires initial film-output time
-        std::cerr << "Error in par.ini: line 3, value 1 is " << doubleValue << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in par.ini: line 3, value 1 is ", doubleValue);
     }
 
     // line 4 =============================================================
@@ -2503,19 +2521,19 @@ bool DPMBase::readParAndIniFiles(const std::string fileName)
     //   4: background damping dashpot constant
     file >> doubleValue;
     if (doubleValue != 0.0)
-        std::cerr << "Warning in par.ini: ignored background damping " << doubleValue << std::endl;
+        logger(WARN, "Warning in par.ini: ignored background damping %", doubleValue);
 
     // line 5 =============================================================
     // Example: 0 0
     //   1: growth rate:  d(radius) = xgrow * dt
     file >> doubleValue;
     if (doubleValue != 0.0)
-        std::cerr << "Warning in par.ini: ignored growth rate " << doubleValue << std::endl;
+        logger(WARN, "Warning in par.ini: ignored growth rate ", doubleValue);
 
     //   2: target volume_fraction
     file >> doubleValue;
     if (doubleValue != 0.0)
-        std::cerr << "Warning in par.ini: ignored target volume_fraction " << doubleValue << std::endl;
+        logger(WARN, "Warning in par.ini: ignored target volume_fraction %", doubleValue);
 
     file.close();
     //std::cout << "Loaded par.ini file " << filename << std::endl;
@@ -2547,7 +2565,7 @@ bool DPMBase::findNextExistingDataFile(Mdouble tMin, bool verbose)
             dataFile.getFstream() >> N;
             if (dataFile.getFstream().eof() || dataFile.getFstream().peek() == -1)
             {
-                std::cout << "file " << dataFile.getName() << " not found" << std::endl;
+                logger(WARN, "file % not found", dataFile.getName());
                 return false;
             }
             //check if tmin condition is satisfied
@@ -2559,7 +2577,7 @@ bool DPMBase::findNextExistingDataFile(Mdouble tMin, bool verbose)
                 return true;
             }
             if (verbose)
-                std::cout << "Jumping file counter: " << dataFile.getCounter() << std::endl;
+                logger(VERBOSE, "Jumping file counter: %", dataFile.getCounter());
         }
     }
     return true;
@@ -2877,7 +2895,7 @@ void DPMBase::fillDomainWithParticles(unsigned N) {
     SphericalParticle p(s);
     CubeInsertionBoundary b;
     Mdouble r = cbrt(getTotalVolume())/N;
-    b.set(p,100,getMin(),getMax(),{0,0,0},{0,0,0},r,r);
+    b.set(p, 100, getMin(), getMax(), {0, 0, 0}, {0, 0, 0});
     b.insertParticles(this);
     logger(INFO,"Inserted % particles",particleHandler.getSize());
     //setTimeMax(0);
@@ -3377,9 +3395,9 @@ void DPMBase::computeInternalForces(BaseParticle* i)
 /*!
  * \details Writes out all relevant information - e.g. system dimensions, run duration, particle information -
  * for a .restart file to the chosen output stream, <TT>os</TT>. More detailed comments may be seen in the body of the code.
- * \param[in] os The output stream to which data is written
  * \param[in] writeAllParticles A boolean which decides whether or not all particle information is written
  * to the output file. (Otherwise, only a small number of particles are printed.)
+ * \param[in] nToWrite
  */
 void DPMBase::write(std::ostream& os, bool writeAllParticles) const
 {
@@ -3435,7 +3453,6 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
             << " numberOfDomains " << numberOfDomains_[Direction::XAXIS] << " " << numberOfDomains_[Direction::YAXIS] << " " << numberOfDomains_[Direction::ZAXIS];
     }
 #endif
-
     //only write xBallsArguments if they are nonzero
     if (getXBallsAdditionalArguments().compare(""))
         os << " xBallsArguments " << getXBallsAdditionalArguments();
@@ -3454,21 +3471,22 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
             os << *wallHandler.getObject(i) << std::endl;
         os << "...\n";
     }
-
+    
     //outputs the number of boundaries in the system
     os << "Boundaries " << boundaryHandler.getNumberOfObjects() << std::endl;
-    if (writeAllParticles || boundaryHandler.getSize() < 9) {
-        for (BaseBoundary* b : boundaryHandler)
+    if (writeAllParticles || boundaryHandler.getSize() < 9)
+    {
+        for (BaseBoundary* b: boundaryHandler)
             os << (*b) << std::endl;
-    } else {
-        for (int i=0; i<2; ++i)
+    }
+    else
+    {
+        for (int i = 0; i < 2; ++i)
             os << *boundaryHandler.getObject(i) << std::endl;
         os << "...\n";
     }
-
-    int nToWrite = 4; // \todo JMFT: Don't hardcode this here, but put it in the argument
-
-    if (writeAllParticles || particleHandler.getSize() < nToWrite)
+    
+    if (writeAllParticles || particleHandler.getSize() < getNToWrite())
     {
         //if the "writeAllParticles" bool == true, or there are fewer than 4 particles
         //calls the particleHandler version of the "write" function and also
@@ -3479,19 +3497,19 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
     {
         //otherwise, only prints out limited information
         os << "Particles " << particleHandler.getSize() << '\n';
-        for (unsigned int i = 0; i < nToWrite; i++)
+        for (unsigned int i = 0; i < getNToWrite(); i++)
             os << *(particleHandler.getObject(i)) << '\n';
         os << "..." << '\n';
     }
     // Similarly, print out interaction details (all of them, or up to nToWrite of them)
-    if (writeAllParticles || interactionHandler.getNumberOfObjects() < nToWrite)
+    if (writeAllParticles || interactionHandler.getNumberOfObjects() < getNToWrite())
     {
         interactionHandler.write(os);
     }
     else
     {
         os << "Interactions " << interactionHandler.getNumberOfObjects() << '\n';
-        for (unsigned int i = 0; i < nToWrite; i++)
+        for (unsigned int i = 0; i < getNToWrite(); i++)
             os << *(interactionHandler.getObject(i)) << '\n';
         os << "..." << '\n';
     }
@@ -4203,7 +4221,7 @@ bool DPMBase::readArguments(int argc, char* argv[])
     // Those that don't will have to do i--; some examples in readNextArgument.)
     for (int i = 1; i < argc; i += 2)
     {
-        std::cout << "interpreting input argument " << argv[i];
+        logger(INFO, "interpreting input argument %\n", argv[i], Flusher::NO_FLUSH);
         for (int j = i + 1; j < argc; j++)
         {
             //looks for the next string that starts with a minus sign
@@ -4211,9 +4229,9 @@ bool DPMBase::readArguments(int argc, char* argv[])
             //and we need to make sure all are read in!
             if (argv[j][0] == '-')
                 break;
-            std::cout << " " << argv[j];
+            logger(INFO, " %\n", argv[j], Flusher::NO_FLUSH);
         }
-        std::cout << std::endl;
+        logger(INFO, "");
         //if "isRead"is true and "readNextArgument" is also true...
         //(i.e. checking if any argument is false)
         isRead &= readNextArgument(i, argc, argv);
@@ -4367,7 +4385,7 @@ bool DPMBase::readNextArgument(int& i, int argc, char* argv[])
     {
         Mdouble old = getTimeStep();
         setTimeStep(atof(argv[i + 1]));
-        std::cout << "  reset dt from " << old << " to " << getTimeStep() << std::endl;
+        logger(INFO, "  reset dt from % to %", old, getTimeStep());
     }
 //    else if (!strcmp(argv[i], "-Hertz"))
 //    {
@@ -4378,13 +4396,13 @@ bool DPMBase::readNextArgument(int& i, int argc, char* argv[])
     {
         Mdouble old = getTimeMax();
         setTimeMax(atof(argv[i + 1]));
-        std::cout << "  reset timeMax from " << old << " to " << getTimeMax() << std::endl;
+        logger(INFO, "  reset timeMax from % to %", old, getTimeMax());
     }
     else if (!strcmp(argv[i], "-saveCount"))
     {
         Mdouble old = dataFile.getSaveCount();
         setSaveCount(static_cast<unsigned int>(atoi(argv[i + 1])));
-        std::cout << "  reset saveCount from " << old << " to " << dataFile.getSaveCount() << std::endl;
+        logger(INFO, "  reset saveCount from & to %", old, dataFile.getSaveCount());
     }
     else if (!strcmp(argv[i], "-saveCountData"))
     {
@@ -4461,7 +4479,7 @@ bool DPMBase::readNextArgument(int& i, int argc, char* argv[])
         {
             i--;
             filename = getName();
-            std::cout << getName() << std::endl;
+            logger(INFO, "%", getName());
         }
         else
         {
@@ -4478,7 +4496,7 @@ bool DPMBase::readNextArgument(int& i, int argc, char* argv[])
     }
     else if (!strcmp(argv[i], "-clean") || !strcmp(argv[i], "-c"))
     {
-        std::cout << "Remove old " << getName() << ".* files" << std::endl;
+        logger(INFO, "Remove old %.* files", getName());
         removeOldFiles();
         i--;
     }
@@ -4951,14 +4969,13 @@ void DPMBase::performGhostVelocityUpdate()
  */
 void DPMBase::outputInteractionDetails() const
 {
-    std::cout << "Interactions currently in the handler:" << std::endl;
+    logger(INFO, "Interactions currently in the handler:\n", Flusher::NO_FLUSH);
     //looping over all individual objects in the interactionHandler
     for (BaseInteraction* p : interactionHandler)
     {
         p->write(std::cout);
-        std::cout << std::endl;
-        std::cout << "Interaction " << p->getName() << " " << p->getId() << " between " << p->getP()->getId() << " and "
-                  << p->getI()->getId() << std::endl;
+        logger(INFO, "\nInteraction % % between % and %",
+               p->getName(), p->getId(), p->getP()->getId(), p->getI()->getId());
     }
 }
 
@@ -5130,7 +5147,7 @@ void DPMBase::setMeanVelocityAndKineticEnergy(Vec3D V_mean_goal, Mdouble Ek_goal
     }
 
     //check the final mean velocity and kinetic energy
-    logger(INFO, "In DPMBase::setMeanVelocityAndKineticEnergy,\nV_mean_final %\n Ek_final %\n",
+    logger(INFO, "In DPMBase::setMeanVelocityAndKineticEnergy,\nV_mean_final %\n Ek_final %",
            getTotalMomentum() / getTotalMass(), getKineticEnergy());
 }
 
@@ -5251,5 +5268,6 @@ void DPMBase::handleParticleAddition(unsigned int id, BaseParticle* p)
         w->handleParticleAddition(id, p);
     }
 }
+
 
 ///\todo When restarting the indexMax should be reset

@@ -792,41 +792,43 @@ void BaseCluster::write(std::ostream& os, bool writeAllParticles) const
 {
     writeAllParticles = true;
     MercuryBase::write(os, writeAllParticles);
-
+    
     os <<
-            "position " << position_ << " " <<
-            "stage " << stage_ << " " <<
-            "t0 " << t0_
-            << std::endl <<
-            "idCluster " << idCluster_ << " " <<
-            "nParticles " << nParticles_ << " " <<
-            "radiusParticle " << radiusParticle_ << " " <<
-            "massParticle " << massParticle_ << " " <<
-            "sizeDispersityParticle " << sizeDispersityParticle_ << " " <<
-            "totalParticleVolume " << totalParticleVolume_
-            << std::endl <<
-            "maximumForceModulus " << maximumForceModulus_ << " " <<
-            "forceTuningInterval " << forceTuningInterval_ << " " <<
-            "forceTuningDuration " << forceTuningDuration_ << " " <<
-            "velocityDampingInterval " << velocityDampingInterval_ << " " <<
-            "velocityDampingModulus " << velocityDampingModulus_ << " " <<
-            "energyRatioTolerance " << energyRatioTolerance_ << " " <<
-            "forceDampingModulus " << forceDampingModulus_ << " " <<
-            "forceModulus " << forceModulus_
-            << std::endl <<
-            "isCdatOutputON " << isCdatOutputOn_ << " " <<
-            "isOverlOutputOn " << isOverlOutputOn_ << " " <<
-            "isAmatOutputOn " << isAmatOutputOn_ << " " <<
-            "isIntStrucOutputOn " << isIntStrucOutputOn_
-            << std::endl;
-    if( isIntStrucOutputOn() )
-    os <<   "nInternalStructurePoints " << nInternalStructurePoints_ << std::endl;
-
-    os <<   "isRestartOutputOn " << isRestartOutputOn_ << " " << //This is obviously on because otherwise restart
-                                                                 // process would not take place.
-                                                                 //For now it is saved but could eventually be removed.
-            "isFStatOutputOn " << isFStatOutputOn_ << " " <<
-            "isEneOutputOn " << isEneOutputOn_ << std::endl;
+       "position " << position_ << " " <<
+       "stage " << stage_ << " " <<
+       "t0 " << t0_
+       << "\n" <<
+       "idCluster " << idCluster_ << " " <<
+       "nParticles " << nParticles_ << " " <<
+       "radiusParticle " << radiusParticle_ << " " <<
+       "massParticle " << massParticle_ << " " <<
+       "sizeDispersityParticle " << sizeDispersityParticle_ << " " <<
+       "totalParticleVolume " << totalParticleVolume_
+       << "\n" <<
+       "maximumForceModulus " << maximumForceModulus_ << " " <<
+       "forceTuningInterval " << forceTuningInterval_ << " " <<
+       "forceTuningDuration " << forceTuningDuration_ << " " <<
+       "velocityDampingInterval " << velocityDampingInterval_ << " " <<
+       "velocityDampingModulus " << velocityDampingModulus_ << " " <<
+       "energyRatioTolerance " << energyRatioTolerance_ << " " <<
+       "forceDampingModulus " << forceDampingModulus_ << " " <<
+       "forceModulus " << forceModulus_
+       << "\n" <<
+       "isCdatOutputON " << isCdatOutputOn_ << " " <<
+       "isOverlOutputOn " << isOverlOutputOn_ << " " <<
+       "isAmatOutputOn " << isAmatOutputOn_ << " " <<
+       "isIntStrucOutputOn " << isIntStrucOutputOn_
+       << "\n";
+    if (isIntStrucOutputOn())
+    {
+        os << "nInternalStructurePoints " << nInternalStructurePoints_ << "\n";
+    }
+    
+    os << "isRestartOutputOn " << isRestartOutputOn_ << " " << //This is obviously on because otherwise restart
+       // process would not take place.
+       //For now it is saved but could eventually be removed.
+       "isFStatOutputOn " << isFStatOutputOn_ << " " <<
+       "isEneOutputOn " << isEneOutputOn_ << std::endl;
 }
 
 /*!
@@ -1000,8 +1002,9 @@ void BaseCluster::setRadii()
 void BaseCluster::setSpecies()
 {
     if (particleSpecies_ == nullptr)
+    {
         logger(ERROR, "Species not set.");
-
+    }
     speciesHandler.copyAndAddObject(particleSpecies_);
     /*
      * \brief mass of the particle which has radius radiusParticle if constantRestitution(false) or

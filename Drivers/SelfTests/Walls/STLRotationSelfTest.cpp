@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
     problem.eneFile.setFileType(FileType::NO_FILE);
     problem.restartFile.setFileType(FileType::NO_FILE);
     problem.setWallsWriteVTK(true);
-    // Introduce an material (no properties set, as no collisions happen here)
+    // Introduce a material (no properties set, as no collisions happen here)
     problem.speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
     // introduce an outer wall
     problem.wallHandler.readTriangleWall("Casing.stl",problem.speciesHandler.getObject(0));

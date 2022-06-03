@@ -105,33 +105,32 @@ public:
 
 int main()
 {
-	std::cout <<
-	"A gas of non-dissipative particles are simulated, colliding at a constant rate.\n"
-	"An external potential force field, f_i=-r_i, keeps the particles in the center of the box.\n"
- 	"No walls, boundaries, file output, thus testing the speed of particle collisions."
-	<< std::endl;
-	
+    logger(INFO,
+           "A gas of non-dissipative particles are simulated, colliding at a constant rate.\n"
+           "An external potential force field, f_i=-r_i, keeps the particles in the center of the box.\n"
+           "No walls, boundaries, file output, thus testing the speed of particle collisions.");
+    
     Time time;
-
+    
     time.tic();
- 	Contact mono(1.0);
-	mono.solve();
-    std::cout << "Total time to run monodisperse simulation: " << time.toc() << "s (Expected: 3s)" << std::endl;
+    Contact mono(1.0);
+    mono.solve();
+    logger(INFO, "Total time to run monodisperse simulation: %s (Expected: 3s)", time.toc());
     //expected time was measured on Thomas' pc 26-Apr-2018 (r2816, Release)
-
+    
     time.tic();
- 	Contact poly(2.0);
-	poly.setTimeMax(0.51*poly.getTimeMax());
-	poly.solve();
-    std::cout << "Total time to run polydisperse simulation: " << time.toc() << "s (Expected: 3s)" << std::endl;
-
+    Contact poly(2.0);
+    poly.setTimeMax(0.51 * poly.getTimeMax());
+    poly.solve();
+    logger(INFO, "Total time to run polydisperse simulation: %s (Expected: 3s)", time.toc());
+    
     time.tic();
- 	Contact highPoly(5.0);
- 	highPoly.setTimeMax(0.44*highPoly.getTimeMax());
-	highPoly.solve();
-    std::cout << "Total time to run highly polydisperse simulation: " << time.toc() << "s (Expected: 3s)" << std::endl;
-
-	return 0;
+    Contact highPoly(5.0);
+    highPoly.setTimeMax(0.44 * highPoly.getTimeMax());
+    highPoly.solve();
+    logger(INFO, "Total time to run highly polydisperse simulation: %s (Expected: 3s)", time.toc());
+    
+    return 0;
 }
 
 // create gperftools profile:

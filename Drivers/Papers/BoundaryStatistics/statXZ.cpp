@@ -43,8 +43,7 @@ template <StatType T> class statistics_while_running : public StatisticsVector<T
 	
 	void printTime() const {
 		static Mdouble tint = getTimeMax()-getTime();
-		std::cout << "\rProgress: " << std::setprecision(2) << std::setw(10) << (int)100.*(1-(getTimeMax()-getTime())/tint) << "%\r";
-		std::cout.flush();
+		logger(INFO, "\rProgress: %2.10%\r", (int) 100. * (1 - (getTimeMax() - getTime()) / tint));
 	}
 
 	// allows getZMax() to be set to the height of the highest particle
@@ -70,49 +69,69 @@ template <StatType T> class statistics_while_running : public StatisticsVector<T
 
 int main(int argc, char *argv[])
 {
-	//select file name to restart from
-  std::string name;
-	if (argc>1) {name=argv[1]; argv++; argc--;} else exit(-1);
-	//select time interval
-	Mdouble tint=.2; if (argc>1) {tint=atof(argv[1]); argv++; argc--; std::cout << "tint=" << tint << std::endl;}
-	argv--; argc++;
-	
-	//load restart data
-	std::cout << "obtaining XZ statictics" << std::endl;
- 	statistics_while_running<XZ> problem;
-	std::cout << "loading restart data: " << name << ".restart" << std::endl;
- 	problem.setName(name.c_str());
-	problem.readRestartFile();//load_restart_data();
-	problem.setFixedParticleRadius(problem.particleHandler.getObject(0)->getRadius());
-	problem.setInflowParticleRadius(problem.particleHandler.getObject(0)->getRadius());
-	problem.restartFile.setFileType(FileType::ONE_FILE); //problem.restartFile.setFileType(FileType::ONE_FILE);
-	problem.writeRestartFile();
-	problem.auto_set_domain();
-	//keep file name but create files in the local directory, i.e. remove folder
-	if (verbose) std::cout << "old name: " << problem.getName() << std::endl;
-	size_t found=name.find_last_of("/\\");
-	problem.setName(name.substr(found+1).c_str());
-	if (verbose) std::cout << "new name: " << problem.getName() << std::endl;
-	//set output to minimum
-	problem.dataFile.setFileType(FileType::NO_FILE);
-	problem.restartFile.setFileType(FileType::NO_FILE);
-	problem.fStatFile.setFileType(FileType::NO_FILE);
-	problem.eneFile.setFileType(FileType::ONE_FILE);
-	//set statistical parameters
-        problem.setDoPeriodicWalls(false);
- 	problem.setN(50);
- 	problem.setCGWidth(.1);
-	problem.setSaveCount(25);
-	problem.setStressTypeForFixedParticles(0);
- 	problem.setCGTimeMin(problem.getTime());
-	problem.setTimeMax(problem.getTime()+tint);
-	//solve and create live statistics
-	problem.readStatArguments(argc, argv);
-	problem.solve();
-
-	//~ cout << endl << "Z averaging" << endl;
- 	//~ statistics_while_running<Z> problemZ;
- 	//~ problemZ.set_name(name.c_str());
+    //select file name to restart from
+    std::string name;
+    if (argc > 1)
+    {
+        name = argv[1];
+        argv++;
+        argc--;
+    }
+    else exit(-1);
+    //select time interval
+    Mdouble tint = .2;
+    if (argc > 1)
+    {
+        tint = atof(argv[1]);
+        argv++;
+        argc--;
+        logger(INFO, "tint=", tint);
+    }
+    argv--;
+    argc++;
+    
+    //load restart data
+    logger(INFO, "obtaining XZ statictics\n", Flusher::NO_FLUSH);
+    statistics_while_running<XZ> problem;
+    logger(INFO, "loading restart data: %.restart", name);
+    problem.setName(name.c_str());
+    problem.readRestartFile();//load_restart_data();
+    problem.setFixedParticleRadius(problem.particleHandler.getObject(0)->getRadius());
+    problem.setInflowParticleRadius(problem.particleHandler.getObject(0)->getRadius());
+    problem.restartFile.setFileType(FileType::ONE_FILE); //problem.restartFile.setFileType(FileType::ONE_FILE);
+    problem.writeRestartFile();
+    problem.auto_set_domain();
+    //keep file name but create files in the local directory, i.e. remove folder
+    if (verbose)
+    {
+        logger(INFO, "old name: %", problem.getName());
+    }
+    size_t found = name.find_last_of("/\\");
+    problem.setName(name.substr(found + 1).c_str());
+    if (verbose)
+    {
+        logger(INFO, "new name: ", problem.getName());
+    }
+    //set output to minimum
+    problem.dataFile.setFileType(FileType::NO_FILE);
+    problem.restartFile.setFileType(FileType::NO_FILE);
+    problem.fStatFile.setFileType(FileType::NO_FILE);
+    problem.eneFile.setFileType(FileType::ONE_FILE);
+    //set statistical parameters
+    problem.setDoPeriodicWalls(false);
+    problem.setN(50);
+    problem.setCGWidth(.1);
+    problem.setSaveCount(25);
+    problem.setStressTypeForFixedParticles(0);
+    problem.setCGTimeMin(problem.getTime());
+    problem.setTimeMax(problem.getTime() + tint);
+    //solve and create live statistics
+    problem.readStatArguments(argc, argv);
+    problem.solve();
+    
+    //~ cout << endl << "Z averaging" << endl;
+    //~ statistics_while_running<Z> problemZ;
+    //~ problemZ.set_name(name.c_str());
 	//~ problemZ.load_restart_data();
 	//~ problemZ.setFixedParticleRadius(problemZ.getObjects()[0].Radius);
 	//~ problemZ.setInflowParticleRadius(problemZ.getObjects()[0].Radius);

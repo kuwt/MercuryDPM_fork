@@ -30,15 +30,16 @@
 int main(int argc, char *argv[])
 {
     //Print description
-    cout << endl << "Description: A quasi-2D inclined plane with inflow "
-            "conditions on the left boundary, and deletion of particles when "
-            "they exit the domain." << endl;
- 
+    logger(INFO, "\nDescription: A quasi-2D inclined plane with inflow "
+                 "conditions on the left boundary, and deletion of particles when "
+                 "they exit the domain.");
+    
     // Problem parameters
     AxisymmetricHopper axisymmetricHopper;
     axisymmetricHopper.setName("AxisymmetricHopperSelfTest");
-    axisymmetricHopper.setTimeMax(std::sqrt(6.0*axisymmetricHopper.getZMax())); //let the particles fall to at most 16 times the domain size
-
+    axisymmetricHopper.setTimeMax(
+            std::sqrt(6.0 * axisymmetricHopper.getZMax())); //let the particles fall to at most 16 times the domain size
+    
     // Particle properties
     axisymmetricHopper.setFixedParticleRadius(0);
     axisymmetricHopper.setInflowParticleRadius(0.5);

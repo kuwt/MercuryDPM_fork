@@ -150,10 +150,10 @@ class muICal3D : public Mercury3D
             setbuf(muICal3D_f, nullptr);
             fprintf(muICal3D_f, "time theta n depth mass xmom ke basfx basfy basfz\n");
             fprintf(stderr, "Started writing to .muI file\n");
-
+    
             /* Gravity initially points downwards */
             setGravity(Vec3D(0, 0, -g));
-
+    
             /* A CubeInsertionBoundary for introducing the particles. We will
              * remove this after a few (arbitrary number of) timesteps. If the
              * InsertionBoundary is doing its job properly then it will stop
@@ -161,16 +161,26 @@ class muICal3D : public Mercury3D
             BaseParticle* p0 = new SphericalParticle;
             p0->setSpecies(speciesP);
             insb = new CubeInsertionBoundary;
+            insb->set(p0, 6,
+                      Vec3D(-pars.at("length") / 2 + 1 * pars.at("particleRadius"),
+                            -pars.at("width") / 2 + 1 * pars.at("particleRadius"),
+                            0 * pars.at("particleRadius")
+                      ),
+                      Vec3D(+pars.at("length") / 2 - 2 * pars.at("particleRadius"),
+                            +pars.at("width") / 2 - 1 * pars.at("particleRadius"),
+                            pars.at("height") + 0 * pars.at("particleRadius")
+                      ),
+                      Vec3D(0, 0, 0), Vec3D(0, 0, 0));
             insb->set(p0, 1,
-                    Vec3D(
-                        getXMin() + particleRadius,
-                        getYMin() + particleRadius,
-                        getZMin()
-                    ),
-                    Vec3D(
-                        getXMax() - 2*particleRadius,
-                        getYMax() - particleRadius,
-                        getZMax()
+                      Vec3D(
+                              getXMin() + particleRadius,
+                              getYMin() + particleRadius,
+                              getZMin()
+                      ),
+                      Vec3D(
+                              getXMax() - 2 * particleRadius,
+                              getYMax() - particleRadius,
+                              getZMax()
                     ),
                     Vec3D(0,0,0), Vec3D(0,0,0),
                     particleRadius * (1-pars.at("dispersity")),
@@ -178,12 +188,14 @@ class muICal3D : public Mercury3D
                     );
             insb = boundaryHandler.copyAndAddObject(insb);
             insb->insertParticles(this);
-
+    
+    
             lid = new InfiniteWall;
             lid->setSpecies(speciesB);
-            lid->set(Vec3D(0,0,1), Vec3D(0, 0, getZMax()));
+            lid->set(Vec3D(0, 0, 1), Vec3D(0, 0, getZMax()));
+            lid->set(Vec3D(0, 0, 1), Vec3D(0, 0, pars.at("height")));
             lid = wallHandler.copyAndAddObject(lid);
-
+    
             notYetRemovedInsb = true;
         }
 

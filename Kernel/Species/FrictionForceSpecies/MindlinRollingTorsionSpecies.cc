@@ -153,8 +153,7 @@ void MindlinRollingTorsionSpecies::mix(MindlinRollingTorsionSpecies* const S, Mi
 //    }
 //    else
 //    {
-//        std::cerr << "Error in setRollingStiffness" << std::endl;
-//        exit(-1);
+//        logger(ERROR, "Error in setRollingStiffness");
 //    }
 //}
 //
@@ -171,8 +170,7 @@ void MindlinRollingTorsionSpecies::setRollingDissipation(Mdouble new_dispt)
         rollingDissipation_ = new_dispt;
     else
     {
-        std::cerr << "Error in setRollingDissipation" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setRollingDissipation");
     }
 }
 
@@ -193,8 +191,7 @@ void MindlinRollingTorsionSpecies::setRollingFrictionCoefficient(Mdouble new_mu)
     }
     else
     {
-        std::cerr << "Error in setSlidingFrictionCoefficient" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setSlidingFrictionCoefficient");
     }
 }
 
@@ -213,8 +210,7 @@ void MindlinRollingTorsionSpecies::setRollingFrictionCoefficientStatic(Mdouble n
     }
     else
     {
-        std::cerr << "Error in setSlidingFrictionCoefficientStatic" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setSlidingFrictionCoefficientStatic");
     }
 }
 
@@ -234,8 +230,7 @@ Mdouble MindlinRollingTorsionSpecies::getRollingFrictionCoefficientStatic() cons
 //    }
 //    else
 //    {
-//        std::cerr << "Error in setTorsionStiffness" << std::endl;
-//        exit(-1);
+//        logger(ERROR, "Error in setTorsionStiffness");
 //    }
 //}
 
@@ -252,8 +247,7 @@ void MindlinRollingTorsionSpecies::setTorsionDissipation(Mdouble new_dispt)
         torsionDissipation_ = new_dispt;
     else
     {
-        std::cerr << "Error in setTorsionDissipation" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setTorsionDissipation");
     }
 }
 
@@ -274,8 +268,7 @@ void MindlinRollingTorsionSpecies::setTorsionFrictionCoefficient(Mdouble new_mu)
     }
     else
     {
-        std::cerr << "Error in setSlidingFrictionCoefficient" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setSlidingFrictionCoefficient");
     }
 }
 
@@ -294,8 +287,7 @@ void MindlinRollingTorsionSpecies::setTorsionFrictionCoefficientStatic(Mdouble n
     }
     else
     {
-        std::cerr << "Error in setSlidingFrictionCoefficientStatic" << std::endl;
-        exit(-1);
+        logger(ERROR, "Error in setSlidingFrictionCoefficientStatic");
     }
 }
 

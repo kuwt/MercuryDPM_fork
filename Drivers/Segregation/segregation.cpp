@@ -78,7 +78,7 @@ public:
         if (helpers::fileExists(dataFile.getName()))
         {
             //If it has move on to the next run immediately
-            cout << "This run has been done " << endl;
+            logger(INFO, "This run has been done ");
             launchNewRun("./segregation", true);
             exit(0);
         }
@@ -127,7 +127,7 @@ public:
         createParticles(numberOfSmallParticles, numberOfLargeParticles);
 
         //Write the info to the screen and save a copy to the disk
-        cout << "Finished creating particles" << endl;
+        logger(INFO, "Finished creating particles");
         write(std::cout, false);
         writeRestartFile();
 

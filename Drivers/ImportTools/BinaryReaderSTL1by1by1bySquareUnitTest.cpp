@@ -120,17 +120,13 @@ public:
     
     void output()
     {
-        
-        std::cout << header_ << std::endl;
-        for (unsigned int i=0;i<(numTriangles_);i++)
+    
+        logger(INFO, "%\n", header_, Flusher::NO_FLUSH);
+        for (unsigned int i = 0; i < (numTriangles_); i++)
         {
-            
-            std::cout << "Triangle " << i << " has normal "<<Triangles_[i].normal <<" and vertexes" << Triangles_[i].vertex1 << Triangles_[i].vertex2 << Triangles_[i].vertex3 << std::endl;
-            
+            logger(INFO, "Triangle % has normal % and vertexes % % %",
+                   i, Triangles_[i].normal, Triangles_[i].vertex1, Triangles_[i].vertex2, Triangles_[i].vertex3);
         }
-        
-        
-        
     }
     
     

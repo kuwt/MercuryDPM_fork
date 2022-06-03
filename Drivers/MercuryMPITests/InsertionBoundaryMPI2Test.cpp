@@ -66,9 +66,10 @@ public:
         //add insertion boundaries
         SphericalParticle p;
         p.setSpecies(s);
+        p.setRadius(0.1);
         CubeInsertionBoundary b;
         b.setHandler(&boundaryHandler);
-        b.set(p,1000,getMin(),{-1,1,1},{0,0,0},{0,0,0},.1,.1);
+        b.set(p, 1000, getMin(), {-1, 1, 1}, {0, 0, 0}, {0, 0, 0});
         b.setInitialVolume(1);
         boundaryHandler.copyAndAddObject(b);
     }

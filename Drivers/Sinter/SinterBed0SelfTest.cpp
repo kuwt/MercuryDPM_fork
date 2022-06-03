@@ -119,21 +119,33 @@ public:
             {
                 particleHandler.copyAndAddObject(p);
                 if (dimensions==3)
+                {
                     volumeOfParticles += p.getVolume();
-                else if (dimensions==2)
-                    volumeOfParticles += pi*p.getRadius()*p.getRadius();
-                else if (dimensions==1)
-                    volumeOfParticles += p.getRadius()+p.getRadius();
+                }
+                else if (dimensions == 2)
+                {
+                    volumeOfParticles += pi * p.getRadius() * p.getRadius();
+                }
+                else if (dimensions == 1)
+                {
+                    volumeOfParticles += p.getRadius() + p.getRadius();
+                }
                 else
+                {
                     break;
-                p.setRadius(random.getRandomNumber(0.9,1.1)*radius);
-                if (particleHandler.getNumberOfObjects()%100==0) std::cout << "." << std::flush;
-            } else {
-                maxHeight+=.002*radius;
+                }
+                p.setRadius(random.getRandomNumber(0.9, 1.1) * radius);
+                if (particleHandler.getNumberOfObjects() % 100 == 0)
+                {
+                    logger(INFO, ".");
+                }
+            }
+            else
+            {
+                maxHeight += .002 * radius;
             }
         }
-        std::cout << std::endl;
-        logger(INFO,"Inserted % particles",particleHandler.getNumberOfObjects());
+        logger(INFO, "\nInserted % particles", particleHandler.getNumberOfObjects());
 
     }
 
@@ -177,10 +189,8 @@ public:
     //override printTime function such that console output shows the state of relaxation (Ekin/Eela)
     void printTime() const override
     {
-        std::cout << "t=" << std::setw(12) << getTime()
-                  << " Ene " << std::setw(12) << getKineticEnergy()/getElasticEnergy()
-                  << " X/a " << std::setw(12) << getMeanRelativeContactRadius()
-                  << std::endl;
+        logger(INFO, "t=%.12 Ene=%.12 X/a=%.12",
+               getTime(), getKineticEnergy() / getElasticEnergy(), getMeanRelativeContactRadius());
     }
 
 //    //extra gravity force to make the explosion effect less

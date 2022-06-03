@@ -84,11 +84,11 @@ public:
 
 int main()
 {
-	std::cout << "An elastic particle between two walls." << std::endl;
-	
+    logger(INFO, "An elastic particle between two walls.");
+    
     Time time;
     Wall wall;
-	wall.solve();
-    std::cout << "Total run time: " << time.toc() << "s (Expected: 3s)" << std::endl;
-	return 0;
+    wall.solve();
+    logger(INFO, "Total run time: %s (Expected: 3s)", time.toc());
+    return 0;
 }

@@ -28,8 +28,6 @@
 #include "Walls/InfiniteWall.h"
 #include "Boundaries/PeriodicBoundary.h"
 #include "Walls/AxisymmetricIntersectionOfWalls.h"
-using std::cout;
-using std::endl;
 
 /// Single particle, indented slowly by spherical indenter.
 
@@ -45,7 +43,7 @@ public:
         setRestarted(false);
         setTime(0);
         setName("SingleParticleIndenter");
-        std::cout << "Restarting SingleParticleConstantTemperature N=" << particleHandler.getNumberOfObjects() << " \n";
+        logger(INFO, "Restarting SingleParticleConstantTemperature N=% \n", particleHandler.getNumberOfObjects());
         write(std::cout);
     }
 
@@ -56,20 +54,20 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     Mdouble timeMax = 2e-5;
     Mdouble indenterDiameter = 127e-6;
     Mdouble indentationDepth = 1e-6; //4mN, 1um
-    Mdouble indentationVelocity = indentationDepth/timeMax*2.0;
+    Mdouble indentationVelocity = indentationDepth / timeMax * 2.0;
     Mdouble indentationForce = 4e-3;
-
+    
     SingleParticleIndenter sp(indenterDiameter, indentationVelocity, indentationForce);
     sp.setFileType(FileType::ONE_FILE);
     sp.setXBallsAdditionalArguments(" -v0 -solidf ");
     sp.setSaveCount(100);
-    sp.setTimeMax(2.0*timeMax);
+    sp.setTimeMax(2.0 * timeMax);
     sp.solve();
-
-    std::cout << "Execute 'gnuplot SingleParticleIndenter.gnu' to view output" << std::endl;
+    
+    logger(INFO, "Execute 'gnuplot SingleParticleIndenter.gnu' to view output");
     helpers::writeToFile("SingleParticleIndenter.gnu",
                          "set xlabel 'displacement [um]'\n"
                          "set ylabel 'force [mN]'\n"
                          "p 'SingleParticleIndenter.ene' u (-$2*1e6):($3*1e3) w lp\n"
-                         );
+    );
 }

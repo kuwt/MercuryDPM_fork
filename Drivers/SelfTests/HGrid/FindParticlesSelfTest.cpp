@@ -54,16 +54,14 @@ int main() {
     // note, the boundary is not added to the dpm, it is only used to insert particles initially
     SphericalParticle particle;
     particle.setSpecies(dpm.speciesHandler.getLastObject());
-    particle.setRadius(0.5);
+    particle.setRadius(0.1);
     int maxFailed = 100;
     Vec3D posMin = dpm.getMin();
     Vec3D posMax = dpm.getMax();
     Vec3D velMin = {0, 0, 0};
     Vec3D velMax = {0, 0, 0};
-    double radMin = 0.1;
-    double radMax = 0.1;
     CubeInsertionBoundary insertionBoundary;
-    insertionBoundary.set(&particle, maxFailed, posMin, posMax, velMin, velMax, radMin, radMax);
+    insertionBoundary.set(&particle, maxFailed, posMin, posMax, velMin, velMax);
     //insertionBoundary.setVolumeFlowRate(10);
     insertionBoundary.checkBoundaryBeforeTimeStep(&dpm);
     logger(INFO,"number of particles % ",dpm.particleHandler.getNumberOfObjects());

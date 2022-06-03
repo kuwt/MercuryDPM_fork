@@ -55,8 +55,7 @@ NumericalVector<std::complex<Mdouble>> Multipole::TranslateMultipoleExpansionTo(
     //Check if a multipole expansion has taken place
     if (multipoleExpansionCoefficients_.size() == 0)
     {
-        std::cout << "Multipole is not yet expanded." << std::endl;
-        std::exit(-1);
+        logger(ERROR, "Multipole is not yet expanded.");
     }
     
     //Determine rho, alpha and beta
@@ -139,7 +138,7 @@ NumericalVector<std::complex<Mdouble>> Multipole::convertMultipoleToLocal(Vec3D 
                     result += multipoleExpansionCoefficients_[location_O] * J * (*squaredFactorials_)(location_A1) *
                               (*squaredFactorials_)(location_A2) * sphericalHarmonics[location_Y] /
                               ((*squaredFactorials_)(location_A3) * std::pow(rho, (j + n + 1)));
-                    
+    
                 }
             }
             localExpansionCoefficients[location] = result;
@@ -149,13 +148,13 @@ NumericalVector<std::complex<Mdouble>> Multipole::convertMultipoleToLocal(Vec3D 
 }
 
 /// Adds multipole coefficients to an existing multipole
-/// todo: remove this function; it should not be required anymore
+/// \deprecated Remove this function; it should not be required anymore:
+MERCURY_DEPRECATED
 void Multipole::addMultipoleCoefficients(NumericalVector<std::complex<Mdouble>> multipoleExpansionCoefficients)
 {
     if (multipoleExpansionCoefficients.size() > multipoleExpansionCoefficients_.size())
     {
-        std::cout << "Multipole expansion coefficient sizes are not correct." << std::endl;
-        std::exit(-1);
+        logger(ERROR, "Multipole expansion coefficient sizes are not correct.");
     }
     
     multipoleExpansionCoefficients_ += multipoleExpansionCoefficients;

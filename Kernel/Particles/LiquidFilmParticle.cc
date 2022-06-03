@@ -31,66 +31,6 @@
 #include "ParticleHandler.h"
 #include "DPMBase.h"
 
-/*!
- * \details default constructor, creates an Particle at (0,0,0) with radius, 
- * mass and inertia equal to 1
- */
-LiquidFilmParticle::LiquidFilmParticle()
-{
-    liquidVolume_ = 0;
-}
-
-/*!
- * \details Constructor that copies most of the properties of the given particle.
- *          Please note that not everything is copied, for example the position 
- *          in the HGrid is not determined yet by the end of this constructor. 
- *          It also does not copy the interactions and the pointer to the handler
- *          that handles this particle. Use with care.
- * \param[in,out] p  Reference to the LiquidFilmParticle this one should become a copy of.
- */
-LiquidFilmParticle::LiquidFilmParticle(const LiquidFilmParticle& p)
-        : BaseParticle(p)
-{
-    liquidVolume_ = p.liquidVolume_;
-}
-
-/*!
- * \details Destructor. It asks the ParticleHandler to check if this was the 
- *          smallest or largest particle and adjust itself accordingly.
- */
-LiquidFilmParticle::~LiquidFilmParticle()
-= default;
-
-/*!
- * \details Copy method. Uses copy constructor to create a copy on the heap. 
- *          Useful for polymorphism.
- * \return pointer to the particle's copy
- */
-LiquidFilmParticle* LiquidFilmParticle::copy() const
-{
-    return new LiquidFilmParticle(*this);
-}
-
-/*!
- * \details LiquidFilmParticle print method, which accepts an os std::ostream as 
- *          input. It prints human readable LiquidFilmParticle information to the 
- *          std::ostream.
- * \param[in,out] os    stream to which the info is written
- */
-void LiquidFilmParticle::write(std::ostream& os) const
-{
-    BaseParticle::write(os);
-    os << " liquidVolume " << liquidVolume_;
-}
-
-/*!
- * \details Returns the name of the object; in this case 'LiquidFilmParticle'.
- * \return The object name.
- */
-std::string LiquidFilmParticle::getName() const
-{
-    return "LiquidFilmParticle";
-}
 
 //todo Does mass and interaction radius change when a liquid film is added?
 
@@ -112,32 +52,6 @@ void LiquidFilmParticle::read(std::istream& is)
     {
         is >> dummy >> liquidVolume_;
     }
-}
-
-Mdouble LiquidFilmParticle::getLiquidVolume() const
-{
-    return liquidVolume_;
-}
-
-void LiquidFilmParticle::setLiquidVolume(Mdouble liquidVolume)
-{
-    liquidVolume_ = liquidVolume;
-}
-
-void LiquidFilmParticle::addLiquidVolume(Mdouble liquidVolume)
-{
-    liquidVolume_ += liquidVolume;
-}
-
-
-unsigned LiquidFilmParticle::getNumberOfFieldsVTK() const
-{
-    return 3;
-}
-
-std::string LiquidFilmParticle::getTypeVTK(unsigned i) const
-{
-    return "Float32";
 }
 
 std::string LiquidFilmParticle::getNameVTK(unsigned i) const
