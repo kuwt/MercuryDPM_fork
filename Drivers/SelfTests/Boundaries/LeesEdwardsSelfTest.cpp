@@ -30,13 +30,18 @@
 //! [Lees:headers]
 
 //! [Lees:class]
-class LeesEdwards : public Mercury2D
+class LeesEdwardsSelfTest : public Mercury2D
 {
-public:
+    public:
 
     void setupInitialConditions() override {
         //set parameters to define the species properties
-        const Mdouble particleRadius=0.5; // such that diameter is one
+
+        setName("LeesEdwardsSelfTest");
+        dataFile.setFileType(FileType::ONE_FILE);
+        fStatFile.setFileType(FileType::ONE_FILE);
+
+        const Mdouble particleRadius = 0.5; // such that diameter is one
         const Mdouble collisionTime = 0.05; //relatively stiff particles
         const Mdouble restitution = 0.95; //restitution close to glass particles
         const Mdouble sizeDistribution = 1.5;
@@ -45,41 +50,45 @@ public:
 
         //define species
         auto species = speciesHandler.copyAndAddObject(LinearViscoelasticSlidingFrictionSpecies());
-        species->setDensity(4.0/constants::pi); //such that particle mass is one
+        species->setDensity(4.0 / constants::pi); //such that particle mass is one
+        Mdouble mass = species->getMassFromRadius(particleRadius);
         species->setCollisionTimeAndNormalAndTangentialRestitutionCoefficient(
-         collisionTime, restitution, restitution, species->getMassFromRadius(particleRadius)); //set stiffness and dissipation
+                collisionTime, restitution, restitution, mass); //set stiffness and dissipation
         species->setSlidingFrictionCoefficient(0.5);
 
-        //set gravity, time step
-        setGravity(Vec3D(0,0,0)); // such that gravity is one
-        setTimeStep(0.02 * collisionTime);
+        setTimeStep(0.02 * species->getCollisionTime(mass));
+        setTimeMax(4.0); //run until the situation is static
+        setSaveCount(100);
 
         //set domain size
-        setXMin(0); setYMin(0); setZMin(0);
-        setXMax(15); setYMax(15); setZMax(1);
+        setMin({0, 0, 0});
+        setMax({15, 15, 1});
+        //set gravity
+        setGravity({0, 0, 0});
+
 
         //define leesEdwardsBoundary
         LeesEdwardsBoundary leesEdwardsBoundary;
         leesEdwardsBoundary.set(
-         [velocity](double time) { return time * velocity; },
-         [velocity](double time UNUSED) { return velocity; },
-         getXMin(), getXMax(), getYMin(), getYMax());
+                [velocity](double time) { return time * velocity; },
+                [velocity](double time UNUSED) { return velocity; },
+                getXMin(), getXMax(), getYMin(), getYMax());
         boundaryHandler.copyAndAddObject(leesEdwardsBoundary);
 
         //define common particle properties
         SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setRadius(particleRadius);
-        Mdouble rMin=2.0*particleRadius/(sizeDistribution+1);
-        Mdouble rMax=sizeDistribution*rMin;
+        Mdouble rMin = 2.0 * particleRadius / (sizeDistribution + 1);
+        Mdouble rMax = sizeDistribution * rMin;
         p.setRadius(rMax);
-        logger(INFO,"Inserting particles of diameter % to %, volumeFraction %", 2.0*rMin, 2.0*rMax, volumeFraction);
+        logger(INFO, "Inserting particles of diameter % to %, volumeFraction %", 2.0 * rMin, 2.0 * rMax,
+               volumeFraction);
 
-        Mdouble particleVolumeMax = volumeFraction * (getXMax()-getXMin()) * (getYMax()-getYMin());
+        Mdouble particleVolumeMax = volumeFraction * (getXMax() - getXMin()) * (getYMax() - getYMin());
         Mdouble particleVolume = 0;
-        Vec3D position = {0,0,0};
-        while (particleVolume+0.5*p.getVolume()<particleVolumeMax)
-        {
+        Vec3D position = {0, 0, 0};
+        while (particleVolume + 0.5 * p.getVolume() < particleVolumeMax) {
             position.X = random.getRandomNumber(getXMin(), getXMax());
             position.Y = random.getRandomNumber(getYMin(), getYMax());
             p.setPosition(position);
@@ -87,24 +96,21 @@ public:
             particleVolume += p.getVolume();
             p.setRadius(random.getRandomNumber(rMin, rMax));
         }
+
     }
+
 
 };
 //! [Lees:class]
 
-//! [Lees:main]
-int main(int argc UNUSED, char* argv[] UNUSED)
+int main()
 {
     //instantiate the class
-    LeesEdwards leesEdwards;
-    //set name
-    leesEdwards.setName("LeesEdwardsSelfTest");
+    LeesEdwardsSelfTest problem;
     //set output and time stepping properties
-    leesEdwards.setTimeMax(4); //run until the situation is static
-    leesEdwards.setSaveCount(100);
-    leesEdwards.setXBallsAdditionalArguments("-w0 -v0 -solidf -cmode 5");
+    problem.setXBallsAdditionalArguments("-w0 -v0 -solidf -cmode 5");
     //solve
-    leesEdwards.solve();
+    problem.solve();
 
     logger(INFO,"Execute 'source LeesEdwardsSelfTest.sh' to get coarse-grained statistics");
     helpers::writeToFile("LeesEdwardsSelfTest.sh","../MercuryCG/fstatistics LeesEdwardsSelfTest -stattype XY -w 0.25 -h 0.25 -tmin 2\n"
@@ -128,5 +134,7 @@ int main(int argc UNUSED, char* argv[] UNUSED)
      "xlabel('y')\n"
      "ylabel('v_x');\n"
      "axis equal");
+
+    return 0;
 }
 //! [Lees:main]

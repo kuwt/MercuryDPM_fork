@@ -23,29 +23,31 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Mercury2D.h"
-#include "Boundaries/LeesEdwardsBoundary.h"
+#include "Mercury3D.h"
+#include "Boundaries/PeriodicBoundary.h"
+#include "Boundaries/TimeDependentPeriodicBoundary.h"
 #include "Boundaries/CubeInsertionBoundary.h"
 #include "Particles/BaseParticle.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
+#include <Logger.h>
 
-class LeesEdwardsDemo : public Mercury2D
+class TimeDependentPeriodicBoundary3DSelfTest : public Mercury3D
 {
     public:
 
-        LeesEdwardsDemo()
+        TimeDependentPeriodicBoundary3DSelfTest()
         {
-            setName("LeesEdwardsDemo");
-            dataFile.setFileType(FileType::MULTIPLE_FILES);
-            fStatFile.setFileType(FileType::NO_FILE);
+            setName("TimeDependentPeriodicBoundary3DSelfTest");
+            dataFile.setFileType(FileType::ONE_FILE);
+            fStatFile.setFileType(FileType::ONE_FILE);
 
             r = 0.05;
-            Mdouble mass = M_PI * r * r;
+            Mdouble mass = 4. / 3. * M_PI * r * r * r;
 
             auto species = speciesHandler.copyAndAddObject(new LinearViscoelasticFrictionSpecies);
             species->setDensity(1);
             species->setCollisionTimeAndRestitutionCoefficient(2e-2, 0.3, mass);
-            logger(WARN, "collision time %, restitution coefficient %, max vel %",
+            logger(WARN, "collision time %, restitution coefficient %, max vel %", 
                     species->getCollisionTime(mass), species->getRestitutionCoefficient(mass),
                     species->getMaximumVelocity(r, mass));
             species->setSlidingFrictionCoefficient(tan( 21.8 * M_PI / 180. ));
@@ -57,8 +59,8 @@ class LeesEdwardsDemo : public Mercury2D
             species = speciesHandler.copyAndAddObject(species);
 
             //set time and file properties
-            setTimeStep(species->getCollisionTime(mass) / 20.0);
-            setTimeMax(25.0);
+            setTimeStep(species->getCollisionTime(mass) / 40.0);
+            setTimeMax(50.0);
             setSaveCount(0.2 / getTimeStep());
 
             setMin({0, -1, 0});
@@ -70,38 +72,52 @@ class LeesEdwardsDemo : public Mercury2D
         {
             auto species = speciesHandler.getObject(0);
 
-            const Mdouble v = 2.0;
-            LeesEdwardsBoundary leesEdwardsBoundary;
-            leesEdwardsBoundary.set(
-                    [v](double t) { return v*t; },
-                    [v](double t) { return v; },
-                    getXMin(), getXMax(), getYMin(), getYMax());
-            boundaryHandler.copyAndAddObject(leesEdwardsBoundary);
+            const Mdouble v = 1.0;
+            auto tdpb = boundaryHandler.copyAndAddObject(new TimeDependentPeriodicBoundary);
+            tdpb->set(Vec3D(0, 1, 0), getYMin(), getYMax(),
+                        [v](Mdouble t) {return Vec3D( 1.25, 0, 0);}, 
+                        [v](Mdouble t) {return Vec3D( 0, 0, 0);});
+            tdpb->setMaxShift(3);
+            auto ends = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
+            ends->set(Vec3D(1, 0, 0), getXMin(), getXMax());
+            auto sides = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
+            sides->set(Vec3D(0, 0, 1), getZMin(), getZMax());
 
-            //define common particle properties
+            Mdouble vel = 0.3;
             auto p = new SphericalParticle;
             p->setSpecies(species);
+            p->setRadius(r);
+            p->setPosition(Vec3D(
+                        random.getRandomNumber(getXMin(), getXMax()),
+                        random.getRandomNumber(getYMin(), getYMax()),
+                        random.getRandomNumber(getZMin(), getZMax()) ));
+            p->setVelocity(Vec3D(
+                        random.getRandomNumber(-vel, vel),
+                        random.getRandomNumber(-vel, vel),
+                        random.getRandomNumber(-vel, vel) ));
+            p = particleHandler.copyAndAddObject(p);
+            /*
             const Mdouble volumeFraction = 0.7;
-            logger(INFO,"Inserting particles of diameter % to %, volumeFraction %",
+            logger(INFO,"Inserting particles of diameter % to %, volumeFraction %", 
                     .9*r, 1.1*r, volumeFraction);
             auto insb = boundaryHandler.copyAndAddObject(new CubeInsertionBoundary);
-            Mdouble vel = 0.1;
-            insb->set(p, 1,
+            insb->set(p, 1, 
                     Vec3D(getXMin(), getYMin(), 0), Vec3D(getXMax(), getYMax(), 0),
                     Vec3D(-vel, -vel, 0), Vec3D(vel, vel, 0), 0.9*r, 1.1*r);
             insb->checkBoundaryBeforeTimeStep(this);
+            */
         }
 
         void actionsAfterTimeStep()
         {
-            if (boundaryHandler.getNumberOfObjects() == 2)
+            if (boundaryHandler.getNumberOfObjects() == 3)
             {
                 Mdouble volfrac = particleHandler.getVolume() / (
-                        (getXMax() - getXMin()) * (getYMax() - getYMin())) ;
+                        (getXMax() - getXMin()) * (getYMax() - getYMin())) ; 
                 if (volfrac > 0.7)
                 {
                     logger(DEBUG, "Finished inserting particles");
-                    boundaryHandler.removeObject(1);
+                    boundaryHandler.removeObject(2);
                     for (auto p : particleHandler)
                         p->setInfo(p->getPosition().Y);
                 }
@@ -116,11 +132,7 @@ class LeesEdwardsDemo : public Mercury2D
 int main()
 {
     //instantiate the class
-    LeesEdwardsDemo problem;
-    //set output and time stepping properties
-    //problem.setXBallsAdditionalArguments("-w0 -v0 -solidf -cmode 5");
-    //solve
+    TimeDependentPeriodicBoundary3DSelfTest problem;
     problem.solve();
     return 0;
 }
-

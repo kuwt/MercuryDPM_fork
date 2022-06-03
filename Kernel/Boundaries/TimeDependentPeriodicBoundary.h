@@ -108,6 +108,11 @@ public:
             std::function<Vec3D(Mdouble)> shift, std::function<Vec3D(Mdouble)> boost);
 
     /*!
+     * \brief Set the maximum shift (will take fmod w.r.t. this)
+     */
+    void setMaxShift(Mdouble maxShift);
+
+    /*!
      * \brief returns the vector normal to the periodic boundary
      */
     Vec3D getNormal() const;
@@ -199,8 +204,6 @@ public:
 
     /*!
      * \brief Creates a single periodic particle if required from a given particle
-     * \todo{JMFT: The time comes from p->getHandler()->getDPMBase()->getTime(), 
-     * which will be undefined if p does not belong to a handler.}
      */
     void createPeriodicParticle(BaseParticle* p, ParticleHandler &pH) override;
 
@@ -209,17 +212,17 @@ public:
      * boundary edge, and applies a shift if that is the case.
      */
     virtual void checkBoundaryAfterParticlesMove(ParticleHandler& pH) override;
- 
+
     /*!
      * \brief reads boundary properties from istream
      */
     virtual void read(std::istream& is) override;
-    
+
     /*!
      * \brief writes boundary properties to ostream
      */
     virtual void write(std::ostream& os) const override;
-    
+
     /*!
      * \brief Returns the name of the object
      */
@@ -230,7 +233,7 @@ protected:
      * \brief outward unit normal vector for right edge
      */
     Vec3D normal_;
-     
+
     /*!
      * \brief position of left edge, s.t. normal*x = distanceLeft_
      */
@@ -251,5 +254,11 @@ protected:
      * \brief boost from the left to right boundary
      */
     std::function<Vec3D (Mdouble)> boost_; 
+
+    /*!
+     * \brief Maximum shifting (will take fmod(shift, maxshift) )
+     */
+    Mdouble maxShift_;
+
 };
 #endif

@@ -39,6 +39,7 @@ TimeDependentPeriodicBoundary::TimeDependentPeriodicBoundary()
 {
     distanceLeft_ = std::numeric_limits<double>::quiet_NaN();
     distanceRight_ = std::numeric_limits<double>::quiet_NaN();
+    maxShift_ = 0;
 
 
 #ifdef MERCURY_USE_MPI
@@ -77,6 +78,7 @@ TimeDependentPeriodicBoundary::TimeDependentPeriodicBoundary(const TimeDependent
     distanceRight_ = other.distanceRight_;
     planewiseShift_ = other.planewiseShift_;
     boost_ = other.boost_;
+    maxShift_ = other.maxShift_;
 
 }
 
@@ -88,6 +90,7 @@ void TimeDependentPeriodicBoundary::set(Vec3D normal, Mdouble distanceLeft, Mdou
     distanceRight_ = distanceRight, 
     planewiseShift_ = planewiseShift;
     boost_ = boost;
+    maxShift_ = maxShift_;
 }
 
 void TimeDependentPeriodicBoundary::set(Vec3D normal, Vec3D positionLeft, Vec3D positionRight,
@@ -104,6 +107,10 @@ void TimeDependentPeriodicBoundary::setPlanewiseShiftAndBoost(
     boost_ = boost;
 }
 
+void TimeDependentPeriodicBoundary::setMaxShift(Mdouble maxShift)
+{
+    maxShift_ = maxShift;
+}
 
 /*!
  * \return The vector perpendicular to the periodic boundary
@@ -136,7 +143,17 @@ Vec3D TimeDependentPeriodicBoundary::getShift(Mdouble time) const
 
 Vec3D TimeDependentPeriodicBoundary::getPlanewiseShift(Mdouble time) const
 {
-    return planewiseShift_(time);
+    if (maxShift_ == 0)
+        return planewiseShift_(time);
+    if (maxShift_ > 0)
+    {
+        Vec3D p = planewiseShift_(time);
+        Mdouble m = p.getLength();
+        Vec3D n = p / m;
+        return fmod(m, maxShift_) * n;
+    }
+    if (maxShift_ < 0)
+        logger(ERROR, "[TimeDependentPeriodicBoundary::getPlanewiseShift] maxShift_ = % is negative", maxShift_);
 }
 
 Vec3D TimeDependentPeriodicBoundary::getBoost(Mdouble time) const
@@ -180,12 +197,8 @@ Mdouble TimeDependentPeriodicBoundary::getDistance(const BaseParticle& p) const
 Mdouble TimeDependentPeriodicBoundary::getDistance(const Vec3D& position) const
 {
     Mdouble distanceFromPlaneThroughOrigin = Vec3D::dot(position, normal_);
-    // logger(WARN, "[TimeDependentPeriodicBoundary::getDistance] position %, normal %", position, normal_);
-    // logger(WARN, "[TimeDependentPeriodicBoundary::getDistance] distanceFromPlaneThroughOrigin %", distanceFromPlaneThroughOrigin);
-    Mdouble dist1 = distanceFromPlaneThroughOrigin - distanceLeft_;
-    Mdouble dist2 = distanceRight_ - distanceFromPlaneThroughOrigin;
-    // logger(WARN, "[TimeDependentPeriodicBoundary::getDistance] dist1 %, dist2 %", dist1, dist2);
-    return std::min(dist1, dist2);
+    return std::min(distanceFromPlaneThroughOrigin - distanceLeft_, 
+                    distanceRight_ - distanceFromPlaneThroughOrigin);
 }
 
 /*!

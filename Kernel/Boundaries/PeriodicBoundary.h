@@ -37,7 +37,6 @@
  * with normal being the outward unit normal vector of the right wall. If a
  * particle moves outside these boundaries, it will be shifted.
  */
-
 class PeriodicBoundary : public BasePeriodicBoundary
 {
 public:
@@ -130,14 +129,14 @@ public:
      */
     virtual void shiftPosition(BaseParticle* p) const override;
     void shiftPosition(Vec3D& p) const;
-    
+
     /*!
      * \brief shifts two positions
      */
     virtual void shiftPositions(Vec3D& postition1, Vec3D& postion2) const;
 
     /*!
-     * \brief Returns TRUE if particle checked is closest to the 'left' 
+     * \brief Returns TRUE if particle checked is closest to the 'left'
      * edge, and FALSE if it is closest to the 'right' edge
      */
     virtual bool isClosestToLeftBoundary(const BaseParticle& p) const;

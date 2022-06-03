@@ -38,20 +38,15 @@ class TimeDependentPeriodicBoundaryTest : public Mercury2D
         TimeDependentPeriodicBoundaryTest()
         {
             setName("TimeDependentPeriodicBoundaryTest");
-            setTimeMax(1000);
-            setTimeStep(1.6e-4);
-            setSaveCount(625);
             dataFile.setFileType(FileType::MULTIPLE_FILES);
             fStatFile.setFileType(FileType::NO_FILE);
 
-            r = 0.02;
-            Mdouble mass = M_PI * r*r;
+            r = 0.05;
+            Mdouble mass = M_PI * r * r;
 
             auto species = speciesHandler.copyAndAddObject(new LinearViscoelasticFrictionSpecies);
             species->setDensity(1);
-            species->setCollisionTimeAndRestitutionCoefficient(6.3291e-3, 0.1, mass);
-            // species->setStiffness(100000);
-            // species->setDissipation(0);
+            species->setCollisionTimeAndRestitutionCoefficient(2e-2, 0.3, mass);
             logger(WARN, "collision time %, restitution coefficient %, max vel %", 
                     species->getCollisionTime(mass), species->getRestitutionCoefficient(mass),
                     species->getMaximumVelocity(r, mass));
@@ -63,9 +58,13 @@ class TimeDependentPeriodicBoundaryTest : public Mercury2D
             species->setRollingDissipation(2.0/5.0 * species->getDissipation());
             species = speciesHandler.copyAndAddObject(species);
 
+            //set time and file properties
+            setTimeStep(species->getCollisionTime(mass) / 20.0);
+            setTimeMax(25.0);
+            setSaveCount(0.2 / getTimeStep());
 
-            setMin({0, 0, 0});
-            setMax({2, 1, 1});
+            setMin({0, -1, 0});
+            setMax({3, 1, 1});
             setGravity({0, 0, 0});
         }
 
@@ -75,17 +74,24 @@ class TimeDependentPeriodicBoundaryTest : public Mercury2D
             auto p = new SphericalParticle;
             p->setSpecies(species);
 
+            const Mdouble v = 2.0;
             auto tdpb = boundaryHandler.copyAndAddObject(new TimeDependentPeriodicBoundary);
-            tdpb->set(Vec3D(0, 1, 0), 0, 1,
-                        [](Mdouble t) {return Vec3D(fmod(t,2), 0, 0);}, 
-                        [](Mdouble t) {return Vec3D(1, 0, 0);});
+            tdpb->set(Vec3D(0, 1, 0), getYMin(), getYMax(),
+                        [v](Mdouble t) {return Vec3D( v*t, 0, 0);}, 
+                        [v](Mdouble t) {return Vec3D( v, 0, 0);});
+            tdpb->setMaxShift(3);
             auto ends = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
-            ends->set(Vec3D(1, 0, 0), 0, 2);
+            ends->set(Vec3D(1, 0, 0), getXMin(), getXMax());
 
+            //define common particle properties
+            p->setSpecies(species);
+            const Mdouble volumeFraction = 0.7;
+            logger(INFO,"Inserting particles of diameter % to %, volumeFraction %",
+                    .9*r, 1.1*r, volumeFraction);
             auto insb = boundaryHandler.copyAndAddObject(new CubeInsertionBoundary);
             Mdouble vel = 0.1;
             insb->set(p, 1, 
-                    Vec3D(0, 0, 0), Vec3D(2, 1, 0), 
+                    Vec3D(getXMin(), getYMin(), 0), Vec3D(getXMax(), getYMax(), 0),
                     Vec3D(-vel, -vel, 0), Vec3D(vel, vel, 0), 0.9*r, 1.1*r);
             insb->checkBoundaryBeforeTimeStep(this);
         }
@@ -94,16 +100,17 @@ class TimeDependentPeriodicBoundaryTest : public Mercury2D
         {
             if (boundaryHandler.getNumberOfObjects() == 3)
             {
-                if (particleHandler.getVolume() > 2 * 0.7)
+                Mdouble volfrac = particleHandler.getVolume() / (
+                        (getXMax() - getXMin()) * (getYMax() - getYMin())) ;
+                if (volfrac > 0.7)
                 {
-                    logger(WARN, "Finished inserting particles");
+                    logger(DEBUG, "Finished inserting particles");
                     boundaryHandler.removeObject(2);
-                    // setTime(0);
                     for (auto p : particleHandler)
                         p->setInfo(p->getPosition().Y);
                 }
                 else
-                    logger(WARN, "volumefraction = %", particleHandler.getVolume()/2);
+                    logger(DEBUG, "volumefraction = %", volfrac);
             }
         }
 
@@ -112,8 +119,8 @@ class TimeDependentPeriodicBoundaryTest : public Mercury2D
 
 int main()
 {
+    //instantiate the class
     TimeDependentPeriodicBoundaryTest problem;
-
     problem.solve();
     return 0;
 }
