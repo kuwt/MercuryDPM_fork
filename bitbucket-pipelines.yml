@@ -24,7 +24,7 @@ pipelines:
           artifacts:
             - error_log2.txt
           after-script:
-            - if [$BITBUCKET_EXIT_CODE != 0] ; then BUILD_STATUS="FAILED" ; fi
+            - if [ $BITBUCKET_EXIT_CODE != 0 ] ; then BUILD_STATUS="FAILED" ; fi
             - pipe: atlassian/slack-notify:2.0.0
               variables:
                 WEBHOOK_URL: 'https://hooks.slack.com/services/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'
