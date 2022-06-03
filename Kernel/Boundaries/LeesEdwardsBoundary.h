@@ -33,9 +33,13 @@
 class ParticleHandler;
 
 /*!
- * \brief Class which creates a boundary with Lees-Edwards type periodic boundary
- * conditions. 
- * \details See also [insert link to the original paper by LE]. Inherits from BaseBoundary.
+ * \brief Class which creates a boundary with Lees-Edwards type periodic boundary conditions. 
+ * \details A LeesEdwardsBoundary is like a PeriodicBoundary, but when a
+ * particle crosses one edge and is copied to the other side then the particle
+ * is also shifted. This sort of boundary is useful for studying shear flows. 
+ * \details See also Lees and Edwards (J. Phys. C 1921, 
+ * <a href="http://dx.doi.org/1088/0022-3719/5/15/006">doi:1088/0022-3719/5/15/006</a>). 
+ * Inherits from BaseBoundary.
  * \todo Add link to paper by Lees-Edwards in the documentation of this class.
  * \todo Is implemented for 2D only now. Needs extension to 3D.
  */
@@ -53,6 +57,11 @@ public:
         }
 #endif
     }
+
+    /*!
+     * \brief Copy constructor 
+     */
+    LeesEdwardsBoundary(const LeesEdwardsBoundary& other);
     
     /*!
      * \brief Sets all boundary properties

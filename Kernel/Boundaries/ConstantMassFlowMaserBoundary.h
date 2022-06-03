@@ -93,53 +93,73 @@ class ConstantMassFlowMaserBoundary : public BaseBoundary { public:
     /*!  \brief MaserBoundary constructor
      */
     ConstantMassFlowMaserBoundary();
-    
+
     /*!  \brief Maserboundary constructor that takes a periodic boundary, and
      * converts it to a maser boundary
      */
     explicit ConstantMassFlowMaserBoundary(const PeriodicBoundary&
             periodicBoundary);
-    
+
     /*!  \brief Creates a copy of this maser on the heap.
      */
     ConstantMassFlowMaserBoundary* copy() const override;
-    
-    /*!  \brief Sets all boundary properties at once and adds particles of the
-     * handler to the maser.
+
+    /*!
+     * \brief Sets all boundary properties at once and adds particles of the handler to the maser.
+     * This deactivates the Maser.
+     */
+    void set(Vec3D normal, Vec3D planewiseShift, Mdouble distanceLeft, Mdouble distanceRight);
+
+    /*!
+     * \brief Sets the Maser's normal and positions, and sets the planewise
+     * shift to zero. This deactivates the Maser.
      */
     void set(Vec3D normal, Mdouble distanceLeft, Mdouble distanceRight);
-    
-    /*!  \brief reads boundary properties from istream
+
+    /*!
+     * \brief Sets a planewise direction to the shift. Doesn't change the normal
+     * or the positions.
+     */
+    void setPlanewiseShift(Vec3D planewiseShift);
+
+    /*!
+     * \brief Sets the shift of the Maser. Usually don't use this directly, use
+     * set() or setPlanewiseShift() instead.
+     */
+    void setShift(Vec3D shift);
+
+    /*!
+     * \brief reads boundary properties from istream
      */
     void read(std::istream& is) override;
-    
+
     /*!  \brief writes boundary properties to ostream
      */
     void write(std::ostream& os) const override;
-    
+
     /*!  \brief Returns the name of the object
      */
     std::string getName() const override;
-    
+
     /*!  \brief Creates periodic particles when the particle is a maser particle
      * and is sufficiently close to one of the boundary walls.
      */
     void createPeriodicParticle(BaseParticle* p, ParticleHandler& pH) override;
-    
+
     void createPeriodicParticles(ParticleHandler& pH) override;
-    
+
     /*!  \brief Shifts the particle to its 'periodic' position if it is a maser
      * particle and has crossed either of the walls. Creates a 'normal' particle
      * at its current position if it is a maser particle which crossed the RIGHT
      * boundary wall.
      */
     bool checkBoundaryAfterParticleMoved(BaseParticle* p, ParticleHandler& pH);
-    
+
     /*!  \brief Evaluates what the particles have to do after they have changed
      * position
      */
     void checkBoundaryAfterParticlesMove(ParticleHandler& pH) override;
-    
+
     /*!  \brief Converts a 'normal' particle into a maser particle.
      */
     void addParticleToMaser(BaseParticle* p);
@@ -147,34 +167,34 @@ class ConstantMassFlowMaserBoundary : public BaseBoundary { public:
     /*!  \brief Convert a maser particle into a 'normal' particle
      */
     void removeParticleFromMaser(BaseParticle* p);
-    
+
     /*!  \brief Returns true if the particle is a Maser particle, and false
      * otherwise.
      */
     bool isMaserParticle(BaseParticle* p) const;
-    
+
     /*!  \brief Returns true if the particle is a Normal particle, and false
      * otherwise.
      */
     bool isNormalParticle(BaseParticle* p) const;
-    
+
     /*!  \brief Does everything that needs to be done for this boundary between
      * setupInitialConditions and the time loop, in this case, it activates the
      * maser.
      */
     void actionsBeforeTimeLoop() override;
-    
+
     /*!  \brief Opens the gap, and transforms particles to maser particles. Also
      * calls turnOnCopying().
      */
     void activateMaser();
-    
+
     /*!  \brief Stops copying particles (and act merely as a chute)
      */
     void closeMaser();
 
-    /*! 
-     * \brief Returns whether the Maser is activated or not. 
+    /*!
+     * \brief Returns whether the Maser is activated or not.
      */
     bool isActivated() const;
 
@@ -183,7 +203,7 @@ class ConstantMassFlowMaserBoundary : public BaseBoundary { public:
      */
     void turnOnCopying();
 
-    /*! 
+    /*!
      * \brief Stop copying particles.
      */
     void turnOffCopying();
@@ -192,7 +212,7 @@ class ConstantMassFlowMaserBoundary : public BaseBoundary { public:
      * \brief Returns whether the Maser is copying particles or not.
      */
     bool isCopying() const;
-    
+
     Mdouble getDistanceLeft() const;
     
     Mdouble getDistanceRight() const;
@@ -200,17 +220,17 @@ class ConstantMassFlowMaserBoundary : public BaseBoundary { public:
     Mdouble getGapSize() const;
 
 private:
-    
+
     /*!
      * \brief Shifts the particle to its 'periodic' position
      */
     void shiftPosition(BaseParticle* p) const;
-    
+
     /*!
      * \brief Creates a copy of the input particle, that gets removed again in DPMBase::removeDuplicatePeriodicParticles
      */
     BaseParticle* createGhostCopy(BaseParticle* p) const;
-    
+
     /*!
      * \brief Returns whether the given particle is closer to the right boundary of the periodic part.
      * \param[in] p Particle for which we would like to know whether it is closest to the right boundary
@@ -221,7 +241,7 @@ private:
         const Mdouble distance = Vec3D::dot(p->getPosition(), normal_);
         return (distanceRight_ - distance < distance - distanceLeft_);
     }
-    
+
     /*!
      * \brief Returns the distance of the wall to the particle
      * \param[in] p     Pointer to the particle of which we want to know the distance to the wall to
@@ -233,22 +253,22 @@ private:
         const Mdouble distance = Vec3D::dot(p->getPosition(), normal_);
         return std::min(distance - distanceLeft_, distanceRight_ - distance);
     }
-    
+
     /*!
      * \brief Normal unit vector of both maser walls. Points in the flowing direction.
      */
     Vec3D normal_;
-    
+
     /*!
      * \brief position of left boundary wall, s.t. normal*x=position_left
      */
     Mdouble distanceLeft_;
-    
+
     /*!
      * \brief position of right boundary wall, s.t. normal*x=position_right
      */
     Mdouble distanceRight_;
-    
+
     /*!
      * \brief distance between the right side of the periodic domain and the start of the outflow domain.
      * \details I.e., each particle in the maser is moved
@@ -263,11 +283,13 @@ private:
      * \todo JMFT: Do you mean 6 radii?
      */
     Mdouble gapSize_;
-    
+
     /*!
      * \brief Direction in which particles are to be shifted when they cross the boundary.
      * \details I.e., the vector pointing from a point the left boundary wall to the equivalent point
      * on the right one.
+     * \details By default this is equal to normal_ * (distanceRight_ - distanceLeft_)
+     * but you can also set a planewise direction to the shift.
      */
     Vec3D shift_;
     
@@ -280,7 +302,7 @@ private:
      * \brief List of 'maser' particles' species, and their normal counterparts
      */
     std::map<const ParticleSpecies*, const ParticleSpecies*> speciesConversionMaserToNormal_;
-    
+
     /*!
      * \brief Flag whether or not the gap is created and particles transformed already.
      */
@@ -290,7 +312,7 @@ private:
      * \brief Flag whether or not the Maser is copying particles.
      */
     bool maserIsCopying_;
-    
+
 };
 
 #endif

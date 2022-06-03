@@ -143,15 +143,16 @@ class muICal2D : public Mercury2D
             BaseParticle* p0 = new SphericalParticle;
             p0->setSpecies(speciesP);
             insb = new CubeInsertionBoundary;
+            PSD myPSD;
+            myPSD.setDistributionUniform( pars.at("particleRadius") * (1-pars.at("dispersity")),  pars.at("particleRadius") * (1+pars.at("dispersity")),1000);
             insb->set(p0, 1,
                     Vec3D(getXMin() + 1*pars.at("particleRadius"),
                           getYMin(), 0),
                     Vec3D(getXMax() - 2*pars.at("particleRadius"),
                           getYMax(), 0),
-                    Vec3D(0,0,0), Vec3D(0,0,0),
-                    pars.at("particleRadius") * (1-pars.at("dispersity")),
-                    pars.at("particleRadius") * (1+pars.at("dispersity"))
+                    Vec3D(0,0,0), Vec3D(0,0,0)
                     );
+            insb->setPSD(myPSD);
             insb = boundaryHandler.copyAndAddObject(insb);
 
             lid = new InfiniteWall;

@@ -94,9 +94,28 @@ public:
     
     /*!
      * \brief Sets all boundary properties at once and adds particles of the handler to the maser.
+     * This deactivates the Maser.
+     */
+    void set(Vec3D normal, Vec3D planewiseShift, Mdouble distanceLeft, Mdouble distanceRight);
+
+    /*!
+     * \brief Sets the Maser's normal and positions, and sets the planewise
+     * shift to zero. This deactivates the Maser. 
      */
     void set(Vec3D normal, Mdouble distanceLeft, Mdouble distanceRight);
     
+    /*!
+     * \brief Sets a planewise direction to the shift. Doesn't change the normal
+     * or the positions.
+     */
+    void setPlanewiseShift(Vec3D planewiseShift);
+
+    /*!
+     * \brief Sets the shift of the Maser. Usually don't use this directly, use
+     * set() or setPlanewiseShift() instead.
+     */
+    void setShift(Vec3D shift);
+
     /*!
      * \brief reads boundary properties from istream
      */
@@ -172,7 +191,7 @@ public:
     
     Mdouble getDistanceRight() const;
 
-private:
+protected:
     
     /*!
      * \brief Shifts the particle to its 'periodic' position
@@ -226,6 +245,8 @@ private:
      * \brief Direction in which particles are to be shifted when they cross the boundary.
      * \details I.e., the vector pointing from a point the left boundary wall to the equivalent point
      * on the right one.
+     * \details By default this is equal to normal_ * (distanceRight_ - distanceLeft_)
+     * but you can also set a planewise direction to the shift.
      */
     Vec3D shift_;
     

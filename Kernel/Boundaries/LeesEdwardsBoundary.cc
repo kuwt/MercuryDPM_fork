@@ -28,6 +28,16 @@
 #include "Particles/BaseParticle.h"
 #include "DPMBase.h"
 
+LeesEdwardsBoundary::LeesEdwardsBoundary(const LeesEdwardsBoundary& other) : BaseBoundary(other)
+{
+    shift_      = other.shift_;
+    velocity_   = other.velocity_;
+    left_       = other.left_;
+    right_      = other.right_;
+    down_       = other.down_;
+    up_         = other.up_;
+}
+
 /*!
  * \details Allows the user to set all the properties of the LeesEdwardsBoundary at once.
  * \param[in] velocity  The difference in velocities at which the bottom and to wall move
@@ -198,6 +208,8 @@ void LeesEdwardsBoundary::createHorizontalPeriodicParticles(BaseParticle* p, Par
 {
     bool positive;      // TRUE if the particle is closest to the left boundary 
     // wall (set by getVerticalDistance in the following if-statement)
+                        //
+                        // Note, 'positive' is passed by reference to getHorizontalDistance
     // check if particle is close enough to either of the walls
     const Mdouble maxDistance = p->getMaxInteractionRadius() + pH.getLargestParticle()->getMaxInteractionRadius();
     if (getHorizontalDistance(*p, positive) < maxDistance)

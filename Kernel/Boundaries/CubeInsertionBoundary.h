@@ -39,45 +39,73 @@ class RNG;
  * would have been the correct name).
  */
 
-class CubeInsertionBoundary : public InsertionBoundary
-{
+class CubeInsertionBoundary : public InsertionBoundary {
 public:
-    
+
     /*!
      * \brief Constructor; sets everything to 0.
      */
     CubeInsertionBoundary();
-    
+
     /*!
      * \brief Copy constructor with deep copy.
      */
-    CubeInsertionBoundary(const CubeInsertionBoundary& other);
-    
+    CubeInsertionBoundary(const CubeInsertionBoundary &other);
+
     /*!
      * \brief Destructor: default destructor.
      */
     ~CubeInsertionBoundary() override;
-    
+
     /*!
      * \brief Creates a copy on the heap and returns a pointer.
      */
-    CubeInsertionBoundary* copy() const override;
-    
+    CubeInsertionBoundary *copy() const override;
+
     /*!
      * \brief Sets the properties of the InsertionBoundary for mutliple different particle types
      */
     void
-    set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax);
-    
+    set(BaseParticle *particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax);
+
     void
-    set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax);
-    
+    set(BaseParticle &particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax);
+
     /*!
      * \brief Sets the properties of the InsertionBoundary for a single particle type
      */
     void
-    set(std::vector<BaseParticle*> particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin,
+    set(std::vector<BaseParticle *> particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin,
         Vec3D velMax);
+
+    /*!
+     * \brief old style set function which also assumes a uniform psd. Note if you want a general PSD do not use but this is quicker for a uniform in size PSD
+     * \todo Check with Timo and Thomas about this.
+     */
+    void set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin,
+        Vec3D velMax, Mdouble rMin, Mdouble rMax)
+    {
+        PSD uniformPSD;
+        uniformPSD.setDistributionUniform(rMin,rMax,1000);
+        setPSD(uniformPSD);
+        set(particleToCopy, maxFailed,posMin, posMax,  velMin, velMax);
+    }
+
+    /*!
+     * \brief old style set function which also assumes a uniform psd. Note if you want a general PSD do not use but this is quicker for a uniform in size PSD
+     * \todo Check with Timo and Thomas about this.
+     */
+    void set(BaseParticle &particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin,
+             Vec3D velMax, Mdouble rMin, Mdouble rMax)
+    {
+        PSD uniformPSD;
+        uniformPSD.setDistributionUniform(rMin,rMax,1000);
+        setPSD(uniformPSD);
+        set(particleToCopy, maxFailed,posMin, posMax,  velMin, velMax);
+    }
+
+
+
     
     /*!
      * \brief Sets the geometry (position and velocity distribution) of the
