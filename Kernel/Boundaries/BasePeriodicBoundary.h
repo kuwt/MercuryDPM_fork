@@ -112,6 +112,7 @@ public:
     
     /*!
      * \brief Creates periodic ocpies of given particle in case of periodic boundaries in serial build
+     * \todo{JMFT: Should this be virtual?}
      */
     void createPeriodicParticles(ParticleHandler& pH) override;
     

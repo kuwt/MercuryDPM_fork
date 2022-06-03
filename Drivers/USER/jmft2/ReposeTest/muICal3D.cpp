@@ -171,6 +171,11 @@ class muICal3D : public Mercury3D
                             pars.at("height") + 0 * pars.at("particleRadius")
                       ),
                       Vec3D(0, 0, 0), Vec3D(0, 0, 0));
+
+            PSD myPSD;
+            myPSD.setDistributionUniform(1-pars.at("dispersity"),1+pars.at("dispersity"),100);
+
+
             insb->set(p0, 1,
                       Vec3D(
                               getXMin() + particleRadius,
@@ -182,10 +187,9 @@ class muICal3D : public Mercury3D
                               getYMax() - particleRadius,
                               getZMax()
                     ),
-                    Vec3D(0,0,0), Vec3D(0,0,0),
-                    particleRadius * (1-pars.at("dispersity")),
-                    particleRadius * (1+pars.at("dispersity"))
+                    Vec3D(0,0,0), Vec3D(0,0,0)
                     );
+            insb->setPSD(myPSD);
             insb = boundaryHandler.copyAndAddObject(insb);
             insb->insertParticles(this);
     
