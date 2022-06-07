@@ -241,6 +241,10 @@ void PSD::validateCumulativeDistribution()
             particleSizeDistribution_.erase(particleSizeDistribution_.end() + std::distance(particleSizeDistribution_
                                                                                                     .end(), i));
         }
+        else
+        {
+            break;
+        }
     }
 }
 
