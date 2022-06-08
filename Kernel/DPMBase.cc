@@ -51,6 +51,11 @@
 #include "MpiContainer.h"
 #include "MpiDataClass.h"
 #include "Domain.h"
+// this header for signal handler
+#include <csignal>
+// this header for memset function
+#include <cstring>
+
 #ifdef MERCURY_USE_MPI
 #include <mpi.h>
 #endif
@@ -200,6 +205,8 @@ DPMBase::DPMBase() : wallVTKWriter_(wallHandler), interactionVTKWriter_(interact
  */
 void DPMBase::constructor()
 {
+    // sofStop function
+    setSoftStop();
     //constructor();
     dataFile.getFstream().precision(10);
     fStatFile.getFstream().precision(10);
@@ -1973,7 +1980,7 @@ void DPMBase::printTime() const
  */
 bool DPMBase::continueSolve() const
 {
-    return true;
+    return continueFlag_ != 0;
 }
 
 /*!
@@ -4964,6 +4971,47 @@ void DPMBase::performGhostVelocityUpdate()
 }
 
 /*!
+* \brief signal handler function.
+*/
+void DPMBase::signalHandler(int signal) {
+    switch (signal) {
+        case SIGINT:
+            logger(INFO, "SIGINT has been captured!\nMercuryDPM is writing the files, then it will stop!");
+            // continue Flag must be set to false here!
+            continueFlag_ = false;
+            //exit(SIGTERM); // this will interrupt the simulation
+            return;
+        case SIGTERM:
+            logger(INFO, "\nSIGTERM has been captured!\nMercuryDPM is writing the files, then it will stop!");
+            // continue Flag must be set to false here!
+            continueFlag_ = false;
+            return;
+        case SIGKILL:
+            logger(INFO, "\nSIGKILL has been captured!\nMercuryDPM is writing the files, then it will stop!");
+            continueFlag_ = false;
+            return;
+        default:
+            logger(INFO, "No Signal to Capture!");
+    }
+}
+
+
+/*!
+* \brief function for setting sigaction constructor.
+*/
+void DPMBase::setSoftStop() {
+    logger(INFO,"Initiated soft stop");
+    struct sigaction act{};
+    memset(&act, 0, sizeof(act));
+
+    act.sa_handler = &signalHandler;
+
+    sigaction(SIGINT, &act, nullptr);
+    sigaction(SIGTERM, &act, nullptr);
+    sigaction(SIGKILL, &act, nullptr);
+}
+
+/*!
  * \details Skims through all the object pointers of type BaseInteraction in the interaction handler. Outputs the type of
  *          interaction between two particles P and I.
  */
@@ -5269,5 +5317,7 @@ void DPMBase::handleParticleAddition(unsigned int id, BaseParticle* p)
     }
 }
 
+// initialise static member variables
+volatile sig_atomic_t DPMBase::continueFlag_ = true;
 
 ///\todo When restarting the indexMax should be reset
