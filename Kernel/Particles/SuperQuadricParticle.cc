@@ -335,6 +335,7 @@ BaseInteraction* SuperQuadricParticle::getInteractionWithSuperQuad(SuperQuadricP
     //if the minimum is positive, there is no contact: return empty vector
     if (computeShape(contactPoint) > -1e-10)
     {
+        interactionHandler->removeObject(C->getIndex());
         return nullptr;
     }
     
