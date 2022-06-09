@@ -107,7 +107,7 @@ static void printMessage(std::string module, std::string msg, Flusher doFlush)
     initialiseMPI();
     MPIContainer& communicator = MPIContainer::Instance();
     std::cout << "\033[1;33mModule " << module << ":\033[0m\n" << "[Processor: " << communicator.getProcessorID() << "]" << msg;
-    if (doFlush)
+    if (doFlush == Flusher::FLUSH)
     {
         std::cout << std::endl;
     }
