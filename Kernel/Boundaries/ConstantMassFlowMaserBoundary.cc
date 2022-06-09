@@ -73,6 +73,13 @@ ConstantMassFlowMaserBoundary* ConstantMassFlowMaserBoundary::copy() const
     return new ConstantMassFlowMaserBoundary(*this);
 }
 
+void ConstantMassFlowMaserBoundary::set(Vec3D normal, Vec3D planewiseShift, Mdouble distanceLeft, Mdouble distanceRight)
+{
+    set(normal, distanceLeft, distanceRight);
+    setPlanewiseShift(planewiseShift);
+}
+
+
 /*!
  * \details Set all the properties of the boundary at once.
  * \param[in] normal            Normal unit vector of the (parallel) boundary walls
@@ -88,6 +95,22 @@ void ConstantMassFlowMaserBoundary::set(Vec3D normal, Mdouble distanceLeft, Mdou
     distanceRight_ = distanceRight * scaleFactor_;
     shift_ = normal_ * (distanceRight_ - distanceLeft_);
     maserIsActivated_ = false;
+}
+
+/*!
+ * \details Sets the shift_ vector through setting the planewise shift.
+ * We delete the component of planewiseShift that is parallel to normal_. 
+ * Allows Lees--Edwards type Masers.
+ */
+void ConstantMassFlowMaserBoundary::setPlanewiseShift(Vec3D planewiseShift)
+{
+    planewiseShift -= Vec3D::dot(planewiseShift, normal_) / Vec3D::dot(normal_, normal_) * normal_;
+    shift_ = normal_ * (distanceRight_ - distanceLeft_) + planewiseShift;
+}
+
+void ConstantMassFlowMaserBoundary::setShift(Vec3D shift)
+{
+    shift_ = shift;
 }
 
 /*!

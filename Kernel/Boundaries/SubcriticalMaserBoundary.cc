@@ -70,6 +70,12 @@ SubcriticalMaserBoundary* SubcriticalMaserBoundary::copy() const
     return new SubcriticalMaserBoundary(*this);
 }
 
+void SubcriticalMaserBoundary::set(Vec3D normal, Vec3D planewiseShift, Mdouble distanceLeft, Mdouble distanceRight)
+{
+    set(normal, distanceLeft, distanceRight);
+    setPlanewiseShift(planewiseShift);
+}
+
 /*!
  * \details Set all the properties of the boundary at once.
  * \param[in] normal            Normal unit vector of the (parallel) boundary walls
@@ -85,6 +91,22 @@ void SubcriticalMaserBoundary::set(Vec3D normal, Mdouble distanceLeft, Mdouble d
     distanceRight_ = distanceRight * scaleFactor_;
     shift_ = normal_ * (distanceRight_ - distanceLeft_);
     maserIsActivated_ = false;
+}
+
+/*!
+ * \details Sets the shift_ vector through setting the planewise shift.
+ * We delete the component of planewiseShift that is parallel to normal_. 
+ * Allows Lees--Edwards type Masers.
+ */
+void SubcriticalMaserBoundary::setPlanewiseShift(Vec3D planewiseShift)
+{
+    planewiseShift -= Vec3D::dot(planewiseShift, normal_) / Vec3D::dot(normal_, normal_) * normal_;
+    shift_ = normal_ * (distanceRight_ - distanceLeft_) + planewiseShift;
+}
+
+void SubcriticalMaserBoundary::setShift(Vec3D shift)
+{
+    shift_ = shift;
 }
 
 /*!
@@ -112,7 +134,7 @@ void SubcriticalMaserBoundary::read(std::istream& is)
         speciesConversionMaserToNormal_[speciesHandler.getObject(value)] = speciesHandler.getObject(key);
     }
     logger(DEBUG, "Finished reading SubcriticalMaserBoundary. \nNormal: % \nDistanceLeft: % \nDistanceRight: % "
-                  ": % \nMaserIsActivated: %", normal_, distanceLeft_, distanceRight_, maserIsActivated_);
+            ": % \nMaserIsActivated: %", normal_, distanceLeft_, distanceRight_, maserIsActivated_);
 }
 
 /*!
@@ -259,7 +281,7 @@ bool SubcriticalMaserBoundary::checkBoundaryAfterParticleMoved(BaseParticle* p, 
             BaseParticle* pCopy = p->copy();
             pCopy->setSpecies(speciesConversionMaserToNormal_.find(p->getSpecies())->second);
             pH.addObject(pCopy);
-            
+
             // If the (original) particle has crossed a right boundary,
             // then shift that particle periodically.
             shiftPosition(p);

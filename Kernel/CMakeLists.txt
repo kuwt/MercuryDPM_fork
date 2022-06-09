@@ -78,6 +78,8 @@ endif ()
 add_library(Chute STATIC
         ChuteBottom.cc
         ChuteWithHopper.cc
-        Chute.cc)
+        Chute.cc
+        CurvyChute.cc
+        )
 
 target_link_libraries(Chute MercuryBase)

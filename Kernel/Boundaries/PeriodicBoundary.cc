@@ -121,7 +121,7 @@ void PeriodicBoundary::set(Vec3D normal, Mdouble distanceLeft, Mdouble distanceR
 
 /*!
  * \details Sets the shift_ vector through setting the planewise shift.
- * We delete the component of planewiseShift that is parallel to normal_. 
+ * We delete the component of planewiseShift that is parallel to normal_.
  */
 void PeriodicBoundary::setPlanewiseShift(Vec3D planewiseShift)
 {
@@ -207,7 +207,7 @@ Mdouble PeriodicBoundary::getDistance(const BaseParticle& p) const
 Mdouble PeriodicBoundary::getDistance(const Vec3D& position) const
 {
     Mdouble distanceFromPlaneThroughOrigin = Vec3D::dot(position, normal_);
-    return std::min(distanceFromPlaneThroughOrigin - distanceLeft_, 
+    return std::min(distanceFromPlaneThroughOrigin - distanceLeft_,
                     distanceRight_ - distanceFromPlaneThroughOrigin);
 }
 
@@ -290,58 +290,6 @@ bool PeriodicBoundary::isClosestToLeftBoundary(const Vec3D& p) const
 }
 
 /*!
- * \details Reads the boundary properties from an istream
- * \param[in] is        the istream
- */
-void PeriodicBoundary::read(std::istream& is)
-{
-    BasePeriodicBoundary::read(is);
-    std::string dummy;
-    is >> dummy >> normal_
-       >> dummy >> scaleFactor_
-       >> dummy >> distanceLeft_
-       >> dummy >> distanceRight_
-       >> dummy >> shift_;
-}
-
-/*!
- * \details Deprecated version of read().
- * \deprecated Should be gone by Mercury 2.0. Instead, use CubeInsertionBoundary::read().
- */
-void PeriodicBoundary::oldRead(std::istream& is)
-{
-    std::string dummy;
-    is >> dummy >> normal_
-       >> dummy >> scaleFactor_
-       >> dummy >> distanceLeft_
-       >> dummy >> distanceRight_
-       >> dummy >> shift_;
-}
-
-/*!
- * \details Writes boundary's properties to an ostream
- * \param[in] os    the ostream
- */
-void PeriodicBoundary::write(std::ostream& os) const
-{
-    BasePeriodicBoundary::write(os);
-    os << " normal " << normal_
-       << " scaleFactor " << scaleFactor_
-       << " distanceLeft " << distanceLeft_
-       << " distanceRight " << distanceRight_
-       << " shift " << shift_;
-}
-
-/*!
- * \details Returns the name of the object class
- * \return      the object's class' name, i.e. 'CubeInsertionBoundary'
- */
-std::string PeriodicBoundary::getName() const
-{
-    return "PeriodicBoundary";
-}
-
-/*!
  * \details Checks the distance of given particle to the closest of both periodic 
  * walls, and creates a periodic copy of the particle if needed (i.e. if the particle
  * is closer to the periodic wall than the radius of the largest particle in the
@@ -382,7 +330,7 @@ void PeriodicBoundary::createGhostParticle(BaseParticle* pReal)
         from = from->getPeriodicFromParticle();
     pGhost->setPeriodicFromParticle(from);
     pGhost->setPeriodicGhostParticle(true);
-    
+
     pH.addObject(pGhost);
 }
 
@@ -405,7 +353,7 @@ void PeriodicBoundary::createPeriodicParticles(ParticleHandler& pH)
     {
 #endif
     unsigned numberOfParticles = pH.getSize();
-    
+
     for (unsigned i = 0; i < numberOfParticles; i++)
     {
         createPeriodicParticle(pH.getObject(i), pH);
@@ -442,18 +390,55 @@ void PeriodicBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
 #endif
 }
 
+/*!
+ * \details Reads the boundary properties from an istream
+ * \param[in] is        the istream
+ */
+void PeriodicBoundary::read(std::istream& is)
+{
+    BasePeriodicBoundary::read(is);
+    std::string dummy;
+    is >> dummy >> normal_
+       >> dummy >> scaleFactor_ // JMFT: I'd like to deprecate scaleFactor_
+       >> dummy >> distanceLeft_
+       >> dummy >> distanceRight_
+       >> dummy >> shift_;
+}
 
+/*!
+ * \details Deprecated version of read().
+ * \deprecated Should be gone by Mercury 2.0. Instead, use CubeInsertionBoundary::read().
+ */
+void PeriodicBoundary::oldRead(std::istream& is)
+{
+    std::string dummy;
+    is >> dummy >> normal_
+       >> dummy >> scaleFactor_ // JMFT: I'd like to deprecate scaleFactor_
+       >> dummy >> distanceLeft_
+       >> dummy >> distanceRight_
+       >> dummy >> shift_;
+}
 
+/*!
+ * \details Writes boundary's properties to an ostream
+ * \param[in] os    the ostream
+ */
+void PeriodicBoundary::write(std::ostream& os) const
+{
+    BasePeriodicBoundary::write(os);
+    os << " normal " << normal_
+       << " scaleFactor " << scaleFactor_ // JMFT: I'd like to deprecate scaleFactor_
+       << " distanceLeft " << distanceLeft_
+       << " distanceRight " << distanceRight_
+       << " shift " << shift_;
+}
 
-
-
-
-
-
-
-
-
-
-
-
+/*!
+ * \details Returns the name of the object class
+ * \return      the object's class' name, i.e. 'CubeInsertionBoundary'
+ */
+std::string PeriodicBoundary::getName() const
+{
+    return "PeriodicBoundary";
+}
 

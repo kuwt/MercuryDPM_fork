@@ -37,7 +37,6 @@
  * with normal being the outward unit normal vector of the right wall. If a
  * particle moves outside these boundaries, it will be shifted.
  */
-
 class PeriodicBoundary : public BasePeriodicBoundary
 {
 public:
@@ -61,7 +60,7 @@ public:
      * \brief copy constructor
      */
     PeriodicBoundary(const PeriodicBoundary& other);
-    
+
     /*!
      * \brief Defines a PeriodicBoundary by its normal and positions
      */
@@ -83,7 +82,7 @@ public:
      * direction, and zero by default).
      */
     void setPlanewiseShift(Vec3D planewiseShift);
-    
+
     /*!
      * \brief returns the vector normal to the periodic boundary
      */
@@ -120,7 +119,7 @@ public:
     Mdouble getDistance(const BaseParticle& p) const override;
 
     /*!
-     * \brief Returns the distance of the wall to the position
+     * \brief Returns the distance of the edge to the position
      */
     Mdouble getDistance(const Vec3D& position) const override;
 
@@ -128,16 +127,16 @@ public:
      * \brief shifts the particle
      * \param[in] p A pointer to the particle which will be shifted.
      */
-    void shiftPosition(BaseParticle* p) const override;
+    virtual void shiftPosition(BaseParticle* p) const override;
     void shiftPosition(Vec3D& p) const;
-    
+
     /*!
      * \brief shifts two positions
      */
     virtual void shiftPositions(Vec3D& postition1, Vec3D& postion2) const;
 
     /*!
-     * \brief Returns TRUE if particle checked is closest to the 'left' 
+     * \brief Returns TRUE if particle checked is closest to the 'left'
      * edge, and FALSE if it is closest to the 'right' edge
      */
     virtual bool isClosestToLeftBoundary(const BaseParticle& p) const;
@@ -149,10 +148,31 @@ public:
     bool isClosestToLeftBoundary(const Vec3D& p) const override;
 
     /*!
+     * \brief Checks distance of particle to closer edge and creates a periodic
+     * copy if necessary
+     */
+    virtual void createPeriodicParticles(ParticleHandler &pH) override;
+
+    /*!
+     * \brief Creates and adds a ghost particle from a given real particle
+     */
+    void createGhostParticle(BaseParticle *pReal);
+
+    /*!
+     * \brief Creates a single periodic particle if required from a given particle
+     */
+    void createPeriodicParticle(BaseParticle* p, ParticleHandler &pH) override;
+
+    /*!
+     * \brief Loops over particles, checks if each particle has crossed either
+     * boundary edge, and applies a shift if that is the case.
+     */
+    virtual void checkBoundaryAfterParticlesMove(ParticleHandler& pH) override;
+
+    /*!
      * \brief reads boundary properties from istream
      */
-    void read(std::istream& is) override;
-    
+    virtual void read(std::istream& is) override;
     /*!
      * \brief deprecated version of CubeInsertionBoundary::read().
      */
@@ -168,33 +188,12 @@ public:
      * \brief Returns the name of the object
      */
     std::string getName() const override;
-    
-    /*!   
-     * \brief Checks distance of particle to closest wall and creates periodic 
-     * copy if necessary
-     */
-    void createPeriodicParticles(ParticleHandler& pH) override;
-    
-    /*!
-     * \brief Creates and adds a ghost particle from a give real particle
-     */
-    void createGhostParticle(BaseParticle* pReal);
-    
-    /*!
-     * \brief Creates a single periodic particle if required from a given particle
-     */
-    void createPeriodicParticle(BaseParticle* p, ParticleHandler& pH) override;
-    
-    /*!
-     * \brief Checks if particle has crossed either boundary wall, and applies a shift
-     * if that is the case.
-     */
-    void checkBoundaryAfterParticlesMove(ParticleHandler& pH) override;
+
 
 protected:
-    /*!
-     * \brief outward unit normal vector for right wall
-     */
+  /*!
+   * \brief outward unit normal vector for right edge
+   */
     Vec3D normal_;
     /*!
      * \brief position of left edge, s.t. normal*x = distanceLeft_

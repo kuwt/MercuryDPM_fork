@@ -1216,7 +1216,24 @@ protected:
      */
     void performGhostVelocityUpdate();
 
+
+    /*!
+    * \brief signal handler function.
+    */
+    static void signalHandler(int signal);
+
+    /*!
+    * \brief function for setting sigaction constructor.
+    */
+    void setSoftStop();
+
 private:
+
+    /**
+     * Stores whether code should be stopped
+     */
+    static volatile sig_atomic_t continueFlag_;
+
     /*The number of openmp (symmetric multiprocessing threads)*/
     int numberOfOMPThreads_;
 
