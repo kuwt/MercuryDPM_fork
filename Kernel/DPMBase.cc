@@ -1264,7 +1264,7 @@ void DPMBase::setNumberOfOMPThreads(int numberOfOMPThreads)
     }
 #pragma omp parallel num_threads(getNumberOfOMPThreads())
     {
-        logger(INFO) " %", std::to_string(omp_get_thread_num(), Flusher::NO_FLUSH);
+        logger(INFO, " %", omp_get_thread_num(), Flusher::NO_FLUSH);
     }
     logger(INFO,"");
 
