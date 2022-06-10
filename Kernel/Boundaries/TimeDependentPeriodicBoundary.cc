@@ -90,7 +90,7 @@ void TimeDependentPeriodicBoundary::set(Vec3D normal, Mdouble distanceLeft, Mdou
     distanceRight_ = distanceRight, 
     planewiseShift_ = planewiseShift;
     boost_ = boost;
-    maxShift_ = maxShift_;
+    maxShift_ = maxShift_; //\todo TW this line cannot be right
 }
 
 void TimeDependentPeriodicBoundary::set(Vec3D normal, Vec3D positionLeft, Vec3D positionRight,

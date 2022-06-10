@@ -155,12 +155,12 @@ public:
     /*!
      * \brief Returns the distance of the edge to the particle
      */
-    Mdouble getDistance(const BaseParticle& p) const;
+    Mdouble getDistance(const BaseParticle& p) const override;
 
     /*!
      * \brief Returns the distance of the edge to the position
      */
-    Mdouble getDistance(const Vec3D &position) const;
+    Mdouble getDistance(const Vec3D &position) const override;
 
     /*!
      * \brief shifts <em>and boosts</em> the particle
@@ -168,7 +168,7 @@ public:
      * \todo{JMFT: The time comes from p->getHandler()->getDPMBase()->getTime(), 
      * which will be undefined if p does not belong to a handler.}
      */
-    virtual void shiftPosition(BaseParticle* p) const;
+    virtual void shiftPosition(BaseParticle* p) const override;
 
     virtual void shiftAndBoostParticle(BaseParticle* p, Mdouble time) const;
 
@@ -187,7 +187,7 @@ public:
      * \brief Returns true if position checked is closer to the 'left'
      * edge, and false if it is closer to the 'right' edge
      */
-    virtual bool isClosestToLeftBoundary(const Vec3D& p) const;
+    virtual bool isClosestToLeftBoundary(const Vec3D& p) const override;
 
     /*!
      * \brief Checks distance of particle to closer edge and creates a periodic

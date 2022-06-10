@@ -440,6 +440,7 @@ void ParticleHandler::removeLastObject()
     getDPMBase()->getPossibleContactList().remove_ParticlePosibleContacts(getLastObject());
 #endif
     getDPMBase()->hGridRemoveParticle(getLastObject());
+    getDPMBase()->handleParticleRemoval(getLastObject()->getId());
     BaseHandler<BaseParticle>::removeLastObject();
 }
 
@@ -973,6 +974,12 @@ void ParticleHandler::clear()
 {
     smallestParticle_ = nullptr;
     largestParticle_ = nullptr;
+
+    for (auto p0: *this)
+    {
+        getDPMBase()->handleParticleRemoval(p0->getId());
+    }
+
     BaseHandler<BaseParticle>::clear();
 }
 

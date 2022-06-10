@@ -29,6 +29,8 @@
 //so that the user doesn't have to include string/io manipulations:
 #include <string>
 #include <iomanip>
+// include file for signal handler types
+#include <csignal>
 //The vector class contains a 3D vector class.
 #include "Math/Vector.h"
 //This class defines the particle handler
