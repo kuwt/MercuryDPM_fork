@@ -19,7 +19,7 @@ pipelines:
                 MESSAGE: "Checking commit [${BITBUCKET_COMMIT}] of User $BITBUCKET_TRIGGERER_USERNAME \n make fullTest running for $BITBUCKET_REPO_SLUG/$BITBUCKET_BRANCH"
             - mkdir MercuryBuild
             - cd MercuryBuild
-            - cmake -DCMAKE_BUILD_TYPE=Debug -DMercury_BUILD_USER_DIR=ON -DMercury_BUILD_DOCUMENTATION=ON -G 'Unix Makefiles' ../
+            - cmake -DMercury_USE_MPI=ON -DCMAKE_BUILD_TYPE=Debug -DMercury_BUILD_USER_DIR=ON -DMercury_BUILD_DOCUMENTATION=ON -G 'Unix Makefiles' ../
             - make fullTest
           artifacts:
             - error_log2.txt
