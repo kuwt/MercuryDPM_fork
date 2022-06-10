@@ -1,0 +1,24 @@
+FROM ubuntu  
+
+
+# Install dependencies.
+RUN apt-get update && \
+     apt-get install -y \
+     curl \
+     sudo \
+     zip \
+     xz-utils \
+     libx11-dev \
+     libxi-dev \
+     libxres-dev \
+     libxt-dev \
+     libxxf86vm-dev \
+     libfontconfig1 \ 
+     libxrender1 \
+     libgl1-mesa-glx \
+     gfortran \
+     cmake \
+     build-essential \
+     doxygen \
+     graphviz \
+     jq
