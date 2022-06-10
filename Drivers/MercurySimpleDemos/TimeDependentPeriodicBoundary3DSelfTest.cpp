@@ -87,14 +87,16 @@ class TimeDependentPeriodicBoundary3DSelfTest : public Mercury3D
             auto p = new SphericalParticle;
             p->setSpecies(species);
             p->setRadius(r);
-            p->setPosition(Vec3D(
-                        random.getRandomNumber(getXMin(), getXMax()),
-                        random.getRandomNumber(getYMin(), getYMax()),
-                        random.getRandomNumber(getZMin(), getZMax()) ));
-            p->setVelocity(Vec3D(
-                        random.getRandomNumber(-vel, vel),
-                        random.getRandomNumber(-vel, vel),
-                        random.getRandomNumber(-vel, vel) ));
+            Vec3D pos;
+            pos.X = random.getRandomNumber(getXMin(), getXMax());
+            pos.Y = random.getRandomNumber(getYMin(), getYMax());
+            pos.Z = random.getRandomNumber(getZMin(), getZMax());
+            p->setPosition(pos);
+            Vec3D velocity;
+            velocity.X = random.getRandomNumber(-vel, vel);
+            velocity.Y = random.getRandomNumber(-vel, vel);
+            velocity.Z = random.getRandomNumber(-vel, vel);
+            p->setVelocity(velocity);
             p = particleHandler.copyAndAddObject(p);
             /*
             const Mdouble volumeFraction = 0.7;
