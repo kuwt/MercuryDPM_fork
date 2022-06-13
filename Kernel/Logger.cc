@@ -100,7 +100,7 @@ static void printInfo(std::string module, std::string msg, Flusher doFlush)
  * \param[in] msg           formatted message to be printed.
  * \param[in] doFlush       Flusher enum class object to enable/disable flushing of the output.
  */
-static void printMessage(std::string module, std::string msg, Flusher doFlush)
+static void printWarn(std::string module, std::string msg, Flusher doFlush)
 {
 #ifdef MERCURY_USE_MPI
     //Check if MPI is initialised
@@ -273,10 +273,10 @@ static void printMessage(std::string module, std::string msg, Flusher doFlush)
 // Default output methods.
 LoggerOutput loggerOutputDefaultImpl = {printFatalError, //onFatal
                                         printError, //onError
-                                        printMessage, //onWarn
+                                        printWarn, //onWarn
                                         printInfo, //onInfo
                                         printInfo, //onVerbose
-                                        printMessage //onDebug
+                                        printInfo //onDebug
 };
 
 //And we assign them.
