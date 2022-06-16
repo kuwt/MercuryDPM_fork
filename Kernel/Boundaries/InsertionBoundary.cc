@@ -133,6 +133,7 @@ BaseParticle* InsertionBoundary::generateParticle(RNG& random)
                                                                                        getHandler()->getDPMBase()->getTime() +
                                                                                        initialVolume_);
         P->setRadius(radius);
+        return P;
     }
     Mdouble radius;
     radius = particleSizeDistributionVector_[chosenSpecies_].drawSample();
@@ -301,17 +302,17 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
             else
             {
                 failed++;
-                if(isManuallyInserting_)
-                {
-                    particleSizeDistributionVector_[chosenSpecies_].decrementNParticlesPerClass();
-                    particleSizeDistributionVector_[chosenSpecies_].decrementVolumePerClass(p0->getVolume());
-                }
                 logger(VERBOSE, "failed to place a particle; have failed % times", failed);
             }
 
             if (failed > maxFailed_)
             {
                 logger(VERBOSE, "failed too many times; giving up");
+                if (isManuallyInserting_)
+                {
+                    particleSizeDistributionVector_[chosenSpecies_].decrementNParticlesPerClass();
+                    particleSizeDistributionVector_[chosenSpecies_].decrementVolumePerClass(p0->getVolume());
+                }
                 break; // out of the 'placing' loop (and will leave the 'generating' loop too
             }
         }
