@@ -778,14 +778,23 @@ Mdouble PSD::getVolumetricMeanRadius() const
     return mean;
 }
 
+/*!
+ * \details Decrement the nParticlesPerClass_ counter of the last inserted class by 1. This is utilized when a
+ * particle is generated but failed to be placed into an insertionBoundary.
+ */
 void PSD::decrementNParticlesPerClass()
 {
     --nParticlesPerClass_[index_];
 }
 
+/*!
+ * \details Decrement the volumePerClass_ counter of the last inserted class by the volume of the particle. This is
+ * utilized when a particle is generated but failed to be placed into an insertionBoundary.
+ * \param[in] volume        Volume of the particle which failed to be inserted.
+ */
 void PSD::decrementVolumePerClass(Mdouble volume)
 {
-     volumePerClass_[index_]-= volume;
+    volumePerClass_[index_]-= volume;
 }
 
 /*!
