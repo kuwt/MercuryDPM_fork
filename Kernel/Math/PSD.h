@@ -220,6 +220,16 @@ public:
     int getInsertedParticleNumber() const;
     
     /*!
+    * \brief Decrement nParticlesPerClass_ counter.
+    */
+    void decrementNParticlesPerClass();
+    
+    /*!
+     * \brief Decrement volumePerClass_ counter.
+     */
+    void decrementVolumePerClass(Mdouble volume);
+    
+    /*!
      * \brief Calculate a certain diameter (e.g. D10, D50, D90, etc.) from a percentile x of the number based PSD.
      */
     Mdouble getNumberDx(Mdouble x) const;
@@ -321,6 +331,11 @@ private:
      * class 12 consists of the particles' volume between size class 12 and 11 of the PDF)
      */
     std::vector<Mdouble> volumePerClass_;
+    
+    /*!
+     * Integer which determines the class in which a particle has to be inserted for the manual insertion routine.
+     */
+    int index_;
 };
 
 

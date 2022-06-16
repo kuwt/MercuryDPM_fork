@@ -33,6 +33,7 @@ PSD::PSD()
 {
     for (auto& momenta: momenta_)
         momenta = 0;
+    index_ = 0;
 }
 
 /*!
@@ -42,6 +43,7 @@ PSD::PSD(const PSD& other)
 {
     particleSizeDistribution_ = other.particleSizeDistribution_;
     momenta_ = other.momenta_;
+    index_ = other.index_;
 }
 
 /*!
@@ -158,31 +160,32 @@ Mdouble PSD::insertManuallyByVolume(Mdouble volume)
         Mdouble pMin = low->probability;
         Mdouble pMax = high->probability;
         // interpolate linearly between [low.radius,high.radius] (assumption: CDF is piecewise linear)
-        int index = std::distance(particleSizeDistribution_.begin(), high);
+        index_ = std::distance(particleSizeDistribution_.begin(), high);
         Mdouble a = (prob - pMin) / (pMax - pMin);
         Mdouble rad = a * rMin + (1 - a) * rMax;
-        // Compare inserted volume against volumeAllowed
+        //\todo generalize this to work for non-spherical particles
+        // Compare inserted volume against volumeAllowed (only works for spherical at the moment)
         Mdouble radVolume = 4.0 / 3.0 * constants::pi * rad * rad * rad;
         convertCumulativeToProbabilityDensity();
         convertProbabilityDensityNumberDistributionToProbabilityDensityVolumeDistribution();
-        Mdouble volumeAllowed = particleSizeDistribution_[index].probability * volume;
+        Mdouble volumeAllowed = particleSizeDistribution_[index_].probability * volume;
         convertProbabilityDensityToProbabilityDensityNumberDistribution(TYPE::PROBABILITYDENSITY_VOLUME_DISTRIBUTION);
         convertProbabilityDensityToCumulative();
-        if (volumePerClass_[index] > volumeAllowed)
+        if (volumePerClass_[index_] > volumeAllowed)
         {
             continue;
         }
-        else if (radVolume + volumePerClass_[index] > volumeAllowed)
+        else if (radVolume + volumePerClass_[index_] > volumeAllowed)
         {
-            Mdouble differenceVolumeLow = -(volumePerClass_[index] - volumeAllowed);
-            Mdouble differenceVolumeHigh = radVolume + volumePerClass_[index] - volumeAllowed;
+            Mdouble differenceVolumeLow = -(volumePerClass_[index_] - volumeAllowed);
+            Mdouble differenceVolumeHigh = radVolume + volumePerClass_[index_] - volumeAllowed;
             Mdouble volumeRatio = differenceVolumeLow / differenceVolumeHigh;
             // If volumeRatio > 1 it will insert anyways, because it should be no problem for the distribution
             prob = dist(gen);
             if (prob <= volumeRatio)
             {
-                ++nParticlesPerClass_[index];
-                volumePerClass_[index] += radVolume;
+                ++nParticlesPerClass_[index_];
+                volumePerClass_[index_] += radVolume;
                 return rad;
             }
             else
@@ -192,14 +195,14 @@ Mdouble PSD::insertManuallyByVolume(Mdouble volume)
         }
         else
         {
-            ++nParticlesPerClass_[index];
-            volumePerClass_[index] += radVolume;
+            ++nParticlesPerClass_[index_];
+            volumePerClass_[index_] += radVolume;
             return rad;
         }
+        
     }
     return 0;
 }
-
 
 /*!
  * \details Validates if a distribution is cumulative by first checking if the psd vector is empty and that the
@@ -773,6 +776,25 @@ Mdouble PSD::getVolumetricMeanRadius() const
         mean += it->probability * 0.5 * (cubic(it->radius) + cubic((it - 1)->radius));
     mean = pow(mean, 1. / 3.);
     return mean;
+}
+
+/*!
+ * \details Decrement the nParticlesPerClass_ counter of the last inserted class by 1. This is utilized when a
+ * particle is generated but failed to be placed into an insertionBoundary.
+ */
+void PSD::decrementNParticlesPerClass()
+{
+    --nParticlesPerClass_[index_];
+}
+
+/*!
+ * \details Decrement the volumePerClass_ counter of the last inserted class by the volume of the particle. This is
+ * utilized when a particle is generated but failed to be placed into an insertionBoundary.
+ * \param[in] volume        Volume of the particle which failed to be inserted.
+ */
+void PSD::decrementVolumePerClass(Mdouble volume)
+{
+    volumePerClass_[index_]-= volume;
 }
 
 /*!

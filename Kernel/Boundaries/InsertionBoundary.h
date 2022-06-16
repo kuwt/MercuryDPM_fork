@@ -342,6 +342,11 @@ protected:
      * \brief vector of probabilities in range [0,1] which determine the mixing ratio of partice size distributions.
      */
     std::vector<Mdouble> probability_;
+    
+    /*!
+     * \brief stores the chosen species for each timestep.
+     */
+    int chosenSpecies_;
 
 };
 
