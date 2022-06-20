@@ -50,6 +50,7 @@ InsertionBoundary::InsertionBoundary() : BaseBoundary()
     velMax_ = Vec3D(0.0, 0.0, 0.0);
     particleSizeDistributionVector_.resize(1);
     isManuallyInserting_ = false;
+    chosenSpecies_ = 0;
 }
 
 /*!
@@ -73,6 +74,7 @@ InsertionBoundary::InsertionBoundary(const InsertionBoundary& other)
     velMin_ = other.velMin_;
     velMax_ = other.velMax_;
     isManuallyInserting_ = other.isManuallyInserting_;
+    chosenSpecies_ = other.chosenSpecies_;
 
     for (int i = 0; i < other.particleToCopy_.size(); i++)
     {
@@ -101,12 +103,11 @@ InsertionBoundary::~InsertionBoundary()
 BaseParticle* InsertionBoundary::generateParticle(RNG& random)
 {
     double check = random.getRandomNumber(0, 1);
-    int chosenSpecies = 0;
     for (int i = 0; i < probability_.size(); i++)
     {
         if (check < probability_[i])
         {
-            chosenSpecies = i;
+            chosenSpecies_ = i;
             break;
         }
         else
@@ -114,10 +115,10 @@ BaseParticle* InsertionBoundary::generateParticle(RNG& random)
             check -= probability_[i];
         }
     }
-    BaseParticle* P = particleToCopy_[chosenSpecies]->copy();
-    if (particleSizeDistributionVector_[chosenSpecies].getParticleSizeDistribution().empty())
+    BaseParticle* P = particleToCopy_[chosenSpecies_]->copy();
+    if (particleSizeDistributionVector_[chosenSpecies_].getParticleSizeDistribution().empty())
     {
-        particleSizeDistributionVector_[chosenSpecies].setDistributionUniform(P->getRadius(), P->getRadius(), 50);
+        particleSizeDistributionVector_[chosenSpecies_].setDistributionUniform(P->getRadius(), P->getRadius(), 50);
         logger(INFO, "Assembling a discrete uniform particle size distribution (50 bins) with the radius set for the "
                      "InsertionBoundary.");
     }
@@ -128,13 +129,14 @@ BaseParticle* InsertionBoundary::generateParticle(RNG& random)
         Mdouble radius;
         // getVolumeFlowRate() * time + initialVolume_ - volumeInserted_ lead to more inaccurate results, therfore
         // -volumeInserted was removed.
-        radius = particleSizeDistributionVector_[chosenSpecies].insertManuallyByVolume(getVolumeFlowRate() *
+        radius = particleSizeDistributionVector_[chosenSpecies_].insertManuallyByVolume(getVolumeFlowRate() *
                                                                                        getHandler()->getDPMBase()->getTime() +
                                                                                        initialVolume_);
         P->setRadius(radius);
+        return P;
     }
     Mdouble radius;
-    radius = particleSizeDistributionVector_[chosenSpecies].drawSample();
+    radius = particleSizeDistributionVector_[chosenSpecies_].drawSample();
     P->setRadius(radius);
     return P;
 }
@@ -283,7 +285,7 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
                 //Note: in parallel only one of the domains will actually add the particle
                 auto p = md->particleHandler.copyAndAddObject(p0);
                 failed = 0;
-
+                
                 ++numberOfParticlesInserted_;
                 const double volume = p0->getVolume();
                 volumeInserted_ += volume;
@@ -306,6 +308,11 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
             if (failed > maxFailed_)
             {
                 logger(VERBOSE, "failed too many times; giving up");
+                if (isManuallyInserting_)
+                {
+                    particleSizeDistributionVector_[chosenSpecies_].decrementNParticlesPerClass();
+                    particleSizeDistributionVector_[chosenSpecies_].decrementVolumePerClass(p0->getVolume());
+                }
                 break; // out of the 'placing' loop (and will leave the 'generating' loop too
             }
         }
