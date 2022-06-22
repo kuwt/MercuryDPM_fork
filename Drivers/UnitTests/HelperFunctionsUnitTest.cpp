@@ -92,6 +92,26 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     }
     
     
+    
+    logger(INFO, " Testing removeFromCommandline");
+    char arguments[][20] = { "programname", "-test1", "-test2", "1"};
+    int argcTest = 4;
+    char** argvTest;
+    argvTest = new char*[argcTest];
+    
+    for (unsigned int i=0; i<argcTest; i++)
+    {
+        argvTest[i] = &arguments[i][0];
+    }
+    
+    if (!(helpers::readFromCommandLine(argcTest, argvTest, "-test1") && helpers::removeFromCommandline(argcTest, argvTest, "-test1", 0) && !helpers::readFromCommandLine(argcTest, argvTest, "-test1"))
+        || !(helpers::readFromCommandLine(argcTest, argvTest, "-test2", 2) == 1 && helpers::removeFromCommandline(argcTest, argvTest, "-test2", 1) && helpers::readFromCommandLine(argcTest, argvTest, "-test2", 2) == 2)
+        || argcTest>1 )
+    {
+        logger(ERROR, "helpers::removeFromCommandline not working as expected");
+    }
+    
+    
     logger(VERBOSE, "Running LinearViscoelasticSpecies helper functions unit test");
     Mdouble realStiffness = 2e5;
     Mdouble realDissipation = 25.0;

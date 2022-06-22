@@ -413,6 +413,13 @@ std::vector<T> readVectorFromCommandLine(int argc, char *argv[], std::string var
     template<>
     std::string readFromCommandLine<std::string>(int argc, char* argv[], std::string varName, std::string value);
     
+    /*
+     * \brief Returns the Rayleigh time step for a Hertz contact law.
+     * \param[in]
+     * \returns bool True if the argument was found and removed, false otherwise
+     */
+    bool removeFromCommandline(int& argc, char* argv[], std::string varName, int nArgs);
+    
     void check(double real, double ideal, double error, std::string errorMessage);
     
     void check(Vec3D real, Vec3D ideal, double error, std::string errorMessage);
