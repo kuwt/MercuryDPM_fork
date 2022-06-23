@@ -7,7 +7,7 @@ statFile    fileType ONE_FILE saveCount 1 counter 0
 interactionFile fileType NO_FILE saveCount 0 counter 0
 xMin -1 xMax 1 yMin -1 yMax 5 zMin 0 zMax 2
 timeStep 0.001 time 0.5 ntimeSteps 500 timeMax 0.5
-systemDimensions 3 particleDimensions 3 gravity 0 -9.8 0 writeVTK 0 NO_FILE NO_FILE 0 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267
+systemDimensions 3 particleDimensions 3 gravity 0 -9.8 0 writeVTK 0 NO_FILE NO_FILE 0 0 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267
 Species 1
 LinearViscoelasticSpecies id 0 density 1000 stiffness 66480.4397719024 dissipation 149.552243520995
 Walls 7
