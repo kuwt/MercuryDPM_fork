@@ -42,6 +42,7 @@ void SphericalParticleVtkWriter::writeVTK() const
     writeVTKPositions(file);
     file << "<PointData  Vectors=\"vector\">\n";
     writeVTKVelocity(file);
+    writeVTKAngularVelocity(file);
     writeVTKRadius(file);
     writeVTKIndSpecies(file);
     writeExtraFields(file);
@@ -65,6 +66,24 @@ void SphericalParticleVtkWriter::writeVTKVelocity(std::fstream& file) const
         }
     }
     file << "  </DataArray>\n";
+}
+
+void SphericalParticleVtkWriter::writeVTKAngularVelocity(std::fstream& file) const
+{
+    if (handler_.getDPMBase()->getRotation())
+    {
+        file << "  <DataArray type=\"Float32\" Name=\"AngularVelocity\" NumberOfComponents=\"3\" format=\"ascii\">\n";
+        // Add velocity
+        for (const auto& p: handler_) {
+#ifdef MERCURY_USE_MPI
+            if (particleMustBeWritten(p))
+#endif
+            {
+                file << '\t' << p->getAngularVelocity() << '\n';
+            }
+        }
+        file << "  </DataArray>\n";
+    }
 }
 
 /*!

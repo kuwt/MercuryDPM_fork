@@ -15,6 +15,11 @@
  0.177379 -0.0520928 -0.0124891
  0.0447639 -0.0400479 0.0304677
  0.0316687 -0.0104024 0.0322543
+  </DataArray>  
+  <DataArray type="Float32" Name="AngularVelocity" NumberOfComponents="3" format="ascii">
+	-0.633838 2.40328 15.5674
+	4.10016 1.75502 33.3896
+	-1.0985 -13.3092 35.0279
   </DataArray>
   <DataArray type="Float32" Name="Radius" format="ascii">
 	0.008
