@@ -3440,6 +3440,7 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
     os << " writeVTK " << writeParticlesVTK_
         << " " << writeWallsVTK_
         << " " << interactionHandler.getWriteVTK()
+        << " " << boundaryHandler.getWriteVTK()
         << " " << (vtkWriter_?vtkWriter_->getFileCounter():0)
         << " " << wallVTKWriter_.getFileCounter()
         << " " << interactionVTKWriter_.getFileCounter()
@@ -3633,9 +3634,9 @@ void DPMBase::read(std::istream& is, ReadOptions opt)
             if (!dummy.compare("writeVTK"))
             {
                 FileType writeInteractionsVTK = FileType::NO_FILE;
-                unsigned particlesCounter, wallCounter, interactionCounter;
+                unsigned particlesCounter, wallCounter, interactionCounter, boundaryCounter;
                 bool writeBoundaryVTK;
-                line >> writeParticlesVTK_ >> writeWallsVTK_ >> writeInteractionsVTK >> writeBoundaryVTK >> particlesCounter >> wallCounter >> interactionCounter;
+                line >> writeParticlesVTK_ >> writeWallsVTK_ >> writeInteractionsVTK >> writeBoundaryVTK >> particlesCounter >> wallCounter >> interactionCounter >> boundaryCounter;
                 line.clear();//because the number of arguments  in writeVTK has changed
                 line >> dummy;
                 setParticlesWriteVTK(writeParticlesVTK_);
@@ -3645,7 +3646,7 @@ void DPMBase::read(std::istream& is, ReadOptions opt)
                 vtkWriter_->setFileCounter(particlesCounter);
                 wallVTKWriter_.setFileCounter(particlesCounter);
                 interactionVTKWriter_.setFileCounter(particlesCounter);
-                boundaryVTKWriter_.setFileCounter(particlesCounter);
+                boundaryVTKWriter_.setFileCounter(boundaryCounter);
             }
             if (!dummy.compare("random"))
             {
