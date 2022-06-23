@@ -74,7 +74,7 @@ void InteractionVTKWriter::writeVTKPointData(std::fstream& file) const
         file << '\t' << p->getContactRadius() << '\n';
     }
     file << "  </DataArray>\n";
-    file << "  <DataArray type=\"Float32\" Name=\"Force\" format=\"ascii\">\n";
+    file << "  <DataArray type=\"Float32\" Name=\"Force\" NumberOfComponents=\"3\" format=\"ascii\">\n";
     
     // Add species type
     for (const auto& p: handler_)
@@ -90,7 +90,7 @@ void InteractionVTKWriter::writeVTKPointData(std::fstream& file) const
         file << '\t' << p->getTangentialOverlap() << '\n';
     }
     file << "  </DataArray>\n";
-    file << "  <DataArray type=\"Float32\" Name=\"Torque\" format=\"ascii\">\n";
+    file << "  <DataArray type=\"Float32\" Name=\"Torque\" NumberOfComponents=\"3\" format=\"ascii\">\n";
     
     // Add species type
     for (const auto& p: handler_)
