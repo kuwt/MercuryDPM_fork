@@ -981,6 +981,57 @@ std::string helpers::readFromCommandLine<std::string>(int argc, char *argv[], st
     return value;
 }
 
+/*!
+ * \param[in] argc
+ * \param[in] argv
+ * \param[in] varName The name of the commandline argument to be removed
+ * \param[in] nArgs The number of additional command line arguments to remove
+ *
+ * \returns boolean True if the argument was found and removed
+ * \details This function does hide the desired argument from the supplied argv
+ * argc combination. It does it by moving the specified arguent to the end of the
+ * supplied argv and reducing argc by the coorect number. Other pieces of code that
+ * rely on argc should therefor no longer see the hidden argument.
+ *
+ * If used in comination with readFromCommandLine(...), this function allows handling
+ * of arguments that are not seen by solve(), even if commandline arguments are passed.
+ */
+bool helpers::removeFromCommandline(int& argc, char* argv[], std::string varName, int nArgs)
+{
+    unsigned int i, j;
+    
+    for (i=0; i<argc; ++i) {
+        if (varName == argv[i]) 
+        {
+            char *tmp[nArgs+1];
+            
+            for (j=i; j<argc-1-nArgs; j++)
+            {
+                // Store the pointers of the handled argument
+                if ( j < i + 1 + nArgs)
+                {
+                    tmp[j-i] = argv[j];
+                }
+                
+                // Move the pointers after the argument to the front
+                argv[j] = argv[j + nArgs + 1];
+                
+            }
+            
+            // Move the stored argument to the end
+            for (j=argc-1-nArgs; j< argc; j++)
+            {
+                argv[j] = tmp[j + 1 + nArgs - argc];
+            }
+            argc -= nArgs + 1;
+            
+            return true;
+        }
+    }
+    
+    return false;
+}
+
 bool helpers::createDirectory(std::string path) {
     //see https://stackoverflow.com/questions/20358455/cross-platform-way-to-make-a-directory
     mode_t nMode = 0733; // UNIX style permissions

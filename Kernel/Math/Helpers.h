@@ -413,6 +413,11 @@ std::vector<T> readVectorFromCommandLine(int argc, char *argv[], std::string var
     template<>
     std::string readFromCommandLine<std::string>(int argc, char* argv[], std::string varName, std::string value);
     
+    /*
+     * \brief May be used to hide arguments from argc and argv.
+     */
+    bool removeFromCommandline(int& argc, char* argv[], std::string varName, int nArgs);
+    
     void check(double real, double ideal, double error, std::string errorMessage);
     
     void check(Vec3D real, Vec3D ideal, double error, std::string errorMessage);
