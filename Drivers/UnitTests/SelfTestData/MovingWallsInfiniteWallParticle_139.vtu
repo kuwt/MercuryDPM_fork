@@ -12,6 +12,9 @@
   <DataArray type="Float32" Name="Velocity" NumberOfComponents="3" format="ascii">
 	-0.0488008 0 -0.100885
   </DataArray>
+  <DataArray type="Float32" Name="AngularVelocity" NumberOfComponents="3" format="ascii">
+	0 0.0998802 0
+  </DataArray>
   <DataArray type="Float32" Name="Radius" format="ascii">
 	0.5
   </DataArray>

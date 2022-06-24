@@ -55,6 +55,7 @@ public:
 
 private:
     void writeVTKVelocity(std::fstream& file) const;
+    void writeVTKAngularVelocity(std::fstream& file) const;
     
     void writeVTKRadius(std::fstream& file) const;
 };
