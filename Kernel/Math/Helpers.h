@@ -414,9 +414,7 @@ std::vector<T> readVectorFromCommandLine(int argc, char *argv[], std::string var
     std::string readFromCommandLine<std::string>(int argc, char* argv[], std::string varName, std::string value);
     
     /*
-     * \brief Returns the Rayleigh time step for a Hertz contact law.
-     * \param[in]
-     * \returns bool True if the argument was found and removed, false otherwise
+     * \brief May be used to hide arguments from argc and argv.
      */
     bool removeFromCommandline(int& argc, char* argv[], std::string varName, int nArgs);
     
