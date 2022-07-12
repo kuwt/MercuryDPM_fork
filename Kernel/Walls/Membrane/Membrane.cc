@@ -160,21 +160,15 @@ void Membrane::read(std::istream& is)
         for (unsigned int i=0; i<8; i++){
             is >> dummy >> e.uPre[i];
         }
-        
+
         // initial state
         is >> dummy >> e.initialState;
         is >> dummy >> e.initialLength;
-        
-        if (!e.face[0] || !e.face[1])
-        {
-            is >> dummy >> dummy;
-        }
-        else
-        {
-            is >> dummy >> e.initialSineHalfTheta;
-        }
+
+        is >> dummy >> e.initialSineHalfTheta;
+
         is >> dummy >> e.effectiveMass;
-        
+
         e.checkActive();
         edge_.push_back(e);
     }
@@ -196,8 +190,6 @@ void Membrane::read(std::istream& is)
     membraneSpecies_ = getDPMBase()->speciesHandler.getObjectById(Id);
     is >> dummy >> Id;
     membraneParticleSpecies_ = getDPMBase()->speciesHandler.getObjectById(Id);
-
-    updateFaceNeighbors();
     
     for (auto& e: edge_)
     {
@@ -217,9 +209,10 @@ void Membrane::write(std::ostream& os) const
     for (unsigned int i: vertexParticleId_)
     {
         os << " " << i;
-    }    
+    }
+    
     os << " vertexInitId_ " << vertexInitId_;
-
+    os << "\n";
 
     // Write out the face-wall Ids
     os << " face " << face_.size();
@@ -227,6 +220,7 @@ void Membrane::write(std::ostream& os) const
     {
         os << " " << f->getId();
     }
+    os << "\n";
 
     // Write out edge information
     os << " edge " << edge_.size();
@@ -261,6 +255,7 @@ void Membrane::write(std::ostream& os) const
         os << " initDist " << e.initialLength;
         os << " initialSineHalfTheta " << e.initialSineHalfTheta;
         os << " effectiveMass " << e.effectiveMass;
+        os << "\n";
     }
 
     // Write out general properties
@@ -798,6 +793,7 @@ void Membrane::updateFaceNeighbors()
 
     for (i =0 ; i<face_.size(); i++)
     {
+        face_[i]->vertexNeighbors = std::vector<std::vector<unsigned int>>();
         for (j=0; j<3; j++)
         {
             face_[i]->neighbor[j] = nullptr;
@@ -1064,6 +1060,24 @@ void Membrane::handleParticleAddition(unsigned int id, BaseParticle* p)
             }
         }
     }
+}
+
+/*!
+ * \returns volume The enclosed volume of the membrane
+ * \details This function computes the current volume enclosed by the membrane.
+ * Note: This function uses the Divergence theorem to integrate along the surface. 
+ * The volume is therefore only accurate, if the surface is closed.
+ */
+Mdouble Membrane::getVolume()
+{
+    Mdouble volume = 0;
+
+    for (auto f: face_)
+    {
+        volume += Vec3D::dot(f->getPosition(), f->getFaceNormal()) * f->getArea();
+    }
+    
+    return volume/3;
 }
 
 //////////////////////////////////////////////////////////////////////////////

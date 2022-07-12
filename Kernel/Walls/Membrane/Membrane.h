@@ -381,7 +381,12 @@ public:
      * \brief Handles the addition of vertex particles to the particle handler
      */
     void handleParticleAddition(unsigned int id, BaseParticle* p);
-    
+
+    /*!
+     * \brief Calculate the volume of the membrane
+     */
+    Mdouble getVolume();
+
 private:
     
     /*!
