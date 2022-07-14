@@ -92,7 +92,7 @@ where the prefactor \f$c\f$ is chosen such that \f$\int \phi(\vec r) d\vec r = 1
 
 Next, the momentum at a given position is defined as the sum over all particle
 moments weighted by the distance to the position:
-\f[\vec j(\vec r)=\sum_i m_i \phi(\vec r,\vec r_i),\f]
+\f[\vec j(\vec r)=\sum_i m_i v_i \phi(\vec r,\vec r_i),\f]
 Thus, the velocity is defined as
 \f[\vec V(\vec r) = \frac{\vec j(\vec r,t)}{\rho(\vec r)}.\f]
 
@@ -108,8 +108,8 @@ sum of the *contact stress* and the *kinetic stress*,
 
 The kinetic stress can be calculated from momentum
 flux and density as
-\f[\mathbf \sigma^{k} = \mathbf k - \rho \vec V \otimes  \vec V,\f]
-where the momentum density is defined as the sum over all particles i
+\f[\mathbf \sigma^{k} = - \mathbf k - \rho \vec V \otimes  \vec V,\f]
+where the momentum flux is defined as the sum over all particles i
 \f[\mathbf k(\vec r,t)=\sum_i m_i \vec v_i \otimes \vec v_i\phi(\vec r,\vec r_i),\f]
 with particle momentum flux  \f$m_i\vec v_i \otimes \vec v_i\f$ and kernel function
 \f$\phi(\vec r,\vec r_i)\f$.
