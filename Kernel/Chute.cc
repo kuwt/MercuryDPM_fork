@@ -382,7 +382,7 @@ void Chute::createBottom()
             //bottom wall, to make sure no particles will fall through the gaps
             InfiniteWall w0;
             w0.setSpecies(speciesHandler.getObject(0));
-            w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0, 0, getZMin() - dx));
+            w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0, 0, getZMin() - dx)); // todo [?] why zmin-dx?
             wallHandler.copyAndAddObject(w0);
         }
         else if (roughBottomType_ == MONOLAYER_DISORDERED)
@@ -426,6 +426,51 @@ void Chute::createBottom()
             w0.setSpecies(speciesHandler.getObject(0));
             w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0, 0, getZMin() - .5 * F0.getRadius()));
             wallHandler.copyAndAddObject(w0);
+        }
+        else if (roughBottomType_ == MONOLAYER_TRIANGULAR)
+        {
+            // fixed-particle bottom with triangular packing (given size and spacing)
+            logger(INFO,"[Chute::createBottom()] create monolayered, ordered rough chute bottom with triangular packing");
+
+            // allowed space for each particle in each direction
+            Mdouble dx = (1 + getFixedParticleSpacing()) * 2.0 * F0.getRadius();
+            Mdouble dy = sqrt(1 + getFixedParticleSpacing()) * 2.0 * F0.getRadius();
+
+            // number of particles that fit in each direction
+            unsigned int nx = static_cast<unsigned int>(std::max(1, static_cast<int>(std::floor((getXMax() - getXMin()) / dx)))) + 1;
+            unsigned int ny = static_cast<unsigned int>(std::max(1, static_cast<int>(std::floor((getYMax() - getYMin()) / dy)))) + 1;
+
+            Mdouble x1, x2, y1, y2;
+
+            for (unsigned int i = 0; i < nx; i++)
+            {
+                for (unsigned int j = 0; j < ny; j++)
+                {
+                    x1 = F0.getRadius() + dx * i;
+                    x2 = x1 + dx/2;
+                    y1 = F0.getRadius() + dy * i;
+                    y2 = y1 + dy/2;
+
+                    // placing of particles on triangular grid points
+                    if (x1 < getXMax() && y1 < getYMax())
+                    {
+                        F0.setPosition(Vec3D(x1, y1, 0.0));
+                        particleHandler.copyAndAddObject(F0);
+                    }
+                    if (x2 < getXMax() && y2 < getYMax())
+                    {
+                        F0.setPosition(Vec3D(x2, y2, 0.0));
+                        particleHandler.copyAndAddObject(F0);
+                    }
+                }
+            }
+
+            //bottom wall, to make sure no particles will fall through the gaps
+            InfiniteWall w0;
+            w0.setSpecies(speciesHandler.getObject(0));
+            w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0, 0, -F0.getRadius()));
+            wallHandler.copyAndAddObject(w0);
+
         }
         else //if (roughBottomType_ == MULTILAYER)
         {
@@ -626,6 +671,34 @@ void Chute::setFixedParticleRadius(Mdouble fixedParticleRadius)
 Mdouble Chute::getFixedParticleRadius() const
 {
     return fixedParticleRadius_;
+}
+
+/*!
+ * \details Sets the spacing of the fixed particles at the bottom (used in triangular packing only),
+ * which is defined as: spacing = particle center-center distance / particle diameter - 1 (Jing PRE 2016).
+ * \param[in] fixedParticleSpacing  The spacing of the fixed particles on the
+ *                                  bottom as an MDouble.
+ */
+void Chute::setFixedParticleSpacing(Mdouble fixedParticleSpacing)
+{
+    if (fixedParticleSpacing >= 0.0)
+    {
+        fixedParticleSpacing_ = fixedParticleSpacing;
+    }
+    else
+    {
+        logger(WARN, "[Chute::setFixedParticleSpacing()] Fixed particle spacing "
+                     "must be greater than or equal to zero.");
+    }
+}
+
+/*!
+ * \details Returns the spacing of the fixed particles at the bottom (used in triangular packing only).
+ * \return The spacing of the fixed particles.
+ */
+Mdouble Chute::getFixedParticleSpacing() const
+{
+    return fixedParticleSpacing_;
 }
 
 /*!
