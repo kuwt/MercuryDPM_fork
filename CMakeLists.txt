@@ -90,7 +90,7 @@ configure_file(Configuration/CMakeDefinitions.h
 #This section is about the build of documentation#
 ##################################################
 
-option(Mercury_BUILD_USER_DIR "Compile USER DIR in testing" OFF)
+option(Mercury_BUILD_USER_DIR "Compile USER DIR in testing" ON)
 
 
 
