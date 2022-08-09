@@ -50,7 +50,7 @@ class InsertionBoundary;
  */
 enum RoughBottomType
 {
-    MONOLAYER_ORDERED, MONOLAYER_DISORDERED, MULTILAYER, FLAT
+    MONOLAYER_ORDERED, MONOLAYER_DISORDERED, MULTILAYER, FLAT, MONOLAYER_TRIANGULAR
 };
 
 /*!
@@ -144,7 +144,19 @@ public:
      * (rough) chute bottom
      */
     Mdouble getFixedParticleRadius() const;
-    
+
+    /*!
+     * \brief Sets the spacing of the fixed particles which constitute the
+     * (rough) chute bottom; used in triangular packing only
+     */
+    void setFixedParticleSpacing(Mdouble fixedParticleSpacing);
+
+    /*!
+     * \brief Returns the particle radius of the fixed particles which constitute the
+     * (rough) chute bottom; used in triangular packing only
+     */
+    Mdouble getFixedParticleSpacing() const;
+
     /*!
      * \brief Sets the type of rough bottom of the chute
      */
@@ -320,6 +332,10 @@ private:
      * \brief radius of the fixed particles at the bottom
      */
     Mdouble fixedParticleRadius_;
+    /*!
+     * \brief spacing of the fixed particles at the bottom (center distance / diameter - 1)
+     */
+    Mdouble fixedParticleSpacing_;
     /*!
      * \brief minimal radius of inflowing particles
      */
