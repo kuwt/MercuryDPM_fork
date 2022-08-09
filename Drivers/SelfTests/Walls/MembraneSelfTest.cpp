@@ -25,6 +25,7 @@
 #include <Mercury3D.h>
 #include <Species/HertzianViscoelasticMindlinSpecies.h>
 #include <Walls/Membrane/Membrane.h>
+#include <CMakeDefinitions.h>
 
 #include <climits>
 
@@ -139,7 +140,7 @@ public:
         p0.setSpecies(membraneParticleSpecies_);
         p0.setRadius(membrane.getParticleRadius());
         p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
-        membrane.loadFromSTL(p0, "MembraneSelfTest.stl");
+        membrane.loadFromSTL(p0, getMercurySourceDir() + "/Drivers/SelfTests/Walls/MembraneSelfTest.stl");
                     
         fixMembraneEdges();
     }

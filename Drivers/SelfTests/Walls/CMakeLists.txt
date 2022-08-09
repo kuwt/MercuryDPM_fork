@@ -18,4 +18,4 @@ endforeach()
 #Copy specific files to your build directory
 #file(COPY ${CMAKE_SOURCE_DIR}/Drivers/MercurySimpleDemos/TriangulatedWall.vtk DESTINATION .)
 
-file(COPY Screw.stl Casing.stl MembraneSelfTest.stl DESTINATION .)
+file(COPY Screw.stl Casing.stl DESTINATION .)
