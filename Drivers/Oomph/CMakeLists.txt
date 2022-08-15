@@ -1,0 +1,12 @@
+if(NOT OOMPH_COUPLING)
+  #message(STATUS "Coupling with oomph-lib is disabled")
+  return()
+endif()
+
+FILE(GLOB ALL_FILES *)
+FOREACH(FILE ${ALL_FILES})
+  IF(EXISTS "${FILE}/CMakeLists.txt")
+    #MESSAGE(STATUS "add_sub(${FILE})")
+    add_subdirectory(${FILE})
+  ENDIF()
+ENDFOREACH()

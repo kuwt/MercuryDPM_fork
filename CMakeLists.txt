@@ -104,7 +104,7 @@ configure_file(Configuration/fpdiff.py
 #find_program(PYTHON_EXEC "python" 
 #	DOC "Location of python executable to use")
 
-# Clone oomph-lib if if has not been cloned before
-if(NOT EXISTS ${PROJECT_SOURCE_DIR}/oomph-lib)
-	execute_process(COMMAND git clone https://github.com/oomph-lib/oomph-lib.git ${PROJECT_SOURCE_DIR}/oomph-lib)
-endif()
+# Determine whether to couple MercuryDPM with oomph-lib or not
+option(OOMPH_COUPLING "Couple MercuryDPM with oomph-lib" OFF)
+# Couple with oomph-lib if OOMPH_COUPLING is on
+include(CMakeModules/OomphCoupling.cmake)
