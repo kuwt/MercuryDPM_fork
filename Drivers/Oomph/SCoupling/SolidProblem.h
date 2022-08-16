@@ -100,9 +100,11 @@ protected:
 
 public:
 
-    /// Empty constructor:
+    /// Constructor: set default constitutive law and time stepper
     SolidProblem()
     {
+        logger(INFO, "Set default constitutive law (GeneralisedHookean) and time stepper (Newmark<2>)");
+
         // Set Newton solver tolerance and maximum number of Newton iterations
         Max_newton_iterations = constants::unsignedMax;
         Newton_solver_tolerance = 1e-10;
@@ -151,6 +153,7 @@ public:
     /// set function for body_force_pt
     void setBodyForceAsGravity()
     {
+        logger(INFO, "Setting gravity in z-direction");
         // define a static body force
         static double& Density = density_;
         body_force_fct = [](const double& time, const Vector<double>& xi, Vector<double>& b) {
@@ -169,6 +172,7 @@ public:
 
     // set is_pinned such that a certain boundary is pinned
     void pinBoundary(unsigned b) {
+        logger(INFO, "Pinning nodes on boundary %", b);
         isPinned_ = [b](SolidNode *n, unsigned d) {
             return n->is_on_boundary(b);
         };
@@ -253,6 +257,7 @@ public:
         logger.assert_always(solid_mesh_pt(), "Set solid mesh via e.g. setSolidCubicMesh(..)");
 
         // Assign constitutive_law_pt and body_force_fct_pt of each element
+        logger(INFO, "Assign constitutive_law, body_force, density to all elements");
         for (unsigned i = 0; i < solid_mesh_pt()->nelement(); i++)
         {
             //Cast to a solid element
@@ -329,6 +334,18 @@ public:
         logger(INFO, "Pinned % of % positions (% free): % in x, % in y, % in z", countPinnedAll, countAll, countAll - countPinnedAll, countPinned[0], countPinned[1], countPinned[2]);
     }
 
+    /**
+     * Solves a steady problem.
+     */
+    void solveSteady()
+    {
+        logger.assert_always(mesh_pt(), "Mesh pointer not set; did you call prepareForSolve?");
+        logger(INFO, "Solve steady-state problem");
+        newton_solve();
+        writeToVTK();
+        saveSolidMesh();
+    }
+
     virtual void actionsBeforeOomphTimeStep() {}
 
     /**
@@ -336,6 +353,8 @@ public:
      */
     void solveUnsteady(double timeMax, double dt, unsigned saveCount = 10)
     {
+        logger.assert_always(mesh_pt(), "Mesh pointer not set; did you call prepareForSolve?");
+
         std::cout << "Solving oomph with dt=" << dt << " until timeMax=" << timeMax << std::endl;
 
         // Setup initial conditions. Default is a non-impulsive start
@@ -366,16 +385,6 @@ public:
                 break;
             }
         }
-        saveSolidMesh();
-    }
-
-    /**
-     * Solves a steady problem.
-     */
-    void solveSteady()
-    {
-        newton_solve();
-        writeToVTK();
         saveSolidMesh();
     }
 

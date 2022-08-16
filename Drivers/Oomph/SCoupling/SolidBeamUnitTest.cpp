@@ -24,9 +24,10 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "SolidProblem.h"
+#include "Math/Helpers.h"
 
 /// Defines a SolidProblem of element type RefineableQDPVDElement<3,2>.
-class SolidBeam : public SolidProblem<RefineableQDPVDElement<3, 2>>
+class Beam : public SolidProblem<RefineableQDPVDElement<3, 2>>
 {
 public:
     /**
@@ -35,11 +36,15 @@ public:
      */
     void checkBeamDeflection()
     {
-        
         std::array<double,3> min;
         std::array<double,3> max;
         getDomainSize(min, max);
-        
+
+        double length = max[0]-min[0];
+        double height = max[2]-min[2];
+        logger(INFO, "Deflection should be -3*rho*g*L^4/(2*E*h^2) = % (in practice: %)",
+               -3. * 9.8 * density_ * pow(length, 4) / ( 2. * elasticModulus_ * pow(height, 2) ), -0.00131642);
+
         Vector<double> xi(3);
         xi[0] = max[0];
         xi[1] = 0.5*(max[1]+min[1]);
@@ -47,11 +52,8 @@ public:
         double deflection = getDeflection(xi,2);
         logger(INFO, "Beam deflection at right end (% % %) is %",
                xi[0], xi[1],xi[2], deflection);
-        
-        double length = max[0]-min[0];
-        double height = max[2]-min[2];
-        logger(INFO, "Deflection should be -3*rho*g*L^4/(2*E*h^2) = % (in practice: %)",
-               -3. * 9.8 * density_ * pow(length, 4) / ( 2. * elasticModulus_ * pow(height, 2) ), -0.00131642);
+
+        helpers::check(deflection,-0.00131642,1e-8,"Checking deflection");
     }
 };
 
@@ -61,15 +63,17 @@ public:
 int main()
 {
     // Solve the problem
-    SolidBeam problem;
-    problem.setName("SolidBeam");
+    Beam problem;
+    problem.setName("SolidBeamUnitTest");
     problem.setElasticModulus(1e8);
     problem.setDensity(2500);
     problem.setSolidCubicMesh(20, 2, 2, 0, 0.2, 0, 0.02, 0, 0.02);
-    problem.pinBoundary(SolidBeam::Boundary::X_MIN);
+    problem.pinBoundary(Beam::Boundary::X_MIN);
     problem.setBodyForceAsGravity();
     problem.setNewtonSolverTolerance(3e-8);
     problem.prepareForSolve();
+    problem.linear_solver_pt()->disable_doc_time();
+    //problem.disable_info_in_newton_solve();
     problem.solveSteady();
     problem.checkBeamDeflection();
     return 0;
