@@ -52,19 +52,24 @@
 using namespace oomph;
 
 /**
- * Base class for many solid problems. One can modify the problem by overriding
- * set*Force, setIsPinned, etc.
+ * Base class for (surface-coupled) problems with a solid body.
+ *
+ * Assumptions:
+ *  - The element type is derived from QPVDElement, i.e. a solid.
+ *  - The mesh type is derived from SolidMesh.
+ *  - The constitutive law is derived from Hookean, with parameters elasticModulus, poissonRatio, density.
+ *
+ * The solid properties (elasticModulus, poissonRatio, density, constitutive_law_pt, body_force_fct, etc.) are stored in member variables, not in globals as typical in oomph-lib, and accessed by setters and getters.
+ *
+ * Additional functionality:
+ * - setIsPinned allows one to define the pinned nodes using a function.
  */
-//template<class ELEMENT>
+template<class ELEMENT>
 class SolidProblem : public Problem
 {
 protected:
     //define element type (should be done by template)
-    typedef SurfaceCoupledElement<RefineableQDPVDElement<3, 2>> ELEMENT;
-    //typedef SurfaceCoupledElement<TPVDElement<3, 2>> ELEMENT;
-
-    //define timestepper type, as SurfaceCoupling.h needs to know
-    typedef Newmark<2> TIMESTEPPER;
+    //typedef QPVDElement<3, 2> ELEMENT;
 
     // name of output files (user-defined)
     std::string name_;
@@ -78,9 +83,11 @@ protected:
     /// Density
     double density_ = 0;
 
-    /// Pointer to constitutive law
-    ConstitutiveLaw* constitutive_law_pt = new AnisotropicHookean(
-        &poissonRatio_, &elasticModulus_);
+    /// Pointer to the body force function
+    void (* body_force_fct)(const double& time, const Vector<double>& xi, Vector<double>& b) = nullptr;
+
+    /// Pointer to constitutive law (should be set in constructor)
+    ConstitutiveLaw* constitutive_law_pt  = nullptr;
 
     /// Pointer to solid mesh
     SolidMesh* Solid_mesh_pt = nullptr;
@@ -88,10 +95,8 @@ protected:
     /// Pointer to mesh of traction elements
     SolidMesh* Traction_mesh_pt = nullptr;
 
-    /// Function to determine which position on which nodes are pinned
+    /// Function to determine which nodal positions are pinned
     std::function<bool(SolidNode*, unsigned)> isPinned_;
-
-    void (* body_force_fct)(const double& time, const Vector<double>& xi, Vector<double>& b) = nullptr;
 
 public:
 
@@ -99,12 +104,15 @@ public:
     SolidProblem()
     {
         // Set Newton solver tolerance and maximum number of Newton iterations
-        Max_newton_iterations = 1000;
+        Max_newton_iterations = constants::unsignedMax;
         Newton_solver_tolerance = 1e-10;
         Max_residuals = constants::inf;
 
+        // Set constitutive law
+        constitutive_law_pt = new GeneralisedHookean(&poissonRatio_, &elasticModulus_);
+
         // Allocate the timestepper
-        add_time_stepper_pt(new TIMESTEPPER());
+        add_time_stepper_pt(new Newmark<2>);
 
         //build_mesh();
 
@@ -112,57 +120,104 @@ public:
         //pin_and_assign_eqn_numbers();
     };
 
-    /// Set functions
+    /// set function for name_
     void setName(const std::string& name)
     {
         name_ = name;
         logger(INFO, "Name: %", name_);
     }
 
+    /// set function for elasticModulus_
     void setElasticModulus(double elasticModulus)
     {
         elasticModulus_ = elasticModulus;
         logger(INFO, "Elastic Modulus: %", elasticModulus_);
     }
 
+    /// set function for poissonRatio_
     void setPoissonRatio(double poissonRatio)
     {
         poissonRatio_ = poissonRatio;
         logger(INFO, "Poisson Ratio: %", poissonRatio_);
     }
 
+    /// set function for density_
     void setDensity(double density)
     {
         density_ = density;
         logger(INFO, "Density: %", density_);
     }
 
+    /// set function for body_force_pt
+    void setBodyForceAsGravity()
+    {
+        // define a static body force
+        static double& Density = density_;
+        body_force_fct = [](const double& time, const Vector<double>& xi, Vector<double>& b) {
+            b[0] = 0.0;
+            b[1] = 0.0;
+            b[2] = -9.8 * Density;
+        };
+    }
+
+    /// set function for isPinned_
     void setIsPinned(std::function<bool(SolidNode*, unsigned)> isPinned)
     {
         isPinned_ = std::move(isPinned);
         logger(INFO, "Setting which positions on which nodes are pinned");
     }
 
-    // add dissipation
-    void addDissipation(double dissipation)
+    // set is_pinned such that a certain boundary is pinned
+    void pinBoundary(unsigned b) {
+        isPinned_ = [b](SolidNode *n, unsigned d) {
+            return n->is_on_boundary(b);
+        };
+    }
+
+    /// Sets the dissipation coefficient for all elements.
+    std::enable_if<std::is_base_of<RefineableQDPVDElement<3,2>, ELEMENT>::value, void> setDissipation(double dissipation)
     {
         logger(INFO,"Adding dissipation %",dissipation);
         for (int i = 0; i < solid_mesh_pt()->nelement(); ++i)
         {
-            dynamic_cast<ELEMENT*>(solid_mesh_pt()->element_pt(i))->dissipation_ = dissipation;
+            dynamic_cast<RefineableQDPVDElement<3,2>*>(solid_mesh_pt()->element_pt(i))->setDissipation(dissipation);
         }
     }
 
-    void addAnisotropy(double Ex, double Ey, double Ez)
+    /// set function for Newton_solver_tolerance
+    void setNewtonSolverTolerance(double Newton_solver_tolerance)
     {
-        logger(INFO,"Adding anisotropy E = [% % %]",Ex, Ey, Ez);
-        // make constitutive law anisotropic in x-direction
-        elasticModulus_ = Ex;
-        auto hooke_law_pt = dynamic_cast<AnisotropicHookean*>(constitutive_law_pt);
-        hooke_law_pt->anisotropy[1] = Ey / Ex;
-        hooke_law_pt->anisotropy[2] = Ez / Ex;
+        this->Newton_solver_tolerance = Newton_solver_tolerance;
     }
 
+    /// set function for Max_newton_iterations
+    void setMaxNewtonIterations(unsigned Max_newton_iterations)
+    {
+        this->Max_newton_iterations = Max_newton_iterations;
+    }
+
+    /// set function for time step
+    void setOomphTimeStep(double dt) {
+        time_pt()->initialise_dt(dt);
+    }
+
+    /// get function for time step
+    double getOomphTimeStep () const {
+        return time_pt()->dt();
+    }
+
+    /// get function for current time
+    double getOomphTime () const {
+        return time_pt()->time();
+    }
+
+    /// Get function for the solid mesh pointer
+    SolidMesh*& solid_mesh_pt() { return Solid_mesh_pt; }
+
+    /// Get function for the traction mesh pointer
+    SolidMesh*& traction_mesh_pt() { return Traction_mesh_pt; }
+
+    /// Computes the domain size (min/max of the nodal positions in x/y/z)
     void getDomainSize(std::array<double, 3>& min, std::array<double, 3>& max)
     {
         min[0] = min[1] = min[2] = constants::inf;
@@ -179,94 +234,16 @@ public:
         }
     }
 
-    // Simple cubic mesh upgraded to become a solid mesh
-    class SolidCubicMesh : public virtual RefineableSimpleCubicMesh<ELEMENT>, public virtual SolidMesh
-    {
-    public:
-        /// \short Constructor:
-        // nx, ny, nz: number of elements in the x, y, and z directions
-        // xMax, yMax, zMax: dimensions of the cube (assume the center of the cube is at the origin)
-        // timeStepper: defaults to Steady.
-        SolidCubicMesh(const unsigned& nx, const unsigned& ny, const unsigned& nz,
-                       const double& xMin, const double& xMax, const double& yMin,
-                       const double& yMax, const double& zMin, const double& zMax,
-                       TimeStepper* time_stepper_pt) :
-            SimpleCubicMesh<ELEMENT>(nx, ny, nz, xMin, xMax, yMin, yMax, zMin, zMax, time_stepper_pt),
-            RefineableSimpleCubicMesh<ELEMENT>(nx, ny, nz, xMin, xMax, yMin, yMax, zMin, zMax, time_stepper_pt),
-            SolidMesh()
-        {
-            //Assign the initial lagrangian coordinates
-            set_lagrangian_nodal_coordinates();
-        }
-    };
-
-    class SolidTetgenMesh : public virtual TetgenMesh<ELEMENT>, public virtual SolidMesh
-    {
-    public:
-
-        /// \short Constructor:
-        // nx, ny, nz: number of elements in the x, y, and z directions
-        // xMax, yMax, zMax: dimensions of the cube (assume the center of the cube is at the origin)
-        // timeStepper: defaults to Steady.
-        SolidTetgenMesh(const std::string& file_name, TimeStepper* time_stepper_pt) :
-            TetgenMesh<ELEMENT>(file_name + ".node", file_name + ".ele", file_name + ".face", time_stepper_pt),
-            SolidMesh()
-        {
-            //Assign the initial lagrangian coordinates
-            set_lagrangian_nodal_coordinates();
-        }
-    };
-
-    void setSolidTetgenMesh(const std::string& fileName)
-    {
-        if (!useTetgen())
-        {
-            logger(ERROR, "This kind of mesh requires a TElement. Use setSolidCubicMesh() for setting a quad mesh");
-        }
-
-        // Create mesh
-        logger(INFO, "Read in mesh");
-        solid_mesh_pt() = new SolidTetgenMesh(fileName, time_stepper_pt());
-        logger(INFO, "Read mesh with % nodes, % elements, % boundaries",
-               solid_mesh_pt()->nnode(), solid_mesh_pt()->nelement(), solid_mesh_pt()->nboundary());
-    }
-
-    void setSolidCubicMesh(const unsigned& nx, const unsigned& ny, const unsigned& nz,
-                           const double& xMin, const double& xMax, const double& yMin,
-                           const double& yMax, const double& zMin, const double& zMax)
-    {
-        if (useTetgen())
-        {
-            logger(ERROR, "This kind of mesh requires a QElement. Use setTetgenMesh() for importing a tetgen mesh");
-        }
-
-        // Create mesh
-        solid_mesh_pt() = new SolidCubicMesh(nx, ny, nz, xMin, xMax, yMin, yMax, zMin, zMax, time_stepper_pt());
-
-        // Assign physical properties to the elements before any refinement
-        for (unsigned i = 0; i < solid_mesh_pt()->nelement(); i++)
-        {
-            //Cast to a solid element
-            ELEMENT* el_pt = dynamic_cast<ELEMENT*>(solid_mesh_pt()->element_pt(i));
-            // Set the constitutive law
-            el_pt->constitutive_law_pt() = constitutive_law_pt;
-        }
-        logger(INFO, "Created %x%x% cubic mesh on domain [%,%]x[%,%]x[%,%]",
-               nx, ny, nz, xMin, xMax, yMin, yMax, zMin, zMax);
-
-    }
-
-    void setGravityAsBodyForce()
-    {
-        // define a static body force
-        static double& Density = density_;
-        body_force_fct = [](const double& time, const Vector<double>& xi, Vector<double>& b) {
-            b[0] = 0.0;
-            b[1] = 0.0;
-            b[2] = -9.8 * Density;
-        };
-    }
-
+    /**
+     * - Asserts all parameters are set
+     * - Assign pointers for all elements
+     * - Builds global mesh
+     * - Pins nodes
+     * - Pins solid pressure
+     * - Assigns equation numbers
+     *
+     * This function should be called before solve(), after creating the mesh, defining body force and constitutive law.
+     */
     void prepareForSolve()
     {
         // check certain values are set
@@ -275,39 +252,34 @@ public:
         logger.assert_always(density_>0, "Set density via setDensity(..)");
         logger.assert_always(solid_mesh_pt(), "Set solid mesh via e.g. setSolidCubicMesh(..)");
 
-        // Assign physical properties to the elements before any refinement
-        if (body_force_fct)
+        // Assign constitutive_law_pt and body_force_fct_pt of each element
+        for (unsigned i = 0; i < solid_mesh_pt()->nelement(); i++)
         {
-            for (unsigned i = 0; i < solid_mesh_pt()->nelement(); i++)
-            {
-                //Cast to a solid element
-                ELEMENT* el_pt = dynamic_cast<ELEMENT*>(solid_mesh_pt()->element_pt(i));
-                // Set the constitutive law
-                el_pt->body_force_fct_pt() = body_force_fct;
-            }
-            Vector<double> xi(3);
-            Vector<double> b(3);
-            body_force_fct(0, xi, b);
-            logger(INFO, "Set body force to % % %", b[0], b[1], b[2]);
+            //Cast to a solid element
+            ELEMENT* el_pt = dynamic_cast<ELEMENT*>(solid_mesh_pt()->element_pt(i));
+            // Set the constitutive law
+            el_pt->constitutive_law_pt() = constitutive_law_pt;
+            // Set body force
+            el_pt->body_force_fct_pt() = body_force_fct;
+            // Set density
+            el_pt->lambda_sq_pt() = &density_;
         }
 
         // Construct the traction element mesh
-        //Traction_mesh_pt = new SolidMesh;
-        //create_traction_elements();
+        // Traction_mesh_pt = new SolidMesh;
+        // create_traction_elements();
 
-        // Build combined "global" mesh
+        //Build combined "global" mesh
         add_sub_mesh(solid_mesh_pt());
-        if (traction_mesh_pt())
-        {
+        if (traction_mesh_pt()) {
             add_sub_mesh(traction_mesh_pt());
             logger(INFO, "Built global mesh from solid mesh and traction mesh");
-        }
-        else
-        {
+        } else {
             logger(INFO, "Built global mesh from solid mesh");
         }
         build_global_mesh();
 
+        //Pin nodes
         if (isPinned_)
         {
             for ( unsigned n = 0; n < solid_mesh_pt()->nnode(); n++ )
@@ -339,6 +311,7 @@ public:
         logger(INFO, "Assigned % equation numbers", n_eq);
     }
 
+    /// returns statistics about pinned nodes to the console
     void countPinned()
     {
         // count pinned
@@ -356,23 +329,22 @@ public:
         logger(INFO, "Pinned % of % positions (% free): % in x, % in y, % in z", countPinnedAll, countAll, countAll - countPinnedAll, countPinned[0], countPinned[1], countPinned[2]);
     }
 
+    virtual void actionsBeforeOomphTimeStep() {}
+
     /**
      * Solves an unsteady problem.
-     * \param timeMax (dimensional)
-     * \param dt (dimensional)
-     * \param saveCount
      */
     void solveUnsteady(double timeMax, double dt, unsigned saveCount = 10)
     {
         std::cout << "Solving oomph with dt=" << dt << " until timeMax=" << timeMax << std::endl;
 
-        // Setup initial conditions
-        set_initial_conditions(dt);
+        // Setup initial conditions. Default is a non-impulsive start
+        assign_initial_values_impulsive(dt);
 
         // This is the main loop over advancing time
         double& time = time_stepper_pt()->time();
         unsigned count = 0;
-        unsigned countMax = std::ceil(timeMax/dt);
+        const unsigned countMax = std::ceil(timeMax/dt);
         while (time < timeMax)
         {
             logger(INFO, "Time %s of %s (% of %)",
@@ -382,66 +354,34 @@ public:
             actionsBeforeOomphTimeStep();
             // solve the oomphProb for one time step (this also increments time)
             unsteady_newton_solve(dt);
+            // increase count
+            count++;
             // write outputs of the oomphProb
-            if (count++ % saveCount == 0 or time + dt > timeMax)
-            {
+            if (count % saveCount == 0 or time + dt > timeMax) {
                 writeToVTK();
             }
+            // abort if problem
             if (Max_res.back()==0) {
                 logger(WARN,"Maximum residual is 0; aborting time loop");
                 break;
             }
         }
-        saveSolidCubicMesh();
+        saveSolidMesh();
     }
 
+    /**
+     * Solves a steady problem.
+     */
     void solveSteady()
     {
-        //prepareForSolve();
         newton_solve();
         writeToVTK();
-        saveSolidCubicMesh();
+        saveSolidMesh();
     }
 
-    virtual void actionsBeforeOomphTimeStep() {}
-
-    enum Boundary : int
-    {
-        Z_MIN = 0, Y_MIN = 1, X_MAX = 2, Y_MAX = 3, X_MIN = 4, Z_MAX = 5
-    };
-
-    /// Access function for the solid mesh pointer
-    SolidMesh*& solid_mesh_pt() { return Solid_mesh_pt; }
-
-    /// Access function to the mesh of surface traction elements
-    SolidMesh*& traction_mesh_pt() { return Traction_mesh_pt; }
-
-    /// Actions before adapt: Wipe the mesh of traction elements
-    //void actions_before_adapt() override;
-
-    /// Actions after adapt: Rebuild the mesh of traction elements
-    //void actions_after_adapt() override;
-
-    /// \short Set the initial conditions, either for an impulsive start or
-    /// with history values for the time stepper
-    void set_initial_conditions(const double& dt)
-    {
-        // set oomph_dt
-        this->time_pt()->initialise_dt(dt);
-        // By default do a non-impulsive start and provide initial conditions
-        assign_initial_values_impulsive(dt);
-    }
-
-    void set_newton_solver_tolerance(double Newton_solver_tolerance)
-    {
-        this->Newton_solver_tolerance = Newton_solver_tolerance;
-    }
-
-    void set_max_newton_iterations(unsigned Max_newton_iterations)
-    {
-        this->Max_newton_iterations = Max_newton_iterations;
-    }
-
+    /**
+     * Removes old output files (vtu) with the same name as this problem.
+     */
     void removeOldFiles() const
     {
         for (int i = 0; true; ++i)
@@ -452,6 +392,9 @@ public:
         }
     }
 
+    /**
+     * Returns the x value at a certain xi value
+     */
     void get_x(const Vector<double>& xi, Vector<double>& x)
     {
     #ifdef OOMPH_HAS_MPI
@@ -476,29 +419,64 @@ public:
     #endif
     }
 
+    /**
+     * Returns the difference between the x and xi value in dimension d at a certain xi value
+     */
     double getDeflection(Vector<double> xi, unsigned d)
     {
-    #ifdef OOMPH_HAS_MPI
-        logger(INFO,"getDeflection does not work with MPI");
-        return 0;
-    #else
         Vector<double> x(3);
         get_x(xi, x);
         return x[d] - xi[d];
-    #endif
     }
 
-    static bool useTetgen()
+    // Boundary types (from cubic mesh)
+    enum Boundary : unsigned
     {
-        return std::is_base_of<SolidTElement<3, 2>, ELEMENT>::value;
+        Z_MIN = 0, Y_MIN = 1, X_MAX = 2, Y_MAX = 3, X_MIN = 4, Z_MAX = 5
+    };
+
+    // Simple cubic mesh upgraded to become a solid mesh
+    class SolidCubicMesh : public virtual RefineableSimpleCubicMesh<ELEMENT>, public virtual SolidMesh
+    {
+    public:
+        /// \short Constructor:
+        // nx, ny, nz: number of elements in the x, y, and z directions
+        // xMax, yMax, zMax: dimensions of the cube (assume the center of the cube is at the origin)
+        // timeStepper: defaults to Steady.
+        SolidCubicMesh(const unsigned& nx, const unsigned& ny, const unsigned& nz,
+                       const double& xMin, const double& xMax, const double& yMin,
+                       const double& yMax, const double& zMin, const double& zMax,
+                       TimeStepper* time_stepper_pt) :
+                SimpleCubicMesh<ELEMENT>(nx, ny, nz, xMin, xMax, yMin, yMax, zMin, zMax, time_stepper_pt),
+                RefineableSimpleCubicMesh<ELEMENT>(nx, ny, nz, xMin, xMax, yMin, yMax, zMin, zMax, time_stepper_pt),
+                SolidMesh()
+        {
+            //Assign the initial lagrangian coordinates
+            set_lagrangian_nodal_coordinates();
+        }
+    };
+
+    // Create a solid cubic mesh
+    void setSolidCubicMesh(const unsigned& nx, const unsigned& ny, const unsigned& nz,
+                           const double& xMin, const double& xMax, const double& yMin,
+                           const double& yMax, const double& zMin, const double& zMax)
+    {
+        // Create mesh
+        solid_mesh_pt() = new SolidCubicMesh(nx, ny, nz, xMin, xMax, yMin, yMax, zMin, zMax, time_stepper_pt());
+
+        logger(INFO, "Created %x%x% cubic mesh on domain [%,%]x[%,%]x[%,%]",
+               nx, ny, nz, xMin, xMax, yMin, yMax, zMin, zMax);
     }
 
-    void saveSolidCubicMesh()
+    void saveSolidMesh()
     {
-        if (useTetgen()) logger(ERROR, "Not implemented for Tetgen meshes");
+        auto solid_cubic_mesh_pt = dynamic_cast<SolidCubicMesh*>(solid_mesh_pt());
+        if (not solid_cubic_mesh_pt) {
+            logger(INFO,"Solid mesh can only be stored if based on cubic constructor");
+            return;
+        }
 
         std::ofstream mesh(name_ + ".mesh");
-        auto solid_cubic_mesh_pt = dynamic_cast<SolidCubicMesh*>(solid_mesh_pt());
         mesh << solid_cubic_mesh_pt->nx() << ' ';
         mesh << solid_cubic_mesh_pt->ny() << ' ';
         mesh << solid_cubic_mesh_pt->nz() << '\n';
@@ -514,9 +492,11 @@ public:
         logger(INFO, "Saved %x%x% mesh to %.mesh",solid_cubic_mesh_pt->nx(), solid_cubic_mesh_pt->ny(), solid_cubic_mesh_pt->nz(),name_);
     }
 
-    void loadSolidCubicMesh(std::string name)
+    void loadSolidMesh(std::string name)
     {
-        if (useTetgen()) logger(ERROR, "Not implemented for Tetgen meshes");
+        //if (not std::is_base_of<QElement<3, 2>, ELEMENT>::value) {
+        //    logger(ERROR, "This kind of mesh requires a QElement.");
+        //}
 
         std::ifstream mesh(name);
         logger.assert_always(mesh.good(),"Mesh file % could not be opened",name);
@@ -524,15 +504,6 @@ public:
         mesh >> nx >> ny >> nz;
         logger(INFO, "Loaded %x%x% cubic mesh from %", nx, ny, nz, name);
         solid_mesh_pt() = new SolidCubicMesh(nx, ny, nz, 0, 1, 0, 1, 0, 1, time_stepper_pt());
-
-        // Assign physical properties to the elements before any refinement
-        for (unsigned i = 0; i < solid_mesh_pt()->nelement(); i++)
-        {
-            //Cast to a solid element
-            ELEMENT* el_pt = dynamic_cast<ELEMENT*>(solid_mesh_pt()->element_pt(i));
-            // Set the constitutive law
-            el_pt->constitutive_law_pt() = constitutive_law_pt;
-        }
 
         double xi, x;
         bool pin;
@@ -549,98 +520,7 @@ public:
         }
     }
 
-//    /// Set pointer to traction function for the relevant
-//    void set_traction_pt()
-//    {
-//        logger(INFO, "Set elements' traction_fct_pt");
-//        // Loop over the elements in the traction element mesh
-//        // for elements on the top boundary (boundary 5)
-//        unsigned n_element = traction_mesh_pt()->nelement();
-//        for (unsigned i = 0; i < n_element; i++)
-//        {
-//            //Cast to a solid traction element
-//            //Cast to a solid traction element
-//            auto* el_pt = dynamic_cast<SolidTractionElement<ELEMENT>*>(traction_mesh_pt()->element_pt(i));
-//            //Set the traction function
-//            el_pt->traction_fct_pt() = tra;
-//        }
-//
-//    }
-
-    //============start_of_create_traction_elements==============================
-    /// Create traction elements
-    //=======================================================================
-    void create_traction_elements()
-    {
-        // Traction elements are located on boundary 5:
-        unsigned b = Boundary::Y_MIN;
-
-        // How many bulk elements are adjacent to boundary b?
-        unsigned n_element = solid_mesh_pt()->nboundary_element(b);
-
-        // Loop over the bulk elements adjacent to boundary b
-        for (unsigned e = 0; e < n_element; e++)
-        {
-            // Get pointer to the bulk element that is adjacent to boundary b
-            auto bulk_elem_pt = dynamic_cast<ELEMENT*>(
-                solid_mesh_pt()->boundary_element_pt(b, e));
-
-            //Find the index of the face of element e along boundary b
-            int face_index = solid_mesh_pt()->face_index_at_boundary(b, e);
-
-            // Create new element and add to mesh
-            Traction_mesh_pt->add_element_pt(new SolidTractionElement<ELEMENT>(bulk_elem_pt, face_index));
-        }
-
-        logger(INFO, "Created % traction elements on boundary %", n_element, b);
-
-//        // Pass the pointer to the traction function to the traction elements
-//        set_traction_pt();
-    } // end of create_traction_elements
-
-
-    //============start_of_delete_traction_elements==============================
-    /// Delete traction elements and wipe the  traction meshes
-    //=======================================================================
-    void delete_traction_elements()
-    {
-        logger(INFO, "Delete traction elements");
-        // Loop over the surface elements
-        for (unsigned e = 0; e < Traction_mesh_pt->nelement(); e++)
-        {
-            // Kill surface element
-            delete Traction_mesh_pt->element_pt(e);
-        }
-        // Wipe the mesh
-        Traction_mesh_pt->flush_element_and_node_storage();
-    }
-
-    ///time of one undamped oscillation
-    double getTimeScale (double lengthScale) const {
-        double stressScale = elasticModulus_;
-        double densityScale = density_;
-        return 0.38 * lengthScale * sqrt(densityScale / stressScale);
-    }
-
-    ///background dissipation needed for critical damping
-    double getCriticalDissipation (double lengthScale) const {
-        double stressScale = elasticModulus_;
-        double densityScale = density_;
-        return 0.1 * sqrt(stressScale * densityScale / lengthScale);
-    }
-
-    void setOomphTimeStep(double dt) {
-        time_pt()->initialise_dt(dt);
-    }
-
-    double getOomphTimeStep () const {
-        return time_pt()->dt();
-    }
-
-    double getOomphTime () const {
-        return time_pt()->time();
-    }
-
+    // stores results in vtk file
     void writeToVTK()
     {
         //set local coordinates list
@@ -652,7 +532,7 @@ public:
         unsigned vtkFormat;
 
         // define differently for tetrahedral and hexahedral (quad) elements
-        if (useTetgen())
+        if (std::is_base_of<SolidTElement<3, 2>, ELEMENT>::value)
         {
             vtkFormat = 10; // TETRA
 
@@ -665,7 +545,7 @@ public:
 
             nList = {0, 1, 2, 3};
         }
-        else
+        else if (std::is_base_of<SolidQElement<3, 2>, ELEMENT>::value)
         {
             vtkFormat = 12; // HEXAHEDRON
 
@@ -681,6 +561,8 @@ public:
             };
             // order of nodes
             nList = {0, 4, 6, 2, 1, 5, 7, 3};
+        } else {
+            logger(ERROR,"Element type unknown");
         }
 
         // convert to Vector
@@ -748,11 +630,6 @@ public:
                 Vector<double> body_force(3);
                 auto bodyForceFct = el_pt->body_force_fct_pt();
                 if (bodyForceFct) bodyForceFct(time(), xi, body_force);
-                // get coupling residual (fails)
-                std::vector<double> couplingResidual
-                    {el_pt->get_nodal_coupling_residual(n, 0),
-                     el_pt->get_nodal_coupling_residual(n, 1),
-                     el_pt->get_nodal_coupling_residual(n, 2)};
                 // get stress/pressure
                 DenseMatrix<double> sigma(3,3);
                 el_pt->get_stress(s, sigma);
@@ -778,7 +655,6 @@ public:
                              {"Displacement", {x[0] - xi[0], x[1] - xi[1], x[2] - xi[2]}},
                              {"BodyForce", {body_force[0], body_force[1], body_force[2]}},
                              {"Pin", pin},
-                             {"CouplingResidual", couplingResidual},
                              {"Velocity2", dudt},
 //                             {"Pressure", {pressure}},
 //                             {"Stress", {sigma(0,0), sigma(0,1), sigma(0,2),
@@ -883,5 +759,4 @@ public:
         logger(INFO, "Written %", vtkFileName);
     }
 };
-
 #endif //SOLID_PROBLEM_H

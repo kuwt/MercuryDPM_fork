@@ -25,7 +25,7 @@
 
 #ifndef SCOUPLEDELEMENT_H
 #define SCOUPLEDELEMENT_H
-#include "Coupling/CoupledSolidNodes.h"
+#include "CoupledSolidNodes.h"
 
 namespace oomph
 {

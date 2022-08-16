@@ -35,7 +35,14 @@ namespace oomph
  */
 class AnisotropicHookean : public oomph::GeneralisedHookean
 {
+    std::array<double, 3> anisotropy_ { 1.0, 1.0, 1.0 };
+
 public:
+
+    void setAnisotropy(std::array<double, 3> anisotropy) {
+        anisotropy_ = anisotropy;
+    }
+
     /// The constructor takes the pointers to values of material parameters:
     /// Poisson's ratio and Young's modulus.
     AnisotropicHookean( double* nu_pt, double* e_pt )
@@ -60,7 +67,7 @@ public:
         {
             for ( unsigned j = 0; j < dim; j++ )
             {
-                sigma( i, j) *= anisotropy[i];
+                sigma( i, j) *= anisotropy_[i];
             }
         }
 
@@ -73,8 +80,6 @@ public:
             }
         }
     }
-
-    std::array<double, 3> anisotropy { 1.0, 1.0, 1.0 };
 };
 }
 

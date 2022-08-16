@@ -28,7 +28,7 @@
 
 #include "Math/Vector.h"
 #include "Walls/TriangleWall.h"
-#include <Species/LinearViscoelasticSpecies.h>
+#include "Species/LinearViscoelasticSpecies.h"
 #include "CG/Functions/Gauss.h"
 #include "CG/Functions/Lucy.h"
 #include "CG/Functions/Heaviside.h"

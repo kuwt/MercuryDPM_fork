@@ -536,8 +536,13 @@ public:
         } // End of loop over integration points
     }
 
-public:
     double dissipation_ = 0.0; //TW
+
+public:
+
+    void setDissipation(double dissipation) {
+        dissipation_ = dissipation;
+    }
 }; // end class
 
 //==============================================================

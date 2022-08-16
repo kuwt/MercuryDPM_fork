@@ -25,14 +25,15 @@
 
 #include "SolidProblem.h"
 
-class SolidBeam : public SolidProblem
+/// Defines a SolidProblem of element type RefineableQDPVDElement<3,2>.
+class SolidBeam : public SolidProblem<RefineableQDPVDElement<3, 2>>
 {
 public:
-    
     /**
+     * Checks the beam deflection against an analytical solution:
      * https://autofem.com/examples/deflection_of_a_plate_under_theg.html
      */
-    void getBeamDeflection()
+    void checkBeamDeflection()
     {
         
         std::array<double,3> min;
@@ -55,7 +56,7 @@ public:
 };
 
 /**
- * Measure bag deformation loaded by body force
+ * Simulates a cubic rod (20mm x 2mm x 2mm) of density 2500 kg/m^3, elastic modulus 100 MPa, fixed on left side, bent by gravity
  */
 int main()
 {
@@ -65,14 +66,11 @@ int main()
     problem.setElasticModulus(1e8);
     problem.setDensity(2500);
     problem.setSolidCubicMesh(20, 2, 2, 0, 0.2, 0, 0.02, 0, 0.02);
-    problem.setIsPinned([](SolidNode* n, unsigned d) {
-        return n->is_on_boundary(SolidProblem::Boundary::X_MIN);
-    });
-    problem.setGravityAsBodyForce();
-    problem.set_newton_solver_tolerance(3e-8);
+    problem.pinBoundary(SolidBeam::Boundary::X_MIN);
+    problem.setBodyForceAsGravity();
+    problem.setNewtonSolverTolerance(3e-8);
     problem.prepareForSolve();
-    problem.writeToVTK();
     problem.solveSteady();
-    problem.getBeamDeflection();
+    problem.checkBeamDeflection();
     return 0;
 }
