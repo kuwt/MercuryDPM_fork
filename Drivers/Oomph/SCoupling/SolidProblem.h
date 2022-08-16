@@ -69,7 +69,7 @@ class SolidProblem : public Problem
 {
 protected:
     //define element type (should be done by template)
-    //typedef QPVDElement<3, 2> ELEMENT;
+    typedef ELEMENT ELEMENT_TYPE;
 
     // name of output files (user-defined)
     std::string name_;
@@ -153,7 +153,7 @@ public:
     /// set function for body_force_pt
     void setBodyForceAsGravity()
     {
-        logger(INFO, "Setting gravity in z-direction");
+        logger(INFO, "Setting oomph-gravity in z-direction");
         // define a static body force
         static double& Density = density_;
         body_force_fct = [](const double& time, const Vector<double>& xi, Vector<double>& b) {
@@ -178,10 +178,22 @@ public:
         };
     }
 
+    // set is_pinned such that a certain boundary is pinned
+    void pinBoundaries(std::vector<unsigned> b) {
+        for (const auto a: b) {
+            logger(INFO, "Pinning nodes on boundary %", a);
+        }
+        isPinned_ = [b](SolidNode *n, unsigned d) {
+            for (const auto a : b) {
+                if (n->is_on_boundary(a)) return true;
+            }
+            return false;
+        };
+    }
+
     /// Sets the dissipation coefficient for all elements.
     std::enable_if<std::is_base_of<RefineableQDPVDElement<3,2>, ELEMENT>::value, void> setDissipation(double dissipation)
     {
-        logger(INFO,"Adding dissipation %",dissipation);
         for (int i = 0; i < solid_mesh_pt()->nelement(); ++i)
         {
             dynamic_cast<RefineableQDPVDElement<3,2>*>(solid_mesh_pt()->element_pt(i))->setDissipation(dissipation);

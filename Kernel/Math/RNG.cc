@@ -199,6 +199,7 @@ Mdouble RNG::getNormalVariate(Mdouble mean, Mdouble stdev)
     } else if (stdev < 0) {
         logger(ERROR,
                "[RNG::getNormalVariate(Mdouble, Mdouble)] Negative stdev is not allowed.");
+        return 0;
     } else {
         return getNormalVariate() * stdev + mean;
     }

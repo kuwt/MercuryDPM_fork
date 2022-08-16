@@ -32,9 +32,10 @@
 #include "chrono"
 using namespace oomph;
 
-class SurfaceCoupling : public BaseCoupling
+template<class M, class O>
+class SurfaceCoupling : public BaseCoupling<M, O>
 {
-
+    typedef typename O::ELEMENT_TYPE ELEMENT;
 public:
     
     
@@ -71,22 +72,38 @@ public:
     // solve surface coupled OomphMercuryProblem
     void solveSurfaceCoupling()
     {
-        unsigned nStep = getOomphTimeStep()/getTimeStep();
-        logger(INFO,"Set nStep %, change oomphTimeStep from % to %",
-                nStep, getOomphTimeStep(), nStep*getTimeStep());
-        //setOomphTimeStep(nStep*getTimeStep());
+        // compute nStep
+        unsigned nStep = O::getOomphTimeStep()/M::getTimeStep();
+        if (nStep==0) {
+            // if oomph has a smaller time step than Mercury
+            logger(INFO, "Set nStep %, change mercuryTimeStep from % to %",
+                   nStep, M::getTimeStep(), O::getOomphTimeStep());
+            nStep = 1;
+            M::setTimeStep(O::getOomphTimeStep());
+        } else {
+            logger(INFO, "Set nStep %, change oomphTimeStep from % to %",
+                   nStep, O::getOomphTimeStep(), nStep * M::getTimeStep());
+            O::setOomphTimeStep(nStep * M::getTimeStep());
+        }
+
+        // call solve routine
         solveSurfaceCoupling(nStep);
     }
     
     // solve surface coupled OomphMercuryProblem
     void solveSurfaceCoupling(unsigned nStep)
     {
+        // check whether time steps are set
+        logger.assert_always(O::getOomphTimeStep()>0,"Oomph time step not initialised");
+        logger.assert_always(M::getTimeStep()>0,"Mercury time step not initialised");
+        // check whether isCoupled is set
+        logger.assert_always(!coupledBoundaries_.empty(), "isCoupled needs to be set, e.g. via setIsCoupled([](unsigned b) { return b == Boundary::Y_MIN; })");
+
         // first part of the Mercury solve routine, containing the actions before time-stepping
-        initialiseSolve();
-        logger.assert_always(isCoupled_!= nullptr, "isCoupled needs to be set, e.g. via setIsCoupled([](unsigned b) { return b == Boundary::Y_MIN; })");
-        
+        M::initialiseSolve();
+
         // read Mercury time step
-        double mercury_dt = getTimeStep();
+        double mercury_dt = M::getTimeStep();
         logger(INFO, "Mercury time step: %", mercury_dt);
         
         // set oomph time step
@@ -94,11 +111,11 @@ public:
         logger(INFO, "Oomph time step: %", oomph_dt);
         
         // set oomph initial conditions
-        set_initial_conditions(oomph_dt);
+        O::assign_initial_values_impulsive(oomph_dt);
         
         // read oomph-mesh
         logger(INFO, "Set up oomph mesh: % elements (% with traction)",
-               solid_mesh_pt()?solid_mesh_pt()->nelement():0, traction_mesh_pt()?traction_mesh_pt()->nelement():0);
+               O::solid_mesh_pt()?O::solid_mesh_pt()->nelement():0, O::traction_mesh_pt()?O::traction_mesh_pt()->nelement():0);
         
         // get list of bulk elements along the surface-coupled boundaries
         getSCoupledElements();
@@ -108,41 +125,43 @@ public:
         
         // this is the main loop advancing over time
         unsigned nDone = 0; //< last written file number
-        while (getTime() < getTimeMax())
+        while (M::getTime() < M::getTimeMax())
         {
+            this->actionsBeforeOomphTimeStep();
             // solve the coupled problem for one time step
             computeOneTimeStepForSCoupling(nStep);
             // write outputs of the oomphProb; this is slaved to the vtk output of Mercury, i.e. an oomph-lib output get written everytime a Mercury vtk file gets written
-            if (getParticlesWriteVTK() && getVtkWriter()->getFileCounter() > nDone)
+            if (M::getParticlesWriteVTK() && M::getVtkWriter()->getFileCounter() > nDone)
             {
-                OomphProblem::writeToVTK();
-                nDone = getVtkWriter()->getFileCounter();
+                O::writeToVTK();
+                nDone = M::getVtkWriter()->getFileCounter();
             }
         }
+
         // close output files of mercuryProb
-        finaliseSolve();
+        M::finaliseSolve();
     }
 
     // solve OomphMercuryProblem, but with fixed solid
     void solveSurfaceCouplingFixedSolid()
     {
         // first part of the Mercury solve routine, containing the actions before time-stepping
-        initialiseSolve();
-        logger.assert_always(isCoupled_!= nullptr, "isCoupled needs to be set, e.g. via setIsCoupled([](unsigned b) { return b == Boundary::Y_MIN; })");
+        O::initialiseSolve();
+        logger.assert_always(!coupledBoundaries_.empty(), "isCoupled needs to be set, e.g. via setIsCoupled([](unsigned b) { return b == Boundary::Y_MIN; })");
         
         // read Mercury time step
-        double mercury_dt = getTimeStep();
+        double mercury_dt = M::getTimeStep();
         logger(INFO, "Mercury time step: %", mercury_dt);
         
         // set oomph time step
         logger(INFO, "Solid position fixed");
         
         // set oomph initial conditions
-        set_initial_conditions(0);
+        O::set_initial_conditions(0);
         
         // read oomph-mesh
         logger(INFO, "Set up oomph mesh: % elements (% with traction)",
-               solid_mesh_pt()?solid_mesh_pt()->nelement():0, traction_mesh_pt()?traction_mesh_pt()->nelement():0);
+               O::solid_mesh_pt()?O::solid_mesh_pt()->nelement():0, O::traction_mesh_pt()?O::traction_mesh_pt()->nelement():0);
         
         // get list of bulk elements along the surface-coupled boundaries
         getSCoupledElements();
@@ -152,17 +171,17 @@ public:
         
         // this is the main loop advancing over time
         unsigned nDone = 0; //< last written file number
-        while (getTime() < getTimeMax())
+        while (M::getTime() < M::getTimeMax())
         {
-            actionsBeforeOomphTimeStep();
-            computeOneTimeStep();
+            O::actionsBeforeOomphTimeStep();
+            M::computeOneTimeStep();
             //if (getParticlesWriteVTK() && getVtkWriter()->getFileCounter() > nDone) {
             //    writeToVTK();
             //    nDone = getVtkWriter()->getFileCounter();
             //}
         }
         // close output files of mercuryProb
-        finaliseSolve();
+        M::finaliseSolve();
     }
 
     /**
@@ -174,11 +193,11 @@ public:
     TriangleWall* createTriangleWall(std::array<Vec3D, 3> vertex)
     {
         TriangleWall wall;
-        auto species = speciesHandler.getObject(0);
+        auto species = M::speciesHandler.getObject(0);
         wall.setSpecies(species);
         wall.setGroupId(100);
         wall.setVertices(vertex[0], vertex[1], vertex[2]);
-        auto w = wallHandler.copyAndAddObject(wall);
+        auto w = M::wallHandler.copyAndAddObject(wall);
         return w;
     }
 
@@ -189,8 +208,8 @@ public:
      */
     void updateTriangleWall(TriangleWall*& wall, std::array<Vec3D, 3> vertex)
     {
-        double time0 = getTime();
-        double dTime = getOomphTimeStep();
+        double time0 = M::getTime();
+        double dTime = O::getOomphTimeStep();
         std::array<Vec3D,3> vertex0 = wall->getVertices();
         std::array<Vec3D,3> dVertex = {
             vertex[0] - vertex0[0],
@@ -221,13 +240,13 @@ public:
         auto t0 = std::chrono::system_clock::now();
         updateDPMWallsFromFiniteElems();
         auto t1 = std::chrono::system_clock::now();
-        solveMercury(nStepsMercury);
+        BaseCoupling<M,O>::solveMercury(nStepsMercury);
         auto t2 = std::chrono::system_clock::now();
         updateTractionOnFiniteElems();
         auto t3 = std::chrono::system_clock::now();
-        solveOomph();
+        BaseCoupling<M,O>::solveOomph();
         auto t4 = std::chrono::system_clock::now();
-        if (logSurfaceCoupling) logger(INFO, "time % Elapsed time: FEM->DEM %, DEM %, DEM->FEM %, FEM %", getTime(),
+        if (logSurfaceCoupling) logger(INFO, "time % Elapsed time: FEM->DEM %, DEM %, DEM->FEM %, FEM %", M::getTime(),
                (t1-t0).count(), (t2-t1).count(), (t3-t2).count(), (t4-t3).count());
     }
     
@@ -254,11 +273,11 @@ public:
             unsigned n = 0;
             while (n < nTriangles)
             {
-                // get vertices of TriangleWall (multiply vertex position with the length scale of the OomphProblem)
+                // get vertices of TriangleWall (multiply vertex position with the length scale of the O)
                 std::array<Vec3D, 3> vertex;
                 // one vertex at the center
                 vertex[0] = center;
-                // two vertices from the OomphProblem<element,TIMESTEPPER>
+                // two vertices from the O<element,TIMESTEPPER>
                 vertex[1] = Vec3D(*position_pt[0][0],*position_pt[0][1],*position_pt[0][2]);
                 vertex[2] = Vec3D(*position_pt[1][0],*position_pt[1][1],*position_pt[1][2]);
                 
@@ -297,11 +316,11 @@ public:
             unsigned n = 0;
             while (n < nTriangles)
             {
-                // get vertices of TriangleWall (multiply vertex position with the length scale of the OomphProblem)
+                // get vertices of TriangleWall (multiply vertex position with the length scale of the O)
                 std::array<Vec3D, 3> vertex;
                 // one vertex at the center
                 vertex[0] = center;
-                // two vertices from the OomphProblem<element,TIMESTEPPER>
+                // two vertices from the O<element,TIMESTEPPER>
                 vertex[1] = Vec3D(*position_pt[0][0],
                                   *position_pt[0][1],
                                   *position_pt[0][2]);;
@@ -309,7 +328,7 @@ public:
                                   *position_pt[1][1],
                                   *position_pt[1][2]);
                 
-                // update vertices of triangle facet  (multiply vertex position with the length scale of the OomphProblem<element,TIMESTEPPER>)
+                // update vertices of triangle facet  (multiply vertex position with the length scale of the O<element,TIMESTEPPER>)
                 updateTriangleWall(triangleWalls_[wallID], vertex);
                 
                 // rotate forward by one element
@@ -327,7 +346,7 @@ public:
     void updateTractionOnFiniteElems()
     {
         // if construct mapping with FEM basis functions
-        if (!useCGMapping())
+        if (!BaseCoupling<M,O>::useCGMapping())
         {
             // tracks the id of the triangle walls (get incremented in computeSCouplingForcesFromTriangles)
             unsigned wallID = 0;
@@ -349,33 +368,33 @@ public:
         }
         else
         {
-            // how many bulk elements in total
-            unsigned n_element = solid_mesh_pt()->nelement();
-            
-            // loop over the bulk elements
-            for (unsigned e = 0; e < n_element; e++)
-            {
-                // get pointer to the bulk element
-                ELEMENT* elem_pt = dynamic_cast<ELEMENT*>(solid_mesh_pt()->element_pt(e));
-                
-                // set up memory for nodal coupling force
-                Vector<Vector<double> > nodalCouplingForces;
-                // whether the element is coupled to particles
-                bool elemIsCoupled = computeSCouplingForcesFromCG(elem_pt, nodalCouplingForces);
-                
-                // assign nodal coupling force to the element to be used by element::fill_in_contribution_to_residuals(...)
-                elem_pt->set_nodal_coupling_residual(elemIsCoupled, nodalCouplingForces);
-            }
-            // reset the sum of the evaluated CG values
-            for (auto inter : interactionHandler)
-            {
-                if (inter->getI()->getName() == "TriangleWall")
-                {
-//                    logger(INFO, "Sum of the CG values previously evaluated for this interaction %",
-//                           inter->getPreviousTotalCGEval());
-                    inter->resetTotalCGEval();
-                }
-            }
+//            // how many bulk elements in total
+//            unsigned n_element = O::solid_mesh_pt()->nelement();
+//
+//            // loop over the bulk elements
+//            for (unsigned e = 0; e < n_element; e++)
+//            {
+//                // get pointer to the bulk element
+//                ELEMENT* elem_pt = dynamic_cast<ELEMENT*>(O::solid_mesh_pt()->element_pt(e));
+//
+//                // set up memory for nodal coupling force
+//                Vector<Vector<double> > nodalCouplingForces;
+//                // whether the element is coupled to particles
+//                bool elemIsCoupled = computeSCouplingForcesFromCG(elem_pt, nodalCouplingForces);
+//
+//                // assign nodal coupling force to the element to be used by element::fill_in_contribution_to_residuals(...)
+//                elem_pt->set_nodal_coupling_residual(elemIsCoupled, nodalCouplingForces);
+//            }
+//            // reset the sum of the evaluated CG values
+//            for (auto inter : M::interactionHandler)
+//            {
+//                if (inter->getI()->getName() == "TriangleWall")
+//                {
+////                    logger(INFO, "Sum of the CG values previously evaluated for this interaction %",
+////                           inter->getPreviousTotalCGEval());
+//                    inter->resetTotalCGEval();
+//                }
+//            }
         }
     }
     
@@ -456,92 +475,92 @@ public:
         return elemIsCoupled;
     }
     
-    /**
-     * Computes nodal scoupling forces from triangles using coarse graining
-     * \param[in] elem_pt pointer to the element for which forces are computed
-     * \param[in,out] nodalCouplingForces coupling forces at nodal positions to be added to the residual
-     * \return
-     */
-    bool computeSCouplingForcesFromCG(ELEMENT*& elem_pt, Vector<Vector<double> >& nodalCouplingForces)
-    {
-        // whether the element is coupled to particles
-        bool elemIsCoupled = false;
-        
-        // get number of nodes in the bulk element
-        const unsigned nnode = elem_pt->nnode();
-        // get dimension of the problem
-        const unsigned dim = elem_pt->dim();
-        // initialize the coupling force vector
-        nodalCouplingForces.resize(nnode, Vector<double>(dim, 0.0));
-        
-        // get particles if there are in the bounding box
-        Vec3D min, max;
-        getElementBoundingBox(elem_pt, min, max);
-        Vector<BaseParticle*> pList;
-        getParticlesInCell(min, max, pList);
-        
-        // loop over shape functions at the contact points
-        for (const auto p : pList)
-        {
-            for (const auto inter : p->getInteractions())
-            {
-                if (inter->getI()->getName() == "TriangleWall")
-                {
-                    // get the number of integration points
-                    const unsigned n_intpt = elem_pt->integral_pt()->nweight();
-                    
-                    // loop over the integration points
-                    for (unsigned ipt = 0; ipt < n_intpt; ipt++)
-                    {
-                        // set up memory for the local and global coordinates
-                        Vector<double> s(dim, 0.0), x(dim, 0.0);
-                        
-                        // get the value of the local coordinates at the integration point
-                        for (unsigned i = 0; i < dim; i++) s[i] = elem_pt->integral_pt()->knot(ipt, i);
-                        
-                        // get the value of the global coordinates at the integration point
-                        elem_pt->interpolated_x(s, x);
-                        
-                        // set CG coordinates
-                        CGCoordinates::XYZ coordinate;
-                        coordinate.setXYZ(Vec3D(x[0], x[1], x[2]));
-                        // evaluate the value of CG function around particle m at CGcoords \phi(\vec r_i-r_m)
-                        double phi = getCGFunction().evaluateCGFunction(
-                            inter->getContactPoint(), coordinate);
-                        
-                        // add contributions to the coupling force
-                        if (!inter->getForce().isZero() && phi > 0.0)
-                        {
-                            // set the flag to true
-                            elemIsCoupled = true;
-                            
-                            // Set up memory for the shape/test functions
-                            Shape psi(nnode);
-                            
-                            // get the integral weight
-                            double w = elem_pt->integral_pt()->weight(ipt);
-                            // find the shape functions at the integration points r_i
-                            elem_pt->shape_at_knot(ipt, psi);
-                            
-                            // loop over the nodes
-                            for (unsigned l = 0; l < nnode; l++)
-                            {
-                                // CG mapping defined as \tilde{N_{l,m}}_ipt = w_ipt * \phi(\vec r_i-r_m) * N_l(r_i)
-                                double shape = w * phi * psi(l);
-                                inter->addCGEval(shape);
-                                shape /= inter->getPreviousTotalCGEval();
-                                Vec3D fc = inter->getForce() * shape;
-                                nodalCouplingForces[l][0] += fc.getX();
-                                nodalCouplingForces[l][1] += fc.getY();
-                                nodalCouplingForces[l][2] += fc.getZ();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return elemIsCoupled;
-    }
+//    /**
+//     * Computes nodal scoupling forces from triangles using coarse graining
+//     * \param[in] elem_pt pointer to the element for which forces are computed
+//     * \param[in,out] nodalCouplingForces coupling forces at nodal positions to be added to the residual
+//     * \return
+//     */
+//    bool computeSCouplingForcesFromCG(ELEMENT*& elem_pt, Vector<Vector<double> >& nodalCouplingForces)
+//    {
+//        // whether the element is coupled to particles
+//        bool elemIsCoupled = false;
+//
+//        // get number of nodes in the bulk element
+//        const unsigned nnode = elem_pt->nnode();
+//        // get dimension of the problem
+//        const unsigned dim = elem_pt->dim();
+//        // initialize the coupling force vector
+//        nodalCouplingForces.resize(nnode, Vector<double>(dim, 0.0));
+//
+//        // get particles if there are in the bounding box
+//        Vec3D min, max;
+//        getElementBoundingBox(elem_pt, min, max);
+//        Vector<BaseParticle*> pList;
+//        BaseCoupling<M,O>::getParticlesInCell(min, max, pList);
+//
+//        // loop over shape functions at the contact points
+//        for (const auto p : pList)
+//        {
+//            for (const auto inter : p->getInteractions())
+//            {
+//                if (inter->getI()->getName() == "TriangleWall")
+//                {
+//                    // get the number of integration points
+//                    const unsigned n_intpt = elem_pt->integral_pt()->nweight();
+//
+//                    // loop over the integration points
+//                    for (unsigned ipt = 0; ipt < n_intpt; ipt++)
+//                    {
+//                        // set up memory for the local and global coordinates
+//                        Vector<double> s(dim, 0.0), x(dim, 0.0);
+//
+//                        // get the value of the local coordinates at the integration point
+//                        for (unsigned i = 0; i < dim; i++) s[i] = elem_pt->integral_pt()->knot(ipt, i);
+//
+//                        // get the value of the global coordinates at the integration point
+//                        elem_pt->interpolated_x(s, x);
+//
+//                        // set CG coordinates
+//                        CGCoordinates::XYZ coordinate;
+//                        coordinate.setXYZ(Vec3D(x[0], x[1], x[2]));
+//                        // evaluate the value of CG function around particle m at CGcoords \phi(\vec r_i-r_m)
+//                        double phi = BaseCoupling<M,O>::getCGFunction().evaluateCGFunction(
+//                            inter->getContactPoint(), coordinate);
+//
+//                        // add contributions to the coupling force
+//                        if (!inter->getForce().isZero() && phi > 0.0)
+//                        {
+//                            // set the flag to true
+//                            elemIsCoupled = true;
+//
+//                            // Set up memory for the shape/test functions
+//                            Shape psi(nnode);
+//
+//                            // get the integral weight
+//                            double w = elem_pt->integral_pt()->weight(ipt);
+//                            // find the shape functions at the integration points r_i
+//                            elem_pt->shape_at_knot(ipt, psi);
+//
+//                            // loop over the nodes
+//                            for (unsigned l = 0; l < nnode; l++)
+//                            {
+//                                // CG mapping defined as \tilde{N_{l,m}}_ipt = w_ipt * \phi(\vec r_i-r_m) * N_l(r_i)
+//                                double shape = w * phi * psi(l);
+//                                inter->addCGEval(shape);
+//                                shape /= inter->getPreviousTotalCGEval();
+//                                Vec3D fc = inter->getForce() * shape;
+//                                nodalCouplingForces[l][0] += fc.getX();
+//                                nodalCouplingForces[l][1] += fc.getY();
+//                                nodalCouplingForces[l][2] += fc.getZ();
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        return elemIsCoupled;
+//    }
     
     /**
      * needed in computeSCouplingForcesFromCG to decide which particles affect a given element
@@ -571,10 +590,10 @@ public:
         max.Z = *max_element(listOfCoordZ.begin(), listOfCoordZ.end());
         
         // extend the bounding box if construct mapping with coarse graining
-        logger.assert_always(particleHandler.getLargestParticle(), "No particles detected");
+        logger.assert_always(M::particleHandler.getLargestParticle(), "No particles detected");
         //todo does it make sense with -2R here?
-        min -= Vec3D(1.0, 1.0, 1.0) * ( getCGWidth() - 2 * particleHandler.getLargestParticle()->getRadius() );
-        max += Vec3D(1.0, 1.0, 1.0) * ( getCGWidth() - 2 * particleHandler.getLargestParticle()->getRadius() );
+        min -= Vec3D(1.0, 1.0, 1.0) * ( BaseCoupling<M,O>::getCGWidth() - 2 * M::particleHandler.getLargestParticle()->getRadius() );
+        max += Vec3D(1.0, 1.0, 1.0) * ( BaseCoupling<M,O>::getCGWidth() - 2 * M::particleHandler.getLargestParticle()->getRadius() );
     }
     
     /**
@@ -587,10 +606,9 @@ public:
         sCoupledElements_.clear();
         
         // loop over all boundaries
-        for (unsigned b = 0; b <= 5; b++)
+        for (unsigned b : coupledBoundaries_)
         {
             // we only need to couple the elements on the upper boundary
-            if (not isCoupled_(b)) continue;
             logger(INFO,"Coupling boundary %", b);
             
             // number of bulk elements adjacent to boundary b
@@ -660,8 +678,14 @@ public:
         }
     }
 
-    void setIsCoupled(std::function<bool(unsigned)> isCoupled) {
-        isCoupled_ = isCoupled;
+    // set is_pinned such that a certain boundary is pinned
+    void coupleBoundary(unsigned b) {
+        coupledBoundaries_ = {b};
+    }
+
+    // set is_pinned such that a certain boundary is pinned
+    void coupleBoundaries(std::vector<unsigned> b) {
+        coupledBoundaries_ = std::move(b);
     }
 
     void disableLogSurfaceCoupling() {
@@ -680,7 +704,7 @@ private:
      * Function to determine whether boundary is coupled.
      * Needs to be set before solveSurfaceCoupling is called.
      */
-    std::function<bool(unsigned)> isCoupled_ = nullptr;
+    std::vector<unsigned> coupledBoundaries_;
     
     bool logSurfaceCoupling = true;
 };

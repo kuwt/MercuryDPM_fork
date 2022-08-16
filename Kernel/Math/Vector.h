@@ -35,6 +35,7 @@
 #include <sstream>
 #include <iostream>
 #include <cstdlib>
+#include "array"
 
 #include "GeneralDefine.h"
 #include "Logger.h"
@@ -85,7 +86,17 @@ public:
         Y = y;
         Z = z;
     }
-    
+
+    /**
+     * Defines mapping between std::array<double,3> and Vec3D
+     */
+    Vec3D(std::array<double, 3> a)
+    {
+        X = a[0];
+        Y = a[1];
+        Z = a[2];
+    }
+
     /*!
      * \brief Sets all elements to zero
      */
