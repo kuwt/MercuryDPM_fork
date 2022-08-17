@@ -143,8 +143,8 @@ public:
                xi[0], xi[1],xi[2], deflection);
 
         double mass, elasticEnergy, kineticEnergy;
-        Vector<double> linearMomentum(3), angularMomentum(3);
-        getMassMomentumEnergy(mass, linearMomentum, angularMomentum, elasticEnergy, kineticEnergy);
+        Vector<double> com(3), linearMomentum(3), angularMomentum(3);
+        getMassMomentumEnergy(mass, com, linearMomentum, angularMomentum, elasticEnergy, kineticEnergy);
         logger(INFO, "mass %, linearMomentum %, angularMomentum %, elasticEnergy %, totalEnergy %",
                mass, linearMomentum, angularMomentum, elasticEnergy, elasticEnergy+kineticEnergy);
 
