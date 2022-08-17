@@ -25,7 +25,7 @@
 
 #include "Mercury3D.h"
 #include "SolidProblem.h"
-#include "Coupling/SurfaceCoupling.h"
+#include "SurfaceCoupling.h"
 
 template<class ELEMENT>
 class SurfaceCoupledSolidProblem : public SurfaceCoupling<Mercury3D, SolidProblem<SurfaceCoupledElement<ELEMENT>>> {};

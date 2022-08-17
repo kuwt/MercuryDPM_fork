@@ -23,7 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "SolidProblem.h"
+#include "Coupling/SolidProblem.h"
 #include "Math/Helpers.h"
 
 /// Defines a SolidProblem of element type RefineableQDPVDElement<3,2>.
@@ -53,8 +53,8 @@ public:
                xi[0], xi[1],xi[2], deflection);
 
         double mass, elasticEnergy, kineticEnergy;
-        Vector<double> linearMomentum(3), angularMomentum(3);
-        getMassMomentumEnergy(mass, linearMomentum, angularMomentum, elasticEnergy, kineticEnergy);
+        Vector<double> com(3), linearMomentum(3), angularMomentum(3);
+        getMassMomentumEnergy(mass, com, linearMomentum, angularMomentum, elasticEnergy, kineticEnergy);
         logger(INFO, "mass %, linearMomentum %, angularMomentum %, elasticEnergy %, kineticEnergy %",
                mass, linearMomentum, angularMomentum, elasticEnergy, kineticEnergy);
 

@@ -23,7 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "SolidProblem.h"
+#include "Coupling/SolidProblem.h"
 #include "Math/Helpers.h"
 
 /// Defines a SolidProblem of element type RefineableQDPVDElement<3,2>.

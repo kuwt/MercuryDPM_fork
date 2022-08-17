@@ -38,17 +38,17 @@
 #include "Math/Vector.h"
 #include <array>
 #include <cstdio>
-#include "Coupling/OomphHelpers.h"
-#include "Coupling/AnisotropicHookean.h"
-#include "Coupling/RefineableQDPVDElement.h"
+#include "OomphHelpers.h"
+#include "AnisotropicHookean.h"
+#include "RefineableQDPVDElement.h"
 
 //The mesh
 #include "meshes/simple_cubic_mesh.h"
 #include "meshes/tetgen_mesh.h"
 
 // The element types needed for surface and volume coupling
-#include "Coupling/SurfaceCoupledElement.h"
-#include "Coupling/VolumeCoupledElement.h"
+#include "SurfaceCoupledElement.h"
+#include "VolumeCoupledElement.h"
 
 using namespace oomph;
 

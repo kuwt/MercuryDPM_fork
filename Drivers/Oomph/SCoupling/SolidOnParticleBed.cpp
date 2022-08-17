@@ -27,7 +27,7 @@
 #include "Mercury3D.h"
 #include "Boundaries/CubeInsertionBoundary.h"
 #include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
-#include "SurfaceCoupledSolidProblem.h"
+#include "Coupling/SurfaceCoupledSolidProblem.h"
 
 class CoupledProblem : public SurfaceCoupledSolidProblem<RefineableQDPVDElement<3, 2>>
 {

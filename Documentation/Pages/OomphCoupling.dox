@@ -1,0 +1,36 @@
+/*! \page OomphCoupling Coupling with oomph-lib
+\tableofcontents
+
+# Overview
+
+MercuryDPM can be coupled with oomph-lib (https://oomph-lib.github.io/), an open-source finite element solver developed by the University of Manchester.
+
+Both surface and volume coupling have been implemented. However, the fully coupled code is currently only available in a branch repository. We refer the interested reader to the paper (in review) by Hongyang Cheng et al.
+
+We are about to transfer the coupled code to the MercuryDPM master branch (https://bitbucket.org/mercurydpm/mercurydpm/branch/master). For that, the code is being revised; the revised version is in this branch (https://bitbucket.org/mercurydpm/mercurydpm/branch/coupling). It currently only allows surface coupling. Note that the interface might still change.
+
+# Test cases
+
+We have implemented the following test cases:
+
+## SolidOnParticleBed.cpp
+
+Illustrates the surface coupling technique implemented in MercuryDPM and oomph-lib. A solid cube (10cm side length) rests on four particles (2cm diameter), which rests on a fixed bottom wall. Gravity acts on both particles and the solid cube. The particle stiffness is chosen very low such that the compression due to gravitational load can be seen: the equilibrium overlap of the particle-wall and particle-cube contacts is 1mm, and you can see in the simulation that the overlaps oscillate between 0 and 2 mm. Both solid cube and particle contacts are non-dissipative, so oscillations are not damped out.
+
+\htmlonly
+<br><iframe width="420" height="315" src="https://youtube.com/shorts/HBmefXK2PZc" frameborder="0" allowfullscreen></iframe>
+\endhtmlonly
+
+## ElementAnalysis.cpp
+A simple code returning the values of the shape functions, jacobian, weights, etc. This is useful to understand what the different oomph-lib functions do.
+
+## CoupledBeam.cpp
+...
+
+## CoupledBeamUnitTest.cpp
+..
+
+## SolidBeamUnitTest.cpp
+
+## UnsteadySolidBeam.cpp
+*/

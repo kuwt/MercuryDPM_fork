@@ -25,7 +25,7 @@
 
 #include "Math/Helpers.h"
 #include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
-#include "SurfaceCoupledSolidProblem.h"
+#include "Coupling/SurfaceCoupledSolidProblem.h"
 
 /**
  * Define a coupled problem
