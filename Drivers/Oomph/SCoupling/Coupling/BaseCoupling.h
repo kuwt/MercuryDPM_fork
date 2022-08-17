@@ -60,7 +60,11 @@ public:
         M::setName(name);
         O::setName(name);
     }
-    
+
+    std::string getName() const {
+        return M::getName();
+    }
+
     void removeOldFiles() const {
         M::removeOldFiles();
         O::removeOldFiles();

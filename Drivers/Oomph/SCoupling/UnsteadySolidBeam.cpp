@@ -29,38 +29,41 @@
 /// Defines a SolidProblem of element type RefineableQDPVDElement<3,2>.
 class Beam : public SolidProblem<RefineableQDPVDElement<3, 2>>
 {
-public:
     /**
      * Checks the beam deflection against an analytical solution:
      * https://autofem.com/examples/deflection_of_a_plate_under_theg.html
      */
-    void checkBeamDeflection()
-    {
-        std::array<double,3> min;
-        std::array<double,3> max;
+    double getBeamDeflection() const {
+        std::array<double, 3> min, max;
         getDomainSize(min, max);
-
-        double length = max[0]-min[0];
-        double height = max[2]-min[2];
-        logger(INFO, "Deflection should be -3*rho*g*L^4/(2*E*h^2) = % (in practice: %)",
-               -3. * 9.8 * density_ * pow(length, 4) / ( 2. * elasticModulus_ * pow(height, 2) ), -0.00131642);
 
         Vector<double> xi(3);
         xi[0] = max[0];
-        xi[1] = 0.5*(max[1]+min[1]);
-        xi[2] = 0.5*(max[2]+min[2]);
-        double deflection = getDeflection(xi,2);
-        logger(INFO, "Beam deflection at right end (% % %) is %",
-               xi[0], xi[1],xi[2], deflection);
-
-        double mass, elasticEnergy, kineticEnergy;
-        Vector<double> linearMomentum(3), angularMomentum(3);
-        getMassMomentumEnergy(mass, linearMomentum, angularMomentum, elasticEnergy, kineticEnergy);
-        logger(INFO, "mass %, linearMomentum %, angularMomentum %, elasticEnergy %, kineticEnergy %",
-               mass, linearMomentum, angularMomentum, elasticEnergy, kineticEnergy);
-
-        helpers::check(deflection,-0.00131642,1e-8,"Checking deflection");
+        xi[1] = 0.5 * (max[1] + min[1]);
+        xi[2] = 0.5 * (max[2] + min[2]);
+        return getDeflection(xi, 2);
     }
+
+    std::ofstream out;
+
+    void actionsBeforeSolve() {
+        helpers::writeToFile(getName()+".gnu", "set key autotitle columnheader\n"
+           "p 'UnsteadySolidBeam.out' u 1:3, '' u 1:4, '' u 1:5, '' u 1:($3+$4+$5) t 'totalEnergy'");
+        out.open(getName()+".out");
+        out << "time deflection elasticEnergy kineticEnergy gravEnergy\n";
+    }
+
+    void actionsBeforeOomphTimeStep() override {
+        double mass, elasticEnergy, kineticEnergy;
+        Vector<double> com(3), linearMomentum(3), angularMomentum(3);
+        getMassMomentumEnergy(mass, com, linearMomentum, angularMomentum, elasticEnergy, kineticEnergy);
+        static double comZ0 = com[2];
+        double gravEnergy = 9.8*mass*(com[2]-comZ0);
+        out << getOomphTime() << ' ' << getBeamDeflection() << ' ' << elasticEnergy << ' ' << kineticEnergy << ' ' << gravEnergy << std::endl;
+        std::cout << getOomphTime() << ' ' << getBeamDeflection() << ' ' << elasticEnergy << ' ' << kineticEnergy << ' ' << gravEnergy << '\n';
+        //-0.00131642
+    }
+
 };
 
 /**
@@ -70,7 +73,7 @@ int main()
 {
     // Solve the problem
     Beam problem;
-    problem.setName("SolidBeamUnitTest");
+    problem.setName("UnsteadySolidBeam");
     problem.setElasticModulus(1e8);
     problem.setDensity(2500);
     problem.setSolidCubicMesh(20, 2, 2, 0, 0.2, 0, 0.02, 0, 0.02);
@@ -80,7 +83,9 @@ int main()
     problem.prepareForSolve();
     problem.linear_solver_pt()->disable_doc_time();
     //problem.disable_info_in_newton_solve();
-    problem.solveSteady();
-    problem.checkBeamDeflection();
+    // set time step
+    double timeScale = 0.06;
+    // simulate two oscillations, check energy balance
+    problem.solveUnsteady(2.0*timeScale, 0.04*timeScale, 1);
     return 0;
 }

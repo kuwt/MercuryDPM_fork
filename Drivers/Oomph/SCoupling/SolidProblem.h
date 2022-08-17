@@ -38,6 +38,7 @@
 #include "Math/Vector.h"
 #include <array>
 #include <cstdio>
+#include "Coupling/OomphHelpers.h"
 #include "Coupling/AnisotropicHookean.h"
 #include "Coupling/RefineableQDPVDElement.h"
 
@@ -129,11 +130,23 @@ public:
         logger(INFO, "Name: %", name_);
     }
 
+    /// get function for name_
+    std::string getName() const
+    {
+        return name_;
+    }
+
     /// set function for elasticModulus_
     void setElasticModulus(double elasticModulus)
     {
         elasticModulus_ = elasticModulus;
         logger(INFO, "Elastic Modulus: %", elasticModulus_);
+    }
+
+    /// get function for elasticModulus_
+    double getElasticModulus() const
+    {
+        return elasticModulus_;
     }
 
     /// set function for poissonRatio_
@@ -143,11 +156,23 @@ public:
         logger(INFO, "Poisson Ratio: %", poissonRatio_);
     }
 
+    /// get function for poissonRatio_
+    double getPoissonRatio() const
+    {
+        return poissonRatio_;
+    }
+
     /// set function for density_
     void setDensity(double density)
     {
         density_ = density;
         logger(INFO, "Density: %", density_);
+    }
+
+    /// get function for density_
+    double getDensity() const
+    {
+        return density_;
     }
 
     /// set function for body_force_pt
@@ -233,8 +258,14 @@ public:
     /// Get function for the traction mesh pointer
     SolidMesh*& traction_mesh_pt() { return Traction_mesh_pt; }
 
+    /// Get function for the solid mesh pointer
+    SolidMesh* const & solid_mesh_pt() const { return Solid_mesh_pt; }
+
+    /// Get function for the traction mesh pointer
+    SolidMesh* const & traction_mesh_pt() const { return Traction_mesh_pt; }
+
     /// Computes the domain size (min/max of the nodal positions in x/y/z)
-    void getDomainSize(std::array<double, 3>& min, std::array<double, 3>& max)
+    void getDomainSize(std::array<double, 3>& min, std::array<double, 3>& max) const
     {
         min[0] = min[1] = min[2] = constants::inf;
         max[0] = max[1] = max[2] = -constants::inf;
@@ -353,10 +384,13 @@ public:
     {
         logger.assert_always(mesh_pt(), "Mesh pointer not set; did you call prepareForSolve?");
         logger(INFO, "Solve steady-state problem");
+        actionsBeforeSolve();
         newton_solve();
         writeToVTK();
         saveSolidMesh();
     }
+
+    virtual void actionsBeforeSolve() {}
 
     virtual void actionsBeforeOomphTimeStep() {}
 
@@ -371,6 +405,7 @@ public:
 
         // Setup initial conditions. Default is a non-impulsive start
         assign_initial_values_impulsive(dt);
+        actionsBeforeSolve();
 
         // This is the main loop over advancing time
         double& time = time_stepper_pt()->time();
@@ -416,7 +451,7 @@ public:
     /**
      * Returns the x value at a certain xi value
      */
-    void get_x(const Vector<double>& xi, Vector<double>& x)
+    void get_x(const Vector<double>& xi, Vector<double>& x) const
     {
     #ifdef OOMPH_HAS_MPI
         logger(INFO,"get_x does not work with MPI");
@@ -443,7 +478,7 @@ public:
     /**
      * Returns the difference between the x and xi value in dimension d at a certain xi value
      */
-    double getDeflection(Vector<double> xi, unsigned d)
+    double getDeflection(Vector<double> xi, unsigned d) const
     {
         Vector<double> x(3);
         get_x(xi, x);
@@ -779,5 +814,150 @@ public:
         vtk.close();
         logger(INFO, "Written %", vtkFileName);
     }
+
+
+    void getMassMomentumEnergy(double& mass, Vector<double>& com, Vector<double>& linearMomentum, Vector<double>& angularMomentum, double& elasticEnergy,
+                               double& kineticEnergy) {
+        // Initialise mass
+        mass = 0;
+        // Initialise center of mass
+        com.initialise(0);
+        // Initialise momentum
+        linearMomentum.initialise(0);
+        angularMomentum.initialise(0);
+        // Initialise energy
+        elasticEnergy = 0;
+        kineticEnergy = 0;
+
+        // For each element
+        const unsigned long nelement = this->solid_mesh_pt()->nelement();
+        for (unsigned long e = 0; e < nelement; e++) {
+
+            // Get the pointer to the element
+            ELEMENT* e_pt = dynamic_cast<ELEMENT*>(Solid_mesh_pt->element_pt(e));
+
+            const unsigned DIM = e_pt->dim();
+
+            //Find out how many integration points there are
+            unsigned n_intpt = e_pt->integral_pt()->nweight();
+
+            //Set the Vector to hold local coordinates
+            Vector<double> s(DIM);
+
+            //Find out how many nodes there are
+            const unsigned n_node = e_pt->nnode();
+
+            //Find out how many positional dofs there are
+            const unsigned n_position_type = e_pt->nnodal_position_type();
+
+            //Set up memory for the shape functions
+            Shape psi(n_node, n_position_type);
+            DShape dpsidxi(n_node, n_position_type, DIM);
+
+            // Timescale ratio (non-dim density)
+            double lambda_sq = e_pt->lambda_sq();
+
+            //Loop over the integration points
+            for (unsigned ipt = 0; ipt < n_intpt; ipt++) {
+                //Assign local coordinate s
+                for (unsigned i = 0; i < DIM; i++) { s[i] = e_pt->integral_pt()->knot(ipt, i); }
+
+                //Get the integral weight
+                double w = e_pt->integral_pt()->weight(ipt);
+
+                //Evaluate the shape function and its derivatives, and get Jacobian
+                double J = e_pt->dshape_lagrangian_at_knot(ipt, psi, dpsidxi);
+
+                //Get mass and the coupling weight at the integration point
+                double coupling_w = 0;
+                //for (unsigned l = 0; l < n_node; l++)
+                //{
+                //    double nodal_coupling_w = dynamic_cast<SolidNode*>(e_pt->node_pt(l))->get_coupling_weight();
+                //    double psi_ = psi(l);
+                //    coupling_w += psi_ * nodal_coupling_w;
+                //}
+
+                //Get the coordinates of the integration point
+                Vector<double> x(DIM, 0.0);
+                e_pt->interpolated_x(s,x);
+
+                //Storage for Lagrangian coordinates and velocity (initialised to zero)
+                Vector<double> interpolated_xi(DIM, 0.0);
+                Vector<double> veloc(DIM, 0.0);
+
+                //Calculate lagrangian coordinates
+                for (unsigned l = 0; l < n_node; l++) {
+                    //Loop over positional dofs
+                    for (unsigned k = 0; k < n_position_type; k++) {
+                        //Loop over displacement components (deformed position)
+                        for (unsigned i = 0; i < DIM; i++) {
+                            //Calculate the Lagrangian coordinates
+                            interpolated_xi[i] += e_pt->lagrangian_position_gen(l, k, i) * psi(l, k);
+
+                            //Calculate the velocity components (if unsteady solve)
+                            if (e_pt->is_inertia_enabled()) {
+                                veloc[i] += e_pt->dnodal_position_gen_dt(l, k, i) * psi(l, k);
+                            }
+                        }
+                    }
+                }
+
+                //Get isotropic growth factor
+                double gamma = 1.0;
+                e_pt->get_isotropic_growth(ipt, s, interpolated_xi, gamma);
+
+                //Premultiply the undeformed volume ratio (from the isotropic
+                // growth), the integral weights, the coupling weights, and the Jacobian
+                double W = gamma * w * (1.0 - coupling_w) * J;
+
+                DenseMatrix<double> sigma(DIM, DIM);
+                DenseMatrix<double> strain(DIM, DIM);
+
+                //Now calculate the stress tensor from the constitutive law
+                e_pt->get_stress(s, sigma);
+
+                // Add pre-stress
+                for (unsigned i = 0; i < DIM; i++) {
+                    for (unsigned j = 0; j < DIM; j++) {
+                        sigma(i, j) += e_pt->prestress(i, j, interpolated_xi);
+                    }
+                }
+
+                //get the strain
+                e_pt->get_strain(s, strain);
+
+                // Initialise
+                double localElasticEnergy = 0;
+                double velocitySquared = 0;
+
+                // Compute integrals
+                for (unsigned i = 0; i < DIM; i++) {
+                    for (unsigned j = 0; j < DIM; j++) {
+                        localElasticEnergy += sigma(i, j) * strain(i, j);
+                    }
+                    velocitySquared += veloc[i] * veloc[i];
+                }
+
+                // Mass
+                mass += lambda_sq * W;
+                // Linear momentum and angular momentum
+                Vector<double> cross_product(DIM, 0);
+                VectorHelpers::cross(interpolated_xi, veloc, cross_product);
+                for (unsigned i = 0; i < DIM; i++) {
+                    com[i] += lambda_sq * W * x[i];
+                    linearMomentum[i] += lambda_sq * veloc[i] * W;
+                    angularMomentum[i] += lambda_sq * cross_product[i] * W;
+                }
+                // Potential energy
+                elasticEnergy += 0.5 * localElasticEnergy * W;
+                // Kinetic energy
+                kineticEnergy += lambda_sq * 0.5 * velocitySquared * W;
+            }
+        }
+        for (unsigned i = 0; i < com.size(); i++) {
+            com[i] /= mass;
+        }
+    }
+
 };
 #endif //SOLID_PROBLEM_H
