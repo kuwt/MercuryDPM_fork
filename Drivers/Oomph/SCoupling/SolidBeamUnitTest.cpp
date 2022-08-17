@@ -36,8 +36,7 @@ public:
      */
     void checkBeamDeflection()
     {
-        std::array<double,3> min;
-        std::array<double,3> max;
+        std::array<double,3> min, max;
         getDomainSize(min, max);
 
         double length = max[0]-min[0];

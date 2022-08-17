@@ -36,7 +36,7 @@ public:
     
     CoupledBeam () {
         //set name
-        setName("CoupledBeamUnitTest");
+        setName("CoupledBeam");
         //remove existing output files
         removeOldFiles();
         
@@ -45,8 +45,8 @@ public:
         setupMercury();
 
         // setup time
-        setTimeMax(4e-3);
-        setSaveCount(4);
+        setTimeMax(200);
+        setSaveCount(500);
         logger(INFO,"timeMax: %, nTimeSteps %", getTimeMax(), getTimeMax()/getTimeStep());
 
         linear_solver_pt()->disable_doc_time();
@@ -56,61 +56,54 @@ public:
         writeToVTK();
         solveSurfaceCoupling();
         saveSolidMesh();
-
-        double velocity = particleHandler.getLastObject()->getVelocity().Z;
-        //logger(INFO,"Final particle velocity %", velocity);
-        helpers::check(velocity, 0.506165, 1e-6, "final particle velocity");
     }
     
     void setupOomph() {
-        setElasticModulus(1e6);
-        setDensity(2500);
-        setSolidCubicMesh(7, 5, 5, 0, 0.16, 0, 0.04, 0, 0.01);
+        setElasticModulus(100e6);
+        setDensity(1309);
+        double h = 0.4;
+        setSolidCubicMesh(30, 2, 2, 0, 30*h, 0, 2*h, 0, 2*h);
         //pin at xmin and xmax
-        pinBoundaries({Boundary::X_MIN, Boundary::X_MAX});
-        // set time step
-        double lengthScale = 0.1;
-        double timeScale = 0.38 * lengthScale * sqrt(density_ / elasticModulus_); //TW
-        setOomphTimeStep(0.04*timeScale);
-        logger(INFO,"Oomph time step %", getOomphTimeStep());
-        //set dissipation
-        double criticalDissipation = 0.1 * sqrt(elasticModulus_ * density_ / lengthScale); //TW
-        setDissipation(criticalDissipation);
-        logger(INFO,"Adding dissipation %",criticalDissipation);
-        //setBodyForceAsGravity();
-        setNewtonSolverTolerance(3e-8);
+        pinBoundary(Boundary::X_MIN);
+        // solve
+        setNewtonSolverTolerance(1e-4);
         prepareForSolve();
         solveSteady();
-        getCentralDeflection();
+        getBeamDeflection();
         // couple boundaries
         coupleBoundary(Boundary::Z_MAX);
     }
 
     void setupMercury() {
         //set domain
-        std::array<double, 3> min;
-        std::array<double, 3> max;
+        std::array<double, 3> min, max;
         getDomainSize(min, max);
         setDomain(min, max);
         // add elastic species
         auto species = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
-        species->setDensity(1000);
-        const double radius = 5e-3;
-        const double mass = species->getMassFromRadius(radius);
-        species->setStiffnessAndRestitutionCoefficient(1000, 0.5, 2.0*mass);
+        species->setDensity(2e4);
+        const double radius = 0.1;
+        species->setStiffness(getElasticModulus()*2*radius);
         logger(INFO,"Species: %", *species);
         // add particle
         SphericalParticle p(species);
         p.setRadius(radius);
-        p.setPosition({getXCenter(),getYCenter(),getZMax()+p.getRadius()});
-        //p.setPosition({getXCenter(),getYMax()+p.getRadius(),getZCenter()});
-        p.setVelocity({0,0,-1});
+        const double mass = species->getMassFromRadius(radius);
+        double overlap = mass*9.81/species->getStiffness();
+        p.setPosition({0.2,0.2,getZMax()+radius-overlap});
+        p.setVelocity({0.1,0,0});
         auto particle = particleHandler.copyAndAddObject(p);
+        logger(INFO,"Particle: %", *particle);
+        p.setPosition({0.2,0.6,getZMax()+radius-overlap});
+        particle = particleHandler.copyAndAddObject(p);
         logger(INFO,"Particle: %", *particle);
         // set time step
         double tc = species->getCollisionTime(species->getMassFromRadius(p.getRadius()));
-        setTimeStep(0.02*tc);
+        setTimeStep(0.05*tc);
+        // set oomph and mercury time step equal
+        setOomphTimeStep(getTimeStep());
         logger(INFO,"Mercury time step %", getTimeStep());
+        logger(INFO,"Oomph time step %", getOomphTimeStep());
         // set output file properties
         setParticlesWriteVTK(true);
         setWallsWriteVTK(true);
@@ -118,24 +111,27 @@ public:
         restartFile.setFileType(FileType::ONE_FILE);
         restartFile.writeFirstAndLastTimeStep();
         // add gravity
-        setGravity({0,0,-0});
-
+        setGravity({0,0,-9.81});
     }
 
     void actionsBeforeOomphTimeStep() override {
         static std::ofstream out(getName()+".out");
-        out << getTime() << ' ' << getCentralDeflection() << ' ' << particleHandler.getLastObject()->getPosition().Z << '\n';
+        out << getTime() << ' ' << getBeamDeflection();
+        for (const auto p: particleHandler) {
+            out << ' ' << p->getPosition();
+        }
+        out << std::endl;
     }
 
     /**
      * Outputs deflection at midpoint
      */
-    double getCentralDeflection() {
+    double getBeamDeflection() {
         std::array<double,3> min, max;
         getDomainSize(min, max);
         
         Vector<double> xi(3);
-        xi[0] = 0.5*(max[0]+min[0]);
+        xi[0] = max[0];
         xi[1] = 0.5*(max[1]+min[1]);
         xi[2] = 0.5*(max[2]+min[2]);
         double deflection = getDeflection(xi,2);
@@ -143,8 +139,8 @@ public:
                xi[0], xi[1],xi[2], deflection);
 
         double mass, elasticEnergy, kineticEnergy;
-        Vector<double> linearMomentum(3), angularMomentum(3);
-        getMassMomentumEnergy(mass, linearMomentum, angularMomentum, elasticEnergy, kineticEnergy);
+        Vector<double> com(3), linearMomentum(3), angularMomentum(3);
+        getMassMomentumEnergy(mass, com, linearMomentum, angularMomentum, elasticEnergy, kineticEnergy);
         logger(INFO, "mass %, linearMomentum %, angularMomentum %, elasticEnergy %, totalEnergy %",
                mass, linearMomentum, angularMomentum, elasticEnergy, elasticEnergy+kineticEnergy);
 

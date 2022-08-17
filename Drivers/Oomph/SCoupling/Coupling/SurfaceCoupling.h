@@ -35,10 +35,10 @@ using namespace oomph;
 template<class M, class O>
 class SurfaceCoupling : public BaseCoupling<M, O>
 {
-    typedef typename O::ELEMENT_TYPE ELEMENT;
+    typedef typename O::ELEMENT ELEMENT;
+
 public:
-    
-    
+
     /**
      * information needed to link surface-coupled oomph elements to DPM
      * \todo should we move this to SurfaceCoupledElement.h?

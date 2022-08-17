@@ -65,12 +65,12 @@ using namespace oomph;
  * Additional functionality:
  * - setIsPinned allows one to define the pinned nodes using a function.
  */
-template<class ELEMENT>
+template<class ELEMENT_TYPE>
 class SolidProblem : public Problem
 {
 protected:
     //define element type (should be done by template)
-    typedef ELEMENT ELEMENT_TYPE;
+    typedef ELEMENT_TYPE ELEMENT;
 
     // name of output files (user-defined)
     std::string name_;
@@ -107,7 +107,7 @@ public:
         logger(INFO, "Set default constitutive law (GeneralisedHookean) and time stepper (Newmark<2>)");
 
         // Set Newton solver tolerance and maximum number of Newton iterations
-        Max_newton_iterations = constants::unsignedMax;
+        Max_newton_iterations = 20;
         Newton_solver_tolerance = 1e-10;
         Max_residuals = constants::inf;
 
