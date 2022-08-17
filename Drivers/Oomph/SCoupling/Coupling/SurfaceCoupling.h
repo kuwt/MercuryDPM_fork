@@ -35,9 +35,8 @@ using namespace oomph;
 template<class M, class O>
 class SurfaceCoupling : public BaseCoupling<M, O>
 {
-    typedef typename O::ELEMENT ELEMENT;
-
 public:
+    typedef typename O::ELEMENT ELEMENT;
 
     /**
      * information needed to link surface-coupled oomph elements to DPM
