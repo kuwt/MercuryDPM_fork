@@ -1,9 +1,9 @@
 include(${CMAKE_SOURCE_DIR}/Configuration/MasterMake.cmake)
-include_directories(${Mercury_SOURCE_DIR}/Oomph-lib/src/generic)
-include_directories(${Mercury_SOURCE_DIR}/Oomph-lib/src/solid)
-include_directories(${Mercury_SOURCE_DIR}/Oomph-lib/src/constitutive)
-include_directories(${Mercury_SOURCE_DIR}/Oomph-lib/src/)
-include_directories(${Mercury_SOURCE_DIR}/Oomph-lib/external_src/)
+include_directories(${Mercury_SOURCE_DIR}/oomph-lib/src/generic)
+include_directories(${Mercury_SOURCE_DIR}/oomph-lib/src/solid)
+include_directories(${Mercury_SOURCE_DIR}/oomph-lib/src/constitutive)
+include_directories(${Mercury_SOURCE_DIR}/oomph-lib/src/)
+include_directories(${Mercury_SOURCE_DIR}/oomph-lib/external_src/)
 
 #Part 1 : All cpp files will be made to exec files
 #########################################

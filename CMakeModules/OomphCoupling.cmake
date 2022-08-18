@@ -7,7 +7,7 @@ endif()
 # Clone oomph-lib if has not been cloned before
 set(OOMPH_DIR ${PROJECT_SOURCE_DIR}/oomph-lib)
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/oomph-lib/src)
-    message(STATUS "Cloning oomph-lib into ${OOMPH_DIR}")
+    message(STATUS "Cloning https://github.com/oomph-lib/oomph-lib.git")
     execute_process(COMMAND git clone https://github.com/oomph-lib/oomph-lib.git ${OOMPH_DIR})
 #else()
     #message(STATUS "Oomph-lib is residing here: ${OOMPH_DIR}")
