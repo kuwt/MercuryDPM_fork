@@ -14,23 +14,41 @@ We are about to transfer the coupled code to the MercuryDPM master branch (https
 We have implemented the following test cases:
 
 ## SolidOnParticleBed.cpp
-
 Illustrates the surface coupling technique implemented in MercuryDPM and oomph-lib. A solid cube (10cm side length) rests on four particles (2cm diameter), which rests on a fixed bottom wall. Gravity acts on both particles and the solid cube. The particle stiffness is chosen very low such that the compression due to gravitational load can be seen: the equilibrium overlap of the particle-wall and particle-cube contacts is 1mm, and you can see in the simulation that the overlaps oscillate between 0 and 2 mm. Both solid cube and particle contacts are non-dissipative, so oscillations are not damped out.
 
 \htmlonly
-<br><iframe width="420" height="315" src="https://youtube.com/shorts/HBmefXK2PZc" frameborder="0" allowfullscreen></iframe>
+<br><iframe width="600" height="400" src="https://www.youtube.com/embed/HBmefXK2PZc" frameborder="0" allowfullscreen></iframe>
 \endhtmlonly
+
+## CoupledBeam.cpp
+This is the demo from the coupling paper by Hongyang: A 20m x 80cm x 80cm beam fixed on the left end, with two particles of 20 cm diameter rolling down the beam at 0.1 m/s velocity, under gravity. Both solid cube and particle contacts are non-dissipative, so oscillations are not damped out. (Does not fully work yet; the smooth wall implementation is not there)
+
+\image html Oomph/SCoupling/CoupledBeam.png
+
+## CoupledBeamUnitTest.cpp
+A short simulation showing the unsteady interaction of a particle impacting a beam that is fixed on both sides. Colors indicate the displacement of the beam, due to gravity and the particle-beam interaction.
+
+\htmlonly
+<br><iframe width="600" height="200" src="https://www.youtube.com/embed/7fuDEd4rBc8" frameborder="0" allowfullscreen></iframe>
+\endhtmlonly
+
+## SolidBeamUnitTest.cpp
+A simple uncoupled simulation of a beam bending under gravity. A steady-state solver is used. the amount of bending is compared to an analytical solution.
+
+\htmlonly <style>div.image img[src="../../SolidBeamUnitTest.png"]{width:100%;}</style> \endhtmlonly
+\image html Oomph/SCoupling/SolidBeamUnitTest.png
+
+## UnsteadySolidBeam.cpp
+A simple uncoupled simulation of a beam bending under gravity. This time, an unsteady solver is used.
+
+\htmlonly
+<br><iframe width="600" height="200" src="https://www.youtube.com/embed/_4XvghIQyc0" frameborder="0" allowfullscreen></iframe>
+\endhtmlonly
+
+The gravitational, elastic and kinetic energies are plotted to check energy conservation.
+
+\image html Oomph/SCoupling/UnsteadySolidBeamEnergy.png
 
 ## ElementAnalysis.cpp
 A simple code returning the values of the shape functions, jacobian, weights, etc. This is useful to understand what the different oomph-lib functions do.
-
-## CoupledBeam.cpp
-...
-
-## CoupledBeamUnitTest.cpp
-..
-
-## SolidBeamUnitTest.cpp
-
-## UnsteadySolidBeam.cpp
 */
