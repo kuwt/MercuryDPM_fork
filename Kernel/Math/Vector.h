@@ -140,6 +140,11 @@ public:
         return Vec3D(X - a.X, Y - a.Y, Z - a.Z);
     };
 
+    inline bool operator==(const Vec3D& a) const
+    {
+        return X == a.X and Y == a.Y and Z == a.Z;
+    };
+
     Vec3D multiplyElementwise(const Vec3D& a) const {
         return Vec3D(X*a.X, Y*a.Y, Z*a.Z);
     }

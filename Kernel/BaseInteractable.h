@@ -414,6 +414,8 @@ public:
     virtual Mdouble getCurvature(const Vec3D& labFixedCoordinates) const
     { return 0.0; }
 
+    virtual bool isFaceContact(const Vec3D& normal) const {return true;}
+
 private:
     /*!
      * User defined function which if set describes the position of the 

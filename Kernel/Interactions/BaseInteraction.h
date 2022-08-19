@@ -373,11 +373,26 @@ public:
     virtual std::string getNameVTK(unsigned i) const;
     
     virtual std::vector<Mdouble> getFieldVTK(unsigned i) const;
-    
+
+    /*!
+     * \brief add an force increment to the total force.
+     */
+    void addForce(Vec3D force);
+
+    /*!
+     * \brief add a torque increment to the total torque.
+     */
+    void addTorque(Vec3D torque);
+
     /*!
      * \brief set total force (this is used by the normal force, tangential forces are added use addForce)
      */
     void setForce(Vec3D force);
+
+    /*!
+     * \brief set the total force (this is used by the normal force, tangential torques are added use addTorque)
+     */
+    void setTorque(Vec3D torque);
 
 protected:
     
@@ -395,25 +410,7 @@ protected:
      * \brief Returns a Mdouble to the effective radius of the interaction. (Not corrected for the overlap)
      */
     Mdouble getEffectiveMass() const;
-    
-    //functions that only the derived Interactions have to know about:
-    /*!
-     * \brief add an force increment to the total force.
-     */
-    void addForce(Vec3D force);
-    
-    /*
-     * \brief add a torque increment to the total torque.
-     */
-    void addTorque(Vec3D torque);
-    
-    //these functions are only used for normal forces and should be made private by the normal forces:
-    
-    /*!
-     * \brief set the total force (this is used by the normal force, tangential torques are added use addTorque)
-     */
-    void setTorque(Vec3D torque);
-    
+
     /*!
      * \brief set the relative velocity of the current of the interactions.
      */

@@ -3344,6 +3344,51 @@ void DPMBase::computeAllForces()
 
     }
 
+    #ifdef Mercury_TRIANGLE_WALL_CORRECTION
+    // This statement deals with interactions of a particle with a group of walls:
+    // If there are multiple contact forces between the particle and the group of walls, we assume that these contacts share a concave edge or a vertex. Thus, we multiply each force by a weight $w_{\alpha\gamma}=|\vec{f}_{\alpha\gamma}^{\text{w}}|/\sum_\gamma|\vec{f}_{\alpha\gamma}^{\text{w}}|$. Note that these weights add up to 1, thus, the total contact force between the particle and the group of walls will be a weighted average of the individual contact forces.
+    // A second modification is done in #BaseWall::getInteractionWith
+    ///\todo add OMP here
+    for (BaseParticle *p : particleHandler) {
+        // find all current interactions between this particle and a TriangleWall
+        std::vector<BaseInteraction *> wallInters;
+        double overlapSum = 0.0;
+        for (const auto i : p->getInteractions()) {
+            if (i->getI()->getName() == "TriangleWall" && i->getTimeStamp() > getNumberOfTimeSteps()) {
+                wallInters.push_back(i);
+                overlapSum += i->getOverlap();
+            }
+        }
+        // if more than one interactions are detected, we have a concave wall interaction problem.
+        if (wallInters.size() > 1) {
+            /// Stefan's weighting approach
+            // get the multiple contact points to define the new contact plane, normal, and overlap
+            for (BaseInteraction *i : wallInters) {
+                auto q = i->getI();
+                // undo the force/torque computation from multiple TriangleWalls
+                p->addForce(-i->getForce());
+                q->addForce(i->getForce());
+                if (getRotation()) {
+                    p->addTorque(-i->getTorque() + Vec3D::cross(p->getPosition() - i->getContactPoint(), i->getForce()));
+                    q->addTorque( i->getTorque() - Vec3D::cross(q->getPosition() - i->getContactPoint(), i->getForce()));
+                }
+                // reset the forces
+                double w = i->getOverlap() / overlapSum;
+                i->setContactPoint(p->getPosition() - (p->getRadius() - 0.5 * i->getOverlap()) * w * i->getNormal());
+                i->setForce(i->getForce() * w);
+                i->setTorque(i->getTorque() * w);
+                // applies the reset forces to the particle and the wall
+                p->addForce(i->getForce());
+                q->addForce(-i->getForce());
+                if (getRotation()) {
+                    p->addTorque( i->getTorque() - Vec3D::cross(p->getPosition() - i->getContactPoint(), i->getForce()));
+                    q->addTorque(-i->getTorque() + Vec3D::cross(q->getPosition() - i->getContactPoint(), i->getForce()));
+                }
+            }
+        }
+    }
+    #endif
+
 #ifdef CONTACT_LIST_HGRID
     PossibleContact* Curr=possibleContactList.getFirstPossibleContact();
     while(Curr)

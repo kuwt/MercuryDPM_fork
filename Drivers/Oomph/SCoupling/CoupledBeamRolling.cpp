@@ -33,13 +33,13 @@
 class CoupledBeam : public SurfaceCoupledSolidProblem<RefineableQDPVDElement<3, 2>>
 {
 public:
-    
+
     CoupledBeam () {
         //set name
         setName("CoupledBeamRolling");
         //remove existing output files
         removeOldFiles();
-        
+
         // setup steps
         setupOomph();
         setupMercury();
@@ -52,7 +52,7 @@ public:
         }
 
         // setup time
-        setTimeMax(2000*getTimeStep());
+        setTimeMax(2.22);
         setSaveCount(4);
         logger(INFO,"timeMax: %, nTimeSteps %", getTimeMax(), getTimeMax()/getTimeStep());
 
@@ -64,7 +64,7 @@ public:
         solveSurfaceCoupling();
         saveSolidMesh();
     }
-    
+
     void setupOomph() {
         setElasticModulus(1e6);
         setDensity(2500);
@@ -112,7 +112,8 @@ public:
         // add particle
         SphericalParticle p(species);
         p.setRadius(radius);
-        p.setPosition({getXMin()+radius,getYCenter(),getZMax()+p.getRadius()});
+        double overlap = mass*9.8/species->getStiffness();
+        p.setPosition({getXMin()+radius,getYCenter(),getZMax()+p.getRadius()-overlap});
         //p.setPosition({getXCenter(),getYMax()+p.getRadius(),getZCenter()});
         p.setVelocity({velocity,0,0});
         auto particle = particleHandler.copyAndAddObject(p);
@@ -165,7 +166,6 @@ public:
             out << ' ' << p->getPosition();
         }
         out << std::endl;
-
     }
 
     /**
@@ -174,21 +174,11 @@ public:
     double getBeamDeflection() {
         std::array<double,3> min, max;
         getDomainSize(min, max);
-        
         Vector<double> xi(3);
         xi[0] = 0.5*(max[0]+min[0]);
         xi[1] = 0.5*(max[1]+min[1]);
         xi[2] = 0.5*(max[2]+min[2]);
-        double deflection = getDeflection(xi,2);
-        logger(INFO, "Beam deflection at center (% % %) is %",
-               xi[0], xi[1],xi[2], deflection);
-
-        double mass, elasticEnergy, kineticEnergy;
-        Vector<double> com(3), linearMomentum(3), angularMomentum(3);
-        getMassMomentumEnergy(mass, com, linearMomentum, angularMomentum, elasticEnergy, kineticEnergy);
-        logger(INFO, "mass %, linearMomentum %, angularMomentum %, elasticEnergy %, totalEnergy %",
-               mass, linearMomentum, angularMomentum, elasticEnergy, elasticEnergy+kineticEnergy);
-        return deflection;
+        return getDeflection(xi,2);
     }
 };
 

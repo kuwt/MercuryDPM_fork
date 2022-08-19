@@ -36,7 +36,7 @@ public:
     
     CoupledBeam () {
         //set name
-        setName("CoupledBeamRolling");
+        setName("CoupledBeamRolling2");
         //remove existing output files
         removeOldFiles();
         

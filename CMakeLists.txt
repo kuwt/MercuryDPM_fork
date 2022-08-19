@@ -52,6 +52,11 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DMERCURY_DEBUG)
 endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
 
+option(Mercury_TRIANGLE_WALL_CORRECTION "Smooth transition between triangle walls" ON)
+if(Mercury_TRIANGLE_WALL_CORRECTION)
+	add_definitions( -DMercury_TRIANGLE_WALL_CORRECTION )
+endif()
+
 include(CMakeModules/MercuryMPI.cmake)
 
 include(CMakeModules/MercuryOMP.cmake)
@@ -105,6 +110,6 @@ configure_file(Configuration/fpdiff.py
 #	DOC "Location of python executable to use")
 
 # Determine whether to couple MercuryDPM with oomph-lib or not
-option(OOMPH_COUPLING "Couple MercuryDPM with oomph-lib" OFF)
+option(OOMPH_COUPLING "Couple MercuryDPM with oomph-lib" ON)
 # Couple with oomph-lib if OOMPH_COUPLING is on
 include(CMakeModules/OomphCoupling.cmake)
