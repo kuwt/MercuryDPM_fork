@@ -32,13 +32,14 @@ A short simulation showing the unsteady interaction of a particle impacting a be
 <br><iframe width="600" height="200" src="https://www.youtube.com/embed/7fuDEd4rBc8" frameborder="0" allowfullscreen></iframe>
 \endhtmlonly
 
+\image html Oomph/SCoupling/CoupledBeamUnitTestEnergy.png
+
 ## SolidBeamUnitTest.cpp
 A simple uncoupled simulation of a beam bending under gravity. A steady-state solver is used. the amount of bending is compared to an analytical solution.
 
-\htmlonly <style>div.image img[src="../../SolidBeamUnitTest.png"]{width:100%;}</style> \endhtmlonly
 \image html Oomph/SCoupling/SolidBeamUnitTest.png
 
-## UnsteadySolidBeam.cpp
+## SolidBeamUnsteady.cpp
 A simple uncoupled simulation of a beam bending under gravity. This time, an unsteady solver is used.
 
 \htmlonly
@@ -47,7 +48,7 @@ A simple uncoupled simulation of a beam bending under gravity. This time, an uns
 
 The gravitational, elastic and kinetic energies are plotted to check energy conservation.
 
-\image html Oomph/SCoupling/UnsteadySolidBeamEnergy.png
+\image html Oomph/SCoupling/SolidBeamUnsteadyEnergy.png
 
 ## ElementAnalysis.cpp
 A simple code returning the values of the shape functions, jacobian, weights, etc. This is useful to understand what the different oomph-lib functions do.

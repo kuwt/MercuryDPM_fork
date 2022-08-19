@@ -26,13 +26,32 @@
 #include "Coupling/SolidProblem.h"
 #include "Math/Helpers.h"
 
-/// Defines a SolidProblem of element type RefineableQDPVDElement<3,2>.
+/// Defines a SolidProblem of element type RefineableQDPVDElement<3,2>. Add functionality to write output
 class Beam : public SolidProblem<RefineableQDPVDElement<3, 2>>
 {
-    /**
-     * Checks the beam deflection against an analytical solution:
-     * https://autofem.com/examples/deflection_of_a_plate_under_theg.html
-     */
+    /// output file stream
+    std::ofstream out;
+
+    /// Write header of output file
+    void actionsBeforeSolve() {
+        helpers::writeToFile(getName()+".gnu", "set key autotitle columnheader\n"
+           "p 'SolidBeamUnsteady.out' u 1:3 w l, '' u 1:4 w l, '' u 1:5 w l, '' u 1:($3+$4+$5) t 'totalEnergy' w l");
+        out.open(getName()+".out");
+        out << "time deflection elasticEnergy kineticEnergy gravEnergy\n";
+    }
+
+    /// Each time step, compute deflection, elastic, kinetic and gravitational energy, and write to output file
+    void actionsBeforeOomphTimeStep() override {
+        double mass, elasticEnergy, kineticEnergy;
+        Vector<double> com(3), linearMomentum(3), angularMomentum(3);
+        getMassMomentumEnergy(mass, com, linearMomentum, angularMomentum, elasticEnergy, kineticEnergy);
+        static double comZ0 = com[2];
+        double gravEnergy = 9.8*mass*(com[2]-comZ0);
+        out << getOomphTime() << ' ' << getBeamDeflection() << ' ' << elasticEnergy << ' ' << kineticEnergy << ' ' << gravEnergy << std::endl;
+        std::cout << getOomphTime() << ' ' << getBeamDeflection() << ' ' << elasticEnergy << ' ' << kineticEnergy << ' ' << gravEnergy << '\n';
+    }
+
+    /// Computes beam deflection
     double getBeamDeflection() const {
         std::array<double, 3> min, max;
         getDomainSize(min, max);
@@ -44,26 +63,6 @@ class Beam : public SolidProblem<RefineableQDPVDElement<3, 2>>
         return getDeflection(xi, 2);
     }
 
-    std::ofstream out;
-
-    void actionsBeforeSolve() {
-        helpers::writeToFile(getName()+".gnu", "set key autotitle columnheader\n"
-           "p 'UnsteadySolidBeam.out' u 1:3, '' u 1:4, '' u 1:5, '' u 1:($3+$4+$5) t 'totalEnergy'");
-        out.open(getName()+".out");
-        out << "time deflection elasticEnergy kineticEnergy gravEnergy\n";
-    }
-
-    void actionsBeforeOomphTimeStep() override {
-        double mass, elasticEnergy, kineticEnergy;
-        Vector<double> com(3), linearMomentum(3), angularMomentum(3);
-        getMassMomentumEnergy(mass, com, linearMomentum, angularMomentum, elasticEnergy, kineticEnergy);
-        static double comZ0 = com[2];
-        double gravEnergy = 9.8*mass*(com[2]-comZ0);
-        out << getOomphTime() << ' ' << getBeamDeflection() << ' ' << elasticEnergy << ' ' << kineticEnergy << ' ' << gravEnergy << std::endl;
-        std::cout << getOomphTime() << ' ' << getBeamDeflection() << ' ' << elasticEnergy << ' ' << kineticEnergy << ' ' << gravEnergy << '\n';
-        //-0.00131642
-    }
-
 };
 
 /**
@@ -73,7 +72,7 @@ int main()
 {
     // Solve the problem
     Beam problem;
-    problem.setName("UnsteadySolidBeam");
+    problem.setName("SolidBeamUnsteady");
     problem.setElasticModulus(1e8);
     problem.setDensity(2500);
     problem.setSolidCubicMesh(20, 2, 2, 0, 0.2, 0, 0.02, 0, 0.02);
@@ -83,9 +82,13 @@ int main()
     problem.prepareForSolve();
     problem.linear_solver_pt()->disable_doc_time();
     //problem.disable_info_in_newton_solve();
-    // set time step
-    double timeScale = 0.06;
+    //set time scale of oscillation
+    //https://vlab.amrita.edu/?sub=3&brch=175&sim=1080&cnt=1
+    double b = 0.02, d = 0.02, l = 0.2;
+    double inertia = b*d*d*d/12;
+    double omega = 1.875*1.875*sqrt(problem.getElasticModulus()*inertia/(problem.getDensity()*b*d*std::pow(l,4)));
+    double timeScale = 2*constants::pi/omega; //0.06
     // simulate two oscillations, check energy balance
-    problem.solveUnsteady(2.0*timeScale, 0.04*timeScale, 1);
+    problem.solveUnsteady(2.0*timeScale, 0.04*timeScale, 10);
     return 0;
 }

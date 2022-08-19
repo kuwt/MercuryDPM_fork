@@ -84,6 +84,9 @@ protected:
     /// Density
     double density_ = 0;
 
+    /// Density
+    double gravity_ = 0;
+
     /// Pointer to the body force function
     void (* body_force_fct)(const double& time, const Vector<double>& xi, Vector<double>& b) = nullptr;
 
@@ -149,6 +152,19 @@ public:
         return elasticModulus_;
     }
 
+    /// set function for elasticModulus_
+    void setOomphGravity(double gravity)
+    {
+        gravity_ = gravity;
+        logger(INFO, "Elastic Modulus: %", gravity_);
+    }
+
+    /// get function for gravity_
+    double getOomphGravity() const
+    {
+        return gravity_;
+    }
+
     /// set function for poissonRatio_
     void setPoissonRatio(double poissonRatio)
     {
@@ -176,15 +192,17 @@ public:
     }
 
     /// set function for body_force_pt
-    void setBodyForceAsGravity()
+    void setBodyForceAsGravity(double gravity = 9.8)
     {
         logger(INFO, "Setting oomph-gravity in z-direction");
+        gravity_ = gravity;
         // define a static body force
         static double& Density = density_;
+        static double& Gravity = gravity_;
         body_force_fct = [](const double& time, const Vector<double>& xi, Vector<double>& b) {
             b[0] = 0.0;
             b[1] = 0.0;
-            b[2] = -9.8 * Density;
+            b[2] = -Gravity * Density;
         };
     }
 
@@ -419,7 +437,7 @@ public:
                     timeMax * Global_Physical_Variables::timeScale, count, countMax);
             actionsBeforeOomphTimeStep();
             // solve the oomphProb for one time step (this also increments time)
-            unsteady_newton_solve(dt);
+            adaptive_unsteady_newton_solve(dt,2e-7);
             // increase count
             count++;
             // write outputs of the oomphProb
@@ -815,7 +833,7 @@ public:
         logger(INFO, "Written %", vtkFileName);
     }
 
-
+    /// See PVDEquationsBase<DIM>::get_energy
     void getMassMomentumEnergy(double& mass, Vector<double>& com, Vector<double>& linearMomentum, Vector<double>& angularMomentum, double& elasticEnergy,
                                double& kineticEnergy) {
         // Initialise mass

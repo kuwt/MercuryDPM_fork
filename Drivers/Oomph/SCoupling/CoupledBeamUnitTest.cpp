@@ -44,8 +44,15 @@ public:
         setupOomph();
         setupMercury();
 
+        // equalise time step
+        if (getOomphTimeStep()>getTimeStep()) {
+            setOomphTimeStep(getTimeStep());
+        } else {
+            setTimeStep(getOomphTimeStep());
+        }
+
         // setup time
-        setTimeMax(4e-3);
+        setTimeMax(100*getTimeStep());
         setSaveCount(4);
         logger(INFO,"timeMax: %, nTimeSteps %", getTimeMax(), getTimeMax()/getTimeStep());
 
@@ -69,19 +76,23 @@ public:
         //pin at xmin and xmax
         pinBoundaries({Boundary::X_MIN, Boundary::X_MAX});
         // set time step
-        double lengthScale = 0.1;
-        double timeScale = 0.38 * lengthScale * sqrt(density_ / elasticModulus_); //TW
+        //set time scale of oscillation
+        //https://vlab.amrita.edu/?sub=3&brch=175&sim=1080&cnt=1
+        double b = 0.04, d = 0.01, l = 0.08;
+        double inertia = b*d*d*d/12;
+        double omega = 1.875*1.875*sqrt(getElasticModulus()*inertia/(getDensity()*b*d*std::pow(l,4)));
+        double timeScale = 2*constants::pi/omega; //0.06
         setOomphTimeStep(0.04*timeScale);
         logger(INFO,"Oomph time step %", getOomphTimeStep());
         //set dissipation
-        double criticalDissipation = 0.1 * sqrt(elasticModulus_ * density_ / lengthScale); //TW
-        setDissipation(criticalDissipation);
-        logger(INFO,"Adding dissipation %",criticalDissipation);
+        //double criticalDissipation = 0.1 * sqrt(elasticModulus_ * density_ / lengthScale); //TW
+        //setDissipation(criticalDissipation);
+        //logger(INFO,"Adding dissipation %",criticalDissipation);
         //setBodyForceAsGravity();
         setNewtonSolverTolerance(3e-8);
         prepareForSolve();
         solveSteady();
-        getCentralDeflection();
+        getBeamDeflection();
         // couple boundaries
         coupleBoundary(Boundary::Z_MAX);
     }
@@ -97,18 +108,21 @@ public:
         species->setDensity(1000);
         const double radius = 5e-3;
         const double mass = species->getMassFromRadius(radius);
-        species->setStiffnessAndRestitutionCoefficient(1000, 0.5, 2.0*mass);
+        // stiffness such that k*(0.1*r)=.5*m*v^2
+        double velocity = 0.05;
+        double stiffness = mass*velocity*velocity/(0.01*radius*radius);
+        species->setStiffness(stiffness);
         logger(INFO,"Species: %", *species);
         // add particle
         SphericalParticle p(species);
         p.setRadius(radius);
         p.setPosition({getXCenter(),getYCenter(),getZMax()+p.getRadius()});
         //p.setPosition({getXCenter(),getYMax()+p.getRadius(),getZCenter()});
-        p.setVelocity({0,0,-1});
+        p.setVelocity({0,0,-velocity});
         auto particle = particleHandler.copyAndAddObject(p);
         logger(INFO,"Particle: %", *particle);
         // set time step
-        double tc = species->getCollisionTime(species->getMassFromRadius(p.getRadius()));
+        double tc = species->getCollisionTime(mass);
         setTimeStep(0.02*tc);
         logger(INFO,"Mercury time step %", getTimeStep());
         // set output file properties
@@ -119,18 +133,45 @@ public:
         restartFile.writeFirstAndLastTimeStep();
         // add gravity
         setGravity({0,0,-0});
-
     }
 
+    /// output file stream
+    std::ofstream out;
+
+    /// Write header of output file
+    void actionsBeforeSolve() {
+        helpers::writeToFile(
+                getName()+".gnu",
+                "set xlabel 'time'\n"
+                "set ylabel 'kinetic and potential energy'\n"
+                "p 'CoupledBeamUnitTest.out' u 1:($3+$4) w lp t 'oomph-lib', '' u 1:(($6+$7-6.54498e-07 )) w lp t 'MercuryDPM', '' u 1:($3+$4+$6+$7-6.54498e-07) w lp t 'total'");
+        out.open(getName()+".out");
+        out << "time deflection elasticEnergy kineticEnergy gravEnergy elasticEnergyInteractions kineticEnergyParticles gravEnergyParticles\n";
+    }
+
+    /// Each time step, compute deflection, elastic, kinetic and gravitational energy, and write to output file
     void actionsBeforeOomphTimeStep() override {
-        static std::ofstream out(getName()+".out");
-        out << getTime() << ' ' << getCentralDeflection() << ' ' << particleHandler.getLastObject()->getPosition().Z << '\n';
+        double mass, elasticEnergy, kineticEnergy;
+        Vector<double> com(3), linearMomentum(3), angularMomentum(3);
+        getMassMomentumEnergy(mass, com, linearMomentum, angularMomentum, elasticEnergy, kineticEnergy);
+        static double gravEnergy0 = getOomphGravity()*mass*com[2];
+        double gravEnergy = getOomphGravity()*mass*com[2]-gravEnergy0;
+        static double gravEnergyParticle0 = getGravitationalEnergy();
+        out << getOomphTime()
+                << ' ' << getBeamDeflection()
+                << ' ' << elasticEnergy
+                << ' ' << kineticEnergy
+                << ' ' << gravEnergy
+                << ' ' << getElasticEnergy()
+                << ' ' << getKineticEnergy()
+                << ' ' << getGravitationalEnergy()-gravEnergyParticle0
+                << std::endl;
     }
 
     /**
      * Outputs deflection at midpoint
      */
-    double getCentralDeflection() {
+    double getBeamDeflection() {
         std::array<double,3> min, max;
         getDomainSize(min, max);
         
