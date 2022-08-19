@@ -36,7 +36,7 @@ public:
     
     CoupledBeam () {
         //set name
-        setName("CoupledBeam");
+        setName("CoupledBeamRolling");
         //remove existing output files
         removeOldFiles();
         
@@ -44,9 +44,16 @@ public:
         setupOomph();
         setupMercury();
 
+        // equalise time step
+        if (getOomphTimeStep()>getTimeStep()) {
+            setOomphTimeStep(getTimeStep());
+        } else {
+            setTimeStep(getOomphTimeStep());
+        }
+
         // setup time
-        setTimeMax(200);
-        setSaveCount(500);
+        setTimeMax(2000*getTimeStep());
+        setSaveCount(4);
         logger(INFO,"timeMax: %, nTimeSteps %", getTimeMax(), getTimeMax()/getTimeStep());
 
         linear_solver_pt()->disable_doc_time();
@@ -59,14 +66,26 @@ public:
     }
     
     void setupOomph() {
-        setElasticModulus(100e6);
-        setDensity(1309);
-        double h = 0.4;
-        setSolidCubicMesh(30, 2, 2, 0, 30*h, 0, 2*h, 0, 2*h);
+        setElasticModulus(1e6);
+        setDensity(2500);
+        setSolidCubicMesh(7, 5, 5, 0, 0.16, 0, 0.04, 0, 0.01);
         //pin at xmin and xmax
-        pinBoundary(Boundary::X_MIN);
-        // solve
-        setNewtonSolverTolerance(1e-4);
+        pinBoundaries({Boundary::X_MIN, Boundary::X_MAX});
+        // set time step
+        //set time scale of oscillation
+        //https://vlab.amrita.edu/?sub=3&brch=175&sim=1080&cnt=1
+        double b = 0.04, d = 0.01, l = 0.08;
+        double inertia = b*d*d*d/12;
+        double omega = 1.875*1.875*sqrt(getElasticModulus()*inertia/(getDensity()*b*d*std::pow(l,4)));
+        double timeScale = 2*constants::pi/omega; //0.06
+        setOomphTimeStep(0.04*timeScale);
+        logger(INFO,"Oomph time step %", getOomphTimeStep());
+        //set dissipation
+        //double criticalDissipation = 0.1 * sqrt(elasticModulus_ * density_ / lengthScale); //TW
+        //setDissipation(criticalDissipation);
+        //logger(INFO,"Adding dissipation %",criticalDissipation);
+        //setBodyForceAsGravity();
+        setNewtonSolverTolerance(3e-8);
         prepareForSolve();
         solveSteady();
         getBeamDeflection();
@@ -76,34 +95,32 @@ public:
 
     void setupMercury() {
         //set domain
-        std::array<double, 3> min, max;
+        std::array<double, 3> min;
+        std::array<double, 3> max;
         getDomainSize(min, max);
         setDomain(min, max);
         // add elastic species
         auto species = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
-        species->setDensity(2e4);
-        const double radius = 0.1;
-        species->setStiffness(getElasticModulus()*2*radius);
+        species->setDensity(1000);
+        const double radius = 5e-3;
+        const double mass = species->getMassFromRadius(radius);
+        // stiffness such that k*(0.1*r)=.5*m*v^2
+        double velocity = 0.05;
+        double stiffness = mass*velocity*velocity/(0.01*radius*radius);
+        species->setStiffness(stiffness);
         logger(INFO,"Species: %", *species);
         // add particle
         SphericalParticle p(species);
         p.setRadius(radius);
-        const double mass = species->getMassFromRadius(radius);
-        double overlap = mass*9.81/species->getStiffness();
-        p.setPosition({0.2,0.2,getZMax()+radius-overlap});
-        p.setVelocity({0.1,0,0});
+        p.setPosition({getXMin()+radius,getYCenter(),getZMax()+p.getRadius()});
+        //p.setPosition({getXCenter(),getYMax()+p.getRadius(),getZCenter()});
+        p.setVelocity({velocity,0,0});
         auto particle = particleHandler.copyAndAddObject(p);
         logger(INFO,"Particle: %", *particle);
-        p.setPosition({0.2,0.6,getZMax()+radius-overlap});
-        particle = particleHandler.copyAndAddObject(p);
-        logger(INFO,"Particle: %", *particle);
         // set time step
-        double tc = species->getCollisionTime(species->getMassFromRadius(p.getRadius()));
+        double tc = species->getCollisionTime(mass);
         setTimeStep(0.05*tc);
-        // set oomph and mercury time step equal
-        setOomphTimeStep(getTimeStep());
         logger(INFO,"Mercury time step %", getTimeStep());
-        logger(INFO,"Oomph time step %", getOomphTimeStep());
         // set output file properties
         setParticlesWriteVTK(true);
         setWallsWriteVTK(true);
@@ -111,7 +128,7 @@ public:
         restartFile.setFileType(FileType::ONE_FILE);
         restartFile.writeFirstAndLastTimeStep();
         // add gravity
-        setGravity({0,0,-9.81});
+        setGravity({0,0,-9.8});
     }
 
     /// output file stream
@@ -123,7 +140,7 @@ public:
                 getName()+".gnu",
                 "set xlabel 'time'\n"
                 "set ylabel 'kinetic and potential energy'\n"
-                "p 'CoupledBeam.out' u 1:($3+$4) w lp t 'oomph-lib', '' u 1:(($6+$7-6.54498e-07 )) w lp t 'MercuryDPM', '' u 1:($3+$4+$6+$7-6.54498e-07) w lp t 'total'");
+                "p 'CoupledBeamRolling.out' u 1:($3+$4+$5) w lp t 'oomph-lib', '' u 1:(($6+$7+$8)) w lp t 'MercuryDPM', '' u 1:($3+$4+$5+$6+$7+$8) w lp t 'total'");
         out.open(getName()+".out");
         out << "time deflection elasticEnergy kineticEnergy gravEnergy elasticEnergyInteractions kineticEnergyParticles gravEnergyParticles particlePosition\n";
     }
@@ -137,17 +154,18 @@ public:
         double gravEnergy = getOomphGravity()*mass*com[2]-gravEnergy0;
         static double gravEnergyParticle0 = getGravitationalEnergy();
         out << getOomphTime()
-            << ' ' << getBeamDeflection()
-            << ' ' << elasticEnergy
-            << ' ' << kineticEnergy
-            << ' ' << gravEnergy
-            << ' ' << getElasticEnergy()
-            << ' ' << getKineticEnergy()
-            << ' ' << getGravitationalEnergy()-gravEnergyParticle0;
+                << ' ' << getBeamDeflection()
+                << ' ' << elasticEnergy
+                << ' ' << kineticEnergy
+                << ' ' << gravEnergy
+                << ' ' << getElasticEnergy()
+                << ' ' << getKineticEnergy()
+                << ' ' << getGravitationalEnergy()-gravEnergyParticle0;
         for (const auto p: particleHandler) {
             out << ' ' << p->getPosition();
         }
         out << std::endl;
+
     }
 
     /**
@@ -158,7 +176,7 @@ public:
         getDomainSize(min, max);
         
         Vector<double> xi(3);
-        xi[0] = max[0];
+        xi[0] = 0.5*(max[0]+min[0]);
         xi[1] = 0.5*(max[1]+min[1]);
         xi[2] = 0.5*(max[2]+min[2]);
         double deflection = getDeflection(xi,2);
@@ -170,7 +188,6 @@ public:
         getMassMomentumEnergy(mass, com, linearMomentum, angularMomentum, elasticEnergy, kineticEnergy);
         logger(INFO, "mass %, linearMomentum %, angularMomentum %, elasticEnergy %, totalEnergy %",
                mass, linearMomentum, angularMomentum, elasticEnergy, elasticEnergy+kineticEnergy);
-
         return deflection;
     }
 };

@@ -66,7 +66,7 @@ public:
 
         double velocity = particleHandler.getLastObject()->getVelocity().Z;
         //logger(INFO,"Final particle velocity %", velocity);
-        helpers::check(velocity, 0.506165, 1e-6, "final particle velocity");
+        helpers::check(velocity, 0.0495209, 1e-6, "final particle velocity");
     }
     
     void setupOomph() {
