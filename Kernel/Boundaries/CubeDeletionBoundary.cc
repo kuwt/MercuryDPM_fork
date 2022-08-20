@@ -30,7 +30,6 @@
 #include "ParticleHandler.h"
 #include "Particles/BaseParticle.h"
 #include <algorithm>
-#include "Domain.h"
 
 CubeDeletionBoundary::CubeDeletionBoundary() : DeletionBoundary()
 {

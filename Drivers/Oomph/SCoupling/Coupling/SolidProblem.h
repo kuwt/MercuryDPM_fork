@@ -52,6 +52,12 @@
 
 using namespace oomph;
 
+#ifdef OOMPH_HAS_MPI
+    #define OOMPH_MPI_PROCESSOR_ID communicator_pt()->my_rank()
+#else
+    #define OOMPH_MPI_PROCESSOR_ID 0
+#endif
+
 /**
  * Base class for (surface-coupled) problems with a solid body.
  *

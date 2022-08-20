@@ -24,7 +24,6 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Math/Helpers.h"
-#include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
 #include "Coupling/SurfaceCoupledSolidProblem.h"
 
 /**
@@ -36,6 +35,9 @@ public:
     ElementAnalysis () {
         //set name
         setName("ElementAnalysis");
+        #ifdef OOMPH_HAS_MUMPS
+        linear_solver_pt()=new MumpsSolver;
+        #endif
         //remove existing output files
         removeOldFiles();
 
@@ -105,7 +107,7 @@ public:
         }
     }
 
-    Vector<double> getXiCenter(ELEMENT* e_pt) {
+    static Vector<double> getXiCenter(ELEMENT* e_pt) {
         Vector<double> center(3);
         for (int n = 0; n < e_pt->nnode(); ++n) {
             SolidNode* n_pt = dynamic_cast<SolidNode*>(e_pt->node_pt(n));

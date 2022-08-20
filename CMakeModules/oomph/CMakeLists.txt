@@ -1,3 +1,6 @@
+# This file includes stuff neccessary for compilation in the oomph directory;
+# for general settings regarding oomph, use OomphlibCoupling.cmake
+
 # the extern keyword is treated compiler-specific
 #\todo add keywords for other fortran compilers
 if(CMAKE_COMPILER_IS_GNUG77)
@@ -22,18 +25,6 @@ endif()
 option(OOMPH_HAS_TRILINOS "Whether TRILINOS is installed" OFF)
 if (OOMPH_HAS_TRILINOS)
     add_definitions( -DOOMPH_HAS_TRILINOS )
-endif()
-
-#add CMakeCache option
-option(OOMPH_HAS_MPI "Whether MPI is installed" OFF)
-if (OOMPH_HAS_MPI)
-    add_definitions( -DOOMPH_HAS_MPI )
-    FIND_PACKAGE(MPI REQUIRED)
-    if(NOT MPI_FOUND)
-        message(FATAL_ERROR "The option you have chosen requires mpi and you do not have this installed. Please install")
-    endif()
-    include_directories(${MPI_CXX_INCLUDE_PATH})
-    add_definitions( -DUSING_OOMPH_SUPERLU_DIST )
 endif()
 
 # the #include statements in oomph-lib assume these paths to be set

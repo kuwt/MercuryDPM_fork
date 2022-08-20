@@ -9,14 +9,42 @@ set(OOMPH_DIR ${PROJECT_SOURCE_DIR}/oomph-lib)
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/oomph-lib/src)
     message(STATUS "Cloning https://github.com/oomph-lib/oomph-lib.git")
     execute_process(COMMAND git clone https://github.com/oomph-lib/oomph-lib.git ${OOMPH_DIR})
-#else()
-    #message(STATUS "Oomph-lib is residing here: ${OOMPH_DIR}")
 endif()
 
+#add CMakeCache option
+option(OOMPH_HAS_MPI "Whether MPI is installed" OFF)
+if (OOMPH_HAS_MPI)
+    add_definitions( -DOOMPH_HAS_MPI )
+    FIND_PACKAGE(MPI REQUIRED)
+    if(NOT MPI_FOUND)
+        message(FATAL_ERROR "The option you have chosen requires mpi and you do not have this installed. Please install")
+    endif()
+    message(STATUS "MPI found: ${MPI_CXX_INCLUDE_PATH}")
+    include_directories(${MPI_CXX_INCLUDE_PATH})
+    add_definitions( -DOOMPH_HAS_MPI )
+    set(MPI_CXX_LIBRARIES oomph_superlu_dist_3.0 ${MPI_CXX_LIBRARIES})
+    add_definitions( -DUSING_OOMPH_SUPERLU_DIST )
+endif()
+
+#add CMakeCache options
+option(MUMPS_INCLUDE_DIR "Whether MUMPS is installed" "")
+if (MPI_FOUND AND MUMPS_INCLUDE_DIR)
+    FIND_PACKAGE(MUMPS)
+    if (MUMPS_FOUND)
+        add_definitions( -DOOMPH_HAS_MUMPS )
+        message(STATUS "MUMPS found: ${MUMPS_INCLUDE_DIR}")
+        #add_library(MUMPS_LIBRARY)
+        include_directories(${MUMPS_INCLUDE_DIR})
+    else()
+        message(ERROR "MUMPS not found; please set OOMPH_HAS_MUMPS=OFF")
+    endif()
+endif()
+
+# Choose whether to compile with cmake or use prebuilt oomph
 option(OOMPH_CMAKE "Use cmake to couple oomph-lib (if coupling turned on)" ON)
 if (OOMPH_CMAKE)
+    # copy CMakeFiles, add oomph directory to compilation
     message(STATUS "Compiling oomph with CMake")
-    # copy CMakeFiles
     FILE(COPY CMakeModules/oomph/CMakeLists.txt DESTINATION ${OOMPH_DIR})
     FILE(COPY CMakeModules/oomph/src/CMakeLists.txt DESTINATION ${OOMPH_DIR}/src)
     FILE(COPY CMakeModules/oomph/src/generic/CMakeLists.txt DESTINATION ${OOMPH_DIR}/src/generic)
@@ -58,10 +86,5 @@ include_directories(${OOMPH_DIR}/src ${OOMPH_DIR}/src/poisson ${OOMPH_DIR}/src/g
 
 add_library(oomph STATIC ${CMAKE_SOURCE_DIR}/Kernel/Logger.cc)
 
-if (OOMPH_HAS_MPI)
-    set(MPILIBS oomph_superlu_dist_3.0)
-    add_definitions( -DOOMPH_HAS_MPI )
-endif()
-
-target_link_libraries(oomph steady_axisym_advection_diffusion young_laplace advection_diffusion advection_diffusion_reaction axisym_advection_diffusion axisym_foeppl_von_karman axisym_linear_elasticity axisym_navier_stokes axisym_poroelasticity axisym_spherical_solid beam biharmonic constitutive darcy fluid_interface flux_transport foeppl_von_karman fourier_decomposed_helmholtz generalised_newtonian_axisym_navier_stokes generalised_newtonian_navier_stokes helmholtz linear_elasticity linear_wave linearised_navier_stokes linearised_axisym_navier_stokes mesh_smoothing meshes multi_physics navier_stokes ode poisson polar_navier_stokes poroelasticity rigid_body shell solid spherical_advection_diffusion spherical_navier_stokes  time_harmonic_fourier_decomposed_linear_elasticity time_harmonic_linear_elasticity unsteady_heat womersley generic oomph_hsl oomph_arpack oomph_crbond_bessel oomph_triangle oomph_tetgen oomph_superlu_4.3 ${MPILIBS} oomph_lapack oomph_flapack oomph_blas  oomph_metis_from_parmetis_3.1.1)
+target_link_libraries(oomph steady_axisym_advection_diffusion young_laplace advection_diffusion advection_diffusion_reaction axisym_advection_diffusion axisym_foeppl_von_karman axisym_linear_elasticity axisym_navier_stokes axisym_poroelasticity axisym_spherical_solid beam biharmonic constitutive darcy fluid_interface flux_transport foeppl_von_karman fourier_decomposed_helmholtz generalised_newtonian_axisym_navier_stokes generalised_newtonian_navier_stokes helmholtz linear_elasticity linear_wave linearised_navier_stokes linearised_axisym_navier_stokes mesh_smoothing meshes multi_physics navier_stokes ode poisson polar_navier_stokes poroelasticity rigid_body shell solid spherical_advection_diffusion spherical_navier_stokes  time_harmonic_fourier_decomposed_linear_elasticity time_harmonic_linear_elasticity unsteady_heat womersley generic oomph_hsl oomph_arpack oomph_crbond_bessel oomph_triangle oomph_tetgen oomph_superlu_4.3 ${MPI_CXX_LIBRARIES} ${MUMPS_LIBRARIES} oomph_lapack oomph_flapack oomph_blas  oomph_metis_from_parmetis_3.1.1)
 # reynolds_averaged_navier_stokes

@@ -71,10 +71,17 @@ include(CMakeModules/MercuryDocumentation.cmake)
 
 include(CMakeModules/MercuryXballs.cmake)
 
-add_subdirectory(Drivers)
+# this is done before including oom
 add_subdirectory(Kernel)
 add_subdirectory(Tools)
 add_subdirectory(XBalls)
+
+# Determine whether to couple MercuryDPM with oomph-lib or not
+option(OOMPH_COUPLING "Couple MercuryDPM with oomph-lib" ON)
+# Couple with oomph-lib if OOMPH_COUPLING is on
+include(CMakeModules/OomphCoupling.cmake)
+# this is done after oomph is included since it needs the includes defined there
+add_subdirectory(Drivers)
 
 #Add the command fullTest, which rebuilds the cache, cleans the project and then compiles and tests everything.
 add_custom_target(fullTest
@@ -108,8 +115,3 @@ configure_file(Configuration/fpdiff.py
 
 #find_program(PYTHON_EXEC "python" 
 #	DOC "Location of python executable to use")
-
-# Determine whether to couple MercuryDPM with oomph-lib or not
-option(OOMPH_COUPLING "Couple MercuryDPM with oomph-lib" ON)
-# Couple with oomph-lib if OOMPH_COUPLING is on
-include(CMakeModules/OomphCoupling.cmake)
