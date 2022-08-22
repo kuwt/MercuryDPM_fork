@@ -29,6 +29,3 @@ endforeach()
 
 #compile to a library named generic
 add_library(generic STATIC ${sources})
-
-#link generic to the external_src libraries
-target_link_libraries(generic oomph_superlu_4.3 oomph_flapack oomph_arpack oomph_blas oomph_crbond_bessel oomph_hsl oomph_lapack  oomph_tetgen oomph_triangle)

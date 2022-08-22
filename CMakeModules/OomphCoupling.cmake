@@ -22,7 +22,8 @@ if (OOMPH_HAS_MPI)
     message(STATUS "MPI found: ${MPI_CXX_INCLUDE_PATH}")
     include_directories(${MPI_CXX_INCLUDE_PATH})
     add_definitions( -DOOMPH_HAS_MPI )
-    set(MPI_CXX_LIBRARIES oomph_superlu_dist_3.0 ${MPI_CXX_LIBRARIES})
+    # add libraries that are only needed in MPI mode
+    set(MPI_CXX_LIBRARIES oomph_superlu_dist_3.0 oomph_metis_from_parmetis_3.1.1 ${MPI_CXX_LIBRARIES})
     add_definitions( -DUSING_OOMPH_SUPERLU_DIST )
 endif()
 
@@ -59,9 +60,9 @@ if (OOMPH_CMAKE)
             FILE(COPY ${OOMPH_DIR}/external_src/oomph_triangle/dummy_fpu_control.h DESTINATION ${OOMPH_DIR})
             FILE(RENAME ${OOMPH_DIR}/dummy_fpu_control.h ${OOMPH_DIR}/external_src/oomph_triangle/fpu_control.h)
         ENDIF()
-        #-DCMAKE_C_FLAGS=-Wno-implicit-function-declaration -DCMAKE_CXX_FLAGS=-Wno-undefined-var-template -DOOMPH_CMAKE=ON -DCMAKE_OSX_DEPLOYMENT_TARGET=11.3
-        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-implicit-function-declaration")
-        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undefined-var-template")
+        # silence some oomph-warnings
+        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-implicit-function-declaration -Wformat-extra-args -Wno-parentheses -Wno-implicit-int -Wno-format-security ")
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-undefined-var-template -Wno-instantiation-after-specialization")
     endif ()
     add_subdirectory(${OOMPH_DIR})
 else()
@@ -84,7 +85,16 @@ endif()
 # (so you can write e.g. #include "mesh.h")
 include_directories(${OOMPH_DIR}/src ${OOMPH_DIR}/src/poisson ${OOMPH_DIR}/src/generic ${OOMPH_DIR}/src/solid ${OOMPH_DIR}/src/constitutive ${OOMPH_DIR}/external_src)
 
-add_library(oomph STATIC ${CMAKE_SOURCE_DIR}/Kernel/Logger.cc)
 
-target_link_libraries(oomph steady_axisym_advection_diffusion young_laplace advection_diffusion advection_diffusion_reaction axisym_advection_diffusion axisym_foeppl_von_karman axisym_linear_elasticity axisym_navier_stokes axisym_poroelasticity axisym_spherical_solid beam biharmonic constitutive darcy fluid_interface flux_transport foeppl_von_karman fourier_decomposed_helmholtz generalised_newtonian_axisym_navier_stokes generalised_newtonian_navier_stokes helmholtz linear_elasticity linear_wave linearised_navier_stokes linearised_axisym_navier_stokes mesh_smoothing meshes multi_physics navier_stokes ode poisson polar_navier_stokes poroelasticity rigid_body shell solid spherical_advection_diffusion spherical_navier_stokes  time_harmonic_fourier_decomposed_linear_elasticity time_harmonic_linear_elasticity unsteady_heat womersley generic oomph_hsl oomph_arpack oomph_crbond_bessel oomph_triangle oomph_tetgen oomph_superlu_4.3 ${MPI_CXX_LIBRARIES} ${MUMPS_LIBRARIES} oomph_lapack oomph_flapack oomph_blas  oomph_metis_from_parmetis_3.1.1)
-# reynolds_averaged_navier_stokes
+# link some essential external libraries to generic as a minimal oomph library
+add_library(oomphBase STATIC ${CMAKE_SOURCE_DIR}/Kernel/Logger.cc)
+target_link_libraries(oomphBase generic oomph_superlu_4.3 oomph_flapack oomph_arpack oomph_blas  oomph_lapack  ${MPI_CXX_LIBRARIES} ${MUMPS_LIBRARIES})
+
+# build a smaller library for solid problems
+add_library(oomphSolid STATIC ${CMAKE_SOURCE_DIR}/Kernel/Logger.cc)
+target_link_libraries(oomphSolid constitutive meshes solid oomphBase)
+
+# the full oomph library
+add_library(oomph STATIC ${CMAKE_SOURCE_DIR}/Kernel/Logger.cc)
+target_link_libraries(oomph steady_axisym_advection_diffusion young_laplace advection_diffusion advection_diffusion_reaction axisym_advection_diffusion axisym_foeppl_von_karman axisym_linear_elasticity axisym_navier_stokes axisym_poroelasticity axisym_spherical_solid beam biharmonic constitutive darcy fluid_interface flux_transport foeppl_von_karman fourier_decomposed_helmholtz generalised_newtonian_axisym_navier_stokes generalised_newtonian_navier_stokes helmholtz linear_elasticity linear_wave linearised_navier_stokes linearised_axisym_navier_stokes mesh_smoothing meshes multi_physics navier_stokes ode poisson polar_navier_stokes poroelasticity rigid_body shell solid spherical_advection_diffusion spherical_navier_stokes  time_harmonic_fourier_decomposed_linear_elasticity time_harmonic_linear_elasticity unsteady_heat womersley oomph_hsl oomph_crbond_bessel oomph_triangle oomph_tetgen oomphBase)
+# missing:  reynolds_averaged_navier_stokes

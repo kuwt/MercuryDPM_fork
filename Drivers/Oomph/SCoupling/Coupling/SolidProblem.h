@@ -477,9 +477,9 @@ public:
      */
     void get_x(const Vector<double>& xi, Vector<double>& x) const
     {
-    #ifdef OOMPH_HAS_MPI
-        logger(INFO,"get_x does not work with MPI");
-    #else
+    //#ifdef OOMPH_HAS_MPI
+    //    logger(INFO,"get_x does not work with MPI");
+    //#else
         Vector<double> s(3);
         GeomObject* geom_obj_pt = nullptr;
         const unsigned long nelement = solid_mesh_pt()->nelement();
@@ -496,7 +496,7 @@ public:
             }
         }
         logger(ERROR, "x(xi) could not be found");
-    #endif
+    //#endif
     }
 
     /**

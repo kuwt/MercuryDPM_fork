@@ -18,7 +18,7 @@ foreach (CPPFILE ${CPPFILES})
     #Make the exe
     add_executable(${EXECNAME} ${FILENAME})
     #All cpp folder and linked agaist MercuryBase
-    target_link_libraries(${EXECNAME} oomph MercuryBase)
+    target_link_libraries(${EXECNAME} oomphSolid MercuryBase)
 endforeach ()
 
 ##Adds extra command to the build of SolidBagSelfTest
