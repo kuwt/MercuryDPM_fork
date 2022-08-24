@@ -71,7 +71,13 @@ include(CMakeModules/MercuryDocumentation.cmake)
 
 include(CMakeModules/MercuryXballs.cmake)
 
-# this is done before including oom
+#This section generates a configuration file that contains the CMake variables#
+#############################################
+configure_file(Configuration/CMakeDefinitions.cc
+		Kernel/CMakeDefinitions.cc)
+configure_file(Configuration/CMakeDefinitions.h
+		Kernel/CMakeDefinitions.h)
+
 add_subdirectory(Kernel)
 add_subdirectory(Tools)
 add_subdirectory(XBalls)
@@ -90,14 +96,6 @@ add_custom_target(fullTest
 	COMMAND make -j 4
 	COMMAND make test -j 4
 	COMMENT "This will clean the project, rebuild and test." )
-
-#This section generates a configuration file that contains the CMake variables#
-#############################################
-configure_file(Configuration/CMakeDefinitions.cc
-	Kernel/CMakeDefinitions.cc)
-configure_file(Configuration/CMakeDefinitions.h
-	Kernel/CMakeDefinitions.h)
-
 
 #This section is about the build of documentation#
 ##################################################

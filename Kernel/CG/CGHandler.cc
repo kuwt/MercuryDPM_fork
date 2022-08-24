@@ -169,7 +169,7 @@ void CGHandler::restart(std::string name)
 //            dpm->wallHandler.copyAndAddObject(InfiniteWall(dpm->speciesHandler.getLastObject()));
 //        }
         //what to do if restart file could not be loaded
-        cgLogger(WARN, "Using default dpm setup as % does not exist", dpm->restartFile.getName());
+        cgLogger(WARN, "No density is specified, thus density is assumed to be 1. Provide % file if you want to specify the density.", dpm->restartFile.getName());
     }
     else
     {
