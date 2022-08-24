@@ -65,21 +65,34 @@ public:
 /**
  * Simulates a cubic rod (20mm x 2mm x 2mm) of density 2500 kg/m^3, elastic modulus 100 MPa, fixed on left side, bent by gravity
  */
-int main()
+int main(int argc, char* argv[])
 {
+    #ifdef OOMPH_HAS_MPI
+        MPI_Helpers::init(argc,argv);
+    #endif
     // Solve the problem
     Beam problem;
     problem.setName("SolidBeamUnitTest");
     problem.setElasticModulus(1e8);
     problem.setDensity(2500);
     problem.setSolidCubicMesh(20, 2, 2, 0, 0.2, 0, 0.02, 0, 0.02);
-    problem.pinBoundary(Beam::Boundary::X_MIN);
+    //problem.pinBoundary(Beam::Boundary::X_MIN);
     problem.setBodyForceAsGravity();
     problem.setNewtonSolverTolerance(3e-8);
     problem.prepareForSolve();
+    #ifdef OOMPH_HAS_MPI
+        // Distribute the problem
+        problem.distribute();
+        // Check halo schemes (optional)
+        //problem.check_halo_schemes();
+    #endif
     problem.linear_solver_pt()->disable_doc_time();
     //problem.disable_info_in_newton_solve();
     problem.solveSteady();
     problem.checkBeamDeflection();
+    #ifdef OOMPH_HAS_MPI
+        MPI_Helpers::finalize();
+    #endif
+
     return 0;
 }

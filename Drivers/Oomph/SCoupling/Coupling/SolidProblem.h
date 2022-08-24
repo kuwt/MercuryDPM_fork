@@ -53,6 +53,12 @@
 using namespace oomph;
 
 #ifdef OOMPH_HAS_MPI
+    #define OOMPH_MPI_PROCESSOR_NUM communicator_pt()->nproc()
+#else
+    #define OOMPH_MPI_PROCESSOR_ID 1
+#endif
+
+#ifdef OOMPH_HAS_MPI
     #define OOMPH_MPI_PROCESSOR_ID communicator_pt()->my_rank()
 #else
     #define OOMPH_MPI_PROCESSOR_ID 0
@@ -477,26 +483,27 @@ public:
      */
     void get_x(const Vector<double>& xi, Vector<double>& x) const
     {
-    //#ifdef OOMPH_HAS_MPI
-    //    logger(INFO,"get_x does not work with MPI");
-    //#else
-        Vector<double> s(3);
-        GeomObject* geom_obj_pt = nullptr;
-        const unsigned long nelement = solid_mesh_pt()->nelement();
-        for (unsigned long i = 0; i < nelement; i++)
-        {
-            auto el_pt = dynamic_cast<ELEMENT*>(solid_mesh_pt()->element_pt(i));
-            el_pt->locate_zeta(xi, geom_obj_pt, s);
-            if (geom_obj_pt)
-            {
-                //logger(INFO,"Point % % % is in element % at % % %",
-                //       xi[0],xi[1],xi[2],i,s[0], s[1], s[2]);
-                el_pt->interpolated_x(s, x); //deformed coordinate
-                return;
+        if (OOMPH_MPI_PROCESSOR_NUM>1) {
+            logger(INFO, "get_x does not work with MPI");
+            for (int i = 0; i < 3; ++i) {
+                x[i] = xi[i];
             }
+        } else {
+            Vector<double> s(3);
+            GeomObject *geom_obj_pt = nullptr;
+            const unsigned long nelement = solid_mesh_pt()->nelement();
+            for (unsigned long i = 0; i < nelement; i++) {
+                auto el_pt = dynamic_cast<ELEMENT *>(solid_mesh_pt()->element_pt(i));
+                el_pt->locate_zeta(xi, geom_obj_pt, s);
+                if (geom_obj_pt) {
+                    //logger(INFO,"Point % % % is in element % at % % %",
+                    //       xi[0],xi[1],xi[2],i,s[0], s[1], s[2]);
+                    el_pt->interpolated_x(s, x); //deformed coordinate
+                    return;
+                }
+            }
+            logger(ERROR, "x(xi) could not be found");
         }
-        logger(ERROR, "x(xi) could not be found");
-    //#endif
     }
 
     /**
