@@ -24,8 +24,8 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Mercury3D.h"
-#include "SolidProblem.h"
-#include "SurfaceCoupling.h"
+#include "Oomph/SolidProblem.h"
+#include "SCoupling.h"
 
 template<class ELEMENT>
-class SurfaceCoupledSolidProblem : public SurfaceCoupling<Mercury3D, SolidProblem<SurfaceCoupledElement<ELEMENT>>> {};
+class SCoupledSolidProblem : public SCoupling<Mercury3D, SolidProblem<SCoupledElement<ELEMENT>>> {};

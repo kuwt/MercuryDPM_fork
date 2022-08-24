@@ -25,12 +25,12 @@
 
 #include "Math/Helpers.h"
 #include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
-#include "Coupling/SurfaceCoupledSolidProblem.h"
+#include "Oomph/SCoupling/SCoupledSolidProblem.h"
 
 /**
  * Define a coupled problem
  */
-class CoupledBeam : public SurfaceCoupledSolidProblem<RefineableQDPVDElement<3, 2>>
+class CoupledBeam : public SCoupledSolidProblem<RefineableQDPVDElement<3, 2>>
 {
 public:
     
@@ -139,7 +139,7 @@ public:
     std::ofstream out;
 
     /// Write header of output file
-    void actionsBeforeSolve() {
+    void actionsBeforeSolve() override {
         helpers::writeToFile(
                 getName()+".gnu",
                 "set xlabel 'time'\n"

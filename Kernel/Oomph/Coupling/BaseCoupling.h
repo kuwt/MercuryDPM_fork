@@ -259,7 +259,7 @@ public:
             CGMapping_ = true;
             // note CG function needs to be nondimensionalized
             // fixme CG width is not set with respect to particle radius. Should we do that?
-            cgFunction_.setWidth(width / Global_Physical_Variables::lenScale);
+            cgFunction_.setWidth(width);
         }
     }
 
@@ -268,7 +268,7 @@ public:
      */
     inline double getCGWidth()
     {
-        return cgFunction_.getWidth() * Global_Physical_Variables::lenScale;
+        return cgFunction_.getWidth();
     }
     
     inline bool useCGMapping()

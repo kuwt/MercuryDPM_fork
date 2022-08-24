@@ -23,7 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Coupling/SolidProblem.h"
+#include "Oomph/SolidProblem.h"
 #include "Math/Helpers.h"
 
 class SolidBag : public SolidProblem<RefineableQDPVDElement<3, 2>>

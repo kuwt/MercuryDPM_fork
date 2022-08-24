@@ -24,12 +24,12 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Math/Helpers.h"
-#include "Coupling/SurfaceCoupledSolidProblem.h"
+#include "Oomph/SCoupling/SCoupledSolidProblem.h"
 
 /**
  * Define a coupled problem
  */
-class ElementAnalysis : public SurfaceCoupledSolidProblem<RefineableQDPVDElement<3, 2>>
+class ElementAnalysis : public SCoupledSolidProblem<RefineableQDPVDElement<3, 2>>
 {
 public:
     ElementAnalysis () {

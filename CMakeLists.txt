@@ -110,8 +110,9 @@ option(Mercury_BUILD_USER_DIR "Compile USER DIR in testing" ON)
 ################################################
 
 FIND_PACKAGE(Python)
-configure_file(Configuration/fpdiff.py
-	${PROJECT_SOURCE_DIR}/Scripts/fpdiff.py)
+# this line causes problems when you have multiple builds
+#configure_file(Configuration/fpdiff.py
+#	${PROJECT_SOURCE_DIR}/Scripts/fpdiff.py)
 
 #find_program(PYTHON_EXEC "python" 
 #	DOC "Location of python executable to use")

@@ -46,16 +46,12 @@
 #include "meshes/simple_cubic_mesh.h"
 #include "meshes/tetgen_mesh.h"
 
-// The element types needed for surface and volume coupling
-#include "SurfaceCoupledElement.h"
-#include "VolumeCoupledElement.h"
-
 using namespace oomph;
 
 #ifdef OOMPH_HAS_MPI
     #define OOMPH_MPI_PROCESSOR_NUM communicator_pt()->nproc()
 #else
-    #define OOMPH_MPI_PROCESSOR_ID 1
+    #define OOMPH_MPI_PROCESSOR_NUM 1
 #endif
 
 #ifdef OOMPH_HAS_MPI
@@ -443,10 +439,7 @@ public:
         const unsigned countMax = std::ceil(timeMax/dt);
         while (time < timeMax)
         {
-            logger(INFO, "Time %s of %s (% of %)",
-                    //logger(INFO, "\n\033[1;33mTime %s of %s\033[0m\n",
-                    time * Global_Physical_Variables::timeScale,
-                    timeMax * Global_Physical_Variables::timeScale, count, countMax);
+            logger(INFO, "Time %s of %s (% of %)", time, timeMax, count, countMax);
             actionsBeforeOomphTimeStep();
             // solve the oomphProb for one time step (this also increments time)
             adaptive_unsteady_newton_solve(dt,2e-7);

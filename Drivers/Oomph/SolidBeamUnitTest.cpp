@@ -23,7 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Coupling/SolidProblem.h"
+#include "Oomph/SolidProblem.h"
 #include "Math/Helpers.h"
 
 /// Defines a SolidProblem of element type RefineableQDPVDElement<3,2>.
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
     problem.setElasticModulus(1e8);
     problem.setDensity(2500);
     problem.setSolidCubicMesh(20, 2, 2, 0, 0.2, 0, 0.02, 0, 0.02);
-    //problem.pinBoundary(Beam::Boundary::X_MIN);
+    problem.pinBoundary(Beam::Boundary::X_MIN);
     problem.setBodyForceAsGravity();
     problem.setNewtonSolverTolerance(3e-8);
     problem.prepareForSolve();

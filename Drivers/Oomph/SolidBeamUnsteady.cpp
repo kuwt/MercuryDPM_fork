@@ -23,7 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Coupling/SolidProblem.h"
+#include "Oomph/SolidProblem.h"
 #include "Math/Helpers.h"
 
 /// Defines a SolidProblem of element type RefineableQDPVDElement<3,2>. Add functionality to write output
@@ -33,7 +33,7 @@ class Beam : public SolidProblem<RefineableQDPVDElement<3, 2>>
     std::ofstream out;
 
     /// Write header of output file
-    void actionsBeforeSolve() {
+    void actionsBeforeSolve() override {
         helpers::writeToFile(getName()+".gnu", "set key autotitle columnheader\n"
            "p 'SolidBeamUnsteady.out' u 1:3 w l, '' u 1:4 w l, '' u 1:5 w l, '' u 1:($3+$4+$5) t 'totalEnergy' w l");
         out.open(getName()+".out");

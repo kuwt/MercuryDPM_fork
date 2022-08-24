@@ -26,14 +26,14 @@
 #ifndef SURFACE_COUPLING_H
 #define SURFACE_COUPLING_H
 
-#include "BaseCoupling.h"
-#include "SurfaceCoupledElement.h"
+#include "Oomph/Coupling/BaseCoupling.h"
+#include "SCoupledElement.h"
 #include "Logger.h"
 #include "chrono"
 using namespace oomph;
 
 template<class M, class O>
-class SurfaceCoupling : public BaseCoupling<M, O>
+class SCoupling : public BaseCoupling<M, O>
 {
 public:
     typedef typename O::ELEMENT ELEMENT;
@@ -57,7 +57,7 @@ public:
     };
 
     // default constructor
-    SurfaceCoupling() = default;
+    SCoupling() = default;
     
 //    // sets a cg width before solving a surface coupled OomphMercuryProblem
 //    void solveSurfaceCoupling(unsigned nStep, const double& width)

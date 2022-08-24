@@ -27,9 +27,9 @@
 #include "Mercury3D.h"
 #include "Boundaries/CubeInsertionBoundary.h"
 #include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
-#include "Coupling/SurfaceCoupledSolidProblem.h"
+#include "Oomph/SCoupling/SCoupledSolidProblem.h"
 
-class CoupledProblem : public SurfaceCoupledSolidProblem<RefineableQDPVDElement<3, 2>>
+class CoupledProblem : public SCoupledSolidProblem<RefineableQDPVDElement<3, 2>>
 {
 public:
     

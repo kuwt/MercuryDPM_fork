@@ -25,7 +25,7 @@
 
 #ifndef SCOUPLEDELEMENT_H
 #define SCOUPLEDELEMENT_H
-#include "CoupledSolidNodes.h"
+#include "Oomph/Coupling/CoupledSolidNodes.h"
 
 namespace oomph
 {
@@ -35,17 +35,17 @@ namespace oomph
 /// solid particles on the surfaces
 //================================================================
 template<class ELEMENT>
-class SurfaceCoupledElement : public ELEMENT
+class SCoupledElement : public ELEMENT
 {
 
 public:
     
     /// Constructor: Call constructor of underlying element
-    SurfaceCoupledElement()
+    SCoupledElement()
     {};
     
     /// Destructor (empty)
-    ~SurfaceCoupledElement()
+    ~SCoupledElement()
     {};
 
     /// Construct the local node n and return a pointer to it.
@@ -390,7 +390,7 @@ private:
 /// FaceGeometry of wrapped element is the same as the underlying element
 //============================================================================
 template<class ELEMENT>
-class FaceGeometry<SurfaceCoupledElement<ELEMENT> > :
+class FaceGeometry<SCoupledElement<ELEMENT> > :
     public virtual FaceGeometry<ELEMENT>
 {
 public:
