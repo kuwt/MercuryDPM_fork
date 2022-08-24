@@ -1,5 +1,4 @@
 /*! \page OomphCoupling Coupling with oomph-lib
-\tableofcontents
 
 # Overview
 
@@ -7,9 +6,77 @@ MercuryDPM can be coupled with oomph-lib (https://oomph-lib.github.io/), an open
 
 Both surface and volume coupling have been implemented. However, the fully coupled code is currently only available in a branch repository. We refer the interested reader to the paper (in review) by Hongyang Cheng et al.
 
-We are about to transfer the coupled code to the MercuryDPM master branch (https://bitbucket.org/mercurydpm/mercurydpm/branch/master). For that, the code is being revised; the revised version is in this branch (https://bitbucket.org/mercurydpm/mercurydpm/branch/coupling). It currently only allows surface coupling. Note that the interface might still change.
+We are about to transfer the coupled code to the MercuryDPM master branch (https://bitbucket.org/mercurydpm/mercurydpm/branch/master). For that, the code is being revised; thus, the master version currently only allows surface coupling, and without course-graining. ALso note, the interface might still change.
 
-# Test cases
+Read the following pages to get more information about the coupling with oomph-lib:
+- \subpage Oomph
+- \subpage SCoupling
+
+
+
+
+\page Oomph How to run oomph-lib codes in MercuryDPM
+
+# Tutorial
+
+Before we can do coupled simulations, it's good to learn how to run oomph-lib simulations in the framework of MercuryDPM.
+
+The first step is to include oomph-lib into the MercuryDPM compilation; this is done via a cmake; just run cmake with one additional argument:
+\code{.sh}
+ cmake . -DOOMPH_COUPLING=ON
+\endcode
+This will clone the oomph-lib repository into your MercuryDPM source directory, and it will compile the oomphlib source files when you type make.
+
+Now you can include oomph-lib source files into your Driver codes. A good example of this is SolidBeamDemo.cpp:
+
+\snippet Drivers/Oomph/SolidBeamDemo.cpp SolidBeamDemo
+
+This code includes the class #SolidProblem, which is derived from the oomph-lib Problem class. This class is defined in the MercuryDPM kernel, and is specifically designed to solve problems with elastic bodies. As you can see, the driver code defines a class of type #SolidProblem, with the element type #RefineableQDPVDElement<3,2>, sets the properties of the elastic solid, then calls solveSteady to solve the linear algebra problem.
+
+You can visualize the results by opening the resulting vtk files in paraview:
+\image html Oomph/SCoupling/SolidBeamUnitTest.png
+
+To do coupled simulations, see \ref SCoupling.
+
+# Further test cases
+
+We have implemented the following test cases:
+
+## SolidBeamUnitTest.cpp
+A simple uncoupled simulation of a beam bending under gravity. A steady-state solver is used. the amount of bending is compared to an analytical solution.
+
+\image html Oomph/SCoupling/SolidBeamUnitTest.png
+
+## SolidBeamUnsteady.cpp
+A simple uncoupled simulation of a beam bending under gravity. This time, an unsteady solver is used.
+
+\htmlonly
+<br><iframe width="600" height="200" src="https://www.youtube.com/embed/_4XvghIQyc0" frameborder="0" allowfullscreen></iframe>
+\endhtmlonly
+
+The gravitational, elastic and kinetic energies are plotted to check energy conservation.
+
+\image html Oomph/SCoupling/SolidBeamUnsteadyEnergy.png
+
+## ElementAnalysis.cpp
+A simple code returning the values of the shape functions, jacobian, weights, etc. This is useful to understand what the different oomph-lib functions do.
+
+
+
+
+\page SCoupling Surface coupling with oomph-lib
+
+# Tutorial
+
+Before we can do coupled simulations, see \ref Oomph to learn how to run oomph-lib simulations in the framework of MercuryDPM.
+
+Now you can include oomph-lib source files into your Driver codes. A good example of this is SolidBeamDemo.cpp:
+
+\snippet Drivers/Oomph/SCoupling/CoupledBeamDemo.cpp CoupledBeamDemo
+
+This code includes the class #SCoupledSolidProblem, which is derived from the #SolidProblem class. This class is defined in the MercuryDPM kernel, and is specifically designed to solve problems with coupled elastic bodies. As you can see, the driver code defines a class of type #SCoupledSolidProblem, with the element type #RefineableQDPVDElement<3,2>, sets the properties of the elastic solid, then calls solveSteady to solve the linear algebra problem.
+
+# Further test cases
 
 We have implemented the following test cases:
 
@@ -33,23 +100,4 @@ A short simulation showing the unsteady interaction of a particle impacting a be
 \endhtmlonly
 
 \image html Oomph/SCoupling/CoupledBeamUnitTestEnergy.png
-
-## SolidBeamUnitTest.cpp
-A simple uncoupled simulation of a beam bending under gravity. A steady-state solver is used. the amount of bending is compared to an analytical solution.
-
-\image html Oomph/SCoupling/SolidBeamUnitTest.png
-
-## SolidBeamUnsteady.cpp
-A simple uncoupled simulation of a beam bending under gravity. This time, an unsteady solver is used.
-
-\htmlonly
-<br><iframe width="600" height="200" src="https://www.youtube.com/embed/_4XvghIQyc0" frameborder="0" allowfullscreen></iframe>
-\endhtmlonly
-
-The gravitational, elastic and kinetic energies are plotted to check energy conservation.
-
-\image html Oomph/SCoupling/SolidBeamUnsteadyEnergy.png
-
-## ElementAnalysis.cpp
-A simple code returning the values of the shape functions, jacobian, weights, etc. This is useful to understand what the different oomph-lib functions do.
 */

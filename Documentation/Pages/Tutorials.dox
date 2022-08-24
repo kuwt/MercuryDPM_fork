@@ -536,6 +536,15 @@ illustrate the commonly used features of MercuryDPM:\n\n
     <td> \ref MPI-IO Parallelisation
 </table>\n
 
+\b Coupling Demos:
+<table>
+<tr><th> Description <th>%File Name
+    <th> Illustrated Features
+<tr><td> Simulating an elastic solid <td> \ref SolidBeamUnitTest.cpp
+    <td> \ref Oomph
+<tr><td> Coupling between surface of elastic solid and particle simulation <td> \ref CoupledBeamUnitTest.cpp
+    <td> \ref SCoupling
+</table>\n
 
 \page CoilSelfTest Particles driven by a rotating coil
 
