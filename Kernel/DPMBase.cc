@@ -3644,8 +3644,8 @@ void DPMBase::read(std::istream& is, ReadOptions opt)
                 interactionHandler.setWriteVTK(writeInteractionsVTK);
                 boundaryHandler.setWriteVTK(writeBoundaryVTK);
                 vtkWriter_->setFileCounter(particlesCounter);
-                wallVTKWriter_.setFileCounter(particlesCounter);
-                interactionVTKWriter_.setFileCounter(particlesCounter);
+                wallVTKWriter_.setFileCounter(wallCounter);
+                interactionVTKWriter_.setFileCounter(interactionCounter);
                 boundaryVTKWriter_.setFileCounter(boundaryCounter);
             }
             if (!dummy.compare("random"))
