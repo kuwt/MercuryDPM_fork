@@ -86,6 +86,12 @@ add_custom_target(fullTest
 	COMMAND make test -j 4
 	COMMENT "This will clean the project, rebuild and test." )
 
+#Add the command update, which rebuilds the cache and compiles the codes (no test).
+add_custom_target(update
+		COMMAND make rebuild_cache
+		COMMAND make -j 4
+		COMMENT "Quick rebuild" )
+
 #This section is about the build of documentation#
 ##################################################
 
