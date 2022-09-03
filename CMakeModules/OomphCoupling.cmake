@@ -7,8 +7,17 @@ endif()
 # Clone oomph-lib if has not been cloned before
 set(OOMPH_DIR ${PROJECT_SOURCE_DIR}/oomph-lib)
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/oomph-lib/src)
-    message(STATUS "Cloning https://github.com/oomph-lib/oomph-lib.git")
-    execute_process(COMMAND git clone https://github.com/oomph-lib/oomph-lib.git ${OOMPH_DIR})
+    message(STATUS "Cloning https://github.com/oomph-lib/oomph-lib.git. Please be patient ...")
+    execute_process(COMMAND git clone https://github.com/oomph-lib/oomph-lib.git ${OOMPH_DIR}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            RESULT_VARIABLE EXE_RESULT)
+    if(NOT EXE_RESULT EQUAL "0")
+        message(FATAL_ERROR "git clone failed. If this problem persists you can manually clone oomph-lib by running: \n git clone https://github.com/oomph-lib/oomph-lib.git ${OOMPH_DIR}")
+    endif()
+endif()
+
+IF(NOT EXISTS ${OOMPH_DIR}/external_src/oomph_triangle/fpu_control.h)
+    message(FATAL_ERROR "git clone failed. If this problem persists you can manually clone oomph-lib by running: \n git clone https://github.com/oomph-lib/oomph-lib.git ${OOMPH_DIR}")
 endif()
 
 #add CMakeCache option
@@ -25,6 +34,8 @@ if (OOMPH_HAS_MPI)
     # add libraries that are only needed in MPI mode
     set(MPI_CXX_LIBRARIES oomph_superlu_dist_3.0 oomph_metis_from_parmetis_3.1.1 ${MPI_CXX_LIBRARIES})
     add_definitions( -DUSING_OOMPH_SUPERLU_DIST )
+else()
+    set(MPI_CXX_LIBRARIES "")
 endif()
 
 #add CMakeCache options
