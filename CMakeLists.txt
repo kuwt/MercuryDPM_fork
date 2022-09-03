@@ -83,7 +83,7 @@ add_subdirectory(Tools)
 add_subdirectory(XBalls)
 
 # Determine whether to couple MercuryDPM with oomph-lib or not
-option(OOMPH_COUPLING "Couple MercuryDPM with oomph-lib" ON)
+option(OOMPH_COUPLING "Couple MercuryDPM with oomph-lib" OFF)
 # Couple with oomph-lib if OOMPH_COUPLING is on
 include(CMakeModules/OomphCoupling.cmake)
 # this is done after oomph is included since it needs the includes defined there
