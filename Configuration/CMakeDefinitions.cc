@@ -38,14 +38,14 @@ const std::string getMercuryBuildDir()
 	return "@Mercury_BINARY_DIR@";
 }
 
-const int getSVNRevision()
+const std::string getRevision()
 {
-	return @SVN_WC_REVISION@;
+	return "@REVISION@";
 }
 
-const std::string getSVNURL()
+const std::string getRepositoryURL()
 {
-	return "@SVN_WC_URL@";
+	return "@REPOSITORY_URL@";
 }
 
 const std::string getVersion()

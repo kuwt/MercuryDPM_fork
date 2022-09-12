@@ -34,10 +34,6 @@
 #include "GeneralDefine.h"
 #include <iostream>
 
-#ifdef MERCURY_USE_MPI
-#include "MpiContainer.h"
-#endif
-
 #ifndef MERCURY_LOGLEVEL
 #define MERCURY_LOGLEVEL Log::DEFAULT
 #endif
@@ -767,6 +763,10 @@ extern Logger<CG_LOGLEVEL> cgLogger;
 //just emptying the functions is not sufficiently aggressive in disabling the actual (costly) comparison
 #if !MERCURY_ASSERTS
 #define assert(e,...) assert(true,"")
+#endif
+
+#ifdef MERCURY_USE_MPI
+#include "MpiContainer.h"
 #endif
 
 #endif

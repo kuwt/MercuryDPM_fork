@@ -33,9 +33,9 @@ const std::string getMercurySourceDir();
 
 const std::string getMercuryBuildDir();
 
-const int getSVNRevision();
+const std::string getRevision();
 
-const std::string getSVNURL();
+const std::string getRepositoryURL();
 
 const std::string getVersion();
 
