@@ -3414,8 +3414,8 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
     if (runNumber_ != 0)
         os << " runNumber " << runNumber_;
     os << " name " << name_;
-    os << " revision " << getSVNRevision();
-    os << " repository " << getSVNURL() << '\n';
+    os << " revision " << getRevision();
+    os << " repository " << getRepositoryURL() << '\n';
     os << "dataFile    " << dataFile << '\n';
     os << "fStatFile   " << fStatFile << '\n';
     os << "eneFile     " << eneFile << '\n';

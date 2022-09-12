@@ -9,16 +9,41 @@ project (Mercury C CXX Fortran)
 set(Mercury_VERSION_MAJOR 0)
 set(Mercury_VERSION_MINOR 14)
 
-set(SVN_WC_REVISION "0")
-find_package(Subversion)
-if(EXISTS ${PROJECT_SOURCE_DIR}/.svn)
-	if(Subversion_FOUND)
-		Subversion_WC_INFO(${PROJECT_SOURCE_DIR} SVN)
-		set(SVN_VERSION ${Project_WC_REVISION})
+set(REVISION, "0")
+set(REPOSITORY_URL "")
+
+find_package(Git)
+if(EXISTS ${PROJECT_SOURCE_DIR}/.git)
+	if(Git_FOUND)
+		execute_process(
+			COMMAND ${GIT_EXECUTABLE} log -1 --format=%h
+			WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+			OUTPUT_VARIABLE REVISION
+			OUTPUT_STRIP_TRAILING_WHITESPACE
+		)
+		# For Git it doesn't make sense to specify a URL since the
+		# commit might not have been pushed to a server. (Using
+		# `git remote -v` doesn't help if the repository has more than
+		# one remote set up.)
+		set(REPOSITORY_URL "https://bitbucket.org/mercurydpm/mercurydpm.git")
+
+		message("Git: commit is ${REVISION}")
+
+	else()
+		message("The project is in a Git repository, but the git executable is not available")
 	endif()
 else()
-	message("This Mercury version in not in svn")
-	set(SVN_VERSION "0")
+	message("This Mercury version is not in Git")
+	find_package(Subversion)
+	if(EXISTS ${PROJECT_SOURCE_DIR}/.svn)
+		if(Subversion_FOUND)
+			Subversion_WC_INFO(${PROJECT_SOURCE_DIR} SVN)
+			set(REPOSITORY_URL ${SVN_WC_URL})
+			set(REVISION ${Project_WC_REVISION})
+		endif()
+	else()
+		message("This Mercury version in not in svn")
+	endif()
 endif()
 
 set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
