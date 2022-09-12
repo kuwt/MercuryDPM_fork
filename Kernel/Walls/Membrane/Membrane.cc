@@ -963,15 +963,10 @@ void Membrane::updateEdgeMass()
  * to the mass spring system. Ideally this function is called from the computeAllForces
  * function of DPMBase.
  */
-void Membrane::computeAdditionalForces(){
-    // Note: I can use omp on add force, because this function does check for omp, or not?
-    // #pragma omp parallel num_threads(getNumberOfOMPThreads())
-    {
-        // Calculate the forces due to the bonds
-        // #pragma omp for
-        for (auto e: edge_){
-            e.applyForce(Kn_, critDampCoeff_, Ke_, Kd_, bendingAreaConstant_);
-        }
+void Membrane::computeAdditionalForces(){    
+    #pragma omp parallel for schedule(static) num_threads(getDPMBase()->getNumberOfOMPThreads())
+    for (int i=0; i < edge_.size(); i++){
+        edge_[i].applyForce(Kn_, critDampCoeff_, Ke_, Kd_, bendingAreaConstant_);
     }
 }
 

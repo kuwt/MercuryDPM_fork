@@ -116,7 +116,6 @@ public:
     /*!
      * \brief Sets member variables such that the wall represents a triangle with vertices A, B, C
      *  - position_ is set to the center of mass of the wall
-     *  - vertexInLabFrame_ is set relative to the position
      *  - updateVertexAndNormal is called to set the remaining variables
      */
     void setVertices(Vec3D A, Vec3D B, Vec3D C);
@@ -273,11 +272,6 @@ private:
      * \brief Retrieve new positions from updated vertex particles
      */
     void updateVerticesFromParticles();
-
-    /*!
-     * stores the position of the vertices relative to the position of the wall and rotated into the lab frame;
-     */
-    std::array<Vec3D, 3> vertexInLabFrame_;
     
     /*!
      * stores the position of the vertices relative to the position of the wall but not rotated into the lab frame;

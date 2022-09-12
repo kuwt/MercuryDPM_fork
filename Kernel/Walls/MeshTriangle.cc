@@ -380,7 +380,7 @@ void MeshTriangle::read(std::istream& is)
     is >> dummy;
     for (int i = 0; i < 3; i++)
     {
-        is >> vertexInLabFrame_[i];
+        is >> vertex_[i];
     }
     is >> dummy;
     for (int i = 0; i < 3; i++)
@@ -416,10 +416,10 @@ void MeshTriangle::write(std::ostream& os) const
         }
     }
     
-    os << " vertexInLabFrame ";
+    os << " vertex ";
     for (int i = 0; i < 3; i++)
     {
-        os << ' ' << vertexInLabFrame_[i];
+        os << ' ' << vertex_[i];
     }
     os << " edgeParticleIds ";
     for (int i = 0; i < 3; i++)
@@ -455,14 +455,16 @@ void MeshTriangle::writeVTK(VTKContainer& vtk) const
 
 void MeshTriangle::setVertices(const Vec3D A, const Vec3D B, const Vec3D C)
 {
-    setPosition((A + B + C) / 3);
+    setVertices(A, B, C, (A + B + C) / 3);
+}
+
+void MeshTriangle::setVertices(const Vec3D A, const Vec3D B, const Vec3D C, const Vec3D position)
+{
+    setPosition(position);
     setOrientation({1, 0, 0, 0});
-    vertexInLabFrame_[0] = A - getPosition();
-    vertexInLabFrame_[1] = B - getPosition();
-    vertexInLabFrame_[2] = C - getPosition();
-    //vertexInLabFrame_[0] = A;
-    //vertexInLabFrame_[1] = B;
-    //vertexInLabFrame_[2] = C;
+    vertex_[0] = A;
+    vertex_[1] = B;
+    vertex_[2] = C;
     updateVertexAndNormal();
 }
 
@@ -611,16 +613,6 @@ void MeshTriangle::move(const Vec3D& move)
     updateVertexAndNormal();
 }
 
-void MeshTriangle::setVertices(const Vec3D A, const Vec3D B, const Vec3D C, const Vec3D position)
-{
-    setPosition(position);
-    setOrientation({1, 0, 0, 0});
-    vertexInLabFrame_[0] = A - getPosition();
-    vertexInLabFrame_[1] = B - getPosition();
-    vertexInLabFrame_[2] = C - getPosition();
-    updateVertexAndNormal();
-}
-
 /**
  * This function should be called after setting either position_ or vertexInLabFrame_.
  *  - vertex is set to the vertex position in the real coordinate system (rotated and shifted)
@@ -629,13 +621,6 @@ void MeshTriangle::setVertices(const Vec3D A, const Vec3D B, const Vec3D C, cons
  */
 void MeshTriangle::updateVertexAndNormal()
 {
-    // logger(INFO, "Position: A: %, B: %, C: %", vertex_[0], vertex_[1], vertex_[2]);
-    for (int i = 0; i < 3; i++)
-    {
-        vertex_[i] = vertexInLabFrame_[i];
-        getOrientation().rotate(vertex_[i]);
-        vertex_[i] += getPosition();
-    }
     vertexMin_ = Vec3D::min(Vec3D::min(vertex_[0], vertex_[1]), vertex_[2]);
     vertexMax_ = Vec3D::max(Vec3D::max(vertex_[0], vertex_[1]), vertex_[2]);
 
@@ -674,20 +659,11 @@ bool MeshTriangle::isLocal(Vec3D& min, Vec3D& max) const
  */
 bool MeshTriangle::isInsideTriangle(const Vec3D &point) const
 {
-    const Vec3D branch0 = point - vertex_[0];
-    const Vec3D branch1 = point - vertex_[1];
-    const Vec3D branch2 = point - vertex_[2];
-
-    //compute total area
-    Mdouble s = sqrt(Vec3D::cross(vertex_[1] - vertex_[0], vertex_[2] - vertex_[1]).getLengthSquared());
-    //compute barycentric coordinates
-    Mdouble s0 = sqrt(Vec3D::cross(branch0, branch1).getLengthSquared())/s;
-    Mdouble s1 = sqrt(Vec3D::cross(branch1, branch2).getLengthSquared())/s;
-    Mdouble s2 = sqrt(Vec3D::cross(branch2, branch0).getLengthSquared())/s;
-    // return (1 > s0 > 0 && 1 > s1 > 0 && 1 > s2 > 0) && (1 > s0+s1 > 0 && 1 > s1+s2 > 0 && 1 > s2+s0 > 0);
+    Vec3D weights = getBaricentricWeight(point);
     
     Mdouble eps = 1e-12;
-    return ((1-eps) > s0 > eps && (1-eps) > s1 > eps && (1-eps) > s2 > eps) && ((1-eps) > s0+s1 > eps && (1-eps) > s1+s2 > eps && (1-eps) > s2+s0 > eps);
+    return ((1-eps) > weights.X > eps && (1-eps) > weights.Y > eps && (1-eps) > weights.Z > eps) && ((1-eps) > weights.X+weights.Y > eps && (1-eps) > weights.Y+weights.Z > eps && (1-eps) > weights.Z+weights.X > eps);
+    // return ((1-eps) > s0 > eps && (1-eps) > s1 > eps && (1-eps) > s2 > eps) && ((1-eps) > s0+s1 > eps && (1-eps) > s1+s2 > eps && (1-eps) > s2+s0 > eps);
     
 }
 
