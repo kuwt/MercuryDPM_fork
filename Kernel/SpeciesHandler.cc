@@ -72,6 +72,8 @@
 #include "Species/NormalForceSpecies/SinterLinNormalSpecies.h"
 #include "Species/ThermalSinterLinFrictionReversibleAdhesiveSpecies.h"
 
+#include "Species/HertzianBSHPViscoelasticSpecies.h"
+#include "Species/HertzianBSHPViscoelasticMindlinSpecies.h"
 /*!
  * \details Constructor of the SpeciesHandler class. It creates an empty SpeciesHandler.
  */
@@ -350,6 +352,18 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
         is >> species;
         copyAndAddObject(species);
     }
+    else if (type == "HertzianBSHPViscoelasticMindlinSpecies")
+    {
+        HertzianBSHPViscoelasticMindlinSpecies species;
+        is >> species;
+        copyAndAddObject(species);
+    }
+    else if (type == "HertzianBSHPViscoelasticSpecies")
+    {
+        HertzianBSHPViscoelasticSpecies species;
+        is >> species;
+        copyAndAddObject(species);
+    }
     else if (type == "LinearViscoelasticFrictionChargedBondedSpecies")
     {
         LinearViscoelasticFrictionChargedBondedSpecies species;
@@ -607,6 +621,18 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
         else if (type == "HertzianViscoelasticFrictionChargedBondedMixedSpecies")
         {
             HertzianViscoelasticFrictionChargedBondedMixedSpecies species;
+            is >> species;
+            mixedObjects_.push_back(species.copy());
+        }
+        else if (type == "HertzianBSHPViscoelasticMindlinMixedSpecies")
+        {
+            HertzianBSHPViscoelasticMindlinMixedSpecies species;
+            is >> species;
+            mixedObjects_.push_back(species.copy());
+        }
+        else if (type == "HertzianBSHPViscoelasticMixedSpecies")
+        {
+            HertzianBSHPViscoelasticMixedSpecies species;
             is >> species;
             mixedObjects_.push_back(species.copy());
         }

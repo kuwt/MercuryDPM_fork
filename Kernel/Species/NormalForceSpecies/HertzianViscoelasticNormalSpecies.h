@@ -56,7 +56,7 @@ public:
     void write(std::ostream& os) const;
     
     /// \brief Used in Species::getName to obtain a unique name for each Species.
-    std::string getBaseName() const;
+    virtual std::string getBaseName() const;
     
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     Mdouble getCollisionTime(Mdouble particleDiameter, Mdouble particleDensity, Mdouble relativeVelocity) const;
@@ -95,7 +95,7 @@ public:
     ///\brief Allows the spring constant to be changed
     void setEffectiveElasticModulus(Mdouble elasticModulus);
     
-    void setEffectiveElasticModulusAndRestitutionCoefficient(Mdouble elasticModulus, Mdouble rest);
+    virtual void setEffectiveElasticModulusAndRestitutionCoefficient(Mdouble elasticModulus, Mdouble rest);
     
     ///\brief Allows the spring constant to be accessed
     Mdouble getEffectiveElasticModulus() const;
