@@ -1,3 +1,5 @@
 [submodule "oomph-lib"]
 	path = oomph-lib
 	url = https://github.com/oomph-lib/oomph-lib.git
+	shallow = true
+	depth = 1
