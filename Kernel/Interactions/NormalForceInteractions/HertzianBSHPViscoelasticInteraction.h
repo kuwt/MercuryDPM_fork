@@ -23,53 +23,53 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef HERTZIANVISCOELASTICINTERACTION_H
-#define HERTZIANVISCOELASTICINTERACTION_H
+#ifndef HertzianBSHPViscoelasticInteraction_H
+#define HertzianBSHPViscoelasticInteraction_H
 
-#include "Interactions/BaseInteraction.h"
+#include "Interactions/NormalForceInteractions/HertzianViscoelasticInteraction.h"
 
 class BaseInteractable;
 
-class HertzianViscoelasticNormalSpecies;
+class HertzianBSHPViscoelasticNormalSpecies;
 
 /*!
- * \class HertzianViscoelasticInteraction
+ * \class HertzianBSHPViscoelasticInteraction
  * \brief Computes normal forces for a Herztian visco-elastic interaction.
  */
-class HertzianViscoelasticInteraction : public virtual BaseInteraction
+class HertzianBSHPViscoelasticInteraction : public virtual HertzianViscoelasticInteraction
 {
 public:
     /*!
      * \brief An alias for HertzianViscoelasticNormalSpecies.
      */
-    typedef HertzianViscoelasticNormalSpecies SpeciesType;
+    typedef HertzianBSHPViscoelasticNormalSpecies SpeciesType;
     
     /*!
      * \brief Constructor.
      */
-    HertzianViscoelasticInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp);
+    HertzianBSHPViscoelasticInteraction(BaseInteractable* P, BaseInteractable* I, unsigned timeStamp);
     
     //used for mpi
-    HertzianViscoelasticInteraction();
+    HertzianBSHPViscoelasticInteraction();
     
     /*!
      * \brief Copy constructor.
      */
-    HertzianViscoelasticInteraction(const HertzianViscoelasticInteraction& p);
+    HertzianBSHPViscoelasticInteraction(const HertzianBSHPViscoelasticInteraction& p);
     
     /*!
      * \brief Destructor.
      */
-    ~HertzianViscoelasticInteraction() override;
+    ~HertzianBSHPViscoelasticInteraction() override;
     //
-    //    HertzianViscoelasticInteraction* copy() const;
+    //    HertzianBSHPViscoelasticInteraction* copy() const;
     //
     /*!
      * \brief Computes the amount of normal force due to an Hertzian visco-elastic interaction.
      */
     void computeNormalForce();
     
-    explicit HertzianViscoelasticInteraction(const BaseInteraction& p) : BaseInteraction(p)
+    explicit HertzianBSHPViscoelasticInteraction(const HertzianViscoelasticInteraction& p) : HertzianViscoelasticInteraction(p)
     {
         
     }
@@ -90,16 +90,9 @@ public:
     std::string getBaseName() const;
     
     /*!
-     * \brief Computes and returns the amount of elastic energy stored in the spring.
+     * \brief Returns a const pointer of type HerztianBSHPViscoelasticNormalSpecies (static-cast).
      */
-    Mdouble getElasticEnergy() const override;
-    
-    /*!
-     * \brief Returns a const pointer of type HerztianViscoelasticNormalSpecies (static-cast).
-     */
-    const HertzianViscoelasticNormalSpecies* getSpecies() const;
-    
-    Mdouble getElasticEnergyAtEquilibrium(Mdouble adhesiveForce) const override;
+    const HertzianBSHPViscoelasticNormalSpecies* getSpecies() const;
 };
 
 #endif
