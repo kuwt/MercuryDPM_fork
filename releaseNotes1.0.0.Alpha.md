@@ -872,7 +872,7 @@ SelfTests/Boundaries/DeletionBoundarySelfTest.cpp*
 
 *Kernel/Mercury3D*
 
- - added distance check in ```Mercury3D:hGridFindContactsWithTargetCell()``` which greatly speeds up simulations
+ - dded distance check in ```Mercury3D:hGridFindContactsWithTargetCell()``` which greatly speeds up simulations
 
 *Kernel/GeneralDefine*
 
