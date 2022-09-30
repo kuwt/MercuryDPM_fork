@@ -127,8 +127,10 @@ The following functions changed their name (the line starting with - is the old 
 
 ---
 
-## CHANGES TO DRIVERS:
+## CHANGES TO DRIVERS
+
 *MercuryMPITests/ForceLawsMPI2Test.cpp*
+
  - a new test that checks if history parameters like ```slidingSpring``` and ```maxOverlap``` are preserved when a contact jumps from one MPI domain to another
 
 *SelfTests/Boundaries/PSDSelfTest.cpp*
