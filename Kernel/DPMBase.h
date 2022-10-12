@@ -1025,7 +1025,7 @@ protected:
     /*!
      * \brief Computes the forces on the particles due to the walls (normals are outward normals)
      */
-    void computeForcesDueToWalls(BaseParticle*, BaseWall*);
+    virtual void computeForcesDueToWalls(BaseParticle*, BaseWall*);
 
     /*!
      * \brief A virtual function where the users can add extra code which is executed

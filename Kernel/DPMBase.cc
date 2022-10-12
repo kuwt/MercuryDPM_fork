@@ -41,6 +41,7 @@
 #include "DPMBaseXBalls.icc" //This is part of this class and just separates out the stuff to do with xballs.
 #include "Logger.h"
 #include "Particles/SphericalParticle.h"
+#include "Particles/NonSphericalParticle.h"
 #include "Walls/BaseWall.h"
 #include "Walls/InfiniteWall.h"
 #include "Boundaries/PeriodicBoundary.h"
@@ -3093,6 +3094,7 @@ void DPMBase::computeExternalForces(BaseParticle* CI)
  */
 void DPMBase::computeForcesDueToWalls(BaseParticle* pI, BaseWall* w)
 {
+
     //No need to compute interactions between periodic particle images and walls
     if (pI->getPeriodicFromParticle() != nullptr)
         return;

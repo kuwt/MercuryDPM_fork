@@ -8,6 +8,7 @@ add_subdirectory(CartesianShearCell)
 add_subdirectory(Segregation)
 
 add_subdirectory(UnitTests)
+add_subdirectory(MultiParticle)
 add_subdirectory(MercurySimpleDemos)
 add_subdirectory(MercuryCG)
 add_subdirectory(MercuryMPITests)

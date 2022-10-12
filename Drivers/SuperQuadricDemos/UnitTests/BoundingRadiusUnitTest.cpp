@@ -28,7 +28,7 @@
 #include "Mercury3D.h"
 
 ///tests whether the radius of the bounding sphere for superquadrics is computed correctly
-/// At the moment it only checks for ellipsoids and spheres using simplified expressions in the SuperQuadricParticle::getMaxInteractionRadius() function.
+/// At the moment it only checks for ellipsoids and spheres using simplified expressions in the NonSphericalParticle::getMaxInteractionRadius() function.
 /// Definitely needs generalisation for complex shapes.
 
 class BoundingRadiusTester : public Mercury3D

@@ -25,7 +25,6 @@
 
 #include "BaseParticle.h"
 #include "DPMBase.h"
-
 /*!
  * \details default constructor, creates an Particle at (0,0,0) with radius, 
  * mass and inertia equal to 1
@@ -164,6 +163,10 @@ Mdouble BaseParticle::getVolume() const
  */
 void BaseParticle::fixParticle()
 {
+//    //
+//    MultiParticle f;
+//    f.invInertia2_ = MatrixSymmetric3D(0, 0, 0, 0, 0, 0);
+    //
     invMass_ = 0.0;
     invInertia_ = MatrixSymmetric3D(0, 0, 0, 0, 0, 0);
     setVelocity(Vec3D(0.0, 0.0, 0.0));
@@ -406,6 +409,7 @@ void BaseParticle::oldRead(std::istream& is)
     invInertia_.XX = invInertiaScalar;
     invInertia_.YY = invInertiaScalar;
     invInertia_.ZZ = invInertiaScalar;
+
     BaseInteractable::setIndSpecies(indSpecies);
     setId(id);
     setIndex(id);
@@ -447,6 +451,7 @@ Mdouble BaseParticle::getKineticEnergy() const
         return 0.0;
     else
         return 0.5 * getMass() * getVelocity().getLengthSquared();
+    //
 }
 
 Mdouble BaseParticle::getRotationalEnergy() const
@@ -520,6 +525,9 @@ void BaseParticle::setInverseInertia(const MatrixSymmetric3D inverseInertia)
 void BaseParticle::setInfiniteInertia()
 {
     invInertia_.setZero();
+
+//    MultiParticle* f;
+//    f->invInertia2_.setZero();
 } //> i.e. no rotations
 
 /*!
@@ -547,6 +555,7 @@ void BaseParticle::setRadius(const Mdouble radius)
         getSpecies()->computeMass(this);
         getHandler()->checkExtrema(this);
     }
+
 }
 
 /*!
@@ -711,6 +720,7 @@ void BaseParticle::integrateBeforeForceComputation(double time, double timeStep)
     ///BaseInteractable::integrateBeforeForceComputation. To check if it works
     ///correctly, remove the p0.fixParticle() line from the DrivenParticleUnitTest
     ///\author irana
+
     if (getInvMass() == 0.0)
     {
         BaseInteractable::integrateBeforeForceComputation(time, timeStep);
@@ -729,6 +739,7 @@ void BaseParticle::integrateBeforeForceComputation(double time, double timeStep)
         {
             dpm->hGridUpdateMove(this, displacement.getLengthSquared());
         }
+
         if (dpm->getRotation())
         {
             angularAccelerate(

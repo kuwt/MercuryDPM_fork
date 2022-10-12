@@ -44,12 +44,10 @@ public:
     
     /*!
      * \brief Particle constructor, setting the species.
-     * This is useful to create e.g. template particles for the InsertionBoundaries.
+     * This is useful to create e.g. template particles for the InsertionBoundaries, which only require the particle type and species to be set.
      * It is marked explicit because you dont want to use it with the assignment operator, particle = species;
      */
-    explicit SphericalParticle(const ParticleSpecies* s) : BaseParticle(s) {
-    
-    };
+    explicit SphericalParticle(const ParticleSpecies* s) : BaseParticle(s) {}
 
     /*!
      * \brief Particle constructor
@@ -67,6 +65,7 @@ public:
     
     /*!
      * \brief Returns the name of the object
+     * \todo Should be renamed to SphericalParticle
      */
     std::string getName() const override {
         return "BaseParticle";
