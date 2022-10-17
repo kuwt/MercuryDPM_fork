@@ -2810,11 +2810,11 @@ void DPMBase::readNextFStatFile()
         BaseInteraction* C;
         if (indexI >= 0)
         {
+            BaseParticle* I = particleHandler.getObject(static_cast<const unsigned int>(indexI));
             //read only one of the two fstat lines reported
-            if (indexI >= indexP)
+            if (indexI >= indexP or I->isFixed())
             {
                 // particle pair contact
-                BaseParticle* I = particleHandler.getObject(static_cast<const unsigned int>(indexI));
                 C = interactionHandler.addInteraction(P, I, getNumberOfTimeSteps() + 1);
                 C->setFStatData(in, P, I);
                 // skip next line
