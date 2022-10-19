@@ -612,6 +612,8 @@ std::vector<BaseParticle*> Mercury3D::hGridFindParticleContacts(const BasePartic
     return particlesInContact;
 }
 
+
+
 void Mercury3D::computeWallForces(BaseWall* const w)
 {
     

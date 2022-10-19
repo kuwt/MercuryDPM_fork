@@ -29,6 +29,7 @@
 #include <Particles/SphericalParticle.h>
 #include <Particles/ThermalParticle.h>
 #include <Particles/HeatFluidCoupledParticle.h>
+#include <Particles/MultiParticle.h>
 #include "ParticleHandler.h"
 #include "DPMBase.h"
 #include "SpeciesHandler.h"
@@ -200,7 +201,7 @@ void ParticleHandler::addObject(BaseParticle* P)
             getDPMBase()->hGridInsertParticle(P);
             //This computes where the particle currently is in the grid
             getDPMBase()->hGridUpdateParticle(P);
-            
+
             // Broadcasts the existance of a new particle
             getDPMBase()->handleParticleAddition(P->getId(), P);
         }
@@ -214,6 +215,9 @@ void ParticleHandler::addObject(BaseParticle* P)
         {
             getDPMBase()->setRotation(true);
         }
+
+        P->actionsAfterAddObject();
+
 #ifdef MERCURY_USE_MPI
         P->setPeriodicComplexity(std::vector<int>(0));
     }
@@ -362,7 +366,7 @@ void ParticleHandler::addGhostObject(BaseParticle* P)
         getDPMBase()->hGridInsertParticle(P);
         //This computes where the particle currently is in the grid
         getDPMBase()->hGridUpdateParticle(P);
-        
+
         // broadcast particle addition
         getDPMBase()->handleParticleAddition(P->getId(), P);
     }
@@ -1043,6 +1047,10 @@ BaseParticle* ParticleHandler::createObject(const std::string& type)
     else if (type == "HeatFluidCoupledParticle")
     {
         return new HeatFluidCoupledParticle;
+    }
+    else if (type == "MultiParticle")
+    {
+        return new MultiParticle;
     }
     else
     {

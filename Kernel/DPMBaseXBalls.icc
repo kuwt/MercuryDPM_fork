@@ -78,7 +78,8 @@ void DPMBase::outputXBallsDataParticle(unsigned int i, unsigned int format, std:
                << p->getVelocity() << " "
                << p->getRadius() << " "
                ///\todo TW should we really write the expensive-to-compute Euler angles instead of the unit quaternion?
-               << angle.getEuler() << " "
+                << angle.getEuler() << " "
+                //<< angle.getAxis() << " "
                << p->getAngularVelocity() << " "
                << getInfo(*p) << '\n';
             break;

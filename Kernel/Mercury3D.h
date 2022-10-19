@@ -77,7 +77,8 @@ protected:
      * \brief Compute contacts with a wall.
      */
     void computeWallForces(BaseWall* w) override;
-    
+
+
     /*!
      * \brief Finds particles within target cell and stores them in a list
      */
