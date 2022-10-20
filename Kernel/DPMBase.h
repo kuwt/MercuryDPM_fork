@@ -169,7 +169,17 @@ public:
      * \todo IFCD @AT, TW: Consider moving some things before the time loop to actionsBeforeTimeLoop
      */
     void solve();
-    
+
+    /*!
+     * \brief Beginning of the solve routine, before time stepping
+     */
+    void initialiseSolve();
+
+    /*!
+     * \brief End of the solve routine, after time stepping
+     */
+    void finaliseSolve();
+
     /*!
      * \brief Performs everything needed for one time step, used in the time-loop of solve().
      * \todo IFCD @AT, TW: please check what should be in here, and whether it should be virtual or not.
@@ -631,6 +641,14 @@ public:
     Mdouble getZMax() const
     { return max_.z(); }
 
+    Mdouble getXCenter() const
+    { return 0.5*(max_.X+min_.X); }
+
+    Mdouble getYCenter() const
+    { return 0.5*(max_.Y+min_.Y); }
+
+    Mdouble getZCenter() const
+    { return 0.5*(max_.Z+min_.Z); }
     /*
      * \brief Returns the minimum coordinates of the problem domain.
      */

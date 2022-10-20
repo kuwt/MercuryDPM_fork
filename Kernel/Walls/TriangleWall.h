@@ -131,6 +131,10 @@ public:
 
     bool isInsideTriangle(const Vec3D &point) const;
 
+    bool isFaceContact(const Vec3D& normal) const override {
+        return (normal==faceNormal_ or normal == -faceNormal_) ? true : false;
+    }
+
 private:
     
     void updateVertexAndNormal();

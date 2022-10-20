@@ -376,6 +376,8 @@ BaseWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHan
     {
         // look for an existing interaction, or create a new one
         BaseInteraction *c = nullptr;
+
+        #ifndef Mercury_TRIANGLE_WALL_CORRECTION
         // This if-statement deals with groups of walls. If a particle has multiple contacts with a group of walls, and if the contact areas of these contacts overlap, then we keep only the biggest of the overlapping contacts.
         if (getGroupId() > 0 && p->getInteractions().size() > 0) {
             // if there is a contact with a group of walls, and if p had at least one previously detected contact (in the last timestep or the current)
@@ -431,6 +433,36 @@ BaseWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHan
                 }
             }
         }
+        #else
+        // This if-statement deals with groups of walls. If a particle has multiple contacts with a group of walls, and if the contact areas of these contacts overlap, then we keep only the biggest of the overlapping contacts.
+        if (getGroupId() > 0) {
+            // if there is a contact with a group of walls, and if p had at least one previously detected contact (in the last timestep or the current)
+            for (const auto i : p->getInteractions()) {
+                const BaseInteractable* q = i->getI();
+                if (q->getGroupId() == getGroupId() and i->getTimeStamp() == timeStamp) {
+                    if (not(isFaceContact(normal) and q->isFaceContact(i->getNormal())))
+                    {
+                        ///\todo face-face contacts should be treated differently
+                        if (overlap > i->getOverlap()) {
+                            p->addForce(-i->getForce());
+                            this->addForce(i->getForce());
+                            if (getHandler()->getDPMBase()->getRotation()) {
+                                p->addTorque(-i->getTorque() +
+                                             Vec3D::cross(p->getPosition() - i->getContactPoint(), i->getForce()));
+                                this->addTorque(i->getTorque() -
+                                                Vec3D::cross(this->getPosition() - i->getContactPoint(),
+                                                             i->getForce()));
+                            }
+                            i->setI(this);
+                            c = i;
+                        } else {
+                            return nullptr;
+                        }
+                    }
+                }
+            }
+        }
+        #endif
 
         if (c == nullptr) {
             // look for an existing interaction, or create a new one

@@ -207,7 +207,7 @@ DPMBase::DPMBase() : wallVTKWriter_(wallHandler), interactionVTKWriter_(interact
 void DPMBase::constructor()
 {
     // sofStop function
-    setSoftStop();
+    //setSoftStop();
     //constructor();
     dataFile.getFstream().precision(10);
     fStatFile.getFstream().precision(10);
@@ -3346,6 +3346,51 @@ void DPMBase::computeAllForces()
 
     }
 
+    #ifdef Mercury_TRIANGLE_WALL_CORRECTION
+    // This statement deals with interactions of a particle with a group of walls:
+    // If there are multiple contact forces between the particle and the group of walls, we assume that these contacts share a concave edge or a vertex. Thus, we multiply each force by a weight $w_{\alpha\gamma}=|\vec{f}_{\alpha\gamma}^{\text{w}}|/\sum_\gamma|\vec{f}_{\alpha\gamma}^{\text{w}}|$. Note that these weights add up to 1, thus, the total contact force between the particle and the group of walls will be a weighted average of the individual contact forces.
+    // A second modification is done in #BaseWall::getInteractionWith
+    ///\todo add OMP here
+    for (BaseParticle *p : particleHandler) {
+        // find all current interactions between this particle and a TriangleWall
+        std::vector<BaseInteraction *> wallInters;
+        double overlapSum = 0.0;
+        for (const auto i : p->getInteractions()) {
+            if (i->getI()->getName() == "TriangleWall" && i->getTimeStamp() > getNumberOfTimeSteps()) {
+                wallInters.push_back(i);
+                overlapSum += i->getOverlap();
+            }
+        }
+        // if more than one interactions are detected, we have a concave wall interaction problem.
+        if (wallInters.size() > 1) {
+            /// Stefan's weighting approach
+            // get the multiple contact points to define the new contact plane, normal, and overlap
+            for (BaseInteraction *i : wallInters) {
+                auto q = i->getI();
+                // undo the force/torque computation from multiple TriangleWalls
+                p->addForce(-i->getForce());
+                q->addForce(i->getForce());
+                if (getRotation()) {
+                    p->addTorque(-i->getTorque() + Vec3D::cross(p->getPosition() - i->getContactPoint(), i->getForce()));
+                    q->addTorque( i->getTorque() - Vec3D::cross(q->getPosition() - i->getContactPoint(), i->getForce()));
+                }
+                // reset the forces
+                double w = i->getOverlap() / overlapSum;
+                i->setContactPoint(p->getPosition() - (p->getRadius() - 0.5 * i->getOverlap()) * w * i->getNormal());
+                i->setForce(i->getForce() * w);
+                i->setTorque(i->getTorque() * w);
+                // applies the reset forces to the particle and the wall
+                p->addForce(i->getForce());
+                q->addForce(-i->getForce());
+                if (getRotation()) {
+                    p->addTorque( i->getTorque() - Vec3D::cross(p->getPosition() - i->getContactPoint(), i->getForce()));
+                    q->addTorque(-i->getTorque() + Vec3D::cross(q->getPosition() - i->getContactPoint(), i->getForce()));
+                }
+            }
+        }
+    }
+    #endif
+
 #ifdef CONTACT_LIST_HGRID
     PossibleContact* Curr=possibleContactList.getFirstPossibleContact();
     while(Curr)
@@ -4002,8 +4047,7 @@ void DPMBase::decompose()
  *       (i.e. should it be in constructor) Thomas: I agree, setTimeStepByParticle should be
  *       rewritten to work without calling setupInitialConditions
  */
-void DPMBase::solve()
-{
+void DPMBase::initialiseSolve() {
     logger(DEBUG, "Entered solve");
 #ifdef CONTACT_LIST_HGRID
     logger(INFO,"Using CONTACT_LIST_HGRID");
@@ -4013,8 +4057,7 @@ void DPMBase::solve()
     /// sets up the initial conditions for the simulation
     ///\todo Is it necessary to reset initial conditions here and in setTimeStepByParticle (i.e. should it be in constructor)?
     ///Thomas: I agree, setTimeStepByParticle should be rewritten to work without calling setupInitialConditions
-    if (!getRestarted())
-    {
+    if (!getRestarted()) {
         // If the simulation is "new" (i.e. not restarted):
         // - set time, nTimeSteps to zero
         // - reset the file counter etc.
@@ -4027,21 +4070,18 @@ void DPMBase::solve()
         //\todo tw there was a function combining the next two lines, why is it back to the old version?
         //setLastSavedTimeStep(NEVER); //reset the counter
         //this is to ensure that the interaction time stamps agree with the resetting of the time value
-        for (auto& i : interactionHandler)
+        for (auto &i: interactionHandler)
             i->setTimeStamp(0);
         setupInitialConditions();
         logger(DEBUG, "Have created the particles initial conditions");
-    }
-    else
-    {
+    } else {
         // If the simulation is "restarted" (i.e. not restarted):
-        
+
         // - run wall-defined actionsOnRestart
-        for (auto w: wallHandler)
-        {
+        for (auto w: wallHandler) {
             w->actionsOnRestart();
         }
-        
+
         // - run user-defined actionsOnRestart
         actionsOnRestart();
     }
@@ -4051,30 +4091,25 @@ void DPMBase::solve()
     checkSettings();
 
     // If the simulation is "new" and the runNumber is used, append the run number to the problem name
-    if (getRunNumber() > 0 && !getRestarted())
-    {
+    if (getRunNumber() > 0 && !getRestarted()) {
         std::stringstream name;
         name << getName() << "." << getRunNumber();
         setName(name.str());
     }
 
     //If append is true, files are appended, not overwritten
-    if (getAppend())
-    {
+    if (getAppend()) {
         setOpenMode(std::fstream::out | std::fstream::app);
         //Restart files should always be overwritten.
         restartFile.setOpenMode(std::fstream::out);
-    }
-    else
-    {
+    } else {
         setOpenMode(std::fstream::out);
     }
 
     //sets the hgrid, writes headers to the .stat output file
     initialiseStatistics();
 
-    if (getInteractionFile().getFileType() == FileType::ONE_FILE)
-    {
+    if (getInteractionFile().getFileType() == FileType::ONE_FILE) {
         logger(WARN, "Warning: interaction file will take up a lot of disk space!");
         getInteractionFile().open();
     }
@@ -4109,18 +4144,26 @@ void DPMBase::solve()
     removeDuplicatePeriodicParticles();
     interactionHandler.actionsAfterTimeStep();
     logger(DEBUG, "Have computed the initial values for the forces ");
+}
+
+void DPMBase::solve()
+{
+    initialiseSolve();
 
     // Can be used to measure simulation time
     clock_.tic();
-    
     // This is the main loop over advancing time
     while (getTime() < getTimeMax() && continueSolve())
     {
         computeOneTimeStep();
     }
-    
     // Can be used to measure simulation time
     clock_.toc();
+
+    finaliseSolve();
+}
+
+void DPMBase::finaliseSolve() {
     
     //force writing of the last time step
     forceWriteOutputFiles();

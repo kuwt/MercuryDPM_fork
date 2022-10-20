@@ -103,12 +103,9 @@ BaseInteraction*
 InteractionHandler::getExistingInteraction(const BaseInteractable* const P, const BaseInteractable* const I) const
 {
     //for particle-particle collision it is assumed BaseInteractable P has a lower index then I, so we only have to check for I, not P
-    {
-        for (unsigned j = 0; j < P->getInteractions().size(); ++j) {
-            auto i = P->getInteractions()[j];
-            if (i->getI() == I) {
-                return i;
-            }
+    for (const auto i : P->getInteractions()) {
+        if (i->getI() == I) {
+            return i;
         }
     }
     return nullptr;

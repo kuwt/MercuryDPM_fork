@@ -35,6 +35,7 @@
 #include <sstream>
 #include <iostream>
 #include <cstdlib>
+#include <array>
 
 #include "GeneralDefine.h"
 #include "Logger.h"
@@ -85,7 +86,17 @@ public:
         Y = y;
         Z = z;
     }
-    
+
+    /**
+     * Defines mapping between std::array<double,3> and Vec3D
+     */
+    Vec3D(std::array<double, 3> a)
+    {
+        X = a[0];
+        Y = a[1];
+        Z = a[2];
+    }
+
     /*!
      * \brief Sets all elements to zero
      */
@@ -127,6 +138,11 @@ public:
     inline Vec3D operator-(const Vec3D a) const
     {
         return Vec3D(X - a.X, Y - a.Y, Z - a.Z);
+    };
+
+    inline bool operator==(const Vec3D& a) const
+    {
+        return X == a.X and Y == a.Y and Z == a.Z;
     };
 
     Vec3D multiplyElementwise(const Vec3D& a) const {

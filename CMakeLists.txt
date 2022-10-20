@@ -77,6 +77,11 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-DMERCURY_DEBUG)
 endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
 
+option(Mercury_TRIANGLE_WALL_CORRECTION "Smooth transition between triangle walls" ON)
+if(Mercury_TRIANGLE_WALL_CORRECTION)
+	add_definitions( -DMercury_TRIANGLE_WALL_CORRECTION )
+endif()
+
 include(CMakeModules/MercuryMPI.cmake)
 
 include(CMakeModules/MercuryOMP.cmake)
@@ -98,10 +103,16 @@ configure_file(Configuration/CMakeDefinitions.cc
 configure_file(Configuration/CMakeDefinitions.h
 		Kernel/CMakeDefinitions.h)
 
-add_subdirectory(Drivers)
 add_subdirectory(Kernel)
 add_subdirectory(Tools)
 add_subdirectory(XBalls)
+
+# Determine whether to couple MercuryDPM with oomph-lib or not
+option(Mercury_OOMPH_COUPLING "Couple MercuryDPM with oomph-lib" OFF)
+# Couple with oomph-lib if OOMPH_COUPLING is on
+include(CMakeModules/OomphCoupling.cmake)
+# this is done after oomph is included since it needs the includes defined there
+add_subdirectory(Drivers)
 
 #Add the command fullTest, which rebuilds the cache, cleans the project and then compiles and tests everything.
 add_custom_target(fullTest
@@ -128,14 +139,8 @@ option(Mercury_BUILD_USER_DIR "Compile USER DIR in testing" ON)
 ################################################
 
 FIND_PACKAGE(Python)
-configure_file(Configuration/fpdiff.py
-	${PROJECT_SOURCE_DIR}/Scripts/fpdiff.py)
+# this line causes problems when you have multiple builds
+FILE(COPY Configuration/fpdiff.py DESTINATION ${PROJECT_SOURCE_DIR}/Scripts/)
 
 #find_program(PYTHON_EXEC "python" 
 #	DOC "Location of python executable to use")
-
-
-
-
-
-
