@@ -595,12 +595,6 @@ void helpers::more(std::string filename, unsigned nLines)
     file.close();
 }
 
-Mdouble helpers::round(const Mdouble value, unsigned precision)
-{
-    const Mdouble logValue = log10(value);
-    const int factor = std::pow(10, precision - std::ceil(logValue));
-    return std::round(value * factor) / factor;
-}
 
 std::string helpers::to_string(const Mdouble value, unsigned precision)
 {
@@ -994,6 +988,11 @@ bool helpers::createDirectory(std::string path) {
         // handle your error here
     }
     return false;
+}
+
+double helpers::round(double val, int prec) {
+    const double n = std::pow(10,prec);
+    return std::round(val*n)/n;
 }
 
 Mdouble helpers::getRayleighTime(Mdouble radius, Mdouble shearModulus, Mdouble poisson, Mdouble density) {

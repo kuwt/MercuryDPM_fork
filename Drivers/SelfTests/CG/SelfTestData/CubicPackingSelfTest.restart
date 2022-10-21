@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name CubicPackingSelfTest revision 5000 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
+MercuryDPM 0.14 name CubicPackingSelfTest revision 6535 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
 dataFile    fileType ONE_FILE saveCount 1000 counter 2 lastSavedTimeStep 1000
 fStatFile   fileType ONE_FILE saveCount 1000 counter 2 lastSavedTimeStep 1000
 eneFile     fileType ONE_FILE saveCount 1000 counter 2 lastSavedTimeStep 1000
@@ -7,7 +7,7 @@ statFile    fileType ONE_FILE saveCount 1000 counter 0
 interactionFile fileType NO_FILE saveCount 0 counter 0
 xMin 0 xMax 5 yMin 0 yMax 5 zMin 0 zMax 5
 timeStep 0.0002 time 0.200000000000004 ntimeSteps 1000 timeMax 0.2
-systemDimensions 3 particleDimensions 3 gravity 0 0 -1 writeVTK 0 NO_FILE NO_FILE 0 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267
+systemDimensions 3 particleDimensions 3 gravity 0 0 -1 backgroundDrag 0 writeVTK 0 NO_FILE NO_FILE 0 0 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267
 Species 1
 LinearViscoelasticSpecies id 0 density 1.9098593 stiffness 75857.5125578386 dissipation 230.258509299404
 Walls 6

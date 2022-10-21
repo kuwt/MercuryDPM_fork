@@ -74,7 +74,7 @@ void PSD::printPSD() const
     {
         for (const auto p : particleSizeDistribution_)
         {
-           logger(INFO, "%m\t %\%", p.radius, p.probability * 100);
+            logger(INFO, "%m\t %\%", p.radius, p.probability * 100);
         }
     }
     else if (particleSizeDistribution_.front().radius > 1e-4)
@@ -142,7 +142,7 @@ Mdouble PSD::insertManuallyByVolume(Mdouble volume)
     // initialize the particleNumberPerClass vector if empty.
     if (volumePerClass_.empty())
         volumePerClass_.resize(particleSizeDistribution_.size());
-    
+
     for (auto it = particleSizeDistribution_.end() - 1; it != particleSizeDistribution_.begin(); --it)
     {
         static std::mt19937 gen(0);
@@ -334,6 +334,41 @@ void PSD::setDistributionNormal(Mdouble mean, Mdouble standardDeviation, int num
         particleSizeDistribution_.push_back({radii[j], probabilities[j]});
     }
     validateCumulativeDistribution();
+}
+
+/*!
+ * \details sets the particle size distribution to a discretised normal (gaussian) cumulative number distribution,
+ * which covers the range of 3 * standardDeviation (99,73% of all values covered).
+ * \param[in] mean                  Double representing the mean of the particle size distribution
+ * \param[in] standardDeviation     Double representing the standard deviation of the particle size distribution
+ * \param[in] numberOfBins          Integer determining the number of bins (aka. particle size classes or resolution)
+ *                                  of the particle size distribution
+ * See https://en.cppreference.com/w/cpp/numeric/random/lognormal_distribution
+ */
+void PSD::setDistributionLogNormal(Mdouble mean, Mdouble standardDeviation, int numberOfBins)
+{
+    //setDistributionNormal(mean, standardDeviation, numberOfBins);
+    if (!particleSizeDistribution_.empty())
+    {
+        particleSizeDistribution_.clear();
+    }
+    Mdouble radMin = mean - 3 * standardDeviation;
+    Mdouble radMax = mean + 3 * standardDeviation;
+    std::vector<Mdouble> radii = helpers::linspace(radMin, radMax, numberOfBins);
+    std::vector<Mdouble> probabilities;
+    for (int i = 0; i < radii.size(); i++)
+    {
+        Mdouble probability = 0.5 * (1 + erf((radii[i] - mean) / (sqrt(2) * standardDeviation)));
+        probabilities.push_back(probability);
+    }
+    for (int j = 0; j < radii.size(); j++)
+    {
+        particleSizeDistribution_.push_back({radii[j], probabilities[j]});
+    }
+    validateCumulativeDistribution();
+    for (auto& rp : particleSizeDistribution_) {
+        rp.radius = exp(rp.radius);
+    }
 }
 
 /*!
@@ -618,7 +653,7 @@ void PSD::convertCumulativeToCumulativeNumberDistribution(TYPE CDFType)
             for (auto it = particleSizeDistribution_.begin() + 1; it != particleSizeDistribution_.end(); ++it)
             {
                 // add conversion here
-            
+
                 // sum up probabilities
                 sum += it->probability;
             }
@@ -632,7 +667,7 @@ void PSD::convertCumulativeToCumulativeNumberDistribution(TYPE CDFType)
             for (auto it = particleSizeDistribution_.begin() + 1; it != particleSizeDistribution_.end(); ++it)
             {
                 // add conversion here
-            
+
                 // sum up probabilities
                 sum += it->probability;
             }
@@ -646,7 +681,7 @@ void PSD::convertCumulativeToCumulativeNumberDistribution(TYPE CDFType)
             for (auto it = particleSizeDistribution_.begin() + 1; it != particleSizeDistribution_.end(); ++it)
             {
                 // add conversion here
-            
+
                 // sum up probabilities
                 sum += it->probability;
             }
@@ -811,7 +846,7 @@ Mdouble PSD::getMinRadius() const
  */
 Mdouble PSD::getMaxRadius() const
 {
-        return particleSizeDistribution_.back().radius;
+    return particleSizeDistribution_.back().radius;
 }
 
 /*!

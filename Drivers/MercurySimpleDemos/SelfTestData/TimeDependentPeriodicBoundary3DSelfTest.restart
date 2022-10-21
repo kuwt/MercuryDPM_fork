@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name TimeDependentPeriodicBoundary3DSelfTest revision 6670 repository https://svn.mercurydpm.org/SourceCode/Trunk
+MercuryDPM 0.14 name TimeDependentPeriodicBoundary3DSelfTest revision 6705 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
 dataFile    fileType ONE_FILE saveCount 400 counter 251 lastSavedTimeStep 100000
 fStatFile   fileType ONE_FILE saveCount 400 counter 251 lastSavedTimeStep 100000
 eneFile     fileType ONE_FILE saveCount 400 counter 251 lastSavedTimeStep 100000
@@ -7,7 +7,7 @@ statFile    fileType ONE_FILE saveCount 400 counter 0
 interactionFile fileType NO_FILE saveCount 0 counter 0
 xMin 0 xMax 3 yMin -1 yMax 1 zMin 0 zMax 1
 timeStep 0.0005 time 50.0000000000567 ntimeSteps 100000 timeMax 50
-systemDimensions 3 particleDimensions 3 gravity 0 0 0 writeVTK 0 NO_FILE NO_FILE 0 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267
+systemDimensions 3 particleDimensions 3 gravity 0 0 0 backgroundDrag 0 writeVTK 0 NO_FILE NO_FILE 0 0 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267
 Species 2
 LinearViscoelasticFrictionSpecies id 0 density 1 stiffness 7.40836956764502 dissipation 0.0315199343099355 slidingStiffness 2.11667701932715 slidingDissipation 0.00900569551712444 slidingFrictionCoefficient 0.399971464074773 slidingFrictionCoefficientStatic 0.399971464074773 rollingStiffness 2.96334782705801 rollingDissipation 0.0126079737239742 rollingFrictionCoefficient 0 rollingFrictionCoefficientStatic 0 torsionStiffness 0 torsionDissipation 0 torsionFrictionCoefficient 0 torsionFrictionCoefficientStatic 0
 LinearViscoelasticFrictionSpecies id 1 density 1 stiffness 7.40836956764502 dissipation 0.0315199343099355 slidingStiffness 2.11667701932715 slidingDissipation 0.00900569551712444 slidingFrictionCoefficient 0.399971464074773 slidingFrictionCoefficientStatic 0.399971464074773 rollingStiffness 2.96334782705801 rollingDissipation 0.0126079737239742 rollingFrictionCoefficient 0 rollingFrictionCoefficientStatic 0 torsionStiffness 0 torsionDissipation 0 torsionFrictionCoefficient 0 torsionFrictionCoefficientStatic 0

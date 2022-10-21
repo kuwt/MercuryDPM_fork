@@ -187,7 +187,7 @@ public:
 
 //        for (const auto& q: particleHandler) {
 //            auto p0 = dynamic_cast<ThermalParticle *>(q);
-//            logger.assert(p0 != nullptr, "Thermal Particles required");
+//            logger.assert_debug(p0 != nullptr, "Thermal Particles required");
 //            logger(INFO, "time % temperature % moltenLayer % radius % solidRadius % invMass % mass % density % volume %",
 //                   getTime(), p0->getTemperature(), p0->getMoltenLayerThickness(),
 //                   p0->getRadius(), p0->getSolidRadius(), p0->getInvMass(), p0->getMass(), p0->getSpecies()->getDensity(), p0->getVolume());

@@ -100,7 +100,7 @@ void BondedInteraction::computeAdhesionForce()
     const BondedSpecies* species = getSpecies();
     if (bonded_ && getOverlap() >= 0)
     {
-        addForce(getNormal() * (-species->getBondForceMax()
+        addForce(getNormal() * (-getBondForce()
                                 - species->getBondDissipation() * getNormalRelativeVelocity()));
     }
 }
@@ -148,6 +148,13 @@ void BondedInteraction::setBonded(bool bonded)
 
 void BondedInteraction::bond()
 {
+    bondForce_=getSpecies()->getBondForceMax();
+    bonded_ = true;
+}
+
+void BondedInteraction::bondInPlace()
+{
+    bondForce_= getForce().getLength();
     bonded_ = true;
 }
 

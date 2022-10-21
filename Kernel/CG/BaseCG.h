@@ -275,6 +275,11 @@ public:
     void setAverageBeyondDomain(const bool val) {averageBeyondDomain_=val;}
 
     bool getAverageBeyondDomain() const {return averageBeyondDomain_;}
+    
+    void setVerbose(const bool verbose) {verbose_=verbose;}
+    
+    bool getVerbose() const {return verbose_;}
+
     /*
      * Sets width such that the CG function has a fixed standard deviation
      * See CGStandardDeviationUnitTest.
@@ -361,6 +366,8 @@ protected:
      * \todo currently, the above description is not implemented; it simply ignores particles outside the domain.
      */
     bool averageBeyondDomain_ = true;
+    
+    bool verbose_ = false;
 
 public:
     /*!

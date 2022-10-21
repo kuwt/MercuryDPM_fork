@@ -231,6 +231,16 @@ std::string to_string(const T& n)
     return stm.str();
 }
 
+template<typename T>
+std::string to_string(const std::vector<T>& vec)
+{
+    std::ostringstream stm;
+    for (const auto val : vec) {
+        stm << val << ' ';
+    }
+    return stm.str();
+}
+
 std::string to_string(Mdouble value, unsigned precision);
 
 /**
@@ -304,19 +314,19 @@ bool compare(std::istream& is, std::string s);
  *
  * @param fileName name of input
  * @param varName  variable name as it appears in the input file
- * @param value    default value (used if the parameter could not be read)
+ * @param defaultValue    default value (used if the parameter could not be read)
  * @return         value of variable
  */
 template<typename T>
-T readFromFile(std::string fileName, std::string varName, T value)
+T readFromFile(const std::string fileName, const std::string varName, const T defaultValue)
 {
     //open filestream
     std::ifstream is(fileName.c_str(), std::ios::in);
     if (is.fail())
     {
         logger(INFO, "readFromFile: file % could not be opened, variable % set to default value %",
-               fileName, varName, value);
-        return value;
+               fileName, varName, defaultValue);
+        return defaultValue;
     }
     
     //read in variables, until the right one is fount
@@ -324,8 +334,9 @@ T readFromFile(std::string fileName, std::string varName, T value)
     while (!is.eof())
     {
         is >> s;
-        if (!s.compare(varName))
+        if (s == varName)
         {
+            T value;
             is >> value;
             logger(INFO, "readFromFile: variable % set to % ", varName, value);
             return value;
@@ -333,8 +344,8 @@ T readFromFile(std::string fileName, std::string varName, T value)
     }
     
     //if the right variable is never found
-    logger(WARN, "readFromFile: variable % not set in file %, using default value % ", varName, fileName, value);
-    return value;
+    logger(WARN, "readFromFile: variable % not set in file %, using default value % ", varName, fileName, defaultValue);
+    return defaultValue;
 }
 
 /**
@@ -408,36 +419,36 @@ std::vector<T> readVectorFromCommandLine(int argc, char *argv[], std::string var
     logger(INFO, "readFromCommandLine: % set to default value % ", varName.substr(1), out.str());
     return values;
 }
-    
-    
-    template<>
-    std::string readFromCommandLine<std::string>(int argc, char* argv[], std::string varName, std::string value);
-    
-    void check(double real, double ideal, double error, std::string errorMessage);
-    
-    void check(Vec3D real, Vec3D ideal, double error, std::string errorMessage);
-    
-    void check(Matrix3D real, Matrix3D ideal, double error, std::string errorMessage);
-    
-    void check(MatrixSymmetric3D real, MatrixSymmetric3D ideal, double error, std::string errorMessage);
-    
-    std::string getPath();
-    
-    Mdouble getRealTime();
-    
-    bool isNext(std::istream& is, const std::string name);
-    
-    bool createDirectory(std::string);
-    
-    Mdouble round(const Mdouble value, unsigned precision);
+
+template<>
+std::string readFromCommandLine<std::string>(int argc, char *argv[], std::string varName, std::string value);
+
+void check(double real, double ideal, double error, std::string errorMessage);
+
+void check(Vec3D real, Vec3D ideal, double error, std::string errorMessage);
+
+void check(Matrix3D real, Matrix3D ideal, double error, std::string errorMessage);
+
+void check(MatrixSymmetric3D real, MatrixSymmetric3D ideal, double error, std::string errorMessage);
+
+std::string getPath();
+
+Mdouble getRealTime();
+
+bool isNext(std::istream& is, const std::string name);
+
+bool createDirectory(std::string);
+
+double round(double val, int prec);
 
 /*
  * \brief Returns the Rayleigh time step for a Hertz contact law.
  * \detailed An accepted time step for Hertz is 10-20% of the Rayleigh time step.
  * See \cite Marigo2015
  */
-    Mdouble getRayleighTime(Mdouble radius, Mdouble shearModulus, Mdouble poisson, Mdouble density);
+Mdouble getRayleighTime(Mdouble radius, Mdouble shearModulus, Mdouble poisson, Mdouble density);
     
-    std::vector<Mdouble> linspace(Mdouble a, Mdouble b, int N);
+std::vector<Mdouble> linspace(Mdouble a, Mdouble b, int N);
+
 }
 #endif

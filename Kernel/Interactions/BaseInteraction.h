@@ -239,7 +239,11 @@ public:
      */
     Mdouble getOverlap() const
     { return overlap_; }
-    
+
+    /*!
+     * \breif Return a Double with the current volume of overlap betweent the two interacting objects.
+     */
+    Mdouble getOverlapVolume() const;
     /*!
      * \brief Returns a Mdouble with the current contact between the two interacting objects.
      */
@@ -579,6 +583,7 @@ private:
      * Identifies individual contact such that it can be distinguished. E.g. the face number of a triangulated wall.
      */
     unsigned multiContactIdentifier_;
+
 };
 
 #endif

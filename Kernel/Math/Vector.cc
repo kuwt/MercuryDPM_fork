@@ -374,8 +374,23 @@ std::ostream& operator<<(std::ostream& os, const Vec3D& a)
 std::istream& operator>>(std::istream& is, Vec3D& a)
 {
     //TW: clearing the stream avoids the nasty problem that the failbit is set to true if numbers below DBL_MIN=1e-308 are read.
-    is >> a.X; is.clear();
-    is >> a.Y; is.clear();
-    is >> a.Z; //is.clear();
+    is >> a.X;
+    if (is.fail()) {
+        logger(VERBOSE,"Failed to read x-value %", a.X);
+        //a.X = 0;
+        is.clear();
+    }
+    is >> a.Y;
+    if (is.fail()) {
+        logger(VERBOSE,"Failed to read y-value %", a.Y);
+        //a.Y = 0;
+        is.clear();
+    }
+    is >> a.Z;
+    if (is.fail()) {
+        logger(VERBOSE,"Failed to read z-value %", a.Z);
+        //a.Z = 0;
+        is.clear();
+    }
     return is;
 }

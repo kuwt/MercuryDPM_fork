@@ -27,6 +27,7 @@ add_subdirectory(Template)
 add_subdirectory(ParallelDrum)
 add_subdirectory(Clusters)
 add_subdirectory(SimpleDrum)
+add_subdirectory(Calibration)
 add_subdirectory(TriangleWalls)
 
 

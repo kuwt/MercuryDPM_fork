@@ -144,10 +144,6 @@ void CubeInsertionBoundary::setGeometry(Vec3D posMin, Vec3D posMax)
 // CubeInsertionBoundary. If the particle is wanted then it is copied into the
 // particleHandler.  In any case, the InsertionBoundary's version of the
 // particle (created here) gets deleted by the InsertionBoundary.
-//
-// TP: Generate Particle is not geometry specific (but sometimes distribution-modality/species specific; in that case
-// it can be overriden) and therefore moved to the Parent class.
-
 void CubeInsertionBoundary::placeParticle(BaseParticle* p, RNG& random)
 {
     Vec3D pos, vel;

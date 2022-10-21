@@ -1059,6 +1059,7 @@ BaseParticle* ParticleHandler::readAndCreateObject(std::istream& is)
 {
     std::string type;
     BaseParticle* particle = nullptr;
+    if (getNumberOfObjects()>0) logger(DEBUG,"size % % %",getNumberOfObjects(),getLastObject()->getVelocity(),getLastObject()->getRadius());
     if (getStorageCapacity() > 0)
     {
         is >> type;
@@ -1069,6 +1070,7 @@ BaseParticle* ParticleHandler::readAndCreateObject(std::istream& is)
     }
     else //for insertion boundaries
     {
+        ///\todo check what is special about this case
         is >> type;
         logger(DEBUG, "ParticleHandler::readAndCreateObject(is): type %", type);
         particle = createObject(type);
@@ -1368,7 +1370,8 @@ void ParticleHandler::actionsAfterTimeStep()
     }
 }
 
-double ParticleHandler::getLiquidFilmVolume() const {
+double ParticleHandler::getLiquidFilmVolume() const
+{
     double liquidVolume = 0;
     for (auto i : objects_) {
         auto j = dynamic_cast<LiquidFilmParticle*>(i);
@@ -1376,3 +1379,62 @@ double ParticleHandler::getLiquidFilmVolume() const {
     }
     return getMPISum(liquidVolume);
 };
+
+void ParticleHandler::saveNumberPSDtoCSV(std::string csvFileName, std::vector<double> diameterBins)
+{
+    //check that there is at least one particle in the handler
+    if (getNumberOfObjects()==0) {
+        logger(WARN, "saveNumberPSDtoCSV: No PSD written, as particleHandler is empty.");
+    }
+    
+    // check that the diameter vector is set
+    double rMin = getSmallestParticle()->getRadius();
+    double rMax = getLargestParticle()->getRadius();
+    if (diameterBins.empty()) {
+        size_t n = std::min(100,(int)std::ceil(getNumberOfObjects()/20));
+        diameterBins.reserve(n);
+        double dr = (rMax-rMin)/(n-1);
+        for (size_t i = 0; i<n-1; i++) {
+            diameterBins.push_back(2.0 * (rMin + i * dr));
+        }
+    } else {
+        // make sure values are in increasing order
+        std::sort(diameterBins.begin(), diameterBins.end());
+    }
+    
+    // set the last bin to include the largest particle
+    if (diameterBins.back() < 2.0 * rMax) {
+        diameterBins.push_back(2.0 * rMax);
+    }
+    
+    // create a psd structure
+    struct PSD {
+        double diameter;
+        double probability;
+    };
+    std::vector<PSD> psd;
+    size_t n = diameterBins.size();
+    psd.reserve(n);
+    for (const auto bin : diameterBins) {
+        psd.push_back({bin,0.0});
+    }
+    
+    for (const auto p : *this) {
+        double d = 2.0*p->getRadius();
+        for (auto& bin : psd) {
+            if (d <= bin.diameter) {
+                bin.probability += 1./getNumberOfObjects();
+                break;
+            }
+        }
+    }
+    
+    logger(INFO,"Writing PSD to %",csvFileName);
+    std::ofstream csv(csvFileName);
+    logger.assert_always(csv.is_open(),"File % could not be opened",csvFileName);
+    csv << "Diameter" << ',' << "Probability Number Distribution" << '\n';
+    for (const auto bin : psd) {
+        csv << bin.diameter << ',' << bin.probability << '\n';
+    }
+    csv.close();
+}

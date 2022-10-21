@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name SingleParticleConstantTemperature revision 5170 repository https://svn.mercurydpm.org/SourceCode/Trunk
+MercuryDPM 0.14 name SingleParticleConstantTemperature revision 6537 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
 dataFile    fileType ONE_FILE saveCount 10 counter 1553 lastSavedTimeStep 15514
 fStatFile   fileType ONE_FILE saveCount 10 counter 1553 lastSavedTimeStep 15514
 eneFile     fileType ONE_FILE saveCount 10 counter 1553 lastSavedTimeStep 15514
@@ -7,7 +7,7 @@ statFile    fileType ONE_FILE saveCount 10 counter 0
 interactionFile fileType NO_FILE saveCount 0 counter 0
 xMin -1e-06 xMax 1e-06 yMin -1e-06 yMax 1e-06 zMin -1e-06 zMax 1e-06
 timeStep 6.445950267993e-05 time 1.0000247245767 ntimeSteps 15514 timeMax 1
-systemDimensions 3 particleDimensions 3 gravity 0 0 -4.9e-06 writeVTK 0 NO_FILE NO_FILE 0 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267 xBallsArguments  -v0 -solidf -noborder 4 -p 1
+systemDimensions 3 particleDimensions 3 gravity 0 0 -4.9e-06 backgroundDrag 0 writeVTK 0 NO_FILE NO_FILE 0 0 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267 xBallsArguments  -v0 -solidf -noborder 4 -p 1
 Species 1
 SinterSpecies id 0 density 1e+15 loadingStiffness 2000 maxUnloadingStiffness 2000 cohesionStiffness 2000 maxPenetration 0.16 dissipation 0.290012017823786 sinterAdhesion 1.2 inverseSinterViscosity 0 sinterRate 0.09 complianceZero 0 surfTension 0 constantC1 0 separationDis 0 sinterType 1
 Walls 0

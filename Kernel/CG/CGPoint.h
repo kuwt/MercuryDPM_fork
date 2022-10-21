@@ -23,7 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CGPOINT_H
-#define    CGPOINT_H
+#define CGPOINT_H
 
 #include "CG/Fields/StandardFields.h"
 #include "CG/Fields/OrientationField.h"

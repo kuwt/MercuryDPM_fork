@@ -170,6 +170,8 @@ void BaseInteraction::write(std::ostream& os) const
     }
     os << " timeStamp " << timeStamp_;
     os << " contactPoint " << contactPoint_;
+    //\todo tw we need to store normal and distance as well
+    // os << " normal " << normal_*distance_;
     os << " force " << force_;
     os << " torque " << torque_;
     //\todo add information that can recreate the contact information (necessary for CG)
@@ -261,14 +263,55 @@ void BaseInteraction::setHandler(InteractionHandler* handler)
     handler_ = handler;
 }
 
-/*!
- * \details Returns a pointer to the InteractionHandler that this interaction
- *          belongs.
- * \return  Constant pointer to the InteractionHandler.
- */
+
 InteractionHandler* BaseInteraction::getHandler() const
 {
     return handler_;
+}
+
+/*!
+    * \details Converts the linear overlap in the corrct volume overlap i.e. this is not the spherical cap approximation
+    * Please see additional docs directory for the calculation of this and the mathematica file with the calulation in
+    * @return The volume of the overlap between the two objects in the interaction
+    */
+Mdouble BaseInteraction::getOverlapVolume() const
+{
+    logger(WARN,"This function is only tested for spheres and (may) give the wrong answer for other objects");
+    //First get overlap and radii of each object
+    Mdouble delta = getOverlap();
+    Mdouble curvatureParticle=getP()->getCurvature(getP()->getPosition());
+    Mdouble curvatureInteractable=getI()->getCurvature(getI()->getPosition());
+
+    if (curvatureInteractable == 0)
+    {
+        logger(ERROR,"This function is not implement for walls yet and will return 0");
+        return 0;
+    }
+    else
+    {
+        Mdouble r1=1.0/curvatureInteractable;
+        Mdouble r2=1.0/curvatureParticle;
+
+        //Eq (2.1) - see doc
+        logger(WARN,"Radius of first object % and second object %",r1,r2);
+        Mdouble t1=(r2-delta/2.0)/(r1+r2-delta)*delta;
+        //Eq (2.2) - see doc
+        Mdouble t2=(r1-delta/2.0)/(r1+r2-delta)*delta;
+
+        //Eq (2.3) - see doc
+        Mdouble V=constants::pi*(
+                std::pow(r1,2.0)*t1
+                -std::pow(t1,3.0)
+                +std::pow(r2,2.0)*t2
+                -std::pow(t2,3.0)/3.0
+                );
+
+        return V;
+
+
+    }
+
+return 0;
 }
 
 /*!
@@ -414,16 +457,20 @@ void BaseInteraction::importI(BaseInteractable *I)
 
 Vec3D BaseInteraction::getIP() const
 {
+    //needs to be done by normal and distance or it fails in periodic systems
+    //return getP()->getPosition() - getI()->getPosition();
     return getNormal() * getDistance();
 }
 
 Vec3D BaseInteraction::getIC() const
 {
+    ///\todo getDistance is not set in postprocessing
     return getNormal() * getDistance() + getContactPoint() - getP()->getPosition();
 }
 
 Vec3D BaseInteraction::getCP() const
 {
+    //works even in periodic systems becuase contact point is defined on the P-side
     return getP()->getPosition() - getContactPoint();
 }
 

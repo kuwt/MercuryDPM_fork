@@ -128,6 +128,7 @@ DPMBase::DPMBase(const DPMBase& other) : wallVTKWriter_(other.wallVTKWriter_),
     systemDimensions_ = other.systemDimensions_;
     particleDimensions_ = other.particleDimensions_;
     gravity_ = other.gravity_;
+    backgroundDrag_=other.backgroundDrag_;
 /*    xMin_ = other.xMin_;
     xMax_ = other.xMax_;
     yMin_ = other.yMin_;
@@ -249,6 +250,7 @@ void DPMBase::constructor()
     setParticleDimensions(3);
     setRestarted(false);
     setGravity(Vec3D(0, 0, 0));
+    setBackgroundDrag(0.0);
 
     //This is the parameter of the numerical part
     setTime(0);
@@ -1265,7 +1267,7 @@ void DPMBase::setNumberOfOMPThreads(int numberOfOMPThreads)
     }
 #pragma omp parallel num_threads(getNumberOfOMPThreads())
     {
-        logger(INFO) " %", std::to_string(omp_get_thread_num(), Flusher::NO_FLUSH);
+        logger(INFO, " %", std::to_string(omp_get_thread_num()), Flusher::NO_FLUSH);
     }
     logger(INFO,"");
 
@@ -2640,7 +2642,6 @@ bool DPMBase::readNextDataFile(unsigned int format)
         dataFile.getFstream() >> doubleN;
         N = doubleN;
     }
-
     //store the parameters you want to preserve:
     const size_t nHistory = std::min(N,particleHandler.getSize());
     std::vector<const ParticleSpecies*> species(nHistory);
@@ -3069,7 +3070,7 @@ void DPMBase::computeInternalForce(BaseParticle* const P1, BaseParticle* const P
 }
 
 /*!
- * \todo take out computeWalls() from compute External Forces method.
+ * By default we have gravity and background drag as the external forces
  * \param[in] CI The BaseParticle object to which the relevant external forces are applied.
  */
 void DPMBase::computeExternalForces(BaseParticle* CI)
@@ -3079,7 +3080,7 @@ void DPMBase::computeExternalForces(BaseParticle* CI)
     if (!CI->isFixed())
     {
         // Applying the force due to gravity (F = m.g)
-        CI->addForce(getGravity() * CI->getMass());
+        CI->addForce(getGravity() * CI->getMass()-getBackgroundDrag()*CI->getVelocity());
         // Still calls this in compute External Forces.
         // computeForcesDueToWalls(CI);
     }
@@ -3319,7 +3320,7 @@ void DPMBase::computeAllForces()
     
     // for omp simulations, reset the newObjects_ variable (used for reduction)
     interactionHandler.resetNewObjectsOMP();
-
+    
     // compute all internal and external forces; for omp simulations, this can be done in parallel
     #pragma omp parallel num_threads(getNumberOfOMPThreads())
     {
@@ -3336,14 +3337,14 @@ void DPMBase::computeAllForces()
             // body forces
             computeExternalForces(p);
         }
-
+        
         // wall-forces
         #pragma omp for schedule(dynamic)
         for (int k = 0; k < wallHandler.getSize(); k++) {
             BaseWall *w = wallHandler.getObject(k);
             computeWallForces(w);
         }
-
+        
     }
 
 #ifdef CONTACT_LIST_HGRID
@@ -3438,10 +3439,12 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
        << " timeMax " << getTimeMax() << '\n'
        << "systemDimensions " << getSystemDimensions()
        << " particleDimensions " << getParticleDimensions()
-       << " gravity " << getGravity();
+       << " gravity " << getGravity()
+       << " backgroundDrag " <<getBackgroundDrag();
     os << " writeVTK " << writeParticlesVTK_
         << " " << writeWallsVTK_
         << " " << interactionHandler.getWriteVTK()
+        << " " << boundaryHandler.getWriteVTK()
         << " " << (vtkWriter_?vtkWriter_->getFileCounter():0)
         << " " << wallVTKWriter_.getFileCounter()
         << " " << interactionVTKWriter_.getFileCounter()
@@ -3629,15 +3632,15 @@ void DPMBase::read(std::istream& is, ReadOptions opt)
             helpers::getLineFromStringStream(is, line);
             line >> dummy >> systemDimensions_
                  >> dummy >> particleDimensions_
-                 >> dummy >> gravity_;
-
+                 >> dummy >> gravity_
+                 >> dummy >> backgroundDrag_;
             line >> dummy;
             if (!dummy.compare("writeVTK"))
             {
                 FileType writeInteractionsVTK = FileType::NO_FILE;
-                unsigned particlesCounter, wallCounter, interactionCounter;
+                unsigned particlesCounter, wallCounter, interactionCounter, boundaryCounter;
                 bool writeBoundaryVTK;
-                line >> writeParticlesVTK_ >> writeWallsVTK_ >> writeInteractionsVTK >> writeBoundaryVTK >> particlesCounter >> wallCounter >> interactionCounter;
+                line >> writeParticlesVTK_ >> writeWallsVTK_ >> writeInteractionsVTK >> writeBoundaryVTK >> particlesCounter >> wallCounter >> interactionCounter >> boundaryCounter;
                 line.clear();//because the number of arguments  in writeVTK has changed
                 line >> dummy;
                 setParticlesWriteVTK(writeParticlesVTK_);
@@ -3645,9 +3648,9 @@ void DPMBase::read(std::istream& is, ReadOptions opt)
                 interactionHandler.setWriteVTK(writeInteractionsVTK);
                 boundaryHandler.setWriteVTK(writeBoundaryVTK);
                 vtkWriter_->setFileCounter(particlesCounter);
-                wallVTKWriter_.setFileCounter(particlesCounter);
-                interactionVTKWriter_.setFileCounter(particlesCounter);
-                boundaryVTKWriter_.setFileCounter(particlesCounter);
+                wallVTKWriter_.setFileCounter(wallCounter);
+                interactionVTKWriter_.setFileCounter(interactionCounter);
+                boundaryVTKWriter_.setFileCounter(boundaryCounter);
             }
             if (!dummy.compare("random"))
             {

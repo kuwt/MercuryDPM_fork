@@ -1,13 +1,13 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+                                                                                                                        //Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
-//modification, are permitted provid->d that the following conditions are met:
+//modification, are permitted provided that the following conditions are met:
 //  * Redistributions of source code must retain the above copyright
 //    notice, this list of conditions and the following disclaimer.
 //  * Redistributions in binary form must reproduce the above copyright
 //    notice, this list of conditions and the following disclaimer in the
-//    documentation and/or other materials provid->d with the distribution.
+//    documentation and/or other materials provided with the distribution.
 //  * Neither the name MercuryDPM nor the
 //    names of its contributors may be used to endorse or promote products
 //    derived from this software without specific prior written permission.
@@ -25,12 +25,11 @@
 
 #include "StressStrainControlBoundary.h"
 #include "ParticleHandler.h"
-#include "Particles/BaseParticle.h"
-#include "MpiDataClass.h"
 #include "MpiContainer.h"
 #include "DPMBase.h"
 #include "PeriodicBoundary.h"
 #include "LeesEdwardsBoundary.h"
+
 
 /*!
  * \details constructor, set all the parameters that boundary needs as inputs to zero.
@@ -42,14 +41,14 @@ StressStrainControlBoundary::StressStrainControlBoundary()
     strainRate_.setZero();
     gainFactor_.setZero();
     isStrainRateControlled_ = true;
-    lengthBox_.setZero();
-    centerBox_.setZero();
-    relativeToCenter_.setZero();
     integratedShift_ = 0.0;
     //
     logger(DEBUG, "StressStrainControlBoundary::StressStrainControlBoundary() finished");
 }
-
+Mdouble StressStrainControlBoundary::computeStressError(){
+    Matrix3D stress = getHandler()->getDPMBase()->getTotalStress();
+    return (stress.XX- stressGoal_.XX);
+}
 /*!
  * \details Copy method; creates a copy on the boundary and returns its pointer.
  */
@@ -110,8 +109,8 @@ std::string StressStrainControlBoundary::getName() const
 
 /*!
  * \details This is where the stress-strain control is implemented and
- * the boundary will be checked at each timestep to make sure the target
- * stress/strainrate are achieved.
+ * the boundary will be checked at each time step to make sure the target
+ * stress/strain rate are achieved.
  */
 void StressStrainControlBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& particleHandler)
 {
@@ -127,7 +126,7 @@ void StressStrainControlBoundary::checkBoundaryAfterParticlesMove(ParticleHandle
     if (stressGoal_.XX != 0 || stressGoal_.YY != 0 || stressGoal_.ZZ != 0 ||
         stressGoal_.XY != 0)
     {
-        //the strainrate in the corresponding direction will be calculated
+        //the strain rate in the corresponding direction will be calculated
         computeStrainRate();
     }
     activateStrainRateControl(particleHandler);
@@ -156,62 +155,52 @@ void StressStrainControlBoundary::checkPeriodicLeesEdwardsBoundariesAfterParticl
  */
 void StressStrainControlBoundary::determineLengthAndCentre()
 {
-    const DPMBase* const dpm = getHandler()->getDPMBase();
-    lengthBox_.X = (dpm->getXMax() - dpm->getXMin());
-    lengthBox_.Y = (dpm->getYMax() - dpm->getYMin());
-    lengthBox_.Z = (dpm->getZMax() - dpm->getZMin());
-    // Box length Lx, Lyand Lz, and center point C of the box
-    centerBox_.X = (dpm->getXMax() + dpm->getXMin()) / 2.0;
-    centerBox_.Y = (dpm->getYMax() + dpm->getYMin()) / 2.0;
-    centerBox_.Z = (dpm->getZMax() + dpm->getZMin()) / 2.0;
-    
+//    const DPMBase* const dpm = getHandler()->getDPMBase();
 }
 
 /*!
- * \details This function is used to compute the new strainrate tensor based on
+ * \details This function is used to compute the new strain rate tensor based on
  * the stress differences between the actual and user set target values.
  */
 void StressStrainControlBoundary::computeStrainRate()
 {
-    //Get the timestep dt
-    const Mdouble timeStep = getHandler()->getDPMBase()->getTimeStep();
     // calculate the stress total and average over the volume
-    Matrix3D stressTotal = getHandler()->getDPMBase()->getTotalStress();
+    const Mdouble timeStep = getHandler()->getDPMBase()->getTimeStep();
+    Matrix3D stress = getHandler()->getDPMBase()->getTotalStress();
 
-    // integral controller
-    // amount by which the strainrate tensor has to be changed
+    // controller
+    // amount by which the strain rate tensor has to be changed
     if (stressGoal_.XX != 0)
     {
-        strainRate_.XX += gainFactor_.XX * timeStep * (stressTotal.XX - stressGoal_.XX);
-        logger(VERBOSE, "StressXX = %",stressTotal.XX);
+//        Mdouble stressError=(stress.XX- stressGoal_.XX);         // Calculate the Error
+//        static PIController xx(0.1,gainFactor_.XX);
+//        strainRate_.XX = xx.apply(stressError,timeStep);      // Controller Command
+//        logger(VERBOSE, "StressXX = %",stress.XX);
+        strainRate_.XX = gainFactor_.XX * (stress.XX - stressGoal_.XX);
     }
     if (stressGoal_.YY != 0)
     {
-        strainRate_.YY +=  gainFactor_.YY * timeStep * (stressTotal.YY - stressGoal_.YY);
-        logger(VERBOSE, "StressYY = %",stressTotal.YY);
+        strainRate_.YY = gainFactor_.YY * (stress.YY - stressGoal_.YY);
     }
     if (stressGoal_.ZZ != 0)
     {
-        strainRate_.ZZ += gainFactor_.ZZ * timeStep * (stressTotal.ZZ - stressGoal_.ZZ);
-        logger(VERBOSE, "StressZZ = %",stressTotal.ZZ);
+        strainRate_.ZZ = gainFactor_.ZZ * (stress.ZZ - stressGoal_.ZZ);
     }
     if (stressGoal_.XY != 0)
     {
-        strainRate_.XY += gainFactor_.XY * timeStep * (stressTotal.XY - stressGoal_.XY);
-        logger(VERBOSE, "StressXY = %",stressTotal.XY);
-        logger(VERBOSE, "StressYX = %",stressTotal.YX);
+        strainRate_.XY = gainFactor_.XY * (stress.XY - stressGoal_.XY);
     }
 }
 
 /*!
- * \details This function activate the strainrate control based on user inputs, it takes only
+ * \details This function activate the strain rate control based on user inputs, it takes only
  * the strainRate_ tensor and move particles based on this tensor, also move boundaries based
  * on the new domain size.
  */
 void StressStrainControlBoundary::activateStrainRateControl(const ParticleHandler& particleHandler)
 {
     const DPMBase* const dpm = getHandler()->getDPMBase();
-    // update the domain size based on the new strainrate tensor
+    // update the domain size based on the new strain rate tensor
     updateDomainSize();
     
     //  Move the boundaries to next time step
@@ -229,41 +218,47 @@ void StressStrainControlBoundary::activateStrainRateControl(const ParticleHandle
         periodicBoundaries_[2].set(Vec3D(0.0, 0.0, 1.0), dpm->getZMin(), dpm->getZMax());
     }
     
-    //  Give the strain-rate for all particles and move them to next timestep before integration
+    //  Give the strain-rate for all particles and move them to next time step before integration
     if (isStrainRateControlled_)
     {
         for (auto& p : particleHandler)
         {
-            relativeToCenter_.X = p->getPosition().X - centerBox_.X;
-            relativeToCenter_.Y = p->getPosition().Y - centerBox_.Y;
-            relativeToCenter_.Z = p->getPosition().Z - centerBox_.Z;
-            p->move(Vec3D(strainRate_.XX * dpm->getTimeStep() * relativeToCenter_.X +
-                          strainRate_.XY * dpm->getTimeStep() * relativeToCenter_.Y,
-                          strainRate_.YY * dpm->getTimeStep() * relativeToCenter_.Y,
-                          strainRate_.ZZ * dpm->getTimeStep() * relativeToCenter_.Z));
+            // Box length Lx, Ly and Lz, and center point C of the box
+            Vec3D centerBox;
+            centerBox.X = (dpm->getXMax() + dpm->getXMin()) / 2.0;
+            centerBox.Y = (dpm->getYMax() + dpm->getYMin()) / 2.0;
+            centerBox.Z = (dpm->getZMax() + dpm->getZMin()) / 2.0;
+            Vec3D relativeToCenter;
+            relativeToCenter.X = p->getPosition().X - centerBox.X;
+            relativeToCenter.Y = p->getPosition().Y - centerBox.Y;
+            relativeToCenter.Z = p->getPosition().Z - centerBox.Z;
+            p->move(Vec3D(strainRate_.XX * dpm->getTimeStep() * relativeToCenter.X +
+                          strainRate_.XY * dpm->getTimeStep() * relativeToCenter.Y,
+                          strainRate_.YY * dpm->getTimeStep() * relativeToCenter.Y,
+                          strainRate_.ZZ * dpm->getTimeStep() * relativeToCenter.Z));
         }
     }
 }
 
 /*!
- * \details This function is used to upate the domain size based on the strainRate tensor,
- * note that the system is symmetric and thereofore we have to update boundary in both Min and Max.
+ * \details This function is used to update the domain size based on the strainRate tensor,
+ * note that the system is symmetric and therefore we have to update boundary in both Min and Max.
  */
 void StressStrainControlBoundary::updateDomainSize()
 {
     DPMBase* const dpm = getHandler()->getDPMBase();
+    // Box length Lx, Ly and Lz for next time step
+    Vec3D lengthBox;
+    lengthBox.X = (dpm->getXMax() - dpm->getXMin());
+    lengthBox.Y = (dpm->getYMax() - dpm->getYMin());
+    lengthBox.Z = (dpm->getZMax() - dpm->getZMin());
     //  Change the system size according to next time step
-    dpm->setXMax(dpm->getXMax() + 0.5 * lengthBox_.X * strainRate_.XX * dpm->getTimeStep());
-    dpm->setXMin(dpm->getXMin() - 0.5 * lengthBox_.X * strainRate_.XX * dpm->getTimeStep());
-    dpm->setYMax(dpm->getYMax() + 0.5 * lengthBox_.Y * strainRate_.YY * dpm->getTimeStep());
-    dpm->setYMin(dpm->getYMin() - 0.5 * lengthBox_.Y * strainRate_.YY * dpm->getTimeStep());
-    dpm->setZMax(dpm->getZMax() + 0.5 * lengthBox_.Z * strainRate_.ZZ * dpm->getTimeStep());
-    dpm->setZMin(dpm->getZMin() - 0.5 * lengthBox_.Z * strainRate_.ZZ * dpm->getTimeStep());
-    
-    // Box length Lx, Lyand Lz for next time step
-    lengthBox_.X = (dpm->getXMax() - dpm->getXMin());
-    lengthBox_.Y = (dpm->getYMax() - dpm->getYMin());
-    lengthBox_.Z = (dpm->getZMax() - dpm->getZMin());
+    dpm->setXMax(dpm->getXMax() + 0.5 * lengthBox.X * strainRate_.XX * dpm->getTimeStep());
+    dpm->setXMin(dpm->getXMin() - 0.5 * lengthBox.X * strainRate_.XX * dpm->getTimeStep());
+    dpm->setYMax(dpm->getYMax() + 0.5 * lengthBox.Y * strainRate_.YY * dpm->getTimeStep());
+    dpm->setYMin(dpm->getYMin() - 0.5 * lengthBox.Y * strainRate_.YY * dpm->getTimeStep());
+    dpm->setZMax(dpm->getZMax() + 0.5 * lengthBox.Z * strainRate_.ZZ * dpm->getTimeStep());
+    dpm->setZMin(dpm->getZMin() - 0.5 * lengthBox.Z * strainRate_.ZZ * dpm->getTimeStep());
 }
 
 /*!
@@ -275,10 +270,10 @@ void StressStrainControlBoundary::determineStressControlledShearBoundaries()
 {
     const DPMBase* const dpm = getHandler()->getDPMBase();
     //Determine the current shear velocity and shift of the Lees-Edwards boundary
-    const Mdouble velocity_xy = strainRate_.XY * lengthBox_.Y;
+    const Mdouble velocity_xy = strainRate_.XY * (dpm->getXMax() - dpm->getXMin());
     integratedShift_ += velocity_xy * dpm->getTimeStep();
     
-    // Determine how to move boundaries based on strainrate control or boundary control
+    // Determine how to move boundaries based on strain rate control or boundary control
     if (isStrainRateControlled_)
     {
         //  Move the Lees-Edwards boundary in z direction to next time step
@@ -307,11 +302,11 @@ void StressStrainControlBoundary::determineStressControlledShearBoundaries()
  * \details This function sets the inputs for the whole StressStrainControlBoundary
  * based on the user inputs.
  * \param[in] stressGoal        The target stress tensor that needs to achieve at the end of the deformation.
- * \param[in] strainRate        The target strainrate tensor, cannot be set non-zero with target Stress,
+ * \param[in] strainRate        The target strain rate tensor, cannot be set non-zero with target Stress,
  *                              i.e. stressGoal.XX != 0, then strainRate.XX = 0.
  * \param[in] gainFactor        The incremental factor for the stress control, usually a very small value ~ 0.0001.
- * \param[in] isStrainRateControlled        The boolean key to determin whether particles are moved by
- *                                          strainrate affine movement (true) or draged by boundary itself (false).
+ * \param[in] isStrainRateControlled        The boolean key to determine whether particles are moved by
+ *                                          strain rate affine movement (true) or dragged by boundary itself (false).
  */
 void StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D& strainRate, const Matrix3D& gainFactor, bool isStrainRateControlled)
 {
@@ -376,6 +371,11 @@ void StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D
                 dpm->getXMin(), dpm->getXMax(), dpm->getYMin(), dpm->getYMax());
         leesEdwardsBoundaries_.push_back(leesEdwardsBoundary);
     }
+}
+
+void StressStrainControlBoundary::setStrainRate(const Matrix3D& strainRate)
+{
+    strainRate_ = strainRate;
 }
 
 /*!

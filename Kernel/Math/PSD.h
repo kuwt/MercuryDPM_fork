@@ -79,7 +79,7 @@ public:
         PROBABILITYDENSITY_AREA_DISTRIBUTION,
         PROBABILITYDENSITY_VOLUME_DISTRIBUTION
     };
-    
+
     /*!
      * \brief Class which stores radii and probabilities of a PSD. This class should be used as a vector<PSD::RadiusAndProbability>.
      */
@@ -89,206 +89,223 @@ public:
         Mdouble radius;
         Mdouble probability;
     };
-    
+
     /*!
      * \brief Constructor; sets everything to 0 or default.
      */
     PSD();
-    
+
     /*!
      * \brief Copy constructor with deep copy.
      */
     PSD(const PSD& other);
-    
+
     /*!
      * \brief Destructor; default destructor.
      */
     ~PSD();
-    
+
     /*!
      * \brief Creates a copy on the heap and returns a pointer.
      */
     PSD* copy() const;
-    
+
     /*!
      * \brief Prints radii and probabilities of the PSD vector.
      */
     void printPSD() const;
-    
+
     /*!
      * \brief Draw a sample radius from a CUMULATIVE_NUMBER_DISTRIBUTION.
      */
     Mdouble drawSample();
-    
+
     /*!
      * \brief Draw sample radius manually per size class and check the volumeAllowed of each size class to insert the
      * PSD as accurate as possible.
      */
     Mdouble insertManuallyByVolume(Mdouble volume);
-    
+
     /*!
      * \brief Validates if a CDF starts with zero and adds up to unity.
     */
     void validateCumulativeDistribution();
-    
+
     /*!
      * \brief Validates if the integral of the PDF equals to unity.
      */
     void validateProbabilityDensityDistribution();
-    
+
     /*!
      * \brief Deprecated version of reading in PSDs from a vector.
      */
     MERCURY_DEPRECATED
     void setPSDFromVector(std::vector<RadiusAndProbability> psd, TYPE PSDType);
-    
+
     /*!
      * \brief read in the PSD vector with probabilities and radii saved in a .csv file.
      */
     void setPSDFromCSV(const std::string& fileName, TYPE PSDType, bool headings = false, Mdouble
     unitScalingFactorRadii = 1.0);
-    
+
     /*!
      * \brief create a PSD vector for a uniform distribution.
      */
     void setDistributionUniform(Mdouble radMin, Mdouble radMax, int numberOfBins);
-    
+
     /*!
      * \brief create a PSD vector for a normal distribution.
      */
     void setDistributionNormal(Mdouble mean, Mdouble standardDeviation, int numberOfBins);
-    
+
+    static PSD getDistributionNormal(Mdouble mean, Mdouble standardDeviation, int numberOfBins) {
+        PSD psd;
+        psd.setDistributionNormal(mean, standardDeviation, numberOfBins);
+        return psd;
+    }
+
+    /*!
+     * \brief create a PSD vector for a normal distribution.
+     */
+    void setDistributionLogNormal(Mdouble mean, Mdouble standardDeviation, int numberOfBins);
+
+    static PSD getDistributionLogNormal(Mdouble mean, Mdouble standardDeviation, int numberOfBins) {
+        PSD psd;
+        psd.setDistributionLogNormal(mean, standardDeviation, numberOfBins);
+        return psd;
+    }
+
     /*!
      * \brief Converts a PDF to a CDF by integration.
      */
     void convertProbabilityDensityToCumulative();
-    
+
     /*!
      * \brief Converts a CDF to a PDF by derivation.
      */
     void convertCumulativeToProbabilityDensity();
-    
+
     /*!
      * \brief convert any PDF to a PROBABILITYDENSITY_NUMBER_DISTRIBUTION.
      */
     void convertProbabilityDensityToProbabilityDensityNumberDistribution(TYPE PDFType);
-    
+
     /*!
      * \brief convert a PROBABILITYDENSITY_NUMBER_DISTRIBUTION to a PROBABILITYDENSITY_VOLUME_DISTRIBUTION.
      */
     void convertProbabilityDensityNumberDistributionToProbabilityDensityVolumeDistribution();
-    
+
     /*!
      * \brief convert any other CDF to a CUMULATIVE_NUMBER_DISTRIBUTION.
      */
     void convertCumulativeToCumulativeNumberDistribution(TYPE CDFType);
-    
+
     /*!
      * \brief cutoff the PSD at given quantiles.
      */
     void cutoffCumulativeNumber(Mdouble quantileMin, Mdouble quantileMax, Mdouble minPolydispersity = 0.1);
-    
+
     /*!
      * \brief cutoff the PSD at given quantiles and make it less polydisperse by squeezing it.
      */
     void cutoffAndSqueezeCumulative(Mdouble quantileMin, Mdouble quantileMax, Mdouble squeeze,
                                     Mdouble minPolydispersity = 0.1);
-    
+
     /*!
      * \brief Get smallest radius of the PSD.
      */
     Mdouble getMinRadius() const;
-    
+
     /*!
      * \brief Get largest radius of the PSD.
      */
     Mdouble getMaxRadius() const;
-    
+
     /*!
      * \brief Get the PSD vector.
      */
     std::vector<RadiusAndProbability> getParticleSizeDistribution() const;
-    
+
     /*!
      * \brief set the PSD by a suitable vector.
      */
     void setParticleSizeDistribution(std::vector<RadiusAndProbability>);
-    
+
     /*!
      * \brief Get the number of particles already inserted into the simulation.
      */
     int getInsertedParticleNumber() const;
-    
+
     /*!
      * \brief Calculate a certain diameter (e.g. D10, D50, D90, etc.) from a percentile x of the number based PSD.
      */
     Mdouble getNumberDx(Mdouble x) const;
-    
+
     /*!
      * \brief Calculate a certain diameter (e.g. D10, D50, D90, etc.) from a percentile x of the volume based PSD.
      */
     Mdouble getVolumeDx(Mdouble x) const;
-    
+
     /*!
      * \brief Calculate the quantile of the PSD.
      */
     Mdouble getRadiusByQuantile(Mdouble quantile) const;
-    
+
     /*!
      * \brief get a volumetric mean radius of the PSD.
      */
     Mdouble getVolumetricMeanRadius() const;
-    
+
     /*!
      * \brief get the size ratio (width) of the PSD.
      */
     Mdouble getSizeRatio() const;
-    
+
     /*!
      * \brief Check if the size ratio is too high and cut it
      */
     void cutHighSizeRatio();
-    
+
     /*!
      * \brief compute raw momenta of the user defined PSD.
      */
     void computeRawMomenta();
-    
+
     /*!
      * \brief compute central momenta of the user defined PSD.
      */
     void computeCentralMomenta();
-    
+
     /*!
      * \brief compute standardised momenta of the user defined PSD.
      */
     void computeStandardisedMomenta();
-    
+
     /*!
      * \brief get momenta of the user defined PSD.
      */
     std::array<Mdouble, 6> getMomenta() const;
-    
+
     /*!
      * \brief determines if a certain value of the PSD vector is lower than another one. Used for std::lower_bound()
      */
     friend bool operator<(const PSD::RadiusAndProbability& l, const PSD::RadiusAndProbability& r);
-    
+
     /*!
      * \brief determines if a certain value of the PSD vector is lower than a double.
      */
     friend bool operator<(const PSD::RadiusAndProbability& l, Mdouble r);
-    
+
     /*!
      * \brief Writes to output stream.
      */
     friend std::ostream& operator<<(std::ostream& os, PSD::RadiusAndProbability& p);
-    
+
     /*!
      * \brief Reads from input stream.
      */
     friend std::istream& operator>>(std::istream& is, PSD::RadiusAndProbability& p);
-    
+
     /*!
      * \brief Determines if a certain value of the PSD vector is equal to a double.
      */
@@ -299,20 +316,20 @@ private:
      * Vector of the PSD::RadiusAndProbability class which stores radii and probabilities of the PSD.
      */
     std::vector<RadiusAndProbability> particleSizeDistribution_;
-    
+
     /*!
      * Array of doubles which stores the moments of a user defined discrete PROBABILITYDENSITY_NUMBER_DISTRIBUTION.
      * \todo TW can we make this a local variable instead of a class variable?
      */
     std::array<Mdouble, 6> momenta_{};
-    
+
     /*!
      * Vector of integers which represents the number of inserted particles in each size class.
      * The classes in this vector are defined to contain the particles between size r_i and r_i-1. (e.g. size class
      * 12 consists of particles between size class 12 and 11 of the PDF)
      */
     std::vector<int> nParticlesPerClass_;
-    
+
     /*!
      * Vector of doubles which stores the volume of inserted particles for each size class. This vector is used in
      * the insertManuallyByVolume() function to check if the volumeAllowed per class is exceeded and thus no further

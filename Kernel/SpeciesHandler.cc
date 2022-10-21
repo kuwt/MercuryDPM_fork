@@ -42,6 +42,7 @@
 #include "Species/LinearPlasticViscoelasticSlidingFrictionSpecies.h"
 #include "Species/HertzianViscoelasticMindlinSpecies.h"
 #include "Species/HertzianViscoelasticMindlinRollingTorsionSpecies.h"
+#include "Species/SPHSpecies.h"
 
 #include "Species/LinearViscoelasticBondedSpecies.h"
 #include "Species/LinearViscoelasticSlidingFrictionBondedSpecies.h"
@@ -160,6 +161,12 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
     if (type == "LinearViscoelasticSpecies")
     {
         LinearViscoelasticSpecies species;
+        is >> species;
+        copyAndAddObject(species);
+    }
+    else if (type == "SPHSpecies")
+    {
+        SPHSpecies species;
         is >> species;
         copyAndAddObject(species);
     }
