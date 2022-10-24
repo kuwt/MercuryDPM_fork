@@ -27,6 +27,7 @@
 
 #include <Interactions/AdhesiveForceInteractions/LiquidBridgeWilletInteraction.h>
 #include <Interactions/AdhesiveForceInteractions/LiquidMigrationWilletInteraction.h>
+#include <Interactions/AdhesiveForceInteractions/LiquidMigrationLSInteraction.h>
 #include "BaseHandler.h"
 #include "Interactions/BaseInteraction.h"
 #include "File.h"

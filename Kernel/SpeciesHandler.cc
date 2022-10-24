@@ -66,6 +66,8 @@
 
 #include "Species/LinearViscoelasticFrictionLiquidBridgeWilletSpecies.h"
 #include "Species/LinearViscoelasticFrictionLiquidMigrationWilletSpecies.h"
+#include "Species/LinearViscoelasticSlidingFrictionLiquidMigrationLSSpecies.h"
+#include "Species/LinearViscoelasticFrictionLiquidMigrationLSSpecies.h"
 #include "Species/HertzianViscoelasticSlidingFrictionParhamiMcMeekingSinterSpecies.h"
 #include "Species/NormalForceSpecies/ThermalSpecies.h"
 
@@ -324,6 +326,18 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
     else if (type == "LinearViscoelasticFrictionLiquidMigrationWilletSpecies")
     {
         LinearViscoelasticFrictionLiquidMigrationWilletSpecies species;
+        is >> species;
+        copyAndAddObject(species);
+    }
+    else if (type == "LinearViscoelasticSlidingFrictionLiquidMigrationLSSpecies")
+    {
+        LinearViscoelasticSlidingFrictionLiquidMigrationLSSpecies species;
+        is >> species;
+        copyAndAddObject(species);
+    }
+    else if (type == "LinearViscoelasticFrictionLiquidMigrationLSSpecies")
+    {
+        LinearViscoelasticFrictionLiquidMigrationLSSpecies species;
         is >> species;
         copyAndAddObject(species);
     }
@@ -602,6 +616,18 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
         else if (type == "LinearViscoelasticFrictionLiquidMigrationWilletMixedSpecies")
         {
             LinearViscoelasticFrictionLiquidMigrationWilletMixedSpecies species;
+            is >> species;
+            mixedObjects_.push_back(species.copy());
+        }
+        else if (type == "LinearViscoelasticSlidingFrictionLiquidMigrationLSMixedSpecies")
+        {
+            LinearViscoelasticSlidingFrictionLiquidMigrationLSMixedSpecies species;
+            is >> species;
+            mixedObjects_.push_back(species.copy());
+        }
+        else if (type == "LinearViscoelasticFrictionLiquidMigrationLSMixedSpecies")
+        {
+            LinearViscoelasticFrictionLiquidMigrationLSMixedSpecies species;
             is >> species;
             mixedObjects_.push_back(species.copy());
         }

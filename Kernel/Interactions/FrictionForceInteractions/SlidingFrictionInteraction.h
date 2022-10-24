@@ -104,13 +104,21 @@ public:
     void setSlidingSpring(Vec3D slidingSpring);
     
     Vec3D getSlidingSpring() const;
-    
+
     //setters and getters
     /*!
      * \brief Returns the sliding friction force vector.
      */
     const Vec3D getTangentialForce() const override;
-    
+
+    /*!
+    * \brief adds an extra tangential force, mainly for the tangential lubrication force from LiquidMigrationLS model.
+    */
+    void addTangentialForce(Vec3D force) {
+        tangentialForce_ = Vec3D(0.0,0.0,0.0);
+        tangentialForce_ += force;
+    }
+
     /*!
      * \brief Returns a const pointer of type SlidingFrictionSpecies*
      */
