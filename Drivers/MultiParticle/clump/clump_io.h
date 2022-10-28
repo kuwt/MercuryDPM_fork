@@ -9,6 +9,7 @@
 #include <string>
 #include <cmath>
 #include "Math/Matrix.h"
+#include<CMakeDefinitions.h>
 
 
 typedef std::vector<double> dvec;
@@ -19,8 +20,7 @@ struct clump_data     // structure for storing clump instances' parameters
 {
 public:
     
-	std::string conf_file_name = "clump_conf.txt";	// Config file with the information on where to find clump input data
-	std::string path;	// Path to MClump working directory 
+	std::string path;	// Path to MClump working directory
 	svec clump_names;	// Array of names of clumps that will be used 
 	dvec mass;		//  clump mass
 	ddvec  pebbles_x;	//  Pebbles geometry (outer index goes over clumps, inner - over pebbles)
@@ -36,39 +36,13 @@ public:
 
 void load_conf(clump_data &a)
 {
-    std::cout<<"Loading clump configuration file..";
-    std::ifstream infile((a.conf_file_name).c_str(), std::ios::in | std::ios::binary);
-    char lin[256];
-    infile.getline(lin, 256, '\n');
-    infile.getline(lin, 256, '\n');
-    infile.getline(lin, 256, '\n');
-    infile.getline(lin, 256, '\n');
-    svec val1;
-    std::string line(lin);
-    std::string buffer = "";
-    for( int i=0; i < line.size(); i++){
-        	if (line[i] != '\t') {buffer += line[i];}
-            	else {val1.push_back(buffer);buffer = "";}
-    }
-    //std::cout<<"clump dir path: "<<val1[0]<<std::endl;
-    a.path = val1[0];
-    infile.getline(lin, 256, '\n');
-    infile.getline(lin, 256, '\n');
-    infile.getline(lin, 256, '\n');
-    svec val2;
-    line = std::string(lin);
-    buffer = "";
-    for(uint i=0; i < line.size(); i++)
-    {
-    	if (line[i] != '\t') {buffer += line[i];}
-        else {val2.push_back(buffer);buffer = "";}
-    }
-    for (int i = 0; i<val2.size(); i++){
-    	//std::cout<<"clump_name: "<<val2[i]<<std::endl;
-    	a.clump_names.push_back(val2[i]);
-    }
-    infile.close();
-    std::cout<<"\t OK"<<std::endl;
+    // Path to MCLump tool
+    a.path = getMercurySourceDir() + "/Tools/MClump/";
+
+    // Clump instances available
+    a.clump_names.push_back("clump01");
+    a.clump_names.push_back("clump02");
+    a.clump_names.push_back("clump03");
 }
 
 
@@ -244,16 +218,16 @@ clump_data rotate_clump(clump_data data, int clump_index, dvec new_pd)
     return new_data; // All loaded clumps in new_data remain unchanged except the clump_index one that is rotated to new_pd
 }
 
-double random_double(double Max, int seed = 1)
-{srand(seed); return Max*((double) rand() / (RAND_MAX));}
+double random_double(double Max)
+{return Max*((double) rand() / (RAND_MAX));}
 
-dvec uniform_random_pds(int seed = 1){
+dvec uniform_random_pds(){
 
     Vec3D n1, n2, n3, ref;
 
     // basis vector n1
-    double r1 = random_double(1, seed);
-    double r2 = random_double(1, seed);
+    double r1 = random_double(1);
+    double r2 = random_double(1);
 
     double theta = acos(r1); // Note that for isotropy of n1 theta is NOT uniform!
     double phi = 2 * M_PI * r2;
@@ -261,8 +235,8 @@ dvec uniform_random_pds(int seed = 1){
     n1 = Vec3D(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
 
     // basis vector n2
-    r1 = random_double(1, seed+1);
-    r2 = random_double(1, seed+1);
+    r1 = random_double(1);
+    r2 = random_double(1);
 
     theta = acos(r1); // Note that for isotropy of n1 theta is NOT uniform!
     phi = 2 * M_PI * r2;

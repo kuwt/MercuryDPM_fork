@@ -39,6 +39,7 @@
 #include <stdexcept>
 #include <string>
 #include <array>
+#include<CMakeDefinitions.h>
 
 std::string exec_command(const char* cmd) {
     std::array<char, 128> buffer;
@@ -55,10 +56,15 @@ std::string exec_command(const char* cmd) {
 
 int main(int argc, char* argv[])
 {
-    exec_command("make bulk_ts");
-    exec_command("./bulk_ts");
-    exec_command("rm -rf paraview_bulk_ts");
-    exec_command("mkdir paraview_bulk_ts");
-    exec_command("../../Tools/data2pvd bulk_ts.data paraview_bulk_ts/bulk_ts");
+    exec_command("make BulkTs");
+    exec_command("./BulkTs");
+    exec_command("rm -rf paraview_BulkTs");
+    exec_command("mkdir paraview_BulkTs");
+    exec_command("../../Tools/data2pvd BulkTs.data paraview_BulkTs/BulkTs");
+    std::string command;
+    command = "python " + getMercurySourceDir() + "/Tools/MClump/plot_ene.py " + getMercuryBuildDir() + "/Drivers/MultiParticle/ " + "BulkTs";
+    exec_command(command.c_str());
     return 0;
 }
+
+

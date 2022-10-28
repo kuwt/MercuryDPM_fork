@@ -146,7 +146,7 @@ void MultiParticle::setPrincipalDirections(Matrix3D directions)
 // V
 void MultiParticle::rotatePrincipalDirections(Vec3D rotation)
 {
-    Mdouble tol = 10e-10;
+    Mdouble tol = 10e-9;
     Mdouble angle = rotation.getLength();
     if (angle < tol) return;
     Mdouble c1, c2, c3, theta, dist;
@@ -162,6 +162,7 @@ void MultiParticle::rotatePrincipalDirections(Vec3D rotation)
     c1 = Vec3D::dot(pa, e1);
     c2 = Vec3D::dot(pa, e2);
     c3 = Vec3D::dot(pa, e3);
+
     dist = sqrt(c1 * c1 + c2 * c2);
     theta = atan2(c2, c1) + angle;
     setPrincipalDirections_e1(dist * cos(theta) * e1 + dist*sin(theta) * e2 + c3 * e3);
@@ -237,6 +238,7 @@ void MultiParticle::rotateTensorOfInertia()
   //  inertia = initInertiaMultiparticle;  // uncomment to turn off rotation of toi
   inertiaMultiparticle = inertia;
   invInertia_= inertiaMultiparticle.inverse();
+
 }
 
 
@@ -262,36 +264,14 @@ void MultiParticle::updateSlavesVelPos()
         pSlave->setAngularVelocity(angularVelocity);
         pSlave->setOrientation(orientation);
         pSlave->setPosition(position + e1*slavePos[iSlave-1].X + e2*slavePos[iSlave-1].Y + e3*slavePos[iSlave-1].Z);
-        velocityDueToRotation = Vec3D::cross(angularVelocity, slavePos[iSlave-1] - position);
+
+
+        velocityDueToRotation = Vec3D::cross(angularVelocity, pSlave->getPosition() - position);
+
+        pSlave->setVelocity(getVelocity());
         pSlave->addVelocity(velocityDueToRotation);
     }
 }
-
-void MultiParticle::updateSlavesVel()
-{
-    BaseParticle* pSlave;
-    Vec3D position = getPosition();
-    Vec3D angularVelocity = getAngularVelocity();
-    Quaternion orientation = getOrientation();
-
-    Vec3D e1 = getPrincipalDirections_e1();
-    Vec3D e2 = getPrincipalDirections_e2();
-    Vec3D e3 = getPrincipalDirections_e3();
-
-    Vec3D velocityDueToRotation;
-
-    for (int iSlave = 1; iSlave <= nSlave; iSlave++)
-    {
-        pSlave = slaveParticles[iSlave-1];
-        // pSlave->setMass(massMultiparticle);
-        pSlave->invMass_ = 1./massMultiparticle;
-        pSlave->setAngularVelocity(angularVelocity);
-        velocityDueToRotation = Vec3D::cross(angularVelocity, slavePos[iSlave-1] - position);
-        pSlave->addVelocity(velocityDueToRotation);
-    }
-}
-
-
 
 /*!
  * \details First step of Velocity Verlet integration (see also
@@ -323,7 +303,7 @@ void MultiParticle::integrateBeforeForceComputation(double time, double timeStep
         }
 
         // PFC4 style acceleration of clumps
-        angularAccelerateMasterIterative(0.5 * timeStep); //W(t+0.5dt)
+        angularAccelerateMasterIterative(timeStep); //W(t+0.5dt)
 
         //apply to rotation quaternion q: q = normalise(q + \tilde{C}\omega*timeStep) (see Wouter's notes)
         rotate(getAngularVelocity() * timeStep);
@@ -355,7 +335,7 @@ void MultiParticle::integrateAfterForceComputation(double time, double timeStep)
     {
         accelerate((getForce() - viscousDamping*getVelocity()) * getInvMass() * 0.5 * timeStep);
         // PFC4 style acceleration of clumps
-        angularAccelerateMasterIterative(0.5 * timeStep);
+        angularAccelerateMasterIterative(timeStep);
         updateSlavesVelPos();
     }
 }
@@ -387,6 +367,7 @@ void MultiParticle::angularAccelerateMasterIterative(double timeStep)
         Vec3D angularAcceleration_n = invInertia_ * (M-W);
         angularVelocity_n = angularVelocity_0 + 0.5 * timeStep * angularAcceleration_n;
     }
+
     setAngularVelocity(angularVelocity_n);
 }
 
@@ -400,6 +381,7 @@ void MultiParticle::computeMass(const ParticleSpecies &s)
     {
         invMass_ = 1.0/massMultiparticle;
         invInertia_= inertiaMultiparticle.inverse();
+
     }
 }
 

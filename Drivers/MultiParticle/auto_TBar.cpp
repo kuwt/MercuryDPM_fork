@@ -23,7 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Automatic rebuild script (gomboc)
+// Automatic rebuild script (Dzhanibekov effect demo)
 
 // Auto rebuild scripts run the following list of commands:
 // 1) make              - to rebuild test example
@@ -32,13 +32,13 @@
 // 4) mkdir paraview_name    - creates new dir for paraview output
 // 5) ../../../Tools/data2pvd name.data paraview_name/name - converts data output into paraview format
 
-
 #include <cstdio>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <array>
+#include<CMakeDefinitions.h>
 
 std::string exec_command(const char* cmd) {
     std::array<char, 128> buffer;
@@ -55,10 +55,13 @@ std::string exec_command(const char* cmd) {
 
 int main(int argc, char* argv[])
 {
-    exec_command("make gomboc");
-    exec_command("./gomboc");
-    exec_command("rm -rf paraview_gomboc");
-    exec_command("mkdir paraview_gomboc");
-    exec_command("../../Tools/data2pvd gomboc.data paraview_gomboc/gomboc");
+    exec_command("make TBar");
+    exec_command("./TBar");
+    exec_command("rm -rf paraview_TBar");
+    exec_command("mkdir paraview_TBar");
+    exec_command("../../Tools/data2pvd TBar.data paraview_TBar/TBar");
+    std::string command;
+    command = "python " + getMercurySourceDir() + "/Tools/MClump/plot_ene.py " + getMercuryBuildDir() + "/Drivers/MultiParticle/ " + "TBar";
+    exec_command(command.c_str());
     return 0;
 }

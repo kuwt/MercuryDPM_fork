@@ -23,69 +23,47 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef NonSphericalParticle_H
-#define NonSphericalParticle_H
+// Automatic rebuild script (Gomboc)
+
+// Auto rebuild scripts run the following list of commands:
+// 1) make              - to rebuild test example
+// 2) ./name        - run the rebuilt test
+// 3) rm -rf paraview_name   - clears previour simulation results
+// 4) mkdir paraview_name    - creates new dir for paraview output
+// 5) ../../../Tools/data2pvd name.data paraview_name/name - converts data output into paraview format
 
 
-#include "BaseParticle.h"
+#include <cstdio>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <array>
+#include<CMakeDefinitions.h>
 
-/*!
- * \class NonSphericalParticle
- * \brief Base class for all non-spherical particle types.
- */
-class NonSphericalParticle : public BaseParticle
+std::string exec_command(const char* cmd) {
+    std::array<char, 128> buffer;
+    std::string result;
+    std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
+    if (!pipe) {
+        throw std::runtime_error("popen() failed!");
+    }
+    while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+        result += buffer.data();
+    }
+    return result;
+}
+
+
+int main(int argc, char* argv[])
 {
-public:
-    /*!
-     * Default constructor.
-     */
-    NonSphericalParticle() = default;
-    
-    /*!
-     * Default copy constructor.
-     */
-    NonSphericalParticle(const NonSphericalParticle& p) = default;
-    
-    /*!
-     * \brief Base class copy constructor.
-     * Creates a NonSphericalParticle particle from a BaseParticle.
-     */
-    NonSphericalParticle(const BaseParticle& p) : BaseParticle(p) {}
-    
-    /**
-     * Default destructor.
-     */
-    ~NonSphericalParticle() override = default;
-
-    /*!
-     * Particle copy method. Pure virtual as this needs to set in the derived class.
-     */
-    NonSphericalParticle* copy() const override = 0;
-
-    /*!
-     * Returns the name of the object. Pure virtual as this needs to set in the derived class.
-     */
-    std::string getName() const override = 0;
-
-    /*!
-     * This property is the main characteristic of non-spherical particles. Set here for all derived classes.
-     */
-    bool isSphericalParticle() const override {
-        return false;
-    }
-
-    /*!
-    * The following redefines functions of BaseParticles as virtual to make them available in child MultiParticle class
-    */
-
-    virtual Mdouble getKineticEnergy() const override{
-        return BaseParticle::getKineticEnergy();
-    }
-
-    virtual Mdouble getRotationalEnergy() const override{
-        return BaseParticle::getRotationalEnergy();
-    }
-
-};
-
-#endif
+    exec_command("make Gomboc");
+    exec_command("./Gomboc");
+    exec_command("rm -rf paraview_Gomboc");
+    exec_command("mkdir paraview_Gomboc");
+    exec_command("../../Tools/data2pvd Gomboc.data paraview_Gomboc/Gomboc");
+    std::string command;
+    command = "python " + getMercurySourceDir() + "/Tools/MClump/plot_ene.py " + getMercuryBuildDir() + "/Drivers/MultiParticle/ " + "Gomboc";
+    exec_command(command.c_str());
+    return 0;
+}

@@ -38,6 +38,7 @@
 #include <stdexcept>
 #include <string>
 #include <array>
+#include<CMakeDefinitions.h>
 
 std::string exec_command(const char* cmd) {
     std::array<char, 128> buffer;
@@ -54,10 +55,13 @@ std::string exec_command(const char* cmd) {
 
 int main(int argc, char* argv[])
 {
-    exec_command("make single");
-    exec_command("./single");
-    exec_command("rm -rf paraview_single");
-    exec_command("mkdir paraview_single");
-    exec_command("../../Tools/data2pvd single.data paraview_single/single");
+    exec_command("make Single");
+    exec_command("./Single");
+    exec_command("rm -rf paraview_Single");
+    exec_command("mkdir paraview_Single");
+    exec_command("../../Tools/data2pvd Single.data paraview_Single/Single");
+    std::string command;
+    command = "python " + getMercurySourceDir() + "/Tools/MClump/plot_ene.py " + getMercuryBuildDir() + "/Drivers/MultiParticle/ " + "Single";
+    exec_command(command.c_str());
     return 0;
 }

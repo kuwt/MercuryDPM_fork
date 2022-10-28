@@ -300,13 +300,13 @@ public:
      * \brief Calculates the particle's translational kinetic energy
      * \return the particle's translational kinetic energy
      */
-    Mdouble getKineticEnergy() const;
+    virtual Mdouble getKineticEnergy() const;
     
     /*!
      * \brief Calculates the particle's rotational kinetic energy
      * \return the particle's rotational kinetic energy
      */
-    Mdouble getRotationalEnergy() const;
+    virtual Mdouble getRotationalEnergy() const;
     
     /*!
      * \brief Calculates the particle's gravitational energy

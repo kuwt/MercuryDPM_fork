@@ -86,6 +86,7 @@ public:
 
     Vec3D getPrincipalDirections_e1() const
     {
+
         return Vec3D(principalDirections.XX, principalDirections.YX, principalDirections.ZX);
     }
     Vec3D getPrincipalDirections_e2() const
@@ -128,7 +129,7 @@ public:
 
     void rotatePrincipalDirections(Vec3D rotation);
 
-    // Principle direction
+    // Principal direction
     void setPrincipalDirections_e1(Vec3D e)
     {
         principalDirections.XX = e.X;
@@ -166,11 +167,38 @@ public:
     void setMassMultiparticle(Mdouble mass)
     {
         massMultiparticle = mass;
+        invMass_ = 1 / massMultiparticle;
     }
 
     void setDamping(Mdouble damp)
     {
         viscousDamping = damp;
+    }
+
+    Mdouble getKineticEnergy() const override{
+        Mdouble res = 0;
+        if (isMaster) {
+            Vec3D v = getVelocity();
+            res = 0.5 * massMultiparticle * ( v.X * v.X +  v.Y * v.Y + v.Z * v.Z );
+        }
+        return res;
+    }
+
+    Mdouble getRotationalEnergy() const override{
+        Mdouble res = 0;
+        if (isMaster) {
+            Vec3D nn = getAngularVelocity();
+            Mdouble nl = nn.getLength();
+            Mdouble tol = 1e-10;
+            if (nl > tol) {
+                nn /= nl;
+                Mdouble ww = getAngularVelocity().getLengthSquared();
+                Mdouble II = Vec3D::dot(nn, (getInertia() * nn));
+                res = 0.5 * II * ww;
+            }
+        }
+        return res;
+
     }
 
 private:
