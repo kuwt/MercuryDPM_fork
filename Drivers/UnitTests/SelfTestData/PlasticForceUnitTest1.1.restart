@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name PlasticForceUnitTest1.1 revision 5000 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
+MercuryDPM 0.14 name PlasticForceUnitTest1.1 revision 6537 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
 dataFile    fileType ONE_FILE saveCount 1 counter 101 lastSavedTimeStep 100
 fStatFile   fileType ONE_FILE saveCount 1 counter 101 lastSavedTimeStep 100
 eneFile     fileType ONE_FILE saveCount 1 counter 101 lastSavedTimeStep 100
@@ -7,7 +7,7 @@ statFile    fileType ONE_FILE saveCount 1 counter 0
 interactionFile fileType NO_FILE saveCount 0 counter 0
 xMin 0 xMax 3 yMin 0 yMax 2 zMin 0 zMax 2
 timeStep 0.00397383530631844 time 0.397383530631845 ntimeSteps 100 timeMax 0.397383530631844
-systemDimensions 3 particleDimensions 3 gravity 0 0 0 writeVTK 0 NO_FILE NO_FILE 0 0 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267
+systemDimensions 3 particleDimensions 3 gravity 0 0 0 backgroundDrag 0 writeVTK 0 NO_FILE NO_FILE 0 0 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267
 Species 1
 LinearPlasticViscoelasticSpecies id 0 density 1.90985931710274 loadingStiffness 100 maxUnloadingStiffness 500 cohesionStiffness 100 maxPenetration 0.05 dissipation 0
 Walls 0

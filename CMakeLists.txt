@@ -1,5 +1,6 @@
 cmake_minimum_required (VERSION 2.8.12)
 project (Mercury C CXX Fortran)
+#set(CMAKE_CXX_STANDARD 17)
 
 # CMAKE_CXX_STANDARD is a cmake 3.1 feature
 # CMAKE_CXX_STANDARD 17 is supported in 3.18, but not in 3.5

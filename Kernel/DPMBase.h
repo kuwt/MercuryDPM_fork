@@ -791,6 +791,18 @@ public:
     Vec3D getGravity() const;
 
     /*!
+     * \brief Simple access function to turn on a background drag.
+     * The force of particleVelocity*drag is applied (note, it allowd to be negaitve i.e. create energy)
+     */
+     void setBackgroundDrag(Mdouble backgroundDrag){backgroundDrag_=backgroundDrag;}
+
+     /*!
+      * \breif Return the background drag
+      * @return double which is the background drag. Positive number removes energy, negative gains.
+      */
+     const Mdouble getBackgroundDrag() const {return backgroundDrag_;}
+
+    /*!
      * \brief Sets both the system dimensions and the particle dimensionality.
      */
     void setDimension(unsigned int newDim);
@@ -1271,6 +1283,12 @@ private:
      * \brief Gravity vector
      */
     Vec3D gravity_;
+
+    /*!
+     * \brief This is a global background drag to help retard particles, or to do a simple fluid drag.
+     * The force particleVeclocity*backgroundDrag is applied.
+     */
+     Mdouble backgroundDrag_;
 
     /*!
      * \brief Vector containing the number of domains in x-,y- and z-direction, required for parallel computations

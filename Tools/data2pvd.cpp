@@ -178,6 +178,7 @@ int transformMercuryToVTK(MercuryDataFile& infile, std::string prefix)
     collection.append(strippedPath);
     
     timeStepCount++;
+    logger(INFO, "Written %", filename.str());
   }
   
   logger(INFO, "Written % time steps in a %D system.", timeStepCount, NDIMS);

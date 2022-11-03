@@ -34,6 +34,7 @@
 #include <map>
 #include <vector>
 #include <type_traits>
+#include <cmath>
 
 //Namespace Detail contains black magic.
 namespace Detail {
@@ -110,7 +111,19 @@ namespace Detail {
   {
     return toVTKDataType< typename std::remove_extent<V>::type >();
   }
-  
+
+  template<typename V>
+  V round(V in) {
+      return in;
+  }
+
+  template<>
+  double round(double in) {
+      //logger.assert_debug(fabs(in)>1e-33 or fabs(in)==0, "Detected underflow: corrected double value % to 0", in);
+      logger.assert_debug(std::isfinite(in), "Detected nans!");
+      return (fabs(in)<1e-33)?0.0:in;
+  }
+
   /*! \brief This function actually writes the correct datatype to ostream. */
   template<typename T, typename V>
   typename std::enable_if<std::is_array<V>::value || std::is_pointer<V>::value, void>::type
@@ -118,7 +131,7 @@ namespace Detail {
   {
     for (std::size_t i = 0; i < nComponents; i++)
     {
-      out << (t.*member)[i] << " ";
+      out << round((t.*member)[i]) << " ";
     }
   }
   
@@ -126,7 +139,7 @@ namespace Detail {
   typename std::enable_if<!(std::is_array<V>::value || std::is_pointer<V>::value), void>::type
      emitProxy(std::ostream& out, const T& t, std::size_t nComponents, V T::*member)
   {
-    out << t.*member << " ";
+    out << round(t.*member) << " ";
   }
   
   /*! This class contains the typed information about the descriptor. We need to inherit

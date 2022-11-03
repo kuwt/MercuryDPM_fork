@@ -51,8 +51,7 @@ public:
         species.setDensity(2000);
         species.setStiffness(10000);
         speciesHandler.copyAndAddObject(species);
-    
-    
+
         SphericalParticle insertionBoundaryParticle;
         insertionBoundaryParticle.setSpecies(speciesHandler.getObject(0));
     
@@ -60,8 +59,8 @@ public:
         psd.setDistributionUniform(0.025, 0.05, 50);
     
         CubeInsertionBoundary insertionBoundary;
-        insertionBoundary.setPSD(psd);
         insertionBoundary.set(&insertionBoundaryParticle, 1, getMin(), getMax(), Vec3D(1, 0, 0), Vec3D(1, 0, 0));
+        insertionBoundary.setPSD(psd);
         boundaryHandler.copyAndAddObject(insertionBoundary);
     
     }

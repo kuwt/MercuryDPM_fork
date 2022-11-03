@@ -4,7 +4,7 @@ include_directories(
         ${Mercury_BINARY_DIR}/Kernel
 )
 if (Mercury_USE_MPI)
-    include_directories(${MPI_CXX_INCLUDE_PATH})
+        include_directories(${MPI_CXX_INCLUDE_PATH})
 endif ()
 
 #For the Fortran-based linear algebra
@@ -53,6 +53,7 @@ file(GLOB Mercury_SRC
         Species/*/*.cc
         Nurbs/*.cc
         Tools/*.cc
+        Controllers/*.cc
         )
 
 #Basic library
@@ -60,18 +61,18 @@ add_library(MercuryBase STATIC ${Mercury_SRC})
 target_link_libraries(MercuryBase LinearAlgebra)
 
 if (Mercury_BACKTRACE_DEMANGLE)
-    if (Mercury_BACKTRACE_LINK_DL)
-        target_link_libraries(MercuryBase dl)
-    endif ()
-    if (Mercury_BACKTRACE_LINK_EXECINFO)
-        target_link_libraries(MercuryBase execinfo)
-    endif ()
+        if (Mercury_BACKTRACE_LINK_DL)
+                target_link_libraries(MercuryBase dl)
+        endif ()
+        if (Mercury_BACKTRACE_LINK_EXECINFO)
+                target_link_libraries(MercuryBase execinfo)
+        endif ()
 endif ()
 
 if (Mercury_USE_MPI)
-    set(DEP_COMPILE_FLAGS "${DEP_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS}")
-    set(DEP_LINKER_FLAGS "${DEP_LINKER_FLAGS} ${MPI_LINK_FLAGS}")
-    target_link_libraries(MercuryBase "${MPI_LIBRARIES}")
+        set(DEP_COMPILE_FLAGS "${DEP_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS}")
+        set(DEP_LINKER_FLAGS "${DEP_LINKER_FLAGS} ${MPI_LINK_FLAGS}")
+        target_link_libraries(MercuryBase "${MPI_LIBRARIES}")
 endif ()
 
 #Required for Chute drivers

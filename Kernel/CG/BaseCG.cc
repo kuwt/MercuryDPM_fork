@@ -66,6 +66,7 @@ void BaseCG::write(std::ostream& os) const
     if (!std::isinf(timeMax_)) os << " timeMax " << timeMax_;
     os << " n " << nX_ << " " << nY_ << " " << nZ_;
     os << " width " << getWidth();
+    if (verbose_) os << " verbose 1";
     //statFile
 }
 

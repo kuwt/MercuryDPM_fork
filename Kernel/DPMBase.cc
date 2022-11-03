@@ -67,1205 +67,1207 @@
 #endif
 
 /*!
- * \details Warns the user of a fatal error and exits the program with a non-zero return
- * value to let the compiler know an error has occurred.
- * \param[in] module
- * \param[in] message
- * \todo Why is this here, and not in the logger?
- */
+* \details Warns the user of a fatal error and exits the program with a non-zero return
+* value to let the compiler know an error has occurred.
+* \param[in] module
+* \param[in] message
+* \todo Why is this here, and not in the logger?
+*/
 /**
- * \deprecated
- */
+* \deprecated
+*/
 MERCURY_DEPRECATED
 [[noreturn]] void logWriteAndDie(const std::string& module, std::string message)
 {
-    std::cerr << "A fatal   error has occured"
-              << "\n Module  :" << module
-              << "\n Message :" << message << std::endl;
-    
-    std::exit(-1);
+std::cerr << "A fatal   error has occured"
+      << "\n Module  :" << module
+      << "\n Message :" << message << std::endl;
+
+std::exit(-1);
 }
 
 /*!
- * \details Overloads the insertion operator (<<) for use with Mercury objects. Utilises
- * the write() function (see link for further information).
- *
- * \param[in] os - The output stream to which we want to 'insert' information relating to
- * 					Mercury objects
- * \param[in] md - An object (passed by reference) of the DPMBase class.
- */
+* \details Overloads the insertion operator (<<) for use with Mercury objects. Utilises
+* the write() function (see link for further information).
+*
+* \param[in] os - The output stream to which we want to 'insert' information relating to
+* 					Mercury objects
+* \param[in] md - An object (passed by reference) of the DPMBase class.
+*/
 std::ostream& operator<<(std::ostream& os, DPMBase& md)
 {
-    md.write(os);
-    return os;
+md.write(os);
+return os;
 }
 
 /*!
- * \details A copy constructor which takes a "DPMBase"-type object and creates
- * a "copy" - i.e. creates a new instance of a class possessing the same properties as the original. \n
- * The argument "other" is the "original", i.e. the instance to be copied from. \n \n
- * The first set of actions performed, which follow the general form: \n
- *  <tt>[variable] = other.[variable]</tt>) \n
- * simply copy the relevant variables (i.e. information such as particle details, system details, simulation details...)
- * from the original ("other").
- * \n \n
- * The various <B>handlers</B> belonging to the original instance, however, are not directly copied,
- * as this may cause problems (i.e. the handlers would still "point" to the original object,
- * not the copy).
- * \n
- * Rather, new handlers are created (e.g. <tt>boundaryHandler.setDPMBase(this);</tt>), and the <B>contents</B>
- * of the handlers is then passed over (e.g. <tt>boundaryHandler = other.boundaryHandler;</tt>).
- * For each handler class, the assignment operator = has been overrided to copy the contents, not
- * just the pointer.
- * \param[in] other
- */
+* \details A copy constructor which takes a "DPMBase"-type object and creates
+* a "copy" - i.e. creates a new instance of a class possessing the same properties as the original. \n
+* The argument "other" is the "original", i.e. the instance to be copied from. \n \n
+* The first set of actions performed, which follow the general form: \n
+*  <tt>[variable] = other.[variable]</tt>) \n
+* simply copy the relevant variables (i.e. information such as particle details, system details, simulation details...)
+* from the original ("other").
+* \n \n
+* The various <B>handlers</B> belonging to the original instance, however, are not directly copied,
+* as this may cause problems (i.e. the handlers would still "point" to the original object,
+* not the copy).
+* \n
+* Rather, new handlers are created (e.g. <tt>boundaryHandler.setDPMBase(this);</tt>), and the <B>contents</B>
+* of the handlers is then passed over (e.g. <tt>boundaryHandler = other.boundaryHandler;</tt>).
+* For each handler class, the assignment operator = has been overrided to copy the contents, not
+* just the pointer.
+* \param[in] other
+*/
 DPMBase::DPMBase(const DPMBase& other) : wallVTKWriter_(other.wallVTKWriter_),
-                                         interactionVTKWriter_(other.interactionVTKWriter_),
-                                         boundaryVTKWriter_(other.boundaryVTKWriter_)
+				 interactionVTKWriter_(other.interactionVTKWriter_),
+				 boundaryVTKWriter_(other.boundaryVTKWriter_)
 {
-    setName(other.getName());
-    runNumber_ = other.runNumber_;
-    systemDimensions_ = other.systemDimensions_;
-    particleDimensions_ = other.particleDimensions_;
-    gravity_ = other.gravity_;
+setName(other.getName());
+runNumber_ = other.runNumber_;
+systemDimensions_ = other.systemDimensions_;
+particleDimensions_ = other.particleDimensions_;
+gravity_ = other.gravity_;
+backgroundDrag_=other.backgroundDrag_;
 /*    xMin_ = other.xMin_;
-    xMax_ = other.xMax_;
-    yMin_ = other.yMin_;
-    yMax_ = other.yMax_;
-    zMin_ = other.zMin_;
-    zMax_ = other.zMax_;*/
-    min_ = other.min_;
-    max_ = other.max_;
-    numberOfDomains_ = other.numberOfDomains_;
-    time_ = other.time_;
-    timeStep_ = other.timeStep_;
-    numberOfTimeSteps_ = other.numberOfTimeSteps_;
-    timeMax_ = other.timeMax_;
-    restartVersion_ = other.restartVersion_; //to read new and old restart data
-    restarted_ = other.restarted_; //to see if it was restarted or not
-    append_ = other.append_;
-    rotation_ = other.rotation_;
-    xBallsColourMode_ = other.xBallsColourMode_; // sets the xballs argument cmode (see xballs.txt)
-    xBallsVectorScale_ = other.xBallsVectorScale_; // sets the xballs argument vscale (see xballs.txt)
-    xBallsScale_ = other.xBallsScale_; // sets the xballs argument scale (see xballs.txt)
-    xBallsAdditionalArguments_ = other.xBallsAdditionalArguments_; // std::string where additional xballs argument can be specified (see xballs.txt)
-    writeWallsVTK_ = other.writeWallsVTK_;
-    writeParticlesVTK_ = other.writeParticlesVTK_;
-    readSpeciesFromDataFile_ = other.readSpeciesFromDataFile_;
+xMax_ = other.xMax_;
+yMin_ = other.yMin_;
+yMax_ = other.yMax_;
+zMin_ = other.zMin_;
+zMax_ = other.zMax_;*/
+min_ = other.min_;
+max_ = other.max_;
+numberOfDomains_ = other.numberOfDomains_;
+time_ = other.time_;
+timeStep_ = other.timeStep_;
+numberOfTimeSteps_ = other.numberOfTimeSteps_;
+timeMax_ = other.timeMax_;
+restartVersion_ = other.restartVersion_; //to read new and old restart data
+restarted_ = other.restarted_; //to see if it was restarted or not
+append_ = other.append_;
+rotation_ = other.rotation_;
+xBallsColourMode_ = other.xBallsColourMode_; // sets the xballs argument cmode (see xballs.txt)
+xBallsVectorScale_ = other.xBallsVectorScale_; // sets the xballs argument vscale (see xballs.txt)
+xBallsScale_ = other.xBallsScale_; // sets the xballs argument scale (see xballs.txt)
+xBallsAdditionalArguments_ = other.xBallsAdditionalArguments_; // std::string where additional xballs argument can be specified (see xballs.txt)
+writeWallsVTK_ = other.writeWallsVTK_;
+writeParticlesVTK_ = other.writeParticlesVTK_;
+readSpeciesFromDataFile_ = other.readSpeciesFromDataFile_;
 
 //effectively saying "if there exists a CONTACT_LIST_HGRID, copy it, if not, ignore.
 #ifdef CONTACT_LIST_HGRID
-    possibleContactList=other.possibleContactList;
+possibleContactList=other.possibleContactList;
 #endif
-    random = other.random;
+random = other.random;
 
-    boundaryHandler.setDPMBase(this);
-    particleHandler.setDPMBase(this);
-    interactionHandler.setDPMBase(this);
-    speciesHandler.setDPMBase(this);
-    wallHandler.setDPMBase(this);
-    domainHandler.setDPMBase(this);
-    periodicBoundaryHandler.setDPMBase(this);
-    //Initialise the handlers
-    domainHandler.initialise();
-    periodicBoundaryHandler.initialise();
+boundaryHandler.setDPMBase(this);
+particleHandler.setDPMBase(this);
+interactionHandler.setDPMBase(this);
+speciesHandler.setDPMBase(this);
+wallHandler.setDPMBase(this);
+domainHandler.setDPMBase(this);
+periodicBoundaryHandler.setDPMBase(this);
+//Initialise the handlers
+domainHandler.initialise();
+periodicBoundaryHandler.initialise();
 
-    //setting contents equal to the other handlers!
-    speciesHandler = other.speciesHandler;
-    particleHandler = other.particleHandler;
-    cgHandler = other.cgHandler;
-    //cgHandler = other.cgHandler.copy(); //todo
-    //cgHandler.setDPMBase(this);
-    wallHandler = other.wallHandler;
-    boundaryHandler = other.boundaryHandler;
-    interactionHandler = other.interactionHandler;
-    vtkWriter_ = other.vtkWriter_;
-    writeSuperquadricParticlesVTK_ = other.writeSuperquadricParticlesVTK_;
-    writeParticlesVTK_ = other.writeParticlesVTK_;
-    writeWallsVTK_ = other.writeWallsVTK_;
-    numberOfOMPThreads_ = other.numberOfOMPThreads_;
+//setting contents equal to the other handlers!
+speciesHandler = other.speciesHandler;
+particleHandler = other.particleHandler;
+cgHandler = other.cgHandler;
+//cgHandler = other.cgHandler.copy(); //todo
+//cgHandler.setDPMBase(this);
+wallHandler = other.wallHandler;
+boundaryHandler = other.boundaryHandler;
+interactionHandler = other.interactionHandler;
+vtkWriter_ = other.vtkWriter_;
+writeSuperquadricParticlesVTK_ = other.writeSuperquadricParticlesVTK_;
+writeParticlesVTK_ = other.writeParticlesVTK_;
+writeWallsVTK_ = other.writeWallsVTK_;
+numberOfOMPThreads_ = other.numberOfOMPThreads_;
 }
 
 /*!
- * Constructor for the DPMBase class. Initialises a set of default parameters allowing
- * a simulation to be created 'off the shelf'. For full details of the parameters
- * initialised and their assigned values, see constructor()
- */
+* Constructor for the DPMBase class. Initialises a set of default parameters allowing
+* a simulation to be created 'off the shelf'. For full details of the parameters
+* initialised and their assigned values, see constructor()
+*/
 DPMBase::DPMBase() : wallVTKWriter_(wallHandler), interactionVTKWriter_(interactionHandler), boundaryVTKWriter_(boundaryHandler)
 {
-    constructor();
+constructor();
 }
 
 /*!
- * \details Provides all the necessary default values for the DPMBase() constructor. When called, will initialise a two-dimensional simulation
- * (<tt>setSystemDimensions(2), setParticleDimensions(2)</tt>)
- * with "normal" vertical gravity
- * (<tt>gravity_ = Vec3D(0.0, -9.8, 0.0);</tt>)
- * as well as defining an arbitrary length (1s) and XBalls viewing domain (0.01 x 0.01) and other relevant viewing parameters (e.g. colourscheme, scale...).
- * The first block of text creates the necessary handlers and sets their content according to the current ("this") instance of the DPMBase superclass.
- */
+* \details Provides all the necessary default values for the DPMBase() constructor. When called, will initialise a two-dimensional simulation
+* (<tt>setSystemDimensions(2), setParticleDimensions(2)</tt>)
+* with "normal" vertical gravity
+* (<tt>gravity_ = Vec3D(0.0, -9.8, 0.0);</tt>)
+* as well as defining an arbitrary length (1s) and XBalls viewing domain (0.01 x 0.01) and other relevant viewing parameters (e.g. colourscheme, scale...).
+* The first block of text creates the necessary handlers and sets their content according to the current ("this") instance of the DPMBase superclass.
+*/
 void DPMBase::constructor()
 {
-    // sofStop function
-    //setSoftStop();
-    //constructor();
-    dataFile.getFstream().precision(10);
-    fStatFile.getFstream().precision(10);
-    eneFile.getFstream().precision(10);
-    restartFile.getFstream().precision(
-            std::numeric_limits<double>::digits10); //highly accurate, so the overlap is accurate
-    statFile.getFstream().precision(10);
-    statFile.getFstream().setf(std::ios::left);
-    interactionFile.getFstream().precision(10);
-    name_ = ""; // needs to be user-specified, otherwise checkSettings throws error
-    //by default, the fileType of all files is ONE_FILE. However, by default we don't want an interaction file since it
-    // is very large.
-    interactionFile.setFileType(FileType::NO_FILE);
+// sofStop function
+//setSoftStop();
+//constructor();
+dataFile.getFstream().precision(10);
+fStatFile.getFstream().precision(10);
+eneFile.getFstream().precision(10);
+restartFile.getFstream().precision(
+    std::numeric_limits<double>::digits10); //highly accurate, so the overlap is accurate
+statFile.getFstream().precision(10);
+statFile.getFstream().setf(std::ios::left);
+interactionFile.getFstream().precision(10);
+name_ = ""; // needs to be user-specified, otherwise checkSettings throws error
+//by default, the fileType of all files is ONE_FILE. However, by default we don't want an interaction file since it
+// is very large.
+interactionFile.setFileType(FileType::NO_FILE);
 
-    runNumber_ = 0;
+runNumber_ = 0;
 
-    //Decomposition direction for MPI
-    numberOfDomains_ = {1, 1, 1};
+//Decomposition direction for MPI
+numberOfDomains_ = {1, 1, 1};
 
-    //Check if MPI is already initialised
-    initialiseMPI();
+//Check if MPI is already initialised
+initialiseMPI();
 
-    //This sets the maximum number of particles
-    boundaryHandler.setDPMBase(this);
-    periodicBoundaryHandler.setDPMBase(this);
-    speciesHandler.setDPMBase(this);
-    particleHandler.setDPMBase(this);
-    cgHandler.setDPMBase(this);
-    interactionHandler.setDPMBase(this);
-    wallHandler.setDPMBase(this);
-    interactionHandler.setDPMBase(this);
-    domainHandler.setDPMBase(this);
-    domainHandler.initialise();
-    periodicBoundaryHandler.setDPMBase(this);
-    periodicBoundaryHandler.initialise();
+//This sets the maximum number of particles
+boundaryHandler.setDPMBase(this);
+periodicBoundaryHandler.setDPMBase(this);
+speciesHandler.setDPMBase(this);
+particleHandler.setDPMBase(this);
+cgHandler.setDPMBase(this);
+interactionHandler.setDPMBase(this);
+wallHandler.setDPMBase(this);
+interactionHandler.setDPMBase(this);
+domainHandler.setDPMBase(this);
+domainHandler.initialise();
+periodicBoundaryHandler.setDPMBase(this);
+periodicBoundaryHandler.initialise();
 
-    //set defaults for DPMBase parameters
-    setSystemDimensions(3);
-    setParticleDimensions(3);
-    setRestarted(false);
-    setGravity(Vec3D(0, 0, 0));
+//set defaults for DPMBase parameters
+setSystemDimensions(3);
+setParticleDimensions(3);
+setRestarted(false);
+setGravity(Vec3D(0, 0, 0));
+setBackgroundDrag(0.0);
 
-    //This is the parameter of the numerical part
-    setTime(0);
-    numberOfTimeSteps_ = 0;
-    setTimeMax(0);
-    timeStep_ = 0; // needs to be user-specified, otherwise checkSettings throws error
-    setSaveCount(20);
+//This is the parameter of the numerical part
+setTime(0);
+numberOfTimeSteps_ = 0;
+setTimeMax(0);
+timeStep_ = 0; // needs to be user-specified, otherwise checkSettings throws error
+setSaveCount(20);
 
-    //This sets the default xballs domain
-    min_ = Vec3D(0, 0, 0);
-    max_ = Vec3D(0, 0, 0); // needs to be user-specified, otherwise checkSettings throws error
+//This sets the default xballs domain
+min_ = Vec3D(0, 0, 0);
+max_ = Vec3D(0, 0, 0); // needs to be user-specified, otherwise checkSettings throws error
 
-    //sets the default write particles data in VTK format flag to false
-    writeParticlesVTK_ = false;
-    writeSuperquadricParticlesVTK_ = false;
-    writeWallsVTK_ = FileType::NO_FILE;
-    vtkWriter_ = nullptr;
+//sets the default write particles data in VTK format flag to false
+writeParticlesVTK_ = false;
+writeSuperquadricParticlesVTK_ = false;
+writeWallsVTK_ = FileType::NO_FILE;
+vtkWriter_ = nullptr;
 
-    setName(""); // needs to be user-specified, otherwise checkSettings throws error
+setName(""); // needs to be user-specified, otherwise checkSettings throws error
 
-    //Default mode is energy with no scale of the vectors
-    xBallsColourMode_ = 0;
-    xBallsVectorScale_ = -1;
-    xBallsScale_ = -1;
-    xBallsAdditionalArguments_ = "";
-    setAppend(false);
-    
-    //The default random seed is 0
-    random.setRandomSeed(0);
-    
-    logger(DEBUG, "DPMBase problem constructor finished");
-    
-    readSpeciesFromDataFile_ = false;
-    
-    numberOfOMPThreads_ = 1;
-    
-    //Set number of elements to write to the screen if a user wants to output write information to the terminal
-    nToWrite_ = 4;
+//Default mode is energy with no scale of the vectors
+xBallsColourMode_ = 0;
+xBallsVectorScale_ = -1;
+xBallsScale_ = -1;
+xBallsAdditionalArguments_ = "";
+setAppend(false);
+
+//The default random seed is 0
+random.setRandomSeed(0);
+
+logger(DEBUG, "DPMBase problem constructor finished");
+
+readSpeciesFromDataFile_ = false;
+
+numberOfOMPThreads_ = 1;
+
+//Set number of elements to write to the screen if a user wants to output write information to the terminal
+nToWrite_ = 4;
 }
 
 /*!
- * \details A simple destructor for "DPMBase"-type objects, used to free-up memory when an object
- * is no longer necessary.
- */
+* \details A simple destructor for "DPMBase"-type objects, used to free-up memory when an object
+* is no longer necessary.
+*/
 DPMBase::~DPMBase()
 {
-    delete vtkWriter_;
+delete vtkWriter_;
 }
 
 /*!
- * \returns File& (A reference of object type File i.e. File& dataFile)
- */
+* \returns File& (A reference of object type File i.e. File& dataFile)
+*/
 File& DPMBase::getDataFile()
 {
-    return dataFile;
+return dataFile;
 }
 
 /*!
- * \returns File& (A reference of object type File i.e. File& eneFile)
- */
+* \returns File& (A reference of object type File i.e. File& eneFile)
+*/
 File& DPMBase::getEneFile()
 {
-    return eneFile;
+return eneFile;
 }
 
 /*!
- * \returns File& (A reference of object type File i.e. File& fStatFile)
- */
+* \returns File& (A reference of object type File i.e. File& fStatFile)
+*/
 File& DPMBase::getFStatFile()
 {
-    return fStatFile;
+return fStatFile;
 }
 
 /*!
- * \returns File& (A reference of object type File i.e. File& restartFile)
- */
+* \returns File& (A reference of object type File i.e. File& restartFile)
+*/
 File& DPMBase::getRestartFile()
 {
-    return restartFile;
+return restartFile;
 }
 
 /*!
- * \returns File& (A reference of object type File i.e. File& statFile)
- */
+* \returns File& (A reference of object type File i.e. File& statFile)
+*/
 File& DPMBase::getStatFile()
 {
-    return statFile;
+return statFile;
 }
 
 /*!
- * \return A reference of object type File i.e. File* interactionFile_
- */
+* \return A reference of object type File i.e. File* interactionFile_
+*/
 File& DPMBase::getInteractionFile()
 {
-    return interactionFile;
+return interactionFile;
 }
 
 
 /*!
- * \returns const File& (A const reference of object type File i.e. const File& dataFile)
- */
+* \returns const File& (A const reference of object type File i.e. const File& dataFile)
+*/
 const File& DPMBase::getDataFile() const
 {
-    return dataFile;
+return dataFile;
 }
 
 /*!
- * \returns const File& (A const reference of object type File i.e. const File& eneFile)
- */
+* \returns const File& (A const reference of object type File i.e. const File& eneFile)
+*/
 const File& DPMBase::getEneFile() const
 {
-    return eneFile;
+return eneFile;
 }
 
 /*!
- * \returns const File& (A const reference of object type File i.e. const File& fStatFile)
- */
+* \returns const File& (A const reference of object type File i.e. const File& fStatFile)
+*/
 const File& DPMBase::getFStatFile() const
 {
-    return fStatFile;
+return fStatFile;
 }
 
 /*!
- * \returns const File& (A const reference of object type File i.e. const File& restartFile)
- */
+* \returns const File& (A const reference of object type File i.e. const File& restartFile)
+*/
 const File& DPMBase::getRestartFile() const
 {
-    return restartFile;
+return restartFile;
 }
 
 /*!
- * \returns const File& (A const reference of object type File i.e. const File& statFile)
- */
+* \returns const File& (A const reference of object type File i.e. const File& statFile)
+*/
 const File& DPMBase::getStatFile() const
 {
-    return statFile;
+return statFile;
 }
 /*!
- * \returns const File& (A const reference of object type std::string i.e. const std::string& name_)
- */
+* \returns const File& (A const reference of object type std::string i.e. const std::string& name_)
+*/
 /// \bug The InteractionFile does not work across multifiles.
 const File& DPMBase::getInteractionFile() const
 {
-    return interactionFile;
+return interactionFile;
 }
 
 const std::string& DPMBase::getName() const
 {
-    return name_;
+return name_;
 }
 
 /*!
- * \details sets the number of time steps skipped between each save for ALL data files, except for the interaction file.
- * Note, that the interaction file is independent of time steps, and just writes when an interaction starts or ends.
- */
+* \details sets the number of time steps skipped between each save for ALL data files, except for the interaction file.
+* Note, that the interaction file is independent of time steps, and just writes when an interaction starts or ends.
+*/
 void DPMBase::setSaveCount(unsigned int saveCount)
 {
-    dataFile.setSaveCount(saveCount);
-    fStatFile.setSaveCount(saveCount);
-    restartFile.setSaveCount(saveCount);
-    statFile.setSaveCount(saveCount);
-    eneFile.setSaveCount(saveCount);
-    for (auto cg : cgHandler)
-        cg->statFile.setSaveCount(saveCount);
+dataFile.setSaveCount(saveCount);
+fStatFile.setSaveCount(saveCount);
+restartFile.setSaveCount(saveCount);
+statFile.setSaveCount(saveCount);
+eneFile.setSaveCount(saveCount);
+for (auto cg : cgHandler)
+cg->statFile.setSaveCount(saveCount);
 }
 
 /*!
- * \param[in] name
- */
+* \param[in] name
+*/
 void DPMBase::setName(const std::string& name)
 {
-    if (NUMBER_OF_PROCESSORS > 1)
-    {
-        name_ = name; // was before this->name_ = name
-        dataFile.setName(name_ + ".data" + std::to_string(PROCESSOR_ID));
-        fStatFile.setName(name_ + ".fstat" + std::to_string(PROCESSOR_ID));
-        restartFile.setName(name_ + ".restart" + std::to_string(PROCESSOR_ID));
-        statFile.setName(name_ + ".stat" + std::to_string(PROCESSOR_ID));
-        eneFile.setName(name_ + ".ene" + std::to_string(PROCESSOR_ID));
-        getInteractionFile().setName(name_ + ".interaction" + std::to_string(PROCESSOR_ID));
-    }
-    else
-    {
-        name_ = name; // was before this->name_ = name
-        dataFile.setName(name_ + ".data");
-        fStatFile.setName(name_ + ".fstat");
-        restartFile.setName(name_ + ".restart");
-        statFile.setName(name_ + ".stat");
-        eneFile.setName(name_ + ".ene");
-        interactionFile.setName(name_ + ".interaction");
-    }
+if (NUMBER_OF_PROCESSORS > 1)
+{
+name_ = name; // was before this->name_ = name
+dataFile.setName(name_ + ".data" + std::to_string(PROCESSOR_ID));
+fStatFile.setName(name_ + ".fstat" + std::to_string(PROCESSOR_ID));
+restartFile.setName(name_ + ".restart" + std::to_string(PROCESSOR_ID));
+statFile.setName(name_ + ".stat" + std::to_string(PROCESSOR_ID));
+eneFile.setName(name_ + ".ene" + std::to_string(PROCESSOR_ID));
+getInteractionFile().setName(name_ + ".interaction" + std::to_string(PROCESSOR_ID));
+}
+else
+{
+name_ = name; // was before this->name_ = name
+dataFile.setName(name_ + ".data");
+fStatFile.setName(name_ + ".fstat");
+restartFile.setName(name_ + ".restart");
+statFile.setName(name_ + ".stat");
+eneFile.setName(name_ + ".ene");
+interactionFile.setName(name_ + ".interaction");
+}
 }
 
 /*!
- * \param[in] name
- */
+* \param[in] name
+*/
 void DPMBase::setName(const char* name)
 {
-    setName(std::string(name));
+setName(std::string(name));
 }
 
 /*!
- * \details Calls the setFileType() function from the File.h, which basically sets the File::fileType_. Note, this does
- * not affect the interactionFile.
- * \param[in] fileType (an object of enum class FileType)
- */
+* \details Calls the setFileType() function from the File.h, which basically sets the File::fileType_. Note, this does
+* not affect the interactionFile.
+* \param[in] fileType (an object of enum class FileType)
+*/
 void DPMBase::setFileType(FileType fileType)
 {
-    dataFile.setFileType(fileType);
-    fStatFile.setFileType(fileType);
-    restartFile.setFileType(fileType);
-    statFile.setFileType(fileType);
-    eneFile.setFileType(fileType);
+dataFile.setFileType(fileType);
+fStatFile.setFileType(fileType);
+restartFile.setFileType(fileType);
+statFile.setFileType(fileType);
+eneFile.setFileType(fileType);
 }
 
 /*!
- * \details This implicitly calls the setCounter() function defined in File.h
- */
+* \details This implicitly calls the setCounter() function defined in File.h
+*/
 void DPMBase::resetFileCounter()
 {
-    dataFile.setCounter(0);
-    fStatFile.setCounter(0);
-    restartFile.setCounter(0);
-    statFile.setCounter(0);
-    eneFile.setCounter(0);
-    interactionFile.setCounter(0);
-    setLastSavedTimeStep(NEVER);
-    if (vtkWriter_) vtkWriter_->setFileCounter(0);
-    boundaryVTKWriter_.setFileCounter(0);
-    interactionVTKWriter_.setFileCounter(0);
-    wallVTKWriter_.setFileCounter(0);
+dataFile.setCounter(0);
+fStatFile.setCounter(0);
+restartFile.setCounter(0);
+statFile.setCounter(0);
+eneFile.setCounter(0);
+interactionFile.setCounter(0);
+setLastSavedTimeStep(NEVER);
+if (vtkWriter_) vtkWriter_->setFileCounter(0);
+boundaryVTKWriter_.setFileCounter(0);
+interactionVTKWriter_.setFileCounter(0);
+wallVTKWriter_.setFileCounter(0);
 }
 
 /*!
- * \param[in] openmode
- */
+* \param[in] openmode
+*/
 void DPMBase::setOpenMode(std::fstream::openmode openMode)
 {
-    dataFile.setOpenMode(openMode);
-    fStatFile.setOpenMode(openMode);
-    restartFile.setOpenMode(openMode);
-    statFile.setOpenMode(openMode);
-    eneFile.setOpenMode(openMode);
-    interactionFile.setOpenMode(openMode);
+dataFile.setOpenMode(openMode);
+fStatFile.setOpenMode(openMode);
+restartFile.setOpenMode(openMode);
+statFile.setOpenMode(openMode);
+eneFile.setOpenMode(openMode);
+interactionFile.setOpenMode(openMode);
 }
 
 /*!
- *
- */
+*
+*/
 void DPMBase::closeFiles()
 {
-    dataFile.close();
-    fStatFile.close();
-    restartFile.close();
-    statFile.close();
-    eneFile.close();
-    interactionFile.close();
+dataFile.close();
+fStatFile.close();
+restartFile.close();
+statFile.close();
+eneFile.close();
+interactionFile.close();
 }
 
 /*!
- * \details Sets the time step when the files will next be saved, except for the interaction file.
- * Note, that the interaction file is independent of time steps, and just writes when an interaction starts or ends.
- * \param[in] nextSavedTimeStep
- *
- */
+* \details Sets the time step when the files will next be saved, except for the interaction file.
+* Note, that the interaction file is independent of time steps, and just writes when an interaction starts or ends.
+* \param[in] nextSavedTimeStep
+*
+*/
 void DPMBase::setLastSavedTimeStep(unsigned int nextSavedTimeStep)
 {
-    dataFile.setLastSavedTimeStep(nextSavedTimeStep);
-    fStatFile.setLastSavedTimeStep(nextSavedTimeStep);
-    restartFile.setLastSavedTimeStep(nextSavedTimeStep);
-    //statFile.setLastSavedTimeStep(nextSavedTimeStep); //this one is not force-written
-    eneFile.setLastSavedTimeStep(nextSavedTimeStep);
+dataFile.setLastSavedTimeStep(nextSavedTimeStep);
+fStatFile.setLastSavedTimeStep(nextSavedTimeStep);
+restartFile.setLastSavedTimeStep(nextSavedTimeStep);
+//statFile.setLastSavedTimeStep(nextSavedTimeStep); //this one is not force-written
+eneFile.setLastSavedTimeStep(nextSavedTimeStep);
 }
 
 /*!
- * \details Using the three functions named above, the autoNumber() function acts to:
- *
- * 1) Use the \ref readRunNumberFromFile() function toead the current run number from the file COUNTER_DONOTDEL
- * created by any script which utilises auto-numbering.
- *
- * 2) Set the  \ref runNumber_ counter to the value obtained from the above using the \ref setRunNumber() function.
- *
- * 3) Increment the value stored in the COUNTER_DONOTDEL file by one once the current value has been read
- * using the \ref incrementRunNumberInFile() function.
- */
+* \details Using the three functions named above, the autoNumber() function acts to:
+*
+* 1) Use the \ref readRunNumberFromFile() function toead the current run number from the file COUNTER_DONOTDEL
+* created by any script which utilises auto-numbering.
+*
+* 2) Set the  \ref runNumber_ counter to the value obtained from the above using the \ref setRunNumber() function.
+*
+* 3) Increment the value stored in the COUNTER_DONOTDEL file by one once the current value has been read
+* using the \ref incrementRunNumberInFile() function.
+*/
 void DPMBase::autoNumber()
 {
-    setRunNumber(readRunNumberFromFile());
+setRunNumber(readRunNumberFromFile());
 
-    if (!getRestarted())
-    {
-        incrementRunNumberInFile();
-    }
+if (!getRestarted())
+{
+incrementRunNumberInFile();
+}
 }
 
 /*!
- * \details Reads in the current counter in from the COUNTER_DONOTDEL file stored on the disk.
- * If a COUNTER_DONOTDEL file does not already exist, creates one and initialises it with a value "1"
- */
+* \details Reads in the current counter in from the COUNTER_DONOTDEL file stored on the disk.
+* If a COUNTER_DONOTDEL file does not already exist, creates one and initialises it with a value "1"
+*/
 int DPMBase::readRunNumberFromFile()
 {
-    int counter;
+int counter;
 
-    FILE* counter_file;
-    //checking if there exists already a file named "COUNTER_DONOTDEL" which can be opened for
-    //input and output (returns "true" if no such file exists).
-    if ((counter_file = fopen("COUNTER_DONOTDEL", "r+")) == nullptr)
-    {
-        //if a file does not already exist, checks whether a new file can be created
-        //retutns "true" if a new file CANNOT be created
-        if ((counter_file = fopen("COUNTER_DONOTDEL", "w")) == nullptr)
-        {
-            //If true, outputs an error message and ends the program
-            fprintf(stderr, "\n\n\tERROR :: Counter File NOT found, please re-create\n\n");
-            fclose(counter_file);
-            exit(-1);
-        }
-            //alternatively, if a new file CAN be created...
-        else
-        {
-            //starts the new counter file, writing to it the value "1"
-            fprintf(counter_file, "1");
-            fprintf(stderr, "Counter File created\n");
-            fclose(counter_file);
-            return 1;
-        }
-    }
-        //alternatively, if a counter file DOES already exist...
-    else
-    {
-        //...checks if there exists only 1 value in the file (as would be expected from a COUNTER_DONOTDEL file...
-        if (fscanf(counter_file, "%d", &counter) != 1)
-        {
-            //...and if not, returns an error.
-            fprintf(stderr, "\n\n\tERROR :: Counter File found, but something went wrong with reading it\n\n");
-            fclose(counter_file);
-            exit(-1);
-        }
-        else
-        {
-            //...otherwise, if all has been successful, returns the current value of the file!
-            fclose(counter_file);
-            return counter;
-        }
-    }
+FILE* counter_file;
+//checking if there exists already a file named "COUNTER_DONOTDEL" which can be opened for
+//input and output (returns "true" if no such file exists).
+if ((counter_file = fopen("COUNTER_DONOTDEL", "r+")) == nullptr)
+{
+//if a file does not already exist, checks whether a new file can be created
+//retutns "true" if a new file CANNOT be created
+if ((counter_file = fopen("COUNTER_DONOTDEL", "w")) == nullptr)
+{
+    //If true, outputs an error message and ends the program
+    fprintf(stderr, "\n\n\tERROR :: Counter File NOT found, please re-create\n\n");
+    fclose(counter_file);
+    exit(-1);
+}
+    //alternatively, if a new file CAN be created...
+else
+{
+    //starts the new counter file, writing to it the value "1"
+    fprintf(counter_file, "1");
+    fprintf(stderr, "Counter File created\n");
+    fclose(counter_file);
+    return 1;
+}
+}
+//alternatively, if a counter file DOES already exist...
+else
+{
+//...checks if there exists only 1 value in the file (as would be expected from a COUNTER_DONOTDEL file...
+if (fscanf(counter_file, "%d", &counter) != 1)
+{
+    //...and if not, returns an error.
+    fprintf(stderr, "\n\n\tERROR :: Counter File found, but something went wrong with reading it\n\n");
+    fclose(counter_file);
+    exit(-1);
+}
+else
+{
+    //...otherwise, if all has been successful, returns the current value of the file!
+    fclose(counter_file);
+    return counter;
+}
+}
 
 }
 
 /*!
- * A simple "set function" which allows the user to simply overwrite the current run number to any valid new value.
- * \param[in] runNumber - the value to which we want to (re)set the internally stored run number parameter, \ref runNumber_
- */
+* A simple "set function" which allows the user to simply overwrite the current run number to any valid new value.
+* \param[in] runNumber - the value to which we want to (re)set the internally stored run number parameter, \ref runNumber_
+*/
 void DPMBase::setRunNumber(int runNumber)
 {
-    runNumber_ = runNumber;
+runNumber_ = runNumber;
 }
 
 /*!
- * A simple "get function" which allows the user to retrieve the current value corresponding to the run number counter, \ref runNumber_
- *
- \returns \ref runNumber_ - the stored value of the current run number, i.e. the number of files corresponding to a given Mercury script that have been produced in
- a given directory.
- */
+* A simple "get function" which allows the user to retrieve the current value corresponding to the run number counter, \ref runNumber_
+*
+\returns \ref runNumber_ - the stored value of the current run number, i.e. the number of files corresponding to a given Mercury script that have been produced in
+a given directory.
+*/
 int DPMBase::getRunNumber() const
 {
-    return runNumber_;
+return runNumber_;
 }
 
 /*!
- * \details In order to increment the counter stored in COUNTER_DONOTDEL, we initialise two fstream objects counter_file, counter_file2 and
- * an integer type temp_counter. First we open the file COUNTER_DONOTDEL, check if everything went fine with the opening. If yes, we extract the
- * runNumber (counter) into the temp_counter. Increment the temp_counter and then write it into COUNTER_DONOTDEL. This is how we increment the
- * counter in the file.
- */
+* \details In order to increment the counter stored in COUNTER_DONOTDEL, we initialise two fstream objects counter_file, counter_file2 and
+* an integer type temp_counter. First we open the file COUNTER_DONOTDEL, check if everything went fine with the opening. If yes, we extract the
+* runNumber (counter) into the temp_counter. Increment the temp_counter and then write it into COUNTER_DONOTDEL. This is how we increment the
+* counter in the file.
+*/
 void DPMBase::incrementRunNumberInFile()
 {
-    //opening two filestreams - counter_file and counter_file2
-    std::fstream counter_file, counter_file2;
-    //declares an integer, temp_counter
-    int temp_counter;
-    //attempts to open the COUNTER_DONOTDEL text file
-    counter_file.open("COUNTER_DONOTDEL", std::ios::in);
-    //gives error message if file could not be successfully opened and ends the program
-    if (counter_file.fail())
-    {
-        fprintf(stderr, "\n\n\tERROR :: Counter File NOT found, please re-create\n\n");
-        counter_file.close();
-        exit(0);
-    }
-    // if opened successfully, reads in the counter corresponding to the current run number
-    //and stored it in the "temp_counter" variable
-    counter_file >> temp_counter;
-    counter_file.close();
-    //Increments the temp_counter
-    temp_counter++;
-    //opens an output stream to the COUNTER_DONOTDEL file
-    counter_file2.open("COUNTER_DONOTDEL", std::ios::out);
-    if (counter_file2.fail())
-    {
-        fprintf(stderr, "\n\n\tERROR :: Counter File NOT found, please re-create2\n\n");
-        counter_file2.close();
-        exit(0);
-    }
-    //writes the new valuer of the counter to COUNTER_DONOTDEL
-    counter_file2 << temp_counter;
+//opening two filestreams - counter_file and counter_file2
+std::fstream counter_file, counter_file2;
+//declares an integer, temp_counter
+int temp_counter;
+//attempts to open the COUNTER_DONOTDEL text file
+counter_file.open("COUNTER_DONOTDEL", std::ios::in);
+//gives error message if file could not be successfully opened and ends the program
+if (counter_file.fail())
+{
+fprintf(stderr, "\n\n\tERROR :: Counter File NOT found, please re-create\n\n");
+counter_file.close();
+exit(0);
+}
+// if opened successfully, reads in the counter corresponding to the current run number
+//and stored it in the "temp_counter" variable
+counter_file >> temp_counter;
+counter_file.close();
+//Increments the temp_counter
+temp_counter++;
+//opens an output stream to the COUNTER_DONOTDEL file
+counter_file2.open("COUNTER_DONOTDEL", std::ios::out);
+if (counter_file2.fail())
+{
+fprintf(stderr, "\n\n\tERROR :: Counter File NOT found, please re-create2\n\n");
+counter_file2.close();
+exit(0);
+}
+//writes the new valuer of the counter to COUNTER_DONOTDEL
+counter_file2 << temp_counter;
 
-    counter_file2.close();
+counter_file2.close();
 }
 
 /*!
- * \details Let's say sizeX = 5, counter stored in COUNTER_DONOTDEL = 1.
- * Substituting these values into the algorithm below implies that studyNum = 0 or 1. Everytime the code is executed the
- * counter gets incremented and the values of studyNum and i are updated, which is returned as std::vector<int>
- * \param[in] sizeX The (integer) number of values to be tested in 1D parameter space.
- * \returns std::vector<int> The current study numbers.
- */
+* \details Let's say sizeX = 5, counter stored in COUNTER_DONOTDEL = 1.
+* Substituting these values into the algorithm below implies that studyNum = 0 or 1. Everytime the code is executed the
+* counter gets incremented and the values of studyNum and i are updated, which is returned as std::vector<int>
+* \param[in] sizeX The (integer) number of values to be tested in 1D parameter space.
+* \returns std::vector<int> The current study numbers.
+*/
 std::vector<int> DPMBase::get1DParametersFromRunNumber(int sizeX) const
 {
-    // Declare a vector of integers capable of storing 2 values
-    std::vector<int> temp(2);
+// Declare a vector of integers capable of storing 2 values
+std::vector<int> temp(2);
 
-    // Declare and initialise for the current simulation run number
-    int counter = getRunNumber();
+// Declare and initialise for the current simulation run number
+int counter = getRunNumber();
 
-    // Give studyNum value 0 if study is incomplete, otherwise value > 0
-    int studyNum = (counter-1)/sizeX;
-    counter = counter - sizeX*studyNum;
+// Give studyNum value 0 if study is incomplete, otherwise value > 0
+int studyNum = (counter-1)/sizeX;
+counter = counter - sizeX*studyNum;
 
-    int i = ((counter - 1) % sizeX) + 1;
-    logger(INFO,"StudyNum: % \t Counter: % \t i: %", studyNum, counter, i);
-    temp[0] = studyNum;
-    temp[1] = i;
+int i = ((counter - 1) % sizeX) + 1;
+logger(INFO,"StudyNum: % \t Counter: % \t i: %", studyNum, counter, i);
+temp[0] = studyNum;
+temp[1] = i;
 
-    return temp;
+return temp;
 }
 
 /*!
- * \details Let's say sizeX = 2 and sizeY = 5, counter stored in COUNTER_DONOTDEL =1. The studySize = 10.
- * Substituting these values into the below algorithm implies that studyNum = 0 or 1, everytime the code is executed the counter gets incremented and hence determined
- * the values of studyNum, i and j which is returned as a std::vector<int>
- * \param[in] sizeX The (integer) number of values to be tested for one of the 2 parameters forming the 2D parameter space.
- * \param[in] sizeY The (integer) number of values to be tested for the other of the 2 parameters forming the 2D parameter space.
- * \returns std::vector<int>
- */
+* \details Let's say sizeX = 2 and sizeY = 5, counter stored in COUNTER_DONOTDEL =1. The studySize = 10.
+* Substituting these values into the below algorithm implies that studyNum = 0 or 1, everytime the code is executed the counter gets incremented and hence determined
+* the values of studyNum, i and j which is returned as a std::vector<int>
+* \param[in] sizeX The (integer) number of values to be tested for one of the 2 parameters forming the 2D parameter space.
+* \param[in] sizeY The (integer) number of values to be tested for the other of the 2 parameters forming the 2D parameter space.
+* \returns std::vector<int>
+*/
 std::vector<int> DPMBase::get2DParametersFromRunNumber(int sizeX, int sizeY) const
 {
-    //declares a vector of integers capable of storing 3 values,
-    std::vector<int> temp(3);
-    //declares and initialises an integer variable named "counter"
-    //with the current counter number, runNumber_
-    int counter = getRunNumber();
-    //calculates the total size of the study, i.e. the number of points
-    //in the 2D parameter space explored
-    int studySize = sizeX * sizeY;
-    //(counter - 1) / studySize gives a fraction comparing the number of runs conducted so far
-    //to the total size of the study, i.e. the total number of runs that need to be performed.
-    //since studyNum is an integer, will declare zero until an adequate number of runs has been performed,
-    //at which point it will equal 1
-    int studyNum = (counter - 1) / studySize;
+//declares a vector of integers capable of storing 3 values,
+std::vector<int> temp(3);
+//declares and initialises an integer variable named "counter"
+//with the current counter number, runNumber_
+int counter = getRunNumber();
+//calculates the total size of the study, i.e. the number of points
+//in the 2D parameter space explored
+int studySize = sizeX * sizeY;
+//(counter - 1) / studySize gives a fraction comparing the number of runs conducted so far
+//to the total size of the study, i.e. the total number of runs that need to be performed.
+//since studyNum is an integer, will declare zero until an adequate number of runs has been performed,
+//at which point it will equal 1
+int studyNum = (counter - 1) / studySize;
 
-    counter = counter - studySize * studyNum;
-    int i = ((counter - 1) % sizeX) + 1;
-    int j = ((counter - i) / sizeX) + 1;
-    logger(INFO,"StudyNum: % \t Counter: % \t i: % \t j: %", studyNum, counter, i, j);
+counter = counter - studySize * studyNum;
+int i = ((counter - 1) % sizeX) + 1;
+int j = ((counter - i) / sizeX) + 1;
+logger(INFO,"StudyNum: % \t Counter: % \t i: % \t j: %", studyNum, counter, i, j);
 
-    temp[0] = studyNum;
-    temp[1] = i;
-    temp[2] = j;
+temp[0] = studyNum;
+temp[1] = i;
+temp[2] = j;
 
-    return (temp);
+return (temp);
 }
 
 /*!
- * \details Let's say sizeX = 2, sizeY = 5 and sizeZ = 3, counter stored in COUNTER_DONOTDEL =1. The studySize = 30.
- * Substituting these values into the below algorithm implies that studyNum = 0 or 1, everytime the code is executed the counter gets incremented and hence determined
- * the values of studyNum, i,j and k which is returned as a std::vector<int>
- * \param[in] sizeX The (integer) number of values to be tested for one of the 3 parameters forming the 3D parameter space.
- * \param[in] sizeY The (integer) number of values to be tested for one of the 3 parameters forming the 3D parameter space.
- * \param[in] sizeZ The (integer) number of values to be tested for one of the 3 parameters forming the 3D parameter space.
- * \returns std::vector<int>
- */
+* \details Let's say sizeX = 2, sizeY = 5 and sizeZ = 3, counter stored in COUNTER_DONOTDEL =1. The studySize = 30.
+* Substituting these values into the below algorithm implies that studyNum = 0 or 1, everytime the code is executed the counter gets incremented and hence determined
+* the values of studyNum, i,j and k which is returned as a std::vector<int>
+* \param[in] sizeX The (integer) number of values to be tested for one of the 3 parameters forming the 3D parameter space.
+* \param[in] sizeY The (integer) number of values to be tested for one of the 3 parameters forming the 3D parameter space.
+* \param[in] sizeZ The (integer) number of values to be tested for one of the 3 parameters forming the 3D parameter space.
+* \returns std::vector<int>
+*/
 std::vector<int> DPMBase::get3DParametersFromRunNumber(int sizeX, int sizeY, int sizeZ) const
 {
-    //declares a vector of integers capable of storing 4 values,
-    std::vector<int> temp(4);
-    //declares and initialises an integer variable named "counter"
-    //with the current counter number, runNumber_
-    int counter = getRunNumber();
-    //calculates the total size of the study, i.e. the number of points
-    //in the 3D parameter space explored
-    int studySize = sizeX * sizeY * sizeZ;
-    //(counter - 1) / studySize gives a fraction comparing the number of runs conducted so far
-    //to the total size of the study, i.e. the total number of runs that need to be performed.
-    //since studyNum is an integer, will declare zero until an adequate number of runs has been performed,
-    //at which point it will equal 1
-    int studyNum = (counter - 1) / studySize;
+//declares a vector of integers capable of storing 4 values,
+std::vector<int> temp(4);
+//declares and initialises an integer variable named "counter"
+//with the current counter number, runNumber_
+int counter = getRunNumber();
+//calculates the total size of the study, i.e. the number of points
+//in the 3D parameter space explored
+int studySize = sizeX * sizeY * sizeZ;
+//(counter - 1) / studySize gives a fraction comparing the number of runs conducted so far
+//to the total size of the study, i.e. the total number of runs that need to be performed.
+//since studyNum is an integer, will declare zero until an adequate number of runs has been performed,
+//at which point it will equal 1
+int studyNum = (counter - 1) / studySize;
 
-    counter = counter - studySize * studyNum;
-    int i = ((counter-1) % sizeX) + 1;
-    int j = static_cast<int>(std::floor((counter-1)/sizeX)) % sizeY + 1;
-    int k = static_cast<int>(std::floor((counter-1)/(sizeX*sizeY))) % sizeZ + 1;
-    logger(INFO,"StudyNum: % \t Counter: % \t i: % \t j: % \t k: %", studyNum, counter, i, j, k);
+counter = counter - studySize * studyNum;
+int i = ((counter-1) % sizeX) + 1;
+int j = static_cast<int>(std::floor((counter-1)/sizeX)) % sizeY + 1;
+int k = static_cast<int>(std::floor((counter-1)/(sizeX*sizeY))) % sizeZ + 1;
+logger(INFO,"StudyNum: % \t Counter: % \t i: % \t j: % \t k: %", studyNum, counter, i, j, k);
 
-    temp[0] = studyNum;
-    temp[1] = i;
-    temp[2] = j;
-    temp[3] = k;
+temp[0] = studyNum;
+temp[1] = i;
+temp[2] = j;
+temp[3] = k;
 
-    return (temp);
+return (temp);
 }
 
 /*!
- * \details Reads in the name of the command (code) to be launched.
- * This name is then converted to a string stream and appended with " &" (such that command
- * is run in the background), before being
- * converted back to a C string and then fed to the system() command which will execute the named code
- * from within the running Mercury program.
- * \param[in] name The name of the code to be launched
- * \param[in] quick
- * \return int
- */
+* \details Reads in the name of the command (code) to be launched.
+* This name is then converted to a string stream and appended with " &" (such that command
+* is run in the background), before being
+* converted back to a C string and then fed to the system() command which will execute the named code
+* from within the running Mercury program.
+* \param[in] name The name of the code to be launched
+* \param[in] quick
+* \return int
+*/
 int DPMBase::launchNewRun(const char* name, bool quick UNUSED)
 {
-    //defines an (empty) stringstream named "com"
-    std::stringstream com("");
-    //adds the name of the code to run (fed in as an argument)
-    //to the "com" string and appends the string with " &"
-    com << name << " &";
-    //converts the stringstream "com" to a standard string, and then
-    //converts this string to a C string
-    //the string is then fed to the "system" function, which will run the named command
-    return system(com.str().c_str());
+//defines an (empty) stringstream named "com"
+std::stringstream com("");
+//adds the name of the code to run (fed in as an argument)
+//to the "com" string and appends the string with " &"
+com << name << " &";
+//converts the stringstream "com" to a standard string, and then
+//converts this string to a C string
+//the string is then fed to the "system" function, which will run the named command
+return system(com.str().c_str());
 }
 
 /*!
- * \details
- * This method allows flags to be passed to Mercury from driver codes, such that variables can be
- * altered without needing to alter the driver files - for example, if the user wishes to give
- * specific commands for the manner in which the system will be displayed in xballs.
- *
- * After reading in the arguments provided, the normal 'solve()' routine is called. For full details
- * see the documentation of the solve() function (linked).
- * \param[in] argc
- * \param[in] argv
- */
+* \details
+* This method allows flags to be passed to Mercury from driver codes, such that variables can be
+* altered without needing to alter the driver files - for example, if the user wishes to give
+* specific commands for the manner in which the system will be displayed in xballs.
+*
+* After reading in the arguments provided, the normal 'solve()' routine is called. For full details
+* see the documentation of the solve() function (linked).
+* \param[in] argc
+* \param[in] argv
+*/
 void DPMBase::solve(int argc, char* argv[])
 {
-    readArguments(argc, argv);
-    solve();
+readArguments(argc, argv);
+solve();
 }
 
 /*!
- * \return time_
- */
+* \return time_
+*/
 Mdouble DPMBase::getTime() const
 {
-    return time_;
+return time_;
 }
 
 /*!
- * \return time_
- */
+* \return time_
+*/
 Mdouble DPMBase::getNextTime() const
 {
-    return time_ + timeStep_;
+return time_ + timeStep_;
 }
 
 /*!
- * \return numberOfTimeSteps_
- */
+* \return numberOfTimeSteps_
+*/
 unsigned int DPMBase::getNumberOfTimeSteps() const
 {
-    return numberOfTimeSteps_;
+return numberOfTimeSteps_;
 }
 
 /*!
- * \details This may be useful in codes where some initial set-up is required e.g. if a system of particles
- * is first prepared and then exposed to excitation.
- * In this situation, <TT>getNumberOfTimeSteps()</TT> may be used to reset the time to zero at the point at which excitation
- * begins to be applied.
- * \param[in] time
- */
+* \details This may be useful in codes where some initial set-up is required e.g. if a system of particles
+* is first prepared and then exposed to excitation.
+* In this situation, <TT>getNumberOfTimeSteps()</TT> may be used to reset the time to zero at the point at which excitation
+* begins to be applied.
+* \param[in] time
+*/
 void DPMBase::setTime(Mdouble time)
 {
-    Mdouble diff = time_ - time;
-    time_ = time;
-    //this sets the interaction timestamp, so each interaction has the right time
-    for (auto i: interactionHandler)
-    {
-        i->setTimeStamp(i->getTimeStamp() - diff);
-    }
+Mdouble diff = time_ - time;
+time_ = time;
+//this sets the interaction timestamp, so each interaction has the right time
+for (auto i: interactionHandler)
+{
+i->setTimeStamp(i->getTimeStamp() - diff);
+}
 }
 
 
 /*!
- * \details sets nToWrite_. If a user wants to output e.g. particle information to the screen we limit the number of
- * outputs to nToWrite elements to not get an overflow of information in the terminal.
- * \param[in] nToWrite          Number of elements to write to the screen
- */
+* \details sets nToWrite_. If a user wants to output e.g. particle information to the screen we limit the number of
+* outputs to nToWrite elements to not get an overflow of information in the terminal.
+* \param[in] nToWrite          Number of elements to write to the screen
+*/
 void DPMBase::setNToWrite(int nToWrite)
 {
-    nToWrite_ = nToWrite;
+nToWrite_ = nToWrite;
 }
 
 /*!
- * \details Gets nToWrite. If a user wants to output e.g. particle information to the screen we limit the number of
- * outputs to nToWrite elements to not get an overflow of information in the terminal.
- * \param[out] nToWrite_          Number of elements to write to the screen
- */
+* \details Gets nToWrite. If a user wants to output e.g. particle information to the screen we limit the number of
+* outputs to nToWrite elements to not get an overflow of information in the terminal.
+* \param[out] nToWrite_          Number of elements to write to the screen
+*/
 
 int DPMBase::getNToWrite() const
 {
-    return nToWrite_;
+return nToWrite_;
 }
 
 /*!
- * \details A sanity check is performed to ensure that the new maximum simulation duration is nonnegative.
- * \param[in] newTMmax
- */
+* \details A sanity check is performed to ensure that the new maximum simulation duration is nonnegative.
+* \param[in] newTMmax
+*/
 void DPMBase::setTimeMax(Mdouble newTMax)
 {
-    if (newTMax >= 0)
-    {
-        timeMax_ = newTMax;
-    }
-    else
-    {
-        logger(ERROR, "Error in setTimeMax, new timeMax=% is not positive", newTMax);
-    }
+if (newTMax >= 0)
+{
+timeMax_ = newTMax;
+}
+else
+{
+logger(ERROR, "Error in setTimeMax, new timeMax=% is not positive", newTMax);
+}
 }
 
 /*!
- * \return timeMax_
- */
+* \return timeMax_
+*/
 Mdouble DPMBase::getTimeMax() const
 {
-    return timeMax_;
+return timeMax_;
 }
 /*!
- * Uses the preprocessor directive <TT>ifdef</TT> to check if there exists a
- * CONTACT_LIST_HGRID, before any code is compiled.
- * If CONTACT_LIST_HGRID <B>does</B> exist, this function can be used to
- * return the "possibleContactsList" - but not to alter it.
- */
+* Uses the preprocessor directive <TT>ifdef</TT> to check if there exists a
+* CONTACT_LIST_HGRID, before any code is compiled.
+* If CONTACT_LIST_HGRID <B>does</B> exist, this function can be used to
+* return the "possibleContactsList" - but not to alter it.
+*/
 #ifdef CONTACT_LIST_HGRID
 PossibleContactList& DPMBase::getPossibleContactList()
 {
-    return possibleContactList;
+return possibleContactList;
 }
 #endif
 
 /*!
- * \details
- * The VTK file is used for visualisation in Paraview.
- * \todo Move this (and the get) to WallHandler.
- * \param[in] writeWallsVTK
- */
+* \details
+* The VTK file is used for visualisation in Paraview.
+* \todo Move this (and the get) to WallHandler.
+* \param[in] writeWallsVTK
+*/
 void DPMBase::setWallsWriteVTK(FileType writeWallsVTK)
 {
-    writeWallsVTK_ = writeWallsVTK;
+writeWallsVTK_ = writeWallsVTK;
 }
 
 /*!
- * \details
- * The VTK file is used for visualisation in Paraview.
- * \todo Move this (and the get) to WallHandler.
- * \param[in] writeWallsVTK
- */
+* \details
+* The VTK file is used for visualisation in Paraview.
+* \todo Move this (and the get) to WallHandler.
+* \param[in] writeWallsVTK
+*/
 void DPMBase::setWallsWriteVTK(bool writeVTK)
 {
-    writeWallsVTK_ = writeVTK?FileType::MULTIPLE_FILES:FileType::NO_FILE;
+writeWallsVTK_ = writeVTK?FileType::MULTIPLE_FILES:FileType::NO_FILE;
 }
 
 void DPMBase::setInteractionsWriteVTK(bool writeVTK)
 {
-    interactionHandler.setWriteVTK(writeVTK?FileType::MULTIPLE_FILES:FileType::NO_FILE);
+interactionHandler.setWriteVTK(writeVTK?FileType::MULTIPLE_FILES:FileType::NO_FILE);
 }
 /*!
- * \details
- * The VTK format is used for visualisation in Paraview.
- * \todo Move this (and the get) to ParticleHandler.
- * \param[in] writeParticlesVTK
- */
+* \details
+* The VTK format is used for visualisation in Paraview.
+* \todo Move this (and the get) to ParticleHandler.
+* \param[in] writeParticlesVTK
+*/
 void DPMBase::setParticlesWriteVTK(bool writeParticlesVTK)
 {
-    writeParticlesVTK_ = writeParticlesVTK;
-    if (writeParticlesVTK_)
-    {
-        writeSuperquadricParticlesVTK_ = false;
-    }
-    delete vtkWriter_;
-    vtkWriter_ = new SphericalParticleVtkWriter(particleHandler);
+writeParticlesVTK_ = writeParticlesVTK;
+if (writeParticlesVTK_)
+{
+writeSuperquadricParticlesVTK_ = false;
+}
+delete vtkWriter_;
+vtkWriter_ = new SphericalParticleVtkWriter(particleHandler);
 }
 
 /*!
- * \param[in] writeParticlesVTK
- */
+* \param[in] writeParticlesVTK
+*/
 void DPMBase::setSuperquadricParticlesWriteVTK(bool writeParticlesVTK)
 {
-    writeSuperquadricParticlesVTK_ = writeParticlesVTK;
-    if (writeSuperquadricParticlesVTK_)
-    {
-        writeParticlesVTK_ = false;
-    }
-    delete vtkWriter_;
-    vtkWriter_ = new SuperQuadricParticleVtkWriter(particleHandler);
+writeSuperquadricParticlesVTK_ = writeParticlesVTK;
+if (writeSuperquadricParticlesVTK_)
+{
+writeParticlesVTK_ = false;
+}
+delete vtkWriter_;
+vtkWriter_ = new SuperQuadricParticleVtkWriter(particleHandler);
 }
 
 /*!
- * \details
- * The VTK file is used for visualisation in Paraview.
- * \todo Move this (and the set) to WallHandler.
- * \returns bool
- */
+* \details
+* The VTK file is used for visualisation in Paraview.
+* \todo Move this (and the set) to WallHandler.
+* \returns bool
+*/
 FileType DPMBase::getWallsWriteVTK() const
 {
-    return writeWallsVTK_;
+return writeWallsVTK_;
 }
 
 /*!
- * \details
- * The VTK format is used for visualisation in Paraview.
- * \todo Move this (and the set) to ParticleHandler.
- * \returns bool
- */
+* \details
+* The VTK format is used for visualisation in Paraview.
+* \todo Move this (and the set) to ParticleHandler.
+* \returns bool
+*/
 bool DPMBase::getParticlesWriteVTK() const
 {
-    return writeParticlesVTK_;
+return writeParticlesVTK_;
 }
 
 /*!
- * \returns bool
- */
+* \returns bool
+*/
 bool DPMBase::getSuperquadricParticlesWriteVTK() const
 {
-    return writeSuperquadricParticlesVTK_;
+return writeSuperquadricParticlesVTK_;
 }
 
 /*!
- * \details An access function which allows the user to alter the value of the (private) x value of the "Vec3D"
- * object "min_", thus setting the minimum x-value corresponding to the system, i.e. the lower limit of the domain in
- * the x-direction.
- * \n \n
- * These bounds are used for display, plotting and statistics purposes. They do not affect the
- * dynamics.
- * \n \n
- * The function also performs a sanity check to stop the user defining a lower bound that
- * is higher than the corresponding upper bound (XMax), giving a (logged) warning if the user attempts to do so.
- * \param[in] newXMin
- */
+* \details An access function which allows the user to alter the value of the (private) x value of the "Vec3D"
+* object "min_", thus setting the minimum x-value corresponding to the system, i.e. the lower limit of the domain in
+* the x-direction.
+* \n \n
+* These bounds are used for display, plotting and statistics purposes. They do not affect the
+* dynamics.
+* \n \n
+* The function also performs a sanity check to stop the user defining a lower bound that
+* is higher than the corresponding upper bound (XMax), giving a (logged) warning if the user attempts to do so.
+* \param[in] newXMin
+*/
 void DPMBase::setXMin(Mdouble newXMin)
 {
-    if (newXMin <= getXMax())
-    {
-        min_.x() = newXMin;
-    }
-    else
-    {
-        logger(WARN, "Warning in setXMin(%): xMax=%", newXMin, getXMax());
-    }
+if (newXMin <= getXMax())
+{
+min_.x() = newXMin;
+}
+else
+{
+logger(WARN, "Warning in setXMin(%): xMax=%", newXMin, getXMax());
+}
 }
 
 /*!
- * \details An access function which allows the user to alter the value of the (private) y value of the "Vec3D"
- * object "min_", thus setting the minimum y-value corresponding to the system, i.e. the lower limit of the domain in
- * the y-direction.
- * \n \n
- * These bounds are used for display, plotting and statistics purposes. They do not affect the
- * dynamics.
- * \n \n
- * The function also performs a sanity check to stop the user defining a lower bound that
- * is higher than the corresponding upper bound (YMax), giving a (logged) warning if the user attempts to do so.
- * \param[in] newYMin
- */
+* \details An access function which allows the user to alter the value of the (private) y value of the "Vec3D"
+* object "min_", thus setting the minimum y-value corresponding to the system, i.e. the lower limit of the domain in
+* the y-direction.
+* \n \n
+* These bounds are used for display, plotting and statistics purposes. They do not affect the
+* dynamics.
+* \n \n
+* The function also performs a sanity check to stop the user defining a lower bound that
+* is higher than the corresponding upper bound (YMax), giving a (logged) warning if the user attempts to do so.
+* \param[in] newYMin
+*/
 void DPMBase::setYMin(Mdouble newYMin)
 {
-    if (newYMin <= getYMax())
-    {
-        min_.y() = newYMin;
-    }
-    else
-    {
-        logger(WARN, "Warning in setYMin(%): yMax=%", newYMin, getYMax());
-    }
+if (newYMin <= getYMax())
+{
+min_.y() = newYMin;
+}
+else
+{
+logger(WARN, "Warning in setYMin(%): yMax=%", newYMin, getYMax());
+}
 }
 
 /*!
- * An access function which allows the user to alter the value of the (private) z value of the "Vec3D"
- * object "min_", thus setting the minimum z-value corresponding to the system, i.e. the lower limit of the domain in
- * the z-direction.
- * \n \n
- * These bounds are used for display, plotting and statistics purposes. They do not affect the
- * dynamics.
- * \n \n
- * The function also performs a sanity check to stop the user defining a lower bound that
- * is higher than the corresponding upper bound (ZMax), giving a (logged) warning if the user attempts to do so.
- * \param[in] newZMin
- */
+* An access function which allows the user to alter the value of the (private) z value of the "Vec3D"
+* object "min_", thus setting the minimum z-value corresponding to the system, i.e. the lower limit of the domain in
+* the z-direction.
+* \n \n
+* These bounds are used for display, plotting and statistics purposes. They do not affect the
+* dynamics.
+* \n \n
+* The function also performs a sanity check to stop the user defining a lower bound that
+* is higher than the corresponding upper bound (ZMax), giving a (logged) warning if the user attempts to do so.
+* \param[in] newZMin
+*/
 void DPMBase::setZMin(Mdouble newZMin)
 {
 
-    if (newZMin <= getZMax())
-    {
-        min_.z() = newZMin;
-    }
-    else
-    {
-        logger(WARN, "Warning in setZMin(%): zMax=%", newZMin, getZMax());
-    }
+if (newZMin <= getZMax())
+{
+min_.z() = newZMin;
+}
+else
+{
+logger(WARN, "Warning in setZMin(%): zMax=%", newZMin, getZMax());
+}
 
 }
 
 /*!
- * \details
- * This specifies one corner of the problem's cuboidal bounding box.
- * These bounds are used for display, plotting and statistics purposes. They do not affect the
- * dynamics.
- * \n \n
- * A sanity check is performed to verify that each of the maximum coordinates are greater than the
- * corresponding minimum coordinates. It raises a (logged) warning if not.
- * \param[in] newMax
- */
+* \details
+* This specifies one corner of the problem's cuboidal bounding box.
+* These bounds are used for display, plotting and statistics purposes. They do not affect the
+* dynamics.
+* \n \n
+* A sanity check is performed to verify that each of the maximum coordinates are greater than the
+* corresponding minimum coordinates. It raises a (logged) warning if not.
+* \param[in] newMax
+*/
 void DPMBase::setMax(const Vec3D& newMax)
 {
-    if (min_.x() > newMax.x() ||
-        min_.y() > newMax.y() ||
-        min_.z() > newMax.z())
-    {
-        logger(WARN, "Warning in setMax: upper bound is smaller"
-                     " than lower bound. (%,%,%) > (%,%,%)",
-               min_.x(), min_.y(), min_.z(), newMax.x(), newMax.y(), newMax.z());
-    }
-    else
-    {
-        max_ = newMax;
-    }
+if (min_.x() > newMax.x() ||
+min_.y() > newMax.y() ||
+min_.z() > newMax.z())
+{
+logger(WARN, "Warning in setMax: upper bound is smaller"
+	     " than lower bound. (%,%,%) > (%,%,%)",
+       min_.x(), min_.y(), min_.z(), newMax.x(), newMax.y(), newMax.z());
+}
+else
+{
+max_ = newMax;
+}
 }
 
 void DPMBase::setDomain(const Vec3D& min, const Vec3D& max)
 {
 
-    logger.assert_debug(min.X <= max.X, "lower x-bound (%) is larger than upper x-bound (%)", min.X, max.X);
-    logger.assert_debug(min.Y <= max.Y, "lower x-bound (%) is larger than upper x-bound (%)", min.Y, max.Y);
-    logger.assert_debug(min.Z <= max.Z, "lower x-bound (%) is larger than upper x-bound (%)", min.Z, max.Z);
-    min_ = min;
-    max_ = max;
+logger.assert_debug(min.X <= max.X, "lower x-bound (%) is larger than upper x-bound (%)", min.X, max.X);
+logger.assert_debug(min.Y <= max.Y, "lower x-bound (%) is larger than upper x-bound (%)", min.Y, max.Y);
+logger.assert_debug(min.Z <= max.Z, "lower x-bound (%) is larger than upper x-bound (%)", min.Z, max.Z);
+min_ = min;
+max_ = max;
 }
 
 /*!
- * \details
- * This specifies one corner of the problem's cuboidal bounding box.
- * These bounds are used for display, plotting and statistics purposes. They do not affect the
- * dynamics.
- * \n \n
- * A sanity check is performed to verify that each of the minimum coordinates are greater than the
- * corresponding maximum coordinates. It raises a (logged) warning if not.
- * \param[in] newMin
- */
+* \details
+* This specifies one corner of the problem's cuboidal bounding box.
+* These bounds are used for display, plotting and statistics purposes. They do not affect the
+* dynamics.
+* \n \n
+* A sanity check is performed to verify that each of the minimum coordinates are greater than the
+* corresponding maximum coordinates. It raises a (logged) warning if not.
+* \param[in] newMin
+*/
 void DPMBase::setMin(const Vec3D& newMin)
 {
-    if (max_.x() < newMin.x() ||
-        max_.y() < newMin.y() ||
-        max_.z() < newMin.z())
-    {
-        logger(WARN, "Warning in setMin: lower bound is larger"
-                     " than upper bound. (%,%,%) < (%,%,%)",
-               max_.x(), max_.y(), max_.z(), newMin.x(), newMin.y(), newMin.z());
-    }
-    else
-    {
-        min_ = newMin;
-    }
+if (max_.x() < newMin.x() ||
+max_.y() < newMin.y() ||
+max_.z() < newMin.z())
+{
+logger(WARN, "Warning in setMin: lower bound is larger"
+	     " than upper bound. (%,%,%) < (%,%,%)",
+       max_.x(), max_.y(), max_.z(), newMin.x(), newMin.y(), newMin.z());
+}
+else
+{
+min_ = newMin;
+}
 }
 
 /*!
- * \details
- * As in \ref setMin but the coordinates are passed as three Mdouble, not a Vec3D.
- */
+* \details
+* As in \ref setMin but the coordinates are passed as three Mdouble, not a Vec3D.
+*/
 void DPMBase::setMin(const Mdouble xMin, const Mdouble yMin, const Mdouble zMin)
 {
-    setMin(Vec3D(xMin, yMin, zMin));
+setMin(Vec3D(xMin, yMin, zMin));
 }
 
 /*!
- * \details
- * As in \ref setMax but the coordinates are passed as three Mdouble, not a Vec3D.
- */
+* \details
+* As in \ref setMax but the coordinates are passed as three Mdouble, not a Vec3D.
+*/
 void DPMBase::setMax(const Mdouble xMax, const Mdouble yMax, const Mdouble zMax)
 {
-    setMax(Vec3D(xMax, yMax, zMax));
+setMax(Vec3D(xMax, yMax, zMax));
 }
 
 /*!
- * \details
- * An access function which allows the user to alter the value of the (private) x value of the "Vec3D"
- * object "max_", thus setting the maximum x-value corresponding to the system, i.e. the upper limit of the domain in
- * the x-direction.
- * \n \n
- * These bounds are used for display, plotting and statistics purposes. They do not affect the
- * dynamics.
- * \n \n
- * The function also performs a sanity check to stop the user defining an upper bound that
- * is lower than the corresponding lower bound (XMin), giving a (logged) warning if the user attempts to do so.
- * \param[in] newXMax
- */
+* \details
+* An access function which allows the user to alter the value of the (private) x value of the "Vec3D"
+* object "max_", thus setting the maximum x-value corresponding to the system, i.e. the upper limit of the domain in
+* the x-direction.
+* \n \n
+* These bounds are used for display, plotting and statistics purposes. They do not affect the
+* dynamics.
+* \n \n
+* The function also performs a sanity check to stop the user defining an upper bound that
+* is lower than the corresponding lower bound (XMin), giving a (logged) warning if the user attempts to do so.
+* \param[in] newXMax
+*/
 void DPMBase::setXMax(Mdouble newXMax)
 {
 
-    if (newXMax >= getXMin())
-    {
-        max_.x() = newXMax;
-    }
-    else
-    {
-        logger(WARN, "Warning in setXMax(%): xMax=%", newXMax, getXMin());
-    }
+if (newXMax >= getXMin())
+{
+max_.x() = newXMax;
+}
+else
+{
+logger(WARN, "Warning in setXMax(%): xMax=%", newXMax, getXMin());
+}
 
 }
 
 /*!
- * An access function which allows the user to alter the value of the (private) y value of the "Vec3D"
- * object "max_", thus setting the maximum y-value corresponding to the system, i.e. the upper limit of the domain in
- * the y-direction.
- * \n \n
- * These bounds are used for display, plotting and statistics purposes. They do not affect the
- * dynamics.
- * \n \n
- * The function also performs a sanity check to stop the user defining an upper bound that
- * is lower than the corresponding lower bound (YMin), giving a (logged) warning if the user attempts to do so.
- * \param[in] newYMax
- */
+* An access function which allows the user to alter the value of the (private) y value of the "Vec3D"
+* object "max_", thus setting the maximum y-value corresponding to the system, i.e. the upper limit of the domain in
+* the y-direction.
+* \n \n
+* These bounds are used for display, plotting and statistics purposes. They do not affect the
+* dynamics.
+* \n \n
+* The function also performs a sanity check to stop the user defining an upper bound that
+* is lower than the corresponding lower bound (YMin), giving a (logged) warning if the user attempts to do so.
+* \param[in] newYMax
+*/
 void DPMBase::setYMax(Mdouble newYMax)
 {
 
-    if (newYMax >= getYMin())
-    {
-        max_.y() = newYMax;
-    }
-    else
-    {
-        logger(WARN, "Warning in setYMax(%): yMax=%", newYMax, getYMin());
-    }
+if (newYMax >= getYMin())
+{
+max_.y() = newYMax;
+}
+else
+{
+logger(WARN, "Warning in setYMax(%): yMax=%", newYMax, getYMin());
+}
 
 }
 
 /*!
- * \details An access function which allows the user to alter the value of the (private) z value of the "Vec3D"
- * object "max_", thus setting the maximum z-value corresponding to the system, i.e. the upper limit of the domain in
- * the z-direction.
- * \n \n
- * These bounds are used for display, plotting and statistics purposes. They do not affect the
- * dynamics.
- * \n \n
- * The function also performs a sanity check to stop the user defining an upper bound that
- * is lower than the corresponding lower bound (ZMin), giving a (logged) warning if the user attempts to do so.
- * \param[in] newZMax
- */
+* \details An access function which allows the user to alter the value of the (private) z value of the "Vec3D"
+* object "max_", thus setting the maximum z-value corresponding to the system, i.e. the upper limit of the domain in
+* the z-direction.
+* \n \n
+* These bounds are used for display, plotting and statistics purposes. They do not affect the
+* dynamics.
+* \n \n
+* The function also performs a sanity check to stop the user defining an upper bound that
+* is lower than the corresponding lower bound (ZMin), giving a (logged) warning if the user attempts to do so.
+* \param[in] newZMax
+*/
 void DPMBase::setZMax(Mdouble newZMax)
 {
-    if (newZMax >= getZMin())
-    {
-        max_.z() = newZMax;
-    }
-    else
-    {
-        logger(WARN, "Warning in setZMax(%): zMax=%", newZMax, getZMin());
-    }
+if (newZMax >= getZMin())
+{
+max_.z() = newZMax;
+}
+else
+{
+logger(WARN, "Warning in setZMax(%): zMax=%", newZMax, getZMin());
+}
 }
 
 /*!
- * \details A sanity check is performed to ensure that the time step must be positive.
- * \param[in] timeStep
- * The (Mdouble) value of the desired new time step
- */
+* \details A sanity check is performed to ensure that the time step must be positive.
+* \param[in] timeStep
+* The (Mdouble) value of the desired new time step
+*/
 void DPMBase::setTimeStep(Mdouble timeStep)
 {
-    if (timeStep > 0.0)
-    {
-        timeStep_ = timeStep;
-    }
-    else
-    {
-        logger(ERROR, "Error in setTimeStep: new timeStep % is not positive", timeStep);
-    }
+if (timeStep > 0.0)
+{
+timeStep_ = timeStep;
+}
+else
+{
+logger(ERROR, "Error in setTimeStep: new timeStep % is not positive", timeStep);
+}
 }
 
 /*!
- * \return timeStep_
- * The current (Mdouble) value of the simulation time step.
- */
+* \return timeStep_
+* The current (Mdouble) value of the simulation time step.
+*/
 Mdouble DPMBase::getTimeStep() const
 {
-    return timeStep_;
+return timeStep_;
 }
 
 
 /* Allows user to set the number of omp threads */
 void DPMBase::setNumberOfOMPThreads(int numberOfOMPThreads)
 {
-    logger.assert_always(numberOfOMPThreads > 0, "Number of OMP threads must be positive");
-    numberOfOMPThreads_ = numberOfOMPThreads;
+logger.assert_always(numberOfOMPThreads > 0, "Number of OMP threads must be positive");
+numberOfOMPThreads_ = numberOfOMPThreads;
 
 #ifdef MERCURY_USE_OMP
-    if(numberOfOMPThreads > omp_get_max_threads()) {
-        logger(INFO, "Number of omp threads set to the maximum number of threads allowed: %",
-               omp_get_max_threads());
-        numberOfOMPThreads_ = numberOfOMPThreads = omp_get_max_threads();
-    }
+if(numberOfOMPThreads > omp_get_max_threads()) {
+logger(INFO, "Number of omp threads set to the maximum number of threads allowed: %",
+       omp_get_max_threads());
+numberOfOMPThreads_ = numberOfOMPThreads = omp_get_max_threads();
+}
 #pragma omp parallel num_threads(getNumberOfOMPThreads())
-    {
-        if (omp_get_thread_num()==0)
-            logger(INFO, "Using % of % omp threads; testing thread",
-                   omp_get_num_threads(), omp_get_max_threads(), Flusher::NO_FLUSH);
-    }
+{
+if (omp_get_thread_num()==0)
+    logger(INFO, "Using % of % omp threads; testing thread",
+	   omp_get_num_threads(), omp_get_max_threads(), Flusher::NO_FLUSH);
+}
 #pragma omp parallel num_threads(getNumberOfOMPThreads())
-    {
-        logger(INFO, " %", omp_get_thread_num(), Flusher::NO_FLUSH);
+{
+        logger(INFO, " %", std::to_string(omp_get_thread_num()), Flusher::NO_FLUSH);
     }
     logger(INFO,"");
 
@@ -2640,7 +2642,6 @@ bool DPMBase::readNextDataFile(unsigned int format)
         dataFile.getFstream() >> doubleN;
         N = doubleN;
     }
-
     //store the parameters you want to preserve:
     const size_t nHistory = std::min(N,particleHandler.getSize());
     std::vector<const ParticleSpecies*> species(nHistory);
@@ -3069,7 +3070,7 @@ void DPMBase::computeInternalForce(BaseParticle* const P1, BaseParticle* const P
 }
 
 /*!
- * \todo take out computeWalls() from compute External Forces method.
+ * By default we have gravity and background drag as the external forces
  * \param[in] CI The BaseParticle object to which the relevant external forces are applied.
  */
 void DPMBase::computeExternalForces(BaseParticle* CI)
@@ -3079,7 +3080,7 @@ void DPMBase::computeExternalForces(BaseParticle* CI)
     if (!CI->isFixed())
     {
         // Applying the force due to gravity (F = m.g)
-        CI->addForce(getGravity() * CI->getMass());
+        CI->addForce(getGravity() * CI->getMass()-getBackgroundDrag()*CI->getVelocity());
         // Still calls this in compute External Forces.
         // computeForcesDueToWalls(CI);
     }
@@ -3319,7 +3320,7 @@ void DPMBase::computeAllForces()
     
     // for omp simulations, reset the newObjects_ variable (used for reduction)
     interactionHandler.resetNewObjectsOMP();
-
+    
     // compute all internal and external forces; for omp simulations, this can be done in parallel
     #pragma omp parallel num_threads(getNumberOfOMPThreads())
     {
@@ -3336,14 +3337,14 @@ void DPMBase::computeAllForces()
             // body forces
             computeExternalForces(p);
         }
-
+        
         // wall-forces
         #pragma omp for schedule(dynamic)
         for (int k = 0; k < wallHandler.getSize(); k++) {
             BaseWall *w = wallHandler.getObject(k);
             computeWallForces(w);
         }
-
+        
     }
 
     #ifdef Mercury_TRIANGLE_WALL_CORRECTION
@@ -3483,7 +3484,8 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
        << " timeMax " << getTimeMax() << '\n'
        << "systemDimensions " << getSystemDimensions()
        << " particleDimensions " << getParticleDimensions()
-       << " gravity " << getGravity();
+       << " gravity " << getGravity()
+       << " backgroundDrag " <<getBackgroundDrag();
     os << " writeVTK " << writeParticlesVTK_
         << " " << writeWallsVTK_
         << " " << interactionHandler.getWriteVTK()
@@ -3675,8 +3677,8 @@ void DPMBase::read(std::istream& is, ReadOptions opt)
             helpers::getLineFromStringStream(is, line);
             line >> dummy >> systemDimensions_
                  >> dummy >> particleDimensions_
-                 >> dummy >> gravity_;
-
+                 >> dummy >> gravity_
+                 >> dummy >> backgroundDrag_;
             line >> dummy;
             if (!dummy.compare("writeVTK"))
             {
