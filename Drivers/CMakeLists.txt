@@ -30,6 +30,8 @@ add_subdirectory(SimpleDrum)
 add_subdirectory(Calibration)
 add_subdirectory(TriangleWalls)
 add_subdirectory(Oomph)
+add_subdirectory(SimpleOpt)
+
 
 #IFCD: If you want (a folder of) the USER directory to be built, mark it so in your ccmake or cmake-gui
 
