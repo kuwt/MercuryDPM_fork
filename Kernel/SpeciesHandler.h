@@ -82,6 +82,9 @@ public:
     /// \brief Returns a pointer to the vector of all mixed objects.
     const std::vector<BaseSpecies*>& getMixedObjects() const;
     
+    /// \brief Updates the mixed species.
+    void updateMixedObjects();
+    
     /// \brief Write all the species and mixed species to an output stream.
     virtual void write(std::ostream& os) const;
     

@@ -843,6 +843,27 @@ BaseSpecies* SpeciesHandler::getMixedObject(const unsigned int id1, const unsign
 }
 
 /*!
+ * \details Updates mixed species by calling the function mixAll() with the
+ * corresponding original species.
+ * \sa mixAll(Object1, Object2) which creates sensible default values for mixed species based on the two species.
+ * Remember mixedSpecies properties can be set independently if required.
+ *
+ * This may (should) be called, if a value is changed
+ * in the original species and the mixed species need to be aware of this change and update by the default rule.
+ * Note this only make sense if you are using the default mixed species and not a custom implementation.
+ */
+void SpeciesHandler::updateMixedObjects()
+{
+    for (unsigned int index1 = 0; index1 < getNumberOfObjects(); ++index1)
+    {
+        for (unsigned int index2 = index1+1; index2 < getNumberOfObjects(); ++index2)
+        {
+            mixedObjects_[getMixedId(index1, index2)]->mixAll(getObject(index1), getObject(index2));
+        }
+    }
+}
+
+/*!
  * \param[in] S A pointer to the ParticleSpecies that has to be added.
  * \details First, add the ParticleSpecies to the vector of ParticleSpecies (object_), 
  * then construct all MixedSpecies. Tell the ParticleSpecies that this is its 
