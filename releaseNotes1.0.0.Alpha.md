@@ -58,10 +58,6 @@ The following functions changed their name (the line starting with - is the old 
 
 ```diff 
 - DPMBase::broadPhase(BaseParticle* i)
-- DPMBase::computeInternalForces(BaseParticle* i)
-+ DPMBase::computeInternalForces(BaseParticle*)
-- DPMBase::computeInternalForces(BaseParticle* P1, BaseParticle* P2)
-+ DPMBase::computeInternalForce(BaseParticle*, BaseParticle*)
 ```
 
 ```diff
@@ -89,31 +85,35 @@ The following functions changed their name (the line starting with - is the old 
 + BaseClusterInsertionBoundary::setGeometry(Vec3D posMin, Vec3D posMax)
 ``` 
  
-```diff 
-- ChuteInsertionBoundary::set(std::vector BaseParticle*> particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, double radMin, double radMax, double fixedParticleRadius, double inflowVelocity, doubleinflowVelocityVariance)
-+ ChuteInsertionBoundary::set(std::vector<BaseParticle*> particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, double fixedParticleRadius, double inflowVelocity, doubleinflowVelocityVariance)
-+ ChuteInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, double fixedParticleRadius, double inflowVelocity, double inflowVelocityVariance)
-```
+>Added the possibility for ChuteInsertionBoundary to add a vector of particles, allowing for multiple species in a single InsertionBoundary.
+> geometry independent parameters (```radMin```, ```radMax```) moved from ChuteInsertionBoundary to the base class InsertionBoundary.
+>```diff 
+>- ChuteInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, double radMin, double radMax, double fixedParticleRadius, double inflowVelocity, doubleinflowVelocityVariance)
+>+ ChuteInsertionBoundary::set(std::vector<BaseParticle*> particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, double fixedParticleRadius, double inflowVelocity, doubleinflowVelocityVariance)
+>+ ChuteInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, double fixedParticleRadius, double inflowVelocity, double inflowVelocityVariance)
+>```
 
-```diff
-- HopperInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, double yMin, double yMax, double radMin, double radMax, double chuteAngle, double fixedParticleRadius, bool isHopperCentred_, int hopperDim, double hopperAngle, double hopperLength, double hopperExitLength, double hopperHeight, double lift, double fillPercent)
-+ HopperInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, double yMin, double yMax, double chuteAngle, double fixedParticleRadius, bool isHopperCentred_, int hopperDim, double hopperAngle, double hopperLength, double hopperExitLength, double hopperHeight, double lift, double fillPercent)
-+ HopperInsertionBoundary::set(std::vector<BaseParticle*> particleToCopy, unsigned int maxFailed, double yMin, double yMax, double chuteAngle, double fixedParticleRadius, bool isHopperCentred_, int hopperDim, double hopperAngle, double hopperLength, double hopperExitLength, double hopperHeight, double lift, double fillPercent) 
-```
+>Added the possibility for HopperInsertionBoundary to add a vector of particles, allowing for multiple species in a single InsertionBoundary.
+> geometry independent parameters (```radMin```, ```radMax```) moved from HopperInsertionBoundary to the base class InsertionBoundary.
+>```diff
+>- HopperInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, double yMin, double yMax, double radMin, double radMax, double chuteAngle, double fixedParticleRadius, bool isHopperCentred_, int hopperDim, double hopperAngle, double hopperLength, double hopperExitLength, double hopperHeight, double lift, double fillPercent)
+>+ HopperInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, double yMin, double yMax, double chuteAngle, double fixedParticleRadius, bool isHopperCentred_, int hopperDim, double hopperAngle, double hopperLength, double hopperExitLength, double hopperHeight, double lift, double fillPercent)
+>+ HopperInsertionBoundary::set(std::vector<BaseParticle*> particleToCopy, unsigned int maxFailed, double yMin, double yMax, double chuteAngle, double fixedParticleRadius, bool isHopperCentred_, int hopperDim, double hopperAngle, double hopperLength, double hopperExitLength, double hopperHeight, double lift, double fillPercent) 
+>```
  
-```diff 
-- RandomClusterInsertionBoundary::set(BaseParticle *particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax, Mdouble radMin, Mdouble radMax, Mdouble rMicroParticle)
-+ RandomClusterInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax, Mdouble rMicroParticle)
-- RandomClusterInsertionBoundary::set(BaseParticle &particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax, Mdouble radMin, Mdouble radMax, Mdouble rMicroParticle)
-+ RandomClusterInsertionBoundary::set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin,Vec3D posMax, Vec3D velMin, Vec3D velMax, Mdouble rMicroParticle)
-```
-
-```diff 
-- RandomClusterInsertionBoundary::set(BaseParticle *particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax, Mdouble radMin, Mdouble radMax)
-+ RandomClusterInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax)
-- RandomClusterInsertionBoundary::set(BaseParticle &particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax, Mdouble radMin, Mdouble radMax)
-+ RandomClusterInsertionBoundary::set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin,Vec3D posMax, unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax)
-```
+> geometry independent parameters (```radMin```, ```radMax```) moved from RandomClusterInsertionBoundary to the base class InsertionBoundary.
+>```diff 
+>- RandomClusterInsertionBoundary::set(BaseParticle *particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax, Mdouble radMin, Mdouble radMax, Mdouble rMicroParticle)
+>+ RandomClusterInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax, Mdouble rMicroParticle)
+>- RandomClusterInsertionBoundary::set(BaseParticle &particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax, Mdouble radMin, Mdouble radMax, Mdouble rMicroParticle)
+>+ RandomClusterInsertionBoundary::set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin,Vec3D posMax, Vec3D velMin, Vec3D velMax, Mdouble rMicroParticle)
+>```
+>```diff 
+>- RandomClusterInsertionBoundary::set(BaseParticle *particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax, Mdouble radMin, Mdouble radMax)
+>+ RandomClusterInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax)
+>- RandomClusterInsertionBoundary::set(BaseParticle &particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax, Mdouble radMin, Mdouble radMax)
+>+ RandomClusterInsertionBoundary::set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin,Vec3D posMax, unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax)
+>```
 
 --- 
  
@@ -358,9 +358,9 @@ SelfTests/Boundaries/DeletionBoundarySelfTest.cpp*
 
  - added a new SelfTest to test the new nozzle feature
  
-*Demos/IndustrialMixers/NozzleDemo.cpp*
+*Demos/IndustrialMixers/SprayNozzleDemo.cpp*
 
- - added a new demo to showcase the new nozzle feature 
+ - added a new demo to showcase the new liquid drop insertion feature 
  
 *SelfTests/Boundaries/DistributionToPSDSelfTest.cpp*
 
@@ -389,6 +389,14 @@ SelfTests/Boundaries/DeletionBoundarySelfTest.cpp*
 --- 
  
 ## BUG FIXES
+
+#### <u>Major fixes</u>
+
+*Kernel/BaseWall*
+
+ - fixed a bug in ```BaseWall::getInteractionWith``` where particle-wall contact detection was not smooth when transitioning e.g. over a point where two TriangleWall faces touch. Now we keep only the biggest of the overlapping contacts 
+ 
+#### <u>Minor fixes</u>
  
 *CMakeModules/MercuryCppFeatureCheck.cmake*
 
@@ -498,6 +506,10 @@ SelfTests/Boundaries/DeletionBoundarySelfTest.cpp*
 
    - moved computation of the ```interactionRadius``` from the get to the set function. Therefore, two new variables where added:  ```BaseSpecies::interactionRadius``` and ```Species::maxInteractionRadius```
 
+*MATLAB/
+
+ - all scripts are tested and work in *GNU Octave*
+
 *MATLAB/LoadStatistics.m*
 
  - reworked and moved this file which loads Mercury output files into MATLAB
@@ -528,10 +540,6 @@ SelfTests/Boundaries/DeletionBoundarySelfTest.cpp*
 
  - optimized Trianglewall contact detection. In the past there where issues with distinguishing edge and vertex contacts 
 
-*Kernel/BaseWall*
-
- - fixed a bug in ```BaseWall::getInteractionWith``` where particle-wall contact detection was not smooth when transitioning e.g. over a point where two TriangleWall faces touch. Now we keep only the biggest of the overlapping contacts
-
 *Kernel/Interactions/FrictionForceInteractions/MindlinRollingTorsionInteraction.cc*
 
  - corrected MindlinRollingTorsionInteraction. ```rollingRelativeVelocity``` is now computed using the radius instead of the diameter
@@ -550,7 +558,7 @@ SelfTests/Boundaries/DeletionBoundarySelfTest.cpp*
 
 *Configuration/Mastermake.cmake*
 
- - added a maximum test time (timeout) of 80 seconds for SelfTests and UnitTests such that tests will complete even if one does not succeed
+ - added a maximum test time (timeout) of 80 seconds for SelfTests and UnitTests such that tests will complete even if one hangs
 
 *Kernel/HGrid*
 
@@ -576,7 +584,7 @@ SelfTests/Boundaries/DeletionBoundarySelfTest.cpp*
 
  - developers are highly encouraged to use the ```logger()``` function instead of ```std::cout()``` or ```std::cerr()```
 
- - logger outout can now be formatted to a certain width and precision. e.g. ```logger(INFO, "%10.12", normalForce```) will add the normal force with a precision of 10 decimal places and a width of 12.
+ - logger output can now be formatted to a certain width and precision. e.g. ```logger(INFO, "%10.12", normalForce```) will add the normal force with a precision of 10 decimal places and a width of 12.
 
  - the output of a message with a certain width is now by standard left-aligned. 
 
@@ -679,8 +687,10 @@ SelfTests/Boundaries/DeletionBoundarySelfTest.cpp*
 **17. Added a new TimeDependentPeriodicBoundary class which is able to create a boundary with Lees-Edwards type periodic boundary conditions.**
 
  - a TimeDependentPeriodicBoundary is like a PeriodicBoundary, but when a particle crosses an edge it is shifted, copied and given a boost.
+ 
+ - See also LeesEdwardsBoundary where particles are only shifted and not copied and given a boost.
 
- - this type sof boundary is useful for studying shear flows.
+ - this type of boundary is useful for studying shear flows.
  
 **18. Added a soft stop feature to the Kernel.**
 
@@ -736,7 +746,7 @@ SelfTests/Boundaries/DeletionBoundarySelfTest.cpp*
 
 *Kernel/Logger*
 
- - added color to logger errors in MPI
+ - added colour to logger errors in MPI
 
 *Kernel/Math/Matrix*
 
@@ -808,7 +818,7 @@ SelfTests/Boundaries/DeletionBoundarySelfTest.cpp*
 
  - added function ```insertParticles```, that lets you insert particles once, without adding the boundary to the handler
 
- - added variables ```initialVolume_``` and ```volumeFlowRate_``` that let's you set a initial volume and a constant flow rate for insertion
+ - added functions ```setInitialVolume(Mdouble initialVolume)```, ```getInitialVolume()``` and ```setVolumeFlowRate_(Mdouble volumeFlowRate)```, ```getVolumeFlowRate_()``` that let's you set an initial volume and a constant flow rate for insertion
 
  - added function ```setVariableVolumeFlowRate```, that lets you define a variable flow rate
 
@@ -860,7 +870,7 @@ SelfTests/Boundaries/DeletionBoundarySelfTest.cpp*
 
 *Tools/CombineParallelDataFiles.cpp*
 
- - added to create single data file from parallel data files
+ - added to create single data file from all data files created by each process when run in parallel
 
 *Tools/CombineParallelOutFiles.py*
 
@@ -872,7 +882,7 @@ SelfTests/Boundaries/DeletionBoundarySelfTest.cpp*
 
 *Kernel/Mercury3D*
 
- - dded distance check in ```Mercury3D:hGridFindContactsWithTargetCell()``` which greatly speeds up simulations
+ - added distance check in ```Mercury3D:hGridFindContactsWithTargetCell()``` which greatly speeds up simulations
 
 *Kernel/GeneralDefine*
 
