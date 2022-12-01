@@ -1,0 +1,25 @@
+# Material parameters
+species LinearPlasticViscoelasticFrictionReversibleAdhesiveSpecies
+d50 50e-6
+psd cumulative volume diameter
+0.1 0.0
+0.1 0.2
+0.3 0.4
+0.5 0.6
+0.7 0.8
+0.9 1.0
+restitutionCoefficient 0.3
+collisionTime 0.000067997
+stiffness 1.34e9
+froudenumber 1.7e-4
+normalstress 1512 1 2 3 4 5
+rollingFriction 0.3
+unloadingStiffnesRatio 120
+cohesionStiffnesRatio 0.5
+# Parameters to be calibrated (names and ranges)
+slidingFriction 0.2 0.8
+bondNumber 1e6 5e6
+density 300 1300
+# Experimental data to be tested (name, values and weights)
+CalibrationDrum 46.1 1
+CalibrationShearCell 1200 0.7 1000 0.7 800 0.7 600 0.7 400 0.7 200 0.7 362 0.7 368 0.3 372 0.3 373 0.3 367 0.3 377 0.3

@@ -6,7 +6,6 @@ add_subdirectory(GranularJet)
 add_subdirectory(Avalanching)
 add_subdirectory(CartesianShearCell)
 add_subdirectory(Segregation)
-
 add_subdirectory(UnitTests)
 add_subdirectory(MultiParticle)
 add_subdirectory(MercurySimpleDemos)

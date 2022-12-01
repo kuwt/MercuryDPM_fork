@@ -1,0 +1,105 @@
+#!/usr/bin/python3
+
+# This is the cloud wrapper script. Here we gather all the flags we get from the cloud interface and write them into
+# a .txt file (here "calibrateMaterialAWS.txt").
+
+import argparse, sys, subprocess
+import os
+
+parser = argparse.ArgumentParser()
+
+# Default cloud interface arguments. 
+parser.add_argument('-name')  # Output file name.
+
+# Input
+parser.add_argument(
+    '-psd')  # PSD (input: space separated array/string with order: size percentage size percentage size percentage etc.)
+parser.add_argument('-d50')  # d50 [m]
+parser.add_argument('-k1')  # stiffness [m]
+parser.add_argument('-density')  # density [kg/m^3]
+parser.add_argument('-cor')  # restitution coefficient
+parser.add_argument('-k2k1')  # k2/k1
+parser.add_argument('-kck1')  # kc/k1
+parser.add_argument('-rf')  # rolling friction
+parser.add_argument('-cs')  # confining stress (input: pre-shear stress + 5 pre-shear stresses)
+parser.add_argument('-Fr')  # Froude number (Fr = R*v^2/g)
+
+# Calibrate
+parser.add_argument('-sf')  # sliding friction
+parser.add_argument('-Bo')  # Bond number (F_adh/(rho_p*g*h/d50^2))
+parser.add_argument('-particleDensity')  # particle density [kg/m^3]
+
+# Target
+parser.add_argument('-aor')  # angle of repose
+parser.add_argument('-aor_w')  # angle of repose weight
+parser.add_argument(
+    '-iss')  # incipient shear stress (input: pre-shear incipient shear stress + 5 incipient shear stresses)
+parser.add_argument('-iss_w')  # incipient shear stress weight
+parser.add_argument('-bulkDensity')  # bulk density (input: pre-shear bulk density + 5 bulk densities)
+parser.add_argument('-bulkDensity_w')  # bulk density weight
+
+args = parser.parse_args()
+
+# Input ########################################################
+print('Reading input...')
+
+# Write psd to psd.txt. 
+if os.path.exists("calibrateMaterialAWS.txt"):
+    os.remove("calibrateMaterialAWS.txt")
+f = open("calibrateMaterialAWS.txt", "w")
+f.write("# Material parameters\n"
+        "species LinearPlasticViscoelasticFrictionReversibleAdhesiveSpecies\n"
+        "d50 " + args.d50 + "\n"
+        "psd cumulative volume diameter\n")
+psds = args.psd.split()
+i = 0
+while i < len(psds):
+    f.write("%s %s\n" % (psds[i], psds[i + 1]))
+    i = i + 2
+
+f.write("restitutionCoefficient " + args.cor + "\n"
+        "collisionTime 0.000067997\n"                                       
+        "stiffness " + args.k1 + "\n"
+        "froudenumber " + args.Fr + "\n"
+        "normalstress " + args.cs + "\n"
+        "rollingFriction " + args.rf + "\n"
+        "unloadingStiffnesRatio " + args.k2k1 + "\n"
+        "cohesionStiffnesRatio " + args.kck1 + "\n"
+        "# Parameters to be calibrated (names and ranges)\n"
+        "slidingFriction " + args.sf + "\n"
+        "bondNumber " + args.Bo + "\n"
+        "density " + args.particleDensity + "\n"
+        "# Experimental data to be tested (name, values and weights)\n"
+        "CalibrationDrum " + args.aor + " " + args.aor_w + "\n")
+
+(iss_pre, iss_1, iss_2, iss_3, iss_4, iss_5) = args.iss.split()
+(bulkDensity_pre, bulkDensity_1, bulkDensity_2, bulkDensity_3, bulkDensity_4, bulkDensity_5) = args.bulkDensity.split()
+
+f.write("CalibrationShearCell " + iss_pre + " " + args.iss_w + " " + iss_1 + " " + args.iss_w + " " + iss_2 + " " + \
+        args.iss_w + " " + iss_3 + " " + args.iss_w + " " + iss_4 + " " + args.iss_w + " " + iss_5 + " " + args.iss_w + " " + \
+        bulkDensity_pre + " " + args.iss_w + " " + bulkDensity_1 + " " + args.bulkDensity_w + " " + bulkDensity_2 \
+        + " " + args.bulkDensity_w + " " + bulkDensity_3 + " " + args.bulkDensity_w + " " + bulkDensity_4 + " " + \
+        args.bulkDensity_w + " " + bulkDensity_5 + " " + args.bulkDensity_w)
+
+# print('Read incipient shear stress (-iss) as ' + args.iss)
+# (iss_pre, iss_1, iss_2, iss_3, iss_4, iss_5) = args.iss.split()
+# print(f'The incipient shear stresses are {iss_pre}, {iss_1}, {iss_2}, {iss_3}, {iss_4} and {iss_5}')
+# print('Read incipient shear stress weight (-iss_w) as ' + args.iss_w)
+#
+# print('Read bulk density (-bulkDensity) as ' + args.bulkDensity)
+# (bulkDensity_pre, bulkDensity_1, bulkDensity_2, bulkDensity_3, bulkDensity_4, bulkDensity_5) = args.bulkDensity.split()
+# print(f'The bulk densities are {bulkDensity_pre}, {bulkDensity_1}, {bulkDensity_2}, {bulkDensity_3}, {bulkDensity_4} and {bulkDensity_5}')
+# print('Read bulk density weight (-bulkDensity_w) as ' + args.bulkDensity_w)
+
+f.close()
+
+# It is good practise to flush the output messages before any child processes are called. 
+# This is because output messages are buffered when they are redirected (which is happening on AWS)
+# and this could cause output messages from different sources to be mixed. 
+sys.stdout.flush()
+
+# add parameters to this command as defined in calibrate.py. This is the command to start the calibration
+sim = subprocess.run(['./calibrate.py', '--material', 'Test_identity1', '--samples', '10', '--cores', '10',
+                      '--infrastructure', 'AWS', '--analysis'])
+if sim.returncode != 0:
+    sys.exit(sim.returncode)

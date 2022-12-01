@@ -1,0 +1,32 @@
+#!/usr/bin/python3
+
+# Run this script for test purposes. It has some random values which are used as arguments to simulate any material
+# and test the algorithm for the cloud.
+
+import subprocess
+
+subprocess.run(['./calibration_script_AWS',
+	'-psd', '0.1 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0',
+	'-d50', '50e-6', 
+	'-k1', '1.34e9', 
+	'-density', '900', 
+	'-cor', '0.3', 
+	'-k2k1', '120', 
+	'-kck1', '0.5', 
+	'-rf', '0.3', 
+	'-cs', '1512 1 2 3 4 5', 
+	'-Fr', '1.7e-4', 
+
+	'-sf', '0.2 0.8', 
+	'-Bo', '1e6 5e6', 
+	'-particleDensity', '300 1300', 
+
+	'-aor', '46.1', 
+	'-aor_w', '1', # min max set to 0 and 1 (is that oke? don't have to)
+	'-iss', '1200 1000 800 600 400 200',
+	'-iss_w', '0.7', # min max set to 0 and 1 (is that oke? don't have to)
+	'-bulkDensity', '362 368 372 373 367 377',
+	'-bulkDensity_w', '0.3', # min max set to 0 and 1 (is that oke? don't have to)
+
+	'-name', 'Calibration']) # Cloud interface will always add the name that the output files should start with (
+# ideally).

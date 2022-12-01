@@ -120,7 +120,7 @@ namespace Detail {
   template<>
   double round(double in) {
       //logger.assert_debug(fabs(in)>1e-33 or fabs(in)==0, "Detected underflow: corrected double value % to 0", in);
-      logger.assert_debug(isfinite(in), "Detected nans!");
+      logger.assert_debug(std::isfinite(in), "Detected nans!");
       return (fabs(in)<1e-33)?0.0:in;
   }
 

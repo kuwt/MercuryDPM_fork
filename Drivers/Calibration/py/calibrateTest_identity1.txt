@@ -1,0 +1,6 @@
+# Material parameters
+fit identity1
+# Parameters to be calibrated (names and ranges)
+param0 0 1
+# Experimental data to be tested (name, values and weights)
+CalibrationTest 0.5 1
