@@ -886,6 +886,7 @@ bool helpers::readFromCommandLine(int argc, char *argv[], std::string varName)
 
 std::vector<Mdouble> helpers::linspace(Mdouble Min, Mdouble Max, int numberOfBins)
 {
+    logger.assert_always(numberOfBins > 1, "The number of bins has to be greater than one");
     Mdouble dx = (Max - Min) / static_cast<Mdouble>(numberOfBins - 1);
     Mdouble val;
     std::vector<Mdouble> linearVector(numberOfBins);
