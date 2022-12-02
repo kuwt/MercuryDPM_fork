@@ -79,51 +79,28 @@ The following functions changed their name (the line starting with - is the old 
 - logger.assert()
 + logger.assert_debug()
 ``` 
- 
+
 ```diff 
 - BaseClusterInsertionBoundary::setGeometry(Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax)
 + BaseClusterInsertionBoundary::setGeometry(Vec3D posMin, Vec3D posMax)
 ``` 
- 
->Added the possibility for ChuteInsertionBoundary to add a vector of particles, allowing for multiple species in a single InsertionBoundary.
-> geometry independent parameters (```radMin```, ```radMax```) moved from ChuteInsertionBoundary to the base class InsertionBoundary.
->```diff 
->- ChuteInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, double radMin, double radMax, double fixedParticleRadius, double inflowVelocity, doubleinflowVelocityVariance)
->+ ChuteInsertionBoundary::set(std::vector<BaseParticle*> particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, double fixedParticleRadius, double inflowVelocity, doubleinflowVelocityVariance)
->+ ChuteInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, double fixedParticleRadius, double inflowVelocity, double inflowVelocityVariance)
->```
 
->Added the possibility for HopperInsertionBoundary to add a vector of particles, allowing for multiple species in a single InsertionBoundary.
-> geometry independent parameters (```radMin```, ```radMax```) moved from HopperInsertionBoundary to the base class InsertionBoundary.
->```diff
->- HopperInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, double yMin, double yMax, double radMin, double radMax, double chuteAngle, double fixedParticleRadius, bool isHopperCentred_, int hopperDim, double hopperAngle, double hopperLength, double hopperExitLength, double hopperHeight, double lift, double fillPercent)
->+ HopperInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, double yMin, double yMax, double chuteAngle, double fixedParticleRadius, bool isHopperCentred_, int hopperDim, double hopperAngle, double hopperLength, double hopperExitLength, double hopperHeight, double lift, double fillPercent)
->+ HopperInsertionBoundary::set(std::vector<BaseParticle*> particleToCopy, unsigned int maxFailed, double yMin, double yMax, double chuteAngle, double fixedParticleRadius, bool isHopperCentred_, int hopperDim, double hopperAngle, double hopperLength, double hopperExitLength, double hopperHeight, double lift, double fillPercent) 
->```
- 
-> geometry independent parameters (```radMin```, ```radMax```) moved from RandomClusterInsertionBoundary to the base class InsertionBoundary.
+> Distributions (uniform and normal distributions) have been moved to the PSD class
 >```diff 
->- RandomClusterInsertionBoundary::set(BaseParticle *particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax, Mdouble radMin, Mdouble radMax, Mdouble rMicroParticle)
->+ RandomClusterInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax, Mdouble rMicroParticle)
->- RandomClusterInsertionBoundary::set(BaseParticle &particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax, Mdouble radMin, Mdouble radMax, Mdouble rMicroParticle)
->+ RandomClusterInsertionBoundary::set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin,Vec3D posMax, Vec3D velMin, Vec3D velMax, Mdouble rMicroParticle)
->```
->```diff 
->- RandomClusterInsertionBoundary::set(BaseParticle *particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax, Mdouble radMin, Mdouble radMax)
->+ RandomClusterInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax)
->- RandomClusterInsertionBoundary::set(BaseParticle &particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax, Mdouble radMin, Mdouble radMax)
->+ RandomClusterInsertionBoundary::set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin,Vec3D posMax, unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax)
->```
+>- void setDistribution(Distribution distribution);
+>- Distribution getDistribution();
+>``` 
 
 --- 
- 
+
 ## KNOWN ISSUES
 
- - A MPISuperQuadric class which was originally planned to replace MPIParticles when SuperQuadrics are used was added. This class however is not fully functioning at the moment and is replaced by MPIParticle in the whole code for now.
- 
- - The Chute and Contraction directory are not up to date and will be resurrected in the future.
- 
- - OpenMP version of MercuryCG is not yet implemented.
+- A MPISuperQuadric class which was originally planned to replace MPIParticles when SuperQuadrics are used was added.
+  This class however is not fully functioning at the moment and is replaced by MPIParticle in the whole code for now.
+
+- The Chute and Contraction directory are not up to date and will be resurrected in the future.
+
+- OpenMP version of MercuryCG is not yet implemented.
 
 ---
 

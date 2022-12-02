@@ -94,11 +94,31 @@ void RandomClusterInsertionBoundary::set(BaseParticle* particleToCopy, unsigned 
 }
 
 void RandomClusterInsertionBoundary::set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin,
-                                         Vec3D posMax,
-                                         Vec3D velMin, Vec3D velMax, Mdouble rMicroParticle)
+                                         Vec3D posMax, Vec3D velMin, Vec3D velMax, Mdouble rMicroParticle)
 {
     set(&particleToCopy, maxFailed, posMin, posMax, velMin, velMax, rMicroParticle);
 }
+
+void
+RandomClusterInsertionBoundary::set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
+                                    Vec3D velMin, Vec3D velMax, Mdouble rMin, Mdouble rMax, Mdouble rMicroParticle)
+{
+    PSD uniformPSD;
+    uniformPSD.setDistributionUniform(rMin, rMax, 2);
+    setPSD(uniformPSD);
+    set(particleToCopy, maxFailed, posMin, posMax, velMin, velMax, rMicroParticle);
+}
+
+void
+RandomClusterInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
+                                    Vec3D velMin, Vec3D velMax, Mdouble rMin, Mdouble rMax, Mdouble rMicroParticle)
+{
+    PSD uniformPSD;
+    uniformPSD.setDistributionUniform(rMin, rMax, 2);
+    setPSD(uniformPSD);
+    set(particleToCopy, maxFailed, posMin, posMax, velMin, velMax, rMicroParticle);
+}
+
 
 /*!
  * \details Sets all the properties of the cuboidal insertion boundary.
@@ -118,10 +138,8 @@ void RandomClusterInsertionBoundary::set(BaseParticle& particleToCopy, unsigned 
  * Important: this function differs from the class above because gives the possiblity to set the number of particles
  *              instead of the radius of the micro particle.
  */
-
 void RandomClusterInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin,
-                                         Vec3D posMax,
-                                         unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax)
+                                         Vec3D posMax, unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax)
 {
     setParticleToCopy(particleToCopy);
     velMin_ = velMin;
@@ -133,17 +151,43 @@ void RandomClusterInsertionBoundary::set(BaseParticle* particleToCopy, unsigned 
 }
 
 void RandomClusterInsertionBoundary::set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin,
-                                         Vec3D posMax,
-                                         unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax)
+                                         Vec3D posMax, unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax)
 {
     set(&particleToCopy, maxFailed, posMin, posMax, nParticlesPerCluster, velMin, velMax);
 }
 
+/*!
+ * \details old style set function which also assumes a uniform psd. Note if you want a specific PSD do not use but
+ * this is quicker for a uniform in size PSD
+ */
+void RandomClusterInsertionBoundary::set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin,
+                                         Vec3D posMax, unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax,
+                                         Mdouble rMin, Mdouble rMax)
+{
+    PSD uniformPSD;
+    uniformPSD.setDistributionUniform(rMin, rMax, 2);
+    setPSD(uniformPSD);
+    set(particleToCopy, maxFailed, posMin, posMax, nParticlesPerCluster, velMin, velMax);
+}
+
+void RandomClusterInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin,
+                                         Vec3D posMax, unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax,
+                                         Mdouble rMin, Mdouble rMax)
+{
+    PSD uniformPSD;
+    uniformPSD.setDistributionUniform(rMin, rMax, 2);
+    setPSD(uniformPSD);
+    set(particleToCopy, maxFailed, posMin, posMax, nParticlesPerCluster, velMin, velMax);
+}
+
+
 void RandomClusterInsertionBoundary::setNumberOfParticlesPerCluster(unsigned int nParticlesPeCluster)
 {
     if (nParticlesPeCluster <= 0)
-        logger(ERROR, "The number of particles for a single cluster must be greater than zero. nParticlesPeCluster = %", nParticlesPeCluster);
-    else {
+        logger(ERROR, "The number of particles for a single cluster must be greater than zero. nParticlesPeCluster = %",
+               nParticlesPeCluster);
+    else
+    {
         nParticles_ = nParticlesPeCluster;
         setRadiusParticleAndNotNumberOfParticles_ = false;
     }
