@@ -120,7 +120,33 @@ void CubeInsertionBoundary::set(BaseParticle& particleToCopy, unsigned int maxFa
     set(&particleToCopy, maxFailed, posMin, posMax, velMin, velMax);
 }
 
+/*!
+ * \details old style set function which also assumes a uniform psd. Note if you want a specific PSD do not use but
+ * this is quicker for a uniform in size PSD
+ */
+void CubeInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
+                                Vec3D velMin, Vec3D velMax, Mdouble rMin, Mdouble rMax)
+{
+    PSD uniformPSD;
+    uniformPSD.setDistributionUniform(rMin, rMax, 2);
+    setPSD(uniformPSD);
+    set(particleToCopy, maxFailed, posMin, posMax, velMin, velMax);
+}
 
+void CubeInsertionBoundary::set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
+                                Vec3D velMin, Vec3D velMax, Mdouble rMin, Mdouble rMax)
+{
+    PSD uniformPSD;
+    uniformPSD.setDistributionUniform(rMin, rMax, 2);
+    setPSD(uniformPSD);
+    set(particleToCopy, maxFailed, posMin, posMax, velMin, velMax);
+}
+
+/*!
+ * \details set the geometry of the Cuboidal insertion boundary.
+ * \param[in] posMin            First defining corner of cuboidal insertion boundary
+ * \param[in] posMax            Second defining corner of cuboidal insertion boundary
+ */
 void CubeInsertionBoundary::setGeometry(Vec3D posMin, Vec3D posMax)
 {
     posMin_ = posMin;

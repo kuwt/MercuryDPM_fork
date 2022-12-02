@@ -63,9 +63,14 @@ public:
     /*!
      * \brief Sets all boundary properties at once.
      */
-    void
-    set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, double fixedParticleRadius,
-        double inflowVelocity, double inflowVelocityVariance);
+    void set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, double
+    fixedParticleRadius, double inflowVelocity, double inflowVelocityVariance);
+    
+    /*!
+     * \brief old style set function which assumes a uniform psd.
+     */
+    void set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Mdouble rMin,
+             Mdouble rMax, double fixedParticleRadius, double inflowVelocity, double inflowVelocityVariance);
     
     void placeParticle(BaseParticle* p, RNG& random) override;
     

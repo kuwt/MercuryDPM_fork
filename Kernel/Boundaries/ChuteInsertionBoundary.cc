@@ -133,6 +133,21 @@ void ChuteInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxF
 }
 
 /*!
+ * \details old style set function which also assumes a uniform psd. Note if you want a specific PSD do not use but
+ * this is quicker for a uniform in size PSD
+ */
+void ChuteInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
+                                 Mdouble rMin, Mdouble rMax, double fixedParticleRadius, double inflowVelocity,
+                                 double inflowVelocityVariance)
+{
+    PSD uniformPSD;
+    uniformPSD.setDistributionUniform(rMin, rMax, 2);
+    setPSD(uniformPSD);
+    set(particleToCopy, maxFailed, posMin, posMax, fixedParticleRadius, inflowVelocity, inflowVelocityVariance);
+}
+
+
+/*!
  * \details place a particle within the boundary with random radius, position
  * and velocity (within the allowed intervals). 
  * Notable properties:
@@ -211,4 +226,3 @@ std::string ChuteInsertionBoundary::getName() const
 {
     return "ChuteInsertionBoundary";
 }
-

@@ -70,6 +70,18 @@ public:
              Vec3D velMin, Vec3D velMax, Mdouble rMicroParticle);
     
     /*!
+     * \brief old style set function which assumes a uniform psd.
+     */
+    void set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
+             Vec3D velMin, Vec3D velMax, Mdouble rMin, Mdouble rMax, Mdouble rMicroParticle);
+    
+    /*!
+     * \brief old style set function which assumes a uniform psd.
+     */
+    void set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
+             Vec3D velMin, Vec3D velMax, Mdouble rMin, Mdouble rMax, Mdouble rMicroParticle);
+    
+    /*!
      * \brief Sets the properties of the ClusterInsertionBoundary
      */
     void set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
@@ -77,6 +89,18 @@ public:
     
     void set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
              unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax);
+    
+    /*!
+     * \brief old style set function which assumes a uniform psd.
+     */
+    void set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
+             unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax, Mdouble rMin, Mdouble rMax);
+    
+    /*!
+     * \brief old style set function which assumes a uniform psd.
+     */
+    void set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax,
+             unsigned int nParticlesPerCluster, Vec3D velMin, Vec3D velMax, Mdouble rMin, Mdouble rMax);
     
     //!\brief sets the number of particles per cluster
     void setNumberOfParticlesPerCluster(unsigned int nParticlesPeCluster);
