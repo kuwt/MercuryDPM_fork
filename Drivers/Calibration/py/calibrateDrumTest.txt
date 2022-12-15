@@ -1,0 +1,19 @@
+# Material parameters
+species LinearViscoelasticFrictionReversibleAdhesiveSpecies
+density 1500
+psd cumulative volume diameter
+1.6e-3 0
+2e-3 1
+collisionTime 0.0005
+restitutionCoefficient 0.8
+output
+bond 0
+revolutions 1
+relDrumRadius 15
+relDrumWidth 4.5
+froude 0.06
+fillFraction 0.25
+# Parameters to be calibrated (names and ranges)
+slidingFriction 0 1
+# Experimental data to be tested (name, values and weights)
+CalibrationDrum 25 1

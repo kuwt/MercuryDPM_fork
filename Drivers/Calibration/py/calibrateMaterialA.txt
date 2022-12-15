@@ -1,0 +1,18 @@
+# Material parameters
+species LinearViscoelasticFrictionReversibleAdhesiveSpecies
+density 1500
+psd cumulative volume diameter
+1e-5 0
+1e-5 0.5
+2e-5 0.5
+2e-5 1
+collisionTime 0.000067997
+torsionFriction 0
+normalStress 1000 800 600 400 200
+# Parameters to be calibrated (names and ranges)
+restitutionCoefficient    0.5 1
+slidingFriction           0   1
+rollingFriction           0   1
+bondNumber                0   1
+# Experimental data to be tested (name, values and weights)
+CalibrationHeap 29.725 1

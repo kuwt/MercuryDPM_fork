@@ -1,0 +1,49 @@
+#!/usr/bin/python3
+
+# This is the cloud wrapper script. Here we gather all the flags we get from the cloud interface and write them into
+# a .txt file (here "calibrateMaterialAWS.txt").
+
+import argparse, sys, subprocess
+import os
+
+parser = argparse.ArgumentParser()
+
+# Default cloud interface arguments. 
+parser.add_argument('-name')  # Output file name.
+
+# Input
+
+# Calibrate
+parser.add_argument('-param0Min')  # any minimum of a parameter
+parser.add_argument('-param0Max')  # any maximum of a parameter
+
+# Target
+parser.add_argument('-identity')  # output identity of any parameter
+parser.add_argument('-identity_w')  # output identity weight of any parameter
+
+args = parser.parse_args()
+
+# Input ########################################################
+print('Reading input...')
+
+# Write psd to psd.txt. 
+if os.path.exists("calibrateTest_identity1.txt"):
+    os.remove("calibrateTest_identity1.txt")
+with open("calibrateTest_identity1.txt", "w") as f:
+    f.write("# Material parameters\n"
+            "fit identity1\n"
+            "# Parameters to be calibrated (names and ranges)\n"
+            "param0 " + args.param0Min + " " + args.param0Max + "\n"
+            "# Experimental data to be tested (name, values and weights)\n"
+            "CalibrationTest " + args.identity + " " + args.identity_w + "\n")
+
+# It is good practise to flush the output messages before any child processes are called. 
+# This is because output messages are buffered when they are redirected (which is happening on AWS)
+# and this could cause output messages from different sources to be mixed. 
+sys.stdout.flush()
+
+# add parameters to this command as defined in calibrate.py. This is the command to start the calibration
+sim = subprocess.run(['./calibrate.py', '--material', 'Test_identity1', '--samples', '10', '--cores', '10',
+                      '--infrastructure', 'AWS', '--analysis'])
+if sim.returncode != 0:
+    sys.exit(sim.returncode)

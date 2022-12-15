@@ -1,5 +1,5 @@
 include(${CMAKE_SOURCE_DIR}/Configuration/MasterMake.cmake)
-
+set(CMAKE_CXX_STANDARD 17)
 
 #Part 1 : All cpp files will be made to exec files
 #########################################
@@ -16,3 +16,10 @@ foreach(CPPFILE ${CPPFILES})
 	#All cpp folder and linked against Chute
 	target_link_libraries(${EXECNAME}  MercuryBase)
 endforeach()
+
+
+
+#Calibration directory is in the source; this adds a link to the build, so the executables can be built
+if(NOT EXISTS build)
+  configure_file(py/build.in ${PROJECT_SOURCE_DIR}/Drivers/Calibration/py/build)
+endif()

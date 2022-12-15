@@ -107,7 +107,7 @@ std::string ParticleSpecies::getBaseName() const
  */
 void ParticleSpecies::setDensity(Mdouble density)
 {
-    logger.assert_always(density >= 0, "[ParticleSpecies::setDensity(%)] value cannot be negative", density);
+    logger.assert_always(density > 0, "[ParticleSpecies::setDensity(%)] value has to be positive", density);
     density_ = density;
     if (getHandler()) getHandler()->getDPMBase()->particleHandler.computeAllMasses(getIndex());
 }

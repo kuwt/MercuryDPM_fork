@@ -1,0 +1,84 @@
+#!/usr/bin/python3
+
+# This is the cloud wrapper script. Here we gather all the flags we get from the cloud interface and write them into
+# a .txt file (here "calibrateMaterialAWS.txt").
+
+import argparse, sys, subprocess
+import os
+
+parser = argparse.ArgumentParser()
+
+# Default cloud interface arguments. 
+parser.add_argument('-name')  # Output file name.
+
+# Input
+parser.add_argument(
+    '-psd')  # PSD (input: space separated array/string with order: size percentage size percentage size percentage etc.)
+parser.add_argument('-density')  # density [kg/m^3]
+parser.add_argument('-comin')  # cutOffMax
+parser.add_argument('-comax')  # cutOffMin
+parser.add_argument('-scaleup')
+parser.add_argument('-squeeze')
+parser.add_argument('-ct')  # collision time
+parser.add_argument('-tf')  # torsion friction
+
+# Calibrate
+parser.add_argument('-rc')  # restitution coefficient
+parser.add_argument('-sf')  # sliding friction
+parser.add_argument('-rf')  # rolling friction coefficient
+parser.add_argument('-bo')  # Bond number (F_adh/(rho_p*g*h/d50^2))
+
+# Target
+parser.add_argument('-aor')  # angle of repose
+parser.add_argument('-aor_w')  # angle of repose weight
+parser.add_argument('-ffc')  # flowability index
+parser.add_argument('-ffc_w')  # flowability index weight
+parser.add_argument('-drum')  # dummy variable
+parser.add_argument('-drum_w')  # dummy variable weight
+
+args = parser.parse_args()
+
+# Input ########################################################
+print('Reading input...')
+
+# Write psd to psd.txt. 
+if os.path.exists("calibrateMaterialAWS.txt"):
+    os.remove("calibrateMaterialAWS.txt")
+with open("calibrateMaterialAWS.txt", "w") as f:
+    f.write("# Material parameters\n"
+            "species LinearViscoelasticFrictionReversibleAdhesiveSpecies\n"
+            "density " + args.density + "\n"                          
+            "psd cumulative volume diameter\n")
+    psds = args.psd.split()
+    i = 0
+    while i < len(psds):
+        f.write("%s %s\n" % (psds[i], psds[i + 1]))
+        i = i + 2
+
+    f.write("cutOffMin " + args.comin + "\n"
+            "cutOffMax " + args.comax + "\n"
+            "scaleUp " + args.scaleup + "\n"
+            "squeeze " + args.squeeze + "\n"
+            "collisionTime " + args.ct + "\n"
+            "torsionFriction " + args.tf + "\n"
+            "fit calibration43\n"
+            "# Parameters to be calibrated (names and ranges)\n"
+            "restitutionCoefficient " + args.rc + "\n"
+            "slidingFriction " + args.sf + "\n"
+            "rollingFriction " + args.rf + "\n"
+            "bondNumber " + args.bo + "\n"
+            "# Experimental data to be tested (name, values and weights)\n"
+            "CalibrationTest " + args.ffc + " " + args.ffc_w + " " + args.aor + " " + args.aor_w + " " + args.drum + " " +
+            args.drum_w + "\n")
+
+
+# It is good practise to flush the output messages before any child processes are called. 
+# This is because output messages are buffered when they are redirected (which is happening on AWS)
+# and this could cause output messages from different sources to be mixed. 
+sys.stdout.flush()
+
+# add parameters to this command as defined in calibrate.py. This is the command to start the calibration
+sim = subprocess.run(['./calibrate.py', '--material', 'Test_calibration43', '--samples', '10', '--cores', '10',
+                      '--infrastructure', 'AWS', '--analysis'])
+if sim.returncode != 0:
+    sys.exit(sim.returncode)
