@@ -79,6 +79,13 @@ public:
              hopperLength, double hopperExitLength, double hopperHeight, double lift, double fillPercent);
     
     /*!
+     * \brief old style set function which assumes a uniform psd.
+     */
+    void set(BaseParticle* particleToCopy, unsigned int maxFailed, double yMin, double yMax, Mdouble rMin, Mdouble
+    rMax, double chuteAngle, double fixedParticleRadius, bool isHopperCentred_, int hopperDim, double hopperAngle,
+             double hopperLength, double hopperExitLength, double hopperHeight, double lift, double fillPercent);
+    
+    /*!
      * \brief This places an inflow particle in the top 50% of the hopper i.e. between gamma=0.5 and gamma=1.0
      */
     void placeParticle(BaseParticle* p, RNG& random) override;
