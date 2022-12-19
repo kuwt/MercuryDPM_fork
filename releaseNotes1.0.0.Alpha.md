@@ -483,10 +483,6 @@ SelfTests/Boundaries/DeletionBoundarySelfTest.cpp*
 
    - moved computation of the ```interactionRadius``` from the get to the set function. Therefore, two new variables where added:  ```BaseSpecies::interactionRadius``` and ```Species::maxInteractionRadius```
 
-*Tools/data2pvd*
-- data2pvd can now read files even if the first line of data file ends without a whitespace
-
-
 *MATLAB/
 
  - all scripts are tested and work in *GNU Octave*
