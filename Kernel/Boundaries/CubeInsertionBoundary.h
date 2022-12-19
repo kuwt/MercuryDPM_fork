@@ -126,10 +126,6 @@ protected:
      * and minimum and maximum velocity of the particles to be inserted.
      */
     Vec3D posMin_, posMax_;
-    
-    void setGeometry(Vec3D posMin, Vec3D posMax);
-    
-    void setGeometry(Vec3D posMin, Vec3D posMax);
 };
 
 #endif

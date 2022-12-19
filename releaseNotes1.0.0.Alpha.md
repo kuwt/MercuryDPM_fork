@@ -512,7 +512,8 @@ SelfTests/Boundaries/DeletionBoundarySelfTest.cpp*
 *Tools/MercuryData.h*
 
 - changed return value of ```MercuryTimeStepIterator<NDIMS>::end()``` in order to fix *data2pvd* tool
-- fixed error in data2pvd when the first line of a data file ended without a whitespace
+- fixed error for data2pvd when the first line of a data file ended without a whitespace. It can now read files even if
+  the first line of data file ends without a whitespace
 
 *Kernel/Walls/TriangleWall.h*
 
