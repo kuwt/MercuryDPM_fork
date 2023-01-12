@@ -3,14 +3,16 @@
 #ifndef CLUMP_IO_H
 #define CLUMP_IO_H
 
+#include <dirent.h>
+#include <sys/types.h>
 #include <iostream>
 #include <fstream>
+#include <boost/filesystem.hpp>
 #include <vector>
 #include <string>
 #include <cmath>
 #include "Math/Matrix.h"
 #include<CMakeDefinitions.h>
-
 
 typedef std::vector<double> dvec;
 typedef std::vector<dvec> ddvec;
@@ -37,12 +39,23 @@ public:
 void load_conf(clump_data &a)
 {
     // Path to MCLump tool
-    a.path = getMercurySourceDir() + "/Tools/MClump/";
+    a.path = getMercurySourceDir() + "/Tools/MClump/clumps/";
 
-    // Clump instances available
-    a.clump_names.push_back("clump01");
-    a.clump_names.push_back("clump02");
-    a.clump_names.push_back("clump03");
+    struct dirent *entry;
+    DIR *dir = opendir(a.path.c_str());
+    while ((entry = readdir(dir)) != NULL) {
+        if (entry->d_type == DT_DIR){
+            std::cout << "Name: " << entry->d_name << std::endl;
+            a.clump_names.push_back(entry->d_name);
+        }
+    }
+    closedir(dir);
+    a.clump_names.pop_back();
+    a.clump_names.pop_back();
+
+    //a.clump_names.push_back("clump01");
+    //a.clump_names.push_back("clump02");
+    //a.clump_names.push_back("clump03");
 }
 
 
