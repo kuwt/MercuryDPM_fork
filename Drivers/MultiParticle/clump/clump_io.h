@@ -226,7 +226,7 @@ dvec uniform_random_pds(){
     Vec3D n1, n2, n3, ref;
 
     // basis vector n1
-    double r1 = random_double(1);
+    double r1 = random_double(2) - 1.0;
     double r2 = random_double(1);
 
     double theta = acos(r1); // Note that for isotropy of n1 theta is NOT uniform!
