@@ -76,7 +76,7 @@ void DPMBase::outputXBallsDataParticle(unsigned int i, unsigned int format, std:
                << p->getPosition() << " "
                << std::setprecision(prec)
                << p->getVelocity() << " "
-               << p->getRadius() * float(!(p->IsMaster()))XBalls << " "
+               << p->getRadius() * float(!(p->IsMaster())) << " "
                ///\todo TW should we really write the expensive-to-compute Euler angles instead of the unit quaternion?
                 << angle.getEuler() << " "
                 //<< angle.getAxis() << " "
