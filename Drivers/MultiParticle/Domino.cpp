@@ -35,20 +35,22 @@
 
 struct dominoes {
 
-    Mdouble margin = 20; // Distance along y from the edge of the box to the center of the first domino
-    int N_dom = 5; // Number of dominoes
-    Mdouble R_peb = 0.5;
-    Mdouble S_peb = 1; // Spacing of pebbles in domino
-    Mdouble S_dom = 5; // Spacing of dominoes
+    Mdouble margin = 20;  // Distance along y from the edge of the box to the center of the first domino
+    int N_dom = 5;        // Number of dominoes
+    Mdouble R_peb = 0.75; // Radius of the pebbles forming dominoes
+    Mdouble R_cue = 0.5;  // Radius of a cue particle
+    Mdouble Vel_cue = 100;  // Velocity of the cue particle
+    Mdouble S_peb = 1;    // Spacing of pebbles in domino
+    Mdouble S_dom = 5;    // Spacing of dominoes
     int m_peb = 1, n_peb = 2, k_peb = 4; // (m,n,k) are numbers of pebbles in (x,y,z) directions correspondingly
 
     Mdouble x_min = 0;
     Mdouble x_max = 2 * margin + N_dom * S_dom;
 
-    Mdouble y_min = -20; // Box min in z and z directions
-    Mdouble y_max =  20; // Box max in z and z directions
+    Mdouble y_min = -20;   // Box min in z and z directions
+    Mdouble y_max =  20;   // Box max in z and z directions
 
-    Mdouble z_min = -k_peb * S_peb; // Box min in z and z directions
+    Mdouble z_min = -(k_peb-0.5) * S_peb - R_peb; // Box min in z and z directions
     Mdouble z_max =  20; // Box max in z and z directions
 
 
@@ -140,15 +142,15 @@ public:
         // Cue
         SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
-        p0.setRadius(0.25); // sets particle radius
+        p0.setRadius(D.R_cue); // sets particle radius
         p0.setPosition(Vec3D(0.5*D.margin, 0, D.S_peb*(D.k_peb-0.5))); // sets particle position
-        p0.setVelocity(Vec3D(100.0, 0., 0.));// sets particle velocity
+        p0.setVelocity(Vec3D(D.Vel_cue, 0., 0.));// sets particle velocity
         particleHandler.copyAndAddObject(p0);
 
         // Rectangular box
         wallHandler.clear();
         InfiniteWall w0;
-        p0.setSpecies(speciesHandler.getObject(1));
+        w0.setSpecies(speciesHandler.getObject(1));
         w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0, 0, getZMin()));
         wallHandler.copyAndAddObject(w0);
     }
@@ -177,14 +179,18 @@ int main(int argc, char* argv[])
     species0->setDensity(1.0); // sets the species type-0 density
     //species->setConstantRestitution(0);
     species0->setSlidingFrictionCoefficient(0.0);
+    species0->setSlidingStiffness(5e5);
     species0->setRollingFrictionCoefficient(0.0);
-    species0->setDissipation(100.0);
+    species0->setRollingStiffness(5e5);
+    species0->setDissipation(1.0);
     species0->setStiffness(1e6);
     const Mdouble collisionTime = species0->getCollisionTime(D.mass);
 
-    species01->setSlidingFrictionCoefficient(0.9);
+    species01->setSlidingFrictionCoefficient(0.5);
+    species01->setSlidingStiffness(5e5);
     species01->setRollingFrictionCoefficient(0.5);
-    species01->setDissipation(100.0);
+    species01->setDissipation(1.0);
+    species01->setRollingStiffness(5e5);
     species01->setStiffness(1e6);
 
 
