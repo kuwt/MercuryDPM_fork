@@ -36,7 +36,7 @@
 struct dominoes {
 
     Mdouble margin = 20; // Distance along y from the edge of the box to the center of the first domino
-    int N_dom = 10; // Number of dominoes
+    int N_dom = 5; // Number of dominoes
     Mdouble R_peb = 0.5;
     Mdouble S_peb = 1; // Spacing of pebbles in domino
     Mdouble S_dom = 5; // Spacing of dominoes
@@ -148,18 +148,8 @@ public:
         // Rectangular box
         wallHandler.clear();
         InfiniteWall w0;
-        w0.setSpecies(speciesHandler.getObject(0));
-        w0.set(Vec3D(-1.0, 0.0, 0.0), Vec3D(getXMin(), 0, 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(1.0, 0.0, 0.0), Vec3D(getXMax(), 0, 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0, -1.0, 0.0), Vec3D(0, getYMin(), 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0, 1.0, 0.0), Vec3D(0, getYMax(), 0));
-        wallHandler.copyAndAddObject(w0);
+        p0.setSpecies(speciesHandler.getObject(1));
         w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0, 0, getZMin()));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0, 0.0, 1.0), Vec3D(0, 0, getZMax()));
         wallHandler.copyAndAddObject(w0);
     }
 private:
@@ -172,14 +162,33 @@ private:
 int main(int argc, char* argv[])
 {
     multiParticleT1 problem;
-    auto species = problem.speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
-    species->setDensity(1.0); // sets the species type-0 density
+
+    // Domino species
+    auto species0 = problem.speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
+
+    // Wall species
+    auto species1 = problem.speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
+
+    // Mixed
+    auto species01 = problem.speciesHandler.getMixedObject(species0, species1);
+
+
+
+    species0->setDensity(1.0); // sets the species type-0 density
     //species->setConstantRestitution(0);
-    species->setSlidingFrictionCoefficient(0.8);
-    std::cout<<species->getConstantRestitution()<<std::endl;
-    species->setDissipation(100.0);
-    species->setStiffness(1e6);
-    const Mdouble collisionTime = species->getCollisionTime(D.mass);
+    species0->setSlidingFrictionCoefficient(0.0);
+    species0->setRollingFrictionCoefficient(0.0);
+    species0->setDissipation(100.0);
+    species0->setStiffness(1e6);
+    const Mdouble collisionTime = species0->getCollisionTime(D.mass);
+
+    species01->setSlidingFrictionCoefficient(0.9);
+    species01->setRollingFrictionCoefficient(0.5);
+    species01->setDissipation(100.0);
+    species01->setStiffness(1e6);
+
+
+
     problem.setClumpDamping(0);
     problem.setTimeStep(collisionTime / 50.0);
 
