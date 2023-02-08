@@ -3077,7 +3077,7 @@ void DPMBase::computeExternalForces(BaseParticle* CI)
 {
     //Checks that the current particle is not "fixed"
     //and hence infinitely massive!
-    if (!CI->isFixed())
+    if ((!CI->isFixed()) && (!CI->IsSlave()))
     {
         // Applying the force due to gravity (F = m.g)
         CI->addForce(getGravity() * CI->getMass()-getBackgroundDrag()*CI->getVelocity());

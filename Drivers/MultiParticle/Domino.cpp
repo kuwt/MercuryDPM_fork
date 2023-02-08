@@ -31,7 +31,8 @@
 #include "Particles/MultiParticle.h"
 #include "clump/clump_io.h"
 #include "clump/mercury3Dclump.h"
-# include <stdlib.h>
+#include <stdlib.h>
+#include "Boundaries/PeriodicBoundary.h"
 
 struct dominoes {
 
@@ -118,7 +119,7 @@ public:
                     MatrixSymmetric3D(D.I_xx,       0,      0,
                                                      D.I_yy,      0,
                                                                   D.I_zz));
-            p0.setMassMultiparticle(D.mass);
+            p0.setMassMultiparticle(1000*D.mass);
 
             p0.setDamping(clump_damping);
             std::cout<<"CLUMP MASS get = "<<p0.getMass()<<std::endl;
@@ -153,6 +154,16 @@ public:
         w0.setSpecies(speciesHandler.getObject(1));
         w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0, 0, getZMin()));
         wallHandler.copyAndAddObject(w0);
+
+        // Periodic box
+        auto per_x = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
+        per_x->set(Vec3D(1, 0, 0), getXMin(), getXMax());
+
+        auto per_y = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
+        per_y->set(Vec3D(0, 1, 0), getYMin(), getYMax());
+
+        auto per_z = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
+        per_z->set(Vec3D(0, 0, 1), getZMin(), getZMax());
     }
 private:
     int clump_index;
@@ -176,7 +187,7 @@ int main(int argc, char* argv[])
 
 
 
-    species0->setDensity(1.0); // sets the species type-0 density
+    species0->setDensity(1000.0); // sets the species type-0 density
     //species->setConstantRestitution(0);
     species0->setSlidingFrictionCoefficient(0.0);
     species0->setSlidingStiffness(5e5);
