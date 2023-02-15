@@ -37,10 +37,10 @@
 struct dominoes {
 
     Mdouble margin = 20;  // Distance along y from the edge of the box to the center of the first domino
-    int N_dom = 5;        // Number of dominoes
+    int N_dom = 10;        // Number of dominoes
     Mdouble R_peb = 0.75; // Radius of the pebbles forming dominoes
-    Mdouble R_cue = 0.5;  // Radius of a cue particle
-    Mdouble Vel_cue = 100;  // Velocity of the cue particle
+    Mdouble R_cue = 0.65;  // Radius of a cue particle
+    Mdouble Vel_cue = 1;  // Velocity of the cue particle
     Mdouble S_peb = 1;    // Spacing of pebbles in domino
     Mdouble S_dom = 5;    // Spacing of dominoes
     int m_peb = 1, n_peb = 2, k_peb = 4; // (m,n,k) are numbers of pebbles in (x,y,z) directions correspondingly
@@ -56,9 +56,9 @@ struct dominoes {
 
 
     Mdouble mass = 1;
-    Mdouble I_xx = 2;
-    Mdouble I_yy = 3;
-    Mdouble I_zz = 4;
+    Mdouble I_xx = mass * (1./12.) * S_peb * S_peb * ( n_peb * n_peb + k_peb * k_peb );
+    Mdouble I_yy = mass * (1./12.) * S_peb * S_peb * ( m_peb * m_peb + k_peb * k_peb );
+    Mdouble I_zz = mass * (1./12.) * S_peb * S_peb * ( m_peb * m_peb + n_peb * n_peb );
 
 };
 
@@ -119,10 +119,10 @@ public:
                     MatrixSymmetric3D(D.I_xx,       0,      0,
                                                      D.I_yy,      0,
                                                                   D.I_zz));
-            p0.setMassMultiparticle(1000*D.mass);
+            p0.setMassMultiparticle(1*D.mass);
 
             p0.setDamping(clump_damping);
-            std::cout<<"CLUMP MASS get = "<<p0.getMass()<<std::endl;
+
 
 
             Vec3D pos = Vec3D(D.margin + part*D.S_dom,
@@ -144,7 +144,7 @@ public:
         SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setRadius(D.R_cue); // sets particle radius
-        p0.setPosition(Vec3D(0.5*D.margin, 0, D.S_peb*(D.k_peb-0.5))); // sets particle position
+        p0.setPosition(Vec3D(0.9*D.margin, 0, D.S_peb*(D.k_peb-0.5))); // sets particle position
         p0.setVelocity(Vec3D(D.Vel_cue, 0., 0.));// sets particle velocity
         particleHandler.copyAndAddObject(p0);
 
@@ -155,15 +155,6 @@ public:
         w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0, 0, getZMin()));
         wallHandler.copyAndAddObject(w0);
 
-        // Periodic box
-        auto per_x = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
-        per_x->set(Vec3D(1, 0, 0), getXMin(), getXMax());
-
-        auto per_y = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
-        per_y->set(Vec3D(0, 1, 0), getYMin(), getYMax());
-
-        auto per_z = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
-        per_z->set(Vec3D(0, 0, 1), getZMin(), getZMax());
     }
 private:
     int clump_index;
@@ -187,7 +178,7 @@ int main(int argc, char* argv[])
 
 
 
-    species0->setDensity(1000.0); // sets the species type-0 density
+    species0->setDensity(1.0); // sets the species type-0 density
     //species->setConstantRestitution(0);
     species0->setSlidingFrictionCoefficient(0.0);
     species0->setSlidingStiffness(5e5);
@@ -197,9 +188,9 @@ int main(int argc, char* argv[])
     species0->setStiffness(1e6);
     const Mdouble collisionTime = species0->getCollisionTime(D.mass);
 
-    species01->setSlidingFrictionCoefficient(0.5);
+    species01->setSlidingFrictionCoefficient(0.2);
     species01->setSlidingStiffness(5e5);
-    species01->setRollingFrictionCoefficient(0.5);
+    species01->setRollingFrictionCoefficient(0.1);
     species01->setDissipation(1.0);
     species01->setRollingStiffness(5e5);
     species01->setStiffness(1e6);
@@ -210,8 +201,8 @@ int main(int argc, char* argv[])
     problem.setTimeStep(collisionTime / 50.0);
 
     // Quick demonstration
-    problem.setSaveCount(50);
-    problem.setTimeMax(2);
+    problem.setSaveCount(500);
+    problem.setTimeMax(20);
 
 
     // For time averaging featuring equipartition - takes a while
