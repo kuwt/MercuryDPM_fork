@@ -71,7 +71,7 @@ public:
     void setupInitialConditions() override
     {
         // Generate single clump
-        setClumpIndex(0);
+        setClumpIndex(1);
 
         for (int part = 0; part<100; part++) {
             MultiParticle p0;
