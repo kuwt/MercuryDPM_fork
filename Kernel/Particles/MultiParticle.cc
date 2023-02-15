@@ -308,7 +308,7 @@ void MultiParticle::integrateBeforeForceComputation(double time, double timeStep
         //apply to rotation quaternion q: q = normalise(q + \tilde{C}\omega*timeStep) (see Wouter's notes)
         rotate(getAngularVelocity() * timeStep);
 
-        // Rotatestd::cout<<"w_"<<n<<" = "<<angularVelocity_n<<std::endl; the principal axis according to the angle of rotation
+        // Rotate
         rotatePrincipalDirections(getAngularVelocity() * timeStep);
 
         // Update slave nodes
@@ -354,7 +354,7 @@ void MultiParticle::angularAccelerateMasterIterative(double timeStep)
 
     Vec3D angularVelocity_0 = getAngularVelocity();
     Vec3D angularVelocity_n = angularVelocity_0;
-    for (int n = 0; n<1; n++) // 4 iterations needed for good precision (PFC4.0 manual)
+    for (int n = 0; n<3; n++) // 4 iterations needed for good precision (PFC4.0 manual)
     {
         Mdouble wx = angularVelocity_n.X;
         Mdouble wy = angularVelocity_n.Y;

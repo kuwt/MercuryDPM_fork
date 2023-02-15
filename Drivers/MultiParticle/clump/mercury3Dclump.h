@@ -2,6 +2,7 @@
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Particles/MultiParticle.h"
+#include "Boundaries/PeriodicBoundary.h"
 #include <stdlib.h>
 // This class contains necessary modifications of Mercury3D framework to enable rigid clumps
 class Mercury3Dclump : public Mercury3D
@@ -123,31 +124,25 @@ public:
         for (BaseParticle* p : particleHandler)
         {
             if ((p->IsSlave())&&(p->getPeriodicFromParticle() == nullptr))
-            {
-                p->getMaster()->addForce(p->getForce());
+                {
+                    p->getMaster()->addForce(p->getForce());
+                    Vec3D lever = p->getPosition()-p->getMaster()->getPosition();
 
-                Vec3D lever;
+                    // Patch to fix lever - we do not create ghost masters, that's why this workaround is needed
+                    // Should affect all boundaries derived from PeriodicBoundary and do not affect other types
+                    for (auto p : boundaryHandler) {
+                        auto pb = dynamic_cast<PeriodicBoundary*> (p);
+                        if (pb){
+                            Vec3D shift = pb->getShift();
+                            if (lever.getLength() > (lever - shift).getLength()) lever -= shift;
+                            if (lever.getLength() > (lever + shift).getLength()) lever += shift;
+                        }
+                    }
+                    // End patch
 
-                Vec3D pm = p->getMaster()->getPosition();
-
-                Vec3D ps1 = p->getPosition();
-                Vec3D ps2 = p->getPosition();
-                if (p->getPeriodicFromParticle()) ps2 = p->getPeriodicFromParticle()->getPosition();
-
-                Vec3D l1 = ps1-pm;
-                Vec3D l2 = ps2-pm;
-
-                if (l1.getLength() < l2.getLength())
-                {lever = l1;} else {lever = l2;}
-                //std::cout<<"L1: "<<l1.getLength()<<std::endl;
-                //std::cout<<"L2: "<<l2.getLength()<<std::endl;
-                //std::cout<<"Lever: "<<lever.getLength()<<std::endl;
-
-                Vec3D torque = p->getTorque();
-
-                if (lever.getLength()>10e-10) torque += Vec3D::cross(lever, p->getForce());
-
-                p->getMaster()->addTorque(torque);
+                    Vec3D torque = p->getTorque();
+                    torque += Vec3D::cross(lever, p->getForce());
+                    p->getMaster()->addTorque(torque);
             }
         }
     }
