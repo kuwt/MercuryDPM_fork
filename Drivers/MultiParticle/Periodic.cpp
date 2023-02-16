@@ -34,8 +34,8 @@
 #include "Boundaries/PeriodicBoundary.h"
 # include <stdlib.h>
 
-Mdouble f_min = -40; Mdouble f_max = 40; // Size of the box and the margin/clearance for clump seeds
-Mdouble margin = 2;
+Mdouble f_min = -10; Mdouble f_max = 10; // Size of the box and the margin/clearance for clump seeds
+Mdouble margin = 3;
 
 
 Mdouble av_min = -5; // range of angular velocities
@@ -43,6 +43,8 @@ Mdouble av_max = 5;
 
 Mdouble tv_min = -100; // range of translational velocities
 Mdouble tv_max = 100;
+
+int N_att = 10;   // Number of attempts to add particle
 
 class multiParticleT1 : public Mercury3Dclump
 {
@@ -70,10 +72,52 @@ public:
 
     void setupInitialConditions() override
     {
-        // Generate single clump
-        setClumpIndex(1);
 
-        for (int part = 0; part<100; part++) {
+        /* Double periodic + bottom wall + unlimited top
+        auto per_x = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
+        per_x->set(Vec3D(1, 0, 0), getXMin(), getXMax());
+        auto per_y = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
+        per_y->set(Vec3D(0, 1, 0), getYMin(), getYMax());
+        wallHandler.clear();
+        InfiniteWall w0;
+        w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0, 0, getZMin()));
+        wallHandler.copyAndAddObject(w0);
+        */
+
+        // Rectangular box
+        wallHandler.clear();
+        InfiniteWall w0;
+        w0.setSpecies(speciesHandler.getObject(0));
+        w0.set(Vec3D(-1.0, 0.0, 0.0), Vec3D(getXMin(), 0, 0));
+        wallHandler.copyAndAddObject(w0);
+        w0.set(Vec3D(1.0, 0.0, 0.0), Vec3D(getXMax(), 0, 0));
+        wallHandler.copyAndAddObject(w0);
+        w0.set(Vec3D(0.0, -1.0, 0.0), Vec3D(0, getYMin(), 0));
+        wallHandler.copyAndAddObject(w0);
+        w0.set(Vec3D(0.0, 1.0, 0.0), Vec3D(0, getYMax(), 0));
+        wallHandler.copyAndAddObject(w0);
+        w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0, 0, getZMin()));
+        wallHandler.copyAndAddObject(w0);
+        w0.set(Vec3D(0.0, 0.0, 1.0), Vec3D(0, 0, getZMax()));
+        wallHandler.copyAndAddObject(w0);
+        //*/
+
+
+        /* Periodic box
+        auto per_x = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
+        per_x->set(Vec3D(1, 0, 0), getXMin(), getXMax());
+
+        auto per_y = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
+        per_y->set(Vec3D(0, 1, 0), getYMin(), getYMax());
+
+        auto per_z = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
+        per_z->set(Vec3D(0, 0, 1), getZMin(), getZMax());
+        */
+
+        // Generate a dense packing of clumps
+        setClumpIndex(1);
+        int N_created = 0;
+        for (int part = 0; part<N_att; part++) {
             MultiParticle p0;
             p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to MultiParticle 1
             p0.setMaster();
@@ -97,11 +141,9 @@ public:
                     MatrixSymmetric3D(rdata.toi[clump_index][0], rdata.toi[clump_index][1], rdata.toi[clump_index][2],
                                       rdata.toi[clump_index][4], rdata.toi[clump_index][5],
                                       rdata.toi[clump_index][8]));
-            std::cout<<"CLUMP MASS set = "<<rdata.mass[clump_index]<<std::endl;
             p0.setMassMultiparticle(rdata.mass[clump_index]);
 
             p0.setDamping(clump_damping);
-            std::cout<<"CLUMP MASS get = "<<p0.getMass()<<std::endl;
 
 
             Vec3D pos = Vec3D(f_min + margin +  random_double(f_max - f_min - 2 * margin),
@@ -118,52 +160,18 @@ public:
                               tv_min + random_double(tv_max - tv_min),
                               tv_min + random_double(tv_max - tv_min));
 
+            angVel = Vec3D(0,0,0);
+            vel = Vec3D(0,0,0);
             p0.setAngularVelocity(angVel);
             p0.setVelocity(vel);
-            particleHandler.copyAndAddObject(p0);
+
+
+            if (checkClumpForInteractionPeriodic(p0)) {
+                particleHandler.copyAndAddObject(p0);
+                N_created++;
+            }
         }
-
-
-        // Periodic box
-        auto per_x = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
-        per_x->set(Vec3D(1, 0, 0), getXMin(), getXMax());
-
-        auto per_y = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
-        per_y->set(Vec3D(0, 1, 0), getYMin(), getYMax());
-
-        auto per_z = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
-        per_z->set(Vec3D(0, 0, 1), getZMin(), getZMax());
-        //*/
-
-        /* Double periodic + bottom wall + unlimited top
-        auto per_x = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
-        per_x->set(Vec3D(1, 0, 0), getXMin(), getXMax());
-        auto per_y = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
-        per_y->set(Vec3D(0, 1, 0), getYMin(), getYMax());
-        wallHandler.clear();
-        InfiniteWall w0;
-        w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0, 0, getZMin()));
-        wallHandler.copyAndAddObject(w0);
-        */
-
-        /* Rectangular box
-        wallHandler.clear();
-        InfiniteWall w0;
-        w0.setSpecies(speciesHandler.getObject(0));
-        w0.set(Vec3D(-1.0, 0.0, 0.0), Vec3D(getXMin(), 0, 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(1.0, 0.0, 0.0), Vec3D(getXMax(), 0, 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0, -1.0, 0.0), Vec3D(0, getYMin(), 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0, 1.0, 0.0), Vec3D(0, getYMax(), 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0, 0, getZMin()));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0, 0.0, 1.0), Vec3D(0, 0, getZMax()));
-        wallHandler.copyAndAddObject(w0);
-        */
-
+        std::cout<<"Number of particles created: "<<N_created<<std::endl;
     }
 private:
     int clump_index;
@@ -187,7 +195,7 @@ int main(int argc, char* argv[])
 
     // Quick demonstration
     problem.setSaveCount(50);
-    problem.setTimeMax(4);
+    problem.setTimeMax(0.1);
 
     problem.removeOldFiles();
     problem.solve();

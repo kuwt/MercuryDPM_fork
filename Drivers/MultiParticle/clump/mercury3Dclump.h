@@ -146,8 +146,54 @@ public:
             }
         }
     }
+
+    bool checkClumpForInteraction(BaseParticle& particle)
+    {
+        MultiParticle* mp = dynamic_cast<MultiParticle*>(&particle);
+        if (mp->IsMaster()){
+            for (int i = 0; i<mp->NSlave(); i++){
+                for (BaseParticle *q: particleHandler) {
+                    if (!q->IsMaster()) { // check every slave vs every non-master intersection
+                        if (Vec3D::getDistanceSquared(q->getPosition(), mp->getSlavePositions()[i]) < q->getRadius() + mp->getSlaveRadii()[i]) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    bool checkClumpForInteractionPeriodic(BaseParticle& particle)
+    {
+        for (BaseBoundary* b : boundaryHandler)
+        {
+            PeriodicBoundary* pb = dynamic_cast<PeriodicBoundary*>(b);
+            if (pb && particleHandler.getNumberOfObjects() > 0 )
+            {
+                MultiParticle* mp = dynamic_cast<MultiParticle*>(&particle);
+                if (mp->IsMaster()){
+                    for (int i = 0; i<mp->NSlave(); i++){
+                        for (BaseParticle *q: particleHandler) {
+                            if (!q->IsMaster()) { // check every slave vs every non-master intersection
+                                if (Vec3D::getDistanceSquared(q->getPosition(), mp->getSlavePositions()[i]) < q->getRadius() + mp->getSlaveRadii()[i]) {
+                                    return false;
+                                }
+                                BaseParticle *q1 = q->copy(); // check every slave vs non-master ghost intersection
+                                pb->shiftPosition(q1);
+                                if (Vec3D::getDistanceSquared(q1->getPosition(), mp->getSlavePositions()[i]) < q1->getRadius() + mp->getSlaveRadii()[i]) {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
 };
 
 
-
+// mathsFunc::square(sp->getSumOfInteractionRadii(q))
 

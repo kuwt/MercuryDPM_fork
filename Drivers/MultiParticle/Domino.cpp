@@ -44,7 +44,7 @@ struct dominoes {
     Mdouble S_peb = 1;    // Spacing of pebbles in domino
     Mdouble S_dom = 5;    // Spacing of dominoes
     int m_peb = 1, n_peb = 2, k_peb = 4; // (m,n,k) are numbers of pebbles in (x,y,z) directions correspondingly
-
+    
     Mdouble x_min = 0;
     Mdouble x_max = 2 * margin + N_dom * S_dom;
 
