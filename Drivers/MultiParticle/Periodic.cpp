@@ -34,7 +34,7 @@
 #include "Boundaries/PeriodicBoundary.h"
 # include <stdlib.h>
 
-Mdouble f_min = -10; Mdouble f_max = 10; // Size of the box and the margin/clearance for clump seeds
+Mdouble f_min = -20; Mdouble f_max = 20; // Size of the box and the margin/clearance for clump seeds
 Mdouble margin = 3;
 
 
@@ -44,7 +44,7 @@ Mdouble av_max = 5;
 Mdouble tv_min = -100; // range of translational velocities
 Mdouble tv_max = 100;
 
-int N_att = 10;   // Number of attempts to add particle
+int N_att = 1000;   // Number of attempts to add particle
 
 class multiParticleT1 : public Mercury3Dclump
 {
@@ -84,7 +84,7 @@ public:
         wallHandler.copyAndAddObject(w0);
         */
 
-        // Rectangular box
+        /* Rectangular box
         wallHandler.clear();
         InfiniteWall w0;
         w0.setSpecies(speciesHandler.getObject(0));
@@ -100,10 +100,10 @@ public:
         wallHandler.copyAndAddObject(w0);
         w0.set(Vec3D(0.0, 0.0, 1.0), Vec3D(0, 0, getZMax()));
         wallHandler.copyAndAddObject(w0);
-        //*/
+        */
 
 
-        /* Periodic box
+        // Periodic box
         auto per_x = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
         per_x->set(Vec3D(1, 0, 0), getXMin(), getXMax());
 
@@ -112,7 +112,7 @@ public:
 
         auto per_z = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
         per_z->set(Vec3D(0, 0, 1), getZMin(), getZMax());
-        */
+        //*/
 
         // Generate a dense packing of clumps
         setClumpIndex(1);
@@ -160,8 +160,10 @@ public:
                               tv_min + random_double(tv_max - tv_min),
                               tv_min + random_double(tv_max - tv_min));
 
-            angVel = Vec3D(0,0,0);
-            vel = Vec3D(0,0,0);
+            // No motion with zero initial conditions
+            //angVel = Vec3D(0,0,0);
+            //vel = Vec3D(0,0,0);
+
             p0.setAngularVelocity(angVel);
             p0.setVelocity(vel);
 

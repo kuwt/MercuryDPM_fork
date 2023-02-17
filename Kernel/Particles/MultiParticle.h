@@ -206,7 +206,7 @@ public:
         Vec3D e1 = getPrincipalDirections_e1();
         Vec3D e2 = getPrincipalDirections_e2();
         Vec3D e3 = getPrincipalDirections_e3();
-        for (int i = 0; i<NSlave(); i++){
+        for (int i = 1; i<=NSlave(); i++){
         globalPos.push_back(getPosition() + e1*slavePos[i-1].X + e2*slavePos[i-1].Y + e3*slavePos[i-1].Z);
         }
         return globalPos;
