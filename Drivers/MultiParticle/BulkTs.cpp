@@ -29,8 +29,8 @@
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Particles/MultiParticle.h"
-#include "clump/clump_io.h"
-#include "clump/mercury3Dclump.h"
+#include "clump/ClumpIO.h"
+#include "clump/Mercury3DClump.h"
 # include <stdlib.h>
 
 Mdouble f_min = -40; Mdouble f_max = 40; // Size of the box and the margin/clearance for clump seeds

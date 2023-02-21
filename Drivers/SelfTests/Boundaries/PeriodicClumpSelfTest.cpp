@@ -29,8 +29,8 @@
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Particles/MultiParticle.h"
-#include "../../MultiParticle/clump/clump_io.h"
-#include "../../MultiParticle/clump/mercury3Dclump.h"
+#include "../../MultiParticle/clump/ClumpIO.h"
+#include "../../MultiParticle/clump/Mercury3DClump.h"
 # include <stdlib.h>
 #include "Boundaries/PeriodicBoundary.h"
 
