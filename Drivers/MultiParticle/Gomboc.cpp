@@ -29,8 +29,8 @@
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Particles/MultiParticle.h"
-#include "clump/clump_io.h"
-#include "clump/mercury3Dclump.h"
+#include "clump/ClumpIO.h"
+#include "clump/Mercury3DClump.h"
 # include <stdlib.h>
 
 Mdouble f_min = -2; Mdouble f_max = 2;
@@ -86,8 +86,8 @@ public:
                                   data.toi[clump_index][8]));
         p0.setMassMultiparticle(data.mass[clump_index]);
         double mag = 0;
-        p0.setAngularVelocity(Vec3D(random_double(mag)-0.5*mag,random_double(mag)-0.5*mag,random_double(mag)-0.5*mag));
-        p0.setVelocity(Vec3D(random_double(10)-5,random_double(10)-5,random_double(10)-5));
+        p0.setAngularVelocity(Vec3D(0,0,0));
+        p0.setVelocity(Vec3D(0,0,0));
 
         p0.setDamping(clump_damping);
         particleHandler.copyAndAddObject(p0);
@@ -113,21 +113,21 @@ private:
     int clump_index;
     clump_data data;
     Mdouble clump_mass;
-    Mdouble clump_damping = 10;
+    Mdouble clump_damping = 1;
 };
 
 int main(int argc, char* argv[])
 {
     multiParticleT1 problem;
     auto species = problem.speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
-    species->setDensity(0.0); // sets the species type-0 density
-    species->setDissipation(100.0);
+    species->setDensity(1.0); // sets the species type-0 density
+    species->setDissipation(50.0);
     species->setStiffness(1e6);
     const Mdouble collisionTime = species->getCollisionTime(problem.getClumpMass());
     problem.setClumpDamping(0);
     problem.setTimeStep(collisionTime / 50.0);
-    problem.setSaveCount(100);
-    problem.setTimeMax(2.0);
+    problem.setSaveCount(400);
+    problem.setTimeMax(20.0);
     problem.removeOldFiles();
     problem.solve();
     return 0;

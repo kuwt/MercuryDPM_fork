@@ -23,7 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Example 1 - Single clump in the box
+// Example 6 - Single clump in the periodic box
 
 #include "Mercury3D.h"
 #include "Walls/InfiniteWall.h"
@@ -33,8 +33,8 @@
 #include "clump/Mercury3DClump.h"
 # include <stdlib.h>
 
-Mdouble f_min = -40; Mdouble f_max = 40; // Size of the box and the margin/clearance for clump seeds
-Mdouble margin = 2;
+Mdouble f_min = -20; Mdouble f_max = 20; // Size of the box and the margin/clearance for clump seeds
+Mdouble margin = 3;
 
 
 Mdouble av_min = -5; // range of angular velocities
@@ -43,18 +43,19 @@ Mdouble av_max = 5;
 Mdouble tv_min = -100; // range of translational velocities
 Mdouble tv_max = 100;
 
+int N_att = 1000;   // Number of attempts to add particle
 
 class multiParticleT1 : public Mercury3Dclump
 {
 public:
     explicit  multiParticleT1()
     {
-        setGravity(Vec3D(0.0, 0.0, -10.0));
-        setName("BulkTs");
+        setGravity(Vec3D(0.0, 0.0, -0.0));
+        setName("Periodic");
         setXBallsAdditionalArguments("-solidf -v0");
         setXMax(f_max);
         setYMax(f_max);
-        setZMax(f_max);
+        setZMax(f_max); // Unbounded domain
         setXMin(f_min);
         setYMin(f_min);
         setZMin(f_min);
@@ -70,10 +71,52 @@ public:
 
     void setupInitialConditions() override
     {
-        // Generate single clump
-        setClumpIndex(1);
 
-        for (int part = 0; part<100; part++) {
+        /* Double periodic + bottom wall + unlimited top
+        auto per_x = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
+        per_x->set(Vec3D(1, 0, 0), getXMin(), getXMax());
+        auto per_y = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
+        per_y->set(Vec3D(0, 1, 0), getYMin(), getYMax());
+        wallHandler.clear();
+        InfiniteWall w0;
+        w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0, 0, getZMin()));
+        wallHandler.copyAndAddObject(w0);
+        */
+
+        /* Rectangular box
+        wallHandler.clear();
+        InfiniteWall w0;
+        w0.setSpecies(speciesHandler.getObject(0));
+        w0.set(Vec3D(-1.0, 0.0, 0.0), Vec3D(getXMin(), 0, 0));
+        wallHandler.copyAndAddObject(w0);
+        w0.set(Vec3D(1.0, 0.0, 0.0), Vec3D(getXMax(), 0, 0));
+        wallHandler.copyAndAddObject(w0);
+        w0.set(Vec3D(0.0, -1.0, 0.0), Vec3D(0, getYMin(), 0));
+        wallHandler.copyAndAddObject(w0);
+        w0.set(Vec3D(0.0, 1.0, 0.0), Vec3D(0, getYMax(), 0));
+        wallHandler.copyAndAddObject(w0);
+        w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0, 0, getZMin()));
+        wallHandler.copyAndAddObject(w0);
+        w0.set(Vec3D(0.0, 0.0, 1.0), Vec3D(0, 0, getZMax()));
+        wallHandler.copyAndAddObject(w0);
+        */
+
+
+        // Periodic box
+        auto per_x = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
+        per_x->set(Vec3D(1, 0, 0), getXMin(), getXMax());
+
+        auto per_y = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
+        per_y->set(Vec3D(0, 1, 0), getYMin(), getYMax());
+
+        auto per_z = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
+        per_z->set(Vec3D(0, 0, 1), getZMin(), getZMax());
+        //*/
+
+        // Generate a dense packing of clumps
+        setClumpIndex(1);
+        int N_created = 0;
+        for (int part = 0; part<N_att; part++) {
             MultiParticle p0;
             p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to MultiParticle 1
             p0.setMaster();
@@ -97,16 +140,14 @@ public:
                     MatrixSymmetric3D(rdata.toi[clump_index][0], rdata.toi[clump_index][1], rdata.toi[clump_index][2],
                                       rdata.toi[clump_index][4], rdata.toi[clump_index][5],
                                       rdata.toi[clump_index][8]));
-            std::cout<<"CLUMP MASS set = "<<rdata.mass[clump_index]<<std::endl;
             p0.setMassMultiparticle(rdata.mass[clump_index]);
 
             p0.setDamping(clump_damping);
-            std::cout<<"CLUMP MASS get = "<<p0.getMass()<<std::endl;
 
 
             Vec3D pos = Vec3D(f_min + margin +  random_double(f_max - f_min - 2 * margin),
-                        f_min + margin + random_double(f_max - f_min - 2 * margin),
-                        f_min + margin + random_double(f_max - f_min - 2 * margin));
+                              f_min + margin + random_double(f_max - f_min - 2 * margin),
+                              f_min + margin + random_double(f_max - f_min - 2 * margin));
 
             p0.setPosition(pos);
 
@@ -115,37 +156,29 @@ public:
                                  av_min + random_double(av_max - av_min));
 
             Vec3D vel = Vec3D(tv_min + random_double(tv_max - tv_min),
-                                 tv_min + random_double(tv_max - tv_min),
-                                 tv_min + random_double(tv_max - tv_min));
+                              tv_min + random_double(tv_max - tv_min),
+                              tv_min + random_double(tv_max - tv_min));
+
+            // No motion with zero initial conditions
+            //angVel = Vec3D(0,0,0);
+            //vel = Vec3D(0,0,0);
 
             p0.setAngularVelocity(angVel);
             p0.setVelocity(vel);
-            particleHandler.copyAndAddObject(p0);
+
+
+            if (checkClumpForInteractionPeriodic(p0)) {
+                particleHandler.copyAndAddObject(p0);
+                N_created++;
+            }
         }
-
-
-        // Rectangular box
-        wallHandler.clear();
-        InfiniteWall w0;
-        w0.setSpecies(speciesHandler.getObject(0));
-        w0.set(Vec3D(-1.0, 0.0, 0.0), Vec3D(getXMin(), 0, 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(1.0, 0.0, 0.0), Vec3D(getXMax(), 0, 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0, -1.0, 0.0), Vec3D(0, getYMin(), 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0, 1.0, 0.0), Vec3D(0, getYMax(), 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0, 0, getZMin()));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0, 0.0, 1.0), Vec3D(0, 0, getZMax()));
-        wallHandler.copyAndAddObject(w0);
+        std::cout<<"Number of particles created: "<<N_created<<std::endl;
     }
 private:
     int clump_index;
     clump_data data;
     Mdouble clump_mass;
-    Mdouble clump_damping = 10;
+    Mdouble clump_damping = 0;
 };
 
 int main(int argc, char* argv[])
@@ -155,7 +188,7 @@ int main(int argc, char* argv[])
     species->setDensity(1.0); // sets the species type-0 density
     //species->setConstantRestitution(0);
     std::cout<<species->getConstantRestitution()<<std::endl;
-    species->setDissipation(100.0);
+    species->setDissipation(0.0);
     species->setStiffness(1e6);
     const Mdouble collisionTime = species->getCollisionTime(problem.getClumpMass());
     problem.setClumpDamping(0);
@@ -163,12 +196,7 @@ int main(int argc, char* argv[])
 
     // Quick demonstration
     problem.setSaveCount(50);
-    problem.setTimeMax(2);
-
-
-    // For time averaging featuring equipartition - takes a while
-    // problem.setSaveCount(50000);
-    // problem.setTimeMax(100000);
+    problem.setTimeMax(0.1);
 
     problem.removeOldFiles();
     problem.solve();

@@ -2,6 +2,7 @@
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Particles/MultiParticle.h"
+#include "Boundaries/PeriodicBoundary.h"
 #include <stdlib.h>
 // This class contains necessary modifications of Mercury3D framework to enable rigid clumps
 class Mercury3Dclump : public Mercury3D
@@ -122,15 +123,100 @@ public:
         ///Loop on pebbles to add forces/moments to masters...
         for (BaseParticle* p : particleHandler)
         {
-            if (p->IsSlave())
-            {
-                p->getMaster()->addForce(p->getForce());
-                p->getMaster()->addTorque(p->getTorque() + Vec3D::cross(p->getPosition() - p->getMaster()->getPosition(), p->getForce()));
+            if ((p->IsSlave())&&(p->getPeriodicFromParticle() == nullptr))
+                {
+                    p->getMaster()->addForce(p->getForce());
+                    Vec3D lever = p->getPosition()-p->getMaster()->getPosition();
+
+                    // Patch to fix lever - we do not create ghost masters, that's why this workaround is needed
+                    // Should affect all boundaries derived from PeriodicBoundary and do not affect other types
+                    for (auto p : boundaryHandler) {
+                        auto pb = dynamic_cast<PeriodicBoundary*> (p);
+                        if (pb){
+                            Vec3D shift = pb->getShift();
+                            if (lever.getLength() > (lever - shift).getLength()) lever -= shift;
+                            if (lever.getLength() > (lever + shift).getLength()) lever += shift;
+                        }
+                    }
+                    // End patch
+
+                    Vec3D torque = p->getTorque();
+                    torque += Vec3D::cross(lever, p->getForce());
+                    p->getMaster()->addTorque(torque);
             }
         }
+    }
+
+    bool checkClumpForInteraction(BaseParticle& particle)
+    {
+        MultiParticle* mp = dynamic_cast<MultiParticle*>(&particle);
+        if (mp->IsMaster()){
+            for (int i = 0; i<mp->NSlave(); i++){
+                for (BaseParticle *q: particleHandler) {
+                    if (!q->IsMaster()) { // check every slave vs every non-master intersection
+                        if (Vec3D::getDistanceSquared(q->getPosition(), mp->getSlavePositions()[i]) < q->getRadius() + mp->getSlaveRadii()[i]) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    bool checkClumpForInteractionPeriodic(BaseParticle& particle)
+    {
+        // Note that this implementation only check for interaction with particles
+        bool NP = true;
+        // Periodic case
+        for (BaseBoundary* b : boundaryHandler)
+        {
+            PeriodicBoundary* pb = dynamic_cast<PeriodicBoundary*>(b);
+            if (pb) NP = false;
+            if (pb && particleHandler.getNumberOfObjects() > 0 )
+            {
+                MultiParticle* mp = dynamic_cast<MultiParticle*>(&particle);
+                if (mp->IsMaster()){
+                    for (int i = 0; i<mp->NSlave(); i++){
+                        for (BaseParticle *q: particleHandler) {
+                            if (!q->IsMaster()) { // check every slave vs every non-master intersection
+                                if (Vec3D::getDistanceSquared(q->getPosition(), mp->getSlavePositions()[i]) < (q->getMaxInteractionRadius() + mp->getSlaveRadii()[i]) * (q->getMaxInteractionRadius()+ mp->getSlaveRadii()[i]) ) {
+                                    return false;
+                                }
+                                BaseParticle *q1 = q->copy(); // check every slave vs non-master ghost intersection
+                                pb->shiftPosition(q1);
+                                Mdouble dist2 = Vec3D::getDistanceSquared(q1->getPosition(), mp->getSlavePositions()[i]);
+                                Mdouble dist02 = (q1->getMaxInteractionRadius() + mp->getSlaveRadii()[i]) * (q1->getMaxInteractionRadius() + mp->getSlaveRadii()[i]);
+                                delete q1;
+                                if (dist2 < dist02) {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // Non-periodic case
+        if ((NP)&&(particleHandler.getNumberOfObjects() > 0 ))
+        {
+            MultiParticle* mp = dynamic_cast<MultiParticle*>(&particle);
+            if (mp->IsMaster()){
+                for (int i = 0; i<mp->NSlave(); i++){
+                    for (BaseParticle *q: particleHandler) {
+                        if (!q->IsMaster()) { // check every slave vs every non-master intersection
+                            if (Vec3D::getDistanceSquared(q->getPosition(), mp->getSlavePositions()[i]) < (q->getRadius() + mp->getSlaveRadii()[i]) * (q->getRadius() + mp->getSlaveRadii()[i])) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
 };
 
 
-
+// mathsFunc::square(sp->getSumOfInteractionRadii(q))
 

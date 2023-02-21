@@ -23,25 +23,26 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Example 2 - T-bar featuring Dzhanibekov effect
+// Self-test -- single clump in a periodic box
 
 #include "Mercury3D.h"
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Particles/MultiParticle.h"
-#include "clump/ClumpIO.h"
-#include "clump/Mercury3DClump.h"
+#include "../../MultiParticle/clump/ClumpIO.h"
+#include "../../MultiParticle/clump/Mercury3DClump.h"
 # include <stdlib.h>
+#include "Boundaries/PeriodicBoundary.h"
 
-Mdouble f_min = -10; Mdouble f_max = 10;
+Mdouble f_min = -4; Mdouble f_max = 4;
 
-class multiParticleT1 : public Mercury3Dclump
+class clumpTest : public Mercury3Dclump
 {
 public:
-    explicit  multiParticleT1()
+    explicit  clumpTest()
     {
         setGravity(Vec3D(0.0, 0.0, 0.0));
-        setName("TBar");
+        setName("periodicClumpSelfTest");
         setXBallsAdditionalArguments("-solidf -v0");
         setXMax(f_max);
         setYMax(f_max);
@@ -61,12 +62,23 @@ public:
 
     void setupInitialConditions() override
     {
+    
+        // Periodic box
+        auto per_x = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
+        per_x->set(Vec3D(1, 0, 0), getXMin(), getXMax());
+
+        auto per_y = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
+        per_y->set(Vec3D(0, 1, 0), getYMin(), getYMax());
+
+        auto per_z = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
+        per_z->set(Vec3D(0, 0, 1), getZMin(), getZMax());
+    
+    
         // Generate single clump
         setClumpIndex(1);
         MultiParticle p0;
         p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to MultiParticle 1
         p0.setMaster();
-        // data = rotate_clump(data, clump_index, uniform_random_pds()); // Rotate clump arbitrarily
         p0.setRadius(data.pebbles_r[clump_index][0]);
         Vec3D pos = Vec3D(0, 0, 0);
         p0.setPosition(pos);
@@ -84,42 +96,23 @@ public:
                     MatrixSymmetric3D(data.toi[clump_index][0], data.toi[clump_index][1], data.toi[clump_index][2],
                                       data.toi[clump_index][4], data.toi[clump_index][5],
                                       data.toi[clump_index][8]));
-        std::cout<<"CLUMP MASS set = "<<data.mass[clump_index]<<std::endl;
         p0.setMassMultiparticle(data.mass[clump_index]);
-        p0.setAngularVelocity(Vec3D(0,5,0));
-        
-        std::cout<<"CLUMP MASS get = "<<p0.getMass()<<std::endl;
-        p0.setDamping(clump_damping);
+        p0.setAngularVelocity(Vec3D(0,20,0.01));
+        p0.setVelocity(Vec3D(8,0,0));
+	p0.setDamping(clump_damping);
         particleHandler.copyAndAddObject(p0);
 
-
-        // Rectangular box
-        wallHandler.clear();
-        InfiniteWall w0;
-        w0.setSpecies(speciesHandler.getObject(0));
-        w0.set(Vec3D(-1.0, 0.0, 0.0), Vec3D(getXMin(), 0, 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(1.0, 0.0, 0.0), Vec3D(getXMax(), 0, 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0, -1.0, 0.0), Vec3D(0, getYMin(), 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0, 1.0, 0.0), Vec3D(0, getYMax(), 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0, 0, getZMin()));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D(0.0, 0.0, 1.0), Vec3D(0, 0, getZMax()));
-        wallHandler.copyAndAddObject(w0);
     }
 private:
     int clump_index;
     clump_data data;
     Mdouble clump_mass;
-    Mdouble clump_damping = 10;
+    Mdouble clump_damping = 0;
 };
 
 int main(int argc, char* argv[])
 {
-    multiParticleT1 problem;
+    clumpTest problem;
     auto species = problem.speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
     species->setDensity(1.0); // sets the species type-0 density
     //species->setConstantRestitution(0);
@@ -131,15 +124,24 @@ int main(int argc, char* argv[])
     problem.setTimeStep(collisionTime / 50.0);
 
     // Quick demonstration
-    problem.setSaveCount(5000);
-    problem.setTimeMax(100);
+    problem.setSaveCount(100);
+    problem.setTimeMax(1);
 
 
-    // For time averaging featuring equipartition - takes a while
-    // problem.setSaveCount(50000);
-    // problem.setTimeMax(100000);
 
     problem.removeOldFiles();
     problem.solve();
+
+    MultiParticle* p = dynamic_cast<MultiParticle*>(problem.particleHandler.getLastObject());
+    Vec3D angVel = p->getAngularVelocity();
+    Vec3D known_angVel = Vec3D(-1.30004, 19.9932, 0.944699);
+
+    Vec3D pos = p->getPosition();
+    Vec3D known_pos = Vec3D(-0.201397, -2.37542, -0.284277);
+
+
+    helpers::check(angVel,known_angVel,1e-4, "Angular velocity check");
+    helpers::check(pos,known_pos,1e-4, "Pebble position");
+    
     return 0;
 }

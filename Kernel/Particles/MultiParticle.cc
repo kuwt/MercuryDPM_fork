@@ -29,6 +29,11 @@
 #include "ParticleHandler.h"
 #include "DPMBase.h"
 
+#define N_ITER 3 // Parameter of time integration
+// Lower values give better performance, higher-better precision.
+// (Passing self-test requires at least 2, PFC4.0 uses 4)
+
+
 MultiParticle::MultiParticle()
 {
     setRadius(1.0);
@@ -71,7 +76,6 @@ MultiParticle::MultiParticle(const MultiParticle& p): NonSphericalParticle(p)
     slaveParticles = p.slaveParticles;
     principalDirections = p.principalDirections;
     initPrincipalDirections = p.initPrincipalDirections;
-
     inertiaMultiparticle = p.inertiaMultiparticle;
     initInertiaMultiparticle = p.initInertiaMultiparticle;
     invInertia_= inertiaMultiparticle.inverse();
@@ -308,7 +312,7 @@ void MultiParticle::integrateBeforeForceComputation(double time, double timeStep
         //apply to rotation quaternion q: q = normalise(q + \tilde{C}\omega*timeStep) (see Wouter's notes)
         rotate(getAngularVelocity() * timeStep);
 
-        // Rotatestd::cout<<"w_"<<n<<" = "<<angularVelocity_n<<std::endl; the principal axis according to the angle of rotation
+        // Rotate
         rotatePrincipalDirections(getAngularVelocity() * timeStep);
 
         // Update slave nodes
@@ -354,7 +358,7 @@ void MultiParticle::angularAccelerateMasterIterative(double timeStep)
 
     Vec3D angularVelocity_0 = getAngularVelocity();
     Vec3D angularVelocity_n = angularVelocity_0;
-    for (int n = 0; n<1; n++) // 4 iterations needed for good precision (PFC4.0 manual)
+    for (int n = 0; n<N_ITER; n++) //
     {
         Mdouble wx = angularVelocity_n.X;
         Mdouble wy = angularVelocity_n.Y;
