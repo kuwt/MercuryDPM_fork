@@ -97,6 +97,10 @@ target_link_libraries(oomphBase generic oomph_superlu_4.3 oomph_flapack oomph_ar
 add_library(oomphSolid STATIC ${CMAKE_SOURCE_DIR}/Kernel/Logger.cc)
 target_link_libraries(oomphSolid constitutive meshes solid oomphBase)
 
+# build a smaller library for fluid problems
+add_library(oomphFluid STATIC ${CMAKE_SOURCE_DIR}/Kernel/Logger.cc)
+target_link_libraries(oomphFluid navier_stokes meshes oomphBase)
+
 # the full oomph library
 add_library(oomph STATIC ${CMAKE_SOURCE_DIR}/Kernel/Logger.cc)
 target_link_libraries(oomph steady_axisym_advection_diffusion young_laplace advection_diffusion advection_diffusion_reaction axisym_advection_diffusion axisym_foeppl_von_karman axisym_linear_elasticity axisym_navier_stokes axisym_poroelasticity axisym_spherical_solid beam biharmonic constitutive darcy fluid_interface flux_transport foeppl_von_karman fourier_decomposed_helmholtz generalised_newtonian_axisym_navier_stokes generalised_newtonian_navier_stokes helmholtz linear_elasticity linear_wave linearised_navier_stokes linearised_axisym_navier_stokes mesh_smoothing meshes multi_physics navier_stokes ode poisson polar_navier_stokes poroelasticity rigid_body shell solid spherical_advection_diffusion spherical_navier_stokes  time_harmonic_fourier_decomposed_linear_elasticity time_harmonic_linear_elasticity unsteady_heat womersley oomph_hsl oomph_crbond_bessel oomph_triangle oomph_tetgen oomphBase)
