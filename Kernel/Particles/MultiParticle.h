@@ -61,7 +61,14 @@ public:
 
     MultiParticle* copy() const override;
 
-    void write(std::ostream& os) const override;
+
+    void write(std::ostream& os) const override
+    {
+        BaseParticle::write(os);
+        os << " DzhanibekovParticle " << DzhanibekovParticle_;
+        os << " VerticallyOriented " << VerticallyOriented_;
+
+    }
 
     void read(std::istream& is) override;
 
@@ -214,10 +221,64 @@ public:
 
     std::vector <Mdouble> getSlaveRadii(){ return slaveRadius; }
 
+    // Methods setting and getting some extra Boolean properties
+
+    bool getDzhanibekovParticle()
+    {
+    	return DzhanibekovParticle_;
+    }
+    
+    bool getVerticallyOriented()
+    {
+    	return VerticallyOriented_;
+    }
+    
+    void setDzhanibekovParticle( bool d)
+    {
+    	DzhanibekovParticle_ = d;
+    }
+    
+    void setVerticallyOriented( bool d)
+    {
+    	VerticallyOriented_ = d;
+    }
+
+    unsigned getNumberOfFieldsVTK() const override
+    {
+        return 2;
+    }
+
+    std::string getTypeVTK(unsigned i) const override
+    {
+        return "Int8";
+    }
+
+
+    std::string getNameVTK(unsigned i) const override
+    {
+        if (i==0)
+            return "DzhanibekovParticle";
+        else
+            return "VerticallyOriented";
+    }
+
+
+    std::vector<Mdouble> getFieldVTK(unsigned i) const override
+    {
+        if (i==0)
+            return std::vector<Mdouble>(1, DzhanibekovParticle_);
+        else
+            return std::vector<Mdouble>(1, VerticallyOriented_);
+    }
+	
+		
 
 private:
 
     int nSlave;
+    
+    bool DzhanibekovParticle_; // This property is needed to quantify Dzhanibekov gas properties
+    bool VerticallyOriented_;  // This property is useful for mechnical stability simulations (Gomboc, Dominos)
 
     Mdouble massMultiparticle;
     Mdouble viscousDamping;

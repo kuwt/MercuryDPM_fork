@@ -59,6 +59,10 @@ MultiParticle::MultiParticle()
     isMaster = false; //Assign false by default
     masterParticle = nullptr;
 
+
+    DzhanibekovParticle_ = false;
+    VerticallyOriented_ = false;
+
     //++++++++++++++
     logger(DEBUG, "Multiparticle::MultiParticle() finished");
 }
@@ -79,8 +83,8 @@ MultiParticle::MultiParticle(const MultiParticle& p): NonSphericalParticle(p)
     inertiaMultiparticle = p.inertiaMultiparticle;
     initInertiaMultiparticle = p.initInertiaMultiparticle;
     invInertia_= inertiaMultiparticle.inverse();
-
-
+    DzhanibekovParticle_ = p.DzhanibekovParticle_;
+    VerticallyOriented_ = p.VerticallyOriented_;
 
     for (int iSlave = 1; iSlave <= nSlave; iSlave++) slaveParticles[iSlave - 1] = nullptr;
 
@@ -102,11 +106,6 @@ MultiParticle* MultiParticle::copy() const
     return new MultiParticle(*this);
 }
 
-void MultiParticle::write(std::ostream& os) const
-{
-    BaseParticle::write(os);
-    os << " nSlaves " << nSlave;
-}
 
 std::string MultiParticle::getName() const
 {
