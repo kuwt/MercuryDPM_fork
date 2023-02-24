@@ -340,6 +340,7 @@ void MultiParticle::integrateAfterForceComputation(double time, double timeStep)
         // PFC4 style acceleration of clumps
         angularAccelerateMasterIterative(timeStep);
         updateSlavesVelPos();
+        updateExtraQuantities();
     }
 }
 
@@ -389,3 +390,56 @@ void MultiParticle::computeMass(const ParticleSpecies &s)
 }
 
 
+void MultiParticle::updateExtraQuantities()
+{
+    Mdouble ANG_TOL = 0.1; // 5.7 degrees - tolerance to misalignment
+    Mdouble TOL = 10e-8;   // External force tolerance
+    MultiParticle* pSlave;
+    Vec3D n3 = getPrincipalDirections_e3();
+    Vec3D v = Vec3D(0,0,1);
+
+    // Check for vertical alignment
+    if (acos(Vec3D::dot(n3, v))<ANG_TOL)
+    {
+        setVerticallyOriented(true);
+        for (int iSlave = 1; iSlave <= nSlave; iSlave++)
+        {
+            pSlave = slaveParticles[iSlave-1];
+            pSlave->setVerticallyOriented(true);
+        }
+    }
+    else {
+        setVerticallyOriented(false);
+        for (int iSlave = 1; iSlave <= nSlave; iSlave++)
+        {
+            pSlave = slaveParticles[iSlave-1];
+            pSlave->setVerticallyOriented(false);
+        }
+    }
+
+    // Check for Dzhanibekov States
+
+    Vec3D w  = getAngularVelocity()/getAngularVelocity().getLength();
+    Vec3D n2 = getPrincipalDirections_e2();
+
+    if (acos(Vec3D::dot(n2, w))<ANG_TOL)
+    {
+        setDzhanibekovParticle(true);
+        for (int iSlave = 1; iSlave <= nSlave; iSlave++)
+        {
+            pSlave = slaveParticles[iSlave-1];
+            pSlave->setDzhanibekovParticle(true);
+        }
+    }
+    if ( (getForce().getLength() > TOL)||(getTorque().getLength() > TOL) )
+    {
+        setDzhanibekovParticle(false);
+        for (int iSlave = 1; iSlave <= nSlave; iSlave++)
+        {
+            pSlave = slaveParticles[iSlave-1];
+            pSlave->setDzhanibekovParticle(false);
+        }
+    }
+
+    return;
+}

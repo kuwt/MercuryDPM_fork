@@ -270,7 +270,8 @@ public:
         else
             return std::vector<Mdouble>(1, VerticallyOriented_);
     }
-	
+
+    void updateExtraQuantities();
 		
 
 private:
