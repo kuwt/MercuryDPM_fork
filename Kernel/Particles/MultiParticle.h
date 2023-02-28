@@ -280,6 +280,7 @@ private:
     
     bool DzhanibekovParticle_; // This property is needed to quantify Dzhanibekov gas properties
     bool VerticallyOriented_;  // This property is useful for mechnical stability simulations (Gomboc, Dominos)
+    Vec3D angularAcceleration_;
 
     Mdouble massMultiparticle;
     Mdouble viscousDamping;

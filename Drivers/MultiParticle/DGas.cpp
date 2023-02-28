@@ -31,7 +31,8 @@
 #include "Particles/MultiParticle.h"
 #include "clump/ClumpIO.h"
 #include "clump/Mercury3DClump.h"
-# include <stdlib.h>
+#include <stdlib.h>
+#include <CMakeDefinitions.h>
 
 Mdouble f_min = -50; Mdouble f_max = 50; // Size of the box and the margin/clearance for clump seeds
 Mdouble margin = 0;
@@ -44,6 +45,7 @@ Mdouble tv_min = -100; // range of translational velocities
 Mdouble tv_max = 100;
 
 int N_att = 200;   // Number of attempts to add particle
+std::vector <int> D_h; // log of the number of Dzhanibekov particles
 
 class multiParticleT1 : public Mercury3Dclump
 {
@@ -61,6 +63,7 @@ public:
         setZMin(f_min);
         load_clumps(data);
         clump_mass = data.mass[clump_index];
+
     }
 
     void setClumpDamping(Mdouble damp){ clump_damping = damp;}
@@ -175,12 +178,24 @@ public:
         }
         std::cout<<"Number of particles created: "<<N_created<<std::endl;
     }
+
+    void actionsAfterTimeStep() override {
+        int D_num = 0;
+        for (std::vector<BaseParticle*>::iterator it= particleHandler.begin(); it!=particleHandler.end(); ++it){
+            if ((*it)->IsMaster()) {
+                D_num += (int) static_cast<MultiParticle*>(*it)->getDzhanibekovParticle();
+            }
+        }
+        D_h.push_back(D_num);
+    }
 private:
     int clump_index;
     clump_data data;
     Mdouble clump_mass;
     Mdouble clump_damping = 0;
 };
+
+
 
 int main(int argc, char* argv[])
 {
@@ -193,13 +208,22 @@ int main(int argc, char* argv[])
     species->setStiffness(1e6);
     const Mdouble collisionTime = species->getCollisionTime(problem.getClumpMass());
     problem.setClumpDamping(0);
+    std::cout <<"coll time"<<collisionTime<<std::endl;
     problem.setTimeStep(collisionTime / 50.0);
 
     // Quick demonstration
     problem.setSaveCount(50);
     problem.setTimeMax(1.0);
 
+
     problem.removeOldFiles();
     problem.solve();
+
+    
+    // Return the log of the angular momentum
+    std::ofstream D_hyst;  D_hyst.open ("Dzh_hystory.txt");
+    for (int i = 0; i<D_h.size(); i+=50){D_hyst <<D_h[i]<<std::endl;}
+    D_hyst.close();
+
     return 0;
 }

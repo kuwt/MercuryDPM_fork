@@ -369,6 +369,8 @@ void MultiParticle::angularAccelerateMasterIterative(double timeStep)
                         wx*wy*(Iyy_-Ixx_) - wy*wy*Ixy_ + wx*wx*Ixy_ + wz*wx*Iyz_ - wy*wz*Ixz_);
 
         Vec3D angularAcceleration_n = invInertia_ * (M-W);
+        angularAcceleration_ = angularAcceleration_n;
+        angularAcceleration_ = angularAcceleration_n;
         angularVelocity_n = angularVelocity_0 + 0.5 * timeStep * angularAcceleration_n;
     }
 
@@ -393,6 +395,8 @@ void MultiParticle::computeMass(const ParticleSpecies &s)
 void MultiParticle::updateExtraQuantities()
 {
     Mdouble ANG_TOL = 0.1; // 5.7 degrees - tolerance to misalignment
+    Mdouble ACC_TOL = 0.1; // Tolerance for angular acceleration magnitude
+
     Mdouble TOL = 10e-8;   // External force tolerance
     MultiParticle* pSlave;
     Vec3D n3 = getPrincipalDirections_e3();
@@ -421,8 +425,9 @@ void MultiParticle::updateExtraQuantities()
 
     Vec3D w  = getAngularVelocity()/getAngularVelocity().getLength();
     Vec3D n2 = getPrincipalDirections_e2();
+    Mdouble acc = angularAcceleration_.getLength();
 
-    if (acos(Vec3D::dot(n2, w))<ANG_TOL)
+    if ((acos(Vec3D::dot(n2, w))<ANG_TOL) || (acc<TOL))
     {
         setDzhanibekovParticle(true);
         for (int iSlave = 1; iSlave <= nSlave; iSlave++)
@@ -431,6 +436,8 @@ void MultiParticle::updateExtraQuantities()
             pSlave->setDzhanibekovParticle(true);
         }
     }
+
+    // Any contact force/torques break D state
     if ( (getForce().getLength() > TOL)||(getTorque().getLength() > TOL) )
     {
         setDzhanibekovParticle(false);
