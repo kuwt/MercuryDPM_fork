@@ -244,6 +244,7 @@ domainHandler.setDPMBase(this);
 domainHandler.initialise();
 periodicBoundaryHandler.setDPMBase(this);
 periodicBoundaryHandler.initialise();
+rotation_ = true;
 
 //set defaults for DPMBase parameters
 setSystemDimensions(3);
