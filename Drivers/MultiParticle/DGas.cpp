@@ -115,68 +115,82 @@ public:
 
         auto per_z = boundaryHandler.copyAndAddObject(new PeriodicBoundary);
         per_z->set(Vec3D(0, 0, 1), getZMin(), getZMax());
-        //*/
+
+
+        /*
+        SphericalParticle p0;
+        p0.setSpecies(speciesHandler.getObject(0));
+        p0.setRadius(1); // sets particle radius
+        p0.setPosition(Vec3D(0., 0., 0.)); // sets particle position
+        p0.setVelocity(Vec3D(0., 0., 0.));// sets particle velocity
+        particleHandler.copyAndAddObject(p0);
+        */
+
 
         // Generate a dense packing of clumps
         setClumpIndex(1);
         int N_created = 0;
-        for (int part = 0; part<N_att; part++) {
-            MultiParticle p0;
-            p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to MultiParticle 1
-            p0.setMaster();
-            clump_data rdata = rotate_clump(data, clump_index, uniform_random_pds()); // Rotate clump arbitrarily
+        //for (int part = 0; part<N_att; part++) {
+        for (int part = 0; part<50; part++) {
+
+                MultiParticle p0;
+                p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to MultiParticle 1
+                p0.setMaster();
+                clump_data rdata = rotate_clump(data, clump_index, uniform_random_pds()); // Rotate clump arbitrarily
 
 
 
-            p0.setRadius(rdata.pebbles_r[clump_index][0]);
+                p0.setRadius(rdata.pebbles_r[clump_index][0]);
 
-            for (int j = 0; j < rdata.pebbles_r[clump_index].size(); j++) {
-                p0.addSlave(Vec3D(rdata.pebbles_x[clump_index][j],
-                                  rdata.pebbles_y[clump_index][j],
-                                  rdata.pebbles_z[clump_index][j]),
-                            rdata.pebbles_r[clump_index][j]);
+                for (int j = 0; j < rdata.pebbles_r[clump_index].size(); j++) {
+                    p0.addSlave(Vec3D(rdata.pebbles_x[clump_index][j],
+                                      rdata.pebbles_y[clump_index][j],
+                                      rdata.pebbles_z[clump_index][j]),
+                                rdata.pebbles_r[clump_index][j]);
+                }
+                p0.setPrincipalDirections(
+                        Matrix3D(rdata.pd[clump_index][0], rdata.pd[clump_index][1], rdata.pd[clump_index][2],
+                                 rdata.pd[clump_index][3], rdata.pd[clump_index][4], rdata.pd[clump_index][5],
+                                 rdata.pd[clump_index][6], rdata.pd[clump_index][7], rdata.pd[clump_index][8]));
+                p0.setInitInertia(
+                        MatrixSymmetric3D(rdata.toi[clump_index][0], rdata.toi[clump_index][1], rdata.toi[clump_index][2],
+                                          rdata.toi[clump_index][4], rdata.toi[clump_index][5],
+                                          rdata.toi[clump_index][8]));
+                p0.setMassMultiparticle(rdata.mass[clump_index]);
+
+                p0.setDamping(clump_damping);
+
+
+                Vec3D pos = Vec3D(f_min + margin +  random_double(f_max - f_min - 2 * margin),
+                                  f_min + margin + random_double(f_max - f_min - 2 * margin),
+                                  f_min + margin + random_double(f_max - f_min - 2 * margin));
+
+                p0.setPosition(pos);
+
+                Vec3D angVel = Vec3D(av_min + random_double(av_max - av_min),
+                                     av_min + random_double(av_max - av_min),
+                                     av_min + random_double(av_max - av_min));
+
+                Vec3D vel = Vec3D(tv_min + random_double(tv_max - tv_min),
+                                  tv_min + random_double(tv_max - tv_min),
+                                  tv_min + random_double(tv_max - tv_min));
+
+                // No motion with zero initial conditions
+                //angVel = Vec3D(0,0,0);
+                //vel = Vec3D(0,0,0);
+
+                p0.setAngularVelocity(angVel);
+                p0.setVelocity(vel);
+
+
+                if (checkClumpForInteractionPeriodic(p0)) {
+                    particleHandler.copyAndAddObject(p0);
+                    N_created++;
+                }
             }
-            p0.setPrincipalDirections(
-                    Matrix3D(rdata.pd[clump_index][0], rdata.pd[clump_index][1], rdata.pd[clump_index][2],
-                             rdata.pd[clump_index][3], rdata.pd[clump_index][4], rdata.pd[clump_index][5],
-                             rdata.pd[clump_index][6], rdata.pd[clump_index][7], rdata.pd[clump_index][8]));
-            p0.setInitInertia(
-                    MatrixSymmetric3D(rdata.toi[clump_index][0], rdata.toi[clump_index][1], rdata.toi[clump_index][2],
-                                      rdata.toi[clump_index][4], rdata.toi[clump_index][5],
-                                      rdata.toi[clump_index][8]));
-            p0.setMassMultiparticle(rdata.mass[clump_index]);
 
-            p0.setDamping(clump_damping);
-
-
-            Vec3D pos = Vec3D(f_min + margin +  random_double(f_max - f_min - 2 * margin),
-                              f_min + margin + random_double(f_max - f_min - 2 * margin),
-                              f_min + margin + random_double(f_max - f_min - 2 * margin));
-
-            p0.setPosition(pos);
-
-            Vec3D angVel = Vec3D(av_min + random_double(av_max - av_min),
-                                 av_min + random_double(av_max - av_min),
-                                 av_min + random_double(av_max - av_min));
-
-            Vec3D vel = Vec3D(tv_min + random_double(tv_max - tv_min),
-                              tv_min + random_double(tv_max - tv_min),
-                              tv_min + random_double(tv_max - tv_min));
-
-            // No motion with zero initial conditions
-            //angVel = Vec3D(0,0,0);
-            //vel = Vec3D(0,0,0);
-
-            p0.setAngularVelocity(angVel);
-            p0.setVelocity(vel);
-
-
-            if (checkClumpForInteractionPeriodic(p0)) {
-                particleHandler.copyAndAddObject(p0);
-                N_created++;
-            }
-        }
         std::cout<<"Number of particles created: "<<N_created<<std::endl;
+
     }
 
     void actionsAfterTimeStep() override {
@@ -200,6 +214,7 @@ private:
 int main(int argc, char* argv[])
 {
     multiParticleT1 problem;
+    problem.setNumberOfOMPThreads(helpers::readFromCommandLine(argc, argv, "-omp",4));
     auto species = problem.speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
     species->setDensity(1.0); // sets the species type-0 density
     //species->setConstantRestitution(0);
@@ -219,7 +234,7 @@ int main(int argc, char* argv[])
     problem.removeOldFiles();
     problem.solve();
 
-    
+
     // Return the log of the angular momentum
     std::ofstream D_hyst;  D_hyst.open ("Dzh_hystory.txt");
     for (int i = 0; i<D_h.size(); i+=50){D_hyst <<D_h[i]<<std::endl;}

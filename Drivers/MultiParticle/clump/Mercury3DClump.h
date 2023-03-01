@@ -12,6 +12,7 @@ public:
     {
 
     }
+
     // Redefine force computation for clumps
     void computeInternalForce(BaseParticle* P1, BaseParticle* P2) override
     {
@@ -94,9 +95,7 @@ public:
         }
         logger(DEBUG,"All forces set to zero");
 
-
         // compute all internal and external forces; for omp simulations, this can be done in parallel
-        #pragma omp parallel num_threads(getNumberOfOMPThreads())
         {
             //logger(INFO, "Number of omp threads = %", getNumberOfOMPThreads());
             ///Now loop over all particles contacts computing force contributions
