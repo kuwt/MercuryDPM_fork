@@ -124,8 +124,16 @@ void MeshTriangle::checkInteractions(InteractionHandler* interactionHandler, uns
         if (i->getMultiContactIdentifier()>3) // Vertex contact
         {
             id = i->getMultiContactIdentifier() - 4;
+            
             for (auto triangleId : vertexNeighbors[id])
             {
+                // If a neighboring particle has a contact and a lower Id with
+                // the same particle, disregard this contact
+                if (triangleId<this->getId())
+                {
+                    interactionValid = false;
+                    break;
+                }
                 // logger(INFO, "id % %", id, getId());
                 auto k = getHandler()->getObjectById(triangleId);
                 auto interactionNeighbor = interactionHandler->getExistingInteraction(i->getP(), k);
@@ -145,13 +153,23 @@ void MeshTriangle::checkInteractions(InteractionHandler* interactionHandler, uns
             id = i->getMultiContactIdentifier() - 1;
             if (neighbor[id])
             {
-                auto interactionNeighbor = interactionHandler->getExistingInteraction(i->getP(), neighbor[id]);
-                if (interactionNeighbor && interactionNeighbor->getTimeStamp()==timeStamp)
+                // If a neighboring particle has at least an edge contact with
+                // the same particle and a lower Id, disregard this contact
+                if (neighbor[id]->getId()<this->getId())
                 {
-                    if (interactionNeighbor->getMultiContactIdentifier() == 0)
+                    // logger(INFO, "Found invalid Edge contact due to Id");
+                    interactionValid = false;
+                } 
+                else
+                {
+                    auto interactionNeighbor = interactionHandler->getExistingInteraction(i->getP(), neighbor[id]);
+                    if (interactionNeighbor && interactionNeighbor->getTimeStamp()==timeStamp)
                     {
-                        // logger(INFO, "Found invalid edge contact");
-                        interactionValid = false;
+                        if (interactionNeighbor->getMultiContactIdentifier() == 0)
+                        {
+                            // logger(INFO, "Found invalid edge contact");
+                            interactionValid = false;
+                        }
                     }
                 }
             }
@@ -162,7 +180,8 @@ void MeshTriangle::checkInteractions(InteractionHandler* interactionHandler, uns
         {
             i->getP()->addForce(-i->getForce());
             this->addForce(i->getForce());
-            if (getHandler()->getDPMBase()->getRotation()) {
+            if (getHandler()->getDPMBase()->getRotation())
+            {
                 i->getP()->addTorque(-i->getTorque() + Vec3D::cross(i->getP()->getPosition() - i->getContactPoint(), i->getForce()));
                 this->addTorque(i->getTorque() - Vec3D::cross(this->getPosition() - i->getContactPoint(), i->getForce()));
             }
@@ -266,7 +285,6 @@ bool MeshTriangle::getDistanceNormalOverlapType(const BaseParticle& p, Mdouble& 
     }
 
     // Then the neighbor will handle this interaction
-    if (neighbor[id] && neighbor[id]->getId()<this->getId()) return false;
     // determine if it is an edge or vertex contact
     const double positionAlongEdge = Vec3D::dot(edgeBranch[id], edge_[id]);
     if (positionAlongEdge <= 0) {
@@ -274,10 +292,6 @@ bool MeshTriangle::getDistanceNormalOverlapType(const BaseParticle& p, Mdouble& 
         distance = edgeBranch[id].getLength();
         if (distance > distanceMax) return false;
         // check vertex ids
-        for (auto triangleId: vertexNeighbors[id])
-        {
-            if (triangleId<this->getId()) return false;
-        }
         normal = edgeBranch[id] / -distance;
         type = 4 + id; // Vertex contact
     } else if (positionAlongEdge >= edgeLength_[id]) {
@@ -286,10 +300,6 @@ bool MeshTriangle::getDistanceNormalOverlapType(const BaseParticle& p, Mdouble& 
         distance = edgeBranch[idRight].getLength();
         if (distance > distanceMax) return false;
         // check vertex ids
-        for (auto triangleId: vertexNeighbors[idRight])
-        {
-            if (triangleId<this->getId()) return false;
-        }
         type = 4 + idRight; // Vertex contact
         normal = edgeBranch[idRight] / -distance;
 
@@ -391,9 +401,7 @@ void MeshTriangle::read(std::istream& is)
     is >> dummy >> invMass_;
     is >> dummy >> isActive;
     
-    checkActive();
     // updateVerticesFromParticles();
-    updateVertexAndNormal();
 }
 
 /*!
