@@ -60,6 +60,7 @@ public:
         setYMin(f_min);
         setZMin(f_min);
         load_clumps(data);
+        setClumpIndex(0);
         clump_mass = data.mass[clump_index];
     }
 

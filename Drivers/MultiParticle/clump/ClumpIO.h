@@ -3,22 +3,28 @@
 #ifndef CLUMP_IO_H
 #define CLUMP_IO_H
 
+#include <algorithm>
 #include <dirent.h>
 #include <sys/types.h>
 #include <iostream>
 #include <fstream>
-#include <boost/filesystem.hpp>
 #include <vector>
 #include <string>
 #include <cmath>
+#include <sstream>
 #include "Math/Matrix.h"
-#include<CMakeDefinitions.h>
+#include <CMakeDefinitions.h>
 
+// Useful containers
 typedef std::vector<double> dvec;
 typedef std::vector<dvec> ddvec;
 typedef std::vector<std::string> svec;
 
-struct clump_data     // structure for storing clump instances' parameters
+// Helper function for alphabetical sorting of clump names
+bool compareFunction (std::string a, std::string b) {return a<b;}
+
+// structure for storing clump instances' parameters
+struct clump_data
 {
 public:
     
@@ -35,7 +41,7 @@ public:
 	
 };
 
-
+// Loading available clumps and their names
 void load_conf(clump_data &a)
 {
     // Path to MCLump tool
@@ -45,53 +51,51 @@ void load_conf(clump_data &a)
     DIR *dir = opendir(a.path.c_str());
     while ((entry = readdir(dir)) != NULL) {
         if (entry->d_type == DT_DIR){
-            std::cout << "Name: " << entry->d_name << std::endl;
             a.clump_names.push_back(entry->d_name);
         }
     }
     closedir(dir);
-    a.clump_names.pop_back();
-    a.clump_names.pop_back();
 
-    //a.clump_names.push_back("clump01");
-    //a.clump_names.push_back("clump02");
-    //a.clump_names.push_back("clump03");
+    // remove "." and ".." from the list of dirs (position of those in the list is OS-sensitive, hence this code)
+
+    std::sort(a.clump_names.begin(),a.clump_names.end(),compareFunction);//sort the vector
+    a.clump_names.erase(a.clump_names.begin());
+    a.clump_names.erase(a.clump_names.begin());
+
+    // Show the names of available clumps
+    for (int i = 0; i<a.clump_names.size(); i++) std::cout<<a.clump_names[i]<<std::endl;
+
 }
 
-
+// Loading pebbles of a clump
 void load_pebbles(clump_data &a)
 {
     std::cout<<"Loading clump pebbles...";
-    
+
     a.pebbles_x.resize(a.clump_names.size());
     a.pebbles_y.resize(a.clump_names.size());
     a.pebbles_z.resize(a.clump_names.size());
     a.pebbles_r.resize(a.clump_names.size());
-    
+
     for (int i = 0; i < a.clump_names.size(); i++ ){
-    	//std::cout<<a.path + a.clump_names[i]+"/clump/clump.txt"<<std::endl;
-    	std::ifstream infile((a.path + a.clump_names[i]+"/clump/clump.txt").c_str(), std::ios::in | std::ios::binary);
-    	char lin[256];
-    	while (infile.getline(lin, 256, '\n')){
-    		svec val;
-    		std::string line(lin);
-    		line+=",";
-    		std::string buffer = "";
-    		for(int j=0; j < line.size(); j++){
-    			if (line[j] != ',') {buffer += line[j];}
-        		else {val.push_back(buffer); buffer = "";}
-        	}
-        	a.pebbles_x[i].push_back(std::stof(val[0]));
-        	a.pebbles_y[i].push_back(std::stof(val[1]));
-        	a.pebbles_z[i].push_back(std::stof(val[2]));
-        	a.pebbles_r[i].push_back(std::stof(val[3]));	
-    	}
-    	infile.close();	
+        std::ifstream infile((a.path + a.clump_names[i]+"/clump/clump.txt").c_str(), std::ios::in | std::ios::binary);
+        std::string line{};
+        while (std::getline(infile, line)) {
+            std::istringstream iss(line);
+            std::string substring{};
+            svec val;
+            while (std::getline(iss, substring, ',')) val.push_back(substring);
+            a.pebbles_x[i].push_back(std::stof(val[0]));
+            a.pebbles_y[i].push_back(std::stof(val[1]));
+            a.pebbles_z[i].push_back(std::stof(val[2]));
+            a.pebbles_r[i].push_back(std::stof(val[3]));
+        }
+        infile.close();
     }
     std::cout<<"\t OK"<<std::endl;
 }
 
-
+// Load mass of a clump
 void load_mass(clump_data &a)
 {
     std::cout<<"Loading clump masses..";
@@ -99,70 +103,58 @@ void load_mass(clump_data &a)
     a.mass.resize(a.clump_names.size());
     
     for (int i = 0; i < a.clump_names.size(); i++ ){
-    	//std::cout<<a.path + a.clump_names[i]+"/inertia/mass.txt"<<std::endl;
     	std::ifstream infile((a.path + a.clump_names[i]+"/inertia/mass.txt").c_str(), std::ios::in | std::ios::binary);
-    	char lin[256];
-    	infile.getline(lin, 256, '\n');
-    	std::string line(lin);
-    	a.mass[i] = std::stof(line);		
-    	infile.close();	
+    	std::string mass;
+        infile >> mass;
+        a.mass[i] = std::stof(mass);
+        infile.close();
     }
     std::cout<<"\t OK"<<std::endl;
 }
 
-
+// Load tensor of inertia (TOI) of a clump
 void load_toi(clump_data &a)
 {
     std::cout<<"Loading clump TOI..";
     a.toi.resize(a.clump_names.size());
+
     for (int i = 0; i < a.clump_names.size(); i++ ){
-    	//std::cout<<a.path + a.clump_names[i]+"/inertia/toi.txt"<<std::endl;
-    	std::ifstream infile((a.path + a.clump_names[i]+"/inertia/toi.txt").c_str(), std::ios::in | std::ios::binary);
-    	char lin[256];
-    	for (int row = 0; row<3; row++){
-    		infile.getline(lin, 256, '\n');
-    		svec val;
-    		std::string line(lin);
-    		line+=",";
-    		std::string buffer = "";
-    		for(int j=0; j < line.size(); j++){
-    			if (line[j] != ',') {buffer += line[j];}
-        		else { val.push_back(buffer); buffer = "";}
-        	}
-        	for (int k = 0; k < 3; k++) a.toi[i].push_back(std::stof(val[k]));
+        std::ifstream infile((a.path + a.clump_names[i]+"/inertia/toi.txt").c_str(), std::ios::in | std::ios::binary);
+        std::string line{};
+        while (std::getline(infile, line)) {
+            std::istringstream iss(line);
+            std::string substring{};
+            svec val;
+            while (std::getline(iss, substring, ',')) val.push_back(substring);
+            for (int k = 0; k < 3; k++) a.toi[i].push_back(std::stof(val[k]));
         }
-    	infile.close();	
+        infile.close();
     }
     std::cout<<"\t OK"<<std::endl;
 }
 
-
+// Load pre-computed principal directions (PDs) of a clump. Normally MClump tool aligns PDs with the global Cartesian axes.
 void load_pd(clump_data &a)
 {
     std::cout<<"Loading clump PD..";
     a.pd.resize(a.clump_names.size());
+
     for (int i = 0; i < a.clump_names.size(); i++ ){
-    	//std::cout<<a.path + a.clump_names[i]+"/inertia/pd.txt"<<std::endl;
-    	std::ifstream infile((a.path + a.clump_names[i]+"/inertia/pd.txt").c_str(), std::ios::in | std::ios::binary);
-    	char lin[256];
-    	for (int row = 0; row<3; row++){
-    		infile.getline(lin, 256, '\n');	
-    		svec val;
-    		std::string line(lin);
-    		line+=",";
-    		std::string buffer = "";
-    		for(int j=0; j < line.size(); j++){
-    			if (line[j] != ',') {buffer += line[j];}
-        		else { val.push_back(buffer); buffer = "";}
-        	}
-        	for (int k = 0; k < 3; k++) a.pd[i].push_back(std::stof(val[k]));
+        std::ifstream infile((a.path + a.clump_names[i]+"/inertia/pd.txt").c_str(), std::ios::in | std::ios::binary);
+        std::string line{};
+        while (std::getline(infile, line)) {
+            std::istringstream iss(line);
+            std::string substring{};
+            svec val;
+            while (std::getline(iss, substring, ',')) val.push_back(substring);
+            for (int k = 0; k < 3; k++) a.pd[i].push_back(std::stof(val[k]));
         }
-    	infile.close();	
+        infile.close();
     }
     std::cout<<"\t OK"<<std::endl;
 }
 
-void load_clumps(clump_data &data)
+void load_clumps(clump_data &data, bool VERBOSE = false)
 {
 	// Umbrela function that loads all the necessary files to initiate clumps
 	std::cout<<"LOAD CLUMP DATA"<<std::endl;
@@ -171,26 +163,26 @@ void load_clumps(clump_data &data)
 	load_mass(data);
 	load_toi(data);
 	load_pd(data);
+    if (VERBOSE) {
+        std::cout<<"LOADED CLUMPS"<<std::endl;
+        for (int i = 0; i < data.pebbles_x.size(); i++) {
+            std::cout << data.clump_names[i] << " mass:" << data.mass[i] << std::endl;
+            std::cout << data.clump_names[i] << " list of pebbles:" << std::endl;
+            for (int j = 0; j < data.pebbles_x[i].size(); j++) {
+                std::cout << "Pebble " << j << ": (" << data.pebbles_x[i][j] << "," << data.pebbles_y[i][j] << ","
+                          << data.pebbles_z[i][j] << ")," << data.pebbles_r[i][j] << std::endl;
+            }
 
-    std::cout<<"LOADED CLUMPS"<<std::endl;
-    for (int i = 0; i < data.pebbles_x.size(); i++){
-        std::cout<<data.clump_names[i]<<" mass:"<<data.mass[i]<<std::endl;
-        std::cout<<data.clump_names[i]<<" list of pebbles:"<<std::endl;
-        for (int j = 0; j< data.pebbles_x[i].size(); j++){
-            std::cout<<"Pebble "<<j<<": ("<<data.pebbles_x[i][j]<<","<<data.pebbles_y[i][j]<<","<<data.pebbles_z[i][j]<<"),"<<data.pebbles_r[i][j]<<std::endl;
+            std::cout << data.clump_names[i] << " TOI:" << std::endl;
+            std::cout << data.toi[i][0] << "," << data.toi[i][1] << "," << data.toi[i][2] << std::endl;
+            std::cout << data.toi[i][3] << "," << data.toi[i][4] << "," << data.toi[i][5] << std::endl;
+            std::cout << data.toi[i][6] << "," << data.toi[i][7] << "," << data.toi[i][8] << std::endl;
+
+            std::cout << data.clump_names[i] << " Principal directions:" << std::endl;
+            std::cout << data.pd[i][0] << "," << data.pd[i][1] << "," << data.pd[i][2] << std::endl;
+            std::cout << data.pd[i][3] << "," << data.pd[i][4] << "," << data.pd[i][5] << std::endl;
+            std::cout << data.pd[i][6] << "," << data.pd[i][7] << "," << data.pd[i][8] << std::endl;
         }
-
-        std::cout<<data.clump_names[i]<<" TOI:"<<std::endl;
-        std::cout<<data.toi[i][0]<<","<<data.toi[i][1]<<","<<data.toi[i][2]<<std::endl;
-        std::cout<<data.toi[i][3]<<","<<data.toi[i][4]<<","<<data.toi[i][5]<<std::endl;
-        std::cout<<data.toi[i][6]<<","<<data.toi[i][7]<<","<<data.toi[i][8]<<std::endl;
-
-        std::cout<<data.clump_names[i]<<" Principal directions:"<<std::endl;
-        std::cout<<data.pd[i][0]<<","<<data.pd[i][1]<<","<<data.pd[i][2]<<std::endl;
-        std::cout<<data.pd[i][3]<<","<<data.pd[i][4]<<","<<data.pd[i][5]<<std::endl;
-        std::cout<<data.pd[i][6]<<","<<data.pd[i][7]<<","<<data.pd[i][8]<<std::endl;
-
-
     }
 
 }
