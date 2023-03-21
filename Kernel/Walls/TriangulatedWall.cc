@@ -101,7 +101,42 @@ void TriangulatedWall::readVTK(std::string filename)
         f.vertex[2] = &vertex_[id2];
         face_.push_back(f);
     }
-    file >> dummy;
+    
+    file.close();
+    
+    setNormalsAndNeighbours();
+}
+
+TriangulatedWall::TriangulatedWall(const std::vector<Vec3D>& points,
+                                   const std::vector<std::vector<unsigned int>>& cells, const ParticleSpecies* species)
+{
+    setSpecies(species);
+    set(points, cells);
+}
+
+void TriangulatedWall::set(const std::vector<Vec3D>& points, const std::vector<std::vector<unsigned int>>& cells)
+{
+    //points
+    vertex_ = points;
+    
+    //cells
+    unsigned num = cells.size();
+    face_.reserve(num);
+    Face f;
+    for (unsigned i = 0; i < num; i++)
+    {
+        f.vertex[0] = &vertex_[cells[i][0]];
+        f.vertex[1] = &vertex_[cells[i][1]];
+        f.vertex[2] = &vertex_[cells[i][2]];
+        face_.push_back(f);
+    }
+    
+    //normals, positions, neighbours
+    setNormalsAndNeighbours();
+}
+
+void TriangulatedWall::setNormalsAndNeighbours()
+{
     //set normals and positions
     for (auto& face: face_)
     {
@@ -186,7 +221,6 @@ void TriangulatedWall::readVTK(std::string filename)
         face.edgeNormal[1] = Vec3D::getUnitVector(Vec3D::cross(face.normal, *face.vertex[2] - *face.vertex[1]));
         face.edgeNormal[2] = Vec3D::getUnitVector(Vec3D::cross(face.normal, *face.vertex[0] - *face.vertex[2]));
     }
-    file.close();
 }
 
 TriangulatedWall::~TriangulatedWall()
@@ -311,31 +345,40 @@ std::string TriangulatedWall::getName() const
 }
 
 /*!
+ * \brief Gets the interaction with this wall. In case of multiple contact points return the one with the shortest distance (i.e. largest overlap)
  * \param[in] p Pointer to the BaseParticle which we want to check the interaction for.
  * \param[in] timeStamp The time at which we want to look at the interaction.
  * \param[in] interactionHandler A pointer to the InteractionHandler in which the interaction can be found.
- * \return A pointer to the BaseInteraction that happened between this InfiniteWall
+ * \return A pointer to the BaseInteraction that happened between this wall
  * and the BaseParticle at the timeStamp.
  */
 BaseInteraction* TriangulatedWall::getInteractionWith(BaseParticle* p, unsigned timeStamp,
                                                                    InteractionHandler* interactionHandler)
 {
-    Mdouble distance;
-    Vec3D normal;
+    Mdouble distance, minDistance = constants::inf;
+    Vec3D normal, minNormal;
     Mdouble interactionRadius = p->getWallInteractionRadius(this);
     for (const auto& face : face_)
     {
-        if (face.getDistanceAndNormal(*p, distance, normal,interactionRadius))
+        if (face.getDistanceAndNormal(*p, distance, normal,interactionRadius) && distance < minDistance)
         {
-            normal = -normal;
-            BaseInteraction* const c = interactionHandler->getInteraction(p, this, timeStamp, normal);
-            c->setNormal(normal);
-            c->setDistance(distance);
-            c->setOverlap(p->getRadius() - distance);
-            c->setContactPoint(p->getPosition() - distance * normal);
-            return c;
+            minDistance = distance;
+            minNormal = normal;
         }
     }
+    
+    if (minDistance != constants::inf)
+    {
+        distance = minDistance;
+        normal = -minNormal;
+        BaseInteraction* const c = interactionHandler->getInteraction(p, this, timeStamp, normal);
+        c->setNormal(normal);
+        c->setDistance(distance);
+        c->setOverlap(p->getRadius() - distance);
+        c->setContactPoint(p->getPosition() - distance * normal);
+        return c;
+    }
+    
     return nullptr;
 }
 

@@ -28,6 +28,7 @@
 
 #include "BaseInteractable.h"
 #include "Particles/SuperQuadricParticle.h"
+#include "VTKWriter/VTKData.h"
 
 class WallHandler;
 
@@ -239,6 +240,10 @@ public:
     void addParticlesAtWall(unsigned numElements = 50);
 
     void setVelocityControl(Vec3D forceGoal, Vec3D gainFactor, Vec3D baseVelocity);
+    
+    virtual void writeWallDetailsVTK(VTKData& data) const { };
+    
+    virtual void computeWear() { };
 
 private:
     /*!

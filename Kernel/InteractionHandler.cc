@@ -555,6 +555,11 @@ void InteractionHandler::setWriteVTK(FileType fileType)
     writeVTK_ = fileType;
 }
 
+void InteractionHandler::setWriteVTK(bool writeVTK)
+{
+    writeVTK_ = writeVTK ? FileType::MULTIPLE_FILES : FileType::NO_FILE;
+}
+
 FileType InteractionHandler::getWriteVTK() const
 {
     return writeVTK_;

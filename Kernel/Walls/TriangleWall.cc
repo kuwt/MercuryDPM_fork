@@ -112,7 +112,7 @@ void TriangleWall::rotate(const Vec3D& angularVelocityDt)
 {
     if (!angularVelocityDt.isZero())
     {
-        BaseInteractable::rotate(angularVelocityDt);
+        BaseWall::rotate(angularVelocityDt);
         updateVertexAndNormal();
     }
 }
@@ -164,8 +164,8 @@ void TriangleWall::writeVTK(VTKContainer& vtk) const
 
 void TriangleWall::setVertices(const Vec3D A, const Vec3D B, const Vec3D C)
 {
-    setPosition((A + B + C) / 3);
-    setOrientation({1, 0, 0, 0});
+    BaseWall::setPosition((A + B + C) / 3);
+    BaseWall::setOrientation({1, 0, 0, 0});
     vertexInLabFrame_[0] = A - getPosition();
     vertexInLabFrame_[1] = B - getPosition();
     vertexInLabFrame_[2] = C - getPosition();
@@ -183,14 +183,26 @@ void TriangleWall::setVertices(const Vec3D A, const Vec3D B, const Vec3D C)
  */
 void TriangleWall::move(const Vec3D& move)
 {
-    BaseInteractable::move(move);
+    BaseWall::move(move);
+    updateVertexAndNormal();
+}
+
+void TriangleWall::setPosition(const Vec3D& position)
+{
+    BaseWall::setPosition(position);
+    updateVertexAndNormal();
+}
+
+void TriangleWall::setOrientation(const Quaternion& orientation)
+{
+    BaseWall::setOrientation(orientation);
     updateVertexAndNormal();
 }
 
 void TriangleWall::setVertices(const Vec3D A, const Vec3D B, const Vec3D C, const Vec3D position)
 {
-    setPosition(position);
-    setOrientation({1, 0, 0, 0});
+    BaseWall::setPosition(position);
+    BaseWall::setOrientation({1, 0, 0, 0});
     vertexInLabFrame_[0] = A - getPosition();
     vertexInLabFrame_[1] = B - getPosition();
     vertexInLabFrame_[2] = C - getPosition();
@@ -248,4 +260,18 @@ bool TriangleWall::isInsideTriangle(const Vec3D &point) const
     Mdouble s1 = sqrt(Vec3D::cross(branch1, branch2).getLengthSquared())/s;
     Mdouble s2 = sqrt(Vec3D::cross(branch2, branch0).getLengthSquared())/s;
     return (1 > s0 > 0 && 1 > s1 > 0 && 1 > s2 > 0);
+}
+
+void TriangleWall::moveVertex(const unsigned index, const Vec3D& dP)
+{
+    vertexInLabFrame_[index] += dP;
+    updateVertexAndNormal();
+}
+
+void TriangleWall::moveVertices(const std::array<Vec3D, 3>& dPs)
+{
+    vertexInLabFrame_[0] += dPs[0];
+    vertexInLabFrame_[1] += dPs[1];
+    vertexInLabFrame_[2] += dPs[2];
+    updateVertexAndNormal();
 }

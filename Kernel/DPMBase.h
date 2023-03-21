@@ -61,6 +61,7 @@
 #include "VTKWriter/WallVTKWriter.h"
 #include "VTKWriter/InteractionVTKWriter.h"
 #include "VTKWriter/BoundaryVTKWriter.h"
+#include "VTKWriter/WallDetailsVTKWriter.h"
 #include "MercuryTime.h"
 
 
@@ -264,18 +265,18 @@ public:
 //     */
 //    void statisticsFromRestartData(const char *name);
 ///\todo what to do with statisticsFromRestartData?
-    
+
     /*!
      * \brief Writes all data into a restart file
      */
     virtual void write(std::ostream& os, bool writeAllParticles = true) const;
-    
+
     /*!
      * \brief Reads all data from a restart file, e.g. domain data and particle data
      * \todo warning: hides non-virtual function from the class 'Files'.
      */
     virtual void read(std::istream& is, ReadOptions opt = ReadOptions::ReadAll);
-    
+
     /*!
      * \brief Allows you to read in a wall defined in a Driver directory; see USER/Luca/ScrewFiller
      */
@@ -467,8 +468,8 @@ public:
      * \brief Sets File::openMode_ for all files (ene, data, fstat, restart, stat)
      */
     void setOpenMode(std::fstream::openmode openMode);
-    
-    
+
+
     //other member functions
 
     /*!
@@ -511,22 +512,22 @@ public:
      * \brief Sets a new value for the maximum simulation duration.
      */
     void setTimeMax(Mdouble newTMax);
-    
+
     /*!
      * \brief Returns the maximum simulation duration.
      */
     Mdouble getTimeMax() const;
-    
+
     /*!
      * \brief Sets File::logarithmicSaveCount_ for all files (ene, data, fstat, restart, stat)
      */
     void setLogarithmicSaveCount(Mdouble logarithmicSaveCountBase);
-    
+
     /*!
      * \brief set the number of elements to write to the screen
      */
     void setNToWrite(int nToWrite);
-    
+
     /*!
      * \brief get the number of elements to write to the
      */
@@ -538,7 +539,7 @@ public:
      */
         PossibleContactList& getPossibleContactList();
 #endif
-    
+
     /*!
      * \todo{these functions should also update the mixed species}
      */
@@ -559,18 +560,24 @@ public:
     bool getRotation() const
     { return rotation_; }
 
+    MERCURY_DEPRECATED
     /*!
      * \brief Sets whether walls are written into a VTK file.
+     * \deprecated Use wallHandler.setWriteVTK(FileType) instead (since 21-07-2021)
      */
     void setWallsWriteVTK(FileType writeWallsVTK);
 
+    MERCURY_DEPRECATED
     /*!
      * \brief Sets whether walls are written into a VTK file.
+     * \deprecated Use wallHandler.setWriteVTK(bool) instead (since 21-07-2021)
      */
     void setWallsWriteVTK(bool);
 
+    MERCURY_DEPRECATED
     /*!
      * \brief Sets whether interactions are written into a VTK file.
+     * \deprecated Use interactionHandler.setWriteVTK(bool) instead (since 21-07-2021)
      */
     void setInteractionsWriteVTK(bool);
 
@@ -581,8 +588,10 @@ public:
 
     void setSuperquadricParticlesWriteVTK(bool writeSuperquadricParticlesVTK);
 
+    MERCURY_DEPRECATED
     /*!
      * \brief Returns whether walls are written in a VTK file.
+     * \deprecated Use wallHandler.getWriteVTK() instead (since 21-07-2021)
      */
     FileType getWallsWriteVTK() const;
 
@@ -881,13 +890,13 @@ public:
      * \brief
      */
     double getCPUTime() { return clock_.getCPUTime(); }
-    
+
     /*!
      * \brief
      */
     double getWallTime() { return clock_.getWallTime(); }
-    
-    
+
+
     /*!
      * \brief Checks if two particle are in contact or is there any positive overlap
      */
@@ -997,12 +1006,12 @@ public:
 
     /// \brief Calculate the total stress tensor in the system averaged over the whole volume.
     Matrix3D getTotalStress() const;
-    
+
     /*!
      * \brief Handles the removal of particles from the particleHandler
      */
     virtual void handleParticleRemoval(unsigned int id);
-    
+
     /*!
      * \briefHandles the addition of particles to the particleHandler
      */
@@ -1073,12 +1082,12 @@ protected:
      * \brief A virtual function which allows to define operations to be executed
      *       prior to the OMP force collect.
      * \details no implementation but can be overidden in its derived classes.
-     * This function is called by DPMBase::computeAllForces. It may be used to add 
+     * This function is called by DPMBase::computeAllForces. It may be used to add
      * additional user defined forces to any MercuryObject. Within this function,
      * OMP parallelization may be used, as it is called prior to sumForceTorqueOMP.
      */
     virtual void computeAdditionalForces() {}
-    
+
     /*!
      * \brief A virtual function which allows to define operations to be executed after
      *       the solve().
@@ -1329,11 +1338,6 @@ private:
     bool rotation_;
 
     /*!
-     * \brief A flag to turn on/off the vtk writer for walls.
-     */
-    FileType writeWallsVTK_;
-
-    /*!
      * \brief A flag to turn on/off the vtk writer for particles.
      */
     bool writeParticlesVTK_;
@@ -1347,6 +1351,8 @@ private:
     InteractionVTKWriter interactionVTKWriter_;
 
     BoundaryVTKWriter boundaryVTKWriter_;
+
+    WallDetailsVTKWriter wallDetailsVTKWriter_;
 
     //This is the private data that is only used by the xballs output
 
@@ -1380,17 +1386,17 @@ private:
      * \brief the name of the problem, used, e.g., for the output files
      */
     std::string name_;
-    
+
     // defines a Macro for creating an instance of class PossibleContactList. See PossibleContactList.h
 #ifdef CONTACT_LIST_HGRID
     PossibleContactList possibleContactList;
 #endif
-    
+
     /*!
      * \brief Determines if the last column of the data file is interpreted as the info parameter during restart
      */
     bool readSpeciesFromDataFile_;
-    
+
     /*!
      * \brief number of elements to write to a screen
      */
@@ -1401,7 +1407,7 @@ public:
      * \brief A handler to that stores the species type i.e. LinearViscoelasticSpecies, etc.
      */
     SpeciesHandler speciesHandler;
-    
+
     /*!
      * \brief This is a random generator, often used for setting up the initial conditions etc...
      */
@@ -1483,7 +1489,7 @@ public:
      * \brief record when the simulation started
      */
     Time clock_;
-    
+
     void writePythonFileForVTKVisualisation() const;
 };
 

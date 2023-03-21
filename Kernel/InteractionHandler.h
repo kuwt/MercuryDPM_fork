@@ -177,6 +177,8 @@ public:
      */
     void setWriteVTK(FileType f);
     
+    void setWriteVTK(bool);
+    
     /*!
      * \brief
      */
