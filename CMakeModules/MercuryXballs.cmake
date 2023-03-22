@@ -2,7 +2,7 @@ if (WIN32)
     message("Windows operating system: Turning off xballs support")
     option(Mercury_Include_Xballs_Support "Use the xballs of Stefan Luding for visualisation" OFF)
 else(WIN32)
-    option(Mercury_Include_Xballs_Support "Use the xballs of Stefan Luding for visualisation" ON)
+    option(Mercury_Include_Xballs_Support "Use the xballs of Stefan Luding for visualisation" OFF)
 endif(WIN32)
 
 if (Mercury_Include_Xballs_Support)
