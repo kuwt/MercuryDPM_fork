@@ -283,6 +283,7 @@ private:
     Vec3D angularAcceleration_;
 
     Mdouble massMultiparticle;
+
     Mdouble viscousDamping;
     MatrixSymmetric3D inertiaMultiparticle;
     MatrixSymmetric3D initInertiaMultiparticle;

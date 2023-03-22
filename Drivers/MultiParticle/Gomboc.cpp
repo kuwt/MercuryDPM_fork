@@ -43,11 +43,11 @@ public:
         setGravity(Vec3D(0.0, 0.0, -10.0));
         setName("Gomboc");
         setXBallsAdditionalArguments("-solidf -v0");
-        setXMax(f_max);
-        setYMax(f_max);
+        setXMax(2*f_max);
+        setYMax(2*f_max);
         setZMax(f_max);
-        setXMin(f_min);
-        setYMin(f_min);
+        setXMin(2*f_min);
+        setYMin(2*f_min);
         setZMin(f_min);
         load_clumps(data);
         setClumpIndex(0);
@@ -124,11 +124,17 @@ int main(int argc, char* argv[])
     species->setDensity(1.0); // sets the species type-0 density
     species->setDissipation(50.0);
     species->setStiffness(1e6);
+
+    species->setSlidingFrictionCoefficient(0.6);
+    species->setSlidingStiffness(5e5);
+    species->setRollingFrictionCoefficient(0.0);
+    species->setRollingStiffness(5e5);
+
     const Mdouble collisionTime = species->getCollisionTime(problem.getClumpMass());
     problem.setClumpDamping(0);
     problem.setTimeStep(collisionTime / 50.0);
     problem.setSaveCount(400);
-    problem.setTimeMax(20.0);
+    problem.setTimeMax(50.0);
     problem.removeOldFiles();
     problem.solve();
     return 0;

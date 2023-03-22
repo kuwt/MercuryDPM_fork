@@ -235,7 +235,7 @@ int main(int argc, char* argv[])
     problem.solve();
 
 
-    // Return the log of the angular momentum
+    // Return the log of the Dzh particles
     std::ofstream D_hyst;  D_hyst.open ("Dzh_hystory.txt");
     for (int i = 0; i<D_h.size(); i+=50){D_hyst <<D_h[i]<<std::endl;}
     D_hyst.close();
