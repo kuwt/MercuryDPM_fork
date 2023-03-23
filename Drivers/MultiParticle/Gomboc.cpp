@@ -34,6 +34,7 @@
 # include <stdlib.h>
 
 Mdouble f_min = -2; Mdouble f_max = 2;
+int SAVECOUNT = 400;
 
 class multiParticleT1 : public Mercury3Dclump
 {
@@ -110,6 +111,31 @@ public:
         w0.set(Vec3D(0.0, 0.0, 1.0), Vec3D(0, 0, getZMax()));
         wallHandler.copyAndAddObject(w0);
     }
+
+    void actionsAfterTimeStep() override {
+        if (getNumberOfTimeSteps()/SAVECOUNT == getNumberOfTimeSteps()/(double) SAVECOUNT ){
+            for (std::vector<BaseParticle*>::iterator it= particleHandler.begin(); it!=particleHandler.end(); ++it){
+                if ((*it)->IsMaster()) {
+
+                    std::cout<<"Saving timestep "<<getNumberOfTimeSteps() <<std::endl;
+
+                    // Add velocity to log
+                    std::ofstream funct("clump_seq.txt", std::ios_base::app | std::ios_base::out);
+                    funct << getNumberOfTimeSteps() <<" "
+                    << static_cast<MultiParticle*>(*it)->getPosition()<<" "
+                    << static_cast<MultiParticle*>(*it)->getPrincipalDirections_e1()<<" "
+                    << static_cast<MultiParticle*>(*it)->getPrincipalDirections_e2()<<" "
+                    << static_cast<MultiParticle*>(*it)->getPrincipalDirections_e3()<<" "
+                    <<"\n";
+                    funct.close();
+
+                }
+            }
+
+        }
+    }
+
+
 private:
     int clump_index;
     clump_data data;
@@ -133,7 +159,7 @@ int main(int argc, char* argv[])
     const Mdouble collisionTime = species->getCollisionTime(problem.getClumpMass());
     problem.setClumpDamping(0);
     problem.setTimeStep(collisionTime / 50.0);
-    problem.setSaveCount(400);
+    problem.setSaveCount(SAVECOUNT);
     problem.setTimeMax(50.0);
     problem.removeOldFiles();
     problem.solve();

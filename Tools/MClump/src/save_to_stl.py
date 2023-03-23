@@ -146,3 +146,56 @@ def save_voxel_grid_stl(filename, vox, bbox, span):
     mesh.save(filename)
     return
 
+def save_stl_snap(input_mesh, pos, v1, v2, v3, filename):
+    print("pos", pos)
+    import copy
+    ms = copy.deepcopy(input_mesh)
+    # Rotate mesh to pd
+    e1 = np.array([1,0,0])
+    e2 = np.array([0,1,0])
+    e3 = np.array([0,0,1])
+    Q = np.array([
+        [e1@v1, e2@v1, e3@v1],
+        [e1@v2, e2@v2, e3@v2],
+        [e1@v3, e2@v3, e3@v3]])
+
+    for j in range(len(ms.normals)):
+        ms.v0[j]  = Q @ ms.v0[j]
+        ms.v1[j]  = Q @ ms.v1[j]
+        ms.v2[j]  = Q @ ms.v2[j]
+        ms.normals[j]  = Q @ ms.normals[j]
+
+    # Shift Mesh's center of gravity to a specified location
+    for j in range(len(ms.normals)):
+        ms.v0[j] += pos
+        ms.v1[j] += pos
+        ms.v2[j] += pos
+
+    ms.save(filename)
+    return
+
+def save_stl_sequence(OPT, DATA):
+    # Load clump sequence
+    filename = OPT['clumpSeqDir'] + 'clump_seq.txt'
+    textfile = open(filename, "r")
+    content_list = textfile.readlines()
+
+    sequence = np.zeros([len(content_list), 13])
+    for i in range(len(content_list)):
+        content_list[i] = content_list[i].replace("\n", "")
+        word_list = content_list[i].split(' ')
+        for j in range (13):
+            sequence[i][j] = float(word_list[j])
+    DATA['clumpSequence'] = sequence
+
+    # Save stl sequence
+    for i in range(5):
+        pos = sequence[i][1:4]
+        v1 = sequence[i][4:7]
+        v2 = sequence[i][7:10]
+        v3 = sequence[i][10:13]
+        print("pos:", pos, "v1:", v1, "v2:", v2, "v3:", v3)
+        save_stl_snap(DATA['stlMesh'], pos, v1, v2, v3, './blender/stl_seq/' + 's_' + str(i) + '.stl')
+
+
+    return OPT, DATA

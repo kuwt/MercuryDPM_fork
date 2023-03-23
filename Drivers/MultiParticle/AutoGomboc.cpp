@@ -57,6 +57,7 @@ std::string exec_command(const char* cmd) {
 
 int main(int argc, char* argv[])
 {
+    exec_command("rm clump_seq.txt");
     exec_command("make Gomboc");
     exec_command("./Gomboc");
     exec_command("rm -rf paraview_Gomboc");

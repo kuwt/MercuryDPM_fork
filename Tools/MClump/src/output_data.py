@@ -39,7 +39,7 @@ def paraview_output_pebbles_animated(OPT, DATA):
     pebbles = DATA['pebbles']
     num_timesteps = OPT['numTimesteps']
 
-    filename = './' + OPT['clumpName']
+    filename = './clumps/' + OPT['clumpName']
     if not os.path.exists(filename):
         os.mkdir(filename)
 
@@ -87,7 +87,7 @@ def paraview_output_pebbles_static(OPT, DATA):
     import os
     pebbles = DATA['pebbles']
 
-    filename = './' + OPT['clumpName']
+    filename = './clumps/' + OPT['clumpName']
     if not os.path.exists(filename):
         os.mkdir(filename)
 
@@ -118,7 +118,7 @@ def paraview_output_pebbles_static(OPT, DATA):
 def save_clump_mdpm(OPT, DATA):
     import os
 
-    path = './' + OPT['clumpName']
+    path = './clumps/' + OPT['clumpName']
     if not os.path.exists(path):
         os.mkdir(path)
 
@@ -153,7 +153,7 @@ def output_clump_data(OPT, DATA):
     # Pebble stl output
     if OPT['PebbleStlOutput']:
         if OPT['verbose']: print("Output pebble stl data")
-        path = './' + OPT['clumpName']
+        path = './clumps/' + OPT['clumpName']
         if not os.path.exists(path):
             os.mkdir(path)
 
@@ -170,7 +170,7 @@ def output_clump_data(OPT, DATA):
     # Voxel grid stl output
     if OPT['mode'] == 2 and OPT['VoxelStlOutput']:
         if OPT['verbose']: print("Output voxel grid stl data")
-        path = './' + OPT['clumpName']
+        path = './clumps/' + OPT['clumpName']
         if not os.path.exists(path):
             os.mkdir(path)
 
