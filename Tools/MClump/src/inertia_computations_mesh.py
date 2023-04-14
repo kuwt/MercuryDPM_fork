@@ -120,7 +120,9 @@ def clump_toi_from_mesh(mesh, density):
                   2*x_3*y_3 + x_4*y_3 + x_1*y_4 + x_2*y_4 + x_3*y_4 + 
                   2*x_4*y_4) / 20.
     
-    return density * np.array([[a, -b_p, -c_p],[ -b_p, b, -a_p],[ -c_p, -a_p, c]])
+    #return density * np.array([[a, -b_p, -c_p],[ -b_p, b, -a_p],[ -c_p, -a_p, c]])
+    return density * np.array([[a, -c_p, -b_p],[ -c_p, b, -a_p],[ -b_p, -a_p, c]])
+
 
 
 def rotate_to_principal_directions_mesh_toi(mesh, toi, v1, v2, v3):
