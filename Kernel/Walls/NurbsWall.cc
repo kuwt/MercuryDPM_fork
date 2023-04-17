@@ -115,14 +115,19 @@ std::string NurbsWall::getName() const
 
 void NurbsWall::writeVTK (VTKContainer& vtk) const
 {
-    unsigned nu = 30;
-    unsigned nv = 30;
-
+    unsigned nu = 5 * nurbsSurface_.getControlPoints().size();
+    unsigned nv = 5 * nurbsSurface_.getControlPoints()[0].size();
+    
+    const double lbU = nurbsSurface_.getLowerBoundU();
+    const double ubU = nurbsSurface_.getUpperBoundU();
+    const double lbV = nurbsSurface_.getLowerBoundV();
+    const double ubV = nurbsSurface_.getUpperBoundV();
+    
     //create points
     size_t nPoints = vtk.points.size();
-    for (double u=0; u<=nu; u++) {
-        for (double v=0; v<=nv; v++) {
-            Vec3D p = nurbsSurface_.evaluate(u/nu,v/nu);
+    for (double u = 0; u <= nu; u++) {
+        for (double v = 0; v <= nv; v++) {
+            Vec3D p = nurbsSurface_.evaluate(lbU+(ubU-lbU)*u/nu, lbV+(ubV-lbV)*v/nv);
             getOrientation().rotate(p);
             p += getPosition();
             vtk.points.push_back(p);
@@ -131,13 +136,53 @@ void NurbsWall::writeVTK (VTKContainer& vtk) const
 
     //create connectivity matrix
     //vtk.triangleStrips.reserve(vtk.triangleStrips.size()+nu);
-    for (unsigned i=0; i<nu; ++i) {
+    for (unsigned i = 0; i < nu; ++i) {
         std::vector<double> cell;
         cell.reserve(2*nv);
-        for (unsigned j=0; j<nv; ++j) {
+        for (unsigned j = 0; j <= nv; ++j) {
             cell.push_back(nPoints + j + i * (nv+1));
             cell.push_back(nPoints + j + (i+1) * (nv+1));
         }
         vtk.triangleStrips.push_back(cell);
+    }
+}
+
+void NurbsWall::writeWallDetailsVTK(VTKData& data) const
+{
+    const std::vector<std::vector<Vec3D>>& controlPoints = nurbsSurface_.getControlPoints();
+    const std::vector<std::vector<double>>& weights = nurbsSurface_.getWeights();
+    
+    // Reserve memory for number of points and cells about to be added
+    const unsigned int np = controlPoints.size() * controlPoints[0].size();
+    const unsigned int nc = (controlPoints.size() - 1) * (controlPoints[0].size() - 1);
+    data.reservePoints(np, { "Weight", "ID" });
+    data.reserveCells(nc);
+    
+    // Number of points in v-direction
+    size_t nv = controlPoints[0].size();
+    // Point index offset, the point indices have to be offset by the number of points already present at the start (from previously added data)
+    size_t pio = data.getPoints().size();
+    // Get last id only when possible and increment it, otherwise start with 0
+    double id = data.getPointData()["ID"].empty() ? 0 : data.getPointData()["ID"].back() + 1;
+
+    for (int i = 0; i < controlPoints.size(); i++)
+    {
+        for (int j = 0; j < controlPoints[i].size(); j++)
+        {
+            Vec3D p = controlPoints[i][j];
+            getOrientation().rotate(p);
+            p += getPosition();
+            data.addToPoints(p);
+            data.addToPointData("Weight", weights[i][j]);
+            data.addToPointData("ID", id);
+            
+            if (i > 0 && j > 0)
+            {
+                // Basic 2D/1D mapping for indexing: nv * i + j (+ point index offset)
+                // 4 points to form a rectangle: point, point to the left, point down, point to the left and down
+                data.addToConnectivity({ nv*i+j+pio, nv*(i-1)+j+pio, nv*i+j-1+pio, nv*(i-1)+j-1+pio });
+                data.addToTypes(8);
+            }
+        }
     }
 }

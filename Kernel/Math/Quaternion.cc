@@ -578,6 +578,24 @@ void Quaternion::rotate(Vec3D& position) const
             q13 - q02, q23 + q01, q00 - q11 - q22 + q33) * position;
 }
 
+Vec3D Quaternion::rotate(const Vec3D& position) const
+{
+    Mdouble q00 = q0 * q0;
+    Mdouble q01 = 2 * q0 * q1;
+    Mdouble q02 = 2 * q0 * q2;
+    Mdouble q03 = 2 * q0 * q3;
+    Mdouble q11 = q1 * q1;
+    Mdouble q12 = 2 * q1 * q2;
+    Mdouble q13 = 2 * q1 * q3;
+    Mdouble q22 = q2 * q2;
+    Mdouble q23 = 2 * q2 * q3;
+    Mdouble q33 = q3 * q3;
+    return Matrix3D(
+            q00 + q11 - q22 - q33, q12 - q03, q13 + q02,
+            q12 + q03, q00 - q11 + q22 - q33, q23 - q01,
+            q13 - q02, q23 + q01, q00 - q11 - q22 + q33) * position;
+}
+
 ///Rotate the given vector from the body-fixed angles to the lab-fixed angles. This is the same as multiplying with the
 ///rotation matrix, A.
 void Quaternion::rotate(SmallVector<3>& position) const
@@ -602,6 +620,24 @@ void Quaternion::rotateBack(Vec3D& position) const
     Mdouble q23 = 2 * q2 * q3;
     Mdouble q33 = q3 * q3;
     position = Matrix3D(
+            q00 + q11 - q22 - q33, q12 + q03, q13 - q02,
+            q12 - q03, q00 - q11 + q22 - q33, q23 + q01,
+            q13 + q02, q23 - q01, q00 - q11 - q22 + q33) * position;
+}
+
+Vec3D Quaternion::rotateBack(const Vec3D& position) const
+{
+    Mdouble q00 = q0 * q0;
+    Mdouble q01 = 2 * q0 * q1;
+    Mdouble q02 = 2 * q0 * q2;
+    Mdouble q03 = 2 * q0 * q3;
+    Mdouble q11 = q1 * q1;
+    Mdouble q12 = 2 * q1 * q2;
+    Mdouble q13 = 2 * q1 * q3;
+    Mdouble q22 = q2 * q2;
+    Mdouble q23 = 2 * q2 * q3;
+    Mdouble q33 = q3 * q3;
+    return Matrix3D(
             q00 + q11 - q22 - q33, q12 + q03, q13 - q02,
             q12 - q03, q00 - q11 + q22 - q33, q23 + q01,
             q13 + q02, q23 - q01, q00 - q11 - q22 + q33) * position;

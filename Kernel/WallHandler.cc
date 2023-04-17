@@ -38,12 +38,15 @@
 #include "Walls/InfiniteWall.h"
 #include "Walls/InfiniteWallWithHole.h"
 #include "Walls/NurbsWall.h"
+#include "Walls/WearableNurbsWall.h"
 #include "Walls/Screw.h"
 #include "Walls/Coil.h"
 #include "DPMBase.h"
 #include "Walls/VChute.h"
 #include "BinaryReader.h"
 #include "STLTriangle.h"
+#include "Walls/TriangleMeshWall.h"
+#include "Walls/WearableTriangleMeshWall.h"
 
 /*!
  * Constructor of the WallHandler class. It creates an empty WallHandler.
@@ -52,6 +55,7 @@ WallHandler::WallHandler()
 {
     ///\todo why is this being done?
     clear();
+    writeVTK_ = FileType::NO_FILE;
 #ifdef DEBUG_CONSTRUCTOR
     std::cerr << "WallHandler::WallHandler() finished" << std::endl;
 #endif
@@ -69,6 +73,7 @@ WallHandler::WallHandler(const WallHandler& WH)
     clear();
     setDPMBase(WH.getDPMBase());
     copyContentsFromOtherHandler(WH);
+    writeVTK_ = WH.writeVTK_;
 #ifdef DEBUG_CONSTRUCTOR
     std::cerr << "WallHandler::WallHandler(const WallHandler&) finished" << std::endl;
 #endif
@@ -87,6 +92,7 @@ WallHandler& WallHandler::operator=(const WallHandler& rhs)
         clear();
         setDPMBase(rhs.getDPMBase());
         copyContentsFromOtherHandler(rhs);
+        writeVTK_ = rhs.writeVTK_;
     }
     return *this;
 #ifdef DEBUG_CONSTRUCTOR
@@ -177,6 +183,18 @@ BaseWall* WallHandler::createObject(const std::string& type)
     else if (type == "NurbsWall")
     {
         return new NurbsWall();
+    }
+    else if (type == "WearableNurbsWall")
+    {
+        return new WearableNurbsWall();
+    }
+    else if (type == "TriangleMeshWall")
+    {
+        return new TriangleMeshWall;
+    }
+    else if (type == "WearableTriangleMeshWall")
+    {
+        return new WearableTriangleMeshWall;
     }
     //for backward compatibility (before svnversion ~2360)
     else if (type == "numFiniteWalls")
@@ -294,61 +312,22 @@ std::string WallHandler::getName() const
     return "WallHandler";
 }
 
-/*!
- * \details Writes a box around all the data to a vtk file. The filename is
- * hard-coded and depends on the DPMBase. Note that there is no static
- * counter that makes sure new files don't have the same name as the old ones.
- */
-void WallHandler::writeVTKBoundingBox() const
+void WallHandler::writeWallDetailsVTKBoundingBox(VTKData& data) const
 {
-    const std::string fileName = getDPMBase()->getName() + "BoundingBox.vtu";
-    //logger(INFO, "% writing vtk file for bounding box: %",
-    //       getDPMBase()->getTime(), fileName);
-    std::fstream file;
-    file.open(fileName.c_str(), std::ios::out);
-    if (file.fail())
+    Vec3D P[2] = { getDPMBase()->getMax(), getDPMBase()->getMin() };
+    for (const Vec3D& i : P)
     {
-        ///\todo Check that this should indeed be WARN
-        logger(WARN, "Error in writeToFile: file could not be opened");
-    }
-    file << "<?xml version=\"1.0\"?>\n\n";
-    file << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n";
-    file << "<UnstructuredGrid>\n";
-    file << "<Piece NumberOfPoints=\"8\" NumberOfCells=\"1\">\n";
-    file << "<Points>\n";
-    file << "  <DataArray type=\"Float32\" Name=\"Position\" NumberOfComponents=\"3\" format=\"ascii\">\n";
-    Vec3D P[2] = {getDPMBase()->getMax(), getDPMBase()->getMin()};
-    for (auto& i : P)
-    {
-        for (auto& j : P)
+        for (const Vec3D& j : P)
         {
-            for (auto& k : P)
+            for (const Vec3D& k : P)
             {
-                Vec3D p = Vec3D(i.X, j.Y, k.Z);
-                file << '\t' << p << '\n';
+                data.addToPoints(Vec3D(i.X, j.Y, k.Z));
             }
         }
     }
-    ///000 001 010 011 ...
-    file << "  </DataArray>\n";
-    file << "</Points>\n";
-    file << "<Cells>\n";
-    file <<
-         "  <DataArray type=\"Int32\" Name=\"connectivity\" format=\"ascii\">\n";
-    file << "\t0 1 3 2 0 4 5 1 5 7 3 7 6 2 6 4\n";
-    file << "  </DataArray>\n";
-    file << "  <DataArray type=\"Int32\" Name=\"offsets\" format=\"ascii\">\n";
-    file <<
-         "\t16\n"; //offset into the connectivity array for the end of each cell.
-    file << "  </DataArray>\n";
-    file << "  <DataArray type=\"UInt8\"  Name=\"types\" format=\"ascii\">\n";
-    file << "\t4\n";
-    file << "  </DataArray>\n";
-    file << "</Cells>\n";
-    file << "</Piece>\n";
-    file << "</UnstructuredGrid>\n";
-    file << "</VTKFile>\n";
-    file.close();
+
+    data.addToConnectivity({ 0, 1, 3, 2, 0, 4, 5, 1, 5, 7, 3, 7, 6, 2, 6, 4 });
+    data.addToTypes(4);
 }
 
 /**
@@ -473,14 +452,67 @@ unsigned WallHandler::readTriangleWall(std::string filename, ParticleSpecies* sp
 
 /**
  * \details This function is called by DPMBase::computeOneTimeStep directly after
- * the ghost particle update. It may be used to adjust wall properties based on 
+ * the ghost particle update. It may be used to adjust wall properties based on
  * the changed wall positions (for an example, look e.g. at MeshTriangle).
  */
 void WallHandler::actionsAfterParticleGhostUpdate()
-{   
+{
     // #pragma omp parallel for //schedule(dynamic)
     for (auto w: *this)
     {
         w->actionsAfterParticleGhostUpdate();
     }
+}
+
+void WallHandler::setWriteVTK(FileType fileType)
+{
+    writeVTK_ = fileType;
+}
+
+void WallHandler::setWriteVTK(bool writeVTK)
+{
+    writeVTK_ = writeVTK ? FileType::MULTIPLE_FILES : FileType::NO_FILE;
+}
+
+FileType WallHandler::getWriteVTK() const
+{
+    return writeVTK_;
+}
+
+void WallHandler::setWriteDetailsVTK(DetailsVTKOptions option, FileType fileType)
+{
+    // Automatically adds option when it doesn't exist in the map yet
+    writeDetailsVTK_[option] = fileType;
+}
+
+void WallHandler::setWriteDetailsVTK(DetailsVTKOptions option, bool writeVTK)
+{
+    FileType fileType = writeVTK ? FileType::MULTIPLE_FILES : FileType::NO_FILE;
+    setWriteDetailsVTK(option, fileType);
+}
+
+FileType WallHandler::getWriteDetailsVTK(DetailsVTKOptions option) const
+{
+    // This function has to be marked constant, so accessing by key is not an option, as it will automatically add keys
+    // not present in the map yet.
+
+    // Try to find the option to see if it's already added to the map or not
+    auto it = writeDetailsVTK_.find(option);
+    // When the iterator does not equal the end, the key has been found
+    if (it != writeDetailsVTK_.end())
+        return it->second;
+    else
+        return FileType::NO_FILE; // Else return a default file type
+}
+
+bool WallHandler::getWriteDetailsVTKAny() const
+{
+    // Simple lambda expression to check if any of the file types are not of type NO_FILE
+    return std::any_of(writeDetailsVTK_.begin(), writeDetailsVTK_.end(),
+                       [](const auto& p) { return p.second != FileType::NO_FILE; });
+}
+
+std::unordered_map<WallHandler::DetailsVTKOptions, FileType> WallHandler::getWriteWallDetailsVTKAll() const
+{
+    return writeDetailsVTK_;
 }
