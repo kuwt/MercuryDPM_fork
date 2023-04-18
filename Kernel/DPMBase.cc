@@ -153,7 +153,6 @@ DPMBase::DPMBase(const DPMBase& other) : wallVTKWriter_(other.wallVTKWriter_),
     xBallsAdditionalArguments_ = other.xBallsAdditionalArguments_; // std::string where additional xballs argument can be specified (see xballs.txt)
     writeParticlesVTK_ = other.writeParticlesVTK_;
     readSpeciesFromDataFile_ = other.readSpeciesFromDataFile_;
->>>>>>> origin/trunk
 
 //effectively saying "if there exists a CONTACT_LIST_HGRID, copy it, if not, ignore.
 #ifdef CONTACT_LIST_HGRID
@@ -194,7 +193,6 @@ possibleContactList=other.possibleContactList;
  */
 DPMBase::DPMBase() : wallVTKWriter_(wallHandler), interactionVTKWriter_(interactionHandler), boundaryVTKWriter_(boundaryHandler),
                      wallDetailsVTKWriter_(wallHandler)
->>>>>>> origin/trunk
 {
 constructor();
 }
@@ -922,9 +920,9 @@ void DPMBase::setWallsWriteVTK(FileType writeWallsVTK)
 */
 void DPMBase::setWallsWriteVTK(bool writeVTK)
 {
-writeWallsVTK_ = writeVTK?FileType::MULTIPLE_FILES:FileType::NO_FILE;
+FileType writeVTKFileType = writeVTK?FileType::MULTIPLE_FILES:FileType::NO_FILE;
     logger(WARN, "DPMBase.setWallsWriteVTK(bool) is deprecated! Use wallHandler.setWriteVTK(bool) instead.");
-    wallHandler.setWriteVTK(writeVTK);
+    wallHandler.setWriteVTK(writeVTKFileType);
 }
 
 void DPMBase::setInteractionsWriteVTK(bool writeVTK)
