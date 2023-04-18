@@ -243,7 +243,7 @@ dvec uniform_random_pds(){
     r1 = random_double(1);
     r2 = random_double(1);
 
-    theta = acos(r1); // Note that for isotropy of n1 theta is NOT uniform!
+    theta = acos(2 * r1 - 1); // Note that for isotropy of n1 theta is NOT uniform!
     phi = 2 * M_PI * r2;
 
     ref = Vec3D(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));

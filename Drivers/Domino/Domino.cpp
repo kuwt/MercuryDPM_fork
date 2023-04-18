@@ -40,10 +40,10 @@ struct dominoes {
     int N_dom = 20;        // Number of dominoes
     Mdouble R_peb = 0.75; // Radius of the pebbles forming dominoes
     Mdouble R_cue = 0.65;  // Radius of a cue particle
-    Mdouble Vel_cue = 1;  // Velocity of the cue particle
+    Mdouble Vel_cue = 3;  // Velocity of the cue particle
     Mdouble S_peb = 1;    // Spacing of pebbles in domino
     Mdouble S_dom = 5;    // Spacing of dominoes
-    int m_peb = 1, n_peb = 1, k_peb = 8; // (m,n,k) are numbers of pebbles in (x,y,z) directions correspondingly
+    int m_peb = 1, n_peb = 4, k_peb = 8; // (m,n,k) are numbers of pebbles in (x,y,z) directions correspondingly
     
     Mdouble x_min = 0;
     Mdouble x_max = 2 * margin + N_dom * S_dom;
@@ -209,6 +209,7 @@ int main(int argc, char* argv[])
     int NumParams = 1;
 
     // Get parameters passed through the command line
+    /*
     std::vector <Mdouble> params(0);
     for (int i = 0; i<NumParams; i++) {
         std::string a;
@@ -216,10 +217,10 @@ int main(int argc, char* argv[])
         params.push_back(param);
         std::cout<<params[i]<<std::endl;
     }
-
+*/
     multiParticleT1 problem;
 
-    D.S_dom = 0.2 * (2 * D.k_peb * D.S_peb) + 0.8 * (2 * D.k_peb * D.S_peb) * (params[0]/100);
+    // D.S_dom = 0.2 * (2 * D.k_peb * D.S_peb) + 0.8 * (2 * D.k_peb * D.S_peb) * (params[0]/100);
 
     // Domino species
     auto species0 = problem.speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
@@ -251,7 +252,7 @@ int main(int argc, char* argv[])
 
 
 
-    problem.setClumpDamping(0);
+    problem.setClumpDamping(5);
     problem.setTimeStep(collisionTime / 50.0);
 
     // Quick demonstration

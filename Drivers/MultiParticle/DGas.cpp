@@ -34,17 +34,17 @@
 #include <stdlib.h>
 #include <CMakeDefinitions.h>
 
-Mdouble f_min = -50; Mdouble f_max = 50; // Size of the box and the margin/clearance for clump seeds
+Mdouble f_min = -20; Mdouble f_max = 20; // Size of the box and the margin/clearance for clump seeds
 Mdouble margin = 0;
 
 
-Mdouble av_min = -50; // range of angular velocities
-Mdouble av_max = 50;
+Mdouble av_min = -0; // range of angular velocities
+Mdouble av_max = 0;
 
 Mdouble tv_min = -100; // range of translational velocities
 Mdouble tv_max = 100;
 
-int N_att = 200;   // Number of attempts to add particle
+int N_att = 2000;   // Number of attempts to add particle
 std::vector <int> D_h; // log of the number of Dzhanibekov particles
 
 class multiParticleT1 : public Mercury3Dclump
@@ -130,8 +130,7 @@ public:
         // Generate a dense packing of clumps
         setClumpIndex(1);
         int N_created = 0;
-        //for (int part = 0; part<N_att; part++) {
-        for (int part = 0; part<50; part++) {
+        for (int part = 0; part<N_att; part++) {
 
                 MultiParticle p0;
                 p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to MultiParticle 1
@@ -228,7 +227,7 @@ int main(int argc, char* argv[])
 
     // Quick demonstration
     problem.setSaveCount(50);
-    problem.setTimeMax(1.0);
+    problem.setTimeMax(2.0);
 
 
     problem.removeOldFiles();
