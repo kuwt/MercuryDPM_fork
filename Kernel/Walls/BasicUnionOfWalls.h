@@ -107,6 +107,9 @@ public:
     
     BaseWall* getObject(unsigned i);
 
+
+    void writeVTK(VTKContainer& vtk) const override;
+
 private:
     /*!
      * Outward normal vector. This does not have to be a unit vector.

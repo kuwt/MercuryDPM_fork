@@ -224,3 +224,34 @@ BaseWall* BasicUnionOfWalls::getObject(unsigned i)
     logger.assert_always(walls_.size() > i, "Index % exceeds number of walls %", i, walls_.size());
     return walls_[i];
 }
+
+void BasicUnionOfWalls::writeVTK(VTKContainer& vtk) const
+{    
+    // Collect the points and triangles from the individual walls
+    VTKContainer vtkDummy;
+    for (auto w: walls_)
+    {   
+        w->writeVTK(vtkDummy);
+    }
+
+    // Save the size of vtk.points for later
+    Mdouble s0 = vtk.points.size();
+
+    // Rotate into real frame and add to vtk
+    Vec3D p;
+    for (auto point: vtkDummy.points)
+    {
+        getOrientation().rotate(point);
+        point += getPosition();
+        vtk.points.push_back(point);
+    }
+    
+    // Shift the triangle stripes to have the right indices
+    for (std::vector<double> cell: vtkDummy.triangleStrips)
+    {
+        std::transform(cell.begin(), cell.end(), cell.begin(),
+                   [s0](double d) { return d + s0; });
+        
+        vtk.triangleStrips.push_back(cell);
+    }
+}
