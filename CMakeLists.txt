@@ -138,8 +138,8 @@ option(Mercury_BUILD_USER_DIR "Compile USER DIR in testing" ON)
 
 ###### These needs to be fixed as the new scripts line above will always create this, so the Python problem is back
 ################################################
-
-FIND_PACKAGE(Python)
+find_package(PythonInterp 3)
+find_package(PythonLibs 3)
 # this line causes problems when you have multiple builds
 FILE(COPY Configuration/fpdiff.py DESTINATION ${PROJECT_SOURCE_DIR}/Scripts/)
 
