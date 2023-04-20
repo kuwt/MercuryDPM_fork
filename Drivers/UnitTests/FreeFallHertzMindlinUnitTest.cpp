@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
 	//set the parameters for the solver
 	dpm.setSaveCount(40);
 	dpm.fStatFile.setFileType(FileType::NO_FILE);
-	dpm.setWallsWriteVTK(FileType::ONE_FILE);
+    dpm.wallHandler.setWriteVTK(FileType::ONE_FILE);
 	Mdouble relativeVelocity = 0.1;
 	Mdouble tc = species.getCollisionTime(2.0*dpm.radius, species.getDensity(), relativeVelocity);
 	logger(INFO,"Collision time %", tc);

@@ -142,7 +142,9 @@ public:
 \endcode
 Please also correct the copy constructor and the empty constructor which are needed for MPI and other functions not shown here. Also there are various other places you need to make the same correct but this should be clear, so not fully documented here.
 
--# You do not need to add the new Species and Interaction to the CMakeList as this is built automatically; however, you do need to type 'make rebuild_cache', to rebuild these lists. Finally, it is advisable todo 'make fullTest' at the end to clear and rebuild these list and everything else from scratch.
+-# You do not need to add the new Species and Interaction to the CMakeList as this is built automatically; however, you
+do need to type 'make rebuild_cache', to rebuild these lists. Finally, it is advisable to run 'make fullTest' at the end
+ to clear and rebuild these list and everything else from scratch.
 
 -# Create a new typedef for the new Hertz-Mindlin contact law in
 <br>`MercurySource/Kernel/Species/HertzianViscoelasticMindlinSpecies.h`

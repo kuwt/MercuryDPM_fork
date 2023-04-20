@@ -68,7 +68,7 @@ public:
         eneFile.setSaveCount(1.0/getTimeStep());
         //dataFile.setSaveCount(0.1/getTimeStep());
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(FileType::NO_FILE);
+        wallHandler.setWriteVTK(FileType::NO_FILE);
         restartFile.setFileType(FileType::MULTIPLE_FILES);
     
         auto maser = static_cast<SubcriticalMaserBoundaryTEST*>(boundaryHandler.getLastObject());

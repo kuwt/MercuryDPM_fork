@@ -173,7 +173,7 @@ int main()
     logger(INFO,"Inserted % particles",dpm.particleHandler.getNumberOfObjects());
     //uncomment to get VTK output
     dpm.setParticlesWriteVTK(true);
-    dpm.setWallsWriteVTK(FileType::ONE_FILE);
+    dpm.wallHandler.setWriteVTK(FileType::ONE_FILE);
     dpm.solve();
     return 0;
 }

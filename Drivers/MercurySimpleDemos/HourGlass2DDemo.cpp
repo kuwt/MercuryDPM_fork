@@ -192,7 +192,7 @@ int main(int argc, char *argv[])
     HG.setXBallsAdditionalArguments("-v0 -solidf");
     //uncomment next two line 2 to create paraview files
     HG.setParticlesWriteVTK(true);
-    HG.setWallsWriteVTK(FileType::ONE_FILE);
+    HG.wallHandler.setWriteVTK(FileType::ONE_FILE);
     
     HG.N = 100; //number of particles
     logger(INFO, "N   = %", HG.N);

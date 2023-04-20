@@ -46,7 +46,7 @@ public:
         setXBallsAdditionalArguments("-solidf -v0 -cmode 8 -cmaxset 100 ");
         setFileType(FileType::ONE_FILE);
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(FileType::MULTIPLE_FILES);
+        wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
         TemperatureFile_.open("Temperature.data");
 
         //define domain size

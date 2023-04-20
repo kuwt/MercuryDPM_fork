@@ -536,7 +536,7 @@ int main(int argc, char *argv[])
     problem.restartFile.setFileType(FileType::ONE_FILE);
     problem.fStatFile.setFileType(FileType::ONE_FILE);
     problem.eneFile.setFileType(FileType::ONE_FILE);
-    problem.setWallsWriteVTK(true);
+    problem.wallHandler.setWriteVTK(true);
     problem.setParticlesWriteVTK(true);
     problem.solve();
     return 0;

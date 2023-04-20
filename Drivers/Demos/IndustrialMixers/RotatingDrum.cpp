@@ -53,7 +53,7 @@ public:
 
         // turn on paraview output
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(true);
+        wallHandler.setWriteVTK(true);
 
         // turn on gravity
         setGravity(Vec3D(0,0,-9.8));

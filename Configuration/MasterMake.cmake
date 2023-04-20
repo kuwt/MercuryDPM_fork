@@ -1,9 +1,10 @@
 #This file is included in all CMakeLists.txt files in the Driver directory
 
 #Define includes for compiling the Driver codes
-#\todo why is binary added here?
+#The Mercury_BINARY_DIR is added here to enable multiple builds in a single file system
+#The CMakeDefinitions.cc and CMakeDefinitions.h file are copied into the binary folder
 include_directories(${Mercury_SOURCE_DIR}/Kernel
-                    ${Mercury_BINARY_DIR}/Kernel)
+		${Mercury_BINARY_DIR}/Kernel)
 
 #Part 2 : Make run test for each of the demo files
 ##################################################
@@ -11,7 +12,7 @@ include_directories(${Mercury_SOURCE_DIR}/Kernel
 #For MPI*Test drivers:
 #Define a function to extract the number of required processors
 function(get_number_of_cores EXECNAME NUMCORES)
-  string(FIND ${EXECNAME} "MPI" POS1)
+	string(FIND ${EXECNAME} "MPI" POS1)
   string(FIND ${EXECNAME} "Test" POS2)
   math(EXPR START "${POS1} + 3")
   math(EXPR LENGTH "${POS2} - ${START}") 

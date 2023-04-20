@@ -126,7 +126,7 @@ int main()
     TriangulatedScrewSelfTest t;
     //uncomment to get VTK output
     //t.setParticlesWriteVTK(true);
-    t.setWallsWriteVTK(FileType::ONE_FILE);
+    t.wallHandler.setWriteVTK(FileType::ONE_FILE);
     t.solve();
     return 0;
 }

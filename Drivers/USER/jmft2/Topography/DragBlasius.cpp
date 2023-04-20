@@ -369,10 +369,10 @@ class DragBlasius : public Mercury2D {
             /* Profiling */
             std::time_t timeSinceStart = std::time(nullptr) - startTime_;
             std::time_t projectedTimeLeft = timeSinceStart * (getTimeMax() - getTime())/getTime();
-            fprintf(profilingFile, "%f %d %d %d\n",
-                getTime(), particleHandler.getNumberOfObjects(),
-                timeSinceStart, 
-                projectedTimeLeft
+            fprintf(profilingFile, "%f %d %ld %ld\n",
+                    getTime(), particleHandler.getNumberOfObjects(),
+                    timeSinceStart,
+                    projectedTimeLeft
             );
 
         }

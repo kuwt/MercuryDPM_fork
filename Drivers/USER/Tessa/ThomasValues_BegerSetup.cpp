@@ -174,10 +174,10 @@ public:
 
 	  boundaryHandler.clear();//WallsPeriodic.resize(0);
 	  InfiniteWall w0;//Walls.resize(5);
-		w0.set(Vec3D( 0.0, 0.0,-1.0), -getZMin());
-                wallHandler.copyAndAddObject(w0);
-		w0.set(Vec3D(-1.0, 0.0, 0.0), -getXMin());
-                wallHandler.copyAndAddObject(w0);
+		w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0, 0, -getZMin()));
+        wallHandler.copyAndAddObject(w0);
+        w0.set(Vec3D(-1.0, 0.0, 0.0), Vec3D(-getXMin(), 0, 0));
+        wallHandler.copyAndAddObject(w0);
 		w0.set(Vec3D( 1.0, 0.0, 0.0),  getMax());
                 wallHandler.copyAndAddObject(w0);
 		w0.set(Vec3D( 0.0,-1.0, 0.0), getMin());

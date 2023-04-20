@@ -274,7 +274,7 @@ int main(int argc, char** argv)
       problem.setSaveCount(floor(0.01/problem.getTimeStep()));
       problem.setParticlesWriteVTK(true);
       // Write one file per timestep
-      problem.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+      problem.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
   }
   
   problem.solve(argc,argv);

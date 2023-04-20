@@ -196,7 +196,7 @@ int main(int argc, char *argv[])
     HG.N = 600; //number of particles
     //uncomment next two line 2 to create paraview files
     HG.setParticlesWriteVTK(true);
-    HG.setWallsWriteVTK(FileType::ONE_FILE);
+    HG.wallHandler.setWriteVTK(FileType::ONE_FILE);
 
     HG.solve(argc, argv);
     return 0;

@@ -399,7 +399,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     //----------------------------------------------
     //    pb.setWallsWriteVTK(FileType::MULTIPLE_FILES);
     pb.setParticlesWriteVTK(false);
-    pb.setWallsWriteVTK(false);
+    pb.wallHandler.setWriteVTK(false);
 
     pb.setName(setFilename);
     pb.setXBallsAdditionalArguments("-solidf -v0");

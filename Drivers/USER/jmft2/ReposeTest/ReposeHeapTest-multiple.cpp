@@ -12,7 +12,7 @@ void sendmail(const char* user, const char* subject, const char* msg, const char
     char command[MAX_STRLEN];
     snprintf(command, MAX_STRLEN, "cat %s | mail -s \"%s\" %s",
             mailbuf_fn, subject, user);
-    system(command);
+    int result = system(command);
 }
 
 
@@ -66,7 +66,7 @@ int main (const int argc, const char** argv)
     FILE * seriesconffile = fopen(argv[1], "r");
     /* First line gives the number of simulations in this series and the name of the series. */
     size_t N; char seriesname[MAX_STRLEN];
-    fscanf(seriesconffile, "%d %s\n", &N, seriesname);
+    fscanf(seriesconffile, "%zd %s\n", &N, seriesname);
 
     /*
     char seriesname[] = "elasticparticles4";
@@ -91,7 +91,7 @@ int main (const int argc, const char** argv)
 
         char buf[MAX_STRLEN];
         double dispersity;
-        fgets(buf, MAX_STRLEN, seriesconffile);
+        char* result = fgets(buf, MAX_STRLEN, seriesconffile);
         sscanf(buf, "%lf %lf %lf %lf %lf %lf",
                 &(pars[i].particleRadius),
                 &dispersity,
@@ -121,7 +121,7 @@ int main (const int argc, const char** argv)
         instances[i]->generator.randomise();
 
         char problemname[MAX_STRLEN];
-        snprintf(problemname, MAX_STRLEN, "ReposeHeapTest-%s-run%d out of %d", seriesname, i, N);
+        snprintf(problemname, MAX_STRLEN, "ReposeHeapTest-%s-run%d out of %zu", seriesname, i, N);
         instances[i]->setName(problemname);
         fprintf(stderr, "%d %p %s\n", i, instances[i], problemname);
         char problem_haf[MAX_STRLEN];

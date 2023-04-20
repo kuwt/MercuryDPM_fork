@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -388,9 +388,7 @@ void PSD::setDistributionLogNormal(Mdouble mean, Mdouble standardDeviation, int 
  *                                              PROBABILITYDENSITY_NUMBER_DISTRIBUTION,
  *                                              PROBABILITYDENSITY_LENGTH_DISTRIBUTION,
  *                                              PROBABILITYDENSITY_AREA_DISTRIBUTION.
- * \deprecated This is the old way of inserting PSDs. In the future use setPSDFromCSV().
  */
-MERCURY_DEPRECATED
 void PSD::setPSDFromVector(std::vector<RadiusAndProbability> psdVector, TYPE PSDType)
 {
     particleSizeDistribution_ = psdVector;

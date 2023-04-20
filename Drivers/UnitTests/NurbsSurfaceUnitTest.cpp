@@ -63,7 +63,7 @@ int main()
     auto w = dpm.wallHandler.copyAndAddObject(nurbsWall);
 
     //write vtk file
-    dpm.setWallsWriteVTK(FileType::ONE_FILE);
+    dpm.wallHandler.setWriteVTK(FileType::ONE_FILE);
     dpm.forceWriteOutputFiles();
 
     //test if contact can be found

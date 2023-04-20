@@ -77,7 +77,7 @@ int main()
 
     //write vtk file
     dpm.setName("NurbsWallUnitTest");
-    dpm.setWallsWriteVTK(FileType::ONE_FILE);
+    dpm.wallHandler.setWriteVTK(FileType::ONE_FILE);
     dpm.setParticlesWriteVTK(true);
     dpm.forceWriteOutputFiles();
 

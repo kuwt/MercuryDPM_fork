@@ -49,7 +49,7 @@ int main() {
     LinearViscoelasticSpecies s;
     s.setDensity(1000);
     problem.speciesHandler.copyAndAddObject(s);
-    problem.setWallsWriteVTK(true);
+    problem.wallHandler.setWriteVTK(true);
     problem.solve();
     return 0;
 }

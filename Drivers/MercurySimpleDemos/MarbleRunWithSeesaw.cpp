@@ -212,7 +212,7 @@ public:
         fStatFile.setFileType(FileType::NO_FILE);
         restartFile.writeFirstAndLastTimeStep();
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(FileType::MULTIPLE_FILES);
+        wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
     }
     
     /// Computes the movement of the two seesaws

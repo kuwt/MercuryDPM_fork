@@ -53,7 +53,7 @@ public:
         setSlopeAngle = constants::pi / 180.0 * slopeAngle;
 
         setName("T_protectiveWall");
-        setWallsWriteVTK(FileType::MULTIPLE_FILES);
+        wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
         setParticlesWriteVTK(true);
 
         setSystemDimensions(3);

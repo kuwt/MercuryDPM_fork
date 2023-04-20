@@ -55,7 +55,7 @@ int main()
 //        else if (g==g6) w->move({60,0,0});
 //    }
     // define values required for each simulation
-    dpm.setWallsWriteVTK(true);
+    dpm.wallHandler.setWriteVTK(true);
     dpm.setTimeMax(1);
     dpm.setTimeStep(1);
     dpm.setName("WGCP");

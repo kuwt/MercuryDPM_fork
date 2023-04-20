@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -154,6 +154,7 @@ Vec3D TimeDependentPeriodicBoundary::getPlanewiseShift(Mdouble time) const
     }
     if (maxShift_ < 0)
         logger(ERROR, "[TimeDependentPeriodicBoundary::getPlanewiseShift] maxShift_ = % is negative", maxShift_);
+    return {0,0,0};
 }
 
 Vec3D TimeDependentPeriodicBoundary::getBoost(Mdouble time) const

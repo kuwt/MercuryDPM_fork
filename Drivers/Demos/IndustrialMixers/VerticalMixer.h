@@ -55,7 +55,7 @@ struct VerticalMixer : public Material {
         setSaveCount(200);
 
         //enforce writing wall output
-        setWallsWriteVTK(FileType::MULTIPLE_FILES);
+        wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
         //if (!prettyWalls_)
         //setParticlesWriteVTK(true);
 

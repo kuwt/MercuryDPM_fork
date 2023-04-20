@@ -195,7 +195,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 
     ic.setFileType(FileType::ONE_FILE);
     ic.setParticlesWriteVTK(true);
-    ic.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+    ic.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
 
     ic.setSaveCount(200);
     ic.setTimeMax(0.4);

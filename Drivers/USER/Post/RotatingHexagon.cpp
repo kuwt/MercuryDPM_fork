@@ -505,7 +505,7 @@ int main(int argc, char *argv[])
     problem.fStatFile.setFileType(FileType::NO_FILE);
     problem.eneFile.setFileType(FileType::NO_FILE);
 
-    problem.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+    problem.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
     problem.setParticlesWriteVTK(true);
 
     problem.setXBallsAdditionalArguments("-cmode 8 -solidf -v0");

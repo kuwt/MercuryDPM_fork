@@ -101,8 +101,8 @@ int main(int argc, char* argv[])
     problem.restartFile.setFileType(FileType::ONE_FILE);
     problem.fStatFile.setFileType(FileType::NO_FILE);
     problem.eneFile.setFileType(FileType::NO_FILE);
-    
-    problem.setWallsWriteVTK(FileType::ONE_FILE);
+
+    problem.wallHandler.setWriteVTK(FileType::ONE_FILE);
     problem.setParticlesWriteVTK(true);
     
     problem.setXBallsAdditionalArguments("-solidf -v0 -s .85");

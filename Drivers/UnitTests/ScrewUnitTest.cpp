@@ -47,7 +47,7 @@ int main()
     dpm.setTimeMax(dpm.getTimeStep());
     dpm.setName("ScrewUnitTest");
     dpm.setParticlesWriteVTK(true);
-    dpm.setWallsWriteVTK(true);
+    dpm.wallHandler.setWriteVTK(true);
     
     Mdouble h = 0.05;
     Mdouble distance;

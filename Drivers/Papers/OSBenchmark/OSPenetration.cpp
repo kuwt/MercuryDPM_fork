@@ -75,7 +75,7 @@ public:
         if (writeOutput()) {
             // write ene, data, fstat, restart and vtu files
             setParticlesWriteVTK(true);
-            setWallsWriteVTK(FileType::MULTIPLE_FILES);
+            wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
             fStatFile.writeFirstAndLastTimeStep();
             restartFile.writeFirstAndLastTimeStep();
         } else {

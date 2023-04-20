@@ -195,7 +195,7 @@ public:
         setSaveCount(2143);
         restartFile.setSaveCount(21430);
         restartFile.setFileType(FileType::MULTIPLE_FILES);
-        setWallsWriteVTK(FileType::ONE_FILE);
+        wallHandler.setWriteVTK(FileType::ONE_FILE);
     }
 
     /*

@@ -70,7 +70,7 @@ int main()
     b.insertParticles(&dpm);
     logger(INFO, "#particles %", dpm.particleHandler.getNumberOfObjects());
     // turn on vtk output
-    dpm.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+    dpm.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
     dpm.setParticlesWriteVTK(true);
     // start the simulation
     dpm.solve();

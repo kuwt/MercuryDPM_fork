@@ -70,7 +70,7 @@ int main()
 
     dpm.setParticlesWriteVTK(true);
 //    dpm.setWallsWriteVTK(FileType::ONE_FILE);
-    dpm.setInteractionsWriteVTK(true);
+    dpm.wallHandler.setWriteVTK(true);
     dpm.boundaryHandler.setWriteVTK(true);
     dpm.solve();
     return 0;

@@ -123,8 +123,8 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 	twoParticleElasticCollisionInteractionProblem.fStatFile.setFileType(FileType::ONE_FILE);
 	twoParticleElasticCollisionInteractionProblem.getInteractionFile().setFileType(FileType::ONE_FILE);
     twoParticleElasticCollisionInteractionProblem.setParticlesWriteVTK(true);
-    twoParticleElasticCollisionInteractionProblem.setInteractionsWriteVTK(true);
-    twoParticleElasticCollisionInteractionProblem.setWallsWriteVTK(FileType::ONE_FILE);
+    twoParticleElasticCollisionInteractionProblem.interactionHandler.setWriteVTK(true);
+    twoParticleElasticCollisionInteractionProblem.wallHandler.setWriteVTK(FileType::ONE_FILE);
 
 	twoParticleElasticCollisionInteractionProblem.solve();
 

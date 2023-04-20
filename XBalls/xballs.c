@@ -561,7 +561,7 @@ int main(argc, argv)
     }
 
     Create_Colors();
-    printf("Create_Color_Map %d %d \n",1,gcMap[1]); 
+    printf("Create_Color_Map %d %p \n", 1, gcMap[1]);
 
     if (i03d == 1)
     {
@@ -2966,7 +2966,7 @@ XtTimerCallbackProc  X_Draw_Snap(char *cfile )
                 if( ifilm == 2 )
                   sprintf(csystem,"import +screen -window %lu -border -scene %d %6.6d.%s \n",eng,icount,icount,coutfile); 
                 printf("%s \n",csystem);
-                system(csystem); 
+                   int status = system(csystem);
                 icount++;
                }
 
@@ -3389,7 +3389,7 @@ int read_line( int inread, FILE *fp,
 
 while( icomp == 0 )
 {
-  fgets( cline, clength, fp );
+    char* result = fgets(cline, clength, fp);
   if( (icomp = strncmp( "#", cline, 1 )) != 0 )
   {
     if( inread == 6 )
@@ -3461,7 +3461,7 @@ int read_header( int inread, FILE *fp,
  
 while( icomp == 0 )
 {
-  fgets( cline, clength, fp );
+    char* result = fgets(cline, clength, fp);
   if( (icomp = strncmp( "#", cline, 1 )) != 0 )
   {
     if(( inread == 3 ) || ( inread == 7 ) || ( inread == 14 ))

@@ -223,7 +223,7 @@ class DrumRot : public Mercury3D
 		}
 		//Write output to vtk file for Paraview
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(FileType::ONE_FILE);
+        wallHandler.setWriteVTK(FileType::ONE_FILE);
 	}
 
 	void actionsBeforeTimeStep()

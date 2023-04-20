@@ -395,7 +395,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     //------------------------------------------------------------------------------Data Output--------------------------------------------------------------------------------------------
     deposition_problem.setSaveCount(1000);//50
     deposition_problem.setParticlesWriteVTK(true);
-    deposition_problem.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+    deposition_problem.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
     //
     deposition_problem.setTimeStep(timeStep);
     //deposition_problem.setTimeStep(1e-4);

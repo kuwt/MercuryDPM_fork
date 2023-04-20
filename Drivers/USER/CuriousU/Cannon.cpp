@@ -152,7 +152,7 @@ int main(int argc, char **argv)
     Drum problem;
     problem.setName("Cannon");
     problem.setSaveCount(10);
-    problem.setWallsWriteVTK(FileType::ONE_FILE);
+    problem.wallHandler.setWriteVTK(FileType::ONE_FILE);
     problem.setParticlesWriteVTK(true);
     problem.setXBallsAdditionalArguments(" -rmult 10");
 

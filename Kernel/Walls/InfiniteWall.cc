@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -135,7 +135,10 @@ void InfiniteWall::setNormal(const Vec3D normal)
  * \param[in] normal A Vec3D that represents the normal vector to the wall.
  * \param[in] positionInNormalDirection The position of the wall in the direction
  *  of the normal vector.
+ *
+ * \deprecated InfiniteWall::set(Vec3D, Mdouble) is deprecated. Use set(Vec3D, Vec3D) instead.
  */
+MERCURY_DEPRECATED
 void InfiniteWall::set(Vec3D normal, Mdouble positionInNormalDirection)
 {
     logger(WARN, "InfiniteWall::set(Vec3D, Mdouble) is deprecated. Use set(Vec3D, Vec3D) instead.");

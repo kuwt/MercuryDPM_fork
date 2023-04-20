@@ -293,7 +293,7 @@ int main(int argc, char** argv)
   {
       problem.setParticlesWriteVTK(true);
       // Write one file per timestep
-      problem.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+      problem.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
   }
   
   problem.setNumberOfOMPThreads(helpers::readFromCommandLine(argc, argv, "-omp",1));

@@ -110,7 +110,7 @@ public:
             setSaveCount(static_cast<unsigned>(0.01 / getTimeStep()));
             // write ene, data, fstat, restart and vtu files
             setParticlesWriteVTK(true);
-            setWallsWriteVTK(true);
+            wallHandler.setWriteVTK(true);
             fStatFile.writeFirstAndLastTimeStep();
             restartFile.writeFirstAndLastTimeStep();
         } else {
