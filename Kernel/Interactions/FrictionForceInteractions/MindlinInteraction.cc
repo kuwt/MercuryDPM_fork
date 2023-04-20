@@ -293,21 +293,20 @@ void MindlinInteraction::computeFrictionForce()
             // **********************************************GENERAL CALCULATIONS*******************************************************
             // *************************************************************************************************************************
             //used to Integrate the spring
-            //if particle-wall
-            if (dynamic_cast<BaseParticle*>(getI()) == nullptr)
+            //Calculating the tangential spring using Luding, S. (2008) eq. (17)
+            const Mdouble springLength = slidingSpring_.getLength();
+            if (springLength > 1e-10)
             {
-                slidingSpringVelocity_ = tangentialRelativeVelocity;
+                slidingSpring_ -= Vec3D::dot(slidingSpring_, getNormal()) * getNormal();
+                slidingSpring_ *= springLength / slidingSpring_.getLength();
+                // logger.assert(std::abs(slidingSpring_.getLength() - springLength) < 1e-10, "Spring length not the same after rotation");
             }
-                //if particle-particle
-            else
-            {
-                slidingSpringVelocity_ = (tangentialRelativeVelocity -
-                                          Vec3D::dot(slidingSpring_, getP()->getVelocity() - getI()->getVelocity()) *
-                                          getNormal() / getDistance());
-            }
+
             //integrate(getHandler()->timeStep_);
+            slidingSpringVelocity_ = tangentialRelativeVelocity;
             slidingSpring_ += slidingSpringVelocity_ * getHandler()->getDPMBase()->getTimeStep();
-            
+            //logger(INFO,"slidingSpring.normalDirection %",Vec3D::dot(slidingSpring_/slidingSpring_.getLength(),getNormal()));
+
             //1) Calculating the current value of K_t0
             //This is identical for both unloading and loading (under constant normal force) and hence can
             //potentially later be moved for neatness/efficiency
