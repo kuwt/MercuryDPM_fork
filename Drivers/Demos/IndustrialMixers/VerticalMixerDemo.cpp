@@ -25,9 +25,9 @@
 
 #include "VerticalMixer.h"
 
-int main(int argc UNUSED, char *argv[] UNUSED)
+int main(int argc, char *argv[])
 {
-    VerticalMixerAngledBlades mixer;
+    VerticalMixerAngledBlades mixer(argc, argv);
     mixer.setName("VerticalMixerDemo");
     mixer.removeOldFiles();
     mixer.prettyWalls_ = true;

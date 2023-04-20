@@ -23,22 +23,22 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "Mercury3D.h"
-#include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
+#include "Material.h"
 #include <Walls/InfiniteWall.h>
 #include <Walls/AxisymmetricIntersectionOfWalls.h>
 #include <Boundaries/CubeInsertionBoundary.h>
 
 /** This code creates a cylindrical container, inserts particles and lets them settle.
 */
-struct VerticalMixer : public Mercury3D{
+struct VerticalMixer : public Material {
 
-    Mdouble particleRadius_ = 1.5e-3;
+    VerticalMixer (int argc, char *argv[]) : Material (argc, argv) {}
+
+    Mdouble particleRadius_ = 0.5*psd.getVolumeDx(50);
     Mdouble drumRadius_ = 30.0*particleRadius_;
     Mdouble drumLength_ = 60.0*particleRadius_;
     Vec3D angularVelocity = Vec3D(1,0,0);
     Mdouble particleNumber_ = 10;
-    Mdouble initialParticleOverlap_ = 0;
     //two options for plotting walls
     bool prettyWalls_ = false;
     bool haveOuterWalls = true;
@@ -49,19 +49,8 @@ struct VerticalMixer : public Mercury3D{
         setMin(-getMax());
         setGravity(Vec3D(0, 0, -9.8));
 
-        //define material/contact properties
-        LinearViscoelasticSlidingFrictionSpecies species;
-        species.setHandler(&speciesHandler);
-        species.setDensity(2000);
-        Mdouble mass = species.getMassFromRadius(particleRadius_);
-        species.setCollisionTimeAndRestitutionCoefficient(0.005, 0.5, mass);
-        species.setSlidingFrictionCoefficient(0.5);
-        species.setSlidingStiffness(2.0/7.0*species.getStiffness());
-        species.setSlidingDissipation(2.0/7.0*species.getDissipation());
-        speciesHandler.copyAndAddObject(species);
-
         //set timestep
-        setTimeStep(species.getCollisionTime(mass)/15);
+        //setTimeStep(species.getCollisionTime(mass)/15);
         //14*collisiontime for nice flow for
         setSaveCount(200);
 
@@ -74,30 +63,30 @@ struct VerticalMixer : public Mercury3D{
         if (!prettyWalls_) {
             //define Walls
             AxisymmetricIntersectionOfWalls outer;
-            outer.setSpecies(speciesHandler.getLastObject());
+            outer.setSpecies(frictionalWallSpecies);
             outer.setAxis(Vec3D(1, 0, 0));
             outer.addObject(Vec3D(1, 0, 0), Vec3D(drumRadius_, 0, 0));
             wallHandler.copyAndAddObject(outer);
 
             AxisymmetricIntersectionOfWalls leftCorner;
-            leftCorner.setSpecies(speciesHandler.getLastObject());
+            leftCorner.setSpecies(frictionalWallSpecies);
             leftCorner.setAxis(Vec3D(1, 0, 0));
             leftCorner.addObject(Vec3D(1, 0, -1), Vec3D(drumRadius_, 0, -0.5 * drumLength_ + cornerLength));
             wallHandler.copyAndAddObject(leftCorner);
 
             AxisymmetricIntersectionOfWalls rightCorner;
-            rightCorner.setSpecies(speciesHandler.getLastObject());
+            rightCorner.setSpecies(frictionalWallSpecies);
             rightCorner.setAxis(Vec3D(1, 0, 0));
             rightCorner.addObject(Vec3D(1, 0, 1), Vec3D(drumRadius_, 0, 0.5 * drumLength_ - cornerLength));
             wallHandler.copyAndAddObject(rightCorner);
 
             InfiniteWall leftEnd;
-            leftEnd.setSpecies(speciesHandler.getLastObject());
+            leftEnd.setSpecies(frictionalWallSpecies);
             leftEnd.set(Vec3D(-1, 0, 0), Vec3D(-0.5 * drumLength_, 0, 0));
             wallHandler.copyAndAddObject(leftEnd);
 
             InfiniteWall rightEnd;
-            rightEnd.setSpecies(speciesHandler.getLastObject());
+            rightEnd.setSpecies(frictionalWallSpecies);
             rightEnd.set(Vec3D(1, 0, 0), Vec3D(0.5 * drumLength_, 0, 0));
             wallHandler.copyAndAddObject(rightEnd);
 
@@ -111,7 +100,7 @@ struct VerticalMixer : public Mercury3D{
             if (haveOuterWalls) {
                 //define Walls
                 AxisymmetricIntersectionOfWalls outer;
-                outer.setSpecies(speciesHandler.getLastObject());
+                outer.setSpecies(frictionalWallSpecies);
                 outer.setAxis(Vec3D(1, 0, 0));
                 outer.addObject(Vec3D(1, 0, 0), Vec3D(drumRadius_, 0, 0));
                 outer.addObject(Vec3D(-1, 0, 0), Vec3D(drumRadius_ + thickness, 0, 0));
@@ -120,7 +109,7 @@ struct VerticalMixer : public Mercury3D{
                 wallHandler.copyAndAddObject(outer);
 
                 AxisymmetricIntersectionOfWalls leftCorner;
-                leftCorner.setSpecies(speciesHandler.getLastObject());
+                leftCorner.setSpecies(frictionalWallSpecies);
                 leftCorner.setAxis(Vec3D(1, 0, 0));
                 leftCorner.addObject(Vec3D(1, 0, -1), Vec3D(drumRadius_, 0, -0.5 * drumLength_ + cornerLength));
                 leftCorner.addObject(Vec3D(-1, 0, 1),
@@ -130,7 +119,7 @@ struct VerticalMixer : public Mercury3D{
                 wallHandler.copyAndAddObject(leftCorner);
 
                 AxisymmetricIntersectionOfWalls rightCorner;
-                rightCorner.setSpecies(speciesHandler.getLastObject());
+                rightCorner.setSpecies(frictionalWallSpecies);
                 rightCorner.setAxis(Vec3D(1, 0, 0));
                 rightCorner.addObject(Vec3D(1, 0, 1), Vec3D(drumRadius_, 0, 0.5 * drumLength_ - cornerLength));
                 rightCorner.addObject(Vec3D(-1, 0, -1),
@@ -140,7 +129,7 @@ struct VerticalMixer : public Mercury3D{
                 wallHandler.copyAndAddObject(rightCorner);
 
                 AxisymmetricIntersectionOfWalls leftEnd;
-                leftEnd.setSpecies(speciesHandler.getLastObject());
+                leftEnd.setSpecies(frictionalWallSpecies);
                 leftEnd.setAxis(Vec3D(1, 0, 0));
                 leftEnd.addObject(Vec3D(0, 0, 1), Vec3D(0, 0, -0.5 * drumLength_ - thickness));
                 leftEnd.addObject(Vec3D(0, 0, -1), Vec3D(0, 0, -0.5 * drumLength_));
@@ -148,7 +137,7 @@ struct VerticalMixer : public Mercury3D{
                 wallHandler.copyAndAddObject(leftEnd);
 
                 AxisymmetricIntersectionOfWalls rightEnd;
-                rightEnd.setSpecies(speciesHandler.getLastObject());
+                rightEnd.setSpecies(frictionalWallSpecies);
                 rightEnd.setAxis(Vec3D(1, 0, 0));
                 rightEnd.addObject(Vec3D(0, 0, -1), Vec3D(0, 0, 0.5 * drumLength_ + thickness));
                 rightEnd.addObject(Vec3D(0, 0, 1), Vec3D(0, 0, 0.5 * drumLength_));
@@ -164,17 +153,14 @@ struct VerticalMixer : public Mercury3D{
         }
 
         SphericalParticle p;
-        p.setSpecies(speciesHandler.getLastObject());
+        p.setSpecies(particleSpecies);
+        p.setRadius(particleRadius_);
         CubeInsertionBoundary c; //delete is done in boundaryHandler
         c.set(&p, 0, getMin(), getMax(), Vec3D(0, 0, 0), Vec3D(0, 0, 0));
-        c.setHandler(&boundaryHandler);
-        while (particleHandler.getSize()<particleNumber_) {
-            c.checkBoundaryBeforeTimeStep(this);
-            if (particleHandler.getSize()%100==0) logger(INFO,"N %",particleHandler.getSize());
-        }
-        for (auto p : particleHandler) {
-            p->setRadius(p->getRadius()+initialParticleOverlap_);
-        }
+        //c.setPSD(PSD::getDistributionNormal(particleRadius_,0.025*particleRadius_,50));
+        c.setPSD(psd);
+        c.setInitialVolume(particleNumber_*p.getVolume());
+        boundaryHandler.copyAndAddObject(c);
     }
 
     void printTime() const override
@@ -190,12 +176,14 @@ struct VerticalMixer : public Mercury3D{
 
 struct VerticalMixerStraightBlades : public VerticalMixer {
 
+    VerticalMixerStraightBlades (int argc, char *argv[]) : VerticalMixer (argc, argv) {}
+
     Mdouble bladeWidth_ = 2.0*particleRadius_;
     Mdouble bladeHeight_ = 0.2*drumRadius_;
 
-    void addBlades() {
+    void addBlades() override {
         IntersectionOfWalls blade;
-        blade.setSpecies(speciesHandler.getLastObject());
+        blade.setSpecies(frictionalWallSpecies);
         blade.createOpenPrism({Vec3D(0,0.5*bladeWidth_,drumRadius_),
                                Vec3D(0,0.5*bladeWidth_,drumRadius_-bladeHeight_),
                                Vec3D(0,-0.5*bladeWidth_,drumRadius_-bladeHeight_),
@@ -214,14 +202,16 @@ struct VerticalMixerStraightBlades : public VerticalMixer {
 
 struct VerticalMixerAngledBlades : public VerticalMixerStraightBlades {
 
+    VerticalMixerAngledBlades (int argc, char *argv[]) : VerticalMixerStraightBlades (argc, argv) {}
+
     Mdouble bladeAngle_ = 0.25*constants::pi;
 
-    void addBlades() {
+    void addBlades() override {
         Mdouble s = sin(bladeAngle_);
         Mdouble c = cos(bladeAngle_);
 
         IntersectionOfWalls blade;
-        blade.setSpecies(speciesHandler.getLastObject());
+        blade.setSpecies(frictionalWallSpecies);
         blade.createOpenPrism({Vec3D(0.5*bladeWidth_*s,0.5*bladeWidth_*c,drumRadius_),
                                Vec3D(0.5*bladeWidth_*s,0.5*bladeWidth_*c,drumRadius_-bladeHeight_),
                                Vec3D(-0.5*bladeWidth_*s,-0.5*bladeWidth_*c,drumRadius_-bladeHeight_),
@@ -241,16 +231,16 @@ struct VerticalMixerAngledBlades : public VerticalMixerStraightBlades {
         wallHandler.copyAndAddObject(blade);
     }
 
-    void addPrettyBlades() {
-        Mdouble s = sin(bladeAngle_);
-        Mdouble c = cos(bladeAngle_);
+    void addPrettyBlades() override {
+        Mdouble sb = sin(bladeAngle_);
+        Mdouble cb = cos(bladeAngle_);
 
         IntersectionOfWalls blade;
-        blade.setSpecies(speciesHandler.getLastObject());
-        blade.createPrism({Vec3D(0.5*bladeWidth_*s,0.5*bladeWidth_*c,drumRadius_),
-                               Vec3D(0.5*bladeWidth_*s,0.5*bladeWidth_*c,drumRadius_-bladeHeight_),
-                               Vec3D(-0.5*bladeWidth_*s,-0.5*bladeWidth_*c,drumRadius_-bladeHeight_),
-                               Vec3D(-0.5*bladeWidth_*s,-0.5*bladeWidth_*c,drumRadius_)});
+        blade.setSpecies(frictionalWallSpecies);
+        blade.createPrism({Vec3D(0.5*bladeWidth_*sb,0.5*bladeWidth_*cb,drumRadius_),
+                               Vec3D(0.5*bladeWidth_*sb,0.5*bladeWidth_*cb,drumRadius_-bladeHeight_),
+                               Vec3D(-0.5*bladeWidth_*sb,-0.5*bladeWidth_*cb,drumRadius_-bladeHeight_),
+                               Vec3D(-0.5*bladeWidth_*sb,-0.5*bladeWidth_*cb,drumRadius_)});
         //restrict to inside
         Mdouble cornerLength = 8.0 * particleRadius_;
         for (Mdouble angle = -0.2*constants::pi; angle<=0.2001*constants::pi; angle+=0.05*constants::pi) {

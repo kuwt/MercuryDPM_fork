@@ -25,9 +25,9 @@
 
 #include "VerticalMixer.h"
 
-int main(int argc UNUSED, char *argv[] UNUSED)
+int main(int argc, char *argv[])
 {
-    VerticalMixerStraightBlades mixer;
+    VerticalMixerStraightBlades mixer(argc, argv);
     mixer.setName("VerticalMixer");
     mixer.removeOldFiles();
     mixer.particleNumber_ = 10000;

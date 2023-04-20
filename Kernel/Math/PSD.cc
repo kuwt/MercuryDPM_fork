@@ -219,7 +219,7 @@ void PSD::validateCumulativeDistribution()
     // check whether the distribution is cumulative
     for (auto it = particleSizeDistribution_.begin() + 1; it != particleSizeDistribution_.end(); ++it)
     {
-        logger.assert_always(it->probability >= (it - 1)->probability, "psd is not cumulative", true);
+        logger.assert_always(it->probability >= (it - 1)->probability, "psd is not cumulative: radius % %, probabilities % %", (it-1)->radius, it->radius, (it-1)->probability, it->probability);
     }
     // cdf needs to start with a probability of zero
     if (particleSizeDistribution_[0].probability != 0)
