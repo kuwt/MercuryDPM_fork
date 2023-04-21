@@ -2542,7 +2542,7 @@ bool DPMBase::readParAndIniFiles(const std::string fileName)
     }
     else
     {
-        logger(ERROR, "Error in par.ini: line 1, value 1 is ", integerValue);
+        logger(ERROR, "Error in par.ini: line 1, value 1 is %", integerValue);
     }
 
     //   2: integer (0|1) dont use | use the search pattern for linked cells
@@ -2588,7 +2588,7 @@ bool DPMBase::readParAndIniFiles(const std::string fileName)
         //   2: requires initial log-output time
         //   3: negative number is multiplied to the previous film-output-time
         //   4: requires initial film-output time
-        logger(ERROR, "Error in par.ini: line 3, value 1 is ", doubleValue);
+        logger(ERROR, "Error in par.ini: line 3, value 1 is %", doubleValue);
     }
 
     // line 4 =============================================================
@@ -2622,7 +2622,7 @@ bool DPMBase::readParAndIniFiles(const std::string fileName)
     //   1: growth rate:  d(radius) = xgrow * dt
     file >> doubleValue;
     if (doubleValue != 0.0)
-        logger(WARN, "Warning in par.ini: ignored growth rate ", doubleValue);
+        logger(WARN, "Warning in par.ini: ignored growth rate %", doubleValue);
 
     //   2: target volume_fraction
     file >> doubleValue;

@@ -345,6 +345,11 @@ void RNG::setLaggedFibonacciGeneratorParameters(const unsigned int p, const unsi
         p_ = q;
         q_ = p;
     }
+    else
+    {
+        p_ = p;
+        q_ = q;
+    }
     
     randomSeedLaggedFibonacciGenerator_.resize(p_);
     seedLaggedFibonacciGenerator();
