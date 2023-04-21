@@ -66,7 +66,7 @@ int main() {
                 }
             }
     logger(INFO,"#particles %",dpm.particleHandler.getNumberOfObjects());
-    dpm.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+    dpm.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
     dpm.setParticlesWriteVTK(true);
     dpm.solve();
     w->writeToFile(10,0.0);

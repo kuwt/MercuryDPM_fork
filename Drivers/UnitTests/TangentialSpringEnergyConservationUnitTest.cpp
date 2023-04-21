@@ -47,7 +47,7 @@ public:
         setTimeMax(10);
         setTimeStep(species->getCollisionTime(1) / 50);
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(FileType::ONE_FILE);
+        wallHandler.setWriteVTK(FileType::ONE_FILE);
         setSaveCount(0.1 / getTimeStep());
     }
     

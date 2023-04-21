@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
                          "set ylabel 'COM_z [m]'\n"
                          "p [0.1:] '" + problem.getName() + ".ene' u 1:2 w l t ''");
 
-    problem.setWallsWriteVTK(false);
+    problem.wallHandler.setWriteVTK(false);
     problem.setParticlesWriteVTK(false);
 
     problem.solve();

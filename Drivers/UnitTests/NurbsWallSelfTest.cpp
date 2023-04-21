@@ -79,7 +79,7 @@ int main()
         }
     }
 
-    dpm.setWallsWriteVTK(FileType::ONE_FILE);
+    dpm.wallHandler.setWriteVTK(FileType::ONE_FILE);
     dpm.setParticlesWriteVTK(true);
     dpm.setTimeStep(0.001);
     dpm.setTimeMax(2.0);

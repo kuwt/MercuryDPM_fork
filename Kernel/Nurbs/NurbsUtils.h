@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -105,6 +105,44 @@ void bsplineBasis(int deg, int span, const std::vector<double>& knots, double u,
 void bsplineDerBasis(int deg, int span, const std::vector<double>& knots, double u,
                      int nDers, std::vector<std::vector<double>>& ders);
 
+/*!
+ * \brief Creates a uniform (clamped) knot vector
+ * @param numberOfControlPoints The number of control points the knot vector should correspond to
+ * @param degree The degree the knot vector should correspond to
+ * @param clampedAtStart Whether or not the knot vector should be clamped at the start
+ * @param clampedAtEnd Whether or not the knot vector should be clamped at the end
+ * @return A uniform (clamped) knot vector
+ */
+std::vector<Mdouble> createUniformKnotVector(unsigned int numberOfControlPoints, unsigned int degree, bool clampedAtStart, bool clampedAtEnd);
+
+/*!
+ * \brief Resets the knot vector to the interval [0, 1]
+ * @param knots The knot vector to be normalized
+ */
+void normalizeKnotVector(std::vector<Mdouble>& knots);
+
+/*!
+ * \brief Extends the knot vector for when control points have been added at the start or end
+ * @param knots The knot vector to be extended
+ * @param degree The nurbs degree
+ * @param numStart Number to be added at the start
+ * @param numEnd Number to be added at the end
+ * @param forceBothEndsUniform When only adding to one end, the other end can remain untouched or it can be forced to be made uniform
+ */
+void extendKnotVector(std::vector<Mdouble>& knots, unsigned int degree, unsigned int numStart, unsigned int numEnd, bool forceBothEndsUniform = false);
+
+/*!
+ * \brief Evaluate point on a NURBS surface
+ * @param u Parameter to evaluate the surface at
+ * @param v Parameter to evaluate the surface at
+ * @param knotsU Knot vector in u-direction
+ * @param knotsV Knot vector in v-direction
+ * @param controlPoints 2D vector of control points
+ * @param weights 2D vector of weights
+ * @return Resulting point on the surface at (u, v)
+ */
+Vec3D evaluate(Mdouble u, Mdouble v, std::vector<Mdouble> knotsU, std::vector<Mdouble> knotsV,
+               std::vector<std::vector<Vec3D>> controlPoints, std::vector<std::vector<Mdouble>> weights);
 }
 
 #endif //MERCURY_NURBSUTILS_H

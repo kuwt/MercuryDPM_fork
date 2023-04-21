@@ -60,7 +60,7 @@ class NozzleDemo : public Mercury3D {
         setTimeMax(1.0);
         setSaveCount(300);
         // Output files: wall-vtu and particle-vtu files
-        setWallsWriteVTK(true);
+        wallHandler.setWriteVTK(true);
         setParticlesWriteVTK(true);
         //Contact law and density
         HertzianViscoelasticMindlinLiquidMigrationWilletSpecies species;

@@ -120,7 +120,7 @@ public:
                 "saveas(gcf,'normalScrew.png')\n"
                 );
         logger(INFO,"Written file");
-        setWallsWriteVTK(true);
+        wallHandler.setWriteVTK(true);
         writeVTKFiles();
         exit(0);
     }

@@ -48,8 +48,8 @@ public:
         setGlobalRadius = pRadius; //Particle radius
         setParticleHeight = height; //Height of release
         setSlopeAngle = constants::pi / 180.0 * slopeAngle; //Slope angle
-        
-        setWallsWriteVTK(FileType::ONE_FILE); //For visualization
+
+        wallHandler.setWriteVTK(FileType::ONE_FILE); //For visualization
         setParticlesWriteVTK(true); //For visualization
         setGravity(Vec3D(0.0, 0.0, -9.81)); //Set gravity
 

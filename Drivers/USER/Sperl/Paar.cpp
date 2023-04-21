@@ -79,7 +79,7 @@ public:
         setSaveCount(1.0/getTimeStep()/frameRate);
         // write paraview output
         if (NUMBER_OF_PROCESSORS==1) setParticlesWriteVTK(true);
-        setWallsWriteVTK(FileType::MULTIPLE_FILES_PADDED);
+        wallHandler.setWriteVTK(FileType::MULTIPLE_FILES_PADDED);
     }
 
     /**

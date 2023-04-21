@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
     problem.setName("EllipticalSuperQuadricCollision");
     problem.setSaveCount(500);
     problem.setSuperquadricParticlesWriteVTK(true);
-    problem.setWallsWriteVTK(FileType::ONE_FILE);
+    problem.wallHandler.setWriteVTK(FileType::ONE_FILE);
     problem.solve();
     return 0;
 }

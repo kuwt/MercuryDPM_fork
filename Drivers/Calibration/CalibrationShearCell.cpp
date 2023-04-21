@@ -175,7 +175,7 @@ int main(int argc, char* argv[])
         cmd << dir << "CalibrationPrecompression";
         for (int i = 1; i < argc; ++i) cmd << ' ' << argv[i];
         logger(INFO, "\nRunning %", cmd.str());
-        system(cmd.str().c_str());
+        int status = system(cmd.str().c_str());
     }
 
     // run shear stages
@@ -184,7 +184,7 @@ int main(int argc, char* argv[])
         cmd << dir << "CalibrationShearStage -compression " << s;
         for (int i = 1; i < argc; ++i) cmd << ' ' << argv[i];
         logger(INFO, "\nRunning %", cmd.str());
-        system(cmd.str().c_str());
+        int status = system(cmd.str().c_str());
     }
     
     //read back output

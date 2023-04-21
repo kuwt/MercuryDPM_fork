@@ -76,7 +76,7 @@ public:
 //        setSaveCount(1);
         setSaveCount(unsigned(getTimeMax() / getTimeStep() / nWrite));
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(true);
+        wallHandler.setWriteVTK(true);
     }
 
     void setSpeciesProperties(const unsigned &flag) {

@@ -402,7 +402,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 
     std::stringstream com;
     com << "mkdir " << dirNameBase.str();
-    system(com.str().c_str());
+    int status = system(com.str().c_str());
 
     problem.setName(saveTo.str());
 

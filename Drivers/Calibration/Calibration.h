@@ -48,7 +48,7 @@ public:
         if (output) {
             setSaveCount(1000);
             dataFile.setFileType(FileType::ONE_FILE);
-            setWallsWriteVTK(FileType::ONE_FILE);
+            wallHandler.setWriteVTK(FileType::ONE_FILE);
             //setParticlesWriteVTK(true);
         }
         //default xballs arguments

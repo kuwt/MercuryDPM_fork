@@ -128,7 +128,7 @@ public:
                 "end"
                 );
         logger(INFO,"Written file");
-        setWallsWriteVTK(true);
+        wallHandler.setWriteVTK(true);
         writeVTKFiles();
         exit(0);
     }

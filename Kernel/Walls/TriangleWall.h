@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -106,6 +106,10 @@ public:
 
     void move(const Vec3D& move) override;
     
+    void setPosition(const Vec3D& position) override;
+    
+    void setOrientation(const Quaternion& orientation) override;
+    
     /*!
      * \brief Same as #setVertices(A,B,C), but sets the position explicitly.
      * The position is important when you rotate the wall, as the wall will be rotated around this position.
@@ -130,6 +134,19 @@ public:
     bool isLocal(Vec3D& min, Vec3D& max) const override;
 
     bool isInsideTriangle(const Vec3D &point) const;
+    
+    /*!
+     * \brief Updates the indexed vertex by a given change in position.
+     * @param index Vertex index, i.e. 0, 1 or 2
+     * @param dP Change in position
+     */
+    void moveVertex(unsigned index, const Vec3D& dP);
+    
+    /*!
+     * \brief Updates all vertices by the given changes in position.
+     * @param dPs Change in position for each vertex
+     */
+    void moveVertices(const std::array<Vec3D, 3>& dPs);
 
     bool isFaceContact(const Vec3D& normal) const override {
         return (normal==faceNormal_ or normal == -faceNormal_) ? true : false;

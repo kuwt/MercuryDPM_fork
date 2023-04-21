@@ -25,35 +25,36 @@
 
 #include "VerticalMixer.h"
 
-int main(int argc UNUSED, char *argv[] UNUSED)
+int main(int argc, char *argv[])
 {
-    //first create pretty wall data
-    VerticalMixerAngledBlades walls;
-    walls.setName("Walls");
-    walls.removeOldFiles();
-    walls.bladeAngle_ = 0.*constants::pi;
-    walls.prettyWalls_ = true;
-    walls.setTimeMax(30.0);
-    walls.solve();
-
-    //first create pretty wall data
-    VerticalMixerAngledBlades blades;
-    blades.setName("Blades");
-    blades.removeOldFiles();
-    blades.bladeAngle_ = 0.*constants::pi;
-    blades.prettyWalls_ = true;
-    blades.haveOuterWalls = false;
-    blades.setTimeMax(30.0);
-    blades.solve();
-
-    //now do the real run
-    VerticalMixerAngledBlades mixer;
+    //first, do the real run
+    VerticalMixerAngledBlades mixer(argc, argv);
     mixer.setName("VerticalMixerAngledBlades");
     mixer.removeOldFiles();
-    mixer.bladeAngle_ = 0.*constants::pi;
-    mixer.particleNumber_ = 10000;
-    mixer.setTimeMax(30.0);
-    //mixer.initialParticleOverlap_ = 0.2*mixer.particleRadius_;
+    // use straight blades
+    mixer.bladeAngle_ = helpers::readFromCommandLine(argc, argv, "-bladeAngle", 0.0)*constants::pi;
+    mixer.particleNumber_ = helpers::readFromCommandLine(argc, argv, "-particleNumber", 5000);
+    mixer.setTimeMax(helpers::readFromCommandLine(argc, argv, "-timeMax", 30.0));
+    mixer.setParticlesWriteVTK(true);
     mixer.solve();
+
+    //then create pretty wall data
+    VerticalMixerAngledBlades walls(argc, argv);
+    walls.setName("Walls");
+    walls.removeOldFiles();
+    walls.bladeAngle_ = mixer.bladeAngle_;
+    walls.prettyWalls_ = true;
+    walls.setTimeMax(mixer.getTimeMax());
+    walls.solve();
+
+    //finally, create pretty blade data
+    VerticalMixerAngledBlades blades(argc, argv);
+    blades.setName("Blades");
+    blades.removeOldFiles();
+    blades.bladeAngle_ = mixer.bladeAngle_;
+    blades.prettyWalls_ = true;
+    blades.haveOuterWalls = false;
+    blades.setTimeMax(mixer.getTimeMax());
+    blades.solve();
     return 0;
 }

@@ -134,7 +134,7 @@ public:
         fStatFile.setFileType(FileType::NO_FILE);
         restartFile.writeFirstAndLastTimeStep();
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(FileType::ONE_FILE);
+        wallHandler.setWriteVTK(FileType::ONE_FILE);
     }
 };
 

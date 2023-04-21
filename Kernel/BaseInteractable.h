@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -191,7 +191,7 @@ public:
      * This reduction approach allows step 2 to be run in parallel, while step 3 needs to be done in sequence.
      * It is efficient, since step 3 is much quicker than step 2.
      */
-    void resetForceTorque(int numberOfOMPthreads);
+    virtual void resetForceTorque(int numberOfOMPthreads);
     
     /*
      * This function does the last step of summing up all forces (and torques) acting on an interactable.
@@ -236,7 +236,7 @@ public:
      * See also BaseInteractable::getPosistion.
      * \param[in] position  Reference to Vec3D storing the position of the particle.
     */
-    void setPosition(const Vec3D& position)
+    virtual void setPosition(const Vec3D& position)
     { position_ = position; }
     
     /*!
@@ -257,7 +257,7 @@ public:
      * \param[in] orientation  Reference to Vec3D storing the orientation
      * of the particle.
      */
-    void setOrientation(const Quaternion& orientation)
+    virtual void setOrientation(const Quaternion& orientation)
     { orientation_ = orientation; }
     
     /*!

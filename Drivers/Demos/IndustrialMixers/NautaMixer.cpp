@@ -78,7 +78,7 @@ public:
     {
         removeOldFiles();
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(FileType::MULTIPLE_FILES);
+        wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
         setDomain(Vec3D(-coneTopRadius, -coneTopRadius, coneTipHeight),
                   Vec3D(coneTopRadius, coneTopRadius, topHeight));
         setGravity({0,0,-9.8});

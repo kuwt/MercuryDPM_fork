@@ -129,7 +129,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
                  "First with the default parameters, prob numbers are from uniform = ", Flusher::NO_FLUSH);
     helpers::check(problem.random.test(), 0.467846, 1e-6, "Checking test result");
     
-    problem.random.setLinearCongruentialGeneratorParmeters(65539, 0, 1024 * 1024 * 1024 * 2 - 1);
+    problem.random.setLinearCongruentialGeneratorParmeters(65539, 0, mathsFunc::cubic(1024) * 2 - 1);
     logger(INFO, "Third test, now with Stefans' the default parameters, prob numbers are from uniform = ",
            Flusher::NO_FLUSH);
     helpers::check(problem.random.test(), 0.131117, 1e-6, "Checking test result");

@@ -105,7 +105,7 @@ public:
 
         //dataFile.setFileType(FileType::NO_FILE);
         fStatFile.setFileType(FileType::NO_FILE);
-        setWallsWriteVTK(FileType::MULTIPLE_FILES);
+        wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
         interactionHandler.setWriteVTK(FileType::MULTIPLE_FILES);
         setParticlesWriteVTK(true);
         setSaveCount(100);

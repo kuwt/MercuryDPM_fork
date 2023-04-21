@@ -43,7 +43,7 @@ public:
         setFileType(FileType::NO_FILE);
         dataFile.setFileType(FileType::ONE_FILE);
         fStatFile.setFileType(FileType::ONE_FILE);
-        setWallsWriteVTK(true);
+        wallHandler.setWriteVTK(true);
         setParticlesWriteVTK(true);
         setSaveCount(2);
 

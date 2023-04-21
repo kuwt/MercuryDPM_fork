@@ -50,7 +50,7 @@ public:
         setTimeMax(15);
         setSaveCount(5000);
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(FileType::ONE_FILE);
+        wallHandler.setWriteVTK(FileType::ONE_FILE);
     
         //set domain size
         setMin({0,-1,-1});

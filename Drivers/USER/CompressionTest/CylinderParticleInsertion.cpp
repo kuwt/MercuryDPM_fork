@@ -44,7 +44,7 @@ public:
         cylVol_ = constants::pi * cylRad_ * cylRad_ * cylHeight_;
     
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(FileType::MULTIPLE_FILES);
+        wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
         //Set files
         dataFile.setFileType(FileType::ONE_FILE);
         restartFile.setFileType(FileType::ONE_FILE);

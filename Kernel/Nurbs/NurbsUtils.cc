@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -251,5 +251,155 @@ void bsplineDerBasis(int deg, int span, const std::vector<double>& knots, double
     }
 }
 
+std::vector<Mdouble> createUniformKnotVector(unsigned int numberOfControlPoints, unsigned int degree, bool clampedAtStart, bool clampedAtEnd)
+{
+    // Total number of knots
+    unsigned int numberOfKnots = numberOfControlPoints + degree + 1;
+    std::vector<Mdouble> knots;
+    knots.reserve(numberOfKnots);
+    
+    // Create uniform from 0 to 1
+    for (int i = 0; i < numberOfKnots; i++)
+    {
+        knots.push_back(i / static_cast<Mdouble>(numberOfKnots - 1));
+    }
+    
+    // When clamped at start, first degree+1 values are set to 0.
+    if (clampedAtStart)
+    {
+        for (int i = 0; i <= degree; i++)
+        {
+            knots[i] = 0.0;
+        }
+    }
+    
+    // When clamped at end, last degree+1 values are set to 1
+    if (clampedAtEnd)
+    {
+        for (int i = 0; i <= degree; i++)
+        {
+            knots[knots.size() - 1 - i] = 1.0;
+        }
+    }
+    
+    return knots;
+}
+
+void normalizeKnotVector(std::vector<Mdouble>& knots)
+{
+    // Reset the interval to [0,1]
+    const Mdouble minK = knots.front();
+    const Mdouble maxK = knots.back();
+    
+    // Already in normalized form
+    if (close(minK, 0.0) && close(maxK, 1.0))
+        return;
+    
+    for (Mdouble& k : knots)
+    {
+        k = (k - minK) / (maxK - minK);
+    }
+}
+
+void extendKnotVector(std::vector<Mdouble>& knots, unsigned int degree, unsigned int numStart, unsigned int numEnd, bool forceBothEndsUniform)
+{
+    // Usually it should already be in normalized form, but just to be sure.
+    // Needed because otherwise comparing to uniform step size doesn't work.
+    normalizeKnotVector(knots);
+    
+    Mdouble uniformStepSize = 1.0 / (knots.size() - 1);
+    
+    // This only works properly when the original start and end knots are uniformly spaced.
+    // Therefore force the degree+1 number of knots at the start and end to have uniform step size
+    // and remember if they weren't already uniform, so when needed a message can be logged.
+    
+    // Since the original knot vector might change a bit, only do stuff when there are actually knots to be added.
+    if (numStart > 0 || forceBothEndsUniform)
+    {
+        // Check if first degree+1 knots are uniform.
+        // Update: also an additional number of knots added to the end should be uniform (the ones "wrapping around")
+        bool startsOfUniform = true;
+        for (int i = 0; i <= degree + numEnd; i++)
+        {
+            if (!close(knots[i], i * uniformStepSize))
+            {
+                startsOfUniform = false;
+                knots[i] = i * uniformStepSize;
+            }
+        }
+    
+        // When needed, let user know that original knot vector has been edited.
+        if (!startsOfUniform)
+        {
+            logger(INFO, "Start of knot vector (first degree+1 values) has been changed to be uniform. The shape might be slightly affected. ");
+        }
+    
+        // Insert knots at start
+        for (int i = 1; i <= numStart; i++)
+        {
+            knots.insert(knots.begin(), -i * uniformStepSize);
+        }
+    }
+    
+    // Since the original knot vector might change a bit, only do stuff when there are actually knots to be added.
+    if (numEnd > 0 || forceBothEndsUniform)
+    {
+        // Check if last degree+1 knots are uniform.
+        // Update: also an additional number of knots added to the start should be uniform (the ones "wrapping around")
+        bool endsOfUniform = true;
+        for (int i = 0; i <= degree + numStart; i++)
+        {
+            if (!close(knots[knots.size() - 1 - i], (1.0 - i * uniformStepSize)))
+            {
+                endsOfUniform = false;
+                knots[knots.size() - 1 - i] = 1.0 - i * uniformStepSize;
+            }
+        }
+    
+        // When needed, let user know that original knot vector has been edited.
+        if (!endsOfUniform)
+        {
+            logger(INFO, "End of knot vector (last degree+1 values) has been changed to be uniform. The shape might be slightly affected. ");
+        }
+    
+        // Add knots to end
+        for (int i = 1; i <= numEnd; i++)
+        {
+            knots.push_back(1.0 + i * uniformStepSize);
+        }
+    }
+    
+    // Reset to interval [0, 1]
+    normalizeKnotVector(knots);
+}
+
+Vec3D evaluate(Mdouble u, Mdouble v, std::vector<Mdouble> knotsU, std::vector<Mdouble> knotsV,
+               std::vector<std::vector<Vec3D>> controlPoints, std::vector<std::vector<Mdouble>> weights)
+{
+    unsigned int degreeU = knotsU.size() - controlPoints.size() - 1;
+    unsigned int degreeV = knotsV.size() - controlPoints[0].size() - 1;
+    
+    Vec3D point = {0,0,0};
+    double temp = 0;
+    
+    // Find span and non-zero basis functions
+    int spanU = findSpan(degreeU, knotsU, u);
+    int spanV = findSpan(degreeV, knotsV, v);
+    std::vector<double> Nu, Nv;
+    bsplineBasis(degreeU, spanU, knotsU, u, Nu);
+    bsplineBasis(degreeV, spanV, knotsV, v, Nv);
+    // make linear combination
+    for (int l = 0; l <= degreeV; ++l)
+    {
+        for (int k = 0; k <= degreeU; ++k)
+        {
+            double weight = Nv[l] * Nu[k] * weights[spanU - degreeU + k][spanV - degreeV + l];
+            point += weight * controlPoints[spanU - degreeU + k][spanV - degreeV + l];
+            temp += weight;
+        }
+    }
+    point /= temp;
+    return point;
+}
 
 }

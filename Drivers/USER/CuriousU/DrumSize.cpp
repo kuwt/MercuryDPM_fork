@@ -113,7 +113,7 @@ int main(int argc, char **argv)
 	Drum problem;
 	problem.setName("DrumSize");
 	problem.setSaveCount(100);
-	problem.setWallsWriteVTK(FileType::ONE_FILE);
+	problem.wallHandler.setWriteVTK(FileType::ONE_FILE);
     problem.setParticlesWriteVTK(true);
 	//problem.setParticlesWriteVTK(true);
 	problem.setXBallsAdditionalArguments(" -v0 -solidf");

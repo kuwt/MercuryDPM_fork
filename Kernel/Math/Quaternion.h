@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -318,6 +318,11 @@ public:
     void rotate(Vec3D& position) const;
     
     /**
+     * Returns the rotated position
+     */
+    Vec3D rotate(const Vec3D& position) const;
+    
+    /**
      * Applies the rotation to a position
      */
     void rotate(SmallVector<3>& position) const;
@@ -326,6 +331,11 @@ public:
      * Applies the inverse rotation to a position
      */
     void rotateBack(Vec3D& position) const;
+    
+    /**
+     * Returns the inverse rotated position
+     */
+    Vec3D rotateBack(const Vec3D& position) const;
     
     /**
      * Calculates the distance from a wall through p0 whose normal is the vector (1,0,0). Used for the calculation of the distance in InfiniteWalls

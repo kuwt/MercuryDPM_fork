@@ -354,7 +354,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     pb.addRoller(RollerType::COUNTER_ROTATING_ROLLER,rollerRadius,rollerVelocity,compaction);
 
     //----------------------------------------------
-    pb.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+    pb.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
     pb.setParticlesWriteVTK(true);
 
     //pb.setSaveCount(100);

@@ -200,7 +200,7 @@ int main(int argc, char* argv[]) // [GranularCollapse : main]
     // [GranularCollapse : contact detection]
     
     problem.setSuperquadricParticlesWriteVTK(true);
-    problem.setWallsWriteVTK(FileType::ONE_FILE);
+    problem.wallHandler.setWriteVTK(FileType::ONE_FILE);
     problem.solve(); //argc,argv
     return 0;
 } // [GranularCollapse : main]

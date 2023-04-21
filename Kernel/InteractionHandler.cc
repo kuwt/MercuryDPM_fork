@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -550,6 +550,11 @@ void InteractionHandler::readAndAddObject(std::istream& is)
 void InteractionHandler::setWriteVTK(FileType fileType)
 {
     writeVTK_ = fileType;
+}
+
+void InteractionHandler::setWriteVTK(bool writeVTK)
+{
+    writeVTK_ = writeVTK ? FileType::MULTIPLE_FILES : FileType::NO_FILE;
 }
 
 FileType InteractionHandler::getWriteVTK() const

@@ -20,8 +20,8 @@ MercuryDPM is contained in two directories:
 At the top level of the source directory you will find six main subdirectories
 -# Drivers/
 This is the only directory you need to create new application codes or modify existing ones; all other directories contain either documentation or files required as input files in the codes contained in this directory.
-\n It has a series of subdirectories, for example Tutorials/, that contain a series of demo codes illustrating how to write applications in MercuryDPM. 
-\todo TW What happened to the Template directory?
+\n It has a series of subdirectories, for example Tutorials/, that contain a series of demo codes illustrating how to
+write applications in MercuryDPM. There is also a Template/ directory enabling to quickly create new driver codes.
 
 -# Kernel/
 \n Contains the heart of the code. Users should not change the Kernel files. Instead, the classes and functions defined here are should be used (and possibly modified) in the Driver files. 

@@ -166,7 +166,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
                          "set ylabel 'COM_z [m]'\n"
                          "p [0.1:] '" + oTest.getName() + ".ene' u 1:2 w l t ''");
 
-    oTest.setWallsWriteVTK(false);
+    oTest.wallHandler.setWriteVTK(false);
     oTest.setParticlesWriteVTK(false);
 
     oTest.solve();

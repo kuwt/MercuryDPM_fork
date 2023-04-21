@@ -46,9 +46,9 @@ public:
         hopper.setHopperShift(-13);
         hopper.setHopperDimension(1);
         hopper.makeHopper(wallHandler);
-        setWallsWriteVTK(FileType::ONE_FILE);
+        wallHandler.setWriteVTK(FileType::ONE_FILE);
         writeVTKFiles();
-        setWallsWriteVTK(FileType::NO_FILE);
+        wallHandler.setWriteVTK(FileType::NO_FILE);
         InfiniteWall w0;
         w0.set({-1, 0, 0}, {-25, 0, 0});
     

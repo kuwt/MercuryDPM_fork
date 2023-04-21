@@ -460,7 +460,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 
     oTest.sinteringParameters(deltaC, fluidity,compliance0,surfaceTension);
     oTest.setParticlesWriteVTK(true);
-    oTest.setWallsWriteVTK(true);
+    oTest.wallHandler.setWriteVTK(true);
 
     oTest.setTimeMax(maxTime); //[s]
     oTest.setXBallsAdditionalArguments("-solidf -v0 -cmode 8 -cmaxset 100 ");

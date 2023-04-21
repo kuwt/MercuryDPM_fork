@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+#Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 #For the list of developers, see <http://www.MercuryDPM.org/Team>.
 #
 #Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,6 @@ import sys
 print("Merging parallel generated restart files.")
 
 simulation_name = sys.argv[1:][0]
-print simulation_name
 print ("Simulation name is " + simulation_name)
 
 #Open the first restart file. This is always name.restart0

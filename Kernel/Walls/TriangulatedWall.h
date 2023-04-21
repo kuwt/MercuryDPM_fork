@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -89,6 +89,13 @@ public:
      */
     TriangulatedWall(std::string filename, const ParticleSpecies* species);
     
+    /*!
+     * \brief Constructor setting values.
+     */
+    TriangulatedWall(const std::vector<Vec3D>& points, const std::vector<std::vector<unsigned>>& cells, const ParticleSpecies* species);
+    
+    void set(const std::vector<Vec3D>& points, const std::vector<std::vector<unsigned>>& cells);
+    
     void readVTK(std::string filename);
     
     void writeVTK(VTKContainer& vtk) const override;
@@ -139,7 +146,7 @@ public:
     BaseInteraction* getInteractionWith(BaseParticle* p, unsigned timeStamp,
                                                      InteractionHandler* interactionHandler) override;
 
-private:
+protected:
     /*!
      * stores the vertex coordinates
      */
@@ -149,6 +156,9 @@ private:
      * stores the face properties
      */
     std::vector<Face> face_;
+    
+private:
+    void setNormalsAndNeighbours();
     
 };
 

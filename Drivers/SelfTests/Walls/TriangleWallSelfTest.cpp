@@ -63,6 +63,6 @@ int main () {
     wall.setVertices(A,B,C);
     dpm.wallHandler.copyAndAddObject(wall);
     dpm.setParticlesWriteVTK(true);
-    dpm.setWallsWriteVTK(FileType::ONE_FILE);
+    dpm.wallHandler.setWriteVTK(FileType::ONE_FILE);
     dpm.solve();
 }

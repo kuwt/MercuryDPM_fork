@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,7 @@
 
 #include "Nurbs/NurbsSurface.h"
 #include "BaseWall.h"
+#include "File.h"
 
 /*!
  * \brief This function defines a wall via a NurbsSurface
@@ -59,10 +60,10 @@ public:
     /*!
      * \brief Copy this wall and return a pointer to the copy.
      */
-    NurbsWall* copy() const final;
+    NurbsWall* copy() const;
 
     /*!
-     * \brief Defines a standard wall, given an outward normal vector s.t. normal*x=normal*point for all x of the wall.
+     * \brief Defines a wall, given a NurbsSurface.
      */
     void set(const NurbsSurface& nurbsSurface);
 
@@ -84,14 +85,13 @@ public:
     /*!
      * \brief Returns the name of the object, here the string "Screw".
      */
-    std::string getName() const final;
+    std::string getName() const;
 
     void writeVTK (VTKContainer &vtk) const override;
+    
+    void writeWallDetailsVTK(VTKData& data) const override;
 
-private:
-    /*!
-     * \brief The centre of the lower end of the screw.
-     */
+protected:
     NurbsSurface nurbsSurface_;
 };
 

@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -79,11 +79,11 @@
 MERCURY_DEPRECATED
 [[noreturn]] void logWriteAndDie(const std::string& module, std::string message)
 {
-std::cerr << "A fatal   error has occured"
-      << "\n Module  :" << module
-      << "\n Message :" << message << std::endl;
+    std::cerr << "A fatal   error has occured"
+              << "\n Module  :" << module
+              << "\n Message :" << message << std::endl;
 
-std::exit(-1);
+    std::exit(-1);
 }
 
 /*!
@@ -120,79 +120,79 @@ return os;
 * \param[in] other
 */
 DPMBase::DPMBase(const DPMBase& other) : wallVTKWriter_(other.wallVTKWriter_),
-				 interactionVTKWriter_(other.interactionVTKWriter_),
-				 boundaryVTKWriter_(other.boundaryVTKWriter_)
+                                         interactionVTKWriter_(other.interactionVTKWriter_),
+                                         boundaryVTKWriter_(other.boundaryVTKWriter_),
+                                         wallDetailsVTKWriter_(other.wallDetailsVTKWriter_)
 {
-setName(other.getName());
-runNumber_ = other.runNumber_;
-systemDimensions_ = other.systemDimensions_;
-particleDimensions_ = other.particleDimensions_;
-gravity_ = other.gravity_;
-backgroundDrag_=other.backgroundDrag_;
+    setName(other.getName());
+    runNumber_ = other.runNumber_;
+    systemDimensions_ = other.systemDimensions_;
+    particleDimensions_ = other.particleDimensions_;
+    gravity_ = other.gravity_;
+    backgroundDrag_=other.backgroundDrag_;
 /*    xMin_ = other.xMin_;
-xMax_ = other.xMax_;
-yMin_ = other.yMin_;
-yMax_ = other.yMax_;
-zMin_ = other.zMin_;
-zMax_ = other.zMax_;*/
-min_ = other.min_;
-max_ = other.max_;
-numberOfDomains_ = other.numberOfDomains_;
-time_ = other.time_;
-timeStep_ = other.timeStep_;
-numberOfTimeSteps_ = other.numberOfTimeSteps_;
-timeMax_ = other.timeMax_;
-restartVersion_ = other.restartVersion_; //to read new and old restart data
-restarted_ = other.restarted_; //to see if it was restarted or not
-append_ = other.append_;
-rotation_ = other.rotation_;
-xBallsColourMode_ = other.xBallsColourMode_; // sets the xballs argument cmode (see xballs.txt)
-xBallsVectorScale_ = other.xBallsVectorScale_; // sets the xballs argument vscale (see xballs.txt)
-xBallsScale_ = other.xBallsScale_; // sets the xballs argument scale (see xballs.txt)
-xBallsAdditionalArguments_ = other.xBallsAdditionalArguments_; // std::string where additional xballs argument can be specified (see xballs.txt)
-writeWallsVTK_ = other.writeWallsVTK_;
-writeParticlesVTK_ = other.writeParticlesVTK_;
-readSpeciesFromDataFile_ = other.readSpeciesFromDataFile_;
+    xMax_ = other.xMax_;
+    yMin_ = other.yMin_;
+    yMax_ = other.yMax_;
+    zMin_ = other.zMin_;
+    zMax_ = other.zMax_;*/
+    min_ = other.min_;
+    max_ = other.max_;
+    numberOfDomains_ = other.numberOfDomains_;
+    time_ = other.time_;
+    timeStep_ = other.timeStep_;
+    numberOfTimeSteps_ = other.numberOfTimeSteps_;
+    timeMax_ = other.timeMax_;
+    restartVersion_ = other.restartVersion_; //to read new and old restart data
+    restarted_ = other.restarted_; //to see if it was restarted or not
+    append_ = other.append_;
+    rotation_ = other.rotation_;
+    xBallsColourMode_ = other.xBallsColourMode_; // sets the xballs argument cmode (see xballs.txt)
+    xBallsVectorScale_ = other.xBallsVectorScale_; // sets the xballs argument vscale (see xballs.txt)
+    xBallsScale_ = other.xBallsScale_; // sets the xballs argument scale (see xballs.txt)
+    xBallsAdditionalArguments_ = other.xBallsAdditionalArguments_; // std::string where additional xballs argument can be specified (see xballs.txt)
+    writeParticlesVTK_ = other.writeParticlesVTK_;
+    readSpeciesFromDataFile_ = other.readSpeciesFromDataFile_;
 
 //effectively saying "if there exists a CONTACT_LIST_HGRID, copy it, if not, ignore.
 #ifdef CONTACT_LIST_HGRID
 possibleContactList=other.possibleContactList;
 #endif
-random = other.random;
+    random = other.random;
 
-boundaryHandler.setDPMBase(this);
-particleHandler.setDPMBase(this);
-interactionHandler.setDPMBase(this);
-speciesHandler.setDPMBase(this);
-wallHandler.setDPMBase(this);
-domainHandler.setDPMBase(this);
-periodicBoundaryHandler.setDPMBase(this);
-//Initialise the handlers
-domainHandler.initialise();
-periodicBoundaryHandler.initialise();
+    boundaryHandler.setDPMBase(this);
+    particleHandler.setDPMBase(this);
+    interactionHandler.setDPMBase(this);
+    speciesHandler.setDPMBase(this);
+    wallHandler.setDPMBase(this);
+    domainHandler.setDPMBase(this);
+    periodicBoundaryHandler.setDPMBase(this);
+    //Initialise the handlers
+    domainHandler.initialise();
+    periodicBoundaryHandler.initialise();
 
-//setting contents equal to the other handlers!
-speciesHandler = other.speciesHandler;
-particleHandler = other.particleHandler;
-cgHandler = other.cgHandler;
-//cgHandler = other.cgHandler.copy(); //todo
-//cgHandler.setDPMBase(this);
-wallHandler = other.wallHandler;
-boundaryHandler = other.boundaryHandler;
-interactionHandler = other.interactionHandler;
-vtkWriter_ = other.vtkWriter_;
-writeSuperquadricParticlesVTK_ = other.writeSuperquadricParticlesVTK_;
-writeParticlesVTK_ = other.writeParticlesVTK_;
-writeWallsVTK_ = other.writeWallsVTK_;
-numberOfOMPThreads_ = other.numberOfOMPThreads_;
+    //setting contents equal to the other handlers!
+    speciesHandler = other.speciesHandler;
+    particleHandler = other.particleHandler;
+    cgHandler = other.cgHandler;
+    //cgHandler = other.cgHandler.copy(); //todo
+    //cgHandler.setDPMBase(this);
+    wallHandler = other.wallHandler;
+    boundaryHandler = other.boundaryHandler;
+    interactionHandler = other.interactionHandler;
+    vtkWriter_ = other.vtkWriter_;
+    writeSuperquadricParticlesVTK_ = other.writeSuperquadricParticlesVTK_;
+    writeParticlesVTK_ = other.writeParticlesVTK_;
+    numberOfOMPThreads_ = other.numberOfOMPThreads_;
 }
 
 /*!
-* Constructor for the DPMBase class. Initialises a set of default parameters allowing
-* a simulation to be created 'off the shelf'. For full details of the parameters
-* initialised and their assigned values, see constructor()
-*/
-DPMBase::DPMBase() : wallVTKWriter_(wallHandler), interactionVTKWriter_(interactionHandler), boundaryVTKWriter_(boundaryHandler)
+ * Constructor for the DPMBase class. Initialises a set of default parameters allowing
+ * a simulation to be created 'off the shelf'. For full details of the parameters
+ * initialised and their assigned values, see constructor()
+ */
+DPMBase::DPMBase() : wallVTKWriter_(wallHandler), interactionVTKWriter_(interactionHandler), boundaryVTKWriter_(boundaryHandler),
+                     wallDetailsVTKWriter_(wallHandler)
 {
 constructor();
 }
@@ -207,95 +207,93 @@ constructor();
 */
 void DPMBase::constructor()
 {
-// sofStop function
-//setSoftStop();
-//constructor();
-dataFile.getFstream().precision(10);
-fStatFile.getFstream().precision(10);
-eneFile.getFstream().precision(10);
-restartFile.getFstream().precision(
-    std::numeric_limits<double>::digits10); //highly accurate, so the overlap is accurate
-statFile.getFstream().precision(10);
-statFile.getFstream().setf(std::ios::left);
-interactionFile.getFstream().precision(10);
-name_ = ""; // needs to be user-specified, otherwise checkSettings throws error
-//by default, the fileType of all files is ONE_FILE. However, by default we don't want an interaction file since it
-// is very large.
-interactionFile.setFileType(FileType::NO_FILE);
+    // sofStop function
+    setSoftStop();
+    //constructor();
+    dataFile.getFstream().precision(10);
+    fStatFile.getFstream().precision(10);
+    eneFile.getFstream().precision(10);
+    restartFile.getFstream().precision(
+            std::numeric_limits<double>::digits10); //highly accurate, so the overlap is accurate
+    statFile.getFstream().precision(10);
+    statFile.getFstream().setf(std::ios::left);
+    interactionFile.getFstream().precision(10);
+    name_ = ""; // needs to be user-specified, otherwise checkSettings throws error
+    //by default, the fileType of all files is ONE_FILE. However, by default we don't want an interaction file since it
+    // is very large.
+    interactionFile.setFileType(FileType::NO_FILE);
 
-runNumber_ = 0;
+    runNumber_ = 0;
 
-//Decomposition direction for MPI
-numberOfDomains_ = {1, 1, 1};
+    //Decomposition direction for MPI
+    numberOfDomains_ = {1, 1, 1};
 
-//Check if MPI is already initialised
-initialiseMPI();
+    //Check if MPI is already initialised
+    initialiseMPI();
 
-//This sets the maximum number of particles
-boundaryHandler.setDPMBase(this);
-periodicBoundaryHandler.setDPMBase(this);
-speciesHandler.setDPMBase(this);
-particleHandler.setDPMBase(this);
-cgHandler.setDPMBase(this);
-interactionHandler.setDPMBase(this);
-wallHandler.setDPMBase(this);
-interactionHandler.setDPMBase(this);
-domainHandler.setDPMBase(this);
-domainHandler.initialise();
-periodicBoundaryHandler.setDPMBase(this);
-periodicBoundaryHandler.initialise();
-rotation_ = true;
+    //This sets the maximum number of particles
+    boundaryHandler.setDPMBase(this);
+    periodicBoundaryHandler.setDPMBase(this);
+    speciesHandler.setDPMBase(this);
+    particleHandler.setDPMBase(this);
+    cgHandler.setDPMBase(this);
+    interactionHandler.setDPMBase(this);
+    wallHandler.setDPMBase(this);
+    interactionHandler.setDPMBase(this);
+    domainHandler.setDPMBase(this);
+    domainHandler.initialise();
+    periodicBoundaryHandler.setDPMBase(this);
+    periodicBoundaryHandler.initialise();
 
-//set defaults for DPMBase parameters
-setSystemDimensions(3);
-setParticleDimensions(3);
-setRestarted(false);
-setGravity(Vec3D(0, 0, 0));
-setBackgroundDrag(0.0);
+    //set defaults for DPMBase parameters
+    setSystemDimensions(3);
+    setParticleDimensions(3);
+    setRestarted(false);
+    setGravity(Vec3D(0, 0, 0));
+    setBackgroundDrag(0.0);
 
-//This is the parameter of the numerical part
-setTime(0);
-numberOfTimeSteps_ = 0;
-setTimeMax(0);
-timeStep_ = 0; // needs to be user-specified, otherwise checkSettings throws error
-setSaveCount(20);
+    //This is the parameter of the numerical part
+    setTime(0);
+    numberOfTimeSteps_ = 0;
+    setTimeMax(0);
+    timeStep_ = 0; // needs to be user-specified, otherwise checkSettings throws error
+    setSaveCount(20);
 
-//This sets the default xballs domain
-min_ = Vec3D(0, 0, 0);
-max_ = Vec3D(0, 0, 0); // needs to be user-specified, otherwise checkSettings throws error
+    //This sets the default xballs domain
+    min_ = Vec3D(0, 0, 0);
+    max_ = Vec3D(0, 0, 0); // needs to be user-specified, otherwise checkSettings throws error
 
-//sets the default write particles data in VTK format flag to false
-writeParticlesVTK_ = false;
-writeSuperquadricParticlesVTK_ = false;
-writeWallsVTK_ = FileType::NO_FILE;
-vtkWriter_ = nullptr;
+    //sets the default write particles data in VTK format flag to false
+    writeParticlesVTK_ = false;
+    writeSuperquadricParticlesVTK_ = false;
+    vtkWriter_ = nullptr;
 
-setName(""); // needs to be user-specified, otherwise checkSettings throws error
+    setName(""); // needs to be user-specified, otherwise checkSettings throws error
 
-//Default mode is energy with no scale of the vectors
-xBallsColourMode_ = 0;
-xBallsVectorScale_ = -1;
-xBallsScale_ = -1;
-xBallsAdditionalArguments_ = "";
-setAppend(false);
+    //Default mode is energy with no scale of the vectors
+    xBallsColourMode_ = 0;
+    xBallsVectorScale_ = -1;
+    xBallsScale_ = -1;
+    xBallsAdditionalArguments_ = "";
+    setAppend(false);
 
-//The default random seed is 0
-random.setRandomSeed(0);
+    //The default random seed is 0
+    random.setRandomSeed(0);
 
-logger(DEBUG, "DPMBase problem constructor finished");
+    logger(DEBUG, "DPMBase problem constructor finished");
 
-readSpeciesFromDataFile_ = false;
+    readSpeciesFromDataFile_ = false;
+    
+    numberOfOMPThreads_ = 1;
 
-numberOfOMPThreads_ = 1;
-
-//Set number of elements to write to the screen if a user wants to output write information to the terminal
-nToWrite_ = 4;
+    //Set number of elements to write to the screen if a user wants to output write information to the terminal
+    nToWrite_ = 4;
 }
 
 /*!
-* \details A simple destructor for "DPMBase"-type objects, used to free-up memory when an object
-* is no longer necessary.
-*/
+ * \details A simple destructor for "DPMBase"-type objects, used to free-up memory when an object
+ * is no longer necessary.
+ */
 DPMBase::~DPMBase()
 {
 delete vtkWriter_;
@@ -472,17 +470,16 @@ eneFile.setFileType(fileType);
 */
 void DPMBase::resetFileCounter()
 {
-dataFile.setCounter(0);
-fStatFile.setCounter(0);
-restartFile.setCounter(0);
-statFile.setCounter(0);
-eneFile.setCounter(0);
-interactionFile.setCounter(0);
-setLastSavedTimeStep(NEVER);
-if (vtkWriter_) vtkWriter_->setFileCounter(0);
-boundaryVTKWriter_.setFileCounter(0);
-interactionVTKWriter_.setFileCounter(0);
-wallVTKWriter_.setFileCounter(0);
+    restartFile.setCounter(0);
+    statFile.setCounter(0);
+    eneFile.setCounter(0);
+    interactionFile.setCounter(0);
+    setLastSavedTimeStep(NEVER);
+    if (vtkWriter_) vtkWriter_->setFileCounter(0);
+    boundaryVTKWriter_.setFileCounter(0);
+    interactionVTKWriter_.setFileCounter(0);
+    wallVTKWriter_.setFileCounter(0);
+    wallDetailsVTKWriter_.setFileCounter(0);
 }
 
 /*!
@@ -911,8 +908,9 @@ return possibleContactList;
 */
 void DPMBase::setWallsWriteVTK(FileType writeWallsVTK)
 {
-writeWallsVTK_ = writeWallsVTK;
-}
+    logger(WARN, "DPMBase.setWallsWriteVTK(FileType) is deprecated! Use wallHandler.setWriteVTK(FileType) instead.");
+    wallHandler.setWriteVTK(writeWallsVTK);
+	}
 
 /*!
 * \details
@@ -922,13 +920,18 @@ writeWallsVTK_ = writeWallsVTK;
 */
 void DPMBase::setWallsWriteVTK(bool writeVTK)
 {
-writeWallsVTK_ = writeVTK?FileType::MULTIPLE_FILES:FileType::NO_FILE;
+FileType writeVTKFileType = writeVTK?FileType::MULTIPLE_FILES:FileType::NO_FILE;
+    logger(WARN, "DPMBase.setWallsWriteVTK(bool) is deprecated! Use wallHandler.setWriteVTK(bool) instead.");
+    wallHandler.setWriteVTK(writeVTKFileType);
 }
 
 void DPMBase::setInteractionsWriteVTK(bool writeVTK)
 {
 interactionHandler.setWriteVTK(writeVTK?FileType::MULTIPLE_FILES:FileType::NO_FILE);
+    logger(WARN, "DPMBase.setInteractionsWriteVTK(bool) is deprecated! Use interactionHandler.setWriteVTK(bool) instead.");
+    interactionHandler.setWriteVTK(writeVTK);
 }
+
 /*!
 * \details
 * The VTK format is used for visualisation in Paraview.
@@ -968,7 +971,8 @@ vtkWriter_ = new SuperQuadricParticleVtkWriter(particleHandler);
 */
 FileType DPMBase::getWallsWriteVTK() const
 {
-return writeWallsVTK_;
+    logger(WARN, "DPMBase.getWallsWriteVTK() is deprecated! Use wallHandler.getWriteVTK() instead.");
+    return wallHandler.getWriteVTK();
 }
 
 /*!
@@ -2122,13 +2126,11 @@ void DPMBase::writeEneTimeStep(std::ostream& os) const
 
 void DPMBase::writeVTKFiles() const
 {
-    static bool writeWall = true;
-    if (getWallsWriteVTK() == FileType::ONE_FILE && writeWall)
+    if (wallHandler.getWriteVTK() == FileType::ONE_FILE && wallVTKWriter_.getFileCounter() == 0)
     {
         wallVTKWriter_.writeVTK();
-        writeWall=false;
-    } else if (getWallsWriteVTK() == FileType::MULTIPLE_FILES
-        || getWallsWriteVTK() == FileType::MULTIPLE_FILES_PADDED) {
+    } else if (wallHandler.getWriteVTK() == FileType::MULTIPLE_FILES
+        || wallHandler.getWriteVTK() == FileType::MULTIPLE_FILES_PADDED) {
         wallVTKWriter_.writeVTK();
     } // else do nothing
 
@@ -2147,9 +2149,15 @@ void DPMBase::writeVTKFiles() const
         boundaryVTKWriter_.writeVTK();
     }
 
+    if (wallHandler.getWriteDetailsVTKAny())
+    {
+        wallDetailsVTKWriter_.writeVTK();
+    }
+
     //only write once
-    bool writePython = getParticlesWriteVTK() || getWallsWriteVTK() != FileType::NO_FILE ||
-                       interactionHandler.getWriteVTK() != FileType::NO_FILE;
+    bool writePython = getParticlesWriteVTK() || wallHandler.getWriteVTK() != FileType::NO_FILE ||
+                       interactionHandler.getWriteVTK() != FileType::NO_FILE ||
+                       wallHandler.getWriteDetailsVTKAny();
     if (writePython && getTime() == 0)
     {
         writePythonFileForVTKVisualisation();
@@ -2161,10 +2169,8 @@ void DPMBase::writePythonFileForVTKVisualisation() const
 #ifdef MERCURY_USE_MPI
     if (PROCESSOR_ID == 0)
     {
-        logger(INFO, "Writing python script for paraview visualisation");
-#else
-    logger(INFO, "Writing python script for paraview visualisation");
 #endif
+    logger(INFO, "Writing python script for paraview visualisation");
 
     std::string script = "#script to visualise the output of data2pvd of MercuryDPM in paraview.\n"
                          "#usage: change the path below to your own path, open paraview\n"
@@ -2174,89 +2180,166 @@ void DPMBase::writePythonFileForVTKVisualisation() const
                          "from paraview.simple import *\n"
                          "import os\n"
                          "import glob\n"
-                         "os.chdir('" + helpers::getPath() + "')\n\n";
+                         "import re # for natural sorting\n\n"
+                         "# Path to directory containing vtu files\n"
+                         "# Hardcoded (for windows you might need to change start of path, for example: from /mnt/c/MyFolder to c:/MyFolder)\n"
+                         "#dirPath = '" + helpers::getPath() + "'\n"
+                         "# Or directory containing this script\n"
+                         "dirPath = os.path.dirname(os.path.realpath(__file__))\n"
+                         "# Change to directory\n"
+                         "os.chdir(dirPath)\n\n";
 
-#ifdef MERCURY_USE_MPI
-    for (int i = 0; i < NUMBER_OF_PROCESSORS; i++)
-    {
-#endif
+    script += "# Some functions to achieve natural sorting for the numbering of the files (regardless of them being padded or not etc.)\n"
+              "# See https://stackoverflow.com/questions/5967500/how-to-correctly-sort-a-string-with-a-number-inside for more info\n"
+              "def atoi(text):\n"
+              "\treturn int(text) if text.isdigit() else text\n"
+              "\n"
+              "def natural_keys(text):\n"
+              "\treturn [ atoi(c) for c in re.split(r'(\\d+)', text) ]\n\n";
+
+    script += "simName = '" + getName() + "' # name of the simulation\n\n";
+
     if (getParticlesWriteVTK())
     {
-        script += "#Load data in any order\n";
 #ifdef MERCURY_USE_MPI
         if (NUMBER_OF_PROCESSORS > 1)
         {
-            script += "Data = glob.glob('./" + getName() + "Processor_" + std::to_string(i) + "_Particle_*.vtu')\n";
+            script += "# PARTICLES ##########################################################\n"
+                      "for processorNumber in range(0, " + std::to_string(NUMBER_OF_PROCESSORS) + "):\n"
+                      "\t# Load data in any order and sort it\n"
+                      "\tDataParticles = glob.glob('./' + simName + 'Processor_' + str(processorNumber) + '_Particle_*.vtu')\n"
+                      "\tDataParticles.sort(key = natural_keys)"
+                      "\t# Load the data and visualise it in paraview\n"
+                      "\tparticles = XMLUnstructuredGridReader(FileName = DataParticles, registrationName = simName + 'Processor_' + str(processorNumber) + '_Particle_*')\n"
+                      "\tglyphP = Glyph(particles, registrationName = 'Glyph Particle')\n" // From here on no differences with (non-)MPI
+                      "\tglyphP.GlyphType = 'Sphere'\n"
+                      "\tglyphP.ScaleArray = 'Radius'\n"
+                      "\tglyphP.ScaleFactor = 2\n"
+                      "\tglyphP.GlyphMode = 'All Points'\n"
+                      "\tparticlesDisplay = Show(glyphP)\n"
+                      "\t#ColorBy(particlesDisplay, ('POINTS', 'Velocity', 'Magnitude'))\n"
+                      "\t#particlesDisplay.Opacity = 0.5\n"
+                      "\n\n";
         }
         else
         {
-            script += "Data = glob.glob('./" + getName() + "Particle_*.vtu')\n";
-        }
-#else
-        script += "Data = glob.glob('./" + getName() + "Particle_*.vtu')\n";
 #endif
-        script += "\n"
-                  "#Find the maximum timestep\n"
-                  "maxTime = 0\n"
-                  "for fileName in Data:\n"
-                  "\ttokens1 = fileName.split('.')\n"
-                  "\ttokens2 = tokens1[1].split('_')\n"
-                  "\tif int(tokens2[-1]) > maxTime:\n"
-                  "\t\tmaxTime = int(tokens2[-1])\n"
-                  "print str(maxTime)\n"
-                  "\n"
-                  "#Create correct order of time steps\n"
-                  "DataSorted = []\n"
-                  "for x in range(0,maxTime+1):\n";
-#ifdef MERCURY_USE_MPI
-        if (NUMBER_OF_PROCESSORS > 1)
-        {
-            script += "\tDataSorted.append('./" + getName() + "Processor_" + std::to_string(i) + "_Particle_' + " + "str(x)" + " + '.vtu')\n";
-        }
-        else
-        {
-            script += "\tDataSorted.append('./" + getName() + "Particle_' + " + "str(x)" + " + '.vtu')\n";
-        }
-#else
-        script += "\tDataSorted.append('./" + getName() + "Particle_' + " + "str(x)" + " + '.vtu')\n";
-#endif
-
-        script += "\n"
-                  "#Load the data and visualise it in paraview\n"
-                  "particles = XMLUnstructuredGridReader(FileName=DataSorted)\n"
-                  "glyphP = Glyph(particles)\n"
+        script += "# PARTICLES ##########################################################\n"
+                  "# Load data in any order and sort it\n"
+                  "DataParticles = glob.glob('./' + simName + 'Particle_*.vtu')\n"
+                  "DataParticles.sort(key = natural_keys)"
+                  "# Load the data and visualise it in paraview\n"
+                  "particles = XMLUnstructuredGridReader(FileName = DataParticles, registrationName = simName + 'Particle_*')\n"
+                  "glyphP = Glyph(particles, registrationName = 'Glyph Particle')\n" // From here on no differences with (non-)MPI
                   "glyphP.GlyphType = 'Sphere'\n"
-                  "glyphP.Scalars = 'Radius'\n"
-                  "glyphP.Vectors = 'None'\n"
-                  "glyphP.ScaleMode = 'scalar'\n"
+                  "glyphP.ScaleArray = 'Radius'\n"
                   "glyphP.ScaleFactor = 2\n"
                   "glyphP.GlyphMode = 'All Points'\n"
-                  "Show(glyphP)\n\n";
+                  "particlesDisplay = Show(glyphP)\n"
+                  "#ColorBy(particlesDisplay, ('POINTS', 'Velocity', 'Magnitude'))\n"
+                  "#particlesDisplay.Opacity = 0.5\n"
+                  "\n\n";
+#ifdef MERCURY_USE_MPI
+        }
+#endif
     }
-    if (getWallsWriteVTK() != FileType::NO_FILE)
+
+    if (wallHandler.getWriteVTK() != FileType::NO_FILE)
     {
-        script += "walls = XMLUnstructuredGridReader(FileName=glob.glob('./"
-                  + getName() + "Wall_*.vtu'))\n"
-                                "Show(walls)\n\n";
+        script += "# WALLS ##############################################################\n"
+                  "# Load data in any order and sort it\n"
+                  "DataWalls = glob.glob('./' + simName + 'Wall_*.vtu')\n"
+                  "DataWalls.sort(key = natural_keys)"
+                  "# Load the data and visualise it in paraview\n"
+                  "walls = XMLUnstructuredGridReader(FileName = DataWalls, registrationName = simName + 'Wall_*')\n"
+                  "wallsDisplay = Show(walls)\n"
+                  "#wallsDisplay.Opacity = 0.5\n"
+                  "\n\n";
     }
-    ///\todo ask Sudeshna how she plotted the cylinders
+
     if (interactionHandler.getWriteVTK() != FileType::NO_FILE)
     {
-        script += "interactions = XMLUnstructuredGridReader(FileName=glob.glob('./"
-                  + getName() + "Interaction_*.vtu'))\n"
-                                "glyphI = Glyph(interactions)\n"
-                                "glyphI.GlyphType = 'Sphere'\n"
-                                "glyphI.Scalars = 'Cylinder'\n"
-                                "glyphI.Vectors = 'None'\n"
-                                "glyphI.ScaleMode = 'scalar'\n"
-                                "glyphI.ScaleFactor = 10\n" //5 times too large
-                                "glyphI.GlyphMode = 'All Points'\n"
-                                "Show(glyphI)\n\n";
-    }
 #ifdef MERCURY_USE_MPI
-    } // end of loop over number of processors
+        if (NUMBER_OF_PROCESSORS > 1)
+        {
+            script += "# INTERACTIONS #######################################################\n"
+                      "for processorNumber in range(0, " + std::to_string(NUMBER_OF_PROCESSORS) + "):\n"
+                      "\t# Load data in any order and sort it\n"
+                      "\tDataInteractions = glob.glob('./' + simName + 'Processor_' + str(processorNumber) + '_Interaction_*.vtu')\n"
+                      "\tDataInteractions.sort(key = natural_keys)"
+                      "\t# Load the data and visualise it in paraview\n"
+                      "\tinteractions = XMLUnstructuredGridReader(FileName = DataInteractions, registrationName = simName + 'Processor_' + str(processorNumber) + '_Interaction_*')\n"
+                      "\tglyphI = Glyph(interactions, registrationName = 'Glyph Interaction')\n" // From here on no differences with (non-)MPI
+                      "\tglyphI.GlyphType = 'Arrow'\n"
+                      "\tglyphI.OrientationArray = 'Normal'\n"
+                      "\tglyphI.ScaleArray = 'Force'\n"
+                      "\tglyphI.ScaleFactor = 0.01\n"
+                      "\tglyphI.GlyphMode = 'All Points'\n"
+                      "\tinteractionsDisplay = Show(glyphI)\n"
+                      "\t#ColorBy(interactionsDisplay, ('POINTS', 'Force'))\n"
+                      "\t#interactionsDisplay.Opacity = 0.5\n"
+                      "\n\n";
+        }
+        else
+        {
 #endif
-    script += "Render()\n"
+        script += "# INTERACTIONS #######################################################\n"
+                  "# Load data in any order and sort it\n"
+                  "DataInteractions = glob.glob('./' + simName + 'Interaction_*.vtu')\n"
+                  "DataInteractions.sort(key = natural_keys)"
+                  "# Load the data and visualise it in paraview\n"
+                  "interactions = XMLUnstructuredGridReader(FileName = DataInteractions, registrationName = simName + 'Interaction_*')\n"
+                  "glyphI = Glyph(interactions, registrationName = 'Glyph Interaction')\n" // From here on no differences with (non-)MPI
+                  "glyphI.GlyphType = 'Arrow'\n"
+                  "glyphI.OrientationArray = 'Normal'\n"
+                  "glyphI.ScaleArray = 'Force'\n"
+                  "glyphI.ScaleFactor = 0.01\n"
+                  "glyphI.GlyphMode = 'All Points'\n"
+                  "interactionsDisplay = Show(glyphI)\n"
+                  "#ColorBy(interactionsDisplay, ('POINTS', 'Force'))\n"
+                  "#interactionsDisplay.Opacity = 0.5\n"
+                  "\n\n";
+#ifdef MERCURY_USE_MPI
+        }
+#endif
+    }
+
+    if (wallHandler.getWriteDetailsVTK(WallHandler::DetailsVTKOptions::BOUNDINGBOX) != FileType::NO_FILE)
+    {
+        script += "# WALL DETAILS - BOUNDING BOX ########################################\n"
+                  "# Load data in any order and sort it\n"
+                  "DataWDBoundingBox = glob.glob('./' + simName + 'WallDetailsBoundingBox_*.vtu')\n"
+                  "DataWDBoundingBox.sort(key = natural_keys)"
+                  "# Load the data and visualise it in paraview\n"
+                  "wdBoundingBox = XMLUnstructuredGridReader(FileName = DataWDBoundingBox, registrationName = simName + 'WallDetailsBoundingBox_*')\n"
+                  "wdBoundingBoxDisplay = Show(wdBoundingBox)\n"
+                  "wdBoundingBoxDisplay.Representation = 'Wireframe'\n"
+                  "\n\n";
+    }
+
+    if (wallHandler.getWriteDetailsVTK(WallHandler::DetailsVTKOptions::NURBSWALL) != FileType::NO_FILE)
+    {
+        script += "# WALL DETAILS - NURBS WALL ##########################################\n"
+                  "# Load data in any order and sort it\n"
+                  "DataWDNurbsWall = glob.glob('./' + simName + 'WallDetailsNurbsWall_*.vtu')\n"
+                  "DataWDNurbsWall.sort(key = natural_keys)"
+                  "# Load the data and visualise it in paraview\n"
+                  "wdNurbsWall = XMLUnstructuredGridReader(FileName = DataWDNurbsWall, registrationName = simName + 'WallDetailsNurbsWall_*')\n"
+                  "wdNurbsWallDisplay = Show(wdNurbsWall)\n"
+                  "wdNurbsWallDisplay.Representation = 'Wireframe'\n"
+                  "ColorBy(wdNurbsWallDisplay, ('POINTS', 'ID'))\n"
+                  "glyphWDNW = Glyph(wdNurbsWall, registrationName='Glyph NURBS Control Point')\n"
+                  "glyphWDNW.GlyphType = 'Sphere'\n"
+                  "glyphWDNW.ScaleArray = 'Weight'\n"
+                  "glyphWDNW.ScaleFactor = 0.05\n"
+                  "glyphWDNW.GlyphMode = 'All Points'\n"
+                  "glyphWDNWDisplay = Show(glyphWDNW)\n"
+                  "ColorBy(glyphWDNWDisplay, ('POINTS', 'ID'))\n"
+                  "\n\n";
+    }
+
+    script += "GetAnimationScene().PlayMode = 'Snap To TimeSteps'\n"
+              "Render()\n"
               "ResetCamera()\n";
 
     helpers::writeToFile(getName() + ".py", script);
@@ -2459,7 +2542,7 @@ bool DPMBase::readParAndIniFiles(const std::string fileName)
     }
     else
     {
-        logger(ERROR, "Error in par.ini: line 1, value 1 is ", integerValue);
+        logger(ERROR, "Error in par.ini: line 1, value 1 is %", integerValue);
     }
 
     //   2: integer (0|1) dont use | use the search pattern for linked cells
@@ -2505,7 +2588,7 @@ bool DPMBase::readParAndIniFiles(const std::string fileName)
         //   2: requires initial log-output time
         //   3: negative number is multiplied to the previous film-output-time
         //   4: requires initial film-output time
-        logger(ERROR, "Error in par.ini: line 3, value 1 is ", doubleValue);
+        logger(ERROR, "Error in par.ini: line 3, value 1 is %", doubleValue);
     }
 
     // line 4 =============================================================
@@ -2539,7 +2622,7 @@ bool DPMBase::readParAndIniFiles(const std::string fileName)
     //   1: growth rate:  d(radius) = xgrow * dt
     file >> doubleValue;
     if (doubleValue != 0.0)
-        logger(WARN, "Warning in par.ini: ignored growth rate ", doubleValue);
+        logger(WARN, "Warning in par.ini: ignored growth rate %", doubleValue);
 
     //   2: target volume_fraction
     file >> doubleValue;
@@ -3321,7 +3404,7 @@ void DPMBase::computeAllForces()
     
     // for omp simulations, reset the newObjects_ variable (used for reduction)
     interactionHandler.resetNewObjectsOMP();
-    
+
     // compute all internal and external forces; for omp simulations, this can be done in parallel
     #pragma omp parallel num_threads(getNumberOfOMPThreads())
     {
@@ -3338,14 +3421,15 @@ void DPMBase::computeAllForces()
             // body forces
             computeExternalForces(p);
         }
-        
+
         // wall-forces
         #pragma omp for schedule(dynamic)
         for (int k = 0; k < wallHandler.getSize(); k++) {
             BaseWall *w = wallHandler.getObject(k);
             computeWallForces(w);
+            w->computeWear();
         }
-        
+
     }
 
     #ifdef Mercury_TRIANGLE_WALL_CORRECTION
@@ -3408,9 +3492,9 @@ void DPMBase::computeAllForces()
         BaseWall *w = wallHandler.getObject(k);
         w->checkInteractions(&interactionHandler, getNumberOfTimeSteps() + 1);
     }
-    
+
     computeAdditionalForces();
-    
+
     // for omp simulations, sum up all forces and add all newObjects_ (needed since both are using reduction)
     #ifdef MERCURY_USE_OMP
     if (getNumberOfOMPThreads()>1) {
@@ -3488,13 +3572,28 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
        << " gravity " << getGravity()
        << " backgroundDrag " <<getBackgroundDrag();
     os << " writeVTK " << writeParticlesVTK_
-        << " " << writeWallsVTK_
+        << " " << wallHandler.getWriteVTK()
         << " " << interactionHandler.getWriteVTK()
         << " " << boundaryHandler.getWriteVTK()
         << " " << (vtkWriter_?vtkWriter_->getFileCounter():0)
         << " " << wallVTKWriter_.getFileCounter()
         << " " << interactionVTKWriter_.getFileCounter()
         << " " << boundaryVTKWriter_.getFileCounter();
+
+    // Outputting the wall details vtk enum values and file types.
+    // For example, we have three wall details options with enum values 4, 12 and 25, and three corresponding filetypes
+    // NO_FILE, ONE_FILE and MULTIPLE_FILES. Let's also say the file counter is at 101.
+    // The output will be: writeWallDetailsVTK 3 4 NO_FILE 12 ONE_FILE 25 MULTIPLE_FILES 101
+    // Only write when any of them have something other than NO_FILE. In this way the selftests restart files all keep working.
+    if (wallHandler.getWriteDetailsVTKAny())
+    {
+        std::unordered_map<WallHandler::DetailsVTKOptions, FileType> writeWallDetailsVTK = wallHandler.getWriteWallDetailsVTKAll();
+        os << " writeWallDetailsVTK " << writeWallDetailsVTK.size();
+        for (const auto& p : writeWallDetailsVTK)
+            os << " " << static_cast<int>(p.first) << " " << p.second;
+        os << " " << wallDetailsVTKWriter_.getFileCounter();
+    }
+
     os << " random ";
     random.write(os);
 #ifdef MERCURY_USE_OMP
@@ -3529,7 +3628,7 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
             os << *wallHandler.getObject(i) << std::endl;
         os << "...\n";
     }
-    
+
     //outputs the number of boundaries in the system
     os << "Boundaries " << boundaryHandler.getNumberOfObjects() << std::endl;
     if (writeAllParticles || boundaryHandler.getSize() < 9)
@@ -3543,7 +3642,7 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
             os << *boundaryHandler.getObject(i) << std::endl;
         os << "...\n";
     }
-    
+
     if (writeAllParticles || particleHandler.getSize() < getNToWrite())
     {
         //if the "writeAllParticles" bool == true, or there are fewer than 4 particles
@@ -3683,14 +3782,14 @@ void DPMBase::read(std::istream& is, ReadOptions opt)
             line >> dummy;
             if (!dummy.compare("writeVTK"))
             {
-                FileType writeInteractionsVTK = FileType::NO_FILE;
+                FileType writeInteractionsVTK = FileType::NO_FILE, writeWallsVTK;
                 unsigned particlesCounter, wallCounter, interactionCounter, boundaryCounter;
-                bool writeBoundaryVTK;
-                line >> writeParticlesVTK_ >> writeWallsVTK_ >> writeInteractionsVTK >> writeBoundaryVTK >> particlesCounter >> wallCounter >> interactionCounter >> boundaryCounter;
+                bool writeBoundaryVTK, writeParticlesVTK;
+                line >> writeParticlesVTK >> writeWallsVTK >> writeInteractionsVTK >> writeBoundaryVTK >> particlesCounter >> wallCounter >> interactionCounter >> boundaryCounter;
                 line.clear();//because the number of arguments  in writeVTK has changed
                 line >> dummy;
-                setParticlesWriteVTK(writeParticlesVTK_);
-                setWallsWriteVTK(writeWallsVTK_);
+                setParticlesWriteVTK(writeParticlesVTK);
+                wallHandler.setWriteVTK(writeWallsVTK);
                 interactionHandler.setWriteVTK(writeInteractionsVTK);
                 boundaryHandler.setWriteVTK(writeBoundaryVTK);
                 vtkWriter_->setFileCounter(particlesCounter);
@@ -3698,6 +3797,26 @@ void DPMBase::read(std::istream& is, ReadOptions opt)
                 interactionVTKWriter_.setFileCounter(interactionCounter);
                 boundaryVTKWriter_.setFileCounter(boundaryCounter);
             }
+
+            if (!dummy.compare("writeWallDetailsVTK"))
+            {
+                // Example input: writeWallDetailsVTK 3 4 NO_FILE 12 ONE_FILE 25 MULTIPLE_FILES 101
+                // Number of options is 3, each option having a enum value and file type (4 NO_FILE), (12 ONE_FILE) and
+                // (25 MULTIPLE_FILES). At the end the file counter (101).
+                unsigned numberOfOptions, fileCounter, enumType;
+                FileType fileType;
+                line >> numberOfOptions;
+                for (unsigned  i = 0; i < numberOfOptions; i++)
+                {
+                    line >> enumType >> fileType;
+                    wallHandler.setWriteDetailsVTK(static_cast<WallHandler::DetailsVTKOptions>(enumType), fileType);
+                }
+                line >> fileCounter;
+                wallDetailsVTKWriter_.setFileCounter(fileCounter);
+                line.clear();
+                line >> dummy;
+            }
+
             if (!dummy.compare("random"))
             {
                 random.read(line);
@@ -4154,20 +4273,21 @@ void DPMBase::solve()
     initialiseSolve();
 
     // Can be used to measure simulation time
-    clock_.tic();
     // This is the main loop over advancing time
     while (getTime() < getTimeMax() && continueSolve())
     {
         computeOneTimeStep();
     }
-    // Can be used to measure simulation time
-    clock_.toc();
 
     finaliseSolve();
 }
 
 void DPMBase::finaliseSolve() {
     
+
+    // Can be used to measure simulation time
+    clock_.toc();
+
     //force writing of the last time step
     forceWriteOutputFiles();
 
@@ -4203,7 +4323,7 @@ void DPMBase::computeOneTimeStep()
     performGhostParticleUpdate();
     // Some walls need to be aware of the new positions
     wallHandler.actionsAfterParticleGhostUpdate();
-    
+
     /// \todo MX: this is not true anymore. all boundaries are handled here.
     /// particles have received a position update, so here the deletion boundary deletes particles
     ///\TODO add particles need a periodic check
@@ -5338,7 +5458,7 @@ void DPMBase::setLogarithmicSaveCount(const Mdouble logarithmicSaveCountBase)
 }
 
 /*!
- * \details This function is called by ParticleHandler::removeObject and 
+ * \details This function is called by ParticleHandler::removeObject and
  * ParticleHandler::removeGhostObject to broadcast the removal of a particle
  * from the handler. It passes the information on to the walls in the wallHandler.
  *  \param[in] id The id of the removed particle.
@@ -5352,7 +5472,7 @@ void DPMBase::handleParticleRemoval(unsigned int id)
 }
 
 /*!
- * \details This function is called by ParticleHandler::addObject and 
+ * \details This function is called by ParticleHandler::addObject and
  * ParticleHandler::addGhostObject to broadcast the addition of a particle
  * from the handler. It passes the information on to the walls in the wallHandler.
  *  \param[in] id The id of the removed particle.

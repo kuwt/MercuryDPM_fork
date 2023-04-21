@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 
 #include "BaseHandler.h"
 #include "Walls/BaseWall.h"
+#include "File.h"
 
 class BaseWall;
 
@@ -92,11 +93,62 @@ public:
      */
 
     unsigned readTriangleWall(std::string filename, ParticleSpecies* species, Mdouble scaleFactor = 1, Vec3D centerOfRotation = {0,0,0}, Vec3D velocity = {0,0,0}, Vec3D angularVelocity = {0,0,0});
-    
+
     /**
      * \brief Calls the method actionsAfterParticleGhostUpdate of every wall in the handler.
      */
     void actionsAfterParticleGhostUpdate();
+
+    /*!
+     * \brief Sets whether walls are written into a VTK file.
+     */
+    void setWriteVTK(FileType);
+
+    /*!
+     * \brief Sets whether walls are written into a VTK file.
+     */
+    void setWriteVTK(bool);
+
+    /*!
+     * \brief Returns whether walls are written in a VTK file.
+     */
+    FileType getWriteVTK() const;
+
+    enum class DetailsVTKOptions
+    {
+        // Used as keys for an unordered_map.
+        // The actual enum values are written to the restart file and their meaning should therefore never change.
+        // So when adding new options, be sure to hardcode a unique enum value!
+        // The options can be in any order and their values are completely free to choose, as long as they're unique.
+
+        /*!
+         * \brief Writes a bounding box around the domain
+         */
+        BOUNDINGBOX = 0,
+
+        /*!
+         * \brief Writes the NURBS control points
+         */
+        NURBSWALL = 1,
+
+        /*!
+         * \brief Writes the debris
+         */
+        WEARABLENURBSWALL = 2
+    };
+
+    void setWriteDetailsVTK(DetailsVTKOptions, FileType);
+
+    void setWriteDetailsVTK(DetailsVTKOptions, bool);
+
+    FileType getWriteDetailsVTK(DetailsVTKOptions) const;
+
+    bool getWriteDetailsVTKAny() const;
+
+    std::unordered_map<DetailsVTKOptions, FileType> getWriteWallDetailsVTKAll() const;
+
+    void writeWallDetailsVTKBoundingBox(VTKData& data) const;
+
 private:
 
     /*!
@@ -104,11 +156,14 @@ private:
      */
     BaseWall* readAndCreateOldObject(std::istream& is);
 
-    /*!
-     * \brief Writes a bounding box around the domain into a vtk file.
-     */
-    void writeVTKBoundingBox() const;
+    FileType writeVTK_;
 
+    /*!
+    * \brief unordered_map storing the file types corresponding to each of the enum DetailsVTKOptions
+    * \details The filetypes are only actually added to the map when setting or getting it. The getter automatically
+    * adds the default filetype NO_FILE when the requested options had not yet been added.
+    */
+    std::unordered_map<DetailsVTKOptions, FileType> writeDetailsVTK_;
 };
 
 #endif

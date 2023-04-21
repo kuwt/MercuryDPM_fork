@@ -44,7 +44,7 @@ public:
         setDomain({-1,-1,-1},{1,1,1});
         //turn on VTK output
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(FileType::MULTIPLE_FILES);
+        wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
         // set file outout
         fStatFile.setFileType(FileType::NO_FILE);
         //define species and time step
