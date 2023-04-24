@@ -408,7 +408,7 @@ Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInter
 template<class NormalForceInteraction, class FrictionForceInteraction, class AdhesiveForceInteraction>
 void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::createMPIType()
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     MPIContainer& communicator = MPIContainer::Instance();
     MPIInteraction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction> dummyHistoryInteraction;
 

@@ -81,7 +81,7 @@ class NozzleDemo : public Mercury3D {
         Vec3D shift = {0,0,0};
         Vec3D velocity = {0,0,0};
         std::string filename;
-        filename=getMercurySourceDir()+"/Drivers/USER/Sjoerd/roundnozzle-0_162mm.STL";
+        filename=getMercuryDPMSourceDir()+"/Drivers/USER/Sjoerd/roundnozzle-0_162mm.STL";
         rotatingWallID = wallHandler.readTriangleWall(filename,speciesHandler.getObject(0), wallScaleFactor,shift,velocity,Vec3D(0,0,0));
         // Add particles
         CubeInsertionBoundary boundary;

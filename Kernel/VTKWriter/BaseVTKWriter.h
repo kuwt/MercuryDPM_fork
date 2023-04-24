@@ -85,7 +85,7 @@ std::fstream BaseVTKWriter<T>::makeVTKFileWithHeader() const
 
     //determine name of output file
     std::string fileName;
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     if (NUMBER_OF_PROCESSORS > 1 && name != "Wall")
     {
         fileName = handler_.getDPMBase()->getName() + "Processor_" + std::to_string(PROCESSOR_ID) +

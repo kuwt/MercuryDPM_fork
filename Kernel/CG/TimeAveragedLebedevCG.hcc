@@ -147,7 +147,7 @@ void TimeAveragedLebedevCG<BaseFunction, Fields>::evaluate()
     // get particle statistics
     for (BaseParticle* p : CG<CGCoordinates::XYZ, BaseFunction, Fields>::getHandler()->getDPMBase()->particleHandler)
     {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         if (!p->isFixed() && !p->isMPIParticle() && CG<CGCoordinates::XYZ, BaseFunction, Fields>::selectedParticle_(p))
             TimeAveragedLebedevCG<BaseFunction, Fields>::evaluateParticle(*p);
 #else

@@ -141,7 +141,7 @@ public:
     /*!
      * \brief Allows the spring and dissipation constants to be changed simultaneously.
      */
-    MERCURY_DEPRECATED void setLoadingStiffnessAndDissipation(helpers::KAndDisp new_);
+    MERCURYDPM_DEPRECATED void setLoadingStiffnessAndDissipation(helpers::KAndDisp new_);
     
     /*!
      * \brief Returns the optimal time step to resolve a collision of two particles of a given mass.

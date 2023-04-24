@@ -80,7 +80,7 @@ public:
     Mdouble getSlidingFrictionCoefficientStatic() const;
     
     ///\brief Allows the poisson ratio to be changed
-    MERCURY_DEPRECATED void setPoissonRatio(Mdouble poissonRatio);
+    MERCURYDPM_DEPRECATED void setPoissonRatio(Mdouble poissonRatio);
 
     ///\brief allows the shear modulus to be changed
     void setEffectiveShearModulus(Mdouble shearModulus);

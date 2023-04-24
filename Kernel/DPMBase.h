@@ -364,7 +364,7 @@ public:
  * \deprecated dataFile is now protected, so it can be used by all applications.
  * Please don't use getDataFile() anymore.
  */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     File& getDataFile();
 
     /*!
@@ -372,7 +372,7 @@ public:
      * \deprecated eneFile is now protected, so it can be used by all applications.
      * Please don't use getEneFile() anymore.
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     File& getEneFile();
 
     /*!
@@ -380,7 +380,7 @@ public:
      * \deprecated fStatFile is now protected, so it can be used by all applications.
      * Please don't use getFStatFile() anymore.
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     File& getFStatFile();
 
     /*!
@@ -388,7 +388,7 @@ public:
      * \deprecated restartFile is now protected, so it can be used by all applications.
      * Please don't use getRestartFile() anymore.
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     File& getRestartFile();
 
     /*!
@@ -396,7 +396,7 @@ public:
      * \deprecated statFile is now protected, so it can be used by all applications.
      * Please don't use getStatFile() anymore.
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     File& getStatFile();
 
     /*!
@@ -409,7 +409,7 @@ public:
      * \deprecated dataFile is now protected, so it can be used by all applications.
      * Please don't use getDataFile() anymore.
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     const File& getDataFile() const;
 
     /*!
@@ -417,7 +417,7 @@ public:
      * \deprecated eneFile is now protected, so it can be used by all applications.
      * Please don't use getEneFile() anymore.
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     const File& getEneFile() const;
 
     /*!
@@ -425,7 +425,7 @@ public:
      * \deprecated fStatFile is now protected, so it can be used by all applications.
      * Please don't use getFStatFile() anymore.
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     const File& getFStatFile() const;
 
     /*!
@@ -433,7 +433,7 @@ public:
      * \deprecated restartFile is now protected, so it can be used by all applications.
      * Please don't use getRestartFile() anymore.
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     const File& getRestartFile() const;
 
     /*!
@@ -441,7 +441,7 @@ public:
      * \deprecated statFile is now protected, so it can be used by all applications.
      * Please don't use getStatFile() anymore.
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     const File& getStatFile() const;
 
     /*!
@@ -570,21 +570,21 @@ public:
     bool getRotation() const
     { return rotation_; }
 
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     /*!
      * \brief Sets whether walls are written into a VTK file.
      * \deprecated Use wallHandler.setWriteVTK(FileType) instead (since 21-07-2021)
      */
     void setWallsWriteVTK(FileType writeWallsVTK);
 
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     /*!
      * \brief Sets whether walls are written into a VTK file.
      * \deprecated Use wallHandler.setWriteVTK(bool) instead (since 21-07-2021)
      */
     void setWallsWriteVTK(bool);
 
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     /*!
      * \brief Sets whether interactions are written into a VTK file.
      * \deprecated Use interactionHandler.setWriteVTK(bool) instead (since 21-07-2021)
@@ -598,7 +598,7 @@ public:
 
     void setSuperquadricParticlesWriteVTK(bool writeSuperquadricParticlesVTK);
 
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     /*!
      * \brief Returns whether walls are written in a VTK file.
      * \deprecated Use wallHandler.getWriteVTK() instead (since 21-07-2021)

@@ -292,7 +292,7 @@ void MultiParticle::integrateBeforeForceComputation(double time, double timeStep
     }
     else
     {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         //For periodic particles in parallel the previous position is required
         setPreviousPosition(getPosition());
 #endif

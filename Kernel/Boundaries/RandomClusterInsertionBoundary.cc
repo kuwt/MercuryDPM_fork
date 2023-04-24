@@ -196,7 +196,7 @@ void RandomClusterInsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
 
             logger(VERBOSE, "attempting to place particle at %, vel %", p0->getPosition(), p0->getVelocity());
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
             /* Communicate the new particle's properties by setHandler (note
              * that this doesn't actually add the particle to the handler). */
             if (NUMBER_OF_PROCESSORS > 1)
@@ -251,7 +251,7 @@ void RandomClusterInsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
                 cluster.setParticleSpecies(
                         dynamic_cast<LinearPlasticViscoelasticFrictionSpecies*>(
                                 md->speciesHandler.getObject(p0->getIndSpecies())));
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
                 cluster.setNumberOfDomains(md->getNumberOfDomains());
                 cluster.setDomain(md->getMin(), md->getMax());
                 cluster.speciesHandler.copyAndAddObject(md->speciesHandler.getObject(0));

@@ -146,7 +146,7 @@ public:
             Vec3D angularVelocity {0,0,2.0*constants::pi*rpm/60.0};
             //the STL file is in the source directory
             unsigned g = wallHandler.readTriangleWall(
-                    getMercurySourceDir()+"/Drivers/USER/Sperl/159324-F.STL",
+                    getMercuryDPMSourceDir()+"/Drivers/USER/Sperl/159324-F.STL",
                     speciesHandler.getObject(0),
                     scaleFactor,
                     centerOfRotation,

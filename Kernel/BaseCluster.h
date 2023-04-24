@@ -32,7 +32,7 @@
 #include "Species/LinearPlasticViscoelasticFrictionSpecies.h"
 
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
 #include <mpi.h>
 #include <MpiDataClass.h>
 #include <MpiContainer.h>

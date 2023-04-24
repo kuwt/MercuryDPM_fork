@@ -2,8 +2,8 @@
 // Created by reza on 04-01-21.
 //
 
-#ifndef MERCURY_PICONTROLLER_H
-#define MERCURY_PICONTROLLER_H
+#ifndef MERCURYDPM_PICONTROLLER_H
+#define MERCURYDPM_PICONTROLLER_H
 #include "Math/ExtendedMath.h"
 
 class PIController {
@@ -18,4 +18,4 @@ public:
 };
 
 
-#endif //MERCURY_PICONTROLLER_H
+#endif //MERCURYDPM_PICONTROLLER_H

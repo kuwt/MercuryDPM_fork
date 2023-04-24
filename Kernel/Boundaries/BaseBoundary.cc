@@ -145,7 +145,7 @@ BoundaryHandler* BaseBoundary::getHandler() const
     return handler_;
 }
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
 /*!
  * \brief Returns a list of particles that need to be deleted.
  */

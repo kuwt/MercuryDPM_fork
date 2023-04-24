@@ -138,7 +138,6 @@ void InfiniteWall::setNormal(const Vec3D normal)
  *
  * \deprecated InfiniteWall::set(Vec3D, Mdouble) is deprecated. Use set(Vec3D, Vec3D) instead.
  */
-MERCURY_DEPRECATED
 void InfiniteWall::set(Vec3D normal, Mdouble positionInNormalDirection)
 {
     logger(WARN, "InfiniteWall::set(Vec3D, Mdouble) is deprecated. Use set(Vec3D, Vec3D) instead.");

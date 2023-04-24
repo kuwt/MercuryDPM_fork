@@ -47,8 +47,8 @@
 //Note: This code is copied and adapted from hpGEM (see license above), version 22th of January 2016. It has been
 //integrated into MercuryDPM at 16th of March 2017.
 
-#ifndef MERCURY_SMALLMATRIX_H
-#define MERCURY_SMALLMATRIX_H
+#ifndef MERCURYDPM_SMALLMATRIX_H
+#define MERCURYDPM_SMALLMATRIX_H
 
 #include "GeneralDefine.h"
 #include "Logger.h"
@@ -389,4 +389,4 @@ SmallVector<numberOfColumns> operator*(SmallVector<numberOfRows>& vec, SmallMatr
 #include "SmallMatrix_impl.h"
 
 
-#endif //MERCURY_SMALLMATRIX_H
+#endif //MERCURYDPM_SMALLMATRIX_H

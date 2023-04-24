@@ -25,13 +25,13 @@
 
 #include "Logger.h"
 
-#ifdef MERCURY_STACKTRACE_SHOW
+#ifdef MERCURYDPM_STACKTRACE_SHOW
 //To create stacktraces, we need the
 //  backtrace(3)
 //function calls.. (really, we don't want to do this by hand)
 #include <execinfo.h>
 
-#ifdef MERCURY_STACKTRACE_DEMANGLE
+#ifdef MercuryDPM_STACKTRACE_DEMANGLE
 //However, we would end up with mangled function names...
 //So, instead we'll use the abi::__cxa_demangle function call..
 #include <cxxabi.h>
@@ -62,7 +62,7 @@ LL<Log::DEBUG> DEBUG;
  *  \brief Definition of different loggers with certain modules. A user can define its own custom logger here.
  */
 /* Actual definition of the default logger. */
-Logger<MERCURY_LOGLEVEL> logger("MercuryKernel");
+Logger<MERCURYDPM_LOGLEVEL> logger("MercuryKernel");
 /* Actual definition of the default logger. */
 Logger<CG_LOGLEVEL> cgLogger("MercuryCG");
 
@@ -75,7 +75,7 @@ Logger<CG_LOGLEVEL> cgLogger("MercuryCG");
  */
 static void printInfo(std::string module, std::string msg, Flusher doFlush)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Check if MPI is initialised
     initialiseMPI();
     MPIContainer& communicator = MPIContainer::Instance();
@@ -102,7 +102,7 @@ static void printInfo(std::string module, std::string msg, Flusher doFlush)
  */
 static void printWarn(std::string module, std::string msg, Flusher doFlush)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Check if MPI is initialised
     initialiseMPI();
     MPIContainer& communicator = MPIContainer::Instance();
@@ -129,7 +129,7 @@ static void printWarn(std::string module, std::string msg, Flusher doFlush)
  */
 [[noreturn]] static void printError(std::string module, std::string msg, Flusher doFlush)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Check if MPI is initialised
     initialiseMPI();
     MPIContainer& communicator = MPIContainer::Instance();
@@ -139,13 +139,13 @@ static void printWarn(std::string module, std::string msg, Flusher doFlush)
               << "\n\033[1;31mModule  :" << module
               << "\n\033[1;31mMessage :" << msg << std::endl;
 #endif
-#ifdef MERCURY_STACKTRACE_SHOW
+#ifdef MERCURYDPM_STACKTRACE_SHOW
     std::cerr << "\n-----------------[Stack Trace]-----------------\n";
     
     void* stackBuffer[64]; //This should be enough for all purposes..
     //First, we retrieve the addresses of the entire stack...
     int nStackFrames = backtrace(stackBuffer, 64);
-#ifndef MERCURY_STACKTRACE_DEMANGLE
+#ifndef MERCURYDPM_STACKTRACE_DEMANGLE
     //We don't have the demangling infra, so just use backtrace_symbols.
     char** functionNames = backtrace_symbols(stackBuffer, nStackFrames);
     for( int i = 0; i < nStackFrames; i++ )
@@ -205,7 +205,7 @@ static void printWarn(std::string module, std::string msg, Flusher doFlush)
 // [[noreturn]] indicates this function may not return
 [[noreturn]] static void printFatalError(const std::string& module, const std::string& msg, Flusher doFlush)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Check if MPI is initialised
     initialiseMPI();
     MPIContainer& communicator = MPIContainer::Instance();
@@ -215,13 +215,13 @@ static void printWarn(std::string module, std::string msg, Flusher doFlush)
               << "\n\033[1;31mModule  :" << module
               << "\n\033[1;31mMessage :" << msg << std::endl;
 #endif
-#ifdef MERCURY_STACKTRACE_SHOW
+#ifdef MERCURYDPM_STACKTRACE_SHOW
     std::cerr << "\n-----------------[Stack Trace]-----------------\n";
     
     void* stackBuffer[64]; //This should be enough for all purposes..
     //First, we retrieve the addresses of the entire stack...
     int nStackFrames = backtrace(stackBuffer, 64);
-#ifndef MERCURY_STACKTRACE_DEMANGLE
+#ifndef MERCURYDPM_STACKTRACE_DEMANGLE
     //We don't have the demangling infra, so just use backtrace_symbols.
     char** functionNames = backtrace_symbols(stackBuffer, nStackFrames);
     for( int i = 0; i < nStackFrames; i++ )

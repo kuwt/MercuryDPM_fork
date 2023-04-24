@@ -906,7 +906,7 @@ public:
     }
     
     /// \todo Should check n and m are coprime or both 0.
-    MERCURY_DEPRECATED void setStarShape(int new_n, int new_m)
+    MERCURYDPM_DEPRECATED void setStarShape(int new_n, int new_m)
     {
         nPolygon.resize(1);
         mPolygon.resize(1);

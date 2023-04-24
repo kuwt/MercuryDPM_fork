@@ -128,7 +128,7 @@ public:
     /*!
      * \brief Deprecated read method. use DeletionBoundary::read() instead.
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     void oldRead(std::istream& is);
     
     /*!

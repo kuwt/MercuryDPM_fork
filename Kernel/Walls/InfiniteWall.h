@@ -98,7 +98,7 @@ public:
      * \deprecated In Mercury 2, the user will have to use the new interface, 
      *             namely set(Vec3D, Vec3D).
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     void set(Vec3D normal, Mdouble position);
     
     using BaseWall::move;

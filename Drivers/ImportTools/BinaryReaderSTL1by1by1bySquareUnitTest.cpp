@@ -150,7 +150,7 @@ private:
 
 int main()
 {
-    std::string directory(getMercurySourceDir());
+    std::string directory(getMercuryDPMSourceDir());
     STLReader myReader(directory+"/Drivers/ImportTools/ExampleSTLFiles/Box1x1x1.stl");
 
     std::vector<STLTriangle> answer;

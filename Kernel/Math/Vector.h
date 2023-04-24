@@ -28,8 +28,8 @@
 ///Modifications
 /// 21:9:2009 - Added the inclusion guards and some include objects
 /// \todo Need to generalize this to n-dimensional vectors of any type
-#ifndef VECTOR_H
-#define VECTOR_H
+#ifndef MECURYDPM_VECTOR_H
+#define MECURYDPM_VECTOR_H
 
 #include <cmath>
 #include <sstream>

@@ -115,7 +115,7 @@ public:
     /*!
      * \brief Deprecated read method. use FluxBoundary::read() instead.
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     void oldRead(std::istream& is);
     
     /*!

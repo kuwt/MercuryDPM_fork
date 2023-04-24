@@ -82,7 +82,7 @@ public:
      */
     void move_time(Mdouble dt);
     
-    //MERCURY_DEPRECATED
+    //MERCURYDPM_DEPRECATED
     void rotate(const Vec3D& angularVelocityDt) override;
     
     /*!

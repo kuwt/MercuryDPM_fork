@@ -60,7 +60,7 @@ BondedInteraction::BondedInteraction(const BondedInteraction& p)
 
 BondedInteraction::BondedInteraction()
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     logger(FATAL,"ChargedBondedInteractions are currently not implemented in parallel MercuryDPM");
 #endif
 }

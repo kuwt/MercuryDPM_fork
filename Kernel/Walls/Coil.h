@@ -91,7 +91,7 @@ public:
      * \deprecated If you have old restart files, please convert them to the current
      * version of the restart files and use read(std::istream&) instead of oldRead(std::istream&).
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     void oldRead(std::istream& is);
     
     /*!

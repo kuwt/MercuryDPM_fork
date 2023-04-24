@@ -34,7 +34,7 @@ CircularPeriodicBoundary::CircularPeriodicBoundary()
 #ifdef DEBUG_CONSTRUCTOR
     std::cout << "CircularPeriodicBoundary::CircularPeriodicBoundary() finished" << std::endl;
 #endif
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     MPIContainer& communicator = MPIContainer::Instance();
     if (communicator.getNumberOfProcessors() > 1)
     {

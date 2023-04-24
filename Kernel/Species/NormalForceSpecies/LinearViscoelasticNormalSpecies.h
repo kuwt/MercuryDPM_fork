@@ -109,7 +109,7 @@ public:
     Mdouble getDissipation() const;
     
     ///Allows the spring and dissipation constants to be changed simultaneously
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     void setStiffnessAndDissipation(helpers::KAndDisp new_);
 
 private:

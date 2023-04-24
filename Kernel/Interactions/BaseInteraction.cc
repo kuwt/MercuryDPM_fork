@@ -124,7 +124,7 @@ BaseInteraction::BaseInteraction(const BaseInteraction& p)
  */
 BaseInteraction::~BaseInteraction()
 {
-#if MERCURY_USE_MPI
+#if MERCURYDPM_USE_MPI
     if (P_ == nullptr)
     {
         logger(DEBUG,"Destroying a fictitious interaction used in MPI transmissions");
@@ -142,7 +142,7 @@ BaseInteraction::~BaseInteraction()
     
     P_->removeInteraction(this);
     I_->removeInteraction(this);
-#if MERCURY_USE_MPI
+#if MERCURYDPM_USE_MPI
     }
 #endif
 }

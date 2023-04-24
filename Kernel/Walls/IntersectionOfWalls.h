@@ -140,7 +140,7 @@ public:
      * to give a plane defined by normal*x=position
      * \deprecated Don't use this function, instead use the function addObject(Vec3D, Vec3D).
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     void addObject(Vec3D normal, Mdouble position);
     
     /*!

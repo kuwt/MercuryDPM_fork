@@ -121,7 +121,7 @@ public:
      */
     BoundaryHandler* getHandler() const;
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     /*!
      * \brief Returns a list of particles that need to be deleted
      * \details Particles can't just be deleted in parallel code - as they need to
@@ -132,7 +132,7 @@ public:
 #endif
 
 protected:
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     /*!
      * \brief Storage for particles in mpi communication zone to be particlesToBeDeleted
      * \details Because the communication lists must remain synced, we must make sure

@@ -48,8 +48,8 @@
 //integrated into MercuryDPM at 17th of September 2015.
 
 
-#ifndef NumericalVector_H_
-#define NumericalVector_H_
+#ifndef MERCURYDPM_NUMERICALVECTOR_H_
+#define MERCURYDPM_NUMERICALVECTOR_H_
 
 #include "Logger.h"
 #include <vector>
@@ -244,6 +244,6 @@ template<typename T = Mdouble>
 std::ostream& operator<<(std::ostream& os, const NumericalVector<T>& A);
 
 
-#endif /* NumericalVector_H_ */
+#endif //MERCURYDPM_NUMERICALVECTOR_H_
 
 

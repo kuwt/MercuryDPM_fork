@@ -23,8 +23,8 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef EXTENDEDMATH_H
-#define EXTENDEDMATH_H
+#ifndef MECURYDPM_EXTENDEDMATH_H
+#define MECURYDPM_EXTENDEDMATH_H
 
 #include <iostream> //std::istream and std::stringstream
 #include <fstream> //std::fstream

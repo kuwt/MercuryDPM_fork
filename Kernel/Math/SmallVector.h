@@ -47,8 +47,8 @@
 //Note: This code is copied and adapted from hpGEM (see license above), version 22th of January 2016. It has been
 //integrated into MercuryDPM at 16th of March 2017.
 
-#ifndef MERCURY_SMALLVECTOR_H
-#define MERCURY_SMALLVECTOR_H
+#ifndef MERCURYDPM_SMALLVECTOR_H
+#define MERCURYDPM_SMALLVECTOR_H
 
 #include "GeneralDefine.h"
 #include "Logger.h"
@@ -289,4 +289,4 @@ std::ostream& operator<<(std::ostream& os, const SmallVector<numberOfRows>& A)
     return os;
 }
 
-#endif //MERCURY_SMALLVECTOR_H
+#endif //MERCURYDPM_SMALLVECTOR_H

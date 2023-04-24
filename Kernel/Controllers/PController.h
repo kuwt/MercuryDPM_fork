@@ -2,8 +2,8 @@
 // Created by reza on 11-01-21.
 //
 
-#ifndef MERCURY_PCONTROLLER_H
-#define MERCURY_PCONTROLLER_H
+#ifndef MERCURYDPM_PCONTROLLER_H
+#define MERCURYDPM_PCONTROLLER_H
 #include "Math/ExtendedMath.h"
 
 class PController {
@@ -16,4 +16,4 @@ public:
 };
 
 
-#endif //MERCURY_PCONTROLLER_H
+#endif //MERCURYDPM_PCONTROLLER_H

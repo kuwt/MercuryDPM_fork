@@ -23,8 +23,8 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PSD_H
-#define PSD_H
+#ifndef MECURYDPM_PSD_H
+#define MECURYDPM_PSD_H
 
 #include <fstream>
 #include <Logger.h>
@@ -139,6 +139,7 @@ public:
     /*!
      * \brief Deprecated version of reading in PSDs from a vector.
      */
+    MERCURYDPM_DEPRECATED
     void setPSDFromVector(std::vector<RadiusAndProbability> psd, TYPE PSDType);
 
     /*!
@@ -355,4 +356,4 @@ private:
 };
 
 
-#endif //PSD_H
+#endif //MECURYDPM_PSD_H

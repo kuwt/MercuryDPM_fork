@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
     exec_command("../../Tools/data2pvd Periodic.data paraview_Periodic/Periodic");
 
     std::string command;
-    command = "python " + getMercurySourceDir() + "/Tools/MClump/plot_ene.py " + getMercuryBuildDir() + "/Drivers/MultiParticle/ " + "Periodic";
+    command = "python " + getMercuryDPMSourceDir() + "/Tools/MClump/plot_ene.py " + getMercuryDPMBuildDir() + "/Drivers/MultiParticle/ " + "Periodic";
     exec_command(command.c_str());
     return 0;
 }

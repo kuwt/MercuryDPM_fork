@@ -117,7 +117,7 @@ public:
         Vec3D velMax = {0.005, 0, 0};
         insertionBoundary.set(&p0, maxFail, posMin, posMax, velMin, velMax);
         PSD psd;
-        psd.setPSDFromCSV(getMercurySourceDir() + "/Drivers/USER/PSD_AoR.csv",
+        psd.setPSDFromCSV(getMercuryDPMSourceDir() + "/Drivers/USER/PSD_AoR.csv",
                           PSD::TYPE::CUMULATIVE_NUMBER_DISTRIBUTION);//mnt/C/dev/mercurydpm_git_xiuqi/   Drivers/USER/Xiuqi/PSD_INPUTDATA/PSD_AoR.csv
         insertionBoundary.setPSD(psd);
         insertionBoundary.setManualInsertion(true);

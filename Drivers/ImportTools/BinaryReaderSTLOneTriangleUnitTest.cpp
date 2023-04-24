@@ -44,7 +44,7 @@ int main()
    
     std::ifstream STLFile;
     
-    std::string directory(getMercurySourceDir());
+    std::string directory(getMercuryDPMSourceDir());
 
     BinaryReader STLReader(directory+"/Drivers/ImportTools/ExampleSTLFiles/SimpleTrianlge.stl");
     

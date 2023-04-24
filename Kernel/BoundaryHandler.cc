@@ -98,7 +98,7 @@ void BoundaryHandler::addObject(BaseBoundary* P)
     //set the handler pointer
     P->setHandler(this);
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Different manner of treating periodic boundaries in MPI: hence there is a periodicBoundaryHandler
     BasePeriodicBoundary* upcast = dynamic_cast<BasePeriodicBoundary*>(P);
     if (upcast != nullptr)

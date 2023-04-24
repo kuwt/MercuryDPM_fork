@@ -1,5 +1,5 @@
-#ifndef MERCURY_CALIBRATION_H
-#define MERCURY_CALIBRATION_H
+#ifndef MERCURYDPM_CALIBRATION_H
+#define MERCURYDPM_CALIBRATION_H
 
 #include <vector>
 #include <cstring>
@@ -233,4 +233,4 @@ public:
     }
 };
 
-#endif //MERCURY_CALIBRATION_H
+#endif //MERCURYDPM_CALIBRATION_H

@@ -23,8 +23,8 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef MERCURY_NURBSSURFACE_H
-#define MERCURY_NURBSSURFACE_H
+#ifndef MERCURYDPM_NURBSSURFACE_H
+#define MERCURYDPM_NURBSSURFACE_H
 
 #include <vector>
 #include <array>
@@ -233,4 +233,4 @@ private:
     void wrapAroundInV(unsigned int numStartToEnd, unsigned int numEndToStart, bool forceBothEndsUniform = false);
 };
 
-#endif //MERCURY_NURBSSURFACE_H
+#endif //MERCURYDPM_NURBSSURFACE_H

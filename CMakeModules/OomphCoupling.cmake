@@ -1,5 +1,5 @@
 #Do nothing if coupling is turned off.
-if(NOT Mercury_OOMPH_COUPLING)
+if(NOT MercuryDPM_OOMPH_COUPLING)
     #message(STATUS "Coupling with oomph-lib is disabled")
     return()
 endif()

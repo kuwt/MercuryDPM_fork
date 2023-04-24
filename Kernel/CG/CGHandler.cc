@@ -247,7 +247,7 @@ void CGHandler::computeContactPoints()
 bool CGHandler::evaluateRestartFiles()
 {
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Make sure that the number of processors is equal to the number of processors used for the run
     MPIContainer& communicator = MPIContainer::Instance();
     std::vector<unsigned> numberOfDomains = this->getDPMBase()->getNumberOfDomains();
@@ -315,7 +315,7 @@ bool CGHandler::evaluateRestartFiles()
 bool CGHandler::evaluateDataFiles(bool evaluateFStatFiles)
 {
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Make sure that the number of processors is equal to the number of processors used for the run
     MPIContainer& communicator = MPIContainer::Instance();
     std::vector<unsigned> numberOfDomains = this->getDPMBase()->getNumberOfDomains();

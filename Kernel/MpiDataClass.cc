@@ -198,7 +198,7 @@ MPIParticleVelocity copyVelocityFrom(BaseParticle* particle)
 
 Vec3D getMPISum(Vec3D& val)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Sum up over all domains
     Vec3D valGlobal = {0.0,0.0,0.0};
     MPIContainer& communicator = MPIContainer::Instance();
@@ -213,7 +213,7 @@ Vec3D getMPISum(Vec3D& val)
 
 double getMPISum(double val)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Sum up over all domains
     double valGlobal = 0.0;
     MPIContainer& communicator = MPIContainer::Instance();

@@ -177,7 +177,7 @@ void ParticleHandler::addObject(BaseParticle* P)
                      "Please make sure that you have "
                      "set the species somewhere in the driver code.", P->getId());
     }
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     bool insertParticle;
     //Check if the particle P should be added to the current domain
     if (NUMBER_OF_PROCESSORS == 1)
@@ -218,7 +218,7 @@ void ParticleHandler::addObject(BaseParticle* P)
 
         P->actionsAfterAddObject();
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         P->setPeriodicComplexity(std::vector<int>(0));
     }
     else
@@ -253,7 +253,7 @@ void ParticleHandler::addObject(BaseParticle* P)
  */
 void ParticleHandler::addObject(int fromProcessor, BaseParticle* p)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     MPIContainer& communicator = MPIContainer::Instance();
 
     //The processor that contains the particle that needs to be copied needs to identify the target, and communicate this
@@ -286,7 +286,7 @@ void ParticleHandler::addObject(int fromProcessor, BaseParticle* p)
  */
 void ParticleHandler::addGhostObject(int fromProcessor, int toProcessor, BaseParticle* p)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     MPIContainer& communicator = MPIContainer::Instance();
     if (fromProcessor == toProcessor)
     {
@@ -347,7 +347,7 @@ void ParticleHandler::addGhostObject(int fromProcessor, int toProcessor, BasePar
  */
 void ParticleHandler::addGhostObject(BaseParticle* P)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     if (P->getSpecies() == nullptr)
     {
         logger(WARN, "[ParticleHandler::adGhostObject(BaseParticle*)] "
@@ -393,7 +393,7 @@ void ParticleHandler::addGhostObject(BaseParticle* P)
  */
 void ParticleHandler::removeObject(const unsigned int index)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     MPIContainer& communicator = MPIContainer::Instance();
     if (communicator.getNumberOfProcessors() > 1 )
     {
@@ -421,7 +421,7 @@ void ParticleHandler::removeObject(const unsigned int index)
  */
 void ParticleHandler::removeGhostObject(const unsigned int index)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
 #ifdef CONTACT_LIST_HGRID
     getDPMBase()->getPossibleContactList().remove_ParticlePosibleContacts(getObject(id));
 #endif
@@ -510,7 +510,7 @@ BaseParticle* ParticleHandler::getSmallestParticleLocal() const
  */
 BaseParticle* ParticleHandler::getSmallestParticle() const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     logger(WARN,"getSmallestParticle should not be used in parallel; use getSmallestInteractionRadius or "
              "ParticleSpecies::getSmallestParticleMass instead");
     return nullptr;
@@ -533,7 +533,7 @@ BaseParticle* ParticleHandler::getLargestParticleLocal() const
  */
 BaseParticle* ParticleHandler::getLargestParticle() const
 {
-#ifdef MERCURY_USE_MPIO
+#ifdef MERCURYDPM_USE_MPIO
     logger(WARN,"getLargestParticle() should not be used in parallel; use getLargestInteractionRadius instead");
     return nullptr;
 #else
@@ -556,7 +556,7 @@ Mdouble ParticleHandler::getKineticEnergyLocal() const
 
 Mdouble ParticleHandler::getKineticEnergy() const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     Mdouble kineticEnergyLocal = getKineticEnergyLocal();
     Mdouble kineticEnergyGlobal = 0.0;
 
@@ -585,7 +585,7 @@ Mdouble ParticleHandler::getRotationalEnergyLocal() const
 
 Mdouble ParticleHandler::getRotationalEnergy() const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     Mdouble rotationalEnergyLocal = getRotationalEnergyLocal();
     Mdouble rotationalEnergyGlobal = 0.0;
 
@@ -610,7 +610,7 @@ Mdouble ParticleHandler::getMassLocal() const
 
 Mdouble ParticleHandler::getMass() const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     Mdouble massLocal = getMassLocal();
     Mdouble massGlobal = 0.0;
 
@@ -635,7 +635,7 @@ Vec3D ParticleHandler::getMassTimesPositionLocal() const
 
 Vec3D ParticleHandler::getMassTimesPosition() const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     Vec3D massTimesPositionLocal = getMassTimesPositionLocal();
     Vec3D massTimesPositionGlobal = {0.0, 0.0, 0.0};
 
@@ -709,7 +709,7 @@ BaseParticle* ParticleHandler::getFastestParticleLocal() const
 
 BaseParticle* ParticleHandler::getFastestParticle() const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     logger(ERROR,"This function should not be used in parallel");
 #endif
     return getFastestParticleLocal();
@@ -735,7 +735,7 @@ Mdouble ParticleHandler::getSmallestInteractionRadiusLocal() const
  */
 Mdouble ParticleHandler::getSmallestInteractionRadius() const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Compute the local value
     Mdouble smallestInteractionRadiusLocal = getSmallestInteractionRadiusLocal();
     Mdouble smallestInteractionRadiusGlobal = 0.0;
@@ -771,7 +771,7 @@ Mdouble ParticleHandler::getLargestInteractionRadiusLocal() const
  */
 Mdouble ParticleHandler::getLargestInteractionRadius() const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     Mdouble largestInteractionRadiusLocal = getLargestInteractionRadiusLocal();
     Mdouble largestInteractionRadiusGlobal = 0.0;
 
@@ -803,7 +803,7 @@ Mdouble ParticleHandler::getSumRadiusLocal() const
 
 Mdouble ParticleHandler::getMeanRadius() const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     Mdouble sumRadiusLocal = getSumRadiusLocal();
     unsigned numberOfRealParticlesLocal = getNumberOfRealObjectsLocal();
 
@@ -828,7 +828,7 @@ Mdouble ParticleHandler::getMeanRadius() const
  */
 BaseParticle* ParticleHandler::getLowestPositionComponentParticleLocal(const int i) const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     logger(ERROR,"getLowestPositionComponentParticle() not implemented yet in parallel");
 #endif
     if (getSize() == 0)
@@ -854,7 +854,7 @@ BaseParticle* ParticleHandler::getLowestPositionComponentParticleLocal(const int
 
 BaseParticle* ParticleHandler::getLowestPositionComponentParticle(const int i) const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     logger(ERROR,"This function should not be used in parallel");
 #endif
     return getLowestPositionComponentParticleLocal(i);
@@ -891,7 +891,7 @@ BaseParticle* ParticleHandler::getHighestPositionComponentParticleLocal(const in
 
 BaseParticle* ParticleHandler::getHighestPositionComponentParticle(const int i) const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     logger(ERROR,"This function should not be used in parallel");
 #endif
     return getHighestPositionComponentParticleLocal(i);
@@ -927,7 +927,7 @@ BaseParticle* ParticleHandler::getLowestVelocityComponentParticleLocal(const int
 
 BaseParticle* ParticleHandler::getLowestVelocityComponentParticle(const int i) const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     logger(ERROR,"This function should not be used in parallel");
 #endif
     return getLowestVelocityComponentParticleLocal(i);
@@ -963,7 +963,7 @@ BaseParticle* ParticleHandler::getHighestVelocityComponentParticleLocal(const in
 
 BaseParticle* ParticleHandler::getHighestVelocityComponentParticle(const int i) const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     logger(ERROR,"This function should not be used in parallel");
 #endif
     return getHighestVelocityComponentParticleLocal(i);
@@ -1147,7 +1147,7 @@ void ParticleHandler::readAndAddObject(std::istream& is)
 
 void ParticleHandler::write(std::ostream& os) const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     os << "Particles " << getNumberOfRealObjectsLocal() << std::endl;
     for (BaseParticle* it : *this)
     {
@@ -1262,7 +1262,7 @@ Mdouble ParticleHandler::getVolumeLocal() const
 
 Mdouble ParticleHandler::getVolume() const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     Mdouble volumeLocal = getVolumeLocal();
     Mdouble volumeGlobal = 0.0;
 
@@ -1282,7 +1282,7 @@ Mdouble ParticleHandler::getVolume() const
  */
 unsigned int ParticleHandler::getNumberOfRealObjectsLocal() const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     const MPIContainer& communicator = MPIContainer::Instance();
     if (communicator.getNumberOfProcessors() > 1)
     {
@@ -1303,7 +1303,7 @@ unsigned int ParticleHandler::getNumberOfRealObjectsLocal() const
 
 unsigned int ParticleHandler::getNumberOfRealObjects() const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     MPIContainer& communicator = MPIContainer::Instance();
     unsigned int numberOfRealParticles = getNumberOfRealObjectsLocal();
 
@@ -1324,7 +1324,7 @@ unsigned int ParticleHandler::getNumberOfRealObjects() const
  */
 unsigned int ParticleHandler::getNumberOfObjects() const
 {
-//#ifdef MERCURY_USE_MPI
+//#ifdef MERCURYDPM_USE_MPI
 //    MPIContainer& communicator = MPIContainer::Instance();
 //    if (communicator.getNumberOfProcessors() > 1)
 //    {
@@ -1357,7 +1357,7 @@ unsigned int ParticleHandler::getNumberOfFixedObjectsLocal() const
  */
 unsigned int ParticleHandler::getNumberOfFixedObjects() const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     unsigned int numberOfFixedParticlesLocal = getNumberOfFixedObjectsLocal();
     unsigned int numberOfFixedParticles = 0;
 

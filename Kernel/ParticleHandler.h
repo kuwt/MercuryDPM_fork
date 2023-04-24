@@ -304,7 +304,7 @@ public:
     typename std::enable_if<std::is_scalar<T>::value, T>::type
     getParticleAttribute(std::function<T(BaseParticle*)> attribute, AttributeType type) const
     {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         T particleAttributeLocal = getParticleAttributeLocal(attribute, type);
         T particleAttributeGlobal;
 

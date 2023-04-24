@@ -537,7 +537,7 @@ public:
      * \deprecated Please do not set the mass yourself, but use 
      * ParticleSpecies->computeMass instead. That makes sure 
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     void setMass(Mdouble mass);
     
     /*!
@@ -620,7 +620,7 @@ public:
     /*!
      * \deprecated Please use setSpecies(const ParticleSpecies*) instead.
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     /// \todo MX: this index is used in the MPI transmission. This should be "undeprecated"
     void setIndSpecies(unsigned int indSpecies) override;
     

@@ -32,7 +32,7 @@ void ParticleVtkWriter::writeVTKPositions(std::fstream& file) const
     file << "  <DataArray type=\"Float32\" Name=\"Position\" NumberOfComponents=\"3\" format=\"ascii\">\n";
     for (const auto& p: handler_)
     {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         if (particleMustBeWritten(p))
         {
             file << '\t' << p->getPosition() << '\n';
@@ -52,7 +52,7 @@ void ParticleVtkWriter::writeVTKIndSpecies(std::fstream& file) const
     // Add species type
     for (const auto& p: handler_)
     {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         if (particleMustBeWritten(p))
         {
             file << '\t' << p->getIndSpecies() << '\n';
@@ -77,7 +77,7 @@ void ParticleVtkWriter::writeExtraFields(std::fstream& file) const
             for (const auto& p: handler_)
             {
                 for (auto f : p->getFieldVTK(i)) {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
                     if (particleMustBeWritten(p))
                     {
                         file << '\t' << f << '\n';

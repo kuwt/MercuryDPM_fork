@@ -58,7 +58,7 @@ RegimeSinterInteraction::RegimeSinterInteraction(const RegimeSinterInteraction& 
 
 RegimeSinterInteraction::RegimeSinterInteraction()
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     logger(FATAL,"RegimeSinterInteractions are currently not implemented in parallel MercuryDPM");
 #endif
 

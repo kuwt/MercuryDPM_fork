@@ -89,7 +89,7 @@ PeriodicBoundaryHandler::~PeriodicBoundaryHandler()
 ///Add the object and tell the object that this is his handler.
 void PeriodicBoundaryHandler::addObject(BasePeriodicBoundary* P)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     if (NUMBER_OF_PROCESSORS == 1)
     {
         return;
@@ -299,7 +299,7 @@ std::vector<int> PeriodicBoundaryHandler::computePeriodicComplexity(Vec3D positi
  */
 void PeriodicBoundaryHandler::addNewParticles()
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     if (NUMBER_OF_PROCESSORS == 1)
     {
         return;
@@ -332,7 +332,7 @@ void PeriodicBoundaryHandler::addNewParticles()
  */
 void PeriodicBoundaryHandler::addNewParticle(BaseParticle* particle)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     if (NUMBER_OF_PROCESSORS == 1)
     {
         return;
@@ -1396,7 +1396,7 @@ void PeriodicBoundaryHandler::findNewInteractions()
  */
 void PeriodicBoundaryHandler::communicateTargetDomains()
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Step 1: Check to how many domains this domain has to send particles
     int numberOfTargetDomainsLocal = 0;
     for (int index = 0; index < NUMBER_OF_PROCESSORS; index++) 

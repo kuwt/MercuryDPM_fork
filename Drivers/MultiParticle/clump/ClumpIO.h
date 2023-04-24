@@ -45,7 +45,7 @@ public:
 void load_conf(clump_data &a)
 {
     // Path to MCLump tool
-    a.path = getMercurySourceDir() + "/Tools/MClump/clumps/";
+    a.path = getMercuryDPMSourceDir() + "/Tools/MClump/clumps/";
 
     struct dirent *entry;
     DIR *dir = opendir(a.path.c_str());

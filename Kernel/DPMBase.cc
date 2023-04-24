@@ -57,12 +57,12 @@
 // this header for memset function
 #include <cstring>
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
 #include <mpi.h>
 #endif
 
 //This is OMP related
-#ifdef MERCURY_USE_OMP
+#ifdef MERCURYDPM_USE_OMP
 #include <omp.h>
 #endif
 
@@ -76,7 +76,7 @@
 /**
 * \deprecated
 */
-MERCURY_DEPRECATED
+MERCURYDPM_DEPRECATED
 [[noreturn]] void logWriteAndDie(const std::string& module, std::string message)
 {
     std::cerr << "A fatal   error has occured"
@@ -1258,7 +1258,7 @@ void DPMBase::setNumberOfOMPThreads(int numberOfOMPThreads)
 logger.assert_always(numberOfOMPThreads > 0, "Number of OMP threads must be positive");
 numberOfOMPThreads_ = numberOfOMPThreads;
 
-#ifdef MERCURY_USE_OMP
+#ifdef MERCURYDPM_USE_OMP
 if(numberOfOMPThreads > omp_get_max_threads()) {
 logger(INFO, "Number of omp threads set to the maximum number of threads allowed: %",
        omp_get_max_threads());
@@ -1730,7 +1730,7 @@ bool DPMBase::getHGridUpdateEachTimeStep() const
  */
 bool DPMBase::mpiInsertParticleCheck(BaseParticle* P)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //If only one core is used (i.e. domainHandler is empty) then the result is always true
     if (domainHandler.getSize() == 0)
     {
@@ -1764,7 +1764,7 @@ bool DPMBase::mpiIsInCommunicationZone(BaseParticle* particle)
 {
 
     bool insideCommunicationZone = false;
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     MPIContainer& communicator = MPIContainer::Instance();
 
     //Check for the current domain if the particle is within the communication domain
@@ -1809,7 +1809,7 @@ bool DPMBase::mpiIsInCommunicationZone(BaseParticle* particle)
  */
 void DPMBase::insertGhostParticle(BaseParticle* particle)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //mpi particles only exist when there is more than one domain
     if (domainHandler.getSize() > 0)
     {
@@ -1835,7 +1835,7 @@ void DPMBase::insertGhostParticle(BaseParticle* particle)
  */
 void DPMBase::updateGhostGrid(BaseParticle* P)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     if (NUMBER_OF_PROCESSORS == 1) { return; }
 
     //Check if the interactionRadius of the BaseParticle is larger than given in the domain
@@ -1968,13 +1968,13 @@ void DPMBase::setFixedParticles(unsigned int n)
  */
 void DPMBase::printTime() const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     MPIContainer& communicator = MPIContainer::Instance();
     if (communicator.getProcessorID() == 0)
     {
 #endif
     logger(INFO, "t=%3.6, tmax=%3.6", getTime(), getTimeMax());
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     }
 #endif
 }
@@ -2166,7 +2166,7 @@ void DPMBase::writeVTKFiles() const
 
 void DPMBase::writePythonFileForVTKVisualisation() const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     if (PROCESSOR_ID == 0)
     {
 #endif
@@ -2201,7 +2201,7 @@ void DPMBase::writePythonFileForVTKVisualisation() const
 
     if (getParticlesWriteVTK())
     {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         if (NUMBER_OF_PROCESSORS > 1)
         {
             script += "# PARTICLES ##########################################################\n"
@@ -2239,7 +2239,7 @@ void DPMBase::writePythonFileForVTKVisualisation() const
                   "#ColorBy(particlesDisplay, ('POINTS', 'Velocity', 'Magnitude'))\n"
                   "#particlesDisplay.Opacity = 0.5\n"
                   "\n\n";
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         }
 #endif
     }
@@ -2259,7 +2259,7 @@ void DPMBase::writePythonFileForVTKVisualisation() const
 
     if (interactionHandler.getWriteVTK() != FileType::NO_FILE)
     {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         if (NUMBER_OF_PROCESSORS > 1)
         {
             script += "# INTERACTIONS #######################################################\n"
@@ -2299,7 +2299,7 @@ void DPMBase::writePythonFileForVTKVisualisation() const
                   "#ColorBy(interactionsDisplay, ('POINTS', 'Force'))\n"
                   "#interactionsDisplay.Opacity = 0.5\n"
                   "\n\n";
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         }
 #endif
     }
@@ -2343,7 +2343,7 @@ void DPMBase::writePythonFileForVTKVisualisation() const
               "ResetCamera()\n";
 
     helpers::writeToFile(getName() + ".py", script);
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     } // end of communicator is root statement
 #endif
 }
@@ -2401,7 +2401,7 @@ void DPMBase::outputXBallsData(std::ostream& os) const
     // This outputs the particle data
     for (unsigned int i = 0; i < particleHandler.getSize(); i++)
     {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         if (!particleHandler.getObject(i)->isPeriodicGhostParticle() && !particleHandler.getObject(i)->isMPIParticle())
         {
             outputXBallsDataParticle(i, format, os);
@@ -2804,7 +2804,7 @@ bool DPMBase::readNextDataFile(unsigned int format)
         for (size_t i = 0; i < N; ++i) {
             helpers::getLineFromStringStream(dataFile.getFstream(), line);
             line >> position >> velocity >> radius >> angle >> angularVelocity >> indSpecies;
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
             //This is required for the CG tool. When reading the data file it is neseccary to know if a particle is an MPIParticle or not
             bool isMPIParticle = false;
             bool isPeriodicGhostParticle = false;
@@ -2829,7 +2829,7 @@ bool DPMBase::readNextDataFile(unsigned int format)
                 p->setSpecies(species[i]);
             if (i < nHistory && fix[i])
                 p->fixParticle();
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
             if (NUMBER_OF_PROCESSORS)
             {
                 p->setMPIParticle(isMPIParticle);
@@ -3061,7 +3061,7 @@ int DPMBase::readRestartFile(std::string fileName, ReadOptions opt)
         logger(INFO, "Counter: %", std::stoi(counter));
     }
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Correct for the processor number
     if (NUMBER_OF_PROCESSORS > 1 && !helpers::fileExists(fileName))
     {
@@ -3226,7 +3226,7 @@ void DPMBase::integrateBeforeForceComputation()
     #pragma omp parallel for num_threads(getNumberOfOMPThreads()) //schedule(dynamic)
     for (int k = 0; k < particleHandler.getSize(); ++k) {
         BaseParticle *p = particleHandler.getObject(k);
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         //MPI particles are not integrated, they are purely ghost particles and get their new velocity and position from an MPI update
         if (!(p->isMPIParticle() || p->isPeriodicGhostParticle()))
         {
@@ -3271,7 +3271,7 @@ void DPMBase::checkInteractionWithBoundaries()
         b->checkBoundaryAfterParticlesMove(particleHandler);
 
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         //When ghost particles are deleted by deletion boundaries they need to be removed
         //from their communication lists to avoid segfaults
         if (NUMBER_OF_PROCESSORS > 1)
@@ -3310,7 +3310,7 @@ void DPMBase::integrateAfterForceComputation()
     #pragma omp parallel for num_threads(getNumberOfOMPThreads()) //schedule(dynamic)
     for (int k = 0; k < particleHandler.getSize(); ++k) {
         BaseParticle *p = particleHandler.getObject(k);
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         //MPI particles do not require integration - they are updated by the communication step
         if (!(p->isMPIParticle() || p->isPeriodicGhostParticle()))
         {
@@ -3432,7 +3432,7 @@ void DPMBase::computeAllForces()
 
     }
 
-    #ifdef Mercury_TRIANGLE_WALL_CORRECTION
+    #ifdef MERCURYDPM_TRIANGLE_WALL_CORRECTION
     // This statement deals with interactions of a particle with a group of walls:
     // If there are multiple contact forces between the particle and the group of walls, we assume that these contacts share a concave edge or a vertex. Thus, we multiply each force by a weight $w_{\alpha\gamma}=|\vec{f}_{\alpha\gamma}^{\text{w}}|/\sum_\gamma|\vec{f}_{\alpha\gamma}^{\text{w}}|$. Note that these weights add up to 1, thus, the total contact force between the particle and the group of walls will be a weighted average of the individual contact forces.
     // A second modification is done in #BaseWall::getInteractionWith
@@ -3496,7 +3496,7 @@ void DPMBase::computeAllForces()
     computeAdditionalForces();
 
     // for omp simulations, sum up all forces and add all newObjects_ (needed since both are using reduction)
-    #ifdef MERCURY_USE_OMP
+    #ifdef MERCURYDPM_USE_OMP
     if (getNumberOfOMPThreads()>1) {
         interactionHandler.addNewObjectsOMP();
     }
@@ -3596,13 +3596,13 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
 
     os << " random ";
     random.write(os);
-#ifdef MERCURY_USE_OMP
+#ifdef MERCURYDPM_USE_OMP
     //Write number of OMP threads
     if(getNumberOfOMPThreads() > 1) {
         os << " numberOfOMPThreads " << getNumberOfOMPThreads();
     }
 #endif
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Check if we are dealing with multiple cores
     if (NUMBER_OF_PROCESSORS > 1 )
     {
@@ -3679,7 +3679,7 @@ void DPMBase::write(std::ostream& os, bool writeAllParticles) const
  */
 void DPMBase::read(std::istream& is, ReadOptions opt)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     int previousNumberOfProcessors;
 #endif
     //Declares...
@@ -3823,7 +3823,7 @@ void DPMBase::read(std::istream& is, ReadOptions opt)
                 line >> dummy;
             }
 
-#ifdef MERCURY_USE_OMP
+#ifdef MERCURYDPM_USE_OMP
             //Read the number of OMP threads
             if (!dummy.compare("numberOfOMPThreads")) {
                 int numberOfOMPThreads;
@@ -3832,7 +3832,7 @@ void DPMBase::read(std::istream& is, ReadOptions opt)
                 //logger(INFO," Check the number of OMP threads = % ", getNumberOfOMPThreads());
             }
 #endif
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
             if (!dummy.compare("numberOfProcessors"))
             {
                 line  >> previousNumberOfProcessors
@@ -3853,7 +3853,7 @@ void DPMBase::read(std::istream& is, ReadOptions opt)
 
             speciesHandler.read(is);
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
             //Initialise MPI structures and perform domain decomposition
             decompose();
 #endif
@@ -3902,7 +3902,7 @@ void DPMBase::read(std::istream& is, ReadOptions opt)
                 ///todo{Do we want to calculate the mass?}
                 //particleHandler.getLastObject()->computeMass();
             }
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
             //Interaction distances of the domainHandler and periodicBoundaryHandler need to be set
             Mdouble interactionRadius = particleHandler.getLargestInteractionRadius();
             domainHandler.setInteractionDistance(2.0*interactionRadius);
@@ -4088,7 +4088,7 @@ void DPMBase::writeOutputFiles()
  */
 void DPMBase::decompose()
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
 
     //If running in parallel build, but just running with one core - no domain decomposition required
     int numberOfRequiredProcessors = numberOfDomains_[Direction::XAXIS]*
@@ -4251,7 +4251,7 @@ void DPMBase::initialiseSolve() {
     // Performs a first force computation
     checkAndDuplicatePeriodicParticles();
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     if (NUMBER_OF_PROCESSORS > 1)
     {
         //Find new mpi particles
@@ -4806,7 +4806,7 @@ bool DPMBase::readNextArgument(int& i, int argc, char* argv[])
  */
 bool DPMBase::checkParticleForInteraction(const BaseParticle& p)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     if (NUMBER_OF_PROCESSORS == 1)
     {
         return checkParticleForInteractionLocalPeriodic(p);
@@ -4989,7 +4989,7 @@ void DPMBase::importParticlesAs(ParticleHandler& particleH, InteractionHandler& 
  */
 void DPMBase::removeDuplicatePeriodicParticles()
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     /// \note: when there is a truely parallel computation (cpu > 2) then periodic particles are done in a different manner (see computeOneTimeStep)
     if (NUMBER_OF_PROCESSORS == 1)
     {
@@ -5020,7 +5020,7 @@ void DPMBase::removeDuplicatePeriodicParticles()
         }
     }*/
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     }
 #endif
 }
@@ -5066,7 +5066,7 @@ void DPMBase::checkAndDuplicatePeriodicParticles()
  */
 void DPMBase::performGhostParticleUpdate()
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //MPIContainer& communicator = MPIContainer::Instance();
     if (NUMBER_OF_PROCESSORS == 1) {return;}
 
@@ -5113,7 +5113,7 @@ void DPMBase::deleteGhostParticles(std::set<BaseParticle*>& particlesToBeDeleted
 // on neighbouring domains.
 void DPMBase::synchroniseParticle(BaseParticle* p, unsigned fromProcessor)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     MPIContainer& communicator = MPIContainer::Instance();
 
     //The processor that contains the particle that needs to be copied needs to identify the target, and communicate this
@@ -5131,7 +5131,7 @@ void DPMBase::synchroniseParticle(BaseParticle* p, unsigned fromProcessor)
 
 void DPMBase::performGhostVelocityUpdate()
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     if (NUMBER_OF_PROCESSORS == 1) {return;}
     //TODO If required, I can implement this for periodic particles, first discuss with Thomas if it is actually requiredf
     //periodicDomainHandler.updateVelocity()
@@ -5216,7 +5216,7 @@ bool DPMBase::isTimeEqualTo(Mdouble time) const
  */
 void DPMBase::setNumberOfDomains(std::vector<unsigned> numberOfDomains)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     numberOfDomains_ = numberOfDomains;
     logger(INFO, "Split domain into a %x%x% grid",numberOfDomains[0],numberOfDomains[1],numberOfDomains[2]);
 #else

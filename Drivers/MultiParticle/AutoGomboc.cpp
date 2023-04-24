@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
     exec_command("mkdir paraview_Gomboc");
     exec_command("../../Tools/data2pvd Gomboc.data paraview_Gomboc/Gomboc");
     std::string command;
-    command = "python " + getMercurySourceDir() + "/Tools/MClump/plot_ene.py " + getMercuryBuildDir() + "/Drivers/MultiParticle/ " + "Gomboc";
+    command = "python " + getMercuryDPMSourceDir() + "/Tools/MClump/plot_ene.py " + getMercuryDPMBuildDir() + "/Drivers/MultiParticle/ " + "Gomboc";
     exec_command(command.c_str());
     return 0;
 }

@@ -42,7 +42,7 @@ TimeDependentPeriodicBoundary::TimeDependentPeriodicBoundary()
     maxShift_ = 0;
 
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     MPIContainer& communicator = MPIContainer::Instance();
     if (communicator.getNumberOfProcessors() > 1)
     {
@@ -263,7 +263,7 @@ bool TimeDependentPeriodicBoundary::isClosestToLeftBoundary(const Vec3D& p) cons
 
 void TimeDependentPeriodicBoundary::createPeriodicParticles(ParticleHandler& pH)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     if (NUMBER_OF_PROCESSORS == 1)
     {
 #endif
@@ -273,7 +273,7 @@ void TimeDependentPeriodicBoundary::createPeriodicParticles(ParticleHandler& pH)
         {
             createPeriodicParticle(pH.getObject(i),pH);
         }
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     }
 #endif
 }
@@ -319,7 +319,7 @@ void TimeDependentPeriodicBoundary::createPeriodicParticle(BaseParticle* p, Part
  */
 void TimeDependentPeriodicBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     if (NUMBER_OF_PROCESSORS == 1)
     {
 #endif
@@ -330,7 +330,7 @@ void TimeDependentPeriodicBoundary::checkBoundaryAfterParticlesMove(ParticleHand
                 shiftAndBoostParticle(*p, pH.getDPMBase()->getTime());
             }
         }
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     }
 #endif
 }

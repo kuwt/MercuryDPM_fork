@@ -537,7 +537,7 @@ void LevelSetWall::setShapeFourSided()
                 "title(['y=' num2str(unique(yLS(i,:,:)))])\n"
                 "xlabel('x'), ylabel('z'), zlabel('dist')\n"
                 "\n"
-                "%% write n and dist values to file (read into Mercury)\n"
+                "%% write n and dist values to file (read into MercuryDPM)\n"
                 "fid = fopen('fourSided.txt','w');\n"
                 "fprintf(fid,'%d\\n',n);\n"
                 "fprintf(fid,'%f ',dist);\n"

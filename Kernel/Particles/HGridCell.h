@@ -23,8 +23,8 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef MERCURY_HGRIDCELL_H
-#define MERCURY_HGRIDCELL_H
+#ifndef MERCURYDPM_HGRIDCELL_H
+#define MERCURYDPM_HGRIDCELL_H
 
 /// Contains the hGrid-information for a certain particle: x,y,z and level of the particle containing this.
 /// Note, that each particle contains a HGridCell.
@@ -103,4 +103,4 @@ private:
 };
 
 
-#endif //MERCURY_HGRIDCELL_H
+#endif //MERCURYDPM_HGRIDCELL_H

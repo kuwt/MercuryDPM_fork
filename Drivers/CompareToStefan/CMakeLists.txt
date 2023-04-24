@@ -1,5 +1,5 @@
-include_directories(${Mercury_SOURCE_DIR}/Kernel
-	                ${Mercury_BINARY_DIR}/Kernel)
+include_directories(${MercuryDPM_SOURCE_DIR}/Kernel
+	                ${MercuryDPM_BINARY_DIR}/Kernel)
 
 #Part 1 : All cpp files will be made to exec files
 #########################################

@@ -593,7 +593,7 @@ Mdouble MercuryBase::getHGridTargetMaxInteractionRadius() const
 /// \todo MX: use all reduce with the appropriate operator
 bool MercuryBase::checkParticleForInteraction(const BaseParticle& p)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     bool interaction;
     if (NUMBER_OF_PROCESSORS == 1)
     {
@@ -654,7 +654,7 @@ bool MercuryBase::checkParticleForInteractionLocal(const BaseParticle& p)
 
 void MercuryBase::hGridInfo(std::ostream& os) const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     MPIContainer& communicator = MPIContainer::Instance();
     int numberOfProcessors = communicator.getNumberOfProcessors();
 #else

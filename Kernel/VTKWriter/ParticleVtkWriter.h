@@ -24,8 +24,8 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-#ifndef MERCURY_VTKWRITER_H
-#define MERCURY_VTKWRITER_H
+#ifndef MERCURYDPM_VTKWRITER_H
+#define MERCURYDPM_VTKWRITER_H
 
 #include "VTKWriter/BaseVTKWriter.h"
 #include "ParticleHandler.h"
@@ -57,4 +57,4 @@ protected:
 };
 
 
-#endif //MERCURY_VTKWRITER_H
+#endif //MERCURYDPM_VTKWRITER_H

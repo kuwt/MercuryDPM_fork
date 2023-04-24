@@ -201,7 +201,7 @@ Mdouble ParticleSpecies::getLargestInverseParticleMassLocal() const
 
 Mdouble ParticleSpecies::getSmallestParticleMass() const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     Mdouble maxInvMass = 0;
     Mdouble invMassLocal = getLargestInverseParticleMassLocal();
     //Obtain the global value

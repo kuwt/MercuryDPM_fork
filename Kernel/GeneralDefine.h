@@ -34,7 +34,7 @@ typedef long double Mdouble;
 typedef double Mdouble;
 #endif
 
-#define MERCURY_DEPRECATED [[deprecated]]
+#define MERCURYDPM_DEPRECATED [[deprecated]]
 
 #define UNUSED  __attribute__ ((__unused__))
 
@@ -55,7 +55,7 @@ namespace constants
  * defining this macro makes the code a bit cleaner. Sadly it can't be defind
  * as a constant global variable as on compile time it is not known what it should be
  */
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
 #define NUMBER_OF_PROCESSORS static_cast<unsigned>(MPIContainer::Instance().getNumberOfProcessors())
 #define PROCESSOR_ID MPIContainer::Instance().getProcessorID()
 #else
@@ -63,7 +63,7 @@ namespace constants
 #define PROCESSOR_ID 0
 #endif
 
-#ifdef MERCURY_USE_OMP
+#ifdef MERCURYDPM_USE_OMP
 #define OMP_THREAD_NUM omp_get_thread_num()
 #else
 #define OMP_THREAD_NUM 0

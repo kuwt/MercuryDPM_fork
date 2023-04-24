@@ -48,7 +48,7 @@ namespace units {
     std::string name;
 }
 
-//=============begin_Mercury_problem====================================
+//=============begin_MercuryDPM_problem====================================
 /// Problem class for a single particle bouncing on a "beam" structure.
 //======================================================================
 

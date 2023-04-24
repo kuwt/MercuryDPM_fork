@@ -20,7 +20,7 @@ The source codes for these three cases in this folder. All three simulations use
 
 To run the simulations for this paper, you need to install the developer's version of MercuryDPM (the 'Trunk'). For the data shown in the article, the revision 5520 was used. Here are the installation instructions: https://www.mercurydpm.org/downloads/developers-version-trunk.
 
-For benchmarking, you need to activate OpenMP parallelisation of the code. Therefore, when installling Mercury, you need to run cmake with the option `-DMercury_USE_OpenMP=ON`.
+For benchmarking, you need to activate OpenMP parallelisation of the code. Therefore, when installling Mercury, you need to run cmake with the option `-DMERCURYDPM_USE_OpenMP=ON`.
 
 To determine the ideal number of threads to use, run the script ``ompTest.sh``. This will simulate 100 time steps of the silo geometry using different number of threads and return the cpu-time used to run the simulation. Pick the number of threads with the lowest cpu-time and set the variable opt in ``run.sh`` to that number (e.g. ``opt=-omp 12``).
 

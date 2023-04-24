@@ -23,8 +23,8 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef MERCURY_NURBSUTILS_H
-#define MERCURY_NURBSUTILS_H
+#ifndef MERCURYDPM_NURBSUTILS_H
+#define MERCURYDPM_NURBSUTILS_H
 
 #include <vector>
 #include <algorithm>
@@ -145,4 +145,4 @@ Vec3D evaluate(Mdouble u, Mdouble v, std::vector<Mdouble> knotsU, std::vector<Md
                std::vector<std::vector<Vec3D>> controlPoints, std::vector<std::vector<Mdouble>> weights);
 }
 
-#endif //MERCURY_NURBSUTILS_H
+#endif //MERCURYDPM_NURBSUTILS_H

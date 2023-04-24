@@ -40,7 +40,7 @@
 
 int main()
 {
-    std::string directory = getMercurySourceDir();
+    std::string directory = getMercuryDPMSourceDir();
     std::string filename = directory+"/Drivers/ImportTools/ExampleSTLFiles/Box1x1x1.stl";
     Mercury3D dpm;
     auto species = dpm.speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());

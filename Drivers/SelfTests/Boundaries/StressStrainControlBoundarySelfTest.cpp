@@ -45,7 +45,7 @@ public:
               isStrainRateControlled_(isStrainRateControlled)
     {
         setName("StressStrainControlBoundarySelfTestInput");
-        readRestartFile(getMercurySourceDir()+"/Drivers/SelfTests/Boundaries/InputData/StressStrainControlBoundarySelfTestInput");
+        readRestartFile(getMercuryDPMSourceDir() + "/Drivers/SelfTests/Boundaries/InputData/StressStrainControlBoundarySelfTestInput");
         setRestarted(false);
         particleSpecies = dynamic_cast<LinearPlasticViscoelasticFrictionSpecies*>(speciesHandler.getLastObject());
         for (auto& p : particleHandler)

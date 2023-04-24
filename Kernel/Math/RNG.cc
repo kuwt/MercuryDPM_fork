@@ -97,7 +97,7 @@ void RNG::setLinearCongruentialGeneratorParmeters(unsigned const int a, unsigned
 
 void RNG::randomise()
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //First set a random seed on the root
     if (PROCESSOR_ID == 0)
     {

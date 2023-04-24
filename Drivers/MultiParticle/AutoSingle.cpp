@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
     exec_command("mkdir paraview_Single");
     exec_command("../../Tools/data2pvd Single.data paraview_Single/Single");
     std::string command;
-    command = "python " + getMercurySourceDir() + "/Tools/MClump/plot_ene.py " + getMercuryBuildDir() + "/Drivers/MultiParticle/ " + "Single";
+    command = "python " + getMercuryDPMSourceDir() + "/Tools/MClump/plot_ene.py " + getMercuryDPMBuildDir() + "/Drivers/MultiParticle/ " + "Single";
     exec_command(command.c_str());
     return 0;
 }

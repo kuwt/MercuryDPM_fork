@@ -55,6 +55,7 @@ std::string ExecCommand(const char* cmd) {
 int main(int argc, char** argv)
 {
     std::string command;
-    command = "python3 " + getMercurySourceDir() + "/Tools/SimpleOpt/SimpleOpt.py " + getMercurySourceDir() + " " + getMercuryBuildDir();
+    command = "python3 " + getMercuryDPMSourceDir() + "/Tools/SimpleOpt/SimpleOpt.py " + getMercuryDPMSourceDir() + " " +
+            getMercuryDPMBuildDir();
     std::cout<<ExecCommand(command.c_str())<<std::endl;
 }

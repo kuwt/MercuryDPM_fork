@@ -20,10 +20,10 @@ be a valid non-type template parameter - it must be either integral, enum
 (which is integral) or a pointer - so we can use it to tag a class to create diffent types.
 
 Now, our Logger instance has a template argument which is the loglevel associated with our Logger; anything of lesser
-priority is ignored; It also honours the symbol MERCURY_LOGLEVEL, and compares it to the lesser of the template argument
+priority is ignored; It also honours the symbol MERCURYDPM_LOGLEVEL, and compares it to the lesser of the template argument
 and the preprocessor define.
 
-The operator() function now should be based on the template parameter of the logger class (or MERCURY_LOGLEVEL), and the
+The operator() function now should be based on the template parameter of the logger class (or MERCURYDPM_LOGLEVEL), and the
 loglevel of the current message. Because we can't depend on the value but just on the type, we have to do some magic.
 Now, we want the function to resolve to something that produces output if the level is high enough, or nothing at all if
 the level is of a too low priority for the current loglevel. For this we utilize std::enable_if<>

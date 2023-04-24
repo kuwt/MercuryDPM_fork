@@ -167,7 +167,7 @@ bool DeletionBoundary::checkBoundaryAfterParticleMoved(BaseParticle* p, Particle
                     << std::setw(12) << trackMassDeleted_ << '\n';
         }
 
-        #ifdef MERCURY_USE_MPI
+        #ifdef MERCURYDPM_USE_MPI
             //Check if the particle is in the mpi communication zone
             if(p->isInMPIDomain())
             {
@@ -202,7 +202,7 @@ void DeletionBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
     if (!isActivated_)
         return;
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     particlesToBeDeleted_.clear();
 #endif
     for (unsigned int i = 0; i < pH.getSize(); i++)

@@ -1,18 +1,18 @@
 cmake_policy(SET CMP0057 NEW)
 FIND_PACKAGE(Doxygen)
 if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
-    option(Mercury_BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" ON)
+    option(MercuryDPM_BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" ON)
 else()
     message(STATUS "Doxygen found: ${DOXYGEN_FOUND}, dot found: ${DOXYGEN_DOT_FOUND}: Local documentation will not be built")
-    option(Mercury_BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" OFF)
+    option(MercuryDPM_BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" OFF)
 endif()
 
 
-if(Mercury_BUILD_DOCUMENTATION)
+if(MercuryDPM_BUILD_DOCUMENTATION)
     FIND_PACKAGE(Doxygen REQUIRED dot)
     if (NOT DOXYGEN_FOUND)
         message(FATAL_ERROR
-                "Doxygen is needed to build the documentation. Please install it correctly or turn off Mercury_BUILD_DOCUMENTATION")
+                "Doxygen is needed to build the documentation. Please install it correctly or turn off MercuryDPM_BUILD_DOCUMENTATION")
     else()
         #This is the configure file for normal doxygen builds
         configure_file(Configuration/doxygen.conf

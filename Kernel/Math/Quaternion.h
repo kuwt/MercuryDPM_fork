@@ -28,8 +28,8 @@
 ///Modifications
 /// 21:9:2009 - Added the inclusion guards and some include objects
 /// \todo Need to generalize this to n-dimensional quaternions of any type
-#ifndef QUATERNION_H
-#define QUATERNION_H
+#ifndef MECURYDPM_QUATERNION_H
+#define MECURYDPM_QUATERNION_H
 
 #include <cmath>
 #include <sstream>

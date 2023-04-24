@@ -181,7 +181,7 @@ void BaseParticle::fixParticle()
 bool BaseParticle::isMPIParticle() const
 {
     //make mpi-dependent so the compiler can optimise
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     return isMPIParticle_;
 #else
     return false;
@@ -730,7 +730,7 @@ void BaseParticle::integrateBeforeForceComputation(double time, double timeStep)
     }
     else
     {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         //For periodic particles in parallel the previous position is required
         setPreviousPosition(getPosition());
 #endif

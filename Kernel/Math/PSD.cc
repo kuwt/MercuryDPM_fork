@@ -389,6 +389,7 @@ void PSD::setDistributionLogNormal(Mdouble mean, Mdouble standardDeviation, int 
  *                                              PROBABILITYDENSITY_LENGTH_DISTRIBUTION,
  *                                              PROBABILITYDENSITY_AREA_DISTRIBUTION.
  */
+MERCURYDPM_DEPRECATED
 void PSD::setPSDFromVector(std::vector<RadiusAndProbability> psdVector, TYPE PSDType)
 {
     particleSizeDistribution_ = psdVector;

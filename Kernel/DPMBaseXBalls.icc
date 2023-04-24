@@ -144,7 +144,7 @@ void DPMBase::writeXBallsScript() const
         
     }
     
-    script_file << getMercuryBuildDir() << "/XBalls/xballs -format " << format
+    script_file << getMercuryDPMBuildDir() << "/XBalls/xballs -format " << format
                 << " -f " << dataFile.getFullName().substr(dataFile.getFullName().find_last_of("/") + 1)
                 << " -s " << scale
                 << " -cmode " << getXBallsColourMode()

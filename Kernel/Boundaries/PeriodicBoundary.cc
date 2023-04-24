@@ -348,7 +348,7 @@ void PeriodicBoundary::createGhostParticle(BaseParticle* pReal)
  */
 void PeriodicBoundary::createPeriodicParticles(ParticleHandler& pH)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     if (NUMBER_OF_PROCESSORS == 1)
     {
 #endif
@@ -358,7 +358,7 @@ void PeriodicBoundary::createPeriodicParticles(ParticleHandler& pH)
     {
         createPeriodicParticle(pH.getObject(i), pH);
     }
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     }
 #endif
 }
@@ -373,7 +373,7 @@ void PeriodicBoundary::createPeriodicParticles(ParticleHandler& pH)
  */
 void PeriodicBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     if (NUMBER_OF_PROCESSORS == 1)
     {
 #endif
@@ -385,7 +385,7 @@ void PeriodicBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
             getHandler()->getDPMBase()->hGridUpdateMove(*p, shift_.getLengthSquared());
         }
     }
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     }
 #endif
 }

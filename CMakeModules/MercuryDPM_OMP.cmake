@@ -1,11 +1,11 @@
 # Creates a new option in cmake which includes the OpenMP libraries when enabled
-OPTION (Mercury_USE_OpenMP "Use OpenMP" OFF)
+OPTION (MercuryDPM_USE_OpenMP "Use OpenMP" OFF)
 
-IF(Mercury_USE_OpenMP)
+IF(MercuryDPM_USE_OpenMP)
     # Tries to find OpenMP; but does not require it.
     find_package(OpenMP)
-    # Adds a precompiler flag, so you can use #ifdef MERCURY_USE_OMP
-    add_definitions( -DMERCURY_USE_OMP)
+    # Adds a precompiler flag, so you can use #ifdef MERCURYDPM_USE_OMP
+    add_definitions( -DMERCURYDPM_USE_OMP)
     # If OpenMP cannot be found, we look for a local install.
     # If none is found, an error message is thrown.
     IF(NOT OPENMP_FOUND)

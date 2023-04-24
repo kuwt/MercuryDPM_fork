@@ -25,17 +25,18 @@
 
 
 /// This file is used for generating defitions that give access to CMakeVaribles from within a cpp file (defintions have only been added as required
+/// PLEASE DO NOT EDIT THE FILE IN THE KERNEL - only in Configuration
 
 #include <CMakeDefinitions.h>
 
-const std::string getMercurySourceDir()
+const std::string getMercuryDPMSourceDir()
 {
-	return "@Mercury_SOURCE_DIR@";
+	return "@MercuryDPM_SOURCE_DIR@";
 }
 
-const std::string getMercuryBuildDir()
+const std::string getMercuryDPMBuildDir()
 {
-	return "@Mercury_BINARY_DIR@";
+	return "@MercuryDPM_BINARY_DIR@";
 }
 
 const std::string getRevision()
@@ -50,6 +51,6 @@ const std::string getRepositoryURL()
 
 const std::string getVersion()
 {
-	return "@Mercury_VERSION_MAJOR@.@Mercury_VERSION_MINOR@";
+	return "@MercuryDPM_VERSION_MAJOR@.@MercuryDPM_VERSION_MINOR@";
 }
 

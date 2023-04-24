@@ -58,7 +58,7 @@ ParhamiMcMeekingSinterInteraction::ParhamiMcMeekingSinterInteraction(const Parha
 
 ParhamiMcMeekingSinterInteraction::ParhamiMcMeekingSinterInteraction()
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     logger(FATAL,"ParhamiMcMeekingSinterInteractions are currently not implemented in parallel MercuryDPM");
 #endif
     

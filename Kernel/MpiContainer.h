@@ -36,20 +36,20 @@
 #include <vector>
 #include "Math/Vector.h"
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
 #include <mpi.h>
 #endif
 
-#ifdef MERCURY_FORCE_ASSERTS
-#define MERCURY_ASSERTS true
+#ifdef MERCURYDPM_FORCE_ASSERTS
+#define MERCURYDPM_ASSERTS true
 #else
-#ifdef MERCURY_NO_ASSERTS
-#define MERCURY_ASSERTS false
+#ifdef MERCURYDPM_NO_ASSERTS
+#define MERCURYDPM_ASSERTS false
 #else
 #ifdef NDEBUG
-#define MERCURY_ASSERTS false
+#define MERCURYDPM_ASSERTS false
 #else
-#define MERCURY_ASSERTS true
+#define MERCURYDPM_ASSERTS true
 #endif
 #endif
 #endif
@@ -89,7 +89,7 @@ enum MercuryMPITag
 
 namespace Detail
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
 //convert integral data to the corresponding MPI type
 template<typename T>
 typename std::enable_if<std::is_integral<T>::value, MPI_Datatype>::type
@@ -151,7 +151,7 @@ public:
      */
     void sync()
     {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         MPI_Waitall(pending_.size(),pending_.data(),MPI_STATUSES_IGNORE);
         pending_.clear();
         MPI_Barrier(communicator_);
@@ -170,13 +170,13 @@ public:
     typename std::enable_if<std::is_scalar<T>::value, void>::type
     send(T& t, int to, int tag)
     {
-#if MERCURY_ASSERTS
+#if MERCURYDPM_ASSERTS
         if (to == processorID_)
         {
             logger(FATAL, "[MPI FATAL]: Sending data to self!");
         }
 #endif
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         MPI_Request request;
         MPI_Isend(&t, 1, Detail::toMPIType(t), to, tag, communicator_, &request);
         pending_.push_back(request);
@@ -189,7 +189,7 @@ public:
     typename std::enable_if<std::is_scalar<T>::value, void>::type
     send(T* t, int count, int to, int tag)
     {
-#if MERCURY_ASSERTS
+#if MERCURYDPM_ASSERTS
         if (to == processorID_)
         {
             logger(FATAL, "[MPI FATAL]: Sending data to self!");
@@ -200,7 +200,7 @@ public:
             logger(WARN, "[MPI ERROR]: Sending zero data");
         }
 #endif
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         MPI_Request request;
         MPI_Isend(t, count, Detail::toMPIType(*t), to, tag, communicator_, &request);
         pending_.push_back(request);
@@ -220,13 +220,13 @@ public:
     typename std::enable_if<std::is_scalar<T>::value, void>::type
     receive(T& t, int from, int tag)
     {
-#if MERCURY_ASSERTS
+#if MERCURYDPM_ASSERTS
         if (from == processorID_)
         {
             logger(FATAL, "[MPI FATAL]: Receiving data from self!");
         }
 #endif
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         MPI_Request request;
         MPI_Irecv(&t, 1, Detail::toMPIType(t), from, tag, communicator_, &request);
         pending_.push_back(request);
@@ -239,7 +239,7 @@ public:
     typename std::enable_if<std::is_scalar<T>::value, void>::type
     receive(T* t, int count, int from, int tag)
     {
-#if MERCURY_ASSERTS
+#if MERCURYDPM_ASSERTS
         if (from == processorID_)
         {
             logger(FATAL, "[MPI FATAL]: Receiving data fromself!");
@@ -250,7 +250,7 @@ public:
             logger(WARN, "[MPI ERROR]: Receiving zero data");
         }
 #endif
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         MPI_Request request;
         MPI_Irecv(&t, count, Detail::toMPIType(*t), from, tag, communicator_, &request);
         pending_.push_back(request);
@@ -271,7 +271,7 @@ public:
     void send(T* t, MercuryMPIType type, int count, int to, int tag)
     {
         //std::cout << "[Process: " << processorID_ << "]: QUEUING SEND REQUEST with tag: " << tag << std::endl;
-#if MERCURY_ASSERTS
+#if MERCURYDPM_ASSERTS
         if (to == processorID_)
         {
             logger(FATAL, "[MPI FATAL]: Sending data to self!");
@@ -282,7 +282,7 @@ public:
             logger(WARN, "[MPI ERROR]: Sending zero data");
         }
 #endif
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         MPI_Request request;
         MPI_Isend(t, count, dataTypes_[type], to, tag, communicator_, &request);
         pending_.push_back(request);
@@ -303,7 +303,7 @@ public:
     void receive(T* t, MercuryMPIType type, int count, int from, int tag)
     {
         //std::cout << "[Process: " << processorID_ << "]: QUEUING RECEIVE REQUEST with tag: " << tag << std::endl;
-#if MERCURY_ASSERTS
+#if MERCURYDPM_ASSERTS
         if (from == processorID_)
         {
             logger(FATAL, "[MPI FATAL]: Receiving data to self!");
@@ -314,7 +314,7 @@ public:
             logger(WARN, "[MPI ERROR]: Receiving zero data");
         }
 #endif
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         MPI_Request request;
         MPI_Irecv(t, count, dataTypes_[type], from, tag, communicator_, &request);
         pending_.push_back(request);
@@ -334,7 +334,7 @@ public:
     typename std::enable_if<std::is_scalar<T>::value, void>::type
     directSend(T& t, int count, int to, int tag)
     {
-#if MERCURY_ASSERTS
+#if MERCURYDPM_ASSERTS
         if (to == processorID_)
         {
             logger(FATAL, "[MPI FATAL]: Sending data to self!");
@@ -345,7 +345,7 @@ public:
             logger(WARN, "[MPI ERROR]: Sending zero data");
         }
 #endif
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         MPI_Ssend(&t, count, Detail::toMPIType(t), to, tag, communicator_);
 #endif
     }
@@ -354,7 +354,7 @@ public:
     template<typename T>
     void directSend(T* t, MercuryMPIType type, int count, int to, int tag)
     {
-#if MERCURY_ASSERTS
+#if MERCURYDPM_ASSERTS
         if (to == processorID_)
         {
             logger(FATAL, "[MPI FATAL]: Sending data to self!");
@@ -365,7 +365,7 @@ public:
             logger(WARN, "[MPI ERROR]: Sending zero data");
         }
 #endif
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         MPI_Ssend(t,count,dataTypes_[type], to, tag, communicator_);
 #endif
     }
@@ -382,7 +382,7 @@ public:
     typename std::enable_if<std::is_scalar<T>::value, void>::type
     directReceive(T& t, int count, int from, int tag)
     {
-#if MERCURY_ASSERTS
+#if MERCURYDPM_ASSERTS
         if (from == processorID_)
         {
             logger(FATAL, "[MPI FATAL]: Receiving data from self!");
@@ -393,7 +393,7 @@ public:
             logger(WARN, "[MPI ERROR]: Receiving zero data");
         }
 #endif
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         MPI_Recv(&t, count, Detail::toMPIType(t), from, tag,communicator_, MPI_STATUS_IGNORE);
 #endif
     }
@@ -401,7 +401,7 @@ public:
     template<typename T>
     void directReceive(T* t, MercuryMPIType type, int count, int from, int tag)
     {
-#if MERCURY_ASSERTS
+#if MERCURYDPM_ASSERTS
         if (from == processorID_)
         {
             logger(FATAL, "[MPI FATAL]: Receiving data to self!");
@@ -412,7 +412,7 @@ public:
             logger(WARN, "[MPI ERROR]: Receiving zero data");
         }
 #endif
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         MPI_Recv(t, count, dataTypes_[type], from, tag, communicator_, MPI_STATUS_IGNORE);
 #endif
     }
@@ -427,7 +427,7 @@ public:
     template<typename T>
     void gather(T& send_t, T* receive_t)
     {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         MPI_Gather(&send_t, 1, Detail::toMPIType(send_t), receive_t, 1, Detail::toMPIType(send_t), 0, communicator_);
 #endif
     }
@@ -440,7 +440,7 @@ public:
     typename std::enable_if<std::is_scalar<T>::value, void>::type
     broadcast(T& t, int fromProcessor = 0)
     {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         MPI_Bcast(&t,1,Detail::toMPIType(t),fromProcessor,communicator_);
 #endif
     }
@@ -453,7 +453,7 @@ public:
     typename std::enable_if<std::is_scalar<T>::value, void>::type
     broadcast(T* t, int size, int fromProcessor)
     {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         MPI_Bcast((void *)t,size,Detail::toMPIType(t[0]),fromProcessor,communicator_);
 
 #endif
@@ -466,7 +466,7 @@ public:
     template<typename T>
     void broadcast(T* t, MercuryMPIType type, int fromProcessor = 0)
     {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         MPI_Bcast((void *)t,1,dataTypes_[type],fromProcessor,communicator_);
 #endif
     }
@@ -481,7 +481,7 @@ public:
      * \param[in] operation Operation that is performed on the collected scalars
      * \param[in] id Optional input, receiving processor of the reduced scalar
      */
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     template<typename T>
     typename std::enable_if<std::is_scalar<T>::value, void>::type
     reduce(T& t, MPI_Op operation, int id = 0)
@@ -506,7 +506,7 @@ public:
      * \param[out] receive_t the reduced scalar 
      * \param[in] operation The operation that is performed on all local numbers to reduce it to a single number
      */
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     template<typename T>
     typename std::enable_if<std::is_scalar<T>::value, void>::type
     allReduce(T& send_t, T& receive_t, MPI_Op operation)
@@ -524,7 +524,7 @@ public:
      * \param[in,out] receive_t A vector of scalars that contain all other scalars from other processors
      * \param[in] receive_count the number of scalars that is received by each processor
      */
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     template<typename T>
     typename std::enable_if<std::is_scalar<T>::value, void>::type
     allGather(T& send_t, int send_count, std::vector<T>& receive_t, int receive_count)
@@ -547,7 +547,7 @@ public:
     /*!
      * \brief Get the communicator used for MPI commands.
      */
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     MPI_Comm& getComm();
 #endif
     
@@ -563,7 +563,7 @@ public:
     template<typename T>
     void createMercuryMPIType(T t, MercuryMPIType type)
     {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         MPI_Datatype MPIType;
         MPI_Type_contiguous(sizeof(T), MPI_BYTE, &MPIType);
         MPI_Type_commit(&MPIType);
@@ -577,7 +577,7 @@ public:
      */
     void deleteMercuryMPITypes()
     {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         for(MPI_Datatype type : dataTypes_)
         {
             MPI_Type_free(&type);
@@ -608,7 +608,7 @@ private:
      */
     int numberOfProcessors_;
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     /*!
      * \brief List of send/receive requests that have not been resolved
      */

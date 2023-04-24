@@ -26,7 +26,7 @@
 #include "MpiContainer.h"
 #include "Logger.h"
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
 #include <mpi.h>
 #include "Interactions/BaseInteraction.h"
 #include "Interactions/Interaction.h"
@@ -42,7 +42,7 @@
  */
 MPIContainer::MPIContainer()
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     int Mpi_init_flag = 0;
     MPI_Initialized(&Mpi_init_flag);
     if(!Mpi_init_flag)
@@ -73,7 +73,7 @@ MPIContainer::MPIContainer()
  */
 void MPIContainer::initialiseMercuryMPITypes(const SpeciesHandler& speciesHandler)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Note: Important that the MPI type creation is done in the order given by the enum
     MPIParticle dummyParticle;
     MPIParticlePosition dummyPosition;
@@ -116,7 +116,7 @@ std::size_t MPIContainer::getProcessorID()
 }
 
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
 
 /*!
  * \brief Get the communicator used for MPI commands.
@@ -136,7 +136,7 @@ MPI_Comm& MPIContainer::getComm()
  */
 void initialiseMPI()
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Check if MPI is already initialised
     int Mpi_init_flag = 0;
     MPI_Initialized(&Mpi_init_flag);

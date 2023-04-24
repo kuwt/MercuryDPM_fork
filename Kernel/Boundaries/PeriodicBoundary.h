@@ -176,7 +176,7 @@ public:
     /*!
      * \brief deprecated version of CubeInsertionBoundary::read().
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     void oldRead(std::istream& is);
     
     /*!

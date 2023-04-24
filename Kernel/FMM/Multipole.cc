@@ -149,7 +149,7 @@ NumericalVector<std::complex<Mdouble>> Multipole::convertMultipoleToLocal(Vec3D 
 
 /// Adds multipole coefficients to an existing multipole
 /// \deprecated Remove this function; it should not be required anymore:
-MERCURY_DEPRECATED
+MERCURYDPM_DEPRECATED
 void Multipole::addMultipoleCoefficients(NumericalVector<std::complex<Mdouble>> multipoleExpansionCoefficients)
 {
     if (multipoleExpansionCoefficients.size() > multipoleExpansionCoefficients_.size())

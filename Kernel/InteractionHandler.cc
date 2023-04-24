@@ -33,7 +33,7 @@
 #include "Interactions/BaseInteraction.h"
 #include "DPMBase.h"
 #include "MpiDataClass.h"
-#ifdef MERCURY_USE_OMP
+#ifdef MERCURYDPM_USE_OMP
 #include "omp.h"
 #endif
 
@@ -120,7 +120,7 @@ BaseInteraction* InteractionHandler::addInteraction(BaseInteractable* P, BaseInt
 }
 
 void InteractionHandler::resetNewObjectsOMP() {
-    #ifdef MERCURY_USE_OMP
+    #ifdef MERCURYDPM_USE_OMP
     newObjects_.clear();
     newObjects_.resize(getDPMBase()->getNumberOfOMPThreads());
     #endif
@@ -151,7 +151,7 @@ InteractionHandler::getInteraction(BaseInteractable* const P, BaseInteractable* 
     BaseInteraction* C = getExistingInteraction(P, I);
     if (C == nullptr) {
         C = species->getNewInteraction(P, I, timeStamp);
-        #ifdef MERCURY_USE_OMP
+        #ifdef MERCURYDPM_USE_OMP
         if (omp_get_num_threads()>1) {
             newObjects_[omp_get_thread_num()].push_back(C);
             C->setHandler(this);
@@ -432,7 +432,7 @@ std::string InteractionHandler::getName() const
  */
 void InteractionHandler::write(std::ostream& os) const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //note: this function only prints the particles on processor 0
     //The rest of the particles are processed in the restart file write function
     MPIContainer& communicator = MPIContainer::Instance();
@@ -506,7 +506,7 @@ void InteractionHandler::readAndAddObject(std::istream& is)
     ///\todo TW: Change identifier in restart file from id to index; is there any reason the id should be kept after restarting, once this is done? (Note, the id is set to the old one in the particle handler because interactions store id, not indices; also note id's are slow
     BaseInteraction* C;
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     if (idType.compare("particleIds") == 0)
     {
         std::vector<BaseParticle*> list0 = getDPMBase()->particleHandler.getObjectsById(id0);

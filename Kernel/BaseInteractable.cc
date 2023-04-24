@@ -27,7 +27,7 @@
 #include "Particles/BaseParticle.h"
 #include "SpeciesHandler.h"
 
-#ifdef MERCURY_USE_OMP
+#ifdef MERCURYDPM_USE_OMP
     #include "omp.h"
 #endif
 
@@ -140,7 +140,7 @@ void BaseInteractable::addTorque(const Vec3D& addTorque)
 
 void BaseInteractable::resetForceTorque(int numberOfOMPthreads)
 {
-    #ifdef MERCURY_USE_OMP
+    #ifdef MERCURYDPM_USE_OMP
     forceOMP_.resize(numberOfOMPthreads-1);
     torqueOMP_.resize(numberOfOMPthreads-1);
     for (auto& force : forceOMP_)
@@ -161,7 +161,7 @@ void BaseInteractable::resetForceTorque(int numberOfOMPthreads)
 
 void BaseInteractable::sumForceTorqueOMP()
 {
-    #ifdef MERCURY_USE_OMP
+    #ifdef MERCURYDPM_USE_OMP
     for (const auto force : forceOMP_)
     {
         force_ += force;
