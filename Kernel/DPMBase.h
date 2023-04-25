@@ -806,7 +806,7 @@ public:
      void setBackgroundDrag(Mdouble backgroundDrag){backgroundDrag_=backgroundDrag;}
 
      /*!
-      * \breif Return the background drag
+      * \brief Return the background drag
       * @return double which is the background drag. Positive number removes energy, negative gains.
       */
      const Mdouble getBackgroundDrag() const {return backgroundDrag_;}

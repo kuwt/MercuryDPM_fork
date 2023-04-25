@@ -323,7 +323,7 @@ public:
     }
     
     ////////////////////////////////////////////////////////////////////////////////////////////
-    /// \breif Create and inserts in the drum new partciles random at non-overlapping locations in the drum. If also check the locations is not already filled by a particle
+    /// \brief Create and inserts in the drum new partciles random at non-overlapping locations in the drum. If also check the locations is not already filled by a particle
     ////////////////////////////////////////////////////////////////////////////////////////////
     void createParticles()
     {

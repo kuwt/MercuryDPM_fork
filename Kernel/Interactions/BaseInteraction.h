@@ -241,7 +241,7 @@ public:
     { return overlap_; }
 
     /*!
-     * \breif Return a Double with the current volume of overlap betweent the two interacting objects.
+     * \brief Return a Double with the current volume of overlap betweent the two interacting objects.
      */
     Mdouble getOverlapVolume() const;
     /*!

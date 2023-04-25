@@ -76,7 +76,7 @@ public:
     
     
     /*!
-     * \breif Required restarter does nothing other that what is required
+     * \brief Required restarter does nothing other that what is required
      * \details  This is the restarted teh code has lambda functions for the moving walls and needs so pointer magic; therefore these need to recreated on restart. Note, in the new version of MercuryDPM this stuff should all be stored in the restart so this will not be used in the future.
      */
     void actionsOnRestart() override
