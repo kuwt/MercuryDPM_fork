@@ -3,8 +3,8 @@
 #Define includes for compiling the Driver codes
 #The Mercury_BINARY_DIR is added here to enable multiple builds in a single file system
 #The CMakeDefinitions.cc and CMakeDefinitions.h file are copied into the binary folder
-include_directories(${Mercury_SOURCE_DIR}/Kernel
-		${Mercury_BINARY_DIR}/Kernel)
+include_directories(${MercuryDPM_SOURCE_DIR}/Kernel
+		${MercuryDPM_BINARY_DIR}/Kernel)
 
 #Part 2 : Make run test for each of the demo files
 ##################################################
