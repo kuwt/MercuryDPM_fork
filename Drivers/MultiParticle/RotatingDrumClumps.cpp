@@ -32,24 +32,40 @@
 #include "clump/ClumpIO.h"
 #include "clump/Mercury3DClump.h"
 # include <stdlib.h>
+#include <Boundaries/CubeInsertionBoundary.h>
 
-Mdouble f_min = -2; Mdouble f_max = 2;
+//Mdouble f_min = -2; Mdouble f_max = 2;
 int SAVECOUNT = 400;
 
 class multiParticleT1 : public Mercury3Dclump
 {
+
+    // Group id of the rotating geometry
+    unsigned rotatingWallID = 0;
+
+    // Pointers to the insertion boundaries
+    CubeInsertionBoundary* insertionBoundary;
+
 public:
     explicit  multiParticleT1()
     {
-        setGravity(Vec3D(0.0, 0.0, -10.0));
-        setName("Gomboc");
+        setGravity(Vec3D(0,-9.8,0));
+        setName("RotatingDrumClumps");
         setXBallsAdditionalArguments("-solidf -v0");
+        // Set domain size
+        setMin({-3.75,-3.75,0});
+        setMax({3.75,3.75,4.25});
+        // Output files: wall-vtu
+        setWallsWriteVTK(true);
+
+        /*
         setXMax(2*f_max);
         setYMax(2*f_max);
         setZMax(f_max);
         setXMin(2*f_min);
         setYMin(2*f_min);
         setZMin(f_min);
+         */
         load_clumps(data);
         setClumpIndex(0);
         clump_mass = data.mass[clump_index];
@@ -63,6 +79,19 @@ public:
 
     void setupInitialConditions() override
     {
+        auto species = speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
+        species->setDensity(1.0); // sets the species type-0 density
+        species->setDissipation(50.0);
+        species->setStiffness(1e6);
+
+        species->setSlidingFrictionCoefficient(0.6);
+        species->setSlidingStiffness(5e5);
+        species->setRollingFrictionCoefficient(0.0);
+        species->setRollingStiffness(5e5);
+
+        const Mdouble collisionTime = species->getCollisionTime(getClumpMass());
+        setClumpDamping(0);
+        setTimeStep(collisionTime / 50.0);
         // Generate gomboc
         setClumpIndex(2);
         MultiParticle p0;
@@ -70,7 +99,7 @@ public:
         p0.setMaster();
         //data = rotate_clump(data, clump_index, uniform_random_pds(seed)); // here you can try different seeds
         p0.setRadius(data.pebbles_r[clump_index][0]);
-        Vec3D pos = Vec3D(0, 0, -1);
+        Vec3D pos = Vec3D(0, 0, 1);
         p0.setPosition(pos);
         for (int j = 0; j < data.pebbles_r[clump_index].size(); j++) {
             p0.addSlave(Vec3D(data.pebbles_x[clump_index][j],
@@ -94,6 +123,22 @@ public:
         p0.setDamping(clump_damping);
         particleHandler.copyAndAddObject(p0);
 
+        // Add particles
+        double insertionVolume = 0.2/species->getDensity();
+        logger(INFO,"Insertion volume: %", insertionVolume);
+        CubeInsertionBoundary boundary;
+
+        boundary.set(p0, 1000, Vec3D(-2.5,-2.5,0), Vec3D(2.5,2.5,4.0),Vec3D(0,0,0),Vec3D(0,0,0));
+        boundary.setInitialVolume(insertionVolume);
+        insertionBoundary = boundaryHandler.copyAndAddObject(boundary);
+
+        // Introduce a rotating wall
+        Mdouble wallScaleFactor = 1e-3; // Scale used in the stl file (mm)
+        Vec3D shift = {0,0,0};
+        Vec3D velocity = {0,0,0};
+        rotatingWallID = wallHandler.readTriangleWall("RotatingDrum.stl",speciesHandler.getObject(0), wallScaleFactor,shift,velocity,Vec3D(0,0,0));
+
+        /*
         // Rectangular box
         wallHandler.clear();
         InfiniteWall w0;
@@ -110,6 +155,7 @@ public:
         wallHandler.copyAndAddObject(w0);
         w0.set(Vec3D(0.0, 0.0, 1.0), Vec3D(0, 0, getZMax()));
         wallHandler.copyAndAddObject(w0);
+         */
     }
 
     void actionsAfterTimeStep() override {
@@ -133,6 +179,18 @@ public:
             }
 
         }
+
+        static bool rotationStarted = false;
+        Vec3D angularVelocity = Vec3D(0,0,4.0/3.0*constants::pi);
+        if (!rotationStarted and insertionBoundary->getInitialVolume()<=insertionBoundary->getVolumeOfParticlesInserted()) {
+            rotationStarted = true;
+            logger(INFO,"Starting rotation");
+            for (const auto wall : wallHandler) {
+                if (wall->getGroupId()==rotatingWallID) {
+                    wall->setAngularVelocity(angularVelocity);
+                }
+            }
+        }
     }
 
 
@@ -146,21 +204,9 @@ private:
 int main(int argc, char* argv[])
 {
     multiParticleT1 problem;
-    auto species = problem.speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
-    species->setDensity(1.0); // sets the species type-0 density
-    species->setDissipation(50.0);
-    species->setStiffness(1e6);
 
-    species->setSlidingFrictionCoefficient(0.6);
-    species->setSlidingStiffness(5e5);
-    species->setRollingFrictionCoefficient(0.0);
-    species->setRollingStiffness(5e5);
-
-    const Mdouble collisionTime = species->getCollisionTime(problem.getClumpMass());
-    problem.setClumpDamping(0);
-    problem.setTimeStep(collisionTime / 50.0);
     problem.setSaveCount(SAVECOUNT);
-    problem.setTimeMax(50.0);
+    problem.setTimeMax(5.0);
     problem.removeOldFiles();
     problem.solve();
     return 0;

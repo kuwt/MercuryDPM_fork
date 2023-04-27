@@ -58,13 +58,13 @@ std::string exec_command(const char* cmd) {
 int main(int argc, char* argv[])
 {
     exec_command("rm clump_seq.txt");
-    exec_command("make Gomboc");
-    exec_command("./Gomboc");
-    exec_command("rm -rf paraview_Gomboc");
-    exec_command("mkdir paraview_Gomboc");
-    exec_command("../../Tools/data2pvd Gomboc.data paraview_Gomboc/Gomboc");
+    exec_command("make RotatingDrumClumps");
+    exec_command("./RotatingDrumClumps");
+    exec_command("rm -rf paraview_RotatingDrumClumps");
+    exec_command("mkdir paraview_RotatingDrumClumps");
+    exec_command("../../Tools/data2pvd RotatingDrumClumps.data paraview_RotatingDrumClumps/RotatingDrumClumps");
     std::string command;
-    command = "python " + getMercurySourceDir() + "/Tools/MClump/plot_ene.py " + getMercuryBuildDir() + "/Drivers/MultiParticle/ " + "Gomboc";
+    command = "python " + getMercurySourceDir() + "/Tools/MClump/plot_ene.py " + getMercuryBuildDir() + "/Drivers/MultiParticle/ " + "RotatingDrumClumps";
     exec_command(command.c_str());
     return 0;
 }
