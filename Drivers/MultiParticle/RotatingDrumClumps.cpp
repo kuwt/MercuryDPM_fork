@@ -50,6 +50,7 @@ public:
     explicit  multiParticleT1()
     {
         setGravity(Vec3D(0,-9.8,0));
+        // Set name of output files
         setName("RotatingDrumClumps");
         setXBallsAdditionalArguments("-solidf -v0");
         // Set domain size
@@ -79,19 +80,21 @@ public:
 
     void setupInitialConditions() override
     {
+        //Contact law and density
         auto species = speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
         species->setDensity(1.0); // sets the species type-0 density
         species->setDissipation(50.0);
         species->setStiffness(1e6);
-
         species->setSlidingFrictionCoefficient(0.6);
         species->setSlidingStiffness(5e5);
         species->setRollingFrictionCoefficient(0.0);
         species->setRollingStiffness(5e5);
-
         const Mdouble collisionTime = species->getCollisionTime(getClumpMass());
         setClumpDamping(0);
+
+        // Set time step
         setTimeStep(collisionTime / 50.0);
+
         // Generate gomboc
         setClumpIndex(2);
         MultiParticle p0;
@@ -124,7 +127,7 @@ public:
         particleHandler.copyAndAddObject(p0);
 
         // Add particles
-        double insertionVolume = 0.2/species->getDensity();
+        double insertionVolume = 0.5/species->getDensity();  //mass of particles: 0.5 Kg
         logger(INFO,"Insertion volume: %", insertionVolume);
         CubeInsertionBoundary boundary;
 
@@ -179,9 +182,9 @@ public:
             }
 
         }
-
+        // Start the rotation after the particles have been inserted
         static bool rotationStarted = false;
-        Vec3D angularVelocity = Vec3D(0,0,4.0/3.0*constants::pi);
+        Vec3D angularVelocity = Vec3D(0,0,1.0/12.0*constants::pi);
         if (!rotationStarted and insertionBoundary->getInitialVolume()<=insertionBoundary->getVolumeOfParticlesInserted()) {
             rotationStarted = true;
             logger(INFO,"Starting rotation");
@@ -204,10 +207,12 @@ private:
 int main(int argc, char* argv[])
 {
     multiParticleT1 problem;
-
+     // Set final time and how often to output
     problem.setSaveCount(SAVECOUNT);
-    problem.setTimeMax(5.0);
+    problem.setTimeMax(50.0);
+    // Remove existing vtk files
     problem.removeOldFiles();
+    // Start solving in time
     problem.solve();
     return 0;
 }
