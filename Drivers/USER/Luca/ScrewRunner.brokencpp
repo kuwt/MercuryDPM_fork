@@ -40,7 +40,7 @@ class ScrewRunner : public Mercury3D
 public:
 //  --- STANDARD FUNCTIONS ---
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         
         // resets the time

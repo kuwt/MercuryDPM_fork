@@ -80,7 +80,7 @@ public:
 		for (unsigned int i=0; i<particleHandler.getNumberOfObjects(); i++) particleHandler.getObject(i)->fixParticle();
 	}
 
-	void actionsBeforeTimeStep(){
+	void actionsBeforeTimeStep() override {
 		Mdouble DeltaAngle = 0.025; //in degree
 		Mdouble CheckInterval = 0.1; //in seconds
 		static Mdouble NextCheck = CheckInterval;
@@ -119,7 +119,7 @@ public:
 		}
 	}
 
-	void writeEneTimeStep(std::ostream& os) const
+	void writeEneTimeStep(std::ostream& os) const override
 	{
 		Mdouble ene_kin = 0, ene_rot = 0, ene_gra = 0, mass_sum= 0, x_masslength=0, y_masslength=0, z_masslength=0;
 
@@ -161,7 +161,7 @@ public:
         P0.setPosition(position);
 	}
 
-	void printTime() const {
+	void printTime() const override {
 			//~ Mdouble ene_kin = 0;
 			//~ for (unsigned int i=0;i<particleHandler.getNumberOfObjects();i++) if (!particleHandler.getObject(i)->isFixed())
 				//~ ene_kin += .5 * particleHandler.getObject(i)->get_Mass() * particleHandler.getObject(i)->getVelocity().GetLength2();
@@ -170,7 +170,7 @@ public:
 			//~ << endl;
 	}
 
-	void setupInitialConditions() {
+	void setupInitialConditions() override {
 
 	  boundaryHandler.clear();//WallsPeriodic.resize(0);
 	  InfiniteWall w0;//Walls.resize(5);

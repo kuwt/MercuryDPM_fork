@@ -74,7 +74,7 @@ public:
     /** the -r option is used to restart the code; this should probably be moved 
      * to DPMBase
      */
-    bool readNextArgument(int& i, int argc, char* argv[])
+    bool readNextArgument(int& i, int argc, char* argv[]) override
     {
         if (!strcmp(argv[i], "-restart") || !strcmp(argv[i], "-r"))
         {
@@ -125,7 +125,7 @@ private:
      * reached. This is done by resetting the final simulation time to the 
      * current time.
      */
-    void writeOutputFiles()
+    void writeOutputFiles() override
     {
         Mercury3D::writeOutputFiles();
         

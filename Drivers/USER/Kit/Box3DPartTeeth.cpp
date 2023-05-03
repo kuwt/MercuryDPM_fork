@@ -42,7 +42,7 @@ public:
 	double argv7;
 	double argv8;
 
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		auto species = new LinearViscoelasticSpecies;
 	

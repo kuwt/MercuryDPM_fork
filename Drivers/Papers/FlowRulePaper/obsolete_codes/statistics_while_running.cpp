@@ -91,9 +91,9 @@ class statistics_while_running : public StatisticsVector<T>, public Chute
 	}
 
 
-	void actionsBeforeTimeStep(){};
+	void actionsBeforeTimeStep() override {};
 		
-	void setupInitialConditions() {
+	void setupInitialConditions() override {
 		write(std::cout,false);
 		StatisticsVector<T>::write();
 		//~ for (unsigned int i=0; i<particleHandler.getNumberOfObjects(); i++) {

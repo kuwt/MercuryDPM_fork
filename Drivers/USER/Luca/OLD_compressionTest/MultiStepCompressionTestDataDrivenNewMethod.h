@@ -30,7 +30,7 @@ class CompressionTest_parameterCalibrationRoutine : public Mercury3D
 {
 private:
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         stage = 1;
         setsInserted = 0;

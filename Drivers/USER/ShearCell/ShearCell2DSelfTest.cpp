@@ -118,7 +118,7 @@ private:
     ///This is were the walls are implemented
     /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         //introduce particles randomly
         LiquidFilmParticle P0;
@@ -152,7 +152,7 @@ private:
         write(std::cout, false);
     }
 
-    void actionsAfterTimeStep()
+    void actionsAfterTimeStep() override
     {
         Mdouble Circumference = OuterRadius * 0.5 * constants::pi;
         Mdouble N = std::floor(Circumference / (2.0 * particleHandler.getObject(0)->getRadius()));
@@ -167,7 +167,7 @@ private:
 
     }
 
-    void outputXBallsData(std::ostream& os) const
+    void outputXBallsData(std::ostream& os) const override
     {
         os << particleHandler.getNumberOfObjects()*2.0 + interactionHandler.getNumberOfObjects()
             << " " << getTime()
@@ -213,7 +213,7 @@ private:
 #endif
     }
 
-    void printTime() const
+    void printTime() const override
     {
         Mdouble volTotP = 0.0;
         unsigned int nLB = 0;

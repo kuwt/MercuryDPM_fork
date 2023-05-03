@@ -38,7 +38,7 @@ public:
 	void set_targetVelocity(Vec3D new_){targetVelocity=new_;}
 
 private:
-	void setupInitialConditions(){}	
+	void setupInitialConditions() override {}
 	
 	void computeExternalForces(int CI) {
 		MD::computeExternalForces(CI);

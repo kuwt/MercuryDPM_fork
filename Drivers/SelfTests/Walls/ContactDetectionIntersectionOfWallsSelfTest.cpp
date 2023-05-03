@@ -111,7 +111,7 @@ public:
 
     void test()
     {
-        //setWallsWriteVTK(FileType::ONE_FILE);
+        //wallHandler.setWriteVTK(FileType::ONE_FILE);
         //setParticlesWriteVTK(true);
         solve();
     }

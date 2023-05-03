@@ -37,7 +37,7 @@ class ChutePeriodic : public Chute
 {
 public:
     
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {};
 
 ///creates flow particles in the whole chute
@@ -53,7 +53,7 @@ public:
         return P0;
     }
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         
         Chute::setupInitialConditions();

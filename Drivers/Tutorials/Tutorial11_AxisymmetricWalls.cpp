@@ -46,7 +46,7 @@ public:
         fStatFile.setFileType(FileType::NO_FILE);
         eneFile.setFileType(FileType::NO_FILE);
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(FileType::ONE_FILE);
+        wallHandler.setWriteVTK(FileType::ONE_FILE);
         setXBallsAdditionalArguments("-v0 -solidf");
 
         //specify body forces

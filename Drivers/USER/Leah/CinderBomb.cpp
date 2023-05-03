@@ -23,7 +23,7 @@ public:
         flag = true;
     }
 
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {        
        //impactorSpecies = speciesHandler.copyAndAddObject(LinearViscoelasticFrictionIrreversibleAdhesiveSpecies());
        //sandSpecies = speciesHandler.copyAndAddObject(LinearViscoelasticFrictionIrreversibleAdhesiveSpecies());
@@ -78,7 +78,7 @@ public:
     int N;
     bool flag;
     
-    void computeExternalForces(BaseParticle* P0){	
+    void computeExternalForces(BaseParticle* P0) override {
 	// Call the MD compute_external_forces function (turns on gravity)
 	DPMBase::computeExternalForces(P0);
 	
@@ -202,7 +202,7 @@ private:
 	}
 
     // Print time to screen
-    void printTime() const
+    void printTime() const override
     {
         std::cout << "\rt=" << std::setprecision(3) << std::left << std::setw(6) << getTime()
             << ", tmax=" << std::setprecision(3) << std::left << std::setw(6) << getTimeMax() << "\r";

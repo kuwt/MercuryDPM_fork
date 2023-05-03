@@ -45,7 +45,7 @@ public:
         //setParticlesWriteVTK(true);
 
         //setParticlesWriteVTK(true);
-        //setWallsWriteVTK(FileType::MULTIPLE_FILES);
+        //wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
 
         setParticleDimensions(3);
         setSystemDimensions(3);

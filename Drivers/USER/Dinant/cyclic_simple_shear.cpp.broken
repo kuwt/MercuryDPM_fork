@@ -40,7 +40,7 @@ template <StatType T> class cyclic_simple_shear : public StatisticsVector<T>, pu
         species  = speciesHandler.copyAndAddObject(LinearViscoelasticSlidingFrictionSpecies());
     }
 
-	void computeExternalForces(BaseParticle* CI)
+	void computeExternalForces(BaseParticle* CI) override
 	{
 		/// Now add on gravity
 		CI->addForce(getGravity() * CI->getMass());

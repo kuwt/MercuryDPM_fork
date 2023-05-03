@@ -389,7 +389,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     logger(INFO,"Time step: %", test.getTimeStep());
 
     //----------------------------------------------
-    //pb.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+    //pb.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
     test.setParticlesWriteVTK(false);
 
     test.setName(setFilename);

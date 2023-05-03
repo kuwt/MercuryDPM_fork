@@ -52,14 +52,8 @@ public:
         SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
         p.setRadius(2e-4);
-        p.setVelocity(Vec3D(1, 1, 1) * 1e-3);
-    
-        CubeInsertionBoundary insertionBoundary;
-        insertionBoundary.set(p, 100, getMin(), getMax(), -p.getVelocity(), p.getVelocity());
-        insertionBoundary.setInitialVolume(p.getVolume() * N);
-        insertionBoundary.checkBoundaryBeforeTimeStep(this);
-        setMeanVelocity({0, 0, 0});
-    
+        p.setVelocity(Vec3D(1, 1, 0) * 1e-3);
+
         double mass = species->getMassFromRadius(p.getRadius());
         double rest = species->getRestitutionCoefficient(mass);
         double tc = species->getCollisionTime(mass);
@@ -67,29 +61,35 @@ public:
         logger(INFO, "Collision time %", tc);
         logger(INFO, "N %", particleHandler.getNumberOfObjects());
     
-        /*wallHandler.clear();
-        InfiniteWall w0;
-        w0.setSpecies(speciesHandler.getObject(0));
-        w0.set(Vec3D(-1, 0, 0), Vec3D(getXMin(), 0, 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D( 1, 0, 0), Vec3D(getXMax(), 0, 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D( 0,-1, 0), Vec3D(0, getYMin(), 0));
-        wallHandler.copyAndAddObject(w0);
-        w0.set(Vec3D( 0, 1, 0), Vec3D(0, getYMax(), 0));
-        wallHandler.copyAndAddObject(w0);*/
+//        wallHandler.clear();
+//        InfiniteWall w0;
+//        w0.setSpecies(speciesHandler.getObject(0));
+//        w0.set(Vec3D(-1, 0, 0), Vec3D(getXMin(), 0, 0));
+//        wallHandler.copyAndAddObject(w0);
+//        w0.set(Vec3D( 1, 0, 0), Vec3D(getXMax(), 0, 0));
+//        wallHandler.copyAndAddObject(w0);
+//        w0.set(Vec3D( 0,-1, 0), Vec3D(0, getYMin(), 0));
+//        wallHandler.copyAndAddObject(w0);
+//        w0.set(Vec3D( 0, 1, 0), Vec3D(0, getYMax(), 0));
+//        wallHandler.copyAndAddObject(w0);
 
         PeriodicBoundary pb;
         pb.set(Vec3D(1,0,0), getXMin(), getXMax());
         boundaryHandler.copyAndAddObject(pb);
         pb.set(Vec3D(0,1,0), getYMin(), getYMax());
         boundaryHandler.copyAndAddObject(pb);
+
+        CubeInsertionBoundary insertionBoundary;
+        insertionBoundary.set(p, 100, getMin(), getMax(), -p.getVelocity(), p.getVelocity());
+        insertionBoundary.setInitialVolume(p.getVolume() * N);
+        insertionBoundary.checkBoundaryBeforeTimeStep(this);
+        setMeanVelocity({0, 0, 0});
     }
 
     int N = 1;
 };
 
-int main(int argc UNUSED, char *argv[] UNUSED)
+int main()
 {
     
     logger(INFO, "In this file 32^2 particles with the same velocity are placed "
@@ -106,13 +106,15 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     problem.setTimeStep(5e-5);
     problem.setSaveCount(2000);
     problem.setTimeMax(1000.0);
-    problem.setMax({0.01, 0.01, 0.01});
+    problem.setMax({0.01, 0.01, 0.0});
     
     
     problem.setHGridMaxLevels(1);
     problem.setHGridCellOverSizeRatio(1.2);
     problem.setHGridUpdateEachTimeStep(false);
     problem.setFileType(FileType::ONE_FILE);
+    //problem.setParticlesWriteVTK(true);
+    //problem.wallHandler.setWriteVTK(true);
 
 	problem.solve();
     return 0;

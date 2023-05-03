@@ -42,7 +42,7 @@ public:
         species  = speciesHandler.copyAndAddObject(LinearViscoelasticSlidingFrictionSpecies());
     }
 // this method overwrites the setupInitialConditions method in Chute
-void setupInitialConditions()
+void setupInitialConditions() override
 {
 	//set side walls - solid if not a periodic
 	if (getIsPeriodic())

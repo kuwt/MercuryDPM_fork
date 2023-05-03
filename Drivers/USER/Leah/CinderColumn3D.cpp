@@ -58,7 +58,7 @@ BaseParticle* getLargestParticle(){
 
 // ************************* SET INITIAL CONDITIONS, FILES TO WRITE *****************************//
 
-void setupInitialConditions(){	
+void setupInitialConditions() override {
 
 	// Create a cylindrical wall:
     AxisymmetricIntersectionOfWalls w0;
@@ -90,7 +90,7 @@ void setupInitialConditions(){
 	
 
     // Write collisions information to fstat files
-    void writeFstatHeader(std::ostream& os) const 
+    void writeFstatHeader(std::ostream& os) const override
     {
         for (std::vector<BaseInteraction*>::const_iterator it = interactionHandler.begin(); it != interactionHandler.end(); ++it)
             {
@@ -107,13 +107,13 @@ void setupInitialConditions(){
              }
     
     // Add particle number to data file
-    double getInfo(const BaseParticle& P) const
+    double getInfo(const BaseParticle& P) const override
     {
         return P.getIndex();
     }
 
     // Print time to screen
-    void printTime() const
+    void printTime() const override
     {
         std::cout << "\rt=" << std::setprecision(3) << std::left << std::setw(6) << getTime()
             << ", tmax=" << std::setprecision(3) << std::left << std::setw(6) << getTimeMax() << "\r";
@@ -134,7 +134,7 @@ void setupInitialConditions(){
 // *************************** INSERT PARTICLES PARAMETERS ***********************//
 
 	
-	void actionsBeforeTimeStep()
+	void actionsBeforeTimeStep() override
 	{
 	
 	 DPMBase::actionsBeforeTimeStep();
@@ -177,7 +177,7 @@ void setupInitialConditions(){
 
 
 
-	void actionsAfterTimeStep()
+	void actionsAfterTimeStep() override
 		{
 			
 			
@@ -253,7 +253,7 @@ fpos.close();
 
 //****************** EXTERNAL FORCES i.e. drags, gravity etc...***************//
 
-	void computeExternalForces(BaseParticle* P0)
+	void computeExternalForces(BaseParticle* P0) override
 	
 {	
 	// Call the MD compute_external_forces function (turns on gravity)
@@ -420,7 +420,7 @@ double calcParticleRadiusLinear(){
        }
 
 
-void actionsAfterSolve()	// After model completes running
+void actionsAfterSolve() override	// After model completes running
 	{
 	verif_file.close();
 	}

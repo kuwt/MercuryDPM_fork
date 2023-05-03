@@ -249,7 +249,6 @@ public:
         {
             dynamic_cast<RefineableQDPVDElement<3,2>*>(solid_mesh_pt()->element_pt(i))->setDissipation(dissipation);
         }
-        return 0;
     }
 
     /// set function for Newton_solver_tolerance

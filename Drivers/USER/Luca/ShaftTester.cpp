@@ -55,7 +55,7 @@ private:
     
     const int nP = 500;
     
-    void setupInitialConditions() {
+    void setupInitialConditions() override {
         // gravity, particle radius
         setGravity(Vec3D(0.0,0.0,-9.81));
         particleRadius = 0.025;
@@ -160,7 +160,7 @@ private:
     }
     
     //! [CST:beforetime]
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {
 //        wallHandler.getObject(0)->setOrientation(Vec3D(0.0,1.0,0.0));
 //        wallHandler.getObject(1)->setOrientation(Vec3D(0.0,1.0,0.0));

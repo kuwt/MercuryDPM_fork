@@ -9,7 +9,7 @@ class my_problem : public Mercury3D{
 
 public:
 	
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 
 	double particle_mass=4.0/3.0*constants::pi*pow(particle_radius,3);	
@@ -103,7 +103,7 @@ void set_Amplitude(double a){shaker_amp=a;}
 
 protected:
 
-	void actionsBeforeTimeStep()
+	void actionsBeforeTimeStep() override
 	{
     }
 

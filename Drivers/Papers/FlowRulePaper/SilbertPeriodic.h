@@ -279,10 +279,10 @@ public:
 	}
 
 	//Do not add or remove particles
-	virtual void actionsBeforeTimeStep(){ };
+	virtual void actionsBeforeTimeStep() override { };
 		
 	//Set up periodic walls, rough bottom, add flow particles
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
         //fix_hgrid();
 		particleHandler.setStorageCapacity(particleHandler.getNumberOfObjects()+getChuteLength()*getChuteWidth()*getZMax());//why is this line needed?
@@ -404,7 +404,7 @@ public:
     Mdouble get_H()
     { return getInflowHeight(); }
     
-    void printTime() const
+    void printTime() const override
     {
         logger(INFO, "t=%3.6"
                      ", tmax=%3.6"
@@ -415,7 +415,7 @@ public:
         //~ << ", finish by " << setprecision(3) << left << setw(6) << timer.getFinishTime(t)
     }
     
-    bool readNextArgument(int& i, int argc, char* argv[])
+    bool readNextArgument(int& i, int argc, char* argv[]) override
     {
         if (!strcmp(argv[i], "-muBottom"))
         {

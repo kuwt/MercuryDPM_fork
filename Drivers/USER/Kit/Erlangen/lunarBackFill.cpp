@@ -169,7 +169,7 @@ public:
         wallHandler.copyAndAddObject(w);
     }
 
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         //number of particles to be inserted
         unsigned int n;

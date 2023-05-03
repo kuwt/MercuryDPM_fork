@@ -29,9 +29,9 @@
 class restart : public Mercury2D{
 public:
 
-	void actionsBeforeTimeStep(){};
+	void actionsBeforeTimeStep() override {};
 		
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		if (readDataFile("c3d.ini", 7) || readDataFile("../c3d.ini", 7))
         {

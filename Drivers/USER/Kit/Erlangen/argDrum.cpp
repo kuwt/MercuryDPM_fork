@@ -35,7 +35,7 @@
 class CoDrum : public Mercury3D{
 public:
 
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 
 	    auto species1 = speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());	
@@ -297,7 +297,7 @@ public:
 		}
 	}
 
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
 	{
 
 		if (step==2)

@@ -39,7 +39,7 @@ template <StatType T> class create_initial_conditions : public StatisticsVector<
         species  = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
     }
 	
-	void computeExternalForces(BaseParticle* CI)
+	void computeExternalForces(BaseParticle* CI) override
 	{
 		///Background friction
         CI->addForce(-CI->getVelocity()*0.1* species->getDissipation());

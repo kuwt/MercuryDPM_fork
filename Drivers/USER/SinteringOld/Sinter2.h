@@ -65,12 +65,12 @@ public:
 
     }
 
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
         *oldSpecies=*species;
     }
 
- 	void printTime() const {
+ 	void printTime() const override {
 	    std::cout << "t=" << std::setprecision(3) << std::left << std::setw(6) << getTime()
             << ", tmax=" << std::setprecision(3) << std::left << std::setw(6) << getTimeMax()
             << ", T=" << std::setprecision(3) << std::left << std::setw(6) << Temperature

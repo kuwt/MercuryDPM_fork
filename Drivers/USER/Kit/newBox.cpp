@@ -47,7 +47,7 @@ public:
 
 	double toothRestitution;
 
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		//general particle species
 		auto species = new LinearViscoelasticSpecies;	

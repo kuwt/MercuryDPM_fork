@@ -54,7 +54,7 @@ public:
     }
     
 ///////////////////////////////////////
-    void write(std::ostream& os, bool print_all) const
+    void write(std::ostream& os, bool print_all) const override
             {
         DPMBase::write(os, print_all);
         os << "-----------------------------" << std::endl;
@@ -123,7 +123,7 @@ public:
     
 // ************************* SET PROBLEM GEOMETRY *****************************//
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         
         setYMax(MaxParticleRadius); // y dimension restricted to width of particle
@@ -187,7 +187,7 @@ public:
     
 // *************************** SET PARTICLE PARAMETERS ***********************//
     
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {
         //if (flag)		// hack to do one particle
         
@@ -230,7 +230,7 @@ public:
 //	void write(std::ostream& os, bool print_all);	// declare print function
 //	leads to errors!!
     
-    void actionsAfterTimeStep()
+    void actionsAfterTimeStep() override
     {
         // Writes out certain particle info to screen 
         //		double z=particleHandler.getObject(996)->getPosition().Z;
@@ -248,7 +248,7 @@ public:
     
 //****************** EXTERNAL FORCES i.e. drags, gravity etc...***************//
     
-    void computeExternalForces(BaseParticle* P0)
+    void computeExternalForces(BaseParticle* P0) override
 
     {
         // Call the MD computeExternalForces function (turns on gravity)
@@ -487,7 +487,7 @@ public:
     
 // ***********************end set / get functions**************************//
     
-    void actionsAfterSolve() // After model completes running
+    void actionsAfterSolve() override // After model completes running
     {
         verif_file.close();
     }

@@ -32,9 +32,9 @@ template <StatType T> class statistics_while_running : public StatisticsVector<T
 	public:
 	statistics_while_running<T>() : StatisticsVector<T>() , Chute() {}
 
-	void actionsBeforeTimeStep(){};
+	void actionsBeforeTimeStep() override {};
 		
-	void setupInitialConditions() {StatisticsVector<T>::write();
+	void setupInitialConditions() override {StatisticsVector<T>::write();
 		//~ for (unsigned int i=0; i<particleHandler.getNumberOfObjects(); i++) {
 			//~ if (particleHandler.getObject(i)->isFixed() || i>10) {removeParticle(i); i--;}
 		//~ }

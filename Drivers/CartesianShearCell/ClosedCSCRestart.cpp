@@ -54,7 +54,7 @@ public:
         lid = static_cast<InfiniteWall*>(wallHandler.getObject(wallHandler.getNumberOfObjects() - 1));
     }
     
-    void writeOutputFiles()
+    void writeOutputFiles() override
     {
         if (get_wall_time()-initialTime<maxWallTime)
         {
@@ -66,7 +66,7 @@ public:
         }
     }
 
-    void actionsAfterTimeStep()
+    void actionsAfterTimeStep() override
     {
         Mdouble zMax = lid->getPosition().Z-1.0;
         // calculate the force applied to all lid particles
@@ -83,7 +83,7 @@ public:
                 p->setVelocity(p->getVelocity()+Vec3D(0.0,0.0,dv));            
     }
 
-    void printTime() const
+    void printTime() const override
     {
         logger(INFO, "t=% Ene=% lid velocity=%",
                getTime(), getKineticEnergy() / getElasticEnergy(), lid->getVelocity().Z);

@@ -68,7 +68,7 @@ class TimeDependentPeriodicBoundaryTest : public Mercury2D
             setGravity({0, 0, 0});
         }
 
-        void setupInitialConditions()
+        void setupInitialConditions() override
         {
             auto species = speciesHandler.getObject(0);
             auto p = new SphericalParticle;
@@ -96,7 +96,7 @@ class TimeDependentPeriodicBoundaryTest : public Mercury2D
             insb->checkBoundaryBeforeTimeStep(this);
         }
 
-        void actionsAfterTimeStep()
+        void actionsAfterTimeStep() override
         {
             if (boundaryHandler.getNumberOfObjects() == 3)
             {

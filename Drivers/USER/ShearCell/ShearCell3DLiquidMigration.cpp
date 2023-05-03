@@ -150,7 +150,7 @@ private:
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     ///This is were the walls are implemented
     /////////////////////////////////////////////////////////////////////////////////////////////////////
-    void setupInitialConditions() 
+    void setupInitialConditions() override
     {
         LiquidFilmParticle p;
         p.setSpecies(speciesHandler.getObject(0));
@@ -177,14 +177,14 @@ private:
         setHGridMaxLevels(1);
     }
 
-    void actionsBeforeTimeStep ()
+    void actionsBeforeTimeStep () override
     {
         //this is because the angular velocity of the wall does not calculate the orientation correctly
         wallHandler.getObject(2)->setOrientation(Vec3D(0.0, 0.0, 1));
         wallHandler.getObject(3)->setOrientation(Vec3D(0.0, 0.0, 1));
     }
 
-    void printTime() const
+    void printTime() const override
     {
         Mdouble volTotP = 0.0;
         unsigned int nLB = 0;

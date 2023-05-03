@@ -101,7 +101,7 @@ public:
 		write(std::cout,false);
 	}
 
-	void computeExternalForces(BaseParticle* CI)
+	void computeExternalForces(BaseParticle* CI) override
 	{
 		if (!CI->isFixed()) {
 			/// Now add on gravity
@@ -114,7 +114,7 @@ public:
 		}
 	}
 
-	void outputXBallsData(std::ostream& os) const
+	void outputXBallsData(std::ostream& os) const override
 	{
 		os  << particleHandler.getNumberOfObjects()+1 << " " << getTime() << " "
 			<< getXMin() << " " << getYMin() << " " << getZMin() << " "
@@ -147,7 +147,7 @@ public:
 
 	}
 
-	void writeEneHeader(std::ostream& os) const
+	void writeEneHeader(std::ostream& os) const override
 	{
 		static int width = os.precision() + 6;
 		os
@@ -164,7 +164,7 @@ public:
 		<< std::endl;
 	}
 
-	void writeEneTimeStep(std::ostream& os) const
+	void writeEneTimeStep(std::ostream& os) const override
 	{
 		Mdouble ene_kin = 0, ene_rot = 0, ene_gra = 0, mass_sum= 0, x_masslength=0, y_masslength=0, z_masslength=0;
 
@@ -210,7 +210,7 @@ public:
 	    }
 	}
 
-	void actionsAfterTimeStep(){
+	void actionsAfterTimeStep() override {
 		if (getTime()<getTimeMax()*0.5/4&& getTime()+ getTimeStep()>getTimeMax()*0.5/4) {
 	 		adjustIndenterHeight();
 	 		MinIndenterHeight = getIndenterHeight();
@@ -238,7 +238,7 @@ public:
 	}
 
 
-	void actionsBeforeTimeStep(){
+	void actionsBeforeTimeStep() override {
 		if (IndenterType==Flat) {
 			return FlatIndenter.setForce(Vec3D(0,0,0));
 	    } else {

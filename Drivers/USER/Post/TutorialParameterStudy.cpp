@@ -33,7 +33,7 @@
 class TutorialParameterStudy : public Mercury3D
 {
 public:
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         //logger(INFO,"Call to setupInitialConditions()");
 

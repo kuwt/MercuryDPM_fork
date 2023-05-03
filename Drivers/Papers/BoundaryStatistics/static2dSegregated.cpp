@@ -66,9 +66,9 @@ public:
 		//fix_hgrid();
 	}
 	
-	void actionsBeforeTimeStep(){};
+	void actionsBeforeTimeStep() override {};
 	
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		if (true) {
 			//set domain and walls

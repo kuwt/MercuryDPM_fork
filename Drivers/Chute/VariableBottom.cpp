@@ -83,7 +83,7 @@ public:
         WallsPeriodic[0].set(Vec3D(0.0, 1.0, 0.0), getYMin(), getYMax());
     }
 
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         createBottom();
     }
@@ -163,7 +163,7 @@ public:
         };
     }
 
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {
         static int counter = 0;
         if ( ++counter > 10)
@@ -199,7 +199,7 @@ public:
             count++;
     }
 
-    void printTime() const
+    void printTime() const override
     {
         static int Nold = get_N();
         static double told = getTime();

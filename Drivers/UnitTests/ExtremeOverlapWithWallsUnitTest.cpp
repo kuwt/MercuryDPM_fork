@@ -93,7 +93,7 @@ public:
 		particleHandler.copyAndAddObject(p0);
 	}
     
-//    void printTime() const
+//    void printTime() const override
 //	{
 //        if (interactionHandler.getNumberOfObjects()>1)
 //        std::cout 

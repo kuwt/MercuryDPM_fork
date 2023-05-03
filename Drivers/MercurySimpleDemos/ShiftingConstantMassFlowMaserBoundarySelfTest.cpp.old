@@ -35,7 +35,7 @@ class ShiftingConstantMassFlowMaserBoundarySelfTest : public Mercury2D
 {
 public:
 
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         setName("ShiftingConstantMassFlowMaserBoundarySelfTest");
         dataFile.setFileType(FileType::MULTIPLE_FILES);

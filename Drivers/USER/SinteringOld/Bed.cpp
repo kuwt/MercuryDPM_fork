@@ -65,7 +65,7 @@ public:
         nCreated_=0;
 	}
 
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		setXMax(N*2.0*getInflowParticleRadius());
 		setYMax(N*2.0*getInflowParticleRadius());
@@ -134,7 +134,7 @@ public:
 		P0.setVelocity(Vec3D(0.0,0.0,0.0));
 	}
 
-	// void actionsBeforeTimeStep(){
+	// void actionsBeforeTimeStep() override {
 	// 	//std::cout << getTime() << std::endl;
 	// 	if (getTime()<0.3*getTimeMax())
 	// 		set_Temperature(0);

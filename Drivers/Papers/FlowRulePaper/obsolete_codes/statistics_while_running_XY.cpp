@@ -32,9 +32,9 @@ template <StatType T> class statistics_while_running : public StatisticsVector<T
 public:
 	statistics_while_running<T>() : StatisticsVector<T>() , Chute() {}
 
-	void actionsBeforeTimeStep(){};
+	void actionsBeforeTimeStep() override {};
 		
-	void actionsBeforeTimeLoop() {
+	void actionsBeforeTimeLoop() override {
 		fix_hgrid();
 		write(std::cout,false);
 		cout<< endl

@@ -29,9 +29,9 @@
 class ChutePeriodic : public Chute{
 public:
 
-	void actionsBeforeTimeStep(){}
+	void actionsBeforeTimeStep() override {}
 		
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		setTime(getTimeStep());
 		setTimeMax(getTimeStep());

@@ -77,7 +77,7 @@ private:
     // std::cout << particleHandler.getNumberOfObjects() << std::endl;
   }
 
-  void actionsAfterTimeStep(){}
+  void actionsAfterTimeStep() override {}
 
   // void actionsAfterTimeStep() override
   // {

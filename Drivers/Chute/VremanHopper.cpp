@@ -37,7 +37,7 @@ using namespace std;
 class Vreman : public ChuteWithHopper
 {
 public:
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		ChuteWithHopper::setupInitialConditions();
 		set_symmetric_contraction(.3,.5,.03);
@@ -77,7 +77,7 @@ public:
 		cout << "t=" << setprecision(3) << left << setw(6) << getTime() << "N=" << setprecision(3) << left << setw(6) << get_N() << endl;
 	}
 	
-	void printTime() const {
+	void printTime() const override {
 		//cout << "t=" << setprecision(3) << left << setw(6) << getTime() << "N=" << setprecision(3) << left << setw(6) << get_N() << endl;
 	}
 

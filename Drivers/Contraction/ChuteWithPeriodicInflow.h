@@ -55,7 +55,7 @@ public:
         ExtendInWidth(numRepetitionsInWidth);
     }
     
-    double getInfo(const BaseParticle& P) const
+    double getInfo(const BaseParticle& P) const override
             {
         return P.getIndSpecies();
     }
@@ -138,7 +138,7 @@ public:
     }
 
     ///Do not add, only remove particles
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {
         cleanChute();
     }
@@ -169,7 +169,7 @@ public:
     }
     
     ///Do not add bottom
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
     }
     
@@ -223,7 +223,7 @@ public:
     }
     
     ///add some particular output
-    void printTime() const
+    void printTime() const override
     {
         int counter = 0;
         

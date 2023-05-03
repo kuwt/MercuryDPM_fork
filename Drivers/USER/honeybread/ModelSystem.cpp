@@ -39,7 +39,7 @@ public:
         
     }
 	
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
         
         // Set up species (forces laws) for particles and walls
@@ -290,13 +290,13 @@ public:
 
 protected:
 
-   void actionsBeforeTimeStep()
+   void actionsBeforeTimeStep() override
    {
         addParticles();
    }
 
 
-   void actionsAfterTimeStep()
+   void actionsAfterTimeStep() override
    {
         static int count;
         count++;

@@ -49,7 +49,7 @@ public:
         printTime();
     }
 
-    void writeOutputFiles()
+    void writeOutputFiles() override
     {
         if (get_wall_time()-initialTime<maxWallTime)
         {
@@ -61,7 +61,7 @@ public:
         }
     }
 
-    void printTime() const
+    void printTime() const override
     {
         logger(INFO, "t=% Ene=% wallTime=%",
                getTime(), getKineticEnergy() / getElasticEnergy(), get_wall_time() - initialTime);

@@ -215,7 +215,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 
     logger(INFO,"Time step: %", pb.getTimeStep());
     //----------------------------------------------
-//    pb.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+//    pb.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
     pb.setParticlesWriteVTK(false);
 
     pb.setName(setFilename);
@@ -274,7 +274,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 //        setParticlesWriteVTK(true);
 //
 //        //setParticlesWriteVTK(true);
-//        //setWallsWriteVTK(FileType::MULTIPLE_FILES);
+//        //wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
 //
 //        setParticleDimensions(3);
 //        setSystemDimensions(3);

@@ -929,7 +929,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 //                               setDeltaC, setC1);
 //
 //    oTest.setParticlesWriteVTK(false);
-//    oTest.setWallsWriteVTK(false);
+//    oTest.wallHandler.setWriteVTK(false);
 //
 //    oTest.setTimeMax(0.3); //[s]
 //    oTest.setXBallsAdditionalArguments("-solidf -v0 -cmode 8 -cmaxset 100 ");

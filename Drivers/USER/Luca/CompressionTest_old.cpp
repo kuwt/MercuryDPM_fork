@@ -42,7 +42,7 @@ class CompressionTest : public Mercury3D
 {
 private:
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         stage = 1;
         cycle = 0;
@@ -94,7 +94,7 @@ private:
         makeParticleSet();
     }
     
-    void actionsAfterTimeStep()
+    void actionsAfterTimeStep() override
     {
         // particle insertion loop
         if (stage == 2)

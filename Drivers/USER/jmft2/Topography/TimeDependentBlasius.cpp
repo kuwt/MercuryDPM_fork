@@ -145,7 +145,7 @@ class TimeDependentBlasius : public Mercury2D {
             delete basePrototype;
         }
 
-        void setupInitialConditions() 
+        void setupInitialConditions() override
         {
             setTimeStep(pars.at("timeStep"));
             setTimeMax(pars.at("timeMax"));
@@ -200,7 +200,7 @@ class TimeDependentBlasius : public Mercury2D {
 
         }
 
-        void actionsOnRestart()
+        void actionsOnRestart() override
         {
         }
 

@@ -138,10 +138,10 @@ public:
 	}
 
 	//Do not add or remove particles
-	void actionsBeforeTimeStep(){ };
+	void actionsBeforeTimeStep() override { };
 		
 	//Set up periodic walls, rough bottom, add flow particles
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		fix_hgrid();
 		set_Nmax(get_N()+getChuteLength()*getChuteWidth()*getZMax());//why is this line needed?

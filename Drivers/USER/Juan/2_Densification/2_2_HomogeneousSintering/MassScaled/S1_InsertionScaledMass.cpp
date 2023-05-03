@@ -45,7 +45,7 @@ public:
 
         setFileType(FileType::ONE_FILE);
 //        setParticlesWriteVTK(true);
-//        setWallsWriteVTK(FileType::MULTIPLE_FILES);
+//        wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
 
         setXBallsAdditionalArguments("-solidf -v0");
 

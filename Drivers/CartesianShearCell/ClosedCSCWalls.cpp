@@ -100,14 +100,14 @@ public:
         setZMin(0);
     }
 
-    void actionsAfterTimeStep()
+    void actionsAfterTimeStep() override
     {
         Mdouble acceleration = (lid->getForce().Z-lidForce)/lidMass;
         lid->setVelocity(lid->getVelocity()+getTimeStep()*Vec3D(0.0,0.0,acceleration));
     }
 
 
-    bool continueSolve() const
+    bool continueSolve() const override
     {
         static unsigned int counter = 0;
         if (++counter>100)
@@ -119,14 +119,14 @@ public:
         return true;
     }
 
-    void printTime() const
+    void printTime() const override
     {
         logger(INFO, "t=% Ene=% lid velocity=%",
                getTime(), getKineticEnergy() / getElasticEnergy(), fabs(lid->getVelocity().Z));
     }
 
     //add flow particles
-    void setupInitialConditions() 
+    void setupInitialConditions() override
     {
         //number of particles to be inserted
         unsigned int n = (getXMax() - getXMin() + 2 * wallThickness)

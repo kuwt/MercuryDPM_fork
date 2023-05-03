@@ -38,7 +38,7 @@ public:
         species  = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
     }
 
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		if(particleHandler.getNumberOfObjects()!=N)
         {

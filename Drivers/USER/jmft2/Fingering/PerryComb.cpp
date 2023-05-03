@@ -172,7 +172,7 @@ class PerryComb : public Mercury3D {
       */
     }
 
-    void setupInitialConditions() {
+    void setupInitialConditions() override {
       SphericalParticle p0;
 
       /* Set up moving particles */

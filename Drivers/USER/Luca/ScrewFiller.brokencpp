@@ -47,7 +47,7 @@ private:
     
     const int nP = 500;
 
-    void setupInitialConditions() {
+    void setupInitialConditions() override {
 //        // gravity, particle radius
 //        setGravity(Vec3D(0.0, 0.0, 0.0));
 //        particleRadius = 0.015;

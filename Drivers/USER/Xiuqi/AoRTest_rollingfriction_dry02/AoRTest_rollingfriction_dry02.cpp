@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
     AoR.N = 1500; //number of particles
     //uncomment next two line 2 to create paraview files
     AoR.setParticlesWriteVTK(true);
-    AoR.setWallsWriteVTK(FileType::ONE_FILE);
+    AoR.wallHandler.setWriteVTK(FileType::ONE_FILE);
     AoR.setInteractionsWriteVTK(true);
     AoR.setFileType(FileType::ONE_FILE);
 

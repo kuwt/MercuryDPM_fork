@@ -63,7 +63,7 @@ public:
         logger(INFO, "saving every % time units", dataFile.getSaveCount() * getTimeStep());
     }
 
-    void actionsAfterTimeStep()
+    void actionsAfterTimeStep() override
     {
         Mdouble zMax = lid->getPosition().Z-1.0;
         // calculate the force applied to all lid particles
@@ -81,14 +81,14 @@ public:
     }
 
     
-    void printTime() const
+    void printTime() const override
     {
         logger(INFO, "t=% Ene=% lid velocity=%",
                getTime(), getKineticEnergy() / getElasticEnergy(), lid->getVelocity().Z);
     }
 
     //add flow particles
-    void setupInitialConditions() 
+    void setupInitialConditions() override
     {
     }
     

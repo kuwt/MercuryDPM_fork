@@ -33,7 +33,7 @@ using namespace std;
 class VariableBottom : public ChuteWithHopper {
 public:
 	
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		cout << "restarted " << restarted << endl;
 		if (!restarted) {

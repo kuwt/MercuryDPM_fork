@@ -18,7 +18,7 @@ class RotatingDrum : public Mercury3D
 		fractionalPolydispersity = 0.0;
 	}
 
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 
 		radiusS2 = sizeRatio*radiusS1;
@@ -288,7 +288,7 @@ class RotatingDrum : public Mercury3D
 		}		
 	}
 
-	void actionsBeforeTimeStep()
+	void actionsBeforeTimeStep() override
 	{
 		wallHandler.getObject(0)->setOrientation(Vec3D(0.0,1.0,0.0));
 		wallHandler.getObject(1)->setOrientation(Vec3D(0.0,1.0,0.0));
@@ -474,7 +474,7 @@ int main(int argc, char *argv[])
         problem.fStatFile.setFileType(FileType::NO_FILE);
         problem.eneFile.setFileType(FileType::NO_FILE);
 
-        problem.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+        problem.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
         problem.setParticlesWriteVTK(true);
 
 	problem.solve();

@@ -145,7 +145,7 @@ int main()
     MinimalExampleDrum problem;
     problem.setName("MinimalExampleDrum");
     problem.setParticlesWriteVTK(true);
-    //problem.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+    //problem.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
     problem.solve();
     return 0;
 }

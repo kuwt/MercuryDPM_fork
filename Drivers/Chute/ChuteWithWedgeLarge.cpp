@@ -38,11 +38,11 @@ class ChutePeriodic : public Chute
 {
 public:
 
-	void actionsBeforeTimeStep()
+	void actionsBeforeTimeStep() override
 	{
 	}
 	
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		int N=get_N();
 		add_particles();
@@ -163,7 +163,7 @@ public:
 	//set approximate height of flow
 	void set_H(double H) {setZMax(H*1.2);}
 
-	void printTime() const {
+	void printTime() const override {
 		static Time2Finish timer;
 		cout << "t=" << setprecision(3) << left << setw(6) << getTime() 
 			<< ", tmax=" << setprecision(3) << left << setw(6) << getTimeMax()

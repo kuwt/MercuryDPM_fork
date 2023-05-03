@@ -29,9 +29,9 @@
 class free_cooling : public Mercury2D{
 public:
 
-	void actionsBeforeTimeStep(){};
+	void actionsBeforeTimeStep() override {};
 		
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
         ///\todo TW check that all user codes are compiling AND running; but many of them need input files.
         if (readDataFile("c3d.ini",7) || readDataFile("../c3d.ini",7)) {

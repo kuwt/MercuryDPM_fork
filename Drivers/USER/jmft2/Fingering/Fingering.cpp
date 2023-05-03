@@ -147,7 +147,7 @@ class Fingering : public Mercury3D {
         delete largePrototype;
     }
 
-    void setupInitialConditions() {
+    void setupInitialConditions() override {
 
       setTimeStep(pars["timeStep"]);
       setTimeMax(pars["timeMax"]);
@@ -230,7 +230,7 @@ class Fingering : public Mercury3D {
 
     }
 
-    void actionsOnRestart() 
+    void actionsOnRestart() override
     {
         frontWall = (IntersectionOfWalls*)wallHandler.getObjectById(5);
         switch(frontWall->getNumberOfObjects())

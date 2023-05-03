@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
     ShapesDemo problem;
     problem.setName("ShapesDemo");
     problem.setSuperquadricParticlesWriteVTK(true);
-    //problem.setWallsWriteVTK(FileType::ONE_FILE);
+    //problem.wallHandler.setWriteVTK(FileType::ONE_FILE);
     problem.solve();
     return 0;
 }

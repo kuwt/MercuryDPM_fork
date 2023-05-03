@@ -50,13 +50,13 @@ public:
 		setTimeMax(20); //40'000 time steps
     }
 
-    void printTime() const
+    void printTime() const override
     {
         logger(INFO, "t=% Ene=%", getTime(), getKineticEnergy() / getElasticEnergy());
     }
 
     //add flow particles
-    void setupInitialConditions() 
+    void setupInitialConditions() override
     {
         std::string filename;
         filename = getName() 

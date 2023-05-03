@@ -31,7 +31,7 @@
 
 class Nurbs: public Mercury3D{
 public:
-    void setupInitialConditions(){
+    void setupInitialConditions() override {
         //define quarter circle as nurbs surface
         std::vector<double> knotsU = {0,0,0,1,1,1};
         std::vector<double> knotsV = {0,0,1,1};

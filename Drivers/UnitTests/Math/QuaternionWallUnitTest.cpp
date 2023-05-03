@@ -198,7 +198,7 @@ int main() {
     }
 
 
-    //q.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+    //q.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
     //q.setParticlesWriteVTK(true);
 
     //solve

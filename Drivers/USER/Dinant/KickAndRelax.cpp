@@ -40,7 +40,7 @@ public:
         species  = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
     }
 
-	void setupInitialConditions() 
+	void setupInitialConditions() override
 	{		
 		wallHandler.clear();
         boundaryHandler.clear();

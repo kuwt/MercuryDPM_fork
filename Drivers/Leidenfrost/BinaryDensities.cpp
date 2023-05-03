@@ -34,7 +34,7 @@ class my_problem : public Mercury3D{
 
 public:
 	
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 
 
@@ -153,7 +153,7 @@ void set_Amplitude(double a){shaker_amp=a;}
 /*
 protected:
 
-	void actionsBeforeTimeStep()
+	void actionsBeforeTimeStep() override
 	{
 		//After t=1.0 start to move the bottom wall
 		double t=getTime()-1.0;

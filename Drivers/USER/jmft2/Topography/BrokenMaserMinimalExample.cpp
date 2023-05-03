@@ -102,7 +102,7 @@ class BrokenMaserMinimalExample : public Mercury2D {
         ~BrokenMaserMinimalExample(void) {
         }
 
-        void setupInitialConditions() 
+        void setupInitialConditions() override
         {
             setTimeStep(pars.at("timeStep"));
             setTimeMax(pars.at("timeMax"));
@@ -175,7 +175,7 @@ class BrokenMaserMinimalExample : public Mercury2D {
             restartFile.setFileType(FileType::ONE_FILE);
         }
 
-        void actionsOnRestart()
+        void actionsOnRestart() override
         {
         }
 

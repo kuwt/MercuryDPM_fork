@@ -129,7 +129,7 @@ class IncidentOntoRoughness : public Mercury2D {
             fclose(flux_f);
         }
 
-        void setupInitialConditions() 
+        void setupInitialConditions() override
         {
             char flux_fn[1024];
             snprintf(flux_fn, 1024, "%s.flux", getName().c_str());

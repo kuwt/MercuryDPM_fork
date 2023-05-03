@@ -40,7 +40,7 @@ class ScrewTrimmer : public Mercury3D
 public:
 //  --- STANDARD FUNCTIONS ---
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         
         wallHandler.clear();
@@ -58,7 +58,7 @@ public:
         
     }
     
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {
 
     }

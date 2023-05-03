@@ -125,7 +125,7 @@ public:
 
     }
 
-    bool continueSolve() const
+    bool continueSolve() const override
     {
         static unsigned int counter = 0;
         if (++counter>100)
@@ -137,7 +137,7 @@ public:
         return true;
     }
 
-    void printTime() const
+    void printTime() const override
     {
         std::cout << "t=" << getTime() << " Ene " << getKineticEnergy()/getElasticEnergy() << std::endl;
     }
@@ -215,7 +215,7 @@ private:
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     ///This is were the walls are implemented
     /////////////////////////////////////////////////////////////////////////////////////////////////////
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         //hGridRebuild();
         for (unsigned int i = particleHandler.getNumberOfObjects(); i >= 1; i--)
@@ -323,7 +323,7 @@ public:
 
 private:
 
-    void actionsAfterTimeStep()
+    void actionsAfterTimeStep() override
     {
         // fix particles that fall through the wall
         if (wallHandler.getNumberOfObjects()==0)

@@ -107,7 +107,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 	twoParticleElasticCollisionInteractionProblem.fStatFile.setFileType(FileType::ONE_FILE);
 	twoParticleElasticCollisionInteractionProblem.getInteractionFile().setFileType(FileType::ONE_FILE);
     twoParticleElasticCollisionInteractionProblem.setParticlesWriteVTK(true);
-    twoParticleElasticCollisionInteractionProblem.setWallsWriteVTK(FileType::ONE_FILE);
+    twoParticleElasticCollisionInteractionProblem.wallHandler.setWriteVTK(FileType::ONE_FILE);
 
 	twoParticleElasticCollisionInteractionProblem.solve();
 

@@ -39,7 +39,7 @@ public:
 	Mdouble newX, newY, newZ;
 	Mdouble epsilonX, epsilonY, epsilonZ; 
 	
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
 
         //***********************************************Setting System Size and Dimensionality**************************************************

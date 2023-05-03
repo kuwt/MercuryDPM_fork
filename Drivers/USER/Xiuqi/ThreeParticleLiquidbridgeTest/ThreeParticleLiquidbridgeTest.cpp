@@ -109,7 +109,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     threeParticleElasticCollisionInteractionProblem.setFileType(FileType::ONE_FILE);
     threeParticleElasticCollisionInteractionProblem.setParticlesWriteVTK(true);
     threeParticleElasticCollisionInteractionProblem.setInteractionsWriteVTK(true);
-    threeParticleElasticCollisionInteractionProblem.setWallsWriteVTK(FileType::ONE_FILE);
+    threeParticleElasticCollisionInteractionProblem.wallHandler.setWriteVTK(FileType::ONE_FILE);
 
 	threeParticleElasticCollisionInteractionProblem.solve();
 

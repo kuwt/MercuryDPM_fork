@@ -35,7 +35,7 @@ using namespace std;
 
 class AngleOfRepose : public ChuteWithHopper {
 public:
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		createBottom();
 

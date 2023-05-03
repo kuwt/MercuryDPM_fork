@@ -76,7 +76,7 @@ public:
 	}
 
 	//Do not add or remove particles
-	void actionsBeforeTimeStep(){cleanChute();};
+	void actionsBeforeTimeStep() override {cleanChute();};
 
 	void cleanChute() {
 		//clean outflow every 100 time steps
@@ -100,7 +100,7 @@ public:
 	}
 	
 	//Do not add bottom
-	void setupInitialConditions(){}
+	void setupInitialConditions() override {}
 	
 	void integrateBeforeForceComputation(int i)
 	{

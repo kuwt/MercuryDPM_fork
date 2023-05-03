@@ -54,7 +54,7 @@ public:
         fStatFile.setFileType(FileType::ONE_FILE);
         eneFile.setFileType(FileType::NO_FILE);
         //setParticlesWriteVTK(true);
-        //setWallsWriteVTK(FileType::MULTIPLE_FILES);
+        //wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
         setParticleDimensions(3);
         setSystemDimensions(3);
         setGravity(Vec3D(0.0, 0.0,0.0));

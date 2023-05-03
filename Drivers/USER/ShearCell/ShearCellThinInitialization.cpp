@@ -140,16 +140,18 @@ private:
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     ///This is were the walls are implemented
     /////////////////////////////////////////////////////////////////////////////////////////////////////
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
     }
     
-    void actionsBeforeTimeStep () {
+    void actionsBeforeTimeStep () override
+    {
         static int counter=0;
         std::cout << ++counter << std::endl;
     }
     
-    void actionsAfterTimeStep () {
+    void actionsAfterTimeStep () override
+    {
     }
     
     Mdouble OuterRadius;

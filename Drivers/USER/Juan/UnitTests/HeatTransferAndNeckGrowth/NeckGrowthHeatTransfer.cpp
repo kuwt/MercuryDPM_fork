@@ -40,7 +40,7 @@ public:
 
         setFileType(FileType::ONE_FILE);
         setParticlesWriteVTK(true);
-//        setWallsWriteVTK(FileType::MULTIPLE_FILES);
+//        wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
 
         std::string r = helpers::to_string(pRadius_);
         setName("NeckGrowthHeatTransfer");

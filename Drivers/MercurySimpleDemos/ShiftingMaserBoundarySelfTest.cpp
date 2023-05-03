@@ -36,7 +36,7 @@ class ShiftingMaserBoundarySelfTest : public Mercury2D
 {
 public:
 
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         setName("ShiftingMaserBoundarySelfTest");
         dataFile.setFileType(FileType::MULTIPLE_FILES);
@@ -84,7 +84,7 @@ public:
         write(std::cout, false);
     }
 
-    void actionsAfterTimeStep()
+    void actionsAfterTimeStep() override
     {
         if (!lifted_ && particleHandler.getVolume() > 2)
         {

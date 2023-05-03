@@ -41,7 +41,7 @@ public:
     {
     }
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {      
         //Number of small particles
         int Ns = num_small;
@@ -187,7 +187,7 @@ public:
         std::cout << "Finished storing bed particles" << std::endl;
     }
     
-    void actionsOnRestart()
+    void actionsOnRestart() override
     {
         
         int Ns=num_restart_small;
@@ -239,7 +239,7 @@ public:
     }
     
     // MOVING BED
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {
         if (BedParticles.empty())
         {

@@ -55,7 +55,7 @@ class RotatingHexagon : public Mercury3D
 	}
 
 // SETUP INITIAL CONDITIONS        
-  void setupInitialConditions()
+  void setupInitialConditions() override
   {
 // INITIAL CALCULATIONS
                 radS1 = 0.003; // 3mm radius
@@ -369,7 +369,7 @@ class RotatingHexagon : public Mercury3D
 
 // ACTIONS BEFORE TIMESTEP
                 
-void actionsBeforeTimeStep()
+void actionsBeforeTimeStep() override
 	{
 		wallHandler.getObject(0)->setOrientation(Vec3D(0.0,1.0,0.0));
 		wallHandler.getObject(1)->setOrientation(Vec3D(0.0,1.0,0.0));

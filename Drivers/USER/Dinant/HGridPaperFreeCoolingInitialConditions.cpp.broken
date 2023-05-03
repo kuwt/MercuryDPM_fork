@@ -42,7 +42,7 @@ public:
         std::cout << "t=" << std::setprecision(4) << std::left << std::setw(7) << getTime() << ", tmax=" << std::setprecision(4) << std::left << std::setw(7) << getTimeMax() << std::endl;
     }
 
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         int dimensions = 2;
         Mdouble density = 1000;

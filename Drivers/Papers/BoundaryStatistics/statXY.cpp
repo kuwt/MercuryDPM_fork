@@ -31,15 +31,15 @@ template <StatType T> class statistics_while_running : public StatisticsVector<T
 	public:
 	statistics_while_running<T>() : StatisticsVector<T>() , Chute() {}
 
-	void actionsBeforeTimeStep(){}
+	void actionsBeforeTimeStep() override {}
 		
-	void setupInitialConditions() {StatisticsVector<T>::printStat();
+	void setupInitialConditions() override {StatisticsVector<T>::printStat();
 		//~ for (unsigned int i=0; i<particleHandler.getNumberOfObjects(); i++) {
 			//~ if (particleHandler.getObject(i)->isFixed() || i>10) {removeParticle(i); i--;}
 		//~ }
 	}
 	
-	void printTime() const {
+	void printTime() const override {
 		static Mdouble tint = getTimeMax()-getTime();
 		logger(INFO, "\r2.5%%\r", static_cast<int>(100. * (1 - (getTimeMax() - getTime()) / tint)));
 	}

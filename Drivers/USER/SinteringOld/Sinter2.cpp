@@ -28,11 +28,11 @@
 
 class two_particle_collision : public Sinter {
 public:
-	void setupInitialConditions() {	}
+	void setupInitialConditions() override {	}
 	
 	void add_particles() {}
 	
-	void actionsBeforeTimeStep(){
+	void actionsBeforeTimeStep() override {
 		if (getTime()<0.7*getTimeMax())
             setTemperature(1.3);
 		else

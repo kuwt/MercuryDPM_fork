@@ -60,11 +60,11 @@ private:
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     ///This is were the walls are implemented
     /////////////////////////////////////////////////////////////////////////////////////////////////////
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
     }
 
-    void printTime() const
+    void printTime() const override
     {
         std::cout
             << "t=" << getTime()

@@ -68,7 +68,7 @@ class TimeDependentPeriodicBoundary3DSelfTest : public Mercury3D
             setGravity({0, 0, 0});
         }
 
-        void setupInitialConditions()
+        void setupInitialConditions() override
         {
             auto species = speciesHandler.getObject(0);
 
@@ -110,7 +110,7 @@ class TimeDependentPeriodicBoundary3DSelfTest : public Mercury3D
             */
         }
 
-        void actionsAfterTimeStep()
+        void actionsAfterTimeStep() override
         {
             if (boundaryHandler.getNumberOfObjects() == 3)
             {

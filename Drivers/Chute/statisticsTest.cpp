@@ -38,9 +38,9 @@ class ChutePeriodic : public Chute
 {
 public:
 
-	void actionsBeforeTimeStep(){};
+	void actionsBeforeTimeStep() override {};
 		
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		set_NWall(0);
 		set_NWallPeriodic(2);
@@ -183,7 +183,7 @@ public:
 	//set approximate height of flow
 	void set_H(double H) {setZMax(H);}
 
-	void printTime() const {
+	void printTime() const override {
 		//~ cout << "t=" << setprecision(3) << left << setw(6) << t 
 			//~ << ", tmax=" << setprecision(3) << left << setw(6) << tmax
 			//~ << endl;

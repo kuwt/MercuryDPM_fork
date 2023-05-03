@@ -46,7 +46,7 @@ public:
 		cycles=2;
     }
 
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
 		setName("CyclicPureShear");
         setSystemDimensions(2);

@@ -122,7 +122,7 @@ class DragBlasiusHertzian : public Mercury2D {
         ~DragBlasiusHertzian(void) {
         }
 
-        void setupInitialConditions() 
+        void setupInitialConditions() override
         {
             setTimeStep(pars.at("timeStep"));
             setTimeMax(pars.at("timeMax"));
@@ -242,7 +242,7 @@ class DragBlasiusHertzian : public Mercury2D {
 
         /* If restarting, we need to assign the pointers properly. 
          * This is a little messy but it must be done. */
-        void actionsOnRestart()
+        void actionsOnRestart() override
         {
             if (wallHandler.getNumberOfObjects() == 3)
             {

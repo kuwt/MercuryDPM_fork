@@ -44,7 +44,7 @@ public:
         logger(INFO, "loaded % fixed particles", particleHandler.getNumberOfObjects());
     }
 
-    bool continueSolve() const
+    bool continueSolve() const override
     {
         static unsigned int counter = 0;
         if (++counter>100)
@@ -56,13 +56,13 @@ public:
         return true;
     }
 
-    void printTime() const
+    void printTime() const override
     {
         logger(INFO, "t=% Ene=%", getTime(), getKineticEnergy() / getElasticEnergy());
     }
 
     //add flow particles
-    void setupInitialConditions() 
+    void setupInitialConditions() override
     {
         //hGridRebuild();
         //exit(-1);

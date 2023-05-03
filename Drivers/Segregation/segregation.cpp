@@ -47,7 +47,7 @@ class SegregationPeriodic : public Chute
 public:
 
     ///This code requires you do not nothing special after each time step
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {
     }
 
@@ -71,7 +71,7 @@ public:
     /// This setup the initial conditions, generates small volume fraction of particles.
     /// Sets the program to be periodic in x.
     /// \bug This code is not non-dimensionalised at the moment, should do this shortly, but at the moment. Should swap this to Silbert particles shortly
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
 
         //Check if the run has been done before. If yes, skip and start next run

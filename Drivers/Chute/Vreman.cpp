@@ -41,7 +41,7 @@ public:
 		InflowNu=0;
 	}
 
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		Chute::setupInitialConditions();
 		set_symmetric_contraction(.3,.5,.03);
@@ -140,7 +140,7 @@ public:
 		}
 	}
 	
-	void printTime() const {
+	void printTime() const override {
 		//cout << "t=" << setprecision(3) << left << setw(6) 
 		//<< getTime() << "N=" << setprecision(3) << left << setw(6) << get_N() << endl;
 	}

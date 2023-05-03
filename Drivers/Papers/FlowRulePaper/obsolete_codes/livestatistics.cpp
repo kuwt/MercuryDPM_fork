@@ -38,9 +38,9 @@ template <StatType T> class CLiveStatistics : public StatisticsVector<T>, public
 		
 		}
 
-	void actionsBeforeTimeStep(){};
+	void actionsBeforeTimeStep() override {};
 		
-	void setupInitialConditions() {StatisticsVector<T>::write();
+	void setupInitialConditions() override {StatisticsVector<T>::write();
 		write(std::cout,false);
 	};
 	

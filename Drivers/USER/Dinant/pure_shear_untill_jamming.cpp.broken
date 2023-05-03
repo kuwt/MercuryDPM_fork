@@ -41,7 +41,7 @@ public:
         species = speciesHandler.copyAndAddObject(LinearViscoelasticSlidingFrictionSpecies());
     }
 
-    void computeExternalForces(BaseParticle* CI)
+    void computeExternalForces(BaseParticle* CI) override
     {
         /// Now add on gravity
         CI->addForce(getGravity() * CI->getMass());
@@ -52,7 +52,7 @@ public:
         CI->addTorque(-CI->getAngularVelocity() * 0.1 * species->getSlidingDissipation());
     }
 
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         if (readDataFile("Startpos.dat", 8))
             std::cout << "inlezen gelukt" << std::endl;

@@ -144,7 +144,7 @@ public:
 		setZMin(-getZMax());
 	}
 	
-	void setupInitialConditions() {}
+	void setupInitialConditions() override {}
 
 	Mdouble relOverlap;
 	Mdouble NormalForce;

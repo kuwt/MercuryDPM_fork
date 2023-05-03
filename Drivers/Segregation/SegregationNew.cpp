@@ -43,7 +43,7 @@ public:
     {
     }
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {      
         //Number of small particles
         int Ns = num_small;
@@ -235,7 +235,7 @@ public:
         logger(INFO, "Finished storing bed particles");
     }
     
-    void actionsOnRestart()
+    void actionsOnRestart() override
     {
 
         int Ns = num_restart_small;
@@ -285,7 +285,7 @@ public:
 
     }
 
-    void actionsAfterTimeStep()
+    void actionsAfterTimeStep() override
     {
 
         setParticlesWriteVTK(true);
@@ -347,7 +347,7 @@ public:
     }
 
     // MOVING BED
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {
         if (BedParticles.empty())
         {

@@ -60,7 +60,7 @@ public:
     /*!
      * \brief Copy this wall and return a pointer to the copy.
      */
-    NurbsWall* copy() const;
+    NurbsWall* copy() const override;
 
     /*!
      * \brief Defines a wall, given a NurbsSurface.
@@ -85,7 +85,7 @@ public:
     /*!
      * \brief Returns the name of the object, here the string "Screw".
      */
-    std::string getName() const;
+    std::string getName() const override;
 
     void writeVTK (VTKContainer &vtk) const override;
     

@@ -34,10 +34,10 @@ class ChutePeriodic : public Chute
 {
 public:
     
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {};
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         if (readDataFile("c3d.ini") || readDataFile("../c3d.ini"))
         {

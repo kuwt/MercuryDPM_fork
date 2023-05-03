@@ -31,11 +31,11 @@ class ChuteRestart : public Chute
 {
 public:
 
-	void actionsBeforeTimeStep(){};
+	void actionsBeforeTimeStep() override {};
 
 	double time;
 
-	void setupInitialConditions(){setTime(time);}
+	void setupInitialConditions() override {setTime(time);}
 };
 
 int main(int argc, char *argv[])

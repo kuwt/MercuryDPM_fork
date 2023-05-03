@@ -196,7 +196,7 @@ public:
         drumWall -> addObject(Vec3D(1,0,0), Vec3D(getXMax()/2.0,0.0,0.0));
     }
 
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         //number of particles to be inserted
         unsigned int n;

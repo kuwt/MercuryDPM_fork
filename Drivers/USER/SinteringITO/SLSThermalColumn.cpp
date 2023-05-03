@@ -268,7 +268,7 @@ public:
          << std::endl;
     }
 
-    double getInfo(const BaseParticle& p) const
+    double getInfo(const BaseParticle& p) const override
     {
         return (dynamic_cast<const ThermalParticle &>(p).getTemperature()-initialTemperature_)/(finalTemperature_-initialTemperature_);
         //return dynamic_cast<const ThermalParticle &>(p).getTemperature();
@@ -336,7 +336,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 
     //run initial conditions
    // pb.setParticlesWriteVTK(true);
-    //pb.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+    //pb.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
     pb.solve();
 
     return 0;

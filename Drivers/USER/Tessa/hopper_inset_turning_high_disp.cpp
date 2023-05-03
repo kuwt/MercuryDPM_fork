@@ -57,7 +57,7 @@ public:
 	
 	void setMaxFailed_triangle(unsigned int new_) {max_failed_triangle = new_;}
 	
-	void setupInitialConditions()
+	void setupInitialConditions() override
     {
         setupSideWalls();
         
@@ -176,7 +176,7 @@ public:
         }
 		}
 	
-	void actionsBeforeTimeStep(){
+	void actionsBeforeTimeStep() override {
 		
 		
 		// Add the option to change the gravity with time

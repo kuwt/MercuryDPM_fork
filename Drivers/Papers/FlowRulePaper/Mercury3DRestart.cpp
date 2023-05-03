@@ -29,12 +29,12 @@ using namespace std;
 
 class Mercury3DRestarter : public Mercury3DRestart
 {
-//	void actionsBeforeTimeStep(){};
-//	void setupInitialConditions(){setTime(time);}
+//	void actionsBeforeTimeStep() override {};
+//	void setupInitialConditions() override {setTime(time);}
 //public:
 //	double time;
     
-//    virtual void actionsAfterTimeStep()
+//    virtual void actionsAfterTimeStep() override
 //    {
 //        std::cout 
 //            << "Time" << getTime() 

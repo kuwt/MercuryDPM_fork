@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
      "\\end{document}";
 
     //dpm.setParticlesWriteVTK(true);
-//	dpm.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+//	dpm.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
 //	dpm.solve(argc-1, argv+1);
     return 0;
 }

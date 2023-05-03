@@ -157,7 +157,7 @@ int main(int argc UNUSED, char* argv[] UNUSED)
     //Set output the particle information in VTK for ParaView Visualisation
     dpm.setParticlesWriteVTK(true);
     //Because of periodic boundary, out put wall files is not necessary in this case
-    //dpm.setWallsWriteVTK(true);
+    //dpm.wallHandler.setWriteVTK(true);
     //Solve the problem
     dpm.solve();
 }

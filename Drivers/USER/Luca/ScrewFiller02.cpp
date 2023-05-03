@@ -44,7 +44,7 @@ class ScrewFiller : public Mercury3D
 public:
 //  --- STANDARD FUNCTIONS ---
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         
         std::cout << "\nWeighting the particles...";
@@ -84,7 +84,7 @@ public:
         
     }
     
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {
         
         // calls the remaining loading cycles

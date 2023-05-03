@@ -44,7 +44,7 @@ private:
     
     bool biDispersity = false;
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         
         std::cout << "\nThe shaft rescaled radius is " << .5*(1. - rMin/screwCasingRadius) << ".\n";
@@ -194,7 +194,7 @@ private:
     }
     
     //! [CST:beforetime]
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {
         screwShaft->setOrientation(Vec3D(0.0,0.0,1.0));
         

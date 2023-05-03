@@ -111,7 +111,7 @@ int main(int argc UNUSED, char *argv[] UNUSED){
 
     sp0.setFileType(FileType::ONE_FILE);
     sp0.setParticlesWriteVTK(true);
-    sp0.setWallsWriteVTK(FileType::ONE_FILE);
+    sp0.wallHandler.setWriteVTK(FileType::ONE_FILE);
     sp0.solve();
 }
 

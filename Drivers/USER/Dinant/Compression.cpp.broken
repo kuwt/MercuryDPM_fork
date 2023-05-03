@@ -34,7 +34,7 @@ template <StatType T> class Compression : public StatisticsVector<T>, public Mer
 {
 public:
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         Mdouble tc=1e-3;
         Mdouble r=0.8;

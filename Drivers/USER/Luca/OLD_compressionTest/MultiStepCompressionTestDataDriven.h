@@ -30,7 +30,7 @@ class CompressionTest_parameterCalibrationRoutine : public Mercury3D
 {
 private:
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         stage = 1;
         setsInserted = 0;
@@ -83,7 +83,7 @@ private:
         stage++;
     }
     
-    void actionsOnRestart()
+    void actionsOnRestart() override
     {
         stage = 3;
         setsInserted = nSets;
@@ -105,7 +105,7 @@ private:
         std::cout << "DONE\n";
     }
     
-    void actionsAfterTimeStep()
+    void actionsAfterTimeStep() override
     {
         // particle insertion loop and trimming
         if (stage == 2 && !restartedFile)

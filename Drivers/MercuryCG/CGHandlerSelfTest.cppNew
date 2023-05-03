@@ -85,7 +85,7 @@ class CGHandlerSelfTest : public Mercury3D
 {
 public:
 
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         //define the domain
         Mdouble d = 1.0;

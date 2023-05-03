@@ -38,7 +38,7 @@ class MembraneSelfTest : public Mercury3D
 {
 public:
     
-     void setupInitialConditions()
+     void setupInitialConditions() override
     {
         // Setting the dimensions of the simulation box
         setXMin(-1);
@@ -184,7 +184,7 @@ public:
         membrane_.computeAdditionalForces();
     }
     
-    void write(std::ostream& os, bool writeAllParticles) const
+    void write(std::ostream& os, bool writeAllParticles) const override
     {
         Mercury3D::write(os, writeAllParticles);
         os << " membrane " << membrane_;
@@ -194,7 +194,7 @@ public:
         os << " membraneParticleSpecies " << membraneParticleSpecies_->getId();
     }
     
-    void read(std::istream& is, ReadOptions opt)
+    void read(std::istream& is, ReadOptions opt) override
     {
         
         std::string dummy;

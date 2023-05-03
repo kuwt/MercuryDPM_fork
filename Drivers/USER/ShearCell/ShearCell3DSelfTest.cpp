@@ -149,7 +149,7 @@ private:
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     ///This is were the walls are implemented
     /////////////////////////////////////////////////////////////////////////////////////////////////////
-    void setupInitialConditions() 
+    void setupInitialConditions() override
     {
         SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
@@ -175,7 +175,7 @@ private:
         setHGridMaxLevels(1);
     }
 
-    void actionsBeforeTimeStep ()
+    void actionsBeforeTimeStep () override
     {
         //this is because the angular velocity of the wall does not calculate the orientation correctly
         wallHandler.getObject(2)->setOrientation(Vec3D(0.0, 0.0, 1));

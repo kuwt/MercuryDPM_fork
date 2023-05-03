@@ -61,7 +61,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////////////////
     /// /brief setupInitial conditions. Basics does step 1 only; creating the walls of the drum
     ////////////////////////////////////////////////////////////////////////////////////////
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {      
         // Set the step counter to 1
         step=1;
@@ -449,7 +449,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// /brief actionsBeforeTimeStep. This does stage 2: insert particles, stage 3: setlle particles, stage 4: relax particles and stage 5: start the drum rotating.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {
         if (step==2)
             createParticles();

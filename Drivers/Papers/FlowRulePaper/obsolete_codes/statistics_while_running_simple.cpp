@@ -34,7 +34,7 @@ template <StatType T> class statistics_while_running : public StatisticsVector<T
 	public:
 	statistics_while_running<T>() : StatisticsVector<T>() , Mercury3D() {}
 	
-	void setupInitialConditions() 
+	void setupInitialConditions() override
 	{
 		setXMax(1);
 		setYMax(1.2);

@@ -31,11 +31,11 @@ class Restart : public Sinter
 {
 public:
 
-	void actionsBeforeTimeStep(){};
+	void actionsBeforeTimeStep() override {};
 
 	double time;
 
-	void setupInitialConditions(){
+	void setupInitialConditions() override {
         setTime(time);}
 };
 

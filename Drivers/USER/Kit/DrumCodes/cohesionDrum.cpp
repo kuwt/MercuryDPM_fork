@@ -61,7 +61,7 @@ public:
         speciesHandler.addObject(speciesWall);
     }
 
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
         setParticleDimensions(3);
         /////////////////////////////////////////////////////////////////////////////////////////////
@@ -309,7 +309,7 @@ public:
 		}
 	}
 
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
 	{
 
 		if (step==2)

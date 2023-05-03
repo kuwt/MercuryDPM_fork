@@ -28,9 +28,9 @@ using namespace std;
 
 class Restart : public Chute {
 public:
-	void actionsBeforeTimeStep(){};
+	void actionsBeforeTimeStep() override {};
 	
-	void setupInitialConditions() { };
+	void setupInitialConditions() override { };
 };
 
 int main(int argc, char *argv[])

@@ -69,11 +69,11 @@ private:
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     ///This is were the walls are implemented
     /////////////////////////////////////////////////////////////////////////////////////////////////////
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
     }
 
-    void printTime() const
+    void printTime() const override
     {
         Mdouble volTotP = 0.0;
         unsigned int nLB = 0;

@@ -40,7 +40,7 @@ class dinant_growparticles : public DPMBase
         species  = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
     }
 
-	void computeExternalForces(BaseParticle* CI)
+	void computeExternalForces(BaseParticle* CI) override
 	{
 		/// Now add on gravity
 		CI->addForce(getGravity() * CI->getMass());

@@ -106,7 +106,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     fiveParticleElasticCollisionInteractionProblem.setFileType(FileType::ONE_FILE);
     //fiveParticleElasticCollisionInteractionProblem.getInteractionFile().setFileType(FileType::ONE_FILE);
     fiveParticleElasticCollisionInteractionProblem.setParticlesWriteVTK(true);
-    fiveParticleElasticCollisionInteractionProblem.setWallsWriteVTK(FileType::ONE_FILE);
+    fiveParticleElasticCollisionInteractionProblem.wallHandler.setWriteVTK(FileType::ONE_FILE);
 
 
     fiveParticleElasticCollisionInteractionProblem.solve();

@@ -30,7 +30,7 @@
 
 class MyCoil: public Mercury3D{
 public:
-    void setupInitialConditions(){
+    void setupInitialConditions() override {
         //define nurbs wall and add to dpm class
         Coil w;
         w.setSpecies(speciesHandler.getLastObject());

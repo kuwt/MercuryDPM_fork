@@ -34,7 +34,7 @@
 class my_problem: public Mercury2D{
 public:
 
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		
 		if (readDataFile("c3d.ini",7))
@@ -57,7 +57,7 @@ public:
 	}
 
 private:
-	void computeExternalForces(BaseParticle* P){}
+	void computeExternalForces(BaseParticle* P) override {}
 		
 };
 

@@ -20,7 +20,7 @@ public:
         setMax({10, 10, 10});
     }
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         makeSpecies();
         makeScrew();

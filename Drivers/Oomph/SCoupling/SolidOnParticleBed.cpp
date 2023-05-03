@@ -127,7 +127,7 @@ public:
         wallHandler.copyAndAddObject(w);
         // set output file properties
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(true);
+        wallHandler.setWriteVTK(true);
         setFileType(FileType::NO_FILE);
         restartFile.setFileType(FileType::ONE_FILE);
         restartFile.writeFirstAndLastTimeStep();

@@ -29,7 +29,7 @@
 
 class Silo: public Mercury3D{
 public:
-    void setupInitialConditions(){
+    void setupInitialConditions() override {
         AxisymmetricIntersectionOfWalls w;
         w.setSpecies(speciesHandler.getLastObject());
         w.setOrientationViaNormal(Vec3D(0,0,1));

@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
     ObliqueImpactSelfTestProblem.setSaveCount(500);
     ObliqueImpactSelfTestProblem.setFileType(FileType::ONE_FILE);
     ObliqueImpactSelfTestProblem.fStatFile.setFileType(FileType::ONE_FILE);
-//    ObliqueImpactSelfTestProblem.setWallsWriteVTK(FileType::NO_FILE);
+//    ObliqueImpactSelfTestProblem.wallHandler.setWriteVTK(FileType::NO_FILE);
     ObliqueImpactSelfTestProblem.setTimeStep(0.25e-8);
     
     //solve the system, the single particle will now bounce on the plate

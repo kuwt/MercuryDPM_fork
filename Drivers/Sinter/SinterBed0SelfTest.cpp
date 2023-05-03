@@ -245,7 +245,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     ic.setTimeMax(1e20);
 //    ic.interactionHandler.setWriteVTK(FileType::MULTIPLE_FILES);
 //    ic.setParticlesWriteVTK(true);
-//    ic.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+//    ic.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
     ic.solve();
 
     return 0;

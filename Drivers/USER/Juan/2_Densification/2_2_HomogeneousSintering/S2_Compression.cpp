@@ -243,7 +243,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 
     oTest.removeOldFiles();
     oTest.setParticlesWriteVTK(false);
-//    oTest.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+//    oTest.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
 
     oTest.setFileType(FileType::ONE_FILE);
     oTest.solve();

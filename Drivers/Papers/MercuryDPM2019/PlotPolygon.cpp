@@ -29,7 +29,7 @@
 
 class Polygon: public Mercury3D{
 public:
-    void setupInitialConditions(){
+    void setupInitialConditions() override {
         IntersectionOfWalls w;
         w.setSpecies(speciesHandler.getLastObject());
         w.addObject(Vec3D(0,0,-1),Vec3D(0,0,3));

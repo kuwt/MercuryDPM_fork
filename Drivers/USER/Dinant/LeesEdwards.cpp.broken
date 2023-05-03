@@ -43,7 +43,7 @@ public:
         tMax=10;
     }
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         setName("LeesEdwards");
         setSystemDimensions(2);
