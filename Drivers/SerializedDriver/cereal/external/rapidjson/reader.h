@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,7 @@
 #ifndef RAPIDJSON_READER_H_
 #define RAPIDJSON_READER_H_
 
-// Copyright (c) 2011-2020Milo Yip (miloyip@gmail.com)
+// Copyright (c) 2011-2023Milo Yip (miloyip@gmail.com)
 // Version 0.1
 
 #include "rapidjson.h"
