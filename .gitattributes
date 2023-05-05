@@ -1,0 +1,5 @@
+# Set the default behavior, in case people don't have core.autocrlf set. This does exactly what core.autocrlf=true does.
+* text=auto eol=crlf
+
+# Declare files that will always have CRLF line endings on checkout. (e.g. a .sln file from VS Code)
+*.sln text eol=crlf
