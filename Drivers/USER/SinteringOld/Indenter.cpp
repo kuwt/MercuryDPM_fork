@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,7 @@ enum StageType {InitialRelaxation, Compression, RelaxationAfterCompression, Move
 class Indenter : public Sinter {
 public:
 
-	void setupInitialConditions() {	}
+	void setupInitialConditions() override {	}
 	
 	Indenter(Mdouble IndenterRadius_, IT IndenterType_, Mdouble IndenterVelocity_, int N_, Mdouble IndentationDepth_, std::string restartfile_) 
 	: IndenterRadius(IndenterRadius_), IndenterType(IndenterType_), IndenterVelocity(IndenterVelocity_), N(N_), IndentationDepth(IndentationDepth_), restartfile(restartfile_)
@@ -121,7 +121,7 @@ public:
 		write(std::cout,false);
 	}
 
-	void computeExternalForces(BaseParticle* CI)
+	void computeExternalForces(BaseParticle* CI) override
 	{
 		if (!CI->isFixed()) {
 			/// Now add on gravity
@@ -134,7 +134,7 @@ public:
 		}
 	}
 
-	void outputXBallsData(std::ostream& os) const
+	void outputXBallsData(std::ostream& os) const override
 	{
 		os  << particleHandler.getNumberOfObjects()+1 << " " << getTime() << " "
 			<< getXMin() << " " << getYMin() << " " << getZMin() << " "
@@ -165,7 +165,7 @@ public:
 
 	}
 
-	void writeEneHeader(std::ostream& os) const
+	void writeEneHeader(std::ostream& os) const override
 	{
 		static int width = os.precision() + 6;
 		os
@@ -182,7 +182,7 @@ public:
 		<< std::endl;
 	}
 
-	void writeEneTimeStep(std::ostream& os) const
+	void writeEneTimeStep(std::ostream& os) const override
 	{
 		Mdouble ene_kin = 0, ene_rot = 0, ene_gra = 0, mass_sum= 0, x_masslength=0, y_masslength=0, z_masslength=0;
 
@@ -228,7 +228,7 @@ public:
 	    }
 	}
 
-	void actionsAfterTimeStep(){
+	void actionsAfterTimeStep() override {
 		if (getTime()<getTimeMax()*0.4*(1.0-3.5/NumSteps)) {
 			
 		} else if (getTime()+ getTimeStep()<getTimeMax()*(1.0-3.5/NumSteps)) {
@@ -261,7 +261,7 @@ public:
 	}
 
 
-	void actionsBeforeTimeStep(){
+	void actionsBeforeTimeStep() override {
 		if (IndenterType==Flat) {
 			return FlatIndenter.setForce(Vec3D(0,0,0));
 	    } else {

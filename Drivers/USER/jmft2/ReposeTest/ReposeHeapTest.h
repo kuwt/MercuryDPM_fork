@@ -130,7 +130,7 @@ class ReposeHeapTest : public Mercury3D
 
         ~ReposeHeapTest() {}
 
-        void actionsAfterTimeStep()
+        void actionsAfterTimeStep() override
         {
             if (!finishedCollapse)
             {

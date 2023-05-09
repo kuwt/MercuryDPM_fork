@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -105,21 +105,28 @@ std::string LinearViscoelasticInteraction::getBaseName() const
 void LinearViscoelasticInteraction::computeNormalForce()
 {
     // Compute the relative velocity vector of particle P w.r.t. I
-    setRelativeVelocity(
+     setRelativeVelocity(
             getP()->getVelocityAtContact(getContactPoint()) - getI()->getVelocityAtContact(getContactPoint()));
+
     // Compute the projection of vrel onto the normal (can be negative)
     setNormalRelativeVelocity(Vec3D::dot(getRelativeVelocity(), getNormal()));
-    
+
     if (getOverlap() > 0) //if contact forces
     {
         const LinearViscoelasticNormalSpecies* species = getSpecies();
         
         Mdouble normalForce =
                 species->getStiffness() * getOverlap() - species->getDissipation() * getNormalRelativeVelocity();
+
+
+
         if (species->getConstantRestitution()) normalForce *= 2.0*getEffectiveMass();
         setAbsoluteNormalForce(std::abs(normalForce)); //used for further corce calculations;
         setForce(getNormal() * normalForce);
         setTorque(Vec3D(0.0, 0.0, 0.0));
+
+
+
     }
     else
     {

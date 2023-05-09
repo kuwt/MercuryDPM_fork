@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -140,7 +140,7 @@ public:
      * to give a plane defined by normal*x=position
      * \deprecated Don't use this function, instead use the function addObject(Vec3D, Vec3D).
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     void addObject(Vec3D normal, Mdouble position);
     
     /*!

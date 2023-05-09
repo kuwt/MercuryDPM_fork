@@ -2,8 +2,8 @@
 // Created by Thomas Weinhart on 29/04/2022.
 //
 
-#ifndef MERCURY_REFINEABLEQDPVDELEMENT_H
-#define MERCURY_REFINEABLEQDPVDELEMENT_H
+#ifndef MERCURYDPM_REFINEABLEQDPVDELEMENT_H
+#define MERCURYDPM_REFINEABLEQDPVDELEMENT_H
 #include "refineable_solid_elements.h"
 
 namespace oomph
@@ -600,4 +600,4 @@ public:
 
 } // end namespace oomph
 
-#endif//MERCURY_REFINEABLEQDPVDELEMENT_H
+#endif//MERCURYDPM_REFINEABLEQDPVDELEMENT_H

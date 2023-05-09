@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -506,14 +506,15 @@ void BaseCluster::setupInitialConditions()
      *          force center d, which is d = D/r).
      *          It is the force necessary to get a overlap of deltaStar (computed above this description).
      *          If constant restitution is true then it is also multiplied by the mass of the biggest particle,
-     *          or if  MERCURY_USE_MPI it is the biggest possible mass computed taking into account particle dispersity,
+     *          or if  MERCURYDPM_USE_MPI it is the biggest possible mass computed taking into account particle
+     *          dispersity,
      *          i.e. the mass of a particle having radius
      *          r = radiusParticle_ * 2 * sizeDispersityParticle_ / (1 + sizeDispersityParticle_).
      *          (In order to get the right value of loading stiffness it should be multiplied by the mass of the smallest
      *          particle; multiplying it for the biggest mass here, instead, is for safety).
      */
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     maximumForceModulus_ = radiusParticle_ * 2 * sizeDispersityParticle_ / (1 + sizeDispersityParticle_) * deltaStar *
                            particleSpecies_->getLoadingStiffness()
                            * (particleSpecies_->getConstantRestitution() ?
@@ -536,7 +537,7 @@ void BaseCluster::setupInitialConditions()
      * As a value for x it is used boxSize_ (instead of boxSize_/4 as a safety factor).
      * As a value for F it is used maximumForceModulus/50 which is half of maximumForceModulus/25 (in this way it is calculated
      * a measure of the time needed with a force which linearly increases from 0 to maximumForceModulus/25, again dividing for 25
-     * is done for safety). As a value for m it is used the  mass of the biggest particle, or if MERCURY_USE_MPI it is
+     * is done for safety). As a value for m it is used the  mass of the biggest particle, or if MERCURYDPM_USE_MPI it is
      * the mass computed taking into account size dispersity, so the mass
      * of a particle having radius r = radiusParticle_ * 2 * sizeDispersityParticle_ / (1 + sizeDispersityParticle_), for safety.
      * The factor 5* outside the sqrt is another safety factor empirically determined: with this values the computation is fast
@@ -545,7 +546,7 @@ void BaseCluster::setupInitialConditions()
      * indeed is quite complicated given that particles can also rearrange during compression and so they will eventually
      * move in a non radial direction and for this reason they will need more time to settle.
      */
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     forceTuningDuration_ =
             5 * sqrt(100 * boxSize_ * particleSpecies_->getMassFromRadius(radiusParticle_ * 2 * sizeDispersityParticle_ /
                                                         (1 + sizeDispersityParticle_)) / maximumForceModulus_);
@@ -687,7 +688,7 @@ void BaseCluster::actionsAfterTimeStep()
      *          -timeMax is set to getTime(), in order to stop the calculation,
      *          -stage is set to 4 (if the energy threshold is not reached stage will remain 3 (because the simulation is stopped by the previous
      *           definition of timeMax): if this happens the user gets a warning, see actionsAfterSolve()).
-     *          If MERCURY_USE_MPI this process lasts for a time T = dissipationDuration_ - getTimeStep().
+     *          If MERCURYDPM_USE_MPI this process lasts for a time T = dissipationDuration_ - getTimeStep().
      */
     if (stage_ == 3)
     {
@@ -699,7 +700,7 @@ void BaseCluster::actionsAfterTimeStep()
             dampVelocities();
 
         applyCentralForce();
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         if (getTime() - t0_ > dissipationDuration_ - getTimeStep())
 #else
         if (getKineticEnergy() / getElasticEnergy() < energyRatioTolerance_ ||

@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -239,7 +239,11 @@ public:
      */
     Mdouble getOverlap() const
     { return overlap_; }
-    
+
+    /*!
+     * \brief Return a Double with the current volume of overlap betweent the two interacting objects.
+     */
+    Mdouble getOverlapVolume() const;
     /*!
      * \brief Returns a Mdouble with the current contact between the two interacting objects.
      */
@@ -576,6 +580,7 @@ private:
      * Identifies individual contact such that it can be distinguished. E.g. the face number of a triangulated wall.
      */
     unsigned multiContactIdentifier_;
+
 };
 
 #endif

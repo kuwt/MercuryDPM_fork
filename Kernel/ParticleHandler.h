@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -85,7 +85,7 @@ public:
     /*!
      * \brief Adds a ghost particle located at fromProcessor to toProcessor
      */
-    void addGhostObject(int fromPrcessor, int toProcessor, BaseParticle* p);
+    void addGhostObject(int fromProcessor, int toProcessor, BaseParticle* p);
     
     /*!
      * \brief Adds a BaseParticle to the ParticleHandler. 
@@ -233,11 +233,11 @@ public:
     /*!
      * \brief Computes an attribute type (min/max/..) of a particle attribute (position/velocity) in a local domain
      * \details Many functions the particleHandler return a pointer to a BaseParticle, i.e. the fastest particle, however
-     * in parallel this is not usefull as pointers can't be send across processes. This function gives the flexibility to
+     * in parallel this is not useful as pointers can't be send across processes. This function gives the flexibility to
      * find a global particle extremum such as the fastest particle Velocity or lowest particle position.
      * \param[in] attribute A function that obtains a scalar from a particle. i.e. position or radius
-     * \param[in] type An AttribyteType tells this function what to do with the attribute, take the maximum or the minimum
-     * \return Returns a scalar value representing the AttributeType of the Attribute: In easier terms returns the max/min/... of a particle atribute such as radius
+     * \param[in] type An AttributeType tells this function what to do with the attribute, take the maximum or the minimum
+     * \return Returns a scalar value representing the AttributeType of the Attribute: In easier terms returns the max/min/... of a particle attribute such as radius
       */
     template<typename T>
     typename std::enable_if<std::is_scalar<T>::value, T>::type
@@ -258,7 +258,7 @@ public:
             attributeParticle = attribute(objects_[0]);
             attributeFinal = attributeParticle;
             
-            //Findn the final attribute
+            //Find the final attribute
             for (BaseParticle* particle : (*this))
             {
                 //Obtain the attribute
@@ -294,17 +294,17 @@ public:
     /*!
      * \brief Computes an attribute type (min/max/..) of a particle attribute(position/velocity) in the global domain
      * \details Many functions the particleHandler return a pointer to a BaseParticle, i.e. the fastest particle, however
-     * in parallel this is not usefull as pointers can't be send across processes. This function gives the flexibility to
+     * in parallel this is not useful as pointers can't be send across processes. This function gives the flexibility to
      * find a global particle extremum such as the fastest particle Velocity or lowest particle position.
      * \param[in] attribute A function that obtains a scalar from a particle. i.e. position or radius
-     * \param[in] type An AttribyteType tells this function what to do with the attribute, take the maximum or the minimum
-     * \return Returns a scalar value representing the AttributeType of the Attribute: In easier terms returns the max/min/... of a particle atribute such as radius
+     * \param[in] type An AttributeType tells this function what to do with the attribute, take the maximum or the minimum
+     * \return Returns a scalar value representing the AttributeType of the Attribute: In easier terms returns the max/min/... of a particle attribute such as radius
      */
     template<typename T>
     typename std::enable_if<std::is_scalar<T>::value, T>::type
     getParticleAttribute(std::function<T(BaseParticle*)> attribute, AttributeType type) const
     {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         T particleAttributeLocal = getParticleAttributeLocal(attribute, type);
         T particleAttributeGlobal;
 
@@ -437,9 +437,10 @@ public:
     void actionsAfterTimeStep();
 
     double getLiquidFilmVolume() const;
+    
+    void saveNumberPSDtoCSV(std::string csvFileName, std::vector<double> diameterBins = {});
 
 private:
-    
     
     Mdouble getKineticEnergyLocal() const;
     

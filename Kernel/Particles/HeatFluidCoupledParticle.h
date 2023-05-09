@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -42,7 +42,7 @@ class HeatFluidCoupledParticle final : public ThermalParticle
 {
 public:
     /*!
-     * \breif HeatFluidCoupledParticle constructor creates a HeatFluidCoupledParticle at (0,0,0) with radius,
+     * \brief HeatFluidCoupledParticle constructor creates a HeatFluidCoupledParticle at (0,0,0) with radius,
      *        mass and inertia equal to 1.
      */
     HeatFluidCoupledParticle()
@@ -97,7 +97,7 @@ public:
     }
 
     /*!
-     * \breif Returns the name of the object; in this case "HeatFluidCoupledParticle".
+     * \brief Returns the name of the object; in this case "HeatFluidCoupledParticle".
      * \return The object name.
      */
     std::string getName() const override

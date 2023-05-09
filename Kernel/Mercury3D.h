@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -77,7 +77,8 @@ protected:
      * \brief Compute contacts with a wall.
      */
     void computeWallForces(BaseWall* w) override;
-    
+
+
     /*!
      * \brief Finds particles within target cell and stores them in a list
      */

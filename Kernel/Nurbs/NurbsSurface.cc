@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -44,10 +44,17 @@ NurbsSurface::NurbsSurface(const std::vector<double>& knotsU, const std::vector<
              const std::vector<std::vector<Vec3D>>& controlPoints, const std::vector<std::vector<double>>& weights)
 {
     set(knotsU,knotsV,controlPoints,weights);
-    logger(INFO,"Created Nurbs surface.");
-    logger(INFO,"  %x% knots",knotsU.size(), knotsV.size());
-    logger(INFO,"  %x% control points",controlPoints.size(), controlPoints[0].size());
-    logger(INFO,"  %x% degrees",degreeU_,degreeV_);
+}
+
+NurbsSurface::NurbsSurface(const std::vector<std::vector<Vec3D>>& controlPoints,
+                           const std::vector<std::vector<Mdouble>>& weights,
+                           unsigned int degreeU, unsigned int degreeV,
+                           bool clampedAtStartU, bool clampedAtEndU, bool clampedAtStartV, bool clampedAtEndV)
+{
+    std::vector<Mdouble> knotsU = createUniformKnotVector(controlPoints.size(), degreeU, clampedAtStartU, clampedAtEndU);
+    std::vector<Mdouble> knotsV = createUniformKnotVector(controlPoints[0].size(), degreeV, clampedAtStartV, clampedAtEndV);
+    
+    set(knotsU, knotsV, controlPoints, weights);
 }
 
 void NurbsSurface::set(const std::vector<double>& knotsU, const std::vector<double>& knotsV,
@@ -90,17 +97,9 @@ void NurbsSurface::set(const std::vector<double>& knotsU, const std::vector<doub
         logger(ERROR, "Degree has to be at least 1");
     }
 
-    //Reset the u/v interval to [0,1]
-    const int minKU = knotsU_.front();
-    const int maxKU = knotsU_.back();
-    for (auto& k : knotsU_) {
-        k = (k - minKU) / (maxKU - minKU);
-    }
-    const int minKV = knotsV_.front();
-    const int maxKV = knotsV_.back();
-    for (auto& k : knotsV_) {
-        k = (k - minKV) / (maxKV - minKV);
-    }
+    // Reset the u/v interval to [0,1]
+    normalizeKnotVector(knotsU_);
+    normalizeKnotVector(knotsV_);
 
     degreeU_ = knotsU.size() - controlPoints.size() - 1;
     degreeV_ = knotsV.size() - controlPoints[0].size() - 1;
@@ -113,6 +112,31 @@ void NurbsSurface::set(const std::vector<double>& knotsU, const std::vector<doub
     //\todo TW
     closedInU_ = false;
     closedInV_ = false;
+    periodicInU_ = false;
+    periodicInV_ = false;
+    
+    // This simply evaluates the positions for a bunch of u's and v's and stores them.
+    // As it is now, the u's and v's are simply taken uniform.
+    // The more points the better (sort of). Too little points can cause a possible convergence to a non-global minimum,
+    // or possible no convergence at all.
+    // For smooth surfaces this already helps a lot. For non-smooth surfaces it most likely doesn't suffice.
+    //\todo JWB The convergence still fails from time to time
+    //\todo JWB These aren't updated when the surface changes shape during simulation (moving control points)
+    unsigned  nu = knotsU_.size() * 3;
+    unsigned  nv = knotsV_.size() * 3;
+    startingPoints_.clear();
+    startingKnotsU_.clear();
+    startingKnotsV_.clear();
+    for (double i = 0; i <= nu; i++) {
+        double u = getLowerBoundU() + (getUpperBoundU() - getLowerBoundU()) * i / nu;
+        for (double j = 0; j <= nv; j++) {
+            double v = getLowerBoundV() + (getUpperBoundV() - getLowerBoundV()) * j / nv;
+            Vec3D p = evaluate(u, v);
+            startingPoints_.push_back(p);
+            startingKnotsU_.push_back(u);
+            startingKnotsV_.push_back(v);
+        }
+    }
 }
 
 void NurbsSurface::setClosedInU(bool closedInU) {
@@ -172,17 +196,26 @@ Vec3D NurbsSurface::evaluate(double u, double v) const {
  * Find projection onto surface, return distance (and contactPoint)
  */
 bool NurbsSurface::getDistance(Vec3D P, double radius, double& distance, Vec3D& normal) const {
-    // find the closest control point
-    double u;
-    double v;
-    double minDist2 = constants::inf;
-    for (int i=0; i<controlPoints_.size(); ++i) {
-        for (int j=0; j<controlPoints_[i].size(); ++j) {
-            const double dist2 = Vec3D::getLengthSquared(controlPoints_[i][j] - P);
-            if (dist2<minDist2) {
-                u = knotsU_[i];
-                v = knotsV_[j];
-            }
+    //JWB Known reasons why convergence might fail (or worse it doesn't fail but finds a wrong point):
+    //    1. Multiple same value knots (together with a low degree).
+    //    2. Multiple control points at the exact same position.
+    //    3. Really high value weights, or big difference in weights.
+    //    4. Too little starting points to start off iteration.
+    //    5. In general possibly a too low degree.
+    // In some cases there is a clear discontinuity, which then is the obvious reason for failure.
+    // In other cases this is not really clear, so the reason isn't quite clear.
+    // One last reason the iteration might fail is when it actually got quite close to the closest point, but the
+    // tolerance is set too tight. This failure does not cause huge problems though, as when the iteration fails the
+    // distance is calculated anyway. The tolerance value is pretty much picked from thin air, so improving it is fine.
+    
+    // Find the closest starting point
+    double u, v, minDist2 = constants::inf;
+    for (int i = 0; i < startingPoints_.size(); i++) {
+        const double dist2 = Vec3D::getLengthSquared(startingPoints_[i] - P);
+        if (dist2 < minDist2) {
+            u = startingKnotsU_[i];
+            v = startingKnotsV_[i];
+            minDist2 = dist2;
         }
     }
     ///\todo here we should use the convex hull argument to rule out certain contactse quickly
@@ -196,38 +229,29 @@ bool NurbsSurface::getDistance(Vec3D P, double radius, double& distance, Vec3D& 
     //          J.[du;dv] = k
     //          J=[fu fv;gu gv], k=-[f;g]
     std::array<std::array<Vec3D,3>,3> S;
-    const double tol = 2*std::numeric_limits<double>::epsilon();
+    //JWB The tolerance originally was pretty much grabbed from thin air. Multiplying it by 100 allowed for additional
+    // convergence (of the third convergence criterion: parameters fixed) for a bunch of positions.
+    const double tol = 2*std::numeric_limits<double>::epsilon() * 100;
     const double tolSquared = mathsFunc::square<double>(tol);
     Vec3D r;
     double r1;
-    for (int i=0;i<15; ++i) {
-        //TW this algorithm does not compute contacts with the boundary
-        if (u<0) {
-            u = closedInU_?(u-static_cast<int>(u)):0;
-        } else if (u>1) {
-            u = closedInU_?(u-static_cast<int>(u)):1;
-        }
-        if (v<0) {
-            v = closedInV_?(v-static_cast<int>(u)):0;
-        } else if (v>1) {
-            v = closedInV_?(v-static_cast<int>(v)):1;
-        }
+    double previousU, previousV;
+    for (int i = 0; i < 15; ++i) {
         evaluateDerivatives(u,v,S);
         r = S[0][0] - P;
         r1 = r.getLengthSquared();
-        if (r1<tolSquared) /*first convergence criterium: contact point on surface*/ {
+        if (r1 < tolSquared) /*first convergence criterion: contact point on surface*/ {
             distance = 0;
             normal = r;
             return true;
         }
         const double r2 = mathsFunc::square<double>(Vec3D::dot(r, S[1][0]))/(r1*S[1][0].getLengthSquared());
         const double r3 = mathsFunc::square<double>(Vec3D::dot(r, S[0][1]))/(r1*S[0][1].getLengthSquared());
-        if (std::fabs(r2)<tolSquared && std::fabs(r3)<tolSquared) /*second convergence criterium: zero cosine*/ {
+        if (std::fabs(r2) < tolSquared && std::fabs(r3) < tolSquared) /*second convergence criterion: zero cosine*/ {
             //you should exit the function here
-            const bool inWall = Vec3D::dot(r,Vec3D::cross(S[1][0],S[0][1]))>=0;
-            if (inWall || r1<radius*radius) {
-                logger(VERBOSE,"contact found at % after % iterations",S[0][0],i);
-                distance = inWall ? -sqrt(r1) : sqrt(r1);
+            if (r1 < radius * radius) {
+                logger(VERBOSE,"contact found at % after % iterations", S[0][0], i);
+                distance = sqrt(r1);
                 normal = r / distance;
                 return true;
             } else {
@@ -243,12 +267,35 @@ bool NurbsSurface::getDistance(Vec3D P, double radius, double& distance, Vec3D& 
         const double det = a * d - b * b;
         const double du = (b * g - d * f) / det;
         const double dv = (b * f - a * g) / det;
-        const double r4 = du*du*S[0][1].getLengthSquared()+dv*dv*S[1][0].getLengthSquared();
-        if (r4<tolSquared) /*third convergence criterium: parameters fixed*/ {
-            const bool inWall = Vec3D::dot(r,Vec3D::cross(S[1][0],S[0][1]))>=0;
-            if (inWall || r1<radius*radius) {
-                logger(VERBOSE,"parameters fixed, contact at % after % iterations",S[0][0],i);
-                distance = inWall ? -sqrt(r1) : sqrt(r1);
+        
+        previousU = u;
+        previousV = v;
+        u += du;
+        v += dv;
+        
+        // Keeping within bounds
+        Mdouble lbU = getLowerBoundU();
+        Mdouble ubU = getUpperBoundU();
+        Mdouble lbV = getLowerBoundV();
+        Mdouble ubV = getUpperBoundV();
+        if (u < lbU) {
+            u = closedInU_ ? ubU - fmod(lbU - u, ubU - lbU) : lbU;
+        }
+        else if (u > ubU) {
+            u = closedInU_ ? lbU + fmod(u - ubU, ubU - lbU) : ubU;
+        }
+        if (v < lbV) {
+            v = closedInV_ ? ubV - fmod(lbV - v, ubV - lbV) : lbV;
+        }
+        else if (v > ubV) {
+            v = closedInV_ ? lbV + fmod(v - ubV, ubV - lbV) : ubV;
+        }
+    
+        const double r4 = ((u - previousU) * S[1][0] + (v - previousV) * S[0][1]).getLengthSquared();
+        if (r4 < tolSquared) /*third convergence criterion: parameters fixed*/ {
+            if (r1 < radius * radius) {
+                logger(VERBOSE,"parameters fixed, contact at % after % iterations", S[0][0], i);
+                distance = sqrt(r1);
                 normal = r / distance;
                 return true;
             } else {
@@ -256,15 +303,14 @@ bool NurbsSurface::getDistance(Vec3D P, double radius, double& distance, Vec3D& 
                 return false;
             }
         }
-        u += du;
-        v += dv;
     }
     /* iteration fails */
-    logger(WARN,"P=%: Number of allowed iterations exceeded; this should never be reached",P);
-    const bool inWall = Vec3D::dot(r,Vec3D::cross(S[1][0],S[0][1]))>=0;
-    if (inWall || r1<radius*radius) {
-        logger(VERBOSE,"contact found at %",S[0][0]);
-        distance = inWall ? -sqrt(r1) : sqrt(r1);
+    //JWB See comments at the start of this method for possible reasons for failure and how it might be solved.
+    // For now a warning is given and whatever was found so far is returned (which is basically rubbish).
+    logger(WARN,"P=%: Number of allowed iterations exceeded; this should never be reached", P);
+    if (r1 < radius * radius) {
+        logger(VERBOSE,"contact found at %", S[0][0]);
+        distance = sqrt(r1);
         normal = r / distance;
         return true;
     } else {
@@ -275,15 +321,11 @@ bool NurbsSurface::getDistance(Vec3D P, double radius, double& distance, Vec3D& 
 
 
 /**
-Evaluate derivatives of a rational NURBS curve
-@param[in] u Parameter to evaluate the derivatives at.
-@param[in] knots Knot vector of the curve.
-@param[in] controlPoints Control points of the curve.
-@param[in] weights Weights corresponding to each control point.
-@param[in] nDers Number of times to differentiate.
-@param[in, out] curveDers Derivatives of the curve at u.
-E.g. curveDers[n] is the nth derivative at u, where n is between 0 and nDers-1.
-*/
+ * Evaluate derivatives of a NURBS curve
+ * @param[in] u Parameter to evaluate derivatives at
+ * @param[in] v Parameter to evaluate derivatives at
+ * @param[out] S Contains position, first order derivatives and second order derivatives
+ */
 void NurbsSurface::evaluateDerivatives(double u, double v, std::array<std::array<Vec3D,3>,3>& S) const
 {
     std::array<std::array<Vec3D,3>,3> A;
@@ -314,12 +356,13 @@ void NurbsSurface::evaluateDerivatives(double u, double v, std::array<std::array
     S[1][1] = (A[1][1]-w[1][1]*S[0][0]-w[1][0]*S[0][1]-w[0][1]*S[1][0])/w[0][0];
     S[2][0] = (A[2][0]-2*w[1][0]*S[1][0]-w[2][0]*S[0][0])/w[0][0];
     S[0][2] = (A[0][2]-2*w[0][1]*S[0][1]-w[0][2]*S[0][0])/w[0][0];
-//    std::cout << S[0][0] << std::endl;
-//    std::cout << S[1][0] << std::endl;
-//    std::cout << S[0][1] << std::endl;
-//    std::cout << S[2][0] << std::endl;
-//    std::cout << S[1][1] << std::endl;
-//    std::cout << S[0][2] << std::endl;
+    // See equations around eq 4.21 in Nurbs book
+    // [0][0] =      e.g. S[0][0] = S      w[0][0] = w
+    // [1][0] = u    e.g. S[1][0] = S_u    w[1][0] = w_u     d/du
+    // [0][1] = v    e.g. S[0][1] = S_v    w[0][1] = w_v     d/dv
+    // [1][1] = uv   e.g. S[1][1] = S_uv   w[1][1] = w_uv    d^2/dudv
+    // [2][0] = uu   e.g. S[2][0] = S_uu   w[2][0] = w_uu    d^2/du^2
+    // [0][2] = vv   e.g. S[0][2] = S_vv   w[0][2] = w_vv    d^2/dv^2
 }
 
 
@@ -344,6 +387,8 @@ std::ostream& operator<<(std::ostream& os, const NurbsSurface& a)
     for (const auto cp0 : a.controlPoints_) for (const auto cp : cp0) os << cp << ' ';
     os << "weights ";
     for (const auto w0 : a.weights_) for (const auto w : w0) os << w << ' ';
+    os << "closedInUV " << a.closedInU_ << ' ' << a.closedInV_;
+    os << " periodicInUV " << a.periodicInU_ << ' ' << a.periodicInV_;
     return os;
 }
 
@@ -388,7 +433,285 @@ std::istream& operator>>(std::istream& is, NurbsSurface& a)
         w0.resize(nv);
         for (auto& w : w0) is >> w;
     }
-
+    
     a.set(knotsU,knotsV,controlPoints,weights);
+    
+    // After setting, since in that method the defaults are set to false.
+    // Also, check if dummy variable exist, for backwards compatibility.
+    is >> dummy;
+    if (dummy == "closedInUV")
+    {
+        is >> a.closedInU_;
+        is >> a.closedInV_;
+    }
+    is >> dummy;
+    if (dummy == "periodicInUV")
+    {
+        is >> a.periodicInU_;
+        is >> a.periodicInV_;
+    }
+    
     return is;
+}
+
+void NurbsSurface::makePeriodicContinuousInU()
+{
+    // Add degree-1 amount of control points to the front and back.
+    wrapAroundInU(degreeU_ - 1, degreeU_ - 1);
+    periodicInU_ = true;
+}
+
+void NurbsSurface::makePeriodicContinuousInV()
+{
+    // Add degree-1 amount of control points to the front and back.
+    wrapAroundInV(degreeV_ - 1, degreeV_ - 1);
+    periodicInV_ = true;
+}
+
+void NurbsSurface::makeClosedInU()
+{
+    // Add degree-1 amount of control points to the back.
+    wrapAroundInU(degreeU_ - 1, 0, true);
+    setClosedInU(true);
+}
+
+void NurbsSurface::makeClosedInV()
+{
+    // Add degree-1 amount of control points to the back.
+    wrapAroundInV(degreeV_ - 1, 0, true);
+    setClosedInV(true);
+}
+
+void NurbsSurface::wrapAroundInU(unsigned int numStartToEnd, unsigned int numEndToStart, bool forceBothEndsUniform)
+{
+    // This method copies the given number of control points from the start to the end and vice versa (not counting the
+    // first and last control point).
+    // The first and last control point are used to know the amount that the control points to be copied have to be
+    // shifted by. In case of closing a surface (circle like shape) the shifted distance is simply 0.
+    // The knot vector is updated in such a way that only the start and end of the shape might be influenced (both ends
+    // should be uniform), however the inner shape remains intact.
+    
+    // A vector of offsets, which is the difference between the first and last row of control points.
+    // These are the values the copied control points need to be shifted by.
+    std::vector<Vec3D> offsets;
+    offsets.reserve(controlPoints_[0].size());
+    for (int j = 0; j < controlPoints_[0].size(); j++)
+    {
+        offsets.push_back(controlPoints_.back()[j] - controlPoints_.front()[j]);
+    }
+    
+    // Temporarily store "ghost" control points and weights to be added in front
+    std::vector<std::vector<Vec3D>> frontControlPoints;
+    std::vector<std::vector<Mdouble>> frontWeights;
+    // Get the numEndToStart amount, in order, ignoring the last one
+    for (unsigned int i = numEndToStart; i > 0; i--)
+    {
+        std::vector<Vec3D> tmpCP = controlPoints_[controlPoints_.size() - 1 - i];
+        for (int j = 0; j < tmpCP.size(); j++)
+        {
+            tmpCP[j] -= offsets[j];
+        }
+        frontControlPoints.push_back(tmpCP);
+        frontWeights.push_back(weights_[weights_.size() - 1 - i]);
+    }
+    
+    // Add "ghost" control points and weights at the back
+    // Get the numStartToEnd amount, in order, ignoring the first one
+    for (int i = 1; i <= numStartToEnd; i++)
+    {
+        std::vector<Vec3D> tmpCP = controlPoints_[i];
+        for (int j = 0; j < tmpCP.size(); j++)
+        {
+            tmpCP[j] += offsets[j];
+        }
+        controlPoints_.push_back(tmpCP);
+        weights_.push_back(weights_[i]);
+    }
+    
+    // Now actually add the "ghost" control points and weights in front
+    controlPoints_.insert(controlPoints_.begin(), frontControlPoints.begin(), frontControlPoints.end());
+    weights_.insert(weights_.begin(), frontWeights.begin(), frontWeights.end());
+    
+    extendKnotVector(knotsU_, degreeU_, numEndToStart, numStartToEnd, forceBothEndsUniform);
+}
+
+void NurbsSurface::wrapAroundInV(unsigned int numStartToEnd, unsigned int numEndToStart, bool forceBothEndsUniform)
+{
+    // This method copies the given number of control points from the start to the end and vice versa (not counting the
+    // first and last control point).
+    // The first and last control point are used to know the amount that the control points to be copied have to be
+    // shifted by. In case of closing a surface (circle like shape) the shifted distance is simply 0.
+    // The knot vector is updated in such a way that only the start and end of the shape might be influenced (both ends
+    // should be uniform), however the inner shape remains intact.
+    
+    for (int i = 0; i < controlPoints_.size(); i++)
+    {
+        // Current offset
+        Vec3D offset = controlPoints_[i].back() - controlPoints_[i].front();
+        
+        // Temporarily store "ghost" control points and weights to be added in front
+        std::vector<Vec3D> frontControlPoints;
+        std::vector<Mdouble> frontWeights;
+        // Get the numEndToStart amount, in order, ignoring the last one
+        for (unsigned int j = numEndToStart; j > 0; j--)
+        {
+            frontControlPoints.push_back(controlPoints_[i][controlPoints_[i].size() - 1 - j] - offset);
+            frontWeights.push_back(weights_[i][weights_[i].size() - 1 - j]);
+        }
+        
+        // Add "ghost" control points and weights at the back
+        // Get the numStartToEnd amount, in order, ignoring the first one
+        for (int j = 1; j <= numStartToEnd; j++)
+        {
+            controlPoints_[i].push_back(controlPoints_[i][j] + offset);
+            weights_[i].push_back(weights_[i][j]);
+        }
+        
+        // Now actually add the "ghost" control points and weights in front
+        controlPoints_[i].insert(controlPoints_[i].begin(), frontControlPoints.begin(), frontControlPoints.end());
+        weights_[i].insert(weights_[i].begin(), frontWeights.begin(), frontWeights.end());
+    }
+    
+    extendKnotVector(knotsV_, degreeV_, numEndToStart, numStartToEnd, forceBothEndsUniform);
+}
+
+void NurbsSurface::unclampKnots(bool inU, bool atStart)
+{
+    // Algorithm from Nurbs book A12.1 extended to surfaces
+    
+    std::vector<Mdouble>& knots = inU ? knotsU_ : knotsV_;
+    unsigned int n = inU ? controlPoints_.size() - 1 : controlPoints_[0].size() - 1;
+    unsigned int p = inU ? degreeU_ : degreeV_;
+    
+    if (atStart)
+    {
+        // Unclamp at left end
+        for (int i = 0; i <= p-2; i++)
+        {
+            knots[p - i - 1] = knots[p - i] - (knots[n - i + 1] - knots[n - i]);
+            int k = p - 1;
+            for (int j = i; j >= 0; j--)
+            {
+                Mdouble alpha = (knots[p] - knots[k]) / (knots[p + j + 1] - knots[k]);
+                k--;
+                
+                // Update changed for each control point and weight in other direction
+                // Only difference between inU or not is the indices are swapped: [j][l] -> [l][j]
+                if (inU)
+                {
+                    for (int l = 0; l < controlPoints_[0].size(); l++)
+                    {
+                        controlPoints_[j][l] = (controlPoints_[j][l] - alpha * controlPoints_[j+1][l]) / (1.0 - alpha);
+                        weights_[j][l] = (weights_[j][l] - alpha * weights_[j+1][l]) / (1.0 - alpha);
+                    }
+                }
+                else
+                {
+                    for (int l = 0; l < controlPoints_.size(); l++)
+                    {
+                        controlPoints_[l][j] = (controlPoints_[l][j] - alpha * controlPoints_[l][j+1]) / (1.0 - alpha);
+                        weights_[l][j] = (weights_[l][j] - alpha * weights_[l][j+1]) / (1.0 - alpha);
+                    }
+                }
+            }
+        }
+        // Set first knot
+        knots[0] = knots[1] - (knots[n - p + 2] - knots[n - p + 1]);
+    }
+    else
+    {
+        // Unclamp at right end
+        for (int i = 0; i <= p-2; i++)
+        {
+            knots[n + i + 2] = knots[n + i + 1] + (knots[p + i + 1] - knots[p + i]);
+            for (int j = 1; j >= 0; j--)
+            {
+                Mdouble alpha = (knots[n + 1] - knots[n - j]) / (knots[n - j + i + 2] - knots[n - j]);
+                
+                // Update changed for each control point and weight in other direction
+                // Only difference between inU or not is the indices are swapped: [j][l] -> [l][j]
+                if (inU)
+                {
+                    for (int l = 0; l < controlPoints_[0].size(); l++)
+                    {
+                        controlPoints_[n - j][l] = (controlPoints_[n - j][l] - (1.0 - alpha) * controlPoints_[n - j -1][l]) / alpha;
+                        weights_[n - j][l] = (weights_[n - j][l] - (1.0 - alpha) * weights_[n - j -1][l]) / alpha;
+                    }
+                }
+                else
+                {
+                    for (int l = 0; l < controlPoints_.size(); l++)
+                    {
+                        controlPoints_[l][n - j] = (controlPoints_[l][n - j] - (1.0 - alpha) * controlPoints_[l][n - j -1]) / alpha;
+                        weights_[l][n - j] = (weights_[l][n - j] - (1.0 - alpha) * weights_[l][n - j -1]) / alpha;
+                    }
+                }
+            }
+        }
+        // Set last knot
+        knots[n + p + 1] = knots[n + p] + (knots[2*p] - knots[2*p - 1]);
+    }
+    
+    normalizeKnotVector(knots);
+}
+
+void NurbsSurface::moveControlPoint(unsigned int indexU, unsigned int indexV, Vec3D dP, bool includingClosedOrPeriodic)
+{
+    // When the surface is closed or periodic, there might be other control points which should also move.
+    // To that end, store all the indices in u and v in two vectors, starting with the current one.
+    // Then later each combination of indices of u and v is moved.
+    std::vector<unsigned int> moveIndexU, moveIndexV;
+    moveIndexU.push_back(indexU);
+    moveIndexV.push_back(indexV);
+    
+    if (includingClosedOrPeriodic)
+    {
+        // Assuming either closed or periodic in u/v, not both.
+        unsigned int lowestIndexU, lowestIndexV, shiftU, shiftV;
+    
+        // For closed, degree-1 control points were added to the end
+        if (closedInU_)
+        {
+            lowestIndexU = degreeU_ - 1;
+            shiftU = controlPoints_.size() - degreeU_;
+        }
+        if (closedInV_)
+        {
+            lowestIndexV = degreeV_ - 1;
+            shiftV = controlPoints_[0].size() - degreeV_;
+        }
+    
+        // For periodic, degree-1 control points were added in front and to the end
+        if (periodicInU_)
+        {
+            lowestIndexU = 2 * (degreeU_ - 1);
+            shiftU = controlPoints_.size() - 2 * degreeU_ + 1;
+        }
+        if (periodicInV_)
+        {
+            lowestIndexV = 2 * (degreeV_ - 1);
+            shiftV = controlPoints_[0].size() - 2 * degreeV_ + 1;
+        }
+    
+        if (closedInU_ || periodicInU_)
+        {
+            // Note, no else if, because technically it might be possible for e.g. the middle control point to be the degree-1
+            // from the starting index as well as the end index. Meaning that on both sides other control points need moving.
+            if (indexU <= lowestIndexU)
+                moveIndexU.push_back(indexU + shiftU);
+            if (indexU >= shiftU)
+                moveIndexU.push_back(indexU - shiftU);
+        }
+        if (closedInV_ || periodicInV_)
+        {
+            if (indexV <= lowestIndexV)
+                moveIndexV.push_back(indexV + shiftV);
+            if (indexV >= shiftV)
+                moveIndexV.push_back(indexV - shiftV);
+        }
+    }
+    
+    for (unsigned int u : moveIndexU)
+        for (unsigned int v : moveIndexV)
+            controlPoints_[u][v] += dP;
 }

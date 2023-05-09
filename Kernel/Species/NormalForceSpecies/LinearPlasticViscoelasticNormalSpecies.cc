@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,7 @@
 #include "LinearPlasticViscoelasticNormalSpecies.h"
 #include "Interactions/NormalForceInteractions/LinearPlasticViscoelasticInteraction.h"
 #include "Species/ParticleSpecies.h"
+#include "Logger.h"
 
 class BaseParticle;
 
@@ -136,7 +137,9 @@ LinearPlasticViscoelasticNormalSpecies::setPlasticParameters(Mdouble loadingStif
     if (loadingStiffness <= 0 || unloadingStiffnessMax < loadingStiffness || cohesionStiffness < 0 ||
         penetrationDepthMax < 0 || penetrationDepthMax > 1)
     {
-        logger(ERROR, "Arguments of setPlasticParameters do not make sense");
+        logger(ERROR,"Error: arguments of setPlasticParameters do not make sense\n %%%%%",
+                loadingStiffness <= 0, unloadingStiffnessMax < loadingStiffness, cohesionStiffness < 0,
+                penetrationDepthMax < 0, penetrationDepthMax > 1);
     }
     setLoadingStiffness(loadingStiffness);
     setUnloadingStiffnessMax(unloadingStiffnessMax);

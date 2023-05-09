@@ -123,6 +123,9 @@ if isfield(data,'Density')
     data.VelocityX = data.MomentumX./data.Density;
     data.VelocityY = data.MomentumY./data.Density;
     data.VelocityZ = data.MomentumZ./data.Density;
+    data.VelocityX(data.Density==0)=0;
+    data.VelocityY(data.Density==0)=0;
+    data.VelocityZ(data.Density==0)=0;
     data.KineticStressXX = data.MomentumFluxXX - data.MomentumX.*data.VelocityX;
     data.KineticStressXY = data.MomentumFluxXY - data.MomentumX.*data.VelocityY;
     data.KineticStressXZ = data.MomentumFluxXZ - data.MomentumX.*data.VelocityZ;

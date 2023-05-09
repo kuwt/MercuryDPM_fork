@@ -23,7 +23,7 @@ Before we can do coupled simulations, it's good to learn how to run oomph-lib si
 
 The first step is to include oomph-lib into the MercuryDPM compilation; this is done via a cmake; just run cmake with one additional argument:
 \code{.sh}
- cmake . -DOOMPH_COUPLING=ON
+ cmake . -DMERCURYDPM_OOMPH_COUPLING=ON
 \endcode
 This will clone the oomph-lib repository into your MercuryDPM source directory, and it will compile the oomphlib source files when you type make.
 

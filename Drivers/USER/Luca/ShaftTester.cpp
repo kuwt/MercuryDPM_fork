@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -55,7 +55,7 @@ private:
     
     const int nP = 500;
     
-    void setupInitialConditions() {
+    void setupInitialConditions() override {
         // gravity, particle radius
         setGravity(Vec3D(0.0,0.0,-9.81));
         particleRadius = 0.025;
@@ -160,7 +160,7 @@ private:
     }
     
     //! [CST:beforetime]
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {
 //        wallHandler.getObject(0)->setOrientation(Vec3D(0.0,1.0,0.0));
 //        wallHandler.getObject(1)->setOrientation(Vec3D(0.0,1.0,0.0));

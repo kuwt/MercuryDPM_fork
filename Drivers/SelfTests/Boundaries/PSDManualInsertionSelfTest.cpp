@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -128,7 +128,7 @@ public:
         PSD psd;
         // laser diffraction measurements usually give volumetric responses. This PSD was already converted to a
         // CUMULATIVE_NUMBER_DISTRIBUTION.
-        psd.setPSDFromCSV(getMercurySourceDir() + "/Drivers/SelfTests/Boundaries/InputData/APAPM.csv",
+        psd.setPSDFromCSV(getMercuryDPMSourceDir() + "/Drivers/SelfTests/Boundaries/InputData/APAPM.csv",
                           PSD::TYPE::CUMULATIVE_NUMBER_DISTRIBUTION);
 //        psd.setPSDFromVector(APAPM, PSD::TYPE::CUMULATIVE_NUMBER_DISTRIBUTION);
         insertionBoundary.setPSD(psd);

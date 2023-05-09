@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -34,8 +34,8 @@
 #include "GeneralDefine.h"
 #include <iostream>
 
-#ifndef MERCURY_LOGLEVEL
-#define MERCURY_LOGLEVEL Log::DEFAULT
+#ifndef MERCURYDPM_LOGLEVEL
+#define MERCURYDPM_LOGLEVEL Log::DEFAULT
 #endif
 
 #ifndef CG_LOGLEVEL
@@ -47,16 +47,16 @@
 //#error You included assert before the logger. Please use logger.assert_debug() instead.
 #endif
 
-#ifdef MERCURY_FORCE_ASSERTS
-#define MERCURY_ASSERTS true
+#ifdef MERCURYDPM_FORCE_ASSERTS
+#define MERCURYDPM_ASSERTS true
 #else
-#ifdef MERCURY_NO_ASSERTS
-#define MERCURY_ASSERTS false
+#ifdef MERCURYDPM_NO_ASSERTS
+#define MERCURYDPM_ASSERTS false
 #else
 #ifdef NDEBUG
-#define MERCURY_ASSERTS false
+#define MERCURYDPM_ASSERTS false
 #else
-#define MERCURY_ASSERTS true
+#define MERCURYDPM_ASSERTS true
 #endif
 #endif
 #endif
@@ -175,7 +175,7 @@ public:
 extern LoggerOutput* loggerOutput;
 
 // Forward declaration..
-template<Log L = Log::DEFAULT, bool ASSERTS = MERCURY_ASSERTS>
+template<Log L = Log::DEFAULT, bool ASSERTS = MERCURYDPM_ASSERTS>
 class Logger;
 
 /*!
@@ -347,7 +347,7 @@ public:
      */
     
     template<Log LOGLEVEL, typename ... Args>
-    typename std::enable_if<!((L < LOGLEVEL) && (MERCURY_LOGLEVEL < LOGLEVEL)), void>::type
+    typename std::enable_if<!((L < LOGLEVEL) && (MERCURYDPM_LOGLEVEL < LOGLEVEL)), void>::type
     operator()(const LL<LOGLEVEL> log, const char* format UNUSED, Args&& ... arg UNUSED)
     {
         std::stringstream msgstream;
@@ -386,7 +386,7 @@ public:
      * \brief Empty body function utilized to suppress logger messages above a certain user defined loglevel L.
      */
     template<Log LOGLEVEL, typename... Args>
-    typename std::enable_if<L < LOGLEVEL && MERCURY_LOGLEVEL < LOGLEVEL, void>::type
+    typename std::enable_if<L < LOGLEVEL && MERCURYDPM_LOGLEVEL < LOGLEVEL, void>::type
     operator()(const LL<LOGLEVEL> log, const char* format UNUSED, Args&& ... arg UNUSED)
     {
     }
@@ -466,10 +466,10 @@ public:
      * \deprecated Use operator() instead.
      */
     template<typename... Args>
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     void log(const Log loglevel, const std::string& format, Args&& ... arg)
     {
-        if (loglevel <= L || loglevel <= MERCURY_LOGLEVEL)
+        if (loglevel <= L || loglevel <= MERCURYDPM_LOGLEVEL)
         {
             std::stringstream msgstream;
             createMessage(msgstream, format.c_str(), arg...);
@@ -628,8 +628,8 @@ private:
     {
         // only suppress flushing if Mercury is not in CMAKE_BUILD_TYPE "Debug" and if the user defined loglevel from
         // cMake is below VERBOSE/DEBUG (<=5)
-#ifndef MERCURY_DEBUG
-        if (arg != Flusher::FLUSH && MERCURY_LOGLEVEL <= Log::VERBOSE)
+#ifndef MERCURYDPM_DEBUG
+        if (arg != Flusher::FLUSH && MERCURYDPM_LOGLEVEL <= Log::VERBOSE)
         {
             doFlush_ = Flusher::NO_FLUSH;
         }
@@ -756,16 +756,16 @@ private:
  * please use a custom logger as well, to prevent polluting
  * the output.
  */
-extern Logger<MERCURY_LOGLEVEL> logger;
+extern Logger<MERCURYDPM_LOGLEVEL> logger;
 
 extern Logger<CG_LOGLEVEL> cgLogger;
 
 //just emptying the functions is not sufficiently aggressive in disabling the actual (costly) comparison
-#if !MERCURY_ASSERTS
+#if !MERCURYDPM_ASSERTS
 #define assert(e,...) assert(true,"")
 #endif
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
 #include "MpiContainer.h"
 #endif
 

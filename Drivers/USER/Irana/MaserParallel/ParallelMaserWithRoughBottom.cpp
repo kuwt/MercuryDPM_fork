@@ -15,7 +15,7 @@ class ParallelMaserWithRoughBottom : public Mercury3D
 {
 public:
     ///Standard maser without rough bottom: use setupInitialConditions
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         //Add a particle
         SphericalParticle p0;

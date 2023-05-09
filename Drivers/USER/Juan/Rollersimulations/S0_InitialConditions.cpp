@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -354,7 +354,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     pb.addRoller(RollerType::COUNTER_ROTATING_ROLLER,rollerRadius,rollerVelocity,compaction);
 
     //----------------------------------------------
-    pb.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+    pb.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
     pb.setParticlesWriteVTK(true);
 
     //pb.setSaveCount(100);

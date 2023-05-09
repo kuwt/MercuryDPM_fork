@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -125,7 +125,7 @@ public:
 
     }
 
-    bool continueSolve() const
+    bool continueSolve() const override
     {
         static unsigned int counter = 0;
         if (++counter>100)
@@ -137,7 +137,7 @@ public:
         return true;
     }
 
-    void printTime() const
+    void printTime() const override
     {
         std::cout << "t=" << getTime() << " Ene " << getKineticEnergy()/getElasticEnergy() << std::endl;
     }
@@ -215,7 +215,7 @@ private:
     /////////////////////////////////////////////////////////////////////////////////////////////////////
     ///This is were the walls are implemented
     /////////////////////////////////////////////////////////////////////////////////////////////////////
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         //hGridRebuild();
         for (unsigned int i = particleHandler.getNumberOfObjects(); i >= 1; i--)

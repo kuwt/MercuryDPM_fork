@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -24,8 +24,8 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-#ifndef MERCURY_SUPERQUADRICPARTICLEVTKWRITER_H
-#define MERCURY_SUPERQUADRICPARTICLEVTKWRITER_H
+#ifndef MERCURYDPM_SUPERQUADRICPARTICLEVTKWRITER_H
+#define MERCURYDPM_SUPERQUADRICPARTICLEVTKWRITER_H
 
 
 #include "VTKWriter/ParticleVtkWriter.h"
@@ -53,4 +53,4 @@ private:
 };
 
 
-#endif //MERCURY_SUPERQUADRICPARTICLEVTKWRITER_H
+#endif //MERCURYDPM_SUPERQUADRICPARTICLEVTKWRITER_H

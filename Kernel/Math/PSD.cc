@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -76,7 +76,7 @@ void PSD::printPSD() const
     {
         for (const auto p : particleSizeDistribution_)
         {
-           logger(INFO, "%m\t %\%", p.radius, p.probability * 100);
+            logger(INFO, "%m\t %\%", p.radius, p.probability * 100);
         }
     }
     else if (particleSizeDistribution_.front().radius > 1e-4)
@@ -144,7 +144,7 @@ Mdouble PSD::insertManuallyByVolume(Mdouble volume)
     // initialize the particleNumberPerClass vector if empty.
     if (volumePerClass_.empty())
         volumePerClass_.resize(particleSizeDistribution_.size());
-    
+
     for (auto it = particleSizeDistribution_.end() - 1; it != particleSizeDistribution_.begin(); --it)
     {
         static std::mt19937 gen(0);
@@ -219,7 +219,7 @@ void PSD::validateCumulativeDistribution()
     // check whether the distribution is cumulative
     for (auto it = particleSizeDistribution_.begin() + 1; it != particleSizeDistribution_.end(); ++it)
     {
-        logger.assert_always(it->probability >= (it - 1)->probability, "psd is not cumulative", true);
+        logger.assert_always(it->probability >= (it - 1)->probability, "psd is not cumulative: radius % %, probabilities % %", (it-1)->radius, it->radius, (it-1)->probability, it->probability);
     }
     // cdf needs to start with a probability of zero
     if (particleSizeDistribution_[0].probability != 0)
@@ -344,6 +344,41 @@ void PSD::setDistributionNormal(Mdouble mean, Mdouble standardDeviation, int num
 }
 
 /*!
+ * \details sets the particle size distribution to a discretised normal (gaussian) cumulative number distribution,
+ * which covers the range of 3 * standardDeviation (99,73% of all values covered).
+ * \param[in] mean                  Double representing the mean of the particle size distribution
+ * \param[in] standardDeviation     Double representing the standard deviation of the particle size distribution
+ * \param[in] numberOfBins          Integer determining the number of bins (aka. particle size classes or resolution)
+ *                                  of the particle size distribution
+ * See https://en.cppreference.com/w/cpp/numeric/random/lognormal_distribution
+ */
+void PSD::setDistributionLogNormal(Mdouble mean, Mdouble standardDeviation, int numberOfBins)
+{
+    //setDistributionNormal(mean, standardDeviation, numberOfBins);
+    if (!particleSizeDistribution_.empty())
+    {
+        particleSizeDistribution_.clear();
+    }
+    Mdouble radMin = mean - 3 * standardDeviation;
+    Mdouble radMax = mean + 3 * standardDeviation;
+    std::vector<Mdouble> radii = helpers::linspace(radMin, radMax, numberOfBins);
+    std::vector<Mdouble> probabilities;
+    for (int i = 0; i < radii.size(); i++)
+    {
+        Mdouble probability = 0.5 * (1 + erf((radii[i] - mean) / (sqrt(2) * standardDeviation)));
+        probabilities.push_back(probability);
+    }
+    for (int j = 0; j < radii.size(); j++)
+    {
+        particleSizeDistribution_.push_back({radii[j], probabilities[j]});
+    }
+    validateCumulativeDistribution();
+    for (auto& rp : particleSizeDistribution_) {
+        rp.radius = exp(rp.radius);
+    }
+}
+
+/*!
  * \details creates the psd vector from radii and probabilities filled in by hand. The Type of PSD will be converted
  * to the default cumulative number distribution function (CUMULATIVE_NUMBER_DISTRIBUTION) for further processing.
  * \param[in] psdVector                         Vector containing radii and probabilities ([0,1]).
@@ -353,9 +388,8 @@ void PSD::setDistributionNormal(Mdouble mean, Mdouble standardDeviation, int num
  *                                              PROBABILITYDENSITY_NUMBER_DISTRIBUTION,
  *                                              PROBABILITYDENSITY_LENGTH_DISTRIBUTION,
  *                                              PROBABILITYDENSITY_AREA_DISTRIBUTION.
- * \deprecated This is the old way of inserting PSDs. In the future use setPSDFromCSV().
  */
-MERCURY_DEPRECATED
+MERCURYDPM_DEPRECATED
 void PSD::setPSDFromVector(std::vector<RadiusAndProbability> psdVector, TYPE PSDType)
 {
     particleSizeDistribution_ = psdVector;
@@ -625,7 +659,7 @@ void PSD::convertCumulativeToCumulativeNumberDistribution(TYPE CDFType)
             for (auto it = particleSizeDistribution_.begin() + 1; it != particleSizeDistribution_.end(); ++it)
             {
                 // add conversion here
-            
+
                 // sum up probabilities
                 sum += it->probability;
             }
@@ -639,7 +673,7 @@ void PSD::convertCumulativeToCumulativeNumberDistribution(TYPE CDFType)
             for (auto it = particleSizeDistribution_.begin() + 1; it != particleSizeDistribution_.end(); ++it)
             {
                 // add conversion here
-            
+
                 // sum up probabilities
                 sum += it->probability;
             }
@@ -653,7 +687,7 @@ void PSD::convertCumulativeToCumulativeNumberDistribution(TYPE CDFType)
             for (auto it = particleSizeDistribution_.begin() + 1; it != particleSizeDistribution_.end(); ++it)
             {
                 // add conversion here
-            
+
                 // sum up probabilities
                 sum += it->probability;
             }
@@ -837,7 +871,7 @@ Mdouble PSD::getMinRadius() const
  */
 Mdouble PSD::getMaxRadius() const
 {
-        return particleSizeDistribution_.back().radius;
+    return particleSizeDistribution_.back().radius;
 }
 
 /*!

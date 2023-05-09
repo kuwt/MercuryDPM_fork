@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -333,7 +333,7 @@ void Membrane::setParticleRadius(Mdouble radius)
 
 void Membrane::saveVertexPositions(std::ostream& os)
 {
-    #ifdef MERCURY_USE_MPI
+    #ifdef MERCURYDPM_USE_MPI
     if (PROCESSOR_ID==0)
     {
         os << " nMembraneParticles " << vertexParticleId_.size();
@@ -388,7 +388,7 @@ void Membrane::loadVertexPositions(std::istream& is)
     is >> dummy >> nVertices;
     is >> dummy;
 
-    #ifdef MERCURY_USE_MPI
+    #ifdef MERCURYDPM_USE_MPI
     if (PROCESSOR_ID==0)
     #endif
     logger.assert_always(nVertices==vertexParticleId_.size(),
@@ -402,7 +402,7 @@ void Membrane::loadVertexPositions(std::istream& is)
         }
     }
 
-    // #ifdef MERCURY_USE_MPI
+    // #ifdef MERCURYDPM_USE_MPI
     // if (PROCESSOR_ID==0)
     // #endif
     // logger(INFO, "Loaded % membrane particles", nVertices);
@@ -614,7 +614,7 @@ void Membrane::buildMesh(BaseParticle& p0, std::vector<Vec3D> vertexPositions, s
 {    
     unsigned int triangleCount = faceVertices.size() / 3;
     unsigned int edgeCount = edgeVertices.size() / 2;
-    // #ifdef MERCURY_USE_MPI
+    // #ifdef MERCURYDPM_USE_MPI
     // if (PROCESSOR_ID==0)
     // #endif
     // logger(INFO, "Creating membrane with % vertices and % faces.", vertexPositions.size(), triangleCount);

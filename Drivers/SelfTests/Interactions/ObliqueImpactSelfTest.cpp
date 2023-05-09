@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
     ObliqueImpactSelfTestProblem.setSaveCount(500);
     ObliqueImpactSelfTestProblem.setFileType(FileType::ONE_FILE);
     ObliqueImpactSelfTestProblem.fStatFile.setFileType(FileType::ONE_FILE);
-//    ObliqueImpactSelfTestProblem.setWallsWriteVTK(FileType::NO_FILE);
+//    ObliqueImpactSelfTestProblem.wallHandler.setWriteVTK(FileType::NO_FILE);
     ObliqueImpactSelfTestProblem.setTimeStep(0.25e-8);
     
     //solve the system, the single particle will now bounce on the plate

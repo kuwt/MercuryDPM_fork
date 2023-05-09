@@ -156,7 +156,7 @@ class DragBlasius : public Mercury2D {
             fclose(profilingFile);
         }
 
-        void setupInitialConditions() 
+        void setupInitialConditions() override
         {
             setTimeStep(pars.at("timeStep"));
             setTimeMax(pars.at("timeMax"));
@@ -305,7 +305,7 @@ class DragBlasius : public Mercury2D {
 
         /* If restarting, we need to assign the pointers properly. 
          * This is a little messy but it must be done. */
-        void actionsOnRestart()
+        void actionsOnRestart() override
         {
             if (wallHandler.getNumberOfObjects() == 3)
             {
@@ -369,10 +369,10 @@ class DragBlasius : public Mercury2D {
             /* Profiling */
             std::time_t timeSinceStart = std::time(nullptr) - startTime_;
             std::time_t projectedTimeLeft = timeSinceStart * (getTimeMax() - getTime())/getTime();
-            fprintf(profilingFile, "%f %d %d %d\n",
-                getTime(), particleHandler.getNumberOfObjects(),
-                timeSinceStart, 
-                projectedTimeLeft
+            fprintf(profilingFile, "%f %d %ld %ld\n",
+                    getTime(), particleHandler.getNumberOfObjects(),
+                    timeSinceStart,
+                    projectedTimeLeft
             );
 
         }

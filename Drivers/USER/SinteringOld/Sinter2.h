@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -65,12 +65,12 @@ public:
 
     }
 
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
         *oldSpecies=*species;
     }
 
- 	void printTime() const {
+ 	void printTime() const override {
 	    std::cout << "t=" << std::setprecision(3) << std::left << std::setw(6) << getTime()
             << ", tmax=" << std::setprecision(3) << std::left << std::setw(6) << getTimeMax()
             << ", T=" << std::setprecision(3) << std::left << std::setw(6) << Temperature

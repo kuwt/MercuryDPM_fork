@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -223,7 +223,7 @@ int main(int argc, char* argv[])
                          "set ylabel 'COM_z [m]'\n"
                          "p [0.1:] '" + problem.getName() + ".ene' u 1:2 w l t ''");
 
-    problem.setWallsWriteVTK(false);
+    problem.wallHandler.setWriteVTK(false);
     problem.setParticlesWriteVTK(false);
 
     problem.solve();

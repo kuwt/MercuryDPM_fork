@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -78,7 +78,7 @@ public:
     {
         removeOldFiles();
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(FileType::MULTIPLE_FILES);
+        wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
         setDomain(Vec3D(-coneTopRadius, -coneTopRadius, coneTipHeight),
                   Vec3D(coneTopRadius, coneTopRadius, topHeight));
         setGravity({0,0,-9.8});

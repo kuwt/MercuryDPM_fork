@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -198,7 +198,7 @@ bool SubcriticalMaserBoundaryTEST::checkBoundaryAfterParticleMoved(BaseParticle*
  */
 void SubcriticalMaserBoundaryTEST::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     if (NUMBER_OF_PROCESSORS == 1)
     {
 #endif
@@ -217,7 +217,7 @@ void SubcriticalMaserBoundaryTEST::checkBoundaryAfterParticlesMove(ParticleHandl
     {
         checkBoundaryAfterParticleMoved(p, pH);
     }
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     }
 
 #endif
@@ -231,7 +231,7 @@ void SubcriticalMaserBoundaryTEST::checkBoundaryAfterParticlesMove(ParticleHandl
 void SubcriticalMaserBoundaryTEST::activateMaser()
 {
     logger(INFO, "SubcriticalMaserBoundaryTEST::activateMaser ");
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Clear the periodic boundaryHandler, only want real particles
     getPeriodicHandler()->clearCommunicationLists();
 #endif
@@ -251,7 +251,7 @@ void SubcriticalMaserBoundaryTEST::activateMaser()
         particle->setMaserParticle((getDistance(particle->getPosition()) > 0));
     }
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Generate ghost particles
     getPeriodicHandler()->addNewParticles();
 #endif
@@ -410,7 +410,7 @@ void SubcriticalMaserBoundaryTEST::performActionsBeforeAddingParticles()
 void SubcriticalMaserBoundaryTEST::extendBottom() const
 {
     logger(INFO, "extending bottom");
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     MPIContainer& communicator = MPIContainer::Instance();
     std::vector<unsigned int> numberOfParticlesPerCore(NUMBER_OF_PROCESSORS);
     std::vector<std::vector<BaseParticle*>> particlesToCores(NUMBER_OF_PROCESSORS);
@@ -441,7 +441,7 @@ void SubcriticalMaserBoundaryTEST::extendBottom() const
             newPosition += shift_;
         }
     }
-#ifndef MERCURY_USE_MPI
+#ifndef MERCURYDPM_USE_MPI
     for (BaseParticle* p : newParticles)
     {
         getHandler()->getDPMBase()->particleHandler.addObject(p);
@@ -502,7 +502,7 @@ if (NUMBER_OF_PROCESSORS > 1)
 void SubcriticalMaserBoundaryTEST::copyExtraParticles() const
 {
     logger(INFO, "copying flow particles");
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     MPIContainer& communicator = MPIContainer::Instance();
     std::vector<unsigned int> numberOfParticlesPerCore(NUMBER_OF_PROCESSORS);
     std::vector<std::vector<BaseParticle*>> particlesToCores(NUMBER_OF_PROCESSORS);
@@ -530,7 +530,7 @@ void SubcriticalMaserBoundaryTEST::copyExtraParticles() const
             newPosition += shift_;
         }
     }
-#ifndef MERCURY_USE_MPI
+#ifndef MERCURYDPM_USE_MPI
     for (BaseParticle* p : newParticles)
     {
         getHandler()->getDPMBase()->particleHandler.addObject(p);

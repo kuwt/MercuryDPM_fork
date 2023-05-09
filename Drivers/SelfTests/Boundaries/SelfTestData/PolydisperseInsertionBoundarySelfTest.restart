@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name PolydisperseInsertionBoundarySelfTest revision 6314 repository https://svn.mercurydpm.org/SourceCode/Branches/Timo
+MercuryDPM 0.14 name PolydisperseInsertionBoundarySelfTest revision 6704 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
 dataFile    fileType ONE_FILE saveCount 10 counter 51 lastSavedTimeStep 500
 fStatFile   fileType ONE_FILE saveCount 20 counter 26 lastSavedTimeStep 500
 eneFile     fileType ONE_FILE saveCount 20 counter 26 lastSavedTimeStep 500
@@ -7,7 +7,7 @@ statFile    fileType ONE_FILE saveCount 20 counter 0
 interactionFile fileType NO_FILE saveCount 0 counter 0
 xMin 0 xMax 1 yMin 0 yMax 1 zMin 0 zMax 1
 timeStep 0.001 time 0.5 ntimeSteps 500 timeMax 0.5
-systemDimensions 2 particleDimensions 3 gravity 0 0 0 writeVTK 0 NO_FILE NO_FILE 0 0 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267
+systemDimensions 2 particleDimensions 3 gravity 0 0 0 backgroundDrag 0 writeVTK 0 NO_FILE NO_FILE 0 0 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267
 Species 2
 LinearViscoelasticSpecies id 0 density 8 stiffness 0.424347369600115 dissipation 0.000855896547673955
 LinearViscoelasticSpecies id 1 density 1 stiffness 3.39477895680092 dissipation 0.00684717238139164

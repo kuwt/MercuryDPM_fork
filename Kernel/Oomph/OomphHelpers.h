@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,7 @@ namespace convertVecFuncs
         returnVec.Z = Vec[2];
         return returnVec;
     }
-    
+
     oomph::Vector<double> convertToOomphVec(const Vec3D& Vec)
     {
         oomph::Vector<double> returnVec(3,0.0);

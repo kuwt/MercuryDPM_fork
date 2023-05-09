@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -29,12 +29,12 @@ using namespace std;
 
 class Mercury3DRestarter : public Mercury3DRestart
 {
-//	void actionsBeforeTimeStep(){};
-//	void setupInitialConditions(){setTime(time);}
+//	void actionsBeforeTimeStep() override {};
+//	void setupInitialConditions() override {setTime(time);}
 //public:
 //	double time;
     
-//    virtual void actionsAfterTimeStep()
+//    virtual void actionsAfterTimeStep() override
 //    {
 //        std::cout 
 //            << "Time" << getTime() 

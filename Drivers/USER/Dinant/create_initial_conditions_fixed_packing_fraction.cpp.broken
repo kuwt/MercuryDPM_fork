@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -41,7 +41,7 @@ template <StatType T> class create_initial_conditions_fixed_packing_fraction : p
         species  = speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
     }
 	
-	void computeExternalForces(BaseParticle* CI)
+	void computeExternalForces(BaseParticle* CI) override
 	{
 		/// Now add on gravity
 		CI->addForce(getGravity() * CI->getMass());

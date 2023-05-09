@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -42,6 +42,7 @@
 #include "Species/LinearPlasticViscoelasticSlidingFrictionSpecies.h"
 #include "Species/HertzianViscoelasticMindlinSpecies.h"
 #include "Species/HertzianViscoelasticMindlinRollingTorsionSpecies.h"
+#include "Species/SPHSpecies.h"
 
 #include "Species/LinearViscoelasticBondedSpecies.h"
 #include "Species/LinearViscoelasticSlidingFrictionBondedSpecies.h"
@@ -66,6 +67,8 @@
 
 #include "Species/LinearViscoelasticFrictionLiquidBridgeWilletSpecies.h"
 #include "Species/LinearViscoelasticFrictionLiquidMigrationWilletSpecies.h"
+#include "Species/LinearViscoelasticSlidingFrictionLiquidMigrationLSSpecies.h"
+#include "Species/LinearViscoelasticFrictionLiquidMigrationLSSpecies.h"
 #include "Species/HertzianViscoelasticSlidingFrictionParhamiMcMeekingSinterSpecies.h"
 #include "Species/NormalForceSpecies/ThermalSpecies.h"
 
@@ -162,6 +165,12 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
     if (type == "LinearViscoelasticSpecies")
     {
         LinearViscoelasticSpecies species;
+        is >> species;
+        copyAndAddObject(species);
+    }
+    else if (type == "SPHSpecies")
+    {
+        SPHSpecies species;
         is >> species;
         copyAndAddObject(species);
     }
@@ -324,6 +333,18 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
     else if (type == "LinearViscoelasticFrictionLiquidMigrationWilletSpecies")
     {
         LinearViscoelasticFrictionLiquidMigrationWilletSpecies species;
+        is >> species;
+        copyAndAddObject(species);
+    }
+    else if (type == "LinearViscoelasticSlidingFrictionLiquidMigrationLSSpecies")
+    {
+        LinearViscoelasticSlidingFrictionLiquidMigrationLSSpecies species;
+        is >> species;
+        copyAndAddObject(species);
+    }
+    else if (type == "LinearViscoelasticFrictionLiquidMigrationLSSpecies")
+    {
+        LinearViscoelasticFrictionLiquidMigrationLSSpecies species;
         is >> species;
         copyAndAddObject(species);
     }
@@ -605,6 +626,18 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
             is >> species;
             mixedObjects_.push_back(species.copy());
         }
+        else if (type == "LinearViscoelasticSlidingFrictionLiquidMigrationLSMixedSpecies")
+        {
+            LinearViscoelasticSlidingFrictionLiquidMigrationLSMixedSpecies species;
+            is >> species;
+            mixedObjects_.push_back(species.copy());
+        }
+        else if (type == "LinearViscoelasticFrictionLiquidMigrationLSMixedSpecies")
+        {
+            LinearViscoelasticFrictionLiquidMigrationLSMixedSpecies species;
+            is >> species;
+            mixedObjects_.push_back(species.copy());
+        }
         else if (type == "HertzianViscoelasticMindlinMixedSpecies")
         {
             HertzianViscoelasticMindlinMixedSpecies species;
@@ -805,6 +838,27 @@ BaseSpecies* SpeciesHandler::getMixedObject(const unsigned int id1, const unsign
         else
         {
             return mixedObjects_[mixedId];
+        }
+    }
+}
+
+/*!
+ * \details Updates mixed species by calling the function mixAll() with the
+ * corresponding original species.
+ * \sa mixAll(Object1, Object2) which creates sensible default values for mixed species based on the two species.
+ * Remember mixedSpecies properties can be set independently if required.
+ *
+ * This may (should) be called, if a value is changed
+ * in the original species and the mixed species need to be aware of this change and update by the default rule.
+ * Note this only make sense if you are using the default mixed species and not a custom implementation.
+ */
+void SpeciesHandler::updateMixedObjects()
+{
+    for (unsigned int index1 = 0; index1 < getNumberOfObjects(); ++index1)
+    {
+        for (unsigned int index2 = index1+1; index2 < getNumberOfObjects(); ++index2)
+        {
+            mixedObjects_[getMixedId(index1, index2)]->mixAll(getObject(index1), getObject(index2));
         }
     }
 }

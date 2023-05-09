@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -150,7 +150,7 @@ private:
 
 int main()
 {
-    std::string directory(getMercurySourceDir());
+    std::string directory(getMercuryDPMSourceDir());
     STLReader myReader(directory+"/Drivers/ImportTools/ExampleSTLFiles/Box1x1x1.stl");
 
     std::vector<STLTriangle> answer;

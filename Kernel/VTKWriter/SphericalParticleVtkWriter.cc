@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,7 @@ void SphericalParticleVtkWriter::writeVTKVelocity(std::fstream& file) const
     file << "  <DataArray type=\"Float32\" Name=\"Velocity\" NumberOfComponents=\"3\" format=\"ascii\">\n";
     // Add velocity
     for (const auto& p: handler_) {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         if (particleMustBeWritten(p))
 #endif
         {
@@ -75,7 +75,7 @@ void SphericalParticleVtkWriter::writeVTKAngularVelocity(std::fstream& file) con
         file << "  <DataArray type=\"Float32\" Name=\"AngularVelocity\" NumberOfComponents=\"3\" format=\"ascii\">\n";
         // Add velocity
         for (const auto& p: handler_) {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
             if (particleMustBeWritten(p))
 #endif
             {
@@ -98,7 +98,7 @@ void SphericalParticleVtkWriter::writeVTKRadius(std::fstream& file) const
     // Add radius
     for (const auto& p: handler_)
     {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
         if (particleMustBeWritten(p))
       {
         file << '\t' << p->getRadius() << '\n';

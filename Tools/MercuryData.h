@@ -492,7 +492,7 @@ class MercuryDataFile
       lineStream >> step;
       
       //Did we reach the end yet?
-      bool isValid = lineStream.good();
+      bool isValid = lineStream.good() || (lineStream.eof() && !lineStream.fail());
       double dummy;
       lineStream >> dummy;
       

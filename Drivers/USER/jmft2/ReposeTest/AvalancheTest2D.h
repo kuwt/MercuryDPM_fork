@@ -83,7 +83,7 @@ class AvalancheTest2D : public Mercury2D
 #endif
         }
 
-        void setupInitialConditions() 
+        void setupInitialConditions() override
         {
             char haffn[MAX_STRLEN];
             snprintf(haffn, MAX_STRLEN, "%s.haf", getName().c_str());
@@ -92,7 +92,7 @@ class AvalancheTest2D : public Mercury2D
             step = 0;
         }
 
-        void actionsAfterTimeStep()
+        void actionsAfterTimeStep() override
         {
             /* Calculate the heap repose angle and write it to the heapAngleFile
              */

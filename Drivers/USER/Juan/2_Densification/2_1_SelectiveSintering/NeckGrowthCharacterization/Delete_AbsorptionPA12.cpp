@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -412,7 +412,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 
     logger(INFO,"Time step: %", pb.getTimeStep());
     //----------------------------------------------
-//    pb.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+//    pb.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
     pb.setParticlesWriteVTK(true);
 
     pb.setName(filename);
@@ -430,7 +430,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
                          "set xlabel 'time [s]'\n"
                          "set ylabel 'a(t)/R'\n"
                          "set xrange [0:5.0]\n"
-                         "plot 'AbsorptionPA12_T171.fstat' u 1:12 title 'E=192 $\mu$ J'\n"
+                         "plot 'AbsorptionPA12_T171.fstat' u 1:12 title 'E=192 $\\mu$ J'\n"
                          "replot 1.0 title 'a_{o} Limit' with lines linestyle 3 \n"
                          "replot 'PA12_R125_E192.txt' u ($1):($2) w p ls 4 title 'Experimental data 3.210 ' \n"
     );

@@ -289,7 +289,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 
     //run initial conditions
     pb.setParticlesWriteVTK(true);
-    pb.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+    pb.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
     pb.solve();
 
     return 0;

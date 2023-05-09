@@ -1,0 +1,38 @@
+MercuryDPM 0.14 name NurbsWallEdgeCaseSelfTest revision 5517 repository https://svn.mercurydpm.org/SourceCode/Trunk
+dataFile    fileType ONE_FILE saveCount 100 counter 42 lastSavedTimeStep 4001
+fStatFile   fileType ONE_FILE saveCount 100 counter 42 lastSavedTimeStep 4001
+eneFile     fileType ONE_FILE saveCount 100 counter 42 lastSavedTimeStep 4001
+restartFile fileType ONE_FILE saveCount 100 counter 42 lastSavedTimeStep 4001
+statFile    fileType ONE_FILE saveCount 100 counter 0
+interactionFile fileType NO_FILE saveCount 0 counter 0
+xMin -1 xMax 1 yMin -1 yMax 1 zMin -1 zMax 1
+timeStep 0.001 time 4.00099999999967 ntimeSteps 4001 timeMax 4
+systemDimensions 3 particleDimensions 3 gravity 0 0 -1 writeVTK 1 ONE_FILE NO_FILE 0 42 1 0 0 random  0 1103515245 12345 1073741824 607 273 784607267
+Species 1
+LinearViscoelasticSpecies id 0 density 1 stiffness 12.7100482224694 dissipation 0.192900917664412
+Walls 1
+NurbsWall id 0 indSpecies 0 position 0 0 0 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0.00722539697727973 0 -0.0188823409996128 torque 0 0 0 NurbsSurface mu 14 mv 4 nu 9 nv 2 knotsU 0 0 0 0 0 0.111111111111111 0.222222222222222 0.333333333333333 0.444444444444444 0.555555555555556 0.666666666666667 0.777777777777778 0.888888888888889 1 knotsV 0 0 1 1 controlPoints -1 -1 1 -1 1 1 -1 -1 0 -1 1 0 -1 -1 -1 -1 1 -1 0 -1 -1 0 1 -1 1 -1 -1 1 1 -1 1 -1 0 1 1 0 1 -1 1 1 1 1 0 -1 1 0 1 1 -1 -1 1 -1 1 1 weights 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 closedInUV 0 0 periodicInUV 0 0
+Boundaries 0
+Particles 11
+BaseParticle id 0 indSpecies 0 position -1 0 1.09967043475119 orientation 1 0 0 0 velocity -3.65315230397669e-15 0 -2.33341726925798e-14 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.1 invMass 238.732414637843
+BaseParticle id 1 indSpecies 0 position 0.190025570348575 0 -0.887268965797297 orientation 1 0 0 0 velocity 0.126538529832584 0 0.00702551178233702 angularVelocity 0 0 0 force -0.00024041406484692 0 -2.83483753078769e-05 torque 0 0 0 radius 0.1 invMass 238.732414637843
+BaseParticle id 2 indSpecies 0 position 0.389093743985402 0 -0.866731885305493 orientation 1 0 0 0 velocity 0.126900010656461 0 0.0194891733991669 angularVelocity 0 0 0 force -0.00143355893916279 0 -0.000426897896185129 torque 0 0 0 radius 0.1 invMass 238.732414637843
+BaseParticle id 3 indSpecies 0 position 0.582706638332508 0 -0.816664720073633 orientation 1 0 0 0 velocity 0.116738960437983 0 0.0462923455084463 angularVelocity 0 0 0 force -0.00151940347176348 0 -0.00111732445413526 torque 0 0 0 radius 0.1 invMass 238.732414637843
+BaseParticle id 4 indSpecies 0 position 0.747261691521035 0 -0.703085941217719 orientation 1 0 0 0 velocity 0.0809815269068977 0 0.0940450741454659 angularVelocity 0 0 0 force -0.00157521243966142 0 -0.0021147082667238 torque 0 0 0 radius 0.1 invMass 238.732414637843
+BaseParticle id 5 indSpecies 0 position 0.853183004726723 0 -0.471976266300618 orientation 1 0 0 0 velocity -0.0539408647595907 0 -0.229225928281451 angularVelocity 0 0 0 force -0.00130350225266814 0 -0.00388346492969386 torque 0 0 0 radius 0.1 invMass 238.732414637843
+BaseParticle id 6 indSpecies 0 position 0.88394142035974 0 -0.266989555244152 orientation 1 0 0 0 velocity -0.019930406949992 0 -0.22537994052714 angularVelocity 0 0 0 force -0.000461981508965201 0 -0.00414774354602677 torque 0 0 0 radius 0.1 invMass 238.732414637843
+BaseParticle id 7 indSpecies 0 position 0.652230788876158 0 -0.527231061139207 orientation 1 0 0 0 velocity -0.105134356923393 0 -0.00697528095732427 angularVelocity 0 0 0 force -0.000691324300211792 0 -0.00290949317060569 torque 0 0 0 radius 0.1 invMass 238.732414637843
+BaseParticle id 8 indSpecies 0 position 1.82114558347995 0 -2.8977132216504 orientation 1 0 0 0 velocity 0.400754080667262 0 -2.7720597778556 angularVelocity 0 0 0 force 0 0 -0.00418879020478639 torque 0 0 0 radius 0.1 invMass 238.732414637843
+BaseParticle id 9 indSpecies 0 position 1.90177848794965 0 -4.85349261128811 orientation 1 0 0 0 velocity 0.330787756753283 0 -3.39061588639909 angularVelocity 0 0 0 force 0 0 -0.00418879020478639 torque 0 0 0 radius 0.1 invMass 238.732414637843
+BaseParticle id 10 indSpecies 0 position 1.90298457664402 0 -6.91300188014427 orientation 1 0 0 0 velocity 0.265366129332042 0 -4.00663766935908 angularVelocity 0 0 0 force 0 0 -0.00418879020478639 torque 0 0 0 radius 0.1 invMass 238.732414637843
+Interactions 10
+LinearViscoelasticInteraction particleWallIds 0 0 timeStamp 4001 contactPoint -1 0 0.999835217375597 force -0 -0 0.00418879020478639 torque 0 0 0
+LinearViscoelasticInteraction particleWallIds 1 0 timeStamp 4001 contactPoint 0.195785183961576 0 -0.986940910583156 force -0.00024041406484692 -0 0.00416044182947851 torque 0 0 0
+LinearViscoelasticInteraction particleWallIds 2 0 timeStamp 4001 contactPoint 0.404740794893968 0 -0.965344778459992 force -0.000629881033170809 -0 0.00396971872764315 torque 0 0 0
+LinearViscoelasticInteraction particleWallIds 6 0 timeStamp 4001 contactPoint 0.983531654466171 0 -0.275838061679646 force -0.000461981508965201 -0 4.10466587596238e-05 torque 0 0 0
+LinearViscoelasticInteraction particleWallIds 3 0 timeStamp 4001 contactPoint 0.619987989679022 0 -0.909300338212956 force -0.00140695654671156 -0 0.0034959647301513 torque 0 0 0
+LinearViscoelasticInteraction particleWallIds 4 0 timeStamp 4001 contactPoint 0.823146414024615 0 -0.767964468436745 force -0.0031826615709171 -0 0.00272105357370124 torque 0 0 0
+LinearViscoelasticInteraction particleIds 3 4 timeStamp 4001 contactPoint 0.664984164926771 0 -0.759875330645676 force -0.00091612483104389 0 -0.000632325398542058 torque 0 0 0
+LinearViscoelasticInteraction particleIds 4 7 timeStamp 4001 contactPoint 0.699746240198597 0 -0.615158501178463 force 0.000691324300211792 0 -0.0012792970341807 torque 0 0 0
+LinearViscoelasticInteraction particleWallIds 5 0 timeStamp 4001 contactPoint 0.950494946951434 0 -0.494770086156879 force -0.00130350225266814 -0 0.000305325275092528 torque 0 0 0
+LinearViscoelasticInteraction particleIds 2 3 timeStamp 4001 contactPoint 0.485900191158955 0 -0.841698302689563 force -0.000803677905991978 0 -0.000207826419041893 torque 0 0 0

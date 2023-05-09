@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,7 @@ public:
         setDomain({-1,-1,-1},{1,1,1});
         //turn on VTK output
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(FileType::MULTIPLE_FILES);
+        wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
         // set file outout
         fStatFile.setFileType(FileType::NO_FILE);
         //define species and time step

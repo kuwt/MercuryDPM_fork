@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
     problem.fStatFile.setFileType(FileType::NO_FILE);
     problem.eneFile.setFileType(FileType::NO_FILE);
     problem.restartFile.setFileType(FileType::NO_FILE);
-    problem.setWallsWriteVTK(true);
+    problem.wallHandler.setWriteVTK(true);
     // Introduce a material (no properties set, as no collisions happen here)
     problem.speciesHandler.copyAndAddObject(LinearViscoelasticSpecies());
     // introduce an outer wall

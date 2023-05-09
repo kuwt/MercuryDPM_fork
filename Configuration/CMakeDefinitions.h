@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -23,15 +23,17 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-/// This file is used for generating defitions that give access to CMakeVaribles from within a cpp file (defintions have only been added as required
+/// This file is used for generating definitions that give access to CMakeVariables from within a cpp file (definitions 
+// have only been added as required
+/// PLEASE DO NOT EDIT THE FILE IN THE KERNEL - only in Configuration
 #ifndef CMAKEDEFINTIONS_H
 #define CMAKEDEFINTIONS_H
 
 #include <string>
 
-const std::string getMercurySourceDir();
+const std::string getMercuryDPMSourceDir();
 
-const std::string getMercuryBuildDir();
+const std::string getMercuryDPMBuildDir();
 
 const std::string getRevision();
 
@@ -47,18 +49,18 @@ const std::string getVersion();
 */
 #define ON 1
 #define OFF 0
-#if @Mercury_BACKTRACE_ENABLE@ == ON
+#if @MercuryDPM_BACKTRACE_ENABLE@ == ON
 // This symbol is only defined as true, when the stacktrace code should be compiled in.
-#define MERCURY_STACKTRACE_SHOW 1
+#define MERCURYDPM_STACKTRACE_SHOW 1
 #else
-#define MERCURY_STACKTRACE_SHOW 0
+#define MERCURYDPM_STACKTRACE_SHOW 0
 #endif
 
-#if @Mercury_BACKTRACE_DEMANGLE@ == ON
+#if @MercuryDPM_BACKTRACE_DEMANGLE@ == ON
 // This symbol is only defined as true, when every system required for demangling is present.
-#define MERCURY_STACKTRACE_DEMANGLE 1
+#define MERCURYDPM_STACKTRACE_DEMANGLE 1
 #else
-#define MERCURY_STACKTRACE_DEMANGLE 0
+#define MERCURYDPM_STACKTRACE_DEMANGLE 0
 #endif
 // Cleaning up our symbols.
 #undef ON

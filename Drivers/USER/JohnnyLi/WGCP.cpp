@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -55,7 +55,7 @@ int main()
 //        else if (g==g6) w->move({60,0,0});
 //    }
     // define values required for each simulation
-    dpm.setWallsWriteVTK(true);
+    dpm.wallHandler.setWriteVTK(true);
     dpm.setTimeMax(1);
     dpm.setTimeStep(1);
     dpm.setName("WGCP");

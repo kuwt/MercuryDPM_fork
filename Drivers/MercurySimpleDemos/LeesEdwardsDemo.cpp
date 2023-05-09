@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -66,7 +66,7 @@ class LeesEdwardsDemo : public Mercury2D
             setGravity({0, 0, 0});
         }
 
-        void setupInitialConditions()
+        void setupInitialConditions() override
         {
             auto species = speciesHandler.getObject(0);
 
@@ -92,7 +92,7 @@ class LeesEdwardsDemo : public Mercury2D
             insb->checkBoundaryBeforeTimeStep(this);
         }
 
-        void actionsAfterTimeStep()
+        void actionsAfterTimeStep() override
         {
             if (boundaryHandler.getNumberOfObjects() == 2)
             {

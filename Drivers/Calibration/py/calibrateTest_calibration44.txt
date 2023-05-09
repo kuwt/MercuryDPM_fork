@@ -1,0 +1,20 @@
+# Material parameters
+species LinearViscoelasticFrictionReversibleAdhesiveSpecies
+density 1500
+psdVolumetricCumulativeDiameter
+1e-5 0
+1e-5 1
+cutOffMin 0
+cutOffMax 1
+scaleUp 1
+squeeze 1
+collisionTime 0.000067997
+torsionFriction 0
+fit calibration44
+# Parameters to be calibrated (names and ranges)
+restitutionCoefficient    0.5 1
+slidingFriction           0   1
+rollingFriction           0   1
+bondNumber                0   1
+# Experimental data to be tested (name, values and weights)
+CalibrationTest 0.5 1  2 1  0.5 1  0.5 1

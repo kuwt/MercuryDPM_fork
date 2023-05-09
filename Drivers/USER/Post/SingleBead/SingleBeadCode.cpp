@@ -13,7 +13,7 @@ class DrumRot : public Mercury3D
 {
 	public:
 
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 
 		radiusS1 = 0.0005; // 1mm diameter
@@ -223,10 +223,10 @@ class DrumRot : public Mercury3D
 		}
 		//Write output to vtk file for Paraview
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(FileType::ONE_FILE);
+        wallHandler.setWriteVTK(FileType::ONE_FILE);
 	}
 
-	void actionsBeforeTimeStep()
+	void actionsBeforeTimeStep() override
 	{
 		//wallHandler.getObject(0)->setOrientation(Vec3D(0.0,1.0,0.0));
 		//wallHandler.getObject(1)->setOrientation(Vec3D(0.0,-1.0,0.0));
@@ -264,7 +264,7 @@ class DrumRot : public Mercury3D
 		}
 	}
 
-	void actionsOnRestart()
+	void actionsOnRestart() override
 	{
 
         //setTimeMax(200.0);

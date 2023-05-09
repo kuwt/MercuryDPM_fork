@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -66,7 +66,7 @@ public:
         setRestarted(false);
         setName("S3_Sintering_PA12_200L");
 //        setParticlesWriteVTK(true);
-//        setWallsWriteVTK(FileType::MULTIPLE_FILES);
+//        wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
         wallHandler.removeLastObject();
 
         particleSpecies = dynamic_cast<ThermalSinterLinFrictionReversibleAdhesiveSpecies*>(speciesHandler.getObject(0));
@@ -355,7 +355,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 
 //-----
 //-----
-////Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+////Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 ////For the list of developers, see <http://www.MercuryDPM.org/Team>.
 ////
 ////Redistribution and use in source and binary forms, with or without
@@ -424,7 +424,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 ////        wallHandler.getLastObject()->setPosition(Vec3D(0.0,0.0,getZMax()));
 //
 //        setParticlesWriteVTK(true);
-//        setWallsWriteVTK(FileType::MULTIPLE_FILES);
+//        wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
 //
 //        particleSpecies = dynamic_cast<ThermalSinterLinFrictionReversibleAdhesiveSpecies*>(speciesHandler.getObject(0));
 //        wallSpecies = dynamic_cast<ThermalSinterLinFrictionReversibleAdhesiveSpecies*>(speciesHandler.getObject(1));

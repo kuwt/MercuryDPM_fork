@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -57,7 +57,7 @@ public:
 	
 	void setMaxFailed_triangle(unsigned int new_) {max_failed_triangle = new_;}
 	
-	void setupInitialConditions()
+	void setupInitialConditions() override
     {
         setupSideWalls();
         
@@ -176,7 +176,7 @@ public:
         }
 		}
 	
-	void actionsBeforeTimeStep(){
+	void actionsBeforeTimeStep() override {
 		
 		
 		// Add the option to change the gravity with time

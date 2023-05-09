@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -23,8 +23,8 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef HELPERS_H
-#define HELPERS_H
+#ifndef MECURYDPM_HELPERS_H
+#define MECURYDPM_HELPERS_H
 
 #include "ExtendedMath.h"
 #include <iostream> //std::istream and std::stringstream
@@ -55,7 +55,7 @@ public:
 //     * \deprecated use species->setCollisionTimeAndRestitutionCoefficient
 //     *   (collisionTime, dissipationTimeScale, 2.0*effectiveMass) instead
 //     */
-//    MERCURY_DEPRECATED
+//    MERCURYDPM_DEPRECATED
 //    KAndDisp computeKAndDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass);
 //
 //    /*!
@@ -63,81 +63,81 @@ public:
 //     * \deprecated use species->computeCollisionTime(2.0*effectiveMass) instead
 //     * \todo This does not result in the same value as the given alternative.
 //     */
-//    MERCURY_DEPRECATED
+//    MERCURYDPM_DEPRECATED
 //    Mdouble computeCollisionTimeFromKAndDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass);
 //
 //    /*!
 //     * \brief Calculates the restitution coefficient time for a given stiffness, dissipation, and effective mass
 //     * \deprecated use species->computeRestitutionCoefficient(2.0*effectiveMass) instead
 //     */
-//    MERCURY_DEPRECATED
+//    MERCURYDPM_DEPRECATED
 //    Mdouble computeRestitutionCoefficientFromKAndDispAndEffectiveMass(Mdouble k, Mdouble disp, Mdouble mass);
 //
 //    /*!
 //     * \brief Calculates the dissipation for a given stiffness, restitution coefficient, and effective mass
 //     */
-//    MERCURY_DEPRECATED
+//    MERCURYDPM_DEPRECATED
 //    Mdouble computeDispFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass);
 //
 //    /*!
 //     * \brief Calculates the collision time for a given stiffness, restitution coefficient, and effective mass
 //     * \deprecated use species->computeCollisionTime(2.0*effectiveMass) instead
 //     */
-//    MERCURY_DEPRECATED
+//    MERCURYDPM_DEPRECATED
 //    Mdouble computeCollisionTimeFromKAndRestitutionCoefficientAndEffectiveMass(Mdouble k, Mdouble r, Mdouble mass);
 //
 //    /*!
 //     * \brief Calculates the dissipation for a given stiffness, collision time, and effective mass
 //     * \deprecated use species->setStiffnessAndRestitutionCoefficient(2.0*effectiveMass) instead
 //     */
-//    MERCURY_DEPRECATED
+//    MERCURYDPM_DEPRECATED
 //    Mdouble computeDispFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass);
 //
 //    /*!
 //     * \brief Calculates the restitution coefficient for a given stiffness, collision time, and effective mass
 //     * \deprecated use species->computeRestitutionCoefficient(2.0*effectiveMass) instead
 //     */
-//    MERCURY_DEPRECATED
+//    MERCURYDPM_DEPRECATED
 //    Mdouble computeRestitutionCoefficientFromKAndCollisionTimeAndEffectiveMass(Mdouble k, Mdouble tc, Mdouble mass);
 //
 //    /*!
 //     * \brief Calculates the dissipation for a given collision time, restitution coefficient, and effective mass
 //     * \deprecated use species->setCollisionTimeAndRestitutionCoefficient(2.0*effectiveMass) instead
 //     */
-//    MERCURY_DEPRECATED
+//    MERCURYDPM_DEPRECATED
 //    Mdouble computeDispFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass);
 //
 //    /*!
 //     * \brief Calculates the stiffness for a given collision time, restitution coefficient, and effective mass
 //     * \deprecated use species->setCollisionTimeAndRestitutionCoefficient(2.0*effectiveMass) instead
 //     */
-//    MERCURY_DEPRECATED
+//    MERCURYDPM_DEPRECATED
 //    Mdouble computeKFromCollisionTimeAndRestitutionCoefficientAndEffectiveMass(Mdouble tc, Mdouble r, Mdouble mass);
 //
 //    /*!
 //     * \brief Calculates the stiffness for a given collision time, dissipation, and effective mass
 //     */
-//    MERCURY_DEPRECATED
+//    MERCURYDPM_DEPRECATED
 //    Mdouble computeKFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass);
 //
 //    /*!
 //     * \brief Calculates the resitution coefficient for a given collision time, dissipation, and effective mass
 //     * \deprecated use species->computeRestitutionCoefficient(2.0*effectiveMass) instead
 //     */
-//    MERCURY_DEPRECATED
+//    MERCURYDPM_DEPRECATED
 //    Mdouble computeRestitutionCoefficientFromCollisionTimeAndDispAndEffectiveMass(Mdouble tc, Mdouble disp, Mdouble mass);
 //
 //    /*!
 //     * \brief Calculates the stiffness for a given dissipation, restitution coefficient, and effective mass
 //     */
-//    MERCURY_DEPRECATED
+//    MERCURYDPM_DEPRECATED
 //    Mdouble computeKFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass);
 //
 //    /*!
 //     * \brief Calculates the collision time for a given dissipation, restitution coefficient, and effective mass
 //     * \deprecated use species->computeCollisionTime(2.0*effectiveMass) instead
 //     */
-//    MERCURY_DEPRECATED
+//    MERCURYDPM_DEPRECATED
 //    Mdouble computeCollisionTimeFromDispAndRestitutionCoefficientAndEffectiveMass(Mdouble disp, Mdouble r, Mdouble mass);
 
 ///return type specifically for fuctions returning k, disp, kt, dispt at once
@@ -160,7 +160,7 @@ public:
  * eq. 43 and 30
  * \todo what should be used instead of this function?
  */
-MERCURY_DEPRECATED
+MERCURYDPM_DEPRECATED
 KAndDispAndKtAndDispt
 computeDisptFromCollisionTimeAndRestitutionCoefficientAndTangentialRestitutionCoefficientAndEffectiveMass(
         Mdouble tc, Mdouble r, Mdouble beta, Mdouble mass);
@@ -170,7 +170,7 @@ computeDisptFromCollisionTimeAndRestitutionCoefficientAndTangentialRestitutionCo
  * particle mass m (for higher velocities particles could pass through each other)
  * \todo what should be used instead of this function?
  */
-MERCURY_DEPRECATED
+MERCURYDPM_DEPRECATED
 Mdouble getMaximumVelocity(Mdouble k, Mdouble disp, Mdouble radius, Mdouble mass);
 
 /*!
@@ -228,6 +228,16 @@ std::string to_string(const T& n)
 {
     std::ostringstream stm;
     stm << n;
+    return stm.str();
+}
+
+template<typename T>
+std::string to_string(const std::vector<T>& vec)
+{
+    std::ostringstream stm;
+    for (const auto val : vec) {
+        stm << val << ' ';
+    }
     return stm.str();
 }
 
@@ -304,19 +314,19 @@ bool compare(std::istream& is, std::string s);
  *
  * @param fileName name of input
  * @param varName  variable name as it appears in the input file
- * @param value    default value (used if the parameter could not be read)
+ * @param defaultValue    default value (used if the parameter could not be read)
  * @return         value of variable
  */
 template<typename T>
-T readFromFile(std::string fileName, std::string varName, T value)
+T readFromFile(const std::string fileName, const std::string varName, const T defaultValue)
 {
     //open filestream
     std::ifstream is(fileName.c_str(), std::ios::in);
     if (is.fail())
     {
         logger(INFO, "readFromFile: file % could not be opened, variable % set to default value %",
-               fileName, varName, value);
-        return value;
+               fileName, varName, defaultValue);
+        return defaultValue;
     }
     
     //read in variables, until the right one is fount
@@ -324,8 +334,9 @@ T readFromFile(std::string fileName, std::string varName, T value)
     while (!is.eof())
     {
         is >> s;
-        if (!s.compare(varName))
+        if (s == varName)
         {
+            T value;
             is >> value;
             logger(INFO, "readFromFile: variable % set to % ", varName, value);
             return value;
@@ -333,8 +344,8 @@ T readFromFile(std::string fileName, std::string varName, T value)
     }
     
     //if the right variable is never found
-    logger(WARN, "readFromFile: variable % not set in file %, using default value % ", varName, fileName, value);
-    return value;
+    logger(WARN, "readFromFile: variable % not set in file %, using default value % ", varName, fileName, defaultValue);
+    return defaultValue;
 }
 
 /**
@@ -436,13 +447,16 @@ std::vector<T> readVectorFromCommandLine(int argc, char *argv[], std::string var
     
     Mdouble round(const Mdouble value, unsigned precision);
 
+
+
 /*
  * \brief Returns the Rayleigh time step for a Hertz contact law.
  * \detailed An accepted time step for Hertz is 10-20% of the Rayleigh time step.
  * See \cite Marigo2015
  */
-    Mdouble getRayleighTime(Mdouble radius, Mdouble shearModulus, Mdouble poisson, Mdouble density);
+Mdouble getRayleighTime(Mdouble radius, Mdouble shearModulus, Mdouble poisson, Mdouble density);
     
-    std::vector<Mdouble> linspace(Mdouble a, Mdouble b, int N);
+std::vector<Mdouble> linspace(Mdouble a, Mdouble b, int N);
+
 }
 #endif

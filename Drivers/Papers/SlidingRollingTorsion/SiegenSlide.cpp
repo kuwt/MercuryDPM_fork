@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -65,12 +65,12 @@ public:
 		setGravity(Vec3D(0,-NormalForce/Mass,0));
 	}
 	
-	void actionsBeforeTimeLoop() {
+	void actionsBeforeTimeLoop() override {
 		//don't allow rotations
 		particleHandler.getObject(0)->setInfiniteInertia();
 	}
 		
-	void actionsBeforeTimeStep(){
+	void actionsBeforeTimeStep() override {
 		//fix tangential velocity
 		Mdouble T1 = getTime()/LoopTime-floor(getTime()/LoopTime);
 		if (T1>0.5) {
@@ -86,7 +86,7 @@ public:
 		}
 	}
 
-	void writeEneTimeStep(std::ostream& os) const{
+	void writeEneTimeStep(std::ostream& os) const override {
 		//MD::writeToEne();
 		os
 		<< " " << std::setw(12) << particleHandler.getObject(0)->getForce().X

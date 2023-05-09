@@ -41,17 +41,17 @@ class Pippo : public Mercury3D
 {
 private:
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         
     }
     
-    void actionsOnRestart()
+    void actionsOnRestart() override
     {
         
     }
     
-    void actionsAfterTimeStep()
+    void actionsAfterTimeStep() override
     {
         if (!loadingBranchDone && !reloadingBranchDone && !unloadingBranchDone)
         {

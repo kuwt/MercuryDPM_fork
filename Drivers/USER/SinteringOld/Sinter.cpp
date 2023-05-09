@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -28,11 +28,11 @@
 
 class two_particle_collision : public Sinter {
 public:
-	void setupInitialConditions() {	}
+	void setupInitialConditions() override {	}
 	
 	void add_particles() {}
 	
-	void actionsBeforeTimeStep(){
+	void actionsBeforeTimeStep() override {
 		if (getTime()<1.0*getTimeMax())
             species->setNeckGrowthRate(0.0001*maxNeckGrowthRate);
 		else

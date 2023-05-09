@@ -1,23 +1,20 @@
-cmake_minimum_required (VERSION 2.8.12)
-project (Mercury C CXX Fortran)
-
-# CMAKE_CXX_STANDARD is a cmake 3.1 feature
-# CMAKE_CXX_STANDARD 17 is supported in 3.18, but not in 3.5
-# set(CMAKE_CXX_STANDARD 17)
+cmake_minimum_required(VERSION 3.1)
+project(MercuryDPM C CXX Fortran)
+set(CMAKE_CXX_STANDARD 17)
 
 # Trunk will become 0.14.alpha
-set(Mercury_VERSION_MAJOR 0)
-set(Mercury_VERSION_MINOR 14)
+set(MercuryDPM_VERSION_MAJOR 1)
+set(MercuryDPM_VERSION_MINOR 0)
 
 set(REVISION, "0")
 set(REPOSITORY_URL "")
 
 find_package(Git)
-if(EXISTS ${PROJECT_SOURCE_DIR}/.git)
-	if(Git_FOUND)
+if (EXISTS ${PROJECT_SOURCE_DIR}/.git)
+	if (Git_FOUND)
 		execute_process(
-			COMMAND ${GIT_EXECUTABLE} log -1 --format=%h
-			WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+				COMMAND ${GIT_EXECUTABLE} log -1 --format=%h
+				WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
 			OUTPUT_VARIABLE REVISION
 			OUTPUT_STRIP_TRAILING_WHITESPACE
 		)
@@ -33,7 +30,7 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/.git)
 		message("The project is in a Git repository, but the git executable is not available")
 	endif()
 else()
-	message("This Mercury version is not in Git")
+	message("This MercuryDPM version is not in Git")
 	find_package(Subversion)
 	if(EXISTS ${PROJECT_SOURCE_DIR}/.svn)
 		if(Subversion_FOUND)
@@ -42,7 +39,7 @@ else()
 			set(REVISION ${Project_WC_REVISION})
 		endif()
 	else()
-		message("This Mercury version in not in svn")
+		message("This MercuryDPM version in not in svn")
 	endif()
 endif()
 
@@ -72,29 +69,29 @@ if (NOT CMAKE_BUILD_TYPE)
             FORCE)
 endif (NOT CMAKE_BUILD_TYPE)
 
-#If cMake builds in debug mode add the MERCURY_DEBUG flag
+#If cMake builds in debug mode add the MercuryDPM_DEBUG flag
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_definitions(-DMERCURY_DEBUG)
+    add_definitions(-DMERCURYDPM_DEBUG)
 endif (CMAKE_BUILD_TYPE STREQUAL "Debug")
 
-option(Mercury_TRIANGLE_WALL_CORRECTION "Smooth transition between triangle walls" ON)
-if(Mercury_TRIANGLE_WALL_CORRECTION)
-	add_definitions( -DMercury_TRIANGLE_WALL_CORRECTION )
+option(MercuryDPM_TRIANGLE_WALL_CORRECTION "Smooth transition between triangle walls" ON)
+if(MercuryDPM_TRIANGLE_WALL_CORRECTION)
+	add_definitions( -DMERCURYDPM_TRIANGLE_WALL_CORRECTION )
 endif()
 
-include(CMakeModules/MercuryMPI.cmake)
+include(CMakeModules/MercuryDPM_MPI.cmake)
 
-include(CMakeModules/MercuryOMP.cmake)
+include(CMakeModules/MercuryDPM_OMP.cmake)
 
-include(CMakeModules/MercuryLogger.cmake)
+include(CMakeModules/MercuryDPM_Logger.cmake)
 
-include(CMakeModules/MercuryBacktrace.cmake)
+include(CMakeModules/MercuryDPM_Backtrace.cmake)
 
-include(CMakeModules/MercuryCppFeatureCheck.cmake)
+include(CMakeModules/MercuryDPM_CppFeatureCheck.cmake)
 
-include(CMakeModules/MercuryDocumentation.cmake)
+include(CMakeModules/MercuryDPM_Documentation.cmake)
 
-include(CMakeModules/MercuryXballs.cmake)
+include(CMakeModules/MercuryDPM_Xballs.cmake)
 
 #This section generates a configuration file that contains the CMake variables#
 #############################################
@@ -108,7 +105,7 @@ add_subdirectory(Tools)
 add_subdirectory(XBalls)
 
 # Determine whether to couple MercuryDPM with oomph-lib or not
-option(OOMPH_COUPLING "Couple MercuryDPM with oomph-lib" OFF)
+option(MercuryDPM_OOMPH_COUPLING "Couple MercuryDPM with oomph-lib" OFF)
 # Couple with oomph-lib if OOMPH_COUPLING is on
 include(CMakeModules/OomphCoupling.cmake)
 # this is done after oomph is included since it needs the includes defined there
@@ -131,17 +128,16 @@ add_custom_target(update
 #This section is about the build of documentation#
 ##################################################
 
-option(Mercury_BUILD_USER_DIR "Compile USER DIR in testing" ON)
+option(MercuryDPM_BUILD_USER_DIR "Compile USER DIR in testing" ON)
 
 
 
 ###### These needs to be fixed as the new scripts line above will always create this, so the Python problem is back
 ################################################
-
-FIND_PACKAGE(Python)
+find_package(PythonInterp 3)
+find_package(PythonLibs 3)
 # this line causes problems when you have multiple builds
-#configure_file(Configuration/fpdiff.py
-#	${PROJECT_SOURCE_DIR}/Scripts/fpdiff.py)
+FILE(COPY Configuration/fpdiff.py DESTINATION ${PROJECT_SOURCE_DIR}/Scripts/)
 
 #find_program(PYTHON_EXEC "python" 
 #	DOC "Location of python executable to use")

@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -377,7 +377,7 @@ BaseWall::getInteractionWith(BaseParticle* p, unsigned timeStamp, InteractionHan
         // look for an existing interaction, or create a new one
         BaseInteraction *c = nullptr;
 
-        #ifndef Mercury_TRIANGLE_WALL_CORRECTION
+        #ifndef MERCURYDPM_TRIANGLE_WALL_CORRECTION
         // This if-statement deals with groups of walls. If a particle has multiple contacts with a group of walls, and if the contact areas of these contacts overlap, then we keep only the biggest of the overlapping contacts.
         if (getGroupId() > 0 && p->getInteractions().size() > 0) {
             // if there is a contact with a group of walls, and if p had at least one previously detected contact (in the last timestep or the current)

@@ -10,7 +10,7 @@ Once Doxygen is successfully installed, Mercury documentation can then be turned
 
 <CODE> ccmake . </CODE>
 
-in the "build" directory and turning &quot;<CODE>Mercury_BUILD_DOCUMENTATION</CODE>&quot; on, before configuring and generating as normal 
+in the "build" directory and turning &quot;<CODE>MercuryDPM_BUILD_DOCUMENTATION</CODE>&quot; on, before configuring and generating as normal
 (for further details, see the MercuryDPM <A HREF="http://mercurydpm.org/documentation/source-code-documentation-beta">  installation guide</A>).
 
 ## Using Doxygen

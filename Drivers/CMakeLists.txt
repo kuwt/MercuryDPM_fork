@@ -6,8 +6,8 @@ add_subdirectory(GranularJet)
 add_subdirectory(Avalanching)
 add_subdirectory(CartesianShearCell)
 add_subdirectory(Segregation)
-
 add_subdirectory(UnitTests)
+add_subdirectory(MultiParticle)
 add_subdirectory(MercurySimpleDemos)
 add_subdirectory(MercuryCG)
 add_subdirectory(MercuryMPITests)
@@ -26,11 +26,14 @@ add_subdirectory(Template)
 add_subdirectory(ParallelDrum)
 add_subdirectory(Clusters)
 add_subdirectory(SimpleDrum)
+add_subdirectory(Calibration)
 add_subdirectory(TriangleWalls)
 add_subdirectory(Oomph)
+add_subdirectory(SimpleOpt)
+
 
 #IFCD: If you want (a folder of) the USER directory to be built, mark it so in your ccmake or cmake-gui
 
-if (Mercury_BUILD_USER_DIR)
+if (MercuryDPM_BUILD_USER_DIR)
     add_subdirectory(USER)
 endif()

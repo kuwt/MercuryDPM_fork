@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -85,7 +85,7 @@ public:
 	void set_T4(Mdouble new_) {t4=new_;}
 	Mdouble get_T4() {return t4;}
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         setupSideWalls();
         
@@ -235,7 +235,7 @@ public:
 		}
 	}
 	
-	void actionsBeforeTimeStep(){
+	void actionsBeforeTimeStep() override {
 		
 		
 		// Add the option to change the gravity with time
@@ -289,7 +289,7 @@ public:
 		//}
 	}
 	
-	void actionsBeforeTimeLoop() {
+	void actionsBeforeTimeLoop() override {
 		
 		//automatically sets dt if dt is not specified by the user
         //if (!getTimeStep()) setTimeStep(); // change "dt" to "getTimeStep()", otherwise error: scr/MD.h:643: error: 'Mdouble MD::dt' is private
@@ -311,7 +311,7 @@ public:
 	};
 	
 	
-	void actionsAfterTimeStep(){
+	void actionsAfterTimeStep() override {
 		//save the gravity information in "gravity_file.txt" after every 100th time step
 		Mdouble factor = 10; //100
 		

@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -55,7 +55,7 @@ class RotatingHexagon : public Mercury3D
 	}
 
 // SETUP INITIAL CONDITIONS        
-  void setupInitialConditions()
+  void setupInitialConditions() override
   {
 // INITIAL CALCULATIONS
                 radS1 = 0.003; // 3mm radius
@@ -327,7 +327,7 @@ class RotatingHexagon : public Mercury3D
 
 // ACTIONS BEFORE TIMESTEP
                 
-void actionsBeforeTimeStep()
+void actionsBeforeTimeStep() override
 	{
 		wallHandler.getObject(0)->setOrientation(Vec3D(0.0,1.0,0.0));
 		wallHandler.getObject(1)->setOrientation(Vec3D(0.0,1.0,0.0));
@@ -505,7 +505,7 @@ int main(int argc, char *argv[])
     problem.fStatFile.setFileType(FileType::NO_FILE);
     problem.eneFile.setFileType(FileType::NO_FILE);
 
-    problem.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+    problem.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
     problem.setParticlesWriteVTK(true);
 
     problem.setXBallsAdditionalArguments("-cmode 8 -solidf -v0");

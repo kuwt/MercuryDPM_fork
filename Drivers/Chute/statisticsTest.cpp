@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -38,9 +38,9 @@ class ChutePeriodic : public Chute
 {
 public:
 
-	void actionsBeforeTimeStep(){};
+	void actionsBeforeTimeStep() override {};
 		
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		set_NWall(0);
 		set_NWallPeriodic(2);
@@ -183,7 +183,7 @@ public:
 	//set approximate height of flow
 	void set_H(double H) {setZMax(H);}
 
-	void printTime() const {
+	void printTime() const override {
 		//~ cout << "t=" << setprecision(3) << left << setw(6) << t 
 			//~ << ", tmax=" << setprecision(3) << left << setw(6) << tmax
 			//~ << endl;

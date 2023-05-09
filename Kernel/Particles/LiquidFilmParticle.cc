@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -71,12 +71,23 @@ std::vector<Mdouble> LiquidFilmParticle::getFieldVTK(unsigned i) const
     } else /*i=2 or 0*/ {
         Mdouble fullLiquidVolume = (i==2)?0:liquidVolume_;
         for (auto k : getInteractions()) {
-            auto j = dynamic_cast<LiquidMigrationWilletInteraction*>(k);
-            if (j && j->getLiquidBridgeVolume()) {
-                fullLiquidVolume += 0.5*j->getLiquidBridgeVolume();
+            if(dynamic_cast<LiquidMigrationWilletInteraction*>(k)){
+                auto j = dynamic_cast<LiquidMigrationWilletInteraction*>(k);
+                if (j && j->getLiquidBridgeVolume()) {
+                    fullLiquidVolume += 0.5*j->getLiquidBridgeVolume();
 //            } else {
 //                logger(WARN,"All contacts of % need to be LiquidMigrationWilletInteraction",i);
+                }
             }
+            if(dynamic_cast<LiquidMigrationLSInteraction*>(k)) {
+                auto j = dynamic_cast<LiquidMigrationLSInteraction*>(k);
+                if (j && j->getLiquidBridgeVolume()) {
+                    fullLiquidVolume += 0.5 * j->getLiquidBridgeVolume();
+//            } else {
+//                logger(WARN,"All contacts of % need to be LiquidMigrationWilletInteraction",i);
+                }
+            }
+
         }
         return std::vector<Mdouble>(1, fullLiquidVolume);
     }

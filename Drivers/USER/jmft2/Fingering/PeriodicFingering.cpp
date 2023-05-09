@@ -181,7 +181,7 @@ class PeriodicFingering : public Mercury3D {
         delete largePrototype;
     }
 
-    void setupInitialConditions() {
+    void setupInitialConditions() override {
 
       setTimeStep(pars.at("timeStep"));
       setTimeMax(pars.at("timeMax"));
@@ -256,7 +256,7 @@ class PeriodicFingering : public Mercury3D {
       stillFillingUp = true;
     }
 
-    void actionsOnRestart() 
+    void actionsOnRestart() override
     {
         /* Set the pointer for liftableGate */
         liftableGate = (IntersectionOfWalls*)wallHandler.getObjectById(2);

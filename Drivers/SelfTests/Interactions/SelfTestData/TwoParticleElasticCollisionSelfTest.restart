@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name TwoParticleElasticCollisionSelfTest revision 4848 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
+MercuryDPM 0.14 name TwoParticleElasticCollisionSelfTest revision 6535 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
 dataFile    fileType ONE_FILE saveCount 10 counter 1252 lastSavedTimeStep 12501
 fStatFile   fileType NO_FILE saveCount 10 counter 0
 eneFile     fileType ONE_FILE saveCount 10 counter 1252 lastSavedTimeStep 12501
@@ -7,7 +7,7 @@ statFile    fileType ONE_FILE saveCount 10 counter 0
 interactionFile fileType NO_FILE saveCount 0 counter 0
 xMin 0 xMax 0.01 yMin 0 yMax 0.01 zMin 0 zMax 0
 timeStep 2e-05 time 0.250019999999968 ntimeSteps 12501 timeMax 0.25
-systemDimensions 2 particleDimensions 2 gravity 0 -9.8 0 writeVTK 0 NO_FILE NO_FILE 0 0 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267
+systemDimensions 2 particleDimensions 2 gravity 0 -9.8 0 backgroundDrag 0 writeVTK 0 NO_FILE NO_FILE 0 0 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267
 Species 1
 LinearViscoelasticSpecies id 0 density 2000 stiffness 10000 dissipation 0
 Walls 4

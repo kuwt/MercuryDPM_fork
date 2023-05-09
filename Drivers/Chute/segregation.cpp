@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -41,7 +41,7 @@ public:
 
 
 //This code requires you do not nothing special after each time step
-void actionsBeforeTimeStep(){};
+void actionsBeforeTimeStep() override {};
 
 ///This is the info call
 void write(  	std::ostream &   	 os, bool  	print_all = false) 	
@@ -63,7 +63,7 @@ void write(  	std::ostream &   	 os, bool  	print_all = false)
 /// This setup the intial conditions, generates small volume fraction of particles. 
 /// Sets the program to be periodic in x.
 /// \bug This code is not non-dimensionalised at the moment, should do this shortly, but at the moment
-void setupInitialConditions()
+void setupInitialConditions() override
 {
 	
 	//Check if the run has been done before. If yes, skip and start next run

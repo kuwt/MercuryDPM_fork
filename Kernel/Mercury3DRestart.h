@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -74,7 +74,7 @@ public:
     /** the -r option is used to restart the code; this should probably be moved 
      * to DPMBase
      */
-    bool readNextArgument(int& i, int argc, char* argv[])
+    bool readNextArgument(int& i, int argc, char* argv[]) override
     {
         if (!strcmp(argv[i], "-restart") || !strcmp(argv[i], "-r"))
         {
@@ -125,7 +125,7 @@ private:
      * reached. This is done by resetting the final simulation time to the 
      * current time.
      */
-    void writeOutputFiles()
+    void writeOutputFiles() override
     {
         Mercury3D::writeOutputFiles();
         

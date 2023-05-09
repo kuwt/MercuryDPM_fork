@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -60,7 +60,7 @@ BondedInteraction::BondedInteraction(const BondedInteraction& p)
 
 BondedInteraction::BondedInteraction()
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     logger(FATAL,"ChargedBondedInteractions are currently not implemented in parallel MercuryDPM");
 #endif
 }
@@ -100,7 +100,7 @@ void BondedInteraction::computeAdhesionForce()
     const BondedSpecies* species = getSpecies();
     if (bonded_ && getOverlap() >= 0)
     {
-        addForce(getNormal() * (-species->getBondForceMax()
+        addForce(getNormal() * (-getBondForce()
                                 - species->getBondDissipation() * getNormalRelativeVelocity()));
     }
 }
@@ -148,6 +148,13 @@ void BondedInteraction::setBonded(bool bonded)
 
 void BondedInteraction::bond()
 {
+    bondForce_=getSpecies()->getBondForceMax();
+    bonded_ = true;
+}
+
+void BondedInteraction::bondInPlace()
+{
+    bondForce_= getForce().getLength();
     bonded_ = true;
 }
 

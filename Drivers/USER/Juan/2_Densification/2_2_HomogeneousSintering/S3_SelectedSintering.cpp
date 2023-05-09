@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -460,7 +460,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 
     oTest.sinteringParameters(deltaC, fluidity,compliance0,surfaceTension);
     oTest.setParticlesWriteVTK(true);
-    oTest.setWallsWriteVTK(true);
+    oTest.wallHandler.setWriteVTK(true);
 
     oTest.setTimeMax(maxTime); //[s]
     oTest.setXBallsAdditionalArguments("-solidf -v0 -cmode 8 -cmaxset 100 ");
@@ -518,7 +518,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 }
 
 
-////Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+////Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 ////For the list of developers, see <http://www.MercuryDPM.org/Team>.
 ////
 ////Redistribution and use in source and binary forms, with or without
@@ -929,7 +929,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 //                               setDeltaC, setC1);
 //
 //    oTest.setParticlesWriteVTK(false);
-//    oTest.setWallsWriteVTK(false);
+//    oTest.wallHandler.setWriteVTK(false);
 //
 //    oTest.setTimeMax(0.3); //[s]
 //    oTest.setXBallsAdditionalArguments("-solidf -v0 -cmode 8 -cmaxset 100 ");

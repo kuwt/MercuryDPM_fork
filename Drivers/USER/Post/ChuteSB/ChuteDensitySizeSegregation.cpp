@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -48,16 +48,16 @@ class SegregationPeriodic : public Chute{
 public:
 
 ///Allows the user to set what is written into the info column in the data file
-double getInfo(const BaseParticle &P) const {
+double getInfo(const BaseParticle &P) const override {
 	return P.getIndSpecies();
 	}
 
 
 ///This code requires you do not nothing special after each time step
-void actionsBeforeTimeStep(){};
+void actionsBeforeTimeStep() override {};
 
 ///This is the info call
-void write(std::ostream& os, bool print_all = false) const
+void write(std::ostream& os, bool print_all = false) const override
 {
 //	os << "This is a density size-segregation chute code problem" << endl;
 //	os << "\n \n \n"<< endl;
@@ -77,7 +77,7 @@ void write(std::ostream& os, bool print_all = false) const
 /// This setup the intial conditions, generates volume fraction of particle 1.
 /// Sets the program to be periodic in x.
 /// \bug This code is not non-dimensionalised at the moment, should do this shortly, but at the moment. Should swap this to Silbert particles shortly
-void setupInitialConditions()
+void setupInitialConditions() override
 {
 
 	//Check if the run has been done before. If yes, skip and start next run
@@ -378,7 +378,7 @@ void setupInitialConditions()
 
 }
 
-void actionsAfterTimeStep()
+void actionsAfterTimeStep() override
 {
     if(getTime() >= 10.0)
     {

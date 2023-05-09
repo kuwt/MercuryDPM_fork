@@ -31,12 +31,12 @@ This page contains the following tutorials: \n
 \image html Tutorials/T1/Tutorial1.jpg Particle moving with a constant velocity in outer space.
 
 #### Problem description:
-The first tutorial is setup to simulate a particle moving with a constant velocity in the absence of gravity. You can find the simulation setup in \b Tutorial1.cpp
+The first tutorial is setup to simulate a particle moving with a constant velocity in the absence of gravity. You can find the simulation setup in \b Tutorial1_ParticleInOuterSpace.cpp
 The detailed description of this tutorial is presented below.\n
 
 ###Headers:
 The headers are necessary to set up the simulations. They come from the kernel and standard libraries (see \ref DevelopersGuideKernel). Headers files usually have a <EM> .h </EM> or <EM> .hpp </EM> extensions. For example:
-\snippet Drivers/Tutorials/Tutorial1.cpp T1:headers
+\snippet Drivers/Tutorials/Tutorial1_ParticleInOuterSpace.cpp T1:headers
 
 ###Before main function:
 
@@ -52,7 +52,7 @@ Here is defined the class Tutorial1, which is inherited from the main class  \re
 
 It creates the problems’ initial conditions to define the radius, position, velocity of particles. In order to create a particle, the following structure must be used:
 
-\snippet Drivers/Tutorials/Tutorial1.cpp T1:createParticle
+\snippet Drivers/Tutorials/Tutorial1_ParticleInOuterSpace.cpp T1:createParticle
 
 The particle data members as positions, radius and velocities are pointed by using an object (P0) to their class member. For the case of the mentioned data members, the class member is called \ref BaseParticle. Then, the defined information is sent to its corresponding handler: \b  particleHandler by using the function \ref copyAndAddObject
 
@@ -66,12 +66,12 @@ Tutorial1 problem;
 
 Then, the data members are defined as:
 
-\snippet Drivers/Tutorials/Tutorial1.cpp T1:problemSetup
+\snippet Drivers/Tutorials/Tutorial1_ParticleInOuterSpace.cpp T1:problemSetup
 
 Subsequently, the \ref species of the problem are defined. It means, the properties (density,stiffness) and the corresponding contact law (for this tutorial, see \ref LinearViscoelasticSpecies).
 Initially, when a particle is created, it attains the properties of a default species type with ‘0’ as its index.
 
-\snippet Drivers/Tutorials/Tutorial1.cpp T1:speciesProp
+\snippet Drivers/Tutorials/Tutorial1_ParticleInOuterSpace.cpp T1:speciesProp
 
 Here, 'species' is an object of the class: \ref LinearViscoelasticSpecies. Data members are fitted to point to this object, and then, coppied and added to their corresponding handler \ref speciesHandler.
 
@@ -80,50 +80,50 @@ Outputs:\n
 Data output is vital to analyse simulations, which leads to defining ways to save the simulation data for post processing.\n
 The simulations generate several types of data files.
 
-\snippet Drivers/Tutorials/Tutorial1.cpp T1:output
+\snippet Drivers/Tutorials/Tutorial1_ParticleInOuterSpace.cpp T1:output
 
 Thereby, data members and member functions are pointed to the object 'problem'.\n
 
 For XBalls users, additional display options can be set as below
 
-\snippet Drivers/Tutorials/Tutorial1.cpp T1:visualOutput
+\snippet Drivers/Tutorials/Tutorial1_ParticleInOuterSpace.cpp T1:visualOutput
 
 After all the simulation parameters are set, we reach a point where we put all the above bits of code in action by the following statements
 
-\snippet Drivers/Tutorials/Tutorial1.cpp T1:solve
+\snippet Drivers/Tutorials/Tutorial1_ParticleInOuterSpace.cpp T1:solve
 
 \n
 \section T2 T2: Particle motion on earth
 \image html Tutorials/T2/Tutorial2.jpg Particle falling due to gravity.
 
 #### Problem description:
-In \b Tutorial2.cpp, we simulate a particle when dropped under the influence of gravity, \f$ g = 9.81 m/s^2\f$. Basically, this tutorial is an extension of \b Tutorial1.cpp with few minor changes.\n
+In \b Tutorial2_ParticleUnderGravity.cpp, we simulate a particle when dropped under the influence of gravity, \f$ g = 9.81 m/s^2\f$. Basically, this tutorial is an extension of \b Tutorial1_ParticleInOuterSpace.cpp with few minor changes.\n
 All we need to do is to change the initial particle position and velocity in the inherited class Tutorial2.\n
 
-\snippet Drivers/Tutorials/Tutorial2.cpp T2:createParticle
+\snippet Drivers/Tutorials/Tutorial2_ParticleUnderGravity.cpp T2:createParticle
 
 Also, the gravity vector in the main function:
 
-\snippet Drivers/Tutorials/Tutorial2.cpp T2:problemSetup
+\snippet Drivers/Tutorials/Tutorial2_ParticleUnderGravity.cpp T2:problemSetup
 
 \n
 \section T3 T3: Bouncing ball (elastic)
 \image html Tutorials/T3/Tutorial3.jpg Particle bouncing off the blue wall.
 
 #### Problem description:
-The \b Tutorial3.cpp simulates a particle bouncing off a wall. It is assumed the collistion between the particle and the wall is elastic by implying that the restitution coefficient is unity. It means that the particle velocity before and after collision remains the same.
+The \b Tutorial3_BouncingBallElastic.cpp simulates a particle bouncing off a wall. It is assumed the collistion between the particle and the wall is elastic by implying that the restitution coefficient is unity. It means that the particle velocity before and after collision remains the same.
 Additionally, we will learn how to add a wall over which the ball bounces.
 
 ### Headers:
 The header \ref InfiniteWall.h is included.
 
-\snippet Drivers/Tutorials/Tutorial3.cpp T3:headers
+\snippet Drivers/Tutorials/Tutorial3_BouncingBallElastic.cpp T3:headers
 
 
 ### Before the main class:
 The class \ref InfiniteWall is included in the inherited class \ref Tutorial3:
 
-\snippet Drivers/Tutorials/Tutorial3.cpp T3:class
+\snippet Drivers/Tutorials/Tutorial3_BouncingBallElastic.cpp T3:class
 
 Where the object "w0" is an instance of the class \b InfiniteWall. Then, the function "copyAndAddObject" coppy and add the object to its corresponding handler. The above set of statements, create and place the wall at \f$ Z_{min} \f$.\n
 
@@ -134,7 +134,7 @@ Note: Don’t forget to include the InfiniteWall.h header, as shown in the heade
 \image html Tutorials/T4/Tutorial4.jpg Particle bouncing off the blue wall with restitution coefficient.
 
 #### Problem description:
-In \b Tutorial4.cpp, the difference between an elastic and inelastic collision between a particle and a wall is illustrated. The only difference between \ref Tutorial3.cpp and \ref Tutorial4.cpp is the value of the restitution coefficient:
+In \b Tutorial4_BouncingBallInelastic.cpp, the difference between an elastic and inelastic collision between a particle and a wall is illustrated. The only difference between \ref Tutorial3_BouncingBallElastic.cpp and \ref Tutorial4_BouncingBallInelastic.cpp is the value of the restitution coefficient:
 \code double rc = 0.88; // restitution coefficient \endcode
 See \ref T4code for more details.
 
@@ -143,10 +143,10 @@ See \ref T4code for more details.
 \image html Tutorials/T5/Tutorial5.jpg Particles moving towards each other.
 
 Problem description:\n
-So far, in the above tutorials, we have seen how a particle and a wall interact during a collision. In this tutorial, we illustrate how two particles interact using \b Tutorial5.cpp. For this purpose, we need two particles. The particles may or may not be of the same species type. But, here we shall assume they are of same species and same size.\n
+So far, in the above tutorials, we have seen how a particle and a wall interact during a collision. In this tutorial, we illustrate how two particles interact using \b Tutorial5_ElasticCollision.cpp. For this purpose, we need two particles. The particles may or may not be of the same species type. But, here we shall assume they are of same species and same size.\n
 
 ### Before the main function
-\snippet Drivers/Tutorials/Tutorial5.cpp T5:class
+\snippet Drivers/Tutorials/Tutorial5_ElasticCollision.cpp T5:class
 On comparison between the above class and class Tutorial1, we see how an additional particle is added. Two particles are created, and positioned oppositely apart at a certain distance between them. Both the particles, have a certain velocity directing them towards each other.
 
 \n
@@ -154,17 +154,17 @@ On comparison between the above class and class Tutorial1, we see how an additio
 \image html Tutorials/T6/Tutorial6.jpg (a) Illustrates the idea behind periodic boundaries, particle exiting boundary b2 re-enters through boundary b1 <br> (b) Illustrates the problem setup.
 
 #### Problem description:
-In order to have multiple collisions, \ref Tutorial5.cpp is fitted with periodic boundaries in X.
+In order to have multiple collisions, \ref Tutorial5_ElasticCollision.cpp is fitted with periodic boundaries in X.
 
 ### Headers:
-\snippet Drivers/Tutorials/Tutorial6.cpp T6:headers
+\snippet Drivers/Tutorials/Tutorial6_ElasticCollisionPeriodic.cpp T6:headers
 The header \ref PeriodicBoundary.h is included.
 
 ### Before the main function:
-\snippet Drivers/Tutorials/Tutorial6.cpp T6:class
+\snippet Drivers/Tutorials/Tutorial6_ElasticCollisionPeriodic.cpp T6:class
 In the Class Tutorial6\n
 (i) we create two particles of same type and different sizes. (ii) we setup periodic boundaries in X-direction as
-\snippet Drivers/Tutorials/Tutorial6.cpp T6:periodicBoundary
+\snippet Drivers/Tutorials/Tutorial6_ElasticCollisionPeriodic.cpp T6:periodicBoundary
 
 Where "b0" is an instance of the class \ref  PeriodicBoundary. Then, the object is copied and added to its corresponding handler:  \ref boundaryHandler.
 
@@ -174,10 +174,10 @@ Where "b0" is an instance of the class \ref  PeriodicBoundary. Then, the object 
 
 #### Problem description:
 In previous tutorials, we have seen how a particle interacts with a wall and itself. In this tutorial, we will design boxes of different shapes by using more than one wall. As an example, in absence of gravity, we will simulate a particle moving in a two dimensional square shaped box. We consider two dimensions only for the sake of simplicity.
-The same idea was introduced in \ref Tutorial3.cpp.
+The same idea was introduced in \ref Tutorial3_BouncingBallElastic.cpp.
 
 ### Before the main function:
-\snippet Drivers/Tutorials/Tutorial7.cpp T7:class
+\snippet Drivers/Tutorials/Tutorial7_ParticleIn2DBox.cpp T7:class
 In this class, we setup a 2D square shaped box or a polygon by adding more walls as shown above. In total, we have 4 walls forming our box within which the particle will traverse.
 Note: As we simulate in 2D, no walls are set in z-direction.
 
@@ -185,7 +185,7 @@ Note: As we simulate in 2D, no walls are set in z-direction.
 As our simulation is two dimensional, we set the system dimensions as 2
 \code problem.setSystemDimensions(2);\endcode
 
-The complete code for the above problem description can be found in \ref Tutorial7.cpp.
+The complete code for the above problem description can be found in \ref Tutorial7_ParticleIn2DBox.cpp.
 
 \n
 \section T8 T8: Motion of a particle in a box with an obstacle
@@ -195,7 +195,7 @@ The complete code for the above problem description can be found in \ref Tutoria
 We extend the problem setup of Tutorial 7, by adding a rectangular block as shown in the above figure. To create this block of wall or obstacle, we will use the Class \ref IntersectionOfWalls. Before we go ahead it is advised to know the difference between an infinite wall and finite wall, see \ref WallTypes. As an example, we create an obstacle using a set of finite walls and place it within the box created using a set of infinite walls. See the above figure.
 
 ### Headers:
-\snippet Drivers/Tutorials/Tutorial8.cpp T8:headers
+\snippet Drivers/Tutorials/Tutorial8_ParticleIn2DBoxWithObstacle.cpp T8:headers
 
 The header \ref IntersectionOfWalls.h is included.
 
@@ -203,7 +203,7 @@ The header \ref IntersectionOfWalls.h is included.
 \image html Tutorials/T8/Tutorial8b.jpg
 
 To add intersection walls, we use:
-\snippet Drivers/Tutorials/Tutorial8.cpp T8:finiteWall
+\snippet Drivers/Tutorials/Tutorial8_ParticleIn2DBoxWithObstacle.cpp T8:finiteWall
 
 where "w1" is an instance of the class \ref IntersectionOfWalls. This surface (wall) will have the properties of the index 0: "getObject(0)". Then, the object is coppied and added to its corresponding handler:  \ref wallHandler.
 
@@ -212,25 +212,25 @@ where "w1" is an instance of the class \ref IntersectionOfWalls. This surface (w
 \image html Tutorials/T9/Tutorial9.jpg
 
 #### Problem description:
-the motion of three particles over an inclined plane is presented in \ref Tutorial9.cpp. Here, the particles are fitted with different features.
+the motion of three particles over an inclined plane is presented in \ref Tutorial9_InclinedPlane.cpp. Here, the particles are fitted with different features.
 
 ### Headers:
 
-\snippet Drivers/Tutorials/Tutorial9.cpp T9:headers
+\snippet Drivers/Tutorials/Tutorial9_InclinedPlane.cpp T9:headers
 
-For \ref Tutorial9.cpp, the header which implements the elastic properties and contact force modelc has been changed. In order to include the rolling and sliding effects, \ref LinearViscoelasticFrictionSpecies.h is used.
+For \ref Tutorial9_InclinedPlane.cpp, the header which implements the elastic properties and contact force modelc has been changed. In order to include the rolling and sliding effects, \ref LinearViscoelasticFrictionSpecies.h is used.
 
 ### Before the main function:
-\snippet Drivers/Tutorials/Tutorial9.cpp T9:class
+\snippet Drivers/Tutorials/Tutorial9_InclinedPlane.cpp T9:class
 
 Three particles are fitted with radius, initial positions and initial velocities.Then, all particles are coppied and added to their corresponding handler. \n
 It is defined the object 'w0' as an instance of the class  InfiniteWall. For this tutorial, the surface will have the same properties of "object0". It means the surface and the first particle will have the same elastic properties.
 
 ### Main function:
 
-\snippet Drivers/Tutorials/Tutorial9.cpp T9:main
+\snippet Drivers/Tutorials/Tutorial9_InclinedPlane.cpp T9:main
 
-The main function of \ref Tutorial9.cpp presents how the elastic features of particles are defined. Also, a new function is added to combine features of different indexes: getMixedObject.
+The main function of \ref Tutorial9_InclinedPlane.cpp presents how the elastic features of particles are defined. Also, a new function is added to combine features of different indexes: getMixedObject.
 
 
 
@@ -241,39 +241,39 @@ The main function of \ref Tutorial9.cpp presents how the elastic features of par
 
 This tutorial explains how to include axisymmetric walls inside a cylindrical domain. Also, the user will find an useful
 implementation of how to create polydisperse particle size distribution and perform internal validation tests. The full code
-can be found in \ref Tutorial11.cpp
+can be found in \ref Tutorial11_AxisymmetricWalls.cpp
 
 ### Headers:
 
 To work with axisymmetric walls, the user needs to add the following headers:
 
-\snippet Drivers/Tutorials/Tutorial11.cpp T11:headers
+\snippet Drivers/Tutorials/Tutorial11_AxisymmetricWalls.cpp T11:headers
 
 ### Before the main function:
 
 The class Tutorial 11 contains the constructor Tutorial 11
 
-\snippet Drivers/Tutorials/Tutorial11.cpp T11:constructor
+\snippet Drivers/Tutorials/Tutorial11_AxisymmetricWalls.cpp T11:constructor
 
 This constructor is an instance of the main class. Here it's defined the global output and non-changeable parameters.
 
 In this tutorial, it's overrided the member function setupInitialConditions(), which doesn't return any value (defined then as void).
 
-\snippet Drivers/Tutorials/Tutorial11.cpp T11:initialConditions
+\snippet Drivers/Tutorials/Tutorial11_AxisymmetricWalls.cpp T11:initialConditions
 
 First, it is added the cylinder, then the prism shape or cone that represents the outer part. A flat surface is included in the middle to stop the downforward flow until a specific time. After adding the walls, the species of the particles are included. All particles have the same properties and they are randomly
 distributed.
 
 An additional member function is included.
 
-\snippet Drivers/Tutorials/Tutorial11.cpp T11:functiontime
+\snippet Drivers/Tutorials/Tutorial11_AxisymmetricWalls.cpp T11:functiontime
 
 This overide function moves the flat surface to the base domain. It happens at a defined time, thus the particles can continue to flow.
 
 ### Main function:
 The main function of this tutorial includes the setup parameters and the tests for a valid collision time and restitution coefficient.
 
-\snippet Drivers/Tutorials/Tutorial11.cpp T11:main
+\snippet Drivers/Tutorials/Tutorial11_AxisymmetricWalls.cpp T11:main
 
 \n
 \section T12 T12: Creating objects by using Prisms
@@ -281,50 +281,50 @@ The main function of this tutorial includes the setup parameters and the tests f
 #### Problem description:
 
 This tutorial explains how to define objects in space with the Prism function. Also, the user will find that you can presecribe the location and motion of the object. The full code
-can be found in \ref Tutorial12.cpp
+can be found in \ref Tutorial12_PrismWalls.cpp
 
 ### Headers:
 
 To work with prismatic walls in this tutorial, the user needs to add the following headers:
 
-\snippet Drivers/Tutorials/Tutorial12.cpp T12:headers
+\snippet Drivers/Tutorials/Tutorial12_PrismWalls.cpp T12:headers
 
 ### Before the main function:
 
 The walls and Prism object are all predefined in the initial conditions.
 
-\snippet Drivers/Tutorials/Tutorial12.cpp T12:initialConditions
+\snippet Drivers/Tutorials/Tutorial12_PrismWalls.cpp T12:initialConditions
 
 The first part in the the initial conditions is defining the particle.
 
-\snippet Drivers/Tutorials/Tutorial12.cpp T12: Define particle
+\snippet Drivers/Tutorials/Tutorial12_PrismWalls.cpp T12: Define particle
 
 After defining the particle that outer walls are generated by using four finite walls as seen in previous tutorials
 
-\snippet Drivers/Tutorials/Tutorial12.cpp T12: Define outer walls
+\snippet Drivers/Tutorials/Tutorial12_PrismWalls.cpp T12: Define outer walls
 
 To creat the prism we have to do the following: First one creates an instance of IntersectionOfWalls "w1". Next the species are assigned. This line is followed by defining a 3D vector "Points" with space for four vertices.
 After that the location of the four vertices are defined. Then, by using w1.createPrism(Points) the prism is formed centered at the origin.
 
-\snippet Drivers/Tutorials/Tutorial12.cpp T12: Create object
+\snippet Drivers/Tutorials/Tutorial12_PrismWalls.cpp T12: Create object
 
 Now the object has been formed you can prescribe several properties of the object such as the angular velocity or translational velocity (using setVelocity).
 Notice that when using setAngularVelocity the object rotates around the origin, so if an object is located at the origin it will rotate around its own axis while located elsewhere it will rotate around the origin.
 It is essential that you set velocities and positions in the correct order such that you get the desired motion.
 
-\snippet Drivers/Tutorials/Tutorial12.cpp T12: Set Angular Velocity
-\snippet Drivers/Tutorials/Tutorial12.cpp T12: Set Velocity
-\snippet Drivers/Tutorials/Tutorial12.cpp T12: Set Position
+\snippet Drivers/Tutorials/Tutorial12_PrismWalls.cpp T12: Set Angular Velocity
+\snippet Drivers/Tutorials/Tutorial12_PrismWalls.cpp T12: Set Velocity
+\snippet Drivers/Tutorials/Tutorial12_PrismWalls.cpp T12: Set Position
 
 ### Main:
 
 In the main function the problem is defined in the problem instance, an instance of class Tutorial 12.
 
-\snippet Drivers/Tutorials/Tutorial12.cpp T12: constructor
+\snippet Drivers/Tutorials/Tutorial12_PrismWalls.cpp T12: constructor
 
 At the end of the main function we call the solve function
 
-\snippet Drivers/Tutorials/Tutorial12.cpp T12: Solve Problem
+\snippet Drivers/Tutorials/Tutorial12_PrismWalls.cpp T12: Solve Problem
 
 After solving the problem you can visualize the results and see the effect of the motion of the object on the trajectory of the particle.
 
@@ -336,57 +336,57 @@ After solving the problem you can visualize the results and see the effect of th
 
 \section T1code Particle motion in outer space (code)
 Return to tutorial \ref T1
-\includelineno Drivers/Tutorials/Tutorial1.cpp
+\includelineno Drivers/Tutorials/Tutorial1_ParticleInOuterSpace.cpp
 Return to tutorial \ref T1
 
 \section T2code Particle motion on earth (code)
 Return to tutorial \ref T2
-\includelineno Drivers/Tutorials/Tutorial2.cpp
+\includelineno Drivers/Tutorials/Tutorial2_ParticleUnderGravity.cpp
 Return to tutorial \ref T2
 
 \section T3code Bouncing ball - elastic (code)
 Return to tutorial \ref T3
-\includelineno Drivers/Tutorials/Tutorial3.cpp
+\includelineno Drivers/Tutorials/Tutorial3_BouncingBallElastic.cpp
 Return to tutorial \ref T3
 
 \section T4code Bouncing ball - inelastic (code)
 Return to tutorial \ref T4
-\includelineno Drivers/Tutorials/Tutorial4.cpp
+\includelineno Drivers/Tutorials/Tutorial4_BouncingBallInelastic.cpp
 Return to tutorial \ref T4
 
 \section T5code Elastic collision - 2 particles (code)
 Return to tutorial \ref T5
-\includelineno Drivers/Tutorials/Tutorial5.cpp
+\includelineno Drivers/Tutorials/Tutorial5_ElasticCollision.cpp
 Return to tutorial \ref T5
 
 \section T6code Elastic collisions with periodic boundaries (code)
 Return to tutorial \ref T6
-\includelineno Drivers/Tutorials/Tutorial6.cpp
+\includelineno Drivers/Tutorials/Tutorial6_ElasticCollisionPeriodic.cpp
 Return to tutorial \ref T6
 
 \section T7code Motion of a particle in a two dimensional box (code)
 Return to tutorial \ref T7
-\includelineno Drivers/Tutorials/Tutorial7.cpp
+\includelineno Drivers/Tutorials/Tutorial7_ParticleIn2DBox.cpp
 Return to tutorial \ref T7
 
 \section T8code Motion of a particle in a box with an obstacle (code)
 Return to tutorial \ref T8
-\includelineno Drivers/Tutorials/Tutorial8.cpp
+\includelineno Drivers/Tutorials/Tutorial8_ParticleIn2DBoxWithObstacle.cpp
 Return to tutorial \ref T8
 
 \section T9code Motion of a ball over an inclined plane (code)
 Return to tutorial \ref T9
-\includelineno Drivers/Tutorials/Tutorial9.cpp
+\includelineno Drivers/Tutorials/Tutorial9_InclinedPlane.cpp
 Return to tutorial \ref T9
 
 \section T11code Axisymmetric walls inside a cylindrical domain (code)
 Return to tutorial \ref T11
-\includelineno Drivers/Tutorials/Tutorial11.cpp
+\includelineno Drivers/Tutorials/Tutorial11_AxisymmetricWalls.cpp
 Return to tutorial \ref T11
 
 \section T12code Prismatic walls using points (code)
 Return to tutorial \ref T12
-\includelineno Drivers/Tutorials/Tutorial12.cpp
+\includelineno Drivers/Tutorials/Tutorial12_PrismWalls.cpp
 Return to tutorial \ref T12
 
 \section CoilSelfTestCode Particles driven by a rotating coil (code)
@@ -1580,12 +1580,13 @@ int main() {
 \endcode
 
 
-Firstly, the OpenMP parallel environment has to be activated using \c cmake, i.e., by turning the flag \c Mercury_USE_OpenMP to \c ON as follows:
+Firstly, the OpenMP parallel environment has to be activated using \c cmake, i.e., by turning the flag \c
+MercuryDPM_USE_OpenMP to \c ON as follows:
 \code
 # enter your build directory
 cd MercuryBuild
 # use cmake to change the CMake configuration
-cmake . -DMercury_USE_OpenMP=ON
+cmake . -DMERCURYDPM_USE_OpenMP=ON
 # Run fullTest with OpenMP activated
 make fullTest
 \endcode
@@ -1594,7 +1595,7 @@ Alternatively, you can use ccmake or cmake-gui to change the CMake configuration
 # use ccmake or cmake-gui to change the CMake configuration
 ccmake ../MercurySource
 # Press [c] to configure
-# Set Mercury_USE_OpenMP --> ON
+# Set MercuryDPM_USE_OpenMP --> ON
 # Press [c] twice to configure 2 times, then press [g] to generate
 \endcode
 
@@ -1690,11 +1691,11 @@ int main() {
 \endcode
 
 
-To run your simulation in parallel, you need to compile the code with MPI. Use cmake and turn the flag Mercury_USE_MPI to ON. You can do this either by loading cmake-gui and changing the use USE_MPI flag to ON; or, alternatively you do it on the command line:
+To run your simulation in parallel, you need to compile the code with MPI. Use cmake and turn the flag MercuryDPM_USE_MPI to ON. You can do this either by loading cmake-gui and changing the use USE_MPI flag to ON; or, alternatively you do it on the command line:
 
 \code
 cd MercuryBuild
-cmake . -DMercury_USE_MPI=ON
+cmake . -DMERCURYDPM_USE_MPI=ON
 \endcode
 
 You also need to tell your program about the decomposition it should use. To split your domain  setNumberOfDomains into \f$n_x \times n_y \times n_z\f$, add the following command in your main function before solve():

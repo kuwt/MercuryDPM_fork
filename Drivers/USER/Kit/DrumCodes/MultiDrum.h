@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -906,7 +906,7 @@ public:
     }
     
     /// \todo Should check n and m are coprime or both 0.
-    MERCURY_DEPRECATED void setStarShape(int new_n, int new_m)
+    MERCURYDPM_DEPRECATED void setStarShape(int new_n, int new_m)
     {
         nPolygon.resize(1);
         mPolygon.resize(1);

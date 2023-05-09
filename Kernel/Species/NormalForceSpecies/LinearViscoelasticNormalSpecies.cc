@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -224,6 +224,9 @@ LinearViscoelasticNormalSpecies::setCollisionTimeAndRestitutionCoefficient(Mdoub
  */
 void LinearViscoelasticNormalSpecies::setCollisionTimeAndRestitutionCoefficient(Mdouble tc, Mdouble eps, Mdouble mass)
 {
+    logger.assert_always(tc>0, "collision time has to be positive");
+    logger.assert_always(eps>=0 && eps<=1, "restitution has to be in [0,1]");
+    logger.assert_always(mass>0, "mass has to be positive");
     if (getConstantRestitution()) mass = 1;
     if (eps == 0.0)
     {

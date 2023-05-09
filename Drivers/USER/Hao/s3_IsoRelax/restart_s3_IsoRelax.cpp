@@ -40,7 +40,7 @@ public:
         }
 	}
 	
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {		
         double Rmin = particleHandler.getObject(0)->getRadius();
 		double Rmax = particleHandler.getObject(0)->getRadius();

@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -32,11 +32,11 @@ public:
 
     CSCRun(Mdouble shearVelocity): shearVelocity_(shearVelocity){};
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         Mdouble timeMax = getTimeMax();
         setName("CSCInit");
-        logger(INFO, "Reading file %\n", restartFile.getName()), Flusher::NO_FLUSH;
+        logger(INFO, "Reading file %\n", restartFile.getName(), Flusher::NO_FLUSH);
         readRestartFile();
         //setRunNumber(0); //otherwise, restart doesn't work with autonumbered init files
         setTimeMax(timeMax);
@@ -66,7 +66,7 @@ public:
         //    << " time units" << std::endl;
     }
 
-    void printTime() const
+    void printTime() const override
     {
         logger(INFO, "t=% ene=% wallTime=%",
                getTime(), getKineticEnergy() / getElasticEnergy(), getWallTime() - getInitialWallTime());

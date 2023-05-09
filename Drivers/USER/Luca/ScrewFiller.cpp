@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -46,7 +46,7 @@ private:
     
     const int nP = 3000;
 
-    void setupInitialConditions() {
+    void setupInitialConditions() override {
         // gravity, particle radius
         setGravity(Vec3D(0.0, 0.0, 0.0));
         particleRadius = 0.015;
@@ -143,7 +143,7 @@ private:
 
     }
 
-    void actionsOnRestart() 
+    void actionsOnRestart() override
     {
         // set problem species
         species = dynamic_cast<LinearViscoelasticFrictionSpecies*>(speciesHandler.getObject(0));
@@ -155,7 +155,7 @@ private:
 
     
     //! [CST:beforetime]
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {
         // continuously changes the radius of the blade from rMin to rMax in a time timeMax - 1.5
         // according to: (t - t0)/(tMax - t0) * (rMax - rMin) + rMin

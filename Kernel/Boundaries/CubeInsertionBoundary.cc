@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -144,10 +144,6 @@ void CubeInsertionBoundary::setGeometry(Vec3D posMin, Vec3D posMax)
 // CubeInsertionBoundary. If the particle is wanted then it is copied into the
 // particleHandler.  In any case, the InsertionBoundary's version of the
 // particle (created here) gets deleted by the InsertionBoundary.
-//
-// TP: Generate Particle is not geometry specific (but sometimes distribution-modality/species specific; in that case
-// it can be overriden) and therefore moved to the Parent class.
-
 void CubeInsertionBoundary::placeParticle(BaseParticle* p, RNG& random)
 {
     Vec3D pos, vel;

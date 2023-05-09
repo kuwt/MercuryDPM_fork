@@ -2,8 +2,8 @@
 // Created by irana on 9/13/17.
 //
 
-#ifndef MERCURY_HOPPER
-#define MERCURY_HOPPER
+#ifndef MERCURYDPM_HOPPER
+#define MERCURYDPM_HOPPER
 
 #include "WallHandler.h"
 #include "BaseObject.h"
@@ -106,4 +106,4 @@ private:
 };
 
 
-#endif //MERCURY_HOPPER
+#endif //MERCURYDPM_HOPPER

@@ -69,11 +69,11 @@ int main() {
 \endcode
 
 
-To run your simulation in parallel, you need to compile the code with MPI. Use cmake and turn the flag Mercury_USE_MPI to ON. You can do this either by loading cmake-gui and changing the use USE_MPI flag to ON; or, alternatively you do it on the command line:
+To run your simulation in parallel, you need to compile the code with MPI. Use cmake and turn the flag MercuryDPM_USE_MPI to ON. You can do this either by loading cmake-gui and changing the use USE_MPI flag to ON; or, alternatively you do it on the command line:
 
 \code
 cd MercuryBuild
-cmake . -DMercury_USE_MPI=ON
+cmake . -DMERCURYDPM_USE_MPI=ON
 \endcode
 
 You also need to tell your program about the decomposition it should use. To split your domain  setNumberOfDomains into \f$n_x \times n_y \times n_z\f$, add the following command in your main function, before solve():

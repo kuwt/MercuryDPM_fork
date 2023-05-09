@@ -1,5 +1,5 @@
-include_directories(${Mercury_SOURCE_DIR}/Kernel
-	                    ${Mercury_BINARY_DIR}/Kernel)
+include_directories(${MercuryDPM_SOURCE_DIR}/Kernel
+	                    ${MercuryDPM_BINARY_DIR}/Kernel)
 add_subdirectory(DrumCodes)
 add_subdirectory(3dVibeCodes)
 

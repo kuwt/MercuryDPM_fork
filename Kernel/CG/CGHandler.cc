@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -247,7 +247,7 @@ void CGHandler::computeContactPoints()
 bool CGHandler::evaluateRestartFiles()
 {
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Make sure that the number of processors is equal to the number of processors used for the run
     MPIContainer& communicator = MPIContainer::Instance();
     std::vector<unsigned> numberOfDomains = this->getDPMBase()->getNumberOfDomains();
@@ -315,7 +315,7 @@ bool CGHandler::evaluateRestartFiles()
 bool CGHandler::evaluateDataFiles(bool evaluateFStatFiles)
 {
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Make sure that the number of processors is equal to the number of processors used for the run
     MPIContainer& communicator = MPIContainer::Instance();
     std::vector<unsigned> numberOfDomains = this->getDPMBase()->getNumberOfDomains();

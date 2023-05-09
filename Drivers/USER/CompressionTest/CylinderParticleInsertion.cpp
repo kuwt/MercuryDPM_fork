@@ -32,7 +32,7 @@ public:
         // CVDFs from QICPIC image analysis measurements)
         //Make particles and walls visible
         /// \todo TP: add InputData automatically to the build folder (define in master cmake file)
-        psd.setPSDFromCSV(getMercurySourceDir() + "/Drivers/USER/CompressionTest/InputData/CVDFLactose.csv",
+        psd.setPSDFromCSV(getMercuryDPMSourceDir() + "/Drivers/USER/CompressionTest/InputData/CVDFLactose.csv",
                           PSD::TYPE::CUMULATIVE_VOLUME_DISTRIBUTION, false, 1000000.0);
         // cut off size distribution if size ratio is too high
         psd.cutHighSizeRatio();
@@ -44,7 +44,7 @@ public:
         cylVol_ = constants::pi * cylRad_ * cylRad_ * cylHeight_;
     
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(FileType::MULTIPLE_FILES);
+        wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
         //Set files
         dataFile.setFileType(FileType::ONE_FILE);
         restartFile.setFileType(FileType::ONE_FILE);

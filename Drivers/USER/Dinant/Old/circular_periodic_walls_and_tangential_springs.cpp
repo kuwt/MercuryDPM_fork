@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,7 @@
 class circular_periodic_walls_and_tangential_springs : public DPMBase
 {
   
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		particleHandler.clear();
 		boundaryHandler.clear();
@@ -104,13 +104,13 @@ class circular_periodic_walls_and_tangential_springs : public DPMBase
 	protected:
 	
 	///Couts time
-	virtual void printTime() const {
+	virtual void printTime() const override {
 		cout << "t=" << setprecision(3) <<fixed<< left << setw(6) << getTime() 
 			<< ", tmax=" << setprecision(3) << left << setw(6) << getTimeMax() << endl;
 		cout.flush();
 	}
 	
-	/*void computeExternalForces(BaseParticle* CI)
+	/*void computeExternalForces(BaseParticle* CI) override
 	{
 		/// Now add on gravity
 		CI->addForce(getGravity() * CI->getMass());

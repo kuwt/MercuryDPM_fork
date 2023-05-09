@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -50,13 +50,13 @@ public:
 		setTimeMax(20); //40'000 time steps
     }
 
-    void printTime() const
+    void printTime() const override
     {
         logger(INFO, "t=% Ene=%", getTime(), getKineticEnergy() / getElasticEnergy());
     }
 
     //add flow particles
-    void setupInitialConditions() 
+    void setupInitialConditions() override
     {
         std::string filename;
         filename = getName() 

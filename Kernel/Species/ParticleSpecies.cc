@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,7 @@
 #include "DPMBase.h"
 #include "Particles/BaseParticle.h"
 #include "Particles/SuperQuadricParticle.h"
+#include "Particles/MultiParticle.h"
 
 class BaseParticle;
 
@@ -106,7 +107,7 @@ std::string ParticleSpecies::getBaseName() const
  */
 void ParticleSpecies::setDensity(Mdouble density)
 {
-    logger.assert_always(density >= 0, "[ParticleSpecies::setDensity(%)] value cannot be negative", density);
+    logger.assert_always(density > 0, "[ParticleSpecies::setDensity(%)] value has to be positive", density);
     density_ = density;
     if (getHandler()) getHandler()->getDPMBase()->particleHandler.computeAllMasses(getIndex());
 }
@@ -200,7 +201,7 @@ Mdouble ParticleSpecies::getLargestInverseParticleMassLocal() const
 
 Mdouble ParticleSpecies::getSmallestParticleMass() const
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     Mdouble maxInvMass = 0;
     Mdouble invMassLocal = getLargestInverseParticleMassLocal();
     //Obtain the global value

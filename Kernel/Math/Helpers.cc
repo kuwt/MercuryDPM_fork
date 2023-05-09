@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -386,6 +386,7 @@ unsigned int helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(unsigne
                "timestep: %\n Arguments need to be positive",
                numberOfSaves, timeMax, timeStep);
     }
+    return 0;
 }
 
 //seems to be unused, consider taking out \author weinhartt
@@ -595,12 +596,6 @@ void helpers::more(std::string filename, unsigned nLines)
     file.close();
 }
 
-Mdouble helpers::round(const Mdouble value, unsigned precision)
-{
-    const Mdouble logValue = log10(value);
-    const int factor = std::pow(10, precision - std::ceil(logValue));
-    return std::round(value * factor) / factor;
-}
 
 std::string helpers::to_string(const Mdouble value, unsigned precision)
 {
@@ -1046,6 +1041,12 @@ bool helpers::createDirectory(std::string path) {
     }
     return false;
 }
+
+Mdouble helpers::round(const Mdouble val, unsigned int prec) {
+    const double n = std::pow(10,prec);
+    return std::round(val*n)/n;
+}
+
 
 Mdouble helpers::getRayleighTime(Mdouble radius, Mdouble shearModulus, Mdouble poisson, Mdouble density) {
     return constants::pi*radius*sqrt(density/shearModulus)/(0.1631*poisson+0.8766);

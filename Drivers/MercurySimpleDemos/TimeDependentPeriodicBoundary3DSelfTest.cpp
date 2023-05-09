@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -68,7 +68,7 @@ class TimeDependentPeriodicBoundary3DSelfTest : public Mercury3D
             setGravity({0, 0, 0});
         }
 
-        void setupInitialConditions()
+        void setupInitialConditions() override
         {
             auto species = speciesHandler.getObject(0);
 
@@ -110,7 +110,7 @@ class TimeDependentPeriodicBoundary3DSelfTest : public Mercury3D
             */
         }
 
-        void actionsAfterTimeStep()
+        void actionsAfterTimeStep() override
         {
             if (boundaryHandler.getNumberOfObjects() == 3)
             {

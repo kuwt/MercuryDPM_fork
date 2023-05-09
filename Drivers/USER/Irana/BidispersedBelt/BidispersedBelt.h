@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -24,8 +24,8 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-#ifndef MERCURY_BIDISPERSEDBELT_H
-#define MERCURY_BIDISPERSEDBELT_H
+#ifndef MERCURYDPM_BIDISPERSEDBELT_H
+#define MERCURYDPM_BIDISPERSEDBELT_H
 
 #include "../BidispersedChute/BidispersedChute.h"
 
@@ -65,4 +65,4 @@ private:
 };
 
 
-#endif //MERCURY_BIDISPERSEDBELT_H
+#endif //MERCURYDPM_BIDISPERSEDBELT_H

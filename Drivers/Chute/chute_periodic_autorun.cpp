@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,7 @@ class ChutePeriodic : public Chute
 {
 public:
     
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {};
 
 ///creates flow particles in the whole chute
@@ -53,7 +53,7 @@ public:
         return P0;
     }
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         
         Chute::setupInitialConditions();

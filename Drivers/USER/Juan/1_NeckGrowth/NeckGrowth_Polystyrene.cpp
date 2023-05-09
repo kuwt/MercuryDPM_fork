@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -215,7 +215,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 
     logger(INFO,"Time step: %", pb.getTimeStep());
     //----------------------------------------------
-//    pb.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+//    pb.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
     pb.setParticlesWriteVTK(false);
 
     pb.setName(setFilename);
@@ -274,7 +274,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 //        setParticlesWriteVTK(true);
 //
 //        //setParticlesWriteVTK(true);
-//        //setWallsWriteVTK(FileType::MULTIPLE_FILES);
+//        //wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
 //
 //        setParticleDimensions(3);
 //        setSystemDimensions(3);

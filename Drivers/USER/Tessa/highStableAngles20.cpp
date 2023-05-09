@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -208,7 +208,7 @@ public:
 		return eKin;
 	}
 	
-	void actionsBeforeTimeStep(){
+	void actionsBeforeTimeStep() override {
 		Mdouble gravity = getGravity().getLength();;
 		Mdouble GravityAngle;	
 		
@@ -292,7 +292,7 @@ public:
 		cleanChute();
 	}	
 	
-	void actionsBeforeTimeLoop() {
+	void actionsBeforeTimeLoop() override {
 		
 		//automatically sets dt if dt is not specified by the user
 	        //if (!getTimeStep()) setTimeStep(); 
@@ -358,7 +358,7 @@ public:
 //		setNWall(n-1);
 	}
 	
-	void actionsAfterTimeStep(){
+	void actionsAfterTimeStep() override {
 		//save the gravity information in "gravity_file.txt" after every factor'th time step
 		Mdouble factor = 10; //100
 		
@@ -376,7 +376,7 @@ public:
 		} 	
 	}
 	
-	virtual void actionsAfterSolve(){
+	virtual void actionsAfterSolve() override {
 	        std::ofstream myfile;
 		myfile.open ("times.txt");
 		myfile<<"This file includes all starting/end times of all six stages"<<std::endl;
@@ -390,7 +390,7 @@ public:
 		myfile.close();				
 	};
 	
-	bool continueSolve() const {
+	bool continueSolve() const override {
 		if (currStatus ==finished) {
 			return false;
 		} else {
@@ -398,7 +398,7 @@ public:
 		}
 	}
 	
-	void printTime() const {
+	void printTime() const override {
 	  std::cout << "t=" << std::setprecision(3) << std::left << std::setw(6) << getTime() 
 		    << ", tmax=" << std::setprecision(3) << std::left << std::setw(6) << getTimeMax()
 		    << ", N=" << std::setprecision(3) << std::left << std::setw(6) << particleHandler.getNumberOfObjects();

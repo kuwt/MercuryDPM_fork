@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -119,25 +119,25 @@ void MindlinRollingTorsionInteraction::computeFrictionForce()
         Mdouble rollingStiffness = tangentialStiffnessZero_;
         double effectiveRadius = getEffectiveRadius();
 
-        //From Luding2008, objective rolling velocity (eq 15) w/o 2.0!
+        //From Luding 2008, objective rolling velocity (eq 15) w/o 2.0!
         Vec3D rollingRelativeVelocity = - effectiveRadius *
                                         Vec3D::cross(getNormal(),
                                                      getP()->getAngularVelocity() - getI()->getAngularVelocity());
-        
-        if (dynamic_cast<BaseParticle*>(getI()) == nullptr)  //if particle-wall
-            rollingSpringVelocity_ = rollingRelativeVelocity;
-        else //if particle-particle
+
+        const Mdouble springLength = rollingSpring_.getLength();
+        if (springLength > 1e-10)
         {
-            const Vec3D relativeVelocity = getP()->getVelocity() - getI()->getVelocity();
-            rollingSpringVelocity_ = rollingRelativeVelocity
-                                     - Vec3D::dot(rollingSpring_, relativeVelocity) / getDistance() * getNormal();
+            rollingSpring_ -= Vec3D::dot(rollingSpring_, getNormal()) * getNormal();
+            rollingSpring_ *= springLength / rollingSpring_.getLength();
+            // logger.assert(std::abs(slidingSpring_.getLength() - springLength) < 1e-10, "Spring length not the same after rotation");
         }
-        
-        //used to Integrate the spring
-        //rollingSpringVelocity_= rollingRelativeVelocity;
+
         //integrate(getHandler()->timeStep_);
+        rollingSpringVelocity_ = rollingRelativeVelocity;
         rollingSpring_ += rollingSpringVelocity_ * getHandler()->getDPMBase()->getTimeStep();
-        
+        //logger(INFO,"rollingSpring.normalDirection %",Vec3D::dot(rollingSpring_/rollingSpring_.getLength(),getNormal()));
+
+
         //Calculate test force acting on P including viscous force
         Vec3D rollingForce = -rollingStiffness * rollingSpring_ -
                              species->getRollingDissipation() * rollingRelativeVelocity;

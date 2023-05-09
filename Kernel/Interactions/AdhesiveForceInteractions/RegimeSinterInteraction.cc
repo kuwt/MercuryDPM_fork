@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -58,7 +58,7 @@ RegimeSinterInteraction::RegimeSinterInteraction(const RegimeSinterInteraction& 
 
 RegimeSinterInteraction::RegimeSinterInteraction()
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     logger(FATAL,"RegimeSinterInteractions are currently not implemented in parallel MercuryDPM");
 #endif
 

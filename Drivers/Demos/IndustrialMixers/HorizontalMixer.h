@@ -55,7 +55,7 @@ public:
     {
         fStatFile.setFileType(FileType::NO_FILE);
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(FileType::MULTIPLE_FILES);
+        wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
     }
 
     ///sets four walls, leftScrew, rightScrew, leftBaseScrew, rightBaseScrew

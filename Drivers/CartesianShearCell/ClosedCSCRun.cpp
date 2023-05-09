@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -63,7 +63,7 @@ public:
         logger(INFO, "saving every % time units", dataFile.getSaveCount() * getTimeStep());
     }
 
-    void actionsAfterTimeStep()
+    void actionsAfterTimeStep() override
     {
         Mdouble zMax = lid->getPosition().Z-1.0;
         // calculate the force applied to all lid particles
@@ -81,14 +81,14 @@ public:
     }
 
     
-    void printTime() const
+    void printTime() const override
     {
         logger(INFO, "t=% Ene=% lid velocity=%",
                getTime(), getKineticEnergy() / getElasticEnergy(), lid->getVelocity().Z);
     }
 
     //add flow particles
-    void setupInitialConditions() 
+    void setupInitialConditions() override
     {
     }
     

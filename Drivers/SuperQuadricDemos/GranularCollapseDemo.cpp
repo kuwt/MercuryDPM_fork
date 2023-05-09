@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -200,7 +200,7 @@ int main(int argc, char* argv[]) // [GranularCollapse : main]
     // [GranularCollapse : contact detection]
     
     problem.setSuperquadricParticlesWriteVTK(true);
-    problem.setWallsWriteVTK(FileType::ONE_FILE);
+    problem.wallHandler.setWriteVTK(FileType::ONE_FILE);
     problem.solve(); //argc,argv
     return 0;
 } // [GranularCollapse : main]

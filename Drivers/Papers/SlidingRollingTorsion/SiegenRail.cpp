@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -93,7 +93,7 @@ public:
 		particleHandler.getObject(0)->setVelocity(Vec3D(0,0,0));
 	}
 
-	void actionsBeforeTimeStep(){
+	void actionsBeforeTimeStep() override {
         static Mdouble mus, mur, mut;
 		if (getTime()==0) {
        		mus= species->getSlidingFrictionCoefficient();
@@ -128,7 +128,7 @@ public:
 // 		}
 	}
 
-	void writeEneTimeStep(std::ostream& os) const{
+	void writeEneTimeStep(std::ostream& os) const override {
 		//MD::writeToEne();
 		os
 		<< " " << std::setw(12) << wallHandler.getObject(0)->getForce().X

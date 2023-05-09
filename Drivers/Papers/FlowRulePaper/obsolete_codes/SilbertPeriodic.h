@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -192,10 +192,10 @@ public:
 	}
 
 	//Do not add or remove particles
-	void actionsBeforeTimeStep(){ };
+	void actionsBeforeTimeStep() override { };
 		
 	//Set up periodic walls, rough bottom, add flow particles
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		fix_hgrid();
 		particleHandler.set_StorageCapacity(particleHandler.getNumberOfObjects()+getChuteLength()*getChuteWidth()*getZMax());//why is this line needed?

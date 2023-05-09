@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -23,8 +23,8 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef MERCURY_ANISOTROPICHOOKEAN_H
-#define MERCURY_ANISOTROPICHOOKEAN_H
+#ifndef MERCURYDPM_ANISOTROPICHOOKEAN_H
+#define MERCURYDPM_ANISOTROPICHOOKEAN_H
 #include "constitutive_laws.h"
 
 namespace oomph
@@ -83,4 +83,4 @@ public:
 };
 }
 
-#endif//MERCURY_ANISOTROPICHOOKEAN_H
+#endif//MERCURYDPM_ANISOTROPICHOOKEAN_H

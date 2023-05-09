@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -98,7 +98,7 @@ void BoundaryHandler::addObject(BaseBoundary* P)
     //set the handler pointer
     P->setHandler(this);
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Different manner of treating periodic boundaries in MPI: hence there is a periodicBoundaryHandler
     BasePeriodicBoundary* upcast = dynamic_cast<BasePeriodicBoundary*>(P);
     if (upcast != nullptr)

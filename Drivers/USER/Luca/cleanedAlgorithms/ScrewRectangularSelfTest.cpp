@@ -20,7 +20,7 @@ public:
         setMax({10, 10, 10});
     }
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         makeSpecies();
         makeScrew();
@@ -28,7 +28,7 @@ public:
         insertParticles();
         setTimeMax(.01);
         setTimeStep(1e-4);
-        setWallsWriteVTK(FileType::ONE_FILE);
+        wallHandler.setWriteVTK(FileType::ONE_FILE);
         setParticlesWriteVTK(true);
         setSaveCount(1000);
         setGravity({1, 0, 0});

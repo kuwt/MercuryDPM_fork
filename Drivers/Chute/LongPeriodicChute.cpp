@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,7 @@ bool quick = true;
 class VariableBottom : public Chute
 {
 public:
-	void setupInitialConditions(){
+	void setupInitialConditions() override {
 		createBottom();
 	}	
 
@@ -102,9 +102,9 @@ public:
 		}
 	}
 
-	void actionsBeforeTimeStep(){}
+	void actionsBeforeTimeStep() override {}
 
-	void printTime() const {
+	void printTime() const override {
 		static int Nold = get_N();
 		static double told = getTime();
 		cout << "t=" << setprecision(3) << left << setw(6) << getTime() 

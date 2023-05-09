@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -537,7 +537,7 @@ void LevelSetWall::setShapeFourSided()
                 "title(['y=' num2str(unique(yLS(i,:,:)))])\n"
                 "xlabel('x'), ylabel('z'), zlabel('dist')\n"
                 "\n"
-                "%% write n and dist values to file (read into Mercury)\n"
+                "%% write n and dist values to file (read into MercuryDPM)\n"
                 "fid = fopen('fourSided.txt','w');\n"
                 "fprintf(fid,'%d\\n',n);\n"
                 "fprintf(fid,'%f ',dist);\n"

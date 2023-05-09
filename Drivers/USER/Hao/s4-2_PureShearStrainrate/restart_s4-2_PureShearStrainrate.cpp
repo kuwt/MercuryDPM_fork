@@ -47,7 +47,7 @@ public:
         }
 	}
 
-    void setupInitialConditions()								//! set up initial conditions
+    void setupInitialConditions() override 				//! set up initial conditions
     {		
 		
 		//! Initialize particle related parameters : Radius: Rmin Rmax, Diameter, mass, collision time tc

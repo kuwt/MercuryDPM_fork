@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -60,7 +60,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////////////////
     /// /brief setupInitial conditions. Basics does step 1 only; creating the walls of the drum
     ////////////////////////////////////////////////////////////////////////////////////////
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {      
         // Set the step counter to 1
         step=1;
@@ -286,7 +286,7 @@ public:
     }
     
     ////////////////////////////////////////////////////////////////////////////////////////////
-    /// \breif Create and inserts in the drum new partciles random at non-overlapping locations in the drum. If also check the locations is not already filled by a particle
+    /// \brief Create and inserts in the drum new partciles random at non-overlapping locations in the drum. If also check the locations is not already filled by a particle
     ////////////////////////////////////////////////////////////////////////////////////////////
     void createParticles()
     {
@@ -394,7 +394,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// /brief actionsBeforeTimeStep. This does stage 2: insert particles, stage 3: setlle particles, stage 4: relax particles and stage 5: start the drum rotating.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {
         if (step==2)
             createParticles();

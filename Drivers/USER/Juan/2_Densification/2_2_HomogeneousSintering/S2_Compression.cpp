@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -243,7 +243,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 
     oTest.removeOldFiles();
     oTest.setParticlesWriteVTK(false);
-//    oTest.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+//    oTest.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
 
     oTest.setFileType(FileType::ONE_FILE);
     oTest.solve();

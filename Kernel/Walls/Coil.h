@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -91,7 +91,7 @@ public:
      * \deprecated If you have old restart files, please convert them to the current
      * version of the restart files and use read(std::istream&) instead of oldRead(std::istream&).
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     void oldRead(std::istream& is);
     
     /*!

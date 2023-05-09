@@ -171,7 +171,7 @@ class AvalancheTest : public Mercury3D
             fclose(heapAngleFile); 
         }
 
-        void actionsAfterTimeStep()
+        void actionsAfterTimeStep() override
         {
             reposeAngle = getHeapReposeAngle();
             if (step++ % pars.saveEvery == 0)

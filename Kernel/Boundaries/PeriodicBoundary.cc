@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -305,7 +305,7 @@ void PeriodicBoundary::createPeriodicParticle(BaseParticle* p, ParticleHandler& 
 {
     //note that getDistance sets closestToLeftBoundary_ to true or false depending on which side is closest
     const Mdouble maxDistance = p->getMaxInteractionRadius() + pH.getLargestParticle()->getMaxInteractionRadius();
-    if (getDistance(*p) < maxDistance)
+    if ((getDistance(*p) < maxDistance)&&(!p->IsMaster()))
     {
         createGhostParticle(p);
     }
@@ -348,7 +348,7 @@ void PeriodicBoundary::createGhostParticle(BaseParticle* pReal)
  */
 void PeriodicBoundary::createPeriodicParticles(ParticleHandler& pH)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     if (NUMBER_OF_PROCESSORS == 1)
     {
 #endif
@@ -358,7 +358,7 @@ void PeriodicBoundary::createPeriodicParticles(ParticleHandler& pH)
     {
         createPeriodicParticle(pH.getObject(i), pH);
     }
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     }
 #endif
 }
@@ -373,7 +373,7 @@ void PeriodicBoundary::createPeriodicParticles(ParticleHandler& pH)
  */
 void PeriodicBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     if (NUMBER_OF_PROCESSORS == 1)
     {
 #endif
@@ -385,7 +385,7 @@ void PeriodicBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
             getHandler()->getDPMBase()->hGridUpdateMove(*p, shift_.getLengthSquared());
         }
     }
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     }
 #endif
 }

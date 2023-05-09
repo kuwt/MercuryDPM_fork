@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@ using namespace std;
 class ChutePeriodic : public Chute{
 public:
 
-	void actionsBeforeTimeStep(){
+	void actionsBeforeTimeStep() override {
 		if  (getTime()>1&&getTime()-getTimeStep()<1) {
 			Walls[Walls.size()-1].set(Vec3D(1,0,0),getXMax());
 		}
@@ -54,7 +54,7 @@ public:
 		P0.Velocity = Vec3D(0.0,0.0,0.0);
 	}
 		
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		
 		Chute::setupInitialConditions();

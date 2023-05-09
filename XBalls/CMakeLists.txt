@@ -1,6 +1,6 @@
 
 
-if (Mercury_Include_Xballs_Support)
+if (MercuryDPM_INCLUDE_XBALLS_SUPPORT)
 	include_directories(${X11_X11_INCLUDE_PATH} ${X11_Xt_INCLUDE_PATH})
 	#include_directories(${X11_X11_INCLUDE_PATH} ${X11_Xt_INCLUDE_PATH} ${X11_XRes_INCLUDE_PATH})
 

@@ -524,7 +524,7 @@ int main()
     
   //Also write the paraview files in case I want to view it this way as well.
   problem.setParticlesWriteVTK(true);
-  problem.setWallsWriteVTK(FileType::ONE_FILE);
+  problem.wallHandler.setWriteVTK(FileType::ONE_FILE);
 
   return 0;
 }

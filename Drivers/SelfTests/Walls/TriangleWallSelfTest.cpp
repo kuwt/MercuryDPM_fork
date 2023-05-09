@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -63,6 +63,6 @@ int main () {
     wall.setVertices(A,B,C);
     dpm.wallHandler.copyAndAddObject(wall);
     dpm.setParticlesWriteVTK(true);
-    dpm.setWallsWriteVTK(FileType::ONE_FILE);
+    dpm.wallHandler.setWriteVTK(FileType::ONE_FILE);
     dpm.solve();
 }

@@ -2,8 +2,8 @@
 // Created by irana on 3/2/18.
 //
 
-#ifndef MERCURY_PERIODICCHUTE_H
-#define MERCURY_PERIODICCHUTE_H
+#ifndef MERCURYDPM_PERIODICCHUTE_H
+#define MERCURYDPM_PERIODICCHUTE_H
 
 #include <fstream>
 #include "Mercury3D.h"
@@ -54,4 +54,4 @@ private:
     bool isMonoDisperse;
 };
 
-#endif //MERCURY_PERIODICCHUTE_H
+#endif //MERCURYDPM_PERIODICCHUTE_H

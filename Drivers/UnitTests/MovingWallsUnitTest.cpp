@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -105,7 +105,7 @@ public:
 
         //dataFile.setFileType(FileType::NO_FILE);
         fStatFile.setFileType(FileType::NO_FILE);
-        setWallsWriteVTK(FileType::MULTIPLE_FILES);
+        wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
         interactionHandler.setWriteVTK(FileType::MULTIPLE_FILES);
         setParticlesWriteVTK(true);
         setSaveCount(100);

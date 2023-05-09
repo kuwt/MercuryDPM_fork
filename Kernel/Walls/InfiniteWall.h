@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -98,7 +98,7 @@ public:
      * \deprecated In Mercury 2, the user will have to use the new interface, 
      *             namely set(Vec3D, Vec3D).
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     void set(Vec3D normal, Mdouble position);
     
     using BaseWall::move;

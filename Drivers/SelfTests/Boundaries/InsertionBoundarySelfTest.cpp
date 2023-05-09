@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -51,8 +51,7 @@ public:
         species.setDensity(2000);
         species.setStiffness(10000);
         speciesHandler.copyAndAddObject(species);
-    
-    
+
         SphericalParticle insertionBoundaryParticle;
         insertionBoundaryParticle.setSpecies(speciesHandler.getObject(0));
     
@@ -60,8 +59,8 @@ public:
         psd.setDistributionUniform(0.025, 0.05, 50);
     
         CubeInsertionBoundary insertionBoundary;
-        insertionBoundary.setPSD(psd);
         insertionBoundary.set(&insertionBoundaryParticle, 1, getMin(), getMax(), Vec3D(1, 0, 0), Vec3D(1, 0, 0));
+        insertionBoundary.setPSD(psd);
         boundaryHandler.copyAndAddObject(insertionBoundary);
     
     }

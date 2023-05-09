@@ -30,7 +30,7 @@ class CompressionTest : public Mercury3D
 {
 private:
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         stage = 1;
         setsInserted = 0;
@@ -83,7 +83,7 @@ private:
         stage++;
     }
     
-    void actionsAfterTimeStep()
+    void actionsAfterTimeStep() override
     {
         // particle insertion loop
         if (stage == 2)

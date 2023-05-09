@@ -28,7 +28,7 @@ class ScrewFiller03 : public Mercury3D
 {
 private:
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         stage = 1;
         
@@ -99,7 +99,7 @@ private:
         std::cout << "DONE!\n";
     }
     
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {
         // stage 1: the particles are loaded. Once they are still the external casing is loaded and the particles outside removed
         if (stage == 1 && getKineticEnergy()/getElasticEnergy() < 1.e-4)

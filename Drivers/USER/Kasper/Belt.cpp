@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -41,7 +41,7 @@ public:
     {
     }
     
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {      
         //Number of small particles
         int Ns = num_small;
@@ -187,7 +187,7 @@ public:
         std::cout << "Finished storing bed particles" << std::endl;
     }
     
-    void actionsOnRestart()
+    void actionsOnRestart() override
     {
         
         int Ns=num_restart_small;
@@ -239,7 +239,7 @@ public:
     }
     
     // MOVING BED
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {
         if (BedParticles.empty())
         {

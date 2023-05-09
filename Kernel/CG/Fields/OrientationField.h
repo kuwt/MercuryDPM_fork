@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -23,8 +23,8 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef MERCURY_ORIENTATIONFIELD_H
-#define MERCURY_ORIENTATIONFIELD_H
+#ifndef MERCURYDPM_ORIENTATIONFIELD_H
+#define MERCURYDPM_ORIENTATIONFIELD_H
 
 #include <Math/Matrix.h>
 #include <Math/MatrixSymmetric.h>
@@ -162,4 +162,4 @@ namespace CGFields
     };
 }
 
-#endif //MERCURY_ORIENTATIONFIELD_H
+#endif //MERCURYDPM_ORIENTATIONFIELD_H

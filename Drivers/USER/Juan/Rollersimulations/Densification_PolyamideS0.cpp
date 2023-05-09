@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -195,7 +195,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 
     ic.setFileType(FileType::ONE_FILE);
     ic.setParticlesWriteVTK(true);
-    ic.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+    ic.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
 
     ic.setSaveCount(200);
     ic.setTimeMax(0.4);

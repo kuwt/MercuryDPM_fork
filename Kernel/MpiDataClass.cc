@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -113,12 +113,12 @@ void copyDataFromMPIParticleToParticle(MPIParticle* bP, BaseParticle* p, Particl
 }
 
 /*!
- * \brief Copies data from a SuperQuadricParticle to an MPIParticle class and returns this
+ * \brief Copies data from a NonSphericalParticle to an MPIParticle class and returns this
  * \details In order to create ghost particles on other processors, data of particles
  * have to be transmitted to other processors. Only the required data is
  * sent. The data is sent in an MPIParticle data class and this function copies
  * the data from a particle into that class.
- * \param[in] p Pointer to a SuperQuadricParticle particle from which data is copied
+ * \param[in] p Pointer to a NonSphericalParticle particle from which data is copied
  * \return MPIParticle class is returned filled with data from BaseParticle p
  */
 MPIParticle copyDataFromParticleToMPIParticle(BaseParticle* p)
@@ -198,7 +198,7 @@ MPIParticleVelocity copyVelocityFrom(BaseParticle* particle)
 
 Vec3D getMPISum(Vec3D& val)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Sum up over all domains
     Vec3D valGlobal = {0.0,0.0,0.0};
     MPIContainer& communicator = MPIContainer::Instance();
@@ -213,7 +213,7 @@ Vec3D getMPISum(Vec3D& val)
 
 double getMPISum(double val)
 {
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
     //Sum up over all domains
     double valGlobal = 0.0;
     MPIContainer& communicator = MPIContainer::Instance();

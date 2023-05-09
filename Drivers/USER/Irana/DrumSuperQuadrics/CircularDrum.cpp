@@ -47,7 +47,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////////////////
     /// /brief setupInitial conditions. Basics does step 1 only; creating the walls of the drum
     ////////////////////////////////////////////////////////////////////////////////////////
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         
         setTimeMax(15 * 2 * constants::pi / rotationSpeed); //simulate 15 rotations of the drum.
@@ -338,7 +338,7 @@ public:
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// /brief actionsBeforeTimeStep. This does stage 3: setlle particles, stage 4: relax particles and stage 5: start the drum rotating.
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {
         if (step == Stage::ROTATE_DRUM || getTime() < checkTime)
         {

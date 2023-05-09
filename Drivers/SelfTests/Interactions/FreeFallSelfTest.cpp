@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
 	//set the parameters for the solver
 	freeFallSelfTestProblem.setSaveCount(500);
 	freeFallSelfTestProblem.fStatFile.setFileType(FileType::NO_FILE);
-	freeFallSelfTestProblem.setWallsWriteVTK(FileType::ONE_FILE);
+    freeFallSelfTestProblem.wallHandler.setWriteVTK(FileType::ONE_FILE);
     freeFallSelfTestProblem.setTimeStep(1e-6);
 
 	//solve the system, the single particle will now bounce on the plate

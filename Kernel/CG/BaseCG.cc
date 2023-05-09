@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -66,6 +66,7 @@ void BaseCG::write(std::ostream& os) const
     if (!std::isinf(timeMax_)) os << " timeMax " << timeMax_;
     os << " n " << nX_ << " " << nY_ << " " << nZ_;
     os << " width " << getWidth();
+    if (verbose_) os << " verbose 1";
     //statFile
 }
 

@@ -2,8 +2,8 @@
 // Created by Thomas Weinhart on 29/04/2022.
 //
 
-#ifndef MERCURY_COUPLEDSOLIDNODES_H
-#define MERCURY_COUPLEDSOLIDNODES_H
+#ifndef MERCURYDPM_COUPLEDSOLIDNODES_H
+#define MERCURYDPM_COUPLEDSOLIDNODES_H
 #include "nodes.h"
 
 namespace oomph
@@ -50,4 +50,4 @@ public:
 
 }// namespace oomph
 
-#endif//MERCURY_SOLIDNODES_H
+#endif//MERCURYDPM_SOLIDNODES_H

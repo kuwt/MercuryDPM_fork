@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2021, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -22,8 +22,8 @@
 //ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#ifndef MERCURY_MERCURYOS_H
-#define MERCURY_MERCURYOS_H
+#ifndef MERCURYDPM_MERCURYOS_H
+#define MERCURYDPM_MERCURYOS_H
 
 #include <Mercury3D.h>
 #include <Species/HertzianViscoelasticMindlinSpecies.h>
@@ -190,4 +190,4 @@ public:
 };
 
 
-#endif //MERCURY_MERCURYOS_H
+#endif //MERCURYDPM_MERCURYOS_H

@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,7 @@ using namespace std;
 class Vreman : public ChuteWithHopper
 {
 public:
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		ChuteWithHopper::setupInitialConditions();
 		set_symmetric_contraction(.3,.5,.03);
@@ -77,7 +77,7 @@ public:
 		cout << "t=" << setprecision(3) << left << setw(6) << getTime() << "N=" << setprecision(3) << left << setw(6) << get_N() << endl;
 	}
 	
-	void printTime() const {
+	void printTime() const override {
 		//cout << "t=" << setprecision(3) << left << setw(6) << getTime() << "N=" << setprecision(3) << left << setw(6) << get_N() << endl;
 	}
 

@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -32,9 +32,9 @@ template <StatType T> class statistics_while_running : public StatisticsVector<T
 	public:
 	statistics_while_running<T>() : StatisticsVector<T>() , Chute() {}
 
-	void actionsBeforeTimeStep(){};
+	void actionsBeforeTimeStep() override {};
 		
-	void setupInitialConditions() {StatisticsVector<T>::write();
+	void setupInitialConditions() override {StatisticsVector<T>::write();
 		//~ for (unsigned int i=0; i<particleHandler.getNumberOfObjects(); i++) {
 			//~ if (particleHandler.getObject(i)->isFixed() || i>10) {removeParticle(i); i--;}
 		//~ }

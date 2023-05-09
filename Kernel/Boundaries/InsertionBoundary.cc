@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,7 @@
 #include "Particles/BaseParticle.h"
 #include<iostream>
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
 #include "MpiDataClass.h"
 #endif
 
@@ -255,7 +255,7 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
             placeParticle(p0, md->random);
             logger(VERBOSE, "attempting to place particle at %, vel %", p0->getPosition(), p0->getVelocity());
 
-#ifdef MERCURY_USE_MPI
+#ifdef MERCURYDPM_USE_MPI
             /* Communicate the new particle's properties by setHandler (note
                  * that this doesn't actually add the particle to the handler). */
                 if (NUMBER_OF_PROCESSORS > 1)

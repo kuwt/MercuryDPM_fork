@@ -5,6 +5,8 @@ FOREACH(DIR oomph_arpack oomph_blas oomph_crbond_bessel oomph_hsl oomph_lapack o
 ENDFOREACH()
 if (OOMPH_HAS_MPI)
     FILE(COPY ../src/solid/CMakeLists.txt DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/oomph_superlu_dist_3.0)
+else()
+    FILE(REMOVE ${CMAKE_CURRENT_SOURCE_DIR}/oomph_superlu_dist_3.0/CMakeLists.txt)
 endif()
 
 # add all subdirectories with a CMakeLists file

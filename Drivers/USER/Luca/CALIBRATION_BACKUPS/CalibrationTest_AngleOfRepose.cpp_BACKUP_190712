@@ -34,7 +34,7 @@ class CalibrationRoutine_AngleOfReposeTest : public Mercury3D
 {
 private:
 
-   void setupInitialConditions()
+   void setupInitialConditions() override
    {
       stage = 1;
       setsInserted = 0;

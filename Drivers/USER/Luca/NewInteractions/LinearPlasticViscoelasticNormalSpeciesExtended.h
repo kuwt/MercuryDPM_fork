@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -131,7 +131,7 @@ public:
     /*!
      * \brief Allows the spring and dissipation constants to be changed simultaneously.
      */
-    MERCURY_DEPRECATED void setLoadingStiffnessAndDissipation(helpers::KAndDisp new_);
+    MERCURYDPM_DEPRECATED void setLoadingStiffnessAndDissipation(helpers::KAndDisp new_);
 
     /*!
      * \brief Returns the optimal time step to resolve a collision of two particles of a given mass.

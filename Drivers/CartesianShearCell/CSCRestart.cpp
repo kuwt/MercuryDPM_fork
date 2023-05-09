@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ public:
         printTime();
     }
 
-    void writeOutputFiles()
+    void writeOutputFiles() override
     {
         if (get_wall_time()-initialTime<maxWallTime)
         {
@@ -61,7 +61,7 @@ public:
         }
     }
 
-    void printTime() const
+    void printTime() const override
     {
         logger(INFO, "t=% Ene=% wallTime=%",
                getTime(), getKineticEnergy() / getElasticEnergy(), get_wall_time() - initialTime);

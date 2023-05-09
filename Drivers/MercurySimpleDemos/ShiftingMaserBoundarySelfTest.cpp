@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@ class ShiftingMaserBoundarySelfTest : public Mercury2D
 {
 public:
 
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         setName("ShiftingMaserBoundarySelfTest");
         dataFile.setFileType(FileType::MULTIPLE_FILES);
@@ -84,7 +84,7 @@ public:
         write(std::cout, false);
     }
 
-    void actionsAfterTimeStep()
+    void actionsAfterTimeStep() override
     {
         if (!lifted_ && particleHandler.getVolume() > 2)
         {

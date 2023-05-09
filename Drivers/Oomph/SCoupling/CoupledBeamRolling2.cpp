@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -122,7 +122,7 @@ public:
         logger(INFO,"Mercury time step %", getTimeStep());
         // set output file properties
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(true);
+        wallHandler.setWriteVTK(true);
         setFileType(FileType::NO_FILE);
         restartFile.setFileType(FileType::ONE_FILE);
         restartFile.writeFirstAndLastTimeStep();

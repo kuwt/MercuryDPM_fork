@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -24,7 +24,7 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "DPMBase.h"
-#include "BaseParticle.h"
+#include "Particles/NonSphericalParticle.h"
 #include <cmath>
 #include "SuperQuadricParticle.h"
 #include "InteractionHandler.h"
@@ -36,7 +36,7 @@
  * (2,2), so it creates a sphere with radius 1.
  */
 SuperQuadricParticle::SuperQuadricParticle()
-        : BaseParticle()
+    : NonSphericalParticle()
 {
     axes_ = Vec3D(1.0, 1.0, 1.0);
     eps1_ = 1.0;
@@ -53,15 +53,15 @@ SuperQuadricParticle::SuperQuadricParticle()
  * \param[in,out] p  Reference to the SuperQuad this one should become a copy of.
  */
 SuperQuadricParticle::SuperQuadricParticle(const SuperQuadricParticle& p)
-        : BaseParticle(p)
+    : NonSphericalParticle(p)
 {
     axes_ = p.axes_;
     eps1_ = p.eps1_;
     eps2_ = p.eps2_;
 }
 
-
-SuperQuadricParticle::SuperQuadricParticle(const BaseParticle& p) : BaseParticle(p)
+SuperQuadricParticle::SuperQuadricParticle(const BaseParticle& p)
+    : NonSphericalParticle(p)
 {
     Mdouble radius = p.getRadius();
     axes_ = Vec3D(radius, radius, radius);

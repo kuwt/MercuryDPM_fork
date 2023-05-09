@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -95,8 +95,7 @@ public:
      * \brief old style set function which also assumes a uniform psd. Note if you want a general PSD do not use but this is quicker for a uniform in size PSD
      * \todo Check with Timo and Thomas about this.
      */
-    void set(BaseParticle &particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin,
-             Vec3D velMax, Mdouble rMin, Mdouble rMax)
+    void set(BaseParticle &particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax, Mdouble rMin, Mdouble rMax)
     {
         PSD uniformPSD;
         uniformPSD.setDistributionUniform(rMin,rMax,1000);
@@ -104,9 +103,6 @@ public:
         set(particleToCopy, maxFailed,posMin, posMax,  velMin, velMax);
     }
 
-
-
-    
     /*!
      * \brief Sets the geometry (position and velocity distribution) of the
      * CubeInsertionBoundary

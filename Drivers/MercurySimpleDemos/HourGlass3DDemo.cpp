@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -196,7 +196,7 @@ int main(int argc, char *argv[])
     HG.N = 600; //number of particles
     //uncomment next two line 2 to create paraview files
     HG.setParticlesWriteVTK(true);
-    HG.setWallsWriteVTK(FileType::ONE_FILE);
+    HG.wallHandler.setWriteVTK(FileType::ONE_FILE);
 
     HG.solve(argc, argv);
     return 0;

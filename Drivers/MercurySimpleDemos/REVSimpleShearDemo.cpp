@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -157,7 +157,7 @@ int main(int argc UNUSED, char* argv[] UNUSED)
     //Set output the particle information in VTK for ParaView Visualisation
     dpm.setParticlesWriteVTK(true);
     //Because of periodic boundary, out put wall files is not necessary in this case
-    //dpm.setWallsWriteVTK(true);
+    //dpm.wallHandler.setWriteVTK(true);
     //Solve the problem
     dpm.solve();
 }

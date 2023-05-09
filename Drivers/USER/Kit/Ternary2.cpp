@@ -10,7 +10,7 @@ class my_problem : public Mercury3D{
 
   public:
 	
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
     double particle_mass1=4.0/3.0*particle_density1*constants::pi*pow(particle_radius1,3);
 

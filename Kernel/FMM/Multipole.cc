@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -149,7 +149,7 @@ NumericalVector<std::complex<Mdouble>> Multipole::convertMultipoleToLocal(Vec3D 
 
 /// Adds multipole coefficients to an existing multipole
 /// \deprecated Remove this function; it should not be required anymore:
-MERCURY_DEPRECATED
+MERCURYDPM_DEPRECATED
 void Multipole::addMultipoleCoefficients(NumericalVector<std::complex<Mdouble>> multipoleExpansionCoefficients)
 {
     if (multipoleExpansionCoefficients.size() > multipoleExpansionCoefficients_.size())

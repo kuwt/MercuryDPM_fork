@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -139,7 +139,7 @@ int main()
     //! [FCD_2D_Walls:solve]
     problem.setFileType(FileType::ONE_FILE);
     problem.setParticlesWriteVTK(true);
-    problem.setWallsWriteVTK(true);
+    problem.wallHandler.setWriteVTK(true);
     //Uncomment to set the number of threads (cores) for the identity-based OpenMP framework
     //problem.setNumberOfOMPThreads(4);
     problem.solve();

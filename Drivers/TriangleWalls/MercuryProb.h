@@ -48,7 +48,7 @@ namespace units {
     std::string name;
 }
 
-//=============begin_Mercury_problem====================================
+//=============begin_MercuryDPM_problem====================================
 /// Problem class for a single particle bouncing on a "beam" structure.
 //======================================================================
 
@@ -76,7 +76,7 @@ public:
 //        setSaveCount(1);
         setSaveCount(unsigned(getTimeMax() / getTimeStep() / nWrite));
         setParticlesWriteVTK(true);
-        setWallsWriteVTK(true);
+        wallHandler.setWriteVTK(true);
     }
 
     void setSpeciesProperties(const unsigned &flag) {

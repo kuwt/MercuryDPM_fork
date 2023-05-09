@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,7 @@
 
 #include "BaseInteractable.h"
 #include "Particles/SuperQuadricParticle.h"
+#include "VTKWriter/VTKData.h"
 
 class WallHandler;
 
@@ -239,6 +240,10 @@ public:
     void addParticlesAtWall(unsigned numElements = 50);
 
     void setVelocityControl(Vec3D forceGoal, Vec3D gainFactor, Vec3D baseVelocity);
+    
+    virtual void writeWallDetailsVTK(VTKData& data) const { };
+    
+    virtual void computeWear() { };
 
 private:
     /*!

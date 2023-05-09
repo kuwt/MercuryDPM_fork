@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,7 @@
 
 class circular_periodic_walls_particle_insertion: public Mercury3D {
   
-	void setupInitialConditions()
+	void setupInitialConditions() override
 	{
 		particleHandler.clear();
 		get_BoundaryHandler().clear();
@@ -57,13 +57,13 @@ class circular_periodic_walls_particle_insertion: public Mercury3D {
 	
 	protected:
 	///Couts time
-	virtual void printTime() const {
+	virtual void printTime() const override {
 		cout << "t=" << setprecision(3) <<fixed<< left << setw(6) << getTime() 
 			<< ", tmax=" << setprecision(3) << left << setw(6) << getTimeMax() << endl;
 		cout.flush();
 	}
 	
-	void actionsBeforeTimeStep(){
+	void actionsBeforeTimeStep() override {
 		
 		int failed = 0;
 		double createSize=0.4;

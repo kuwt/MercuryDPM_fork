@@ -184,7 +184,7 @@ class MaserFingering : public Mercury3D {
         delete largePrototype;
     }
 
-    void setupInitialConditions() {
+    void setupInitialConditions() override {
 
       setTimeStep(pars.at("timeStep"));
       setTimeMax(pars.at("timeMax"));

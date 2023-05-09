@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -49,8 +49,7 @@ public:
         setParticleHeight = height; //Height of release
         setSlopeAngle = constants::pi / 180.0 * slopeAngle; //Slope angle
 
-        setName("protectiveWall"); //Output file name
-        setWallsWriteVTK(FileType::MULTIPLE_FILES); //For visualization
+        wallHandler.setWriteVTK(FileType::ONE_FILE); //For visualization
         setParticlesWriteVTK(true); //For visualization
         setGravity(Vec3D(0.0, 0.0, -9.81)); //Set gravity
 
@@ -248,9 +247,11 @@ int main(int argc, char* argv[])
     
     Mdouble simTime = helpers::readFromCommandLine(argc, argv, "-t", 5.0); // 5.0 [s]
     problem.setTimeMax(simTime);
+    std::string simName = helpers::readFromCommandLine(argc,argv,"-name",std::string("protectiveWall"));
+    problem.setName(simName);
     //! [AT_PW:setUp]
     
-    problem.setSaveCount(10);
+    problem.setSaveCount(400);
     problem.setTimeStep(0.005 / 50.0); // (collision time)/50.0
     problem.removeOldFiles();
     problem.solve();

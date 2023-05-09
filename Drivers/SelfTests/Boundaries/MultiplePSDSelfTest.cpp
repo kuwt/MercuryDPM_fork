@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -103,13 +103,13 @@ public:
         PSD psdC;
         // laser diffraction measurements usually give volumetric responses. The APAPM was already converted to a
         // CUMULATIVE_NUMBER_DISTRIBUTION.
-        psd.setPSDFromCSV(getMercurySourceDir() + "/Drivers/SelfTests/Boundaries/InputData/APAPM.csv",
+        psd.setPSDFromCSV(getMercuryDPMSourceDir() + "/Drivers/SelfTests/Boundaries/InputData/APAPM.csv",
                           PSD::TYPE::CUMULATIVE_NUMBER_DISTRIBUTION);
         //psd.cutHighSizeRatio();
-        psdB.setPSDFromCSV(getMercurySourceDir() + "/Drivers/SelfTests/Boundaries/InputData/CVDFLactose.csv",
+        psdB.setPSDFromCSV(getMercuryDPMSourceDir() + "/Drivers/SelfTests/Boundaries/InputData/CVDFLactose.csv",
                            PSD::TYPE::CUMULATIVE_VOLUME_DISTRIBUTION, false, 10000);
         //psdB.cutHighSizeRatio();
-        psdC.setPSDFromCSV(getMercurySourceDir() + "/Drivers/SelfTests/Boundaries/InputData/CVDFLactose.csv",
+        psdC.setPSDFromCSV(getMercuryDPMSourceDir() + "/Drivers/SelfTests/Boundaries/InputData/CVDFLactose.csv",
                            PSD::TYPE::CUMULATIVE_VOLUME_DISTRIBUTION, false, 10000);
         //psdC.cutHighSizeRatio();
         insertionBoundary.setPSD({psd, psdB, psdC}, {0.9, 0.05, 0.05});

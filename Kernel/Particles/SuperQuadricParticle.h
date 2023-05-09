@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -23,12 +23,13 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef SuperQuad_H
-#define SuperQuad_H
+#ifndef SuperQuadricParticle_H
+#define SuperQuadricParticle_H
 
 #include "Math/SmallVector.h"
 #include "BaseParticle.h"
 #include "BaseInteractable.h"
+#include "NonSphericalParticle.h"
 #include "Species/ParticleSpecies.h"
 
 typedef Vec3D BodyFixedCoordinates;
@@ -36,7 +37,7 @@ typedef Vec3D LabFixedCoordinates;
 
 /*!
  * \class SuperQuad
- * \brief Class that implements superquadric particles, which are non-spherical.
+ * \brief Class that implements SuperQuadric particles.
  *
  * \details We use the super-ellipsoid definition stated in Chapter 2 of the book "Segmentation and recovery of
  * superquadrics" by Jaklic et al. This class contains the geometrical information of the particles, i.e. the length of
@@ -52,7 +53,7 @@ typedef Vec3D LabFixedCoordinates;
  * of superquadric particles in Discrete element Method within an open-source framework" by Podlozhnyuk, Pirker and
  * Kloss.
  */
-class SuperQuadricParticle final : public BaseParticle
+class SuperQuadricParticle final : public NonSphericalParticle
 {
 public:
     /*!
@@ -68,6 +69,10 @@ public:
      */
     SuperQuadricParticle(const SuperQuadricParticle& p);
     
+    /*!
+     * \brief Base class copy constructor.
+     * Creates a Superquadric particle from a NonSphericalParticle.
+     */
     SuperQuadricParticle(const BaseParticle& p);
     
     /*!
@@ -82,7 +87,7 @@ public:
     SuperQuadricParticle* copy() const override;
     
     /*!
-     * \brief Write function: write this superquadric to the given output-stream, for example a restart-file
+     * \brief Write function: write this SuperQuadric to the given output-stream, for example a restart-file
      */
     void write(std::ostream& os) const override;
     
@@ -93,7 +98,7 @@ public:
     void read(std::istream& is) override;
     
     /*!
-     * \brief Returns the name of the class, here "SuperQuadricParticle"
+     * \brief Returns the name of the class, here "SuperQuadric"
      */
     std::string getName() const override;
     

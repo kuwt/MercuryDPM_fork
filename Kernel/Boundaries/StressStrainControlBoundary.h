@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,9 @@
 #include "Side.h"
 #include "LeesEdwardsBoundary.h"
 #include "PeriodicBoundary.h"
-
+#include "Controllers/PController.h"
+#include "Controllers/PIController.h"
+#include "Controllers/PIDController.h"
 class PeriodicBoundaryHandler;
 
 /*!
@@ -52,6 +54,7 @@ class PeriodicBoundaryHandler;
 class StressStrainControlBoundary : public BaseBoundary
 {
 public:
+
     /// \brief default constructor.
     StressStrainControlBoundary();
     
@@ -81,6 +84,8 @@ public:
      */
     void set(const Matrix3D& stressGoal, const Matrix3D& strainRate, const Matrix3D& gainFactor,
              bool isStrainRateControlled);
+
+    void setStrainRate(const Matrix3D& strainRate);
 
     /// \brief Create the periodic particles after read in from a restart file to attain right information.
     void createPeriodicParticles(ParticleHandler& particleHandler) override;
@@ -114,6 +119,19 @@ public:
     /// \brief Accesses the gainFactor.
     Matrix3D getGainFactor() const {return gainFactor_;}
 
+
+    Mdouble computeStressError();
+
+
+
+    double getIntegratedShift() const {return integratedShift_;}
+
+//    // Proportional Controller
+//    static void pControl (Mdouble& strainRate, Mdouble stress, Mdouble stressGoal, Mdouble pGain) {
+//        strainRate = pGain * (stress- stressGoal);
+//    }
+
+
 private:
 
     //Set by the user.
@@ -121,17 +139,11 @@ private:
      * \brief Stores the stress value the boundary should attain.
      * \details Unused if the all stressGoal values are set to zero.
      */
+
     Matrix3D stressGoal_, strainRate_, gainFactor_;
 
     /// The boolean input, true means switch on the strain rate control for particles affine movements.
     bool isStrainRateControlled_;
-
-    /// Box length in x-y-z.
-    Vec3D lengthBox_;
-    /// Center position of the domain.
-    Vec3D centerBox_;
-    /// Particle position relative to the center of domain.
-    Vec3D relativeToCenter_;
 
     /// Shift integrated for all the time when using Lees-Edwards Boundary.
     Mdouble integratedShift_;

@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -28,9 +28,9 @@ using namespace std;
 
 class Restart : public Chute {
 public:
-	void actionsBeforeTimeStep(){};
+	void actionsBeforeTimeStep() override {};
 	
-	void setupInitialConditions() { };
+	void setupInitialConditions() override { };
 };
 
 int main(int argc, char *argv[])

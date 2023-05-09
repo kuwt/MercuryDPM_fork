@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,7 @@ class MembraneSelfTest : public Mercury3D
 {
 public:
     
-     void setupInitialConditions()
+     void setupInitialConditions() override
     {
         // Setting the dimensions of the simulation box
         setXMin(-1);
@@ -140,7 +140,7 @@ public:
         p0.setSpecies(membraneParticleSpecies_);
         p0.setRadius(membrane.getParticleRadius());
         p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
-        membrane.loadFromSTL(p0, getMercurySourceDir() + "/Drivers/SelfTests/Walls/MembraneSelfTest.stl");
+        membrane.loadFromSTL(p0, getMercuryDPMSourceDir() + "/Drivers/SelfTests/Walls/MembraneSelfTest.stl");
                     
         fixMembraneEdges();
     }
@@ -184,7 +184,7 @@ public:
         membrane_.computeAdditionalForces();
     }
     
-    void write(std::ostream& os, bool writeAllParticles) const
+    void write(std::ostream& os, bool writeAllParticles) const override
     {
         Mercury3D::write(os, writeAllParticles);
         os << " membrane " << membrane_;
@@ -194,7 +194,7 @@ public:
         os << " membraneParticleSpecies " << membraneParticleSpecies_->getId();
     }
     
-    void read(std::istream& is, ReadOptions opt)
+    void read(std::istream& is, ReadOptions opt) override
     {
         
         std::string dummy;
@@ -274,7 +274,7 @@ int main(int argc, char** argv)
       problem.setSaveCount(floor(0.01/problem.getTimeStep()));
       problem.setParticlesWriteVTK(true);
       // Write one file per timestep
-      problem.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+      problem.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
   }
   
   problem.solve(argc,argv);

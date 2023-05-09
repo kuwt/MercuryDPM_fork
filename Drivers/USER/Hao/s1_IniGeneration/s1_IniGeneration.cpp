@@ -43,7 +43,7 @@ public:
         }
 	}
 	
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
 		
 		double mass = rhop*constants::pi*mathsFunc::cubic(2*particleDiameter/(poly+1))/6.0;  //mass or effective mass in Mercury =/frac{2}{1/m1+1/m2}

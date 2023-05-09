@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,7 @@
 /// In this file, the rolling behaviour of the tangential spring is tested. This is done by placing one normal partilce on top of a fixed partilce and letting graviry roll it over the other particle until it loses contact.
 class ChargedBondedParticleUnitTest : public DPMBase {
 public:
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
 
         //***********************************************Setting System Size and Dimensionality**************************************************

@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -28,14 +28,14 @@
 ///Modifications
 /// 21:9:2009 - Added the inclusion guards and some include objects
 /// \todo Need to generalize this to n-dimensional vectors of any type
-#ifndef VECTOR_H
-#define VECTOR_H
+#ifndef MECURYDPM_VECTOR_H
+#define MECURYDPM_VECTOR_H
 
 #include <cmath>
 #include <sstream>
 #include <iostream>
 #include <cstdlib>
-#include "array"
+#include <array>
 
 #include "GeneralDefine.h"
 #include "Logger.h"

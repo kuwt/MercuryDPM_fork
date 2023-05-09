@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,7 @@ public:
         setFileType(FileType::ONE_FILE);
         //setParticlesWriteVTK(true);
 
-        //setWallsWriteVTK(FileType::MULTIPLE_FILES);
+        //wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
 
         setParticleDimensions(3);
         setSystemDimensions(3);
@@ -187,7 +187,7 @@ public:
 
 //        for (const auto& q: particleHandler) {
 //            auto p0 = dynamic_cast<ThermalParticle *>(q);
-//            logger.assert(p0 != nullptr, "Thermal Particles required");
+//            logger.assert_debug(p0 != nullptr, "Thermal Particles required");
 //            logger(INFO, "time % temperature % moltenLayer % radius % solidRadius % invMass % mass % density % volume %",
 //                   getTime(), p0->getTemperature(), p0->getMoltenLayerThickness(),
 //                   p0->getRadius(), p0->getSolidRadius(), p0->getInvMass(), p0->getMass(), p0->getSpecies()->getDensity(), p0->getVolume());

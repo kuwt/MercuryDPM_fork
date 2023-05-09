@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,7 @@
 class ChuteWithHopperAndInset_time : public ChuteWithHopperAndInset
 {
 public:
-    void setupInitialConditions()
+    void setupInitialConditions() override
     {
         setupSideWalls();
         createBottom();
@@ -296,7 +296,7 @@ public:
         return eKin;
     }
     
-    void actionsBeforeTimeStep()
+    void actionsBeforeTimeStep() override
     {
         Mdouble gravity = getGravity().getLength();
         Mdouble GravityAngle;
@@ -442,7 +442,7 @@ public:
         wallHandler.removeLastObject();
     }
     
-    void actionsAfterTimeStep()
+    void actionsAfterTimeStep() override
     {
         //save the gravity information in "gravity_file.txt" after every factor'th time step
         Mdouble factor = 10; //100
@@ -489,7 +489,7 @@ public:
         }
     }
     
-    void printTime() const
+    void printTime() const override
     {
         std::cout << "t=" << std::setprecision(3) << std::left << std::setw(6) << getTime()
                 << ", tmax=" << std::setprecision(3) << std::left << std::setw(6) << getTimeMax()

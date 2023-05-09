@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -119,7 +119,7 @@ public:
     bool isInPeriodicDomain() const;
     
     /*!
-     * \brief Flags the status of the particle wether it is in the periodic communication zone or not
+     * \brief Flags the status of the particle whether it is in the periodic communication zone or not
      */
     void setInPeriodicDomain(bool flag);
     
@@ -300,13 +300,13 @@ public:
      * \brief Calculates the particle's translational kinetic energy
      * \return the particle's translational kinetic energy
      */
-    Mdouble getKineticEnergy() const;
+    virtual Mdouble getKineticEnergy() const;
     
     /*!
      * \brief Calculates the particle's rotational kinetic energy
      * \return the particle's rotational kinetic energy
      */
-    Mdouble getRotationalEnergy() const;
+    virtual Mdouble getRotationalEnergy() const;
     
     /*!
      * \brief Calculates the particle's gravitational energy
@@ -537,7 +537,7 @@ public:
      * \deprecated Please do not set the mass yourself, but use 
      * ParticleSpecies->computeMass instead. That makes sure 
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     void setMass(Mdouble mass);
     
     /*!
@@ -604,13 +604,13 @@ public:
      * integration.
      * 
      */
-    void integrateBeforeForceComputation(double time, double timeStep);
+    virtual void integrateBeforeForceComputation(double time, double timeStep);
     
     /*!
      * \brief Second step of <a href="http://en.wikipedia.org/wiki/Verlet_integration#Velocity_Verlet">Velocity Verlet</a> 
      * integration.
      */
-    void integrateAfterForceComputation(double time, double timeStep);
+    virtual void integrateAfterForceComputation(double time, double timeStep);
     
     /*!
      * \brief Returns the particle's dimensions (either 2 or 3).
@@ -620,7 +620,7 @@ public:
     /*!
      * \deprecated Please use setSpecies(const ParticleSpecies*) instead.
      */
-    MERCURY_DEPRECATED
+    MERCURYDPM_DEPRECATED
     /// \todo MX: this index is used in the MPI transmission. This should be "undeprecated"
     void setIndSpecies(unsigned int indSpecies) override;
     
@@ -639,26 +639,48 @@ public:
     
     virtual std::vector<Mdouble> getFieldVTK(unsigned i) const;
     
-    virtual void actionsAfterTimeStep()
-    {};
+    virtual void actionsAfterTimeStep() {}
 
-    virtual bool isSphericalParticle() const {return false;}
-    
+    /**
+     * this flag is used to decide whether to compute orientation, which is not necessary for spherical particles
+     * \todo This flag is used badly, and used to determine whether particles are superquadric
+     */
+    virtual bool isSphericalParticle() const = 0;
+
     //const HGridCell& getHGridCell() const;
     const HGridCell& getHGridCell() const
     { return hGridCell; }
 
     virtual void computeMass(const ParticleSpecies& s);
 
-protected:
-    
+    //+++++++Multiparticles++++++++
+    BaseParticle* getMaster() const
+    {
+        return masterParticle;
+    }
+
+    // Slave-Master functions
+    bool IsMaster() const
+    {
+        return isMaster;
+    }
+    bool IsSlave() const
+    {
+        return isSlave;
+    }
+
+    virtual Vec3D getCenterOfMass() {return Vec3D(0,0,0);}
+    //+++++++++++++++++++++++++++++
+
+
+public:
+
     Mdouble radius_; ///Particle radius_
     Mdouble invMass_; ///Inverse Particle mass (for computation optimization)
     MatrixSymmetric3D invInertia_; ///Inverse Particle inverse inertia (for computation optimization)
 
-
 private:
-    
+
     /*!
      * \brief Pointer to the particle's ParticleHandler container
      */
@@ -703,6 +725,14 @@ private:
     friend void ParticleSpecies::computeMass(BaseParticle*) const;
     
     Mdouble info_; // by default, the species ID (if a species is set)
+
+
+public:
+    virtual void actionsAfterAddObject() {}
+
+    BaseParticle* masterParticle;
+    bool isSlave;
+    bool isMaster;
 };
 
 #endif

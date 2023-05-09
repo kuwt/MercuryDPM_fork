@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,7 @@
 
 class Polygon: public Mercury3D{
 public:
-    void setupInitialConditions(){
+    void setupInitialConditions() override {
         IntersectionOfWalls w;
         w.setSpecies(speciesHandler.getLastObject());
         w.addObject(Vec3D(0,0,-1),Vec3D(0,0,3));
@@ -51,7 +51,7 @@ int main() {
     LinearViscoelasticSpecies s;
     s.setDensity(1000);
     problem.speciesHandler.copyAndAddObject(s);
-    problem.setWallsWriteVTK(true);
+    problem.wallHandler.setWriteVTK(true);
     problem.solve();
     return 0;
 }

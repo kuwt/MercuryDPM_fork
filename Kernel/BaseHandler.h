@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -577,7 +577,7 @@ T* BaseHandler<T>::getObjectById(const unsigned int id)
         if (obj->getId() == id) //Found it, so return!
             return obj;
     }
-#ifndef MERCURY_USE_MPI
+#ifndef MERCURYDPM_USE_MPI
     logger(ERROR, "[BaseHandler::getObjectById()] in Object* %: Object with ID % could not be found.", getName(), id);
 #endif
     return nullptr;
@@ -600,7 +600,7 @@ std::vector<T*> BaseHandler<T>::getObjectsById(const unsigned int id)
             list.push_back(obj);
         }
     }
-#ifndef MERCURY_USE_MPI
+#ifndef MERCURYDPM_USE_MPI
     logger(ERROR, "[BaseHandler::getObjectById()] in Object* %: Object with ID % could not be found.", getName(), id);
 #endif
     return list;

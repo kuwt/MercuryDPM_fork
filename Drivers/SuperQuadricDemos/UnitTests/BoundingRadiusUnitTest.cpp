@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,7 @@
 #include "Mercury3D.h"
 
 ///tests whether the radius of the bounding sphere for superquadrics is computed correctly
-/// At the moment it only checks for ellipsoids and spheres using simplified expressions in the SuperQuadricParticle::getMaxInteractionRadius() function.
+/// At the moment it only checks for ellipsoids and spheres using simplified expressions in the NonSphericalParticle::getMaxInteractionRadius() function.
 /// Definitely needs generalisation for complex shapes.
 
 class BoundingRadiusTester : public Mercury3D
