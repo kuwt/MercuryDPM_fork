@@ -193,11 +193,11 @@ While the above example works, we advise you to avoid the number of explicitly u
 
 ### Creating new drivers
 You can start a new driver code by creating your own user directory. 
-First, chose a \c UserName, then add a folder to the user directory and create a new source file, e.g. \c Example.cpp, which for convenience is copied here from the file \c Tutorial1.cpp.
+First, chose a \c UserName, then add a folder to the user directory and create a new source file, e.g. \c Example.cpp, which for convenience is copied here from the file \c Tutorial1_ParticleInOuterSpace.cpp.
 cd ~/MercurySource/Drivers/USER
 svn mkdir UserName
 cd UserName
-svn cp ../../Tutorials/Tutorial1.cpp Example.cpp
+svn cp ../../Tutorials/Tutorial1_ParticleInOuterSpace.cpp Example.cpp
 
 Now write your code in the Example.cpp file. Note, you cannot yet execute your code, as the Makefiles in your build directory doesn't know about the new file. To update your Makefiles, use cmake. Note, the file name of your source file has to be unique, otherwise you get error messages.
 cd ~/MercuryBuild

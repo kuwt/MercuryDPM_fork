@@ -5,7 +5,7 @@ and draws them in an X11 window.
 
 Each MercuryDPM simulation that outputs data files also outputs a small
 script to view the data in xballs;
-e.g. to view Tutorial1.data, execute ./Tutorial1.xballs
+e.g. to view Tutorial1_ParticleInOuterSpace.data, execute ./Tutorial1_ParticleInOuterSpace.xballs
 
 
 ## Screen output:
@@ -32,7 +32,7 @@ the order of increasing value.
 
 This script calls xballs with the name of the data file, plus a few options for viewing:
 \code
-xballs -format 14 -f Tutorial1.data -s 1.2 -cmode 0 -cmax -sort  -solidf -v0 $*
+xballs -format 14 -f Tutorial1_ParticleInOuterSpace.data -s 1.2 -cmode 0 -cmax -sort  -solidf -v0 $*
 \endcode
 
 Note, you can change the options to achieve different views of the simulation. Below we explain these options in detail:
