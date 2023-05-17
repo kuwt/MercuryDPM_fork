@@ -51,6 +51,9 @@
 #define GetCurrentDir getcwd
 #endif
 
+#ifdef MERCURYDPM_USE_OMP
+#include <omp.h>
+#endif
 
 std::string helpers::lower(std::string s) {
     std::transform(s.begin(), s.end(), s.begin(), ::tolower);
@@ -1047,7 +1050,20 @@ Mdouble helpers::round(const Mdouble val, unsigned int prec) {
     return std::round(val*n)/n;
 }
 
-
 Mdouble helpers::getRayleighTime(Mdouble radius, Mdouble shearModulus, Mdouble poisson, Mdouble density) {
     return constants::pi*radius*sqrt(density/shearModulus)/(0.1631*poisson+0.8766);
+}
+
+/**
+ * Gets the maximum number of OpenMP threads if MERCURYDPM_USE_OMP is enabled.
+ * \returns int  maximum number of OpenMP threads
+ */
+int helpers::getMaximumNumberOfOMPThreads()
+{
+#ifdef MERCURYDPM_USE_OMP
+    return omp_get_max_threads();
+#else
+    logger(WARN, "You are getting the maximum number of OMP threads, but OMP is not turned on");
+    return 1;
+#endif
 }
