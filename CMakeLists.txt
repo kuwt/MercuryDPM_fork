@@ -100,44 +100,57 @@ configure_file(Configuration/CMakeDefinitions.cc
 configure_file(Configuration/CMakeDefinitions.h
 		Kernel/CMakeDefinitions.h)
 
+option(MercuryDPM_KERNEL_ONLY "Only the kernel files are built, no drivers, no tests." OFF)
+mark_as_advanced(MercuryDPM_KERNEL_ONLY)
+
 add_subdirectory(Kernel)
-add_subdirectory(Tools)
-add_subdirectory(XBalls)
+
+if (NOT MercuryDPM_KERNEL_ONLY)
+	add_subdirectory(Tools)
+	add_subdirectory(XBalls)
+endif()
 
 # Determine whether to couple MercuryDPM with oomph-lib or not
 option(MercuryDPM_OOMPH_COUPLING "Couple MercuryDPM with oomph-lib" OFF)
 # Couple with oomph-lib if OOMPH_COUPLING is on
 include(CMakeModules/OomphCoupling.cmake)
-# this is done after oomph is included since it needs the includes defined there
-add_subdirectory(Drivers)
 
-#Add the command fullTest, which rebuilds the cache, cleans the project and then compiles and tests everything.
-add_custom_target(fullTest
-    	COMMAND make rebuild_cache
-	COMMAND make clean
-	COMMAND make -j 4
-	COMMAND make test -j 4
-	COMMENT "This will clean the project, rebuild and test." )
+if (NOT MercuryDPM_KERNEL_ONLY)
+	# this is done after oomph is included since it needs the includes defined there
+	add_subdirectory(Drivers)
+
+	#Add the command fullTest, which rebuilds the cache, cleans the project and then compiles and tests everything.
+	add_custom_target(fullTest
+		COMMAND make rebuild_cache
+		COMMAND make clean
+		COMMAND make -j 4
+		COMMAND make test -j 4
+		COMMENT "This will clean the project, rebuild and test." )
+endif()
 
 #Add the command update, which rebuilds the cache and compiles the codes (no test).
 add_custom_target(update
-		COMMAND make rebuild_cache
-		COMMAND make -j 4
-		COMMENT "Quick rebuild" )
+	COMMAND make rebuild_cache
+	COMMAND make -j 4
+	COMMENT "Quick rebuild" )
 
 #This section is about the build of documentation#
 ##################################################
 
 option(MercuryDPM_BUILD_USER_DIR "Compile USER DIR in testing" ON)
+if(MercuryDPM_KERNEL_ONLY AND MercuryDPM_BUILD_USER_DIR)
+	message(WARNING "MercuryDPM_KERNEL_ONLY overwrites MercuryDPM_BUILD_USER_DIR")
+	set(MercuryDPM_BUILD_USER_DIR OFF)
+endif()
 
+if (NOT MercuryDPM_KERNEL_ONLY)
+	###### These needs to be fixed as the new scripts line above will always create this, so the Python problem is back
+	################################################
+	find_package(PythonInterp 3)
+	find_package(PythonLibs 3)
+	# this line causes problems when you have multiple builds
+	FILE(COPY Configuration/fpdiff.py DESTINATION ${PROJECT_SOURCE_DIR}/Scripts/)
 
-
-###### These needs to be fixed as the new scripts line above will always create this, so the Python problem is back
-################################################
-find_package(PythonInterp 3)
-find_package(PythonLibs 3)
-# this line causes problems when you have multiple builds
-FILE(COPY Configuration/fpdiff.py DESTINATION ${PROJECT_SOURCE_DIR}/Scripts/)
-
-#find_program(PYTHON_EXEC "python" 
-#	DOC "Location of python executable to use")
+	#find_program(PYTHON_EXEC "python" 
+	#	DOC "Location of python executable to use")
+endif()
