@@ -1509,6 +1509,12 @@ public:
     Time clock_;
 
     void writePythonFileForVTKVisualisation() const;
+
+    void setWritePythonFileForVTKVisualisation(bool forceWritePythonFileForVTKVisualisation);
+    bool getWritePythonFileForVTKVisualisation() const;
+
+private:
+    bool forceWritePythonFileForVTKVisualisation_ { true };
 };
 
 #endif

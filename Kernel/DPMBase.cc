@@ -2158,6 +2158,9 @@ void DPMBase::writeVTKFiles() const
     bool writePython = getParticlesWriteVTK() || wallHandler.getWriteVTK() != FileType::NO_FILE ||
                        interactionHandler.getWriteVTK() != FileType::NO_FILE ||
                        wallHandler.getWriteDetailsVTKAny();
+
+    writePython &= forceWritePythonFileForVTKVisualisation_;
+
     if (writePython && getTime() == 0)
     {
         writePythonFileForVTKVisualisation();
@@ -5490,3 +5493,18 @@ void DPMBase::handleParticleAddition(unsigned int id, BaseParticle* p)
 volatile sig_atomic_t DPMBase::continueFlag_ = true;
 
 ///\todo When restarting the indexMax should be reset
+
+/*!
+* \details
+* Enables/disables the writePythonFileForVTKVisualisation() function.
+* \param[in] forceWritePythonFileForVTKVisualisation
+*/
+void DPMBase::setWritePythonFileForVTKVisualisation(bool forceWritePythonFileForVTKVisualisation)
+{
+    forceWritePythonFileForVTKVisualisation_ = forceWritePythonFileForVTKVisualisation;
+}
+
+bool DPMBase::getWritePythonFileForVTKVisualisation() const
+{
+    return forceWritePythonFileForVTKVisualisation_;
+}
