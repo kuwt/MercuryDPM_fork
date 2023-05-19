@@ -796,6 +796,22 @@ Mdouble PSD::getRadiusByQuantile(Mdouble quantile) const
 }
 
 /*!
+ * \details Calculates the quantile corresponding to a certain radius.
+ * @param radius The radius to find the quantile for.
+ * @return The quantile found.
+ */
+Mdouble PSD::getQuantileByRadius(Mdouble radius) const
+{
+    auto high = std::lower_bound(particleSizeDistribution_.begin(), particleSizeDistribution_.end(),
+                                 radius, [](const PSD::RadiusAndProbability& rp, Mdouble value){ return rp.radius < value; });
+    auto low = std::max(particleSizeDistribution_.begin(), high - 1);
+    if (high->radius == low->radius)
+        return high->probability;
+    else
+        return low->probability + (high->probability - low->probability) * (radius - low->radius) / (high->radius - low->radius);
+}
+
+/*!
  * \details Gets a radius such that a monodisperse system has the same number of particles as a polydisperse system.
  * (i.e. mean += p_i * 0.5*(r_i^3 + r_i-1^3)
  * \return A double which corresponds to the volumetric mean radius.

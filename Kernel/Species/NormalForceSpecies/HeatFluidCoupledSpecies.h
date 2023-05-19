@@ -25,46 +25,35 @@
 
 #ifndef HEATFLUIDCOUPLEDSPECIES_H
 #define HEATFLUIDCOUPLEDSPECIES_H
-
+#include "ThermalSpecies.h"
+#include "Interactions/NormalForceInteractions/HeatFluidCoupledInteraction.h"
 class BaseInteraction;
 
+/// Species for the HeatFluidCoupledParticle
 template<class NormalForceSpecies>
-class HeatFluidCoupledSpecies : public NormalForceSpecies
+class HeatFluidCoupledSpecies : public ThermalSpecies<NormalForceSpecies>
 {
 public:
-    
-   // ///\brief The correct Interaction type for this FrictionForceSpecies
-    //typename NormalForceSpecies::InteractionType InteractionType;
-    
+
+    typedef HeatFluidCoupledInteraction<typename NormalForceSpecies::InteractionType> InteractionType;
+
     ///\brief The default constructor.
     HeatFluidCoupledSpecies();
-    
+
     ///\brief The default copy constructor.
     HeatFluidCoupledSpecies(const HeatFluidCoupledSpecies& s);
-    
+
     ///\brief The default destructor.
     virtual ~HeatFluidCoupledSpecies();
-    
+
     /// \brief Writes the species properties to an output stream.
     void write(std::ostream& os) const;
-    
+
     /// \brief Reads the species properties from an input stream.
     void read(std::istream& is);
-    
+
     /// \brief Used in Species::getName to obtain a unique name for each Species.
     std::string getBaseName() const;
-    
-    ///Allows heatCapacity_ to be accessed
-    Mdouble getHeatCapacity() const;
-    
-    ///Allows heatCapacity_ to be changed
-    void setHeatCapacity(Mdouble heatCapacity);
-    
-    ///Allows thermalConductivity_ to be accessed
-    Mdouble getThermalConductivity() const;
-    
-    ///Allows thermalConductivity_ to be changed
-    void setThermalConductivity(Mdouble thermalConductivity);
 
     ///Allows massTransferCoefficient_ to be accessed
     Mdouble getMassTransferCoefficient() const;
@@ -120,59 +109,55 @@ public:
     ///Allows ambientTemperature_ to be changed
     void setAmbientTemperature(Mdouble ambientTemperature);
 
+    void actionsAfterTimeStep(BaseParticle* particle) const override;
+
+    /// f1 is used in Runge–Kutta method.
+    std::array<double,2> f(double liquidVolume,double temperature, double mass, double surfaceArea) const;
+
 private:
-    /*!
-     * \brief The heat capacity.
-     */
-    Mdouble heatCapacity_;
-    
-    /*!
-     * \brief The thermal conductivity.
-     */
-    Mdouble thermalConductivity_;
 
     /*!
-     * \brief The mass transfer coefficient.
+     * \brief The mass transfer rate (m/s)
      */
     Mdouble massTransferCoefficient_;
 
     /*!
-     * \brief The latent heat of vaporization.
+     * \brief The latent heat of vaporization (J/kg)
      */
     Mdouble latentHeatVaporization_;
 
     /*!
-     * \brief The liquid density.
+     * \brief The liquid density (kg/m^3)
      */
     Mdouble liquidDensity_;
 
     /*!
-     * \brief The evaporation coefficient a.
+     * \brief The evaporation coefficient a (dimensionless)
      */
     Mdouble evaporationCoefficientA_;
 
     /*!
-     * \brief The evaporation coefficient b.
+     * \brief The evaporation coefficient b (dimensionless)
      */
     Mdouble evaporationCoefficientB_;
 
     /*!
-     * \brief The ambient humidity.
+     * \brief The ambient humidity (dimensionless, between 0 and 1, but cannot be 0)
      */
     Mdouble ambientHumidity_;
 
     /*!
-     * \brief The ambient equilibrium moisture content.
+     * \brief The ambient equilibrium moisture content (dimensionless, between 0 and 1).
      */
     Mdouble ambientEquilibriumMoistureContent_;
 
     /*!
-     * \brief The ambient vapour concentration.
+     * \brief The ambient vapour concentration (kg/m^3).
      */
     Mdouble ambientVapourConcentration_;
 
     /*!
-     * \brief The ambient temperature.
+     * \brief The ambient temperature (K).
      */
     Mdouble ambientTemperature_;
 
@@ -180,16 +165,15 @@ private:
 
 template<class NormalForceSpecies>
 HeatFluidCoupledSpecies<NormalForceSpecies>::HeatFluidCoupledSpecies()
-        : NormalForceSpecies()
+        : ThermalSpecies<NormalForceSpecies>()
 {
-    heatCapacity_ = 0.0;
-    thermalConductivity_ = 0.0;
     massTransferCoefficient_=0.0;
     latentHeatVaporization_=0.0;
-    liquidDensity_=0.0;
+    liquidDensity_=1.0;
     evaporationCoefficientA_=0.0;
     evaporationCoefficientB_=0.0;
-    ambientHumidity_=0.0;
+    // note, this default value is unrealistically high; 0.3 is realistic.
+    ambientHumidity_=1.0;
     ambientEquilibriumMoistureContent_=0.0;
     ambientVapourConcentration_=0.0;
     ambientTemperature_=0.0;
@@ -197,10 +181,8 @@ HeatFluidCoupledSpecies<NormalForceSpecies>::HeatFluidCoupledSpecies()
 
 template<class NormalForceSpecies>
 HeatFluidCoupledSpecies<NormalForceSpecies>::HeatFluidCoupledSpecies(const HeatFluidCoupledSpecies& s)
-        : NormalForceSpecies(s)
+        : ThermalSpecies<NormalForceSpecies>(s)
 {
-    heatCapacity_ = s.heatCapacity_;
-    thermalConductivity_ = s.thermalConductivity_;
     massTransferCoefficient_= s.massTransferCoefficient_;
     latentHeatVaporization_= s.latentHeatVaporization_;
     liquidDensity_=s.liquidDensity_;
@@ -219,9 +201,7 @@ HeatFluidCoupledSpecies<NormalForceSpecies>::~HeatFluidCoupledSpecies()
 template<class NormalForceSpecies>
 void HeatFluidCoupledSpecies<NormalForceSpecies>::write(std::ostream& os) const
 {
-    NormalForceSpecies::write(os);
-    os << " heatCapacity " << heatCapacity_;
-    os << " thermalConductivity " << thermalConductivity_;
+    ThermalSpecies<NormalForceSpecies>::write(os);
     os << " massTransferCoefficient " << massTransferCoefficient_;
     os << " latentHeatVaporization " << latentHeatVaporization_;
     os << " liquidDensity " << liquidDensity_;
@@ -237,9 +217,7 @@ template<class NormalForceSpecies>
 void HeatFluidCoupledSpecies<NormalForceSpecies>::read(std::istream& is)
 {
     std::string dummy;
-    NormalForceSpecies::read(is);
-    is >> dummy >> heatCapacity_;
-    is >> dummy >> thermalConductivity_;
+    ThermalSpecies<NormalForceSpecies>::read(is);
     is >> dummy >> massTransferCoefficient_;
     is >> dummy >> latentHeatVaporization_;
     is >> dummy >> liquidDensity_;
@@ -255,37 +233,6 @@ template<class NormalForceSpecies>
 std::string HeatFluidCoupledSpecies<NormalForceSpecies>::getBaseName() const
 {
     return "HeatFluidCoupled" + NormalForceSpecies::getBaseName();
-}
-
-
-template<class NormalForceSpecies>
-Mdouble HeatFluidCoupledSpecies<NormalForceSpecies>::getHeatCapacity() const
-{
-    return heatCapacity_;
-}
-
-template<class NormalForceSpecies>
-void HeatFluidCoupledSpecies<NormalForceSpecies>::setHeatCapacity(Mdouble heatCapacity)
-{
-    logger.assert_always(heatCapacity > 0,
-                         "[HeatFluidCoupledSpecies<>::setHeatCapacity(%)] value has to be positive",
-                         heatCapacity);
-    heatCapacity_ = heatCapacity;
-}
-
-template<class NormalForceSpecies>
-Mdouble HeatFluidCoupledSpecies<NormalForceSpecies>::getThermalConductivity() const
-{
-    return thermalConductivity_;
-}
-
-template<class NormalForceSpecies>
-void HeatFluidCoupledSpecies<NormalForceSpecies>::setThermalConductivity(Mdouble thermalConductivity)
-{
-    logger.assert_always(thermalConductivity >= 0,
-                         "[HeatFluidCoupledSpecies<>::setThermalConductivity(%)] value has to be positive",
-                         thermalConductivity);
-    thermalConductivity_ = thermalConductivity;
 }
 
 template<class NormalForceSpecies>
@@ -342,7 +289,7 @@ Mdouble HeatFluidCoupledSpecies<NormalForceSpecies>::getEvaporationCoefficientA(
 template<class NormalForceSpecies>
 void HeatFluidCoupledSpecies<NormalForceSpecies>::setEvaporationCoefficientA(Mdouble evaporationCoefficientA)
 {
-    logger.assert_always(evaporationCoefficientA > 0,
+    logger.assert_always(evaporationCoefficientA >= 0,
                          "[HeatFluidCoupledSpecies<>::setEvaporationCoefficientA(%)] value has to be positive",
                          evaporationCoefficientA);
     evaporationCoefficientA_ = evaporationCoefficientA;
@@ -357,7 +304,7 @@ Mdouble HeatFluidCoupledSpecies<NormalForceSpecies>::getEvaporationCoefficientB(
 template<class NormalForceSpecies>
 void HeatFluidCoupledSpecies<NormalForceSpecies>::setEvaporationCoefficientB(Mdouble evaporationCoefficientB)
 {
-    logger.assert_always(evaporationCoefficientB < 0,
+    logger.assert_always(evaporationCoefficientB <= 0,
                          "[HeatFluidCoupledSpecies<>::setEvaporationCoefficientB(%)] value has to be negative",
                          evaporationCoefficientB);
     evaporationCoefficientB_ = evaporationCoefficientB;
@@ -372,6 +319,7 @@ Mdouble HeatFluidCoupledSpecies<NormalForceSpecies>::getAmbientHumidity() const
 template<class NormalForceSpecies>
 void HeatFluidCoupledSpecies<NormalForceSpecies>::setAmbientHumidity(Mdouble ambientHumidity)
 {
+    //note, this is not allowed to be zero!
     logger.assert_always(ambientHumidity > 0,
                          "[HeatFluidCoupledSpecies<>::setAmbientHumidity(%)] value has to be positive",
                          ambientHumidity);
@@ -387,7 +335,7 @@ Mdouble HeatFluidCoupledSpecies<NormalForceSpecies>::getAmbientEquilibriumMoistu
 template<class NormalForceSpecies>
 void HeatFluidCoupledSpecies<NormalForceSpecies>::setAmbientEquilibriumMoistureContent(Mdouble ambientEquilibriumMoistureContent)
 {
-    logger.assert_always(ambientEquilibriumMoistureContent > 0,
+    logger.assert_always(ambientEquilibriumMoistureContent >= 0,
                          "[HeatFluidCoupledSpecies<>::setAmbientEquilibriumMoistureContent(%)] value has to be positive",
                          ambientEquilibriumMoistureContent);
     ambientEquilibriumMoistureContent_ = ambientEquilibriumMoistureContent;
@@ -402,7 +350,7 @@ Mdouble HeatFluidCoupledSpecies<NormalForceSpecies>::getAmbientVapourConcentrati
 template<class NormalForceSpecies>
 void HeatFluidCoupledSpecies<NormalForceSpecies>::setAmbientVapourConcentration(Mdouble ambientVapourConcentration)
 {
-    logger.assert_always(ambientVapourConcentration > 0,
+    logger.assert_always(ambientVapourConcentration >= 0,
                          "[HeatFluidCoupledSpecies<>::setAmbientVapourConcentration(%)] value has to be positive",
                          ambientVapourConcentration);
     ambientVapourConcentration_ = ambientVapourConcentration;
@@ -423,4 +371,101 @@ void HeatFluidCoupledSpecies<NormalForceSpecies>::setAmbientTemperature(Mdouble 
     ambientTemperature_ = ambientTemperature;
 }
 
+template<class NormalForceSpecies>
+void HeatFluidCoupledSpecies<NormalForceSpecies>::actionsAfterTimeStep(BaseParticle* baseParticle) const
+{
+    double dt = baseParticle->getHandler()->getDPMBase()->getTimeStep();
+    auto p = dynamic_cast<HeatFluidCoupledParticle*>(baseParticle);
+    double mass = p->getMass();
+    double surfaceArea = p->getSurfaceArea();
+    //Runge–Kutta method
+    std::array<double,2> k1 = f(p->getLiquidVolume(),p->getTemperature(), mass, surfaceArea);
+    //logger(INFO, "dL % dT %", k1[0], k1[1]);
+    std::array<double,2> k2 = f(p->getLiquidVolume()+dt*0.5*k1[0],p->getTemperature()+dt*0.5*k1[1], mass, surfaceArea);
+    std::array<double,2> k3 = f(p->getLiquidVolume()+dt*0.5*k2[0],p->getTemperature()+dt*0.5*k2[1], mass, surfaceArea);
+    std::array<double,2> k4 = f(p->getLiquidVolume()+dt*k3[0],p->getTemperature()+dt*k3[1], mass, surfaceArea);
+    double dliquidVolume = dt*(k1[0]+2*k2[0]+2*k3[0]+k4[0])/6.0;
+    double dTemperature = dt*(k1[1]+2*k2[1]+2*k3[1]+k4[1])/6.0;
+    // if liquid film volume is larger than the volume that needs to be subtracted
+    if (p->getLiquidVolume()+dliquidVolume>=0.0) {
+        p->setLiquidVolume(p->getLiquidVolume()+dliquidVolume);
+        p->setTemperature(std::max(0.0,p->getTemperature()+dTemperature));
+        //logger(INFO,"% LF % T %", p->getIndex(), p->getLiquidVolume(), p->getTemperature());
+    } else {
+        // how much to remove from liquid bridges
+        double liquidVolumeToDistribute = - (p->getLiquidVolume()+dliquidVolume);
+        p->setLiquidVolume(0.0);
+        // get liquid bridge volume
+        double liquidBridgeVolume = 0.0;
+        for (BaseInteraction* i : p-> getInteractions()) {
+            auto j = dynamic_cast<LiquidMigrationWilletInteraction*>(i);
+            liquidBridgeVolume += j->getLiquidBridgeVolume();
+        }
+        // if liquid bridge volume is larger than the volume that needs to be subtracted
+        if (liquidVolumeToDistribute<=liquidBridgeVolume) {
+            double factor = 1.0-liquidVolumeToDistribute/liquidBridgeVolume;
+            for (BaseInteraction* i : p-> getInteractions()) {
+                auto j = dynamic_cast<LiquidMigrationWilletInteraction*>(i);
+                j->setLiquidBridgeVolume(factor*j->getLiquidBridgeVolume());
+            }
+            p->setTemperature(std::max(0.0,p->getTemperature()+dTemperature));
+        } else {
+            // if both liquid bridges and liquid films are empty after the subtraction
+            if (liquidBridgeVolume!=0.0) {
+                liquidVolumeToDistribute -= liquidBridgeVolume;
+                for (BaseInteraction *i: p->getInteractions()) {
+                    auto j = dynamic_cast<LiquidMigrationWilletInteraction *>(i);
+                    j->setLiquidBridgeVolume(0.0);
+                }
+            }
+            double factor = 1.0+liquidVolumeToDistribute/dliquidVolume;
+            p->setTemperature(std::max(0.0,p->getTemperature()+factor*dTemperature));
+        }
+    }
+}
+
+/**
+ * Computes the drying and cooling rate of a particle; based on equations in (Azmir et al., 2018), which are summarised in EvaporationModel.pdf
+ * @param liquidVolume_  Liquid film volume
+ * @param temperature_   Temperature of particle
+ * @param mass           Mass of particle
+ * @param surfaceArea    Surface area of particle
+ * @return
+ */
+template<class NormalForceSpecies>
+std::array<double,2> HeatFluidCoupledSpecies<NormalForceSpecies>::f(double liquidVolume_,double temperature_, double mass, double surfaceArea) const {
+    // Saturated vapour concentration  (kg/m^3), eq(7)
+    // Dependency on temperature is valid between 1 and 200 degree Celsius
+    // (it is unphysically decreasing between 0 and 1 degree),
+    // extrapolated as linear functions
+    double dT = temperature_-273;
+    double saturatedVapourConcentration = dT < 1 ? 8.319815774e-3*temperature_/274 :
+                                          (((4.844e-9*dT-1.4807e-7)*dT+2.6572e-5)*dT-4.8613e-5)*dT+8.342e-3;
+
+    // Relative activation energy of evaporation, eq(6)
+    double equilibriumActivationEnergy=-constants::R*getAmbientTemperature()*log(getAmbientHumidity());
+    // \todo what is the difference between the variable X and Y in Azmir?
+    double moistureContent = liquidVolume_*getLiquidDensity()/mass;
+    double activationEnergy=equilibriumActivationEnergy*(moistureContent-getAmbientEquilibriumMoistureContent());
+
+    // Vapour concentrations at the particle-medium interface (kg/m^3), eq(5)
+    // Implemented such that the code does not necessarily fail if temperature is 0
+    double interfaceVapourConcentration = temperature_==0?0.0:
+                                          exp(-activationEnergy/(constants::R*temperature_))*saturatedVapourConcentration;
+
+    // Drying rate of liquid film mass (kg/s), eq (4)
+    double dLiquidMass=-getMassTransferCoefficient()*surfaceArea
+                       *(interfaceVapourConcentration-getAmbientVapourConcentration());
+
+    // Drying rate of liquid film volume (kg/s), eq (3)
+    double dLiquidVolume = dLiquidMass/getLiquidDensity();
+
+    // Heat of evaporation (J/s), eq (2)
+    double heatOfEvaporation = getLatentHeatVaporization()*(1.0+getEvaporationCoefficientA()*exp((getEvaporationCoefficientB()*getLiquidDensity()/mass)*liquidVolume_))*dLiquidMass;
+
+    // Cooling rate of particle (K/s), eq (1)
+    double dTemperature = heatOfEvaporation / (mass * this->getHeatCapacity());
+
+    return {dLiquidVolume, dTemperature};
+}
 #endif

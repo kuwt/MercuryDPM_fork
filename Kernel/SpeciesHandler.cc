@@ -67,6 +67,7 @@
 
 #include "Species/LinearViscoelasticFrictionLiquidBridgeWilletSpecies.h"
 #include "Species/LinearViscoelasticFrictionLiquidMigrationWilletSpecies.h"
+#include "Species/LinearPlasticViscoelasticFrictionLiquidMigrationWilletSpecies.h"
 #include "Species/LinearViscoelasticSlidingFrictionLiquidMigrationLSSpecies.h"
 #include "Species/LinearViscoelasticFrictionLiquidMigrationLSSpecies.h"
 #include "Species/HertzianViscoelasticSlidingFrictionParhamiMcMeekingSinterSpecies.h"
@@ -333,6 +334,12 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
     else if (type == "LinearViscoelasticFrictionLiquidMigrationWilletSpecies")
     {
         LinearViscoelasticFrictionLiquidMigrationWilletSpecies species;
+        is >> species;
+        copyAndAddObject(species);
+    }
+    else if (type == "LinearPlasticViscoelasticFrictionLiquidMigrationWilletSpecies")
+    {
+        LinearPlasticViscoelasticFrictionLiquidMigrationWilletSpecies species;
         is >> species;
         copyAndAddObject(species);
     }
@@ -623,6 +630,12 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
         else if (type == "LinearViscoelasticFrictionLiquidMigrationWilletMixedSpecies")
         {
             LinearViscoelasticFrictionLiquidMigrationWilletMixedSpecies species;
+            is >> species;
+            mixedObjects_.push_back(species.copy());
+        }
+        else if (type == "LinearPlasticViscoelasticFrictionLiquidMigrationWilletMixedSpecies")
+        {
+            LinearPlasticViscoelasticFrictionLiquidMigrationWilletMixedSpecies species;
             is >> species;
             mixedObjects_.push_back(species.copy());
         }

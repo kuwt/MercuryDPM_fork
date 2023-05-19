@@ -23,46 +23,16 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <Species/LinearViscoelasticSpecies.h>
-#include "InteractionHandler.h"
-#include "Particles/ThermalParticle.h"
-#include "Interactions/BaseInteraction.h"
-#include "Species/ParticleSpecies.h"
-#include "ParticleHandler.h"
-#include "DPMBase.h"
 
+#ifndef HeatFluidCoupledLinearViscoelasticFrictionLiquidMigrationWilletSpecies_H
+#define HeatFluidCoupledLinearViscoelasticFrictionLiquidMigrationWilletSpecies_H
 
-/*!
- * \details Particle read function. Has an std::istream as argument, from which 
- *          it extracts the radius_, invMass_ and invInertia_, respectively. 
- *          From these the mass_ and inertia_ are deduced. An additional set of 
- *          properties is read through the call to the parent's method
- *          BaseParticle::read().
- * \param[in,out] is    input stream with particle properties.
- */
-void ThermalParticle::read(std::istream& is)
-{
-    BaseParticle::read(is);
-    std::string dummy;
-    is >> dummy >> temperature_;
-}
+#include "Species.h"
+#include "NormalForceSpecies/HeatFluidCoupledSpecies.h"
+#include "NormalForceSpecies/LinearViscoelasticNormalSpecies.h"
+#include "FrictionForceSpecies/FrictionSpecies.h"
+#include "AdhesiveForceSpecies/LiquidMigrationWilletSpecies.h"
 
-void ThermalParticle::actionsAfterTimeStep()
-{
-    if (timeDependentTemperature_)
-    {
-        temperature_ = timeDependentTemperature_(getHandler()->getDPMBase()->getTime());
-    }
-    if (getSpecies()->getTemperatureDependentDensity())
-    {
-        const Mdouble density = getSpecies()->getTemperatureDependentDensity()(temperature_);
-        radius_ = getRadius() * cbrt(getMass() / (getVolume() * density));
-    }
-}
-
-void ThermalParticle::setTimeDependentTemperature(const std::function<double(double)>& timeDependentTemperature)
-{
-    timeDependentTemperature_ = timeDependentTemperature;
-    temperature_ = timeDependentTemperature(0);
-    logger(INFO, "Setting initial temperature to %", temperature_);
-}
+typedef Species<HeatFluidCoupledSpecies<LinearViscoelasticNormalSpecies>, FrictionSpecies, LiquidMigrationWilletSpecies> HeatFluidCoupledLinearViscoelasticFrictionLiquidMigrationWilletSpecies;
+typedef MixedSpecies<HeatFluidCoupledSpecies<LinearViscoelasticNormalSpecies>, FrictionSpecies, LiquidMigrationWilletSpecies> HeatFluidCoupledLinearViscoelasticFrictionLiquidMigrationWilletMixedSpecies;
+#endif

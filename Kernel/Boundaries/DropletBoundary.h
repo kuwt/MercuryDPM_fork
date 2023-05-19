@@ -30,9 +30,19 @@ public:
         Vec3D position;
         Vec3D velocity;
         double radius;
+
+        // Used for when not to repel at walls.
+        Vec3D force;
     };
 
     std::vector<Droplet> droplets_;
+
+    // volume of liquid stored in droplets
+    double dropletVolume = 0;
+    // volume of liquid absorbed by particles
+    double absorbedVolume = 0;
+    // volume of liquid lost at walls
+    double lostVolume = 0;
 
 private:
 
@@ -46,6 +56,8 @@ public:
     DropletBoundary(const DropletBoundary& other) {
         droplets_ = other.droplets_;
         generateDroplets_ = other.generateDroplets_;
+        removeDropletsAtWalls_ = other.removeDropletsAtWalls_;
+        dropletSpecies_ = other.dropletSpecies_;
     }
     
     ~DropletBoundary() override {
@@ -83,6 +95,34 @@ public:
 
     // this is the number of timesteps between checks whether the droplet is in contact with a particle or wall.
     unsigned checkCount = 3;
+
+    void setRemoveDropletsAtWalls(bool removeDroplets) {
+        removeDropletsAtWalls_ = removeDroplets;
+    }
+
+    void setDropletSpecies(const ParticleSpecies* species) {
+        dropletSpecies_ = species;
+    }
+
+    void actionsBeforeTimeLoop() override
+    {
+        // When no droplet species were set, use the last species from the handler.
+        // This is fine for when the droplets are removed at the walls, if not, a warning is shown.
+        if (!dropletSpecies_)
+        {
+            dropletSpecies_ = getHandler()->getDPMBase()->speciesHandler.getLastObject();
+            if (!removeDropletsAtWalls_)
+                logger(WARN, "DropletBoundary: Droplets should repel from wall, but no droplet species was set. Using last species from the species handler instead.");
+        }
+
+        // When droplets should repel from the wall, it requires to be checked every time step.
+        if (!removeDropletsAtWalls_)
+            checkCount = 1;
+    }
+
+private:
+    bool removeDropletsAtWalls_ = true;
+    const ParticleSpecies* dropletSpecies_ = nullptr;
 };
 
 #endif

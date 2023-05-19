@@ -262,6 +262,11 @@ public:
     Mdouble getRadiusByQuantile(Mdouble quantile) const;
 
     /*!
+     * \brief Calculates the quantile corresponding to a certain radius.
+     */
+    Mdouble getQuantileByRadius(Mdouble radius) const;
+
+    /*!
      * \brief get a volumetric mean radius of the PSD.
      */
     Mdouble getVolumetricMeanRadius() const;

@@ -55,7 +55,7 @@ int main()
     //droplets
     double flowRate = 1e-3/60.; //m^3/s
     double dropletRadius = 4e-3;
-    double dropletVolume = std::pow(dropletRadius,3)*constants::pi/6.0;
+    double dropletVolume = std::pow(2.0*dropletRadius,3)*constants::pi/6.0;
     DropletBoundary d;
     d.setGenerateDroplets([&dpm,flowRate,dropletRadius,dropletVolume] (DropletBoundary& d) {
         static double accumulatedDropletVolume = 0;

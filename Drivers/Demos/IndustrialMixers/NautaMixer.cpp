@@ -76,7 +76,7 @@ private:
 public:
     void setupInitialConditions() override
     {
-        removeOldFiles();
+//        removeOldFiles();
         setParticlesWriteVTK(true);
         wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
         setDomain(Vec3D(-coneTopRadius, -coneTopRadius, coneTipHeight),
@@ -287,10 +287,10 @@ public:
 /**
  * Instantiates the above class and calls solve
  */
-int main()
+int main(int argc, char* argv[])
 {
     NautaMixer mixer;
     mixer.setName("NautaMixer");
     mixer.setTimeMax(5);
-    mixer.solve();
+    mixer.solve(argc, argv);
 }

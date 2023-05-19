@@ -197,7 +197,10 @@ public:
      * \brief This function should not be called.
      */
     void mixAll(BaseSpecies* const S, BaseSpecies* const T);
-    
+
+    void actionsAfterTimeStep(BaseParticle* particle) const override {
+        NormalForceSpecies::actionsAfterTimeStep(particle);
+    }
 };
 
 template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveForceSpecies>

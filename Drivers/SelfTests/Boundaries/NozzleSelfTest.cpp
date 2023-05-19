@@ -100,7 +100,7 @@ class NozzleSelfTest : public Mercury3D {
             // Radius of droplet (m)
             double dropletRadius = 1e-3;
             // Volume of droplet (m^3)
-            double dropletVolume = std::pow(dropletRadius, 3) * constants::pi / 6.0;
+            double dropletVolume = std::pow(2.0 * dropletRadius, 3) * constants::pi / 6.0;
             // Angle in radians where the nozzle is located
             double nozzleAngle = 25. * constants::pi / 180.;
             double cosNozzleAngle = cos(nozzleAngle);

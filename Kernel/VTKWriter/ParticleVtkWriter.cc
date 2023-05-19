@@ -38,7 +38,7 @@ void ParticleVtkWriter::writeVTKPositions(std::fstream& file) const
             file << '\t' << p->getPosition() << '\n';
         }
 #else
-        file << '\t' << p->getPosition() << '\n';
+        file << '\t' << (float)p->getPosition().X << ' ' << (float)p->getPosition().Y << ' ' << (float)p->getPosition().Z << '\n';
 #endif
     
     }
@@ -80,10 +80,10 @@ void ParticleVtkWriter::writeExtraFields(std::fstream& file) const
 #ifdef MERCURYDPM_USE_MPI
                     if (particleMustBeWritten(p))
                     {
-                        file << '\t' << f << '\n';
+                        file << '\t' << (float)f << '\n';
                     }
 #else
-                    file << '\t' << f << '\n';
+                    file << '\t' << (float)f << '\n';
 #endif
                 }
             }

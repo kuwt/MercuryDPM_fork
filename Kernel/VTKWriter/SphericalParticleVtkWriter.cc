@@ -79,7 +79,7 @@ void SphericalParticleVtkWriter::writeVTKAngularVelocity(std::fstream& file) con
             if (particleMustBeWritten(p))
 #endif
             {
-                file << '\t' << p->getAngularVelocity() << '\n';
+                file << '\t' << (float)p->getAngularVelocity().X << ' ' << (float)p->getAngularVelocity().Y << ' ' << (float)p->getAngularVelocity().Z << '\n';
             }
         }
         file << "  </DataArray>\n";
@@ -104,7 +104,7 @@ void SphericalParticleVtkWriter::writeVTKRadius(std::fstream& file) const
         file << '\t' << p->getRadius() << '\n';
       }
 #else
-        file << '\t' << p->getRadius() << '\n';//Radius
+        file << '\t' << (float)p->getRadius() << '\n';//Radius
 #endif
     }
     file << "  </DataArray>\n";

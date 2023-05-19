@@ -66,9 +66,7 @@ BaseWall::BaseWall(const BaseWall& w)
 BaseWall::~BaseWall()
 {
     logger(DEBUG, "BaseWall::~BaseWall() finished");
-    for (auto* const r : renderedWalls_)
-        delete r;
-    renderedWalls_.clear();
+    removeRenderedWalls();
 }
 
 /*!
@@ -589,14 +587,19 @@ void BaseWall::addRenderedWall(BaseWall* w)
 }
 
 void BaseWall::removeRenderedWalls() {
-    while (!renderedWalls_.empty()) {
-        renderedWalls_.pop_back();
-    }
+    for (auto* const r : renderedWalls_)
+        delete r;
+    renderedWalls_.clear();
 }
 
 BaseWall* BaseWall::getRenderedWall(size_t i) const
 {
     return renderedWalls_[i];
+}
+
+std::vector<BaseWall*> BaseWall::getRenderedWalls() const
+{
+    return renderedWalls_;
 }
 
 void BaseWall::renderWall(VTKContainer& vtk)
@@ -610,11 +613,23 @@ void BaseWall::renderWall(VTKContainer& vtk)
         else
         {
             const Mdouble time = getHandler()->getDPMBase()->getTime();
+            const Mdouble timeStep = getHandler()->getDPMBase()->getTimeStep();
+            const int saveCount = getHandler()->getDPMBase()->dataFile.getSaveCount();
             for (const auto& r: renderedWalls_)
             {
-                r->applyPrescribedPosition(time);
-                r->applyPrescribedOrientation(time);
+                // First write...
                 r->writeVTK(vtk);
+
+                // Then update the position and orientation for time steps that were skipped.
+                // We have to use a loop, as doing it at once like so:
+                // r->integrateBeforeForceComputation(time - timeStep * (saveCount - 1), timeStep * saveCount);
+                // r->integrateAfterForceComputation(time - timeStep * (saveCount - 1), timeStep * saveCount);
+                // gives small deviations which add up quickly to give very different results.
+                for (int i = 0; i < saveCount; i++)
+                {
+                    r->integrateBeforeForceComputation(time - timeStep * (saveCount - i - 1), timeStep);
+                    r->integrateAfterForceComputation(time - timeStep * (saveCount - i - 1), timeStep);
+                }
             }
         }
     }

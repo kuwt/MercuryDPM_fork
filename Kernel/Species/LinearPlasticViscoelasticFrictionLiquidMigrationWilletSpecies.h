@@ -23,43 +23,15 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef MERCURYDPM_BASENORMALFORCE_H
-#define MERCURYDPM_BASENORMALFORCE_H
-#include "Species/BaseForce.h"
-class BaseParticle;
 
-class BaseNormalForce : public BaseForce
-{
-public:
+#ifndef LinearPlasticViscoelasticFrictionLiquidMigrationWilletSpecies_H
+#define LinearPlasticViscoelasticFrictionLiquidMigrationWilletSpecies_H
 
-    BaseNormalForce() {
-        constantRestitution_ = false;
-    }
+#include "Species.h"
+#include "NormalForceSpecies/LinearPlasticViscoelasticNormalSpecies.h"
+#include "FrictionForceSpecies/FrictionSpecies.h"
+#include "AdhesiveForceSpecies/LiquidMigrationWilletSpecies.h"
 
-    BaseNormalForce(const BaseNormalForce& p) {
-        constantRestitution_ = p.constantRestitution_;
-    }
-
-    /*!
-     * Accesses constantRestitution_.
-     */
-    bool getConstantRestitution() const {
-        return constantRestitution_;
-    }
-
-    /*!
-     * Sets constantRestitution_.
-     */
-    void setConstantRestitution(bool constantRestitution);
-
-    virtual void actionsAfterTimeStep(BaseParticle* particle) const {};
-
-private:
-
-    /*!
-     * If constantRestitution_ is true, the elastic and dissipative force is multiplied by the harmonic mean mass, making restitution and collision time independent of the particle mass. This is set to false by default.
-     */
-    bool constantRestitution_;
-};
-
-#endif //MERCURYDPM_BASENORMALFORCE_H
+typedef Species<LinearPlasticViscoelasticNormalSpecies, FrictionSpecies, LiquidMigrationWilletSpecies> LinearPlasticViscoelasticFrictionLiquidMigrationWilletSpecies;
+typedef MixedSpecies<LinearPlasticViscoelasticNormalSpecies, FrictionSpecies, LiquidMigrationWilletSpecies> LinearPlasticViscoelasticFrictionLiquidMigrationWilletMixedSpecies;
+#endif

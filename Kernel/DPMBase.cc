@@ -67,12 +67,12 @@
 #endif
 
 /*!
-* \details Warns the user of a fatal error and exits the program with a non-zero return
-* value to let the compiler know an error has occurred.
-* \param[in] module
-* \param[in] message
-* \todo Why is this here, and not in the logger?
-*/
+ * \details Warns the user of a fatal error and exits the program with a non-zero return
+ * value to let the compiler know an error has occurred.
+ * \param[in] module
+ * \param[in] message
+ * \todo Why is this here, and not in the logger?
+ */
 /**
 * \deprecated
 */
@@ -283,7 +283,7 @@ void DPMBase::constructor()
     logger(DEBUG, "DPMBase problem constructor finished");
 
     readSpeciesFromDataFile_ = false;
-    
+
     numberOfOMPThreads_ = 1;
 
     //Set number of elements to write to the screen if a user wants to output write information to the terminal
@@ -470,6 +470,8 @@ eneFile.setFileType(fileType);
 */
 void DPMBase::resetFileCounter()
 {
+    dataFile.setCounter(0);
+    fStatFile.setCounter(0);
     restartFile.setCounter(0);
     statFile.setCounter(0);
     eneFile.setCounter(0);
@@ -910,7 +912,7 @@ void DPMBase::setWallsWriteVTK(FileType writeWallsVTK)
 {
     logger(WARN, "DPMBase.setWallsWriteVTK(FileType) is deprecated! Use wallHandler.setWriteVTK(FileType) instead.");
     wallHandler.setWriteVTK(writeWallsVTK);
-	}
+}
 
 /*!
 * \details
@@ -920,14 +922,13 @@ void DPMBase::setWallsWriteVTK(FileType writeWallsVTK)
 */
 void DPMBase::setWallsWriteVTK(bool writeVTK)
 {
-FileType writeVTKFileType = writeVTK?FileType::MULTIPLE_FILES:FileType::NO_FILE;
+    FileType writeVTKFileType = writeVTK?FileType::MULTIPLE_FILES:FileType::NO_FILE;
     logger(WARN, "DPMBase.setWallsWriteVTK(bool) is deprecated! Use wallHandler.setWriteVTK(bool) instead.");
     wallHandler.setWriteVTK(writeVTKFileType);
 }
 
 void DPMBase::setInteractionsWriteVTK(bool writeVTK)
 {
-interactionHandler.setWriteVTK(writeVTK?FileType::MULTIPLE_FILES:FileType::NO_FILE);
     logger(WARN, "DPMBase.setInteractionsWriteVTK(bool) is deprecated! Use interactionHandler.setWriteVTK(bool) instead.");
     interactionHandler.setWriteVTK(writeVTK);
 }
@@ -4276,20 +4277,19 @@ void DPMBase::solve()
     initialiseSolve();
 
     // Can be used to measure simulation time
+    clock_.tic();
     // This is the main loop over advancing time
     while (getTime() < getTimeMax() && continueSolve())
     {
         computeOneTimeStep();
     }
+    // Can be used to measure simulation time
+    clock_.toc();
 
     finaliseSolve();
 }
 
 void DPMBase::finaliseSolve() {
-    
-
-    // Can be used to measure simulation time
-    clock_.toc();
 
     //force writing of the last time step
     forceWriteOutputFiles();
@@ -4470,7 +4470,7 @@ void DPMBase::removeOldFiles() const
     // add processor id to file extension for mpi jobs
     std::string q = (NUMBER_OF_PROCESSORS > 1)?("Processor_"+std::to_string(PROCESSOR_ID)+"_"):"";
     // all the file extensions that should be deleted
-    ext = {"Wall_", q+"Particle_", q+"Interaction_"};
+    ext = {"Wall_", q+"Particle_", q+"Interaction_", q+"Boundary_"};
     for (const auto& j : ext)
     {
         // remove files with given extension for FileType::ONE_FILE

@@ -66,17 +66,17 @@ public:
      * \brief Sets the properties of the InsertionBoundary for mutliple different particle types
      */
     void
-    set(BaseParticle *particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax);
+    set(BaseParticle *particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin = {0,0,0}, Vec3D velMax = {0,0,0});
 
     void
-    set(BaseParticle &particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax);
+    set(BaseParticle &particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin = {0,0,0}, Vec3D velMax = {0,0,0});
 
     /*!
      * \brief Sets the properties of the InsertionBoundary for a single particle type
      */
     void
-    set(std::vector<BaseParticle *> particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin,
-        Vec3D velMax);
+    set(std::vector<BaseParticle *> particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin = {0,0,0},
+        Vec3D velMax = {0,0,0});
 
     /*!
      * \brief old style set function which also assumes a uniform psd. Note if you want a general PSD do not use but this is quicker for a uniform in size PSD
