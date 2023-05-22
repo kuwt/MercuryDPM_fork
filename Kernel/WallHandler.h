@@ -149,6 +149,13 @@ public:
 
     void writeWallDetailsVTKBoundingBox(VTKData& data) const;
 
+    /*!
+     * \brief Enables/disables the calculation and writing of the surface area of the cells.
+     */
+    void setWriteWallSurfaceAreaVTK(bool writeWallSurfaceAreaVTK);
+
+    bool getWriteWallSurfaceAreaVTK() const;
+
 private:
 
     /*!

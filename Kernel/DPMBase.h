@@ -1513,6 +1513,8 @@ public:
     void setWritePythonFileForVTKVisualisation(bool forceWritePythonFileForVTKVisualisation);
     bool getWritePythonFileForVTKVisualisation() const;
 
+    WallVTKWriter &getWallVTKWriter();
+
 private:
     bool forceWritePythonFileForVTKVisualisation_ { true };
 };

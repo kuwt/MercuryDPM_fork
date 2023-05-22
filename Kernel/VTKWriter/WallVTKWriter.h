@@ -62,6 +62,9 @@ public:
     std::string getName() const
     { return "WallVTKWriter"; }
 
+    void setWriteWallSurfaceAreaVTK(bool writeWallSurfaceAreaVTK);
+    bool getWriteWallSurfaceAreaVTK() const;
+
 protected:
     
     void write(std::fstream& file, std::string name, std::function<double(BaseWall*)> f) const;
@@ -76,6 +79,17 @@ protected:
      */
     void writeVTKCells(std::fstream& file, VTKContainer& vtk) const;
     
+    /**
+     * writes the cell data to the vtu file (i.e. surface area)
+     */
+    void writeVTKCellData(std::fstream& file, VTKContainer& vtk) const;
+
+    /*!
+     * \brief Calculates and writes the surface areas of the cells to the vtu file.
+     */
+    void writeVTKSurfaceArea(std::fstream& file, VTKContainer& vtk) const;
+
+    bool writeWallSurfaceAreaVTK_ { false };
 };
 
 

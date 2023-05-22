@@ -55,10 +55,15 @@ public:
 
 private:
     void writeVTKVelocity(std::fstream& file) const;
-    void writeVTKAngularVelocity(std::fstream& file) const;
-    
-    void writeVTKRadius(std::fstream& file) const;
-};
 
+    void writeVTKAngularVelocity(std::fstream& file) const;
+
+    void writeVTKRadius(std::fstream& file) const;
+
+    /*!
+     * \brief Writes the id (unique integer) of the particles to the vtu file.
+     */
+    void writeVTKId(std::fstream& file) const;
+};
 
 #endif //MERCURYDPM_SPHERICALPARTICLEVTKWRITER_H

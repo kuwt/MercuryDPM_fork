@@ -5508,3 +5508,8 @@ bool DPMBase::getWritePythonFileForVTKVisualisation() const
 {
     return forceWritePythonFileForVTKVisualisation_;
 }
+
+WallVTKWriter & DPMBase::getWallVTKWriter()
+{
+    return wallVTKWriter_;
+}
