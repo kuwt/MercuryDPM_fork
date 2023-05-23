@@ -338,7 +338,7 @@ void CG<Coordinates, BaseFunction, Fields>::evaluateParticle(const BaseParticle&
         maxX = (averageBeyondDomain_ || (pos.X>=min_.X && pos.X<=max_.X) )?1:0; // don't do anything if particle is beyond domain and should not be considered
     } else if (max_.X == min_.X) {
         minX = 0;
-        maxX = nZ_;
+        maxX = nX_;
     } else {
         //Example
         // min.X=0, max.X=6, nX=3 => points[0,1,2]=1,3,5

@@ -455,6 +455,10 @@ SelfTests/Boundaries/DeletionBoundarySelfTest.cpp*
 
  - fixed bug in ```set``` function, that caused a memory leak
 
+*Kernel/CG/Fields/StandardFields.cc*
+
+ - fixed bug, in ```setFields```: the interactionForceDensity did not correctly account for the sign of the force
+
 *Kernel/CG/TimeSmoothedCG*
 
  - fixed bug that caused NaN output
