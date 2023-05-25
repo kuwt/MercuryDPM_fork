@@ -8,6 +8,33 @@ image:
   name: plath/mercurydpm@sha256:158588b223eae3f50b9e7f5844faeaa2290dcf7bf56e8e510d289e3b5dc7155f
 
 pipelines:
+  # run check on source branch of a pull request when a pull request is created. Only run this when the target is master
+  pull-requests:
+    '**': #this runs as default for any branch not elsewhere defined
+      - step:
+          name: PullRequestTest
+          script:
+          # only pull requests to master
+            - if [ "${BITBUCKET_PR_DESTINATION_BRANCH}" != "master" ]; then printf 'not a target branch we want to check'; exit; fi
+            - export BITBUCKET_TRIGGERER_USERNAME=$(curl -X GET -g "https://api.bitbucket.org/2.0/users/${BITBUCKET_STEP_TRIGGERER_UUID}" | tac | tac | jq --raw-output '.display_name')
+            - pipe: atlassian/slack-notify:2.0.0
+              variables:
+                WEBHOOK_URL: 'https://hooks.slack.com/services/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'
+                MESSAGE: "Checking commit [${BITBUCKET_COMMIT}] of User $BITBUCKET_TRIGGERER_USERNAME \n make fullTest running for $BITBUCKET_REPO_SLUG/$BITBUCKET_BRANCH"
+            - mkdir MercuryBuild
+            - cd MercuryBuild
+            - cmake -DMercuryDPM_USE_MPI=OFF -DCMAKE_BUILD_TYPE=Debug -DMercuryDPM_BUILD_USER_DIR=ON -DMercuryDPM_BUILD_DOCUMENTATION=ON -G 'Unix Makefiles' ../
+            - make fullTest
+          artifacts:
+            - error_log2.txt
+          after-script:
+            - if [ $BITBUCKET_EXIT_CODE != 0 ] ; then BUILD_STATUS="FAILED" ; fi
+            - pipe: atlassian/slack-notify:2.0.0
+              variables:
+                WEBHOOK_URL: 'https://hooks.slack.com/services/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'
+                MESSAGE: '"Build has exited with status [$BUILD_STATUS];"'
+                DEBUG: 'true'
+
   default:
       - step:
           name: Test
