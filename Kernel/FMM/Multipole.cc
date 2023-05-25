@@ -59,7 +59,7 @@ NumericalVector<std::complex<Mdouble>> Multipole::TranslateMultipoleExpansionTo(
     }
     
     //Determine rho, alpha and beta
-    Vec3D distance = location_ - location;
+    //Vec3D distance = location_ - location;
     
     //Todo: Add a quarternion step in here with distance as input, to avoid NaN values in the angles.
     Mdouble rho = 1.0;

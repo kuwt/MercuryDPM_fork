@@ -344,15 +344,15 @@ void LiquidMigrationLSInteraction::rupture()
             PParticle->setLiquidVolume(PParticle->getLiquidVolume() + liquidBridgeVolume_);
         }
         liquidBridgeVolume_ = 0.0;
-        for (auto i : *getHandler())
-        {
-            LiquidMigrationLSInteraction* j =
-                    dynamic_cast<LiquidMigrationLSInteraction*>(i);
-        }
-        for (auto i : getHandler()->getDPMBase()->particleHandler)
-        {
-            LiquidFilmParticle* j = dynamic_cast<LiquidFilmParticle*>(i);
-        }
+        //for (auto i : *getHandler())
+        //{
+        //    LiquidMigrationLSInteraction* j =
+        //           dynamic_cast<LiquidMigrationLSInteraction*>(i);
+        //}
+        //for (auto i : getHandler()->getDPMBase()->particleHandler)
+        //{
+        //    LiquidFilmParticle* j = dynamic_cast<LiquidFilmParticle*>(i);
+        //}
     }
     else if (PParticle == nullptr) //if P is a wall
     {
@@ -396,7 +396,7 @@ void LiquidMigrationLSInteraction::rupture()
                     }
                 }
             }
-            Mdouble PParticle_fin = PParticle->getLiquidVolume();
+            //Mdouble PParticle_fin = PParticle->getLiquidVolume();
 
         }
 

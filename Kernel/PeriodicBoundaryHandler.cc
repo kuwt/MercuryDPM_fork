@@ -859,8 +859,6 @@ void PeriodicBoundaryHandler::processLocalGhostParticles(std::vector<BaseParticl
  */
 void PeriodicBoundaryHandler::updateParticles()
 {
-    MPIContainer& communicator = MPIContainer::Instance();
-    
     //For all lists that contain ghost particles
     //The variable dataIndex indicates which index in update<...>Receive_ the data is located
     int dataIndex = -1;
@@ -1038,7 +1036,6 @@ bool PeriodicBoundaryHandler::checkChanged(const std::vector<int> previousComple
 void PeriodicBoundaryHandler::updateParticleStatus(std::set<BaseParticle*>& particlesToBeDeleted)
 {
     MPIContainer& communicator = MPIContainer::Instance();
-    int processorID = communicator.getProcessorID();
     int numberOfProcessors = communicator.getNumberOfProcessors();
     std::set<MpiPeriodicParticleID*> deletePeriodicIDList;
     std::set<MpiPeriodicGhostParticleID*> deletePeriodicGhostIDList;
@@ -1850,11 +1847,9 @@ void PeriodicBoundaryHandler::clearCommunicationLists()
         getDPMBase()->getCurrentDomain()->cleanCommunicationLists();
         
         //Delete particles
-        int index = 0;
         for (BaseParticle* particle : toBeDeleted)
         {
             pH.removeGhostObject(particle->getIndex());
-            index++;
         }
     }
 }

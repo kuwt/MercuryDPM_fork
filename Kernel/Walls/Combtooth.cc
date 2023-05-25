@@ -62,12 +62,6 @@ Combtooth* Combtooth::copy() const
 bool Combtooth::getDistanceAndNormal(const BaseParticle& p,
                                      Mdouble& distance, Vec3D& normal_return) const
 {
-    /* define shortcuts */
-    const Mdouble x0 = p.getPosition().X;
-    const Mdouble y0 = p.getPosition().Y;
-    const Mdouble z0 = p.getPosition().Z;
-    const Mdouble ra = p.getWallInteractionRadius(this); // note, not getRadius()
-    
     // distance between x0 and the *surface* (not the axis)
     distance = sqrt(
             pow((p.getPosition() - position_).getLength(), 2)

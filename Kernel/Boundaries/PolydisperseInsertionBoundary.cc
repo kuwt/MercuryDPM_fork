@@ -134,7 +134,7 @@ BaseParticle* PolydisperseInsertionBoundary::generateParticle(RNG& random)
         totalprob += p;
     
     Mdouble check = random.getRandomNumber(0, totalprob);
-    unsigned int spec;
+    unsigned int spec = generanda_.size();
     logger(VERBOSE, "PolydisperseInsertionBoundary: check = % out of %",
            check, totalprob);
     for (int i = 0; i < generanda_.size(); i++)
@@ -147,6 +147,7 @@ BaseParticle* PolydisperseInsertionBoundary::generateParticle(RNG& random)
             break;
         }
     }
+    logger.assert_debug(spec==generanda_.size(),"spec set wrongly");
     
     auto P = generanda_[spec]->copy();
     

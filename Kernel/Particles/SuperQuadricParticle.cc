@@ -290,7 +290,6 @@ BaseInteraction* SuperQuadricParticle::getInteractionWith(BaseParticle* const p,
     const LabFixedCoordinates branchVector = p->getPosition() - getPosition();
     //Get the square of the distance between particle i and particle j
     const Mdouble distanceSquared = Vec3D::getLengthSquared(branchVector);
-    auto mixedSpecies = getSpecies()->getHandler()->getMixedObject(getSpecies(),p->getSpecies());
 
     const Mdouble sumOfInteractionRadii = getMaxInteractionRadius()+p->getMaxInteractionRadius();
     if (distanceSquared < (sumOfInteractionRadii * sumOfInteractionRadii))

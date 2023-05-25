@@ -55,7 +55,7 @@ public:
         const Mdouble density = 1000;
         const Mdouble k1 = 1.0 * radius; //[Stiffness depends on particle radius]
         const Mdouble restitutionCoefficient = 1.0;
-        const Mdouble pDepth = 0.1;
+        //const Mdouble pDepth = 0.1;
         //-------------------
 
         //------------------

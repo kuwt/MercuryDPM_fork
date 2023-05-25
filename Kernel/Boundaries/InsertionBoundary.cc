@@ -283,7 +283,7 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
             if (!checkParticleForInteraction_ || md->checkParticleForInteraction(*p0))
             {
                 //Note: in parallel only one of the domains will actually add the particle
-                auto p = md->particleHandler.copyAndAddObject(p0);
+                md->particleHandler.copyAndAddObject(p0);
                 failed = 0;
                 
                 ++numberOfParticlesInserted_;

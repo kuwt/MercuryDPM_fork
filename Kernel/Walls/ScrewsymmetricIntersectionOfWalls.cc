@@ -101,7 +101,7 @@ bool ScrewsymmetricIntersectionOfWalls::getDistanceAndNormal(const BaseParticle&
     const Mdouble rho2 = positionLabFrame.X * positionLabFrame.X + positionLabFrame.Y * positionLabFrame.Y;
 
     // should thickness be added here?
-    const Mdouble wallInteractionRadius = p.getWallInteractionRadius(this) + thickness_;
+    // const Mdouble wallInteractionRadius = p.getWallInteractionRadius(this) + thickness_;
 
     // if the particle is outside the cylinder containing the screw there is no collision
     if (//rho2 > square(rMax_ + wallInteractionRadius) ||
@@ -363,7 +363,6 @@ void ScrewsymmetricIntersectionOfWalls::writeVTK(VTKContainer& vtk) const
         
         //finally create the connectivity matri to plot shell-like triangle strips.
         unsigned long nz = rzVec.size();
-        unsigned long nCells = vtk.triangleStrips.size();
         for (unsigned iz = 0; iz < nz - 1; iz++)
         {
             std::vector<double> cell;

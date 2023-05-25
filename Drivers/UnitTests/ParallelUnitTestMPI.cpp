@@ -88,8 +88,8 @@ int main(int argc, char *argv[])
     species->setSlidingDissipation(6.3e-2);
  
     //set other simulation parameters
-    Mdouble MinParticleMass = species->getDensity()*4.0 / 3.0 * constants::pi ;    
-    Mdouble tc = species->getCollisionTime(MinParticleMass);
+    //Mdouble MinParticleMass = species->getDensity()*4.0 / 3.0 * constants::pi ;
+    //Mdouble tc = species->getCollisionTime(MinParticleMass);
     problem.setTimeStep(0.1);
     problem.setTimeMax(60.0);//run until 3.0 to see full simulation
     problem.setSaveCount(1); //used to be 500

@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
     species->setSlidingDissipation(6.3e-2);
  
     //set other simulation parameters
-    Mdouble MinParticleMass = species->getDensity()*4.0 / 3.0 * constants::pi ;    
+    //Mdouble MinParticleMass = species->getDensity()*4.0 / 3.0 * constants::pi ;
     //Mdouble tc = species->getCollisionTime(MinParticleMass);
     Mdouble tc = 0.02;
     logger(INFO,"tc: %",tc);

@@ -71,8 +71,7 @@ bool ParabolaChute::getDistanceAndNormal(const BaseParticle& p, Mdouble& distanc
     /* Define some shortcuts */
     Mdouble y0 = p.getPosition().Y;
     Mdouble z0 = p.getPosition().Z;
-    Mdouble a = p.getRadius();
-    
+
     /* First, check whether the particle is definitely out of contact with the
      * chute. This will be so if the particle's interaction radius is small and
      * the particle's z-position is high. */
@@ -83,13 +82,13 @@ bool ParabolaChute::getDistanceAndNormal(const BaseParticle& p, Mdouble& distanc
     }
     
     /* If not, then use Newton's method to minimise (half of the squared) distance */
-    Mdouble R; //TODO
-    Mdouble alpha; //TODO
-    Mdouble dz = p.getPosition().Z; //TODO
-    Mdouble q; // current guess
-    Mdouble dd; // derivative of half of the squared distance at current guess
-    Mdouble ddd; // second derivative at current guess
-    Mdouble q0 = dz / l_; // minimum of the parabolic part
+    //Mdouble R; //TODO
+    //Mdouble alpha; //TODO
+    //Mdouble dz = p.getPosition().Z; //TODO
+    Mdouble q = 0; // current guess
+    Mdouble dd = 0; // derivative of half of the squared distance at current guess
+    Mdouble ddd = 0; // second derivative at current guess
+    //Mdouble q0 = dz / l_; // minimum of the parabolic part
     
     // Iterate according to Newton
     do

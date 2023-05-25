@@ -493,7 +493,6 @@ void InteractionHandler::readAndAddObject(std::istream& is)
 {
     std::string type, dummy, idType;
     unsigned int id0, id1;
-    Mdouble doubleTimeStamp;
     unsigned timeStamp;
     
     /// \todo Ant This is a tmp fix as in some cases the line before has not be finished reading. This should be looked at again at a later date.

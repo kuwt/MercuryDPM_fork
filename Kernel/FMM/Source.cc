@@ -30,7 +30,7 @@
 #include <vector>
 #include <complex>
 
-Source::Source(Vec3D location, Mdouble strength, Mdouble c) : location_(location), strength_(strength), c_(c)
+Source::Source(Vec3D location, Mdouble strength, Mdouble c) : location_(location)//, strength_(strength), c_(c)
 {
 
 }

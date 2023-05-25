@@ -119,8 +119,6 @@ bool SineWall::getDistanceAndNormal(const BaseParticle& p, Mdouble& distance, Ve
             double dzdq = A * k * cos(k * q + ph);
             double d2zdq2 = -A * pow(k, 2) * sin(k * q + ph);
             
-            // (Half of the square of the) distance. Not used.
-            double R = 0.5 * (pow(q - x0, 2) + pow(z - z0, 2));
             // derivative of half the squared distance -- to be zeroed
             double dRdq = q - x0 + (z - z0) * dzdq;
             // second derivative of half the squared distance

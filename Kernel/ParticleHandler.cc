@@ -1395,8 +1395,13 @@ void ParticleHandler::saveNumberPSDtoCSV(std::string csvFileName, std::vector<do
     }
     
     // check that the diameter vector is set
+#ifdef MERCURYDPM_USE_MPI
+    double rMin = getSmallestInteractionRadius();
+    double rMax = getLargestInteractionRadius();
+#else
     double rMin = getSmallestParticle()->getRadius();
     double rMax = getLargestParticle()->getRadius();
+#endif
     if (diameterBins.empty()) {
         size_t n = std::min(100,(int)std::ceil(getNumberOfObjects()/20));
         diameterBins.reserve(n);

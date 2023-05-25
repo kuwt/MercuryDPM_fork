@@ -261,7 +261,6 @@ void HorizontalBaseScrew::writeVTK (VTKContainer& vtk) const
         ///\bug once the quaternions are implemented, we can orient these walls properly
         unsigned nPoints = vtk.points.size();
         Vec3D p;
-        Vec3D o = getOrientation().getAxis();
         for (auto rz : rzVec)
         {
             for (auto xy : xyVec)
@@ -277,7 +276,6 @@ void HorizontalBaseScrew::writeVTK (VTKContainer& vtk) const
 
         //finally create the connectivity matri to plot shell-like triangle strips.
         unsigned nz = rzVec.size();
-        unsigned nCells = vtk.triangleStrips.size();
         for (unsigned iz=0; iz<nz-1; iz++) {
             std::vector<double> cell;
             cell.reserve(2*nr+2);

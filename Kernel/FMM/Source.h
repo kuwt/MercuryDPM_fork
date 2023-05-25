@@ -43,15 +43,15 @@ public:
         return location_;
     }
     
-    Mdouble getStrength()
-    {
-        return strength_;
-    }
+//    Mdouble getStrength()
+//    {
+//        return strength_;
+//    }
 
 private:
     Vec3D location_;
-    Mdouble strength_;
-    Mdouble c_;
+    //Mdouble strength_;
+    //Mdouble c_;
 };
 
 

@@ -96,17 +96,17 @@ public:
     /*!
      * \brief Creates horizontal and vertical periodic copies of given particle, if needed
      */
-    void createPeriodicParticles(BaseParticle* p, ParticleHandler& pH);
+    void createPeriodicParticle(BaseParticle* p, ParticleHandler& pH) override;
     
     /*!
      * \brief Creates horizontal periodic copies of given particle, if needed
      */
-    void createHorizontalPeriodicParticles(BaseParticle* p, ParticleHandler& pH);
+    void createHorizontalPeriodicParticle(BaseParticle* p, ParticleHandler& pH);
     
     /*!
      * \brief Creates vertical periodic copies of given particle, if needed
      */
-    void createVerticalPeriodicParticles(BaseParticle* p, ParticleHandler& pH);
+    void createVerticalPeriodicParticle(BaseParticle* p, ParticleHandler& pH);
     
     void setVelocity(std::function<double(double, double)>);
 

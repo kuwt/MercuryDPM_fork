@@ -193,7 +193,6 @@ void WearableTriangulatedWall::storeDebris(Vec3D P, const Vec3D& debris)
 //    P -= getPosition();
 //    getOrientation().rotateBack(P);
     
-    Face* face;
     unsigned it = 0;
     for (auto& f : face_)
     {
@@ -204,11 +203,10 @@ void WearableTriangulatedWall::storeDebris(Vec3D P, const Vec3D& debris)
         const Vec3D u = Vec3D::cross(b, c);
         const Vec3D v = Vec3D::cross(c, a);
         const Vec3D w = Vec3D::cross(a, b);
-        
+
         // When all are pointing in same direction, the point is inside (or on edge of) the triangle.
         if (!(Vec3D::dot(u, v) < 0.0 || Vec3D::dot(u, w) < 0.0))
         {
-            face = &f;
             break;
         }
         

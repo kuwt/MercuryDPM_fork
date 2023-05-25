@@ -196,9 +196,9 @@ public:
     /*!
      * \brief This function should not be called.
      */
-    void mixAll(BaseSpecies* const S, BaseSpecies* const T);
+    void mixAll(BaseSpecies* const S, BaseSpecies* const T) final;
 
-    void actionsAfterTimeStep(BaseParticle* particle) const override {
+    void actionsAfterTimeStep(BaseParticle* particle) const final {
         NormalForceSpecies::actionsAfterTimeStep(particle);
     }
 };
@@ -276,7 +276,7 @@ void Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>
     auto* s = dynamic_cast<Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>*>(bs);
     if (s == nullptr)
     {
-        logger(WARN, "Error in %::copyInto: copying of % failed", getName(), s->getName());
+        logger(WARN, "Error in %::copyInto: copying of species failed", getName());
         return;
     }
     *s = *this;

@@ -193,7 +193,7 @@ void SinterLinInteraction::computeNormalForce()
         const Mdouble baseNum = (9.0/2.0)*pi*species->getComplianceZero()*species->getSurfTension()/(getEffectiveRadius());
         const Mdouble a0_R = std::pow(2.0*baseNum,1.0/3.0);
 
-        const Mdouble realOverlap = std::sqrt(getOverlap()/effectiveDiameter);
+        //const Mdouble realOverlap = std::sqrt(getOverlap()/effectiveDiameter);
 
         DPMBase* dpmBase = getHandler()->getDPMBase();
         Mdouble rateOverlap;

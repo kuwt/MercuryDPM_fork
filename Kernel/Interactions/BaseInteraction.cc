@@ -910,8 +910,7 @@ void BaseInteraction::setMPIInteraction(void* historyDataArray, unsigned int ind
 void* BaseInteraction::createMPIInteractionDataArray(unsigned int numberOfInteractions) const
 {
     logger(ERROR, "BaseInteraction::createMPIInteractionDataArray should never be called");
-    void* historyArray;
-    return historyArray;
+    return nullptr;
 }
 
 void BaseInteraction::deleteMPIInteractionDataArray(void* dataArray)

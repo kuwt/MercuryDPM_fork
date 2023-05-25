@@ -179,7 +179,7 @@ void ShearBoxBoundary::shiftVerticalPosition(BaseParticle* p, bool positive)
  * \param[in] p         A pointer to the BaseParticle that is checked
  * \param[out] pH       A reference to the ParticleHandler where periodic copies will be added
  */
-void ShearBoxBoundary::createHorizontalPeriodicParticles(BaseParticle* p, ParticleHandler& pH)
+void ShearBoxBoundary::createHorizontalPeriodicParticle(BaseParticle* p, ParticleHandler& pH)
 {
     bool positive;      // TRUE if the particle is closest to the left boundary 
     // wall (set by getVerticalDistance in the following if-statement)
@@ -202,8 +202,8 @@ void ShearBoxBoundary::createHorizontalPeriodicParticles(BaseParticle* p, Partic
         shiftHorizontalPosition(F0, positive);
         
         // NB: No extra creation of possible vertical copies of the horizontal copy 
-        // here (as compared to createVerticalPeriodicParticles), because these would
-        // overlap with the extra creation of horizontal copies in createVerticalPeriodicParticles.
+        // here (as compared to createVerticalPeriodicParticle), because these would
+        // overlap with the extra creation of horizontal copies in createVerticalPeriodicParticle.
     }
 }
 
@@ -215,7 +215,7 @@ void ShearBoxBoundary::createHorizontalPeriodicParticles(BaseParticle* p, Partic
  * \param[in] p         A pointer to the BaseParticle that is checked
  * \param[out] pH       A reference to the ParticleHandler where periodic copies will be added
  */
-void ShearBoxBoundary::createVerticalPeriodicParticles(BaseParticle* p, ParticleHandler& pH)
+void ShearBoxBoundary::createVerticalPeriodicParticle(BaseParticle* p, ParticleHandler& pH)
 {
     bool positive;      // TRUE if the particle is closest to the bottom boundary 
     // wall (set by getVerticalDistance in the following if-statement)
@@ -243,7 +243,7 @@ void ShearBoxBoundary::createVerticalPeriodicParticles(BaseParticle* p, Particle
         
         // Create horizontal periodic copies of the copy particle, if needed (i.e.,
         // if the original particle is in one of the boundary corners).
-        createHorizontalPeriodicParticles(pH.getLastObject(), pH);
+        createHorizontalPeriodicParticle(pH.getLastObject(), pH);
     }
 }
 
@@ -252,10 +252,10 @@ void ShearBoxBoundary::createVerticalPeriodicParticles(BaseParticle* p, Particle
  * \param[in] p         A pointer to the BaseParticle that is checked
  * \param[out] pH       A reference to the ParticleHandler where periodic copies will be added
  */
-void ShearBoxBoundary::createPeriodicParticles(BaseParticle* p, ParticleHandler& pH)
+void ShearBoxBoundary::createPeriodicParticle(BaseParticle* p, ParticleHandler& pH)
 {
-    createVerticalPeriodicParticles(p, pH);
-    createHorizontalPeriodicParticles(p, pH);
+    createVerticalPeriodicParticle(p, pH);
+    createHorizontalPeriodicParticle(p, pH);
 }
 
 /*!

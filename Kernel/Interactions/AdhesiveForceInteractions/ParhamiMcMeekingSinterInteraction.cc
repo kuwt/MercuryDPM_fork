@@ -106,7 +106,7 @@ void ParhamiMcMeekingSinterInteraction::computeAdhesionForce()
     Vec3D tangentialForce = -species->getSlidingFrictionCoefficient() * contactRadiusSquared * effectiveDiameter *
                             tangentialRelativeVelocity;
     //std::cout << "P" << species->getAdhesionCoefficient() << species->getViscosityCoefficient() << species->getSlidingFrictionCoefficient() << std::endl;
-    Mdouble attractiveForce = -species->getAdhesionCoefficient() * effectiveDiameter;
+    //Mdouble attractiveForce = -species->getAdhesionCoefficient() * effectiveDiameter;
     //std::cout << effectiveDiameter << "Fs=" << species->getAdhesionCoefficient() * effectiveDiameter
     //<< " Fv/del/del/del=" << 4.0*species->getViscosityCoefficient()*effectiveDiameter*effectiveDiameter << std::endl;
     //<< species->getViscosityCoefficient() << " d" <<contactRadiusSquared<< " d" <<getNormalRelativeVelocity() << std::endl;

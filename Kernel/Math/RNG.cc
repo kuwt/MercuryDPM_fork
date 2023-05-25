@@ -216,13 +216,11 @@ unsigned int RNG::getPoissonVariate(Mdouble lambda)
         logger(WARN, "[RNG::getPoissonVariate(Mdouble)] Knuth's algorithm for Poissons may be slow for lambda = %", lambda);
     }
     unsigned int k = 0; 
-    Mdouble p = 1; 
     Mdouble u;
     do 
     {
         k++;
         u = getRandomNumber(0, 1);
-        p *= u;
     }
     while (u > exp(-lambda));
     return k-1;
