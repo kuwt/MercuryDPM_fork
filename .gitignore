@@ -1,11 +1,8 @@
 .idea
+.vscode
 cmake-build-*
 build
-
-Kernel/CMakeDefinitions.*
-
 Scripts/fpdiff.py
-
 Tools/MClump/clumps/*.vtu
 
-.vscode/
+

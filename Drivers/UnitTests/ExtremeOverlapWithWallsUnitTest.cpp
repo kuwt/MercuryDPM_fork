@@ -54,49 +54,49 @@ and walls.ini
  */
 class ExtremeOverlapWithWallsUnitTest : public DPMBase{
 public:
-	
-	void setupInitialConditions() override {
-		Mdouble r0=0.004, r1=0.001;
 
-		setZMax(2.0*(r0+r1));
-		setZMin(0.0);
-		setYMax(r0);
-		setYMin(-r0);
-		setXMax(r0);
-		setXMin(-r0);
+    void setupInitialConditions() override {
+        Mdouble r0=0.004, r1=0.001;
 
-		///\bug setting gravity here was a quick fix when I changed the default gravity to zero. Should gravity be 0 here?
-		setGravity(Vec3D(0,-9.8,0));
+        setXMax(2.0*(r0+r1));
+        setXMin(0.0);
+        setYMax(r0);
+        setYMin(-r0);
+        setZMax(r0);
+        setZMin(-r0);
 
-		InfiniteWall w0;
+        ///\bug setting gravity here was a quick fix when I changed the default gravity to zero. Should gravity be 0 here?
+        setGravity(Vec3D(0,0,0));
+
+        InfiniteWall w0;
         w0.setSpecies(speciesHandler.getObject(0));
-		w0.set(Vec3D(0,0,-1), Vec3D(0,0,0));
-		wallHandler.copyAndAddObject(w0);
-		w0.set(Vec3D(0,0,1),  Vec3D(0,0,getZMax()));
-		//should be set to 0.005*sin(2*pi*t/0.02))
+        w0.set(Vec3D(-1,0,0), Vec3D(0,0,0));
+        wallHandler.copyAndAddObject(w0);
+        w0.set(Vec3D(1,0,0),  Vec3D(getXMax(),0,0));
+        //should be set to 0.005*sin(2*pi*t/0.02))
         //w0.setVelocity(Vec3D(0.0,0.0,-constants::pi/2.0));
-		w0.setPrescribedPosition([this] (double time)
+		w0.setPrescribedPosition([this,r1] (double time)
         {
-            return Vec3D(0.0,0.0,getZMax() - 0.005 * std::sin(time * 2.0 * constants::pi/0.02));
+            return Vec3D(getXMax() - 4.0*r1 * std::sin(time * 2.0 * constants::pi/0.02),0,0);
         });
         wallHandler.copyAndAddObject(w0);
-		
-		SphericalParticle p0;
+
+        SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
-		p0.setPosition(Vec3D(0,0,r0));
-		p0.setVelocity(Vec3D(0.0,0.0,0.0));
-		p0.setRadius(r0);
-		particleHandler.copyAndAddObject(p0);
-		p0.setPosition(Vec3D(0,0,r0+r0+r1));
-		p0.setVelocity(Vec3D(0.0,0.0,0.0));
-		p0.setRadius(r1);
-		particleHandler.copyAndAddObject(p0);
-	}
-    
+        p0.setPosition(Vec3D(r0,0,0));
+        p0.setVelocity(Vec3D(0.0,0.0,0.0));
+        p0.setRadius(r0);
+        particleHandler.copyAndAddObject(p0);
+        p0.setPosition(Vec3D(r0+r0+r1,0,0));
+        p0.setVelocity(Vec3D(0.0,0.0,0.0));
+        p0.setRadius(r1);
+        particleHandler.copyAndAddObject(p0);
+    }
+
 //    void printTime() const override
 //	{
 //        if (interactionHandler.getNumberOfObjects()>1)
-//        std::cout 
+//        std::cout
 //        << getTime() << " "
 //        << particleHandler.getObject(0)->getPosition().Z << " "
 //        << particleHandler.getObject(1)->getPosition().Z << " "
@@ -116,6 +116,8 @@ int main(int argc, char *argv[])
     OverlapProblem.setName("ExtremeOverlapWithWallsUnitTest");
     OverlapProblem.setFileType(FileType::NO_FILE);
 	OverlapProblem.dataFile.setFileType(FileType::ONE_FILE);
+    //OverlapProblem.setWallsWriteVTK(true);
+    //OverlapProblem.setParticlesWriteVTK(true);
 	OverlapProblem.setSaveCount(1000);
     OverlapProblem.setDimension(3);
     OverlapProblem.setTimeStep(1e-7);
@@ -124,28 +126,10 @@ int main(int argc, char *argv[])
 	OverlapProblem.solve(argc,argv);
     
     Vec3D position = OverlapProblem.particleHandler.getObject(0)->getPosition();
-    Vec3D positionToCompare = Vec3D(0, -0.0004900098000491, 0.004008957617341);
-    if (!position.isEqualTo(positionToCompare, 1e-10))
-    {
-        logger(FATAL, "Large particle is in the wrong position. It is at % and should be %", position,
-               positionToCompare);
-    }
-    else
-    {
-        logger(INFO, "Test passed");
-    }
+    helpers::check(position,Vec3D(0.00402345, 0, 0), 1e-8,"First particle position");
+
     position = OverlapProblem.particleHandler.getObject(1)->getPosition();
-    positionToCompare = Vec3D(0, -0.0004900098000491, 0.009004578797915);
-    //std::cout.precision(13); std::cout << position << std::endl;
-    if (!position.isEqualTo(positionToCompare, 1e-10))
-    {
-        logger(FATAL, "Large particle is in the wrong position. It is at % and should be %", position,
-               positionToCompare);
-    }
-    else
-    {
-        logger(INFO, "Test passed");
-    }
+    helpers::check(position,Vec3D(0.00901182, 0, 0), 1e-8,"Second particle position");
 
     return 0;
 }
