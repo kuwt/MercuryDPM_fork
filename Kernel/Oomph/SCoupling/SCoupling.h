@@ -222,7 +222,7 @@ public:
                 vertex0[2] + dVertex[2] * f };
             wall->setVertices( vertex[0], vertex[1], vertex[2] );
             //logger(INFO,"p %",vertex[0]);
-            return Vec3D( 0, 0, 0 );
+            return wall->getPosition();
         } );
         Vec3D velocity = (dVertex[0]+dVertex[1]+dVertex[2])/3./dTime;
         wall->setPrescribedVelocity([velocity] (double time) {
