@@ -362,7 +362,7 @@ bool readFromCommandLine(int argc, char *argv[], std::string varName);
 template<typename T>
 T readFromCommandLine(int argc, char *argv[], std::string varName, T value)
 {
-    for (unsigned i=0; i<argc-1; ++i) {
+    for (int i = 0; i < argc-1; ++i) {
         if (varName == argv[i]) {
             value = atof(argv[i+1]);
             logger(INFO, "readFromCommandLine: % set to % ", varName.substr(1), value);
@@ -377,7 +377,7 @@ T readFromCommandLine(int argc, char *argv[], std::string varName, T value)
 template<typename T, size_t n>
 std::array<T,n> readArrayFromCommandLine(int argc, char *argv[], std::string varName, std::array<T,n> value)
 {
-    for (unsigned i=0; i<argc-1; ++i) {
+    for (int i = 0; i < argc-1; ++i) {
         if (varName == argv[i]) {
             unsigned j = i+1;
             std::stringstream out;
@@ -386,21 +386,21 @@ std::array<T,n> readArrayFromCommandLine(int argc, char *argv[], std::string var
                 out << v << ' ';
                 ++j;
             }
-            logger(INFO, "readFromCommandLine: % set to % ", varName.substr(1), out.str());
+            logger(INFO, "readArrayFromCommandLine: % set to % ", varName.substr(1), out.str());
             return value;
         }
     }
     //if the variable is not found
     std::stringstream out;
     for (auto& v : value) out << v << ' ';
-    logger(INFO, "readFromCommandLine: % set to default value % ", varName.substr(1), out.str());
+    logger(INFO, "readArrayFromCommandLine: % set to default value % ", varName.substr(1), out.str());
     return value;
 }
 
 template<typename T>
 std::vector<T> readVectorFromCommandLine(int argc, char *argv[], std::string varName, size_t n, std::vector<T> values)
 {
-    for (unsigned i=0; i<argc-1; ++i) {
+    for (int i = 0; i < argc-1; ++i) {
         if (varName == argv[i]) {
             // read until the next argument starts
             values.resize(0);
@@ -409,18 +409,17 @@ std::vector<T> readVectorFromCommandLine(int argc, char *argv[], std::string var
                 values.push_back(atof(argv[j]));
                 out << values.back() << ' ';
             }
-            logger(INFO, "readFromCommandLine: % set to % ", varName.substr(1), out.str());
+            logger(INFO, "readVectorFromCommandLine: % set to % ", varName.substr(1), out.str());
             return values;
         }
     }
     //if the variable is not found
     std::stringstream out;
     for (auto& v: values) out << v << ' ';
-    logger(INFO, "readFromCommandLine: % set to default value % ", varName.substr(1), out.str());
+    logger(INFO, "readVectorFromCommandLine: % set to default value % ", varName.substr(1), out.str());
     return values;
 }
-    
-    
+
 template<>
 std::string readFromCommandLine<std::string>(int argc, char* argv[], std::string varName, std::string value);
 

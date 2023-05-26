@@ -967,7 +967,7 @@ bool helpers::isNext(std::istream& is, const std::string name) {
 template<>
 std::string helpers::readFromCommandLine<std::string>(int argc, char *argv[], std::string varName, std::string value)
 {
-    for (unsigned i=0; i<argc-1; ++i) {
+    for (int i = 0; i < argc - 1; ++i) {
         if (varName == argv[i]) {
             value = argv[i+1];
             logger(INFO, "readFromCommandLine: % set to % ", varName.substr(1), value);
@@ -996,7 +996,7 @@ std::string helpers::readFromCommandLine<std::string>(int argc, char *argv[], st
  */
 bool helpers::removeFromCommandline(int& argc, char* argv[], std::string varName, int nArgs)
 {
-    unsigned int i, j;
+    int i, j;
     
     for (i=0; i<argc; ++i) {
         if (varName == argv[i]) 
