@@ -147,6 +147,12 @@ void MultiParticle::setPrincipalDirections(Matrix3D directions)
 }
 
 // V
+void MultiParticle::setInitPrincipalDirections(Matrix3D directions)
+{
+    initPrincipalDirections = directions;
+}
+
+// V
 void MultiParticle::rotatePrincipalDirections(Vec3D rotation)
 {
     Mdouble tol = 10e-9;

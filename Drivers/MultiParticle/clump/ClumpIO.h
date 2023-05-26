@@ -211,7 +211,7 @@ clump_data rotate_clump(clump_data data, int clump_index, dvec new_pd)
     // Set new pd's
     new_data.pd[clump_index] = new_pd;
 
-    // Rotate tensor of inertia
+    /* Rotate tensor of inertia
     Matrix3D iI = Matrix3D(data.toi[clump_index][0], data.toi[clump_index][1], data.toi[clump_index][2],
                                 data.toi[clump_index][3], data.toi[clump_index][4], data.toi[clump_index][5],
                                 data.toi[clump_index][6], data.toi[clump_index][7], data.toi[clump_index][8]);
@@ -219,7 +219,7 @@ clump_data rotate_clump(clump_data data, int clump_index, dvec new_pd)
     Matrix3D nI = Q * iI * Qt;
     dvec d{ nI.XX, nI.XY, nI.XZ, nI.YX, nI.YY, nI.YZ, nI.ZX, nI.ZY, nI.ZZ };
     new_data.toi[clump_index] = d;
-
+    */
     return new_data; // All loaded clumps in new_data remain unchanged except the clump_index one that is rotated to new_pd
 }
 

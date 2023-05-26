@@ -67,16 +67,19 @@ public:
         MultiParticle p0;
         p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to MultiParticle 1
         p0.setMaster();
-        // data = rotate_clump(data, clump_index, uniform_random_pds()); // Rotate clump arbitrarily
+        dvec urpds = {0.707,0.707,0,-0.707,0.707,0,0,0,1};
+        // dvec urpds = uniform_random_pds();
+        Vec3D angVel = 2 * Vec3D( urpds[0], urpds[1], urpds[2]);
+        data = rotate_clump(data, clump_index, urpds); // Rotate clump arbitrarily
         p0.setRadius(data.pebbles_r[clump_index][0]);
         Vec3D pos = Vec3D(0, 0, 0);
         p0.setPosition(pos);
-        for (int j = 0; j < data.pebbles_r[clump_index].size(); j++) {
-            p0.addSlave(Vec3D(data.pebbles_x[clump_index][j],
-                                  data.pebbles_y[clump_index][j],
-                                  data.pebbles_z[clump_index][j]),
-                            data.pebbles_r[clump_index][j]);
-        }
+
+        //p0.setInitPrincipalDirections(
+        //        Matrix3D(data.pd[clump_index][0], data.pd[clump_index][1], data.pd[clump_index][2],
+        //                 data.pd[clump_index][3], data.pd[clump_index][4], data.pd[clump_index][5],
+        //                 data.pd[clump_index][6], data.pd[clump_index][7], data.pd[clump_index][8]));
+
         p0.setPrincipalDirections(
                     Matrix3D(data.pd[clump_index][0], data.pd[clump_index][1], data.pd[clump_index][2],
                              data.pd[clump_index][3], data.pd[clump_index][4], data.pd[clump_index][5],
@@ -85,9 +88,18 @@ public:
                     MatrixSymmetric3D(data.toi[clump_index][0], data.toi[clump_index][1], data.toi[clump_index][2],
                                       data.toi[clump_index][4], data.toi[clump_index][5],
                                       data.toi[clump_index][8]));
+
+
+        for (int j = 0; j < data.pebbles_r[clump_index].size(); j++) {
+            p0.addSlave(Vec3D(data.pebbles_x[clump_index][j],
+                              data.pebbles_y[clump_index][j],
+                              data.pebbles_z[clump_index][j]),
+                        data.pebbles_r[clump_index][j]);
+        }
+
         std::cout<<"CLUMP MASS set = "<<data.mass[clump_index]<<std::endl;
         p0.setMassMultiparticle(data.mass[clump_index]);
-        p0.setAngularVelocity(Vec3D(0,5,0));
+        p0.setAngularVelocity(angVel);
         
         std::cout<<"CLUMP MASS get = "<<p0.getMass()<<std::endl;
         p0.setDamping(clump_damping);

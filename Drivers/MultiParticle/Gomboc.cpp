@@ -68,7 +68,7 @@ public:
         MultiParticle p0;
         p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to MultiParticle 1
         p0.setMaster();
-        //data = rotate_clump(data, clump_index, uniform_random_pds(seed)); // here you can try different seeds
+        data = rotate_clump(data, clump_index, uniform_random_pds()); // here you can try different seeds
         p0.setRadius(data.pebbles_r[clump_index][0]);
         Vec3D pos = Vec3D(0, 0, -1);
         p0.setPosition(pos);

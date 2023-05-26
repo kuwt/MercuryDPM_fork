@@ -91,6 +91,8 @@ public:
 
     void setPrincipalDirections(Matrix3D directions);
 
+    void setInitPrincipalDirections(Matrix3D directions);
+
     Vec3D getPrincipalDirections_e1() const
     {
 
