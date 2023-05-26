@@ -115,16 +115,13 @@ void LiquidMigrationLSSpecies::mix(LiquidMigrationLSSpecies* const S, LiquidMigr
 }
 
 ///\return the maximum separation distance below which adhesive forces can occur (needed for contact detection)
-void LiquidMigrationLSSpecies::setInteractionDistance()//可能需要改
+void LiquidMigrationLSSpecies::setInteractionDistance()
 {
-    //const LiquidMigrationLSInteraction* Interaction = getIntercation();
-    //getBaseSpecies()->setInteractionDistance(Interaction->getRuptureDistance());
-    //getBaseSpecies()->setInteractionDistance((1.0 + 0.5 * contactAngle_) * cbrt(liquidBridgeVolumeMax_));
     getBaseSpecies()->setInteractionDistance((1.0 + 0.5 * contactAngle_) * (cbrt(liquidBridgeVolumeMax_) + 0.1 * pow(liquidBridgeVolumeMax_, 2.0/3.0)));
 }
 
 /*!
- * \param[in] liquidBridgeVolume the volume of the liquid bridge.
+ * \param[in] liquidBridgeVolume the maximum volume of the liquid bridge.
  */
 void LiquidMigrationLSSpecies::setLiquidBridgeVolumeMax(Mdouble liquidBridgeVolumeMax)
 {
@@ -134,6 +131,9 @@ void LiquidMigrationLSSpecies::setLiquidBridgeVolumeMax(Mdouble liquidBridgeVolu
     setInteractionDistance();
 }
 
+/*!
+ * \param[in] liquidBridgeVolume the minimum volume of the liquid bridge, the criterion value of the summation of the liquid film volumes for the liquid bridge forming.
+ */
 void LiquidMigrationLSSpecies::setLiquidBridgeVolumeMin(Mdouble liquidBridgeVolumeMin)
 {
     logger.assert_always(liquidBridgeVolumeMin>=0,
@@ -142,13 +142,16 @@ void LiquidMigrationLSSpecies::setLiquidBridgeVolumeMin(Mdouble liquidBridgeVolu
 }
 
 /*!
- * \return the volume of the liquid bridge.
+ * \return the maximum volume of the liquid bridge.
  */
 Mdouble LiquidMigrationLSSpecies::getLiquidBridgeVolumeMax() const
 {
     return liquidBridgeVolumeMax_;
 }
 
+/*!
+ * \return the minimum volume of the liquid bridge.
+ */
 Mdouble LiquidMigrationLSSpecies::getLiquidBridgeVolumeMin() const
 {
     return liquidBridgeVolumeMin_;
@@ -248,11 +251,4 @@ Mdouble LiquidMigrationLSSpecies::getViscosity() const
     return viscosity_;
 }
 
-///*!
-// * \return const LiquidMigrationLSInteraction*
-// */
-//const LiquidMigrationLSInteraction* LiquidMigrationLSSpecies::getIntercation() const
-//{
-//    return static_cast<const LiquidMigrationLSInteraction*>(getBaseInteraction());
-//    ;
-//}
+

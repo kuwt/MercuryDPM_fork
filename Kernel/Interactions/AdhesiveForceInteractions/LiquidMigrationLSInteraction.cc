@@ -110,10 +110,12 @@ void LiquidMigrationLSInteraction::read(std::istream& is)
 }
 
 /*!
- * The contact model is based on the description given in
+ * The contact model is based on the description given in (Zhang and Wu, 2020):
  * https://www.sciencedirect.com/science/article/pii/S0032591019311258
  * This model includes a normal capillary force, a normal lubrication force and a tangential lubrication force.
  * The capillary force is valid when particles are within rupture distance.
+ * The formulation is in (Lian and Seville, 2015):
+ * https://doi.org/10.1016/j.cis.2015.11.003.
  * The lubrication force is valid when particles are within limiting distance.
  * Note: the tangential lubrication force is added to sliding friction force through SlidingFrictionInteraction::addTangentialForce().
  */
@@ -163,6 +165,7 @@ void LiquidMigrationLSInteraction::computeAdhesionForce()
         }
         addForce(getNormal() * (fdotnc + fdotnl) + fdottl);
 
+        //add tangential lubrication force to sliding friction force
         auto slidingFrictionInteraction = dynamic_cast<SlidingFrictionInteraction*>(this);
         slidingFrictionInteraction->addTangentialForce(fdottl);
     }
