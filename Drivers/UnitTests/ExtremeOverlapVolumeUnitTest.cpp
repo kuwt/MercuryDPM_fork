@@ -29,21 +29,13 @@
 #include <Logger.h>
 
 /*!
- * \brief This test it to check the formulae to compute the overlap volume between two particles is giving the correct
- * result it tested in the extreme case
- * \details In this test, two particles are initialized such that the smaller 
- * particle is completely contained in the larger particle. Such an extreme 
- * overlap does not make physical sense, but we test the overlap volume is equal to the volume of the small particle
- *
+ * \brief This test checks the formula for computing the overlap volume between two spherical particles.
+ * \details In this test, two particles are initialized and the position of the smaller particles is updated multiple
+ * times, to then calculate and compare the overlap volume. The first and fourth overlap volumes are pre-calculated,
+ * the second and third overlap volumes should equal half and fully the smaller particle volume.
  */
 class ExtremeOverlapVolumeUnitTest : public DPMBase{
 public:
-	
-    /*!
-     * defines the initial position and velocity of the two particles such that 
-     * the smaller particle is completely contained inside the larger particle,
-     * and that the small particle has a tangential velocity.
-     */
 	void setupInitialConditions() final
 	{
         //Define the radii of the two particles
@@ -58,48 +50,44 @@ public:
 		setXMax(r0);
 		setXMin(-r0);
 
-        ///\bug setting gravity here was a quick fix when I changed the default gravity to zero. Should gravity be 0 here?
-        setGravity(Vec3D(0,-9.8,0));
-
         //Create both particles and set their positions, radii, and velocities.
 		SphericalParticle p;
         p.setSpecies(speciesHandler.getObject(0));
 		p.setPosition(Vec3D(0.0,r0,0.0));
-		p.setVelocity(Vec3D(0.0,0.0,0.0));
 		p.setRadius(r0);
 		particleHandler.copyAndAddObject(p);
-		p.setPosition(Vec3D(0.0,1.5*r0,0.0));
-		p.setVelocity(Vec3D(1.0,0.0,0));
 		p.setRadius(r1);
 		particleHandler.copyAndAddObject(p);
-	}
-    
-//    /*!
-//     * print the time, the position of both particles and the position of the 
-//     * contact point to the screen. This allows you to plot these variables in 
-//     * gnuplot; you can see that the contact point is not between the two 
-//     * particles anymore.
-//     */
-//    void printTime() const final
-//	{
-//        if (interactionHandler.getNumberOfObjects()>0)
-//        std::cout 
-//        << getTime() << " "
-//        << particleHandler.getObject(0)->getPosition().Z << " "
-//        << particleHandler.getObject(1)->getPosition().Z << " "
-//        << interactionHandler.getObject(0)->getContactPoint().Z <<std::endl;
-//    }
 
+        // Small overlap. Should equal pre-calculated value.
+        particleHandler.getObject(1)->setPosition(Vec3D(0.0,2.0*r0+0.9*r1,0.0));
+        computeAllForces();
+        helpers::check(interactionHandler.getObject(0)->getOverlapVolume(), 2.77675e-11, 1.0e-12,"overlapVolume");
+
+        // Small particle center exactly on big particle surface. Overlap volume should equal half volume smallest particle.
+        particleHandler.getObject(1)->setPosition(Vec3D(0.0,2.0*r0,0.0));
+        computeAllForces();
+        helpers::check(interactionHandler.getObject(0)->getOverlapVolume(), 0.5 * particleHandler.getObject(1)->getVolume(), 1.0e-10,"overlapVolume");
+
+        // Small particle fully inside big particle, but still just touching big particle surface. Overlap volume should equal volume smallest particle.
+        particleHandler.getObject(1)->setPosition(Vec3D(0.0,2.0*r0-r1,0.0));
+        computeAllForces();
+        helpers::check(interactionHandler.getObject(0)->getOverlapVolume(), particleHandler.getObject(1)->getVolume(), 1.0e-12,"overlapVolume");
+
+        // Small particle fully inside big particle, and not touching the big particle surface anymore, causes the overlap volume calculations to return nonsensical values.
+        // It should, however, equal to pre-calculated value.
+        particleHandler.getObject(1)->setPosition(Vec3D(0.0,2.0*r0-1.1*r1,0.0));
+        computeAllForces();
+        helpers::check(interactionHandler.getObject(0)->getOverlapVolume(), 4.15244e-09, 1.0e-12,"overlapVolume");
+
+        exit(0);
+	}
 };
 
 int main(int argc, char *argv[])
 {
 	ExtremeOverlapVolumeUnitTest OverlapProblem;
-    
-    //set some contact parameters; the contact is elastic (so we can check 
-    //energy conservation), and very soft (so the particles repel each other slowly))
-    //To check Energy conservation, use gnuplot:
-    //  p 'ExtremeOverlapUnitTest.ene' u 1:($2+$3+$4+$5)
+
     auto species = OverlapProblem.speciesHandler.copyAndAddObject(LinearViscoelasticSlidingFrictionSpecies());
     species->setDensity(2000);
     species->setStiffness(1e1);
@@ -109,35 +97,7 @@ int main(int argc, char *argv[])
     species->setSlidingDissipation(2.0/7.0*species->getDissipation());
     
     OverlapProblem.setName("ExtremeOverlapUnitTest");
-    OverlapProblem.setFileType(FileType::NO_FILE);
-	OverlapProblem.dataFile.setFileType(FileType::ONE_FILE);
-	OverlapProblem.setSaveCount(1e3);
-    OverlapProblem.setDimension(2);
-    OverlapProblem.setTimeStep(1e-7);
-	OverlapProblem.setTimeMax(1e-7);
 	OverlapProblem.solve(argc,argv);
-    
-
-    Mdouble overlapVolume = OverlapProblem.interactionHandler.getObject(0)->getOverlapVolume();
-    std::cout << overlapVolume <<std::endl;
-    std::cout << OverlapProblem.particleHandler.getObject(1)->getVolume() <<std::endl;
-    helpers::check(overlapVolume, -2.57515e-06, 1e-8,"overlapVolume");
-//    logger(FATAL,"Test not fully written"); /todo TW
-
-    /*
-    Vec3D positionToCompare = Vec3D(-1.031389999146e-06, 0.009506389407855, 0);
-    if (!position.isEqualTo(positionToCompare, 1e-7))
-        logger(FATAL,"Large particle is in the wrong position. It is at % and should be %",position,positionToCompare);
-    else
-        std::cout << "Test passed" << std::endl;
-    position = OverlapProblem.particleHandler.getObject(1)->getPosition();
-    positionToCompare = Vec3D(0.01010314899993, 0.01487096023445, 0);
-    if (!position.isEqualTo(positionToCompare, 1e-7))
-        logger(FATAL,"Small particle is in the wrong position. It is at % and should be %",position,positionToCompare);
-    else
-        std::cout << "Test passed" << std::endl;
-    //std::cout.precision(13); std::cout << position << std::endl;
-     */
 
     return 0;
 }
