@@ -29,5 +29,5 @@ foreach (CPPFILE ${CPPFILES})
   #Make the exe
   add_executable(${EXECNAME} ${FILENAME})
   #All cpp folder and linked agaist MercuryBase
-  target_link_libraries(${EXECNAME} oomphSolid MercuryBase)
+  target_link_libraries(${EXECNAME} oomphSolid oomphFluid MercuryBase)
 endforeach ()

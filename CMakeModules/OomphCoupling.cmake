@@ -98,7 +98,7 @@ add_library(oomphSolid STATIC ${CMAKE_SOURCE_DIR}/Kernel/Math/daxpy.f)
 target_link_libraries(oomphSolid constitutive meshes solid oomphBase)
 
 # build a smaller library for fluid problems
-add_library(oomphFluid STATIC ${CMAKE_SOURCE_DIR}/Kernel/Logger.cc)
+add_library(oomphFluid STATIC ${CMAKE_SOURCE_DIR}/Kernel/Math/daxpy.f)
 target_link_libraries(oomphFluid navier_stokes meshes oomphBase)
 
 # the full oomph library
