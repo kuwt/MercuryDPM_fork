@@ -38,7 +38,7 @@ class GSHRelax : public Mercury3D{
 public:
 
     GSHRelax(int i) {
-        readRestartFile("GSHCompaction.restart."+helpers::to_string(i));
+        readRestartFile("GSHCompaction.restart."+ helpers::toString(i));
         setTimeMax(constants::inf);
         setFileType(FileType::NO_FILE);
         restartFile.setFileType(FileType::ONE_FILE);

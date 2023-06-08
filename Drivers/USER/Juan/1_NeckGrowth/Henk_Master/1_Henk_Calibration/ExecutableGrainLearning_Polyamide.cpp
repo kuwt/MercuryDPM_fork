@@ -40,9 +40,9 @@ public:
 
         //-----------------
         //Global parameters
-        std::string r = helpers::to_string(radius);
-        std::string mtc1 = helpers::to_string(materialC1);
-        std::string sDc = helpers::to_string(separationDc);
+        std::string r = helpers::toString(radius);
+        std::string mtc1 = helpers::toString(materialC1);
+        std::string sDc = helpers::toString(separationDc);
 
 //        printf_s("%11.4e \n", materialC1);
 

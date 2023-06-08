@@ -54,6 +54,7 @@ file(GLOB MercuryDPM_SRC
         Nurbs/*.cc
         Tools/*.cc
         Controllers/*.cc
+        Helpers/*.cc
         )
 
 #Basic library

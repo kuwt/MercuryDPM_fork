@@ -37,7 +37,7 @@ public:
     explicit powdersAndgrains(Mdouble radius) {
         //-----------------
         //Global parameters
-        std::string r = helpers::to_string(radius);
+        std::string r = helpers::toString(radius);
         setName("PowdersAndGrainsPolyamide12_" + r);
 
         setFileType(FileType::ONE_FILE);

@@ -27,6 +27,8 @@
 #include "Species/HertzianViscoelasticSlidingFrictionSpecies.h"
 #include "DPMBase.h"
 
+#include "ContactLawTestHelpers.h"
+
 int main(int argc, char *argv[])
 {
 	Mdouble displacement=0.015;
@@ -43,10 +45,10 @@ int main(int argc, char *argv[])
 //	species.setSlidingDissipation(4.0/7.0);
 	species.setSlidingFrictionCoefficient(0.1);
 
-	helpers::loadingTest(&species, displacement, velocity, radius, "MindlinSelfTestLoading");
-	helpers::normalAndTangentialLoadingTest(&species, displacement, tangentialDisplacement, velocity, radius,
+	loadingTest(&species, displacement, velocity, radius, "MindlinSelfTestLoading");
+	normalAndTangentialLoadingTest(&species, displacement, tangentialDisplacement, velocity, radius,
 											"MindlinSelfTestNormalAndTangentialLoading");
-    helpers::objectivenessTest(&species, displacement, tangentialDisplacement, velocity, radius, "MindlinSelfTestFrameIndependence");
+    objectivenessTest(&species, displacement, tangentialDisplacement, velocity, radius, "MindlinSelfTestFrameIndependence");
 
 	/*
 	 * //- for Hertz-SlidingFriction
@@ -61,7 +63,7 @@ int main(int argc, char *argv[])
 	//"MindlinSelfTestTangentialLoading.fstat" using 8:($10*$14)
 
 
-	//helpers::loadingTest(&species2, displacement, velocity, radius);
-    //helpers::normalAndTangentialLoadingTest(&species2, displacement, tangentialDisplacement, velocity, radius);
-    //helpers::objectivenessTest(&species2, displacement, tangentialDisplacement, velocity, radius);
+	//loadingTest(&species2, displacement, velocity, radius);
+    //normalAndTangentialLoadingTest(&species2, displacement, tangentialDisplacement, velocity, radius);
+    //objectivenessTest(&species2, displacement, tangentialDisplacement, velocity, radius);
 }

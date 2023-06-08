@@ -172,8 +172,8 @@ public:
     void actionsAfterSolve() override {
         logger(INFO,"Max shear stress %, bulk density %", maxShearStress_, bulkDensity_);
         helpers::writeToFile(getName()+".out",
-                             "maxShearStress " + helpers::to_string(maxShearStress_) + "\n"
-                                      "bulkDensity " + helpers::to_string(bulkDensity_)
+                             "maxShearStress " + helpers::toString(maxShearStress_) + "\n"
+                                      "bulkDensity " + helpers::toString(bulkDensity_)
         );
     }
 };

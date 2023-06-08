@@ -31,7 +31,7 @@
 #include "Boundaries/LeesEdwardsBoundary.h"
 #include "Species/LinearViscoelasticSlidingFrictionSpecies.h"
 using constants::pi;
-using helpers::to_string;
+using helpers::toString;
 
 /**
  * Simulates homogeneous shear for fixed shear-rate and volume fraction.
@@ -68,7 +68,7 @@ public:
         setTimeStep(0.1*collisionTime);
         setTimeMax(10000);
         setSaveCount(500);
-        setName("SperlLE_P"+to_string(pressure,4)+"_S"+to_string(shearRate,4));
+        setName("SperlLE_P"+toString(pressure,4)+"_S"+toString(shearRate,4));
         logger(INFO,"Name %",getName());
         setXBallsAdditionalArguments("-v0 -solidf -3dturn 1");
 

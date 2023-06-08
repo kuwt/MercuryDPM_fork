@@ -38,7 +38,7 @@ public:
     explicit regimeForceUnitTest(Mdouble radius) {
         //-----------------
         //Global parameters
-        //std::string r = helpers::to_string(radius);
+        //std::string r = helpers::toString(radius);
         setName("RegimeSinterForceUnitTest");
 
         setFileType(FileType::ONE_FILE);

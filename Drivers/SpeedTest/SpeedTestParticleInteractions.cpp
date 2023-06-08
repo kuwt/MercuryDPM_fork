@@ -48,7 +48,7 @@ public:
 		polydispersity_=polydispersity;
 		setTimeStep(5e-5);
 	    setTimeMax(0.39);
-    	setName("SpeedTest_P"+helpers::to_string(polydispersity,2));
+    	setName("SpeedTest_P"+helpers::toString(polydispersity, 2));
 		setFileType(FileType::NO_FILE);
 	}
 

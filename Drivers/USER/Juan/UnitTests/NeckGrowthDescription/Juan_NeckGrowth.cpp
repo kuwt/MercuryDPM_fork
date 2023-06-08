@@ -111,7 +111,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     //----------------------------------------------
     //Output file:
     logger(INFO, "Running for Particle radious=%",sf.radius);
-    std::string r = helpers::to_string(sf.radius);
+    std::string r = helpers::toString(sf.radius);
     sf.setName("Juan_NeckGrowth"+r);
     sf.writeRestartFile();
     sf.solve();

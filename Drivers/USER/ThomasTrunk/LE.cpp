@@ -81,7 +81,7 @@ public:
         eneFile.setSaveCount(200);
         dataFile.setSaveCount(200);
         fStatFile.setFileType(FileType::NO_FILE);
-        setName("LE_V"+helpers::to_string(volumeFraction,4));
+        setName("LE_V"+helpers::toString(volumeFraction, 4));
         setXBallsAdditionalArguments("-v0 -solidf -3dturn 1");
         //logger(INFO, "File name %", getName());
 
@@ -155,13 +155,13 @@ class LeesEdwards : public Mercury3D
 public:
 
     LeesEdwards(Mdouble volumeFraction, Mdouble shearRate) {
-        setName("LE_V"+helpers::to_string(volumeFraction,4)+"_ini");
+        setName("LE_V" + helpers::toString(volumeFraction, 4) + "_ini");
         while (!readRestartFile()) {
             logger(INFO, "Creating initial conditions %", getName());
             LeesEdwardsInit leesEdwardsInit(volumeFraction);
         }
         //logger(INFO, "Read initial conditions %", getName());
-        setName("LE_V"+helpers::to_string(volumeFraction,4)+"_S"+helpers::to_string(shearRate,4));
+        setName("LE_V" + helpers::toString(volumeFraction, 4) + "_S" + helpers::toString(shearRate, 4));
 
         //define leesEdwardsBoundary
         const Mdouble L = getXMax()-getXMin();

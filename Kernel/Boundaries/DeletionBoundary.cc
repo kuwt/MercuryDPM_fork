@@ -129,7 +129,7 @@ bool DeletionBoundary::checkBoundaryAfterParticleMoved(BaseParticle* p, Particle
             trackMassDeleted_ += p->getMass();
             if (!tracker.is_open()) {
                 std::string name  = dpm->getName()
-                        + helpers::to_string(getIndex())
+                        + helpers::toString(getIndex())
                         + ".out" + (NUMBER_OF_PROCESSORS==1?"":std::to_string(PROCESSOR_ID));
                 logger(INFO, "Open file %", name);
                 tracker.open(name);

@@ -20,9 +20,9 @@ public:
         //-----------------
         //Global parameters
         // Density
-        std::string pD = helpers::to_string(particleDensity);
+        std::string pD = helpers::toString(particleDensity);
         // Scale the cylinder to fit the maximum radius of the PSD cylScaling times into one cylinder diameter
-        std::string cS = helpers::to_string(cylScaling);
+        std::string cS = helpers::toString(cylScaling);
     
         setName("CylinderParticleInsertion_" + pD + "_" + cS);
     

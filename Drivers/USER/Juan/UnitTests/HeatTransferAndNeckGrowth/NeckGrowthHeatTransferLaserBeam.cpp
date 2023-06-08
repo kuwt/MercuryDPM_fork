@@ -41,7 +41,7 @@ public:
         setParticlesWriteVTK(true);
 //        wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
 
-        std::string r = helpers::to_string(pRadius_);
+        std::string r = helpers::toString(pRadius_);
         setName("NeckGrowthHeatTransfer2");
         setXBallsAdditionalArguments("-solidf -v0 -cmode 8 -cmaxset 100 ");
 //        setXBallsAdditionalArguments("-v0 -solidf -p 1 -cmode 8");

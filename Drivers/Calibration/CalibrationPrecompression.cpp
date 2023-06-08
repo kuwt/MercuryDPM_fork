@@ -393,8 +393,8 @@ public:
         logger(INFO,"Pre-compression shear stress %, Pre-compression bulk density %", preCompressionShearStress_,
                preCompressionbulkDensity_);
         helpers::writeToFile(getName()+".out",
-            "preCompressionShearStress " + helpers::to_string(preCompressionShearStress_) + "\n"
-            "preCompressionBulkDensity " + helpers::to_string(preCompressionbulkDensity_)
+                             "preCompressionShearStress " + helpers::toString(preCompressionShearStress_) + "\n"
+            "preCompressionBulkDensity " + helpers::toString(preCompressionbulkDensity_)
             );
     }
 };
