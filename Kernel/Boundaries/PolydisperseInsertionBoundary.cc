@@ -147,7 +147,7 @@ BaseParticle* PolydisperseInsertionBoundary::generateParticle(RNG& random)
             break;
         }
     }
-    logger.assert_debug(spec==generanda_.size(),"spec set wrongly");
+    logger.assert_debug(spec<generanda_.size(),"spec set wrongly");
     
     auto P = generanda_[spec]->copy();
     
