@@ -399,13 +399,13 @@ public:
     inline void setZ(Mdouble z)
     { Z = z; }
     
-    inline Mdouble getX()
+    inline Mdouble getX() const
     { return X; }
     
-    inline Mdouble getY()
+    inline Mdouble getY() const
     { return Y; }
     
-    inline Mdouble getZ()
+    inline Mdouble getZ() const
     { return Z; }
     
     inline void set(Mdouble x, Mdouble y, Mdouble z)
