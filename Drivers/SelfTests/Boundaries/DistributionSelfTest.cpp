@@ -69,8 +69,6 @@ public:
         Vec3D velMin = {0,0,0};
         Vec3D velMax = {0,0,0};
         unsigned maxFail = 10; //insert as quick as possible: try every time step, until you maxFail=1 particle fails to be insertable (overlaps with another particle or wall)
-        double radMin = 0.4;
-        double radMax = 0.6;
         insertionBoundary.set(&templateParticle, maxFail, posMin, posMax, velMin, velMax);
         insertionBoundary.setPSD(PSD::getDistributionLogNormal(0, 0.25, 500));
         

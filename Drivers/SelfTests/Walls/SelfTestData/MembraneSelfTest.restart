@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name MembraneSelfTest revision 0 repository 
+MercuryDPM 0.14 name MembraneSelfTest revision 737d820 repository https://bitbucket.org/mercurydpm/mercurydpm.git
 dataFile    fileType NO_FILE saveCount 99999 counter 0
 fStatFile   fileType NO_FILE saveCount 99999 counter 0
 eneFile     fileType NO_FILE saveCount 99999 counter 0
@@ -7,7 +7,7 @@ statFile    fileType ONE_FILE saveCount 99999 counter 0
 interactionFile fileType NO_FILE saveCount 0 counter 0
 xMin -1 xMax 1 yMin -1 yMax 1 zMin -1 zMax 1
 timeStep 1e-05 time 0.200000000000059 ntimeSteps 20000 timeMax 0.2
-systemDimensions 3 particleDimensions 3 gravity 0 0 -9.81 writeVTK 0 NO_FILE NO_FILE 0 0 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267
+systemDimensions 3 particleDimensions 3 gravity 0 0 -9.81 backgroundDrag 0 writeVTK 0 NO_FILE NO_FILE 0 0 0 0 0 random  0 1103515245 12345 1073741824 607 273 784607267
 Species 3
 HertzianViscoelasticMindlinSpecies id 0 density 2000 elasticModulus 10000000 dissipation 1.32186284081552 slidingDissipation 1.32186284081552 slidingFrictionCoefficient 0.5 slidingFrictionCoefficientStatic 0.5 shearModulus 6225000
 HertzianViscoelasticMindlinSpecies id 1 density 2000 elasticModulus 1250000 dissipation 0.293194957100995 slidingDissipation 0.293194957100995 slidingFrictionCoefficient 1.2 slidingFrictionCoefficientStatic 1.2 shearModulus 833333.333333333
