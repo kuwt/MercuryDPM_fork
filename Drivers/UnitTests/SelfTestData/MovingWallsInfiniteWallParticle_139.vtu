@@ -10,7 +10,7 @@
 </Points>
 <PointData  Vectors="vector">
   <DataArray type="Float32" Name="Velocity" NumberOfComponents="3" format="ascii">
-	-0.0488008 0 -0.100885
+ -0.0488008 0 -0.100885
   </DataArray>
   <DataArray type="Float32" Name="AngularVelocity" NumberOfComponents="3" format="ascii">
 	0 0.0998802 0
@@ -19,6 +19,9 @@
 	0.5
   </DataArray>
   <DataArray type="Float32" Name="speciesType" format="ascii">
+	0
+  </DataArray>
+  <DataArray type="Int32" Name="Id" format="ascii">
 	0
   </DataArray>
 </PointData>

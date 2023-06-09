@@ -131,7 +131,7 @@ public:
         PSD psd;
         // laser diffraction measurements usually give volumetric responses. This PSD was already converted to a
         // CUMULATIVE_NUMBER_DISTRIBUTION.
-        psd.setPSDFromCSV(getMercurySourceDir() + "/Drivers/SelfTests/Boundaries/InputData/APAPM.csv",
+        psd.setPSDFromCSV(getMercuryDPMSourceDir() + "/Drivers/SelfTests/Boundaries/InputData/APAPM.csv",
                           PSD::TYPE::CUMULATIVE_NUMBER_DISTRIBUTION);
         insertionBoundary.setPSD(psd);
         
