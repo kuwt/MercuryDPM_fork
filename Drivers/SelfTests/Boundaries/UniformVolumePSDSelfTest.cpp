@@ -57,18 +57,19 @@ public:
         SphericalParticle particle(s);
         insertionBoundary.set(&particle, 10, getMin(), getMax(), {0,0,0}, {0,0,0}, 1, 1);
         insertionBoundary.setInitialVolume(1);
-
+    
         //create uniform-volume distribution
         std::vector<PSD::RadiusAndProbability> cvd;
-        for (int i = 0; i <= 600; ++i) {
-            cvd.push_back({(i+3)*0.0015, i*0.1});
+        for (int i = 0; i <= 600; ++i)
+        {
+            cvd.push_back({(i + 3) * 0.0015, i * 0.1});
         }
         PSD psd;
         psd.setParticleSizeDistribution(cvd);
         // convert to number-csd
         psd.convertCumulativeToCumulativeNumberDistribution(PSD::TYPE::CUMULATIVE_VOLUME_DISTRIBUTION);
         insertionBoundary.setPSD(psd);
-        
+    
         //add the insertion boundary to the handler
         auto i = boundaryHandler.copyAndAddObject(insertionBoundary);
         i->checkBoundaryBeforeTimeStep(this);

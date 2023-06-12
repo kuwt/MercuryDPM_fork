@@ -27,9 +27,11 @@
 
 int main(int argc, char *argv[])
 {
+    std::string name = helpers::readFromCommandLine(argc, argv, "-name", std::string("VerticalMixerAngledBlades"));
+
     //first, do the real run
     VerticalMixerAngledBlades mixer(argc, argv);
-    mixer.setName("VerticalMixerAngledBlades");
+    mixer.setName(name);
     mixer.removeOldFiles();
     // use straight blades
     mixer.bladeAngle_ = helpers::readFromCommandLine(argc, argv, "-bladeAngle", 0.0)*constants::pi;
@@ -40,7 +42,7 @@ int main(int argc, char *argv[])
 
     //then create pretty wall data
     VerticalMixerAngledBlades walls(argc, argv);
-    walls.setName("Walls");
+    walls.setName(name + "PrettyWalls");
     walls.removeOldFiles();
     walls.bladeAngle_ = mixer.bladeAngle_;
     walls.prettyWalls_ = true;
@@ -49,7 +51,7 @@ int main(int argc, char *argv[])
 
     //finally, create pretty blade data
     VerticalMixerAngledBlades blades(argc, argv);
-    blades.setName("Blades");
+    blades.setName(name + "PrettyBlades");
     blades.removeOldFiles();
     blades.bladeAngle_ = mixer.bladeAngle_;
     blades.prettyWalls_ = true;

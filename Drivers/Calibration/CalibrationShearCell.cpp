@@ -26,7 +26,7 @@
 #include <Math/Helpers.h>
 #include "Calibration.h"
 using mathsFunc::square;
-using helpers::to_string;
+using helpers::toString;
 
 // Here is a templated function to do the linear regression fit of data points.
 template <typename T>
@@ -74,8 +74,8 @@ double computeFFc (Mdouble preCompressionNormalStress, Mdouble preCompressionShe
                    std::vector<double> normalStress, std::vector<double> maxShearStress) {
     //This part does the linear fit through the shear points and get the yield locus with slope and intercept
     //Then we calculate the sigma_1 and sigma_c to compute flow function FFc
-    logger(INFO, "p % % tau % %", preCompressionNormalStress, to_string(normalStress), preCompressionShearStress,
-           to_string(maxShearStress));
+    logger(INFO, "p % % tau % %", preCompressionNormalStress, toString(normalStress), preCompressionShearStress,
+           toString(maxShearStress));
     
     double sigmaC;
     {
@@ -122,7 +122,8 @@ double computeSimpleFFc (Mdouble preCompressionNormalStress, Mdouble preCompress
     //This part does the linear fit through the shear points and get the yield locus with slope and intercept
     //Then we calculate the sigma_1 and sigma_c to compute flow function FFc
     
-    logger(INFO, "p % % tau % %",preCompressionNormalStress, to_string(normalStress), preCompressionShearStress, to_string(maxShearStress));
+    logger(INFO, "p % % tau % %", preCompressionNormalStress, toString(normalStress), preCompressionShearStress,
+           toString(maxShearStress));
     auto [slope, intercept] = getLinearFit(normalStress,maxShearStress);
     
     if (intercept < 0) {

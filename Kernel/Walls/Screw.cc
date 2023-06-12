@@ -401,8 +401,6 @@ void Screw::writeVTK(VTKContainer& vtk) const
         }
     }
     
-    unsigned long nCells = vtk.triangleStrips.size();
-    //vtk.triangleStrips.reserve(nCells + (nz - 1)*(screwType_==ScrewType::doubleHelix?2:1));
     for (unsigned iz = 0; iz < (screwType_==ScrewType::doubleHelix?2:1)*nz-1; iz++)
     {
         //skip step that would connect the two screw parts
@@ -435,7 +433,7 @@ void Screw::writeVTK(std::string filename) const
     for (const auto& face : vtk.triangleStrips)
         file << "3 " << face[0] << ' ' << face[1] << ' ' << face[2] << '\n';
     file << "\nCELL_TYPES " << vtk.triangleStrips.size() << "\n";
-    for (const auto& face : vtk.triangleStrips)
+    for (const auto& face UNUSED : vtk.triangleStrips)
         file << "5\n";
     helpers::writeToFile(filename, file.str());
 }

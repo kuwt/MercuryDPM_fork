@@ -38,7 +38,7 @@ public:
     explicit calibrationUnitTest(Mdouble radius) {
         //-----------------nu
         //Global parameters
-        std::string r = helpers::to_string(radius);
+        std::string r = helpers::toString(radius);
         setName("LinearPlasticViscoElasticFrictionThermalTest" + r);
 
         setFileType(FileType::ONE_FILE);

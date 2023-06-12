@@ -236,7 +236,6 @@ void AxisymmetricIntersectionOfWalls::writeVTK(VTKContainer& vtk) const
         
         //finally create the connectivity matri to plot shell-like triangle strips.
         unsigned long nz = rzVec.size();
-        unsigned long nCells = vtk.triangleStrips.size();
         for (unsigned iz = 0; iz < nz - 1; iz++)
         {
             std::vector<double> cell;

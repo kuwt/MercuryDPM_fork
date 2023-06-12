@@ -51,19 +51,20 @@ public:
         species.setDensity(2000);
         species.setStiffness(10000);
         auto s = speciesHandler.copyAndAddObject(species);
-        
+    
         // define a cube insertion boundary, which inserts particles in a cuboid region
         CubeInsertionBoundary insertionBoundary;
         SphericalParticle particle(s);
-        insertionBoundary.set(&particle, 10, getMin(), getMax(), {0,0,0}, {0,0,0}, 1, 1);
+        insertionBoundary.set(&particle, 10, getMin(), getMax(), {0, 0, 0}, {0, 0, 0}, 1, 1);
         insertionBoundary.setInitialVolume(1);
-
+    
         //uniform distribution
         PSD psd;
-        psd.setParticleSizeDistribution({{0, 0},{0.015, 1}});
+        psd.setParticleSizeDistribution({{0.005,     0},
+                                         {0.015, 1}});
         //PSD::convertCumulativeVolumeToNumber(psd); //PSND
         insertionBoundary.setPSD(psd);
-        
+    
         //add the insertion boundary to the handler
         auto i = boundaryHandler.copyAndAddObject(insertionBoundary);
         i->checkBoundaryBeforeTimeStep(this);

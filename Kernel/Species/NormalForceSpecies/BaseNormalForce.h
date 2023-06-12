@@ -26,6 +26,7 @@
 #ifndef MERCURYDPM_BASENORMALFORCE_H
 #define MERCURYDPM_BASENORMALFORCE_H
 #include "Species/BaseForce.h"
+class BaseParticle;
 
 class BaseNormalForce : public BaseForce
 {
@@ -50,6 +51,8 @@ public:
      * Sets constantRestitution_.
      */
     void setConstantRestitution(bool constantRestitution);
+
+    virtual void actionsAfterTimeStep(BaseParticle* particle) const {};
 
 private:
 

@@ -115,7 +115,7 @@ public:
         insertionBoundary.setPSD({psd, psdB, psdC}, {0.9, 0.05, 0.05});
         //instead of inserting 1 particle per timestep, insert a a given flow rate, such as 0.001 m^3/s
         // insertionBoundary.setVolumeFlowRate(1e-3);
-        
+    
         //add the insertion boundary to the handler
         boundaryHandler.copyAndAddObject(insertionBoundary);
     }

@@ -119,7 +119,9 @@ public:
     void setMaxInteractionDistance(Mdouble interactionDistance=0);
     
     const BaseSpecies* getMixedSpecies(const ParticleSpecies* s) const;
-    
+
+    virtual void actionsAfterTimeStep(BaseParticle* particle) const {};
+
 private:
     
     /*!

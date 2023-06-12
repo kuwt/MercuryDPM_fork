@@ -23,46 +23,54 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <Species/LinearViscoelasticSpecies.h>
-#include "InteractionHandler.h"
-#include "Particles/ThermalParticle.h"
-#include "Interactions/BaseInteraction.h"
-#include "Species/ParticleSpecies.h"
-#include "ParticleHandler.h"
-#include "DPMBase.h"
+#ifndef MERCURYDPM_STRING_HELPERS_H
+#define MERCURYDPM_STRING_HELPERS_H
 
+#include "Math/ExtendedMath.h"
 
-/*!
- * \details Particle read function. Has an std::istream as argument, from which 
- *          it extracts the radius_, invMass_ and invInertia_, respectively. 
- *          From these the mass_ and inertia_ are deduced. An additional set of 
- *          properties is read through the call to the parent's method
- *          BaseParticle::read().
- * \param[in,out] is    input stream with particle properties.
- */
-void ThermalParticle::read(std::istream& is)
+#include <string>
+
+namespace helpers
 {
-    BaseParticle::read(is);
-    std::string dummy;
-    is >> dummy >> temperature_;
-}
+    /*!
+     * \brief returns the input string after converting upper-case characters to lower case
+     */
+    std::string lower(std::string s);
 
-void ThermalParticle::actionsAfterTimeStep()
-{
-    if (timeDependentTemperature_)
+    /*!
+     * \brief Reads a line from one stringstream into another, and prepares the latter for reading in.
+     */
+    void getLineFromStringStream(std::istream& in, std::stringstream& out);
+
+    bool isNext(std::istream& is, const std::string name);
+
+    /**
+     * \brief Checks if the next argument in the input stream is a certain string
+     */
+    bool compare(std::istream& is, std::string s);
+
+    /*!
+     * \brief converts a floating point number into a string with a given precision
+     */
+    std::string toString(Mdouble value, unsigned precision);
+    
+    template<typename T>
+    std::string toString(const T& n)
     {
-        temperature_ = timeDependentTemperature_(getHandler()->getDPMBase()->getTime());
+        std::ostringstream stm;
+        stm << n;
+        return stm.str();
     }
-    if (getSpecies()->getTemperatureDependentDensity())
+    
+    template<typename T>
+    std::string toString(const std::vector<T>& vec)
     {
-        const Mdouble density = getSpecies()->getTemperatureDependentDensity()(temperature_);
-        radius_ = getRadius() * cbrt(getMass() / (getVolume() * density));
+        std::ostringstream stm;
+        for (const auto val : vec) {
+            stm << val << ' ';
+        }
+        return stm.str();
     }
 }
 
-void ThermalParticle::setTimeDependentTemperature(const std::function<double(double)>& timeDependentTemperature)
-{
-    timeDependentTemperature_ = timeDependentTemperature;
-    temperature_ = timeDependentTemperature(0);
-    logger(INFO, "Setting initial temperature to %", temperature_);
-}
+#endif // MERCURYDPM_STRING_HELPERS_H

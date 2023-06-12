@@ -144,7 +144,6 @@ std::istream& operator>>(std::istream& in, MercuryParticle<NDIMS>& part)
 template<>
 std::istream& operator>><2>(std::istream& in, MercuryParticle<2>& part)
 {
-  std::size_t i;
   in >> part.position[0] >> part.position[2];
   part.position[1] = 0;
   

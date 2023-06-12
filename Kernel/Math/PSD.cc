@@ -34,6 +34,8 @@ PSD::PSD()
     for (auto& momenta: momenta_)
         momenta = 0;
     index_ = 0;
+    // default seed is zero for reproducibility
+    random_.setRandomSeed(0);
 }
 
 /*!
@@ -44,6 +46,7 @@ PSD::PSD(const PSD& other)
     particleSizeDistribution_ = other.particleSizeDistribution_;
     momenta_ = other.momenta_;
     index_ = other.index_;
+    random_ = other.random_;
 }
 
 /*!
@@ -111,10 +114,7 @@ void PSD::printPSD() const
 Mdouble PSD::drawSample()
 {
     // draw a number between 0 and 1, uniformly distributed
-    /// \todo TP: We should add a variable seed. Maybe make it definable by the user?
-    static std::mt19937 gen(0);
-    static std::uniform_real_distribution<Mdouble> dist(0, 1);
-    Mdouble prob = dist(gen);
+    Mdouble prob = random_.getRandomNumber(0, 1);
     // find the interval [low,high] of the psd in which the number sits
     auto high = std::lower_bound(particleSizeDistribution_.begin(), particleSizeDistribution_.end(), prob);
     auto low = std::max(particleSizeDistribution_.begin(), high - 1);
@@ -793,6 +793,22 @@ Mdouble PSD::getRadiusByQuantile(Mdouble quantile) const
     else
         return low->radius + (high->radius - low->radius) * (quantile - low->probability) /
                              (high->probability - low->probability);
+}
+
+/*!
+ * \details Calculates the quantile corresponding to a certain radius.
+ * @param radius The radius to find the quantile for.
+ * @return The quantile found.
+ */
+Mdouble PSD::getQuantileByRadius(Mdouble radius) const
+{
+    auto high = std::lower_bound(particleSizeDistribution_.begin(), particleSizeDistribution_.end(),
+                                 radius, [](const PSD::RadiusAndProbability& rp, Mdouble value){ return rp.radius < value; });
+    auto low = std::max(particleSizeDistribution_.begin(), high - 1);
+    if (high->radius == low->radius)
+        return high->probability;
+    else
+        return low->probability + (high->probability - low->probability) * (radius - low->radius) / (high->radius - low->radius);
 }
 
 /*!

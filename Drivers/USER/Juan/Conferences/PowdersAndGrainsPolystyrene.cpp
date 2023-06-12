@@ -38,7 +38,7 @@ public:
     explicit Calibration_Polystyrene(Mdouble radius) {
         //-----------------
         //Global parameters
-        std::string r = helpers::to_string(radius);
+        std::string r = helpers::toString(radius);
         setName("PowdersAndGrainsPolystyrene_" + r);
 
         setFileType(FileType::ONE_FILE);

@@ -23,13 +23,41 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef MECURYDPM_JONNYTOOLS_H
-#define MECURYDPM_JONNYTOOLS_H
+#include "Helpers/MiscHelpers.h"
+#include "Logger.h"
 
-#include <stdlib.h>
+#include <chrono>
 
-/* For use with qsort */
-int qsort_cmp(const void* x, const void* y)
+#ifdef __linux__
+#include <unistd.h>
+#endif
+
+/*!
+ * \note Not used function.
+ */
+void helpers::gnuplot(std::string command)
+{
+#ifdef __CYGWIN__
+    logger(WARN, "[helpers::gnuplot] is not supported on Cygwin");
+#elif _WIN32
+    logger(WARN, "[helpers::gnuplot] is not supported on Windows");
+#else
+    FILE* pipe = popen("gnuplot -persist", "w");
+    fprintf(pipe, "%s", command.c_str());
+    fflush(pipe);
+#endif
+}
+
+Mdouble helpers::getRealTime()
+{
+    // record start time
+    static auto start = std::chrono::steady_clock::now();
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> diff = end - start;
+    return diff.count();
+}
+
+int helpers::qSortCompare(const void* x, const void* y)
 {
     double xx = *(double*) x, yy = *(double*) y;
     if (xx < yy) return -1;
@@ -37,12 +65,13 @@ int qsort_cmp(const void* x, const void* y)
     return 0;
 }
 
-/* Returns the 100*perc-th percentile of array.
- * array should be sorted, e.g. 
- *   qsort(xs, n, sizeof(double), qsort_cmp);
- * and perc should be a number between 0 and 1. 
+/*!
+ * \brief Returns the 100*perc-th percentile of array.
+ * \details array should be sorted, e.g. 
+ *  qsort(xs, n, sizeof(double), qSortCompare);
+ *  and perc should be a number between 0 and 1. 
  */
-double getPercentile(const double* array, size_t nel, double perc)
+double helpers::getPercentile(const double* array, size_t nel, double perc)
 {
     size_t lower_ind = floor(perc * (nel - 1));
     size_t upper_ind = ceil(perc * (nel - 1));
@@ -50,9 +79,5 @@ double getPercentile(const double* array, size_t nel, double perc)
     double lower_x = array[lower_ind];
     double upper_x = array[upper_ind];
     double percentile = (1 - lambda) * lower_x + lambda * upper_x;
-    // fprintf(stderr, "nel %d perc %f lower_ind %d upper_ind %d lambda %f lower_x %f upper_x %f percentile %f\n", 
-    //         nel, perc, lower_ind, upper_ind, lambda, lower_x, upper_x, percentile);
     return percentile;
 }
-
-#endif

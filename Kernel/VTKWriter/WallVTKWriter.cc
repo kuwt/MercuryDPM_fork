@@ -68,7 +68,10 @@ void WallVTKWriter::writeVTK() const
     //    file << "</PointData>\n";
     file << "<Cells>\n";
     writeVTKCells(file, vtk);
-    file << "</Cells>\n"
+    file << "</Cells>\n";
+    file << "<CellData>\n";
+    writeVTKCellData(file, vtk);
+    file << "</CellData>\n"
          << "</Piece>\n"
          << "</UnstructuredGrid>\n"
          << "</VTKFile>\n";
@@ -128,4 +131,65 @@ void WallVTKWriter::writeVTKCells(std::fstream& file, VTKContainer& vtk) const
         }
     }
     file << "  </DataArray>\n";
+}
+
+void WallVTKWriter::writeVTKCellData(std::fstream& file, VTKContainer& vtk) const {
+    if(writeWallSurfaceAreaVTK_){
+        writeVTKSurfaceArea(file, vtk);
+    }
+}
+
+/*!
+ * \brief Calculates and writes the surface areas of the cells to the vtu file.
+ *
+ * \details The calculation is based on the rendered VTKContainer and it takes time.
+ * This functionality is diasabled by default and can be enabled using WallHandler::setWriteWallSurfaceAreaVTK().
+ *
+ * \param[in] file Output filestream
+ * \param[in] vtk Rendered VTKContainer
+ */
+void WallVTKWriter::writeVTKSurfaceArea(std::fstream& file, VTKContainer& vtk) const {
+    file << "  <DataArray type=\"Float32\"  Name=\"SurfaceArea\" format=\"ascii\">\n";
+    /**
+     * \todo gmb This only needs to be calculated if the mesh changes.
+     */
+    for (const std::vector<double>& strip : vtk.triangleStrips){
+        double area = 0;
+        for(size_t i = 1; i < strip.size() - 1; i++){
+            size_t i1 = static_cast<size_t>(strip.at(i-1));
+            size_t i2 = static_cast<size_t>(strip.at(i));
+            size_t i3 = static_cast<size_t>(strip.at(i+1));
+
+            /**
+             * \todo gmb Check if it always true.
+             */
+            // strip is a polygon
+            if(strip.front() == strip.back() && i == strip.size() - 2){
+                break;
+            }
+
+            Vec3D &p1 = vtk.points.at(i1);
+            Vec3D &p2 = vtk.points.at(i2);
+            Vec3D &p3 = vtk.points.at(i3);
+
+            Vec3D p12 = p2 - p1;
+            Vec3D p13 = p3 - p1;
+
+            double triangleArea = 0.5 * Vec3D::cross(p12, p13).getLength();
+            area += triangleArea;
+        }
+        file << '\t' << area << '\n';
+    }
+
+    file << "  </DataArray>\n";
+}
+
+void WallVTKWriter::setWriteWallSurfaceAreaVTK(bool writeWallSurfaceAreaVTK)
+{
+    writeWallSurfaceAreaVTK_ = writeWallSurfaceAreaVTK;
+}
+
+bool WallVTKWriter::getWriteWallSurfaceAreaVTK() const 
+{
+    return writeWallSurfaceAreaVTK_;
 }

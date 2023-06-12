@@ -241,7 +241,8 @@ public:
     { return overlap_; }
 
     /*!
-     * \brief Return a Double with the current volume of overlap betweent the two interacting objects.
+     * \brief Returns the overlap volume between two interacting objects.
+     * \warning Only works for spherical particles. Not implemented for walls. Returns nonsense when one particle is fully inside the other.
      */
     Mdouble getOverlapVolume() const;
     /*!

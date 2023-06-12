@@ -30,7 +30,7 @@
 #include <iomanip>
 #include <cassert>
 
-using helpers::to_string;
+using helpers::toString;
 using helpers::writeToFile;
 using helpers::readFromFile;
 
@@ -129,7 +129,8 @@ int main(int argc UNUSED, char *argv[] UNUSED)
     writeToFile("SinterBed1b.gnu",
                           "set xlabel 't'\n"
                           "set ylabel 'x/d'\n"
-                          "p '"+s.getName()+".fstat' u 1:(sqrt($7/"+to_string(2.0*s.particleHandler.getMeanRadius())+")), 0.3*x**0.5\n"
+                          "p '" + s.getName() + ".fstat' u 1:(sqrt($7/" +
+                                  toString(2.0 * s.particleHandler.getMeanRadius()) + ")), 0.3*x**0.5\n"
     );
 
     s.species->setSinterType(SINTERTYPE::CONSTANT_RATE);

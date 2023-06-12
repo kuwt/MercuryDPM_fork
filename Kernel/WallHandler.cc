@@ -516,3 +516,13 @@ std::unordered_map<WallHandler::DetailsVTKOptions, FileType> WallHandler::getWri
 {
     return writeDetailsVTK_;
 }
+
+void WallHandler::setWriteWallSurfaceAreaVTK(bool writeWallSurfaceAreaVTK)
+{
+    getDPMBase()->getWallVTKWriter().setWriteWallSurfaceAreaVTK(writeWallSurfaceAreaVTK);
+}
+
+bool WallHandler::getWriteWallSurfaceAreaVTK() const 
+{
+    return getDPMBase()->getWallVTKWriter().getWriteWallSurfaceAreaVTK();
+}

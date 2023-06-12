@@ -56,7 +56,7 @@ namespace SerializationWrappers {
 template<class Archive>
 void save(Archive& ar, const WallHandler& w) {
     ar ( cereal::make_size_tag(w.getNumberOfObjects()));
-    for (const auto& wall : w ) {
+    for (const auto& wall UNUSED : w ) {
         ar ( w );
     }
 }

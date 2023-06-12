@@ -5,21 +5,21 @@
 <Piece NumberOfPoints="3" NumberOfCells="0">
 <Points>
   <DataArray type="Float32" Name="Position" NumberOfComponents="3" format="ascii">
-	7.5728 6.09784 -1.94032
-	-0.914189 -3.69108 0.0764822
-	-0.0284043 -0.0603194 0.0505222
+	23.351 -14.1767 -3.90333
+	-0.0411989 -0.0490015 0.0081553
+	0.00435738 -0.0664869 0.0472269
   </DataArray>
 </Points>
 <PointData  Vectors="vector">
   <DataArray type="Float32" Name="Velocity" NumberOfComponents="3" format="ascii">
- 9.8173 4.1576 -2.624
- -8.3705 -37.1657 0.37228
- 2.45936 -0.519774 -0.925619
+ 52.6634 -34.3365 -8.93731
+ -0.239126 1.50293 0.520078
+ 0.213209 0.0147902 -0.177738
   </DataArray>
   <DataArray type="Float32" Name="AngularVelocity" NumberOfComponents="3" format="ascii">
-	8037.1 -2492.64 43129.6
-	1026.12 212.459 -9144.75
-	-169.362 -123.077 -321.219
+	55187.9 41893 373861
+	1009.23 -1028.61 2089.75
+	-270.297 127.306 -562.373
   </DataArray>
   <DataArray type="Float32" Name="Radius" format="ascii">
 	0.008
@@ -32,19 +32,24 @@
 	0
   </DataArray>
   <DataArray type="Float32" Name="fullLiquidVolume" format="ascii">
-	6.54319e-08
-	8.19043e-07
-	1.70813e-07
+	1.15379e-07
+	2.02821e-07
+	2.58231e-07
   </DataArray>
   <DataArray type="Float32" Name="liquidFilmVolume" format="ascii">
-	6.54319e-08
-	8.19043e-07
-	1.65813e-07
+	1.15379e-07
+	1.97821e-07
+	2.53231e-07
   </DataArray>
   <DataArray type="Float32" Name="liquidBridgeVolume" format="ascii">
 	0
-	0
 	5e-09
+	5e-09
+  </DataArray>
+  <DataArray type="Int32" Name="Id" format="ascii">
+	0
+	1
+	2
   </DataArray>
 </PointData>
 <Cells>

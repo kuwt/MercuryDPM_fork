@@ -384,9 +384,9 @@ std::ostream& operator<<(std::ostream& os, const NurbsSurface& a)
     os << "knotsV ";
     for (const auto k : a.knotsV_) os << k << ' ';
     os << "controlPoints ";
-    for (const auto cp0 : a.controlPoints_) for (const auto cp : cp0) os << cp << ' ';
+    for (const auto& cp0 : a.controlPoints_) for (const auto cp : cp0) os << cp << ' ';
     os << "weights ";
-    for (const auto w0 : a.weights_) for (const auto w : w0) os << w << ' ';
+    for (const auto& w0 : a.weights_) for (const auto w : w0) os << w << ' ';
     os << "closedInUV " << a.closedInU_ << ' ' << a.closedInV_;
     os << " periodicInUV " << a.periodicInU_ << ' ' << a.periodicInV_;
     return os;

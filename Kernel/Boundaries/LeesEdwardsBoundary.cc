@@ -204,7 +204,7 @@ void LeesEdwardsBoundary::shiftVerticalPosition(BaseParticle* p, bool positive)
  * \param[in] p         A pointer to the BaseParticle that is checked
  * \param[out] pH       A reference to the ParticleHandler where periodic copies will be added
  */
-void LeesEdwardsBoundary::createHorizontalPeriodicParticles(BaseParticle* p, ParticleHandler& pH)
+void LeesEdwardsBoundary::createHorizontalPeriodicParticle(BaseParticle* p, ParticleHandler& pH)
 {
     bool positive;      // TRUE if the particle is closest to the left boundary 
     // wall (set by getVerticalDistance in the following if-statement)
@@ -229,8 +229,8 @@ void LeesEdwardsBoundary::createHorizontalPeriodicParticles(BaseParticle* p, Par
         shiftHorizontalPosition(F0, positive);
         
         // NB: No extra creation of possible vertical copies of the horizontal copy 
-        // here (as compared to createVerticalPeriodicParticles), because these would
-        // overlap with the extra creation of horizontal copies in createVerticalPeriodicParticles.
+        // here (as compared to createVerticalPeriodicParticle), because these would
+        // overlap with the extra creation of horizontal copies in createVerticalPeriodicParticle.
     }
 }
 
@@ -242,7 +242,7 @@ void LeesEdwardsBoundary::createHorizontalPeriodicParticles(BaseParticle* p, Par
  * \param[in] p         A pointer to the BaseParticle that is checked
  * \param[out] pH       A reference to the ParticleHandler where periodic copies will be added
  */
-void LeesEdwardsBoundary::createVerticalPeriodicParticles(BaseParticle* p, ParticleHandler& pH)
+void LeesEdwardsBoundary::createVerticalPeriodicParticle(BaseParticle* p, ParticleHandler& pH)
 {
     bool positive;      // TRUE if the particle is closest to the bottom boundary 
     // wall (set by getVerticalDistance in the following if-statement)
@@ -270,7 +270,7 @@ void LeesEdwardsBoundary::createVerticalPeriodicParticles(BaseParticle* p, Parti
         
         // Create horizontal periodic copies of the copy particle, if needed (i.e.,
         // if the original particle is in one of the boundary corners).
-        createHorizontalPeriodicParticles(pH.getLastObject(), pH);
+        createHorizontalPeriodicParticle(pH.getLastObject(), pH);
     }
 }
 
@@ -281,8 +281,8 @@ void LeesEdwardsBoundary::createVerticalPeriodicParticles(BaseParticle* p, Parti
  */
 void LeesEdwardsBoundary::createPeriodicParticle(BaseParticle* p, ParticleHandler& pH)
 {
-    createVerticalPeriodicParticles(p, pH);
-    createHorizontalPeriodicParticles(p, pH);
+    createVerticalPeriodicParticle(p, pH);
+    createHorizontalPeriodicParticle(p, pH);
 }
 
 void LeesEdwardsBoundary::createPeriodicParticles(ParticleHandler& pH)

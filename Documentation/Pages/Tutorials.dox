@@ -1572,10 +1572,10 @@ class Demo : public Mercury3D {
   }
 };
 
-int main() {
+int main(int argc, char** argv) {
   Demo problem;
   //define contact law, time step, final time, domain size here
-  problem.solve();
+  problem.solve(argc, argv);
 }
 \endcode
 
@@ -1605,29 +1605,30 @@ Next, we set the number of threads to run in parallel for the program by calling
 
 ...
 
-int main() {
+int main(int argc, char** argv) {
   Demo problem;
   ...
   //Set the number of threads (cores) for the identity-based OpenMP framework   
   problem.setNumberOfOMPThreads(4);
-  problem.solve();
+  problem.solve(argc, argv);
 }
 \endcode
 
 
 After adding the above modifications, the simulation will be executed in parallel, with only one additional line included to the main() function.
 
-Alternatively, you can set the number of OMP threads  using a command-line argument that is passed through helpers::readFromCommandLine(...) function:
+Alternatively, you can set the number of OMP threads using a command-line argument that is passed through helpers::readFromCommandLine(...) function:
 \code
 
 ...
 
-int main() {
+int main(int argc, char** argv) {
   Demo problem;
   ...
   // command line arguments:
   problem.setNumberOfOMPThreads(helpers::readFromCommandLine(argc, argv, "-omp",1));
-  problem.solve();
+  helpers::removeFromCommandline(argc, argv, "-omp", 1);
+  problem.solve(argc, argv);
 }
 \endcode
 
@@ -1635,6 +1636,25 @@ In that case, the number of threads is set at execution-time via the command lin
 
 \code
 time ./Demo -test -omp 4  
+\endcode
+
+Or you can use helpers::getMaximumNumberOfOMPThreads() the get the number of available OpenMP threads:
+\code
+
+...
+
+int main(int argc, char** argv) {
+  Demo problem;
+  ...
+  problem.setNumberOfOMPThreads(helpers::getMaximumNumberOfOMPThreads());
+  problem.solve(argc, argv);
+}
+\endcode
+
+In this case, the number of threads is set at execution-time automatically:
+
+\code
+time ./Demo -test  
 \endcode
 
 For an example of an OpenMP-ready code, see /Drivers/MercurySimpleDemos/FreeCooling2DinWallsDemo.cpp.

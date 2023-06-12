@@ -33,6 +33,7 @@
 #include <random>
 #include "iostream"
 #include "ExtendedMath.h"
+#include "RNG.h"
 
 using mathsFunc::square;
 using mathsFunc::cubic;
@@ -262,6 +263,11 @@ public:
     Mdouble getRadiusByQuantile(Mdouble quantile) const;
 
     /*!
+     * \brief Calculates the quantile corresponding to a certain radius.
+     */
+    Mdouble getQuantileByRadius(Mdouble radius) const;
+
+    /*!
      * \brief get a volumetric mean radius of the PSD.
      */
     Mdouble getVolumetricMeanRadius() const;
@@ -285,22 +291,31 @@ public:
      * \brief compute central momenta of the user defined PSD.
      */
     void computeCentralMomenta();
-
+    
     /*!
      * \brief compute standardised momenta of the user defined PSD.
      */
     void computeStandardisedMomenta();
-
+    
     /*!
      * \brief get momenta of the user defined PSD.
      */
     std::array<Mdouble, 6> getMomenta() const;
-
+    
+    /*!
+     * \brief set a fixed seed for the random number generator; this is used for the PSDSelfTest to reproduce results
+     */
+    void setFixedSeed(int seed)
+    {
+//        random_.setLinearCongruentialGeneratorParmeters(0,0,1);
+        random_.setRandomSeed(seed);
+    }
+    
     /*!
      * \brief determines if a certain value of the PSD vector is lower than another one. Used for std::lower_bound()
      */
     friend bool operator<(const PSD::RadiusAndProbability& l, const PSD::RadiusAndProbability& r);
-
+    
     /*!
      * \brief determines if a certain value of the PSD vector is lower than a double.
      */
@@ -339,7 +354,7 @@ private:
      * 12 consists of particles between size class 12 and 11 of the PDF)
      */
     std::vector<int> nParticlesPerClass_;
-
+    
     /*!
      * Vector of doubles which stores the volume of inserted particles for each size class. This vector is used in
      * the insertManuallyByVolume() function to check if the volumeAllowed per class is exceeded and thus no further
@@ -353,6 +368,11 @@ private:
      * Integer which determines the class in which a particle has to be inserted for the manual insertion routine.
      */
     int index_;
+    
+    /*!
+     * Mercury random number generator object used to draw random numbers from a random initial seed
+     */
+    RNG random_;
 };
 
 

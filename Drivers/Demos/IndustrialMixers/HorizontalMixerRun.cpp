@@ -2,7 +2,7 @@
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 #include "HorizontalMixer.h"
 
-int main()
+int main(int argc, char* argv[])
 {
     Mdouble revolutionsPerSecond = 0.25;
     Mdouble rotationSpeed = 0.1*constants::pi*revolutionsPerSecond;
@@ -15,7 +15,7 @@ int main()
     mixer.setName("HorizontalMixer");
 
     //remove old files (note this is a bit dangerous)
-    mixer.removeOldFiles();
+//    mixer.removeOldFiles();
 
     //set species
     auto s = mixer.speciesHandler.copyAndAddObject(LinearViscoelasticSlidingFrictionSpecies());
@@ -35,7 +35,7 @@ int main()
     mixer.setTimeMax(100);
     mixer.writeScript();
     
-    mixer.solve();
+    mixer.solve(argc, argv);
     
     return 0;
 }

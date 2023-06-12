@@ -213,14 +213,12 @@ bool HorizontalScrew::getDistanceAndNormal(const BaseParticle& p, Mdouble& dista
             return false;
         //... or we have to compute the contact around the edge
         r = mathsFunc::sign(r) * maxR;
-        unsigned int steps = 0;
         //This case reduces to the coil problem
         do
         {
             dd = -4.0 * R * r * constants::pi * n_ * sin(A - 2.0 * constants::pi * (n_ * q + offset_)) - 2.0 * l_ * (Z - q * l_);
             ddd = 8.0 * R * r * constants::sqr_pi * n_ * n_ * cos(A - 2.0 * constants::pi * (n_ * q + offset_)) + 2.0 * l_ * l_;
             q -= dd / ddd;
-            steps++;
         } while (fabs(dd / ddd) > 1e-14);
     }
     //Second possibility is that it occurred before the start of after the end
@@ -369,8 +367,6 @@ void HorizontalScrew::writeVTK (VTKContainer& vtk) const
         }
     }
 
-    unsigned nCells = vtk.triangleStrips.size();
-    //vtk.triangleStrips.reserve(nCells+(nz-1));
     for (unsigned iz=0; iz<nz-1; iz++) {
         std::vector<double> cell;
         cell.reserve(2*nr);

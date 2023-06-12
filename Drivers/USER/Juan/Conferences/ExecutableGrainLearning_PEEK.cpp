@@ -39,10 +39,10 @@ public:
 
         //-----------------
         //Global parameters
-        std::string r = helpers::to_string(radius);
-        std::string sint = helpers::to_string(tsintering);
-        std::string mtc1 = helpers::to_string(materialC1);
-        std::string sDc = helpers::to_string(separationDc);
+        std::string r = helpers::toString(radius);
+        std::string sint = helpers::toString(tsintering);
+        std::string mtc1 = helpers::toString(materialC1);
+        std::string sDc = helpers::toString(separationDc);
 
         setName("Test_" + sint + "_" + mtc1);
 

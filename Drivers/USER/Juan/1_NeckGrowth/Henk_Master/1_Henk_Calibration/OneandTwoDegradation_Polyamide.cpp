@@ -37,7 +37,7 @@ public:
     explicit DegradationTest(Mdouble radius) {
         //-----------------
         //Global parameters
-        std::string r = helpers::to_string(radius);
+        std::string r = helpers::toString(radius);
         setName("SecondDegradationTest" + r);
 
         setFileType(FileType::ONE_FILE);

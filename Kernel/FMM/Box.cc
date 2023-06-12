@@ -118,23 +118,23 @@ void Box::computeFlow(int k)
     downwardPass();
     
     //For all panels on the finest level
-    for (Panel* panel : levels_[maxLevel_])
-    {
+    //for (Panel* panel : levels_[maxLevel_])
+    //{
         //For all dipoles on the finest level
-        for (Dipole* iD : panel->getDipoles())
-        {
+        //for (Dipole* iD : panel->getDipoles())
+        //{
             // Add a multipole in the domain
             //Multipole* multipole = new Multipole(iD->getP, iD->getSquaredFactorials, iD->getLocation());
             //panel->multipoles_.push_back(multipole);
-            
+
             // Construct a sphere
             //Sphere* sphere = new Sphere(panel, iD->getLocation(), iD, multipole);
-            
+
             // Add the sphere to the list of spheres and to the panel list
             //spheres_.push_back(sphere);
             //spheres_.push_back(sphere);
-        }
-    }
+        //}
+    //}
     
     //***********************************
     //* 	Compue Mirror Multipoles	*
@@ -151,7 +151,7 @@ void Box::computeFlow(int k)
             for (Sphere* sphere : panel->getSpheres())
             {
                 std::vector<std::complex<Mdouble>> localExpansionAroundSphere;
-                Vec3D sphereCentre = sphere->getLocation();
+                //Vec3D sphereCentre = sphere->getLocation();
                 
                 // Compute panel local expansion around sphere
                 //localExpansionAroundSphere = panel->localExpansionAroundCentre_->translateLocalExpansion(sphereCentre);
@@ -168,14 +168,14 @@ void Box::computeFlow(int k)
                 // Compute multipole
                 size_t nTerms = (p_ + 1) * (p_ + 1);
                 NumericalVector<std::complex<Mdouble>> multipoleExpansionCoefficients(nTerms);
-                for (int n = 0; n <= p_; n++)
-                {
-                    for (int m = -n; m <= n; m++)
-                    {
-                        int location = n * n + (m + n);
+                //for (int n = 0; n <= p_; n++)
+                //{
+                    //for (int m = -n; m <= n; m++)
+                    //{
+                        //int location = n * n + (m + n);
                         //multipoleExpansionCoefficients[location] = localExpansionAroundSphere[0]*n/(n+1)*std::pow(sphere->getRadius,2n+1);
-                    }
-                }
+                    //}
+                //}
                 //sphere->multipole_->setExpansionCoefficients(multipoleExpansionCoefficients);
             }
         }

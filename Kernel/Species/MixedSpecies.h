@@ -166,7 +166,7 @@ void MixedSpecies<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies
     auto* s = dynamic_cast<MixedSpecies<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>*>(bs);
     if (s == nullptr)
     {
-        logger(WARN, "Error in %::copyInto: copying of % failed", getName(), s->getName());
+        logger(WARN, "Error in %::copyInto: copying of species failed", getName());
         return;
     }
     *s = *this;

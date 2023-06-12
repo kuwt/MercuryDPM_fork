@@ -146,7 +146,7 @@ void WearableNurbsWall::write(std::ostream& os) const
     os << " Debris ";
     os << "nu " << localDebris_.size() << ' ';
     os << "nv " << localDebris_[0].size() << ' ';
-    for (const auto d0 : localDebris_) for (const auto d : d0) os << d << ' ';
+    for (const auto& d0 : localDebris_) for (const auto d : d0) os << d << ' ';
 }
 
 std::string WearableNurbsWall::getName() const

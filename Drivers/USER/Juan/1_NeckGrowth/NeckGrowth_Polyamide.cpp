@@ -310,7 +310,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 //    explicit powdersAndgrains(Mdouble radius) {
 //        //-----------------
 //        //Global parameters
-//        std::string r = helpers::to_string(radius);
+//        std::string r = helpers::toString(radius);
 //        setName("NeckGrowthPolyamide12_" + r);
 //
 //        setFileType(FileType::ONE_FILE);

@@ -36,7 +36,7 @@ class SinterPair : public Mercury3D
 public:
     explicit SinterPair (Mdouble radius)
     {
-        std::string r = helpers::to_string(radius);
+        std::string r = helpers::toString(radius);
         setName("SinterPair"+r);
         helpers::writeToFile("SinterPair"+r+".gnu",
                              "set xlabel 'time [s]'\n"

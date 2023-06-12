@@ -150,7 +150,7 @@ public:
             logger(WARN,"Center of mass (% %) is not in fourth quadrant, setting angle to 90",com.X,com.Z);
             angle_drum=90;
         }
-        helpers::writeToFile(getName()+".txt", helpers::to_string(angle_drum));
+        helpers::writeToFile(getName()+".txt", helpers::toString(angle_drum));
     }
 };
 

@@ -69,7 +69,7 @@ public:
     /*!
      * \brief Sets boundary position based on a normal and distance.
      */
-    virtual void set(const Vec3D& normal, Mdouble distance);
+    void set(const Vec3D& normal, Mdouble distance);
     
     /*!
      * \brief Sets the boundary's distance property to the given one.

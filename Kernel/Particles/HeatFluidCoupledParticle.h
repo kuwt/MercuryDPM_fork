@@ -27,73 +27,57 @@
 #define HeatFluidCoupledParticle_H
 
 #include "ThermalParticle.h"
+#include "LiquidFilmParticle.h"
 
 /*!
- * \class HeatFluidCoupledParticle
- * \brief Class that implements particles which store both temperature/heat capacity and liquid content
+ * \class HeatFluidCoupled
+ * \brief Class of particles that store both temperature and liquid volume,
  *        which is adapted for the CFD-DEM studies.
  * \details In some CFD-DEM studies, a drying process needs to be simulated.
- *          Therefore, we selected the drying model of Azmir et al. (2018), which considers heat and mass transfer.
- *          Their model considers convection, conduction, radiation, and evaporation.
- *          Conduction and convection had already been implemented in ThermalParticle class.
+ *          Therefore, we selected the drying/liquid evaporation model of Azmir et al. (2018),
+ *          which considers heat and mass transfer between the liquid film on the particles and the surrounding air.
+ *          Their model considers convection, conduction, radiation of heat, and evaporation of liquid.
+ *          Conduction is already implemented in ThermalParticles, from which this class derives;
+ *          convection and radiation is still missing.
  *          This class implements evaporation model.
  */
-class HeatFluidCoupledParticle final : public ThermalParticle
+template<class Particle>
+class HeatFluidCoupled final : public Thermal<LiquidFilm<Particle>>
 {
 public:
     /*!
-     * \brief HeatFluidCoupledParticle constructor creates a HeatFluidCoupledParticle at (0,0,0) with radius,
+     * \brief HeatFluidCoupled constructor creates a HeatFluidCoupled at (0,0,0) with radius,
      *        mass and inertia equal to 1.
      */
-    HeatFluidCoupledParticle()
-    {
-        liquidVolume_ = 0;
-    }
+    HeatFluidCoupled() = default;
 
     /*!
-     * \brief HeatFluidCoupledParticle copy constructor, which accepts as input a reference to a HeatFluidCoupledParticle.
-     *        It creates a copy of this HeatFluidCoupledParticle and all it's information.
+     * \brief HeatFluidCoupled copy constructor, which accepts as input a reference to a HeatFluidCoupled.
+     *        It creates a copy of this HeatFluidCoupled and all it's information.
      *        Usually it is better to use the copy() function for polymorphism.
      * \details Constructor that copies most of the properties of the given particle.
      *          Please note that not everything is copied, for example the position
      *          in the HGrid is not determined yet by the end of this constructor.
      *          It also does not copy the interactions and the pointer to the handler
      *          that handles this particle. Use with care.
-     * \param[in,out] p  Reference to the HeatFluidCoupledParticle this one should become a copy of.
+     * \param[in,out] p  Reference to the HeatFluidCoupled this one should become a copy of.
      */
-    HeatFluidCoupledParticle(const HeatFluidCoupledParticle& p)
-    {
-        liquidVolume_ = p.liquidVolume_;
-    }
+    HeatFluidCoupled(const HeatFluidCoupled& p) = default;
 
     /*!
-     * \brief HeatFluidCoupledParticle destructor, needs to be implemented and checked if it removes tangential spring information.
+     * \brief HeatFluidCoupled destructor, needs to be implemented and checked if it removes tangential spring information.
      * \details Destructor that asks the ParticleHandler to check if this was the smallest or largest particle and adjust itself accordingly.
      */
-    ~HeatFluidCoupledParticle() override
-    = default;
+    ~HeatFluidCoupled() override = default;
 
     /*!
-     * \brief HeatFluidCoupledParticle copy method. Use copy constructor of this HeatFluidCoupledParticle to create a copy on the heap,
+     * \brief HeatFluidCoupled copy method. Use copy constructor of this HeatFluidCoupled to create a copy on the heap,
      *        useful for polymorphism.
      *\return pointer to the particle's copy.
      */
-    HeatFluidCoupledParticle* copy() const override
+    HeatFluidCoupled* copy() const override
     {
-        return new HeatFluidCoupledParticle(*this);
-    }
-
-    /*!
-     * \brief HeatFluidCoupledParticle write function, writes HeatFluidCoupledParticle information to the given output-stream,
-     *        for example a restart-file.
-     * \details HeatFluidCoupledParticle print method, which accepts an os std::ostream as input.
-     *          It prints human readable HeatFluidCoupledParticle information to the std::ostream.
-     * \param[in,out] os    stream to which the info is written.
-     */
-    void write(std::ostream& os) const override
-    {
-        ThermalParticle::write(os);
-        os << " liquidVolume " << liquidVolume_;
+        return new HeatFluidCoupled<Particle>(*this);
     }
 
     /*!
@@ -104,67 +88,48 @@ public:
     {
         return "HeatFluidCoupledParticle";
     }
+    /// Tells the vtkWriter how many fields should be written for this particle type.
+    unsigned getNumberOfFieldsVTK() const override { return 4; }
 
-    /*!
-     * \brief HeatFluidCoupledParticle read function, reads in the information for this HeatFluidCoupledParticle from the given input-stream,
-     *        for example a restart file.
-     */
-    void read(std::istream& is) override;
+    /// Tells the vtkWriter the type of each field written for this particle type.
+    std::string getTypeVTK(unsigned) const override { return "Float32"; }
 
-    /*!
-     * \brief Returns the volume of the Liquid.
-     * \return The actual volume of the liquid.
-     */
-    Mdouble getLiquidVolume() const
-    {
-        return liquidVolume_;
+    /// Tells the vtkWriter the name of each field written for this particle type.
+    std::string getNameVTK(unsigned i) const override {
+        if (i==1)
+            return "liquidFilmVolume";
+        else if (i==2)
+            return "liquidBridgeVolume";
+        else if (i==0)
+            return "fullLiquidVolume";
+        else /* i=3 */
+            return "temperature";
     }
 
-    /*!
-     * \brief Sets the volume of the Liquid.
-     */
-    void setLiquidVolume(Mdouble liquidVolume)
-    {
-        liquidVolume_ = liquidVolume;
+    /// Tells the vtkWriter the value of each field written for this particle type.
+    std::vector<Mdouble> getFieldVTK(unsigned i) const override {
+        if (i==1) {
+            return {this->liquidVolume_};
+        } else if (i==2 || i==0) {
+            Mdouble fullLiquidVolume = (i==2)?0:this->liquidVolume_;
+            for (auto k : this->getInteractions()) {
+                auto j = dynamic_cast<LiquidMigrationWilletInteraction*>(k);
+                if (j) {
+                    fullLiquidVolume += 0.5*j->getLiquidBridgeVolume();
+                }
+            }
+            return {fullLiquidVolume};
+        } else {
+            return {this->temperature_};
+        }
     }
 
-    /*!
-     * \brief Adds the volume of the Liquid.
-     */
-    void addLiquidVolume(Mdouble liquidVolume)
-    {
-        liquidVolume_ += liquidVolume;
+    /// The actionAfterTimeStep is defined in the species, as we cannot extract the species properties of a HeatFluidCoupled*Species
+    void actionsAfterTimeStep() override {
+        this->getSpecies()->actionsAfterTimeStep(this);
     }
-
-    unsigned getNumberOfFieldsVTK() const override
-    {
-        return 4;
-    }
-
-    std::string getTypeVTK(unsigned i) const override
-    {
-        return "Float32";
-    }
-
-    std::string getNameVTK(unsigned i) const override;
-
-    std::vector<Mdouble> getFieldVTK(unsigned i) const override;
-
-    bool isSphericalParticle() const override {return true;}
-
-    void actionsAfterTimeStep() override;
-
-private:
-
-    /// f1 is used in Runge–Kutta method.
-    double f1(double liquidVolume,double temperature);
-
-    /// f2 is used in Runge–Kutta method.
-    double f2(double liquidVolume,double temperature);
-
-    //Volume of the liquid
-    Mdouble liquidVolume_;
-
 };
 
+/// Template specialisation of HeatFluidCoupled<Particle> for spherical particles.
+typedef HeatFluidCoupled<SphericalParticle> HeatFluidCoupledParticle;
 #endif

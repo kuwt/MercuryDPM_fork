@@ -7,7 +7,7 @@
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Math/RNG.h"
 #include "Math/ExtendedMath.h"
-#include "Math/JonnyTools.h"
+#include "Helpers/Helpers.h"
 #include "File.h"
 #include <iostream>
 #include <cassert>
@@ -157,10 +157,10 @@ class AvalancheTest2D : public Mercury2D
             double theta;
             if (n > 0)
             {
-                qsort(rs, n, sizeof(double), qsort_cmp);
-                qsort(ys, n, sizeof(double), qsort_cmp);
+                qsort(rs, n, sizeof(double), helpers::qSortCompare);
+                qsort(ys, n, sizeof(double), helpers::qSortCompare);
                 double perc = 0.99;
-                height = getPercentile(ys, n, perc);
+                height = helpers::getPercentile(ys, n, perc);
                 theta = atan(height / (pars.baseRadius - pars.releaseRadius));
             }
             else

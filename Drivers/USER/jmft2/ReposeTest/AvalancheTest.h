@@ -6,7 +6,7 @@
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Math/RNG.h"
 #include "Math/ExtendedMath.h"
-#include "Math/JonnyTools.h"
+#include "Helpers/Helpers.h"
 #include "File.h"
 #include <iostream>
 #include <cassert>
@@ -242,13 +242,13 @@ class AvalancheTest : public Mercury3D
             double height, spread, theta;
             if (n > 0)
             {
-                qsort(rs, n, sizeof(double), qsort_cmp);
-                qsort(zs, n, sizeof(double), qsort_cmp);
+                qsort(rs, n, sizeof(double), helpers::qSortCompare);
+                qsort(zs, n, sizeof(double), helpers::qSortCompare);
 
                 double perc = 0.99;
-                spread = getPercentile(rs, n, perc);
+                spread = helpers::getPercentile(rs, n, perc);
                 // spread = pars.radiusDisc;
-                height = getPercentile(zs, n, perc);
+                height = helpers::getPercentile(zs, n, perc);
                 // fprintf(stdout, "length %f height %f\n", length, height);
                 theta = atan(height/spread);
             }

@@ -5,7 +5,7 @@
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Math/RNG.h"
 #include "Math/ExtendedMath.h"
-#include "Math/JonnyTools.h"
+#include "Helpers/Helpers.h"
 #include "File.h"
 #include <iostream>
 #include <cassert>
@@ -206,12 +206,12 @@ class ReposeHeapTest : public Mercury3D
                 // fprintf(stdout, "i %d z %f\n", i, zs[i]);
                 i++;
             }
-            qsort(xs, n, sizeof(double), qsort_cmp);
-            qsort(zs, n, sizeof(double), qsort_cmp);
+            qsort(xs, n, sizeof(double), helpers::qSortCompare);
+            qsort(zs, n, sizeof(double), helpers::qSortCompare);
 
             double perc = 0.99;
-            double length = 0.5 * (getPercentile(xs, n, perc) - getPercentile(xs, n, 1-perc));
-            double height = getPercentile(zs, n, 1);
+            double length = 0.5 * (helpers::getPercentile(xs, n, perc) - helpers::getPercentile(xs, n, 1-perc));
+            double height = helpers::getPercentile(zs, n, 1);
             // fprintf(stdout, "length %f height %f\n", length, height);
             free(xs); free(zs);
             return atan(height / length);

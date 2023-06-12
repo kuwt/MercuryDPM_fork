@@ -233,6 +233,8 @@ public:
 
     BaseWall* getRenderedWall(size_t i) const;
 
+    std::vector<BaseWall*> getRenderedWalls() const;
+
     void removeRenderedWalls();
 
     void renderWall(VTKContainer& vtk);

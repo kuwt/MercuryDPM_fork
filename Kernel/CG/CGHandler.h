@@ -47,7 +47,7 @@ class DPMBase;
  * \todo take out dependence on DPMBase::statFile (i.e. the savecount) 
  * \todo TW note, to keep the code working on Windows:
  * - std::exit requires correct header cstdlib, 
- * - don't use to_string
+ * - don't use toString
  * (thanks to Silvia for debugging)
  */
 

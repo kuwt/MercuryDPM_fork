@@ -143,7 +143,7 @@ void ChuteWithHopper::setupInitialConditions()
     
     PSD psd;
     psd.setDistributionUniform(getMinInflowParticleRadius(), getMaxInflowParticleRadius(), 50);
-    
+
     HopperInsertionBoundary b1;
     b1.set(p1, getMaxFailed(), getYMin(), getYMax(), getChuteAngle(),
            getFixedParticleRadius(), isHopperCentred_, hopperDimension_, hopperAngle_, hopperLength_,

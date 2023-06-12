@@ -267,7 +267,7 @@ int main(int argc UNUSED, char *argv[] UNUSED)
 //    explicit Calibration_Polystyrene(Mdouble radius) {
 //        //-----------------
 //        //Global parameters
-//        std::string r = helpers::to_string(radius);
+//        std::string r = helpers::toString(radius);
 //        setName("NeckGrowth_Polystyrene");
 //
 //        setFileType(FileType::ONE_FILE);

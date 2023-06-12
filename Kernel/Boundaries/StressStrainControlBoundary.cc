@@ -165,7 +165,6 @@ void StressStrainControlBoundary::determineLengthAndCentre()
 void StressStrainControlBoundary::computeStrainRate()
 {
     // calculate the stress total and average over the volume
-    const Mdouble timeStep = getHandler()->getDPMBase()->getTimeStep();
     Matrix3D stress = getHandler()->getDPMBase()->getTotalStress();
 
     // controller

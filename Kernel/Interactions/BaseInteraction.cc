@@ -270,13 +270,13 @@ InteractionHandler* BaseInteraction::getHandler() const
 }
 
 /*!
-    * \details Converts the linear overlap in the corrct volume overlap i.e. this is not the spherical cap approximation
-    * Please see additional docs directory for the calculation of this and the mathematica file with the calulation in
+    * \details Converts the linear overlap in the correct volume overlap i.e. this is the spherical cap approximation
+    * Please see additional docs directory for the calculation of this and the mathematica file with the calculation in
     * @return The volume of the overlap between the two objects in the interaction
     */
 Mdouble BaseInteraction::getOverlapVolume() const
 {
-    logger(WARN,"This function is only tested for spheres and (may) give the wrong answer for other objects");
+    //logger(WARN,"This function is only tested for spheres and (may) give the wrong answer for other objects");
     //First get overlap and radii of each object
     Mdouble delta = getOverlap();
     Mdouble curvatureParticle=getP()->getCurvature(getP()->getPosition());
@@ -284,7 +284,7 @@ Mdouble BaseInteraction::getOverlapVolume() const
 
     if (curvatureInteractable == 0)
     {
-        logger(ERROR,"This function is not implement for walls yet and will return 0");
+        logger(WARN,"This function is not implemented for walls yet and will return 0");
         return 0;
     }
     else
@@ -292,23 +292,24 @@ Mdouble BaseInteraction::getOverlapVolume() const
         Mdouble r1=1.0/curvatureInteractable;
         Mdouble r2=1.0/curvatureParticle;
 
+        if (delta > 2.0 * r1 || delta > 2.0 * r2)
+            logger(WARN, "Warning in BaseInteraction::getOverlapVolume: One of the particles is fully inside the other. The calculations are undefined for this case and will return nonsensical values.");
+
         //Eq (2.1) - see doc
-        logger(WARN,"Radius of first object % and second object %",r1,r2);
+//        logger(WARN,"Radius of first object % and second object %",r1,r2);
         Mdouble t1=(r2-delta/2.0)/(r1+r2-delta)*delta;
         //Eq (2.2) - see doc
         Mdouble t2=(r1-delta/2.0)/(r1+r2-delta)*delta;
 
         //Eq (2.3) - see doc
         Mdouble V=constants::pi*(
-                std::pow(r1,2.0)*t1
-                -std::pow(t1,3.0)
-                +std::pow(r2,2.0)*t2
+                std::pow(t1,2.0)*r1
+                -std::pow(t1,3.0)/3.0
+                +std::pow(t2,2.0)*r2
                 -std::pow(t2,3.0)/3.0
                 );
 
         return V;
-
-
     }
 
 return 0;
@@ -910,8 +911,7 @@ void BaseInteraction::setMPIInteraction(void* historyDataArray, unsigned int ind
 void* BaseInteraction::createMPIInteractionDataArray(unsigned int numberOfInteractions) const
 {
     logger(ERROR, "BaseInteraction::createMPIInteractionDataArray should never be called");
-    void* historyArray;
-    return historyArray;
+    return nullptr;
 }
 
 void BaseInteraction::deleteMPIInteractionDataArray(void* dataArray)

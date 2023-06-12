@@ -105,6 +105,7 @@ void IntersectionOfWalls::clear()
     A_.clear();
     AB_.clear();
     C_.clear();
+    removeRenderedWalls();
 }
 
 void IntersectionOfWalls::setHandler(WallHandler* wallHandler)
@@ -451,7 +452,7 @@ void IntersectionOfWalls::setPointsAndLines(unsigned int n)
  */
 void IntersectionOfWalls::addObject(Vec3D normal, Mdouble position)
 {
-    logger(WARN, "This function is deprecated, use IntersectionOfWalls::addObject(Vec3D, Vec3D) instead.");
+    //logger(WARN, "This function is deprecated, use IntersectionOfWalls::addObject(Vec3D, Vec3D) instead.");
     addObject(normal, position * normal);
 }
 

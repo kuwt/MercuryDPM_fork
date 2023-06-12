@@ -105,7 +105,7 @@ public:
                               "set logscale y\n"
                               "set xlabel 't'\n"
                               "set ylabel 'x/a'\n"
-                              "p '"+getName()+".fstat' u 1:(sqrt($7/"+helpers::to_string(2.0*getXMax())+")) title 'x/d', 0.3*x**(1./"+(species->getSinterType()==SINTERTYPE::PARHAMI_MCKEEPING?'6':'2')+")\n"
+                              "p '" + getName() + ".fstat' u 1:(sqrt($7/" + helpers::toString(2.0 * getXMax()) + ")) title 'x/d', 0.3*x**(1./" + (species->getSinterType() == SINTERTYPE::PARHAMI_MCKEEPING ? '6' : '2') + ")\n"
         );
 
     }

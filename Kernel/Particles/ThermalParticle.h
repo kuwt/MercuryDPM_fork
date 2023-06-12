@@ -25,21 +25,21 @@
 
 #ifndef ThermalParticle_H
 #define ThermalParticle_H
-
-#include "BaseParticle.h"
+#include "DPMBase.h"
 
 /*!
- * \class ThermalParticle
+ * \class Thermal
  * \brief
  */
-class ThermalParticle : public BaseParticle
+template<class Particle>
+class Thermal : public Particle
 {
 public:
     /*!
      * \brief Basic Particle constructor, creates a particle at (0,0,0) with radius, mass and inertia equal to 1.
      * \details default constructor
      */
-    ThermalParticle()
+    Thermal()
     {
         temperature_ = 0;
         //temperatureDependentDensity_
@@ -52,9 +52,9 @@ public:
      *          in the HGrid is not determined yet by the end of this constructor.
      *          It also does not copy the interactions and the pointer to the handler
      *          that handles this particle. Use with care.
-     * \param[in,out] p  Reference to the ThermalParticle this one should become a copy of.
+     * \param[in,out] p  Reference to the Thermal this one should become a copy of.
      */
-    ThermalParticle(const ThermalParticle& p) : BaseParticle(p)
+    Thermal(const Thermal& p) : Particle(p)
     {
         temperature_ = p.temperature_;
         timeDependentTemperature_ = p.timeDependentTemperature_;
@@ -65,7 +65,7 @@ public:
      * \details Destructor. It asks the ParticleHandler to check if this was the
      *          smallest or largest particle and adjust itself accordingly.
      */
-    ~ThermalParticle() override
+    ~Thermal() override
     = default;
     
     /*!
@@ -74,26 +74,26 @@ public:
      *          Useful for polymorphism.
      * \return pointer to the particle's copy
      */
-    ThermalParticle* copy() const override
+    Thermal* copy() const override
     {
-        return new ThermalParticle(*this);
+        return new Thermal(*this);
     }
 
     /*!
-     * \details ThermalParticle print method, which accepts an os std::ostream as
-     *          input. It prints human readable ThermalParticle information to the
+     * \details Thermal print method, which accepts an os std::ostream as
+     *          input. It prints human readable Thermal information to the
      *          std::ostream.
      * \param[in,out] os    stream to which the info is written
      */
     void write(std::ostream& os) const override
     {
-        BaseParticle::write(os);
+        Particle::write(os);
         os << " temperature " << temperature_;
     }
     
     std::string getName() const override
     {
-        return "ThermalParticle";
+        return "Thermal" + Particle::getName();
     }
     
     void read(std::istream& is) override;
@@ -105,12 +105,14 @@ public:
     
     void setTemperature(Mdouble temperature)
     {
+        logger.assert_debug(temperature>0, "Temperature has to be positive");
         temperature_ = temperature;
     }
     
     void addTemperature(Mdouble temperature)
     {
         temperature_ += temperature;
+        logger.assert_debug(temperature_>0, "Temperature has to be positive");
     }
     
     void setTemperatureDependentDensity(const std::function<double(double)>& temperatureDependentDensity);
@@ -139,4 +141,43 @@ protected:
     Mdouble temperature_;
 };
 
+/*!
+ * \details Particle read function. Has an std::istream as argument, from which
+ *          it extracts the radius_, invMass_ and invInertia_, respectively.
+ *          From these the mass_ and inertia_ are deduced. An additional set of
+ *          properties is read through the call to the parent's method
+ *          BaseParticle::read().
+ * \param[in,out] is    input stream with particle properties.
+ */
+template<class Particle>
+void Thermal<Particle>::read(std::istream& is)
+{
+    Particle::read(is);
+    std::string dummy;
+    is >> dummy >> temperature_;
+}
+
+template<class Particle>
+void Thermal<Particle>::actionsAfterTimeStep()
+{
+    if (timeDependentTemperature_)
+    {
+        temperature_ = timeDependentTemperature_(this->getHandler()->getDPMBase()->getTime());
+    }
+    if (this->getSpecies()->getTemperatureDependentDensity())
+    {
+        const Mdouble density = this->getSpecies()->getTemperatureDependentDensity()(temperature_);
+        this->radius_ = this->getRadius() * cbrt(this->getMass() / (this->getVolume() * density));
+    }
+}
+
+template<class Particle>
+void Thermal<Particle>::setTimeDependentTemperature(const std::function<double(double)>& timeDependentTemperature)
+{
+    timeDependentTemperature_ = timeDependentTemperature;
+    temperature_ = timeDependentTemperature(0);
+    logger(INFO, "Setting initial temperature to %", temperature_);
+}
+
+typedef Thermal<SphericalParticle> ThermalParticle;
 #endif

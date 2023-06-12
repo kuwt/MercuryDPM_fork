@@ -25,21 +25,21 @@
 
 #ifndef LiquidFilmParticle_H
 #define LiquidFilmParticle_H
-
-#include "BaseParticle.h"
+#include "DPMBase.h"
 
 /*!
- * \class LiquidFilmParticle
+ * \class LiquidFilm
  * \brief
  */
-class LiquidFilmParticle final : public BaseParticle
+template<class Particle>
+class LiquidFilm : public Particle
 {
 public:
     /*!
      * \brief Basic Particle constructor, creates an Particle at (0,0,0) with radius, mass and inertia equal to 1.
      * \details default constructor
      */
-    LiquidFilmParticle()
+    LiquidFilm()
     {
         liquidVolume_ = 0;
     }
@@ -51,9 +51,9 @@ public:
      *          in the HGrid is not determined yet by the end of this constructor.
      *          It also does not copy the interactions and the pointer to the handler
      *          that handles this particle. Use with care.
-     * \param[in,out] p  Reference to the LiquidFilmParticle this one should become a copy of.
+     * \param[in,out] p  Reference to the LiquidFilm this one should become a copy of.
      */
-    LiquidFilmParticle(const LiquidFilmParticle& p) : BaseParticle(p)
+    LiquidFilm(const LiquidFilm& p) : Particle(p)
     {
         liquidVolume_ = p.liquidVolume_;
     }
@@ -63,7 +63,7 @@ public:
      * \details Destructor. It asks the ParticleHandler to check if this was the
      *          smallest or largest particle and adjust itself accordingly.
      */
-    ~LiquidFilmParticle() override
+    ~LiquidFilm() override
     = default;
     
     /*!
@@ -72,30 +72,30 @@ public:
      *          Useful for polymorphism.
      * \return pointer to the particle's copy
      */
-    LiquidFilmParticle* copy() const override
+    LiquidFilm* copy() const override
     {
-        return new LiquidFilmParticle(*this);
+        return new LiquidFilm(*this);
     }
 
     /*!
-     * \details LiquidFilmParticle print method, which accepts an os std::ostream as
-     *          input. It prints human readable LiquidFilmParticle information to the
+     * \details LiquidFilm print method, which accepts an os std::ostream as
+     *          input. It prints human readable LiquidFilm information to the
      *          std::ostream.
      * \param[in,out] os    stream to which the info is written
      */
     void write(std::ostream& os) const override
     {
-        BaseParticle::write(os);
+        Particle::write(os);
         os << " liquidVolume " << liquidVolume_;
     }
 
     /*!
-     * \details Returns the name of the object; in this case 'LiquidFilmParticle'.
+     * \details Returns the name of the object; in this case 'LiquidFilm'.
      * \return The object name.
      */
     std::string getName() const override
     {
-        return "LiquidFilmParticle";
+        return "LiquidFilm";
     }
     
     void read(std::istream& is) override;
@@ -131,9 +131,71 @@ public:
 
     bool isSphericalParticle() const override {return true;}
 
-private:
+protected:
     
     Mdouble liquidVolume_;
 };
+
+
+//todo Does mass and interaction radius change when a liquid film is added?
+/*!
+ * \details Particle read function. Has an std::istream as argument, from which 
+ *          it extracts the radius_, invMass_ and invInertia_, respectively. 
+ *          From these the mass_ and inertia_ are deduced. An additional set of 
+ *          properties is read through the call to the parent's method
+ *          BaseParticle::read().
+ * \param[in,out] is    input stream with particle properties.
+ */
+template<class Particle>
+void LiquidFilm<Particle>::read(std::istream& is)
+{
+    Particle::read(is);
+    std::string dummy;
+    is >> dummy >> liquidVolume_;
+    // a fix to allow reading of restart files pre-nonspherical
+    if (dummy == "invInertia")
+    {
+        is >> dummy >> liquidVolume_;
+    }
+}
+
+template<class Particle>
+std::string LiquidFilm<Particle>::getNameVTK(unsigned i) const
+{
+    if (i==1)
+        return "liquidFilmVolume";
+    else if (i==2)
+        return "liquidBridgeVolume";
+    else /*i=0*/
+        return "fullLiquidVolume";
+}
+
+template<class Particle>
+std::vector<Mdouble> LiquidFilm<Particle>::getFieldVTK(unsigned i) const
+{
+    if (i==1) {
+        return std::vector<Mdouble>(1, liquidVolume_);
+    } else /*i=2 or 0*/ {
+        Mdouble fullLiquidVolume = (i==2)?0:liquidVolume_;
+        for (auto k : this->getInteractions()) {
+            if(dynamic_cast<LiquidMigrationWilletInteraction*>(k)){
+                auto j = dynamic_cast<LiquidMigrationWilletInteraction*>(k);
+                if (j && j->getLiquidBridgeVolume()) {
+                    fullLiquidVolume += 0.5*j->getLiquidBridgeVolume();
+                }
+            }
+            if(dynamic_cast<LiquidMigrationLSInteraction*>(k)) {
+                auto j = dynamic_cast<LiquidMigrationLSInteraction*>(k);
+                if (j && j->getLiquidBridgeVolume()) {
+                    fullLiquidVolume += 0.5 * j->getLiquidBridgeVolume();
+                }
+            }
+
+        }
+        return std::vector<Mdouble>(1, fullLiquidVolume);
+    }
+}
+
+typedef LiquidFilm<SphericalParticle> LiquidFilmParticle;
 
 #endif

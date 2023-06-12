@@ -46,7 +46,7 @@ void SphericalParticleVtkWriter::writeVTK() const
     writeVTKRadius(file);
     writeVTKIndSpecies(file);
     writeExtraFields(file);
-
+    writeVTKId(file);
     file << "</PointData>\n";
     writeVTKFooterAndClose(file);
 }
@@ -79,7 +79,7 @@ void SphericalParticleVtkWriter::writeVTKAngularVelocity(std::fstream& file) con
             if (particleMustBeWritten(p))
 #endif
             {
-                file << '\t' << p->getAngularVelocity() << '\n';
+                file << '\t' << (float)p->getAngularVelocity().X << ' ' << (float)p->getAngularVelocity().Y << ' ' << (float)p->getAngularVelocity().Z << '\n';
             }
         }
         file << "  </DataArray>\n";
@@ -100,12 +100,36 @@ void SphericalParticleVtkWriter::writeVTKRadius(std::fstream& file) const
     {
 #ifdef MERCURYDPM_USE_MPI
         if (particleMustBeWritten(p))
-      {
-        file << '\t' << p->getRadius() << '\n';
-      }
-#else
-        file << '\t' << p->getRadius() << '\n';//Radius
 #endif
+        {
+            file << '\t' << p->getRadius() << '\n';
+        }
+
+    }
+    file << "  </DataArray>\n";
+}
+
+/*!
+ * \brief Writes the id (unique integer) of the particles to the vtu file.
+ *
+ * \details This enables the tracing of particles through multiple files.
+ *
+ * \param[in] file Output filestream.
+ */
+void SphericalParticleVtkWriter::writeVTKId(std::fstream& file) const
+{
+    /**
+     * \note gmb Maybe Int64 is needed.
+     */
+    file << "  <DataArray type=\"Int32\" Name=\"Id\" format=\"ascii\">\n";
+    // Add id
+    for (const auto& p: handler_) {
+#ifdef MERCURYDPM_USE_MPI
+        if (particleMustBeWritten(p))
+#endif
+        {
+            file << '\t' << p->getId() << '\n';
+        }
     }
     file << "  </DataArray>\n";
 }

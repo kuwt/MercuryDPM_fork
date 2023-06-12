@@ -277,7 +277,7 @@ public:
 
     void printTime () const override
     {
-        logger(INFO, "t=%3.6, tmax3.6=, EneRatio=%3.6", getTime(), getTimeMax(),
+        logger(INFO, "t=%3.6, tmax=%3.6, EneRatio=%3.6", getTime(), getTimeMax(),
                getKineticEnergy() / getElasticEnergy());
     }
 

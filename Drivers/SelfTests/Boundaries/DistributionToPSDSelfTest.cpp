@@ -76,7 +76,7 @@ public:
         double radMin = 1;
         double radMax = 2;
         insertionBoundary.set(&templateParticle, maxFail, posMin, posMax, velMin, velMax);
-        
+    
         //create a predefined discrete uniform distribution between radMin and radMax with a certain resolution
         // (numberOfBins)
         PSD psd;
@@ -86,10 +86,10 @@ public:
 //                          PSD::TYPE::CUMULATIVE_NUMBER_DISTRIBUTION);
         psd.setDistributionNormal(0.001, 0.0001, 50);
         insertionBoundary.setPSD(psd);
-        
+    
         //instead of inserting 1 particle per timestep, insert at a given flow rate, such as 0.001 m^3/s
         // insertionBoundary.setVolumeFlowRate(1e-3);
-        
+    
         //add the insertion boundary to the handler
         boundaryHandler.copyAndAddObject(insertionBoundary);
     }

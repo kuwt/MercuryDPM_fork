@@ -42,10 +42,10 @@ public:
     }
 
 private:
-    Panel* panel_;                    // finest level panel in which the sphere is located
+    //Panel* panel_;                    // finest level panel in which the sphere is located
     Vec3D location_;    // location of the sphere
-    Dipole* dipole_;                // Dipole corresponding to a single sphere solution
-    Multipole* multipole_;            // Multipole corresponding to other sphere distortions
+    //Dipole* dipole_;                // Dipole corresponding to a single sphere solution
+    //Multipole* multipole_;            // Multipole corresponding to other sphere distortions
     
 };
 

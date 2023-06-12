@@ -21,6 +21,8 @@
 	6
   </DataArray>
 </Cells>
+<CellData>
+</CellData>
 </Piece>
 </UnstructuredGrid>
 </VTKFile>

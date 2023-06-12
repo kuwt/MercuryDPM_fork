@@ -10,41 +10,53 @@ void DropletBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
     logger.assert_always(dpm,"You can only run DropletBoundary with Mercury2D or Mercury3D, not DPMBase");
     // generate new droplets
     generateDroplets_(*this);
-//    logger(INFO,"Droplets: %",droplets_.size());
     // integrate Newtons equation of motion
     Vec3D g = dpm->getGravity();
     double dt = dpm->getTimeStep();
     for (auto& d : droplets_) {
-        d.velocity += dt*g;
+        Mdouble m = dropletSpecies_->getMassFromRadius(d.radius);
+        d.velocity += dt * (d.force + m * g) / m;
+        d.force.setZero();
         d.position += dt*d.velocity;
     }
     // check for interaction with particles; this is costly, so we only do iit every 50 time steps
     if (dpm->getNumberOfTimeSteps()%checkCount==0) {
         LiquidFilmParticle p;
-        p.setSpecies(dpm->speciesHandler.getLastObject());
+        p.setSpecies(dropletSpecies_);
         for (auto &d : droplets_) {
             p.setPosition(d.position);
+            p.setVelocity(d.velocity);
             p.setRadius(d.radius);
             auto q = dpm->hGridFindParticleContacts(&p);
             if (q.size() > 0) {
-                double liquidVolume = std::pow(d.radius, 3) * constants::pi / 6.0 / q.size();
+                double liquidVolume = std::pow(2.0 * d.radius, 3) * constants::pi / 6.0;
                 for (auto particle : q) {
+                    // should that be a static cast?
                     auto lfp = static_cast<LiquidFilmParticle *>(particle);
-                    lfp->addLiquidVolume(liquidVolume);
+                    lfp->addLiquidVolume(liquidVolume/q.size());
                 }
+                absorbedVolume += liquidVolume;
+                dropletVolume -= liquidVolume;
                 d.radius = 0;
             }
             // check for interactions with walls
             for (BaseWall* w : dpm->wallHandler) {
-                Mdouble distance;
-                Vec3D normal_return;
-                double overlap;
                 //Checks if the particle is interacting with the current wall
-                bool inContact = w->getDistanceNormalOverlap(p, distance, normal_return, overlap);
+                BaseInteraction* i = w->getInteractionWith(&p, dpm->getNumberOfTimeSteps() + 1, &dpm->interactionHandler);
                 // if there is a wall interacting with the droplet
-                if (inContact) {
-                    //set droplet radius to zero
-                    d.radius = 0;
+                if (i != nullptr) {
+                    if (removeDropletsAtWalls_) {
+                        //set droplet radius to zero
+                        double liquidVolume = std::pow(2.0 * d.radius, 3) * constants::pi / 6.0;
+                        lostVolume += liquidVolume;
+                        dropletVolume -= liquidVolume;
+                        d.radius = 0;
+                    } else {
+                        // For some reason the species have to be set here, otherwise the force is always 0.
+                        i->setSpecies(dropletSpecies_);
+                        i->computeForce();
+                        d.force += i->getForce();
+                    }
                 }
             }
         }
@@ -95,15 +107,15 @@ void DropletBoundary::writeVTK(std::fstream& file) {
     file << "<Piece NumberOfPoints=\"" << droplets_.size() << "\" NumberOfCells=\"" << 0 << "\">\n";
     file << "<Points>\n";
     file << "  <DataArray type=\"Float32\" Name=\"Position\" NumberOfComponents=\"3\" format=\"ascii\">\n";
-    for (const auto& d : droplets_) file << '\t' << d.position << '\n';
+    for (const auto& d : droplets_) file << '\t' << (float)d.position.X << ' ' << (float)d.position.Y << ' ' << (float)d.position.Z << '\n';
     file << "  </DataArray>\n";
     file << "</Points>\n";
     file << "<PointData  Vectors=\"vector\">\n";
     file << "  <DataArray type=\"Float32\" Name=\"Velocity\" NumberOfComponents=\"3\" format=\"ascii\">\n";
-    for (const auto& d : droplets_) file << '\t' << d.velocity << '\n';
+    for (const auto& d : droplets_) file << '\t' << (float)d.velocity.X << ' ' << (float)d.velocity.Y << ' ' << (float)d.velocity.Z << '\n';
     file << "  </DataArray>\n";
     file << "  <DataArray type=\"Float32\" Name=\"Radius\" format=\"ascii\">\n";
-    for (const auto& d : droplets_) file << '\t' << d.radius << '\n';
+    for (const auto& d : droplets_) file << '\t' << (float)d.radius << '\n';
     file << "  </DataArray>\n";
     file << "</PointData>\n";
 }

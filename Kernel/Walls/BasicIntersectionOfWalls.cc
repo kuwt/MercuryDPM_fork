@@ -195,12 +195,6 @@ bool BasicIntersectionOfWalls::getDistanceAndNormal(const BaseParticle& p, Mdoub
         {
             if (contactPointOutsideID2)
             {
-                //possible contact is with intersection of id,id2,id3
-                //we know id2<id3
-                unsigned int index =
-                        (id < id2) ? ((id3 - 2) * (id3 - 1) * id3 / 6 + (id2 - 1) * id2 / 2 + id) :
-                        (id < id3) ? ((id3 - 2) * (id3 - 1) * id3 / 6 + (id - 1) * id / 2 + id2) :
-                        ((id - 2) * (id - 1) * id / 6 + (id3 - 1) * id3 / 2 + id2);
                 //find vertex C
                 Matrix3D N(normal.X, normal.Y, normal.Z, normal2.X, normal2.Y, normal2.Z, normal3.X, normal3.Y,
                            normal3.Z);

@@ -67,12 +67,12 @@
 #endif
 
 /*!
-* \details Warns the user of a fatal error and exits the program with a non-zero return
-* value to let the compiler know an error has occurred.
-* \param[in] module
-* \param[in] message
-* \todo Why is this here, and not in the logger?
-*/
+ * \details Warns the user of a fatal error and exits the program with a non-zero return
+ * value to let the compiler know an error has occurred.
+ * \param[in] module
+ * \param[in] message
+ * \todo Why is this here, and not in the logger?
+ */
 /**
 * \deprecated
 */
@@ -283,7 +283,7 @@ void DPMBase::constructor()
     logger(DEBUG, "DPMBase problem constructor finished");
 
     readSpeciesFromDataFile_ = false;
-    
+
     numberOfOMPThreads_ = 1;
 
     //Set number of elements to write to the screen if a user wants to output write information to the terminal
@@ -470,6 +470,8 @@ eneFile.setFileType(fileType);
 */
 void DPMBase::resetFileCounter()
 {
+    dataFile.setCounter(0);
+    fStatFile.setCounter(0);
     restartFile.setCounter(0);
     statFile.setCounter(0);
     eneFile.setCounter(0);
@@ -910,7 +912,7 @@ void DPMBase::setWallsWriteVTK(FileType writeWallsVTK)
 {
     logger(WARN, "DPMBase.setWallsWriteVTK(FileType) is deprecated! Use wallHandler.setWriteVTK(FileType) instead.");
     wallHandler.setWriteVTK(writeWallsVTK);
-	}
+}
 
 /*!
 * \details
@@ -920,14 +922,13 @@ void DPMBase::setWallsWriteVTK(FileType writeWallsVTK)
 */
 void DPMBase::setWallsWriteVTK(bool writeVTK)
 {
-FileType writeVTKFileType = writeVTK?FileType::MULTIPLE_FILES:FileType::NO_FILE;
+    FileType writeVTKFileType = writeVTK?FileType::MULTIPLE_FILES:FileType::NO_FILE;
     logger(WARN, "DPMBase.setWallsWriteVTK(bool) is deprecated! Use wallHandler.setWriteVTK(bool) instead.");
     wallHandler.setWriteVTK(writeVTKFileType);
 }
 
 void DPMBase::setInteractionsWriteVTK(bool writeVTK)
 {
-interactionHandler.setWriteVTK(writeVTK?FileType::MULTIPLE_FILES:FileType::NO_FILE);
     logger(WARN, "DPMBase.setInteractionsWriteVTK(bool) is deprecated! Use interactionHandler.setWriteVTK(bool) instead.");
     interactionHandler.setWriteVTK(writeVTK);
 }
@@ -2158,6 +2159,9 @@ void DPMBase::writeVTKFiles() const
     bool writePython = getParticlesWriteVTK() || wallHandler.getWriteVTK() != FileType::NO_FILE ||
                        interactionHandler.getWriteVTK() != FileType::NO_FILE ||
                        wallHandler.getWriteDetailsVTKAny();
+
+    writePython &= forceWritePythonFileForVTKVisualisation_;
+
     if (writePython && getTime() == 0)
     {
         writePythonFileForVTKVisualisation();
@@ -2874,7 +2878,6 @@ void DPMBase::readNextFStatFile()
     Mdouble time;
     unsigned int indexP;
     int indexI; //could be negative
-    unsigned counter = 0;
     interactionHandler.clear();
     while ((in.peek() != -1) && (in.peek() != '#'))
     {
@@ -2920,7 +2923,6 @@ void DPMBase::readNextFStatFile()
             C = interactionHandler.addInteraction(P, I, getNumberOfTimeSteps() + 1);
             C->setFStatData(in, P, I);
         }
-        counter++;
         //skip the rest of the line, to allow additional output and to ignore the second time a particle-particle contact is printed
         in.ignore(256, '\n');
     }
@@ -2987,12 +2989,9 @@ void DPMBase::fillDomainWithParticles(unsigned N) {
     ParticleSpecies* s = speciesHandler.getLastObject();
     SphericalParticle p(s);
     CubeInsertionBoundary b;
-    Mdouble r = cbrt(getTotalVolume())/N;
     b.set(p, 100, getMin(), getMax(), {0, 0, 0}, {0, 0, 0});
     b.insertParticles(this);
     logger(INFO,"Inserted % particles",particleHandler.getSize());
-    //setTimeMax(0);
-    //solve();
 }
 
 
@@ -4279,15 +4278,14 @@ void DPMBase::solve()
     {
         computeOneTimeStep();
     }
+    // Can be used to measure simulation time
+    clock_.toc();
 
     finaliseSolve();
 }
 
 void DPMBase::finaliseSolve() {
 
-
-    // Can be used to measure simulation time
-    clock_.toc();
 
     //force writing of the last time step
     forceWriteOutputFiles();
@@ -4468,7 +4466,7 @@ void DPMBase::removeOldFiles() const
     // add processor id to file extension for mpi jobs
     std::string q = (NUMBER_OF_PROCESSORS > 1)?("Processor_"+std::to_string(PROCESSOR_ID)+"_"):"";
     // all the file extensions that should be deleted
-    ext = {"Wall_", q+"Particle_", q+"Interaction_"};
+    ext = {"Wall_", q+"Particle_", q+"Interaction_", q+"Boundary_"};
     for (const auto& j : ext)
     {
         // remove files with given extension for FileType::ONE_FILE
@@ -4957,11 +4955,9 @@ bool DPMBase::checkParticleForInteractionLocal(const BaseParticle& p)
 void DPMBase::importParticlesAs(ParticleHandler& particleH, InteractionHandler& interactionH, const ParticleSpecies* species )
 {
     size_t nParticlesPreviouslyIn = particleHandler.getSize();
-    int l = 0;
     for (auto k = particleH.begin(); k != particleH.end(); ++k) {
         auto p = particleHandler.copyAndAddObject( *k );
         p->setSpecies(species);
-        l++;
     }
 
     for (std::vector<BaseInteraction*>::const_iterator i = interactionH.begin(); i != interactionH.end(); ++i) {
@@ -5491,3 +5487,23 @@ void DPMBase::handleParticleAddition(unsigned int id, BaseParticle* p)
 volatile sig_atomic_t DPMBase::continueFlag_ = true;
 
 ///\todo When restarting the indexMax should be reset
+
+/*!
+* \details
+* Enables/disables the writePythonFileForVTKVisualisation() function.
+* \param[in] forceWritePythonFileForVTKVisualisation
+*/
+void DPMBase::setWritePythonFileForVTKVisualisation(bool forceWritePythonFileForVTKVisualisation)
+{
+    forceWritePythonFileForVTKVisualisation_ = forceWritePythonFileForVTKVisualisation;
+}
+
+bool DPMBase::getWritePythonFileForVTKVisualisation() const
+{
+    return forceWritePythonFileForVTKVisualisation_;
+}
+
+WallVTKWriter & DPMBase::getWallVTKWriter()
+{
+    return wallVTKWriter_;
+}

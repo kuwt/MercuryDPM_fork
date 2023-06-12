@@ -31,7 +31,7 @@
 #include "Walls/AxisymmetricIntersectionOfWalls.h"
 #include "Logger.h"
 using helpers::readFromFile;
-using helpers::to_string;
+using helpers::toString;
 using helpers::writeToFile;
 
 /// Single particle, indented slowly by spherical indenter.
@@ -44,7 +44,7 @@ public:
         : SphericalIndenter(indenterDiameter, indentationVelocity, indentationForce)
     {
         unsigned restartNumber = readFromFile<unsigned>("in","restartNumber",5);
-        restartFile.setName("SinterBed1.restart."+to_string(restartNumber));
+        restartFile.setName("SinterBed1.restart." + toString(restartNumber));
         readRestartFile();
         setRestarted(false);
         setName("SinterBed2");
