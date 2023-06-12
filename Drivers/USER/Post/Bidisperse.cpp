@@ -443,7 +443,7 @@ int main(int argc, char *argv[])
 	problem.setName("BidisperseParametersFromLit");
 	//problem.autoNumber();
 	//problem.setDrumRadius(0.125);// in meters
-        problem.setDrumRadius(0.125);
+    problem.setDrumRadius(0.125);
         
 	problem.setXMin(0.0);
 	problem.setYMin(0.0);
@@ -469,13 +469,13 @@ int main(int argc, char *argv[])
 	problem.setXBallsAdditionalArguments("-cmode 8 -solidf -v0");
 	problem.readArguments(argc,argv);
         
-        problem.dataFile.setFileType(FileType::MULTIPLE_FILES);
-        problem.restartFile.setFileType(FileType::ONE_FILE);
-        problem.fStatFile.setFileType(FileType::NO_FILE);
-        problem.eneFile.setFileType(FileType::NO_FILE);
+    problem.dataFile.setFileType(FileType::MULTIPLE_FILES);
+    problem.restartFile.setFileType(FileType::ONE_FILE);
+    problem.fStatFile.setFileType(FileType::NO_FILE);
+    problem.eneFile.setFileType(FileType::NO_FILE);
 
-        problem.wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
-        problem.setParticlesWriteVTK(true);
+    problem.setWallsWriteVTK(FileType::MULTIPLE_FILES);
+    problem.setParticlesWriteVTK(true);
 
 	problem.solve();
 
