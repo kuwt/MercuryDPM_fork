@@ -10,7 +10,7 @@ foreach (CPPFILE ${CPPFILES})
     #extract the filename minus the cpp. This will be the name of exe file
     get_filename_component(EXECNAME ${CPPFILE} NAME_WE)
     #Make the exe
-    add_executable(${EXECNAME} ${FILENAME})
+    add_executable(${EXECNAME} ${FILENAME} DieFilling.cc)
     #All cpp folder and linked agaist MercuryBase
     target_link_libraries(${EXECNAME} oomphFluid MercuryBase)
 endforeach ()
