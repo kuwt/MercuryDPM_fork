@@ -34,7 +34,7 @@
 #include "Species/ParticleSpecies.h"
 #include "DPMBase.h"
 /*!
- * \class MultiParticle
+ * \class Clump
  * \brief
  */
 class MultiParticle final: public NonSphericalParticle

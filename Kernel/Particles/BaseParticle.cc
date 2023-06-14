@@ -167,7 +167,7 @@ Mdouble BaseParticle::getVolume() const
 void BaseParticle::fixParticle()
 {
 //    //
-//    MultiParticle f;
+//    Clump f;
 //    f.invInertia2_ = MatrixSymmetric3D(0, 0, 0, 0, 0, 0);
     //
     invMass_ = 0.0;
@@ -529,7 +529,7 @@ void BaseParticle::setInfiniteInertia()
 {
     invInertia_.setZero();
 
-//    MultiParticle* f;
+//    Clump* f;
 //    f->invInertia2_.setZero();
 } //> i.e. no rotations
 

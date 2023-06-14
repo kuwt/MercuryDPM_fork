@@ -7,7 +7,7 @@ add_subdirectory(Avalanching)
 add_subdirectory(CartesianShearCell)
 add_subdirectory(Segregation)
 add_subdirectory(UnitTests)
-add_subdirectory(MultiParticle)
+add_subdirectory(Clump)
 add_subdirectory(MercurySimpleDemos)
 add_subdirectory(MercuryCG)
 add_subdirectory(MercuryMPITests)
@@ -30,7 +30,7 @@ add_subdirectory(Calibration)
 add_subdirectory(TriangleWalls)
 add_subdirectory(Oomph)
 add_subdirectory(SimpleOpt)
-add_subdirectory(Domino)
+
 
 
 

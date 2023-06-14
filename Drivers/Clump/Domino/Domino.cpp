@@ -29,8 +29,8 @@
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Particles/MultiParticle.h"
-#include "../MultiParticle/clump/ClumpIO.h"
-#include "../MultiParticle/clump/Mercury3DClump.h"
+#include "../ClumpHeaders/ClumpIO.h"
+#include "../ClumpHeaders/Mercury3DClump.h"
 #include <stdlib.h>
 #include "Boundaries/PeriodicBoundary.h"
 
@@ -104,7 +104,7 @@ public:
         // Dominoes
         for (int part = 0; part<D.N_dom; part++) {
             MultiParticle p0;
-            p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to MultiParticle 1
+            p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to Clump 1
             p0.setMaster();
             p0.setRadius(D.R_peb);
 
@@ -155,7 +155,7 @@ public:
         // Cue
 
         MultiParticle p0;
-        p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to MultiParticle 1
+        p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to Clump 1
         p0.setMaster();
         p0.setRadius(D.R_cue);
         p0.addSlave(Vec3D( 0,0,0), D.R_cue);
@@ -178,7 +178,7 @@ public:
 
         for (std::vector<BaseParticle*>::iterator it= particleHandler.begin(); it!=particleHandler.end(); ++it){
             if ((*it)->IsMaster()) {
-                //D_num += (int) static_cast<MultiParticle*>(*it)->getDzhanibekovParticle();
+                //D_num += (int) static_cast<Clump*>(*it)->getDzhanibekovParticle();
 
                 if ((D.started == false)&&((*it)->getPosition().X > D.margin + D.N_ini*D.S_dom - 0.001)&&( (*it)->getVelocity().getLength()>0.001  ))
                 {

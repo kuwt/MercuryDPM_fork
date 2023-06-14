@@ -29,8 +29,8 @@
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Particles/MultiParticle.h"
-#include "../../MultiParticle/clump/ClumpIO.h"
-#include "../../MultiParticle/clump/Mercury3DClump.h"
+#include "../../Clump/ClumpHeaders/ClumpIO.h"
+#include "../../Clump/ClumpHeaders/Mercury3DClump.h"
 # include <stdlib.h>
 #include "Boundaries/PeriodicBoundary.h"
 
@@ -78,7 +78,7 @@ public:
         // Generate single clump
         setClumpIndex(1);
         MultiParticle p0;
-        p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to MultiParticle 1
+        p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to Clump 1
         p0.setMaster();
         p0.setRadius(data.pebbles_r[clump_index][0]);
         Vec3D pos = Vec3D(0, 0, 0);

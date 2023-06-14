@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2015, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -23,30 +23,27 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Automatic rebuild script (multiple dominoes)
 
-// Auto rebuild scripts run the following list of commands:
-// 1) make              - to rebuild test example
-// 2) ./name        - run the rebuilt test
-// 3) rm -rf paraview_name   - clears previour simulation results
-// 4) mkdir paraview_name    - creates new dir for paraview output
-// 5) ../../../Tools/data2pvd name.data paraview_name/name - converts data output into paraview format
+// SimpleOpt feature, opt_main.cpp: Runs the python optimization tool with
+// proper mercury dir structure passed via command line
 
-
-#include <cstdio>
+#include"CMakeDefinitions.h"
 #include <iostream>
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <array>
-#include<CMakeDefinitions.h>
+#include "Walls/InfiniteWall.h"
+#include <stdio.h>
 
-std::string exec_command(const char* cmd) {
+// Helper function to implement extra OS commands after the driver code is done
+std::string ExecCommand(const char* cmd) {
     std::array<char, 128> buffer;
     std::string result;
     std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
     if (!pipe) {
-        throw std::runtime_error("popen() failed!");
+        std::string ret = "Could not run an extra OS command: "; ret.append(cmd);
+        throw std::runtime_error(ret);
     }
     while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
         result += buffer.data();
@@ -54,22 +51,10 @@ std::string exec_command(const char* cmd) {
     return result;
 }
 
-int main(int argc, char* argv[])
+// Runs python optimization tool
+int main(int argc, char** argv)
 {
-
-    exec_command("make Domino");
-    exec_command("./Domino");
-
-    exec_command("rm -rf paraview_Domino");
-    exec_command("mkdir paraview_Domino");
-
-
-    exec_command("../../Tools/data2pvd Domino.data paraview_Domino/Domino");
-
     std::string command;
-    command = "python " + getMercurySourceDir() + "/Tools/MClump/plot_ene.py " + getMercuryBuildDir() + "/Drivers/Domino/ " + "Domino";
-    exec_command(command.c_str());
-    return 0;
+    command = "python3 " + getMercurySourceDir() + "/Tools/SimpleOpt/BatchRun.py " + getMercurySourceDir() + " " + getMercuryBuildDir();
+    std::cout<<ExecCommand(command.c_str())<<std::endl;
 }
-
-

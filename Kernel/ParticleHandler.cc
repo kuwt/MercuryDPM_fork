@@ -1048,7 +1048,7 @@ BaseParticle* ParticleHandler::createObject(const std::string& type)
     {
         return new HeatFluidCoupledParticle;
     }
-    else if (type == "MultiParticle")
+    else if (type == "Clump")
     {
         return new MultiParticle;
     }

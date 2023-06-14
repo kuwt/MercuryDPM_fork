@@ -33,12 +33,10 @@ import numpy as np
 
 
 def main():
-	path = ""
-	name = ""
-
-	if (len(sys.argv) == 3):  # Full format: run -m 2
-        	path = sys.argv[1]
-        	name = sys.argv[2]
+	path = sys.argv[1]
+	name = 'Rattleback'
+	print(path)
+	print(name)
 
 	textfile = open(path + name + ".ene", "r")
 	content_list = textfile.readlines()

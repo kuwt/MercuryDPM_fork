@@ -39,7 +39,7 @@
 #include <stdexcept>
 #include <string>
 #include <array>
-#include<CMakeDefinitions.h>
+#include"CMakeDefinitions.h"
 
 std::string exec_command(const char* cmd) {
     std::array<char, 128> buffer;
@@ -56,17 +56,18 @@ std::string exec_command(const char* cmd) {
 
 int main(int argc, char* argv[])
 {
-    exec_command("make Periodic");
-    exec_command("./Periodic");
 
-    exec_command("rm -rf paraview_Periodic");
-    exec_command("mkdir paraview_Periodic");
+    exec_command("make Domino");
+    exec_command("./Domino");
+
+    exec_command("rm -rf paraview_Domino");
+    exec_command("mkdir paraview_Domino");
 
 
-    exec_command("../../Tools/data2pvd Periodic.data paraview_Periodic/Periodic");
+    exec_command("../../Tools/data2pvd Domino.data paraview_Domino/Domino");
 
     std::string command;
-    command = "python " + getMercurySourceDir() + "/Tools/MClump/plot_ene.py " + getMercuryBuildDir() + "/Drivers/MultiParticle/ " + "Periodic";
+    command = "python " + getMercurySourceDir() + "/Tools/MClump/plot_ene.py " + getMercuryBuildDir() + "/Drivers/Domino/ " + "Domino";
     exec_command(command.c_str());
     return 0;
 }

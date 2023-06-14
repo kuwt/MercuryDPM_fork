@@ -64,7 +64,7 @@ MultiParticle::MultiParticle()
     VerticallyOriented_ = false;
 
     //++++++++++++++
-    logger(DEBUG, "Multiparticle::MultiParticle() finished");
+    logger(DEBUG, "Multiparticle::Clump() finished");
 }
 
 MultiParticle::MultiParticle(const MultiParticle& p): NonSphericalParticle(p)
@@ -109,7 +109,7 @@ MultiParticle* MultiParticle::copy() const
 
 std::string MultiParticle::getName() const
 {
-    return "MultiParticle";
+    return "Clump";
 }
 
 void MultiParticle::read(std::istream& is)
