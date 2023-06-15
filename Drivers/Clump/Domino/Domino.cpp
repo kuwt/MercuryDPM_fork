@@ -28,7 +28,7 @@
 #include "Mercury3D.h"
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
-#include "Particles/MultiParticle.h"
+#include "Particles/ClumpParticle.h"
 #include "../ClumpHeaders/ClumpIO.h"
 #include "../ClumpHeaders/Mercury3DClump.h"
 #include <stdlib.h>
@@ -103,18 +103,18 @@ public:
         setParticlesWriteVTK(1);
         // Dominoes
         for (int part = 0; part<D.N_dom; part++) {
-            MultiParticle p0;
+            ClumpParticle p0;
             p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to Clump 1
-            p0.setMaster();
+            p0.setClump();
             p0.setRadius(D.R_peb);
 
             for (int i = 0; i < 2*D.m_peb; i++) {
                 for (int j = 0; j < 2*D.n_peb; j++) {
                     for (int k = 0; k < 2*D.k_peb; k++) {
 
-                        p0.addSlave(Vec3D( - D.S_peb * D.m_peb + (i+0.5)*D.S_peb,
-                                           - D.S_peb * D.n_peb + (j+0.5)*D.S_peb,
-                                           - D.S_peb * D.k_peb + (k+0.5)*D.S_peb), D.R_peb);
+                        p0.addPebble(Vec3D(-D.S_peb * D.m_peb + (i + 0.5) * D.S_peb,
+                                           -D.S_peb * D.n_peb + (j + 0.5) * D.S_peb,
+                                           -D.S_peb * D.k_peb + (k + 0.5) * D.S_peb), D.R_peb);
 
             }}}
             p0.setPrincipalDirections(
@@ -154,11 +154,11 @@ public:
 
         // Cue
 
-        MultiParticle p0;
+        ClumpParticle p0;
         p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to Clump 1
-        p0.setMaster();
+        p0.setClump();
         p0.setRadius(D.R_cue);
-        p0.addSlave(Vec3D( 0,0,0), D.R_cue);
+        p0.addPebble(Vec3D(0, 0, 0), D.R_cue);
         p0.setPosition(Vec3D(0.9*D.margin, 0, D.S_peb*(D.k_peb-0.5))); // sets particle position
         p0.setVelocity(Vec3D(D.Vel_cue, 0., 0.));// sets particle velocity
         particleHandler.copyAndAddObject(p0);
@@ -177,7 +177,7 @@ public:
         // Measurement of the propagation velocity of a Domino wave
 
         for (std::vector<BaseParticle*>::iterator it= particleHandler.begin(); it!=particleHandler.end(); ++it){
-            if ((*it)->IsMaster()) {
+            if ((*it)->IsClump()) {
                 //D_num += (int) static_cast<Clump*>(*it)->getDzhanibekovParticle();
 
                 if ((D.started == false)&&((*it)->getPosition().X > D.margin + D.N_ini*D.S_dom - 0.001)&&( (*it)->getVelocity().getLength()>0.001  ))

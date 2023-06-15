@@ -34,7 +34,7 @@ import numpy as np
 
 def main():
 	path = sys.argv[1]
-	name = 'Rattleback'
+	name = sys.argv[2]
 	print(path)
 	print(name)
 

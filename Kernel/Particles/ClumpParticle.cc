@@ -25,7 +25,7 @@
 
 #include <string>
 #include <Mercury3D.h>
-#include "MultiParticle.h"
+#include "ClumpParticle.h"
 #include "ParticleHandler.h"
 #include "DPMBase.h"
 
@@ -34,18 +34,17 @@
 // (Passing self-test requires at least 2, PFC4.0 uses 4)
 
 
-MultiParticle::MultiParticle()
+ClumpParticle::ClumpParticle()
 {
     setRadius(1.0);
-    nSlave = 0;
-    // slaveMass =  std::vector<Mdouble>(0);
-    // slaveVolume =  std::vector<Mdouble>(0);
+    nPebble = 0;
+
     massMultiparticle = 1.0;
     viscousDamping = 0.0;
-    slavePos = std::vector<Vec3D>(0);
+    pebblePos = std::vector<Vec3D>(0);
 
-    slaveRadius = std::vector<Mdouble>(0);
-    slaveParticles = std::vector<MultiParticle*>(0);
+    pebbleRadius = std::vector<Mdouble>(0);
+    pebbleParticles = std::vector<ClumpParticle*>(0);
 
     principalDirections = Matrix3D(1, 0, 0, 0, 1, 0, 0, 0, 1);
     initPrincipalDirections = Matrix3D(1, 0, 0, 0, 1, 0, 0, 0, 1);
@@ -55,9 +54,9 @@ MultiParticle::MultiParticle()
     invInertia_= inertiaMultiparticle.inverse();
 
     //++++++++++++++
-    isSlave = false; //Assign false by default
-    isMaster = false; //Assign false by default
-    masterParticle = nullptr;
+    isPebble = false; //Assign false by default
+    isClump = false; //Assign false by default
+    clumpParticle = nullptr;
 
 
     DzhanibekovParticle_ = false;
@@ -67,17 +66,15 @@ MultiParticle::MultiParticle()
     logger(DEBUG, "Multiparticle::Clump() finished");
 }
 
-MultiParticle::MultiParticle(const MultiParticle& p): NonSphericalParticle(p)
+ClumpParticle::ClumpParticle(const ClumpParticle& p): NonSphericalParticle(p)
 {
-    nSlave = p.nSlave;
-    // slaveMass = p.slaveMass;
-    // slaveVolume = p.slaveVolume;
+    nPebble = p.nPebble;
     
     massMultiparticle = p.massMultiparticle;
     viscousDamping = p.viscousDamping;
-    slavePos = p.slavePos;
-    slaveRadius = p.slaveRadius;
-    slaveParticles = p.slaveParticles;
+    pebblePos = p.pebblePos;
+    pebbleRadius = p.pebbleRadius;
+    pebbleParticles = p.pebbleParticles;
     principalDirections = p.principalDirections;
     initPrincipalDirections = p.initPrincipalDirections;
     inertiaMultiparticle = p.inertiaMultiparticle;
@@ -86,74 +83,74 @@ MultiParticle::MultiParticle(const MultiParticle& p): NonSphericalParticle(p)
     DzhanibekovParticle_ = p.DzhanibekovParticle_;
     VerticallyOriented_ = p.VerticallyOriented_;
 
-    for (int iSlave = 1; iSlave <= nSlave; iSlave++) slaveParticles[iSlave - 1] = nullptr;
+    for (int iPebble = 1; iPebble <= nPebble; iPebble++) pebbleParticles[iPebble - 1] = nullptr;
 
     //++++++++++++
-    // Slave attributes
-    isSlave = p.isSlave;
-    masterParticle = p.masterParticle;
-    // Master attributes
-    isMaster = p.isMaster;
+    // Pebble attributes
+    isPebble = p.isPebble;
+    clumpParticle = p.clumpParticle;
+    // Clump attributes
+    isClump = p.isClump;
     //++++++++++++
 }
 
-MultiParticle::~MultiParticle()
+ClumpParticle::~ClumpParticle()
 = default;
 
 
-MultiParticle* MultiParticle::copy() const
+ClumpParticle* ClumpParticle::copy() const
 {
-    return new MultiParticle(*this);
+    return new ClumpParticle(*this);
 }
 
 
-std::string MultiParticle::getName() const
+std::string ClumpParticle::getName() const
 {
     return "Clump";
 }
 
-void MultiParticle::read(std::istream& is)
+void ClumpParticle::read(std::istream& is)
 {
     BaseParticle::read(is);
     std::string dummy;
-    is >> dummy >> nSlave;
+    is >> dummy >> nPebble;
 }
 
-int MultiParticle::NSlave() const
+int ClumpParticle::NPebble() const
 {
-    return nSlave;
+    return nPebble;
 }
 
-void MultiParticle::setMaster()
+void ClumpParticle::setClump()
 {
-    isMaster = true;
+    isClump = true;
 
 }
 
-//Function to store slave information
-void MultiParticle::addSlave(Vec3D position, Mdouble radius)
+//Function to store pebble information
+void ClumpParticle::addPebble(Vec3D position, Mdouble radius)
 {
-    nSlave++; //Counter of slaves
-    slavePos.push_back(position); //Store slave positions
-    slaveRadius.push_back(radius); //Store slave radius
-    slaveParticles.push_back(nullptr);//Store null pointer per slave.
-//    isMaster = true;
+    nPebble++; //Counter of pebbles
+    pebblePos.push_back(position); //Store pebble positions
+    pebbleRadius.push_back(radius); //Store pebble radius
+    pebbleParticles.push_back(nullptr);//Store null pointer per pebble.
+//    isClump = true;
 }
 
 // V
-void MultiParticle::setPrincipalDirections(Matrix3D directions)
+void ClumpParticle::setPrincipalDirections(Matrix3D directions)
 {
     principalDirections = directions;
 }
 
 // V
-void MultiParticle::setInitPrincipalDirections(Matrix3D directions)
+void ClumpParticle::setInitPrincipalDirections(Matrix3D directions)
 {
     initPrincipalDirections = directions;
 }
 
 // V
-void MultiParticle::rotatePrincipalDirections(Vec3D rotation)
+void ClumpParticle::rotatePrincipalDirections(Vec3D rotation)
 {
     Mdouble tol = 10e-9;
     Mdouble angle = rotation.getLength();
@@ -194,38 +191,38 @@ void MultiParticle::rotatePrincipalDirections(Vec3D rotation)
 }
 
 //After adding the objects to the handler, compute multiparticle quantities.
-void MultiParticle::actionsAfterAddObject()
+void ClumpParticle::actionsAfterAddObject()
 {
-    //Only attribute features to master particle.
-    if (IsSlave()) return;
-    if (IsMaster())
+    //Only attribute features to clump particle.
+    if (IsPebble()) return;
+    if (IsClump())
     {
-        MultiParticle p0;   // Instance for the pebbles
+        ClumpParticle p0;   // Instance for the pebbles
         p0.setSpecies(getSpecies());
-        p0.setMaster(this);
+        p0.setClump(this);
 
-        //Go through the number of slaves
-        for (int iSlave = 1; iSlave <= NSlave(); iSlave++)
+        //Go through the number of pebbles
+        for (int iPebble = 1; iPebble <= NPebble(); iPebble++)
         {
-            //Set the radius of slaves:
-            p0.setRadius(getSlaveRadius()[iSlave - 1]);
-            //Store the address of the slave:
-            setSlave(iSlave - 1, getHandler()->copyAndAddObject(p0));
+            //Set the radius of pebbles:
+            p0.setRadius(getPebbleRadius()[iPebble - 1]);
+            //Store the address of the pebble:
+            setPebble(iPebble - 1, getHandler()->copyAndAddObject(p0));
         }
 
-        //Update the slave positions, velocities.
-        updateSlavesVelPos();
+        //Update the pebble positions, velocities.
+        updatePebblesVelPos();
     }
 }
 
-void MultiParticle::setInitInertia(MatrixSymmetric3D inertia)
+void ClumpParticle::setInitInertia(MatrixSymmetric3D inertia)
 {
     initInertiaMultiparticle = inertia;
     inertiaMultiparticle = inertia;
     invInertia_= inertiaMultiparticle.inverse();
 }
 
-void MultiParticle::rotateTensorOfInertia()
+void ClumpParticle::rotateTensorOfInertia()
 {
    // Initial and current principal directions
    Vec3D e10 = getInitPrincipalDirections_e1();
@@ -252,9 +249,9 @@ void MultiParticle::rotateTensorOfInertia()
 
 
 
-void MultiParticle::updateSlavesVelPos()
+void ClumpParticle::updatePebblesVelPos()
 {
-    BaseParticle* pSlave;
+    BaseParticle* pPebble;
     Vec3D position = getPosition();
     Vec3D angularVelocity = getAngularVelocity();
     Quaternion orientation = getOrientation();
@@ -265,20 +262,20 @@ void MultiParticle::updateSlavesVelPos()
 
     Vec3D velocityDueToRotation;
 
-    for (int iSlave = 1; iSlave <= nSlave; iSlave++)
+    for (int iPebble = 1; iPebble <= nPebble; iPebble++)
     {
-        pSlave = slaveParticles[iSlave-1];
-        // pSlave->setMass(massMultiparticle);
-        pSlave->invMass_ = 1./massMultiparticle;
-        pSlave->setAngularVelocity(angularVelocity);
-        pSlave->setOrientation(orientation);
-        pSlave->setPosition(position + e1*slavePos[iSlave-1].X + e2*slavePos[iSlave-1].Y + e3*slavePos[iSlave-1].Z);
+        pPebble = pebbleParticles[iPebble - 1];
+        // pPebble->setMass(massMultiparticle);
+        pPebble->invMass_ = 1. / massMultiparticle;
+        pPebble->setAngularVelocity(angularVelocity);
+        pPebble->setOrientation(orientation);
+        pPebble->setPosition(position + e1 * pebblePos[iPebble - 1].X + e2 * pebblePos[iPebble - 1].Y + e3 * pebblePos[iPebble - 1].Z);
 
 
-        velocityDueToRotation = Vec3D::cross(angularVelocity, pSlave->getPosition() - position);
+        velocityDueToRotation = Vec3D::cross(angularVelocity, pPebble->getPosition() - position);
 
-        pSlave->setVelocity(getVelocity());
-        pSlave->addVelocity(velocityDueToRotation);
+        pPebble->setVelocity(getVelocity());
+        pPebble->addVelocity(velocityDueToRotation);
     }
 }
 
@@ -288,9 +285,9 @@ void MultiParticle::updateSlavesVelPos()
  * \param[in] time          current time
  * \param[in] timeStep      current time step
  */
-void MultiParticle::integrateBeforeForceComputation(double time, double timeStep)
+void ClumpParticle::integrateBeforeForceComputation(double time, double timeStep)
 {
-    if (IsSlave()) return;
+    if (IsPebble()) return;
     if (getInvMass() == 0.0)
     {
         BaseInteractable::integrateBeforeForceComputation(time, timeStep);
@@ -312,7 +309,7 @@ void MultiParticle::integrateBeforeForceComputation(double time, double timeStep
         }
 
         // PFC4 style acceleration of clumps
-        angularAccelerateMasterIterative(timeStep); //W(t+0.5dt)
+        angularAccelerateClumpIterative(timeStep); //W(t+0.5dt)
 
         //apply to rotation quaternion q: q = normalise(q + \tilde{C}\omega*timeStep) (see Wouter's notes)
         rotate(getAngularVelocity() * timeStep);
@@ -320,8 +317,8 @@ void MultiParticle::integrateBeforeForceComputation(double time, double timeStep
         // Rotate
         rotatePrincipalDirections(getAngularVelocity() * timeStep);
 
-        // Update slave nodes
-        updateSlavesVelPos();
+        // Update pebble nodes
+        updatePebblesVelPos();
         rotateTensorOfInertia();
 
     }
@@ -333,9 +330,9 @@ void MultiParticle::integrateBeforeForceComputation(double time, double timeStep
  * \param[in] time      current time
  * \param[in] timeStep  current time step
  */
-void MultiParticle::integrateAfterForceComputation(double time, double timeStep)
+void ClumpParticle::integrateAfterForceComputation(double time, double timeStep)
 {
-    if (IsSlave()) return;
+    if (IsPebble()) return;
     if (getInvMass() == 0.0)
     {
         BaseInteractable::integrateAfterForceComputation(time, timeStep);
@@ -344,14 +341,14 @@ void MultiParticle::integrateAfterForceComputation(double time, double timeStep)
     {
         accelerate((getForce() - viscousDamping*getVelocity()) * getInvMass() * 0.5 * timeStep);
         // PFC4 style acceleration of clumps
-        angularAccelerateMasterIterative(timeStep);
-        updateSlavesVelPos();
+        angularAccelerateClumpIterative(timeStep);
+        updatePebblesVelPos();
         updateExtraQuantities();
     }
 }
 
 // V
-void MultiParticle::angularAccelerateMasterIterative(double timeStep)
+void ClumpParticle::angularAccelerateClumpIterative(double timeStep)
 {
     Mdouble Ixx_ = getInertia().XX;
     Mdouble Iyy_ = getInertia().YY;
@@ -384,12 +381,12 @@ void MultiParticle::angularAccelerateMasterIterative(double timeStep)
 }
 
 // V
-void MultiParticle::computeMass(const ParticleSpecies &s)
+void ClumpParticle::computeMass(const ParticleSpecies &s)
 {
     if (isFixed()) return;
-    if (IsSlave()) return;
+    if (IsPebble()) return;
 
-    if (IsMaster())
+    if (IsClump())
     {
         invMass_ = 1.0/massMultiparticle;
         invInertia_= inertiaMultiparticle.inverse();
@@ -398,13 +395,13 @@ void MultiParticle::computeMass(const ParticleSpecies &s)
 }
 
 
-void MultiParticle::updateExtraQuantities()
+void ClumpParticle::updateExtraQuantities()
 {
     Mdouble ANG_TOL = 0.1; // 5.7 degrees - tolerance to misalignment
     Mdouble ACC_TOL = 0.1; // Tolerance for angular acceleration magnitude
 
     Mdouble TOL = 10e-8;   // External force tolerance
-    MultiParticle* pSlave;
+    ClumpParticle* pPebble;
     Vec3D n3 = getPrincipalDirections_e3();
     Vec3D v = Vec3D(0,0,1);
 
@@ -412,18 +409,18 @@ void MultiParticle::updateExtraQuantities()
     if (acos(Vec3D::dot(n3, v))<ANG_TOL)
     {
         setVerticallyOriented(true);
-        for (int iSlave = 1; iSlave <= nSlave; iSlave++)
+        for (int iPebble = 1; iPebble <= nPebble; iPebble++)
         {
-            pSlave = slaveParticles[iSlave-1];
-            pSlave->setVerticallyOriented(true);
+            pPebble = pebbleParticles[iPebble - 1];
+            pPebble->setVerticallyOriented(true);
         }
     }
     else {
         setVerticallyOriented(false);
-        for (int iSlave = 1; iSlave <= nSlave; iSlave++)
+        for (int iPebble = 1; iPebble <= nPebble; iPebble++)
         {
-            pSlave = slaveParticles[iSlave-1];
-            pSlave->setVerticallyOriented(false);
+            pPebble = pebbleParticles[iPebble - 1];
+            pPebble->setVerticallyOriented(false);
         }
     }
 
@@ -436,10 +433,10 @@ void MultiParticle::updateExtraQuantities()
     if ((acos(Vec3D::dot(n2, w))<ANG_TOL) || (acc<TOL))
     {
         setDzhanibekovParticle(true);
-        for (int iSlave = 1; iSlave <= nSlave; iSlave++)
+        for (int iPebble = 1; iPebble <= nPebble; iPebble++)
         {
-            pSlave = slaveParticles[iSlave-1];
-            pSlave->setDzhanibekovParticle(true);
+            pPebble = pebbleParticles[iPebble - 1];
+            pPebble->setDzhanibekovParticle(true);
         }
     }
 
@@ -447,10 +444,10 @@ void MultiParticle::updateExtraQuantities()
     if ( (getForce().getLength() > TOL)||(getTorque().getLength() > TOL) )
     {
         setDzhanibekovParticle(false);
-        for (int iSlave = 1; iSlave <= nSlave; iSlave++)
+        for (int iPebble = 1; iPebble <= nPebble; iPebble++)
         {
-            pSlave = slaveParticles[iSlave-1];
-            pSlave->setDzhanibekovParticle(false);
+            pPebble = pebbleParticles[iPebble - 1];
+            pPebble->setDzhanibekovParticle(false);
         }
     }
 

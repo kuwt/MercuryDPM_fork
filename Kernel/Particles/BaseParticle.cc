@@ -59,8 +59,8 @@ BaseParticle::BaseParticle()
     hGridCell.setHGridZ(99999);
     
     info_ = std::numeric_limits<double>::quiet_NaN();
-    isMaster = false;
-    isSlave = false;
+    isClump = false;
+    isPebble = false;
     logger(DEBUG, "BaseParticle::BaseParticle() finished");
 }
 
@@ -96,8 +96,8 @@ BaseParticle::BaseParticle(const BaseParticle& p)
     isMaserParticle_ = p.isMaserParticle_;
     isPeriodicGhostParticle_ = p.isPeriodicGhostParticle_;
     communicationComplexity_ = p.communicationComplexity_;
-    isMaster = p.IsMaster();
-    isSlave = p.IsSlave();
+    isClump = p.IsClump();
+    isPebble = p.IsPebble();
     //periodicComplexity_ = p.periodicComplexity_;
     //previousPeriodicComplexity_ = p.previousPeriodicComplexity_;
 #ifdef CONTACT_LIST_HGRID

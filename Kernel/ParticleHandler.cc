@@ -29,7 +29,7 @@
 #include <Particles/SphericalParticle.h>
 #include <Particles/ThermalParticle.h>
 #include <Particles/HeatFluidCoupledParticle.h>
-#include <Particles/MultiParticle.h>
+#include <Particles/ClumpParticle.h>
 #include "ParticleHandler.h"
 #include "DPMBase.h"
 #include "SpeciesHandler.h"
@@ -1050,7 +1050,7 @@ BaseParticle* ParticleHandler::createObject(const std::string& type)
     }
     else if (type == "Clump")
     {
-        return new MultiParticle;
+        return new ClumpParticle;
     }
     else
     {

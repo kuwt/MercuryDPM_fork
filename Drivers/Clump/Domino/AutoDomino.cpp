@@ -23,14 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Automatic rebuild script (multiple dominoes)
-
-// Auto rebuild scripts run the following list of commands:
-// 1) make              - to rebuild test example
-// 2) ./name        - run the rebuilt test
-// 3) rm -rf paraview_name   - clears previour simulation results
-// 4) mkdir paraview_name    - creates new dir for paraview output
-// 5) ../../../Tools/data2pvd name.data paraview_name/name - converts data output into paraview format
+// Automatic script to clean working directories, recompile the code and post-process the output for Paraview
 
 
 #include <cstdio>
@@ -39,10 +32,10 @@
 #include <stdexcept>
 #include <string>
 #include <array>
-#include"CMakeDefinitions.h"
+#include<CMakeDefinitions.h>
 
 std::string exec_command(const char* cmd) {
-    std::array<char, 128> buffer;
+    std::array<char, 256> buffer;
     std::string result;
     std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
     if (!pipe) {
@@ -54,22 +47,40 @@ std::string exec_command(const char* cmd) {
     return result;
 }
 
+
 int main(int argc, char* argv[])
 {
-
-    exec_command("make Domino");
-    exec_command("./Domino");
-
-    exec_command("rm -rf paraview_Domino");
-    exec_command("mkdir paraview_Domino");
-
-
-    exec_command("../../Tools/data2pvd Domino.data paraview_Domino/Domino");
-
+    // Automatic script to clean working directories, recompile the code and post-process the output for Paraview
     std::string command;
-    command = "python " + getMercurySourceDir() + "/Tools/MClump/plot_ene.py " + getMercuryBuildDir() + "/Drivers/Domino/ " + "Domino";
+    std::string name = "Domino";
+
+    // Remove data for stl sequence (Blender) visualizations
+    command = "rm clump_seq.txt";
+    exec_command(command.c_str());
+
+    // Make
+    command = "make " + name;
+    exec_command(command.c_str());
+
+    // Run
+    command = "./" + name;
+    exec_command(command.c_str());
+
+    // Clean the old paraview output directory
+    command = "rm -rf paraview_" + name;
+    exec_command(command.c_str());
+
+    // Create new paraview output directory
+    command = "mkdir paraview_" + name;
+    exec_command(command.c_str());
+
+    // Data2pvd tool run
+    command = "../../../Tools/data2pvd " + name + ".data paraview_" + name + "/" + name;
+    exec_command(command.c_str());
+
+    // Paraview energy data postprocessing tool
+    command = "python " + getMercurySourceDir() + "/Tools/MClump/plot_ene.py " +
+            getMercuryBuildDir() + "/Drivers/Clump/" + name + "/ " + name;
     exec_command(command.c_str());
     return 0;
 }
-
-

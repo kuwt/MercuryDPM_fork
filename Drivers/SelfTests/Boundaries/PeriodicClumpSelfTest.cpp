@@ -28,7 +28,7 @@
 #include "Mercury3D.h"
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
-#include "Particles/MultiParticle.h"
+#include "Particles/ClumpParticle.h"
 #include "../../Clump/ClumpHeaders/ClumpIO.h"
 #include "../../Clump/ClumpHeaders/Mercury3DClump.h"
 # include <stdlib.h>
@@ -77,17 +77,17 @@ public:
     
         // Generate single clump
         setClumpIndex(1);
-        MultiParticle p0;
+        ClumpParticle p0;
         p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to Clump 1
-        p0.setMaster();
+        p0.setClump();
         p0.setRadius(data.pebbles_r[clump_index][0]);
         Vec3D pos = Vec3D(0, 0, 0);
         p0.setPosition(pos);
         for (int j = 0; j < data.pebbles_r[clump_index].size(); j++) {
-            p0.addSlave(Vec3D(data.pebbles_x[clump_index][j],
-                                  data.pebbles_y[clump_index][j],
-                                  data.pebbles_z[clump_index][j]),
-                            data.pebbles_r[clump_index][j]);
+            p0.addPebble(Vec3D(data.pebbles_x[clump_index][j],
+                               data.pebbles_y[clump_index][j],
+                               data.pebbles_z[clump_index][j]),
+                         data.pebbles_r[clump_index][j]);
         }
         p0.setPrincipalDirections(
                     Matrix3D(data.pd[clump_index][0], data.pd[clump_index][1], data.pd[clump_index][2],
@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
     problem.removeOldFiles();
     problem.solve();
 
-    MultiParticle* p = dynamic_cast<MultiParticle*>(problem.particleHandler.getLastObject());
+    ClumpParticle* p = dynamic_cast<ClumpParticle*>(problem.particleHandler.getLastObject());
     Vec3D angVel = p->getAngularVelocity();
     Vec3D known_angVel = Vec3D(-1.30004, 19.9932, 0.944699);
 

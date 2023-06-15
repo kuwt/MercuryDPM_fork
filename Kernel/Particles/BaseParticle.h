@@ -653,20 +653,19 @@ public:
 
     virtual void computeMass(const ParticleSpecies& s);
 
-    //+++++++Multiparticles++++++++
-    BaseParticle* getMaster() const
+    BaseParticle* getClump() const
     {
-        return masterParticle;
+        return clumpParticle;
     }
 
-    // Slave-Master functions
-    bool IsMaster() const
+    // Pebble-Clump functions
+    bool IsClump() const
     {
-        return isMaster;
+        return isClump;
     }
-    bool IsSlave() const
+    bool IsPebble() const
     {
-        return isSlave;
+        return isPebble;
     }
 
     virtual Vec3D getCenterOfMass() {return Vec3D(0,0,0);}
@@ -730,9 +729,9 @@ private:
 public:
     virtual void actionsAfterAddObject() {}
 
-    BaseParticle* masterParticle;
-    bool isSlave;
-    bool isMaster;
+    BaseParticle* clumpParticle;
+    bool isPebble;
+    bool isClump;
 };
 
 #endif

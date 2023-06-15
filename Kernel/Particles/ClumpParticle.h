@@ -37,29 +37,29 @@
  * \class Clump
  * \brief
  */
-class MultiParticle final: public NonSphericalParticle
+class ClumpParticle final: public NonSphericalParticle
 {
 public:
     /*!
      * \brief Basic Particle constructor, creates a particle at (0,0,0) with radius, mass and inertia equal to 1
      */
-    MultiParticle();
+    ClumpParticle();
 
     /*!
      * \brief Copy constructor, which accepts as input a reference to a Superquadric.
      * It creates a copy of this Particle and all it's information.
      * Usually it is better to use the copy() function for polymorphism.
      */
-    MultiParticle(const MultiParticle& p);
+    ClumpParticle(const ClumpParticle& p);
     
     /*!
     * \brief Destructor, needs to be implemented and checked to see if it is the largest or smallest particle currently
     * in its particleHandler
     */
 
-    ~MultiParticle() override;
+    ~ClumpParticle() override;
 
-    MultiParticle* copy() const override;
+    ClumpParticle* copy() const override;
 
 
     void write(std::ostream& os) const override
@@ -85,9 +85,9 @@ public:
 
     void rotateTensorOfInertia();
 
-    void addSlave(Vec3D position, Mdouble radius);
+    void addPebble(Vec3D position, Mdouble radius);
 
-    void setMaster();
+    void setClump();
 
     void setPrincipalDirections(Matrix3D directions);
 
@@ -122,19 +122,19 @@ public:
     }
 
 
-    int NSlave() const;
+    int NPebble() const;
 
     void actionsAfterAddObject() override;
 
-    void updateSlavesVelPos();
+    void updatePebblesVelPos();
 
-    void updateSlavesVel();
+    void updatePebblesVel();
 
     void integrateBeforeForceComputation(double time, double timeStep) override;
 
     void integrateAfterForceComputation(double time, double timeStep) override;
 
-    void angularAccelerateMasterIterative(double timeStep);
+    void angularAccelerateClumpIterative(double timeStep);
 
     void rotatePrincipalDirections(Vec3D rotation);
 
@@ -158,19 +158,19 @@ public:
         principalDirections.ZZ = e.Z;
     }
 
-    std::vector<Mdouble> getSlaveRadius() const {
-        return slaveRadius;
+    std::vector<Mdouble> getPebbleRadius() const {
+        return pebbleRadius;
     }
 
-    void setSlave(int kSlave, MultiParticle* pSlave) {
-        slaveParticles[kSlave] = pSlave;
+    void setPebble(int kPebble, ClumpParticle* pPebble) {
+        pebbleParticles[kPebble] = pPebble;
     }
 
     //ToDo: This function is used in ParticleHandler
-    void setMaster(MultiParticle* master) {
-        isMaster = false;
-        isSlave = true;
-        masterParticle = master;
+    void setClump(ClumpParticle* master) {
+        isClump = false;
+        isPebble = true;
+        clumpParticle = master;
     }
 
     void setMassMultiparticle(Mdouble mass)
@@ -186,7 +186,7 @@ public:
 
     Mdouble getKineticEnergy() const override{
         Mdouble res = 0;
-        if (isMaster) {
+        if (isClump) {
             Vec3D v = getVelocity();
             res = 0.5 * massMultiparticle * ( v.X * v.X +  v.Y * v.Y + v.Z * v.Z );
         }
@@ -195,7 +195,7 @@ public:
 
     Mdouble getRotationalEnergy() const override{
         Mdouble res = 0;
-        if (isMaster) {
+        if (isClump) {
             Vec3D nn = getAngularVelocity();
             Mdouble nl = nn.getLength();
             Mdouble tol = 1e-10;
@@ -210,18 +210,18 @@ public:
 
     }
 
-    std::vector <Vec3D> getSlavePositions(){
+    std::vector <Vec3D> getPebblePositions(){
         std::vector <Vec3D> globalPos;
         Vec3D e1 = getPrincipalDirections_e1();
         Vec3D e2 = getPrincipalDirections_e2();
         Vec3D e3 = getPrincipalDirections_e3();
-        for (int i = 1; i<=NSlave(); i++){
-        globalPos.push_back(getPosition() + e1*slavePos[i-1].X + e2*slavePos[i-1].Y + e3*slavePos[i-1].Z);
+        for (int i = 1; i <= NPebble(); i++){
+        globalPos.push_back(getPosition() + e1 * pebblePos[i - 1].X + e2 * pebblePos[i - 1].Y + e3 * pebblePos[i - 1].Z);
         }
         return globalPos;
     }
 
-    std::vector <Mdouble> getSlaveRadii(){ return slaveRadius; }
+    std::vector <Mdouble> getPebbleRadii(){ return pebbleRadius; }
 
     // Methods setting and getting some extra Boolean properties
 
@@ -278,7 +278,7 @@ public:
 
 private:
 
-    int nSlave;
+    int nPebble;
     
     bool DzhanibekovParticle_; // This property is needed to quantify Dzhanibekov gas properties
     bool VerticallyOriented_;  // This property is useful for mechnical stability simulations (Gomboc, Dominos)
@@ -290,12 +290,12 @@ private:
     MatrixSymmetric3D inertiaMultiparticle;
     MatrixSymmetric3D initInertiaMultiparticle;
 
-    std::vector<Vec3D> slavePos;
-    std::vector<Mdouble> slaveRadius;
+    std::vector<Vec3D> pebblePos;
+    std::vector<Mdouble> pebbleRadius;
 
     Matrix3D principalDirections;
     Matrix3D initPrincipalDirections;
-    std::vector<MultiParticle*> slaveParticles;
+    std::vector<ClumpParticle*> pebbleParticles;
 
     //Helper functions
     MatrixSymmetric3D MtoS( Matrix3D M){ return MatrixSymmetric3D(M.XX, M.XY, M.XZ, M.YY, M.YZ, M.ZZ);}

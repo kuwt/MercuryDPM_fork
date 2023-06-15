@@ -305,7 +305,7 @@ void PeriodicBoundary::createPeriodicParticle(BaseParticle* p, ParticleHandler& 
 {
     //note that getDistance sets closestToLeftBoundary_ to true or false depending on which side is closest
     const Mdouble maxDistance = p->getMaxInteractionRadius() + pH.getLargestParticle()->getMaxInteractionRadius();
-    if ((getDistance(*p) < maxDistance)&&(!p->IsMaster()))
+    if ((getDistance(*p) < maxDistance)&&(!p->IsClump()))
     {
         createGhostParticle(p);
     }

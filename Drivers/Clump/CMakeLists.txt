@@ -1,7 +1,5 @@
-add_subdirectory(BulkTs)
 add_subdirectory(Domino)
 add_subdirectory(Gomboc)
-add_subdirectory(Periodic)
 add_subdirectory(RotatingDrum)
 add_subdirectory(Single)
 add_subdirectory(TBar)
