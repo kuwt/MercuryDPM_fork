@@ -1,10 +1,5 @@
-<<<<<<< HEAD:Drivers/Clump/Domino/DominoBatch.cpp
-//Copyright (c) 2015, The MercuryDPM Developers Team. All rights reserved.
-=======
 //Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
->>>>>>> remotes/origin/master:Drivers/MultiParticle/AutoTBar.cpp
-//For the list of developers, see <http://www.MercuryDPM.org/Team>.
-//
+// For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //Redistribution and use in source and binary forms, with or without
 //modification, are permitted provided that the following conditions are met:
 //  * Redistributions of source code must retain the above copyright
@@ -59,12 +54,7 @@ std::string ExecCommand(const char* cmd) {
 int main(int argc, char** argv)
 {
     std::string command;
-<<<<<<< HEAD:Drivers/Clump/Domino/DominoBatch.cpp
     command = "python3 " + getMercurySourceDir() + "/Tools/SimpleOpt/BatchRun.py " + getMercurySourceDir() + " " + getMercuryBuildDir();
     std::cout<<ExecCommand(command.c_str())<<std::endl;
-=======
-    command = "python " + getMercuryDPMSourceDir() + "/Tools/MClump/plot_ene.py " + getMercuryDPMBuildDir() + "/Drivers/MultiParticle/ " + "TBar";
-    exec_command(command.c_str());
     return 0;
->>>>>>> remotes/origin/master:Drivers/MultiParticle/AutoTBar.cpp
 }

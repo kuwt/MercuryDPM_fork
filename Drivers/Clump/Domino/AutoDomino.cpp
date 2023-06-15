@@ -52,7 +52,6 @@ int main(int argc, char* argv[])
 {
     // Automatic script to clean working directories, recompile the code and post-process the output for Paraview
     std::string command;
-<<<<<<< HEAD:Drivers/Clump/Domino/AutoDomino.cpp
     std::string name = "Domino";
 
     // Remove data for stl sequence (Blender) visualizations
@@ -82,9 +81,6 @@ int main(int argc, char* argv[])
     // Paraview energy data postprocessing tool
     command = "python " + getMercurySourceDir() + "/Tools/MClump/plot_ene.py " +
             getMercuryBuildDir() + "/Drivers/Clump/" + name + "/ " + name;
-=======
-    command = "python " + getMercuryDPMSourceDir() + "/Tools/MClump/plot_ene.py " + getMercuryDPMBuildDir() + "/Drivers/MultiParticle/ " + "Domino";
->>>>>>> remotes/origin/master:Drivers/MultiParticle/AutoDomino.cpp
     exec_command(command.c_str());
     return 0;
 }
