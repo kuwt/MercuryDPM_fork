@@ -124,6 +124,8 @@ int ClumpParticle::NPebble() const
 void ClumpParticle::setClump()
 {
     isClump = true;
+    isPebble = false;
+
 
 }
 
