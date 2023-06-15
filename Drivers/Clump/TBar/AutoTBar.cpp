@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2020, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -52,12 +52,11 @@ int main(int argc, char* argv[])
 {
     // Automatic script to clean working directories, recompile the code and post-process the output for Paraview
     std::string command;
-<<<<<<< HEAD:Drivers/Clump/Domino/AutoDomino.cpp
-    std::string name = "Domino";
+    std::string name = "TBar";
 
     // Remove data for stl sequence (Blender) visualizations
-    command = "rm clump_seq.txt";
-    exec_command(command.c_str());
+    //command = "rm clump_seq.txt";
+    //exec_command(command.c_str());
 
     // Make
     command = "make " + name;
@@ -82,9 +81,6 @@ int main(int argc, char* argv[])
     // Paraview energy data postprocessing tool
     command = "python " + getMercurySourceDir() + "/Tools/MClump/plot_ene.py " +
             getMercuryBuildDir() + "/Drivers/Clump/" + name + "/ " + name;
-=======
-    command = "python " + getMercuryDPMSourceDir() + "/Tools/MClump/plot_ene.py " + getMercuryDPMBuildDir() + "/Drivers/MultiParticle/ " + "Domino";
->>>>>>> remotes/origin/master:Drivers/MultiParticle/AutoDomino.cpp
     exec_command(command.c_str());
     return 0;
 }
