@@ -3,7 +3,6 @@
 //
 
 // This driver code will contain a 3D system that is used for the simulation of a die filling process.
-
 #include "DieFilling.h"
 
 int main(int argc, char**argv)
@@ -65,11 +64,11 @@ int main(int argc, char**argv)
     problem.fStatFile.setFileType(FileType::ONE_FILE);
     problem.restartFile.setFileType(FileType::ONE_FILE);
     problem.setParticlesWriteVTK(false);
-    problem.setWallsWriteVTK(false);
+    problem.wallHandler.setWriteVTK(false);
     problem.setName("singleParticleTest/MercSol");
     problem.removeOldFiles();
 
-    DocInfo doc_info;
+    oomph::DocInfo doc_info;
     doc_info.set_directory("singleParticleTest");
     doc_info.number() = 0;
 

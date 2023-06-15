@@ -2,19 +2,18 @@
 // Created by mitchel on 6/4/19.
 //
 
-#ifndef MERCURY_OOMPHDIEFILLING_H
-#define MERCURY_OOMPHDIEFILLING_H
+#ifndef MERCURYDPM_OOMPHDIEFILLING_H
+#define MERCURYDPM_OOMPHDIEFILLING_H
 
 // General headers
-#include "generic.h"
+#include "../../../../oomph-lib/src/generic/generic.h"
 //#include <algorithm>
 #include "assert.h"
 
 // Equation headers
-#include "elements.h"
+#include "../../../../oomph-lib/src/generic/elements.h"
 #include "Elements/AndersonJackson.h"
-#include "meshes/simple_cubic_mesh.h"
-
+#include "../../../../oomph-lib/src/meshes/simple_cubic_mesh.h"
 
 template<class ELEMENT>
 class OomphDieFilling : public oomph::Problem
@@ -81,7 +80,7 @@ void OomphDieFilling<ELEMENT>::doc_voidage(oomph::DocInfo& doc_info)
     // Output solution if using get_voidage_byEl
     sprintf(filename,"%s/voidagen%i.dat",doc_info.directory().c_str(),doc_info.number());
     some_file.open(filename);
-    mesh_pt()->output_voidage_byEl(some_file,npts);
+    //mesh_pt()->output_voidage_byEl(some_file,npts);
     some_file.close();
 } //end doc_voidage
 
@@ -105,4 +104,4 @@ void OomphDieFilling<ELEMENT>::doc_element(oomph::DocInfo& doc_info)
     some_file.close();
 } //end doc_voidage
 
-#endif //MERCURY_OOMPHDIEFILLING_H
+#endif //MERCURYDPM_OOMPHDIEFILLING_H

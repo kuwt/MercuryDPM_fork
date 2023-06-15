@@ -3,39 +3,19 @@
 //  Modified by Hao on 2-Jul-2019
 //
 
-#ifndef MERCURY_MERCURYDIEFILLING_H
-#define MERCURY_MERCURYDIEFILLING_H
+#ifndef MERCURYDPM_MERCURYDIEFILLING_H
+#define MERCURYDPM_MERCURYDIEFILLING_H
 
 // Generic MercuryDPM header
-#include <Mercury3D.h>
+#include "Mercury3D.h"
 #include <Species/LinearViscoelasticFrictionSpecies.h>
 #include <Species/LinearPlasticViscoelasticFrictionSpecies.h>
 #include <Species/LinearPlasticViscoelasticFrictionReversibleAdhesiveSpecies.h>
 #include <Walls/InfiniteWall.h>
 
-#include "generic.h"
-#include "math.h"
+#include "../../../../oomph-lib/src/generic/generic.h"
 
-/*namespace convertVecFuncs
-{
-    Vec3D convertToVec3D(oomph::Vector<double>& Vec)
-    {
-        Vec3D returnVec;
-        returnVec.X = Vec[0];
-        returnVec.Y = Vec[1];
-        returnVec.Z = Vec[2];
-        return returnVec;
-    }
-    
-    oomph::Vector<double> convertToOomphVec(const Vec3D& Vec)
-    {
-        oomph::Vector<double> returnVec(3,0.0);
-        returnVec[0] = Vec.X;
-        returnVec[1] = Vec.Y;
-        returnVec[2] = Vec.Z;
-        return returnVec;
-    }
-}*/
+#include <cmath>
 
 namespace mercVoidage
 {
@@ -87,7 +67,7 @@ namespace mercVoidage
 
 
 class MercuryDieFilling : public Mercury3D //, GeomObject
-// Can not place GeomObject simply a it needs a function definition for
+// Can not place GeomObject simply as it needs a function definition for
 // oomph::GeomObject::position(const oomph::Vector<double>&, oomph::Vector<double>)
 // which is declared pure virtual
 {
@@ -101,4 +81,4 @@ protected:
 
 };
 
-#endif //MERCURY_MERCURYDIEFILLING_H
+#endif //MERCURYDPM_MERCURYDIEFILLING_H

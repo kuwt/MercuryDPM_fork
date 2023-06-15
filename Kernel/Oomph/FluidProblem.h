@@ -2,8 +2,8 @@
 // Created by mitchel on 11/7/22.
 //
 
-#ifndef MERCURY_FLUIDPROBLEM_H
-#define MERCURY_FLUIDPROBLEM_H
+#ifndef MERCURYDPM_FLUIDPROBLEM_H
+#define MERCURYDPM_FLUIDPROBLEM_H
 
 // Generic oomph-lib headers
 #include "generic.h"
@@ -344,4 +344,4 @@ void FluidProblem<ELEMENT>::doc_element(DocInfo& doc_info)
     some_file.close();
 } //end doc_voidage
 
-#endif //MERCURY_FLUIDPROBLEM_H
+#endif //MERCURYDPM_FLUIDPROBLEM_H

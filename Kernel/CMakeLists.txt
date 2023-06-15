@@ -55,6 +55,9 @@ file(GLOB MercuryDPM_SRC
         Tools/*.cc
         Controllers/*.cc
         Helpers/*.cc
+
+        Oomph/FluidCoupling/UnderResolved/*.cc
+        Oomph/FluidCoupling/UnderResolved/Elements/*.cc
         )
 
 #Basic library

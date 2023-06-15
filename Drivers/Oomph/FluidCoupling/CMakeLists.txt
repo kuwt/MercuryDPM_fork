@@ -1,5 +1,12 @@
 include(${CMAKE_SOURCE_DIR}/Configuration/MasterMake.cmake)
-add_subdirectory(UnderResolved)
+
+FILE(GLOB ALL_FILES *)
+FOREACH(FILE ${ALL_FILES})
+    IF(EXISTS "${FILE}/CMakeLists.txt")
+        #MESSAGE(STATUS "add_sub(${FILE})")
+        add_subdirectory(${FILE})
+    ENDIF()
+ENDFOREACH()
 
 #Part 1 : All cpp files will be made to exec files
 #########################################

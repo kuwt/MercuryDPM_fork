@@ -4,7 +4,7 @@
 
 #include "DieFilling.h"
 
-void DieFilling::setupInitialConditions() override
+void DieFilling::setupInitialConditions()
 {
     //logger(ERROR,"MercuryDieFilling::setBC() not overwritten correctly");
     logger(INFO,"Call to MercuryDieFilling::setupInitialConditions()");
@@ -183,9 +183,9 @@ void DieFilling::setBC()
     //logger(ERROR,"UnderResolvedCoupling::setBC() not overwritten correctly");
     
     // Pin redudant pressure dofs
-    RefineableAndersonJacksonEquations<3>::pin_redundant_nodal_pressures(mesh_pt()->element_pt());
+    oomph::RefineableAndersonJacksonEquations<3>::pin_redundant_nodal_pressures(mesh_pt()->element_pt());
     //Fix 3-th pressure value in first element to 0.0.
-    dynamic_cast<RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(0))->fix_pressure(1,0.0);
+    dynamic_cast<oomph::RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(0))->fix_pressure(1,0.0);
     
     // Boundaries are numbered:
     // 0 is at the bottom

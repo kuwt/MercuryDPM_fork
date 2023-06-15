@@ -2,8 +2,8 @@
 // Created by mitchel on 11/7/22.
 //
 
-#ifndef MERCURY_FLUIDCOUPLING_H
-#define MERCURY_FLUIDCOUPLING_H
+#ifndef MERCURYDPM_FLUIDCOUPLING_H
+#define MERCURYDPM_FLUIDCOUPLING_H
 
 #include "VCoupling.h"
 #include "FluidCoupledElement.h"
@@ -142,4 +142,4 @@ private:
     double fractionPressureGradient = 0.0;
 };
 
-#endif //MERCURY_FLUIDCOUPLING_H
+#endif //MERCURYDPM_FLUIDCOUPLING_H

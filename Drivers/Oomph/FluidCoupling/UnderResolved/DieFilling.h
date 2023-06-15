@@ -2,10 +2,10 @@
 // Created by mitchel on 1/23/20.
 //
 
-#ifndef MERCURY_DIEFILLING_H
-#define MERCURY_DIEFILLING_H
+#ifndef MERCURYDPM_DIEFILLING_H
+#define MERCURYDPM_DIEFILLING_H
 
-#include "Oomph/FluidCoupling/UnderResolved/UnderResolvedCoupling.h"
+#include "../../../../Kernel/Oomph/FluidCoupling/UnderResolved/UnderResolvedCoupling.h"
 
 class DieFilling : public UnderResolvedCoupling
 {
@@ -70,4 +70,4 @@ private:
 
 };
 
-#endif //MERCURY_DIEFILLING_H
+#endif //MERCURYDPM_DIEFILLING_H

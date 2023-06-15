@@ -4,7 +4,7 @@
 
 #include "UnderResolvedCoupling.h"
 
-void UnderResolvedCoupling::solveSystem(DocInfo &doc_info_)
+void UnderResolvedCoupling::solveSystem(oomph::DocInfo &doc_info_)
 {
     logger(INFO,"Entered solveSystem");
     
@@ -148,7 +148,7 @@ void UnderResolvedCoupling::actions_after_adapt()
     unsigned long nelem=mesh_pt()->nelement();
     for (unsigned e=0;e<nelem;e++)
     {
-        dynamic_cast<RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(e))->set_number(e); // Adding global number to element
+        dynamic_cast<oomph::RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(e))->set_number(e); // Adding global number to element
     }
     
     logger(DEBUG,"We need to store dedt before overwriting");
@@ -251,9 +251,9 @@ void UnderResolvedCoupling::updateFdOnPart(const unsigned int &iPart, const int 
 
 Vec3D UnderResolvedCoupling::getFdOnPart(const unsigned int &iPart, const int &pInEl, const double &voidInEl, const oomph::Vector<double> &s)
 {
-    auto elPtr = dynamic_cast<RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(pInEl));
-    mesh_pt()->element_pt(pInEl)->
-    
+    auto elPtr = dynamic_cast<oomph::RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(pInEl));
+    //mesh_pt()->element_pt(pInEl)->
+
     BaseParticle* particlePtr = particleHandler.getObject(iPart);
     
     // Drag force is given by: Fd = 1/2 Cd \rho_f \vec{v_rel} |\vec{v_rel}|, the fluid velocity dependence on voidage is already taken care by AJ solver
@@ -341,7 +341,7 @@ void UnderResolvedCoupling::updateShearOnPart(const unsigned int &iPart_, const 
     oomph::Vector<double> pPos = convertVecFuncs::convertToOomphVec(particlePtr->getPosition());
     double pRad = particlePtr->getRadius();
     double pVolume = particlePtr->getVolume();
-    auto elPtr = dynamic_cast<RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(pInEl_));
+    auto elPtr = dynamic_cast<oomph::RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(pInEl_));
     
     oomph::Vector<double> shearForceOnP(3,0.0);
     oomph::Vector<double> torques(3,0.0);
@@ -366,7 +366,7 @@ void UnderResolvedCoupling::updateShearOnPart(const unsigned int &iPart_, const 
     
     /// Shear force contribution
     oomph::Vector<double> dummyVec(3,0.0);
-    GeomObject* geom_obj_pt = nullptr;
+    oomph::GeomObject* geom_obj_pt = nullptr;
     //FIXME We could make setDistFromCOM to relative distance in s, if we find out how to get the absolute distance between the points (see dx_tauxx .../(2*setDistFromCOM))
     
     oomph::Vector<double> nX(3,0.0); nX[0] = 1.0;
@@ -510,7 +510,7 @@ void UnderResolvedCoupling::updateSaffmanLift(const unsigned &iPart_, const int 
     BaseParticle* particlePtr = particleHandler.getObject(iPart_);
     
     oomph::Vector<double> velAtPos(3,0.0);
-    auto elPtr = dynamic_cast<RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(pInEl_));
+    auto elPtr = dynamic_cast<oomph::RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(pInEl_));
     
     elPtr->interpolated_u_nst(s_,velAtPos);
     Vec3D scaledFluidVel = getVelocityScaling() * convertVecFuncs::convertToVec3D(velAtPos); // Need to scale fluid velocity to dimensional
@@ -562,7 +562,7 @@ void UnderResolvedCoupling::updateMagnusLift(const unsigned &iPart_, const int &
     // Cl = min(0.5, 0.5pRad |w_rel|/|u_rel|)
     Vec3D FMagnus ={0.0, 0.0, 0.0};
     double pRad =particlePtr->getRadius();
-    auto elPtr = dynamic_cast<RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(pInEl_));
+    auto elPtr = dynamic_cast<oomph::RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(pInEl_));
     
     oomph::Vector<double> velAtPos(3,0.0);
     elPtr->interpolated_u_nst(s_,velAtPos);
@@ -649,7 +649,7 @@ oomph::Vector<double> UnderResolvedCoupling::getBodyForceInElemByCoupling(const 
     
     oomph::Vector<double> posNode0(3, 0.0);
     oomph::Vector<double> posNodeEnd(3, 0.0);
-    auto elPtr = dynamic_cast<RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(iEl_));
+    auto elPtr = dynamic_cast<oomph::RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(iEl_));
     const unsigned int iNode = elPtr->nnode();
     // Note that index of end node is iNode - 1, else segmentation fault as node_pt(iNode) does not exist
     elPtr->node_pt(0)->position(posNode0);
@@ -677,7 +677,7 @@ oomph::Vector<double> UnderResolvedCoupling::getBodyForceInElemByCoupling(const 
 Vec3D UnderResolvedCoupling::getPressureGradient(const int & pIsInEl_, const oomph::Vector<double> &s_)
 {
     oomph::Vector<double> pGrad(3, 0.0);
-    auto elPtr = dynamic_cast<RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(pIsInEl_));
+    auto elPtr = dynamic_cast<oomph::RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(pIsInEl_));
     
     pGrad[0] = elPtr->interpolated_dpdx_nst(s_,0);
     pGrad[1] = elPtr->interpolated_dpdx_nst(s_,1);
@@ -747,7 +747,7 @@ void UnderResolvedCoupling::setBC()
 
     // Pin redudant pressure dofs
     //Fix 3-th pressure value in first element to 0.0.
-    dynamic_cast<RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(0))->fix_pressure(1,0.0);
+    dynamic_cast<oomph::RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(0))->fix_pressure(1,0.0);
     
     // Boundaries are numbered:
     // 0 is at the bottom
@@ -954,8 +954,8 @@ void UnderResolvedCoupling::updateListOfPInElem(const unsigned &iPart)
     for (unsigned iEl = 0; iEl < nEl; iEl++)
     {
         oomph::Vector<double> s(3, 0.0);
-        GeomObject* geom_obj_pt = nullptr;
-        dynamic_cast<RefineableAJQCrouzeixRaviartElement<3>*>(mesh_pt()->element_pt(
+        oomph::GeomObject* geom_obj_pt = nullptr;
+        dynamic_cast<oomph::RefineableAJQCrouzeixRaviartElement<3>*>(mesh_pt()->element_pt(
                 iEl))->locate_zeta(convertVecFuncs::convertToOomphVec(pPos), geom_obj_pt, s);
         if (geom_obj_pt != nullptr)
         {
@@ -999,7 +999,7 @@ void UnderResolvedCoupling::updateListOfVoidageInElem(const unsigned &iEl)
     oomph::Vector<double> posNode0(3, 0.0);
     oomph::Vector<double> posNodeEnd(3, 0.0);
     
-    auto elPtr = dynamic_cast<RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(iEl));
+    auto elPtr = dynamic_cast<oomph::RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(iEl));
     const unsigned int iNode = elPtr->nnode();
     
     // Note that index of end node is iNode - 1, else segmentation fault as node_pt(iNode) does not exist
@@ -1049,7 +1049,7 @@ void UnderResolvedCoupling::updateNeighbourList()
     // Output solution if using get_voidage_byEl
     sprintf(filename,"%s/updateNeighbourListVoidagen%i.dat",doc_info.directory().c_str(),doc_info.number());
     some_file.open(filename);
-    mesh_pt()->output_voidage_byEl(some_file,npts);
+    //mesh_pt()->output_voidage_byEl(some_file,npts);
     some_file.close();
     doc_info.number()++;
     
@@ -1079,9 +1079,9 @@ void UnderResolvedCoupling::updateNeighbourList()
     logger(DEBUG,"Going into loop, nTree = %", nTree);
     for (unsigned iTree = 0; iTree < nTree; iTree++)
     {
-        Tree* treeRootPtr = mesh_pt()->forest_pt()->tree_pt(iTree);
+        oomph::Tree* treeRootPtr = mesh_pt()->forest_pt()->tree_pt(iTree);
         
-        oomph::Vector<Tree*> allLeavesOfTree;
+        oomph::Vector<oomph::Tree*> allLeavesOfTree;
         treeRootPtr->stick_leaves_into_vector(allLeavesOfTree);
         
         logger(DEBUG,"allLeavesOfTree.size() = %",allLeavesOfTree.size());
@@ -1090,7 +1090,7 @@ void UnderResolvedCoupling::updateNeighbourList()
         {
             for (int dir = 0; dir < 6; dir++)
             {
-                Tree* neighbourTreeRootPtr = mesh_pt()->forest_pt()->tree_pt(iTree)->neighbour_pt(startInd+dir);
+                oomph::Tree* neighbourTreeRootPtr = mesh_pt()->forest_pt()->tree_pt(iTree)->neighbour_pt(startInd+dir);
                 if (neighbourTreeRootPtr == nullptr)
                 {
                     logger(DEBUG,"There is no neighbour in  dir %",dir);
@@ -1100,7 +1100,7 @@ void UnderResolvedCoupling::updateNeighbourList()
                 {
                     logger(DEBUG,"There is a neighbour in  dir %",dir);
                     
-                    oomph::Vector<Tree*> neighbourTreeRootPtrsLeaves;
+                    oomph::Vector<oomph::Tree*> neighbourTreeRootPtrsLeaves;
                     
                     stickLeavesOfEqualOrSmallerSizedNeighbourRecursiveInDir(neighbourTreeRootPtr, neighbourTreeRootPtrsLeaves, dir);
                     for (auto iLeaf : neighbourTreeRootPtrsLeaves)
@@ -1116,7 +1116,7 @@ void UnderResolvedCoupling::updateNeighbourList()
             {
                 for (int dir = 0; dir < 6; dir++)
                 {
-                    oomph::Vector<Tree*> neighbourTreePtrs;
+                    oomph::Vector<oomph::Tree*> neighbourTreePtrs;
                     logger(DEBUG, "We get here");
                     stickLeavesOfNeighbourRecursiveInDir(iLeaf, iTree, neighbourTreePtrs, dir);
                     for (auto iLeaf2 : neighbourTreePtrs)
@@ -1144,7 +1144,7 @@ void UnderResolvedCoupling::updateNeighbourList()
  * @param[in] const int &dir_, direction in which the elements neighbour needs to be determined following the oomph-lib
  *              numbering convention in direction (-x = 0, +x = 1, ... , +z = 5)
  */
-void UnderResolvedCoupling::stickLeavesOfNeighbourRecursiveInDir(Tree* Tree_, const int &iTree, std::vector<Tree*> &allNeighbouringLeaves_, const int &dir_)
+void UnderResolvedCoupling::stickLeavesOfNeighbourRecursiveInDir(oomph::Tree* Tree_, const int &iTree, std::vector<oomph::Tree*> &allNeighbouringLeaves_, const int &dir_)
 {
     logger(DEBUG,"call to stickLeavesOfNeighbourRecursiveInDir for iEl % in dir %",Tree_->object_pt()->number(),dir_);
     logger(DEBUG,"Tree_->level() == %",Tree_->level());
@@ -1160,7 +1160,7 @@ void UnderResolvedCoupling::stickLeavesOfNeighbourRecursiveInDir(Tree* Tree_, co
     std::vector<int> indexPath;
     
     getNeighbourIndex(indexTree_, dir_, indexInternalNeighbour);
-    Tree* neighbourPtr = nullptr;
+    oomph::Tree* neighbourPtr = nullptr;
     
     logger(DEBUG,"indexInternalNeighbour = %", indexInternalNeighbour);
     
@@ -1183,7 +1183,7 @@ void UnderResolvedCoupling::stickLeavesOfNeighbourRecursiveInDir(Tree* Tree_, co
     }
     
     // Make sure that only the right sons are considered
-    Tree* neighbourTreeSonAtSameLevel;
+    oomph::Tree* neighbourTreeSonAtSameLevel;
     neighbourTreeSonAtSameLevel = neighbourPtr;
     
     logger(DEBUG,"neighbourTreeSonAtSameLevel->number = %", neighbourTreeSonAtSameLevel->object_pt()->number());
@@ -1215,11 +1215,11 @@ void UnderResolvedCoupling::stickLeavesOfNeighbourRecursiveInDir(Tree* Tree_, co
  * @param[in] Tree* Tree_, pointer to Tree of which neighbours need to be determined
  * @param[in] &internalIndex
  */
-void UnderResolvedCoupling::getInternalIndex(Tree* Tree_, int &internalIndex)
+void UnderResolvedCoupling::getInternalIndex(oomph::Tree* Tree_, int &internalIndex)
 {
     logger(DEBUG,"call to getInternalIndex");
-    
-    Tree* fathPtr = Tree_->father_pt();
+
+    oomph::Tree* fathPtr = Tree_->father_pt();
     if (fathPtr == nullptr) //
     {
         logger(DEBUG,"father Pointer = nullptr");
@@ -1311,7 +1311,7 @@ void UnderResolvedCoupling::getNeighbourIndex(const int indexTree_, const int di
  * @param[in] std::vector<int> &indexPath, contain indices of the path taken to find the neighbour of Tree_
  * @param[in] Tree* &neighbourPtr_, pointer to neighbouring Tree
  */
-void UnderResolvedCoupling::getExternalNeighbour(Tree* Tree_, const int &iTree, const int dir_, int &differenceInLevel, std::vector<int> &indexPath, Tree* &neighbourPtr_)
+void UnderResolvedCoupling::getExternalNeighbour(oomph::Tree* Tree_, const int &iTree, const int dir_, int &differenceInLevel, std::vector<int> &indexPath, oomph::Tree* &neighbourPtr_)
 {
     //std::cout<<std::endl;
     logger(DEBUG,"call to getExternalNeighbour for el % in idir %, iTree %,", Tree_->object_pt()->number(),dir_, iTree);
@@ -1328,7 +1328,7 @@ void UnderResolvedCoupling::getExternalNeighbour(Tree* Tree_, const int &iTree, 
     if (Tree_->father_pt() == Tree_->root_pt())
     {
         logger(DEBUG,"Tree_->father_pt() == treeRootPtr, hence make neighbourPtr other tree");
-        Tree* externalNeighbour = mesh_pt()->forest_pt()->tree_pt(iTree)->neighbour_pt(startInd+dir_);
+        oomph::Tree* externalNeighbour = mesh_pt()->forest_pt()->tree_pt(iTree)->neighbour_pt(startInd+dir_);
         neighbourPtr_ = externalNeighbour;
         return;
     }
@@ -1423,7 +1423,7 @@ int UnderResolvedCoupling::convertIndexFromPath(std::vector<int>& indexPath, con
  * @param[in] const int &dir_, direction in which the elements neighbour needs to be determined following the oomph-lib
  *              numbering convention in direction (-x = 0, +x = 1, ... , +z = 5)
  */
-void UnderResolvedCoupling::stickLeavesOfEqualOrSmallerSizedNeighbourRecursiveInDir(Tree* neighbourTree_, std::vector<Tree*> &allNeighbouringLeaves_, const int &dir_)
+void UnderResolvedCoupling::stickLeavesOfEqualOrSmallerSizedNeighbourRecursiveInDir(oomph::Tree* neighbourTree_, std::vector<oomph::Tree*> &allNeighbouringLeaves_, const int &dir_)
 {
     std::vector<unsigned int> iSonsForMinX = {1, 3, 5, 7};
     std::vector<unsigned int> iSonsForMaxX = {0, 2, 4, 6};
@@ -1519,7 +1519,7 @@ void UnderResolvedCoupling::updateListOfdVoidagedxAroundElem(const unsigned &iEl
     //refineable version
     for (unsigned iDir =0; iDir < 6; iDir++)
     {
-        std::vector<Tree*> neighbours = getNeighboursOfEl(iEl, iDir);
+        std::vector<oomph::Tree*> neighbours = getNeighboursOfEl(iEl, iDir);
         for (auto iNeighbour = 0; iNeighbour < neighbours.size(); iNeighbour++)
         {
             if (neighbours[iNeighbour] != nullptr)
@@ -1623,7 +1623,7 @@ void UnderResolvedCoupling::updateListOfdVoidagedxInElem(const unsigned &iEl)
         auto neighboursMinDir = listOfRefinableNeighbours_[iEl][2*iDir];
         auto neighboursMaxDir = listOfRefinableNeighbours_[iEl][2*iDir+1];
         
-        int levelIEl = dynamic_cast<RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(iEl))->tree_pt()->level(); // neighboursMaxDir[0]->level();
+        int levelIEl = dynamic_cast<oomph::RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(iEl))->tree_pt()->level(); // neighboursMaxDir[0]->level();
         
         double level;
         std::vector<double> voidages;
@@ -1634,7 +1634,7 @@ void UnderResolvedCoupling::updateListOfdVoidagedxInElem(const unsigned &iEl)
         double avgPosLeft = 0.0;
         oomph::Vector<double> s1(3,0.0);
         oomph::Vector<double> x1(3,0.0);
-        dynamic_cast<RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(iEl))->interpolated_x(s1,x1);
+        dynamic_cast<oomph::RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(iEl))->interpolated_x(s1,x1);
         double avgPosRight = 0.;
         
         int sumNonNullMin = 0;
@@ -1649,13 +1649,13 @@ void UnderResolvedCoupling::updateListOfdVoidagedxInElem(const unsigned &iEl)
                 level = neighboursMinDir[iNeighbour]->level();
                 sumNonNullMin++;
                 
-                double iWeight = min(1.0, 1.0 / (pow(2, level - levelIEl)));
+                double iWeight = std::min(1.0, 1.0 / (pow(2, level - levelIEl)));
                 avgVoidageLeft += iWeight * getVoidageInElemFromList(neighboursMinDir[iNeighbour]->object_pt()->number());
                 logger(DEBUG,"elLeft = %", neighboursMinDir[iNeighbour]->object_pt()->number());
                 
                 oomph::Vector<double> s0(3,0.0);
                 oomph::Vector<double> x0(3,0.0);
-                dynamic_cast<RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(neighboursMinDir[iNeighbour]->object_pt()->number()))->interpolated_x(s0,x0);
+                dynamic_cast<oomph::RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(neighboursMinDir[iNeighbour]->object_pt()->number()))->interpolated_x(s0,x0);
                 
                 avgPosLeft += iWeight * x0[iDir];
             }
@@ -1667,13 +1667,13 @@ void UnderResolvedCoupling::updateListOfdVoidagedxInElem(const unsigned &iEl)
                 level = neighboursMaxDir[iNeighbour]->level();
                 sumNonNullMax++;
                 
-                double iWeight = min(1.0, 1.0 / (pow(2, level - levelIEl)));
+                double iWeight = std::min(1.0, 1.0 / (pow(2, level - levelIEl)));
                 avgVoidageRight += iWeight * getVoidageInElemFromList(neighboursMaxDir[iNeighbour]->object_pt()->number());
                 logger(DEBUG,"elRight = %", neighboursMaxDir[iNeighbour]->object_pt()->number());
                 
                 oomph::Vector<double> s2(3,0.0);
                 oomph::Vector<double> x2(3,0.0);
-                dynamic_cast<RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(neighboursMaxDir[iNeighbour]->object_pt()->number()))->interpolated_x(s2,x2);
+                dynamic_cast<oomph::RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(neighboursMaxDir[iNeighbour]->object_pt()->number()))->interpolated_x(s2,x2);
                 
                 avgPosRight += iWeight * x2[iDir];
             }
@@ -1754,8 +1754,8 @@ void UnderResolvedCoupling::updateListOfdVoidagedtAfterAdapt(const std::vector< 
     int atPrevEl = 0;
     int cntForRef = 0;
     
-    oomph::Vector<Tree*> currLeaves;
-    oomph::Vector<Tree*> currTrees;
+    oomph::Vector<oomph::Tree*> currLeaves;
+    oomph::Vector<oomph::Tree*> currTrees;
     mesh_pt()->forest_pt()->stick_leaves_into_vector(currLeaves);
     mesh_pt()->forest_pt()->stick_all_tree_nodes_into_vector(currTrees);
     
@@ -1765,8 +1765,8 @@ void UnderResolvedCoupling::updateListOfdVoidagedtAfterAdapt(const std::vector< 
     for (unsigned iEl = 0; iEl < nEl; iEl++)
     {
         logger(DEBUG,"Element %, atPrevEl = %", iEl, atPrevEl);
-        
-        Tree* currLeaf = currLeaves[iEl];
+
+        oomph::Tree* currLeaf = currLeaves[iEl];
         bool wasTree = false;
         bool wasLeaf = false;
         
@@ -1898,10 +1898,10 @@ void UnderResolvedCoupling::getS(oomph::Vector<double> &s_, const unsigned &iPar
     BaseParticle* particlePtr = particleHandler.getObject(iPart_);
     
     oomph::Vector<double> pPos = convertVecFuncs::convertToOomphVec(particlePtr->getPosition());
-    GeomObject* geom_obj_pt = nullptr;
+    oomph::GeomObject* geom_obj_pt = nullptr;
     
     logger(DEBUG,"Check if pPos is in pIsInEl");
-    dynamic_cast<RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(pInEl_))->locate_zeta(pPos, geom_obj_pt, s_);
+    dynamic_cast<oomph::RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(pInEl_))->locate_zeta(pPos, geom_obj_pt, s_);
     if (geom_obj_pt == nullptr)
     {
         logger(DEBUG,"particle % moved through element boundary",iPart_);
@@ -1910,7 +1910,7 @@ void UnderResolvedCoupling::getS(oomph::Vector<double> &s_, const unsigned &iPar
         
         int pInEl_redo = getPInElemFromList(iPart_);
         oomph::Vector<double> sNew(3,0.0);
-        dynamic_cast<RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(pInEl_redo))->locate_zeta(pPos, geom_obj_pt, sNew);
+        dynamic_cast<oomph::RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(pInEl_redo))->locate_zeta(pPos, geom_obj_pt, sNew);
         
         if (geom_obj_pt == nullptr)
         {
@@ -1974,4 +1974,56 @@ bool UnderResolvedCoupling::myHeaviSide(const double &a_, const double &b_)
 }
 
 
+
+namespace getDataFromElement
+{
+    double getVoidageOfElement_byEl(const int& elNr_)
+    {
+        return ptrToCoupledClass->getVoidageInElemFromList(elNr_);
+    }
+    double getdVoidagedxOfElement_byEl(const int& elNr_, const int& dir_)
+    {
+        return ptrToCoupledClass->getdVoidagedxInElemFromList(elNr_,dir_);
+    }
+    double getdVoidagedtOfElement_byEl(const int& elNr_)
+    {
+        return 0.0;
+        //return ptrToCoupledClass->getdVoidagedtInElemFromList(elNr_);
+    }
+    oomph::Vector<double> getBodyForceByCoupling_byEl(const int& elNr_)
+    {
+        return ptrToCoupledClass->getBodyForceInElemByCoupling(elNr_);
+    }
+
+    std::clock_t totaltime = 0.0;
+    int long cnt = 0;
+    void printTotalTime()
+    {
+        std::cout << "TotalTime in getVoidageOfElement = " << 1000.*totaltime / CLOCKS_PER_SEC << std::endl;
+        std::cout << "count getVoidageOfElement calls = " << cnt << std::endl;
+    }
+    double getVoidageOfElement(const double& time, const oomph::Vector<double>& x)
+    {
+        std::clock_t start = clock();
+        cnt++;
+
+        double nEl = ptrToCoupledClass->mesh_pt()->nelement();
+
+        for (unsigned iEl = 0; iEl < nEl; iEl++)
+        {
+            oomph::Vector<double> s(3, 0.0);
+            oomph::GeomObject* geom_obj_pt = nullptr;
+            dynamic_cast<oomph::RefineableAJQCrouzeixRaviartElement<3>*>(ptrToCoupledClass->mesh_pt()->element_pt(
+                    iEl))->locate_zeta(x, geom_obj_pt, s);
+            if (geom_obj_pt != nullptr)
+            {
+                std::clock_t end = clock();
+                totaltime += (end-start);
+
+                return ptrToCoupledClass->listOfVoidageInElem_[iEl];
+            }
+        }
+        return 1.0;
+    }
+}
 

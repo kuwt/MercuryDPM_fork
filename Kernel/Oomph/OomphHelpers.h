@@ -25,7 +25,7 @@
 
 #ifndef OOMPHHELPERS_H
 #define OOMPHHELPERS_H
-#include "Vector.h"
+#include "../../oomph-lib/src/generic/Vector.h"
 
 namespace oomph {
     /*!
