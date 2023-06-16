@@ -28,7 +28,7 @@
 #include "DPMBase.h"
 #include "Particles/BaseParticle.h"
 #include "Particles/SuperQuadricParticle.h"
-#include "Particles/MultiParticle.h"
+#include "Particles/ClumpParticle.h"
 
 class BaseParticle;
 
