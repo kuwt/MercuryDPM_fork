@@ -143,7 +143,7 @@ public:
         Mdouble wallScaleFactor = 1e-3; // Scale used in the stl file (mm)
         Vec3D shift = {0,0,0};
         Vec3D velocity = {0,0,0};
-        rotatingWallID = wallHandler.readTriangleWall(getMercurySourceDir() + "/Drivers/Clump/RotatingDrum.stl",speciesHandler.getObject(0), wallScaleFactor,shift,velocity,Vec3D(0,0,0));
+        rotatingWallID = wallHandler.readTriangleWall(getMercuryDPMSourceDir() + "/Drivers/Clump/RotatingDrum.stl",speciesHandler.getObject(0), wallScaleFactor,shift,velocity,Vec3D(0,0,0));
 
 
     }

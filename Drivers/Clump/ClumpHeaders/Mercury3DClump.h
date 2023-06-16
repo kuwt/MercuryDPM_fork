@@ -73,7 +73,6 @@ public:
             if (getRotation()) // getRotation() returns a boolean.
             {
                 pI->addTorque(i->getTorque() - Vec3D::cross(pI->getPosition() - i->getContactPoint(), i->getForce()));
-                ///\todo TW: I think this torque has the wrong sign
                 w->addTorque(-i->getTorque() + Vec3D::cross(w->getPosition() - i->getContactPoint(), i->getForce()));
             }
         }
