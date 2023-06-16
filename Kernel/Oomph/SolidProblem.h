@@ -46,6 +46,8 @@
 #include "meshes/simple_cubic_mesh.h"
 #include "meshes/tetgen_mesh.h"
 
+#include "Oomph/ScaleCoupling/ScaleCoupledElement.h"
+
 using namespace oomph;
 
 #ifdef OOMPH_HAS_MPI
@@ -412,11 +414,14 @@ public:
         logger(INFO, "Solve steady-state problem");
         actionsBeforeSolve();
         newton_solve();
+        actionsAfterSolve();
         writeToVTK();
         saveSolidMesh();
     }
 
     virtual void actionsBeforeSolve() {}
+
+    virtual void actionsAfterSolve() {}
 
     virtual void actionsBeforeOomphTimeStep() {}
 
@@ -456,6 +461,7 @@ public:
             }
         }
         saveSolidMesh();
+        actionsAfterSolve();
     }
 
     /**
@@ -722,6 +728,22 @@ public:
                     {el_pt->dnodal_position_dt(n, 0),
                      el_pt->dnodal_position_dt(n, 1),
                      el_pt->dnodal_position_dt(n, 2)};
+                // get coupling force
+                std::vector<double> coupledForce(3,0.0);
+                double couplingWeight = 0.0;
+                auto c_el_pt = dynamic_cast<ScaleCoupledElement<RefineableQDPVDElement<3, 2>>*>(el_pt);
+                if (c_el_pt != nullptr) {
+                    double nnode = c_el_pt->nnode();
+                    double dim = c_el_pt->dim();
+                    Shape psi(nnode);
+                    c_el_pt->shape(s, psi);
+                    for (int n=0; n<nnode; ++n) {
+                        for (int d=0; d<dim; ++d) {
+                            coupledForce[d] += c_el_pt->get_coupling_residual(n, d) * psi(n);
+                        }
+                        couplingWeight += c_el_pt->get_coupling_weight(n) * psi(n);
+                    }
+                }
                 // get boundary (works)
                 std::set<unsigned>* boundaries_pt;
                 n_pt->get_boundaries_pt(boundaries_pt);
@@ -736,6 +758,8 @@ public:
                              {"BodyForce", {body_force[0], body_force[1], body_force[2]}},
                              {"Pin", pin},
                              {"Velocity2", dudt},
+                             {"CoupledForce",coupledForce},
+                             {"CouplingWeight", {couplingWeight}},
 //                             {"Pressure", {pressure}},
 //                             {"Stress", {sigma(0,0), sigma(0,1), sigma(0,2),
 //                                           sigma(1,0), sigma(1,1), sigma(1,2),
@@ -766,7 +790,7 @@ public:
 
         //write vtk file
         vtk << "<?xml version=\"1.0\"?>\n"
-               "<!-- time 10.548-->\n"
+               "<!-- time " << getOomphTime() << "-->\n"
                "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n"
                "<UnstructuredGrid>\n"
                "<Piece NumberOfPoints=\""
