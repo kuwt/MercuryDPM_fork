@@ -569,3 +569,12 @@ double InteractionHandler::getLiquidBridgeVolume() const {
     }
     return getMPISum(liquidVolume);
 };
+
+unsigned InteractionHandler::getNumberOfLiquidBridges() const {
+    int liquidBridges = 0;
+    for (auto i : objects_) {
+        auto j = dynamic_cast<LiquidMigrationWilletInteraction*>(i);
+        if (j and !static_cast<BaseParticle*>(j->getP())->isMPIParticle() && j->getLiquidBridgeVolume()>0) liquidBridges++;
+    }
+    return getMPISum(liquidBridges);
+};
