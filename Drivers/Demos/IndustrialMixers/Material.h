@@ -48,16 +48,20 @@ protected:
     void setPSD(int argc, char *argv[]) {
         for (unsigned i=0; i<argc-1; ++i) {
             if (!strcmp(argv[i],"-psd")) {
-                std::vector<PSD::RadiusAndProbability> psdVector;
-                PSD::RadiusAndProbability value;
+                std::vector<DistributionElements> psdVector;
+                DistributionElements value;
                 // distribution type given
-                if (!strcmp(argv[i+1],"logNormal")) {
-                    logger.assert_debug(argc>i+5,"Error in logNormal");
+                if (!strcmp(argv[i + 1], "logNormal"))
+                {
+                    logger.assert_debug(argc > i + 5, "Error in logNormal");
                     // https://en.wikipedia.org/wiki/Log-normal_distribution
-                    double meanX = std::atof(argv[i+4]);
-                    double stdX = std::atof(argv[i+5]);
-                    if (!strcmp(argv[i+3],"radius")) {
-                    } else if (!strcmp(argv[i+3],"diameter")) {
+                    double meanX = std::atof(argv[i + 4]);
+                    double stdX = std::atof(argv[i + 5]);
+                    if (!strcmp(argv[i + 3], "radius"))
+                    {
+                    }
+                    else if (!strcmp(argv[i + 3], "diameter"))
+                    {
                         meanX /= 2;
                         stdX /= 2;
                     } else {
@@ -74,10 +78,10 @@ protected:
                     if (std>0) {
                         for (int j = 1; j < n; ++j) {
                             double lnR = lnRMin + j / (double) n * (lnRMax - lnRMin);
-                            value.radius = exp(lnR);
+                            value.internalVariable = exp(lnR);
                             value.probability = 0.5 * (1.0 + erf((lnR - mean) / (sqrt(2) * std)));
                             psdVector.push_back(value);
-                            logger(INFO, "psd % %", value.radius, value.probability);
+                            logger(INFO, "psd % %", value.internalVariable, value.probability);
                         }
                     }
                     psdVector.push_back({0.5*exp(lnRMax), 1});
@@ -93,9 +97,9 @@ protected:
                 // distribution given
                 for (unsigned j=i+4; j<argc-1 && argv[j][0]!='-' && argv[j+1][0]!='-'; j+=2) {
                     if (!strcmp(argv[i+3],"radius")) {
-                        value.radius = std::atof(argv[j]);
+                        value.internalVariable = std::atof(argv[j]);
                     } else if (!strcmp(argv[i+3],"diameter")) {
-                        value.radius = std::atof(argv[j]) / 2.;
+                        value.internalVariable = std::atof(argv[j]) / 2.;
                     } else {
                         logger(ERROR,"setPSD: distribution type % not known", argv[i+3]);
                     }

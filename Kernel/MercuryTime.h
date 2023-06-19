@@ -31,6 +31,7 @@
 #include <cstring>
 #include <sstream>
 #include <chrono>
+#include <cmath>
 #include "GeneralDefine.h"
 #include "Logger.h"
 

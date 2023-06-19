@@ -34,6 +34,7 @@
 #include "iostream"
 #include "ExtendedMath.h"
 #include "RNG.h"
+#include <Math/DistributionElements.h>
 
 using mathsFunc::square;
 using mathsFunc::cubic;
@@ -41,7 +42,7 @@ using mathsFunc::cubic;
 /*!
  * \brief Contains a vector with radii and probabilities of a user defined particle size distribution (PSD)
  *
- * \details Stores radii and probabilities of a particle size distribution (PSD) in a vector of type PSD::RadiusAndProbability and
+ * \details Stores radii and probabilities of a particle size distribution (PSD) in a vector of type DistributionElements and
  * converts them to a PSD which can be used by insertionBoundaries which insert particles into a simulation:
  *
  * Cumulative distribution function (CDF): gives percentage of particles p_i whose radius r is less than
@@ -80,17 +81,7 @@ public:
         PROBABILITYDENSITY_AREA_DISTRIBUTION,
         PROBABILITYDENSITY_VOLUME_DISTRIBUTION
     };
-
-    /*!
-     * \brief Class which stores radii and probabilities of a PSD. This class should be used as a vector<PSD::RadiusAndProbability>.
-     */
-    class RadiusAndProbability
-    {
-    public:
-        Mdouble radius;
-        Mdouble probability;
-    };
-
+    
     /*!
      * \brief Constructor; sets everything to 0 or default.
      */
@@ -141,7 +132,7 @@ public:
      * \brief Deprecated version of reading in PSDs from a vector.
      */
     MERCURYDPM_DEPRECATED
-    void setPSDFromVector(std::vector<RadiusAndProbability> psd, TYPE PSDType);
+    void setPSDFromVector(std::vector<DistributionElements> psd, TYPE PSDType);
 
     /*!
      * \brief read in the PSD vector with probabilities and radii saved in a .csv file.
@@ -221,22 +212,22 @@ public:
      * \brief Get largest radius of the PSD.
      */
     Mdouble getMaxRadius() const;
-
+    
     /*!
      * \brief Get the PSD vector.
      */
-    std::vector<RadiusAndProbability> getParticleSizeDistribution() const;
-
+    std::vector<DistributionElements> getParticleSizeDistribution() const;
+    
     /*!
      * \brief set the PSD by a suitable vector.
      */
-    void setParticleSizeDistribution(std::vector<RadiusAndProbability>);
+    void setParticleSizeDistribution(std::vector<DistributionElements>);
 
     /*!
      * \brief Get the number of particles already inserted into the simulation.
      */
     int getInsertedParticleNumber() const;
-
+    
     /*!
     * \brief Decrement nParticlesPerClass_ counter.
     */
@@ -246,12 +237,17 @@ public:
      * \brief Decrement volumePerClass_ counter.
      */
     void decrementVolumePerClass(Mdouble volume);
+
+/*!
+     * \brief get a radius at a certain index of the particleSizeDistribution_
+     */
+    Mdouble getRadius(int index) const;
     
     /*!
      * \brief Calculate a certain diameter (e.g. D10, D50, D90, etc.) from a percentile x of the number based PSD.
      */
     Mdouble getNumberDx(Mdouble x) const;
-
+    
     /*!
      * \brief Calculate a certain diameter (e.g. D10, D50, D90, etc.) from a percentile x of the volume based PSD.
      */
@@ -271,36 +267,41 @@ public:
      * \brief get a volumetric mean radius of the PSD.
      */
     Mdouble getVolumetricMeanRadius() const;
-
+    
     /*!
      * \brief get the size ratio (width) of the PSD.
      */
     Mdouble getSizeRatio() const;
-
+    
     /*!
      * \brief Check if the size ratio is too high and cut it
      */
     void cutHighSizeRatio();
 
-    /*!
-     * \brief compute raw momenta of the user defined PSD.
-     */
-    void computeRawMomenta();
-
-    /*!
-     * \brief compute central momenta of the user defined PSD.
-     */
-    void computeCentralMomenta();
+//    /*!
+//     * \brief compute raw momenta of the user defined PSD.
+//     */
+//    void computeRawMomenta();
+//
+//    /*!
+//     * \brief compute central momenta of the user defined PSD.
+//     */
+//    void computeCentralMomenta();
+//
+//    /*!
+//     * \brief compute standardised momenta of the user defined PSD.
+//     */
+//    void computeStandardisedMomenta();
+//
+//    /*!
+//     * \brief get momenta of the user defined PSD.
+//     */
+//    std::array<Mdouble, 6> getMomenta() const;
     
     /*!
-     * \brief compute standardised momenta of the user defined PSD.
+     * \brief create a vector of linearly spaced values.
      */
-    void computeStandardisedMomenta();
-    
-    /*!
-     * \brief get momenta of the user defined PSD.
-     */
-    std::array<Mdouble, 6> getMomenta() const;
+    static std::vector<Mdouble> linspace(Mdouble Min, Mdouble Max, int numberOfBins);
     
     /*!
      * \brief set a fixed seed for the random number generator; this is used for the PSDSelfTest to reproduce results
@@ -314,39 +315,33 @@ public:
     /*!
      * \brief determines if a certain value of the PSD vector is lower than another one. Used for std::lower_bound()
      */
-    friend bool operator<(const PSD::RadiusAndProbability& l, const PSD::RadiusAndProbability& r);
+    friend bool operator<(const DistributionElements& l, const DistributionElements& r);
     
     /*!
      * \brief determines if a certain value of the PSD vector is lower than a double.
      */
-    friend bool operator<(const PSD::RadiusAndProbability& l, Mdouble r);
-
+    friend bool operator<(const DistributionElements& l, Mdouble r);
+    
     /*!
      * \brief Writes to output stream.
      */
-    friend std::ostream& operator<<(std::ostream& os, PSD::RadiusAndProbability& p);
-
+    friend std::ostream& operator<<(std::ostream& os, DistributionElements& p);
+    
     /*!
      * \brief Reads from input stream.
      */
-    friend std::istream& operator>>(std::istream& is, PSD::RadiusAndProbability& p);
-
+    friend std::istream& operator>>(std::istream& is, DistributionElements& p);
+    
     /*!
      * \brief Determines if a certain value of the PSD vector is equal to a double.
      */
-    friend Mdouble operator==(PSD::RadiusAndProbability l, Mdouble r);
+    friend Mdouble operator==(DistributionElements l, Mdouble r);
 
 private:
     /*!
-     * Vector of the PSD::RadiusAndProbability class which stores radii and probabilities of the PSD.
+     * Vector of the DistributionElements class which stores radii as internalVariable and probabilities of a PSD.
      */
-    std::vector<RadiusAndProbability> particleSizeDistribution_;
-
-    /*!
-     * Array of doubles which stores the moments of a user defined discrete PROBABILITYDENSITY_NUMBER_DISTRIBUTION.
-     * \todo TW can we make this a local variable instead of a class variable?
-     */
-    std::array<Mdouble, 6> momenta_{};
+    std::vector<DistributionElements> particleSizeDistribution_;
 
     /*!
      * Vector of integers which represents the number of inserted particles in each size class.
