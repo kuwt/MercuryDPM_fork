@@ -309,7 +309,7 @@ void CG<Coordinates, BaseFunction, Fields>::evaluateParticleAtPoint(Fields& curr
     r.addParticleStatistics(phi, currentInteraction);
 
     //Compute derivatives if required
-    if (CGFields::StandardFields::isDifferentialField())
+    if (Fields::isDifferentialField())
     {
         Vec3D dPhi = function_.evaluateCGFunctionDerivatives(p.getPosition(), r.coordinates);
         r.addParticleDifferentialStatistics(dPhi, currentInteraction);

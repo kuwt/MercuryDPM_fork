@@ -455,10 +455,14 @@ SelfTests/Boundaries/DeletionBoundarySelfTest.cpp*
 
  - fixed bug in ```set``` function, that caused a memory leak
 
+*Kernel/CG/CG.hcc*
+
+ - fixed bug in ```evaluateParticleAtPoint```, that prevented differential fields to be calculated
+
 *Kernel/CG/Fields/StandardFields.cc*
 
  - fixed bug, in ```setFields```: the interactionForceDensity did not correctly account for the sign of the force
-
+ 
 *Kernel/CG/TimeSmoothedCG*
 
  - fixed bug that caused NaN output
@@ -530,6 +534,10 @@ SelfTests/Boundaries/DeletionBoundarySelfTest.cpp*
 *Drivers\MercuryCG\fstatistics.cpp*
 
  - *fstatistics* did not work well for the *FiveParticles* example. The problem was that some particles were unduly set as fixed in ```readNextDataFile```. Now, the ```fixed``` property is correctly set, i.e. particles that are ```fixed``` in the restart file (and only those) are ```fixed``` for all time steps
+
+*Drivers/MercuryCG/MercuryCG.cpp*
+
+ - *MercuryCG* now sets an eps value for the evaluation of differential fields with numerical differentiation
 
 *Kernel/Math/Helpers*
 

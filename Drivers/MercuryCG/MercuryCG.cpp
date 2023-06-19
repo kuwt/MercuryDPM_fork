@@ -244,6 +244,10 @@ void commandLineCG(Mercury3D &dpm, int argc, char **argv)
             logger.assert_always(i+1<argc,"% requires argument",argv[i]);
             cg->setStandardDeviation(atof(argv[i + 1]));
             logger(INFO, "Set cg width to % (std %)", cg->getWidth(),atof(argv[i + 1]));
+        } else if (!strcmp(argv[i], "-eps")) {
+            logger.assert_always(i+1<argc,"% requires argument",argv[i]);
+            cg->setEps(atof(argv[i + 1]));
+            logger(INFO, "Set eps to %", cg->getEps());
         } else if (!strcmp(argv[i], "-verbose")) {
             cg->setVerbose(true);
             logger(INFO, "Verbose output");
@@ -352,6 +356,12 @@ void commandLineCG(Mercury3D &dpm, int argc, char **argv)
         } else {
             logger(ERROR, "Could not read argument %", argv[i]);
         }
+    }
+
+    if (cg->getEps() == 0.0)
+    {
+        cg->setEps(cg->getWidth()*0.1);
+        logger(INFO, "Set eps to default value % (0.1*width)", cg->getEps());
     }
 
     logger(INFO, "Created object of type %", cg->getName());
