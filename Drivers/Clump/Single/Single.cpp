@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2022, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -86,7 +86,7 @@ public:
                                       data.toi[clump_index][4], data.toi[clump_index][5],
                                       data.toi[clump_index][8]));
         std::cout<<"CLUMP MASS set = "<<data.mass[clump_index]<<std::endl;
-        p0.setMassMultiparticle(data.mass[clump_index]);
+        p0.setClumpMass(data.mass[clump_index]);
         p0.setAngularVelocity(Vec3D(0,5,0));
         p0.setVelocity(Vec3D(4,0,10));
 

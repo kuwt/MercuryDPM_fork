@@ -97,7 +97,7 @@ public:
                     MatrixSymmetric3D(data.toi[clump_index][0], data.toi[clump_index][1], data.toi[clump_index][2],
                                       data.toi[clump_index][4], data.toi[clump_index][5],
                                       data.toi[clump_index][8]));
-        p0.setMassMultiparticle(data.mass[clump_index]);
+        p0.setClumpMass(data.mass[clump_index]);
         p0.setAngularVelocity(Vec3D(0,20,0.01));
         p0.setVelocity(Vec3D(8,0,0));
 	p0.setDamping(clump_damping);

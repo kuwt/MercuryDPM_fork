@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2022, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -88,7 +88,7 @@ public:
                 MatrixSymmetric3D(data.toi[clump_index][0], data.toi[clump_index][1], data.toi[clump_index][2],
                                   data.toi[clump_index][4], data.toi[clump_index][5],
                                   data.toi[clump_index][8]));
-        p0.setMassMultiparticle(data.mass[clump_index]);
+        p0.setClumpMass(data.mass[clump_index]);
         double mag = 0;
         p0.setAngularVelocity(Vec3D(0,0,0));
         p0.setVelocity(Vec3D(0,0,0));
@@ -117,7 +117,7 @@ public:
     void actionsAfterTimeStep() override {
         if (getNumberOfTimeSteps()/SAVECOUNT == getNumberOfTimeSteps()/(double) SAVECOUNT ){
             for (std::vector<BaseParticle*>::iterator it= particleHandler.begin(); it!=particleHandler.end(); ++it){
-                if ((*it)->IsClump()) {
+                if ((*it)->isClump()) {
 
                     std::cout<<"Saving timestep "<<getNumberOfTimeSteps() <<std::endl;
 

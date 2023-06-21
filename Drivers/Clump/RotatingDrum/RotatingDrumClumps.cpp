@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2022, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -109,7 +109,7 @@ public:
                     MatrixSymmetric3D(rdata.toi[clump_index][0], rdata.toi[clump_index][1], rdata.toi[clump_index][2],
                                       rdata.toi[clump_index][4], rdata.toi[clump_index][5],
                                       rdata.toi[clump_index][8]));
-            p0.setMassMultiparticle(rdata.mass[clump_index]);
+            p0.setClumpMass(rdata.mass[clump_index]);
 
             p0.setDamping(clump_damping);
 

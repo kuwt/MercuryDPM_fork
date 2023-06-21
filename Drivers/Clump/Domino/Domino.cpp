@@ -130,7 +130,7 @@ public:
                     MatrixSymmetric3D(D.I_xx,       0,      0,
                                                      D.I_yy,      0,
                                                                   D.I_zz));
-            p0.setMassMultiparticle(1*D.mass);
+            p0.setClumpMass(1 * D.mass);
 
             p0.setDamping(clump_damping);
 
@@ -177,7 +177,7 @@ public:
         // Measurement of the propagation velocity of a Domino wave
 
         for (std::vector<BaseParticle*>::iterator it= particleHandler.begin(); it!=particleHandler.end(); ++it){
-            if ((*it)->IsClump()) {
+            if ((*it)->isClump()) {
                 //D_num += (int) static_cast<Clump*>(*it)->getDzhanibekovParticle();
 
                 if ((D.started == false)&&((*it)->getPosition().X > D.margin + D.N_ini*D.S_dom - 0.001)&&( (*it)->getVelocity().getLength()>0.001  ))

@@ -34,9 +34,12 @@
 #include <array>
 #include<CMakeDefinitions.h>
 
+// This function executes the OS command 'cmd' and returns the 'result'
 std::string exec_command(const char* cmd) {
     std::array<char, 256> buffer;
     std::string result;
+
+    // Prepare a pipe to write a to execute a systm command and read the result
     std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
     if (!pipe) {
         throw std::runtime_error("popen() failed!");

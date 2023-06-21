@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2022, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -98,7 +98,7 @@ public:
         }
 
         std::cout<<"CLUMP MASS set = "<<data.mass[clump_index]<<std::endl;
-        p0.setMassMultiparticle(data.mass[clump_index]);
+        p0.setClumpMass(data.mass[clump_index]);
         p0.setAngularVelocity(angVel);
         
         std::cout<<"CLUMP MASS get = "<<p0.getMass()<<std::endl;

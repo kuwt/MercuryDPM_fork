@@ -1,3 +1,29 @@
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
+//For the list of developers, see <http://www.MercuryDPM.org/Team>.
+//
+//Redistribution and use in source and binary forms, with or without
+//modification, are permitted provided that the following conditions are met:
+//  * Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+//  * Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+//  * Neither the name MercuryDPM nor the
+//    names of its contributors may be used to endorse or promote products
+//    derived from this software without specific prior written permission.
+//
+//THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+//ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+//WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+//DISCLAIMED. IN NO EVENT SHALL THE MERCURYDPM DEVELOPERS TEAM BE LIABLE FOR ANY
+//DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+//(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+//LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+//ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+//(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+//SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
 #include "Mercury3D.h"
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
@@ -21,8 +47,8 @@ public:
         // 2) pebbles of the same clump
         // 3) both particles are fixed
         // 4) both particles are "ghosts".
-        if (P1->IsClump() || P2->IsClump()) return;
-        if (P1->IsPebble() && P2->IsPebble() && P1->getClump() == P2->getClump()) return;
+        if (P1->isClump() || P2->isClump()) return;
+        if (P1->isPebble() && P2->isPebble() && P1->getClump() == P2->getClump()) return;
         if (P1->isFixed() && P2->isFixed()) return;
         if ((P1->getPeriodicFromParticle() != nullptr) && (P2->getPeriodicFromParticle() != nullptr)) return;
 
@@ -50,7 +76,7 @@ public:
     void computeForcesDueToWalls(BaseParticle* pI, BaseWall* w) override
     {
         // No interaction between walls and master particles
-        if (pI->IsClump())
+        if (pI->isClump())
             return;
 
         //No need to compute interactions between periodic particle images and walls
@@ -121,7 +147,7 @@ public:
         ///Loop on pebbles to add forces/moments to masters...
         for (BaseParticle* p : particleHandler)
         {
-            if ((p->IsPebble()) && (p->getPeriodicFromParticle() == nullptr))
+            if ((p->isPebble()) && (p->getPeriodicFromParticle() == nullptr))
                 {
                     p->getClump()->addForce(p->getForce());
                     Vec3D lever = p->getPosition()- p->getClump()->getPosition();
@@ -148,10 +174,10 @@ public:
     bool checkClumpForInteraction(BaseParticle& particle)
     {
         ClumpParticle* mp = dynamic_cast<ClumpParticle*>(&particle);
-        if (mp->IsClump()){
+        if (mp->isClump()){
             for (int i = 0; i< mp->NPebble(); i++){
                 for (BaseParticle *q: particleHandler) {
-                    if (!q->IsClump()) { // check every slave vs every non-master intersection
+                    if (!q->isClump()) { // check every slave vs every non-master intersection
                         if (Vec3D::getDistanceSquared(q->getPosition(), mp->getPebblePositions()[i]) < q->getRadius() +
                                                                                                                mp->getPebbleRadii()[i]) {
                             return false;
@@ -175,10 +201,10 @@ public:
             if (pb && particleHandler.getNumberOfObjects() > 0 )
             {
                 ClumpParticle* mp = dynamic_cast<ClumpParticle*>(&particle);
-                if (mp->IsClump()){
+                if (mp->isClump()){
                     for (int i = 0; i< mp->NPebble(); i++){
                         for (BaseParticle *q: particleHandler) {
-                            if (!q->IsClump()) { // check every slave vs every non-master intersection
+                            if (!q->isClump()) { // check every slave vs every non-master intersection
                                 if (Vec3D::getDistanceSquared(q->getPosition(), mp->getPebblePositions()[i]) < (q->getMaxInteractionRadius() +
                                         mp->getPebbleRadii()[i]) * (q->getMaxInteractionRadius() +
                                                                                                                                                                            mp->getPebbleRadii()[i]) ) {
@@ -203,10 +229,10 @@ public:
         if ((NP)&&(particleHandler.getNumberOfObjects() > 0 ))
         {
             ClumpParticle* mp = dynamic_cast<ClumpParticle*>(&particle);
-            if (mp->IsClump()){
+            if (mp->isClump()){
                 for (int i = 0; i< mp->NPebble(); i++){
                     for (BaseParticle *q: particleHandler) {
-                        if (!q->IsClump()) { // check every slave vs every non-master intersection
+                        if (!q->isClump()) { // check every slave vs every non-master intersection
                             if (Vec3D::getDistanceSquared(q->getPosition(), mp->getPebblePositions()[i]) < (q->getRadius() +
                                     mp->getPebbleRadii()[i]) * (q->getRadius() +
                                                                                                                                                          mp->getPebbleRadii()[i])) {

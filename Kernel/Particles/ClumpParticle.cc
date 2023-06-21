@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2018, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -37,61 +37,57 @@
 ClumpParticle::ClumpParticle()
 {
     setRadius(1.0);
-    nPebble = 0;
+    nPebble_ = 0;
 
-    massMultiparticle = 1.0;
-    viscousDamping = 0.0;
-    pebblePos = std::vector<Vec3D>(0);
+    clumpMass_ = 1.0;
+    viscousDamping_ = 0.0;
+    pebblePos_ = std::vector<Vec3D>(0);
 
-    pebbleRadius = std::vector<Mdouble>(0);
-    pebbleParticles = std::vector<ClumpParticle*>(0);
+    pebbleRadius_ = std::vector<Mdouble>(0);
+    pebbleParticles_ = std::vector<ClumpParticle*>(0);
 
-    principalDirections = Matrix3D(1, 0, 0, 0, 1, 0, 0, 0, 1);
-    initPrincipalDirections = Matrix3D(1, 0, 0, 0, 1, 0, 0, 0, 1);
+    principalDirections_ = Matrix3D(1, 0, 0, 0, 1, 0, 0, 0, 1);
+    initPrincipalDirections_ = Matrix3D(1, 0, 0, 0, 1, 0, 0, 0, 1);
 
-    inertiaMultiparticle = MatrixSymmetric3D(1, 0, 0, 1, 0, 1);
-    initInertiaMultiparticle = MatrixSymmetric3D(1, 0, 0, 1, 0, 1);
-    invInertia_= inertiaMultiparticle.inverse();
+    clumpInertia_ = MatrixSymmetric3D(1, 0, 0, 1, 0, 1);
+    clumpInitInertia_ = MatrixSymmetric3D(1, 0, 0, 1, 0, 1);
+    invInertia_= clumpInertia_.inverse();
 
-    //++++++++++++++
-    isPebble = false; //Assign false by default
-    isClump = false; //Assign false by default
+    isPebble_ = false; //Assign false by default
+    isClump_ = false; //Assign false by default
     clumpParticle = nullptr;
 
 
     DzhanibekovParticle_ = false;
     VerticallyOriented_ = false;
 
-    //++++++++++++++
-    logger(DEBUG, "Multiparticle::Clump() finished");
+    logger(DEBUG, "Clump() created");
 }
 
 ClumpParticle::ClumpParticle(const ClumpParticle& p): NonSphericalParticle(p)
 {
-    nPebble = p.nPebble;
-    
-    massMultiparticle = p.massMultiparticle;
-    viscousDamping = p.viscousDamping;
-    pebblePos = p.pebblePos;
-    pebbleRadius = p.pebbleRadius;
-    pebbleParticles = p.pebbleParticles;
-    principalDirections = p.principalDirections;
-    initPrincipalDirections = p.initPrincipalDirections;
-    inertiaMultiparticle = p.inertiaMultiparticle;
-    initInertiaMultiparticle = p.initInertiaMultiparticle;
-    invInertia_= inertiaMultiparticle.inverse();
+    nPebble_ = p.nPebble_;
+
+    clumpMass_ = p.clumpMass_;
+    viscousDamping_ = p.viscousDamping_;
+    pebblePos_ = p.pebblePos_;
+    pebbleRadius_ = p.pebbleRadius_;
+    pebbleParticles_ = p.pebbleParticles_;
+    principalDirections_ = p.principalDirections_;
+    initPrincipalDirections_ = p.initPrincipalDirections_;
+    clumpInertia_ = p.clumpInertia_;
+    clumpInitInertia_ = p.clumpInitInertia_;
+    invInertia_= clumpInertia_.inverse();
     DzhanibekovParticle_ = p.DzhanibekovParticle_;
     VerticallyOriented_ = p.VerticallyOriented_;
 
-    for (int iPebble = 1; iPebble <= nPebble; iPebble++) pebbleParticles[iPebble - 1] = nullptr;
+    for (int iPebble = 1; iPebble <= nPebble_; iPebble++) pebbleParticles_[iPebble - 1] = nullptr;
 
-    //++++++++++++
     // Pebble attributes
-    isPebble = p.isPebble;
+    isPebble_ = p.isPebble_;
     clumpParticle = p.clumpParticle;
     // Clump attributes
-    isClump = p.isClump;
-    //++++++++++++
+    isClump_ = p.isClump_;
 }
 
 ClumpParticle::~ClumpParticle()
@@ -106,25 +102,25 @@ ClumpParticle* ClumpParticle::copy() const
 
 std::string ClumpParticle::getName() const
 {
-    return "Clump";
+    return "ClumpParticle";
 }
 
 void ClumpParticle::read(std::istream& is)
 {
     BaseParticle::read(is);
     std::string dummy;
-    is >> dummy >> nPebble;
+    is >> dummy >> nPebble_;
 }
 
 int ClumpParticle::NPebble() const
 {
-    return nPebble;
+    return nPebble_;
 }
 
 void ClumpParticle::setClump()
 {
-    isClump = true;
-    isPebble = false;
+    isClump_ = true;
+    isPebble_ = false;
 
 
 }
@@ -132,26 +128,26 @@ void ClumpParticle::setClump()
 //Function to store pebble information
 void ClumpParticle::addPebble(Vec3D position, Mdouble radius)
 {
-    nPebble++; //Counter of pebbles
-    pebblePos.push_back(position); //Store pebble positions
-    pebbleRadius.push_back(radius); //Store pebble radius
-    pebbleParticles.push_back(nullptr);//Store null pointer per pebble.
-//    isClump = true;
+    nPebble_++; //Counter of pebbles
+    pebblePos_.push_back(position); //Store pebble positions
+    pebbleRadius_.push_back(radius); //Store pebble radius
+    pebbleParticles_.push_back(nullptr);//Store null pointer per pebble.
+//    isClump_ = true;
 }
 
 // V
 void ClumpParticle::setPrincipalDirections(Matrix3D directions)
 {
-    principalDirections = directions;
+    principalDirections_ = directions;
 }
 
 // V
 void ClumpParticle::setInitPrincipalDirections(Matrix3D directions)
 {
-    initPrincipalDirections = directions;
+    initPrincipalDirections_ = directions;
 }
 
-// V
+// Rotate basis vectors around given rotation vector by |rotation|
 void ClumpParticle::rotatePrincipalDirections(Vec3D rotation)
 {
     Mdouble tol = 10e-9;
@@ -192,12 +188,12 @@ void ClumpParticle::rotatePrincipalDirections(Vec3D rotation)
     setPrincipalDirections_e3(dist * cos(theta) * e1 + dist*sin(theta) * e2 + c3 * e3);
 }
 
-//After adding the objects to the handler, compute multiparticle quantities.
+//After adding the objects to the handler, update clump quantities.
 void ClumpParticle::actionsAfterAddObject()
 {
     //Only attribute features to clump particle.
-    if (IsPebble()) return;
-    if (IsClump())
+    if (isPebble()) return;
+    if (isClump())
     {
         ClumpParticle p0;   // Instance for the pebbles
         p0.setSpecies(getSpecies());
@@ -219,11 +215,12 @@ void ClumpParticle::actionsAfterAddObject()
 
 void ClumpParticle::setInitInertia(MatrixSymmetric3D inertia)
 {
-    initInertiaMultiparticle = inertia;
-    inertiaMultiparticle = inertia;
-    invInertia_= inertiaMultiparticle.inverse();
+    clumpInitInertia_ = inertia;
+    clumpInertia_ = inertia;
+    invInertia_= clumpInertia_.inverse();
 }
 
+// Rotate TOI
 void ClumpParticle::rotateTensorOfInertia()
 {
    // Initial and current principal directions
@@ -242,15 +239,15 @@ void ClumpParticle::rotateTensorOfInertia()
 
    Matrix3D Qt = transpose(Q);
 
-  MatrixSymmetric3D inertia = MtoS(Q * (StoM(initInertiaMultiparticle) * Qt));
-  //  inertia = initInertiaMultiparticle;  // uncomment to turn off rotation of toi
-  inertiaMultiparticle = inertia;
-  invInertia_= inertiaMultiparticle.inverse();
+  MatrixSymmetric3D inertia = MtoS(Q * (StoM(clumpInitInertia_) * Qt));
+  //  inertia = clumpInitInertia_;  // uncomment to turn off rotation of toi
+  clumpInertia_ = inertia;
+  invInertia_= clumpInertia_.inverse();
 
 }
 
 
-
+// Rotate pebbles
 void ClumpParticle::updatePebblesVelPos()
 {
     BaseParticle* pPebble;
@@ -264,14 +261,14 @@ void ClumpParticle::updatePebblesVelPos()
 
     Vec3D velocityDueToRotation;
 
-    for (int iPebble = 1; iPebble <= nPebble; iPebble++)
+    for (int iPebble = 1; iPebble <= nPebble_; iPebble++)
     {
-        pPebble = pebbleParticles[iPebble - 1];
-        // pPebble->setMass(massMultiparticle);
-        pPebble->invMass_ = 1. / massMultiparticle;
+        pPebble = pebbleParticles_[iPebble - 1];
+        // pPebble->setMass(clumpMass_);
+        pPebble->invMass_ = 1. / clumpMass_;
         pPebble->setAngularVelocity(angularVelocity);
         pPebble->setOrientation(orientation);
-        pPebble->setPosition(position + e1 * pebblePos[iPebble - 1].X + e2 * pebblePos[iPebble - 1].Y + e3 * pebblePos[iPebble - 1].Z);
+        pPebble->setPosition(position + e1 * pebblePos_[iPebble - 1].X + e2 * pebblePos_[iPebble - 1].Y + e3 * pebblePos_[iPebble - 1].Z);
 
 
         velocityDueToRotation = Vec3D::cross(angularVelocity, pPebble->getPosition() - position);
@@ -289,7 +286,7 @@ void ClumpParticle::updatePebblesVelPos()
  */
 void ClumpParticle::integrateBeforeForceComputation(double time, double timeStep)
 {
-    if (IsPebble()) return;
+    if (isPebble()) return;
     if (getInvMass() == 0.0)
     {
         BaseInteractable::integrateBeforeForceComputation(time, timeStep);
@@ -300,7 +297,7 @@ void ClumpParticle::integrateBeforeForceComputation(double time, double timeStep
         //For periodic particles in parallel the previous position is required
         setPreviousPosition(getPosition());
 #endif
-        accelerate((getForce() - viscousDamping*getVelocity()) * getInvMass() * 0.5 * timeStep); // V(t+0.5dt)
+        accelerate((getForce() - viscousDamping_ * getVelocity()) * getInvMass() * 0.5 * timeStep); // V(t+0.5dt)
         const Vec3D displacement = getVelocity() * timeStep;
         move(displacement); // X(t+dt)
 
@@ -321,6 +318,8 @@ void ClumpParticle::integrateBeforeForceComputation(double time, double timeStep
 
         // Update pebble nodes
         updatePebblesVelPos();
+
+        // Update TOI
         rotateTensorOfInertia();
 
     }
@@ -334,22 +333,28 @@ void ClumpParticle::integrateBeforeForceComputation(double time, double timeStep
  */
 void ClumpParticle::integrateAfterForceComputation(double time, double timeStep)
 {
-    if (IsPebble()) return;
+    if (isPebble()) return;
     if (getInvMass() == 0.0)
     {
         BaseInteractable::integrateAfterForceComputation(time, timeStep);
     }
     else
     {
-        accelerate((getForce() - viscousDamping*getVelocity()) * getInvMass() * 0.5 * timeStep);
-        // PFC4 style acceleration of clumps
+        // Translational acceleration
+        accelerate((getForce() - viscousDamping_ * getVelocity()) * getInvMass() * 0.5 * timeStep);
+
+        // PFC4 style angular acceleration of clumps
         angularAccelerateClumpIterative(timeStep);
+
+        // Rotate pebbles
         updatePebblesVelPos();
+
+        // Updates extra quantities
         updateExtraQuantities();
     }
 }
 
-// V
+// Clump-specific time integration algorithm (PFC4.0 style)
 void ClumpParticle::angularAccelerateClumpIterative(double timeStep)
 {
     Mdouble Ixx_ = getInertia().XX;
@@ -359,7 +364,7 @@ void ClumpParticle::angularAccelerateClumpIterative(double timeStep)
     Mdouble Ixz_ = getInertia().XZ;
     Mdouble Iyz_ = getInertia().YZ;
 
-    Vec3D M = getTorque() - viscousDamping * getAngularVelocity();
+    Vec3D M = getTorque() - viscousDamping_ * getAngularVelocity();
 
     Vec3D angularVelocity_0 = getAngularVelocity();
     Vec3D angularVelocity_n = angularVelocity_0;
@@ -386,12 +391,12 @@ void ClumpParticle::angularAccelerateClumpIterative(double timeStep)
 void ClumpParticle::computeMass(const ParticleSpecies &s)
 {
     if (isFixed()) return;
-    if (IsPebble()) return;
+    if (isPebble()) return;
 
-    if (IsClump())
+    if (isClump())
     {
-        invMass_ = 1.0/massMultiparticle;
-        invInertia_= inertiaMultiparticle.inverse();
+        invMass_ = 1.0 / clumpMass_;
+        invInertia_= clumpInertia_.inverse();
 
     }
 }
@@ -411,17 +416,17 @@ void ClumpParticle::updateExtraQuantities()
     if (acos(Vec3D::dot(n3, v))<ANG_TOL)
     {
         setVerticallyOriented(true);
-        for (int iPebble = 1; iPebble <= nPebble; iPebble++)
+        for (int iPebble = 1; iPebble <= nPebble_; iPebble++)
         {
-            pPebble = pebbleParticles[iPebble - 1];
+            pPebble = pebbleParticles_[iPebble - 1];
             pPebble->setVerticallyOriented(true);
         }
     }
     else {
         setVerticallyOriented(false);
-        for (int iPebble = 1; iPebble <= nPebble; iPebble++)
+        for (int iPebble = 1; iPebble <= nPebble_; iPebble++)
         {
-            pPebble = pebbleParticles[iPebble - 1];
+            pPebble = pebbleParticles_[iPebble - 1];
             pPebble->setVerticallyOriented(false);
         }
     }
@@ -435,9 +440,9 @@ void ClumpParticle::updateExtraQuantities()
     if ((acos(Vec3D::dot(n2, w))<ANG_TOL) || (acc<TOL))
     {
         setDzhanibekovParticle(true);
-        for (int iPebble = 1; iPebble <= nPebble; iPebble++)
+        for (int iPebble = 1; iPebble <= nPebble_; iPebble++)
         {
-            pPebble = pebbleParticles[iPebble - 1];
+            pPebble = pebbleParticles_[iPebble - 1];
             pPebble->setDzhanibekovParticle(true);
         }
     }
@@ -446,9 +451,9 @@ void ClumpParticle::updateExtraQuantities()
     if ( (getForce().getLength() > TOL)||(getTorque().getLength() > TOL) )
     {
         setDzhanibekovParticle(false);
-        for (int iPebble = 1; iPebble <= nPebble; iPebble++)
+        for (int iPebble = 1; iPebble <= nPebble_; iPebble++)
         {
-            pPebble = pebbleParticles[iPebble - 1];
+            pPebble = pebbleParticles_[iPebble - 1];
             pPebble->setDzhanibekovParticle(false);
         }
     }

@@ -155,7 +155,7 @@ public:
                         MatrixSymmetric3D(rdata.toi[clump_index][0], rdata.toi[clump_index][1], rdata.toi[clump_index][2],
                                           rdata.toi[clump_index][4], rdata.toi[clump_index][5],
                                           rdata.toi[clump_index][8]));
-                p0.setMassMultiparticle(rdata.mass[clump_index]);
+            p0.setClumpMass(rdata.mass[clump_index]);
 
                 p0.setDamping(clump_damping);
 
@@ -195,7 +195,7 @@ public:
     void actionsAfterTimeStep() override {
         int D_num = 0;
         for (std::vector<BaseParticle*>::iterator it= particleHandler.begin(); it!=particleHandler.end(); ++it){
-            if ((*it)->IsClump()) {
+            if ((*it)->isClump()) {
                 D_num += (int) static_cast<ClumpParticle*>(*it)->getDzhanibekovParticle();
             }
         }
