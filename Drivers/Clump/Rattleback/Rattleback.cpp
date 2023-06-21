@@ -72,7 +72,7 @@ public:
         dvec upds = {1,0,0,   0,0,1,  0,-1,0};
         data = rotate_clump(data, clump_index, upds); // here you can try different seeds
         p0.setRadius(data.pebbles_r[clump_index][0]);
-        Vec3D pos = Vec3D(0, 0, -93);
+        Vec3D pos = Vec3D(0, 0, -94);
         p0.setPosition(pos);
         for (int j = 0; j < data.pebbles_r[clump_index].size(); j++) {
             p0.addPebble(Vec3D(data.pebbles_x[clump_index][j],
@@ -90,7 +90,7 @@ public:
                                   data.toi[clump_index][8]));
         p0.setMassMultiparticle(data.mass[clump_index]);
         double mag = 0;
-        p0.setAngularVelocity(Vec3D(0,0,0.5));
+        p0.setAngularVelocity(Vec3D(0,0,-0.7));
         p0.setVelocity(Vec3D(0,0,0));
 
         p0.setDamping(clump_damping);
@@ -163,7 +163,7 @@ int main(int argc, char* argv[])
     problem.setTimeStep(collisionTime / 50.0);
     problem.setSaveCount(SAVECOUNT);
     problem.setHGridMaxLevels(1);
-    problem.setTimeMax(50.0);
+    problem.setTimeMax(100.0);
     problem.removeOldFiles();
     problem.solve();
     return 0;

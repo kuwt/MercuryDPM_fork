@@ -152,6 +152,26 @@ def rotate_to_principal_directions_mesh_toi_pebbles(mesh, toi, pebbles, v1, v2, 
     return mesh, toi, r_pebbles, e1, e2, e3
 
 
+# Extra rotation of the mesh
+def rotate_to_pd(mesh, v1, v2, v3):
+    # This function rotates the centered mesh to match specified principal directions v1, v2, v3 with Cartesian axes
+    e1 = np.array([1,0,0])
+    e2 = np.array([0,1,0])
+    e3 = np.array([0,0,1])
+    Q = np.array([
+        [e1@v1, e2@v1, e3@v1],
+        [e1@v2, e2@v2, e3@v2],
+        [e1@v3, e2@v3, e3@v3]])
+
+    for j in range(len(mesh.normals)):
+        mesh.v0[j]  = Q @ mesh.v0[j]
+        mesh.v1[j]  = Q @ mesh.v1[j]
+        mesh.v2[j]  = Q @ mesh.v2[j]
+        mesh.normals[j]  = Q @ mesh.normals[j]
+
+    return mesh
+
+
 def compute_inertia_mixed(OPT, DATA):
     # take arrays of mesh and pebbles
     mesh = DATA['stlMesh']
@@ -174,6 +194,9 @@ def compute_inertia_mixed(OPT, DATA):
         mesh, toi, pebbles, v1, v2, v3 = rotate_to_principal_directions_mesh_toi_pebbles(mesh, toi, pebbles, v1, v2, v3)
         if OPT['verbose']: print("Rotated principal directions: ", v1, v2, v3)
         if OPT['verbose']: print("Rotated toi: ", toi)
+
+    #mesh = rotate_to_pd(mesh, np.array([1,0,0]), np.array([0,0,-1]), np.array([0,1,0]))
+
 
     # Save all the data
     DATA['stlMesh'] = mesh

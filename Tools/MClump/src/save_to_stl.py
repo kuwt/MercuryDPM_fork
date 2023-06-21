@@ -189,7 +189,7 @@ def save_stl_sequence(OPT, DATA):
     DATA['clumpSequence'] = sequence
 
     # Save stl sequence
-    for i in range(5):
+    for i in range(len(sequence)):
         pos = sequence[i][1:4]
         v1 = sequence[i][4:7]
         v2 = sequence[i][7:10]
