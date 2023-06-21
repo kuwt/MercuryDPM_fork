@@ -164,7 +164,11 @@ void LiquidMigrationWilletInteraction::form()
     const LiquidMigrationWilletSpecies* species = getSpecies();
     LiquidFilmParticle* IParticle = dynamic_cast<LiquidFilmParticle*>(getI());
     LiquidFilmParticle* PParticle = dynamic_cast<LiquidFilmParticle*>(getP());
-    if (IParticle == nullptr) //if I is a wall
+    if (PParticle == nullptr) //if P is a wall
+    {
+        logger(ERROR,"In LiquidMigrationWilletInteraction::form, P should be a particle");
+    }
+    else if (IParticle == nullptr) //if I is a wall
     {
         //do not form bridge if the volume is below minimum
         if (PParticle->getLiquidVolume() < species->getLiquidBridgeVolumeMin())
@@ -184,10 +188,6 @@ void LiquidMigrationWilletInteraction::form()
             PParticle->setLiquidVolume(PParticle->getLiquidVolume() - species->getLiquidBridgeVolumeMax());
         }
 //        if (liquidBridgeVolume_) logger(INFO,"Forming liquid bridge of volume % between particles % and wall %",liquidBridgeVolume_,getP()->getId(),getI()->getId());
-    }
-    else if (PParticle == nullptr) //if P is a wall
-    {
-        logger(ERROR,"Should not happen");
     }
     else //if P and I are particles
     {

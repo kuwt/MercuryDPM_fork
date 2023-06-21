@@ -79,7 +79,7 @@ public:
         
         // DEPRECATED INSERTION; instead use a .csv file
         // The psd is given by a vector of size and probability values (r_i, p_i); it means p_i is the probability of inserting a particle of radius less than r_i.
-//        const std::vector<PSD::RadiusAndProbability> APAPM = {{0.000387645, 0},
+//        const std::vector<DistributionElements> APAPM = {{0.000387645, 0},
 //                                                              {0.000405195, 0.00641963},
 //                                                              {0.000423541, 0.0157881},
 //                                                              {0.000442717, 0.0289129},

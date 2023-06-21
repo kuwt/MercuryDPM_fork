@@ -59,7 +59,7 @@ public:
         insertionBoundary.setInitialVolume(1);
     
         //create uniform-volume distribution
-        std::vector<PSD::RadiusAndProbability> cvd;
+        std::vector<DistributionElements> cvd;
         for (int i = 0; i <= 600; ++i)
         {
             cvd.push_back({(i + 3) * 0.0015, i * 0.1});
