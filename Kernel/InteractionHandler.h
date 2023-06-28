@@ -204,6 +204,8 @@ public:
 
     double getLiquidBridgeVolume() const;
 
+    unsigned getNumberOfLiquidBridges() const;
+
 private:
     
     FileType writeVTK_;

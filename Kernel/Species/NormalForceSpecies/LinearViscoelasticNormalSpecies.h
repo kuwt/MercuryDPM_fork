@@ -112,6 +112,12 @@ public:
     MERCURYDPM_DEPRECATED
     void setStiffnessAndDissipation(helpers::KAndDisp new_);
 
+    Mdouble computeTimeStep(Mdouble mass)
+    {
+        return 0.02 * constants::pi /
+               std::sqrt(stiffness_ / (.5 * mass) - mathsFunc::square(dissipation_ / mass));
+    }
+
 private:
     Mdouble stiffness_; ///<(normal) spring constant
     Mdouble dissipation_; ///<(normal) viscosity
