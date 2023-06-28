@@ -57,16 +57,16 @@ def import_or_install_modules():
 import_or_install_modules()
 
 
-from Src.output_data import output_clump_data
-from Src.baseline import baseline
-from Src.color_lib import colorClass
-from Src.input_data import load_pebbles
-from Src.input_data import load_mesh
-from Src.inertia_computations_pebbles import compute_inertia_from_pebbles
-from Src.inertia_computations_mesh import compute_inertia_from_mesh
-from Src.inertia_computations_mixed import compute_inertia_mixed
-from Src.mesh_to_clump_algorithms import compute_clump_from_mesh
-from Src.save_to_stl import save_stl_sequence
+from Src.OutputData import output_clump_data
+from Src.Baseline import baseline
+from Src.ColorLib import colorClass
+from Src.InputData import load_pebbles
+from Src.InputData import load_mesh
+from Src.InertiaComputationsPebbles import compute_inertia_from_pebbles
+from Src.InertiaComputationsMesh import compute_inertia_from_mesh
+from Src.InertiaComputationsMixed import compute_inertia_mixed
+from Src.MeshToClumpAlgorithms import compute_clump_from_mesh
+from Src.SaveToStl import save_stl_sequence
 
 def main():
     # Load baseline parameters - options (OPT) and model data (DATA)
@@ -132,13 +132,13 @@ def main():
         # shift to center of mass and rotate to principal directions.
 
         if OPT['useNumba']:
-            from Src.inertia_computations_voxel_grid import compute_inertia_from_voxel_grid
+            from Src.InertiaComputationsVoxelGrid import compute_inertia_from_voxel_grid
             if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Computing inertial properties..." + clr.BLUE)
             OPT, DATA = compute_inertia_from_voxel_grid(OPT, DATA)
             if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
 
         else:
-            from Src.inertia_computations_voxel_grid_nonumba import compute_inertia_from_voxel_grid_nonumba
+            from Src.InertiaComputationsVoxelGridNonumba import compute_inertia_from_voxel_grid_nonumba
             if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Computing inertial properties..." + clr.BLUE)
             OPT, DATA = compute_inertia_from_voxel_grid_nonumba(OPT, DATA)
             if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
