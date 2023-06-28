@@ -653,20 +653,26 @@ public:
 
     virtual void computeMass(const ParticleSpecies& s);
 
-    //+++++++Multiparticles++++++++
-    BaseParticle* getMaster() const
+    BaseParticle* getClump() const
     {
-        return masterParticle;
+        return clumpParticle;
     }
 
-    // Slave-Master functions
-    bool IsMaster() const
+    /*!
+    * \brief Checks if particle is a clump (container)
+    */
+    bool isClump() const
     {
-        return isMaster;
+        return isClump_;
     }
-    bool IsSlave() const
+
+    /*!
+    * \brief Checks if particle is a pebble (belongs to a clump)
+    */
+
+    bool isPebble() const
     {
-        return isSlave;
+        return isPebble_;
     }
 
     virtual Vec3D getCenterOfMass() {return Vec3D(0,0,0);}
@@ -728,11 +734,18 @@ private:
 
 
 public:
-    virtual void actionsAfterAddObject() {}
 
-    BaseParticle* masterParticle;
-    bool isSlave;
-    bool isMaster;
+    /*!
+     * Methods and attributes necessary for clumped particles
+     */
+
+    virtual void actionsAfterAddObject() {} /// Function that updates necessary quantities of a clump particle after adding a pebble
+
+    BaseParticle* clumpParticle; /// pointer to a clump particle (for a pebble)
+
+    bool isPebble_; /// The particle is pebble
+
+    bool isClump_; /// The particle is clump
 };
 
 #endif

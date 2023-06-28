@@ -53,7 +53,7 @@ namespace helpers
      * \brief converts a floating point number into a string with a given precision
      */
     std::string toString(Mdouble value, unsigned precision);
-    
+
     template<typename T>
     std::string toString(const T& n)
     {
@@ -61,7 +61,7 @@ namespace helpers
         stm << n;
         return stm.str();
     }
-    
+
     template<typename T>
     std::string toString(const std::vector<T>& vec)
     {

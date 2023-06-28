@@ -23,7 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-//#include "../../src/Mercury3D.h"
+//#include "../../Src/Mercury3D.h"
 #include "DPMBase.h"
 #include <sstream>
 #include <iostream>

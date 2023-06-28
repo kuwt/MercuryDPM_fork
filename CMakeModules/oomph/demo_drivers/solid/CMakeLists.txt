@@ -87,7 +87,7 @@ foreach(CPPFILE ${CPPFILES})
 		add_executable(${EXECNAME} ${FILENAME})
 	endif()
 
-    #link executable against all src and external_src libraries (except axisym_displ_based_foeppl_von_karman pml_fourier_decomposed_helmholtz pml_helmholtz pml_time_harmonic_linear_elasticity)
+    #link executable against all Src and external_src libraries (except axisym_displ_based_foeppl_von_karman pml_fourier_decomposed_helmholtz pml_helmholtz pml_time_harmonic_linear_elasticity)
 	#exceptions: folders that are in conflict with the standard oomph libraries
 	if (${folder} STREQUAL "axisym_displ_based_foeppl_von_karman")
 		target_link_libraries(${EXECNAME} axisym_displ_based_foeppl_von_karman generic)

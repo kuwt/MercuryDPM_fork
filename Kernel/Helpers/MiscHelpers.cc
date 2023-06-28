@@ -67,9 +67,9 @@ int helpers::qSortCompare(const void* x, const void* y)
 
 /*!
  * \brief Returns the 100*perc-th percentile of array.
- * \details array should be sorted, e.g. 
+ * \details array should be sorted, e.g.
  *  qsort(xs, n, sizeof(double), qSortCompare);
- *  and perc should be a number between 0 and 1. 
+ *  and perc should be a number between 0 and 1.
  */
 double helpers::getPercentile(const double* array, size_t nel, double perc)
 {

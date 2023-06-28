@@ -32,7 +32,7 @@
 /*!
  * \brief Tests the implementation of TriangulatedWall.
  * \details
- *  <img src="Walls/triangulatedWallsSelfTest.png" height="250px">
+ *  <img Src="Walls/triangulatedWallsSelfTest.png" height="250px">
  */
 class TriangulatedWallSelfTest : public Mercury3D
 {

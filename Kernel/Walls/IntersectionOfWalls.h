@@ -50,10 +50,10 @@
  * \f$p-n\cdot x\leq r\f$
  * (note 'touching particles' also includes particles that are completely enclosed inside the wall).
  * A particle touches an #IntersectionOfWalls if it touches all InfiniteWall objects (shown in the image below).
- * <img src="T8_fig2_finitewall.jpg" height="250px">
+ * <img Src="T8_fig2_finitewall.jpg" height="250px">
  *
  * For a demonstration on how to use this class, see \ref T8 and \ref HourGlass3DDemo (shown in the image below).
- * <img src="HourGlass2DDemo.png" height="250px">
+ * <img Src="HourGlass2DDemo.png" height="250px">
  */
 class IntersectionOfWalls : public BaseWall
 {
