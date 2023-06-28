@@ -57,7 +57,7 @@ def main():
 	
 	
 	for i in range(100):
-		command  = [build_dir + '/Drivers/Clump/Domino']
+		command  = [build_dir + '/Drivers/Clump/Domino/Domino']
 		command.append('-p0')
 		command.append(str(i))
 		print(command)

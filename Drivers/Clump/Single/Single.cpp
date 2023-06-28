@@ -29,7 +29,7 @@
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Particles/ClumpParticle.h"
-#include "../ClumpHeaders/ClumpIO.h"
+#include "../ClumpHeaders/ClumpInput.h"
 #include "../ClumpHeaders/Mercury3DClump.h"
 # include <stdlib.h>
 
@@ -49,7 +49,7 @@ public:
         setXMin(f_min);
         setYMin(f_min);
         setZMin(f_min);
-        load_clumps(data);
+        LoadClumps(data);
         setClumpIndex(0);
         clump_mass = data.mass[clump_index];
     }
@@ -67,7 +67,7 @@ public:
         ClumpParticle p0;
         p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to Clump 1
         p0.setClump();
-        // data = rotate_clump(data, clump_index, uniform_random_pds()); // Rotate clump arbitrarily
+        // data = RotateClump(data, clump_index, UniformRandomPDs()); // Rotate clump arbitrarily
         p0.setRadius(data.pebbles_r[clump_index][0]);
         Vec3D pos = Vec3D(0, 0, 5);
         p0.setPosition(pos);
@@ -113,7 +113,7 @@ public:
     }
 private:
     int clump_index;
-    clump_data data;
+    ClumpData data;
     Mdouble clump_mass;
     Mdouble clump_damping = 10;
 };

@@ -26,8 +26,8 @@
 
 // This module loads clump configuration produced by MClump tool
 
-#ifndef CLUMP_IO_H
-#define CLUMP_IO_H
+#ifndef CLUMP_INPUT_H
+#define CLUMP_INPUT_H
 
 #include <algorithm>
 #include <dirent.h>
@@ -42,36 +42,47 @@
 #include <CMakeDefinitions.h>
 
 // Useful containers
-typedef std::vector<double> dvec;
-typedef std::vector<dvec> ddvec;
-typedef std::vector<std::string> svec;
+typedef std::vector<double> DoubleVector;
+typedef std::vector<DoubleVector> Double2DVector;
+typedef std::vector<std::string> StringVector;
 
 // Helper function for alphabetical sorting of clump names
-bool compareFunction (std::string a, std::string b) {return a<b;}
+bool CompareFunction (std::string a, std::string b) {return a < b;}
 
-// structure for storing clump instances' parameters
-struct clump_data
+// Helper function to generate a random double in range (0, MAX)
+double RandomDouble(double Max)
+{return Max*((double) rand() / (RAND_MAX));}
+
+/*!
+* Structure for storing clump instance parameters
+*/
+
+struct ClumpData
 {
 public:
     
 	std::string path;	// Path to MClump working directory
-	svec clump_names;	// Array of names of clumps that will be used 
-	dvec mass;		//  clump mass
-	ddvec  pebbles_x;	//  Pebbles geometry (outer index goes over clumps, inner - over pebbles)
-	ddvec  pebbles_y;
-	ddvec  pebbles_z;
-	ddvec  pebbles_r;
+	StringVector clump_names;	// Array of names of Clumps that will be used
+	DoubleVector mass;		//  clump mass
+	Double2DVector  pebbles_x;	//  Pebbles geometry (outer index goes over Clumps, inner - over pebbles)
+	Double2DVector  pebbles_y;
+	Double2DVector  pebbles_z;
+	Double2DVector  pebbles_r;
 	
-	ddvec  toi;		// Clump tensor of inertia (I11, I12, I13, I21..I33)
-	ddvec  pd;		// Clump principal directions v1, v2, v3
+	Double2DVector  toi;		// Clump tensor of inertia (I11, I12, I13, I21..I33)
+	Double2DVector  pd;		// Clump principal directions v1, v2, v3
 	
 };
 
-// Loading available clumps and their names
-void load_conf(clump_data &a)
+
+/*!
+* Loading available Clumps and their names
+*/
+
+void LoadConf(ClumpData &a)
 {
     // Path to MCLump tool
-    a.path = getMercuryDPMSourceDir() + "/Tools/MClump/clumps/";
+    a.path = getMercuryDPMSourceDir() + "/Tools/MClump/Clumps/";
 
     struct dirent *entry;
     DIR *dir = opendir(a.path.c_str());
@@ -84,19 +95,22 @@ void load_conf(clump_data &a)
 
     // remove "." and ".." from the list of dirs (position of those in the list is OS-sensitive, hence this code)
 
-    std::sort(a.clump_names.begin(),a.clump_names.end(),compareFunction);//sort the vector
+    std::sort(a.clump_names.begin(), a.clump_names.end(), CompareFunction);//sort the vector
     a.clump_names.erase(a.clump_names.begin());
     a.clump_names.erase(a.clump_names.begin());
 
-    // Show the names of available clumps
+    // Show the names of available Clumps
     for (int i = 0; i<a.clump_names.size(); i++) std::cout<<a.clump_names[i]<<std::endl;
 
 }
 
-// Loading pebbles of a clump
-void load_pebbles(clump_data &a)
+/*!
+* Loading pebbles of a clump
+*/
+
+void LoadPebbles(ClumpData &a)
 {
-    std::cout<<"Loading clump pebbles...";
+    logger(INFO, "Loading clump pebbles...");
 
     a.pebbles_x.resize(a.clump_names.size());
     a.pebbles_y.resize(a.clump_names.size());
@@ -109,7 +123,7 @@ void load_pebbles(clump_data &a)
         while (std::getline(infile, line)) {
             std::istringstream iss(line);
             std::string substring{};
-            svec val;
+            StringVector val;
             while (std::getline(iss, substring, ',')) val.push_back(substring);
             a.pebbles_x[i].push_back(std::stof(val[0]));
             a.pebbles_y[i].push_back(std::stof(val[1]));
@@ -118,14 +132,16 @@ void load_pebbles(clump_data &a)
         }
         infile.close();
     }
-    std::cout<<"\t OK"<<std::endl;
+    logger(INFO, "\t OK\n");
 }
 
-// Load mass of a clump
-void load_mass(clump_data &a)
+/*!
+* Load mass of a clump
+*/
+void LoadMass(ClumpData &a)
 {
-    std::cout<<"Loading clump masses..";
-    
+    logger(INFO, "Loading clump masses...");
+
     a.mass.resize(a.clump_names.size());
     
     for (int i = 0; i < a.clump_names.size(); i++ ){
@@ -135,11 +151,14 @@ void load_mass(clump_data &a)
         a.mass[i] = std::stof(mass);
         infile.close();
     }
-    std::cout<<"\t OK"<<std::endl;
+    logger(INFO, "\t OK\n");
 }
 
-// Load tensor of inertia (TOI) of a clump
-void load_toi(clump_data &a)
+/*!
+* Load tensor of inertia (TOI) of a clump
+*/
+
+void LoadTOI(ClumpData &a)
 {
     std::cout<<"Loading clump TOI..";
     a.toi.resize(a.clump_names.size());
@@ -150,17 +169,20 @@ void load_toi(clump_data &a)
         while (std::getline(infile, line)) {
             std::istringstream iss(line);
             std::string substring{};
-            svec val;
+            StringVector val;
             while (std::getline(iss, substring, ',')) val.push_back(substring);
             for (int k = 0; k < 3; k++) a.toi[i].push_back(std::stof(val[k]));
         }
         infile.close();
     }
-    std::cout<<"\t OK"<<std::endl;
+    logger(INFO, "\t OK\n");
 }
 
-// Load pre-computed principal directions (PDs) of a clump. Normally MClump tool aligns PDs with the global Cartesian axes.
-void load_pd(clump_data &a)
+/*!
+* Load pre-computed principal directions (PDs) of a clump. Normally MClump tool aligns PDs with the global Cartesian axes.
+*/
+
+void LoadPD(ClumpData &a)
 {
     std::cout<<"Loading clump PD..";
     a.pd.resize(a.clump_names.size());
@@ -171,24 +193,29 @@ void load_pd(clump_data &a)
         while (std::getline(infile, line)) {
             std::istringstream iss(line);
             std::string substring{};
-            svec val;
+            StringVector val;
             while (std::getline(iss, substring, ',')) val.push_back(substring);
             for (int k = 0; k < 3; k++) a.pd[i].push_back(std::stof(val[k]));
         }
         infile.close();
     }
-    std::cout<<"\t OK"<<std::endl;
+    logger(INFO, "\t OK\n");
 }
 
-void load_clumps(clump_data &data, bool VERBOSE = false)
+
+/*!
+*  // Main function that loads all the necessary files to initiate Clumps
+*/
+
+void LoadClumps(ClumpData &data, bool VERBOSE = false)
 {
-	// Umbrela function that loads all the necessary files to initiate clumps
+
 	std::cout<<"LOAD CLUMP DATA"<<std::endl;
-	load_conf(data);
-	load_pebbles(data);
-	load_mass(data);
-	load_toi(data);
-	load_pd(data);
+    LoadConf(data);
+    LoadPebbles(data);
+    LoadMass(data);
+    LoadTOI(data);
+    LoadPD(data);
     if (VERBOSE) {
         std::cout<<"LOADED CLUMPS"<<std::endl;
         for (int i = 0; i < data.pebbles_x.size(); i++) {
@@ -213,52 +240,32 @@ void load_clumps(clump_data &data, bool VERBOSE = false)
 
 }
 
-Matrix3D transpose(Matrix3D M) { return Matrix3D(M.XX, M.YX, M.ZX, M.XY, M.YY, M.ZY, M.XZ, M.YZ, M.ZZ);}
+/*!
+*  Changes PDs of the clump - sufficient for clump to be properly rotated
+*/
 
-clump_data rotate_clump(clump_data data, int clump_index, dvec new_pd)
+ClumpData RotateClump(ClumpData data, int clump_index, DoubleVector new_pd)
 {
-    clump_data new_data = data;
-
-    // Prepare rotation matrices
-    Vec3D e10 = Vec3D(data.pd[clump_index][0], data.pd[clump_index][1], data.pd[clump_index][2]);
-    Vec3D e20 = Vec3D(data.pd[clump_index][3], data.pd[clump_index][4], data.pd[clump_index][5]);
-    Vec3D e30 = Vec3D(data.pd[clump_index][6], data.pd[clump_index][7], data.pd[clump_index][8]);
-
-    Vec3D e1  = Vec3D(new_pd[0], new_pd[1], new_pd[2]);
-    Vec3D e2  = Vec3D(new_pd[3], new_pd[4], new_pd[5]);
-    Vec3D e3  = Vec3D(new_pd[6], new_pd[7], new_pd[8]);
-
-    Matrix3D Q(Vec3D::dot(e10, e1), Vec3D::dot(e10, e2), Vec3D::dot(e10, e3),
-               Vec3D::dot(e20, e1), Vec3D::dot(e20, e2), Vec3D::dot(e20, e3),
-               Vec3D::dot(e30, e1), Vec3D::dot(e30, e2), Vec3D::dot(e30, e3));
-
-    Matrix3D Qt = transpose(Q);
-
-    // Set new pd's
+    ClumpData new_data = data;
     new_data.pd[clump_index] = new_pd;
-
-    /* Rotate tensor of inertia
-    Matrix3D iI = Matrix3D(data.toi[clump_index][0], data.toi[clump_index][1], data.toi[clump_index][2],
-                                data.toi[clump_index][3], data.toi[clump_index][4], data.toi[clump_index][5],
-                                data.toi[clump_index][6], data.toi[clump_index][7], data.toi[clump_index][8]);
-
-    Matrix3D nI = Q * iI * Qt;
-    dvec d{ nI.XX, nI.XY, nI.XZ, nI.YX, nI.YY, nI.YZ, nI.ZX, nI.ZY, nI.ZZ };
-    new_data.toi[clump_index] = d;
-    */
-    return new_data; // All loaded clumps in new_data remain unchanged except the clump_index one that is rotated to new_pd
+    return new_data;
 }
 
-double random_double(double Max)
-{return Max*((double) rand() / (RAND_MAX));}
 
-dvec uniform_random_pds(){
+
+
+
+
+/*!
+*  Generate random (and isotropically distributed) principal directions frame
+*/
+DoubleVector UniformRandomPDs(){
 
     Vec3D n1, n2, n3, ref;
 
     // basis vector n1
-    double r1 = random_double(2) - 1.0;
-    double r2 = random_double(1);
+    double r1 = RandomDouble(2) - 1.0;
+    double r2 = RandomDouble(1);
 
     double theta = acos(r1); // Note that for isotropy of n1 theta is NOT uniform!
     double phi = 2 * M_PI * r2;
@@ -266,8 +273,8 @@ dvec uniform_random_pds(){
     n1 = Vec3D(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
 
     // basis vector n2
-    r1 = random_double(1);
-    r2 = random_double(1);
+    r1 = RandomDouble(1);
+    r2 = RandomDouble(1);
 
     theta = acos(2 * r1 - 1); // Note that for isotropy of n1 theta is NOT uniform!
     phi = 2 * M_PI * r2;
@@ -275,9 +282,9 @@ dvec uniform_random_pds(){
     ref = Vec3D(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
     n2 = Vec3D::cross(ref, n1); n2.normalise();
     n3 = Vec3D::cross(n1, n2); n3.normalise();
-    return dvec{n1.X, n1.Y, n1.Z, n2.X, n2.Y, n2.Z, n3.X, n3.Y, n3.Z};
+    return DoubleVector{n1.X, n1.Y, n1.Z, n2.X, n2.Y, n2.Z, n3.X, n3.Y, n3.Z};
 
 }
 
 
-#endif // CLUMP_IO_H
+#endif // CLUMP_INPUT_H

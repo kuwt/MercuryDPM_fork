@@ -29,7 +29,7 @@
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Particles/ClumpParticle.h"
-#include "../ClumpHeaders/ClumpIO.h"
+#include "../ClumpHeaders/ClumpInput.h"
 #include "../ClumpHeaders/Mercury3DClump.h"
 # include <stdlib.h>
 #include <Boundaries/CubeInsertionBoundary.h>
@@ -68,7 +68,7 @@ public:
         setMax({f_max,f_max,f_max});
         // Output files: wall-vtu
         setWallsWriteVTK(true);
-        load_clumps(data);
+        LoadClumps(data);
         setClumpIndex(2);
         clump_mass = data.mass[clump_index];
     }
@@ -89,7 +89,7 @@ public:
             ClumpParticle p0;
             p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to Clump 1
             p0.setClump();
-            clump_data rdata = rotate_clump(data, clump_index, uniform_random_pds()); // Rotate clump arbitrarily
+            ClumpData rdata = RotateClump(data, clump_index, UniformRandomPDs()); // Rotate clump arbitrarily
 
 
 
@@ -114,19 +114,19 @@ public:
             p0.setDamping(clump_damping);
 
 
-            Vec3D pos = Vec3D(f_min + margin +  random_double(f_max - f_min - 2 * margin),
-                              f_min + margin + random_double(f_max - f_min - 2 * margin),
-                              z_shift + f_min + z_margin + random_double(f_max - f_min - 2 * z_margin));
+            Vec3D pos = Vec3D(f_min + margin + RandomDouble(f_max - f_min - 2 * margin),
+                              f_min + margin + RandomDouble(f_max - f_min - 2 * margin),
+                              z_shift + f_min + z_margin + RandomDouble(f_max - f_min - 2 * z_margin));
 
             p0.setPosition(pos);
 
-            Vec3D angVel = Vec3D(av_min + random_double(av_max - av_min),
-                                 av_min + random_double(av_max - av_min),
-                                 av_min + random_double(av_max - av_min));
+            Vec3D angVel = Vec3D(av_min + RandomDouble(av_max - av_min),
+                                 av_min + RandomDouble(av_max - av_min),
+                                 av_min + RandomDouble(av_max - av_min));
 
-            Vec3D vel = Vec3D(tv_min + random_double(tv_max - tv_min),
-                              tv_min + random_double(tv_max - tv_min),
-                              tv_min + random_double(tv_max - tv_min));
+            Vec3D vel = Vec3D(tv_min + RandomDouble(tv_max - tv_min),
+                              tv_min + RandomDouble(tv_max - tv_min),
+                              tv_min + RandomDouble(tv_max - tv_min));
 
             p0.setAngularVelocity(angVel);
             p0.setVelocity(vel);
@@ -160,7 +160,7 @@ public:
 
 private:
     int clump_index;
-    clump_data data;
+    ClumpData data;
     Mdouble clump_mass;
     Mdouble clump_damping = 1;
 };

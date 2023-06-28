@@ -30,7 +30,11 @@
 #include "Particles/ClumpParticle.h"
 #include "Boundaries/PeriodicBoundary.h"
 #include <stdlib.h>
-// This class contains necessary modifications of Mercury3D framework to enable rigid clumps
+
+/*!
+ * This class contains necessary modifications of Mercury3D framework to enable rigid Clumps
+ */
+
 class Mercury3Dclump : public Mercury3D
 {
 public:
@@ -39,7 +43,9 @@ public:
 
     }
 
-    // Redefine force computation for clumps
+    /*!
+    * Redefine contact particle-particle force computation for Clumps
+    */
     void computeInternalForce(BaseParticle* P1, BaseParticle* P2) override
     {
         // Quit if:
@@ -73,6 +79,9 @@ public:
         }
     }
 
+    /*!
+    * Redefine contact particle-wall force computation for Clumps
+    */
     void computeForcesDueToWalls(BaseParticle* pI, BaseWall* w) override
     {
         // No interaction between walls and master particles
@@ -104,6 +113,9 @@ public:
         }
     }
 
+    /*!
+    * Redefine total force computation for Clumps
+    */
     void computeAllForces() override
     {
         //Resetting all forces on both particles and walls to zero
@@ -171,6 +183,9 @@ public:
         }
     }
 
+    /*!
+    * Checks if clump is in contact with at least one particle/clump
+    */
     bool checkClumpForInteraction(BaseParticle& particle)
     {
         ClumpParticle* mp = dynamic_cast<ClumpParticle*>(&particle);
@@ -189,6 +204,9 @@ public:
         return true;
     }
 
+    /*!
+    * Checks if clump is in contact with at least one particle/clump (periodic boundary conditions)
+    */
     bool checkClumpForInteractionPeriodic(BaseParticle& particle)
     {
         // Note that this implementation only check for interaction with particles
@@ -247,6 +265,4 @@ public:
     }
 };
 
-
-// mathsFunc::square(sp->getSumOfInteractionRadii(q))
 

@@ -307,7 +307,7 @@ void ClumpParticle::integrateBeforeForceComputation(double time, double timeStep
             dpm->hGridUpdateMove(this, displacement.getLengthSquared());
         }
 
-        // PFC4 style acceleration of clumps
+        // PFC4 style acceleration of Clumps
         angularAccelerateClumpIterative(timeStep); //W(t+0.5dt)
 
         //apply to rotation quaternion q: q = normalise(q + \tilde{C}\omega*timeStep) (see Wouter's notes)
@@ -343,7 +343,7 @@ void ClumpParticle::integrateAfterForceComputation(double time, double timeStep)
         // Translational acceleration
         accelerate((getForce() - viscousDamping_ * getVelocity()) * getInvMass() * 0.5 * timeStep);
 
-        // PFC4 style angular acceleration of clumps
+        // PFC4 style angular acceleration of Clumps
         angularAccelerateClumpIterative(timeStep);
 
         // Rotate pebbles

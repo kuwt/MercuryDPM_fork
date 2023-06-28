@@ -41,10 +41,10 @@ if (OOMPH_HAS_MPI)
     include_directories(${OOMPH_DIR}/external_src/oomph_superlu_dist_3.0)
 endif()
 
-# for #include "../../../src/*" to work
+# for #include "../../../Src/*" to work
 include_directories(${OOMPH_DIR}/demo_drivers/solid/static_fish)
 
-# first compile external_src, then src, then demo_drivers
+# first compile external_src, then Src, then demo_drivers
 add_subdirectory(external_src)
 add_subdirectory(src)
 

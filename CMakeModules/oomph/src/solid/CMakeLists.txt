@@ -1,4 +1,4 @@
-# This file is a copy of the CMakeLists.txt template in src/solid;
+# This file is a copy of the CMakeLists.txt template in Src/solid;
 # only change the original file in that folder
 
 # extract name of current directory

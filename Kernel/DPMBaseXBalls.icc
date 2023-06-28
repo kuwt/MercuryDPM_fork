@@ -47,7 +47,7 @@ void DPMBase::outputXBallsDataParticle(unsigned int i, unsigned int format, std:
             {
                 os << p->getPosition().X << " 0 "
                    << p->getVelocity().X << " 0 "
-                   << p->getRadius() * float(!(p->isClump())) << " 0 0 0" << std::endl; // assign zero radius for masters of clumps
+                   << p->getRadius() * float(!(p->isClump())) << " 0 0 0" << std::endl; // assign zero radius for masters of Clumps
                 break;
             }
             else

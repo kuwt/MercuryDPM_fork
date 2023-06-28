@@ -23,13 +23,13 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Example - clumps in the periodic box
+// Example - Clumps in the periodic box
 
 #include "Mercury3D.h"
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Particles/ClumpParticle.h"
-#include "../ClumpHeaders/ClumpIO.h"
+#include "../ClumpHeaders/ClumpInput.h"
 #include "../ClumpHeaders/Mercury3DClump.h"
 #include <stdlib.h>
 #include <CMakeDefinitions.h>
@@ -61,7 +61,7 @@ public:
         setXMin(f_min);
         setYMin(f_min);
         setZMin(f_min);
-        load_clumps(data);
+        LoadClumps(data);
         clump_mass = data.mass[clump_index];
 
     }
@@ -127,7 +127,7 @@ public:
         */
 
 
-        // Generate a dense packing of clumps
+        // Generate a dense packing of Clumps
         setClumpIndex(1);
         int N_created = 0;
         for (int part = 0; part<N_att; part++) {
@@ -135,7 +135,7 @@ public:
                 ClumpParticle p0;
                 p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to Clump 1
             p0.setClump();
-                clump_data rdata = rotate_clump(data, clump_index, uniform_random_pds()); // Rotate clump arbitrarily
+                ClumpData rdata = RotateClump(data, clump_index, UniformRandomPDs()); // Rotate clump arbitrarily
 
 
 
@@ -160,19 +160,19 @@ public:
                 p0.setDamping(clump_damping);
 
 
-                Vec3D pos = Vec3D(f_min + margin +  random_double(f_max - f_min - 2 * margin),
-                                  f_min + margin + random_double(f_max - f_min - 2 * margin),
-                                  f_min + margin + random_double(f_max - f_min - 2 * margin));
+                Vec3D pos = Vec3D(f_min + margin + RandomDouble(f_max - f_min - 2 * margin),
+                                  f_min + margin + RandomDouble(f_max - f_min - 2 * margin),
+                                  f_min + margin + RandomDouble(f_max - f_min - 2 * margin));
 
                 p0.setPosition(pos);
 
-                Vec3D angVel = Vec3D(av_min + random_double(av_max - av_min),
-                                     av_min + random_double(av_max - av_min),
-                                     av_min + random_double(av_max - av_min));
+                Vec3D angVel = Vec3D(av_min + RandomDouble(av_max - av_min),
+                                     av_min + RandomDouble(av_max - av_min),
+                                     av_min + RandomDouble(av_max - av_min));
 
-                Vec3D vel = Vec3D(tv_min + random_double(tv_max - tv_min),
-                                  tv_min + random_double(tv_max - tv_min),
-                                  tv_min + random_double(tv_max - tv_min));
+                Vec3D vel = Vec3D(tv_min + RandomDouble(tv_max - tv_min),
+                                  tv_min + RandomDouble(tv_max - tv_min),
+                                  tv_min + RandomDouble(tv_max - tv_min));
 
                 // No motion with zero initial conditions
                 //angVel = Vec3D(0,0,0);
@@ -203,7 +203,7 @@ public:
     }
 private:
     int clump_index;
-    clump_data data;
+    ClumpData data;
     Mdouble clump_mass;
     Mdouble clump_damping = 0;
 };

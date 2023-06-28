@@ -33,7 +33,7 @@
 /*!
  * \brief Tests the implementation of TriangulatedWall.
  * \details
- *  <img src="Walls/triangulatedStepSelfTest.png" height="250px">
+ *  <img Src="Walls/triangulatedStepSelfTest.png" height="250px">
  */
 class TriangulatedStepSelfTest : public Mercury3D
 {
@@ -81,7 +81,7 @@ public:
 /*!
  * \brief Tests the implementation of TriangulatedWall.
  * \details
- *  <img src="Walls/triangulatedStepSelfTest.png" height="250px">
+ *  <img Src="Walls/triangulatedStepSelfTest.png" height="250px">
  */
 class TriangulatedStepWallSelfTest : public Mercury3D
 {

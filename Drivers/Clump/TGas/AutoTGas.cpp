@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
     exec_command(command.c_str());
 
     // Paraview energy data postprocessing tool
-    command = "python " + getMercuryDPMSourceDir() + "/Tools/MClump/plot_ene.py " +
+    command = "python " + getMercuryDPMSourceDir() + "/Tools/MClump/PlotEnergies.py " +
               getMercuryDPMBuildDir() + "/Drivers/Clump/" + name + "/ " + name;
     exec_command(command.c_str());
     return 0;

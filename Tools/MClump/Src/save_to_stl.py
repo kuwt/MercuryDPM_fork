@@ -195,7 +195,7 @@ def save_stl_sequence(OPT, DATA):
         v2 = sequence[i][7:10]
         v3 = sequence[i][10:13]
         print("pos:", pos, "v1:", v1, "v2:", v2, "v3:", v3)
-        save_stl_snap(DATA['stlMesh'], pos, v1, v2, v3, './blender/stl_seq/' + 's_' + str(i) + '.stl')
+        save_stl_snap(DATA['stlMesh'], pos, v1, v2, v3, './Blender/stl_seq/' + 's_' + str(i) + '.stl')
 
 
     return OPT, DATA

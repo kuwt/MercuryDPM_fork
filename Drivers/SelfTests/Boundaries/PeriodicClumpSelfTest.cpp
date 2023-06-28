@@ -29,7 +29,7 @@
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Particles/ClumpParticle.h"
-#include "../../Clump/ClumpHeaders/ClumpIO.h"
+#include "../../Clump/ClumpHeaders/ClumpInput.h"
 #include "../../Clump/ClumpHeaders/Mercury3DClump.h"
 # include <stdlib.h>
 #include "Boundaries/PeriodicBoundary.h"
@@ -50,7 +50,7 @@ public:
         setXMin(f_min);
         setYMin(f_min);
         setZMin(f_min);
-        load_clumps(data);
+        LoadClumps(data);
         setClumpIndex(0);
         clump_mass = data.mass[clump_index];
     }
@@ -106,7 +106,7 @@ public:
     }
 private:
     int clump_index;
-    clump_data data;
+    ClumpData data;
     Mdouble clump_mass;
     Mdouble clump_damping = 0;
 };

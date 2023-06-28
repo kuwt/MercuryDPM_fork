@@ -41,12 +41,12 @@
  *
  * The file consists of a set of vertices and a n-by-3 connectivity matrix defining n faces.
  * Three vertices form a face; the face normal is oriented such that the vertices are ordered in anticlockwise direction around the normal.
- * <img src="triangulatedWall.png" height="250px">
+ * <img Src="triangulatedWall.png" height="250px">
  *
  * Particles interact with a TriangulatedWall when they contact a face (from either side), a edge, or a vertex.
  *
  * For a demonstration on how to use this class, see \ref TriangulatedWallSelfTest (shown in the image below).
- * <img src="triangulatedWallsSelfTest.png" height="250px">
+ * <img Src="triangulatedWallsSelfTest.png" height="250px">
  */
 class TriangulatedWall : public BaseWall
 {
@@ -54,7 +54,7 @@ public:
     
     /**
      * Struct used to store the properties of a face needed for contact detection.
-     * <img src="triangulatedWall.png" height="250px">
+     * <img Src="triangulatedWall.png" height="250px">
      */
     struct Face
     {

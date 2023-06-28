@@ -34,7 +34,7 @@
 #include "Species/ParticleSpecies.h"
 #include "DPMBase.h"
 /*!
- * \class Clump
+ * \class Clump Particle provides the functional of rigid clumps in mercuryDPM
  * \brief
  */
 class ClumpParticle final: public NonSphericalParticle

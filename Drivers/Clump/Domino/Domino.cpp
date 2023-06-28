@@ -29,7 +29,7 @@
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Particles/ClumpParticle.h"
-#include "../ClumpHeaders/ClumpIO.h"
+#include "../ClumpHeaders/ClumpInput.h"
 #include "../ClumpHeaders/Mercury3DClump.h"
 #include <stdlib.h>
 #include "Boundaries/PeriodicBoundary.h"
@@ -198,7 +198,7 @@ public:
 
 private:
     int clump_index;
-    clump_data data;
+    ClumpData data;
     Mdouble clump_mass;
     Mdouble clump_damping = 10;
 };

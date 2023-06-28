@@ -26,7 +26,7 @@
 
 # This tool parses the *.ene file and generates paraview-friendly plot data
 
-# usage: python plot_ene.py <path_to_the_driver_dir> <name_of_the_driver_file>
+# usage: python PlotEnergies.py <path_to_the_driver_dir> <name_of_the_driver_file>
 
 import sys
 import numpy as np

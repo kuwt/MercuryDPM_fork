@@ -29,7 +29,7 @@
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Particles/ClumpParticle.h"
-#include "../ClumpHeaders/ClumpIO.h"
+#include "../ClumpHeaders/ClumpInput.h"
 #include "../ClumpHeaders/Mercury3DClump.h"
 # include <stdlib.h>
 
@@ -49,7 +49,7 @@ public:
         setXMin(f_min);
         setYMin(f_min);
         setZMin(f_min);
-        load_clumps(data);
+        LoadClumps(data);
         setClumpIndex(0);
         clump_mass = data.mass[clump_index];
     }
@@ -67,10 +67,10 @@ public:
         ClumpParticle p0;
         p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to Clump 1
         p0.setClump();
-        dvec urpds = {0.707,0.707,0,-0.707,0.707,0,0,0,1};
-        // dvec urpds = uniform_random_pds();
+        DoubleVector urpds = {0.707, 0.707, 0, -0.707, 0.707, 0, 0, 0, 1};
+        // DoubleVector urpds = UniformRandomPDs();
         Vec3D angVel = 2 * Vec3D( urpds[0], urpds[1], urpds[2]);
-        data = rotate_clump(data, clump_index, urpds); // Rotate clump arbitrarily
+        data = RotateClump(data, clump_index, urpds); // Rotate clump arbitrarily
         p0.setRadius(data.pebbles_r[clump_index][0]);
         Vec3D pos = Vec3D(0, 0, 0);
         p0.setPosition(pos);
@@ -125,7 +125,7 @@ public:
     }
 private:
     int clump_index;
-    clump_data data;
+    ClumpData data;
     Mdouble clump_mass;
     Mdouble clump_damping = 10;
 };

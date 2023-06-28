@@ -30,7 +30,7 @@
 
 import sys
 
-sys.path.append('./src/')
+sys.path.append('./Src/')
 sys.path.append('./')
 
 try:
@@ -57,16 +57,16 @@ def import_or_install_modules():
 import_or_install_modules()
 
 
-from src.output_data import output_clump_data
-from src.baseline import baseline
-from src.color_lib import colorClass
-from src.input_data import load_pebbles
-from src.input_data import load_mesh
-from src.inertia_computations_pebbles import compute_inertia_from_pebbles
-from src.inertia_computations_mesh import compute_inertia_from_mesh
-from src.inertia_computations_mixed import compute_inertia_mixed
-from src.mesh_to_clump_algorithms import compute_clump_from_mesh
-from src.save_to_stl import save_stl_sequence
+from Src.output_data import output_clump_data
+from Src.baseline import baseline
+from Src.color_lib import colorClass
+from Src.input_data import load_pebbles
+from Src.input_data import load_mesh
+from Src.inertia_computations_pebbles import compute_inertia_from_pebbles
+from Src.inertia_computations_mesh import compute_inertia_from_mesh
+from Src.inertia_computations_mixed import compute_inertia_mixed
+from Src.mesh_to_clump_algorithms import compute_clump_from_mesh
+from Src.save_to_stl import save_stl_sequence
 
 def main():
     # Load baseline parameters - options (OPT) and model data (DATA)
@@ -132,13 +132,13 @@ def main():
         # shift to center of mass and rotate to principal directions.
 
         if OPT['useNumba']:
-            from src.inertia_computations_voxel_grid import compute_inertia_from_voxel_grid
+            from Src.inertia_computations_voxel_grid import compute_inertia_from_voxel_grid
             if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Computing inertial properties..." + clr.BLUE)
             OPT, DATA = compute_inertia_from_voxel_grid(OPT, DATA)
             if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
 
         else:
-            from src.inertia_computations_voxel_grid_nonumba import compute_inertia_from_voxel_grid_nonumba
+            from Src.inertia_computations_voxel_grid_nonumba import compute_inertia_from_voxel_grid_nonumba
             if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Computing inertial properties..." + clr.BLUE)
             OPT, DATA = compute_inertia_from_voxel_grid_nonumba(OPT, DATA)
             if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
@@ -209,7 +209,7 @@ def main():
     if OPT['mode']==5:   # 3 - inertia from stl, external generator of pebbles
         out = "Mode 5"
         if (OPT['verbose']):
-            out += ": generation of stl sequence for blender"
+            out += ": generation of stl sequence for Blender"
         print(clr.BOLD + clr.GREEN + out)
 
         # load stl mesh
