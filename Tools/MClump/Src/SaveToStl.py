@@ -30,7 +30,7 @@ import numpy as np
 
 
 
-def make_sphere(pos, R, edges_phi, edges_theta):
+def MakeSphere(pos, R, edges_phi, edges_theta):
     from stl import mesh
     # This function creates an stl model of a sphere
     data = np.zeros((edges_theta - 1) * edges_phi * 2, dtype=mesh.Mesh.dtype)  # Create the data structure for triangles
@@ -70,17 +70,17 @@ def make_sphere(pos, R, edges_phi, edges_theta):
 
     return data
 
-def save_pebbles_stl(filename, pebbles, N_phi, N_theta):
+def SavePebblesStl(filename, pebbles, N_phi, N_theta):
     from stl import mesh
-    data = make_sphere(pebbles[0][:3], pebbles[0][3], N_phi, N_theta)
+    data = MakeSphere(pebbles[0][:3], pebbles[0][3], N_phi, N_theta)
     for pebble in range(1, len(pebbles)):
-        data = np.hstack((data, make_sphere(pebbles[pebble][:3], pebbles[pebble][3], N_phi, N_theta)))
+        data = np.hstack((data, MakeSphere(pebbles[pebble][:3], pebbles[pebble][3], N_phi, N_theta)))
     your_mesh = mesh.Mesh(data, remove_empty_areas=True)
     your_mesh.save(filename)
     print("stl model saved: " + filename)
     return
 
-def save_voxel_grid_stl(filename, vox, bbox, span):
+def SaveVoxelGridStl(filename, vox, bbox, span):
     # A function that saves voxels as an stl
     #   Numbering of vertices v1-v8:
     #        z
@@ -146,7 +146,7 @@ def save_voxel_grid_stl(filename, vox, bbox, span):
     mesh.save(filename)
     return
 
-def save_stl_snap(input_mesh, pos, v1, v2, v3, filename):
+def SaveStlSnap(input_mesh, pos, v1, v2, v3, filename):
     print("pos", pos)
     import copy
     ms = copy.deepcopy(input_mesh)
@@ -174,9 +174,9 @@ def save_stl_snap(input_mesh, pos, v1, v2, v3, filename):
     ms.save(filename)
     return
 
-def save_stl_sequence(OPT, DATA):
+def SaveStlSequence(OPT, DATA):
     # Load clump sequence
-    filename = OPT['clumpSeqDir'] + 'clump_seq.txt'
+    filename = OPT['clumpSeqDir'] + 'ClumpSeq.txt'
     textfile = open(filename, "r")
     content_list = textfile.readlines()
 
@@ -195,7 +195,7 @@ def save_stl_sequence(OPT, DATA):
         v2 = sequence[i][7:10]
         v3 = sequence[i][10:13]
         print("pos:", pos, "v1:", v1, "v2:", v2, "v3:", v3)
-        save_stl_snap(DATA['stlMesh'], pos, v1, v2, v3, './Blender/stl_seq/' + 's_' + str(i) + '.stl')
+        SaveStlSnap(DATA['stlMesh'], pos, v1, v2, v3, './Blender/StlSeq/' + 's_' + str(i) + '.stl')
 
 
     return OPT, DATA

@@ -25,7 +25,7 @@
 
 # This tool generates stl model of multiple spheres, used for test purposes
 import numpy as np
-def import_or_install_modules():
+def ImportOrInstallModules():
     # This function automatically installs required packages if they are missing
     try:
         __import__('stl')
@@ -34,7 +34,7 @@ def import_or_install_modules():
         pip.main(['install', 'numpy-stl'])
     return
 
-import_or_install_modules()
+ImportOrInstallModules()
 
 
 

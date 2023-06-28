@@ -139,13 +139,13 @@ public:
 
 
 
-                p0.setRadius(rdata.pebbles_r[clump_index][0]);
+                p0.setRadius(rdata.pebblesR[clump_index][0]);
 
-                for (int j = 0; j < rdata.pebbles_r[clump_index].size(); j++) {
-                    p0.addPebble(Vec3D(rdata.pebbles_x[clump_index][j],
-                                       rdata.pebbles_y[clump_index][j],
-                                       rdata.pebbles_z[clump_index][j]),
-                                 rdata.pebbles_r[clump_index][j]);
+                for (int j = 0; j < rdata.pebblesR[clump_index].size(); j++) {
+                    p0.addPebble(Vec3D(rdata.pebblesX[clump_index][j],
+                                       rdata.pebblesY[clump_index][j],
+                                       rdata.pebblesZ[clump_index][j]),
+                                 rdata.pebblesR[clump_index][j]);
                 }
                 p0.setPrincipalDirections(
                         Matrix3D(rdata.pd[clump_index][0], rdata.pd[clump_index][1], rdata.pd[clump_index][2],

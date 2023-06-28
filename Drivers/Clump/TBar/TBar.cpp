@@ -71,7 +71,7 @@ public:
         // DoubleVector urpds = UniformRandomPDs();
         Vec3D angVel = 2 * Vec3D( urpds[0], urpds[1], urpds[2]);
         data = RotateClump(data, clump_index, urpds); // Rotate clump arbitrarily
-        p0.setRadius(data.pebbles_r[clump_index][0]);
+        p0.setRadius(data.pebblesR[clump_index][0]);
         Vec3D pos = Vec3D(0, 0, 0);
         p0.setPosition(pos);
 
@@ -90,11 +90,11 @@ public:
                                       data.toi[clump_index][8]));
 
 
-        for (int j = 0; j < data.pebbles_r[clump_index].size(); j++) {
-            p0.addPebble(Vec3D(data.pebbles_x[clump_index][j],
-                               data.pebbles_y[clump_index][j],
-                               data.pebbles_z[clump_index][j]),
-                         data.pebbles_r[clump_index][j]);
+        for (int j = 0; j < data.pebblesR[clump_index].size(); j++) {
+            p0.addPebble(Vec3D(data.pebblesX[clump_index][j],
+                               data.pebblesY[clump_index][j],
+                               data.pebblesZ[clump_index][j]),
+                         data.pebblesR[clump_index][j]);
         }
 
         std::cout<<"CLUMP MASS set = "<<data.mass[clump_index]<<std::endl;

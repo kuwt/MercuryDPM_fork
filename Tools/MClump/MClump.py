@@ -57,20 +57,19 @@ def import_or_install_modules():
 import_or_install_modules()
 
 
-from Src.OutputData import output_clump_data
-from Src.Baseline import baseline
+from Src.OutputData import OutputClumpData
+from Src.Baseline import Baseline
 from Src.ColorLib import colorClass
-from Src.InputData import load_pebbles
-from Src.InputData import load_mesh
-from Src.InertiaComputationsPebbles import compute_inertia_from_pebbles
-from Src.InertiaComputationsMesh import compute_inertia_from_mesh
-from Src.InertiaComputationsMixed import compute_inertia_mixed
-from Src.MeshToClumpAlgorithms import compute_clump_from_mesh
-from Src.SaveToStl import save_stl_sequence
+from Src.InputData import LoadPebbles
+from Src.InputData import LoadMesh
+from Src.InertiaComputationsPebbles import ComputeInertiaFromPebbles
+from Src.InertiaComputationsMesh import ComputeInertiaFromMesh
+from Src.InertiaComputationsMixed import ComputeInertiaMixed
+from Src.SaveToStl import SaveStlSequence
 
 def main():
     # Load baseline parameters - options (OPT) and model data (DATA)
-    OPT, DATA = baseline()
+    OPT, DATA = Baseline()
 
     # Set up terminal output
     clr = colorClass()
@@ -104,18 +103,18 @@ def main():
         print(clr.BOLD + clr.GREEN + out)
         # load the input data
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Loading pebble configuration..." + clr.BLUE)
-        OPT, DATA = load_pebbles(OPT, DATA)
+        OPT, DATA = LoadPebbles(OPT, DATA)
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
 
         # Compute mass, center of mass, tensor of inertia, principal directions,
         # shift to center of mass and rotate to principal directions.
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Computing inertial properties..." + clr.BLUE)
-        OPT,DATA = compute_inertia_from_pebbles(OPT, DATA)
+        OPT,DATA = ComputeInertiaFromPebbles(OPT, DATA)
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
 
         # compute inertial properties
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Output clump data..." + clr.BLUE)
-        OPT, DATA = output_clump_data(OPT, DATA)
+        OPT, DATA = OutputClumpData(OPT, DATA)
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
 
 
@@ -125,16 +124,16 @@ def main():
         print(clr.BOLD + clr.GREEN + out)
         # load the input data
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Loading pebble configuration..." + clr.BLUE)
-        OPT, DATA = load_pebbles(OPT, DATA)
+        OPT, DATA = LoadPebbles(OPT, DATA)
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
 
         # Compute mass, center of mass, tensor of inertia, principal directions,
         # shift to center of mass and rotate to principal directions.
 
         if OPT['useNumba']:
-            from Src.InertiaComputationsVoxelGrid import compute_inertia_from_voxel_grid
+            from Src.InertiaComputationsVoxelGrid import ComputeInertiaFromVoxelGrid
             if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Computing inertial properties..." + clr.BLUE)
-            OPT, DATA = compute_inertia_from_voxel_grid(OPT, DATA)
+            OPT, DATA = ComputeInertiaFromVoxelGrid(OPT, DATA)
             if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
 
         else:
@@ -146,92 +145,64 @@ def main():
 
         # Output clump data
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Output clump data..." + clr.BLUE)
-        OPT, DATA = output_clump_data(OPT, DATA)
+        OPT, DATA = OutputClumpData(OPT, DATA)
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
 
-    if OPT['mode']==3:   # 3 - start with the list of pebbles, compute inertia by summation over pebbles
+
+    if OPT['mode']==3:   # 3 - inertia from stl, external generator of pebbles
         out = "Mode 3"
-        if (OPT['verbose']):
-            out += ": clump generation from the stl, inertial properties from stl"
-        print(clr.BOLD + clr.GREEN + out)
-        if (OPT['verbose']):
-            out = clr.BOLD + clr.RED + "WARNING: For better results use external clump generation procedure (e.g CLUMP library)"
-        print(clr.BOLD + clr.GREEN + out)
-
-        # load the input data
-        if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Loading stl configuration..." + clr.BLUE)
-        OPT, DATA = load_mesh(OPT, DATA)
-        if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
-
-        # Compute mass, center of mass, tensor of inertia, principal directions,
-        # shift to center of mass and rotate to principal directions.
-        if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Computing inertial properties..." + clr.BLUE)
-        OPT, DATA = compute_inertia_from_mesh(OPT, DATA)
-        if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
-
-        if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Computing clump approximation of spheres" + clr.BLUE)
-        OPT, DATA = compute_clump_from_mesh(OPT, DATA)
-        if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
-
-        # Output clump data
-        if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Output clump data..." + clr.BLUE)
-        OPT, DATA = output_clump_data(OPT, DATA)
-        if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
-
-    if OPT['mode']==4:   # 3 - inertia from stl, external generator of pebbles
-        out = "Mode 4"
         if (OPT['verbose']):
             out += ": external clump generation, inertial properties from stl"
         print(clr.BOLD + clr.GREEN + out)
 
         # load stl mesh
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Loading stl configuration..." + clr.BLUE)
-        OPT, DATA = load_mesh(OPT, DATA)
+        OPT, DATA = LoadMesh(OPT, DATA)
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
 
         # load pebbles
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Loading pebble configuration..." + clr.BLUE)
-        OPT, DATA = load_pebbles(OPT, DATA)
+        OPT, DATA = LoadPebbles(OPT, DATA)
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
 
         # Compute mass, center of mass, tensor of inertia, principal directions,
         # shift to center of mass and rotate to principal directions.
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Computing inertial properties..." + clr.BLUE)
-        OPT, DATA = compute_inertia_mixed(OPT, DATA)
+        OPT, DATA = ComputeInertiaMixed(OPT, DATA)
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
 
 
         # Output clump data
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Output clump data..." + clr.BLUE)
-        OPT, DATA = output_clump_data(OPT, DATA)
+        OPT, DATA = OutputClumpData(OPT, DATA)
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
 
-    if OPT['mode']==5:   # 3 - inertia from stl, external generator of pebbles
-        out = "Mode 5"
+    if OPT['mode']==4:   # 4 - generation of stl sequence for Blender
+        out = "Mode 4"
         if (OPT['verbose']):
             out += ": generation of stl sequence for Blender"
         print(clr.BOLD + clr.GREEN + out)
 
         # load stl mesh
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Loading stl configuration..." + clr.BLUE)
-        OPT, DATA = load_mesh(OPT, DATA)
+        OPT, DATA = LoadMesh(OPT, DATA)
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
 
         # load pebbles
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Loading pebble configuration..." + clr.BLUE)
-        OPT, DATA = load_pebbles(OPT, DATA)
+        OPT, DATA = LoadPebbles(OPT, DATA)
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
 
         # Compute mass, center of mass, tensor of inertia, principal directions,
         # shift to center of mass and rotate to principal directions.
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Computing inertial properties..." + clr.BLUE)
-        OPT, DATA = compute_inertia_mixed(OPT, DATA)
+        OPT, DATA = ComputeInertiaMixed(OPT, DATA)
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
 
 
         # Save stl sequence
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Saving stl sequence..." + clr.BLUE)
-        OPT, DATA = save_stl_sequence(OPT, DATA)
+        OPT, DATA = SaveStlSequence(OPT, DATA)
         if (OPT['verbose']): print(clr.BOLD + clr.YELLOW + "Done")
 
 

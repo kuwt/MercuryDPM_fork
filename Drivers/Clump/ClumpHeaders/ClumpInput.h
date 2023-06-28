@@ -62,12 +62,12 @@ struct ClumpData
 public:
     
 	std::string path;	// Path to MClump working directory
-	StringVector clump_names;	// Array of names of Clumps that will be used
+	StringVector clumpNames;	// Array of names of Clumps that will be used
 	DoubleVector mass;		//  clump mass
-	Double2DVector  pebbles_x;	//  Pebbles geometry (outer index goes over Clumps, inner - over pebbles)
-	Double2DVector  pebbles_y;
-	Double2DVector  pebbles_z;
-	Double2DVector  pebbles_r;
+	Double2DVector  pebblesX;	//  Pebbles geometry (outer index goes over Clumps, inner - over pebbles)
+	Double2DVector  pebblesY;
+	Double2DVector  pebblesZ;
+	Double2DVector  pebblesR;
 	
 	Double2DVector  toi;		// Clump tensor of inertia (I11, I12, I13, I21..I33)
 	Double2DVector  pd;		// Clump principal directions v1, v2, v3
@@ -88,19 +88,19 @@ void LoadConf(ClumpData &a)
     DIR *dir = opendir(a.path.c_str());
     while ((entry = readdir(dir)) != NULL) {
         if (entry->d_type == DT_DIR){
-            a.clump_names.push_back(entry->d_name);
+            a.clumpNames.push_back(entry->d_name);
         }
     }
     closedir(dir);
 
     // remove "." and ".." from the list of dirs (position of those in the list is OS-sensitive, hence this code)
 
-    std::sort(a.clump_names.begin(), a.clump_names.end(), CompareFunction);//sort the vector
-    a.clump_names.erase(a.clump_names.begin());
-    a.clump_names.erase(a.clump_names.begin());
+    std::sort(a.clumpNames.begin(), a.clumpNames.end(), CompareFunction);//sort the vector
+    a.clumpNames.erase(a.clumpNames.begin());
+    a.clumpNames.erase(a.clumpNames.begin());
 
     // Show the names of available Clumps
-    for (int i = 0; i<a.clump_names.size(); i++) std::cout<<a.clump_names[i]<<std::endl;
+    for (int i = 0; i<a.clumpNames.size(); i++) std::cout << a.clumpNames[i] << std::endl;
 
 }
 
@@ -112,23 +112,23 @@ void LoadPebbles(ClumpData &a)
 {
     logger(INFO, "Loading clump pebbles...");
 
-    a.pebbles_x.resize(a.clump_names.size());
-    a.pebbles_y.resize(a.clump_names.size());
-    a.pebbles_z.resize(a.clump_names.size());
-    a.pebbles_r.resize(a.clump_names.size());
+    a.pebblesX.resize(a.clumpNames.size());
+    a.pebblesY.resize(a.clumpNames.size());
+    a.pebblesZ.resize(a.clumpNames.size());
+    a.pebblesR.resize(a.clumpNames.size());
 
-    for (int i = 0; i < a.clump_names.size(); i++ ){
-        std::ifstream infile((a.path + a.clump_names[i]+"/clump/clump.txt").c_str(), std::ios::in | std::ios::binary);
+    for (int i = 0; i < a.clumpNames.size(); i++ ){
+        std::ifstream infile((a.path + a.clumpNames[i] + "/Clump/Clump.txt").c_str(), std::ios::in | std::ios::binary);
         std::string line{};
         while (std::getline(infile, line)) {
             std::istringstream iss(line);
             std::string substring{};
             StringVector val;
             while (std::getline(iss, substring, ',')) val.push_back(substring);
-            a.pebbles_x[i].push_back(std::stof(val[0]));
-            a.pebbles_y[i].push_back(std::stof(val[1]));
-            a.pebbles_z[i].push_back(std::stof(val[2]));
-            a.pebbles_r[i].push_back(std::stof(val[3]));
+            a.pebblesX[i].push_back(std::stof(val[0]));
+            a.pebblesY[i].push_back(std::stof(val[1]));
+            a.pebblesZ[i].push_back(std::stof(val[2]));
+            a.pebblesR[i].push_back(std::stof(val[3]));
         }
         infile.close();
     }
@@ -142,10 +142,10 @@ void LoadMass(ClumpData &a)
 {
     logger(INFO, "Loading clump masses...");
 
-    a.mass.resize(a.clump_names.size());
+    a.mass.resize(a.clumpNames.size());
     
-    for (int i = 0; i < a.clump_names.size(); i++ ){
-    	std::ifstream infile((a.path + a.clump_names[i]+"/inertia/mass.txt").c_str(), std::ios::in | std::ios::binary);
+    for (int i = 0; i < a.clumpNames.size(); i++ ){
+    	std::ifstream infile((a.path + a.clumpNames[i] + "/Inertia/Mass.txt").c_str(), std::ios::in | std::ios::binary);
     	std::string mass;
         infile >> mass;
         a.mass[i] = std::stof(mass);
@@ -160,11 +160,11 @@ void LoadMass(ClumpData &a)
 
 void LoadTOI(ClumpData &a)
 {
-    std::cout<<"Loading clump TOI..";
-    a.toi.resize(a.clump_names.size());
+    logger(INFO, "Loading clump TOI..");
+    a.toi.resize(a.clumpNames.size());
 
-    for (int i = 0; i < a.clump_names.size(); i++ ){
-        std::ifstream infile((a.path + a.clump_names[i]+"/inertia/toi.txt").c_str(), std::ios::in | std::ios::binary);
+    for (int i = 0; i < a.clumpNames.size(); i++ ){
+        std::ifstream infile((a.path + a.clumpNames[i] + "/Inertia/TOI.txt").c_str(), std::ios::in | std::ios::binary);
         std::string line{};
         while (std::getline(infile, line)) {
             std::istringstream iss(line);
@@ -184,11 +184,11 @@ void LoadTOI(ClumpData &a)
 
 void LoadPD(ClumpData &a)
 {
-    std::cout<<"Loading clump PD..";
-    a.pd.resize(a.clump_names.size());
+    logger(INFO, "Loading clump PD..");
+    a.pd.resize(a.clumpNames.size());
 
-    for (int i = 0; i < a.clump_names.size(); i++ ){
-        std::ifstream infile((a.path + a.clump_names[i]+"/inertia/pd.txt").c_str(), std::ios::in | std::ios::binary);
+    for (int i = 0; i < a.clumpNames.size(); i++ ){
+        std::ifstream infile((a.path + a.clumpNames[i] + "/Inertia/PD.txt").c_str(), std::ios::in | std::ios::binary);
         std::string line{};
         while (std::getline(infile, line)) {
             std::istringstream iss(line);
@@ -210,7 +210,7 @@ void LoadPD(ClumpData &a)
 void LoadClumps(ClumpData &data, bool VERBOSE = false)
 {
 
-	std::cout<<"LOAD CLUMP DATA"<<std::endl;
+	logger(INFO, "LOAD CLUMP DATA");
     LoadConf(data);
     LoadPebbles(data);
     LoadMass(data);
@@ -218,20 +218,20 @@ void LoadClumps(ClumpData &data, bool VERBOSE = false)
     LoadPD(data);
     if (VERBOSE) {
         std::cout<<"LOADED CLUMPS"<<std::endl;
-        for (int i = 0; i < data.pebbles_x.size(); i++) {
-            std::cout << data.clump_names[i] << " mass:" << data.mass[i] << std::endl;
-            std::cout << data.clump_names[i] << " list of pebbles:" << std::endl;
-            for (int j = 0; j < data.pebbles_x[i].size(); j++) {
-                std::cout << "Pebble " << j << ": (" << data.pebbles_x[i][j] << "," << data.pebbles_y[i][j] << ","
-                          << data.pebbles_z[i][j] << ")," << data.pebbles_r[i][j] << std::endl;
+        for (int i = 0; i < data.pebblesX.size(); i++) {
+            std::cout << data.clumpNames[i] << " mass:" << data.mass[i] << std::endl;
+            std::cout << data.clumpNames[i] << " list of pebbles:" << std::endl;
+            for (int j = 0; j < data.pebblesX[i].size(); j++) {
+                std::cout << "Pebble " << j << ": (" << data.pebblesX[i][j] << "," << data.pebblesY[i][j] << ","
+                          << data.pebblesZ[i][j] << ")," << data.pebblesR[i][j] << std::endl;
             }
 
-            std::cout << data.clump_names[i] << " TOI:" << std::endl;
+            std::cout << data.clumpNames[i] << " TOI:" << std::endl;
             std::cout << data.toi[i][0] << "," << data.toi[i][1] << "," << data.toi[i][2] << std::endl;
             std::cout << data.toi[i][3] << "," << data.toi[i][4] << "," << data.toi[i][5] << std::endl;
             std::cout << data.toi[i][6] << "," << data.toi[i][7] << "," << data.toi[i][8] << std::endl;
 
-            std::cout << data.clump_names[i] << " Principal directions:" << std::endl;
+            std::cout << data.clumpNames[i] << " Principal directions:" << std::endl;
             std::cout << data.pd[i][0] << "," << data.pd[i][1] << "," << data.pd[i][2] << std::endl;
             std::cout << data.pd[i][3] << "," << data.pd[i][4] << "," << data.pd[i][5] << std::endl;
             std::cout << data.pd[i][6] << "," << data.pd[i][7] << "," << data.pd[i][8] << std::endl;

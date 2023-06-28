@@ -26,10 +26,10 @@
 # ------------Inertial properties computation based on stl mesh-----------------
 
 import numpy as np
-from src.inertia_computations_pebbles import compute_principal_directions
+from Src.InertiaComputationsPebbles import ComputePrincipalDirections
 
 
-def compute_mass_com_mesh(mesh, density):
+def ComputeMassCOMMesh(mesh, density):
     # Computes center of mass of the body bound by the triangulated surface "mesh"
     # Returns mass, coordinates of the center of mass
     O = np.zeros(3)
@@ -51,9 +51,9 @@ def compute_mass_com_mesh(mesh, density):
     return density*vol, com
 
 
-def shift_to_center_of_mass_mesh_pebbles(mesh, pebbles, density):
+def ShiftToCenterOfMassMeshPebbles(mesh, pebbles, density):
     # Returns the coordinates of mesh and pebbles shifted such that the center of mass is at zero.
-    mass, com = compute_mass_com_mesh(mesh, density)
+    mass, com = ComputeMassCOMMesh(mesh, density)
     for j in range(len(mesh.normals)):
         mesh.v0[j] -= com
         mesh.v1[j] -= com
@@ -65,7 +65,7 @@ def shift_to_center_of_mass_mesh_pebbles(mesh, pebbles, density):
     return mass, mesh, pebbles
 
 
-def clump_toi_from_mesh(mesh, density):
+def ClumpTOIFromMesh(mesh, density):
     # This function computes the tensor of inertia of a body bound by a triangulated surface
     O = np.zeros([3])
     a = 0
@@ -127,7 +127,7 @@ def clump_toi_from_mesh(mesh, density):
     return density * np.array([[a, -b_p, -c_p],[ -b_p, b, -a_p],[ -c_p, -a_p, c]])
 
 
-def rotate_to_principal_directions_mesh_toi_pebbles(mesh, toi, pebbles, v1, v2, v3):
+def RotateToPrincipalDirectionsMeshTOIPebbles(mesh, toi, pebbles, v1, v2, v3):
     # This function rotates the centered mesh to match specified principal directions v1, v2, v3 with Cartesian axes
     e1 = np.array([1,0,0])
     e2 = np.array([0,1,0])
@@ -153,7 +153,7 @@ def rotate_to_principal_directions_mesh_toi_pebbles(mesh, toi, pebbles, v1, v2, 
 
 
 # Extra rotation of the mesh
-def rotate_to_pd(mesh, v1, v2, v3):
+def RotateToPD(mesh, v1, v2, v3):
     # This function rotates the centered mesh to match specified principal directions v1, v2, v3 with Cartesian axes
     e1 = np.array([1,0,0])
     e2 = np.array([0,1,0])
@@ -172,26 +172,26 @@ def rotate_to_pd(mesh, v1, v2, v3):
     return mesh
 
 
-def compute_inertia_mixed(OPT, DATA):
+def ComputeInertiaMixed(OPT, DATA):
     # take arrays of mesh and pebbles
     mesh = DATA['stlMesh']
     density = DATA['density']
     pebbles = DATA['pebbles']
     # Compute mass, shift to center of mass
-    mass, mesh, pebbles = shift_to_center_of_mass_mesh_pebbles(mesh, pebbles, density)
+    mass, mesh, pebbles = ShiftToCenterOfMassMeshPebbles(mesh, pebbles, density)
     if OPT['verbose']: print("Total mass of stl: ", mass)
 
     # Compute tensor of inertia
-    toi = clump_toi_from_mesh(mesh, density)
+    toi = ClumpTOIFromMesh(mesh, density)
     if OPT['verbose']: print("Tensor of inertia of stl: ", toi)
 
     # Compute principal directions
-    v1, v2, v3 = compute_principal_directions(toi)
+    v1, v2, v3 = ComputePrincipalDirections(toi)
     if OPT['verbose']: print("Principal directions: ", v1, v2, v3)
 
     # Rotate to principal directions
     if OPT['rotateToPD']:
-        mesh, toi, pebbles, v1, v2, v3 = rotate_to_principal_directions_mesh_toi_pebbles(mesh, toi, pebbles, v1, v2, v3)
+        mesh, toi, pebbles, v1, v2, v3 = RotateToPrincipalDirectionsMeshTOIPebbles(mesh, toi, pebbles, v1, v2, v3)
         if OPT['verbose']: print("Rotated principal directions: ", v1, v2, v3)
         if OPT['verbose']: print("Rotated toi: ", toi)
 

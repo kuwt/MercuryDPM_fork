@@ -29,7 +29,7 @@ import numpy as np
 from src.inertia_computations_pebbles import compute_principal_directions
 from src.inertia_computations_pebbles import rotate_to_pd_pebbles_toi
 
-def bounding_box(pebbles):
+def BoundingBox(pebbles):
     # returns CUBIC bounding box in the shape [x_min, x_max, y_min, y_max, z_min, z_max]
     # that encloses the clump. This bounding box is used for voxelization. Such an approach
     # is OK if the shapes are not too oblique.
@@ -49,11 +49,11 @@ def bounding_box(pebbles):
                      box_center[2] - max_span,
                      box_center[2] + max_span]), max_span
 
-def voxel_grid_from_pebbles(pebbles, N):
+def VoxelGridFromPebbles(pebbles, N):
     # this function returns decomposition of cubic domain with void and material split in binary voxels
 
     vox = np.zeros(N ** 3).reshape(N, N, N)
-    bbox, span = bounding_box(pebbles)
+    bbox, span = BoundingBox(pebbles)
 
     for i in range(N):
         for j in range(N):
@@ -68,7 +68,7 @@ def voxel_grid_from_pebbles(pebbles, N):
     return bbox, span, vox
 
 
-def compute_vol_com_voxel_grid(bbox, span, vox):
+def ComputeVolCOMVoxelGrid(bbox, span, vox):
     # This function defines the absolute position of center of gravity of all voxels
     N = vox.shape[0]
     vol = np.sum(vox) * (2. * span / N)**3
@@ -83,7 +83,7 @@ def compute_vol_com_voxel_grid(bbox, span, vox):
     return vol, com / np.sum(vox)
 
 
-def shift_to_voxel_com_bbox_pebbles(com, pebbles, bbox):
+def ShiftToVoxelComBBoxPebbles(com, pebbles, bbox):
     # Returns the coordinates of pebbles shifted such that the center of mass (COM) is at zero.
     for j in range(len(pebbles)):
         pebbles[j][:3] -= com
@@ -94,7 +94,7 @@ def shift_to_voxel_com_bbox_pebbles(com, pebbles, bbox):
     return pebbles, bbox
 
 
-def clump_toi_voxel_grid(density, com, vox, bbox, span):
+def ClumpTOIVoxelGrid(density, com, vox, bbox, span):
     TOI = np.zeros(9).reshape(3,3)
     N = vox.shape[0]
     for i in range(N):
@@ -112,23 +112,23 @@ def clump_toi_voxel_grid(density, com, vox, bbox, span):
                                     [-X*Z, -Y*Z, X**2 + Y**2]])
     return density * (2*span/N)**3 * TOI
 
-def compute_inertia_from_voxel_grid(OPT, DATA):
+def ComputeInertiaFromVoxelGrid(OPT, DATA):
     # take array of pebbles
     pebbles = DATA['pebbles']
     density = DATA['density']
 
     # Compute voxel grid
     N = OPT['voxNum']
-    bbox, span, vox = voxel_grid_from_pebbles(pebbles, N)
+    bbox, span, vox = VoxelGridFromPebbles(pebbles, N)
 
     # Compute mass, and center of mass
-    vol, com = compute_vol_com_voxel_grid(bbox, span, vox)
+    vol, com = ComputeVolCOMVoxelGrid(bbox, span, vox)
 
     # Shift pebbles and span to make com an origin
-    pebbles, bbox = shift_to_voxel_com_bbox_pebbles(com, pebbles, bbox)
+    pebbles, bbox = ShiftToVoxelComBBoxPebbles(com, pebbles, bbox)
 
     # Compute tensor of inertia
-    toi = clump_toi_voxel_grid(density, com, vox, bbox, span)
+    toi = ClumpTOIVoxelGrid(density, com, vox, bbox, span)
     if OPT['verbose']: print("Tensor of inertia of voxels: ", toi)
 
     # Compute principal directions

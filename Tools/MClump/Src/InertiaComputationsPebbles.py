@@ -28,7 +28,7 @@
 import numpy as np
 
 
-def compute_mass_com_pebbles(pebbles, density):
+def ComputeMassCOMPebbles(pebbles, density):
     # Computes mass/center of mass (COM) of the assembly of pebbles
     com = np.zeros(3)
     mass = 0
@@ -42,15 +42,15 @@ def compute_mass_com_pebbles(pebbles, density):
     return mass, com
 
 
-def shift_to_com_pebbles(pebbles, density):
+def ShiftToCOMPebbles(pebbles, density):
     # Returns the coordinates of pebbles shifted such that the center of mass (COM) is at zero.
-    mass, com = compute_mass_com_pebbles(pebbles, density)
+    mass, com = ComputeMassCOMPebbles(pebbles, density)
     for j in range(len(pebbles)):
         pebbles[j][:3] -= com
     return mass, pebbles
 
 
-def compute_toi_pebbles(pebbles, density):
+def ComputeTOIPebbles(pebbles, density):
     # Tensor of inertia of non-overlapping spherical particles (origin of CS is in center of mass)
     toi = np.zeros(9).reshape(3, 3)
     for j in range(len(pebbles)):
@@ -66,7 +66,7 @@ def compute_toi_pebbles(pebbles, density):
     return toi
 
 
-def compute_principal_directions(toi):
+def ComputePrincipalDirections(toi):
     # For a given tensor of inertia "toi" returns normalized principal directions
     w, v = np.linalg.eig(toi)
     v1 = v[0] / np.linalg.norm(v[0])
@@ -77,7 +77,7 @@ def compute_principal_directions(toi):
     if np.allclose(np.cross(v1, v2), -v3): v3 = -v3
     return v1, v2, v3
 
-def rotate_to_pd_pebbles(pebbles, v1, v2, v3):
+def RotateToPDPebbles(pebbles, v1, v2, v3):
     # This function rotates the centered pebbles to the specified principal directions v1, v2, v3.
     e1 = np.array([1, 0, 0])
     e2 = np.array([0, 1, 0])
@@ -96,7 +96,7 @@ def rotate_to_pd_pebbles(pebbles, v1, v2, v3):
 
 
 
-def rotate_to_pd_pebbles_toi(pebbles, toi, v1, v2, v3):
+def RotateToPDPebblesTOI(pebbles, toi, v1, v2, v3):
     # This function rotates the centered pebbles to the specified principal directions v1, v2, v3.
     e1 = np.array([1, 0, 0])
     e2 = np.array([0, 1, 0])
@@ -113,25 +113,25 @@ def rotate_to_pd_pebbles_toi(pebbles, toi, v1, v2, v3):
     return pebbles, toi, e1, e2, e3
 
 
-def compute_inertia_from_pebbles(OPT, DATA):
+def ComputeInertiaFromPebbles(OPT, DATA):
     # take array of pebbles
     pebbles = DATA['pebbles']
     density = DATA['density']
     # Compute mass, shift to center of mass
-    mass, pebbles = shift_to_com_pebbles(pebbles, density)
+    mass, pebbles = ShiftToCOMPebbles(pebbles, density)
     if OPT['verbose']: print("Total mass of pebbles: ", mass)
 
     # Compute tensor of inertia
-    toi = compute_toi_pebbles(pebbles, density)
+    toi = ComputeTOIPebbles(pebbles, density)
     if OPT['verbose']: print("Tensor of inertia of pebbles: ", toi)
 
     # Compute principal directions
-    v1, v2, v3 = compute_principal_directions(toi)
+    v1, v2, v3 = ComputePrincipalDirections(toi)
     if OPT['verbose']: print("Principal directions: ", v1, v2, v3)
 
     # Rotate to principal directions
     if OPT['rotateToPD']:
-        pebbles, toi, v1, v2, v3 = rotate_to_pd_pebbles_toi(pebbles, toi, v1, v2, v3)
+        pebbles, toi, v1, v2, v3 = RotateToPDPebblesTOI(pebbles, toi, v1, v2, v3)
         if OPT['verbose']: print("Rotated principal directions: ", v1, v2, v3)
         if OPT['verbose']: print("Rotated toi: ", toi)
 

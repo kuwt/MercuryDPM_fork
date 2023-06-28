@@ -26,10 +26,10 @@
 # ------------Inertial properties computation based on stl mesh-----------------
 
 import numpy as np
-from src.inertia_computations_pebbles import compute_principal_directions
+from Src.InertiaComputationsPebbles import ComputePrincipalDirections
 
 
-def compute_mass_com_mesh(mesh, density):
+def ComputeMassCOMMesh(mesh, density):
     # Computes center of mass of the body bound by the triangulated surface "mesh"
     # Returns mass, coordinates of the center of mass
     O = np.zeros(3)
@@ -51,9 +51,9 @@ def compute_mass_com_mesh(mesh, density):
     return density*vol, com
 
 
-def shift_to_center_of_mass_mesh(mesh, density):
+def ShiftToCenterOfMassMesh(mesh, density):
     # Returns the coordinates of "mesh" shifted such that the center of mass is at zero.
-    mass, com = compute_mass_com_mesh(mesh, density)
+    mass, com = computeMassComMesh(mesh, density)
     for j in range(len(mesh.normals)):
         mesh.v0[j] -= com
         mesh.v1[j] -= com
@@ -61,7 +61,7 @@ def shift_to_center_of_mass_mesh(mesh, density):
     return mass, mesh
 
 
-def clump_toi_from_mesh(mesh, density):
+def ClumpTOIFromMesh(mesh, density):
     # This function computes the tensor of inertia of a body bound by a triangulated surface
     O = np.zeros([3])
     a = 0
@@ -125,7 +125,7 @@ def clump_toi_from_mesh(mesh, density):
 
 
 
-def rotate_to_principal_directions_mesh_toi(mesh, toi, v1, v2, v3):
+def RotateToPrincipalDirectionsMeshTOI(mesh, toi, v1, v2, v3):
     # This function rotates the centered mesh to match specified principal directions v1, v2, v3 with Cartesian axes
     e1 = np.array([1,0,0])
     e2 = np.array([0,1,0])
@@ -144,12 +144,12 @@ def rotate_to_principal_directions_mesh_toi(mesh, toi, v1, v2, v3):
     return mesh, toi, e1, e2, e3
 
 
-def compute_inertia_from_mesh(OPT, DATA):
+def ComputeInertiaFromMesh(OPT, DATA):
     # take array of pebbles
     mesh = DATA['stlMesh']
     density = DATA['density']
     # Compute mass, shift to center of mass
-    mass, mesh = shift_to_center_of_mass_mesh(mesh, density)
+    mass, mesh = shiftToCenterOfMassMesh(mesh, density)
     if OPT['verbose']: print("Total mass of stl: ", mass)
 
     # Compute tensor of inertia

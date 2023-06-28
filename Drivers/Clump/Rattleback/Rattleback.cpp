@@ -71,14 +71,14 @@ public:
         //DoubleVector upds = UniformRandomPDs();
         DoubleVector upds = {1, 0, 0, 0, 0, 1, 0, -1, 0};
         data = RotateClump(data, clump_index, upds); // here you can try different seeds
-        p0.setRadius(data.pebbles_r[clump_index][0]);
+        p0.setRadius(data.pebblesR[clump_index][0]);
         Vec3D pos = Vec3D(0, 0, -94);
         p0.setPosition(pos);
-        for (int j = 0; j < data.pebbles_r[clump_index].size(); j++) {
-            p0.addPebble(Vec3D(data.pebbles_x[clump_index][j],
-                               data.pebbles_y[clump_index][j],
-                               data.pebbles_z[clump_index][j]),
-                         data.pebbles_r[clump_index][j]);
+        for (int j = 0; j < data.pebblesR[clump_index].size(); j++) {
+            p0.addPebble(Vec3D(data.pebblesX[clump_index][j],
+                               data.pebblesY[clump_index][j],
+                               data.pebblesZ[clump_index][j]),
+                         data.pebblesR[clump_index][j]);
         }
         p0.setPrincipalDirections(
                 Matrix3D(data.pd[clump_index][0], data.pd[clump_index][1], data.pd[clump_index][2],
@@ -122,7 +122,7 @@ public:
                     std::cout<<"Saving timestep "<<getNumberOfTimeSteps() <<std::endl;
 
                     // Add velocity to log
-                    std::ofstream funct("clump_seq.txt", std::ios_base::app | std::ios_base::out);
+                    std::ofstream funct("ClumpSeq.txt", std::ios_base::app | std::ios_base::out);
                     funct << getNumberOfTimeSteps() << " "
                           << static_cast<ClumpParticle*>(*it)->getPosition() << " "
                           << static_cast<ClumpParticle*>(*it)->getPrincipalDirections_e1() << " "

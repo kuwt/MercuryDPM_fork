@@ -27,7 +27,7 @@
 
 
 
-def load_pebbles(OPT,DATA):
+def LoadPebbles(OPT, DATA):
     import numpy as np
     # This function loads pebbles data in the CLUMP library (csv) format
     filename = OPT['clumpInputDir'] + OPT['clumpFileName']
@@ -44,7 +44,7 @@ def load_pebbles(OPT,DATA):
 
     return OPT, DATA
 
-def load_mesh(OPT, DATA):
+def LoadMesh(OPT, DATA):
     from stl import mesh
     filename = OPT['stlInputDir'] + OPT['stlFileName']
     stl_mesh = mesh.Mesh.from_file(filename)

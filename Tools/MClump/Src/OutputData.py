@@ -26,15 +26,15 @@
 # ------------Output data functions---------------------------
 
 
-from src.save_to_vtu import save_pebbles_to_vtu
-from src.save_to_vtu import save_pd_to_vtu
-from src.save_to_stl import save_voxel_grid_stl
-from src.save_to_stl import save_pebbles_stl
+from Src.SaveToVtu import SavePebblesToVtu
+from Src.SaveToVtu import SavePDToVtu
+from Src.SaveToStl import SaveVoxelGridStl
+from Src.SaveToStl import SavePebblesStl
 
 import numpy as np
-from src.inertia_computations_pebbles import rotate_to_pd_pebbles
+from Src.InertiaComputationsPebbles import RotateToPDPebbles
 
-def paraview_output_pebbles_animated(OPT, DATA):
+def ParaviewOutputPebblesAnimated(OPT, DATA):
     import os
     pebbles = DATA['pebbles']
     num_timesteps = OPT['numTimesteps']
@@ -69,7 +69,7 @@ def paraview_output_pebbles_animated(OPT, DATA):
         v2c = np.array([np.sin(-k * (2. * np.pi / (num_timesteps + 0.))), np.cos(-k * (2. * np.pi / (num_timesteps + 0.))), 0.0])
         v3c = np.array([0.0, 0.0, 1.0])
 
-        r_pebbles = rotate_to_pd_pebbles(pebbles, v1, v2, v3)
+        r_pebbles = RotateToPDPebbles(pebbles, v1, v2, v3)
         v1t[k][:] = v1c
         v2t[k][:] = v2c
         v3t[k][:] = v3c
@@ -78,12 +78,12 @@ def paraview_output_pebbles_animated(OPT, DATA):
             positions[i][k][:] = r_pebbles[i][:3]
             radii[i][k] = r_pebbles[i][3]
 
-    save_pebbles_to_vtu(filename, positions, velocities, radii)
-    save_pd_to_vtu(filename, v1t, v2t, v3t)
+    SavePebblesToVtu(filename, positions, velocities, radii)
+    SavePDToVtu(filename, v1t, v2t, v3t)
 
     return
 
-def paraview_output_pebbles_static(OPT, DATA):
+def ParaviewOutputPebblesStatic(OPT, DATA):
     import os
     pebbles = DATA['pebbles']
 
@@ -111,11 +111,11 @@ def paraview_output_pebbles_static(OPT, DATA):
         positions[i][0][:] = pebbles[i][:3]
         radii[i][0] = pebbles[i][3]
 
-    save_pebbles_to_vtu(filename, positions, velocities, radii)
+    SavePebblesToVtu(filename, positions, velocities, radii)
     return
 
 
-def save_clump_mdpm(OPT, DATA):
+def SaveClumpMDPM(OPT, DATA):
     import os
 
     path = './Clumps/' + OPT['clumpName']
@@ -137,18 +137,18 @@ def save_clump_mdpm(OPT, DATA):
     return OPT, DATA
 
 
-def output_clump_data(OPT, DATA):
+def OutputClumpData(OPT, DATA):
     # Output clump data for MDPM + additional output (vtu, stl)
     import os
 
     # MDPM output
-    OPT, DATA = save_clump_mdpm(OPT, DATA)
+    OPT, DATA = SaveClumpMDPM(OPT, DATA)
 
     # Paraview output
     if OPT['paraviewOutput']:
         if OPT['verbose']: print("Output vtu data")
-        if (OPT['animate']): paraview_output_pebbles_animated(OPT, DATA)
-        if not (OPT['animate']): paraview_output_pebbles_static(OPT, DATA)
+        if (OPT['animate']): ParaviewOutputPebblesAnimated(OPT, DATA)
+        if not (OPT['animate']): ParaviewOutputPebblesStatic(OPT, DATA)
 
     # Pebble stl output
     if OPT['PebbleStlOutput']:
@@ -165,7 +165,7 @@ def output_clump_data(OPT, DATA):
         pebbles = DATA['pebbles']
         N_theta = OPT['stlThetaRes']
         N_phi = OPT['stlPhiRes']
-        save_pebbles_stl(filename, pebbles, N_theta, N_phi)
+        SavePebblesStl(filename, pebbles, N_theta, N_phi)
 
     # Voxel grid stl output
     if OPT['mode'] == 2 and OPT['VoxelStlOutput']:
@@ -180,7 +180,7 @@ def output_clump_data(OPT, DATA):
 
         filename = path + OPT['voxStlFileName']
         vox, bbox, span = DATA['voxelGrid']
-        save_voxel_grid_stl(filename, vox, bbox, span)
+        SaveVoxelGridStl(filename, vox, bbox, span)
 
     return OPT, DATA
 

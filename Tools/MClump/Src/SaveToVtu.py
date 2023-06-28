@@ -28,7 +28,7 @@
 
 import numpy as np
 
-def save_pebbles_to_vtu(filename, positions, velocities, rad):
+def SavePebblesToVtu(filename, positions, velocities, rad):
     # This function saves pebble information in XML/vtu (unstructured grid) format
     num_part = np.shape(positions)[0]
     num_timesteps = np.shape(positions)[1]
@@ -93,7 +93,7 @@ def save_pebbles_to_vtu(filename, positions, velocities, rad):
 
 
 
-def save_pd_to_vtu(filename, v1, v2, v3):
+def SavePDToVtu(filename, v1, v2, v3):
     # This function saves clump principal directions in XML/vtu (unstructured grid) format
     num_part = 1
     num_timesteps = len(v1)

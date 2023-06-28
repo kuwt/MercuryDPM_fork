@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
     std::string name = "Rattleback";
 
     // Remove data for stl sequence (Blender) visualizations
-    command = "rm clump_seq.txt";
+    command = "rm ClumpSeq.txt";
     exec_command(command.c_str());
 
     // Make
