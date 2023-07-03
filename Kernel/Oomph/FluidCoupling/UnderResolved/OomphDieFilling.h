@@ -13,7 +13,6 @@
 // Equation headers
 #include "../../../../oomph-lib/src/generic/elements.h"
 #include "Elements/AndersonJackson.h"
-#include "../../../../oomph-lib/src/meshes/simple_cubic_mesh.h"
 
 template<class ELEMENT>
 class OomphDieFilling : public oomph::Problem

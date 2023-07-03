@@ -26,6 +26,7 @@
 #ifndef OOMPHHELPERS_H
 #define OOMPHHELPERS_H
 #include "../../oomph-lib/src/generic/Vector.h"
+#include "Math/Vector.h"
 
 namespace oomph {
     /*!
@@ -35,36 +36,22 @@ namespace oomph {
      * \param[in] a     The vector of interest
      * \return          the output stream with vector elements added
      */
-    std::ostream &operator<<(std::ostream &os, const Vector<double> &a) {
-        if (not a.empty()) {
-            os << a[0];
-        }
-        for (int i = 1; i < a.size(); i++) {
-            os << ' ' << a[i];
-        }
-        return os;
-    }
+
+    //std::ostream &operator<<(std::ostream &os, const Vector<double> &a) {
+    //    if (not a.empty()) {
+    //        os << a[0];
+    //    }
+    //    for (int i = 1; i < a.size(); i++) {
+    //        os << ' ' << a[i];
+    //    }
+    //    return os;
+    //}
 }
 
 namespace convertVecFuncs
 {
-    Vec3D convertToVec3D(oomph::Vector<double>& Vec)
-    {
-        Vec3D returnVec;
-        returnVec.X = Vec[0];
-        returnVec.Y = Vec[1];
-        returnVec.Z = Vec[2];
-        return returnVec;
-    }
-
-    oomph::Vector<double> convertToOomphVec(const Vec3D& Vec)
-    {
-        oomph::Vector<double> returnVec(3,0.0);
-        returnVec[0] = Vec.X;
-        returnVec[1] = Vec.Y;
-        returnVec[2] = Vec.Z;
-        return returnVec;
-    }
+    Vec3D convertToVec3D(oomph::Vector<double> &Vec);
+    oomph::Vector<double> convertToOomphVec(const Vec3D& Vec);
 }
 
 #endif //OOMPHHELPERS_H

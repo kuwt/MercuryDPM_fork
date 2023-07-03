@@ -35,7 +35,6 @@ public:
     double getDieDepth() {return dieDepth_;}
     
 private:
-    // Die dimensions
     double dieLength_;
     double dieWidth_;
     double dieDepth_;

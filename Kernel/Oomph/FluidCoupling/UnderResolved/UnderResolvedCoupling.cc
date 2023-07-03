@@ -1977,23 +1977,23 @@ bool UnderResolvedCoupling::myHeaviSide(const double &a_, const double &b_)
 
 namespace getDataFromElement
 {
-    double getVoidageOfElement_byEl(const int& elNr_)
-    {
-        return ptrToCoupledClass->getVoidageInElemFromList(elNr_);
-    }
-    double getdVoidagedxOfElement_byEl(const int& elNr_, const int& dir_)
-    {
-        return ptrToCoupledClass->getdVoidagedxInElemFromList(elNr_,dir_);
-    }
-    double getdVoidagedtOfElement_byEl(const int& elNr_)
-    {
-        return 0.0;
-        //return ptrToCoupledClass->getdVoidagedtInElemFromList(elNr_);
-    }
-    oomph::Vector<double> getBodyForceByCoupling_byEl(const int& elNr_)
-    {
-        return ptrToCoupledClass->getBodyForceInElemByCoupling(elNr_);
-    }
+//    double getVoidageOfElement_byEl(const int& elNr_)
+//    {
+//        return ptrToCoupledClass->getVoidageInElemFromList(elNr_);
+//    }
+//    double getdVoidagedxOfElement_byEl(const int& elNr_, const int& dir_)
+//    {
+//        return ptrToCoupledClass->getdVoidagedxInElemFromList(elNr_,dir_);
+//    }
+//    double getdVoidagedtOfElement_byEl(const int& elNr_)
+//    {
+//        return 0.0;
+//        //return ptrToCoupledClass->getdVoidagedtInElemFromList(elNr_);
+//    }
+//    oomph::Vector<double> getBodyForceByCoupling_byEl(const int& elNr_)
+//    {
+//        return ptrToCoupledClass->getBodyForceInElemByCoupling(elNr_);
+//    }
 
     std::clock_t totaltime = 0.0;
     int long cnt = 0;
@@ -2007,22 +2007,22 @@ namespace getDataFromElement
         std::clock_t start = clock();
         cnt++;
 
-        double nEl = ptrToCoupledClass->mesh_pt()->nelement();
-
-        for (unsigned iEl = 0; iEl < nEl; iEl++)
-        {
-            oomph::Vector<double> s(3, 0.0);
-            oomph::GeomObject* geom_obj_pt = nullptr;
-            dynamic_cast<oomph::RefineableAJQCrouzeixRaviartElement<3>*>(ptrToCoupledClass->mesh_pt()->element_pt(
-                    iEl))->locate_zeta(x, geom_obj_pt, s);
-            if (geom_obj_pt != nullptr)
-            {
-                std::clock_t end = clock();
-                totaltime += (end-start);
-
-                return ptrToCoupledClass->listOfVoidageInElem_[iEl];
-            }
-        }
+//        double nEl = ptrToCoupledClass->mesh_pt()->nelement();
+//
+//        for (unsigned iEl = 0; iEl < nEl; iEl++)
+//        {
+//            oomph::Vector<double> s(3, 0.0);
+//            oomph::GeomObject* geom_obj_pt = nullptr;
+//            dynamic_cast<oomph::RefineableAJQCrouzeixRaviartElement<3>*>(ptrToCoupledClass->mesh_pt()->element_pt(
+//                    iEl))->locate_zeta(x, geom_obj_pt, s);
+//            if (geom_obj_pt != nullptr)
+//            {
+//                std::clock_t end = clock();
+//                totaltime += (end-start);
+//
+//                return ptrToCoupledClass->listOfVoidageInElem_[iEl];
+//            }
+//        }
         return 1.0;
     }
 }

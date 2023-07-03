@@ -43,10 +43,7 @@
 #include "../../../../../oomph-lib/src/generic/fsi.h"
 #include "../../../../../oomph-lib/src/generic/projection.h"
 #include "../../../../../oomph-lib/src/generic/timesteppers.h"
-//#include "generic/Qelements.h"
-//#include "generic/fsi.h"
-//#include "generic/projection.h"
-//#include "generic/timesteppers.h"
+
 
 namespace oomph
 {

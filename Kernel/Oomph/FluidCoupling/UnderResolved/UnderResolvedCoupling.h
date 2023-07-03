@@ -9,14 +9,18 @@
 #include "OomphDieFilling.h"
 #include <vector>
 #include "Oomph/OomphHelpers.h"
+#include "Math/Vector.h"
 
 // Equation headers
 #include "Elements/AndersonJackson.h"
 
+//#include "../../../../oomph-lib/src/meshes/simple_cubic_mesh.h"
+#include "UnderResolvedMesh.h"
+
 class UnderResolvedCoupling;
 namespace getDataFromElement
 {
-    UnderResolvedCoupling *ptrToCoupledClass = nullptr;
+    //UnderResolvedCoupling *ptrToCoupledClass = nullptr;
     double getVoidageOfElement(const double &, const oomph::Vector<double> &);
     double getVoidageOfElement_byEl(const int &);
     double getdVoidagedxOfElement_byEl(const int &, const int &);
@@ -39,15 +43,16 @@ public:
             xMin_(xMin), xMax_(xMax), yMin_(yMin), yMax_(yMax), zMin_(zMin), zMax_(zMax), nx_(nx), ny_(ny), nz_(nz),
             adaptEveryNFluidTimesteps_(5), updateCouplingEveryNParticleTimesteps_(1)
     {
-        getDataFromElement::ptrToCoupledClass = this;
-        mercVoidage::dpmPointer = this;
+        //getDataFromElement::ptrToCoupledClass = this;
+        //mercVoidage::dpmPointer = this;
         oomph::Problem::add_time_stepper_pt(new oomph::BDF<2>);
 
         setXMin(xMin_); setXMax(xMax_);
         setYMin(yMin_); setYMax(yMax_);
         setZMin(zMin_); setZMax(zMax_);
         
-        oomph::Problem::mesh_pt() = new oomph::RefineableSimpleCubicMesh<oomph::RefineableAJQCrouzeixRaviartElement<3> >(nx_,ny_,nz_,xMin_,xMax_,yMin_,yMax_,zMin_,zMax_,time_stepper_pt);
+        //oomph::Problem::mesh_pt() = new UnderResolvedMesh<oomph::RefineableAJQCrouzeixRaviartElement<3> >(nx_,ny_,nz_,xMin_,xMax_,yMin_,yMax_,zMin_,zMax_,time_stepper_pt);
+
         // Set error estimator
         oomph::Z2ErrorEstimator* error_estimator_pt=new oomph::Z2ErrorEstimator;
         mesh_pt()->spatial_error_estimator_pt()=error_estimator_pt;
@@ -68,11 +73,11 @@ public:
             // USED FOR PLOTTING AND SEMI-RESOLVED
             //dynamic_cast<RefineableAJQCrouzeixRaviartElement<3> *>(mesh_pt()->element_pt(e))->voidage_fct_pt() = &getDataFromElement::getVoidageOfElement;
     
-            currEl->voidage_fct_pt_byEl() = &getDataFromElement::getVoidageOfElement_byEl;
+/*            currEl->voidage_fct_pt_byEl() = &getDataFromElement::getVoidageOfElement_byEl;
             currEl->dvoidage_dx_fct_pt_byEl() = &getDataFromElement::getdVoidagedxOfElement_byEl;
             currEl->dvoidage_dt_fct_pt_byEl() = &getDataFromElement::getdVoidagedtOfElement_byEl;
             
-            currEl->body_force_fct_pt_by_coupling() = &getDataFromElement::getBodyForceByCoupling_byEl;
+            currEl->body_force_fct_pt_by_coupling() = &getDataFromElement::getBodyForceByCoupling_byEl;*/
     
             // NEEDED FOR COUPLING THROUGH ELEMENT NUMBER
             currEl->set_number(e); // Adding global number to element

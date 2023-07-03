@@ -152,10 +152,6 @@ public:
         return (normal==faceNormal_ or normal == -faceNormal_) ? true : false;
     }
 
-    bool isFaceContact(const Vec3D& normal) const override {
-        return (normal==faceNormal_ or normal == -faceNormal_) ? true : false;
-    }
-
 private:
     
     void updateVertexAndNormal();
