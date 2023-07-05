@@ -51,6 +51,7 @@ ClumpParticle::ClumpParticle()
 
     clumpInertia_ = MatrixSymmetric3D(1, 0, 0, 1, 0, 1);
     clumpInitInertia_ = MatrixSymmetric3D(1, 0, 0, 1, 0, 1);
+    rotationMatrix_ = Matrix3D(1, 0, 0, 0, 1, 0, 0, 0, 1);
     invInertia_= clumpInertia_.inverse();
 
     isPebble_ = false; //Assign false by default
@@ -243,6 +244,7 @@ void ClumpParticle::rotateTensorOfInertia()
   //  inertia = clumpInitInertia_;  // uncomment to turn off rotation of toi
   clumpInertia_ = inertia;
   invInertia_= clumpInertia_.inverse();
+  rotationMatrix_ = Q;
 
 }
 

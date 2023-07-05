@@ -119,6 +119,10 @@ public:
         return Vec3D(initPrincipalDirections_.XZ, initPrincipalDirections_.YZ, initPrincipalDirections_.ZZ);
     }
 
+    Matrix3D getRotationMatrix() const
+    {
+        return rotationMatrix_;
+    }
 
     int NPebble() const; // Number of pebbles (for a clump particle)
 
@@ -305,6 +309,8 @@ private:
     Matrix3D initPrincipalDirections_;      // clump's initial principal directions
 
     std::vector<ClumpParticle*> pebbleParticles_; // pointers to pebbles
+
+    Matrix3D rotationMatrix_; // Rotation matrix
 
     //Helper functions
 
