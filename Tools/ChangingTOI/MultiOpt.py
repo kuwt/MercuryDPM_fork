@@ -24,7 +24,7 @@
 #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-# This tool uses a custom optimization instruments from scipy.optimize 
+# This expansion of SimpleOpt tool uses a custom optimization instruments from scipy.optimize
 # to achieve the desirable system parameters in a simulation-guided optimization
 
 import sys
@@ -38,42 +38,32 @@ from noisyopt import minimizeCompass
 
 
 # Global parameters
-source_dir = "/home/iostanin/Desktop/MercuryGit/MercurySource"				# Mercury source dir
-build_dir = "/home/iostanin/Desktop/MercuryGit/MercuryBuild"					# Mercury Build dir
-N = 5						# Number of maneuvers
-TEST_MODE = False				# True for self-test on toy functional, False for real simulation-guided optimization
+SourceDir = "/home/iostanin/Desktop/MercuryGit/MercurySource"				# Mercury source dir
+BuildDir = "/home/iostanin/Desktop/MercuryGit/MercuryBuild"					# Mercury Build dir
+
+N = 5						# Number of maneuver reference points
+TEST_MODE = False			# True for self-test on toy functional, False for real simulation-guided optimization
 TEST_OPTIONS = {'xtol':1e-3, 'ftol':1e-4, 'maxiter':3} 	# Optimizer options (test mode)
 REAL_OPTIONS = {'xtol':1e-3, 'ftol':1e-3, 'maxiter':100}	# Optimizer options (real mode)
-q_min = 0.5					# Minimum allowed value of principal moment of inertia
-q_max = 1.5					# Maximum allowed value of principal moment of inertia
-I_0 = 10 					# Initial (spherical) moment of inertia
+QMin = 0.5					# Minimum allowed value of principal moment of inertia
+QMax = 1.5					# Maximum allowed value of principal moment of inertia
+I0 = 10 					# Initial (spherical) moment of inertia
 
-#prog_duration = 20 					# Maneuver duration (absolute time)
-#sym_duration = 25 					# Maneuver duration (absolute time)
-#base_angvel = 7						# Initial angular velocity of the rotation
+ProgDuration = 100 					# Maneuver duration (absolute time)
+SymDuration = 105 					# Maneuver duration (absolute time)
+BaseAngvel = 5					# Initial angular velocity of the rotation
 
+Timestep = 5.56833e-05 * 50
 
-prog_duration = 100 					# Maneuver duration (absolute time)
-sym_duration = 105 					# Maneuver duration (absolute time)
-base_angvel = 5					# Initial angular velocity of the rotation
+NTimesteps = ProgDuration / Timestep				# Number of timesteps in <duration> - should be sync W number of program timesteps!
 
-timestep = 5.56833e-05 * 50
+QInitValues = np.array([1, 1])  # Initial/final conditions for control parameters
+QFinalValues = np.array([1, 1])
 
-N_timesteps = prog_duration/timestep				# Number of timesteps in <duration> - should be sync W number of program timesteps!
-
-q_init_values = np.array([1, 1])
-q_final_values = np.array([1, 1])
-
-
-x0 = np.ones(2*N)
-#for i in range(2*N):
-#	if (i/2==i//2): x0[i] = 0
-#	else: x0[i] = np.pi
-
+x0 = np.ones(2*N) #Initial guess for control vector sequence
 print(x0)
 xc = np.random.rand(3*N) # Known solution (for toy functional only)
 
-#delta = np.pi/10
 
 """
 # Transition 1-2
@@ -83,7 +73,6 @@ initial_phi = np.pi/4
 final_theta = np.pi/4 	  # Final orientation is along x axis
 final_phi = np.pi/2
 
-
 # Transition 2-3
 initial_theta = np.pi/4 	  # Initial orientation is along z axis
 initial_phi = np.pi/2
@@ -91,15 +80,12 @@ initial_phi = np.pi/2
 final_theta = np.pi/4 	  # Final orientation is along x axis
 final_phi = 0
 
-
-
 # Transition 3-1
 initial_theta = np.pi/4 	  # Initial orientation is along z axis
 initial_phi = 0
 
 final_theta = np.pi/2 	  # Final orientation is along x axis
 final_phi = np.pi/4
-
 
 # Transition 1-4
 initial_theta = np.pi/2 	  # Initial orientation is along z axis
@@ -116,9 +102,6 @@ initial_phi = 0
 final_theta = np.pi 	  # Final orientation is along x axis
 final_phi = 0
 
-
-
-
 # Transition 5-7
 delta = np.pi/1000.
 initial_theta = delta 	  # Initial orientation is along z axis
@@ -129,14 +112,14 @@ final_phi = np.pi/2
 """
 
 # Transition 4-5
-delta = np.pi/1000.
-initial_theta = np.arccos(1/3**0.5)	  # Initial orientation is along x=y=z
-initial_phi = np.pi/4
+Delta = np.pi / 1000.
+InitialTheta = np.arccos(1 / 3 ** 0.5)	  # Initial orientation is along x=y=z
+InitialPhi = np.pi/4
 
-final_theta = delta 	  # Final orientation is along z axis
-final_phi = 0
+FinalTheta = Delta 	  # Final orientation is along z axis
+FinalPhi = 0
 
-def compute_inertia_profiles(nodal_values, duration, N_t):
+def ComputeInertiaProfiles(nodal_values, duration, N_t):
 	# pre-computes time evolution of tensor of inertia for MercuryDPM driver file
 	# nodal_values is an array N X 3  equispaced values of three principal moments of inertia
 	N = len(nodal_values)//3
@@ -154,80 +137,81 @@ def compute_inertia_profiles(nodal_values, duration, N_t):
 	return x, n_I1, n_I2, n_I3, xc, I1, dI1, I2, dI2, I3, dI3
 
 
-fun_count = 0
-fun_batch = False
+FunCount = 0
+FunBatch = False
 # This function computes the value of the functional being optimized based on the simulation run in MercuryDPM.
-def real_fun(x):
+def RealFun(x):
 	import os
 	import subprocess
-	global source_dir, build_dir, N
-	global prog_duration, sym_duration, N_timesteps, fun_count, fun_batch
-	global q_max, q_min, I_0
+	global SourceDir, BuildDir, N
+	global ProgDuration, SymDuration, NTimesteps, FunCount, FunBatch
+	global QMax, QMin, I0, QInitValues, QFinalValues
 
-	ret = 0
+	ret = 0 # Return zero by default
 
-	q = (q_max + q_min) / 2. + (q_max - q_min) / 2. * np.cos(x)
-	q_ext_1 = np.hstack((q_init_values[0], q[:N], q_final_values[0] ))
-	q_ext_2 = np.hstack((q_init_values[1], q[N:], q_final_values[1] ))
+	# Project the unconstrained vector of optimization parameters x into (QMin,QMax)
+	q = (QMax + QMin) / 2. + (QMax - QMin) / 2. * np.cos(x)
 
-	I_1 = q_ext_2 * I_0
-	I_2 = q_ext_1 * I_0
-	I_3 = q_ext_1 * q_ext_2 * I_0
+	# Expand the set of control parameters with initial and final values
+	q_ext_1 = np.hstack((QInitValues[0], q[:N], QFinalValues[0]))
+	q_ext_2 = np.hstack((QInitValues[1], q[N:], QFinalValues[1]))
 
+	# Compute principal components of inertia
+	I_1 = q_ext_2 * I0
+	I_2 = q_ext_1 * I0
+	I_3 = q_ext_1 * q_ext_2 * I0
 	nodal_values = np.hstack((I_1, I_2, I_3))
-
 	print("Nodal values of principal moments of inertia:", nodal_values)
-	xx, n_I1, n_I2, n_I3, xc, I1, dI1, I2, dI2, I3, dI3 = compute_inertia_profiles(nodal_values, prog_duration, N_timesteps)
+
+	# Compute cubic splines approximating the evolution of TOI
+	xx, n_I1, n_I2, n_I3, xc, I1, dI1, I2, dI2, I3, dI3 = ComputeInertiaProfiles(nodal_values, ProgDuration, NTimesteps)
 
 	arr = np.transpose(np.vstack((xc, I1, I2, I3, dI1, dI2, dI3)))
 
-	I1_ext = np.hstack((I1, I1[len(I1)-1] * np.ones((int) (N_timesteps * (sym_duration - prog_duration)/sym_duration))))
-	I2_ext = np.hstack((I2, I2[len(I2)-1] * np.ones((int) (N_timesteps * (sym_duration - prog_duration)/sym_duration))))
-	I3_ext = np.hstack((I3, I3[len(I3)-1] * np.ones((int) (N_timesteps * (sym_duration - prog_duration)/sym_duration))))
-	T_I = np.arange(0, sym_duration, sym_duration / len(I1_ext))
-	np.savetxt(build_dir+'/Drivers/Clump/ChangingTOI/opt/inertia_profiles.txt', arr)
-	np.savetxt(build_dir+'/Drivers/Clump/ChangingTOI/opt/I_1.txt', I1_ext)
-	np.savetxt(build_dir+'/Drivers/Clump/ChangingTOI/opt/I_2.txt', I2_ext)
-	np.savetxt(build_dir+'/Drivers/Clump/ChangingTOI/opt/I_3.txt', I3_ext)
-	np.savetxt(build_dir+'/Drivers/Clump/ChangingTOI/opt/T_I.txt', T_I)
-	np.savetxt(build_dir+'/Drivers/Clump/ChangingTOI/opt/nodal_values.txt', nodal_values)
+	# Expanded evolution incluidng the final piece with constant TOI
+	I1_ext = np.hstack((I1, I1[len(I1)-1] * np.ones((int) (NTimesteps * (SymDuration - ProgDuration) / SymDuration))))
+	I2_ext = np.hstack((I2, I2[len(I2)-1] * np.ones((int) (NTimesteps * (SymDuration - ProgDuration) / SymDuration))))
+	I3_ext = np.hstack((I3, I3[len(I3)-1] * np.ones((int) (NTimesteps * (SymDuration - ProgDuration) / SymDuration))))
+	T_I = np.arange(0, SymDuration, SymDuration / len(I1_ext)) # Timestamp
 
-
-
-
-
+	# Save inertia control parameters of the simulation
+	np.savetxt(BuildDir + '/Drivers/Clump/ChangingTOI/opt/inertia_profiles.txt', arr)
+	np.savetxt(BuildDir + '/Drivers/Clump/ChangingTOI/opt/I_1.txt', I1_ext)
+	np.savetxt(BuildDir + '/Drivers/Clump/ChangingTOI/opt/I_2.txt', I2_ext)
+	np.savetxt(BuildDir + '/Drivers/Clump/ChangingTOI/opt/I_3.txt', I3_ext)
+	np.savetxt(BuildDir + '/Drivers/Clump/ChangingTOI/opt/T_I.txt', T_I)
+	np.savetxt(BuildDir + '/Drivers/Clump/ChangingTOI/opt/nodal_values.txt', nodal_values)
 
 	# Run Mercury Driver file
-	os.chdir(build_dir+'/Drivers/Clump/ChangingTOI')
-	command  = [build_dir+'/Drivers/Clump/ChangingTOI/ChangingTOI']
+	# (feed program duration, simulation duration, and initial angular velocity
+	# as command line arguments)
+	os.chdir(BuildDir + '/Drivers/Clump/ChangingTOI')
+	command  = [BuildDir + '/Drivers/Clump/ChangingTOI/ChangingTOI']
 	command.append('-p1')
-	command.append(str(prog_duration))
+	command.append(str(ProgDuration))
 	command.append('-p2')
-	command.append(str(sym_duration))
+	command.append(str(SymDuration))
 	command.append('-p3')
-	command.append(str(base_angvel))
-
-	#for i in range(len(x)):
-	#	command.append('-p'+str(i))
-	#	command.append(str(x[i]))
+	command.append(str(BaseAngvel))
 	print(command)
-
 	subprocess.run(command)
 
-	f = open(build_dir+'/Drivers/Clump/ChangingTOI/opt/functional.txt', "r")
+	# Get the functional value
+	f = open(BuildDir + '/Drivers/Clump/ChangingTOI/opt/functional.txt', "r")
 	ret = float(f.read())
 
-	if (fun_count == 0):
-		fun_batch = ret
+	# Save the functional value in the in the hystory batch
+	if (FunCount == 0):
+		FunBatch = ret
 	else:
-		fun_batch = np.append(fun_batch, ret)
-		np.savetxt(build_dir+'/Drivers/Clump/ChangingTOI/opt/fun_batch.txt', fun_batch)
+		FunBatch = np.append(FunBatch, ret)
+		np.savetxt(BuildDir + '/Drivers/Clump/ChangingTOI/opt/fun_batch.txt', FunBatch)
 
-	fun_count+=1
+	FunCount+=1 # Number of functional evaluations
 	return ret
 
-
-def toy_fun(x):
+# Toy functional necessary for testing purposes
+def ToyFun(x):
 	global xc
 	ret = 0
 	for m in range(len(x)):
@@ -236,7 +220,7 @@ def toy_fun(x):
 
 
 def main():
-	global source_dir, build_dir, initial_phi, initial_theta, final_phi, final_theta
+	global SourceDir, BuildDir, initial_phi, InitialTheta, FinalPhi, FinalTheta
 
 	# Set up terminal output
 	clr = colorClass()
@@ -247,39 +231,38 @@ def main():
 	print(clr.END + clr.BOLD + clr.VIOLET + "-------------------------------------------")
 	print(clr.END + clr.BOLD + clr.VIOLET + "     MercuryDPM MultiOpt experiment        ")
 	print(clr.END + clr.BOLD + clr.VIOLET + "-------------------------------------------")
-	
+
+
+	# If the values for sourceDir and Build dir are provided in the command, then overwrite the default values
 	if (len(sys.argv) == 3):  # Full format: "run source_dir build_dir"
-		source_dir = sys.argv[1]
-		build_dir = sys.argv[2]
+		SourceDir = sys.argv[1]
+		BuildDir = sys.argv[2]
+	print("Source dir: ", SourceDir)
+	print("Build dir: ", BuildDir)
 
-	source_dir = "/home/iostanin/Desktop/MercuryGit/MercurySource"				# Mercury source dir
-	build_dir = "/home/iostanin/Desktop/MercuryGit/MercuryBuild"
-
-	print("Source dir: ", source_dir)
-	print("Build dir: ", build_dir)
-	
-	opt_path = build_dir + "/Drivers/Clump/ChangingTOI/opt"
-	if ( not os.path.exists( opt_path )):
-		os.mkdir( opt_path )
+	# Path to optimization directory
+	OptPath = BuildDir + "/Drivers/Clump/ChangingTOI/opt"
+	if ( not os.path.exists( OptPath )):
+		os.mkdir( OptPath )
 	
 	# Let Mercury code know what is the goal orientation
-	np.savetxt(build_dir+'/Drivers/Clump/ChangingTOI/opt/init_orientation.txt', (initial_theta, initial_phi), delimiter = ' ')
-	np.savetxt(build_dir+'/Drivers/Clump/ChangingTOI/opt/final_orientation.txt', (final_theta, final_phi), delimiter = ' ')
+	np.savetxt(BuildDir + '/Drivers/Clump/ChangingTOI/opt/init_orientation.txt', (InitialTheta, InitialPhi), delimiter =' ')
+	np.savetxt(BuildDir + '/Drivers/Clump/ChangingTOI/opt/final_orientation.txt', (FinalTheta, FinalPhi), delimiter =' ')
 
 	print(clr.END)
 
 	if (TEST_MODE):
-		res = minimize(toy_fun, x0, method='Powell', options = TEST_OPTIONS)
+		res = minimize(ToyFun, x0, method='Powell', options = TEST_OPTIONS)
 	else:
-		res = minimize(real_fun, x0, method='Powell', options = REAL_OPTIONS)
+		res = minimize(RealFun, x0, method='Powell', options = REAL_OPTIONS)
+		# Alternative optimization tools
 		#res = minimizeSPSA(real_fun, x0=x0, niter=1000, paired=False)
 		#res = minimizeCompass(real_fun, x0=x0, deltatol=0.01, paired=False)
-	
 
 	print(res)
 
 	if (TEST_MODE): print(clr.END + "Converged to the known solution: ", np.allclose(res["x"], xc))
 
-
+# Main script that runs the maneuver optimization procedure
 if __name__ == "__main__":
     sys.exit(main())

@@ -38,27 +38,27 @@ from noisyopt import minimizeCompass
 
 
 # Global parameters
-source_dir = "/home/iostanin/Desktop/MercuryGit/MercurySource"				# Mercury source dir
-build_dir = "/home/iostanin/Desktop/MercuryGit/MercuryBuild"					# Mercury Build dir
+SourceDir = "/home/iostanin/Desktop/MercuryGit/MercurySource"				# Mercury source dir
+BuildDir = "/home/iostanin/Desktop/MercuryGit/MercuryBuild"					# Mercury Build dir
 N = 100						# Number of maneuvers
 TEST_MODE = False				# True for self-test on toy functional, False for real simulation-guided optimization
 TEST_OPTIONS = {'xtol':1e-3, 'ftol':1e-4, 'maxiter':3} 	# Optimizer options (test mode)
 REAL_OPTIONS = {'xtol':1e-3, 'ftol':1e-3, 'maxiter':100}	# Optimizer options (real mode)
-q_min = 0.5					# Minimum allowed value of principal moment of inertia
-q_max = 1.5					# Maximum allowed value of principal moment of inertia
-I_0 = 10 					# Initial (spherical) moment of inertia
+QMin = 0.5					# Minimum allowed value of principal moment of inertia
+QMax = 1.5					# Maximum allowed value of principal moment of inertia
+I0 = 10 					# Initial (spherical) moment of inertia
 
 #prog_duration = 20 					# Maneuver duration (absolute time)
 #sym_duration = 25 					# Maneuver duration (absolute time)
 #base_angvel = 7						# Initial angular velocity of the rotation
 
 
-prog_duration = 9.0 					# Maneuver duration (absolute time)
-sym_duration = 20 					# Maneuver duration (absolute time)
+ProgDuration = 9.0 					# Maneuver duration (absolute time)
+SymDuration = 20 					# Maneuver duration (absolute time)
 base_angvel = 5						# Initial angular velocity of the rotation
 
 
-N_timesteps = 1000				# Number of timesteps in <duration>
+NTimesteps = 1000				# Number of timesteps in <duration>
 
 q_init_values = np.array([1, 1])
 q_final_values = np.array([1, 1])
@@ -74,11 +74,11 @@ xc = np.random.rand(3*N) # Known solution (for toy functional only)
 
 delta = np.pi/1000
 
-initial_theta = delta 	  # Initial orientation is along z axis
+InitialTheta = delta 	  # Initial orientation is along z axis
 initial_phi = 0
 
-final_theta = np.pi/2 	  # Final orientation is along x axis
-final_phi = 0
+FinalTheta = np.pi / 2 	  # Final orientation is along x axis
+FinalPhi = 0
 """
 final_theta = np.arccos(1/3**0.5) 	  # Final orientation is along y axis
 final_phi = np.pi/4
@@ -102,15 +102,15 @@ def compute_inertia_profiles(nodal_values, duration, N_t):
 	return x, n_I1, n_I2, n_I3, xc, I1, dI1, I2, dI2, I3, dI3
 
 
-fun_count = 0
-fun_batch = False
+FunCount = 0
+FunBatch = False
 # This function computes the value of the functional being optimized based on the simulation run in MercuryDPM.
 def real_fun(x):
 	import os
 	import subprocess
-	global source_dir, build_dir, N
-	global prog_duration, sym_duration, N_timesteps, fun_count, fun_batch
-	global q_max, q_min, I_0
+	global SourceDir, BuildDir, N
+	global ProgDuration, SymDuration, NTimesteps, FunCount, FunBatch
+	global QMax, QMin, I0
 
 	ret = 0
 
@@ -181,7 +181,7 @@ def toy_fun(x):
 
 
 def main():
-	global source_dir, build_dir, initial_phi, initial_theta, final_phi, final_theta
+	global SourceDir, BuildDir, initial_phi, InitialTheta, FinalPhi, FinalTheta
 
 	# Set up terminal output
 	clr = colorClass()
