@@ -47,10 +47,10 @@ Mdouble tv_max = 100;
 int N_att = 2000;   // Number of attempts to add particle
 std::vector <int> D_h; // log of the number of Dzhanibekov particles
 
-class multiParticleT1 : public Mercury3Dclump
+class ChangingTOIParticle : public Mercury3Dclump
 {
 public:
-    explicit  multiParticleT1()
+    explicit  ChangingTOIParticle()
     {
         setGravity(Vec3D(0.0, 0.0, -0.0));
         setName("TGas");
@@ -212,7 +212,7 @@ private:
 
 int main(int argc, char* argv[])
 {
-    multiParticleT1 problem;
+    ChangingTOIParticle problem;
     problem.setNumberOfOMPThreads(helpers::readFromCommandLine(argc, argv, "-omp",4));
     auto species = problem.speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
     species->setDensity(1.0); // sets the species type-0 density

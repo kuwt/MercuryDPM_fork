@@ -36,10 +36,10 @@
 Mdouble f_min = -100; Mdouble f_max = 100;
 int SAVECOUNT = 400;
 
-class multiParticleT1 : public Mercury3Dclump
+class ChangingTOIParticle : public Mercury3Dclump
 {
 public:
-    explicit  multiParticleT1()
+    explicit  ChangingTOIParticle()
     {
         setGravity(Vec3D(0.0, 0.0, -10.0));
         setName("Rattleback");
@@ -147,7 +147,7 @@ private:
 
 int main(int argc, char* argv[])
 {
-    multiParticleT1 problem;
+    ChangingTOIParticle problem;
     auto species = problem.speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
     species->setDensity(1.0); // sets the species type-0 density
     species->setDissipation(30.0);

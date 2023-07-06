@@ -76,10 +76,10 @@ struct dominoes {
 dominoes D;
 
 
-class multiParticleT1 : public Mercury3Dclump
+class ChangingTOIParticle : public Mercury3Dclump
 {
 public:
-    explicit  multiParticleT1()
+    explicit  ChangingTOIParticle()
     {
         setGravity(Vec3D(0.0, 0.0, -10.0));
         setName("Domino");
@@ -218,7 +218,7 @@ int main(int argc, char* argv[])
         std::cout<<params[i]<<std::endl;
     }
 */
-    multiParticleT1 problem;
+    ChangingTOIParticle problem;
 
     // D.S_dom = 0.2 * (2 * D.k_peb * D.S_peb) + 0.8 * (2 * D.k_peb * D.S_peb) * (params[0]/100);
 

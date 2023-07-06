@@ -38,7 +38,7 @@
 #include <string>
 #include <array>
 
-std::string exec_command(const char* cmd) {
+std::string ExecCommand(const char* cmd) {
     std::array<char, 128> buffer;
     std::string result;
     std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
@@ -53,10 +53,11 @@ std::string exec_command(const char* cmd) {
 
 int main(int argc, char* argv[])
 {
-//    exec_command("make");
-//    exec_command("./LB_S1_Insertion");
-    exec_command("rm -rf paraview");
-    exec_command("mkdir paraview");
-    exec_command("../../../../../../Tools/data2pvd S3_SelectedSintering_PA12_500L.data paraview/S3_SelectedSintering_PA12_500L");
+//    ExecCommand("make");
+//    ExecCommand("./LB_S1_Insertion");
+    ExecCommand("rm -rf paraview");
+    ExecCommand("mkdir paraview");
+    ExecCommand(
+            "../../../../../../Tools/data2pvd S3_SelectedSintering_PA12_500L.data paraview/S3_SelectedSintering_PA12_500L");
     return 0;
 }

@@ -1,4 +1,4 @@
-//Copyright (c) 2013-2022, The MercuryDPM Developers Team. All rights reserved.
+//Copyright (c) 2013-2023, The MercuryDPM Developers Team. All rights reserved.
 //For the list of developers, see <http://www.MercuryDPM.org/Team>.
 //
 //Redistribution and use in source and binary forms, with or without
@@ -23,8 +23,8 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Extra feature: T-bar with changing tensor of inertia featuring a controlled 
-// Dzhanibekov effect
+// Extra feature: a body with changing tensor of inertia featuring a controlled
+// Dzhanibekov effect and other kinds of maneuvering
 
 #include "Mercury3D.h"
 #include "Walls/InfiniteWall.h"
@@ -35,19 +35,17 @@
 # include <stdlib.h>
 #include<CMakeDefinitions.h>
 
-//typedef std::vector<double> dvec;
-//typedef std::vector<dvec> ddvec;
-
 Mdouble f_min = -10; Mdouble f_max = 10;
 
-// Helper function to implement extra OS commands after the driver code is done
-std::string execCommand(const char* cmd) {
-    std::array<char, 128> buffer;
+// This function executes the OS command 'cmd' and returns the 'result'
+std::string ExecCommand(const char* cmd) {
+    std::array<char, 256> buffer;
     std::string result;
+
+    // Prepare a pipe to write a to execute a system command and read the result
     std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
     if (!pipe) {
-        std::string ret = "Could not run an extra OS command: "; ret.append(cmd);
-        throw std::runtime_error(ret);
+        throw std::runtime_error("popen() failed!");
     }
     while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
         result += buffer.data();
@@ -55,15 +53,16 @@ std::string execCommand(const char* cmd) {
     return result;
 }
 
-class multiParticleT1 : public Mercury3Dclump
+class ChangingTOIParticle : public Mercury3Dclump
 {
 public:
 
+    // Helpers functions for matrix manipulations
     MatrixSymmetric3D MtoS( Matrix3D M){ return MatrixSymmetric3D(M.XX, M.XY, M.XZ, M.YY, M.YZ, M.ZZ);}
     Matrix3D StoM( MatrixSymmetric3D M){ return Matrix3D(M.XX, M.XY, M.XZ, M.XY, M.YY, M.YZ, M.XZ, M.YZ, M.ZZ);}
     Matrix3D transpose(Matrix3D M){ return Matrix3D(M.XX, M.YX, M.ZX, M.XY, M.YY, M.ZY, M.XZ, M.YZ, M.ZZ);}
 
-    explicit  multiParticleT1()
+    explicit  ChangingTOIParticle()
     {
         setGravity(Vec3D(0.0, 0.0, 0.0));
         setName("ChangingTOI");
@@ -87,19 +86,24 @@ public:
     void setupInitialConditions() override
     {
         // Generate single clump
-        //setClumpIndex(1); // T-bar clump - serves for visualization purposes only
         ClumpParticle p0;
-        p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to MultiParticle 1
+        p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to ClumpParticle
         p0.setClump();
         p0.setRadius(0.5);
         p0.setPosition(Vec3D(0, 0, 0));
-        p0.addPebble(Vec3D(0,0,0),1); // slave particles are used for visualisation purposes only
+
+        // Pebble particles are used for visualisation purposes only
+        // (sphere/arrow glyphs are employed in Paraview to visualize the corresponding directions)
+        // Pebble's inertial properties are not employed in calculations
+        p0.addPebble(Vec3D(0,0,0),1);
         p0.addPebble(Vec3D(1,0,0),3.5);
         p0.addPebble(Vec3D(-1,0,0),4);
         p0.addPebble(Vec3D(0,1,0),2.5);
         p0.addPebble(Vec3D(0,-1,0),3);
         p0.addPebble(Vec3D(0,0,1),1.5);
         p0.addPebble(Vec3D(0,0,-1),2);
+
+        // Extra direction markers (for Paraview arrow glyphs)
         //p0.addPebble(Vec3D(10e-8,10e-8,10e-8),2); // Marker of point 4
         //p0.addPebble(Vec3D(10e-8,0,10e-8),2); // marker of point 3
         //p0.addPebble(Vec3D(0,10e-8,10e-8),2); // marker of point 2
@@ -118,12 +122,11 @@ public:
                                                                           
         p0.setClumpMass(5);
 
-        Mdouble th = 0.1;
-        Mdouble ph = 0.9;
-        Vec3D angVelVec = Vec3D( sin(th) * cos(ph), sin(th)*sin(ph), cos(th) );
+        // Mdouble th = 0.1;
+        // Mdouble ph = 0.9;
+        // Vec3D angVelVec = Vec3D( sin(th) * cos(ph), sin(th)*sin(ph), cos(th) );
 
         p0.setAngularVelocity(baseAngVel * init_orientation);
-
         particleHandler.copyAndAddObject(p0);
     }
 
@@ -256,13 +259,11 @@ private:
 };
 
 
-Vec3D load_init_orient()
+Vec3D LoadInitOrient()
 {
     std::cout<<"Read init orientation"<<std::endl;
     // Load init orientation
     std::ifstream infile((getMercuryDPMBuildDir() + "/Drivers/Clump/ChangingTOI/opt/init_orientation.txt").c_str(), std::ios::in | std::ios::binary);
-    
-
     char lin[256];
     infile.getline(lin, 256, '\n');
     std::string line(lin);
@@ -274,13 +275,11 @@ Vec3D load_init_orient()
     return Vec3D(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
 }
 
-Vec3D load_final_orient()
+Vec3D LoadFinalOrient()
 {
     std::cout<<"Read final orientation"<<std::endl;
     // Load final orientation
     std::ifstream infile((getMercuryDPMBuildDir() + "/Drivers/Clump/ChangingTOI/opt/final_orientation.txt").c_str(), std::ios::in | std::ios::binary);
-
-
     char lin[256];
     infile.getline(lin, 256, '\n');
     std::string line(lin);
@@ -289,13 +288,11 @@ Vec3D load_final_orient()
     std::string line2(lin);
     Mdouble phi = std::stof(line2);
     infile.close();
-
     std::cout<<"LOADED FINAL ORIENTATION: theta = "<<theta<<", phi = "<<phi<<std::endl;
-
     return Vec3D(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
 }
 
-Double2DVector load_I_profiles()
+Double2DVector LoadIProfiles()
 {
     std::cout<<"read inertia profile"<<std::endl;
     // Load goal orientation
@@ -321,13 +318,10 @@ Double2DVector load_I_profiles()
 
 int main(int argc, char* argv[])
 {
-
-
-    multiParticleT1 problem;
-    problem.init_orientation = load_init_orient();
-    problem.final_orientation = load_final_orient();
-
-    problem.inertia_profiles = load_I_profiles();
+    ChangingTOIParticle problem;
+    problem.init_orientation = LoadInitOrient();
+    problem.final_orientation = LoadFinalOrient();
+    problem.inertia_profiles = LoadIProfiles();
 
     // Get parameters passed through the command line
     std::string a;
@@ -337,7 +331,6 @@ int main(int argc, char* argv[])
 
     auto species = problem.speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
     species->setDensity(1.0); // sets the species type-0 density
-    //species->setConstantRestitution(0);
     species->setDissipation(0.0);
     species->setStiffness(1e6);
     const Mdouble collisionTime = species->getCollisionTime(problem.getClumpMass());
@@ -348,17 +341,15 @@ int main(int argc, char* argv[])
     // Quick demonstration
     problem.setSaveCount(500);
     problem.setTimeMax(problem.symDuration);
-
-
     problem.removeOldFiles();
     problem.solve();
     // Paraview data
-    execCommand("rm -rf paraview_ChangingTOI/");
-    execCommand("mkdir paraview_ChangingTOI/");
-    execCommand("../../../Tools/data2pvd ChangingTOI.data paraview_ChangingTOI/ChangingTOI");
+    ExecCommand("rm -rf paraview_ChangingTOI/");
+    ExecCommand("mkdir paraview_ChangingTOI/");
+    ExecCommand("../../../Tools/data2pvd ChangingTOI.data paraview_ChangingTOI/ChangingTOI");
     std::string command;
     command = "python " + getMercuryDPMSourceDir() + "/Tools/MClump/PlotEnergies.py " + getMercuryDPMBuildDir() + "/Drivers/Clump/ChangingTOI/ " + "ChangingTOI";
-    execCommand(command.c_str());
+    ExecCommand(command.c_str());
 
     // Return the functional via the text file
     std::ofstream funct;  funct.open ("opt/functional.txt");
@@ -375,7 +366,5 @@ int main(int argc, char* argv[])
     std::ofstream mom;  mom.open ("opt/momentum.txt");
     for (int i = 0; i<problem.angularMomentumLog.size(); i+=500){mom <<problem.angularMomentumLog[i]<<std::endl;}
     mom.close();
-
-
     return 0;
 }

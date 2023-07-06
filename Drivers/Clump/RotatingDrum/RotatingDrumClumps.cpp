@@ -47,7 +47,7 @@ int N_att = 1000;   // Number of attempts to add particle
 
 int SAVECOUNT = 400;
 
-class multiParticleT1 : public Mercury3Dclump
+class ChangingTOIParticle : public Mercury3Dclump
 {
 
     // Group id of the rotating geometry
@@ -57,7 +57,7 @@ class multiParticleT1 : public Mercury3Dclump
     CubeInsertionBoundary* insertionBoundary;
 
 public:
-    explicit  multiParticleT1()
+    explicit  ChangingTOIParticle()
     {
         setGravity(Vec3D(0,-9.8,0));
         // Set name of output files
@@ -167,7 +167,7 @@ private:
 
 int main(int argc, char* argv[])
 {
-    multiParticleT1 problem;
+    ChangingTOIParticle problem;
     auto species = problem.speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
     species->setDensity(1.0); // sets the species type-0 density
     species->setDissipation(50.0);

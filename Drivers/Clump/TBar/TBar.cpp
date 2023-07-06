@@ -35,10 +35,10 @@
 
 Mdouble f_min = -10; Mdouble f_max = 10;
 
-class multiParticleT1 : public Mercury3Dclump
+class ChangingTOIParticle : public Mercury3Dclump
 {
 public:
-    explicit  multiParticleT1()
+    explicit  ChangingTOIParticle()
     {
         setGravity(Vec3D(0.0, 0.0, 0.0));
         setName("TBar");
@@ -132,7 +132,7 @@ private:
 
 int main(int argc, char* argv[])
 {
-    multiParticleT1 problem;
+    ChangingTOIParticle problem;
     auto species = problem.speciesHandler.copyAndAddObject(LinearViscoelasticFrictionSpecies());
     species->setDensity(1.0); // sets the species type-0 density
     //species->setConstantRestitution(0);
