@@ -63,9 +63,34 @@ public:
     void write(std::ostream& os) const override
     {
         BaseParticle::write(os);
-        os << " DzhanibekovParticle " << DzhanibekovParticle_;
-        os << " VerticallyOriented " << VerticallyOriented_;
-
+        os << " DzhanibekovParticle_ " << DzhanibekovParticle_;
+        os << " verticallyOriented_ " << verticallyOriented_;
+        os << " nPebble_ " << nPebble_;
+        os << " clumpMass_ " << clumpMass_;
+        os << " viscousDamping_ " << viscousDamping_;
+        os << " pebblePos_ ";
+        for (const auto & pebbleP : pebblePos_) {os << pebbleP.X << " "pebbleP.Y << " " << pebbleP.Z;}
+        os << " pebbleRadius_ ";
+        for (double pebbleRad : pebbleRadius_) {os << pebbleRad;}
+        os << " pebbleParticles_ ";
+        for (auto pebblePart : pebbleParticles_) {os << pebblePart;}
+        os << " principalDirections_ ";
+        os << principalDirections_.XX << " " << principalDirections_.XY << " " << principalDirections_.XZ << " ";
+        os << principalDirections_.YX << " " << principalDirections_.YY << " " << principalDirections_.YZ << " ";
+        os << principalDirections_.ZX << " " << principalDirections_.ZY << " " << principalDirections_.ZZ << " ";
+        os << " initPrincipalDirections_ ";
+        os << initPrincipalDirections_.XX << " " << initPrincipalDirections_.XY << " " << initPrincipalDirections_.XZ << " ";
+        os << initPrincipalDirections_.YX << " " << initPrincipalDirections_.YY << " " << initPrincipalDirections_.YZ << " ";
+        os << initPrincipalDirections_.ZX << " " << initPrincipalDirections_.ZY << " " << initPrincipalDirections_.ZZ << " ";
+        os << " clumpInitInertia_ " << clumpInitInertia_;
+        os << " clumpInertia_ " << clumpInertia_;
+        os << " rotationMatrix_ ";
+        os << rotationMatrix_.XX << " " << rotationMatrix_.XY << " " << rotationMatrix_.XZ << " ";
+        os << rotationMatrix_.YX << " " << rotationMatrix_.YY << " " << rotationMatrix_.YZ << " ";
+        os << rotationMatrix_.ZX << " " << rotationMatrix_.ZY << " " << rotationMatrix_.ZZ << " ";
+        os << " isPebble_ " << isPebble_;
+        os << " clumpParticle_ " << clumpParticle_;
+        os << " isPebble_ " << isPebble_;
     }
 
     void read(std::istream& is) override;
@@ -171,7 +196,7 @@ public:
     void setClump(ClumpParticle* master) {
         isClump_ = false;
         isPebble_ = true;
-        clumpParticle = master;
+        clumpParticle_ = master;
     }
 
     void setClumpMass(Mdouble mass)
@@ -236,7 +261,7 @@ public:
     // check if particle is "vertically oriented"
     bool getVerticallyOriented()
     {
-    	return VerticallyOriented_;
+    	return verticallyOriented_;
     }
 
     // set the "Dzhanibekov" state
@@ -248,7 +273,7 @@ public:
     // set "vertically oriented" state
     void setVerticallyOriented( bool d)
     {
-    	VerticallyOriented_ = d;
+        verticallyOriented_ = d;
     }
 
     unsigned getNumberOfFieldsVTK() const override
@@ -276,7 +301,7 @@ public:
         if (i==0)
             return std::vector<Mdouble>(1, DzhanibekovParticle_);
         else
-            return std::vector<Mdouble>(1, VerticallyOriented_);
+            return std::vector<Mdouble>(1, verticallyOriented_);
     }
 
     void updateExtraQuantities();
@@ -288,7 +313,7 @@ private:
     
     bool DzhanibekovParticle_;  // This property is needed to quantify Dzhanibekov gas properties
 
-    bool VerticallyOriented_;   // This property is useful for mechnical stability simulations (Gomboc, Dominos)
+    bool verticallyOriented_;   // This property is useful for mechnical stability simulations (Gomboc, Dominos)
 
     Vec3D angularAcceleration_; // Clump angular acceleration
 

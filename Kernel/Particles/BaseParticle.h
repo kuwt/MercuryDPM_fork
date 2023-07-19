@@ -655,7 +655,7 @@ public:
 
     BaseParticle* getClump() const
     {
-        return clumpParticle;
+        return clumpParticle_;
     }
 
     /*!
@@ -741,7 +741,7 @@ public:
 
     virtual void actionsAfterAddObject() {} /// Function that updates necessary quantities of a clump particle after adding a pebble
 
-    BaseParticle* clumpParticle; /// pointer to a clump particle (for a pebble)
+    BaseParticle* clumpParticle_; /// pointer to a clump particle (for a pebble)
 
     bool isPebble_; /// The particle is pebble
 

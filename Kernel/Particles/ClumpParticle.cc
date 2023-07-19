@@ -56,11 +56,11 @@ ClumpParticle::ClumpParticle()
 
     isPebble_ = false; //Assign false by default
     isClump_ = false; //Assign false by default
-    clumpParticle = nullptr;
+    clumpParticle_ = nullptr;
 
 
     DzhanibekovParticle_ = false;
-    VerticallyOriented_ = false;
+    verticallyOriented_ = false;
 
     logger(DEBUG, "Clump() created");
 }
@@ -78,15 +78,16 @@ ClumpParticle::ClumpParticle(const ClumpParticle& p): NonSphericalParticle(p)
     initPrincipalDirections_ = p.initPrincipalDirections_;
     clumpInertia_ = p.clumpInertia_;
     clumpInitInertia_ = p.clumpInitInertia_;
+    rotationMatrix_ = p.rotationMatrix_;
     invInertia_= clumpInertia_.inverse();
     DzhanibekovParticle_ = p.DzhanibekovParticle_;
-    VerticallyOriented_ = p.VerticallyOriented_;
+    verticallyOriented_ = p.verticallyOriented_;
 
     for (int iPebble = 1; iPebble <= nPebble_; iPebble++) pebbleParticles_[iPebble - 1] = nullptr;
 
     // Pebble attributes
     isPebble_ = p.isPebble_;
-    clumpParticle = p.clumpParticle;
+    clumpParticle_ = p.clumpParticle_;
     // Clump attributes
     isClump_ = p.isClump_;
 }
