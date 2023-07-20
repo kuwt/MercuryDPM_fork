@@ -136,8 +136,8 @@ static void printWarn(std::string module, std::string msg, Flusher doFlush)
     std::cout << "\033[1;33mError " << module << ":\033[0m\n" << "[Processor: " << communicator.getProcessorID() << "]" << msg << std::endl;
 #else
     std::cout << "\033[1;31mAn error has occured"
-              << "\n\033[1;31mModule  :" << module
-              << "\n\033[1;31mMessage :" << msg << std::endl;
+              << "\n\033[1;31mModule : " << module
+              << "\n\033[1;31mMessage: " << msg << ":\033[0m\n" << std::endl;
 #endif
 #ifdef MERCURYDPM_STACKTRACE_SHOW
     std::cerr << "\n-----------------[Stack Trace]-----------------\n";
@@ -212,8 +212,8 @@ static void printWarn(std::string module, std::string msg, Flusher doFlush)
     std::cout << "\033[1;33mError " << module << ":\033[0m\n" << "[Processor: " << communicator.getProcessorID() << "]" << msg << std::endl;
 #else
     std::cout << "\033[1;31mA fatal error has occured"
-              << "\n\033[1;31mModule  :" << module
-              << "\n\033[1;31mMessage :" << msg << std::endl;
+              << "\n\033[1;31mModule : " << module
+              << "\n\033[1;31mMessage: " << msg << ":\033[0m\n" << std::endl;
 #endif
 #ifdef MERCURYDPM_STACKTRACE_SHOW
     std::cerr << "\n-----------------[Stack Trace]-----------------\n";
