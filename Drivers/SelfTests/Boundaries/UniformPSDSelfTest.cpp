@@ -60,9 +60,8 @@ public:
     
         //uniform distribution
         PSD psd;
-        psd.setParticleSizeDistribution({{0.005,     0},
-                                         {0.015, 1}});
-        //PSD::convertCumulativeVolumeToNumber(psd); //PSND
+        psd.setPSDFromVector({{0.005,     0}, {0.015, 1}},
+                             PSD::TYPE::CUMULATIVE_NUMBER_DISTRIBUTION);
         insertionBoundary.setPSD(psd);
     
         //add the insertion boundary to the handler

@@ -499,7 +499,7 @@ void InsertionBoundary::read(std::istream& is)
             is >> radiusAndProbability.probability;
             particleSizeDistribution.push_back(radiusAndProbability);
         }
-        particleSizeDistributionVector.setParticleSizeDistribution(particleSizeDistribution);
+        particleSizeDistributionVector.setPSDFromVector(particleSizeDistribution, PSD::TYPE::CUMULATIVE_NUMBER_DISTRIBUTION);
     }
     if (psdVectorSize > 1)
     {

@@ -129,9 +129,8 @@ public:
     void validateProbabilityDensityDistribution();
 
     /*!
-     * \brief Deprecated version of reading in PSDs from a vector.
+     * \brief Sets the PSD from a vector with DistributionElements.
      */
-    MERCURYDPM_DEPRECATED
     void setPSDFromVector(std::vector<DistributionElements> psd, TYPE PSDType);
 
     /*!
@@ -183,8 +182,15 @@ public:
     void convertProbabilityDensityToProbabilityDensityNumberDistribution(TYPE PDFType);
 
     /*!
-     * \brief convert a PROBABILITYDENSITY_NUMBER_DISTRIBUTION to a PROBABILITYDENSITY_VOLUME_DISTRIBUTION.
+     * \brief Convert the default PROBABILITYDENSITY_NUMBER_DISTRIBUTION to any PDF.
      */
+    void convertProbabilityDensityNumberDistributionToProbabilityDensity(TYPE PDFType);
+
+    /*!
+     * \brief convert a PROBABILITYDENSITY_NUMBER_DISTRIBUTION to a PROBABILITYDENSITY_VOLUME_DISTRIBUTION.
+     * \deprecated Use convertProbabilityDensityNumberDistributionToProbabilityDensity(TYPE::PROBABILITYDENSITY_VOLUME_DISTRIBUTION) instead.
+     */
+    MERCURYDPM_DEPRECATED
     void convertProbabilityDensityNumberDistributionToProbabilityDensityVolumeDistribution();
 
     /*!
@@ -217,10 +223,17 @@ public:
      * \brief Get the PSD vector.
      */
     std::vector<DistributionElements> getParticleSizeDistribution() const;
+
+    /*!
+     * \brief Gets the PSD vector, converted to the preferred type.
+     */
+    std::vector<DistributionElements> getParticleSizeDistributionByType(TYPE psdType, Mdouble scalingFactor = 1.0) const;
     
     /*!
      * \brief set the PSD by a suitable vector.
+     * \deprecated Use setPSDFromVector() instead.
      */
+    MERCURYDPM_DEPRECATED
     void setParticleSizeDistribution(std::vector<DistributionElements>);
 
     /*!

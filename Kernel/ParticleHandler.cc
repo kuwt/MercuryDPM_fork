@@ -1387,14 +1387,46 @@ double ParticleHandler::getLiquidFilmVolume() const
     return getMPISum(liquidVolume);
 };
 
-void ParticleHandler::saveNumberPSDtoCSV(std::string csvFileName, std::vector<double> diameterBins)
+/*!
+ * @param csvFileName The filename to write to.
+ * @param diameterBins Optionally, the bins of interest.
+ */
+void ParticleHandler::saveNumberPSDtoCSV(std::string csvFileName, std::vector<double> diameterBins) const
 {
-    //check that there is at least one particle in the handler
-    if (getNumberOfObjects()==0) {
-        logger(WARN, "saveNumberPSDtoCSV: No PSD written, as particleHandler is empty.");
+    // get the PSD, with scale factor 0.5 to scale diameter to radius
+    PSD psd = getPSD(diameterBins, 0.5);
+    // get the PSD vector by the required type, with scale factor 2 to scale radius to diameter
+    std::vector<DistributionElements> psdVector = psd.getParticleSizeDistributionByType(PSD::TYPE::PROBABILITYDENSITY_NUMBER_DISTRIBUTION, 2.0);
+
+    logger(INFO,"Writing PSD to %",csvFileName);
+    std::ofstream csv(csvFileName);
+    logger.assert_always(csv.is_open(),"File % could not be opened",csvFileName);
+    csv << "Diameter" << ',' << "Probability Number Distribution" << '\n';
+    for (const auto& bin : psdVector) {
+        csv << bin.internalVariable << ',' << bin.probability << '\n';
     }
-    
-    // check that the diameter vector is set
+    csv.close();
+}
+
+/*!
+ * \details When no bins are provided, they will be created linearly between the smallest and largest particle radius in
+ * the handler. When bins are provided and don't include the smallest/largest particle size currently in the handler,
+ * they will be added. For the largest particle size this is a necessity, otherwise there is no way to account for
+ * larger particles. For the smallest particle size this isn't strictly necessary, however it is preferred to have the
+ * PSD start with zero probability.
+ * @param bins Optionally, the bins of interest.
+ * @param scaleFactor Optionally, value to scale the bins by, to convert them to radii. E.g. 0.5 when diameters are provided.
+ * @return
+ */
+PSD ParticleHandler::getPSD(std::vector<Mdouble> bins, Mdouble scaleFactor) const
+{
+    // check that there is at least one particle in the handler
+    if (getNumberOfObjects()==0) {
+        logger(WARN, "getPSD: Empty PSD is returned, as particleHandler is empty.");
+        return PSD();
+    }
+
+    // check that the bins vector is set
 #ifdef MERCURYDPM_USE_MPI
     double rMin = getSmallestInteractionRadius();
     double rMax = getLargestInteractionRadius();
@@ -1402,51 +1434,54 @@ void ParticleHandler::saveNumberPSDtoCSV(std::string csvFileName, std::vector<do
     double rMin = getSmallestParticle()->getRadius();
     double rMax = getLargestParticle()->getRadius();
 #endif
-    if (diameterBins.empty()) {
+    if (bins.empty()) {
         size_t n = std::min(100,(int)std::ceil(getNumberOfObjects()/20));
-        diameterBins.reserve(n);
+        bins.reserve(n);
         double dr = (rMax-rMin)/(n-1);
         for (size_t i = 0; i<n-1; i++) {
-            diameterBins.push_back(2.0 * (rMin + i * dr));
+            bins.push_back(rMin + i * dr);
         }
     } else {
         // make sure values are in increasing order
-        std::sort(diameterBins.begin(), diameterBins.end());
+        std::sort(bins.begin(), bins.end());
+        // and convert to radius
+        for (auto& b : bins) {
+            b *= scaleFactor;
+        }
     }
-    
-    // set the last bin to include the largest particle
-    if (diameterBins.back() < 2.0 * rMax) {
-        diameterBins.push_back(2.0 * rMax);
+
+    // set the first/last bin to include the smallest/largest particle (first bin to make PSD start with zero probability)
+    if (bins.front() > rMin) {
+        bins.insert(bins.begin(), rMin);
     }
-    
-    // create a psd structure
-    struct PSD {
-        double diameter;
-        double probability;
-    };
-    std::vector<PSD> psd;
-    size_t n = diameterBins.size();
-    psd.reserve(n);
-    for (const auto bin : diameterBins) {
-        psd.push_back({bin,0.0});
+    if (bins.back() < rMax) {
+        bins.push_back(rMax);
     }
-    
-    for (const auto p : *this) {
-        double d = 2.0*p->getRadius();
-        for (auto& bin : psd) {
-            if (d <= bin.diameter) {
-                bin.probability += 1./getNumberOfObjects();
+
+    // PSD vector, all probabilities initialised to 0
+    std::vector<DistributionElements> des;
+    des.reserve(bins.size());
+    for (const Mdouble bin : bins) {
+        des.push_back({ bin, 0.0 });
+    }
+
+    // calculate the probabilities
+    for (const auto& p : *this) {
+        if (p->isFixed() || p->isMPIParticle() || p->isPeriodicGhostParticle()) {
+            continue;
+        }
+        // the first "bin"/radius is skipped, since the probabilities for each bin are assigned to its upper radius
+        // i.e. the PSD should start with zero probability
+        for (auto bin = des.begin() + 1; bin != des.end(); bin++) {
+            if (p->getRadius() <= bin->internalVariable) {
+                bin->probability += 1.0 / getNumberOfRealObjects();
                 break;
             }
         }
     }
-    
-    logger(INFO,"Writing PSD to %",csvFileName);
-    std::ofstream csv(csvFileName);
-    logger.assert_always(csv.is_open(),"File % could not be opened",csvFileName);
-    csv << "Diameter" << ',' << "Probability Number Distribution" << '\n';
-    for (const auto bin : psd) {
-        csv << bin.diameter << ',' << bin.probability << '\n';
-    }
-    csv.close();
+
+    // create and return PSD
+    PSD psd;
+    psd.setPSDFromVector(des, PSD::TYPE::PROBABILITYDENSITY_NUMBER_DISTRIBUTION);
+    return psd;
 }
