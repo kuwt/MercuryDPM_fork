@@ -65,9 +65,7 @@ public:
             cvd.push_back({(i + 3) * 0.0015, i * 0.1});
         }
         PSD psd;
-        psd.setParticleSizeDistribution(cvd);
-        // convert to number-csd
-        psd.convertCumulativeToCumulativeNumberDistribution(PSD::TYPE::CUMULATIVE_VOLUME_DISTRIBUTION);
+        psd.setPSDFromVector(cvd, PSD::TYPE::CUMULATIVE_VOLUME_DISTRIBUTION);
         insertionBoundary.setPSD(psd);
     
         //add the insertion boundary to the handler
