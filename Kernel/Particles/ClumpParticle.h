@@ -63,37 +63,60 @@ public:
     void write(std::ostream& os) const override
     {
         BaseParticle::write(os);
-        os << " DzhanibekovParticle_ " << DzhanibekovParticle_;
-        os << " verticallyOriented_ " << verticallyOriented_;
         os << " nPebble_ " << nPebble_;
         os << " clumpMass_ " << clumpMass_;
         os << " viscousDamping_ " << viscousDamping_;
         os << " pebblePos_ ";
-        for (const auto & pebbleP : pebblePos_) {os << pebbleP.X << " "pebbleP.Y << " " << pebbleP.Z;}
+        for (const auto & pebbleP : pebblePos_) {os << pebbleP;}
         os << " pebbleRadius_ ";
         for (double pebbleRad : pebbleRadius_) {os << pebbleRad;}
-        os << " pebbleParticles_ ";
-        for (auto pebblePart : pebbleParticles_) {os << pebblePart;}
+        //os << " pebbleParticles_ ";
+        //for (auto pebblePart : pebbleParticles_) {os << pebblePart;}
         os << " principalDirections_ ";
-        os << principalDirections_.XX << " " << principalDirections_.XY << " " << principalDirections_.XZ << " ";
-        os << principalDirections_.YX << " " << principalDirections_.YY << " " << principalDirections_.YZ << " ";
-        os << principalDirections_.ZX << " " << principalDirections_.ZY << " " << principalDirections_.ZZ << " ";
+        os << principalDirections_;
         os << " initPrincipalDirections_ ";
-        os << initPrincipalDirections_.XX << " " << initPrincipalDirections_.XY << " " << initPrincipalDirections_.XZ << " ";
-        os << initPrincipalDirections_.YX << " " << initPrincipalDirections_.YY << " " << initPrincipalDirections_.YZ << " ";
-        os << initPrincipalDirections_.ZX << " " << initPrincipalDirections_.ZY << " " << initPrincipalDirections_.ZZ << " ";
+        os << initPrincipalDirections_;
         os << " clumpInitInertia_ " << clumpInitInertia_;
         os << " clumpInertia_ " << clumpInertia_;
         os << " rotationMatrix_ ";
-        os << rotationMatrix_.XX << " " << rotationMatrix_.XY << " " << rotationMatrix_.XZ << " ";
-        os << rotationMatrix_.YX << " " << rotationMatrix_.YY << " " << rotationMatrix_.YZ << " ";
-        os << rotationMatrix_.ZX << " " << rotationMatrix_.ZY << " " << rotationMatrix_.ZZ << " ";
+        os << rotationMatrix_;
         os << " isPebble_ " << isPebble_;
-        os << " clumpParticle_ " << clumpParticle_;
+        //os << " clumpParticle_ " << clumpParticle_;
         os << " isPebble_ " << isPebble_;
+        os << " DzhanibekovParticle_ " << DzhanibekovParticle_;
+        os << " verticallyOriented_ " << verticallyOriented_;
     }
 
-    void read(std::istream& is) override;
+    void read(std::istream& is) override
+    {
+        BaseParticle::read(is);
+        std::string dummy;
+        is >> dummy >> nPebble_;
+        is >> dummy >> nPebble_;
+        is >> dummy >> clumpMass_;
+        is >> dummy >> viscousDamping_;
+        is >> dummy;
+        for (int i = 0; i<nPebble_; i++) {is >> pebblePos_[i];}
+        is >> dummy;
+        for (int i = 0; i<nPebble_; i++) {is >> pebbleRadius_[i];}
+        //is >> dummy;
+        //for (int i = 0; i<nPebble_; i++) {is >> pebbleParticles_[i];}
+        is >> dummy;
+        is >> principalDirections_;
+        is >> dummy;
+        is >> initPrincipalDirections_;
+        is >> dummy >> clumpInitInertia_;
+        is >> dummy >> clumpInertia_;
+        is >> dummy;
+        is >> rotationMatrix_;
+        is >> dummy >> isPebble_;
+        //is >> dummy >> clumpParticle_;
+        is >> dummy >> isPebble_;
+        is >> dummy >> DzhanibekovParticle_;
+        is >> dummy >> verticallyOriented_;
+
+
+    }
 
     std::string getName() const override;
 

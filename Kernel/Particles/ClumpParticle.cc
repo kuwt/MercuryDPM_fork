@@ -107,12 +107,6 @@ std::string ClumpParticle::getName() const
     return "ClumpParticle";
 }
 
-void ClumpParticle::read(std::istream& is)
-{
-    BaseParticle::read(is);
-    std::string dummy;
-    is >> dummy >> nPebble_;
-}
 
 int ClumpParticle::NPebble() const
 {
