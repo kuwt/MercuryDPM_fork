@@ -83,8 +83,8 @@ public:
         os << " isPebble_ " << isPebble_;
         //os << " clumpParticle_ " << clumpParticle_;
         os << " isPebble_ " << isPebble_;
-        os << " DzhanibekovParticle_ " << DzhanibekovParticle_;
-        os << " verticallyOriented_ " << verticallyOriented_;
+        os << " isDzhanibekovParticle_ " << isDzhanibekovParticle_;
+        os << " isVerticallyOriented_ " << isVerticallyOriented_;
     }
 
     void read(std::istream& is) override
@@ -112,8 +112,8 @@ public:
         is >> dummy >> isPebble_;
         //is >> dummy >> clumpParticle_;
         is >> dummy >> isPebble_;
-        is >> dummy >> DzhanibekovParticle_;
-        is >> dummy >> verticallyOriented_;
+        is >> dummy >> isDzhanibekovParticle_;
+        is >> dummy >> isVerticallyOriented_;
 
 
     }
@@ -278,25 +278,25 @@ public:
     // check if particle is in "Dzhanibekov" state
     bool getDzhanibekovParticle()
     {
-    	return DzhanibekovParticle_;
+    	return isDzhanibekovParticle_;
     }
 
     // check if particle is "vertically oriented"
     bool getVerticallyOriented()
     {
-    	return verticallyOriented_;
+    	return isVerticallyOriented_;
     }
 
     // set the "Dzhanibekov" state
     void setDzhanibekovParticle( bool d)
     {
-    	DzhanibekovParticle_ = d;
+        isDzhanibekovParticle_ = d;
     }
 
     // set "vertically oriented" state
     void setVerticallyOriented( bool d)
     {
-        verticallyOriented_ = d;
+        isVerticallyOriented_ = d;
     }
 
     unsigned getNumberOfFieldsVTK() const override
@@ -322,9 +322,9 @@ public:
     std::vector<Mdouble> getFieldVTK(unsigned i) const override
     {
         if (i==0)
-            return std::vector<Mdouble>(1, DzhanibekovParticle_);
+            return std::vector<Mdouble>(1, isDzhanibekovParticle_);
         else
-            return std::vector<Mdouble>(1, verticallyOriented_);
+            return std::vector<Mdouble>(1, isVerticallyOriented_);
     }
 
     void updateExtraQuantities();
@@ -334,9 +334,9 @@ private:
 
     int nPebble_;               // Number of pebbles
     
-    bool DzhanibekovParticle_;  // This property is needed to quantify Dzhanibekov gas properties
+    bool isDzhanibekovParticle_;  // This property is needed to quantify Dzhanibekov gas properties
 
-    bool verticallyOriented_;   // This property is useful for mechnical stability simulations (Gomboc, Dominos)
+    bool isVerticallyOriented_;   // This property is useful for mechnical stability simulations (Gomboc, Dominos)
 
     Vec3D angularAcceleration_; // Clump angular acceleration
 

@@ -59,8 +59,8 @@ ClumpParticle::ClumpParticle()
     clumpParticle_ = nullptr;
 
 
-    DzhanibekovParticle_ = false;
-    verticallyOriented_ = false;
+    isDzhanibekovParticle_ = false;
+    isVerticallyOriented_ = false;
 
     logger(DEBUG, "Clump() created");
 }
@@ -80,8 +80,8 @@ ClumpParticle::ClumpParticle(const ClumpParticle& p): NonSphericalParticle(p)
     clumpInitInertia_ = p.clumpInitInertia_;
     rotationMatrix_ = p.rotationMatrix_;
     invInertia_= clumpInertia_.inverse();
-    DzhanibekovParticle_ = p.DzhanibekovParticle_;
-    verticallyOriented_ = p.verticallyOriented_;
+    isDzhanibekovParticle_ = p.isDzhanibekovParticle_;
+    isVerticallyOriented_ = p.isVerticallyOriented_;
 
     for (int iPebble = 1; iPebble <= nPebble_; iPebble++) pebbleParticles_[iPebble - 1] = nullptr;
 
