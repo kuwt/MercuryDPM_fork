@@ -51,15 +51,16 @@ ClumpParticle::ClumpParticle()
 
     clumpInertia_ = MatrixSymmetric3D(1, 0, 0, 1, 0, 1);
     clumpInitInertia_ = MatrixSymmetric3D(1, 0, 0, 1, 0, 1);
+    rotationMatrix_ = Matrix3D(1, 0, 0, 0, 1, 0, 0, 0, 1);
     invInertia_= clumpInertia_.inverse();
 
     isPebble_ = false; //Assign false by default
     isClump_ = false; //Assign false by default
-    clumpParticle = nullptr;
+    clumpParticle_ = nullptr;
 
 
-    DzhanibekovParticle_ = false;
-    VerticallyOriented_ = false;
+    isDzhanibekovParticle_ = false;
+    isVerticallyOriented_ = false;
 
     logger(DEBUG, "Clump() created");
 }
@@ -77,15 +78,16 @@ ClumpParticle::ClumpParticle(const ClumpParticle& p): NonSphericalParticle(p)
     initPrincipalDirections_ = p.initPrincipalDirections_;
     clumpInertia_ = p.clumpInertia_;
     clumpInitInertia_ = p.clumpInitInertia_;
+    rotationMatrix_ = p.rotationMatrix_;
     invInertia_= clumpInertia_.inverse();
-    DzhanibekovParticle_ = p.DzhanibekovParticle_;
-    VerticallyOriented_ = p.VerticallyOriented_;
+    isDzhanibekovParticle_ = p.isDzhanibekovParticle_;
+    isVerticallyOriented_ = p.isVerticallyOriented_;
 
     for (int iPebble = 1; iPebble <= nPebble_; iPebble++) pebbleParticles_[iPebble - 1] = nullptr;
 
     // Pebble attributes
     isPebble_ = p.isPebble_;
-    clumpParticle = p.clumpParticle;
+    clumpParticle_ = p.clumpParticle_;
     // Clump attributes
     isClump_ = p.isClump_;
 }
@@ -105,12 +107,6 @@ std::string ClumpParticle::getName() const
     return "ClumpParticle";
 }
 
-void ClumpParticle::read(std::istream& is)
-{
-    BaseParticle::read(is);
-    std::string dummy;
-    is >> dummy >> nPebble_;
-}
 
 int ClumpParticle::NPebble() const
 {
@@ -243,6 +239,7 @@ void ClumpParticle::rotateTensorOfInertia()
   //  inertia = clumpInitInertia_;  // uncomment to turn off rotation of toi
   clumpInertia_ = inertia;
   invInertia_= clumpInertia_.inverse();
+  rotationMatrix_ = Q;
 
 }
 

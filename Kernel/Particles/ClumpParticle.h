@@ -63,12 +63,60 @@ public:
     void write(std::ostream& os) const override
     {
         BaseParticle::write(os);
-        os << " DzhanibekovParticle " << DzhanibekovParticle_;
-        os << " VerticallyOriented " << VerticallyOriented_;
-
+        os << " nPebble_ " << nPebble_;
+        os << " clumpMass_ " << clumpMass_;
+        os << " viscousDamping_ " << viscousDamping_;
+        os << " pebblePos_ ";
+        for (const auto & pebbleP : pebblePos_) {os << pebbleP;}
+        os << " pebbleRadius_ ";
+        for (double pebbleRad : pebbleRadius_) {os << pebbleRad;}
+        //os << " pebbleParticles_ ";
+        //for (auto pebblePart : pebbleParticles_) {os << pebblePart;}
+        os << " principalDirections_ ";
+        os << principalDirections_;
+        os << " initPrincipalDirections_ ";
+        os << initPrincipalDirections_;
+        os << " clumpInitInertia_ " << clumpInitInertia_;
+        os << " clumpInertia_ " << clumpInertia_;
+        os << " rotationMatrix_ ";
+        os << rotationMatrix_;
+        os << " isPebble_ " << isPebble_;
+        //os << " clumpParticle_ " << clumpParticle_;
+        os << " isPebble_ " << isPebble_;
+        os << " isDzhanibekovParticle_ " << isDzhanibekovParticle_;
+        os << " isVerticallyOriented_ " << isVerticallyOriented_;
     }
 
-    void read(std::istream& is) override;
+    void read(std::istream& is) override
+    {
+        BaseParticle::read(is);
+        std::string dummy;
+        is >> dummy >> nPebble_;
+        is >> dummy >> nPebble_;
+        is >> dummy >> clumpMass_;
+        is >> dummy >> viscousDamping_;
+        is >> dummy;
+        for (int i = 0; i<nPebble_; i++) {is >> pebblePos_[i];}
+        is >> dummy;
+        for (int i = 0; i<nPebble_; i++) {is >> pebbleRadius_[i];}
+        //is >> dummy;
+        //for (int i = 0; i<nPebble_; i++) {is >> pebbleParticles_[i];}
+        is >> dummy;
+        is >> principalDirections_;
+        is >> dummy;
+        is >> initPrincipalDirections_;
+        is >> dummy >> clumpInitInertia_;
+        is >> dummy >> clumpInertia_;
+        is >> dummy;
+        is >> rotationMatrix_;
+        is >> dummy >> isPebble_;
+        //is >> dummy >> clumpParticle_;
+        is >> dummy >> isPebble_;
+        is >> dummy >> isDzhanibekovParticle_;
+        is >> dummy >> isVerticallyOriented_;
+
+
+    }
 
     std::string getName() const override;
 
@@ -119,6 +167,10 @@ public:
         return Vec3D(initPrincipalDirections_.XZ, initPrincipalDirections_.YZ, initPrincipalDirections_.ZZ);
     }
 
+    Matrix3D getRotationMatrix() const
+    {
+        return rotationMatrix_;
+    }
 
     int NPebble() const; // Number of pebbles (for a clump particle)
 
@@ -167,7 +219,7 @@ public:
     void setClump(ClumpParticle* master) {
         isClump_ = false;
         isPebble_ = true;
-        clumpParticle = master;
+        clumpParticle_ = master;
     }
 
     void setClumpMass(Mdouble mass)
@@ -226,25 +278,25 @@ public:
     // check if particle is in "Dzhanibekov" state
     bool getDzhanibekovParticle()
     {
-    	return DzhanibekovParticle_;
+    	return isDzhanibekovParticle_;
     }
 
     // check if particle is "vertically oriented"
     bool getVerticallyOriented()
     {
-    	return VerticallyOriented_;
+    	return isVerticallyOriented_;
     }
 
     // set the "Dzhanibekov" state
     void setDzhanibekovParticle( bool d)
     {
-    	DzhanibekovParticle_ = d;
+        isDzhanibekovParticle_ = d;
     }
 
     // set "vertically oriented" state
     void setVerticallyOriented( bool d)
     {
-    	VerticallyOriented_ = d;
+        isVerticallyOriented_ = d;
     }
 
     unsigned getNumberOfFieldsVTK() const override
@@ -270,9 +322,9 @@ public:
     std::vector<Mdouble> getFieldVTK(unsigned i) const override
     {
         if (i==0)
-            return std::vector<Mdouble>(1, DzhanibekovParticle_);
+            return std::vector<Mdouble>(1, isDzhanibekovParticle_);
         else
-            return std::vector<Mdouble>(1, VerticallyOriented_);
+            return std::vector<Mdouble>(1, isVerticallyOriented_);
     }
 
     void updateExtraQuantities();
@@ -282,9 +334,9 @@ private:
 
     int nPebble_;               // Number of pebbles
     
-    bool DzhanibekovParticle_;  // This property is needed to quantify Dzhanibekov gas properties
+    bool isDzhanibekovParticle_;  // This property is needed to quantify Dzhanibekov gas properties
 
-    bool VerticallyOriented_;   // This property is useful for mechnical stability simulations (Gomboc, Dominos)
+    bool isVerticallyOriented_;   // This property is useful for mechnical stability simulations (Gomboc, Dominos)
 
     Vec3D angularAcceleration_; // Clump angular acceleration
 
@@ -305,6 +357,8 @@ private:
     Matrix3D initPrincipalDirections_;      // clump's initial principal directions
 
     std::vector<ClumpParticle*> pebbleParticles_; // pointers to pebbles
+
+    Matrix3D rotationMatrix_; // Rotation matrix
 
     //Helper functions
 

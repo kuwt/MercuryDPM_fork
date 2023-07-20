@@ -35,7 +35,7 @@
 #include<CMakeDefinitions.h>
 
 // This function executes the OS command 'cmd' and returns the 'result'
-std::string exec_command(const char* cmd) {
+std::string ExecCommand(const char* cmd) {
     std::array<char, 256> buffer;
     std::string result;
 
@@ -59,31 +59,31 @@ int main(int argc, char* argv[])
 
     // Remove vtu data with extra fields
     command = "rm *.vtu";
-    exec_command(command.c_str());
+    ExecCommand(command.c_str());
 
     // Make
     command = "make " + name;
-    exec_command(command.c_str());
+    ExecCommand(command.c_str());
 
     // Run
     command = "./" + name;
-    exec_command(command.c_str());
+    ExecCommand(command.c_str());
 
     // Clean the old paraview output directory
     command = "rm -rf paraview_" + name;
-    exec_command(command.c_str());
+    ExecCommand(command.c_str());
 
     // Create new paraview output directory
     command = "mkdir paraview_" + name;
-    exec_command(command.c_str());
+    ExecCommand(command.c_str());
 
     // Data2pvd tool run
     command = "../../../Tools/data2pvd " + name + ".data paraview_" + name + "/" + name;
-    exec_command(command.c_str());
+    ExecCommand(command.c_str());
 
     // Paraview energy data postprocessing tool
     command = "python " + getMercuryDPMSourceDir() + "/Tools/MClump/PlotEnergies.py " +
               getMercuryDPMBuildDir() + "/Drivers/Clump/" + name + "/ " + name;
-    exec_command(command.c_str());
+    ExecCommand(command.c_str());
     return 0;
 }
