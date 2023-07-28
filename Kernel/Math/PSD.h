@@ -31,10 +31,12 @@
 #include <vector>
 #include <Tools/csvReader.h>
 #include <random>
+#include <utility>
+#include <algorithm>
 #include "iostream"
 #include "ExtendedMath.h"
 #include "RNG.h"
-#include <Math/DistributionElements.h>
+#include "Math/DistributionElements.h"
 
 using mathsFunc::square;
 using mathsFunc::cubic;
@@ -148,7 +150,7 @@ public:
      * \brief create a PSD vector for a normal distribution.
      */
     void setDistributionNormal(Mdouble mean, Mdouble standardDeviation, int numberOfBins);
-
+    
     static PSD getDistributionNormal(Mdouble mean, Mdouble standardDeviation, int numberOfBins) {
         PSD psd;
         psd.setDistributionNormal(mean, standardDeviation, numberOfBins);
@@ -165,7 +167,12 @@ public:
         psd.setDistributionLogNormal(mean, standardDeviation, numberOfBins);
         return psd;
     }
-
+    
+     /*!
+     * \brief create a PSD vector for a normal distribution in Phi Units that has the demanded D50.
+     */
+    void setDistributionPhiNormal(Mdouble D50, Mdouble standardDeviationinPhi, int numberOfBins);
+    
     /*!
      * \brief Converts a PDF to a CDF by integration.
      */
@@ -310,6 +317,17 @@ public:
 //     * \brief get momenta of the user defined PSD.
 //     */
 //    std::array<Mdouble, 6> getMomenta() const;
+    
+
+    /*!
+     * \brief convert the probabilityDensity of diameter in Phi to the probabilityDensity of diameter in Meter.
+     */
+    std::vector< std::pair <Mdouble,Mdouble> > convertPdfPhiToPdfMeter(Mdouble meaninPhi, Mdouble standardDeviationinPhi, int numberOfBins);
+
+    /*!
+     * \brief compute the mass-based D_50 of the paired diameter and probabilityDensity.
+     */
+    Mdouble computeD50(std::vector< std::pair <Mdouble,Mdouble> > vectorOfPair);
     
     /*!
      * \brief create a vector of linearly spaced values.

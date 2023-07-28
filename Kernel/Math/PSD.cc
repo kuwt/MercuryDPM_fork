@@ -363,10 +363,11 @@ void PSD::setDistributionNormal(Mdouble mean, Mdouble standardDeviation, int num
 }
 
 /*!
- * \details sets the particle size distribution to a discretised normal (gaussian) cumulative number distribution,
- * which covers the range of 3 * standardDeviation (99,73% of all values covered).
- * \param[in] mean                  Double representing the mean of the particle size distribution
- * \param[in] standardDeviation     Double representing the standard deviation of the particle size distribution
+ * \details sets the particle size distribution to a discretised lognormal cumulative number distribution,
+ * which generates random values of radius following a lognormal distribution and iterates
+ * until the mass-based D50 is close to two times the user-defined mean radius.
+ * \param[in] mean                  Double representing the mean of the particle size distribution in meters (radius)
+ * \param[in] standardDeviation     Double representing the standard deviation of the particle size distribution in meters (radius)
  * \param[in] numberOfBins          Integer determining the number of bins (aka. particle size classes or resolution)
  *                                  of the particle size distribution
  * See https://en.cppreference.com/w/cpp/numeric/random/lognormal_distribution
@@ -397,6 +398,128 @@ void PSD::setDistributionLogNormal(Mdouble mean, Mdouble standardDeviation, int 
         p.internalVariable = exp(p.internalVariable);
     }
 }
+
+/*!
+ * \details sets the particle size distribution to a discretised cumulative number distribution,
+ * which is a normal distribution in phi units and has the demanded D50. D50 is the mass-based median grain size, while
+ * the Phi scale is a logarithmic scale computed by: Phi = -log2(1000*D). It can be used for visualizing sediment grain
+ * size distributions over a wide range of grain sizes. The combination of D50 and standardDeviation in Phi units is a
+ * representative measure of grain size distribution in the field of Sedimentology.
+ * Source: Donoghue, J.F. (2016). Phi Scale. In: Kennish, M.J. (eds) Encyclopedia of Estuaries. Encyclopedia of Earth Sciences Series.
+ * Springer, Dordrecht. https://doi.org/10.1007/978-94-017-8801-4_277
+ * \param[in] D50                       Double representing the mass-based D50 of the particle size distribution in meters
+ * \param[in] standardDeviationInPhi    Double representing the standard deviation of the particle size distribution (diameter) in phi units
+ * \param[in] numberOfBins              Integer determining the number of bins (aka. particle size classes or resolution)
+ *                                      of the particle size distribution
+ */
+void PSD::setDistributionPhiNormal(Mdouble D50, Mdouble standardDeviationInPhi, int numberOfBins){
+    Mdouble PhiMean = -log2(1000*D50);
+    std::vector<std::pair<Mdouble,Mdouble>> vect = convertPdfPhiToPdfMeter(PhiMean, standardDeviationInPhi, numberOfBins);
+    std::sort(vect.begin(), vect.end());
+    Mdouble D50Test = computeD50(vect);
+    Mdouble res = D50Test - D50;
+    Mdouble tol = D50*1e-5;
+    int itter = 0;
+    Mdouble dPhiMean, slope, res_old;
+    while (res > tol && itter < 100) {
+        if(itter==0) dPhiMean = 0.1;
+        else {
+            slope = (res - res_old)/dPhiMean;
+            dPhiMean = -res/slope;
+        }
+        PhiMean = PhiMean+dPhiMean;
+        vect = convertPdfPhiToPdfMeter(PhiMean, standardDeviationInPhi, numberOfBins);
+        std::sort(vect.begin(), vect.end());
+        D50Test = computeD50(vect);
+        res_old = res;
+        res = D50Test - D50;
+        itter++;
+    }
+    logger(INFO, "D50 %, Final D50Test %", D50, D50Test);
+
+    Mdouble probTot=0;
+    for(int i = 0; i < vect.size(); i++){
+        probTot += vect[i].second;
+    }
+    for (int i = 0; i < vect.size(); i++)
+    {
+        vect[i].second = vect[i].second/probTot;
+    }
+
+    if (!particleSizeDistribution_.empty())
+    {
+        particleSizeDistribution_.clear();
+    }
+    for (int j = 0; j < vect.size(); j++)
+    {
+        particleSizeDistribution_.push_back({vect[j].first*0.5, vect[j].second});
+    }
+    convertProbabilityDensityToCumulative();
+    validateCumulativeDistribution();
+}
+
+/*!
+ * \details generates a normal particle size distribution in Phi units and converts it to the distribution in meters.
+ * \param[in] meanInPhi                  Double representing the mean diameter of the particle size distribution in phi units
+ * \param[in] standardDeviationInPhi     Double representing the standard deviation of the particle size distribution (diameter) in phi units
+ * \param[in] numberOfBins               Integer determining the number of bins (aka. particle size classes or resolution)
+ *                                       of the particle size distribution
+ */
+std::vector< std::pair <Mdouble,Mdouble> > PSD::convertPdfPhiToPdfMeter(Mdouble meanInPhi, Mdouble standardDeviationInPhi, int numberOfBins) {
+    Mdouble dMin = meanInPhi - 6 * standardDeviationInPhi;
+    Mdouble dMax = meanInPhi + 6 * standardDeviationInPhi;
+    std::vector<Mdouble> diameterPhi = helpers::linspace(dMin, dMax, numberOfBins);
+    std::vector<Mdouble> pdfPhi;
+    for (int i = 0; i < diameterPhi.size(); i++) {
+        Mdouble probability = 1 / (standardDeviationInPhi * sqrt(2.0 * constants::pi)) *
+                              exp(-0.5 * pow((diameterPhi[i] - meanInPhi) / standardDeviationInPhi, 2));
+        pdfPhi.push_back(probability);
+    }
+    std::vector<Mdouble> diameter;
+    std::vector<Mdouble> pdf(pdfPhi.size());
+    for(int i = 0; i < diameterPhi.size(); i++){
+        Mdouble D = pow(2, -diameterPhi[i])/1000.0;
+        diameter.push_back(D);
+    }
+    pdf[0] = 0;
+    for(int i= 0; i < diameterPhi.size()-1; i++){
+        Mdouble area = (diameterPhi[i+1]-diameterPhi[i]) * 0.5*(pdfPhi[i+1]+pdfPhi[i]);
+        Mdouble dD = fabs(diameter[i+1]-diameter[i]);
+        pdf[i+1] = 2.0*area/dD - pdf[i];
+    }
+    std::vector< std::pair <Mdouble,Mdouble> > vect;
+    for (int i=0; i<diameter.size(); i++)
+        vect.push_back(std::make_pair(diameter[i],pdf[i]));
+    return vect;
+}
+
+/*!
+ * \details computes the mass-based D50 of the paired diameter and probabilityDensity
+ * \param[in]  vectorOfPair         vector of pair containing paired data of diameter and probabilityDensity
+ */
+Mdouble PSD::computeD50(std::vector< std::pair <Mdouble,Mdouble> > vectorOfPair)
+    {
+        Mdouble D_50 = 0.0;
+        int numberOfBins = vectorOfPair.size();
+        std::vector<Mdouble> Vcum(numberOfBins, 0);
+        Mdouble Vint=0;
+        for (int i = 0; i < Vcum.size()-1; i++)
+        {
+                Mdouble dD = fabs(vectorOfPair[i+1].first-vectorOfPair[i].first);
+                Mdouble V = 0.5*(pow(vectorOfPair[i].first, 3.0) * vectorOfPair[i].second +
+                        pow(vectorOfPair[i+1].first, 3.0) * vectorOfPair[i+1].second) * dD;
+                Vint = Vint + V;
+                Vcum[i+1] = Vint;
+        }
+
+        for(int j=0; j<Vcum.size()-1; ++j){
+            if(Vcum[j]/Vint*100<=50 && Vcum[j+1]/Vint*100>50){
+                D_50 = vectorOfPair[j].first + fabs(vectorOfPair[j+1].first-vectorOfPair[j].first)/(Vcum[j+1]/Vint*100-Vcum[j]/Vint*100)
+                        *(50-Vcum[j]/Vint*100);
+            }
+        }
+        return D_50;
+    }
 
 /*!
  * \details creates the psd vector from radii and probabilities filled in by hand. The Type of PSD will be converted
@@ -725,6 +848,7 @@ void PSD::convertCumulativeToCumulativeNumberDistribution(TYPE CDFType)
     }
 }
 
+
 /*!
  * \details Cuts off the CDF at given minimum and maximum quantiles and applies a minimum polydispersity at the base.
  * \param[in] quantileMin                       undersize quantile to cut off the lower part of the CDF.
@@ -777,6 +901,8 @@ minPolydispersity)
         p.internalVariable = r50 + (p.internalVariable - r50) * squeeze;
     }
 }
+
+
 
 /*!
  * \details Gets the diameter from a certain percentile of the number based PSD.
@@ -1136,4 +1262,3 @@ std::ostream& operator<<(std::ostream& os, DistributionElements& p)
     os << p.internalVariable << ' ' << p.probability << ' ';
     return os;
 }
-
