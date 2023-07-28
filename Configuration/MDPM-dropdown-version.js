@@ -9,7 +9,7 @@ let master = 'master';
 
 /// Pathname part of the URL containing the different versioned doxygen
 /// subdirectories. Must be browsable.
-let urlroot = '/project-name/docs-subfolder';
+let urlroot = '/';
 
 ///=============================================================================
 // Remove trailing '/'.
@@ -61,7 +61,7 @@ $.get(urlroot + '/', (data) => {
 function parseDirectoryListing(text) {
   let docs = text.match(/href="([^/][^"]+)"/g); // only directories.
   docs = docs.map((x) =>
-    x.replace(/.\//g, '')
+    x.replace(/\.\//g, '')
       .replace(/href="/, '')
       .replace(/"$/, ''))
     .sort().reverse();
