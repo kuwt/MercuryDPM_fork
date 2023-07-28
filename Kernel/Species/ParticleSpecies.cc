@@ -35,7 +35,7 @@ class BaseParticle;
 class BaseInteractable;
 
 ParticleSpecies::ParticleSpecies()
-    : BaseSpecies(), density_(1.0)
+    : BaseSpecies(), density_(1.0), maxInteractionDistance_(0.0)
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"ParticleSpecies::ParticleSpecies() finished"<<std::endl;
@@ -43,7 +43,7 @@ ParticleSpecies::ParticleSpecies()
 }
 
 ParticleSpecies::ParticleSpecies(BaseNormalForce* normalForce, BaseFrictionForce* frictionForce, BaseAdhesiveForce* adhesiveForce)
-    : BaseSpecies(normalForce,frictionForce, adhesiveForce), density_(1.0)
+    : BaseSpecies(normalForce,frictionForce, adhesiveForce), density_(1.0), maxInteractionDistance_(0.0)
 {
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"ParticleSpecies::ParticleSpecies(n,f,a) finished"<<std::endl;
@@ -59,6 +59,7 @@ ParticleSpecies::ParticleSpecies(const ParticleSpecies& p)
 {
     density_ = p.density_;
     temperatureDependentDensity_ = p.temperatureDependentDensity_;
+    maxInteractionDistance_ = p.maxInteractionDistance_;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"ParticleSpecies::ParticleSpecies(const ParticleSpecies &p) finished"<<std::endl;
 #endif

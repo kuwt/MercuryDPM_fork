@@ -365,7 +365,7 @@ void StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D
         leesEdwardsBoundary.setHandler(getHandler());
         double integratedShift = integratedShift_;
         leesEdwardsBoundary.set(
-                [&integratedShift](Mdouble time UNUSED) { return integratedShift; },
+                [this](Mdouble time UNUSED) { return integratedShift_; },
                 [](Mdouble time UNUSED) { return 0; },
                 dpm->getXMin(), dpm->getXMax(), dpm->getYMin(), dpm->getYMax());
         leesEdwardsBoundaries_.push_back(leesEdwardsBoundary);
