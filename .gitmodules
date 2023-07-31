@@ -3,3 +3,9 @@
 	url = https://github.com/oomph-lib/oomph-lib.git
 	shallow = true
 	depth = 1
+
+[submodule "Eigen"]
+	path = Eigen
+	url = https://gitlab.com/libeigen/eigen.git
+	shallow = true
+	depth = 1

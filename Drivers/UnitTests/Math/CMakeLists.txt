@@ -15,5 +15,9 @@ foreach(CPPFILE ${CPPFILES})
 	target_link_libraries(${EXECNAME} Chute)
 endforeach()
 
+if (MercuryDPM_EIGEN)
+	add_subdirectory(Eigen)
+endif ()
+
 #Copy specific files to your build directory
 #file(COPY ${CMAKE_SOURCE_DIR}/Drivers/MercurySimpleDemos/TriangulatedWall.vtk DESTINATION .)

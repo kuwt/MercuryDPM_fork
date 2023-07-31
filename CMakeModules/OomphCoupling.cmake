@@ -6,8 +6,8 @@ endif()
 
 # Clone oomph-lib if has not been cloned before
 set(OOMPH_DIR ${PROJECT_SOURCE_DIR}/oomph-lib)
-execute_process(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} COMMAND git submodule init)
-execute_process(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} COMMAND git submodule update --depth 1)
+execute_process(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} COMMAND git submodule init ${OOMPH_DIR})
+execute_process(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} COMMAND git submodule update  ${OOMPH_DIR})
 if(NOT EXISTS ${OOMPH_DIR}/src)
     message(FATAL_ERROR "git clone failed. If this problem persists you can manually clone oomph-lib by running: \n   git submodule init\n   git submodule update")
 endif()
