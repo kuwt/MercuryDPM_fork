@@ -36,7 +36,8 @@
 class SetDistributionPhiNormalSelfTest : public Mercury3D {
 
 private:
-    double D50_, StdDev_, numofPSD_;
+    double D50_, StdDev_;
+    int numofPSD_;
 
 public:
     void setupInitialConditions () override {
