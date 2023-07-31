@@ -13,12 +13,19 @@ RUN apt-get update && \
      libxres-dev \
      libxt-dev \
      libxxf86vm-dev \
-     libfontconfig1 \ 
+     libfontconfig1 \
      libxrender1 \
+     libxtst-dev \
      libgl1-mesa-glx \
      gfortran \
      cmake \
      build-essential \
+     g++ \
+     git \
+     openmpi-bin \
+     mpi-default-dev \
      doxygen \
      graphviz \
-     jq
+     jq \
+     less \
+     python3
