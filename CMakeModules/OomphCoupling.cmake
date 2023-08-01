@@ -4,6 +4,11 @@ if(NOT MercuryDPM_OOMPH_COUPLING)
     return()
 endif()
 
+#check if git is installed
+if (NOT Git_FOUND)
+    message(FATAL_ERROR "The option you have chosen requires git and you do not have this installed. Please install")
+endif()
+
 # Clone oomph-lib if has not been cloned before
 set(OOMPH_DIR ${PROJECT_SOURCE_DIR}/oomph-lib)
 execute_process(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} COMMAND git submodule init ${OOMPH_DIR})

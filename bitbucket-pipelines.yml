@@ -5,7 +5,7 @@
 
 
 image:
-  name: plath/mercurydpm@sha256:301bad4191f9e0e915ded9595488ea70e33eb28d49ceaa5c608bf9f8ff32f926
+  name: plath/mercurydpm@sha256:df370f5f1dfb1e7117977eb5fd7a8ae1ff550230a079c1491fb8b49194590dba
 
 pipelines:
   # run check on source branch of a pull request when a pull request is created. Only run this when the target is master

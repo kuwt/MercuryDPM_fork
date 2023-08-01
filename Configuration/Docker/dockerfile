@@ -28,4 +28,5 @@ RUN apt-get update && \
      graphviz \
      jq \
      less \
-     python3
+     python3 \
+     python3-dev
