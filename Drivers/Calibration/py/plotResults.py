@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib
 matplotlib.rcParams['toolbar'] = 'None'
+import copy
 # from os import system, listdir, path
 from matplotlib.offsetbox import AnchoredText
 from scipy import stats
@@ -20,12 +21,12 @@ matplotlib.rcParams.update(params)
 
 class Analysis:
     def __init__(self, smcTest, smcSamples, obsNames, paramNames, posterior, bestId):
-        self.smcTest = smcTest
-        self.smcSamples = smcSamples
-        self.obsNames = obsNames
-        self.paramNames = paramNames
-        self.posterior = posterior
-        self.bestId = bestId
+        self.smcTest = copy.deepcopy(smcTest)
+        self.smcSamples = copy.deepcopy(smcSamples)
+        self.obsNames = copy.deepcopy(obsNames)
+        self.paramNames = copy.deepcopy(paramNames)
+        self.posterior = copy.deepcopy(posterior)
+        self.bestId = copy.deepcopy(bestId)
 
 
 # # get weight from files
@@ -747,6 +748,7 @@ def plotParametersAndObservables(analysis, material):
     axs = fig.subplots(nObs, nPar)
     for iter in range(nIter):
         # the calibration parameters set in dpm simulations
+        #TODO WORKS SO FAR BUT THIS HERE IS A PROBLEM: IT WORKS FOR smcSamples[0] BUT THE MAIN PROBLEM IS THAT E.G. analysis[0].smcTest.smcSamples HAS TO VALUES INSTEAD OF ONLY ONE VALUE THIS LEADS TO AN ERROR WHERE X AND Y HAVE DIFFEREN VALUES. NUMPAR HAS 10 VALUES SUDDENLY. FIND OUT WHY TWO ARE SAVED TO ANALYSIS AND NOT ONLY ONE AS IN ANALYSIS.APPEND().
         numPar = analysis[iter].smcTest.smcSamples[-1]
         # the observables (response) obtained from dpm simulations
         numObs = analysis[iter].smcTest.DPMData[-1]

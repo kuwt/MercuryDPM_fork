@@ -12,7 +12,7 @@ collisionTime 0.000067997
 torsionFriction 0
 fit calibration44
 # Parameters to be calibrated (names and ranges)
-restitutionCoefficient    0.5 1
+restitutionCoefficient    0   1
 slidingFriction           0   1
 rollingFriction           0   1
 bondNumber                0   1

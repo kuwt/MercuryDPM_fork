@@ -21,13 +21,13 @@ parser.add_argument('-cor')  # restitution coefficient
 parser.add_argument('-k2k1')  # k2/k1
 parser.add_argument('-kck1')  # kc/k1
 parser.add_argument('-rf')  # rolling friction
-parser.add_argument('-cs')  # confining stress (input: pre-shear stress + 5 pre-shear stresses)
+parser.add_argument('-tf')  # torsion friction
+parser.add_argument('-nS')  # confining stress (input: pre-shear normal stress + 5 pre-shear normal stresses)
 parser.add_argument('-Fr')  # Froude number (Fr = R*v^2/g)
 
 # Calibrate
 parser.add_argument('-sf')  # sliding friction
-parser.add_argument('-Bo')  # Bond number (F_adh/(rho_p*g*h/d50^2))
-parser.add_argument('-particleDensity')  # particle density [kg/m^3]
+parser.add_argument('-Bo')  # Bond number (F_adh/(m*g))
 
 # Target
 parser.add_argument('-aor')  # angle of repose
@@ -35,8 +35,6 @@ parser.add_argument('-aor_w')  # angle of repose weight
 parser.add_argument(
     '-iss')  # incipient shear stress (input: pre-shear incipient shear stress + 5 incipient shear stresses)
 parser.add_argument('-iss_w')  # incipient shear stress weight
-parser.add_argument('-bulkDensity')  # bulk density (input: pre-shear bulk density + 5 bulk densities)
-parser.add_argument('-bulkDensity_w')  # bulk density weight
 
 args = parser.parse_args()
 
@@ -57,29 +55,30 @@ while i < len(psds):
     f.write("%s %s\n" % (psds[i], psds[i + 1]))
     i = i + 2
 
-f.write("restitutionCoefficient " + args.cor + "\n"
-        "collisionTime 0.000067997\n"                                       
-        "stiffness " + args.k1 + "\n"
-        "froudenumber " + args.Fr + "\n"
-        "normalstress " + args.cs + "\n"
+(nS_pre, nS_1, nS_2, nS_3, nS_4, nS_5) = args.nS.split()
+
+f.write("normalStress " + nS_pre + " " + nS_1 + " " + nS_2 + " " + nS_3 + " " + nS_4 + " " + nS_5 + "\n"
+        "froude " + args.Fr + "\n"
+        "fillFraction 0.214\n"
+        "relDrumRadius " + 0.0382/args.d50 + "\n"
+        "restitutionCoefficient " + args.cor + "\n"
+        "collisionTime 0.000067997\n"
+        "loadingStiffness " + args.k1 + "\n"
         "rollingFriction " + args.rf + "\n"
-        "unloadingStiffnesRatio " + args.k2k1 + "\n"
-        "cohesionStiffnesRatio " + args.kck1 + "\n"
+        "torsionFriction " + args.tf + "\n"
+        "unloadingStiffness " + args.k2k1*args.k1 + "\n"
+        "cohesionStiffness " + args.kck1*args.k1 + "\n"
+        "density " + args.density + "\n"
         "# Parameters to be calibrated (names and ranges)\n"
         "slidingFriction " + args.sf + "\n"
         "bondNumber " + args.Bo + "\n"
-        "density " + args.particleDensity + "\n"
         "# Experimental data to be tested (name, values and weights)\n"
         "CalibrationDrum " + args.aor + " " + args.aor_w + "\n")
 
 (iss_pre, iss_1, iss_2, iss_3, iss_4, iss_5) = args.iss.split()
-(bulkDensity_pre, bulkDensity_1, bulkDensity_2, bulkDensity_3, bulkDensity_4, bulkDensity_5) = args.bulkDensity.split()
 
 f.write("CalibrationShearCell " + iss_pre + " " + args.iss_w + " " + iss_1 + " " + args.iss_w + " " + iss_2 + " " + \
-        args.iss_w + " " + iss_3 + " " + args.iss_w + " " + iss_4 + " " + args.iss_w + " " + iss_5 + " " + args.iss_w + " " + \
-        bulkDensity_pre + " " + args.iss_w + " " + bulkDensity_1 + " " + args.bulkDensity_w + " " + bulkDensity_2 \
-        + " " + args.bulkDensity_w + " " + bulkDensity_3 + " " + args.bulkDensity_w + " " + bulkDensity_4 + " " + \
-        args.bulkDensity_w + " " + bulkDensity_5 + " " + args.bulkDensity_w)
+        args.iss_w + " " + iss_3 + " " + args.iss_w + " " + iss_4 + " " + args.iss_w + " " + iss_5 + " " + args.iss_w)
 
 # print('Read incipient shear stress (-iss) as ' + args.iss)
 # (iss_pre, iss_1, iss_2, iss_3, iss_4, iss_5) = args.iss.split()
@@ -99,7 +98,7 @@ f.close()
 sys.stdout.flush()
 
 # add parameters to this command as defined in calibrate.py. This is the command to start the calibration
-sim = subprocess.run(['./calibrate.py', '--material', 'Test_identity1', '--samples', '10', '--cores', '10',
+sim = subprocess.run(['./calibrate.py', '--material', 'MaterialAWS', '--samples', '50', '--iter', '5',
                       '--infrastructure', 'AWS', '--analysis'])
 if sim.returncode != 0:
     sys.exit(sim.returncode)

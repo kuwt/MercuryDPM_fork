@@ -150,7 +150,10 @@ public:
             logger(WARN,"Center of mass (% %) is not in fourth quadrant, setting angle to 90",com.X,com.Z);
             angle_drum=90;
         }
+        // output AOR
         helpers::writeToFile(getName()+".txt", helpers::toString(angle_drum));
+        // output froude number
+        helpers::writeToFile(getName()+".out", helpers::toString(rotRate/(sqrt(getGravity().getLength()/drumRadius))));
     }
 };
 

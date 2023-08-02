@@ -10,8 +10,10 @@ from numpy.ma import ceil
 # - simDir the name of the directory where the simulation data will be stored
 #   most importantly, the data*.txt files should reside in that directory
 # - buildDir the directory where the MercuryDPM executables will be built
+
+
 def runSimulations(smcTable, simDir, buildDir, paramStringTemplate, exeNames, material, samples, onNode=False, nodes=[],
-                   cores=0, infrastructure=[], verbose=False):
+                   cores=0, infrastructure=[], killRatio=0.2, verbose=False):
     # # run make to produce the executables
     # print("Running make in the build directory %s" % buildDir)
     # try:
@@ -50,7 +52,7 @@ def runSimulations(smcTable, simDir, buildDir, paramStringTemplate, exeNames, ma
             print("Copy files to cluster (rsync -avz %s $cloud:) and execute ./run.sh in the sim directory before continuing" % material)
         elif infrastructure == "AWS":
             print("Adjusting script for AWS")
-            buildDir = "../../."
+            buildDir = "../../"
         else:
             print("Adjusting script for msm3")
             buildDir = open('build').read().split()[0]
@@ -84,6 +86,8 @@ def runSimulations(smcTable, simDir, buildDir, paramStringTemplate, exeNames, ma
     params = file.readline()
 
     # reading smcTable line by line
+    # initialise samplesCounter to iterate through all samples and create files for each
+    samplesCounter = -1
     for line in file.readlines():
         # extracting parameters
         params = line.split()[2:]
@@ -94,14 +98,21 @@ def runSimulations(smcTable, simDir, buildDir, paramStringTemplate, exeNames, ma
         paramString += "-param _"+material+"_"+"_".join(params)
         #print("Running simulations for: %s" % paramString)
 
-        if cores:
+        if infrastructure == "AWS":
+            for executable in exeNames:
+                samplesCounter += 1
+                open(simDir + str(samplesCounter) + ".sh", "w").write("")
+                cmd = '%s/%s %s\n' % (buildDir, executable, paramString)
+                print("Writing to %r, %r" % (simDir+str(samplesCounter)+".sh", samplesCounter))
+                open(simDir+str(samplesCounter)+".sh", "a").write("#!/bin/sh\n" + cmd)
+        elif cores:
             for executable in exeNames:
                 if numCmdCounter == 0:
                     coresCounter += 1
                     open(simDir + str(coresCounter) + ".sh", "w").write("")
                 cmd = '%s/%s %s\n' % (buildDir, executable, paramString)
                 #print("Writing to %r, %r" % (simDir+str(coresCounter)+".sh", coresCounter))
-                open(simDir+str(coresCounter)+".sh", "a").write("#!/bin/sh\n" + cmd)
+                open(simDir+str(coresCounter)+".sh", "a").write(cmd)
                 numCmdCounter = (numCmdCounter+1)%numCmd
         elif onNode:
             # initialise the freeCores list
@@ -127,7 +138,7 @@ def runSimulations(smcTable, simDir, buildDir, paramStringTemplate, exeNames, ma
                 subprocess.check_output(cmd, shell=True)
     if infrastructure == "AWS":
         cwd = os.getcwd()
-        startAndWaitForSimulationsToFinish(simDir, samples)
+        startAndWaitForSimulationsToFinish(simDir, samples, smcTable, cores, killRatio, verbose)
         # Change working directory to simDir to save output files in the right place
         os.chdir(cwd)
     print("Runs finished.")
@@ -138,7 +149,7 @@ def runProcess(simDir, id):
     cmd = f"{simDir}{id}.sh"
     return subprocess.Popen(cmd)
 
-def startAndWaitForSimulationsToFinish(simDir, samples):
+def startAndWaitForSimulationsToFinish(simDir, samples, smcTable, cores, killRatio, verbose):
 
     # Start all processes and add to array.
     processes = []
@@ -148,28 +159,46 @@ def startAndWaitForSimulationsToFinish(simDir, samples):
     os.chdir(simDir)
     for i in range(samples):
         processes.append(runProcess(simDir, i))
-        print("Started process with PID %s" % processes[i])
-    # Finished processes are removed from the array.
-    # Keep looping when there are more than 20% in the array.
-    # ratio of simulations to kill when the number of (1-killRatio) * samples has finished.
-    killRatio = 0.2
+        if verbose:
+            print("Started process with PID %s" % processes[i])
+    # Processes are subdivided over all cores. Finished processes are removed from the array.
+    # At the beginning of the calibrate.py script we ensure that samples are a multiple of cores if cores AND
+    # killratio are specified.
+    # processes to kill are killRatio * samples, simulations per script are samples / cores. So the number of
+    # scripts to kill is processesToKill / simulationsPerScript = killRatio * cores.
+    # Keep looping when there are more than killRatio * cores simulation scripts in the array.
     while len(processes) > killRatio * samples:
         for p in processes:
             # poll() checks if the process is terminated and returns None when this is NOT the case.
             # Remove process from array when finished.
             if p.poll() is not None:
                 processes.remove(p)
+                break
         # Sleep for a while to only check at certain intervals.
         time.sleep(0.5)
 
-    print(f"At least {(1-killRatio) * 100}% of processes finished.")
-    print(f"Killing remaining {len(processes)} processes.")
+    if killRatio > 0:
+        print(f"At least {(1.0-killRatio) * 100}% of processes finished.")
+        print(f"Killing remaining {len(processes)} processes.")
 
-    # 80% of processes are finished, now kill the remaining processes.
+    # 80% of processes are finished, now kill the remaining processes and remove them from the smcTable
     for p in processes:
         #p.terminate()
-        # Since we definitely don't care anymore about the remaining processes, I would use kill.
-        p.kill()
+        # Delete non-finished simulations also for the GrainLearning in the smcTable and rename the keys
+        # Extract the number before .sh from the args parameter
+        simulationKey = int(p.args.split('/')[-1].split('.')[0])
+        # Read the contents of the smc file
+        with open("../../" + smcTable, 'r') as file:
+            lines = file.readlines()
+
+        # Remove the row with the corresponding number
+        lines = [line for line in lines if not line.split()[1] == str(simulationKey)]
+
+        # Write the modified content back to the smc file
+        with open("../../" + smcTable, 'w') as file:
+            file.writelines(lines)
+    # Since we definitely don't care anymore about the remaining processes, I would use kill.
+    p.kill()
 
     # simulationOutput = []
     # while True:

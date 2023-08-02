@@ -192,29 +192,23 @@ int main(int argc, char* argv[])
     Calibration dpm(argc, argv);
     dpm.setName("CalibrationShearCell" + dpm.getParam());
     Mdouble preCompressionShearStress = helpers::readFromFile(dpm.getName()+".out","preCompressionShearStress",0);
-    Mdouble preCompressionBulkDensity = helpers::readFromFile(dpm.getName()+".out","preCompressionBulkDensity", 0);
     
     std::vector<Mdouble> maxShearStress;
-    std::vector<Mdouble> bulkDensity;
     for (const int s : normalStress) {
         maxShearStress.push_back(
             helpers::readFromFile(dpm.getName() + "-" + std::to_string(s) + "Pa.out",
                               "maxShearStress", 0));
-        bulkDensity.push_back(
-                helpers::readFromFile(dpm.getName() + "-" + std::to_string(s) + "Pa.out",
-                                      "bulkDensity", 0));
     }
     
     //Write output file
     std::stringstream out;
+    std::stringstream out2;
     if (helpers::readFromCommandLine(argc,argv,"-ffc")) {
         out << computeFFc(preCompressionNormalStress, preCompressionShearStress, normalStress, maxShearStress) << ' ';
         //out << computeSimpleFFc(preCompressionNormalStress, preCompressionShearStress, normalStress, maxShearStress) << ' ';
     } else {
         for (const auto s : maxShearStress)
             out << s << ' ';
-        for (const auto b : bulkDensity)
-            out << b << ' ';
     }
     helpers::writeToFile(dpm.getName()+".txt", out.str());
     logger(INFO,"Output to %: %",dpm.getName()+".txt", out.str());
