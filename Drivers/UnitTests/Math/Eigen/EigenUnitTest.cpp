@@ -112,19 +112,13 @@ int main(int argc, char** argv){
 
         //output the values at the grid points to the console
         std::cout << "t=" << t << "s" << "\t" << T(0) << "\t" << T((varnum-1)*1/4) << "\t" << T((varnum-1)/2) << "\t" << T((varnum-1)*3/4) << "\t" << T(varnum-1)<< std::endl;
-        
-        
-        //check last timestep
-        if (6.1875 - t  <= 1e-5)
-        {
-            helpers::check(T(0),0.166667,1e-5, "Gridpoint 0");
-            helpers::check(T((varnum-1)*1/4),0.333333,1e-5, "Gridpoint 1/4");
-            helpers::check(T((varnum-1)*2/4),0.5,1e-5, "Gridpoint 2/4");
-            helpers::check(T((varnum-1)*3/4),0.666667,1e-5, "Gridpoint 3/4");
-            helpers::check(T(varnum-1),0.833333,1e-5, "Gridpoint 1");
-        }
     }
-
+    //check last timestep
+    helpers::check(T(0),0.166667,1e-5, "Gridpoint 0");
+    helpers::check(T((varnum-1)*1/4),0.333333,1e-5, "Gridpoint 1/4");
+    helpers::check(T((varnum-1)*2/4),0.5,1e-5, "Gridpoint 2/4");
+    helpers::check(T((varnum-1)*3/4),0.666667,1e-5, "Gridpoint 3/4");
+    helpers::check(T(varnum-1),0.833333,1e-5, "Gridpoint 1");
 }
 
 
