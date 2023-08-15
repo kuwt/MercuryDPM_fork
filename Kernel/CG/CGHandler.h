@@ -146,7 +146,50 @@ public:
         return initialFileCounter;
     }
 
+    /*!
+     * \brief Returns the time of the last read/evaluated time step.
+    */
+    Mdouble getPreviousEvaluationTime() { return previousEvaluationTime_; }
+
+    /*!
+     * \brief Sets the time of the last read/evaluated time step to a specified time.
+     */
+    void setPreviousEvaluationTime(Mdouble time ) { previousEvaluationTime_= time; }
+
+    /*!
+     * \brief Sets the previous evaluation time to the current time
+     * \details This is needed, so that fields like the displacementField, which rely
+     * on the previous evaluation time, can be calculated.
+     */
+    void setPreviousEvaluationTimeToCurrentTime();
+
+    /*!
+     * \brief Sets the previous position for every particle to its current position
+     * \details This is needed, so that fields like the displacementField, which rely
+     * on the previous particle position, can be calculated.
+     */
+    void setPreviousPositionToCurrentPosition();
+
+    /*!
+     * \brief Sets data from the current time step as data from the previous time step
+     * \details This is needed, so that fields like the displacementField, which rely
+     * on the previous data, can be calculated.
+     * 
+     * It calls the functions setPreviousEvaluationTimeToCurrentTime() and
+     * setPreviousPositionToCurrentPosition().
+     */
+    void handlePreviousInformation();
+
     unsigned initialFileCounter = 0;
+
+private:
+
+    /*!
+     * \brief Saves the time of the last read/evaluated data/restartFile.
+     * \details This counter is used to calculate displacement fields.
+     */
+    Mdouble previousEvaluationTime_ = 0;
+
 };
 
 #endif

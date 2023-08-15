@@ -108,6 +108,9 @@ void CGHandler::evaluate()
             it->evaluate();
         }
     }
+
+    // Remember information from this read
+    handlePreviousInformation();
 };
 
 void CGHandler::finish()
@@ -277,6 +280,9 @@ bool CGHandler::evaluateRestartFiles()
     else
         while (getDPMBase()->getTime() < timeMin)
         {
+            // Remember information from this read
+            handlePreviousInformation();
+
             cgLogger(INFO, "Skipped %, t = %, because time is below tMin = %", dpm->restartFile.getFullName(),
                      dpm->getTime(), timeMin);
             //the particle and wall handler is cleared here, because  BaseSpecies doesn't delete particles belonging to it
@@ -302,7 +308,7 @@ bool CGHandler::evaluateRestartFiles()
         //the particle and wall handler is cleared here, because  BaseSpecies doesn't delete particles belonging to it
         dpm->particleHandler.clear();
         dpm->wallHandler.clear();
-        
+
         //continue if the next restart file can be read and the max time has not been reached
     }
     cgLogger(INFO, "Finished reading from %", dpm->dataFile.getFullName());
@@ -355,6 +361,9 @@ bool CGHandler::evaluateDataFiles(bool evaluateFStatFiles)
     else
         while (dpm->getTime() < timeMin)
         {
+            // Remember information from this read
+            handlePreviousInformation();
+
             if (evaluateFStatFiles) dpm->readNextFStatFile();
             cgLogger(INFO, "Skipped %, t = %, because time is below tMin = %", dpm->dataFile.getFullName(),
                      dpm->getTime(), timeMin);
@@ -370,6 +379,7 @@ bool CGHandler::evaluateDataFiles(bool evaluateFStatFiles)
                  dpm->particleHandler.getSize(), dpm->interactionHandler.getNumberOfObjects());
         
         evaluate();
+        
     } while (dpm->readNextDataFile() && getDPMBase()->getTime() <= timeMax);
     cgLogger(INFO, "Finished reading from %", dpm->dataFile.getFullName());
     
@@ -396,4 +406,23 @@ Mdouble CGHandler::getTimeMax()
         time = std::max(time, it->getTimeMax());
     }
     return time;
+}
+
+void CGHandler::setPreviousEvaluationTimeToCurrentTime() 
+{
+    previousEvaluationTime_ = getDPMBase()->getTime();
+}
+
+void CGHandler::setPreviousPositionToCurrentPosition() 
+{
+    for (BaseParticle* p : getDPMBase()->particleHandler)
+    {
+        p->setPreviousPosition(p->getPosition());
+    }
+}
+
+void CGHandler::handlePreviousInformation()
+{
+    setPreviousEvaluationTimeToCurrentTime();
+    setPreviousPositionToCurrentPosition();
 }

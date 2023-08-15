@@ -2734,10 +2734,12 @@ bool DPMBase::readNextDataFile(unsigned int format)
     const size_t nHistory = std::min(N,particleHandler.getSize());
     std::vector<const ParticleSpecies*> species(nHistory);
     std::vector<bool> fix(nHistory);
+    std::vector<Vec3D> positionHistory(nHistory);
     for (size_t i=0; i<nHistory; ++i) {
         const BaseParticle *p = particleHandler.getObject(i);
         species[i] = p->getSpecies();
         fix[i] = p->isFixed();
+        positionHistory[i] = p->getPosition();
         //store from reading the restart file which particles are fixed and which species each particle has
     }
     
@@ -2779,6 +2781,10 @@ bool DPMBase::readNextDataFile(unsigned int format)
                 p->setSpecies(species[i]);
             if (i < nHistory && fix[i])
                 p->fixParticle();
+            if (i < nHistory)
+                p->setPreviousPosition(positionHistory[i]);
+            else
+                p->setPreviousPosition(p->getPosition());
             particleHandler.copyAndAddObject(*p);
             p->unfix();
         }
@@ -2798,6 +2804,8 @@ bool DPMBase::readNextDataFile(unsigned int format)
             if (readSpeciesFromDataFile_) p->setSpecies(speciesHandler.getObject(indSpecies));
             else if (i < nHistory) p->setSpecies(species[i]);
             if (i < nHistory && fix[i]) p->fixParticle();
+            if (i < nHistory) p->setPreviousPosition(positionHistory[i]);
+            else p->setPreviousPosition(p->getPosition());
             particleHandler.copyAndAddObject(*p);
             p->unfix();
         } //end for all particles
@@ -2833,6 +2841,8 @@ bool DPMBase::readNextDataFile(unsigned int format)
                 p->setSpecies(species[i]);
             if (i < nHistory && fix[i])
                 p->fixParticle();
+            if (i < nHistory) p->setPreviousPosition(positionHistory[i]);
+            else p->setPreviousPosition(p->getPosition());
 #ifdef MERCURYDPM_USE_MPI
             if (NUMBER_OF_PROCESSORS)
             {
@@ -2858,6 +2868,8 @@ bool DPMBase::readNextDataFile(unsigned int format)
             if (readSpeciesFromDataFile_) p->setSpecies(speciesHandler.getObject(indSpecies));
             else if (i < nHistory) p->setSpecies(species[i]);
             if (i < nHistory && fix[i]) p->fixParticle();
+            if (i < nHistory) p->setPreviousPosition(positionHistory[i]);
+            else p->setPreviousPosition(p->getPosition());
             particleHandler.copyAndAddObject(*p);
         } //end for all particles
     } //end if format

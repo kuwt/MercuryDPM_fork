@@ -81,6 +81,8 @@ BaseParticle::BaseParticle(const BaseParticle& p)
     invMass_ = p.getInvMass();
     invInertia_ = p.getInvInertia();
     
+    previousPosition_ = p.previousPosition_;
+    
     hGridNextObject_ = nullptr;
     hGridPrevObject_ = nullptr;
     

@@ -106,6 +106,11 @@ void CG<Coordinates, BaseFunction, Fields>::createMesh()
     nY_ = Coordinates::isResolvedIn(1) ? nY_ : 1;
     nZ_ = Coordinates::isResolvedIn(2) ? nZ_ : 1;
     logger(INFO, "In CG, setting number of evaluation points to %, %, % in X, Y and Z dimensions respectively", nX_, nY_, nZ_);
+
+    for (auto& p: points_)
+    {
+        p.setCG(this);
+    }
 }
 
 template<class Coordinates, template<class> class BaseFunction, class Fields>
@@ -385,6 +390,7 @@ void CG<Coordinates, BaseFunction, Fields>::evaluateParticle(const BaseParticle&
     }
     // BREAK THROUGH
     Fields currentInteraction;
+    currentInteraction.setCG(this);
     currentInteraction.setFields(p);
     //#pragma omp parallel for
     for (std::size_t i = minX; i < maxX; i++)
@@ -405,6 +411,7 @@ template<>
 void CG<CGCoordinates::R, CGFunctions::Gauss, CGFields::StandardFields>::evaluateParticle(const BaseParticle& p)
 {
     CGFields::StandardFields currentInteraction;
+    currentInteraction.setCG(this);
     currentInteraction.setFields(p);
     
     for (Point& r : points_)
@@ -425,6 +432,7 @@ template<>
 void CG<CGCoordinates::RZ, CGFunctions::Gauss, CGFields::StandardFields>::evaluateParticle(const BaseParticle& p)
 {
     CGFields::StandardFields currentInteraction;
+    currentInteraction.setCG(this);
     currentInteraction.setFields(p);
     
     for (Point& r : points_)
@@ -470,6 +478,7 @@ void CG<Coordinates, BaseFunction, Fields>::evaluateContact(const BaseInteractio
         return;
     
     Fields currentInteraction;
+    currentInteraction.setCG(this);
     currentInteraction.setFields(c, it);
     
     const Vec3D& p = c.getP()->getPosition();
@@ -523,6 +532,7 @@ void CG<CGCoordinates::R, CGFunctions::Gauss>::evaluateContact(const BaseInterac
     IntegralType i = getIntegralType(c);
     if (i == IntegralType::NONE) return;
     CGFields::StandardFields currentInteraction;
+    currentInteraction.setCG(this);
     currentInteraction.setCylindricalFields(c, i);
     
     for (Point& r : points_)
@@ -545,6 +555,7 @@ void CG<CGCoordinates::RZ, CGFunctions::Gauss>::evaluateContact(const BaseIntera
     IntegralType i = getIntegralType(c);
     if (i == IntegralType::NONE) return;
     CGFields::StandardFields currentInteraction;
+    currentInteraction.setCG(this);
     currentInteraction.setCylindricalFields(c, i);
     
     for (Point& r : points_)

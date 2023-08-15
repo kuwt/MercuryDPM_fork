@@ -31,6 +31,7 @@
 #include <CG/Fields/GradVelocityField.h>
 #include <CG/Fields/LiquidMigrationFields.h>
 #include <CG/Fields/OrientationField.h>
+#include <CG/Fields/DisplacementField.h>
 #include <algorithm>
 #include <Interactions/AdhesiveForceInteractions/LiquidMigrationWilletInteraction.h>
 #include <cstring>
@@ -105,6 +106,8 @@ BaseCG *addObject(CGHandler &cg, std::string type, std::string coordinate, std::
         addObject<CGFields::GradVelocityField>(cg, type, coordinate, function);
     } else if (fields == "liquidmigrationfields" || fields == "liquidmigration") {
         addObject<CGFields::LiquidMigrationFields>(cg, type, coordinate, function);
+    } else if (fields == "displacement" || fields == "displacementfields") {
+        addObject<CGFields::DisplacementField>(cg, type, coordinate, function);
     } else {
         logger(ERROR, "CGFields % not understood; options are standard, gradVelocity, liquidMigration ", fieldsOrig);
     }

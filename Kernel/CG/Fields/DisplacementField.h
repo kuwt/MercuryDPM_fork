@@ -23,8 +23,8 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef MERCURYDPM_ORIENTATIONFIELD_H
-#define MERCURYDPM_ORIENTATIONFIELD_H
+#ifndef MERCURYDPM_DisplacementField_H
+#define MERCURYDPM_DisplacementField_H
 
 #include <Math/Matrix.h>
 #include <Math/MatrixSymmetric.h>
@@ -32,6 +32,11 @@
 #include <array>
 
 #include "BaseFields.h"
+#include "CG/CGHandler.h"
+#include "BaseHandler.h"
+#include "DPMBase.h"
+
+class DPMBase;
 
 class BaseParticle;
 
@@ -40,24 +45,20 @@ namespace CGFields
 {
 
 /*!
- * \brief Contains the computed field values, like density, momentum and stress.
- * \details CGPoints inherits from this class; CGPoints::evaluate adds to the
- * values of these variables.
- * \todo These are currently the only fields that are computed.
- * However, this class is destined to be extended to
- * contain additional information such as fabric, energy, local angular
- * momentum. Also, a simpler version is planned, where only particle statistics
- * are evaluated (density and momentum).
+ * \brief Computed the displacement fields
+ * \details The displacement moment and the displacement moment flux
+ * are calculated from the previous position of the particle and the
+ * time since the last evaluation of the data files
  */
     
-    class OrientationField : public BaseFields
+    class DisplacementField : public BaseFields
     {
     public:
-        OrientationField();
+        DisplacementField();
         
-        OrientationField(const OrientationField& other) = default;
+        DisplacementField(const DisplacementField& other) = default;
         
-        ~OrientationField() = default;
+        ~DisplacementField() = default;
         
         static void writeNames(std::ostream& os, unsigned countVariables);
         
@@ -79,50 +80,48 @@ namespace CGFields
         /*!
          * \brief Returns the square of all field values (to calculate standard deviation).
         */
-        OrientationField getSquared() const;
+        DisplacementField getSquared() const;
         
         /*!
          * \brief Copies all field values.
          */
-        OrientationField& operator=(const OrientationField& P);
+        DisplacementField& operator=(const DisplacementField& P);
         
         /*!
          * \brief Adds the field values on the RHS to the LHS of the equation.
          */
-        OrientationField& operator+=(const OrientationField& P);
+        DisplacementField& operator+=(const DisplacementField& P);
         
         /*!
          * \brief Subtracts the field values on the RHS from the LHS of the equation.
          */
-        OrientationField& operator-=(const OrientationField& P);
+        DisplacementField& operator-=(const DisplacementField& P);
         
         /*!
          * \brief Divides the field values on the LHS by the RHS of the equation.
          */
-        OrientationField& operator/=(Mdouble a);
+        DisplacementField& operator/=(Mdouble a);
         
         /*!
          * \brief Multiplies the field values on the left of the '*' by the
          * scalar value on the right of the '*' and returns the answer.
          */
-        OrientationField operator*(Mdouble a) const;
+        DisplacementField operator*(Mdouble a) const;
         
         /*!
          * \brief This function should be called from within a loop over all
          * particles to compute all the fields that are defined as a sum over all
          * particles (e.g. density, momentum).
          */
-        void addParticleStatistics(Mdouble phi, const OrientationField& currentInteraction);
+        void addParticleStatistics(Mdouble phi, const DisplacementField& currentInteraction);
         
         void setFields(const BaseParticle& p);
         
         void setCylindricalFields(const BaseParticle& p);
         
         
-        MatrixSymmetric3D getOrientation() const
-        {
-            return orientation_;
-        }
+        MatrixSymmetric3D getDisplacementMomentumFlux() const { return displacementMomentumFlux_; }
+        Vec3D getDisplacementMomentum() const { return displacementMomentum_; }
         
         
         static bool evaluateFixedParticles()
@@ -150,18 +149,19 @@ namespace CGFields
         void setCylindricalFields(const BaseInteraction& c, IntegralType type)
         {}
         
-        void addParticleDifferentialStatistics(Vec3D& dphi, const OrientationField& currentInteraction)
+        void addParticleDifferentialStatistics(Vec3D& dphi, const DisplacementField& currentInteraction)
         {}
         
-        void addInteractionStatistics(Mdouble psi, const OrientationField& currentInteraction)
+        void addInteractionStatistics(Mdouble psi, const DisplacementField& currentInteraction)
         {}
         
-        void addContactPointStatistics(Mdouble phi, const OrientationField& currentInteraction)
+        void addContactPointStatistics(Mdouble phi, const DisplacementField& currentInteraction)
         {}
     
     private:
-        MatrixSymmetric3D orientation_;
+        MatrixSymmetric3D displacementMomentumFlux_;
+        Vec3D displacementMomentum_;
     };
 }
 
-#endif //MERCURYDPM_ORIENTATIONFIELD_H
+#endif //MERCURYDPM_DisplacementField_H
