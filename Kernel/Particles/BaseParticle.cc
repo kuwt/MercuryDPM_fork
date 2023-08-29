@@ -739,6 +739,7 @@ void BaseParticle::integrateBeforeForceComputation(double time, double timeStep)
         accelerate(getForce() * getInvMass() * 0.5 * timeStep);
         const Vec3D displacement = getVelocity() * timeStep;
         move(displacement);
+	    setDisplacement(displacement); // Needed for FluxBoundary
         DPMBase* const dpm = getHandler()->getDPMBase();
         if (!dpm->getHGridUpdateEachTimeStep())
         {
