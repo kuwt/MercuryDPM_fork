@@ -33,11 +33,12 @@ BaseParticle::BaseParticle()
         : BaseInteractable()
 {
     handler_ = nullptr;
-    displacement_.setZero();
     radius_ = 1.0;
     invMass_ = 1.0;
     invInertia_ = MatrixSymmetric3D(1, 0, 0, 1, 0, 1);
     
+    previousPosition_=getPosition();
+
     periodicFromParticle_ = nullptr;
     isMPIParticle_ = false;
     isInMPIDomain_ = false;
@@ -76,7 +77,6 @@ BaseParticle::BaseParticle(const BaseParticle& p)
         : BaseInteractable(p)
 {
     handler_ = nullptr;
-    displacement_ = p.displacement_;
     radius_ = p.radius_;
     invMass_ = p.getInvMass();
     invInertia_ = p.getInvInertia();
@@ -601,15 +601,6 @@ void BaseParticle::setMassForP3Statistics(const Mdouble mass)
 }
 
 /*!
- * \details This is used to set the particle displacement_ 
- * \param[in] disp  the displacement vector
- */
-void BaseParticle::setDisplacement(const Vec3D& disp)
-{
-    displacement_ = disp;
-}
-
-/*!
  * \details This is used to set the particle's previous position
  * \param[in] pos   the particle's previous position vector.
  */
@@ -646,15 +637,6 @@ void BaseParticle::accelerate(const Vec3D& vel)
 void BaseParticle::angularAccelerate(const Vec3D& angVel)
 {
     addAngularVelocity(angVel);
-}
-
-/*!
- * \details Lets you add a vector to the particle's displacement_ vector.
- * \param[in] addDisp   vector to be added.
- */
-void BaseParticle::addDisplacement(const Vec3D& addDisp)
-{
-    displacement_ += addDisp;
 }
 
 /*!
@@ -732,14 +714,13 @@ void BaseParticle::integrateBeforeForceComputation(double time, double timeStep)
     }
     else
     {
-#ifdef MERCURYDPM_USE_MPI
-        //For periodic particles in parallel the previous position is required
+        // For periodic particles in parallel the previous position is required
+        // also required by FluxBoundary
         setPreviousPosition(getPosition());
-#endif
+
         accelerate(getForce() * getInvMass() * 0.5 * timeStep);
         const Vec3D displacement = getVelocity() * timeStep;
         move(displacement);
-	    setDisplacement(displacement); // Needed for FluxBoundary
         DPMBase* const dpm = getHandler()->getDPMBase();
         if (!dpm->getHGridUpdateEachTimeStep())
         {

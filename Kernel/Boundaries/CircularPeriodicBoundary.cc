@@ -147,7 +147,7 @@ bool CircularPeriodicBoundary::checkBoundaryAfterParticleMoved(BaseParticle* P, 
     double pieSize = 2.0 / pow(2.0, i) * constants::pi;
     
     double oldR = sqrt(
-            pow(P->getPosition().X - P->getDisplacement().X, 2) + pow(P->getPosition().Y - P->getDisplacement().Y, 2));
+            pow(P->getPreviousPosition().X, 2) + pow(P->getPreviousPosition().Y, 2));
     ///\todo TW: Dinant, please confirm that i and oldI should be integer
     int oldI = static_cast<int>(std::floor(std::log(oldR / innerRadius_) / std::log(2.0))) + 1;
     
@@ -178,7 +178,7 @@ bool CircularPeriodicBoundary::checkBoundaryAfterParticleMoved(BaseParticle* P, 
         //std::cout<<"i="<<i<<" oldI="<<oldI<<" R="<<R<<" oldR="<<oldR<<std::endl;
         //std::cout<<"Position="<<P->getPosition()<<" Displacement="<<P->get_Displacement()<<std::endl;
         BaseParticle* F0 = P->copy();
-        F0->setDisplacement(Vec3D(0.0, 0.0, 0.0));
+        F0->setPreviousPosition(F0->getPosition());
         if (alpha < 0)
         {
             rotateParticle(P, pieSize);

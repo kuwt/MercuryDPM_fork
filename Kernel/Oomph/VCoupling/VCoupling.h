@@ -479,7 +479,7 @@ public:
         // get particle displacements
         for (unsigned m = 0; m < nParticles; m++)
         {
-            Vec3D displ = particles[m]->getDisplacement() / Global_Physical_Variables::lenScale;
+            Vec3D displ = (particles[m]->getPosition() - particles[m]->getPreviousPosition()) / Global_Physical_Variables::lenScale;
             particleDispl[m][0] = displ.getX();
             particleDispl[m][1] = displ.getY();
             particleDispl[m][2] = displ.getZ();
@@ -709,7 +709,7 @@ public:
                             // change finite element coupling stiffness into the DEM scale
                             cForce += couplingMatrix[l][m] * bulkStiffness[l][ll] *
                                 Global_Physical_Variables::stiffScale() * couplingMatrix[ll][mm] *
-                                particles[mm]->getDisplacement();
+                                (particles[mm]->getPosition() - particles[mm]->getPreviousPosition());
                         }
                     }
                 }
@@ -723,7 +723,7 @@ public:
                 {
                     for (unsigned m = 0; m < nParticles; m++)
                     {
-                        Vec3D displ = particles[m]->getDisplacement() / Global_Physical_Variables::lenScale;
+                        Vec3D displ = (particles[m]->getPosition() - particles[m]->getPreviousPosition()) / Global_Physical_Variables::lenScale;
                         double particleStiffness = bulkStiffness[i][j] * couplingMatrix[j][m];
                         nodalResidualDPM[i][0] -= particleStiffness * displ.getX();
                         nodalResidualDPM[i][1] -= particleStiffness * displ.getY();

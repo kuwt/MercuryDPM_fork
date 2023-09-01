@@ -150,13 +150,13 @@ void FluxBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
  */
 bool FluxBoundary::checkBoundaryAfterParticleMoved(BaseParticle* p, ParticleHandler& pH)
 {
-    if (getPreviousDistance(p->getPosition() - p->getDisplacement()) >= 0 && getDistance(p->getPosition()) < 0)
+    if (getPreviousDistance(p->getPreviousPosition()) >= 0 && getDistance(p->getPosition()) < 0)
     {
         numberOfParticlesCrossedForw_++;
         massCrossedForw_ += p->getMass();
         volumeCrossedForw_ += p->getVolume();
     }
-    else if (getPreviousDistance(p->getPosition() - p->getDisplacement()) < 0 && getDistance(p->getPosition()) >= 0)
+    else if (getPreviousDistance(p->getPreviousPosition()) < 0 && getDistance(p->getPosition()) >= 0)
     {
         numberOfParticlesCrossedBack_++;
         massCrossedBack_ += p->getMass();

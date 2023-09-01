@@ -388,14 +388,6 @@ public:
     }
     
     /*!
-     * \brief Returns the particle's displacement relative to the previous time step
-     * \details Returns the particle's displacement_, which is the difference between the current particle's position and its position in the previous time step.
-     * \return (reference to) the particle displacement vector
-     */
-    const Vec3D& getDisplacement() const
-    { return displacement_; }
-    
-    /*!
      * \brief Returns the particle's position in the previous time step
      * \details Returns the particle's position in the previous time step.
      * \return (reference to) the previous position of the particle
@@ -548,12 +540,6 @@ public:
     void setMassForP3Statistics(Mdouble mass);
     
     /*!
-     * \brief Sets the particle's displacement (= difference between current 
-     * position and that of the previous time step)
-     */
-    void setDisplacement(const Vec3D& disp);
-    
-    /*!
      * \brief Sets the particle's position in the previous time step
      */
     void setPreviousPosition(const Vec3D& pos);
@@ -572,11 +558,6 @@ public:
      * \brief Increases the particle's angularVelocity_ by the given vector
      */
     void angularAccelerate(const Vec3D& angVel);
-    
-    /*!
-     * \brief Adds a vector to the particle's displacement_
-     */
-    void addDisplacement(const Vec3D& addDisp);
     
     /*!
      * \brief Sets the pointer to the particle's ParticleHandler
@@ -721,7 +702,6 @@ private:
     std::vector<int> periodicComplexity_;  /// Indicates the periodic complexity at current time step. Used to update periodic status
     bool isMaserParticle_; ///Indicates if this particle belongs to the maser boundary or is released into the wide open world.
     
-    Vec3D displacement_; ///Displacement (only used in StatisticsVector, StatisticsPoint)
     Vec3D previousPosition_; /// Particle's position at previous time step
     
     /*!
