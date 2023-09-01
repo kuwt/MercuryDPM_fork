@@ -305,6 +305,7 @@ int main(int argc, char *argv[])
     Silo.fStatFile.setSaveCount(2000); //setting how often to output data to file
     Silo.restartFile.setSaveCount(10000); //setting how often to output data to file
     Silo.fStatFile.setFileType(FileType::NO_FILE);
+    Silo.setParticlesWriteVTK(true);
     //Silo.dataFile.setFileType(FileType::NO_FILE);
     //Silo.scaleUp(8);
     Silo.setName("Silo3D"); //naming the output file
