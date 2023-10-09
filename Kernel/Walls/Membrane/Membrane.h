@@ -246,7 +246,7 @@ public:
     
     /*!
      * \brief Set the elastic modulus and thickness of the membrane
-     * \deltails The supplied values are used to calculate the spring constant
+     * \details The supplied values are used to calculate the spring constant
      * of the membrane.
      */
     void setElasticModulusAndThickness(Mdouble E, Mdouble thickness);

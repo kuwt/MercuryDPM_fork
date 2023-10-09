@@ -99,7 +99,7 @@ std::string HertzianBSHPViscoelasticInteraction::getBaseName() const
  * It contains a viscoelastic damping proportional to \sqrt{\delta}
  * The force is calculated with
  * kn = 4/3 E* sqrt(R*)
- * fn = kn (delta^{3/2} + 3/2 kn A delta^{1/2} \dot{\delta})
+ * fn = kn (delta^{3/2} + 3/2 kn A delta^{1/2} \f\dot{\delta})
  *
  * https://doi.org/10.1103/PhysRevE.84.021302 provides a way for calculating
  * the damping constant A from the coefficient of restitution, a reference velocity

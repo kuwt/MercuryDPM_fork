@@ -50,16 +50,16 @@ enum class SINTER_APPROACH : unsigned char
 class SinterLinNormalSpecies : public BaseNormalForce
 {
 public:
-    ///\brief The correct Interaction type for this FrictionForceSpecies
+    /// \brief The correct Interaction type for this FrictionForceSpecies
     typedef SinterLinInteraction InteractionType;
     
-    ///\brief The default constructor.
+    /// \brief The default constructor.
     SinterLinNormalSpecies();
     
-    ///\brief The default copy constructor.
+    /// \brief The default copy constructor.
     SinterLinNormalSpecies(const SinterLinNormalSpecies& p);
     
-    ///\brief The default destructor.
+    /// \brief The default destructor.
     ~SinterLinNormalSpecies();
     
     /// \brief Reads the species properties from an input stream.
@@ -73,7 +73,7 @@ public:
 
 // Species-specific functions
     
-    ///\brief creates default values for mixed species
+    /// \brief creates default values for mixed species
     void mix(SinterLinNormalSpecies* S, SinterLinNormalSpecies* T);
     
     ///Set k, disp such that is matches a given tc and eps for a collision of two different masses.

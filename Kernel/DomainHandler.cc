@@ -330,7 +330,7 @@ Mdouble DomainHandler::getInteractionDistance()
 int DomainHandler::getParticleDomainGlobalIndex(BaseParticle* particle)
 {
     //Step 1: obtain values i,j,k by looking at the position
-    //TODO this could possibly be stored in the domainHandler to save computational power
+    /// \todo this could possibly be stored in the domainHandler to save computational power
     std::vector<int> decompositionVector(3);
     
     int i, j, k;

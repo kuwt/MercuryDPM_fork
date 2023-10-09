@@ -30,7 +30,7 @@
 
 /**
  * \brief Tests the contact detection between particles and a set of TriangleWalls.
- * \detail In particular, distinguishing face, edge and vertex contacts is tricky.
+ * \details In particular, distinguishing face, edge and vertex contacts is tricky.
  * So here a particle is set to rollover a face, edge and vertex of a flat wall made from particles.
  **/
 class RollingOverTriangleWalls : public Mercury3D

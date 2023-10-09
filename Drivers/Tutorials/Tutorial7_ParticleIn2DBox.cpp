@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
     problem.setXMax(1);
     problem.setYMax(0.5);
     problem.setZMax(1.0);
-    problem.setTimeMax(1.0);
+    problem.setTimeMax(2.5);
 
     //! [T7:speciesProp]
     // The normal spring stiffness and normal dissipation is computed and set as

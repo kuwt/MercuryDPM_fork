@@ -31,7 +31,7 @@
 #include <limits>
 #include <string>
 #include <cstdio>
-///todo strcmp relies on this, should be changed to more modern version
+///\todo strcmp relies on this, should be changed to more modern version
 #include <cstring>
 #include <Species/LinearViscoelasticSlidingFrictionSpecies.h>
 #include <Boundaries/CubeInsertionBoundary.h>
@@ -175,7 +175,7 @@ possibleContactList=other.possibleContactList;
     speciesHandler = other.speciesHandler;
     particleHandler = other.particleHandler;
     cgHandler = other.cgHandler;
-    //cgHandler = other.cgHandler.copy(); //todo
+    //cgHandler = other.cgHandler.copy(); //\todo
     //cgHandler.setDPMBase(this);
     wallHandler = other.wallHandler;
     boundaryHandler = other.boundaryHandler;
@@ -2017,9 +2017,8 @@ void DPMBase::writeEneHeader(std::ostream& os) const
     if (getAppend())
         return;
 
-    /// \todo JMFT: Get rid of aligned columns. They make things too wide. (changed back) */
-
-    /// \todo{Why is there a +6 here? TW: to get the numbers and title aligned}
+    /// \todo JMFT: Get rid of aligned columns. They make things too wide. (changed back) 
+    /// \todo {Why is there a +6 here? TW: to get the numbers and title aligned}
     /// \todo Add number of particles to this file (change from Jonny to be added later)
     long width = os.precision() + 6;
     os << std::setw(width)
@@ -2697,7 +2696,7 @@ bool DPMBase::readNextDataFile(unsigned int format)
     if (format == 0)
     {
         //checking the dimensionality of the system
-        ///todo make systemDimensions enum (2 or 3)
+        /// \todo make systemDimensions enum (2 or 3)
         switch (getSystemDimensions())
         {
             case 1:
@@ -2811,7 +2810,7 @@ bool DPMBase::readNextDataFile(unsigned int format)
         } //end for all particles
     } else if (format==14) {
         //This is a 3D format_
-        //@TODO: Check bounds or get rid of this function
+        // \todo : Check bounds or get rid of this function
         line >> time_ >> min_.x() >> min_.y() >> min_.z() >> max_.x() >> max_.y() >> max_.z();
         for (size_t i = 0; i < N; ++i) {
             helpers::getLineFromStringStream(dataFile.getFstream(), line);
@@ -3351,7 +3350,7 @@ void DPMBase::integrateAfterForceComputation()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //void DPMBase::statisticsFromRestartData(const char *name)
 //{
-//    ///todo{Check this whole function}
+//    /// \todo {Check this whole function}
 //    //This function loads all MD data
 //    readRestartFile();
 //
@@ -3772,8 +3771,8 @@ void DPMBase::read(std::istream& is, ReadOptions opt)
             }
 
             helpers::getLineFromStringStream(is, line);
-            line >> dummy >> min_.x()   ///\TODO: Bound checking
-                 >> dummy >> max_.x()  ///\TODO: Same order as other file format, please?
+            line >> dummy >> min_.x()  /// \todo : Bound checking
+                 >> dummy >> max_.x()  /// \todo : Same order as other file format, please?
                  >> dummy >> min_.y()
                  >> dummy >> max_.y()
                  >> dummy >> min_.z()
@@ -3910,7 +3909,7 @@ void DPMBase::read(std::istream& is, ReadOptions opt)
                 particleHandler.readAndAddObject(is);
                 //skip the remaining data in line
                 is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                ///todo{Do we want to calculate the mass?}
+                /// \todo {Do we want to calculate the mass?}
                 //particleHandler.getLastObject()->computeMass();
             }
 #ifdef MERCURYDPM_USE_MPI
@@ -4155,7 +4154,7 @@ void DPMBase::decompose()
     }
 
     //Define the mpi transfer types, which requires a definition of the species already
-    ///\TODO update this function for Jonny
+    /// \todo update this function for Jonny
     logger.assert_always(speciesHandler.getNumberOfObjects() > 0, "Please create a particle species before calling solve()");
     MPIContainer::Instance().initialiseMercuryMPITypes(speciesHandler);
 
@@ -4188,7 +4187,7 @@ void DPMBase::initialiseSolve() {
 
     /// Initialise the time and
     /// sets up the initial conditions for the simulation
-    ///\todo Is it necessary to reset initial conditions here and in setTimeStepByParticle (i.e. should it be in constructor)?
+    /// \todo Is it necessary to reset initial conditions here and in setTimeStepByParticle (i.e. should it be in constructor)?
     ///Thomas: I agree, setTimeStepByParticle should be rewritten to work without calling setupInitialConditions
     if (!getRestarted()) {
         // If the simulation is "new" (i.e. not restarted):
@@ -4200,7 +4199,7 @@ void DPMBase::initialiseSolve() {
         setTime(0.0);
         resetFileCounter();
         decompose();
-        //\todo tw there was a function combining the next two lines, why is it back to the old version?
+        // \todo tw there was a function combining the next two lines, why is it back to the old version?
         //setLastSavedTimeStep(NEVER); //reset the counter
         //this is to ensure that the interaction time stamps agree with the resetting of the time value
         for (auto &i: interactionHandler)
@@ -4336,7 +4335,7 @@ void DPMBase::computeOneTimeStep()
 
     /// \todo MX: this is not true anymore. all boundaries are handled here.
     /// particles have received a position update, so here the deletion boundary deletes particles
-    ///\TODO add particles need a periodic check
+    /// \todo add particles need a periodic check
 
     logger(DEBUG, "about to call checkInteractionWithBoundaries()");
     checkInteractionWithBoundaries(); // INSERTION boundaries handled
@@ -4923,7 +4922,7 @@ bool DPMBase::checkParticleForInteractionLocal(const BaseParticle& p)
     {
         //returns false if the function getDistanceAndNormal returns true,
         //i.e. if there exists an interaction between wall and particle
-        //\todo TW getDistanceAndNormal(p,distance,normal) should ideally be replaced by a inContact(p) function, as it doesn't require distance and normal for anything (and walls now can have multiple contacts, soon particles can have it too.)
+        // \todo TW getDistanceAndNormal(p,distance,normal) should ideally be replaced by a inContact(p) function, as it doesn't require distance and normal for anything (and walls now can have multiple contacts, soon particles can have it too.)
         if (w->getDistanceAndNormal(p, distance, normal))
         {
             //std::cout<<"failure: Collision with wall: "<<**it<<std::endl;
@@ -4952,7 +4951,7 @@ bool DPMBase::checkParticleForInteractionLocal(const BaseParticle& p)
         }
     }
     return true;
-    ///\todo tw check against periodic copies (see ShearCell3DInitialConditions.cpp)
+    /// \todo tw check against periodic copies (see ShearCell3DInitialConditions.cpp)
 }
 
 /*!
@@ -5141,7 +5140,7 @@ void DPMBase::performGhostVelocityUpdate()
 {
 #ifdef MERCURYDPM_USE_MPI
     if (NUMBER_OF_PROCESSORS == 1) {return;}
-    //TODO If required, I can implement this for periodic particles, first discuss with Thomas if it is actually requiredf
+    // \todo If required, I can implement this for periodic particles, first discuss with Thomas if it is actually requiredf
     //periodicDomainHandler.updateVelocity()
     //domainHandler.updateVelocity();
 #endif
@@ -5497,7 +5496,7 @@ void DPMBase::handleParticleAddition(unsigned int id, BaseParticle* p)
 // initialise static member variables
 volatile sig_atomic_t DPMBase::continueFlag_ = true;
 
-///\todo When restarting the indexMax should be reset
+/// \todo When restarting the indexMax should be reset
 
 /*!
 * \details

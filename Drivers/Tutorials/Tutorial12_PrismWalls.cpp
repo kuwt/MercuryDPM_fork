@@ -71,7 +71,7 @@ public:
         
         w0.set(Vec3D(0.0, -1.0, 0.0), Vec3D(0.0, getYMin(), 0.0));
         wallHandler.copyAndAddObject(w0);
-        //! [T12: Defining outer walls]
+		//! [T12: Defining outer walls]
 
 		//! [T12: Create object]
 		// Defining the object in het center of the box

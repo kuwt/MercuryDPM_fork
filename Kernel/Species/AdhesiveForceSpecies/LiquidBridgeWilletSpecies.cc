@@ -40,7 +40,7 @@ LiquidBridgeWilletSpecies::LiquidBridgeWilletSpecies()
 }
 
 /*!
- * \param[in] the species that is copied
+ * \param[in] LiquidBridgeWilletSpecies the species that is copied
  */
 LiquidBridgeWilletSpecies::LiquidBridgeWilletSpecies(const LiquidBridgeWilletSpecies& s)
 {
@@ -71,7 +71,7 @@ void LiquidBridgeWilletSpecies::write(std::ostream& os) const
 }
 
 /*!
- * \param[in] input stream (typically the restart file)
+ * \param[in] is input stream (typically the restart file)
  */
 void LiquidBridgeWilletSpecies::read(std::istream& is)
 {

@@ -69,7 +69,7 @@ public:
     /*!
      * \brief Set parameters of the ArcWall.
      *
-     * \detail The axis vector is normalized. The centreline vector is
+     * \details The axis vector is normalized. The centreline vector is
      * also treated to remove any component parallel to the axis, and
      * the remaining component is normalized.
      *

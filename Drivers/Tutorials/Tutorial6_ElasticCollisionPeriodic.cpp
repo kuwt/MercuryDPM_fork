@@ -47,8 +47,8 @@ public:
     void setupInitialConditions() override {
         SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
-        p0.setRadius(0.005);//particle-1
-        p0.setPosition(Vec3D(0.25 * getXMax(), 0.5 * getYMax(), 0.5 * getZMax()));
+        p0.setRadius(0.015);//particle-1
+        p0.setPosition(Vec3D(0.15 * getXMax(), 0.5 * getYMax(), 0.5 * getZMax()));
         p0.setVelocity(Vec3D(0.25, 0.0, 0.0));
         particleHandler.copyAndAddObject(p0);
         

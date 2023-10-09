@@ -417,8 +417,8 @@ Quaternion Quaternion::angularVelocityBodyFixedFrameToAngularDisplacement(Vec3D 
             -q2 * v.X + q1 * v.Y + q0 * v.Z);
 }
 
-///Given v = \omega * dt, with omega the angular velocity, this computes the change in angular displacement to be added
-///in the time integration. This is equivalent to applying the matrix \tilde{C}
+///Given v = &omega * dt, with omega the angular velocity, this computes the change in angular displacement to be added
+///in the time integration. This is equivalent to applying the matrix &tilde{C}
 Quaternion Quaternion::angularDisplacementTimeDerivative(Vec3D v) const
 {
     return 0.5 * Quaternion(

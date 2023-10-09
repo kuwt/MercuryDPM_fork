@@ -104,7 +104,7 @@ public:
 
 private:
     /*!
-     * \TODO document
+     * \todo document
      */
     double radiusInner_;
     double radiusOuter_;

@@ -30,7 +30,7 @@
 
 /**
  * \brief Tests the contact detection between particles and IntersectionOfWalls.
- * \detail In particular, distinguishing face, edge and vertex contacts is tricky.
+ * \details In particular, distinguishing face, edge and vertex contacts is tricky.
  * The most difficult case is when a face is less or equal in size to a particle, so this is tested here.
  **/
 class GetDistanceAndNormalForScrew : public Mercury3D

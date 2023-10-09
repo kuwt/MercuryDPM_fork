@@ -136,13 +136,13 @@ public:
     Mdouble getInteractionDistance();
     
     /// \todo MX: function under construction
-    ///\todo TW@Marnix should this be unsigned int?
+    /// \todo TW, Marnix should this be unsigned int?
     int getParticleDomainGlobalIndex(BaseParticle* particle);
     
-    ///\todo TW@Marnix should this be unsigned int?
+    /// \todo TW, Marnix should this be unsigned int?
     int getParticleProcessor(int globalIndex);
     
-    ///\todo TW@Marnix should this be unsigned int?
+    /// \todo TW, Marnix should this be unsigned int?
     Domain* getParticleDomain(int globalIndex);
     
     void updateStatus(std::set<BaseParticle*>& particlesToBeDeleted);
