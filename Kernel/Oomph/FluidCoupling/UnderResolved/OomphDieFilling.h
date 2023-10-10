@@ -21,15 +21,15 @@ public:
     OomphDieFilling();
     
     /// Doc the solution
-    void doc_solution(oomph::DocInfo& doc_info);
+    virtual void doc_solution(oomph::DocInfo& doc_info);
     
     /// Doc the voidage
-    void doc_voidage(oomph::DocInfo& doc_info);
+    virtual void doc_voidage(oomph::DocInfo& doc_info);
     
     /// Doc the elements
-    void doc_element(oomph::DocInfo& doc_info);
+    virtual void doc_element(oomph::DocInfo& doc_info);
 
-protected:
+//protected:
     oomph::DocInfo doc_info;
 
 };

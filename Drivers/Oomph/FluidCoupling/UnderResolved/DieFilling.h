@@ -7,7 +7,8 @@
 
 #include "../../../../Kernel/Oomph/FluidCoupling/UnderResolved/UnderResolvedCoupling.h"
 
-class DieFilling : public UnderResolvedCoupling
+template <class ELEMENT>
+class DieFilling : public UnderResolvedCoupling<ELEMENT>
 {
 public:
     DieFilling(const double& xMin, const double& xMax,
@@ -15,14 +16,10 @@ public:
                  const double& zMin, const double& zMax,
                  const unsigned int& nx, const unsigned int& ny, const unsigned int& nz,
                  oomph::TimeStepper* time_stepper_pt = &oomph::Mesh::Default_TimeStepper) :
-            UnderResolvedCoupling(xMin,xMax,yMin,yMax,zMin,zMax,nx,ny,nz,time_stepper_pt)
+            UnderResolvedCoupling<ELEMENT>(xMin,xMax,yMin,yMax,zMin,zMax,nx,ny,nz,time_stepper_pt)
     {
-        //pinBC();
-        //setBC();
+
     };
-    
-    void pinBC() override;
-    void setBC() override;
     
     void setupInitialConditions() override;
     
@@ -60,7 +57,6 @@ private:
     Mdouble rollingFrictionMCC = 0.0;
     Mdouble torsionFrictionMCC = 0.0;
     
-    //Mdouble mercStiffness = pGlass->getLoadingStiffness();
     Vec3D frictionVal = {slidingFrictionGlass, rollingFrictionGlass, torsionFrictionGlass};
     
     LinearPlasticViscoelasticFrictionSpecies* pSteel;
@@ -68,5 +64,116 @@ private:
     LinearPlasticViscoelasticFrictionSpecies* pMCC;
 
 };
+
+template <class ELEMENT>
+void DieFilling<ELEMENT>::setupInitialConditions()
+{
+    logger(INFO,"Call to MercuryDieFilling::setupInitialConditions()");
+
+    double tc = 50.* DPMBase::getTimeStep();
+
+    this->speciesHandler.clear();
+
+    LinearPlasticViscoelasticFrictionSpecies steel;
+    steel.setHandler(&this->speciesHandler);
+    steel.setDensity(rhoSteel);
+    Mdouble mSteel = steel.getMassFromRadius(dSteel/2.0);
+    steel.setCollisionTimeAndRestitutionCoefficient(tc,rSteel,mSteel);
+    steel.setUnloadingStiffnessMax(5.0*steel.getLoadingStiffness());
+    steel.setPenetrationDepthMax(0.05*dSteel);
+    steel.setSlidingFrictionCoefficient(slidingFrictionSteel);
+    steel.setSlidingStiffness(2.0 / 7.0 * steel.getLoadingStiffness());
+    steel.setSlidingDissipation(2.0 / 7.0 * steel.getDissipation());
+    steel.setRollingFrictionCoefficient(rollingFrictionSteel);
+    steel.setRollingStiffness(0.2 * steel.getLoadingStiffness());
+    steel.setRollingDissipation(0.2 * steel.getDissipation());
+    pSteel = this->speciesHandler.copyAndAddObject(steel);
+
+    LinearPlasticViscoelasticFrictionSpecies glass;
+    glass.setHandler(&this->speciesHandler);
+    glass.setDensity(rhoGlass);
+    Mdouble mGlass = glass.getMassFromRadius(dGlass/2.0);
+    glass.setCollisionTimeAndRestitutionCoefficient(tc,rGlass,mGlass);
+    glass.setUnloadingStiffnessMax(5.0*glass.getLoadingStiffness());
+    glass.setPenetrationDepthMax(0.05*dGlass);
+    glass.setSlidingFrictionCoefficient(slidingFrictionGlass);
+    glass.setSlidingStiffness(2.0 / 7.0 * glass.getLoadingStiffness());
+    glass.setSlidingDissipation(2.0 / 7.0 * glass.getDissipation());
+    glass.setRollingFrictionCoefficient(rollingFrictionGlass);
+    glass.setRollingStiffness(0.2 * glass.getLoadingStiffness());
+    glass.setRollingDissipation(0.2 * glass.getDissipation());
+    pGlass = this->speciesHandler.copyAndAddObject(glass);
+
+    LinearPlasticViscoelasticFrictionSpecies MCC;
+    MCC.setHandler(&this->speciesHandler);
+    MCC.setDensity(rhoMCC);
+    Mdouble mMCC = MCC.getMassFromRadius(dMCC/2.0);
+    MCC.setCollisionTimeAndRestitutionCoefficient(tc,rMCC,mMCC);
+    MCC.setUnloadingStiffnessMax(5.0*MCC.getLoadingStiffness());
+    MCC.setPenetrationDepthMax(0.05*dMCC);
+    MCC.setSlidingFrictionCoefficient(slidingFrictionMCC);
+    MCC.setSlidingStiffness(2.0 / 7.0 * MCC.getLoadingStiffness());
+    MCC.setSlidingDissipation(2.0 / 7.0 * MCC.getDissipation());
+    MCC.setRollingFrictionCoefficient(rollingFrictionMCC);
+    MCC.setRollingStiffness(0.2 * MCC.getLoadingStiffness());
+    MCC.setRollingDissipation(0.2 * MCC.getDissipation());
+    pMCC = this->speciesHandler.copyAndAddObject(MCC);
+
+
+    SphericalParticle p0;
+    p0.setSpecies(pSteel);
+    p0.setRadius(dSteel/2.);
+
+    double percXMin = 0.0;
+    double percXMax = 1.0;
+    double percYMin = 0.0;
+    double percYMax = 1.0;
+    double percZMin = 0.65;
+    double percZMax = 0.95;
+
+    const unsigned int numToInsert = 1;
+    for (unsigned int i=0; i<numToInsert; i++)
+    {
+        Vec3D getRandomPos;
+        Vec3D getRandomVel;
+        int failcounter = 0;
+
+        do
+        {
+            getRandomPos.X = DPMBase::random.getRandomNumber(DPMBase::getXMin() + p0.getRadius() + percXMin*(DPMBase::getXMax()-DPMBase::getXMin()), percXMax*DPMBase::getXMax() - p0.getRadius());
+            getRandomPos.Y = DPMBase::random.getRandomNumber(DPMBase::getYMin() + p0.getRadius() + percYMin*(DPMBase::getYMax()-DPMBase::getYMin()), percYMax*DPMBase::getYMax() - p0.getRadius());
+            getRandomPos.Z = DPMBase::random.getRandomNumber(DPMBase::getZMin() + p0.getRadius() + percZMin*(DPMBase::getZMax()-DPMBase::getZMin()), percZMax*DPMBase::getZMax() - p0.getRadius());
+
+            getRandomPos = {0.5*DPMBase::getXMax(), 0.5*DPMBase::getYMax(), 0.9*DPMBase::getZMax()};
+
+            p0.setPosition(getRandomPos);
+            p0.setVelocity(getRandomVel);
+            failcounter++;
+            if (failcounter == 1000) {logger(INFO,"Failcounter reached"); break;}
+
+        } while (!MercuryBase::checkParticleForInteraction(p0));
+
+        if (failcounter != 1000)
+        {
+            this->particleHandler.copyAndAddObject(p0);
+        }
+        else {break;}
+    }
+
+    std::cout << "Placed " << this->particleHandler.getNumberOfObjects() << " out of " << numToInsert <<  " particles" << std::endl;
+
+    InfiniteWall wall;
+    wall.setSpecies(pSteel);
+    wall.set(Vec3D(-1,0,0),{DPMBase::getXMin(),0.0,0.0});
+    this->wallHandler.copyAndAddObject(wall);
+    wall.set(Vec3D( 1,0,0),{DPMBase::getXMax(),0.0,0.0});
+    this->wallHandler.copyAndAddObject(wall);
+    wall.set(Vec3D(0,-1,0),{0.0,DPMBase::getYMin(),0.0});
+    this->wallHandler.copyAndAddObject(wall);
+    wall.set(Vec3D(0, 1,0),{0.0,DPMBase::getYMax(),0.0});
+    this->wallHandler.copyAndAddObject(wall);
+    wall.set(Vec3D(0, 0,-1),{0.0,0.0,DPMBase::getZMin()});
+    this->wallHandler.copyAndAddObject(wall);
+}
 
 #endif //MERCURYDPM_DIEFILLING_H

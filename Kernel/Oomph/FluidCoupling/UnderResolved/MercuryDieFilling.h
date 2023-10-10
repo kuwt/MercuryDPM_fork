@@ -23,19 +23,11 @@
     //double getVoidageFromMerc(const double &, const oomph::Vector<double> &);
 //}
 
-class MercuryDieFilling : public Mercury3D //, GeomObject
-// Can not place GeomObject simply as it needs a function definition for
-// oomph::GeomObject::position(const oomph::Vector<double>&, oomph::Vector<double>)
-// which is declared pure virtual
+class MercuryDieFilling : public Mercury3D
 {
 public:
-    MercuryDieFilling()
-    {
-        //mercVoidage::dpmPointer = this;
-    }
+    MercuryDieFilling() {}
     ~MercuryDieFilling() {}
-protected:
-
 };
 
 #endif //MERCURYDPM_MERCURYDIEFILLING_H

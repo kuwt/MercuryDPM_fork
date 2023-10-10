@@ -15,7 +15,7 @@ int main(int argc, char**argv)
     const int ny = 5;
     const int nz = 10;
     
-    DieFilling problem(0.0, domainLength, 0.0, domainWidth, 0.0, domainDepth,nx,ny,nz);
+    DieFilling<oomph::RefineableAJQCrouzeixRaviartElement<3>> problem(0.0, domainLength, 0.0, domainWidth, 0.0, domainDepth,nx,ny,nz);
 
     problem.setInflowVel(0.005); // Enter in m/s
     //problem.setFluidDensity(1.225);
@@ -53,15 +53,15 @@ int main(int argc, char**argv)
 
     problem.setTimeStep(dt_Merc);
     problem.setTimeStepOomph(dt_Oomph);
-    problem.setTimeMax(0.15);
+    problem.setTimeMax(0.015);
 
     problem.setSaveCount(10);// Store data every so many mercury timesteps
     problem.setSaveCountOomph(10); // Store data every so many oomph timesteps
     
     problem.setGravity(Vec3D(0.0, 0.0, -g));
     problem.dataFile.setFileType(FileType::ONE_FILE);
-    problem.eneFile.setFileType(FileType::ONE_FILE);
-    problem.fStatFile.setFileType(FileType::ONE_FILE);
+    problem.eneFile.setFileType(FileType::NO_FILE);
+    problem.fStatFile.setFileType(FileType::NO_FILE);
     problem.restartFile.setFileType(FileType::ONE_FILE);
     problem.setParticlesWriteVTK(false);
     problem.wallHandler.setWriteVTK(false);
@@ -82,10 +82,10 @@ int main(int argc, char**argv)
     doc_info.number()++;
 
     problem.solveSystem(doc_info);
-    problem.doc_solution(doc_info);
-    problem.doc_voidage(doc_info);
-    problem.doc_element(doc_info);
-    doc_info.number()++;
+    //problem.doc_solution(doc_info);
+    //problem.doc_voidage(doc_info);
+    //problem.doc_element(doc_info);
+    //doc_info.number()++;
     
     return 0;
 }

@@ -1,11 +1,5 @@
 include(${CMAKE_SOURCE_DIR}/Configuration/MasterMake.cmake)
 
-#Required for Chute drivers
-add_library(DieFilling STATIC
-        DieFilling.cc
-        )
-
-
 #Part 1 : All cpp files will be made to exec files
 #########################################
 file(GLOB CPPFILES "*.cpp")
@@ -18,5 +12,5 @@ foreach (CPPFILE ${CPPFILES})
     #Make the exe
     add_executable(${EXECNAME} ${FILENAME})
     #All cpp folder and linked agaist MercuryBase
-    target_link_libraries(${EXECNAME} oomphFluid MercuryBase DieFilling)
+    target_link_libraries(${EXECNAME} oomphFluid MercuryBase)
 endforeach ()
