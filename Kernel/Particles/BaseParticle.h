@@ -222,6 +222,10 @@ public:
      * \brief Returns some user-defined information about this object (by default, species ID).
      */
     virtual Mdouble getInfo() const;
+
+    void setTimeStamp(unsigned timeStamp);
+
+    unsigned getTimeStamp() const;
     
     /*!
      * \brief Adds particle's HGrid level and cell coordinates to an ostream
@@ -386,7 +390,7 @@ public:
     Mdouble getWallInteractionRadius(const BaseWall* wall) const {
         return getRadius() + getInteractionDistance((const BaseInteractable*)wall);
     }
-    
+
     /*!
      * \brief Returns the particle's position in the previous time step
      * \details Returns the particle's position in the previous time step.
@@ -538,7 +542,7 @@ public:
      * toolbox to non-spherical particles.
      */
     void setMassForP3Statistics(Mdouble mass);
-    
+
     /*!
      * \brief Sets the particle's position in the previous time step
      */
@@ -558,7 +562,7 @@ public:
      * \brief Increases the particle's angularVelocity_ by the given vector
      */
     void angularAccelerate(const Vec3D& angVel);
-    
+
     /*!
      * \brief Sets the pointer to the particle's ParticleHandler
      */
@@ -701,7 +705,7 @@ private:
     std::vector<int> previousPeriodicComplexity_; /// Indicates the periodic complexity at previous time step
     std::vector<int> periodicComplexity_;  /// Indicates the periodic complexity at current time step. Used to update periodic status
     bool isMaserParticle_; ///Indicates if this particle belongs to the maser boundary or is released into the wide open world.
-    
+
     Vec3D previousPosition_; /// Particle's position at previous time step
     
     /*!
@@ -712,6 +716,10 @@ private:
     
     Mdouble info_; // by default, the species ID (if a species is set)
 
+    /*!
+     * Stores the time stamp the particle was created.
+     */
+    unsigned timeStamp_;
 
 public:
 

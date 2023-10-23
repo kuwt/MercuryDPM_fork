@@ -1573,19 +1573,17 @@ Mdouble DPMBase::getGravitationalEnergy() const
     return gravitationalEnergy;
 }
 
-///\todo TW why is the ene_rot commented out
 Mdouble DPMBase::getRotationalEnergy() const
 {
-    Mdouble ene_rot = 0;
-    for (std::vector<BaseParticle*>::const_iterator it = particleHandler.begin(); it != particleHandler.end(); ++it)
+    Mdouble kineticEnergy = 0;
+    for (const BaseParticle* const p : particleHandler)
     {
-        // See above.
-        if (!(*it)->isFixed())
+        if (!(p->isFixed()))
         {
-            //  ene_rot += .5 * (*it)->getInertia() * (*it)->getAngularVelocity().getLengthSquared();
+            kineticEnergy += .5 * Vec3D::dot(p->getAngularVelocity(), p->getInertia() * p->getAngularVelocity());
         }
     }
-    return ene_rot;
+    return kineticEnergy;
 }
 
 Mdouble DPMBase::getTotalEnergy() const {

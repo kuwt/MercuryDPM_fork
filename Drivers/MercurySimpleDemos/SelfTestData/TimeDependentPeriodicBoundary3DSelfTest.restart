@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name TimeDependentPeriodicBoundary3DSelfTest revision 6705 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
+MercuryDPM 1.0 name TimeDependentPeriodicBoundary3DSelfTest revision 7622ee90 repository https://bitbucket.org/mercurydpm/mercurydpm.git
 dataFile    fileType ONE_FILE saveCount 400 counter 251 lastSavedTimeStep 100000
 fStatFile   fileType ONE_FILE saveCount 400 counter 251 lastSavedTimeStep 100000
 eneFile     fileType ONE_FILE saveCount 400 counter 251 lastSavedTimeStep 100000
@@ -18,6 +18,6 @@ TimeDependentPeriodicBoundary id 0 normal 0 1 0 distanceLeft -1 distanceRight 1
 PeriodicBoundary id 1 normal 1 0 0 scaleFactor 1 distanceLeft 0 distanceRight 3 shift 3 0 0
 PeriodicBoundary id 2 normal 0 0 1 scaleFactor 1 distanceLeft 0 distanceRight 1 shift 0 0 1
 Particles 1
-BaseParticle id 0 indSpecies 0 position 0.217537214303937 -0.156361043307317 0.929026056145927 orientation 1 0 0 0 velocity 0.20857273553631 0.0783600587599351 -0.17045049940194 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.05 invMass 1909.85931710274
+BaseParticle id 0 indSpecies 0 position 0.217537214303937 -0.156361043307317 0.929026056145927 orientation 1 0 0 0 velocity 0.20857273553631 0.0783600587599351 -0.17045049940194 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.05 invMass 1909.85931710274 timeStamp 0
 Interactions 0
 hGrid method TOPDOWN distribution EXPONENTIAL cellOverSizeRatio 1 numberOfBuckets 10 cellSizes 0.1 gridNeedsUpdate 0 updateEachTimeStep 1 currentMaxRelativeDisplacement 0 totalCurrentMaxRelativeDisplacement 0

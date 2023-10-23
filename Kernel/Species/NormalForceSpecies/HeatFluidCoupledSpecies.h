@@ -390,6 +390,7 @@ void HeatFluidCoupledSpecies<NormalForceSpecies>::actionsAfterTimeStep(BaseParti
     if (p->getLiquidVolume()+dliquidVolume>=0.0) {
         p->setLiquidVolume(p->getLiquidVolume()+dliquidVolume);
         p->setTemperature(std::max(0.0,p->getTemperature()+dTemperature));
+        p->addTotalEvaporatedLiquidVolume(-dliquidVolume);
         //logger(INFO,"% LF % T %", p->getIndex(), p->getLiquidVolume(), p->getTemperature());
     } else {
         // how much to remove from liquid bridges
@@ -406,20 +407,22 @@ void HeatFluidCoupledSpecies<NormalForceSpecies>::actionsAfterTimeStep(BaseParti
             double factor = 1.0-liquidVolumeToDistribute/liquidBridgeVolume;
             for (BaseInteraction* i : p-> getInteractions()) {
                 auto j = dynamic_cast<LiquidMigrationWilletInteraction*>(i);
-                j->setLiquidBridgeVolume(factor*j->getLiquidBridgeVolume());
+                j->setLiquidBridgeVolumeByEvaporation(factor*j->getLiquidBridgeVolume());
             }
             p->setTemperature(std::max(0.0,p->getTemperature()+dTemperature));
+            p->addTotalEvaporatedLiquidVolume(-dliquidVolume);
         } else {
             // if both liquid bridges and liquid films are empty after the subtraction
             if (liquidBridgeVolume!=0.0) {
                 liquidVolumeToDistribute -= liquidBridgeVolume;
                 for (BaseInteraction *i: p->getInteractions()) {
                     auto j = dynamic_cast<LiquidMigrationWilletInteraction *>(i);
-                    j->setLiquidBridgeVolume(0.0);
+                    j->setLiquidBridgeVolumeByEvaporation(0.0);
                 }
             }
             double factor = 1.0+liquidVolumeToDistribute/dliquidVolume;
             p->setTemperature(std::max(0.0,p->getTemperature()+factor*dTemperature));
+            p->addTotalEvaporatedLiquidVolume(-dliquidVolume*factor);
         }
     }
 }

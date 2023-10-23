@@ -60,6 +60,7 @@ BaseParticle::BaseParticle()
     hGridCell.setHGridZ(99999);
     
     info_ = std::numeric_limits<double>::quiet_NaN();
+    timeStamp_ = 0;
     isClump_ = false;
     isPebble_ = false;
     logger(DEBUG, "BaseParticle::BaseParticle() finished");
@@ -82,7 +83,7 @@ BaseParticle::BaseParticle(const BaseParticle& p)
     invInertia_ = p.getInvInertia();
     
     previousPosition_ = p.previousPosition_;
-    
+
     hGridNextObject_ = nullptr;
     hGridPrevObject_ = nullptr;
     
@@ -107,6 +108,7 @@ BaseParticle::BaseParticle(const BaseParticle& p)
 #endif
     
     info_ = p.info_;
+    timeStamp_ = p.timeStamp_;
     logger(DEBUG, "BaseParticle::BaseParticle(BaseParticle &p) finished");
 }
 
@@ -339,7 +341,8 @@ void BaseParticle::write(std::ostream& os) const
 {
     BaseInteractable::write(os);
     os << " radius " << radius_
-       << " invMass " << invMass_;
+       << " invMass " << invMass_
+       << " timeStamp " << timeStamp_;
     //invMass_ is a computed value, but needs to be stored to see if a particle is fixed
 }
 
@@ -365,6 +368,16 @@ Mdouble BaseParticle::getInfo() const
         return info_;
 }
 
+void BaseParticle::setTimeStamp(unsigned timeStamp)
+{
+    timeStamp_ = timeStamp;
+}
+
+unsigned BaseParticle::getTimeStamp() const
+{
+    return timeStamp_;
+}
+
 /*!
  * \details Particle read function. Has an std::istream as argument, from which 
  *          it extracts the radius_, invMass_ and invInertia_, respectively. 
@@ -378,6 +391,7 @@ void BaseParticle::read(std::istream& is)
     BaseInteractable::read(is);
     std::string dummy;
     is >> dummy >> radius_ >> dummy >> invMass_;// >> dummy >> invInertia_;
+    helpers::readOptionalVariable(is, "timeStamp", timeStamp_); // Optional, for backwards compatibility.
 }
 
 /*!

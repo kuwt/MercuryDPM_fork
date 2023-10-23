@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name TwoParticleElasticCollisionSelfTest revision 6535 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
+MercuryDPM 1.0 name TwoParticleElasticCollisionSelfTest revision 7622ee90 repository https://bitbucket.org/mercurydpm/mercurydpm.git
 dataFile    fileType ONE_FILE saveCount 10 counter 1252 lastSavedTimeStep 12501
 fStatFile   fileType NO_FILE saveCount 10 counter 0
 eneFile     fileType ONE_FILE saveCount 10 counter 1252 lastSavedTimeStep 12501
@@ -17,7 +17,7 @@ InfiniteWall id 2 indSpecies 0 position 0 0 0 orientation 0.707106781186548 0 0 
 InfiniteWall id 3 indSpecies 0 position 0 0.01 0 orientation 0.707106781186548 0 0 0.707106781186548 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0
 Boundaries 0
 Particles 2
-BaseParticle id 0 indSpecies 0 position 0.0056345672661971 0.00496606506459345 0 orientation 1 0 0 0 velocity -0.0999822942401462 -0.0253992856953384 0 angularVelocity 0 0 0 force 0 -0.01539380400259 0 torque 0 0 0 radius 0.0005 invMass 636.619772367581
-BaseParticle id 1 indSpecies 0 position 0.00436543273380732 0.00496606506459345 0 orientation 1 0 0 0 velocity 0.0999822942402187 -0.0253992856953384 0 angularVelocity 0 0 0 force 0 -0.01539380400259 0 torque 0 0 0 radius 0.0005 invMass 636.619772367581
+BaseParticle id 0 indSpecies 0 position 0.0056345672661971 0.00496606506459345 0 orientation 1 0 0 0 velocity -0.0999822942401462 -0.0253992856953384 0 angularVelocity 0 0 0 force 0 -0.01539380400259 0 torque 0 0 0 radius 0.0005 invMass 636.619772367581 timeStamp 0
+BaseParticle id 1 indSpecies 0 position 0.00436543273380732 0.00496606506459345 0 orientation 1 0 0 0 velocity 0.0999822942402187 -0.0253992856953384 0 angularVelocity 0 0 0 force 0 -0.01539380400259 0 torque 0 0 0 radius 0.0005 invMass 636.619772367581 timeStamp 0
 Interactions 0
 hGrid method TOPDOWN distribution EXPONENTIAL cellOverSizeRatio 1 numberOfBuckets 10 cellSizes 0.001 gridNeedsUpdate 0 updateEachTimeStep 1 currentMaxRelativeDisplacement 0 totalCurrentMaxRelativeDisplacement 0

@@ -82,8 +82,8 @@ public:
     /*!  \brief Sets all boundary inputs at once and determines which deformation mode it is,
      * then combine the right boundaries to assemble the cuboid box/domain.
      */
-    void set(const Matrix3D& stressGoal, const Matrix3D& strainRate, const Matrix3D& gainFactor,
-             bool isStrainRateControlled);
+    void set(const Matrix3D& stressGoal, const Matrix3D& strainRate, const Matrix3D& pGain,
+             bool isStrainRateControlled, const Matrix3D& iGain = {0, 0, 0, 0, 0, 0, 0, 0, 0});
 
     void setStrainRate(const Matrix3D& strainRate);
 
@@ -117,7 +117,7 @@ public:
     Matrix3D getStressGoal() const {return stressGoal_;}
 
     /// \brief Accesses the gainFactor.
-    Matrix3D getGainFactor() const {return gainFactor_;}
+    Matrix3D getGainFactor() const {return pGainFactor_;}
 
 
     Mdouble computeStressError();
@@ -126,11 +126,14 @@ public:
 
     double getIntegratedShift() const {return integratedShift_;}
 
-//    // Proportional Controller
-//    static void pControl (Mdouble& strainRate, Mdouble stress, Mdouble stressGoal, Mdouble pGain) {
-//        strainRate = pGain * (stress- stressGoal);
-//    }
-
+    /// getter for xx
+    const PIController& getXX () const { return xx; }
+    /// getter for xy
+    const PIController& getXY () const { return xy; }
+    /// getter for yy
+    const PIController& getYY () const { return yy; }
+    /// getter for zz
+    const PIController& getZZ () const { return zz; }
 
 private:
 
@@ -139,8 +142,16 @@ private:
      * \brief Stores the stress value the boundary should attain.
      * \details Unused if the all stressGoal values are set to zero.
      */
+    Matrix3D stressGoal_, strainRate_, pGainFactor_;
 
-    Matrix3D stressGoal_, strainRate_, gainFactor_;
+    /*!
+     * set such that iGain = pGain/integralTime (default off)
+     * https://en.wikipedia.org/wiki/Proportional%E2%80%93integral%E2%80%93derivative_controller
+     */
+    Matrix3D iGainFactor_;
+
+    /// PI-Controllers for the strain rate in xx, xy, yy, zz directions
+    PIController xx, xy, yy, zz;
 
     /// The boolean input, true means switch on the strain rate control for particles affine movements.
     bool isStrainRateControlled_;

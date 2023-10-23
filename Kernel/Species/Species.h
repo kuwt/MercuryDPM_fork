@@ -207,6 +207,12 @@ template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveFor
 Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::Species()
         : ParticleSpecies(this,this,this), NormalForceSpecies(), FrictionForceSpecies(), AdhesiveForceSpecies()
 {
+    normalForce_ = this;
+    frictionForce_ = this;
+    adhesiveForce_ = this;
+    normalForce_->setBaseSpecies(this);
+    frictionForce_->setBaseSpecies(this);
+    adhesiveForce_->setBaseSpecies(this);
     logger(DEBUG, "Species::Species() finished");
 }
 

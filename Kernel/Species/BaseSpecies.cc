@@ -176,7 +176,10 @@ void BaseSpecies::setInteractionDistance(Mdouble interactionDistance) {
             return;
         }
     }
-    handler->getObject(getId())->setMaxInteractionDistance(interactionDistance);
+    // if not a mixed species, check it's a species in the speciesHandler
+    if (handler->getSize()>getId() && handler->getObject(getId()) == this) {
+        handler->getObject(getId())->setMaxInteractionDistance(interactionDistance);
+    }
     
     //logger(INFO,"setInteractionDistance(%) species % handler %",interactionDistance, getIndex(), getHandler());
 }

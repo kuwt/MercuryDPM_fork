@@ -4,7 +4,7 @@
 #include <vector>
 #include <cstring>
 #include "Species/LinearViscoelasticFrictionReversibleAdhesiveSpecies.h"
-#include "Species/LinearPlasticViscoelasticFrictionReversibleAdhesiveSpecies.h"
+#include "Species/LinearPlasticViscoelasticFrictionSpecies.h"
 #include "Math/PSD.h"
 #include "Math/ExtendedMath.h"
 #include "Mercury3D.h"
@@ -146,59 +146,7 @@ public:
     // set species from command line (-species, -density, etc)
     void setSpecies(int argc, char *argv[]) {
         std::string stringSpecies = readFromCommandLine(argc,argv,"-species",std::string(""));
-        if (stringSpecies == "LinearPlasticViscoelasticFrictionReversibleAdhesiveSpecies")
-        {
-            //set species
-            auto species = speciesHandler.copyAndAddObject(LinearPlasticViscoelasticFrictionReversibleAdhesiveSpecies());
-            //set density
-            species->setDensity(readFromCommandLine(argc, argv, "-density", constants::NaN));
-            double massMin = species->getMassFromRadius(psd.getMinRadius());
-            double massD50 = species->getMassFromRadius(0.5 * psd.getVolumeDx(50));
-            //set constantRestitution
-            species->setConstantRestitution(readFromCommandLine(argc, argv, "-constantRestitution"));
-            //set collisionTime and restitutionCoefficient
-            double collisionTime = readFromCommandLine(argc, argv, "-collisionTime", 0.0);
-            double restitutionCoefficient = readFromCommandLine(argc, argv, "-restitutionCoefficient", 1.0);
-            species->setCollisionTimeAndRestitutionCoefficient(collisionTime, restitutionCoefficient, massMin);
-            // set loadingStiffness, unloadingStiffness and cohesionStiffness
-            species->setLoadingStiffness(readFromCommandLine(argc, argv, "-loadingStiffness", 2.0e5));
-            species->setUnloadingStiffnessMax(readFromCommandLine(argc, argv, "-unloadingStiffness", species->getLoadingStiffness()));
-            species->setCohesionStiffness(readFromCommandLine(argc, argv, "-cohesionStiffness", 0.0));
-            // set slidingFriction, rollingFriction, torsionFriction
-            species->setSlidingFrictionCoefficient(readFromCommandLine(argc, argv, "-slidingFriction", 0.0));
-            species->setSlidingStiffness(2. / 7. * species->getLoadingStiffness());
-            species->setSlidingDissipation(2. / 7. * species->getDissipation());
-            species->setRollingFrictionCoefficient(readFromCommandLine(argc, argv, "-rollingFriction", 0.0));
-            species->setRollingStiffness(2. / 5. * species->getLoadingStiffness());
-            species->setRollingDissipation(2. / 5. * species->getDissipation());
-            species->setTorsionFrictionCoefficient(readFromCommandLine(argc, argv, "-torsionFriction", 0.0));
-            species->setTorsionStiffness(2. / 5. * species->getLoadingStiffness());
-            species->setTorsionDissipation(2. / 5. * species->getDissipation());
-            // set adhesion
-            species->setAdhesionStiffness(species->getLoadingStiffness());
-            species->setAdhesionForceMax(9.8*massD50*readFromCommandLine(argc,argv,"-bondNumber",0.0));
-            // set timeStep
-            setTimeStep(0.05 * species->getCollisionTime(massMin));
-            // define side-wall species (no friction/cohesion)
-            auto frictionlessWallSpecies_ = speciesHandler.copyAndAddObject(species);
-            auto mixedSpecies = speciesHandler.getMixedObject(species, frictionlessWallSpecies_);
-            mixedSpecies->setRollingFrictionCoefficient(0.0);
-            mixedSpecies->setSlidingFrictionCoefficient(0.0);
-            mixedSpecies->setAdhesionForceMax(0.0);
-            // define drum-wall species (high friction/ no cohesion)
-            auto frictionalWallSpecies_ = speciesHandler.copyAndAddObject(species);
-            mixedSpecies = speciesHandler.getMixedObject(species, frictionalWallSpecies_);
-            mixedSpecies->setRollingFrictionCoefficient(std::max(1.0,
-                                                                 species->getSlidingFrictionCoefficient())); //\todo TW infinity does not work (anymore?)
-            mixedSpecies->setSlidingFrictionCoefficient(std::max(1.0, species->getRollingFrictionCoefficient()));
-            mixedSpecies->setAdhesionForceMax(0.0);
-            // cast down
-            particleSpecies = species;
-            frictionalWallSpecies = frictionalWallSpecies_;
-            frictionlessWallSpecies = frictionlessWallSpecies_;
-        }
-        else if(stringSpecies == "LinearViscoelasticFrictionReversibleAdhesiveSpecies")
-        {
+        if (stringSpecies == "LinearViscoelasticFrictionReversibleAdhesiveSpecies") {
             //set species
             auto species = speciesHandler.copyAndAddObject(LinearViscoelasticFrictionReversibleAdhesiveSpecies());
             //set density
@@ -242,9 +190,7 @@ public:
             particleSpecies = species;
             frictionalWallSpecies = frictionalWallSpecies_;
             frictionlessWallSpecies = frictionlessWallSpecies_;
-        }
-        else
-        {
+        } else {
             logger(ERROR,"Species % unknown", stringSpecies);
         }
         logger(INFO, "Species: %", *particleSpecies);

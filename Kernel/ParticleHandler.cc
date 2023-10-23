@@ -204,6 +204,9 @@ void ParticleHandler::addObject(BaseParticle* P)
 
             // Broadcasts the existance of a new particle
             getDPMBase()->handleParticleAddition(P->getId(), P);
+
+            // Store the time stamp of creation.
+            P->setTimeStamp(getDPMBase()->getNumberOfTimeSteps());
         }
         //set the particleHandler pointer
         P->setHandler(this);
@@ -217,6 +220,12 @@ void ParticleHandler::addObject(BaseParticle* P)
         }
 
         P->actionsAfterAddObject();
+
+        if (getDPMBase() != nullptr)
+        {
+            // Broadcasts the existence of a new particle
+            getDPMBase()->handleParticleAddition(P->getId(), P);
+        }
 
 #ifdef MERCURYDPM_USE_MPI
         P->setPeriodicComplexity(std::vector<int>(0));
@@ -376,6 +385,12 @@ void ParticleHandler::addGhostObject(BaseParticle* P)
     P->getSpecies()->computeMass(P) ;
     //Check if this particle has new extrema
     checkExtrema(P);
+
+    if (getDPMBase() != nullptr)
+    {
+        // Broadcasts the existence of a new particle
+        getDPMBase()->handleParticleAddition(P->getId(), P);
+    }
 #else
     logger(INFO,
            "Function ParticleHandler::mpiAddObject(BaseParticle* P) should only be called when compiling with parallel build on");
@@ -1044,7 +1059,7 @@ BaseParticle* ParticleHandler::createObject(const std::string& type)
     {
         return new ThermalParticle;
     }
-    else if (type == "HeatFluidCoupledParticle")
+    else if (type == "HeatFluidCoupledBaseParticle")
     {
         return new HeatFluidCoupledParticle;
     }
@@ -1435,10 +1450,14 @@ PSD ParticleHandler::getPSD(std::vector<Mdouble> bins, Mdouble scaleFactor) cons
     double rMax = getLargestParticle()->getRadius();
 #endif
     if (bins.empty()) {
-        size_t n = std::min(100,(int)std::ceil(getNumberOfObjects()/20));
+        // Number of bins needed with average of 20 particles in each bin.
+        int n = (int)std::ceil(getNumberOfObjects()/20);
+        // Limit number of bins to a certain maximum and minimum.
+        n = std::min(100, n);
+        n = std::max(5, n);
         bins.reserve(n);
         double dr = (rMax-rMin)/(n-1);
-        for (size_t i = 0; i<n-1; i++) {
+        for (int i = 0; i<n-1; i++) {
             bins.push_back(rMin + i * dr);
         }
     } else {

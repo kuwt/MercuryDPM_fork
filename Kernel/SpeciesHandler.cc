@@ -73,6 +73,8 @@
 #include "Species/LinearViscoelasticFrictionLiquidMigrationWilletViscousSpecies.h"
 #include "Species/HertzianViscoelasticSlidingFrictionParhamiMcMeekingSinterSpecies.h"
 #include "Species/NormalForceSpecies/ThermalSpecies.h"
+#include "Species/HeatFluidCoupledLinearViscoelasticFrictionLiquidMigrationWilletSpecies.h"
+#include "Species/HeatFluidCoupledLinearViscoelasticFrictionSolidifyingLiquidMigrationWilletSpecies.h"
 
 #include "Species/NormalForceSpecies/SinterLinNormalSpecies.h"
 #include "Species/ThermalSinterLinFrictionReversibleAdhesiveSpecies.h"
@@ -146,9 +148,9 @@ SpeciesHandler::~SpeciesHandler()
     {
         delete o;
     }*/
-    for (BaseSpecies* mixSpec : mixedObjects_)
+    for (BaseSpecies* mixedObject : mixedObjects_)
     {
-        delete mixSpec;
+        delete mixedObject;
     }
     mixedObjects_.clear();
     logger(DEBUG, "SpeciesHandler::~SpeciesHandler() finished");
@@ -365,6 +367,18 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
     else if (type == "LinearPlasticViscoelasticSlidingFrictionLiquidMigrationWilletSpecies")
     {
         LinearPlasticViscoelasticSlidingFrictionLiquidMigrationWilletSpecies species;
+        is >> species;
+        copyAndAddObject(species);
+    }
+    else if (type == "HeatFluidCoupledLinearViscoelasticFrictionLiquidMigrationWilletSpecies")
+    {
+        HeatFluidCoupledLinearViscoelasticFrictionLiquidMigrationWilletSpecies species;
+        is >> species;
+        copyAndAddObject(species);
+    }
+    else if (type == "HeatFluidCoupledLinearViscoelasticFrictionSolidifyingLiquidMigrationWilletSpecies")
+    {
+        HeatFluidCoupledLinearViscoelasticFrictionSolidifyingLiquidMigrationWilletSpecies species;
         is >> species;
         copyAndAddObject(species);
     }
@@ -589,6 +603,18 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
         else if (type == "LinearPlasticViscoelasticFrictionLiquidBridgeWilletMixedSpecies")
         {
             LinearPlasticViscoelasticFrictionLiquidBridgeWilletMixedSpecies species;
+            is >> species;
+            mixedObjects_.push_back(species.copy());
+        }
+        else if (type == "HeatFluidCoupledLinearViscoelasticFrictionLiquidMigrationWilletMixedSpecies")
+        {
+            HeatFluidCoupledLinearViscoelasticFrictionLiquidMigrationWilletMixedSpecies species;
+            is >> species;
+            mixedObjects_.push_back(species.copy());
+        }
+        else if (type == "HeatFluidCoupledLinearViscoelasticFrictionSolidifyingLiquidMigrationWilletMixedSpecies")
+        {
+            HeatFluidCoupledLinearViscoelasticFrictionSolidifyingLiquidMigrationWilletMixedSpecies species;
             is >> species;
             mixedObjects_.push_back(species.copy());
         }

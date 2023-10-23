@@ -103,16 +103,18 @@ public:
     std::string getBaseName() const;
     
     Mdouble getLiquidBridgeVolume() const;
+
+    void setLiquidBridgeVolumeByEvaporation(Mdouble liquidBridgeVolume);
+
+    virtual void setLiquidBridgeVolume(Mdouble liquidBridgeVolume);
     
-    void setLiquidBridgeVolume(Mdouble liquidBridgeVolume);
-    
-    void addLiquidBridgeVolume(Mdouble liquidBridgeVolume);
+    virtual void addLiquidBridgeVolume(Mdouble liquidBridgeVolume);
     
     bool getWasInContact() const;
     
     void setWasInContact(bool wasInContact);
     
-    void rupture();
+    virtual void rupture();
     
     void form();
     

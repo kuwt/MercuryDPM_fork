@@ -178,13 +178,13 @@ void LiquidMigrationWilletInteraction::form()
         //if below max bridge volume, move all liquid from film to volume
         else if (PParticle->getLiquidVolume() <= species->getLiquidBridgeVolumeMax())
         {
-            liquidBridgeVolume_ = PParticle->getLiquidVolume();
+            setLiquidBridgeVolume(PParticle->getLiquidVolume());
             PParticle->setLiquidVolume(0.0);
         }
         //if above max bridge volume, fill the liquid bridge and keep the rest of the liquid in the particle
         else
         {
-            liquidBridgeVolume_ = species->getLiquidBridgeVolumeMax();
+            setLiquidBridgeVolume(species->getLiquidBridgeVolumeMax());
             PParticle->setLiquidVolume(PParticle->getLiquidVolume() - species->getLiquidBridgeVolumeMax());
         }
 //        if (liquidBridgeVolume_) logger(INFO,"Forming liquid bridge of volume % between particles % and wall %",liquidBridgeVolume_,getP()->getId(),getI()->getId());
@@ -213,7 +213,7 @@ void LiquidMigrationWilletInteraction::form()
         }
         else if (distributableLiquidVolume <= species->getLiquidBridgeVolumeMax())
         {
-            liquidBridgeVolume_ = distributableLiquidVolume;
+            setLiquidBridgeVolume(distributableLiquidVolume);
             if (!IParticle->getPeriodicFromParticle() ||
                 PParticle->getIndex() < IParticle->getPeriodicFromParticle()->getIndex())
             {
@@ -223,7 +223,7 @@ void LiquidMigrationWilletInteraction::form()
         }
         else //if the total volume exceeds LiquidBridgeVolumeMax, only distribute the max value
         {
-            liquidBridgeVolume_ = species->getLiquidBridgeVolumeMax();
+            setLiquidBridgeVolume(species->getLiquidBridgeVolumeMax());
             Mdouble pFraction =
                     PParticle->getLiquidVolume() / distributableLiquidVolume;
             if (!IParticle->getPeriodicFromParticle() ||
@@ -280,7 +280,7 @@ void LiquidMigrationWilletInteraction::rupture()
         {
             // Updating new volume with distribution less than critical volume
             Mdouble ExcessBridgeVolume = 0.0;
-            Mdouble newVolume = liquidBridgeVolume_ * species->getDistributionCoefficient() / (numContactsP);
+            Mdouble newVolume = getLiquidBridgeVolume() * species->getDistributionCoefficient() / (numContactsP);
             
             for (auto i : getP()->getInteractions())
             {
@@ -303,24 +303,24 @@ void LiquidMigrationWilletInteraction::rupture()
             }
             PParticle->setLiquidVolume(
                     PParticle->getLiquidVolume() + ExcessBridgeVolume +
-                    liquidBridgeVolume_ * (1 - species->getDistributionCoefficient()));
+                    getLiquidBridgeVolume() * (1 - species->getDistributionCoefficient()));
             
             setLiquidBridgeVolume(0.0);
         }
         else
         {
-            PParticle->setLiquidVolume(PParticle->getLiquidVolume() + liquidBridgeVolume_);
+            PParticle->setLiquidVolume(PParticle->getLiquidVolume() + getLiquidBridgeVolume());
         }
-        liquidBridgeVolume_ = 0.0;
-        //for (auto i : *getHandler())
-        //{
-        //    LiquidMigrationWilletInteraction* j =
-        //            dynamic_cast<LiquidMigrationWilletInteraction*>(i);
-        //}
-        //for (auto i : getHandler()->getDPMBase()->particleHandler)
-        //{
-        //    LiquidFilmParticle* j = dynamic_cast<LiquidFilmParticle*>(i);
-        //}
+        setLiquidBridgeVolume(0.0);
+        for (auto i : *getHandler())
+        {
+            LiquidMigrationWilletInteraction* j =
+                    dynamic_cast<LiquidMigrationWilletInteraction*>(i);
+        }
+        for (auto i : getHandler()->getDPMBase()->particleHandler)
+        {
+            LiquidFilmParticle* j = dynamic_cast<LiquidFilmParticle*>(i);
+        }
     }
     else if (PParticle == nullptr) //if P is a wall
     {
@@ -333,12 +333,12 @@ void LiquidMigrationWilletInteraction::rupture()
 //        logger(INFO,"Rupturing liquid bridge of volume % between particles % and % (numContacts %, MPI %%, overlap %)",liquidBridgeVolume_,getP()->getId(),getI()->getId(),numContactsP,PParticle->isMPIParticle(),IParticle->isMPIParticle(),getOverlap());
         if (numContactsP < 1) //if P has only one contact (the one that gets ruptured), pass the fluid into it)
         {
-            PParticle->addLiquidVolume(0.5 * liquidBridgeVolume_);
+            PParticle->addLiquidVolume(0.5 * getLiquidBridgeVolume());
         }
         else //if P has only multiple contacts pass the fluid into it)
         {
             // move fluid to neighbouring contacts
-            Mdouble perContactVolume = 0.5 * liquidBridgeVolume_ * species->getDistributionCoefficient() / numContactsP;
+            Mdouble perContactVolume = 0.5 * getLiquidBridgeVolume() * species->getDistributionCoefficient() / numContactsP;
             for (auto i : getP()->getInteractions())
             {
                 LiquidMigrationWilletInteraction* j =
@@ -353,14 +353,14 @@ void LiquidMigrationWilletInteraction::rupture()
                     {
                         j->addLiquidBridgeVolume(perContactVolume);
                         PParticle->addLiquidVolume(
-                                0.5 * liquidBridgeVolume_ * (1 - species->getDistributionCoefficient()) / numContactsP);
+                                0.5 * getLiquidBridgeVolume() * (1 - species->getDistributionCoefficient()) / numContactsP);
                     }
                     else
                     {
                         j->setLiquidBridgeVolume(species->getLiquidBridgeVolumeMax());
                         PParticle->addLiquidVolume(excessVolume);
                         PParticle->addLiquidVolume(
-                                0.5 * liquidBridgeVolume_ * (1 - species->getDistributionCoefficient()) / numContactsP);
+                                0.5 * getLiquidBridgeVolume() * (1 - species->getDistributionCoefficient()) / numContactsP);
                     }
                 }
             }
@@ -372,8 +372,8 @@ void LiquidMigrationWilletInteraction::rupture()
         int numContactsI = getNumberOfContacts(getI());
         if (numContactsI < 1)
         {
-            IParticle->addLiquidVolume(0.5 * liquidBridgeVolume_);
-            //std::cout << "added " << 0.5 * liquidBridgeVolume_ 
+            IParticle->addLiquidVolume(0.5 * getLiquidBridgeVolume());
+            //std::cout << "added " << 0.5 * liquidBridgeVolume_
             //   << " to particle #" << IParticle->getIndex() 
             //<< ", V=" << IParticle->getLiquidVolume() << std::endl;
         }
@@ -381,7 +381,7 @@ void LiquidMigrationWilletInteraction::rupture()
         {
             // move fluid to neighbouring contacts
             Mdouble perContactVolume =
-                    0.5 * liquidBridgeVolume_ * species->getDistributionCoefficient() / (numContactsI);
+                    0.5 * getLiquidBridgeVolume() * species->getDistributionCoefficient() / (numContactsI);
             for (BaseInteraction* i : getI()->getInteractions())
             {
                 LiquidMigrationWilletInteraction* j = dynamic_cast<LiquidMigrationWilletInteraction*>(i);
@@ -396,7 +396,7 @@ void LiquidMigrationWilletInteraction::rupture()
                     {
                         j->addLiquidBridgeVolume(perContactVolume);
                         IParticle->addLiquidVolume(
-                                0.5 * liquidBridgeVolume_ * (1 - species->getDistributionCoefficient()) /
+                                0.5 * getLiquidBridgeVolume() * (1 - species->getDistributionCoefficient()) /
                                 (numContactsI));
                     }
                     else
@@ -405,7 +405,7 @@ void LiquidMigrationWilletInteraction::rupture()
                         j->setLiquidBridgeVolume(species->getLiquidBridgeVolumeMax());
                         IParticle->addLiquidVolume(excessVolume);
                         IParticle->addLiquidVolume(
-                                0.5 * liquidBridgeVolume_ * (1 - species->getDistributionCoefficient()) /
+                                0.5 * getLiquidBridgeVolume() * (1 - species->getDistributionCoefficient()) /
                                 (numContactsI));
                     }
                     //~ std::cout << "added " << perContactVolume 
@@ -428,7 +428,7 @@ void LiquidMigrationWilletInteraction::rupture()
         //~ << std::endl;
         
         //to balance the added volume, remove the liquid from the bridge
-        liquidBridgeVolume_ = 0.0;
+        setLiquidBridgeVolume(0.0);
         
     }
 }
@@ -464,6 +464,11 @@ Mdouble LiquidMigrationWilletInteraction::getLiquidBridgeVolume() const
     return liquidBridgeVolume_;
 }
 
+void LiquidMigrationWilletInteraction::setLiquidBridgeVolumeByEvaporation(Mdouble liquidBridgeVolume)
+{
+    liquidBridgeVolume_ = liquidBridgeVolume;
+}
+
 void LiquidMigrationWilletInteraction::setLiquidBridgeVolume(Mdouble liquidBridgeVolume)
 {
     liquidBridgeVolume_ = liquidBridgeVolume;
@@ -487,7 +492,7 @@ void LiquidMigrationWilletInteraction::setWasInContact(bool wasInContact)
 Mdouble LiquidMigrationWilletInteraction::getRuptureDistance()
 {
     const LiquidMigrationWilletSpecies* species = getSpecies();
-    return (1.0 + 0.5 * species->getContactAngle()) * cbrt(liquidBridgeVolume_);
+    return (1.0 + 0.5 * species->getContactAngle()) * cbrt(getLiquidBridgeVolume());
 }
 
 unsigned LiquidMigrationWilletInteraction::getNumberOfFieldsVTK() const
@@ -508,7 +513,7 @@ std::string LiquidMigrationWilletInteraction::getNameVTK(unsigned i) const
 
 std::vector<Mdouble> LiquidMigrationWilletInteraction::getFieldVTK(unsigned i) const
 {
-    return std::vector<Mdouble>(1, cbrt(liquidBridgeVolume_));
+    return std::vector<Mdouble>(1, cbrt(getLiquidBridgeVolume()));
 }
 
 Mdouble LiquidMigrationWilletInteraction::getTotalLiquidFilmVolume(ParticleHandler& h)

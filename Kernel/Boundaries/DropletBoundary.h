@@ -31,7 +31,7 @@ public:
         Vec3D velocity;
         double radius;
 
-        // Used for when not to repel at walls.
+        // Used for when to repel droplet at walls.
         Vec3D force;
     };
 

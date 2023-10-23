@@ -11,13 +11,11 @@ psd cumulative volume diameter
 restitutionCoefficient 0.3
 collisionTime 0.000067997
 stiffness 1.34e9
-froude 1.7e-4
+froudenumber 1.7e-4
 normalstress 1512 1 2 3 4 5
 rollingFriction 0.3
-unloadingStiffnessRatio 120
+unloadingStiffnesRatio 120
 cohesionStiffnesRatio 0.5
-fillFraction 0.214
-relDrumRadius
 # Parameters to be calibrated (names and ranges)
 slidingFriction 0.2 0.8
 bondNumber 1e6 5e6

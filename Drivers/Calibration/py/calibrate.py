@@ -46,12 +46,8 @@ parser.add_argument("--verbose", help="Whether smc should be run in verbose mode
 parser.add_argument("--samples", help="Number of samples", default=0, type=int)
 parser.add_argument("--cores", help="How many cores we can use", default=0, type=int)
 parser.add_argument("--node", help="On which node(s) to run (0=local)", nargs="+", default=[])
-parser.add_argument("--infrastructure", help="define the Infrastructure on which you are running", default=[])
-parser.add_argument("--killratio", help="ratio of simulations to kill when the number of simulations"
-                                        "((1-killRatio) * samples) has finished. Mainly used to save time (and money)"
-                                        "on AWS. BEWARE: Setting this ratio too high can result in accuracy loss",
-                    default=0.2, type=float)
-
+parser.add_argument("--infrastructure", help="define the Infrastructure on which you are running",
+                    default=[])
 args = parser.parse_args()
 args.onNode = len(args.node) > 0
 
@@ -154,7 +150,7 @@ print("Command line parameters: %s" % paramString)
 
 # check existence of build directory
 if args.infrastructure == "AWS":
-    buildDir = "../../"
+    buildDir = "../../."
 else:
     buildDir = open("build", "r").read().split()[0]
 if not os.path.exists(os.path.expanduser(buildDir)):
@@ -234,8 +230,6 @@ for iteration in range(args.iter + 1):
         else:
             # On all other iterations, create an smcTable that does depend on the previous data
             # noinspection PyUnboundLocalVariable
-            if args.infrastructure == "AWS":
-                smcTest.numSamples = args.samples
             gmm, maxNumComponents = smcTest.resampleParams(caliStep=-1)
             os.system('mv smcTableNew.txt %s' % smcTable)
             # write out gmm properties
@@ -248,7 +242,7 @@ for iteration in range(args.iter + 1):
         print("Preparing simulations. After simulations have finished, rerun this script to continue.")
         if args.infrastructure == "AWS":
             AWS.runSimulations(smcTable, outputDir, buildDir, paramString, exeNames, args.material, args.samples,
-                               args.onNode, args.node, args.cores, args.infrastructure, args.killratio, args.verbose)
+                               args.onNode, args.node, args.cores, args.infrastructure, args.verbose)
         else:
             runSimulations(smcTable, outputDir, buildDir, paramString, exeNames, args.material, args.onNode,
                            args.node, args.cores, args.verbose)
