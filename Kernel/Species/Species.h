@@ -308,6 +308,8 @@ void Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::re
     NormalForceSpecies::read(is);
     FrictionForceSpecies::read(is);
     AdhesiveForceSpecies::read(is);
+    // ensure that interaction distance is recomputed after restarting
+    AdhesiveForceSpecies::setInteractionDistance();
 }
 
 /*!

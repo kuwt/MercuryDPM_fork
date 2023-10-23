@@ -30,7 +30,7 @@
 class BaseAdhesiveForce : public BaseForce
 {
 public:
-
+    virtual void setInteractionDistance() {};
 };
 
 #endif //MERCURYDPM_BaseAdhesiveForce_H
