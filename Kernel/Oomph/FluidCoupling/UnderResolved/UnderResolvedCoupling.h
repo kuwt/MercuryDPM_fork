@@ -19,14 +19,16 @@
 
 template<class ELEMENT>
 class UnderResolvedCoupling;
+
 namespace getDataFromElement
 {
-    //UnderResolvedCoupling *ptrToCoupledClass = nullptr;
+    template<class ELEMENT>
+    UnderResolvedCoupling<ELEMENT> *ptrToCoupledClass = nullptr;
     double getVoidageOfElement(const double &, const oomph::Vector<double> &);
     double getVoidageOfElement_byEl(const int &);
     double getdVoidagedxOfElement_byEl(const int &, const int &);
     double getdVoidagedtOfElement_byEl(const int &);
-    oomph::Vector<double> getBodyForceByCoupling_byEl(const int &);
+    void getBodyForceByCoupling_byEl(const int &, const oomph::Vector<double> &);
 }
 
 template <class ELEMENT>
@@ -58,7 +60,7 @@ public:
     
         pinBC();
         setBC();
-        
+
         // Pass pointer to Reynolds number to elements
         unsigned long nelem=mesh_pt()->nelement();
         for (unsigned e=0;e<nelem;e++)
@@ -71,13 +73,16 @@ public:
     
             // USED FOR PLOTTING AND SEMI-RESOLVED
             //dynamic_cast<ELEMENT *>(mesh_pt()->element_pt(e))->voidage_fct_pt() = &getDataFromElement::getVoidageOfElement;
-    
-/*            currEl->voidage_fct_pt_byEl() = &getDataFromElement::getVoidageOfElement_byEl;
-            currEl->dvoidage_dx_fct_pt_byEl() = &getDataFromElement::getdVoidagedxOfElement_byEl;
-            currEl->dvoidage_dt_fct_pt_byEl() = &getDataFromElement::getdVoidagedtOfElement_byEl;
-            
-            currEl->body_force_fct_pt_by_coupling() = &getDataFromElement::getBodyForceByCoupling_byEl;*/
-    
+
+            //FIXME I think we need this to get coupling 24-10-23 it is unset in AJElements.h
+            //FIXME I do not know why this is commented as of yet, maybe in old codes this can be found? Different way of coupling?
+            //currEl->voidage_fct_pt_byEl() = &getDataFromElement::getVoidageOfElement_byEl;
+            //currEl->dvoidage_dx_fct_pt_byEl() = &getDataFromElement::getdVoidagedxOfElement_byEl;
+            //currEl->dvoidage_dt_fct_pt_byEl() = &getDataFromElement::getdVoidagedtOfElement_byEl;
+            //currEl->body_force_fct_pt_by_coupling() = &getDataFromElement::getBodyForceByCoupling_byEl;
+
+            //currEl->body_force_fct_pt_by_coupling() = GetFPointer();
+
             // NEEDED FOR COUPLING THROUGH ELEMENT NUMBER
             currEl->set_number(e); // Adding global number to element
         }
@@ -92,7 +97,14 @@ public:
     {
         return dynamic_cast<oomph::RefineableSimpleCubicMesh<ELEMENT>*>(oomph::Problem::mesh_pt());
     }
-    
+
+    //FIXME why not working?
+    //typedef void (UnderResolvedCoupling::*fptr)(const int&, oomph::Vector<double> &);
+    //fptr GetFPointer()
+    //{
+        //return &this->getBodyForceInElemByCoupling;
+    //}
+
     // General functions for solving time-dependent problems
     void setTimeStepOomph(const double& dtOomph) {dtOomph_ = dtOomph;}
     double getTimeStepOomph() {return dtOomph_;}
@@ -166,9 +178,9 @@ public:
     
     Vec3D getPOnPart(const unsigned int &iPart, const int &pInEl, const double &voidInEl, const oomph::Vector<double> &s);
     Vec3D getFdOnPart(const unsigned &iPart, const int &pInEl, const double &voidInEl, const oomph::Vector<double> &s);
-    
-    //Functions regarding particle->fluid interaction
-    void addCouplingToResiudals();
+
+    // Functions to pass info to fluid element
+    void passInfoToFluid();
 
     // Functions keeping track of particle-element-voidage information
     void generateLists();
@@ -206,8 +218,8 @@ public:
     std::vector<long int> getNeighbourElementNumbers(const int &iEl_) {return listOfNeighbours_[iEl_];} // unrefineable version
     double getdVoidagedxInElemFromList(const int &iEl_, const int &dir_) {return listOfdVoidagedxInElem_[iEl_][dir_];}
     double getdVoidagedtInElemFromList(const int &iEl_) {return listOfdVoidagedtInElem_[iEl_];}
-    oomph::Vector<double> getBodyForceInElemByCoupling(const int &iEl_);
-    
+    void getBodyForceInElemByCoupling(const int &iEl_, oomph::Vector<double> &force_);
+
     // General functions
     void setInflowVel(double inflowVel) {inflowVel_ = inflowVel;}
     double getInflowVel() {return inflowVel_;}
@@ -235,7 +247,19 @@ public:
     // Flags
     void setSettling(bool flag) {settlingOn_ = flag;}
     void setAdaptOn(bool flag) {adaptOn_ = flag;}
-    
+
+    // Flags for active interaction forces
+    void setInteractionForceP(bool flag) {interactionForceP_ = flag;}
+    bool getInteractionForceP() {return interactionForceP_;}
+    void setInteractionForceFd(bool flag) {interactionForceFd_ = flag;}
+    bool getInteractionForceFd() {return interactionForceFd_;}
+    void setInteractionForceShear(bool flag) {interactionForceShear_ = flag;}
+    bool getInteractionForceShear() {return interactionForceShear_;}
+    void setInteractionForceMagnus(bool flag) {interactionForceMagnus_ = flag;}
+    bool getInteractionForceMagnus() {return interactionForceMagnus_;}
+    void setInteractionForceSaffman(bool flag) {interactionForceSaffman_ = flag;}
+    bool getInteractionForceSaffman() {return interactionForceSaffman_;}
+
     // Member variables
     std::vector<unsigned int> listOfPInElem_;
     std::vector<double> listOfVoidageInElem_;
@@ -287,9 +311,19 @@ private:
     double fluidDensity_;
     double fluidKinematicViscosity_; // At 25 degrees C
     double fluidDynamicViscosity_; // At 25 degrees C
+
+    // Set bools for which forces contribute to interactionForces
+    bool interactionForceP_ = false;
+    bool interactionForceFd_ = false;
+    bool interactionForceShear_ = false;
+    bool interactionForceMagnus_ = false;
+    bool interactionForceSaffman_ = false;
 };
 
-
+/*!
+ * \details General solve routine for a Particle-Fluid coupled simulation (with oomph-lib and MercuryDPM)
+ * @param[in] oomph::DocInfo &doc_info, contains info of oomph outputs
+ */
 template <class ELEMENT>
 void UnderResolvedCoupling<ELEMENT>::solveSystem(oomph::DocInfo &doc_info_)
 {
@@ -314,6 +348,10 @@ void UnderResolvedCoupling<ELEMENT>::solveSystem(oomph::DocInfo &doc_info_)
             logger(INFO, "MercuryDPM/oomph-lib time = % / % , tmax = % ", getTime(), this->time_pt()->time(),
                    getTimeMax());
         }
+
+        //FIXME Hacked in place but should be actionsBeforeTimestep
+        passInfoToFluid();
+
         // If merc is at lower time than oomph, do particle solve
         if (getTime() <= this->time_pt()->time())
         {
@@ -388,6 +426,10 @@ void UnderResolvedCoupling<ELEMENT>::solveSystem(oomph::DocInfo &doc_info_)
     }
 };
 
+/*!
+ * \details Output for oomph-lib standard output
+ * @param[in] oomph::DocInfo &doc_info, contains info of oomph outputs
+ */
 template <class ELEMENT>
 void UnderResolvedCoupling<ELEMENT>::doc_solution(oomph::DocInfo& doc_info)
 {
@@ -403,12 +445,15 @@ void UnderResolvedCoupling<ELEMENT>::doc_solution(oomph::DocInfo& doc_info)
     some_file.open(filename);
     mesh_pt()->output(some_file,npts);
     some_file.close();
-} //end doc_solution
+}
 
+/*!
+ * \details Output for oomph-lib voidage (fluid volume fraction)
+ * @param[in] oomph::DocInfo &doc_info, contains info of oomph outputs
+ */
 template <class ELEMENT>
 void UnderResolvedCoupling<ELEMENT>::doc_voidage(oomph::DocInfo& doc_info)
 {
-    //std::cout << "In doc_voidage" << std::endl;
     std::ofstream some_file;
     char filename[100];
 
@@ -420,8 +465,12 @@ void UnderResolvedCoupling<ELEMENT>::doc_voidage(oomph::DocInfo& doc_info)
     some_file.open(filename);
     //mesh_pt()->output_voidage_byEl(some_file,npts); //FIXME Create function
     some_file.close();
-} //end doc_voidage
+}
 
+/*!
+ * \details Output for oomph-lib element output, containing nodes and element number
+ * @param[in] oomph::DocInfo &doc_info, contains info of oomph outputs
+ */
 template <class ELEMENT>
 void UnderResolvedCoupling<ELEMENT>::doc_element(oomph::DocInfo& doc_info)
 {
@@ -438,7 +487,9 @@ void UnderResolvedCoupling<ELEMENT>::doc_element(oomph::DocInfo& doc_info)
     some_file.close();
 }
 
-
+/*!
+ * \details Syncing time-steps for the two participants based on changing Mercury timestep slightly (MercuryDPM and oomph-lib)
+ */
 template <class ELEMENT>
 void UnderResolvedCoupling<ELEMENT>::syncTimeSteps()
 {
@@ -451,10 +502,7 @@ void UnderResolvedCoupling<ELEMENT>::syncTimeSteps()
 }
 
 /*!
- * \details Updates lists during simulation.
- *
- * \param[in]
- * \param[in]
+ * \details Updates lists containing information for coupling during simulation.
  */
 template <class ELEMENT>
 void UnderResolvedCoupling<ELEMENT>::updateLists()
@@ -464,7 +512,9 @@ void UnderResolvedCoupling<ELEMENT>::updateLists()
     updateListOfdVoidagedxInElem();
 }
 
-
+/*!
+ * \details Letting the particles settle due to gravity before the coupling simulation is started.
+ */
 template <class ELEMENT>
 void UnderResolvedCoupling<ELEMENT>::settleParticles()
 {
@@ -485,8 +535,9 @@ void UnderResolvedCoupling<ELEMENT>::settleParticles()
     setTime(0.);
 }
 
-
-// Actions after adapt, renumber elements, update lists
+/*!
+ * \details Actions before adapt, copying tree-structure before it is adapted to keep access to history values
+ */
 template <class ELEMENT>
 void UnderResolvedCoupling<ELEMENT>::actions_before_adapt()
 {
@@ -500,8 +551,9 @@ void UnderResolvedCoupling<ELEMENT>::actions_before_adapt()
     logger(DEBUG,"prevLeaves.size() = %, prevTrees.size() = %",prevLeaves_.size(),prevTrees_.size());
 }
 
-
-// Actions after adapt, renumber elements, update lists
+/*!
+ * \details Actions after adapt, renumber elements, update lists
+ */
 template <class ELEMENT>
 void UnderResolvedCoupling<ELEMENT>::actions_after_adapt()
 {
@@ -518,16 +570,17 @@ void UnderResolvedCoupling<ELEMENT>::actions_after_adapt()
     auto historyValuesVoidageBeforeAdapt = historyValuesVoidage_;
     auto dVoidagedtBeforeAdapt = listOfdVoidagedtInElem_;
 
-    logger(INFO,"Call to generateLists()");
+    logger(DEBUG,"Call to generateLists()");
     generateLists();
 
     logger(DEBUG,"Pass history values for dedt");
     updateListOfdVoidagedtAfterAdapt(historyValuesVoidageBeforeAdapt, dVoidagedtBeforeAdapt);
-
 }
 
-
-// Actions after timestep, update drag, pressure and shear contributions to force
+/*!
+ * \details Actions after timestep, update drag, pressure and shear contributions to force
+ */
+//
 template <class ELEMENT>
 void UnderResolvedCoupling<ELEMENT>::actionsAfterTimeStep()
 {
@@ -538,6 +591,9 @@ void UnderResolvedCoupling<ELEMENT>::actionsAfterTimeStep()
     setBC();
 }
 
+/*!
+ * \details Updating interaction forces between fluid and particles
+ */
 template <class ELEMENT>
 void UnderResolvedCoupling<ELEMENT>::updateInteractionForces()
 {
@@ -562,34 +618,49 @@ void UnderResolvedCoupling<ELEMENT>::updateInteractionForces()
         getS(s,iPart,pInEl);
 
         logger(DEBUG,"Call to updatePOnPart()");
-        //updatePOnPart(iPart, pInEl, voidInEl, s);
+        updatePOnPart(iPart, pInEl, voidInEl, s);
 
         logger(DEBUG,"Call to updateFdOnPart()");
         updateFdOnPart(iPart, pInEl, voidInEl, s);
 
         logger(DEBUG,"Call to updateShearOnPart()");
-        //updateShearOnPart(iPart, pInEl, voidInEl, s);
+        updateShearOnPart(iPart, pInEl, voidInEl, s);
 
         logger(DEBUG,"Call to updateSaffmanLift()");
-        //updateSaffmanLift(iPart, pInEl, s);
+        updateSaffmanLift(iPart, pInEl, s);
 
         logger(DEBUG,"Call to updateMagnusLift()");
-        //updateMagnusLift(iPart, pInEl, s);
+        updateMagnusLift(iPart, pInEl, s);
     }
 
-    //logger(INFO,"Updated forces on all particles");
+    logger(DEBUG,"Updated forces on all particles");
 }
 
-
+/*!
+ * \details Add pressure contribution to force computation
+ * @param[in] const unsigned int &iPart, particle index
+ * @param[in] const int &pInEl, element index containing iPart
+ * @param[in] const double &voidInEl, local voidage
+ * @param[in] const oomph::Vector<double> &s, parameterised location of iPart in pInEl
+ */
 template <class ELEMENT>
 void UnderResolvedCoupling<ELEMENT>::updatePOnPart(const unsigned int &iPart, const int &pInEl, const double &voidInEl, const oomph::Vector<double> &s)
 {
+    if (!getInteractionForceP()) {return;}
+
     BaseParticle* particlePtr = particleHandler.getObject(iPart);
     Vec3D Fp = getPOnPart(iPart, pInEl, voidInEl, s) * getPressureScaling(); // To get dimensional quantity
 
     particlePtr->addForce(Fp);
 }
 
+/*!
+ * \details Computes pressure force on particle based on pressure gradient around particle
+ * @param[in] const unsigned int &iPart, particle index
+ * @param[in] const int &pInEl, element index containing iPart
+ * @param[in] const double &voidInEl, local voidage
+ * @param[in] const oomph::Vector<double> &s, parameterised location of iPart in pInEl
+ */
 template <class ELEMENT>
 Vec3D UnderResolvedCoupling<ELEMENT>::getPOnPart(const unsigned int &iPart, const int &pInEl, const double &voidInEl, const oomph::Vector<double> &s)
 {
@@ -602,9 +673,18 @@ Vec3D UnderResolvedCoupling<ELEMENT>::getPOnPart(const unsigned int &iPart, cons
     return pForceOnP;
 }
 
+/*!
+ * \details Add drag force contribution to force computation
+ * @param[in] const unsigned int &iPart, particle index
+ * @param[in] const int &pInEl, element index containing iPart
+ * @param[in] const double &voidInEl, local voidage
+ * @param[in] const oomph::Vector<double> &s, parameterised location of iPart in pInEl
+ */
 template <class ELEMENT>
 void UnderResolvedCoupling<ELEMENT>::updateFdOnPart(const unsigned int &iPart, const int &pInEl, const double &voidInEl, const oomph::Vector<double> &s)
 {
+    if (!getInteractionForceFd()) {return;}
+
     BaseParticle* particlePtr = particleHandler.getObject(iPart);
     Vec3D dF = getFdOnPart(iPart,pInEl,voidInEl,s) * getBodyForceScaling(); // To get dimensional quantity
 
@@ -613,11 +693,17 @@ void UnderResolvedCoupling<ELEMENT>::updateFdOnPart(const unsigned int &iPart, c
     particlePtr->addForce(dF);
 }
 
+/*!
+ * \details Computes drag force on particle based on drag coefficient of particle (Reynolds nr), implemented both Stokes law and Ergun + Wen-Yu
+ * @param[in] const unsigned int &iPart, particle index
+ * @param[in] const int &pInEl, element index containing iPart
+ * @param[in] const double &voidInEl, local voidage
+ * @param[in] const oomph::Vector<double> &s, parameterised location of iPart in pInEl
+ */
 template <class ELEMENT>
 Vec3D UnderResolvedCoupling<ELEMENT>::getFdOnPart(const unsigned int &iPart, const int &pInEl, const double &voidInEl, const oomph::Vector<double> &s)
 {
     auto elPtr = dynamic_cast<ELEMENT *>(mesh_pt()->element_pt(pInEl));
-    //mesh_pt()->element_pt(pInEl)->
 
     BaseParticle* particlePtr = particleHandler.getObject(iPart);
 
@@ -693,15 +779,22 @@ Vec3D UnderResolvedCoupling<ELEMENT>::getFdOnPart(const unsigned int &iPart, con
     }
     // ---------------------------------------------- Ergun + Wen-Yu ------------------------------------------------ //
 
-
     return dF;
 }
 
-
-//FIXME Code unfinished
+/*!
+ * \details Add shear force contribution to force computation
+ * @param[in] const unsigned int &iPart, particle index
+ * @param[in] const int &pInEl, element index containing iPart
+ * @param[in] const double &voidInEl, local voidage
+ * @param[in] const oomph::Vector<double> &s, parameterised location of iPart in pInEl
+ */
+//FIXME Code options open
 template <class ELEMENT>
 void UnderResolvedCoupling<ELEMENT>::updateShearOnPart(const unsigned int &iPart_, const int &pInEl_, const double &voidInEl_, const oomph::Vector<double> &s_)
 {
+    if (!getInteractionForceShear()) {return;}
+
     BaseParticle* particlePtr = particleHandler.getObject(iPart_);
 
     oomph::Vector<double> pPos = convertVecFuncs::convertToOomphVec(particlePtr->getPosition());
@@ -870,9 +963,18 @@ void UnderResolvedCoupling<ELEMENT>::updateShearOnPart(const unsigned int &iPart
     //allPrevForces += convertVecFuncs::convertToVec3D(shearForceOnP);
 }
 
+/*!
+ * \details Add Saffman lift contribution to force computation
+ * @param[in] const unsigned int &iPart, particle index
+ * @param[in] const int &pInEl, element index containing iPart
+ * @param[in] const double &voidInEl, local voidage
+ * @param[in] const oomph::Vector<double> &s, parameterised location of iPart in pInEl
+ */
 template <class ELEMENT>
 void UnderResolvedCoupling<ELEMENT>::updateSaffmanLift(const unsigned &iPart_, const int &pInEl_, const oomph::Vector<double> &s_)
 {
+    if (!getInteractionForceSaffman()) {return;}
+
     BaseParticle* particlePtr = particleHandler.getObject(iPart_);
 
     oomph::Vector<double> velAtPos(3,0.0);
@@ -918,9 +1020,17 @@ void UnderResolvedCoupling<ELEMENT>::updateSaffmanLift(const unsigned &iPart_, c
     //allPrevForces += Fsaffman;
 }
 
+/*!
+ * \details Add Magnus lift contribution to force computation
+ * @param[in] const unsigned int &iPart, particle index
+ * @param[in] const int &pInEl, element index containing iPart
+ * @param[in] const oomph::Vector<double> &s, parameterised location of iPart in pInEl
+ */
 template <class ELEMENT>
 void UnderResolvedCoupling<ELEMENT>::updateMagnusLift(const unsigned &iPart_, const int &pInEl_, const oomph::Vector<double> &s_)
 {
+    if (!getInteractionForceMagnus()) {return;}
+
     BaseParticle* particlePtr = particleHandler.getObject(iPart_);
 
     https://www.sciencedirect.com/science/article/pii/S1001627917302901, Issues in Eulerian–Lagrangian modeling of sediment transport under saltation regime
@@ -994,7 +1104,19 @@ void UnderResolvedCoupling<ELEMENT>::updateMagnusLift(const unsigned &iPart_, co
 }
 
 template <class ELEMENT>
-oomph::Vector<double> UnderResolvedCoupling<ELEMENT>::getBodyForceInElemByCoupling(const int &iEl_)
+void UnderResolvedCoupling<ELEMENT>::passInfoToFluid()
+{
+    for (int i = 0; i<mesh_pt()->nelement(); i++)
+    {
+        double localVoidage = getVoidageInElemFromList(i);
+        oomph::Vector<double> dummyF = {0.,0.,0.};
+        dynamic_cast<ELEMENT*>(mesh_pt()->element_pt(i))->setVoidage(localVoidage);
+        getBodyForceInElemByCoupling(i,dummyF);
+    }
+}
+
+template <class ELEMENT>
+void UnderResolvedCoupling<ELEMENT>::getBodyForceInElemByCoupling(const int &iEl_, oomph::Vector<double> &force_)
 {
     Vec3D Ftotal = {0.,0.,0.};
     for (int iP = 0; iP < particleHandler.getNumberOfObjects(); iP++)
@@ -1006,10 +1128,11 @@ oomph::Vector<double> UnderResolvedCoupling<ELEMENT>::getBodyForceInElemByCoupli
             oomph::Vector<double> s(3,0.0);
             getS(s,iP,pInEl);
 
+            Ftotal += getPOnPart(iP, pInEl, voidInEl, s);
             Ftotal += getFdOnPart(iP, pInEl, voidInEl, s);
+            //FIXME ADD other 3 forces? they are rotations though, not normal forces so as vorticity?
 
-            logger(INFO,"Ftotal on % = {% % %}",iP, Ftotal.X, Ftotal.Y, Ftotal.Z);
-
+            logger(DEBUG,"Ftotal on % = {% % %}",iP, Ftotal.X, Ftotal.Y, Ftotal.Z);
         }
     }
 
@@ -1029,14 +1152,16 @@ oomph::Vector<double> UnderResolvedCoupling<ELEMENT>::getBodyForceInElemByCoupli
 
     Ftotal *= -1.0; // As action = -reaction
 
-    if (Ftotal.Z > 1e-6)
+    if (Ftotal.Z > 1e-15)
     {
         logger(INFO, "Ftotal on el % = {% % %}\n", iEl_, Ftotal.X, Ftotal.Y, Ftotal.Z);
     }
 
     oomph::Vector<double> F = convertVecFuncs::convertToOomphVec(Ftotal);
 
-    return F;
+    force_ = F; //FIXME where is this force added to the residuals?
+
+    elPtr->setCouplingForce(F);
 }
 
 template <class ELEMENT>
@@ -1124,7 +1249,7 @@ void UnderResolvedCoupling<ELEMENT>::setBC()
     //double zVelIn = 0.05+ 0.3*sin(9.*getTime());
 
     // Uniform inflow
-    double zVelIn = 0.1;// getInflowVel(getTime());// getInflowVel(getTime());
+    double zVelIn = 0.;// getInflowVel(getTime());// getInflowVel(getTime());
 
     for (unsigned iBound = 0; iBound < mesh_pt()->nboundary(); iBound++)
     {
@@ -1196,22 +1321,6 @@ void UnderResolvedCoupling<ELEMENT>::generateLists()
     updateListOfdVoidagedxInElem();
 }
 
-
-/*!
- * \details Updates lists during simulation.
- *
- * \param[in]
- * \param[in]
- *//*
-template <class ELEMENT>
-void UnderResolvedCoupling<ELEMENT>::updateLists()
-{
-    updateListOfPInElem();
-    updateListOfVoidageInElem();
-    updateListOfdVoidagedxInElem();
-}*/
-
-
 /*!
  * \details Clear and update 2 lists with default values.
  * 1) listOfPInElem, Contains a list with particleID and elementID it is in.
@@ -1258,7 +1367,6 @@ void UnderResolvedCoupling<ELEMENT>::setListsLengths()
     }
 }
 
-
 /*!
  * \details update lists for specific particle upon moving elements. It determines elements to update based on
  * listOfPInElem.
@@ -1290,10 +1398,8 @@ void UnderResolvedCoupling<ELEMENT>::updateListsForSpecificParticle(const unsign
     updateListOfdVoidagedxAroundElem(currEl);
 
     //Note that dVoidagedt is updated only after a fluid timestep
-
     logger(DEBUG,"Updated elements % & % (and its neighbours for depsdx)",prevEl, currEl);
 }
-
 
 /*!
  * \details update listOfPInElem, Contains a list with particleID and elementID it is in.
@@ -1338,7 +1444,6 @@ void UnderResolvedCoupling<ELEMENT>::updateListOfPInElem(const unsigned &iPart)
     }
 }
 
-
 /*!
  * \details update listOfVoidageInElem, Contains a list of elementID with its voidage.
  * This function uses the information stored in listOfPInElem
@@ -1358,7 +1463,6 @@ void UnderResolvedCoupling<ELEMENT>::updateListOfVoidageInElem()
         updateListOfVoidageInElem(iEl);
     }
 }
-
 
 /*!
  * \details update listOfVoidageInElem, for specific fluid element
@@ -1383,15 +1487,6 @@ void UnderResolvedCoupling<ELEMENT>::updateListOfVoidageInElem(const unsigned &i
 
     VolumeElement = abs(posNode0[0] - posNodeEnd[0]) * abs(posNode0[1] - posNodeEnd[1]) * abs(posNode0[2] - posNodeEnd[2]);
 
-/*    if (posNode0[0] == posNodeEnd[0] || posNode0[1] == posNodeEnd[1] || posNode0[2] == posNodeEnd[2])
-    {
-        logger(INFO,"posNode0 == posNodeEnd for at least one dimension, incorrect volume of element");
-    }
-    if (posNode0[0] > posNodeEnd[0] || posNode0[1] > posNodeEnd[1] || posNode0[2] > posNodeEnd[2])
-    {
-        logger(INFO,"posNode0 > posNodeEnd for at least one dimension, incorrect particles in element");
-    }*/
-
     for (unsigned int iP = 0; iP < listOfPInElem_.size(); iP++)
     {
         if (listOfPInElem_[iP] == iEl)
@@ -1401,7 +1496,6 @@ void UnderResolvedCoupling<ELEMENT>::updateListOfVoidageInElem(const unsigned &i
     }
     listOfVoidageInElem_[iEl] =  (1. - VolumeParticles / VolumeElement);
 }
-
 
 /*!
  * \details update listOfNeighbours
@@ -1414,7 +1508,6 @@ void UnderResolvedCoupling<ELEMENT>::updateNeighbourList()
 {
     logger(INFO,"Call to updateNeighbourList()");
     int startInd = 20; // Used to access right index in enum
-
 
     //FIXME Make output code new function with doc_info as input var
     /*
@@ -1512,7 +1605,6 @@ void UnderResolvedCoupling<ELEMENT>::updateNeighbourList()
     outputNeighboursOfElements();
 }
 
-
 /*!
  * \details creates a vector of Tree* that are neighbouring to input Tree* in a certain direction.
  * It needs iTree to find the neighbours on TreeRoot level (see getExternalNeighbour)
@@ -1533,7 +1625,6 @@ void UnderResolvedCoupling<ELEMENT>::stickLeavesOfNeighbourRecursiveInDir(oomph:
 
     getInternalIndex(Tree_, indexTree_);
     logger(DEBUG,"indexTree_ = %", indexTree_);
-
 
     int indexInternalNeighbour = 0;
     int differenceInLevel = 0;
@@ -1587,7 +1678,6 @@ void UnderResolvedCoupling<ELEMENT>::stickLeavesOfNeighbourRecursiveInDir(oomph:
     }
 }
 
-
 /*!
  * \details Find the internal index of Tree_ in its father, following oomph-lib number convention.
  * If the element has no father (e.g. Tree_ is a TreeRoot*), internalIndex is assigned -1
@@ -1624,9 +1714,7 @@ void UnderResolvedCoupling<ELEMENT>::getInternalIndex(oomph::Tree* Tree_, int &i
     {
         logger(INFO,"internalIndex could not be found");
     }
-
 }
-
 
 /*!
  * \details Assigns index of internal neighbour to indexInternalNeighbour. If no internal neighbour is found, assign -1.
@@ -1679,7 +1767,6 @@ void UnderResolvedCoupling<ELEMENT>::getNeighbourIndex(const int indexTree_, con
     logger(DEBUG,"indexTree_ = %, dir_ = %, indexInternalNeighbour_ = %", indexTree_, dir_, indexInternalNeighbour_);
 
 }
-
 
 /*!
  * \details Find the neighbour of Tree_, use when no internal neighbour could be found. neighbourPtr points to an equal
@@ -1740,7 +1827,6 @@ void UnderResolvedCoupling<ELEMENT>::getExternalNeighbour(oomph::Tree* Tree_, co
     }
 }
 
-
 /*!
  * \details Converts the index found in indexPath[differenceInLevel - 1] to account for refined neighbour Tree_.
  * In the end this results in only finding the neighbouring leaves of Tree_. Return the converted index, either the
@@ -1796,7 +1882,6 @@ int UnderResolvedCoupling<ELEMENT>::convertIndexFromPath(std::vector<int>& index
 
     return convertedIndex;
 }
-
 
 /*!
  * \details Stick all leaves of the neighbouring tree that is in contact with Tree_ in a certain direction into a vector.
@@ -1857,7 +1942,6 @@ void UnderResolvedCoupling<ELEMENT>::stickLeavesOfEqualOrSmallerSizedNeighbourRe
     }
 }
 
-
 /*!
  * \details update listOfdVoidagedxInElem
  *
@@ -1902,7 +1986,6 @@ void UnderResolvedCoupling<ELEMENT>::updateListOfdVoidagedxAroundElem(const unsi
         }
     }    */
 
-
     //refineable version
     for (unsigned iDir =0; iDir < 6; iDir++)
     {
@@ -1916,7 +1999,6 @@ void UnderResolvedCoupling<ELEMENT>::updateListOfdVoidagedxAroundElem(const unsi
         }
     }
 }
-
 
 /*!
  * \details update listOfdVoidagedxInElem for specific iEl
@@ -2096,7 +2178,6 @@ void UnderResolvedCoupling<ELEMENT>::updateListOfdVoidagedxInElem(const unsigned
 
 }
 
-
 /*!
  * \details update listOfdVoidagedtInElem. Hard-coded 5 history values of voidage, using one-sided 5pt
  * stencil to determine dvoidage/dt. Update historyValuesVoidage as well.
@@ -2125,7 +2206,6 @@ void UnderResolvedCoupling<ELEMENT>::updateListOfdVoidagedtInElem()
         logger(DEBUG,"dVoidagedt[iEl = %]: % ", iEl, listOfdVoidagedtInElem_[iEl]);
     }
 }
-
 
 /*!
  * \details update listOfdVoidagedtInElem upon adapting mesh. It uses the Trees and Leaves of the previous timestep to
@@ -2231,7 +2311,6 @@ void UnderResolvedCoupling<ELEMENT>::updateListOfdVoidagedtAfterAdapt(const std:
     }
 }
 
-
 /*!
  * \details Update history values for specific element
  *
@@ -2252,7 +2331,6 @@ void UnderResolvedCoupling<ELEMENT>::updateHistoryValuesVoidage(const unsigned i
     // Add current voidage as last entry
     histValuesVoidage[histValuesVoidage.size()-1] = getVoidageInElemFromList(iEl_);
 }
-
 
 // OUTPUT ALL ELEMENTS WITH ITS NEIGHBOURING ELEMENTS
 template <class ELEMENT>
@@ -2277,7 +2355,6 @@ void UnderResolvedCoupling<ELEMENT>::outputNeighboursOfElements()
         }
     }
 }
-
 
 /*!
  * \details get s for specific particle. Also checks if particle has moved element.
@@ -2321,8 +2398,6 @@ void UnderResolvedCoupling<ELEMENT>::getS(oomph::Vector<double> &s_, const unsig
     }
 }
 
-
-
 /*!
  * Function that returns the amplification factor of a parabolic function based on time and stroke
  *
@@ -2332,8 +2407,6 @@ void UnderResolvedCoupling<ELEMENT>::getS(oomph::Vector<double> &s_, const unsig
 template <class ELEMENT>
 double UnderResolvedCoupling<ELEMENT>::getInflowVel(const double &time_)
 {
-    // Break signal into two different parts based on what time is passed to function
-
     double stroke = 0.14;
     double inflowVel = 0.;
     double timeSplit = 0.15;
@@ -2368,9 +2441,6 @@ bool UnderResolvedCoupling<ELEMENT>::myHeaviSide(const double &a_, const double 
     return b_ >= a_;
 }
 
-
-
-
 namespace getDataFromElement
 {
 //    double getVoidageOfElement_byEl(const int& elNr_)
@@ -2386,9 +2456,9 @@ namespace getDataFromElement
 //        return 0.0;
 //        //return ptrToCoupledClass->getdVoidagedtInElemFromList(elNr_);
 //    }
-//    oomph::Vector<double> getBodyForceByCoupling_byEl(const int& elNr_)
+//    void getBodyForceByCoupling_byEl(const int& elNr_, oomph::Vector<double> &force_)
 //    {
-//        return ptrToCoupledClass->getBodyForceInElemByCoupling(elNr_);
+//        ptrToCoupledClass->getBodyForceInElemByCoupling(elNr_,force_);
 //    }
 
     std::clock_t totaltime = 0.0;

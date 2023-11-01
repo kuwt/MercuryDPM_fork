@@ -9,15 +9,15 @@ int main(int argc, char**argv)
 {
     double domainLength = 2.5e-2; // Enter in m (x-dir)
     double domainWidth = 2.5e-2; // Enter in m (y-dir)
-    double domainDepth = 25e-2; // Enter in m (z-dir)
+    double domainDepth = 10e-2; // Enter in m (z-dir)
     
     const int nx = 5;
     const int ny = 5;
-    const int nz = 10;
+    const int nz = 15;
     
     DieFilling<oomph::RefineableAJQCrouzeixRaviartElement<3>> problem(0.0, domainLength, 0.0, domainWidth, 0.0, domainDepth,nx,ny,nz);
 
-    problem.setInflowVel(0.005); // Enter in m/s
+    problem.setInflowVel(0.000); // Enter in m/s
     //problem.setFluidDensity(1.225);
     //problem.setFluidDynamicViscosity(1.81e-5);
     //problem.setFluidKinematicViscosity(1.470e-5);
@@ -30,14 +30,14 @@ int main(int argc, char**argv)
     logger(INFO,"computed Reynolds number = %",computedReynolds);
     
     Mdouble scaleFactorPSizeMCC = 10.0;
-    Mdouble dMin = 30e-4 * scaleFactorPSizeMCC;
+    Mdouble dMin = 4e-3 * scaleFactorPSizeMCC;
     Mdouble g = 9.81;
     
     Mdouble tg = sqrt(dMin/g);
     Mdouble tc = tg/1000; ///\todo
 
     double dt_Merc = tc/50.0;
-    double dt_Oomph = 1e-4;
+    double dt_Oomph = 1000.*dt_Merc;
 
     problem.setReynoldsNumber(computedReynolds);
     problem.scaleReynolds();
@@ -50,10 +50,11 @@ int main(int argc, char**argv)
     problem.setAdaptOn(false);
     problem.setAdaptEveryNFluidTimesteps(10);
     problem.setUpdateCouplingEveryNParticleTimesteps(100);
+    problem.setInteractionForceFd(true);
 
     problem.setTimeStep(dt_Merc);
     problem.setTimeStepOomph(dt_Oomph);
-    problem.setTimeMax(0.015);
+    problem.setTimeMax(0.15);
 
     problem.setSaveCount(10);// Store data every so many mercury timesteps
     problem.setSaveCountOomph(10); // Store data every so many oomph timesteps
@@ -74,18 +75,19 @@ int main(int argc, char**argv)
 
     problem.setupInitialConditions();
     problem.generateLists();
-    
-    problem.steady_newton_solve();
-    problem.doc_solution(doc_info);
-    problem.doc_voidage(doc_info);
-    problem.doc_element(doc_info);
-    doc_info.number()++;
 
-    problem.solveSystem(doc_info);
+    //FIXME steady state newton not working due to default of voidage and body force from AJeq
+    //problem.steady_newton_solve();
     //problem.doc_solution(doc_info);
     //problem.doc_voidage(doc_info);
     //problem.doc_element(doc_info);
     //doc_info.number()++;
+
+    problem.solveSystem(doc_info);
+    problem.doc_solution(doc_info);
+    problem.doc_voidage(doc_info);
+    problem.doc_element(doc_info);
+    doc_info.number()++;
     
     return 0;
 }

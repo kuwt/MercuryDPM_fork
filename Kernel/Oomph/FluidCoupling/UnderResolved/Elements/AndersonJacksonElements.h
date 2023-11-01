@@ -443,8 +443,9 @@ template <unsigned DIM>
      /// \short Function pointer to dvoidagedt function fct(elNr)
      typedef double (*AndersonJacksondVoidage_dt_fct_pt_byEl)(const int& elNr);
 
-    /// \short Function pointer to dvoidagedt function fct(elNr)
-     typedef oomph::Vector<double> (*AndersonJacksonBodyForceByCoupling_fct_pt_byEl)(const int& elNr);
+    /// \short Function pointer to body_force function fct(elNr)
+    //typedef oomph::Vector<double> (*AndersonJacksonBodyForceByCoupling_fct_pt_byEl)(const int& elNr);
+    typedef void (*AndersonJacksonBodyForceByCoupling_fct_pt_byEl)(const int& elNr, oomph::Vector<double> &force);
 
 ///----------------------------------- Added by Mitchel -----------------------------------------
 
@@ -690,7 +691,6 @@ template <unsigned DIM>
         {
             return 1.0;
         }
-            //Otherwise call the function
         else
         {
             return (*Voidage_fct_pt_byEl)(elNr);
@@ -705,7 +705,6 @@ template <unsigned DIM>
             for (unsigned i =0; i<DIM ; i++)
             {
                 gradient[i] = 0;
-    
             }
         }
         else
@@ -729,18 +728,20 @@ template <unsigned DIM>
         }
     }
     
-    virtual void get_body_foce_by_coupling_by_el(const int& elNr, oomph::Vector<double>& force)
+    virtual void get_body_force_by_coupling_by_el(const int& elNr, oomph::Vector<double>& force)
     {
-        if (BodyForceByCoupling_fct_pt_byEl == 0)
+        if (BodyForceByCoupling_fct_pt_byEl == nullptr)
         {
+            //std::cout << "BodyForceByCoupling_fct_pt_byEl is unset" << std::endl; //FIXME Apparently this is not set, so still uncoupled?
             for (unsigned i =0; i<DIM ; i++)
             {
-                force[i] = 0;
+                force[i] = 0.;
             }
         }
         else
         {
-            force = (*BodyForceByCoupling_fct_pt_byEl)(elNr);
+            //force = (*BodyForceByCoupling_fct_pt_byEl)(elNr, force);
+            (*BodyForceByCoupling_fct_pt_byEl)(elNr, force);
         }
     }
 ///----------------------------------- Added by Mitchel -----------------------------------------
@@ -896,6 +897,14 @@ public:
  /// Access function for the body-force pointer. Const version
  AndersonJacksonBodyForceFctPt body_force_fct_pt() const
   {return Body_force_fct_pt;}
+
+  /// Implementing voidage and coupling force directly as member variable; Mitchel ///
+  double voidage123;
+  void setVoidage(const double &voidage_) {voidage123 = voidage_;}
+  double getVoidage() {return voidage123;}
+  oomph::Vector<double> couplingForce;
+  void setCouplingForce(const oomph::Vector<double> & cf_) {couplingForce = cf_;}
+  oomph::Vector<double> getCouplingForce() {return couplingForce;}
 
  ///----------------------------------- Added by Mitchel -----------------------------------------
     AndersonJacksonVoidageFctPt& voidage_fct_pt() {return Voidage_fct_pt;}
@@ -1081,8 +1090,8 @@ public:
     
     void body_force_fct_pt_by_coupling(int &elNr, oomph::Vector<double> &force) const
     {
-        force = (*BodyForceByCoupling_fct_pt_byEl)(elNr);
-
+        //force = (*BodyForceByCoupling_fct_pt_byEl)(elNr, force);
+        (*BodyForceByCoupling_fct_pt_byEl)(elNr, force);
     }
 
 ///----------------------------------- Added by Mitchel -----------------------------------------

@@ -608,9 +608,17 @@ fill_in_generic_residual_contribution_nst(Vector<double> &residuals,
     this->get_voidage_gradient_time_nst_byEl(elNr, dvoidagedt);
 
     oomph::Vector<double> bodyForceByCoupling(DIM, 0.0);
-    this->get_body_foce_by_coupling_by_el(elNr, bodyForceByCoupling);
+    this->get_body_force_by_coupling_by_el(elNr, bodyForceByCoupling);
 
-    if (bodyForceByCoupling[2] > 1e-6)
+    // Direct access to member variables
+    void_ratio = this->getVoidage();
+    bodyForceByCoupling = this->getCouplingForce();
+    //std::cout << "void_ratio = " << void_ratio << std::endl;
+    //std::cout << "bodyForceByCoupling = " << bodyForceByCoupling[0] << ", " << bodyForceByCoupling[1] << ", " << bodyForceByCoupling[2] << std::endl;
+    //void_ratio = 1.;//this->getVoidage();
+    //bodyForceByCoupling = {0.,0.,0.}; //this->getCouplingForce();
+
+    if (void_ratio < 1.0)
     {
         std::cout << "elNr = " << elNr << std::endl;
         std::cout << "void_ratio = " << void_ratio << std::endl;

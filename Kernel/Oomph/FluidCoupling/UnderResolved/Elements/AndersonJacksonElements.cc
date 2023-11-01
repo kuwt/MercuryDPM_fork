@@ -1658,6 +1658,7 @@ fill_in_generic_pressure_advection_diffusion_contribution_nst(
        interpolated_dpdx[i] += p_nst(l)*dpsip(l,i);
       }
     }
+   //FIXME Can we do a similar thing for voidage?
 
    //Calculate velocities
 
@@ -1773,7 +1774,13 @@ fill_in_generic_residual_contribution_nst(Vector<double> &residuals,
     this->get_voidage_gradient_time_nst_byEl(elNr, dvoidagedt);
     
     oomph::Vector<double> bodyForceByCoupling(DIM,0.0);
-    this->get_body_foce_by_coupling_by_el(elNr,bodyForceByCoupling);
+    this->get_body_force_by_coupling_by_el(elNr,bodyForceByCoupling);
+
+    // Direct access to member variables
+    void_ratio = this->getVoidage();
+    bodyForceByCoupling = this->getCouplingForce();
+    //void_ratio = 1.;//this->getVoidage();
+    //bodyForceByCoupling = {0.,0.,0.}; //this->getCouplingForce();
     
 //    std::cout << "elNr = " << elNr << std::endl;
 //    std::cout << "void_ratio = " << void_ratio << std::endl;
