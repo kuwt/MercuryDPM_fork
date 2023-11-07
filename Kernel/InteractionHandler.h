@@ -206,6 +206,8 @@ public:
 
     unsigned getNumberOfLiquidBridges() const;
 
+    unsigned getNumberOfWallContacts() const;
+
 private:
     
     FileType writeVTK_;

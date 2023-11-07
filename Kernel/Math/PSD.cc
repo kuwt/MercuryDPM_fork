@@ -1115,6 +1115,13 @@ void PSD::setParticleSizeDistribution(std::vector<DistributionElements> particle
     particleSizeDistribution_ = particleSizeDistribution;
 }
 
+void PSD::scaleParticleSize(double scale)
+{
+    for (auto& p : particleSizeDistribution_) {
+        p.internalVariable *= scale;
+    }
+}
+
 /*!
  * \details Gets the number of particles already inserted into the simulation by summing up the particles inserted in
  * each class.

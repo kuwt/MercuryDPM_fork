@@ -244,6 +244,11 @@ public:
     void setParticleSizeDistribution(std::vector<DistributionElements>);
 
     /*!
+     * \brief Scales all particle sizes by a factor
+     */
+    void scaleParticleSize(double scale);
+
+    /*!
      * \brief Get the number of particles already inserted into the simulation.
      */
     int getInsertedParticleNumber() const;

@@ -578,3 +578,11 @@ unsigned InteractionHandler::getNumberOfLiquidBridges() const {
     }
     return getMPISum(liquidBridges);
 };
+
+unsigned InteractionHandler::getNumberOfWallContacts() const {
+    unsigned nWall = 0;
+    for (auto i : *this) {
+        if (dynamic_cast<BaseParticle*>(i->getI()) == nullptr) nWall++;
+    }
+    return nWall;
+}
