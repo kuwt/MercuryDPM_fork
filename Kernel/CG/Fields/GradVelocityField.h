@@ -29,6 +29,8 @@
 #include <Math/MatrixSymmetric.h>
 #include <CG/Functions/IntegralType.h>
 
+#include "BaseFields.h"
+
 class BaseParticle;
 
 class BaseInteraction;
@@ -36,7 +38,7 @@ class BaseInteraction;
 namespace CGFields
 {
 
-class GradVelocityField
+class GradVelocityField : public BaseFields
 {
 public:
     

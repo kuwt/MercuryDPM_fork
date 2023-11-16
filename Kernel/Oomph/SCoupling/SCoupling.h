@@ -145,7 +145,7 @@ public:
     void solveSurfaceCouplingFixedSolid()
     {
         // first part of the Mercury solve routine, containing the actions before time-stepping
-        O::initialiseSolve();
+        M::initialiseSolve();
         logger.assert_always(!coupledBoundaries_.empty(), "isCoupled needs to be set, e.g. via setIsCoupled([](unsigned b) { return b == Boundary::Y_MIN; })");
         
         // read Mercury time step
@@ -155,9 +155,11 @@ public:
         // set oomph time step
         logger(INFO, "Solid position fixed");
         
-        // set oomph initial conditions
-        O::set_initial_conditions(0);
-        
+        // set oomph_dt
+        this->time_pt()->initialise_dt(0);
+        // By default do a non-impulsive start and provide initial conditions
+        this->assign_initial_values_impulsive(0);
+
         // read oomph-mesh
         logger(INFO, "Set up oomph mesh: % elements (% with traction)",
                O::solid_mesh_pt()?O::solid_mesh_pt()->nelement():0, O::traction_mesh_pt()?O::traction_mesh_pt()->nelement():0);

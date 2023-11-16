@@ -193,7 +193,7 @@ public:
     /*!
      * \brief Sets the volume flow rate of the insertion routine.
      */
-    void setVolumeFlowRate(Mdouble volumeFlowRate_);
+    void setVolumeFlowRate(Mdouble volumeFlowRate);
 
     /*!
      * \brief Gets the initialVolume() .

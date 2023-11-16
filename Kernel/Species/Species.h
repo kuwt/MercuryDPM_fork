@@ -207,6 +207,12 @@ template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveFor
 Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::Species()
         : ParticleSpecies(this,this,this), NormalForceSpecies(), FrictionForceSpecies(), AdhesiveForceSpecies()
 {
+    normalForce_ = this;
+    frictionForce_ = this;
+    adhesiveForce_ = this;
+    normalForce_->setBaseSpecies(this);
+    frictionForce_->setBaseSpecies(this);
+    adhesiveForce_->setBaseSpecies(this);
     logger(DEBUG, "Species::Species() finished");
 }
 
@@ -308,6 +314,8 @@ void Species<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::re
     NormalForceSpecies::read(is);
     FrictionForceSpecies::read(is);
     AdhesiveForceSpecies::read(is);
+    // ensure that interaction distance is recomputed after restarting
+    AdhesiveForceSpecies::setInteractionDistance();
 }
 
 /*!

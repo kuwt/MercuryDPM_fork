@@ -154,7 +154,7 @@ void CurvyChute::createBottom()
 }
 
 /*!
- * \detail Do not run this in the middle of a simulation: This does not check
+ * \details Do not run this in the middle of a simulation: This does not check
  * for interactions with existing particles, so you could create a basal
  * particle that intersects and interacts strongly with one. 
  */

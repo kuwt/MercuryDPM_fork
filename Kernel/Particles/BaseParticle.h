@@ -222,6 +222,10 @@ public:
      * \brief Returns some user-defined information about this object (by default, species ID).
      */
     virtual Mdouble getInfo() const;
+
+    void setTimeStamp(unsigned timeStamp);
+
+    unsigned getTimeStamp() const;
     
     /*!
      * \brief Adds particle's HGrid level and cell coordinates to an ostream
@@ -386,15 +390,7 @@ public:
     Mdouble getWallInteractionRadius(const BaseWall* wall) const {
         return getRadius() + getInteractionDistance((const BaseInteractable*)wall);
     }
-    
-    /*!
-     * \brief Returns the particle's displacement relative to the previous time step
-     * \details Returns the particle's displacement_, which is the difference between the current particle's position and its position in the previous time step.
-     * \return (reference to) the particle displacement vector
-     */
-    const Vec3D& getDisplacement() const
-    { return displacement_; }
-    
+
     /*!
      * \brief Returns the particle's position in the previous time step
      * \details Returns the particle's position in the previous time step.
@@ -546,13 +542,7 @@ public:
      * toolbox to non-spherical particles.
      */
     void setMassForP3Statistics(Mdouble mass);
-    
-    /*!
-     * \brief Sets the particle's displacement (= difference between current 
-     * position and that of the previous time step)
-     */
-    void setDisplacement(const Vec3D& disp);
-    
+
     /*!
      * \brief Sets the particle's position in the previous time step
      */
@@ -572,12 +562,7 @@ public:
      * \brief Increases the particle's angularVelocity_ by the given vector
      */
     void angularAccelerate(const Vec3D& angVel);
-    
-    /*!
-     * \brief Adds a vector to the particle's displacement_
-     */
-    void addDisplacement(const Vec3D& addDisp);
-    
+
     /*!
      * \brief Sets the pointer to the particle's ParticleHandler
      */
@@ -653,20 +638,26 @@ public:
 
     virtual void computeMass(const ParticleSpecies& s);
 
-    //+++++++Multiparticles++++++++
-    BaseParticle* getMaster() const
+    BaseParticle* getClump() const
     {
-        return masterParticle;
+        return clumpParticle_;
     }
 
-    // Slave-Master functions
-    bool IsMaster() const
+    /*!
+    * \brief Checks if particle is a clump (container)
+    */
+    bool isClump() const
     {
-        return isMaster;
+        return isClump_;
     }
-    bool IsSlave() const
+
+    /*!
+    * \brief Checks if particle is a pebble (belongs to a clump)
+    */
+
+    bool isPebble() const
     {
-        return isSlave;
+        return isPebble_;
     }
 
     virtual Vec3D getCenterOfMass() {return Vec3D(0,0,0);}
@@ -714,8 +705,7 @@ private:
     std::vector<int> previousPeriodicComplexity_; /// Indicates the periodic complexity at previous time step
     std::vector<int> periodicComplexity_;  /// Indicates the periodic complexity at current time step. Used to update periodic status
     bool isMaserParticle_; ///Indicates if this particle belongs to the maser boundary or is released into the wide open world.
-    
-    Vec3D displacement_; ///Displacement (only used in StatisticsVector, StatisticsPoint)
+
     Vec3D previousPosition_; /// Particle's position at previous time step
     
     /*!
@@ -726,13 +716,24 @@ private:
     
     Mdouble info_; // by default, the species ID (if a species is set)
 
+    /*!
+     * Stores the time stamp the particle was created.
+     */
+    unsigned timeStamp_;
 
 public:
-    virtual void actionsAfterAddObject() {}
 
-    BaseParticle* masterParticle;
-    bool isSlave;
-    bool isMaster;
+    /*!
+     * Methods and attributes necessary for clumped particles
+     */
+
+    virtual void actionsAfterAddObject() {} /// Function that updates necessary quantities of a clump particle after adding a pebble
+
+    BaseParticle* clumpParticle_; /// pointer to a clump particle (for a pebble)
+
+    bool isPebble_; /// The particle is pebble
+
+    bool isClump_; /// The particle is clump
 };
 
 #endif

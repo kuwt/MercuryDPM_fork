@@ -487,7 +487,7 @@ Mdouble SuperQuadricParticle::computeShape(const LabFixedCoordinates& labFixedCo
  * \details This function computes the gradient ("first derivative") of the shape function in the lab-fixed coordinate
  * system. The expressions are provided in Eq. 14 of the article in Comp. Part. Mech. (2017) 4 : 101-118.
  * \return The gradient of the shape function at the given (lab-fixed) coordinates. Note, that this is the gradient to
- * the lab-fixed coordinates, \nabla_X F(X)
+ * the lab-fixed coordinates, \f nabla_X F(X)
  * \todo Come up with good expression for when x = y = 0 and n1 < n2
  */
 SmallVector<3> SuperQuadricParticle::computeShapeGradientLabFixed(const LabFixedCoordinates& labFixedCoordinates) const
@@ -614,7 +614,7 @@ SmallVector<4> SuperQuadricParticle::computeResidualContactDetection(const Small
  * purpose of mapping are provided in Eq. 18 of the article in Comp. Part. Mech. (2017) 4 : 101-118.
  * Then fill in the respective contributions.
  *
- * \param[in]contactPoint   The contact point where this Jacobian should be evaluated
+ * \param[in] contactPoint  The contact point where this Jacobian should be evaluated
  * \param[in] p1            First particle in the contact for which this Jacobian should be evaluated
  * \param[in] p2            Second particle in the contact for which this Jacobian should be evaluated
  * \return                  A 4x4 matrix with the Jacobian of computeResidualContactDetection.

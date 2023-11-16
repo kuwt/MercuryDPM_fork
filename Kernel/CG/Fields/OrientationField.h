@@ -31,6 +31,8 @@
 #include <CG/Functions/IntegralType.h>
 #include <array>
 
+#include "BaseFields.h"
+
 class BaseParticle;
 
 class BaseInteraction;
@@ -48,7 +50,7 @@ namespace CGFields
  * are evaluated (density and momentum).
  */
     
-    class OrientationField
+    class OrientationField : public BaseFields
     {
     public:
         OrientationField();

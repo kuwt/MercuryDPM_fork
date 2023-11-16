@@ -13,7 +13,7 @@
 /// because they're used to identify mesh boundaries etc. Their boundary lookup
 /// schemes etc. are updated to account for the "glued" nodes.
 /// hierher currently only for SolidMesh; should be generalised before the
-/// machinery is moved into src/generic.
+/// machinery is moved into Src/generic.
 /// hierher search for collocated nodes currently brute forced. Could be
 /// optimised with cgal's tree-based search.
 //=========================================================================

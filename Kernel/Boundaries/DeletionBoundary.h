@@ -54,7 +54,8 @@ public:
     DeletionBoundary(DeletionBoundary const &d)
         : normal_(d.normal_), scaleFactor_(d.scaleFactor_), distance_(d.distance_),
           numberOfParticlesDeleted_(d.numberOfParticlesDeleted_), massDeleted_(d.massDeleted_),
-          volumeDeleted_(d.volumeDeleted_), isActivated_(d.isActivated_), trackOutflow_(d.trackOutflow_) {}
+          volumeDeleted_(d.volumeDeleted_), isActivated_(d.isActivated_), trackOutflow_(d.trackOutflow_),
+          trackerCustom_(d.trackerCustom_) {}
 
     /*!
      * \brief destructor
@@ -121,6 +122,16 @@ public:
     void trackOutflow(bool trackOutflow = true) {trackOutflow_ = trackOutflow;}
 
     /*!
+     * \brief Sets a custom function for tracking the outflow.
+     * @param trackerCustom The function to which the tracker ofstream and a pointer to the BaseParticle is passed.
+     */
+    void setTrackerCustom(std::function<void(std::ofstream&, BaseParticle*)> trackerCustom)
+    {
+        trackOutflow_ = false;
+        trackerCustom_ = trackerCustom;
+    }
+
+    /*!
      * \brief Reads some boundary properties from an std::istream.
      */
     void read(std::istream& is) override;
@@ -179,7 +190,7 @@ private:
     bool trackOutflow_;
 
     std::ofstream tracker;
-
+    std::function<void(std::ofstream&, BaseParticle*)> trackerCustom_ = [] (std::ofstream&, BaseParticle*) {};
 };
 
 #endif

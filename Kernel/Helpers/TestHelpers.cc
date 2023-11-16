@@ -53,3 +53,4 @@ void helpers::check(Matrix3D real, Matrix3D ideal, double error, std::string wha
 {
     checkTemplate(real, ideal, error, whatIsChecked);
 }
+

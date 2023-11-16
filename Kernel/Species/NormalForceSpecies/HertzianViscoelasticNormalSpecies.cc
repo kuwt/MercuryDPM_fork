@@ -92,6 +92,7 @@ std::string HertzianViscoelasticNormalSpecies::getBaseName() const
     return "HertzianViscoelastic";
 }
 
+///
 ///Allows the spring constant to be changed
 void HertzianViscoelasticNormalSpecies::setEffectiveElasticModulus(Mdouble elasticModulus)
 {
@@ -103,6 +104,7 @@ void HertzianViscoelasticNormalSpecies::setEffectiveElasticModulus(Mdouble elast
     }
 }
 
+///
 ///Allows the spring constant to be changed
 void HertzianViscoelasticNormalSpecies::setEffectiveElasticModulusAndRestitutionCoefficient(Mdouble elasticModulus, Mdouble rest)
 {
@@ -135,6 +137,7 @@ void HertzianViscoelasticNormalSpecies::setEffectiveElasticModulusAndRestitution
     }
 }
 
+///
 ///Allows to change elastic modulus and poisson ratio to compute shear modulus
 void HertzianViscoelasticNormalSpecies::setEffectiveElasticModulusAndPoissonRatio(Mdouble elasticModulus, Mdouble poissonRatio)
 {
@@ -177,12 +180,14 @@ void HertzianViscoelasticNormalSpecies::setEffectiveElasticModulusAndEffectiveSh
     }
 }
 
+///
 ///Allows the spring constant to be accessed
 Mdouble HertzianViscoelasticNormalSpecies::getEffectiveElasticModulus() const
 {
     return elasticModulus_;
 }
 
+///
 ///Allows the normal dissipation to be changed
 void HertzianViscoelasticNormalSpecies::setDissipation(Mdouble dissipation)
 {
@@ -196,6 +201,7 @@ void HertzianViscoelasticNormalSpecies::setDissipation(Mdouble dissipation)
     }
 }
 
+///
 ///Allows the normal dissipation to be accessed
 Mdouble HertzianViscoelasticNormalSpecies::getDissipation() const
 {

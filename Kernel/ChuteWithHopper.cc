@@ -376,14 +376,14 @@ Mdouble ChuteWithHopper::getHopperLowestPoint() const
 
 /*!
  * \details Sets all the geometrical properties of the hopper at once
- * \param[in] ExitLength    Horizontal width of the (rectangular) hopper exit
- * \param[in] ExitHeight    The vertical position of the lowest point of the right side
+ * \param[in] exitLength    Horizontal width of the (rectangular) hopper exit
+ * \param[in] exitHeight    The vertical position of the lowest point of the right side
  *                          of the hopper relative to the chute bottom
- * \param[in] Angle         The angle of the hopper inlet, relative to the vertical
+ * \param[in] angle         The angle of the hopper inlet, relative to the vertical
  *                          (in DEGREES)
- * \param[in] Length        Horizontal width of the hopper entrance (i.e., at the top
+ * \param[in] length        Horizontal width of the hopper entrance (i.e., at the top
  *                          of the hopper)
- * \param[in] Height        The (vertical) height of the hopper relative to the start
+ * \param[in] height        The (vertical) height of the hopper relative to the start
  *                          of the chute
  */
 void ChuteWithHopper::setHopper(Mdouble exitLength, Mdouble exitHeight, Mdouble angle, Mdouble length, Mdouble height)

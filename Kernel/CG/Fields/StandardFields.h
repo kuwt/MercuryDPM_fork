@@ -30,6 +30,8 @@
 #include <CG/Functions/IntegralType.h>
 #include <array>
 
+#include "BaseFields.h"
+
 class BaseParticle;
 
 class BaseInteraction;
@@ -47,7 +49,7 @@ namespace CGFields
  * momentum. Also, a simpler version is planned, where only particle statistics 
  * are evaluated (density and momentum).
  */
-class StandardFields
+class StandardFields : public BaseFields
 {
 public:
     

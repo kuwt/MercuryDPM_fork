@@ -96,7 +96,7 @@ void EmptyFrictionInteraction::computeFrictionInteraction()
 {}
 
 /*!
- * \param[in] timeStep
+ *  \param[in] timeStep
  */
 void EmptyFrictionInteraction::integrate(Mdouble timeStep UNUSED)
 {}

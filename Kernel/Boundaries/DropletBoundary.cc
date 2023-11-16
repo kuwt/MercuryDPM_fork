@@ -85,6 +85,7 @@ void DropletBoundary::read(std::istream& is)
         is >> position >> velocity >> radius;
         droplets_.emplace_back(Droplet{position,velocity,radius});
     }
+    is >> dummy >> dropletVolume >> dummy >> absorbedVolume >> dummy >> lostVolume;
 }
 
 /*!
@@ -101,6 +102,7 @@ void DropletBoundary::write(std::ostream& os) const
         os << " " << d.velocity;
         os << " " << d.radius;
     }
+    os << " dropletVolume " << dropletVolume << " absorbedVolume " << absorbedVolume << " lostVolume " << lostVolume;
 }
 
 void DropletBoundary::writeVTK(std::fstream& file) {

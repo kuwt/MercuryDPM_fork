@@ -36,6 +36,7 @@ FluxBoundary::FluxBoundary()
         : BaseBoundary()
 {
     distance_ = std::numeric_limits<double>::quiet_NaN();
+    previousDistance_  = std::numeric_limits<double>::quiet_NaN();
     scaleFactor_ = std::numeric_limits<double>::quiet_NaN();
     numberOfParticlesCrossedForw_ = 0;
     numberOfParticlesCrossedBack_ = 0;
@@ -43,6 +44,7 @@ FluxBoundary::FluxBoundary()
     massCrossedBack_ = 0;
     volumeCrossedForw_ = 0;
     volumeCrossedBack_ = 0;
+    prescribedDistance_ = nullptr;
 #ifdef DEBUG_CONSTRUCTOR
     std::cout<<"FluxBoundary::FluxBoundary() finished"<<std::endl;
 #endif
@@ -87,6 +89,7 @@ void FluxBoundary::set(const Vec3D& normal, Mdouble distance)
     scaleFactor_ = 1. / std::sqrt(Vec3D::dot(normal, normal));
     normal_ = normal * scaleFactor_;
     distance_ = distance * scaleFactor_;
+    previousDistance_ = distance_;
 }
 
 /*!
@@ -112,20 +115,31 @@ void FluxBoundary::move(Mdouble distance)
     distance_ = distance * scaleFactor_;
 }
 
-/*!
- * \details Calculates the shortest distance between the wall and given position.
+/*
+ * \details Calculates the shortest distance between the wall at a given separation from
+ * the origin and a given position.
+ * \param[in] distanceFromOrigin the distance between the origin and the boundary.
  * \param[in] position the position of which the distance should be calculated.
  */
-Mdouble FluxBoundary::getDistance(const Vec3D& position) const
+Mdouble FluxBoundary::getDistance(const Mdouble& distanceFromOrigin, const Vec3D& position) const
 {
-    return distance_ - Vec3D::dot(position, normal_);
+    return distanceFromOrigin - Vec3D::dot(position, normal_);
 }
 
 void FluxBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
 {
+    if (prescribedDistance_)
+    {
+        distance_ = prescribedDistance_(getHandler()->getDPMBase()->getTime());
+    }
+
     for (auto p = pH.begin(); p != pH.end(); ++p)
         checkBoundaryAfterParticleMoved(*p, pH);
+
+    // Set the current distance as previous distance for the next timestep
+    previousDistance_ = distance_;
 }
+
 
 
 /*!
@@ -136,13 +150,13 @@ void FluxBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
  */
 bool FluxBoundary::checkBoundaryAfterParticleMoved(BaseParticle* p, ParticleHandler& pH)
 {
-    if (getDistance(p->getPosition() - p->getDisplacement()) > 0 && getDistance(p->getPosition()) < 0)
+    if (getPreviousDistance(p->getPreviousPosition()) >= 0 && getDistance(p->getPosition()) < 0)
     {
         numberOfParticlesCrossedForw_++;
         massCrossedForw_ += p->getMass();
         volumeCrossedForw_ += p->getVolume();
     }
-    else if (getDistance(p->getPosition() - p->getDisplacement()) < 0 && getDistance(p->getPosition()) > 0)
+    else if (getPreviousDistance(p->getPreviousPosition()) < 0 && getDistance(p->getPosition()) >= 0)
     {
         numberOfParticlesCrossedBack_++;
         massCrossedBack_ += p->getMass();
@@ -154,54 +168,56 @@ bool FluxBoundary::checkBoundaryAfterParticleMoved(BaseParticle* p, ParticleHand
 
 /*!
  * \details Returns the number of particles that have crossed in either
- * direction. All of these quantities have to be divided by two, because
- * DPMBase.cc calls DPMBase::checkInteractionWithBoundaries() TWICE in each time
- * step. (The intention is that the first round resolves InsertionBoundaries and
- * the second resolves DeletionBoundaries, but this means FluxBoundaries are
- * updated twice.) */
+ * direction.
+ */
 unsigned int FluxBoundary::getNumberOfParticlesCrossedForw() const
 {
-    return numberOfParticlesCrossedForw_ / 2;
+    return numberOfParticlesCrossedForw_;
 }
 
 double FluxBoundary::getMassOfParticlesCrossedForw() const
 {
-    return massCrossedForw_ * 0.5;
+    return massCrossedForw_;
 }
 
 double FluxBoundary::getVolumeOfParticlesCrossedForw() const
 {
-    return volumeCrossedForw_ * 0.5;
+    return volumeCrossedForw_;
 }
 
 unsigned int FluxBoundary::getNumberOfParticlesCrossedBack() const
 {
-    return numberOfParticlesCrossedBack_ / 2;
+    return numberOfParticlesCrossedBack_;
 }
 
 double FluxBoundary::getMassOfParticlesCrossedBack() const
 {
-    return massCrossedBack_ * 0.5;
+    return massCrossedBack_;
 }
 
 double FluxBoundary::getVolumeOfParticlesCrossedBack() const
 {
-    return volumeCrossedBack_ * 0.5;
+    return volumeCrossedBack_;
 }
 
 unsigned int FluxBoundary::getNumberOfParticlesCrossedNet() const
 {
-    return (numberOfParticlesCrossedForw_ - numberOfParticlesCrossedBack_) / 2;
+    return (numberOfParticlesCrossedForw_ - numberOfParticlesCrossedBack_);
 }
 
 double FluxBoundary::getMassOfParticlesCrossedNet() const
 {
-    return (massCrossedForw_ - massCrossedBack_) * 0.5;
+    return (massCrossedForw_ - massCrossedBack_);
 }
 
 double FluxBoundary::getVolumeOfParticlesCrossedNet() const
 {
-    return (volumeCrossedForw_ - volumeCrossedBack_) * 0.5;
+    return (volumeCrossedForw_ - volumeCrossedBack_);
+}
+
+void FluxBoundary::setPrescribedDistance(std::function<Mdouble(double)> prescribedDistance)
+{
+    prescribedDistance_ = prescribedDistance;
 }
 
 /*!
@@ -212,9 +228,15 @@ void FluxBoundary::read(std::istream& is)
 {
     BaseBoundary::read(is);
     std::string dummy;
+    bool hadPrescribedDistance;
     is >> dummy >> normal_
        >> dummy >> scaleFactor_
-       >> dummy >> distance_;
+       >> dummy >> distance_
+       >> dummy >> previousDistance_
+       >> dummy >> hadPrescribedDistance;
+
+    if (hadPrescribedDistance)
+        logger(WARN, "FluxBoundary had described distance. The function can not be read from the restart file. Make sure you set it again.");
 }
 
 /*!
@@ -237,7 +259,14 @@ void FluxBoundary::write(std::ostream& os) const
     BaseBoundary::write(os);
     os << " normal " << normal_
        << " scaleFactor " << scaleFactor_
-       << " distance " << distance_;
+       << " distance " << distance_
+       << " previousDistance " << previousDistance_;
+    os << " prescribedDistance ";
+    if (prescribedDistance_)
+        os << true;
+    else
+        os << false;
+        
 }
 
 /*!

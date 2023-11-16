@@ -133,7 +133,7 @@ equation *by definition*.
 This feature is _still in development_, so the documentation is meant for
 developers only. However, anyone is welcome to give it a try.
 
-MercuryCG is a new implementation of the \ref coarsegraining "coarse graining" toolbox \ref fstatistics "fstatistics", and will replace this toolbox in the near future.
+MercuryCG is a new implementation of the \ref CG "coarse graining" toolbox \ref fstatistics "fstatistics", and will replace this toolbox in the near future.
 
 MercuryCG is a postprocessing tool: it takes an existing data set, consisting of a restart and one or more data and fstat files, and applies the coarse-graining formulation to it. The output is stored in a stat file, which can then be read by gnuplot or Matlab (via the readMercuryCG.m file in Drivers/MercuryCG/) to be visualised.
 
@@ -431,11 +431,11 @@ The code above produces two sets of output: <TT>Test.0.stat</TT> contains global
 <TT>Test.1.stat</TT> contains spatially resolved data.
 In the latter case, the number of evaluation points and the coarse-graining width has to be specified --
 in this case, a Gaussian of width (standard deviation) 1 and a 20x20x20 mesh of evaluation points will be used.
-</br>
+\n
 Note that the latter statistics will produce huge amounts of data (8000 times more than the globally averaged statistics),
 even though we have not chosen a particularly high resolution.
 The data will further be highly fluctuating, as the continuum fields only depend on the small amount of data in the sphere around the evaluation point.
-</br>
+\n
 Thus, it is advisable to average in space when ever possible, i.e. if the data is homogeneous in space.
 Often the data is not homogeneous in all spatial directions, but in some. In that case, spatial averaging can be applied in specific directions only.
 This is done by using partially resolved CGCoordinates: X, Y, Z, XY, XZ, or YZ.
@@ -522,8 +522,7 @@ Contains the classes O, X, Y, Z, XY, XZ, YZ, XYZ:
 Contains the position of the CGPoint.
 */
 
-/*!
-\page fstatistics fstatistics: Post-processing discrete particle data using teh coarse-graining formulation (old version)
+/*! \page fstatistics fstatistics: Post-processing discrete particle data using the coarse-graining formulation (old version)
 \tableofcontents
 
 \section sec A postprocessing tool for analysing particle data.

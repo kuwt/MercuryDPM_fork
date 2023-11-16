@@ -1,4 +1,4 @@
-# src/solid contains the default CMakeList.txt; copy it into all external_src folders
+# Src/solid contains the default CMakeList.txt; copy it into all external_src folders
 # exceptions: oomph_metis_from_parmetis_3.1.1 oomph_parmetis_3.1.1 oomph_superlu_dist_3.0
 FOREACH(DIR oomph_arpack oomph_blas oomph_crbond_bessel oomph_hsl oomph_lapack oomph_flapack oomph_superlu_4.3 oomph_tetgen oomph_triangle oomph_metis_from_parmetis_3.1.1)
     FILE(COPY ../src/solid/CMakeLists.txt DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/${DIR})

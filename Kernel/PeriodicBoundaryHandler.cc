@@ -140,7 +140,7 @@ Mdouble PeriodicBoundaryHandler::getInteractionDistance()
 }
 
 /*!
- * \detail This function updates the status of periodic particles and periodic ghost particles.
+ * \details This function updates the status of periodic particles and periodic ghost particles.
  * This is done in two steps. The first step is to update the ghost particles with the position
  * of their corresponding real particles. Based on this new position their status will be updated.
  * Occasionally a particle needs to be removed and because this particle might also be listed
@@ -161,7 +161,7 @@ void PeriodicBoundaryHandler::updateStatus(std::set<BaseParticle*>& particlesToB
 }
 
 /*!
- * \detail This function shifts the position of the particle with respect to the periodic boundaries
+ * \details This function shifts the position of the particle with respect to the periodic boundaries
  * based on the periodic complexity it currently has. Note that some boundaries such as the angular
  * periodic boundary do not only shift the position, but also the velocity. In that sense this
  * function name is a bit of a misnomer.
@@ -173,7 +173,7 @@ void PeriodicBoundaryHandler::shiftParticle(BaseParticle* particle)
 }
 
 /*!
- * \detail This function shifts the position of the particle with respect to the periodic boundaries
+ * \details This function shifts the position of the particle with respect to the periodic boundaries
  * based on a given periodic complexity. Note that some boundaries such as the angular
  * periodic boundary do not only shift the position, but also the velocity. In that sense this
  * function name is a bit of a misnomer.
@@ -194,7 +194,7 @@ void PeriodicBoundaryHandler::shiftParticle(BaseParticle* particle, const std::v
 }
 
 /*!
- * \detail This function computes the periodic complexity, a vector of intergers that indicate how this
+ * \details This function computes the periodic complexity, a vector of intergers that indicate how this
  * particle is related to the periodic boundaries. Every boundary has a status value following:
  * [2]  = Real particle, not in the proximity of the boundary
  * [1]  = Real particle, in the proximity of the boundary
@@ -270,7 +270,7 @@ PeriodicBoundaryHandler::computePeriodicComplexity(std::vector<int>& periodicCom
 }
 
 /*!
- * \detail This function computes the periodic complexity, a vector of intergers that indicate how this
+ * \details This function computes the periodic complexity, a vector of intergers that indicate how this
  * particle is related to the periodic boundaries. Every boundary has a status value following:
  * [2]  = Real particle, not in the proximity of the boundary
  * [1]  = Real particle, in the proximity of the boundary
@@ -290,7 +290,7 @@ std::vector<int> PeriodicBoundaryHandler::computePeriodicComplexity(Vec3D positi
 }
 
 /*!
- * \detail This function adds new particles to the periodiocBoundary lists. Particles
+ * \details This function adds new particles to the periodiocBoundary lists. Particles
  * that are not yet flagged as periodic(ghost) particles are checked if they entered the interaction 
  * distances of periodic boundaries. If this is the case these will be communicated to the other
  * processors in a three step process. First the processors communicate which each other to
@@ -322,7 +322,7 @@ void PeriodicBoundaryHandler::addNewParticles()
 }
 
 /*!
- * \detail When a user or an insertion boundary is adding a single new particle to the system,
+ * \details When a user or an insertion boundary is adding a single new particle to the system,
  * this function will add it to the corresponding lists if required. If this is the case, the 
  * particle will be communicated to the receiving processor in a three step process. 
  * First the processors communicate which each other to determine who is getting how many particles 
@@ -979,7 +979,7 @@ void PeriodicBoundaryHandler::updateParticles()
 
 
 /*!
- * \detail An important distinction between periodic particles is if they are real or not. This check is
+ * \details An important distinction between periodic particles is if they are real or not. This check is
  * generally required for the particle status update. A real particle only has positive periodic
  * complexity values. So the moment a negative value is found it is clear the particle is not real.
  * \param[in] complexity The periodic complexity that indicates the status of the periodic particle
@@ -1000,7 +1000,7 @@ bool PeriodicBoundaryHandler::checkIsReal(const std::vector<int> complexity)
 }
 
 /*!
- * \detail A large part of the status update requires on if the periodic complexity of the real 
+ * \details A large part of the status update requires on if the periodic complexity of the real 
  *  particle is changed. This function will check if the previous and current periodic complexity
  *  differ. If this is the case it returns true, if they remain the same the function returns false
  * \param[in] previousPeriodicComplexity A periodioc complexity vector that is used as reference

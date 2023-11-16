@@ -34,8 +34,8 @@ from scipy.optimize import minimize
 
 
 # Global parameters
-source_dir = ""				# Mercury source dir
-build_dir = ""				# Mercury Build dir
+SourceDir = ""				# Mercury source dir
+BuildDir = ""				# Mercury Build dir
 N = 2					# Number of parameters our functional depends upon
 TEST_MODE = True			# True for self-test on toy functional, False for real simulation-guided optimization
 
@@ -47,7 +47,7 @@ xc = np.array([ 1.57055293e+00, -2.51228303e-08]) # Known solution for the Simpl
 
 def real_fun(x):
 	import subprocess
-	global source_dir, build_dir
+	global SourceDir, BuildDir
 	ret = 0
 	
 	command  = [build_dir+'/Drivers/SimpleOpt/Opt']
@@ -74,7 +74,7 @@ def toy_fun(x):
 
 
 def main():
-	global source_dir, build_dir
+	global SourceDir, BuildDir
 
 	# Set up terminal output
 	clr = colorClass()

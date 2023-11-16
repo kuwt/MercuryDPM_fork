@@ -103,7 +103,7 @@ BaseInteraction* ArcWall::getInteractionWith(BaseParticle* p,
         c->setDistance(distance);
         c->setOverlap(p->getRadius() - distance);
         c->setContactPoint(p->getPosition() - (p->getRadius() - 0.5 * c->getOverlap()) * c->getNormal());
-        /// \todo Hacked please fix @Thomas
+        /// \todo Thomas, Hacked please fix 
         return c;
     }
     else

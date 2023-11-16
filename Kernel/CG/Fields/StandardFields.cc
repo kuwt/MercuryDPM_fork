@@ -239,13 +239,14 @@ void StandardFields::setFields(const BaseInteraction& c, IntegralType type)
     }
     else if (type == IntegralType::I_TO_CONTACT)
     {
+        interactionForceDensity_ = -c.getForce();
         contactStress_ = Matrix3D::dyadic(c.getForce(), c.getIC());
     }
     else
     {
+        interactionForceDensity_ = c.getForce();
         contactStress_ = Matrix3D::dyadic(c.getForce(), c.getCP());
     }
-    interactionForceDensity_ = c.getForce();
 }
 
 void StandardFields::setFields(const BaseParticle& p)

@@ -542,7 +542,7 @@ unsigned int MercuryBase::getHGridTargetNumberOfBuckets() const
     unsigned int nParticles = particleHandler.getSize();
     if (nParticles > 10)
     {
-        ///\todo TW SpeedCheckThomas revealed that adding a factor 10 here improved performance by 20% for monodisperse particles, 45% for highly polydisperse (this seems true for particle numbers 1e3 - 1e6); a larger factor seems to little extra effect; the memory cost is small compared to the number of particles, so I added the factor permanently. @Irana please check this is ok to do.
+        ///\todo TW SpeedCheckThomas revealed that adding a factor 10 here improved performance by 20% for monodisperse particles, 45% for highly polydisperse (this seems true for particle numbers 1e3 - 1e6); a larger factor seems to little extra effect; the memory cost is small compared to the number of particles, so I added the factor permanently. At Irana, please check this is ok to do.
         return 10 * nParticles;
     }
     else

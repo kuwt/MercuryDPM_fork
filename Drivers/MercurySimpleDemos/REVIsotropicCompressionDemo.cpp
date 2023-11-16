@@ -81,6 +81,7 @@ private:
         //Add particles
         CubeInsertionBoundary insertion;
         SphericalParticle particle(speciesHandler.getObject(0));
+        particle.setRadius(radius);
         //Insert 96 particles in the subvolume = 0.8*0.8*0.8 = 0.512, if failed by 100 times, it stops
         insertion.set(&particle, 100, 0.8 * getMin(), 0.8 * getMax(), Vec3D(0, 0, 0), Vec3D(0, 0, 0));
         insertion.setInitialVolume(1.0);

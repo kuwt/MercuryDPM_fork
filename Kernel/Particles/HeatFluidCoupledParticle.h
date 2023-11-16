@@ -86,42 +86,40 @@ public:
      */
     std::string getName() const override
     {
-        return "HeatFluidCoupledParticle";
+        return "HeatFluidCoupled" + Particle::getName();
     }
     /// Tells the vtkWriter how many fields should be written for this particle type.
-    unsigned getNumberOfFieldsVTK() const override { return 4; }
+    unsigned getNumberOfFieldsVTK() const override { return 5; }
 
     /// Tells the vtkWriter the type of each field written for this particle type.
     std::string getTypeVTK(unsigned) const override { return "Float32"; }
 
     /// Tells the vtkWriter the name of each field written for this particle type.
     std::string getNameVTK(unsigned i) const override {
-        if (i==1)
+        if (i==0)
+            return "fullLiquidVolume";
+        else if (i==1)
             return "liquidFilmVolume";
         else if (i==2)
             return "liquidBridgeVolume";
-        else if (i==0)
-            return "fullLiquidVolume";
-        else /* i=3 */
+        else if (i==3)
+            return "totalEvaporatedLiquidVolume";
+        else /* i=4 */
             return "temperature";
     }
 
     /// Tells the vtkWriter the value of each field written for this particle type.
     std::vector<Mdouble> getFieldVTK(unsigned i) const override {
-        if (i==1) {
-            return {this->liquidVolume_};
-        } else if (i==2 || i==0) {
-            Mdouble fullLiquidVolume = (i==2)?0:this->liquidVolume_;
-            for (auto k : this->getInteractions()) {
-                auto j = dynamic_cast<LiquidMigrationWilletInteraction*>(k);
-                if (j) {
-                    fullLiquidVolume += 0.5*j->getLiquidBridgeVolume();
-                }
-            }
-            return {fullLiquidVolume};
-        } else {
-            return {this->temperature_};
-        }
+        if (i==0)
+            return { this->getFullLiquidVolume() };
+        else if (i==1)
+            return { this->liquidVolume_ };
+        else if (i==2)
+            return { this->getLiquidBridgeVolume() };
+        else if (i==3)
+            return { this->totalEvaporatedLiquidVolume_ };
+        else /* i=4 */
+            return { this->temperature_ };
     }
 
     /// The actionAfterTimeStep is defined in the species, as we cannot extract the species properties of a HeatFluidCoupled*Species

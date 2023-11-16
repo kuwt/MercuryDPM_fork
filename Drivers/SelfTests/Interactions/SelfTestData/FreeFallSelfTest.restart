@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name FreeFallSelfTest revision 6535 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
+MercuryDPM 1.0 name FreeFallSelfTest revision 7622ee90 repository https://bitbucket.org/mercurydpm/mercurydpm.git
 dataFile    fileType ONE_FILE saveCount 500 counter 2001 lastSavedTimeStep 1000000
 fStatFile   fileType NO_FILE saveCount 500 counter 0
 eneFile     fileType ONE_FILE saveCount 500 counter 2001 lastSavedTimeStep 1000000
@@ -14,6 +14,6 @@ Walls 1
 InfiniteWall id 0 indSpecies 0 position 0 0 0 orientation 0.707106781186548 0 0 -0.707106781186548 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0
 Boundaries 0
 Particles 1
-BaseParticle id 0 indSpecies 0 position 0.005 0.060162719426194 0 orientation 1 0 0 0 velocity 0 0.826766416424872 0 angularVelocity 0 0 0 force 0 -0.0102625360017267 0 torque 0 0 0 radius 0.005 invMass 954.929658551372
+BaseParticle id 0 indSpecies 0 position 0.005 0.060162719426194 0 orientation 1 0 0 0 velocity 0 0.826766416424872 0 angularVelocity 0 0 0 force 0 -0.0102625360017267 0 torque 0 0 0 radius 0.005 invMass 954.929658551372 timeStamp 0
 Interactions 0
 hGrid method TOPDOWN distribution EXPONENTIAL cellOverSizeRatio 1 numberOfBuckets 10 cellSizes 0.01 gridNeedsUpdate 0 updateEachTimeStep 1 currentMaxRelativeDisplacement 0 totalCurrentMaxRelativeDisplacement 0

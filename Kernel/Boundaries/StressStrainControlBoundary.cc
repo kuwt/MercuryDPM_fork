@@ -39,7 +39,8 @@ StressStrainControlBoundary::StressStrainControlBoundary()
 {
     stressGoal_.setZero();
     strainRate_.setZero();
-    gainFactor_.setZero();
+    pGainFactor_.setZero();
+    iGainFactor_.setZero();
     isStrainRateControlled_ = true;
     integratedShift_ = 0.0;
     //
@@ -66,7 +67,8 @@ void StressStrainControlBoundary::write(std::ostream& os) const
     BaseBoundary::write(os);
     os << " stressGoal " << stressGoal_;
     os << " strainRate " << strainRate_;
-    os << " gainFactor " << gainFactor_;
+    os << " pGainFactor " << pGainFactor_;
+    os << " iGainFactor " << iGainFactor_;
     os << " isStrainRateControlled " << isStrainRateControlled_;
     os << " integratedShift " << integratedShift_;
 //    os << leesEdwardsBoundaries_.size() << ' ';
@@ -92,9 +94,10 @@ void StressStrainControlBoundary::read(std::istream& is)
     std::string dummy;
     is >> dummy >> stressGoal_;
     is >> dummy >> strainRate_;
-    is >> dummy >> gainFactor_;
+    is >> dummy >> pGainFactor_;
+    is >> dummy >> iGainFactor_;
     is >> dummy >> isStrainRateControlled_;
-    set(stressGoal_, strainRate_, gainFactor_, isStrainRateControlled_);
+    set(stressGoal_, strainRate_, pGainFactor_, isStrainRateControlled_, iGainFactor_);
     is >> dummy >> integratedShift_;
 }
 
@@ -161,33 +164,28 @@ void StressStrainControlBoundary::determineLengthAndCentre()
 /*!
  * \details This function is used to compute the new strain rate tensor based on
  * the stress differences between the actual and user set target values.
+ * This is based on a PI-controller,
+ *    strainRate = pGain * (stress-stressGoal) + iGain * integral(stress-stressGoal)
  */
 void StressStrainControlBoundary::computeStrainRate()
 {
     // calculate the stress total and average over the volume
     Matrix3D stress = getHandler()->getDPMBase()->getTotalStress();
 
-    // controller
+    // controller, sets the amount by which the strain rate tensor has to be changed
+    double timeStep = getHandler()->getDPMBase()->getTimeStep();
     // amount by which the strain rate tensor has to be changed
-    if (stressGoal_.XX != 0)
-    {
-//        Mdouble stressError=(stress.XX- stressGoal_.XX);         // Calculate the Error
-//        static PIController xx(0.1,gainFactor_.XX);
-//        strainRate_.XX = xx.apply(stressError,timeStep);      // Controller Command
-//        logger(VERBOSE, "StressXX = %",stress.XX);
-        strainRate_.XX = gainFactor_.XX * (stress.XX - stressGoal_.XX);
+    if (stressGoal_.XX != 0) {
+        strainRate_.XX = xx.apply(stress.XX - stressGoal_.XX,timeStep);
     }
-    if (stressGoal_.YY != 0)
-    {
-        strainRate_.YY = gainFactor_.YY * (stress.YY - stressGoal_.YY);
+    if (stressGoal_.YY != 0) {
+        strainRate_.YY = yy.apply(stress.YY - stressGoal_.YY,timeStep);
     }
-    if (stressGoal_.ZZ != 0)
-    {
-        strainRate_.ZZ = gainFactor_.ZZ * (stress.ZZ - stressGoal_.ZZ);
+    if (stressGoal_.ZZ != 0) {
+        strainRate_.ZZ = zz.apply(stress.ZZ - stressGoal_.ZZ,timeStep);
     }
-    if (stressGoal_.XY != 0)
-    {
-        strainRate_.XY = gainFactor_.XY * (stress.XY - stressGoal_.XY);
+    if (stressGoal_.XY != 0) {
+        strainRate_.XY = xy.apply(stress.XY - stressGoal_.XY,timeStep);
     }
 }
 
@@ -303,11 +301,12 @@ void StressStrainControlBoundary::determineStressControlledShearBoundaries()
  * \param[in] stressGoal        The target stress tensor that needs to achieve at the end of the deformation.
  * \param[in] strainRate        The target strain rate tensor, cannot be set non-zero with target Stress,
  *                              i.e. stressGoal.XX != 0, then strainRate.XX = 0.
- * \param[in] gainFactor        The incremental factor for the stress control, usually a very small value ~ 0.0001.
+ * \param[in] pGain        The incremental factor for the stress control, usually a very small value ~ 0.0001.
  * \param[in] isStrainRateControlled        The boolean key to determine whether particles are moved by
  *                                          strain rate affine movement (true) or dragged by boundary itself (false).
+ * \param[in] iGain        The incremental factor for the integral stress control
  */
-void StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D& strainRate, const Matrix3D& gainFactor, bool isStrainRateControlled)
+void StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D& strainRate, const Matrix3D& pGain, bool isStrainRateControlled, const Matrix3D& iGain)
 {
     periodicBoundaries_.clear();
     leesEdwardsBoundaries_.clear();
@@ -315,7 +314,8 @@ void StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D
     isStrainRateControlled_ = isStrainRateControlled;
     stressGoal_ = stressGoal;
     strainRate_ = strainRate;
-    gainFactor_ = gainFactor;
+    pGainFactor_ = pGain;
+    iGainFactor_ = iGain;
 
     logger.assert_always(stressGoal.XZ == 0, "Shear stress in XZ cannot be controlled; use shear stress in XY instead");
     logger.assert_always(stressGoal.ZX == 0, "Shear stress in ZX cannot be controlled; use shear stress in XY instead");
@@ -325,17 +325,28 @@ void StressStrainControlBoundary::set(const Matrix3D& stressGoal, const Matrix3D
     logger.assert_always(strainRate.ZX == 0, "Strain rate in ZX cannot be controlled; use strain rate in XY instead");
     logger.assert_always(strainRate.YZ == 0, "Strain rate in YZ cannot be controlled; use strain rate in XY instead");
     logger.assert_always(strainRate.ZY == 0, "Strain rate in ZY cannot be controlled; use strain rate in XY instead");
-    logger.assert_always(stressGoal.XZ != 0 ? gainFactor.XZ != 0 : true,
+    logger.assert_always(stressGoal.XZ != 0 ? (pGain.XZ != 0 || iGain.XZ != 0) : true,
                          "You need to set a gain factor in XZ in order to control stress");
-    logger.assert_always(stressGoal.XX != 0 ? gainFactor.XX != 0 : true,
+    logger.assert_always(stressGoal.XX != 0 ? (pGain.XX != 0 || iGain.XX != 0) : true,
                          "You need to set a gain factor in XX in order to control stress");
-    logger.assert_always(stressGoal.YY != 0 ? gainFactor.YY != 0 : true,
+    logger.assert_always(stressGoal.YY != 0 ? (pGain.YY != 0 || iGain.YY != 0) : true,
                          "You need to set a gain factor in YY in order to control stress");
-    logger.assert_always(stressGoal.ZZ != 0 ? gainFactor.ZZ != 0 : true,
+    logger.assert_always(stressGoal.ZZ != 0 ? (pGain.ZZ != 0 || iGain.ZZ != 0) : true,
                          "You need to set a gain factor in ZZ in order to control stress");
 
     logger.assert_always(getHandler() != nullptr, "You need to set the handler of this boundary");
     const DPMBase *dpm = getHandler()->getDPMBase();
+
+    // set gains for the strain-rate controllers
+    xx.set(pGainFactor_.XX, iGainFactor_.XX);
+    xy.set(pGainFactor_.XY, iGainFactor_.XY);
+    yy.set(pGainFactor_.YY, iGainFactor_.YY);
+    zz.set(pGainFactor_.ZZ, iGainFactor_.ZZ);
+    // reset the integrated error to zero
+    xx.reset();
+    xy.reset();
+    yy.reset();
+    zz.reset();
 
     // if there is no shear (compression only)
     if (stressGoal_.XY == 0 && strainRate_.XY == 0)

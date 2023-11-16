@@ -75,7 +75,7 @@ public:
     }
 
     /*!
-    * The following redefines functions of BaseParticles as virtual to make them available in child MultiParticle class
+    * The following redefines functions of BaseParticles as virtual to make them available in child Clump class
     */
 
     virtual Mdouble getKineticEnergy() const override{

@@ -29,7 +29,7 @@
 #include <algorithm>
 #include <cctype>
 
-std::string helpers::lower(std::string s) 
+std::string helpers::lower(std::string s)
 {
     std::transform(s.begin(), s.end(), s.begin(), ::tolower);
     return s;

@@ -33,11 +33,12 @@ BaseParticle::BaseParticle()
         : BaseInteractable()
 {
     handler_ = nullptr;
-    displacement_.setZero();
     radius_ = 1.0;
     invMass_ = 1.0;
     invInertia_ = MatrixSymmetric3D(1, 0, 0, 1, 0, 1);
     
+    previousPosition_=getPosition();
+
     periodicFromParticle_ = nullptr;
     isMPIParticle_ = false;
     isInMPIDomain_ = false;
@@ -59,8 +60,9 @@ BaseParticle::BaseParticle()
     hGridCell.setHGridZ(99999);
     
     info_ = std::numeric_limits<double>::quiet_NaN();
-    isMaster = false;
-    isSlave = false;
+    timeStamp_ = 0;
+    isClump_ = false;
+    isPebble_ = false;
     logger(DEBUG, "BaseParticle::BaseParticle() finished");
 }
 
@@ -76,11 +78,12 @@ BaseParticle::BaseParticle(const BaseParticle& p)
         : BaseInteractable(p)
 {
     handler_ = nullptr;
-    displacement_ = p.displacement_;
     radius_ = p.radius_;
     invMass_ = p.getInvMass();
     invInertia_ = p.getInvInertia();
     
+    previousPosition_ = p.previousPosition_;
+
     hGridNextObject_ = nullptr;
     hGridPrevObject_ = nullptr;
     
@@ -96,8 +99,8 @@ BaseParticle::BaseParticle(const BaseParticle& p)
     isMaserParticle_ = p.isMaserParticle_;
     isPeriodicGhostParticle_ = p.isPeriodicGhostParticle_;
     communicationComplexity_ = p.communicationComplexity_;
-    isMaster = p.IsMaster();
-    isSlave = p.IsSlave();
+    isClump_ = p.isClump();
+    isPebble_ = p.isPebble();
     //periodicComplexity_ = p.periodicComplexity_;
     //previousPeriodicComplexity_ = p.previousPeriodicComplexity_;
 #ifdef CONTACT_LIST_HGRID
@@ -105,6 +108,7 @@ BaseParticle::BaseParticle(const BaseParticle& p)
 #endif
     
     info_ = p.info_;
+    timeStamp_ = p.timeStamp_;
     logger(DEBUG, "BaseParticle::BaseParticle(BaseParticle &p) finished");
 }
 
@@ -167,7 +171,7 @@ Mdouble BaseParticle::getVolume() const
 void BaseParticle::fixParticle()
 {
 //    //
-//    MultiParticle f;
+//    Clump f;
 //    f.invInertia2_ = MatrixSymmetric3D(0, 0, 0, 0, 0, 0);
     //
     invMass_ = 0.0;
@@ -230,7 +234,7 @@ void BaseParticle::setPeriodicComplexity(int index, int value)
 
 const std::vector<int>& BaseParticle::getPeriodicComplexity()
 {
-    //TODO resolve this hack
+    /// \todo resolve this hack
     //hack: generally you'd add particles after declaring the boundaries
     //but no official programming guildelines rules have been setup for that
     //So incase that doesnt happen we need to resize this periodicComplexity
@@ -250,7 +254,7 @@ int BaseParticle::getPeriodicComplexity(int index)
     //hack: generally you'd add particles after declaring the boundaries
     //but no official programming guildelines rules have been setup for that
     //So incase that doesnt happen we need to resize this periodicComplexity
-    ///\todo TW @Marnix, this is indeed a hack; you should call a setter every time you add a value to the periodic boundary handler (this function takes 0.5% cpu time in the speedtest)
+    /// \todo TW Marnix, this is indeed a hack; you should call a setter every time you add a value to the periodic boundary handler (this function takes 0.5% cpu time in the speedtest)
     if (periodicComplexity_.empty())
     {
         const unsigned numberOfPeriodicBoundaries = getHandler()->getDPMBase()->periodicBoundaryHandler.getSize();
@@ -337,7 +341,8 @@ void BaseParticle::write(std::ostream& os) const
 {
     BaseInteractable::write(os);
     os << " radius " << radius_
-       << " invMass " << invMass_;
+       << " invMass " << invMass_
+       << " timeStamp " << timeStamp_;
     //invMass_ is a computed value, but needs to be stored to see if a particle is fixed
 }
 
@@ -363,6 +368,16 @@ Mdouble BaseParticle::getInfo() const
         return info_;
 }
 
+void BaseParticle::setTimeStamp(unsigned timeStamp)
+{
+    timeStamp_ = timeStamp;
+}
+
+unsigned BaseParticle::getTimeStamp() const
+{
+    return timeStamp_;
+}
+
 /*!
  * \details Particle read function. Has an std::istream as argument, from which 
  *          it extracts the radius_, invMass_ and invInertia_, respectively. 
@@ -376,6 +391,7 @@ void BaseParticle::read(std::istream& is)
     BaseInteractable::read(is);
     std::string dummy;
     is >> dummy >> radius_ >> dummy >> invMass_;// >> dummy >> invInertia_;
+    helpers::readOptionalVariable(is, "timeStamp", timeStamp_); // Optional, for backwards compatibility.
 }
 
 /*!
@@ -397,7 +413,7 @@ void BaseParticle::oldRead(std::istream& is)
     double dummy = 0;
     is >> position >> velocity >> radius_ >> orientation >> angularVelocity;
     is >> invMass_ >> invInertiaScalar >> numberOfContacts;
-    ///\todo incorporate contact information
+    /// \todo incorporate contact information
     for (unsigned int i = 0; i < 12 * numberOfContacts; ++i)
     {
         is >> dummy;
@@ -529,7 +545,7 @@ void BaseParticle::setInfiniteInertia()
 {
     invInertia_.setZero();
 
-//    MultiParticle* f;
+//    Clump* f;
 //    f->invInertia2_.setZero();
 } //> i.e. no rotations
 
@@ -599,15 +615,6 @@ void BaseParticle::setMassForP3Statistics(const Mdouble mass)
 }
 
 /*!
- * \details This is used to set the particle displacement_ 
- * \param[in] disp  the displacement vector
- */
-void BaseParticle::setDisplacement(const Vec3D& disp)
-{
-    displacement_ = disp;
-}
-
-/*!
  * \details This is used to set the particle's previous position
  * \param[in] pos   the particle's previous position vector.
  */
@@ -644,15 +651,6 @@ void BaseParticle::accelerate(const Vec3D& vel)
 void BaseParticle::angularAccelerate(const Vec3D& angVel)
 {
     addAngularVelocity(angVel);
-}
-
-/*!
- * \details Lets you add a vector to the particle's displacement_ vector.
- * \param[in] addDisp   vector to be added.
- */
-void BaseParticle::addDisplacement(const Vec3D& addDisp)
-{
-    displacement_ += addDisp;
 }
 
 /*!
@@ -705,7 +703,7 @@ BaseInteraction* BaseParticle::getInteractionWith(BaseParticle* const P, const u
     C->setOverlap(P->getRadius() + getRadius() - distance);
     C->setDistance(distance);
     C->setContactPoint(P->getPosition() - (P->getRadius() - 0.5 * C->getOverlap()) * C->getNormal());
-    ///\todo We should consider setting the contact point to \author weinhartt
+    /// \todo We should consider setting the contact point to \author weinhartt
     //Mdouble ratio=P->getRadius()/(getRadius()+P->getRadius());
     //C->setContactPoint(P->getPosition() - (P->getRadius() - ratio * C->getOverlap()) * C->getNormal());
     return C;
@@ -719,7 +717,7 @@ BaseInteraction* BaseParticle::getInteractionWith(BaseParticle* const P, const u
  */
 void BaseParticle::integrateBeforeForceComputation(double time, double timeStep)
 {
-    ///\todo If the position is described by the user, one should also call
+    /// \todo If the position is described by the user, one should also call
     ///BaseInteractable::integrateBeforeForceComputation. To check if it works
     ///correctly, remove the p0.fixParticle() line from the DrivenParticleUnitTest
     ///\author irana
@@ -730,10 +728,10 @@ void BaseParticle::integrateBeforeForceComputation(double time, double timeStep)
     }
     else
     {
-#ifdef MERCURYDPM_USE_MPI
-        //For periodic particles in parallel the previous position is required
+        // For periodic particles in parallel the previous position is required
+        // also required by FluxBoundary
         setPreviousPosition(getPosition());
-#endif
+
         accelerate(getForce() * getInvMass() * 0.5 * timeStep);
         const Vec3D displacement = getVelocity() * timeStep;
         move(displacement);
@@ -797,7 +795,7 @@ void BaseParticle::setIndSpecies(unsigned int indSpecies)
     {
         //BaseInteractable::setIndSpecies(indSpecies);
         setSpecies(handler_->getDPMBase()->speciesHandler.getObject(indSpecies));
-        ///\todo TW do we have to update the species stored in the interactions here?
+        /// \todo TW do we have to update the species stored in the interactions here?
     }
     else
     {
@@ -818,10 +816,10 @@ void BaseParticle::setIndSpecies(unsigned int indSpecies)
 void BaseParticle::setSpecies(const ParticleSpecies* species)
 {
     BaseInteractable::setSpecies(species);
-    ///\todo TW should we chaeck here if we have the right kind of species for the right kind of particle?
+    /// \todo TW should we chaeck here if we have the right kind of species for the right kind of particle?
     //set pointer to the ParticleHandler handler_, which is needed to retrieve 
     //species information
-    //\todo maybe these if statements should throw warnings
+    /// \todo maybe these if statements should throw warnings
     if (handler_ == nullptr)
     {
         SpeciesHandler* sH = species->getHandler();

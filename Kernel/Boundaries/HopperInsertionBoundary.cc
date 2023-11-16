@@ -192,6 +192,23 @@ void HopperInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int max
 }
 
 /*!
+ * \details old style set function which also assumes a uniform psd. Note if you want a specific PSD do not use but
+ * this is quicker for a uniform in size PSD
+ */
+void HopperInsertionBoundary::set(BaseParticle* particleToCopy, unsigned int maxFailed, double yMin, double yMax,
+                                  Mdouble rMin, Mdouble rMax, double chuteAngle, double fixedParticleRadius,
+                                  bool isHopperCentred_, int hopperDim, double hopperAngle, double hopperLength,
+                                  double hopperExitLength, double hopperHeight, double lift, double fillPercent)
+{
+    PSD uniformPSD;
+    uniformPSD.setDistributionUniform(rMin, rMax, 2);
+    setPSD(uniformPSD);
+    set(particleToCopy, maxFailed, yMin, yMax, chuteAngle, fixedParticleRadius, isHopperCentred_, hopperDim,
+        hopperAngle, hopperLength, hopperExitLength, hopperHeight, lift, fillPercent);
+}
+
+
+/*!
  * \details 
  * This function places random particles inside the hopper. The space in which
  * the particles are placed in a (truncated) triangle in 2D, or a (truncated) pyramid
@@ -338,4 +355,3 @@ std::string HopperInsertionBoundary::getName() const
 {
     return "HopperInsertionBoundary";
 }
-
