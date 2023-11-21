@@ -23,6 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Math/Quaternion.h"
+#include "ExtendedMath.h"
 
 /*!
  * \details Default constructor
@@ -453,7 +454,6 @@ Vec3D Quaternion::getEuler() const
 {
     Mdouble sinp = 2 * (q0 * q2 - q3 * q1);
     Mdouble pitch;
-    const Mdouble pi = 3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117068;
 
     if ((std::abs(sinp) < 1))
     {
@@ -461,7 +461,7 @@ Vec3D Quaternion::getEuler() const
     }
     else
     {
-        pitch = copysign(pi/2., sinp);
+        pitch = copysign(constants::pi, sinp);
     }
 
     return Vec3D(

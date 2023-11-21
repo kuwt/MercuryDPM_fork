@@ -29,6 +29,8 @@
 #include "Boundaries/PeriodicBoundary.h"
 #include "Species/LinearViscoelasticSpecies.h"
 #include "Walls/InfiniteWall.h"
+#include "Boundaries/CylinderInsertionBoundary.h"
+#include "Boundaries/SphereInsertionBoundary.h"
 
 
 class InsertionBoundarySelfTest : public Mercury3D
@@ -58,11 +60,24 @@ public:
         PSD psd;
         psd.setDistributionUniform(0.025, 0.05, 50);
     
-        CubeInsertionBoundary insertionBoundary;
-        insertionBoundary.set(&insertionBoundaryParticle, 1, getMin(), getMax(), Vec3D(1, 0, 0), Vec3D(1, 0, 0));
-        insertionBoundary.setPSD(psd);
-        boundaryHandler.copyAndAddObject(insertionBoundary);
-    
+        CubeInsertionBoundary insertionBoundaryCube;
+        insertionBoundaryCube.set(&insertionBoundaryParticle, 1, getMin(), getMax(), Vec3D(1, 0, 0), Vec3D(1, 0, 0));
+        insertionBoundaryCube.setPSD(psd);
+        boundaryHandler.copyAndAddObject(insertionBoundaryCube);
+
+        CylinderInsertionBoundary insertionBoundaryCylinder;
+        insertionBoundaryCylinder.set(&insertionBoundaryParticle, 1, 0, 1, 0, 1,
+                                      Vec3D(1, 0, 0), -constants::pi, constants::pi,
+                                      Vec3D(1, 0, 0), Vec3D(1, 0, 0));
+        insertionBoundaryCylinder.setPSD(psd);
+        boundaryHandler.copyAndAddObject(insertionBoundaryCylinder);
+
+
+        SphereInsertionBoundary insertionBoundarySphere;
+        insertionBoundarySphere.set(&insertionBoundaryParticle, 1, 0, 1, -constants::pi, constants::pi, -constants::pi, constants::pi,
+                                      Vec3D(1, 0, 0), Vec3D(1, 0, 0));
+        insertionBoundarySphere.setPSD(psd);
+        boundaryHandler.copyAndAddObject(insertionBoundarySphere);
     }
 
     void printTime() const override

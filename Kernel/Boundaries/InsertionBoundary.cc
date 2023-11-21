@@ -428,6 +428,16 @@ void InsertionBoundary::setParticleToCopy(std::vector<BaseParticle*> particleToC
     }
 }
 
+void InsertionBoundary::shiftBoundary(Vec3D shift)
+{
+
+}
+
+void InsertionBoundary::rotateBoundary(Vec3D angle)
+{
+
+}
+
 /*!
  * \details Sets the vector of pointers to particles which will be inserted by the insertion boundary.
  * \param[in] particleToCopy    pointer to the particle to be inserted
