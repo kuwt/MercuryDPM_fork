@@ -30,6 +30,7 @@ add_subdirectory(Calibration)
 add_subdirectory(TriangleWalls)
 add_subdirectory(Oomph)
 add_subdirectory(SimpleOpt)
+add_subdirectory(RotatingDrum)
 
 
 
