@@ -39,6 +39,7 @@
 #include "Species/LinearViscoelasticFrictionSpecies.h"
 #include "Species/LinearViscoelasticSlidingFrictionSpecies.h"
 #include "Species/LinearPlasticViscoelasticFrictionSpecies.h"
+#include "Species/LinearPlasticViscoelasticFrictionBondedSpecies.h"
 #include "Species/LinearPlasticViscoelasticSlidingFrictionSpecies.h"
 #include "Species/HertzianViscoelasticMindlinSpecies.h"
 #include "Species/HertzianViscoelasticMindlinRollingTorsionSpecies.h"
@@ -91,8 +92,8 @@ SpeciesHandler::SpeciesHandler()
 
 /*!
  * \param[in] other The SpeciesHandler that has to be copied.
- * \details This is not a copy constructor! This constructor copies only all 
- *          BaseSpecies and MixedSpecies and copies the pointer to the DPMBase. 
+ * \details This is not a copy constructor! This constructor copies only all
+ *          BaseSpecies and MixedSpecies and copies the pointer to the DPMBase.
  *          It sets all other data members to 0 or nullptr.
  */
 SpeciesHandler::SpeciesHandler(const SpeciesHandler& other)
@@ -111,8 +112,8 @@ SpeciesHandler::SpeciesHandler(const SpeciesHandler& other)
 /*!
  * \param[in] rhs The BoundaryHandler on the right hand side of the assignment.
  * \return The SpeciesHandler that is a copy of the input SpeciesHandler rhs.
- * \details This is not a copy assignment operator! It copies only all 
- *          BaseSpecies and MixedSpecies and copies the pointer to the DPMBase. 
+ * \details This is not a copy assignment operator! It copies only all
+ *          BaseSpecies and MixedSpecies and copies the pointer to the DPMBase.
  *          It sets all other data members to 0 or nullptr.
  */
 SpeciesHandler& SpeciesHandler::operator=(const SpeciesHandler& rhs)
@@ -132,7 +133,7 @@ SpeciesHandler& SpeciesHandler::operator=(const SpeciesHandler& rhs)
             mixedObjects_.back()->setHandler(this);
         }
     }
-    
+
     logger(DEBUG, "SpeciesHandler SpeciesHandler::operator =(const SpeciesHandler& rhs)");
     return *this;
 }
@@ -247,6 +248,12 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
     else if (type == "LinearPlasticViscoelasticFrictionSpecies")
     {
         LinearPlasticViscoelasticFrictionSpecies species;
+        is >> species;
+        copyAndAddObject(species);
+    }
+    else if (type == "LinearPlasticViscoelasticFrictionBondedSpecies")
+    {
+        LinearPlasticViscoelasticFrictionBondedSpecies species;
         is >> species;
         copyAndAddObject(species);
     }
@@ -456,20 +463,20 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
         helpers::getLineFromStringStream(is, line);
         copyAndAddObject(LinearViscoelasticSpecies());
     }
-    
+
     //remove the default mixed species
     for (unsigned int i = 0; i + 1 < getNumberOfObjects(); i++)
     {
         ///\todo TW why does deleting these objects create a segmentation fault
         ///How do you create the segmentation fault? \author weinhartt
         ///\todo IFCD how does the numbering of mixedSpecies_ work?
-        ///the numbering of mixed species is 01, 02, 12, 03, 13, 23, 04, 14, 24, 34, 
-        ///i.e. if you add the n-th ParticleSpecies, then you have to add n-1 MixedSpecies. 
-        ///So here I remove the last n-1 MixedSpecies and add n-1 new ones. \author weinhartt 
+        ///the numbering of mixed species is 01, 02, 12, 03, 13, 23, 04, 14, 24, 34,
+        ///i.e. if you add the n-th ParticleSpecies, then you have to add n-1 MixedSpecies.
+        ///So here I remove the last n-1 MixedSpecies and add n-1 new ones. \author weinhartt
         delete mixedObjects_.back();
         mixedObjects_.pop_back();
     }
-    
+
     //Read the mixed species.
     for (unsigned int i = 0; i + 1 < getNumberOfObjects(); i++)
     {
@@ -549,6 +556,12 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
         else if (type == "LinearPlasticViscoelasticFrictionMixedSpecies")
         {
             LinearPlasticViscoelasticFrictionMixedSpecies species;
+            is >> species;
+            mixedObjects_.push_back(species.copy());
+        }
+        else if (type == "LinearPlasticViscoelasticFrictionBondedMixedSpecies")
+        {
+            LinearPlasticViscoelasticFrictionBondedMixedSpecies species;
             is >> species;
             mixedObjects_.push_back(species.copy());
         }
@@ -768,7 +781,7 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
  * \param[in] is The input stream from which the information is read.
  * \return A pointer to the ParticleSpecies that has just been read.
  * \details To read the old object, we first make a stringstream of the line that
- * describes this ParticleSpecies. After that, we read the properties one by one, 
+ * describes this ParticleSpecies. After that, we read the properties one by one,
  * first the stiffness and after that the other properties. We stop when we either
  * reach the end of the file(eof) or if a string is not recognized as a property.
  */
@@ -777,7 +790,7 @@ ParticleSpecies* SpeciesHandler::readOldObject(std::istream& is)
     //read in next line
     std::stringstream line;
     helpers::getLineFromStringStream(is, line);
-    
+
     //read each property
     std::string property;
     unsigned int particleDimension = 0;
@@ -815,7 +828,7 @@ ParticleSpecies* SpeciesHandler::readOldObject(std::istream& is)
         if (line.eof())
             break;
     }
-    
+
     //create the correct species
     if (slidingFrictionCoefficient == 0.0)
     {
@@ -842,7 +855,7 @@ ParticleSpecies* SpeciesHandler::readOldObject(std::istream& is)
 }
 
 /*!
- * \param[in] id1 Id of the first species. 
+ * \param[in] id1 Id of the first species.
  * \param[in] id2 Id of the second species.
  * \return An unsigned integer that denotes the Id of the mixed species.
  * \details The numbering of the mixed species is 0-1,  0-2, 1-2,  0-3, 1-3, 2-3,  0-4, 1-4, 2-4, 3-4, ...,
@@ -917,13 +930,13 @@ void SpeciesHandler::updateMixedObjects()
 
 /*!
  * \param[in] S A pointer to the ParticleSpecies that has to be added.
- * \details First, add the ParticleSpecies to the vector of ParticleSpecies (object_), 
- * then construct all MixedSpecies. Tell the ParticleSpecies that this is its 
+ * \details First, add the ParticleSpecies to the vector of ParticleSpecies (object_),
+ * then construct all MixedSpecies. Tell the ParticleSpecies that this is its
  * handler and compute all masses and whether it should use angular degrees of freedom.
- * 
- * Note: The MixedSpecies objects are initialized with 
- * averaged values from both species: e.g., the mixedSpecies between Species A 
- * and B will have a stiffness \$fk=(1/k_a+1/k_b)^{-1}\$f, you have to change 
+ *
+ * Note: The MixedSpecies objects are initialized with
+ * averaged values from both species: e.g., the mixedSpecies between Species A
+ * and B will have a stiffness \$fk=(1/k_a+1/k_b)^{-1}\$f, you have to change
  * the MixedSpecies properties if you don't like these defaults.
  */
 void SpeciesHandler::addObject(ParticleSpecies* const S)
@@ -945,10 +958,10 @@ void SpeciesHandler::addObject(ParticleSpecies* const S)
 }
 
 /*!
- * \param[in] index The index of which ParticleSpecies has to be removed from this 
+ * \param[in] index The index of which ParticleSpecies has to be removed from this
  *                  ParticleHandler.
- * \details         The ParticleSpecies with index is removed and the last 
- *                  ParticleSpecies in the vector is moved to its position. 
+ * \details         The ParticleSpecies with index is removed and the last
+ *                  ParticleSpecies in the vector is moved to its position.
  *                  It also removes all mixed species for this ParticleSpecies.
  */
 void SpeciesHandler::removeObject(unsigned const int index)

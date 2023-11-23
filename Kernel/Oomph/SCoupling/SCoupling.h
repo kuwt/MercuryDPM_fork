@@ -141,6 +141,29 @@ public:
         M::finaliseSolve();
     }
 
+    /**
+     * Solves an unsteady problem, returns successful if timeMaxMin has been reached
+     */
+    void solveSurfaceCouplingForgiving(unsigned nStep, double timeMaxMin=-constants::inf) {
+        // solve
+        try {
+            solveSurfaceCoupling(nStep);
+        } catch(OomphLibError& error)  {
+            //Store output if newton solver fails
+            O::saveSolidMesh();
+            M::finaliseSolve();
+            double time = O::time_stepper_pt()->time() - nStep * M::getTimeStep();;
+            double timeMax = M::getTimeMax();;
+            if (time >= timeMaxMin) {
+                // take it as successful if a fraction of the time evolution has finished
+                logger(INFO,"Newton solver failed at t=% (tMax=%), but code will continue.", time, timeMax);
+                exit(0);
+            } else {
+                logger(ERROR,"Newton solver failed at t=% (tMax=%).", time, timeMax);
+            }
+        }
+    }
+
     // solve OomphMercuryProblem, but with fixed solid
     void solveSurfaceCouplingFixedSolid()
     {
@@ -174,7 +197,7 @@ public:
         unsigned nDone = 0; //< last written file number
         while (M::getTime() < M::getTimeMax())
         {
-            O::actionsBeforeOomphTimeStep();
+            this->actionsBeforeOomphTimeStep();
             M::computeOneTimeStep();
             //if (getParticlesWriteVTK() && getVtkWriter()->getFileCounter() > nDone) {
             //    writeToVTK();

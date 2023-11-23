@@ -34,6 +34,7 @@
 #include "../ClumpHeaders/Mercury3DClump.h"
 # include <stdlib.h>
 #include<CMakeDefinitions.h>
+#include <memory>
 
 Mdouble f_min = -10; Mdouble f_max = 10;
 

@@ -100,5 +100,5 @@ int main(int argc UNUSED, char* argv[] UNUSED)
     problem.solve();
 
     // check if the particles where inserted correctly into the CylinderInsertionBoundary
-    logger.assert_always(problem.particleHandler.getSize() == 253, "The number of particles in the CylinderInsertionBoundary is not correct");
+    logger.assert_always(problem.particleHandler.getSize() == 170, "The number of particles (%) in the SphereInsertionBoundary is not correct", problem.particleHandler.getSize());
 }

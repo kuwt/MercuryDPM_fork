@@ -218,13 +218,8 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
         /* Generate random *intrinsic* properties for the new particle. */
         logger(VERBOSE, "about to call generateParticle\n");
 
-
-
-
-        //! HERE
-
-
-        auto p0 = generateParticle(md->random);
+        //generate a particle the first time
+        if (!p0) p0 = generateParticle(md->random);
         // Important for particle generation with a particle size distribution as it generates a particle with zero
         // radius. If a particle is not allowed to be inserted by the PSD criteria it will generate a particle with
         // zero diameter. This if statement prevents inserting particles with zero radius, which would else be a problem.
@@ -244,14 +239,6 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
         {
             /* Generate extrinsic properties (position and velocity) for this
              * new particle. */
-
-
-
-            //! HERE
-
-
-
-
             placeParticle(p0, md->random);
             logger(VERBOSE, "attempting to place particle at %, vel %", p0->getPosition(), p0->getVelocity());
 
@@ -296,7 +283,8 @@ void InsertionBoundary::checkBoundaryBeforeTimeStep(DPMBase* md)
                  * free it here. (Don't worry, the particle will have been copied to the
                  * particleHandler by this point iff we want it.) */
                 delete p0;
-
+                // generate a new particle to be inserted only if the last particle could be successfully places
+                p0 = generateParticle(md->random);
                 break; // out of the 'placing' loop
             }
             else

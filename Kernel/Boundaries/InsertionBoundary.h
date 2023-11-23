@@ -364,6 +364,10 @@ protected:
      */
     int chosenSpecies_;
 
+    /*!
+     * \brief pointer to the next particle that should be inserted (needs to be stored across time steps).
+     */
+    BaseParticle* p0= nullptr;
 };
 
 #endif
