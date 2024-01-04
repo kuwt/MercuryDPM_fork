@@ -3,6 +3,9 @@
 #include "DropletBoundary.h"
 #include "ParticleHandler.h"
 #include "Particles/BaseParticle.h"
+#include "Particles/HeatFluidCoupledParticle.h"
+#include "Species/HeatFluidCoupledLinearViscoelasticFrictionLiquidMigrationWilletSpecies.h"
+#include "Species/HeatFluidCoupledLinearViscoelasticFrictionSolidifyingLiquidMigrationWilletSpecies.h"
 
 void DropletBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
 {
@@ -34,6 +37,7 @@ void DropletBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
                     // should that be a static cast?
                     auto lfp = static_cast<LiquidFilmParticle *>(particle);
                     lfp->addLiquidVolume(liquidVolume/q.size());
+                    addHeatTransfer(particle, liquidVolume / q.size());
                 }
                 absorbedVolume += liquidVolume;
                 dropletVolume -= liquidVolume;
@@ -66,6 +70,41 @@ void DropletBoundary::checkBoundaryAfterParticlesMove(ParticleHandler& pH)
     }
 }
 
+void DropletBoundary::addHeatTransfer(BaseParticle* particle, double liquidVolume)
+{
+    // Skip when no droplet temperature has been set.
+    if (dropletTemperature_ < 0.0)
+        return;
+
+    auto hfp = dynamic_cast<HeatFluidCoupledParticle*>(particle);
+    if (hfp)
+    {
+        double particleHeatCapacity = getSpeciesHeatCapacity(hfp->getSpecies());
+        double dropletHeatCapacity = getSpeciesHeatCapacity(dropletSpecies_);
+        if (particleHeatCapacity > 0.0 && dropletHeatCapacity > 0.0)
+        {
+            double transferMass = dropletSpecies_->getDensity() * liquidVolume;
+            // Tf = (mp*cp*Tp + md*cd*Td) / (mp*cp + md*cd)
+            double temperatureFinal = (hfp->getMass() * particleHeatCapacity * hfp->getTemperature() + transferMass * dropletHeatCapacity * dropletTemperature_) /
+                                      (hfp->getMass() * particleHeatCapacity + transferMass * dropletHeatCapacity);
+            hfp->setTemperature(temperatureFinal);
+        }
+    }
+}
+
+double DropletBoundary::getSpeciesHeatCapacity(const ParticleSpecies* species) const
+{
+    auto s0 = dynamic_cast<const HeatFluidCoupledLinearViscoelasticFrictionLiquidMigrationWilletSpecies*>(species);
+    if (s0)
+        return s0->getHeatCapacity();
+
+    auto s1 = dynamic_cast<const HeatFluidCoupledLinearViscoelasticFrictionSolidifyingLiquidMigrationWilletSpecies*>(species);
+    if (s1)
+        return s1->getHeatCapacity();
+
+    return 0.0;
+}
+
 /*!
  * \details Reads a number of boundary properties from the given std::istream.
  * \param[in,out] is   the istream
@@ -86,6 +125,8 @@ void DropletBoundary::read(std::istream& is)
         droplets_.emplace_back(Droplet{position,velocity,radius});
     }
     is >> dummy >> dropletVolume >> dummy >> absorbedVolume >> dummy >> lostVolume;
+    if (helpers::isNext(is, "removeDropletsAtWalls")) // For backwards compatibility.
+        is >> removeDropletsAtWalls_ >> dummy >> dropletTemperature_;
 }
 
 /*!
@@ -103,6 +144,8 @@ void DropletBoundary::write(std::ostream& os) const
         os << " " << d.radius;
     }
     os << " dropletVolume " << dropletVolume << " absorbedVolume " << absorbedVolume << " lostVolume " << lostVolume;
+    // Droplet species not written, so should be set in actionsOnRestart() if needed.
+    os << " removeDropletsAtWalls " << removeDropletsAtWalls_ << " dropletTemperature " << dropletTemperature_;
 }
 
 void DropletBoundary::writeVTK(std::fstream& file) {

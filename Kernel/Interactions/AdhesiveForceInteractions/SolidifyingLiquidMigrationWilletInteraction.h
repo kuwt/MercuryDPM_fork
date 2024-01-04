@@ -125,9 +125,17 @@ public:
         return bondForce_;
     }
 
+    void setBondForce(Mdouble bondForce) {
+        bondForce_ = bondForce;
+    }
+
     ///Different from bondInteraction:
 
     double getSolidVolume() { return solidVolume_; }
+
+    void setSolidVolume(Mdouble solidVolume) {
+        solidVolume_ = solidVolume;
+    }
 
     void setLiquidBridgeVolume(Mdouble liquidBridgeVolume) override;
 
