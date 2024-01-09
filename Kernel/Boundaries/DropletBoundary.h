@@ -35,22 +35,6 @@ public:
         Vec3D force;
     };
 
-    std::vector<Droplet> droplets_;
-
-    // volume of liquid stored in droplets
-    double dropletVolume = 0;
-    // volume of liquid absorbed by particles
-    double absorbedVolume = 0;
-    // volume of liquid lost at walls
-    double lostVolume = 0;
-
-private:
-
-    std::function<void(DropletBoundary&)> generateDroplets_
-        = [] (DropletBoundary&) {};
-
-public:
-
     DropletBoundary() {}
     
     DropletBoundary(const DropletBoundary& other) {
@@ -129,12 +113,26 @@ public:
     }
 
 private:
+    std::function<void(DropletBoundary&)> generateDroplets_ = [] (DropletBoundary&) {};
+
+    void addHeatTransfer(BaseParticle* particle, double liquidVolume);
+    double getSpeciesHeatCapacity(const ParticleSpecies* species) const;
+
+public:
+    std::vector<Droplet> droplets_;
+
+    // volume of liquid stored in droplets
+    double dropletVolume = 0;
+    // volume of liquid absorbed by particles
+    double absorbedVolume = 0;
+    // volume of liquid lost at walls
+    double lostVolume = 0;
+
+private:
     bool removeDropletsAtWalls_ = true;
     const ParticleSpecies* dropletSpecies_ = nullptr;
 
     double dropletTemperature_ = -1.0; // Default negative, means no heat transfer.
-    void addHeatTransfer(BaseParticle* particle, double liquidVolume);
-    double getSpeciesHeatCapacity(const ParticleSpecies* species) const;
 };
 
 #endif
