@@ -28,6 +28,7 @@
 #include <Math/Helpers.h>
 #include <Particles/SphericalParticle.h>
 #include <Particles/ThermalParticle.h>
+#include <Particles/MeltableParticle.h>
 #include <Particles/HeatFluidCoupledParticle.h>
 #include <Particles/ClumpParticle.h>
 #include "ParticleHandler.h"
@@ -1059,6 +1060,10 @@ BaseParticle* ParticleHandler::createObject(const std::string& type)
     {
         return new ThermalParticle;
     }
+    else if (type == "MeltableParticle")
+    {
+        return new MeltableParticle;
+    }
     else if (type == "HeatFluidCoupledBaseParticle")
     {
         return new HeatFluidCoupledParticle;
@@ -1382,6 +1387,14 @@ unsigned int ParticleHandler::getNumberOfFixedObjects() const
 #else
     return getNumberOfFixedObjectsLocal();
 #endif
+}
+
+void ParticleHandler::actionsBeforeTimeStep()
+{
+    for (auto i: *this)
+    {
+        i->actionsBeforeTimeStep();
+    }
 }
 
 void ParticleHandler::actionsAfterTimeStep()

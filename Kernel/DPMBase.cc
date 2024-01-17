@@ -4351,6 +4351,8 @@ void DPMBase::computeOneTimeStep()
 
     logger(DEBUG, "about to call actionsBeforeTimeStep()");
     actionsBeforeTimeStep();
+    particleHandler.actionsBeforeTimeStep();
+    //interactionHandler.actionsBeforeTimeStep();
 
     logger(DEBUG, "about to call checkAndDuplicatePeriodicParticles()");
     checkAndDuplicatePeriodicParticles();

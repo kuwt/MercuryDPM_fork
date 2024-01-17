@@ -434,7 +434,9 @@ public:
      * \brief Returns the number of real objects on a local domain. MPI particles and periodic particles are neglected
      */
     unsigned int getNumberOfRealObjectsLocal() const;
-    
+
+    void actionsBeforeTimeStep();
+
     void actionsAfterTimeStep();
 
     double getLiquidFilmVolume() const;

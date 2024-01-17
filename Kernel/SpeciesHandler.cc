@@ -61,6 +61,11 @@
 #include "Species/LinearViscoelasticReversibleAdhesiveSpecies.h"
 #include "Species/LinearPlasticViscoelasticReversibleAdhesiveSpecies.h"
 #include "Species/LinearViscoelasticFrictionReversibleAdhesiveSpecies.h"
+
+#include "Species/LinearViscoelasticFrictionJKRAdhesiveSpecies.h"
+#include "Species/MeltableSpecies.h"
+#include "Species/MeltableFrictionSpecies.h"
+
 #include "Species/LinearViscoelasticSlidingFrictionReversibleAdhesiveSpecies.h"
 #include "Species/LinearPlasticViscoelasticFrictionReversibleAdhesiveSpecies.h"
 #include "Species/LinearPlasticViscoelasticSlidingFrictionReversibleAdhesiveSpecies.h"
@@ -326,6 +331,24 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
     else if (type == "LinearViscoelasticFrictionReversibleAdhesiveSpecies")
     {
         LinearViscoelasticFrictionReversibleAdhesiveSpecies species;
+        is >> species;
+        copyAndAddObject(species);
+    }
+    else if (type == "LinearViscoelasticFrictionJKRAdhesiveSpecies")
+    {
+        LinearViscoelasticFrictionJKRAdhesiveSpecies species;
+        is >> species;
+        copyAndAddObject(species);
+    }
+    else if (type == "MeltableFrictionSpecies")
+    {
+        MeltableFrictionSpecies species;
+        is >> species;
+        copyAndAddObject(species);
+    }
+    else if (type == "MeltableSpecies")
+    {
+        MeltableSpecies species;
         is >> species;
         copyAndAddObject(species);
     }
@@ -664,6 +687,18 @@ void SpeciesHandler::readAndAddObject(std::istream& is)
         else if (type == "LinearPlasticViscoelasticFrictionReversibleAdhesiveMixedSpecies")
         {
             LinearPlasticViscoelasticFrictionReversibleAdhesiveMixedSpecies species;
+            is >> species;
+            mixedObjects_.push_back(species.copy());
+        }
+        else if (type == "LinearViscoelasticFrictionJKRAdhesiveMixedSpecies")
+        {
+            LinearViscoelasticFrictionJKRAdhesiveMixedSpecies species;
+            is >> species;
+            mixedObjects_.push_back(species.copy());
+        }
+        else if (type == "MeltableFrictionMixedSpecies")
+        {
+            MeltableFrictionMixedSpecies species;
             is >> species;
             mixedObjects_.push_back(species.copy());
         }

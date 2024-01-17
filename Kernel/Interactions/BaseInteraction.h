@@ -405,12 +405,12 @@ protected:
      * Returns a constant vector to the Tangential Force
      */
     virtual const Vec3D getTangentialForce() const;
-    
+
     /*!
      * \brief Returns a Mdouble to the effective radius of the interaction. (Not corrected for the overlap)
      */
     Mdouble getEffectiveRadius() const;
-    
+
     /*!
      * \brief Returns a Mdouble to the effective radius of the interaction. (Not corrected for the overlap)
      */

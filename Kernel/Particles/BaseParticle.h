@@ -614,8 +614,10 @@ public:
      * particleHandler, which is needed to retrieve species information.
      */
     ///\todo TW: this function should also check if the particle is the correct particle for the species type
-    void setSpecies(const ParticleSpecies* species);
-    
+    virtual void setSpecies(const ParticleSpecies* species);
+
+    virtual void actionsBeforeTimeStep() {}
+
     virtual unsigned getNumberOfFieldsVTK() const;
     
     virtual std::string getTypeVTK(unsigned i) const;
