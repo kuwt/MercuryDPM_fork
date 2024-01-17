@@ -24,4 +24,10 @@ IF(MercuryDPM_USE_OpenMP)
     ENDIF()
     # Set compiler flags
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    # display a warning and Disable MercuryDPM_TRIANGEL_WALL_CORRECTION and remove the definition for OpenMP as it is not working correctly
+    IF(MercuryDPM_TRIANGLE_WALL_CORRECTION)
+        message(WARNING "MercuryDPM_TRIANGLE_WALL_CORRECTION is disabled for OpenMP as it is not working correctly")
+        set(MercuryDPM_TRIANGLE_WALL_CORRECTION OFF)
+        remove_definitions( -DMERCURYDPM_TRIANGLE_WALL_CORRECTION )
+    ENDIF()
 ENDIF()
