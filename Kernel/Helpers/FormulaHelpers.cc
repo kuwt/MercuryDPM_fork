@@ -112,3 +112,10 @@ unsigned int helpers::getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(
     }
     return 0;
 }
+
+/*!
+ * \brief Returns the shear modulus calculated from Young's modulus and Poisson's ratio. 
+ */
+Mdouble helpers::getShearModulus(Mdouble youngsModulus, Mdouble poisson){
+    return youngsModulus / (2.0 * (1 + poisson));
+}
