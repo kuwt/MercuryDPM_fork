@@ -39,12 +39,17 @@
 #include <Walls/InfiniteWall.h>
 //! [T3:headers]
 
+/** Tutorial3 derives from Mercury3D (3D particle simulation with hGrid contact detection).
+ *  It simulates the impact of a particle onto a wall under the influence of gravity.
+ */
 //! [T3:class]
 class Tutorial3 : public Mercury3D
 {
 public:
-    
+
+    // add particles and walls
     void setupInitialConditions() override {
+        // add a particle of 1cm diameter at height zMax
         SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
         p0.setRadius(0.005);
@@ -52,6 +57,7 @@ public:
         p0.setVelocity(Vec3D(0.0, 0.0, 0.0));
         particleHandler.copyAndAddObject(p0);
 
+        // add a bottom wall at zMin
         //! [T3:infiniteWall]
         InfiniteWall w0;
         w0.setSpecies(speciesHandler.getObject(0));
@@ -68,36 +74,45 @@ int main(int argc, char* argv[])
     
     // Problem setup
     Tutorial3 problem;
-    
-    problem.setName("Tutorial3");
-    problem.setSystemDimensions(3);
-    problem.setGravity(Vec3D(0.0, 0.0, -9.81));
-    problem.setXMax(1.0);
-    problem.setYMax(1.0);
-    problem.setZMax(2.0);
-    problem.setTimeMax(5.0);
 
+    // name the output files
+    problem.setName("Tutorial3");
+    // remove old output files with the same name
+    problem.removeOldFiles();
+    // set gravivational acceleration
+    problem.setGravity(Vec3D(0.0, 0.0, -9.81));
+    // set domain size (xMin = yMin = zMin = 0 by default)
+    problem.setXMax(0.5);
+    problem.setYMax(0.5);
+    problem.setZMax(0.5);
+    problem.setTimeMax(2.0);
+
+    // Sets a linear spring-damper contact law.
+    // The spring stiffness and normal dissipation is computed such that collision time tc = 0.005
+    // and restitution coefficient r=1.0 for a pair of particles of 1cm diameter
     //! [T3:speciesProp]
-    // The normal spring stiffness and normal dissipation is computed and set as
-    // For collision time tc=0.005 and restitution coefficeint rc=1.0,
-    LinearViscoelasticSpecies species;
-    species.setDensity(2500.0); //sets the species type_0 density
-    species.setStiffness(258.5);//sets the spring stiffness.
-    species.setDissipation(0.0); //sets the dissipation.
-    problem.speciesHandler.copyAndAddObject(species);
+    LinearViscoelasticSpecies s;
+    s.setDensity(2500.0); //sets the density
+    s.setStiffness(258.5);//sets the spring stiffness.
+    s.setDissipation(0.0); //sets the dissipation.
+    auto species = problem.speciesHandler.copyAndAddObject(s);
     //! [T3:speciesProp]
-    
-    problem.setSaveCount(10);
-    problem.dataFile.setFileType(FileType::ONE_FILE);
-    problem.restartFile.setFileType(FileType::ONE_FILE);
-    problem.fStatFile.setFileType(FileType::NO_FILE);
-    problem.eneFile.setFileType(FileType::NO_FILE);
-    
+
+    // Settings for xBalls visualisation
     problem.setXBallsAdditionalArguments("-solidf -v0");
-    problem.wallHandler.setWriteVTK(true);
+    // Output vtk files for ParaView visualisation
+    problem.wallHandler.setWriteVTK(FileType::ONE_FILE);
     problem.setParticlesWriteVTK(true);
-    
-    problem.setTimeStep(0.005 / 50.0); // (collision time)/50.0
+    // Output every 100th time step
+    problem.setSaveCount(100); // (collision time)/50.0
+
+    double mass = species->getMassFromRadius(0.005);
+    double collisionTime = species->getCollisionTime(mass);
+    double restitution = species->getRestitutionCoefficient(mass);
+    logger(INFO, "Collision Time %, Restitution %", collisionTime, restitution );
+
+    // Sets time step to 1/50th of the collision time
+    problem.setTimeStep(0.005 / 50.0);
     problem.solve(argc, argv);
     
     return 0;
