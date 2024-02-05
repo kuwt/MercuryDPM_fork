@@ -2184,9 +2184,9 @@ void DPMBase::writePythonFileForVTKVisualisation() const
                          "import re # for natural sorting\n\n"
                          "# Path to directory containing vtu files\n"
                          "# Hardcoded (for windows you might need to change start of path, for example: from /mnt/c/MyFolder to c:/MyFolder)\n"
-                         "#dirPath = '" + helpers::getPath() + "'\n"
+                         "dirPath = '" + helpers::getPath() + "'\n"
                          "# Or directory containing this script\n"
-                         "dirPath = os.path.dirname(os.path.realpath(__file__))\n"
+                         "#dirPath = os.path.dirname(os.path.realpath(__file__))\n"
                          "# Change to directory\n"
                          "os.chdir(dirPath)\n\n";
 
