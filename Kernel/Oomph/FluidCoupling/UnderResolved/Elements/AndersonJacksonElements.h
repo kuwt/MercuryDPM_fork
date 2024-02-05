@@ -900,8 +900,11 @@ public:
 
   /// Implementing voidage and coupling force directly as member variable; Mitchel ///
   double voidage123;
+  bool voidageFixed_ = false;
   void setVoidage(const double &voidage_) {voidage123 = voidage_;}
   double getVoidage() {return voidage123;}
+  void setVoidageFixed(bool bool_) {voidageFixed_ = bool_;}
+  bool voidageIsFixed() {return voidageFixed_;}
   oomph::Vector<double> couplingForce;
   void setCouplingForce(const oomph::Vector<double> & cf_) {couplingForce = cf_;}
   oomph::Vector<double> getCouplingForce() {return couplingForce;}

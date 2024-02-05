@@ -2,7 +2,8 @@
 // Created by mitchel on 17/Jan/19.
 //
 
-// This driver code will contain a 3D system that is used for the simulation of a die filling process.
+// This driver code will contain a 3D system that is used for the simulation of the die-filling process.
+
 #include "DieFilling.h"
 
 int main(int argc, char**argv)
@@ -28,7 +29,7 @@ int main(int argc, char**argv)
     
     double computedReynolds = domainDepth * problem.getInflowVel() * problem.getFluidDensity()/problem.getFluidDynamicViscosity();
     logger(INFO,"computed Reynolds number = %",computedReynolds);
-    
+
     Mdouble scaleFactorPSizeMCC = 10.0;
     Mdouble dMin = 4e-3 * scaleFactorPSizeMCC;
     Mdouble g = 9.81;
@@ -73,7 +74,6 @@ int main(int argc, char**argv)
     doc_info.set_directory("singleParticleTest");
     doc_info.number() = 0;
 
-    problem.setupInitialConditions();
     problem.generateLists();
 
     //FIXME steady state newton not working due to default of voidage and body force from AJeq

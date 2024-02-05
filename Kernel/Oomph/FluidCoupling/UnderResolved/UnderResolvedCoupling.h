@@ -74,15 +74,6 @@ public:
             // USED FOR PLOTTING AND SEMI-RESOLVED
             //dynamic_cast<ELEMENT *>(mesh_pt()->element_pt(e))->voidage_fct_pt() = &getDataFromElement::getVoidageOfElement;
 
-            //FIXME I think we need this to get coupling 24-10-23 it is unset in AJElements.h
-            //FIXME I do not know why this is commented as of yet, maybe in old codes this can be found? Different way of coupling?
-            //currEl->voidage_fct_pt_byEl() = &getDataFromElement::getVoidageOfElement_byEl;
-            //currEl->dvoidage_dx_fct_pt_byEl() = &getDataFromElement::getdVoidagedxOfElement_byEl;
-            //currEl->dvoidage_dt_fct_pt_byEl() = &getDataFromElement::getdVoidagedtOfElement_byEl;
-            //currEl->body_force_fct_pt_by_coupling() = &getDataFromElement::getBodyForceByCoupling_byEl;
-
-            //currEl->body_force_fct_pt_by_coupling() = GetFPointer();
-
             // NEEDED FOR COUPLING THROUGH ELEMENT NUMBER
             currEl->set_number(e); // Adding global number to element
         }
@@ -98,13 +89,6 @@ public:
         return dynamic_cast<oomph::RefineableSimpleCubicMesh<ELEMENT>*>(oomph::Problem::mesh_pt());
     }
 
-    //FIXME why not working?
-    //typedef void (UnderResolvedCoupling::*fptr)(const int&, oomph::Vector<double> &);
-    //fptr GetFPointer()
-    //{
-        //return &this->getBodyForceInElemByCoupling;
-    //}
-
     // General functions for solving time-dependent problems
     void setTimeStepOomph(const double& dtOomph) {dtOomph_ = dtOomph;}
     double getTimeStepOomph() {return dtOomph_;}
@@ -113,8 +97,8 @@ public:
     void syncTimeSteps();
     void settleParticles();
     
-    virtual void pinBC();
-    virtual void setBC();
+    virtual void pinBC() {}
+    virtual void setBC() {}
     void solveSystem(oomph::DocInfo &doc_info);
     void setAdaptEveryNFluidTimesteps(const int nFluidTimesteps) {adaptEveryNFluidTimesteps_ = nFluidTimesteps;}
     int getAdaptEveryNFluidTimesteps() {return adaptEveryNFluidTimesteps_;}
@@ -158,7 +142,6 @@ public:
     double getDynViscosityScaling() {return Rmu_;}// Scaling when going from dimensionless to dimensional
 
     // Specific functions for time-dependent boundary conditions
-    double getInflowVel(const double &);
     bool myHeaviSide(const double &, const double &);
 
     // Actions during solving
@@ -183,6 +166,8 @@ public:
     void passInfoToFluid();
 
     // Functions keeping track of particle-element-voidage information
+    void prescribeVoidage(double voidageValue, double from, double to, int dir);
+
     void generateLists();
     void updateLists();
     void setListsLengths();
@@ -221,8 +206,8 @@ public:
     void getBodyForceInElemByCoupling(const int &iEl_, oomph::Vector<double> &force_);
 
     // General functions
-    void setInflowVel(double inflowVel) {inflowVel_ = inflowVel;}
-    double getInflowVel() {return inflowVel_;}
+    virtual void setInflowVel(double inflowVel) {inflowVel_ = inflowVel;}
+    virtual double getInflowVel() {return inflowVel_;}
     
     void setFluidDensity(double fluidDensity) {fluidDensity_ = fluidDensity;}
     double getFluidDensity() {return fluidDensity_;}
@@ -1108,10 +1093,16 @@ void UnderResolvedCoupling<ELEMENT>::passInfoToFluid()
 {
     for (int i = 0; i<mesh_pt()->nelement(); i++)
     {
-        double localVoidage = getVoidageInElemFromList(i);
-        oomph::Vector<double> dummyF = {0.,0.,0.};
-        dynamic_cast<ELEMENT*>(mesh_pt()->element_pt(i))->setVoidage(localVoidage);
-        getBodyForceInElemByCoupling(i,dummyF);
+        auto elPtr = dynamic_cast<ELEMENT *>(mesh_pt()->element_pt(i));
+
+        if (!elPtr->voidageIsFixed())
+        {
+            double localVoidage = getVoidageInElemFromList(i);
+            oomph::Vector<double> dummyF = {0.,0.,0.};
+
+            elPtr->setVoidage(localVoidage);
+            getBodyForceInElemByCoupling(i, dummyF);
+        }
     }
 }
 
@@ -1177,132 +1168,36 @@ Vec3D UnderResolvedCoupling<ELEMENT>::getPressureGradient(const int & pIsInEl_, 
     return convertVecFuncs::convertToVec3D(pGrad);
 }
 
+
+/*!
+ * \details Prescribe voidage values in certain elements that have volumetric overlap with input values in a ceratin direction
+ *
+ * \param[in] double voidageValue prescribed value for the voidage
+ * \param[in] double from Start of domain that has prescribed voidage
+ * \param[in] double to End of domain that has prescribed voidage
+ * \param[in] double dir Direction of the domain
+ *
+ */
 template <class ELEMENT>
-void UnderResolvedCoupling<ELEMENT>::pinBC()
+void UnderResolvedCoupling<ELEMENT>::prescribeVoidage(double voidageValue, double from, double to, int dir)
 {
-    logger(DEBUG,"Call to pinBC()");
-
-    // Boundaries are numbered:
-    // 0 is at the bottom
-    // 1 2 3 4 from the front  proceeding anticlockwise
-    // 5 is at the top
-
-    // ---------------------------------------------------------------------------------------------- //
-    // FOR UNIFORM INFLOW in z-ir
-    //
-    //   ^   ^   ^  ^   ^
-    //   |   |   |  |   |
-    //
-    for (unsigned iBound = 0; iBound < mesh_pt()->nboundary(); iBound++)
+    for (unsigned int iEl = 0; iEl < mesh_pt()->nelement(); iEl++)
     {
-        if (iBound == 0)
+        auto elPtr = dynamic_cast<ELEMENT*>(mesh_pt()->element_pt(iEl));
+
+        oomph::Vector<double> posNode0(3, 0.0);
+        oomph::Vector<double> posNodeEnd(3, 0.0);
+        const unsigned int iNode = elPtr->nnode();
+        elPtr->node_pt(0)->position(posNode0);
+        elPtr->node_pt(iNode - 1)->position(posNodeEnd);
+
+        if ((posNode0[dir]>from && posNode0[dir]<to) || (posNodeEnd[dir]>from && posNodeEnd[dir]<to))
         {
-            unsigned long int nNode = mesh_pt()->nboundary_node(iBound);
-            for (unsigned iNode = 0; iNode < nNode; iNode++)
-            {
-                //Pin u and v and w
-                mesh_pt()->boundary_node_pt(iBound, iNode)->pin(0);
-                mesh_pt()->boundary_node_pt(iBound, iNode)->pin(1);
-                mesh_pt()->boundary_node_pt(iBound, iNode)->pin(2);
-            }
-        }
-        else if (iBound == 5)
-        {
-            unsigned long int nNode = mesh_pt()->nboundary_node(iBound);
-            for (unsigned iNode = 0; iNode < nNode; iNode++)
-            {
-                //Pin u and v and w
-                mesh_pt()->boundary_node_pt(iBound, iNode)->pin(0);
-                mesh_pt()->boundary_node_pt(iBound, iNode)->pin(1);
-            }
-        }
-        else
-        {
-            unsigned long int nNode = mesh_pt()->nboundary_node(iBound);
-            for (unsigned iNode = 0; iNode < nNode; iNode++)
-            {
-                //Pin all velocities
-                for (unsigned i = 0; i < 3; i++)
-                {
-                    mesh_pt()->boundary_node_pt(iBound, iNode)->pin(i);
-                }
-            }
+            elPtr->setVoidage(voidageValue);
+            elPtr->setVoidageFixed(true);
         }
     }
 }
-
-template <class ELEMENT>
-void UnderResolvedCoupling<ELEMENT>::setBC()
-{
-    logger(DEBUG,"Call to setBC()");
-
-    // Pin redudant pressure dofs
-    //Fix 3-th pressure value in first element to 0.0.
-    dynamic_cast<ELEMENT*>(mesh_pt()->element_pt(0))->fix_pressure(1,0.0);
-
-    // Boundaries are numbered:
-    // 0 is at the bottom
-    // 1 2 3 4 from the front  proceeding anticlockwise
-    // 5 is at the top
-
-    // Periodic flow
-    //double zVelIn = 0.05+ 0.3*sin(9.*getTime());
-
-    // Uniform inflow
-    double zVelIn = 0.;// getInflowVel(getTime());// getInflowVel(getTime());
-
-    for (unsigned iBound = 0; iBound < mesh_pt()->nboundary(); iBound++)
-    {
-        if (iBound == 0)
-        {
-            unsigned long int nNode = mesh_pt()->nboundary_node(iBound);
-            for (unsigned iNode = 0; iNode < nNode; iNode++)
-            {
-                mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(0,0.0);
-                mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(1,0.0);
-                mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(2,zVelIn);
-            }
-        }
-        else if (iBound == 5)
-        {
-            unsigned long int nNode = mesh_pt()->nboundary_node(iBound);
-            for (unsigned iNode = 0; iNode < nNode; iNode++)
-            {
-                mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(0,0.0);
-                mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(1,0.0);
-            }
-        }
-        else if (iBound == 1 || iBound == 3)
-        {
-            unsigned long int nNode = mesh_pt()->nboundary_node(iBound);
-            for (unsigned iNode = 0; iNode < nNode; iNode++)
-            {
-                mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(0,0.0);
-                mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(1,0.0);
-                mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(2,0.0);
-            }
-        }
-        else if (iBound == 2)
-        {
-            unsigned long int nNode = mesh_pt()->nboundary_node(iBound);
-            for (unsigned iNode = 0; iNode < nNode; iNode++) {
-                mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(0,0.0);
-                mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(1,0.0);
-                mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(2,0.0);
-            }
-        }
-        else if (iBound == 4)
-        {
-            unsigned long int nNode = mesh_pt()->nboundary_node(iBound);
-            for (unsigned iNode = 0; iNode < nNode; iNode++) {
-                mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(0,0.0);
-                mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(1,0.0);
-                mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(2,0.0);
-            }
-        }
-    }
-}
-
 
 /*!
  * \details Create lists as initial condition.
@@ -1473,12 +1368,15 @@ void UnderResolvedCoupling<ELEMENT>::updateListOfVoidageInElem()
 template <class ELEMENT>
 void UnderResolvedCoupling<ELEMENT>::updateListOfVoidageInElem(const unsigned &iEl)
 {
+    auto elPtr = dynamic_cast<ELEMENT*>(mesh_pt()->element_pt(iEl));
+
+    if (elPtr->voidageIsFixed()) {return;}
+
     double VolumeElement;
     double VolumeParticles = 0.0;
     oomph::Vector<double> posNode0(3, 0.0);
     oomph::Vector<double> posNodeEnd(3, 0.0);
 
-    auto elPtr = dynamic_cast<ELEMENT*>(mesh_pt()->element_pt(iEl));
     const unsigned int iNode = elPtr->nnode();
 
     // Note that index of end node is iNode - 1, else segmentation fault as node_pt(iNode) does not exist
@@ -2404,7 +2302,7 @@ void UnderResolvedCoupling<ELEMENT>::getS(oomph::Vector<double> &s_, const unsig
  * @param[in] time_
  * @return double ampFactor
  */
-template <class ELEMENT>
+/*template <class ELEMENT>
 double UnderResolvedCoupling<ELEMENT>::getInflowVel(const double &time_)
 {
     double stroke = 0.14;
@@ -2424,7 +2322,7 @@ double UnderResolvedCoupling<ELEMENT>::getInflowVel(const double &time_)
     }
 
     return inflowVel;
-}
+}*/
 
 
 /*!

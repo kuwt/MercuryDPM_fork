@@ -18,10 +18,15 @@ public:
                  oomph::TimeStepper* time_stepper_pt = &oomph::Mesh::Default_TimeStepper) :
             UnderResolvedCoupling<ELEMENT>(xMin,xMax,yMin,yMax,zMin,zMax,nx,ny,nz,time_stepper_pt)
     {
+        pinBC();
+        setBC();
 
+        setupInitialConditions();
     };
     
     void setupInitialConditions() override;
+    void setBC() override;
+    void pinBC() override;
     
     void setDieLength(double dieLength) {dieLength_ = dieLength;}
     void setDieWidth(double dieWidth) {dieWidth_ = dieWidth;}
@@ -174,6 +179,132 @@ void DieFilling<ELEMENT>::setupInitialConditions()
     this->wallHandler.copyAndAddObject(wall);
     wall.set(Vec3D(0, 0,-1),{0.0,0.0,DPMBase::getZMin()});
     this->wallHandler.copyAndAddObject(wall);
+}
+
+template <class ELEMENT>
+void DieFilling<ELEMENT>::pinBC()
+{
+    logger(DEBUG,"Call to pinBC()");
+
+    // Boundaries are numbered:
+    // 0 is at the bottom
+    // 1 2 3 4 from the front  proceeding anticlockwise
+    // 5 is at the top
+
+    // ---------------------------------------------------------------------------------------------- //
+    // FOR UNIFORM INFLOW in z-ir
+    //
+    //   ^   ^   ^  ^   ^
+    //   |   |   |  |   |
+    //
+    for (unsigned iBound = 0; iBound < this->mesh_pt()->nboundary(); iBound++)
+    {
+        if (iBound == 0)
+        {
+            unsigned long int nNode = this->mesh_pt()->nboundary_node(iBound);
+            for (unsigned iNode = 0; iNode < nNode; iNode++)
+            {
+                //Pin u and v and w
+                this->mesh_pt()->boundary_node_pt(iBound, iNode)->pin(0);
+                this->mesh_pt()->boundary_node_pt(iBound, iNode)->pin(1);
+                this->mesh_pt()->boundary_node_pt(iBound, iNode)->pin(2);
+            }
+        }
+        else if (iBound == 5)
+        {
+            unsigned long int nNode = this->mesh_pt()->nboundary_node(iBound);
+            for (unsigned iNode = 0; iNode < nNode; iNode++)
+            {
+                //Pin u and v and w
+                this->mesh_pt()->boundary_node_pt(iBound, iNode)->pin(0);
+                this->mesh_pt()->boundary_node_pt(iBound, iNode)->pin(1);
+            }
+        }
+        else
+        {
+            unsigned long int nNode = this->mesh_pt()->nboundary_node(iBound);
+            for (unsigned iNode = 0; iNode < nNode; iNode++)
+            {
+                //Pin all velocities
+                for (unsigned i = 0; i < 3; i++)
+                {
+                    this->mesh_pt()->boundary_node_pt(iBound, iNode)->pin(i);
+                }
+            }
+        }
+    }
+}
+
+template <class ELEMENT>
+void DieFilling<ELEMENT>::setBC()
+{
+    logger(DEBUG,"Call to setBC()");
+
+    // Pin redudant pressure dofs
+    //Fix 3-th pressure value in first element to 0.0.
+    dynamic_cast<ELEMENT*>(this->mesh_pt()->element_pt(0))->fix_pressure(1,0.0);
+
+    // Boundaries are numbered:
+    // 0 is at the bottom
+    // 1 2 3 4 from the front  proceeding anticlockwise
+    // 5 is at the top
+
+    // Periodic flow
+    //double zVelIn = 0.05+ 0.3*sin(9.*getTime());
+
+    // Uniform inflow
+    double zVelIn = 0.;// getInflowVel(getTime());// getInflowVel(getTime());
+
+    for (unsigned iBound = 0; iBound < this->mesh_pt()->nboundary(); iBound++)
+    {
+        if (iBound == 0)
+        {
+            unsigned long int nNode = this->mesh_pt()->nboundary_node(iBound);
+            for (unsigned iNode = 0; iNode < nNode; iNode++)
+            {
+                this->mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(0,0.0);
+                this->mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(1,0.0);
+                this->mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(2,zVelIn);
+            }
+        }
+        else if (iBound == 5)
+        {
+            unsigned long int nNode = this->mesh_pt()->nboundary_node(iBound);
+            for (unsigned iNode = 0; iNode < nNode; iNode++)
+            {
+                this->mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(0,0.0);
+                this->mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(1,0.0);
+            }
+        }
+        else if (iBound == 1 || iBound == 3)
+        {
+            unsigned long int nNode = this->mesh_pt()->nboundary_node(iBound);
+            for (unsigned iNode = 0; iNode < nNode; iNode++)
+            {
+                this->mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(0,0.0);
+                this->mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(1,0.0);
+                this->mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(2,0.0);
+            }
+        }
+        else if (iBound == 2)
+        {
+            unsigned long int nNode = this->mesh_pt()->nboundary_node(iBound);
+            for (unsigned iNode = 0; iNode < nNode; iNode++) {
+                this->mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(0,0.0);
+                this->mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(1,0.0);
+                this->mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(2,0.0);
+            }
+        }
+        else if (iBound == 4)
+        {
+            unsigned long int nNode = this->mesh_pt()->nboundary_node(iBound);
+            for (unsigned iNode = 0; iNode < nNode; iNode++) {
+                this->mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(0,0.0);
+                this->mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(1,0.0);
+                this->mesh_pt()->boundary_node_pt(iBound, iNode)->set_value(2,0.0);
+            }
+        }
+    }
 }
 
 #endif //MERCURYDPM_DIEFILLING_H
