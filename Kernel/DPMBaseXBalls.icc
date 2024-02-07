@@ -47,7 +47,7 @@ void DPMBase::outputXBallsDataParticle(unsigned int i, unsigned int format, std:
             {
                 os << p->getPosition().X << " 0 "
                    << p->getVelocity().X << " 0 "
-                   << p->getRadius() * float(!(p->IsMaster())) << " 0 0 0" << std::endl; // assign zero radius for masters of clumps
+                   << p->getRadius() * float(!(p->isClump())) << " 0 0 0" << std::endl; // assign zero radius for masters of Clumps
                 break;
             }
             else
@@ -59,7 +59,7 @@ void DPMBase::outputXBallsDataParticle(unsigned int i, unsigned int format, std:
                    << std::setprecision(prec)
                    << p->getVelocity().X << " "
                    << p->getVelocity().Y << " "
-                   << p->getRadius() * float(!(p->IsMaster())) << " "
+                   << p->getRadius() * float(!(p->isClump())) << " "
                    << p->getOrientation().getAngleZ()
                    << " " // negative b/c we are plotting (x,y) coordinates on the xz-axis of xballs
                    << -p->getAngularVelocity().Z << " "
@@ -76,7 +76,7 @@ void DPMBase::outputXBallsDataParticle(unsigned int i, unsigned int format, std:
                << p->getPosition() << " "
                << std::setprecision(prec)
                << p->getVelocity() << " "
-               << p->getRadius() * float(!(p->IsMaster())) << " "
+               << p->getRadius() * float(!(p->isClump())) << " "
                ///\todo TW should we really write the expensive-to-compute Euler angles instead of the unit quaternion?
                 << angle.getEuler() << " "
                 //<< angle.getAxis() << " "

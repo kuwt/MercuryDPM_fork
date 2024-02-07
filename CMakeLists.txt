@@ -23,9 +23,7 @@ if (EXISTS ${PROJECT_SOURCE_DIR}/.git)
 		# `git remote -v` doesn't help if the repository has more than
 		# one remote set up.)
 		set(REPOSITORY_URL "https://bitbucket.org/mercurydpm/mercurydpm.git")
-
-		message("Git: commit is ${REVISION}")
-
+		#message("Git: commit is ${REVISION}")
 	else()
 		message("The project is in a Git repository, but the git executable is not available")
 	endif()
@@ -115,8 +113,13 @@ option(MercuryDPM_OOMPH_COUPLING "Couple MercuryDPM with oomph-lib" OFF)
 # Couple with oomph-lib if OOMPH_COUPLING is on
 include(CMakeModules/OomphCoupling.cmake)
 
+# Determine whether to couple MercuryDPM with Eigen or not
+option(MercuryDPM_EIGEN "Couple MercuryDPM with Eigen" OFF)
+# Couple with Eigen if EIGEN is on
+include(CMakeModules/MercuryDPM_Eigen.cmake)
+
 if (NOT MercuryDPM_KERNEL_ONLY)
-	# this is done after oomph is included since it needs the includes defined there
+	# this is done after oomph and Eigen is included since it needs the includes defined there
 	add_subdirectory(Drivers)
 
 	#Add the command fullTest, which rebuilds the cache, cleans the project and then compiles and tests everything.
@@ -146,11 +149,12 @@ endif()
 if (NOT MercuryDPM_KERNEL_ONLY)
 	###### These needs to be fixed as the new scripts line above will always create this, so the Python problem is back
 	################################################
-	find_package(PythonInterp 3)
+	find_package(PythonInterp 3 REQUIRED)
 	find_package(PythonLibs 3)
+
 	# this line causes problems when you have multiple builds
 	FILE(COPY Configuration/fpdiff.py DESTINATION ${PROJECT_SOURCE_DIR}/Scripts/)
 
-	#find_program(PYTHON_EXEC "python" 
+	#find_program(PYTHON_EXEC "python"
 	#	DOC "Location of python executable to use")
 endif()

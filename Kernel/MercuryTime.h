@@ -27,11 +27,13 @@
 #define TIME_H
 
 #include <ctime>
-#include <time.h>
-#include <string.h>
+#include <ctime>
+#include <cstring>
 #include <sstream>
 #include <chrono>
+#include <cmath>
 #include "GeneralDefine.h"
+#include "Logger.h"
 
 /*!
  * \brief Allows for timing the algorithms; accurate up to 0.01 sec. 
@@ -46,6 +48,8 @@ public:
     
     Time () {
         tic();
+        start = 0;
+        finish = 0;
     }
     
     /*!
@@ -73,7 +77,7 @@ public:
     /*!
      * Returns the time elapsed (in seconds) between tic and toc.
      */
-    Mdouble getCPUTime()
+    Mdouble getCPUTime() const
     {
         return (Mdouble(finish) - Mdouble(start)) / CLOCKS_PER_SEC;
     }

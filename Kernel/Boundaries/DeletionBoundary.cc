@@ -55,6 +55,7 @@ DeletionBoundary::DeletionBoundary()
  */
 DeletionBoundary::~DeletionBoundary()
 {
+    tracker.close();
     logger(DEBUG, "DeletionBoundary::~DeletionBoundary() finished", true);
 }
 
@@ -166,6 +167,8 @@ bool DeletionBoundary::checkBoundaryAfterParticleMoved(BaseParticle* p, Particle
                     << std::setw(12) << p->getMass() << ' '
                     << std::setw(12) << trackMassDeleted_ << '\n';
         }
+        else
+            trackerCustom_(tracker, p);
 
         #ifdef MERCURYDPM_USE_MPI
             //Check if the particle is in the mpi communication zone

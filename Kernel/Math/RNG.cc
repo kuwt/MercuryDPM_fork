@@ -67,6 +67,7 @@ void RNG::read(std::istream& is)
     is >> m_;
     is >> p_;
     is >> q_;
+    ///\todo tw @at should that number be part of the restart file? It seems to be computed from the other numbers.
     is >> randomSeedLinearCongruentialGenerator_;
     //note: the seeds for the LaggedFibonacciGenerator cannot be restarted currently.
     seedLaggedFibonacciGenerator();

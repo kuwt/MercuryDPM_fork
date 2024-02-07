@@ -102,6 +102,12 @@ template<class NormalForceSpecies, class FrictionForceSpecies, class AdhesiveFor
 MixedSpecies<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies>::MixedSpecies()
         : BaseSpecies(this,this,this), NormalForceSpecies(), FrictionForceSpecies(), AdhesiveForceSpecies()
 {
+    normalForce_ = this;
+    frictionForce_ = this;
+    adhesiveForce_ = this;
+    normalForce_->setBaseSpecies(this);
+    frictionForce_->setBaseSpecies(this);
+    adhesiveForce_->setBaseSpecies(this);
     logger(DEBUG, "MixedSpecies::MixedSpecies() finished");
 }
 
@@ -211,6 +217,8 @@ void MixedSpecies<NormalForceSpecies, FrictionForceSpecies, AdhesiveForceSpecies
     NormalForceSpecies::read(is);
     FrictionForceSpecies::read(is);
     AdhesiveForceSpecies::read(is);
+    // ensure that interaction distance is recomputed after restarting
+    AdhesiveForceSpecies::setInteractionDistance();
 }
 
 /*!

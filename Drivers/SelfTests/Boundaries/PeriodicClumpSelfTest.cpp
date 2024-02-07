@@ -28,9 +28,9 @@
 #include "Mercury3D.h"
 #include "Walls/InfiniteWall.h"
 #include "Species/LinearViscoelasticFrictionSpecies.h"
-#include "Particles/MultiParticle.h"
-#include "../../MultiParticle/clump/ClumpIO.h"
-#include "../../MultiParticle/clump/Mercury3DClump.h"
+#include "Particles/ClumpParticle.h"
+#include "../../Clump/ClumpHeaders/ClumpInput.h"
+#include "../../Clump/ClumpHeaders/Mercury3DClump.h"
 # include <stdlib.h>
 #include "Boundaries/PeriodicBoundary.h"
 
@@ -50,7 +50,7 @@ public:
         setXMin(f_min);
         setYMin(f_min);
         setZMin(f_min);
-        load_clumps(data);
+        LoadClumps(data);
         setClumpIndex(0);
         clump_mass = data.mass[clump_index];
     }
@@ -77,17 +77,17 @@ public:
     
         // Generate single clump
         setClumpIndex(1);
-        MultiParticle p0;
-        p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to MultiParticle 1
-        p0.setMaster();
-        p0.setRadius(data.pebbles_r[clump_index][0]);
+        ClumpParticle p0;
+        p0.setSpecies(speciesHandler.getObject(0)); // Assign the material type to Clump 1
+        p0.setClump();
+        p0.setRadius(data.pebblesR[clump_index][0]);
         Vec3D pos = Vec3D(0, 0, 0);
         p0.setPosition(pos);
-        for (int j = 0; j < data.pebbles_r[clump_index].size(); j++) {
-            p0.addSlave(Vec3D(data.pebbles_x[clump_index][j],
-                                  data.pebbles_y[clump_index][j],
-                                  data.pebbles_z[clump_index][j]),
-                            data.pebbles_r[clump_index][j]);
+        for (int j = 0; j < data.pebblesR[clump_index].size(); j++) {
+            p0.addPebble(Vec3D(data.pebblesX[clump_index][j],
+                               data.pebblesY[clump_index][j],
+                               data.pebblesZ[clump_index][j]),
+                         data.pebblesR[clump_index][j]);
         }
         p0.setPrincipalDirections(
                     Matrix3D(data.pd[clump_index][0], data.pd[clump_index][1], data.pd[clump_index][2],
@@ -97,7 +97,7 @@ public:
                     MatrixSymmetric3D(data.toi[clump_index][0], data.toi[clump_index][1], data.toi[clump_index][2],
                                       data.toi[clump_index][4], data.toi[clump_index][5],
                                       data.toi[clump_index][8]));
-        p0.setMassMultiparticle(data.mass[clump_index]);
+        p0.setClumpMass(data.mass[clump_index]);
         p0.setAngularVelocity(Vec3D(0,20,0.01));
         p0.setVelocity(Vec3D(8,0,0));
 	p0.setDamping(clump_damping);
@@ -106,7 +106,7 @@ public:
     }
 private:
     int clump_index;
-    clump_data data;
+    ClumpData data;
     Mdouble clump_mass;
     Mdouble clump_damping = 0;
 };
@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
     problem.removeOldFiles();
     problem.solve();
 
-    MultiParticle* p = dynamic_cast<MultiParticle*>(problem.particleHandler.getLastObject());
+    ClumpParticle* p = dynamic_cast<ClumpParticle*>(problem.particleHandler.getLastObject());
     Vec3D angVel = p->getAngularVelocity();
     Vec3D known_angVel = Vec3D(-1.30004, 19.9932, 0.944699);
 

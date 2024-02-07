@@ -79,30 +79,17 @@ public:
         Vec3D velMax = {0,0,0});
 
     /*!
-     * \brief old style set function which also assumes a uniform psd. Note if you want a general PSD do not use but this is quicker for a uniform in size PSD
-     * \todo Check with Timo and Thomas about this.
+     * \brief old style set function which assumes a uniform psd.
      */
     void set(BaseParticle* particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin,
-        Vec3D velMax, Mdouble rMin, Mdouble rMax)
-    {
-        PSD uniformPSD;
-        uniformPSD.setDistributionUniform(rMin,rMax,1000);
-        setPSD(uniformPSD);
-        set(particleToCopy, maxFailed,posMin, posMax,  velMin, velMax);
-    }
-
+             Vec3D velMax, Mdouble rMin, Mdouble rMax);
+    
     /*!
-     * \brief old style set function which also assumes a uniform psd. Note if you want a general PSD do not use but this is quicker for a uniform in size PSD
-     * \todo Check with Timo and Thomas about this.
+     * \brief old style set function which assumes a uniform psd.
      */
-    void set(BaseParticle &particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin, Vec3D velMax, Mdouble rMin, Mdouble rMax)
-    {
-        PSD uniformPSD;
-        uniformPSD.setDistributionUniform(rMin,rMax,1000);
-        setPSD(uniformPSD);
-        set(particleToCopy, maxFailed,posMin, posMax,  velMin, velMax);
-    }
-
+    void set(BaseParticle& particleToCopy, unsigned int maxFailed, Vec3D posMin, Vec3D posMax, Vec3D velMin,
+             Vec3D velMax, Mdouble rMin, Mdouble rMax);
+    
     /*!
      * \brief Sets the geometry (position and velocity distribution) of the
      * CubeInsertionBoundary

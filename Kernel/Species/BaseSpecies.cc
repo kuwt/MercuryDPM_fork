@@ -102,7 +102,7 @@ SpeciesHandler* BaseSpecies::getHandler() const
 }
 
 /*!
- * \detail Returns the harmonic mean of two variables.
+ * \details Returns the harmonic mean of two variables.
  * This function is used to define default mixed species.
  * \param[in] a,b The two variables you want to average
  * \return The harmonic mean of a and b, \f$\frac{2}{1/a+1/b}\f$
@@ -115,7 +115,7 @@ Mdouble BaseSpecies::average(Mdouble a, Mdouble b)
 }
 
 /*! 
- * \detail Returns the harmonic mean of two variables, returning inf if either is inf.
+ * \details Returns the harmonic mean of two variables, returning inf if either is inf.
  */
 Mdouble BaseSpecies::averageInf(Mdouble a, Mdouble b)
 {
@@ -176,7 +176,10 @@ void BaseSpecies::setInteractionDistance(Mdouble interactionDistance) {
             return;
         }
     }
-    handler->getObject(getId())->setMaxInteractionDistance(interactionDistance);
+    // if not a mixed species, check it's a species in the speciesHandler
+    if (handler->getSize()>getId() && handler->getObject(getId()) == this) {
+        handler->getObject(getId())->setMaxInteractionDistance(interactionDistance);
+    }
     
     //logger(INFO,"setInteractionDistance(%) species % handler %",interactionDistance, getIndex(), getHandler());
 }

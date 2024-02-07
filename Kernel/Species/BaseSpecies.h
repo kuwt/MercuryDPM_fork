@@ -167,21 +167,21 @@ protected:
 
     /*!
      * \brief A pointer to the normal force parameters
-     * \detail This pointer is used by the Interaction's to get a pointer to the species
+     * \details This pointer is used by the Interaction's to get a pointer to the species
      * The pointer is set in the constructors of SPecies and MixedSpecies
      */
     BaseNormalForce* normalForce_;
 
     /*!
      * \brief A pointer to the friction force parameters
-     * \detail This pointer is used by the Interaction's to get a pointer to the species
+     * \details This pointer is used by the Interaction's to get a pointer to the species
      * The pointer is set in the constructors of SPecies and MixedSpecies
      */
     BaseFrictionForce* frictionForce_;
 
     /*!
      * \brief A pointer to the adhesive force parameters
-     * \detail This pointer is used by the Interaction's to get a pointer to the species
+     * \details This pointer is used by the Interaction's to get a pointer to the species
      * The pointer is set in the constructors of SPecies and MixedSpecies
      */
     BaseAdhesiveForce* adhesiveForce_;

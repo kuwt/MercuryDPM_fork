@@ -29,6 +29,8 @@
 #include <Math/MatrixSymmetric.h>
 #include <CG/Functions/IntegralType.h>
 
+#include "BaseFields.h"
+
 class BaseParticle;
 
 class BaseInteraction;
@@ -47,7 +49,7 @@ namespace CGFields
  * momentum. Also, a simpler version is planned, where only particle statistics
  * are evaluated (density and momentum).
  */
-class LiquidMigrationFields
+class LiquidMigrationFields : public BaseFields
 {
 public:
     

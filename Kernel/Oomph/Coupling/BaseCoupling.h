@@ -106,39 +106,6 @@ public:
            << std::endl;
     }
     
-//    /**
-//     * elastic energy is multiplied by the coupling weight (used in writeEneTimeStep)
-//     * \todo this only works for one species; rather, we should override elastic energy
-//     */
-//    Mdouble getElasticEnergyCoupled() const
-//    {
-//        // get elastic energy
-//        Mdouble elasticEnergy = 0.0;
-//        for (const BaseInteraction* c : MercuryProblem::interactionHandler)
-//        {
-//            Mdouble energyNormal = c->getNormalElasticEnergy();
-//            Mdouble energyTangential = 0;
-//            elasticEnergy += c->getCouplingWeight() * ( energyNormal + energyTangential );
-//        }
-//        return elasticEnergy;
-//    }
-    
-//    /**
-//     * If coupled, mass is multiplied by coupling weight at the center of mass (used in writeEneTimeStep)
-//     */
-//    Mdouble getCoupledMass() const
-//    {
-//        Mdouble m = 0;
-//        for (BaseParticle* p : MercuryProblem::particleHandler)
-//        {
-//            if (!( p->isFixed() || p->isMPIParticle() || p->isPeriodicGhostParticle() ))
-//            {
-//                m += p->getMass() / p->getInvCouplingWeight();
-//            }
-//        }
-//        return m;
-//    }
-    
     /**
      *  override writeEneHeader in DPMBase class for the coupling
      */
@@ -186,66 +153,6 @@ public:
         {
             M::computeOneTimeStep();
         }
-    }
-    
-    /**
-     * find all particles in a particular region
-     * \param min
-     * \param max
-     * \param[out] pList used to return the list of particles
-     */
-    void getParticlesInCell(const Vec3D& min, const Vec3D& max, std::vector<BaseParticle*>& pList)
-    {
-        HGrid* const hGrid = M::getHGrid();
-        
-        int occupiedLevelsMask = hGrid->getOccupiedLevelsMask();
-        
-        for (unsigned int level = 0; level < hGrid->getNumberOfLevels(); occupiedLevelsMask >>= 1, level++)
-        {
-            // If no objects in rest of grid, stop now
-            if (occupiedLevelsMask == 0)
-            {
-                logger(VERBOSE, "Level % and higher levels are empty", level);
-                break;
-            }
-            
-            // If no objects at this level, go on to the next level
-            if (( occupiedLevelsMask & 1 ) == 0)
-            {
-                logger(VERBOSE, "Level % is empty", level);
-                continue;
-            }
-            
-            const Mdouble inv_size = hGrid->getInvCellSize(level);
-            const int xs = static_cast<int>(std::floor(min.X * inv_size - 0.5));
-            const int xe = static_cast<int>(std::floor(max.X * inv_size + 0.5));
-            const int ys = static_cast<int>(std::floor(min.Y * inv_size - 0.5));
-            const int ye = static_cast<int>(std::floor(max.Y * inv_size + 0.5));
-            const int zs = static_cast<int>(std::floor(min.Z * inv_size - 0.5));
-            const int ze = static_cast<int>(std::floor(max.Z * inv_size + 0.5));
-            
-            for (int x = xs; x <= xe; ++x)
-            {
-                for (int y = ys; y <= ye; ++y)
-                {
-                    for (int z = zs; z <= ze; ++z)
-                    {
-                        // Loop through all objects in the bucket to find nearby objects
-                        const unsigned int bucket = hGrid->computeHashBucketIndex(x, y, z, level);
-                        BaseParticle* p = hGrid->getFirstBaseParticleInBucket(bucket);
-                        while (p != nullptr)
-                        {
-                            if (!p->isFixed() && p->getPeriodicFromParticle() == nullptr &&
-                                p->getHGridCell().equals(x, y, z, level))
-                            {
-                                pList.push_back(p);
-                            }
-                            p = p->getHGridNextObject();
-                        }
-                    }
-                }
-            }
-        } //end for level
     }
     
     inline void setCGWidth(const double& width)

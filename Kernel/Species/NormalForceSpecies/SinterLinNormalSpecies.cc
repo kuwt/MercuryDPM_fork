@@ -55,7 +55,7 @@ SinterLinNormalSpecies::SinterLinNormalSpecies()
 }
 
 /*!
- * \param[in] the species that is copied
+ * \param[in] SinterLinNormalSpecies the species that is copied
  */
 SinterLinNormalSpecies::SinterLinNormalSpecies(const SinterLinNormalSpecies& p)
         : BaseNormalForce(p)
@@ -86,7 +86,7 @@ SinterLinNormalSpecies::~SinterLinNormalSpecies()
 }
 
 /*!
- * \param[out] output stream (typically the restart file)
+ * \param[out] os output stream (typically the restart file)
  */
 void SinterLinNormalSpecies::write(std::ostream& os) const
 {

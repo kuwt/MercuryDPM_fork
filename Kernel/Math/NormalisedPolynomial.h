@@ -40,7 +40,7 @@
  * Use #evaluate to evaluate the polynomial.
  * Use #evaluateGradient to evaluate the polynomial's gradient.\n
  * 
- * Calculations can be found in src/docs/Polynomials.nb \n
+ * Calculations can be found in Src/docs/Polynomials.nb \n
  * 
  * This is used to define polynomial axisymmetric coarse-graining functions (see StatisticsVector).\n
  * 

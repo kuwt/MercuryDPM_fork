@@ -33,8 +33,8 @@
   </DataArray>
   <DataArray type="Float32" Name="fullLiquidVolume" format="ascii">
 	1.15379e-07
-	2.02821e-07
-	2.58231e-07
+	2.07821e-07
+	2.63231e-07
   </DataArray>
   <DataArray type="Float32" Name="liquidFilmVolume" format="ascii">
 	1.15379e-07
@@ -43,8 +43,13 @@
   </DataArray>
   <DataArray type="Float32" Name="liquidBridgeVolume" format="ascii">
 	0
-	5e-09
-	5e-09
+	1e-08
+	1e-08
+  </DataArray>
+  <DataArray type="Float32" Name="totalEvaporatedLiquidVolume" format="ascii">
+	0
+	0
+	0
   </DataArray>
   <DataArray type="Int32" Name="Id" format="ascii">
 	0

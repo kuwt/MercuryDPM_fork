@@ -102,7 +102,7 @@ class LeesEdwardsSelfTest : public Mercury2D
 
 };
 //! [Lees:class]
-
+//! [Lees:main]
 int main()
 {
     //instantiate the class

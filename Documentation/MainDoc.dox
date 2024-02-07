@@ -9,7 +9,7 @@ The manual is split into three parts:
 - \subpage GettingStarted
 - \subpage Tutorials
 - \subpage creating
-- \subpage Mercury_CG
+- \subpage MercuryDPM_CG
 - \subpage VisualisingYourResults
 - \subpage OomphCoupling
 - \subpage DevelopersGuide

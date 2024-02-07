@@ -29,6 +29,7 @@
 
 #include "BaseHandler.h"
 #include "Particles/BaseParticle.h"
+#include "Math/PSD.h"
 
 class SpeciesHandler;
 
@@ -437,8 +438,16 @@ public:
     void actionsAfterTimeStep();
 
     double getLiquidFilmVolume() const;
-    
-    void saveNumberPSDtoCSV(std::string csvFileName, std::vector<double> diameterBins = {});
+
+    /*!
+     * \brief Writes the PSD of the particles currently in the handler to a CSV file, with type PROBABILITYDENSITY_NUMBER_DISTRIBUTION.
+     */
+    void saveNumberPSDtoCSV(std::string csvFileName, std::vector<double> diameterBins = {}) const;
+
+    /*!
+     * \brief Gets the PSD from the particles currently in the handler.
+     */
+    PSD getPSD(std::vector<Mdouble> bins = {}, Mdouble scaleFactor = 1.0) const;
 
 private:
     

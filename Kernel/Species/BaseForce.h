@@ -25,6 +25,7 @@
 
 #ifndef MERCURYDPM_BASEFORCE_H
 #define MERCURYDPM_BASEFORCE_H
+#include "Logger.h"
 
 class BaseSpecies;
 
@@ -34,6 +35,7 @@ public:
 
     BaseSpecies* getBaseSpecies() const
     {
+        logger.assert_debug(baseSpecies_,"BaseSpecies not set; consider using species.setHandler()");
         return baseSpecies_;
     }
 
@@ -44,7 +46,7 @@ public:
 
 private:
 
-    BaseSpecies* baseSpecies_;
+    BaseSpecies* baseSpecies_ = nullptr;
 };
 
 #endif //MERCURYDPM_BASENORMALFORCE_H

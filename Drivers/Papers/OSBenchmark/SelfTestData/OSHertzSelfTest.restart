@@ -1,4 +1,4 @@
-MercuryDPM 0.14 name OSHertzSelfTest revision 6537 repository https://svn.mercurydpm.org/SourceCode/MercuryLab
+MercuryDPM 1.0 name OSHertzSelfTest revision 7622ee90 repository https://bitbucket.org/mercurydpm/mercurydpm.git
 dataFile    fileType ONE_FILE saveCount 1 counter 122 lastSavedTimeStep 121
 fStatFile   fileType ONE_FILE saveCount 4294967295 counter 2 lastSavedTimeStep 121
 eneFile     fileType ONE_FILE saveCount 1 counter 122 lastSavedTimeStep 121
@@ -19,6 +19,6 @@ Walls 1
 InfiniteWall id 0 indSpecies 2 position 0 0 0 orientation 0.707106781186548 0 0.707106781186548 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0
 Boundaries 0
 Particles 1
-BaseParticle id 0 indSpecies 0 position 0 0 0.00100724021886788 orientation 1 0 0 0 velocity 0 0 0.40107538074925 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.001 invMass 95492.9658551372
+BaseParticle id 0 indSpecies 0 position 0 0 0.00100724021886788 orientation 1 0 0 0 velocity 0 0 0.40107538074925 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.001 invMass 95492.9658551372 timeStamp 0
 Interactions 0
 hGrid method TOPDOWN distribution EXPONENTIAL cellOverSizeRatio 1 numberOfBuckets 10 cellSizes 0.002 gridNeedsUpdate 0 updateEachTimeStep 1 currentMaxRelativeDisplacement 0 totalCurrentMaxRelativeDisplacement 0

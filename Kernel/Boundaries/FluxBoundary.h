@@ -28,6 +28,8 @@
 
 #include "BaseBoundary.h"
 #include "Math/Vector.h"
+#include "BoundaryHandler.h"
+#include "DPMBase.h"
 
 class ParticleHandler;
 
@@ -72,9 +74,29 @@ public:
     void move(Mdouble position);
     
     /*!
-     * \brief Returns the shortest distance between the boundary and given position.
+     * \brief Returns the shortest distance between the boundary at a given separation from
+     * the origin and given position
      */
-    Mdouble getDistance(const Vec3D& position) const;
+    Mdouble getDistance(const Mdouble& distanceFromOrigin, const Vec3D& position) const;
+
+    /*!
+     * \brief Returns the shortest distance between the boundary and given position.
+     * \param[in] position the position of which the distance should be calculated.
+     */
+    inline Mdouble getDistance(const Vec3D& position) const
+    {
+        return getDistance(distance_, position);
+    }
+
+    /*!
+     * \brief Returns the shortest distance between the boundary and given position as it
+     * was in the previous timestep.
+     * \param[in] position the position of which the distance should be calculated.
+     */
+    inline Mdouble getPreviousDistance(const Vec3D& position) const
+    {
+        return getDistance(previousDistance_, position);
+    }
     
     /*!
      * \brief Runs at the end of each time step.
@@ -128,11 +150,17 @@ public:
      */
     std::string getName() const override;
 
+    /*!
+     * \brief Sets the prescribed distance function
+     */
+    void setPrescribedDistance(std::function<Mdouble(double)> prescribedDistance);
+
 private:
     /*!
      * \brief outward unit normal vector
      */
     Vec3D normal_;
+
     /*!
      * \brief This is the factor to rescale the given normal vector to a unit vectors. 
      * \details NB: Not only the normal vector is rescaled by this factor, also 
@@ -142,10 +170,18 @@ private:
      * will be rescaled by the same factor!
      */
     Mdouble scaleFactor_;
+
     /*!
      * \brief The boundary's distance from the origin.
      */
     Mdouble distance_;
+    
+    /*!
+     * \brief The boundary's distance from the origin in the previous timestep).
+     * \details This is necessary to catch transitions from particles, if the
+     * Boundary is moving
+     */
+    Mdouble previousDistance_;
     
     /*!
      * \brief Number of particles that have been deleted by this boundary.
@@ -156,6 +192,12 @@ private:
     double massCrossedBack_;
     double volumeCrossedForw_;
     double volumeCrossedBack_;
+
+    /*!
+     * \brief A function which sets the distance of the boundary from the origin
+     */
+    std::function<Mdouble(double)> prescribedDistance_;
+
 };
 
 

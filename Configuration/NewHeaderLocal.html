@@ -16,8 +16,27 @@ $search
 $mathjax
 <link href="$relpath^$stylesheet" rel="stylesheet" type="text/css" />
 $extrastylesheet
+<script type="text/javascript" src="$relpath^MDPM-fragment-copy-button.js"></script>
+<script type="text/javascript">
+DoxygenAwesomeFragmentCopyButton.init()
+</script>
+<script type="text/javascript" src="$relpath^MDPM-paragraph-link.js"></script>
+<script type="text/javascript">
+DoxygenAwesomeParagraphLink.init()
+</script>
+<script type="text/javascript" src="$relpath^MDPM-interactive-toc.js"></script>
+<script type="text/javascript">
+DoxygenAwesomeInteractiveToc.init()
+</script>
+<script type="text/javascript" src="$relpath^MDPM-darkmode-toggle.js"></script>
+<script type="text/javascript">
+DoxygenAwesomeDarkModeToggle.init()
+</script>
 </head>
 <body>
+  <div id="bitbucket-corner">
+   <a href="https://bitbucket.org/mercurydpm/mercurydpm/src/master/" target="_blank" id="fork-corner" class="fork-corner fc-pos-tr fc-animate fc-theme-bitbucket"></a>
+  </div>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 
 <!--BEGIN TITLEAREA-->
@@ -31,7 +50,16 @@ $extrastylesheet
   <!--BEGIN PROJECT_NAME-->
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname"> <!--$projectname--!>
-   <!--BEGIN PROJECT_NUMBER-->&#160;<span id="projectnumber">revision: $projectnumber</span><!--END PROJECT_NUMBER-->
+   <!--BEGIN PROJECT_NUMBER-->
+   <!-- BEGIN version select -->
+   <div class="dropdown" id="projectnumber">
+    <button class="dropbtn">$projectnumber</button>
+    <div class="dropdown-content">
+    </div>
+   </div>
+   <script type="text/javascript" src="$relpath^MDPM-dropdown-version.js"></script>
+<!-- END version select -->
+   <!--&#160;<span id="projectnumber">revision: $projectnumber</span>--><!--END PROJECT_NUMBER-->
    </div>
    <!--BEGIN PROJECT_BRIEF--><div id="projectbrief">$projectbrief</div><!--END PROJECT_BRIEF-->
   </td>
@@ -45,7 +73,9 @@ $extrastylesheet
   <!--END !PROJECT_NAME-->
   <!--BEGIN DISABLE_INDEX-->
    <!--BEGIN SEARCHENGINE-->
-   <td>$searchbox</td>
+     <td>
+      $searchbox
+     </td>
    <!--END SEARCHENGINE-->
   <!--END DISABLE_INDEX-->
  </tr>
@@ -54,3 +84,4 @@ $extrastylesheet
 </div>
 <!--END TITLEAREA-->
 <!-- end header part -->
+<script type="text/javascript" src="$relpath^MDPM-fork-corner.js"></script>

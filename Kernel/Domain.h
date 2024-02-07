@@ -251,7 +251,7 @@ public:
      */
     void findNewMPIParticle(BaseParticle* particle);
 
-    /*
+    /*!
      * Checks whether a particle is in the list of new particles received by this thread
      */
     bool isInNewBoundaryParticleList(BaseParticle* object,int localIndex) const;
@@ -475,13 +475,13 @@ private:
     
     /*!
      * \brief look-up table to get the global index given a local domain index
-     * \todo TW@Marnix should this be unsigned int
+     * \todo TW, Marnix should this be unsigned int
      */
     std::vector<int> localIndexToGlobalIndexTable_;
     
     /*!
      * \brief look-up table to get the processor of the domain given a local domain index
-     * \todo TW@Marnix should this be unsigned int
+     * \todo TW, Marnix should this be unsigned int
      */
     std::vector<int> localIndexToProcessorList_;
     
@@ -492,7 +492,7 @@ private:
     
     /*!
      * \brief A list of indices of all the active boundaries
-     * \todo TW@Marnix should this be unsigned int
+     * \todo TW, Marnix should this be unsigned int
      */
     std::vector<int> boundaryList_;
     

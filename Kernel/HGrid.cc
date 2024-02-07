@@ -50,8 +50,7 @@ HGrid::HGrid(unsigned int num_buckets, double cellOverSizeRatio, std::vector<dou
     numberOfBuckets_ = num_buckets;
     cellOverSizeRatio_ = cellOverSizeRatio;
     occupiedLevelsMask_ = 0;
-    invCellSizes_ = std::vector<double>(0);
-    
+
     firstBaseParticleInBucket_.resize(numberOfBuckets_, nullptr);
     bucketIsChecked_.resize(numberOfBuckets_, false);
     
@@ -105,6 +104,7 @@ void HGrid::insertParticleToHgrid(BaseParticle* obj)
                          "grid cell (%) allows.",
                    obj->getId(), obj->getIndex(), diameter, cellOverSizeRatio_, cellSizes_.back());
             needsRebuilding_ = true;
+            level--;
         }
         
         obj->setHGridLevel(level);

@@ -488,18 +488,18 @@ void InsertionBoundary::read(std::istream& is)
     for (auto& particleSizeDistributionVector: particleSizeDistributionVector_)
     {
         size_t psdSize;
-        PSD::RadiusAndProbability radiusAndProbability{};
-        std::vector<PSD::RadiusAndProbability> particleSizeDistribution{};
+        DistributionElements radiusAndProbability{};
+        std::vector<DistributionElements> particleSizeDistribution{};
         is >> dummy >> psdSize;
         particleSizeDistribution.clear();
         particleSizeDistribution.reserve(psdSize);
         for (size_t i = 0; i < psdSize; i++)
         {
-            is >> radiusAndProbability.radius;
+            is >> radiusAndProbability.internalVariable;
             is >> radiusAndProbability.probability;
             particleSizeDistribution.push_back(radiusAndProbability);
         }
-        particleSizeDistributionVector.setParticleSizeDistribution(particleSizeDistribution);
+        particleSizeDistributionVector.setPSDFromVector(particleSizeDistribution, PSD::TYPE::CUMULATIVE_NUMBER_DISTRIBUTION);
     }
     if (psdVectorSize > 1)
     {
@@ -573,7 +573,7 @@ void InsertionBoundary::write(std::ostream& os) const
         os << " psd " << particleSizeDistribution.getParticleSizeDistribution().size();
         for (auto p: particleSizeDistribution.getParticleSizeDistribution())
         {
-            os << " " << p.radius
+            os << " " << p.internalVariable
                << " " << p.probability;
         }
     }

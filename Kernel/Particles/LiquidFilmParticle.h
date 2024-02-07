@@ -42,6 +42,7 @@ public:
     LiquidFilm()
     {
         liquidVolume_ = 0;
+        totalEvaporatedLiquidVolume_ = 0;
     }
     
     /*!
@@ -56,6 +57,7 @@ public:
     LiquidFilm(const LiquidFilm& p) : Particle(p)
     {
         liquidVolume_ = p.liquidVolume_;
+        totalEvaporatedLiquidVolume_ = p.totalEvaporatedLiquidVolume_;
     }
     
     /*!
@@ -86,7 +88,7 @@ public:
     void write(std::ostream& os) const override
     {
         Particle::write(os);
-        os << " liquidVolume " << liquidVolume_;
+        os << " liquidVolume " << liquidVolume_ << " totalEvaporatedLiquidVolume " << totalEvaporatedLiquidVolume_;
     }
 
     /*!
@@ -95,7 +97,7 @@ public:
      */
     std::string getName() const override
     {
-        return "LiquidFilm";
+        return "LiquidFilm" + Particle::getName();
     }
     
     void read(std::istream& is) override;
@@ -114,10 +116,32 @@ public:
     {
         liquidVolume_ += liquidVolume;
     }
+
+    Mdouble getFullLiquidVolume() const
+    {
+        return liquidVolume_ + getLiquidBridgeVolume();
+    }
+
+    Mdouble getLiquidBridgeVolume() const;
+
+    Mdouble getTotalEvaporatedLiquidVolume() const
+    {
+        return totalEvaporatedLiquidVolume_;
+    }
+
+    void setTotalEvaporatedLiquidVolume(Mdouble liquidVolume)
+    {
+        totalEvaporatedLiquidVolume_ = liquidVolume;
+    }
+
+    void addTotalEvaporatedLiquidVolume(Mdouble liquidVolume)
+    {
+        totalEvaporatedLiquidVolume_ += liquidVolume;
+    }
     
     unsigned getNumberOfFieldsVTK() const override
     {
-        return 3;
+        return 4;
     }
     
     std::string getTypeVTK(unsigned i) const override
@@ -133,15 +157,15 @@ public:
 
 protected:
     
-    Mdouble liquidVolume_;
+    Mdouble liquidVolume_, totalEvaporatedLiquidVolume_;
 };
 
 
 //todo Does mass and interaction radius change when a liquid film is added?
 /*!
- * \details Particle read function. Has an std::istream as argument, from which 
- *          it extracts the radius_, invMass_ and invInertia_, respectively. 
- *          From these the mass_ and inertia_ are deduced. An additional set of 
+ * \details Particle read function. Has an std::istream as argument, from which
+ *          it extracts the radius_, invMass_ and invInertia_, respectively.
+ *          From these the mass_ and inertia_ are deduced. An additional set of
  *          properties is read through the call to the parent's method
  *          BaseParticle::read().
  * \param[in,out] is    input stream with particle properties.
@@ -157,6 +181,7 @@ void LiquidFilm<Particle>::read(std::istream& is)
     {
         is >> dummy >> liquidVolume_;
     }
+    is >> dummy >> totalEvaporatedLiquidVolume_;
 }
 
 template<class Particle>
@@ -166,6 +191,8 @@ std::string LiquidFilm<Particle>::getNameVTK(unsigned i) const
         return "liquidFilmVolume";
     else if (i==2)
         return "liquidBridgeVolume";
+    else if (i==3)
+        return "totalEvaporatedLiquidVolume";
     else /*i=0*/
         return "fullLiquidVolume";
 }
@@ -173,27 +200,41 @@ std::string LiquidFilm<Particle>::getNameVTK(unsigned i) const
 template<class Particle>
 std::vector<Mdouble> LiquidFilm<Particle>::getFieldVTK(unsigned i) const
 {
-    if (i==1) {
-        return std::vector<Mdouble>(1, liquidVolume_);
-    } else /*i=2 or 0*/ {
-        Mdouble fullLiquidVolume = (i==2)?0:liquidVolume_;
-        for (auto k : this->getInteractions()) {
-            if(dynamic_cast<LiquidMigrationWilletInteraction*>(k)){
-                auto j = dynamic_cast<LiquidMigrationWilletInteraction*>(k);
-                if (j && j->getLiquidBridgeVolume()) {
-                    fullLiquidVolume += 0.5*j->getLiquidBridgeVolume();
-                }
-            }
-            if(dynamic_cast<LiquidMigrationLSInteraction*>(k)) {
-                auto j = dynamic_cast<LiquidMigrationLSInteraction*>(k);
-                if (j && j->getLiquidBridgeVolume()) {
-                    fullLiquidVolume += 0.5 * j->getLiquidBridgeVolume();
-                }
-            }
+    if (i==1)
+        return { liquidVolume_ };
+    else if (i==2)
+        return { getLiquidBridgeVolume() };
+    else if (i==3)
+        return { totalEvaporatedLiquidVolume_ };
+    else /*i=0*/
+        return { getFullLiquidVolume() };
+}
 
+template<class Particle>
+Mdouble LiquidFilm<Particle>::getLiquidBridgeVolume() const
+{
+    // Sums the volume of all liquid bridges. Half when interacting with a particle, full when interacting with a wall.
+    Mdouble volume = 0.0;
+    for (auto i : this->getInteractions())
+    {
+        auto j = dynamic_cast<LiquidMigrationWilletInteraction*>(i);
+        if (j)
+        {
+            if (dynamic_cast<BaseParticle*>(j->getI()))
+                volume += 0.5 * j->getLiquidBridgeVolume();
+            else
+                volume += j->getLiquidBridgeVolume();
         }
-        return std::vector<Mdouble>(1, fullLiquidVolume);
+        auto k = dynamic_cast<LiquidMigrationLSInteraction*>(i);
+        if (k)
+        {
+            if (dynamic_cast<BaseParticle*>(k->getI()))
+                volume += 0.5 * k->getLiquidBridgeVolume();
+            else
+                volume += k->getLiquidBridgeVolume();
+        }
     }
+    return volume;
 }
 
 typedef LiquidFilm<SphericalParticle> LiquidFilmParticle;

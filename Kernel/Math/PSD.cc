@@ -31,8 +31,8 @@
  */
 PSD::PSD()
 {
-    for (auto& momenta: momenta_)
-        momenta = 0;
+//    for (auto& momenta: momenta_)
+//        momenta = 0;
     index_ = 0;
     // default seed is zero for reproducibility
     random_.setRandomSeed(0);
@@ -44,7 +44,7 @@ PSD::PSD()
 PSD::PSD(const PSD& other)
 {
     particleSizeDistribution_ = other.particleSizeDistribution_;
-    momenta_ = other.momenta_;
+//    momenta_ = other.momenta_;
     index_ = other.index_;
     random_ = other.random_;
 }
@@ -75,32 +75,32 @@ PSD* PSD::copy() const
  */
 void PSD::printPSD() const
 {
-    if (particleSizeDistribution_.front().radius > 1e-1)
+    if (particleSizeDistribution_.front().internalVariable > 1e-1)
     {
-        for (const auto p : particleSizeDistribution_)
+        for (const auto p: particleSizeDistribution_)
         {
-            logger(INFO, "%m\t %\%", p.radius, p.probability * 100);
+            logger(INFO, "%m\t %\%", p.internalVariable, p.probability * 100);
         }
     }
-    else if (particleSizeDistribution_.front().radius > 1e-4)
+    else if (particleSizeDistribution_.front().internalVariable > 1e-4)
     {
-        for (const auto p : particleSizeDistribution_)
+        for (const auto p: particleSizeDistribution_)
         {
-            logger(INFO, "%mm\t %\%", p.radius * 1000, p.probability * 100);
+            logger(INFO, "%mm\t %\%", p.internalVariable * 1000, p.probability * 100);
         }
     }
-    else if (particleSizeDistribution_.front().radius > 1e-7)
+    else if (particleSizeDistribution_.front().internalVariable > 1e-7)
     {
-        for (const auto p : particleSizeDistribution_)
+        for (const auto p: particleSizeDistribution_)
         {
-            logger(INFO, "%um\t %\%", p.radius * 1e6, p.probability * 100);
+            logger(INFO, "%um\t %\%", p.internalVariable * 1e6, p.probability * 100);
         }
     }
     else
     {
-        for (const auto p : particleSizeDistribution_)
+        for (const auto p: particleSizeDistribution_)
         {
-            logger(INFO, "%nm\t %\%", p.radius * 1e9, p.probability * 100);
+            logger(INFO, "%nm\t %\%", p.internalVariable * 1e9, p.probability * 100);
         }
     }
 }
@@ -118,8 +118,8 @@ Mdouble PSD::drawSample()
     // find the interval [low,high] of the psd in which the number sits
     auto high = std::lower_bound(particleSizeDistribution_.begin(), particleSizeDistribution_.end(), prob);
     auto low = std::max(particleSizeDistribution_.begin(), high - 1);
-    Mdouble rMin = low->radius;
-    Mdouble rMax = high->radius;
+    Mdouble rMin = low->internalVariable;
+    Mdouble rMax = high->internalVariable;
     Mdouble pMin = low->probability;
     Mdouble pMax = high->probability;
     // interpolate linearly between [low.radius,high.radius] (assumption: CDF is piecewise linear)
@@ -155,11 +155,11 @@ Mdouble PSD::insertManuallyByVolume(Mdouble volume)
         // find the interval [low,high] of the psd in which the number sits
         auto high = std::lower_bound(particleSizeDistribution_.begin(), particleSizeDistribution_.end(), prob);
         auto low = std::max(particleSizeDistribution_.begin(), high - 1);
-        Mdouble rMin = low->radius;
-        Mdouble rMax = high->radius;
+        Mdouble rMin = low->internalVariable;
+        Mdouble rMax = high->internalVariable;
         Mdouble pMin = low->probability;
         Mdouble pMax = high->probability;
-        // interpolate linearly between [low.radius,high.radius] (assumption: CDF is piecewise linear)
+        // interpolate linearly between [low.internalVariable,high.internalVariable] (assumption: CDF is piecewise linear)
         index_ = std::distance(particleSizeDistribution_.begin(), high);
         Mdouble a = (prob - pMin) / (pMax - pMin);
         Mdouble rad = a * rMin + (1 - a) * rMax;
@@ -167,7 +167,7 @@ Mdouble PSD::insertManuallyByVolume(Mdouble volume)
         // Compare inserted volume against volumeAllowed (only works for spherical at the moment)
         Mdouble radVolume = 4.0 / 3.0 * constants::pi * rad * rad * rad;
         convertCumulativeToProbabilityDensity();
-        convertProbabilityDensityNumberDistributionToProbabilityDensityVolumeDistribution();
+        convertProbabilityDensityNumberDistributionToProbabilityDensity(TYPE::PROBABILITYDENSITY_VOLUME_DISTRIBUTION);
         Mdouble volumeAllowed = particleSizeDistribution_[index_].probability * volume;
         convertProbabilityDensityToProbabilityDensityNumberDistribution(TYPE::PROBABILITYDENSITY_VOLUME_DISTRIBUTION);
         convertProbabilityDensityToCumulative();
@@ -212,29 +212,39 @@ Mdouble PSD::insertManuallyByVolume(Mdouble volume)
  */
 void PSD::validateCumulativeDistribution()
 {
-    // ensure interval of probabilities to be [0,1]
-    for (auto p = 0; p < particleSizeDistribution_.size(); ++p)
-        particleSizeDistribution_[p].probability =
-                particleSizeDistribution_[p].probability / particleSizeDistribution_.back().probability;
     // check whether the distribution is cumulative
     for (auto it = particleSizeDistribution_.begin() + 1; it != particleSizeDistribution_.end(); ++it)
     {
-        logger.assert_always(it->probability >= (it - 1)->probability, "psd is not cumulative: radius % %, probabilities % %", (it-1)->radius, it->radius, (it-1)->probability, it->probability);
+        logger.assert_always(it->probability >= (it - 1)->probability,
+                             "psd is not cumulative: radius % %, probabilities % %", (it - 1)->internalVariable,
+                             it->internalVariable, (it - 1)->probability, it->probability);
     }
+    // set negative probabilities to 0
+    for (auto& rp : particleSizeDistribution_)
+    {
+        if (rp.probability < 0)
+        {
+            logger(INFO, "negative probability % has been set to 0", rp.probability);
+            rp.probability = 0;
+        }
+    }
+    // ensure interval of probabilities to be [0,1]
+    for (auto p = 0; p < particleSizeDistribution_.size(); ++p)
+        particleSizeDistribution_[p].probability /= particleSizeDistribution_.back().probability;
     // cdf needs to start with a probability of zero
     if (particleSizeDistribution_[0].probability != 0)
     {
         logger(INFO, "adding a zero at the beginning of the psd");
         particleSizeDistribution_.insert(particleSizeDistribution_.begin(),
-                                         {std::max(1e-3 * particleSizeDistribution_[0].radius,
-                                                   2 * particleSizeDistribution_[0].radius -
-                                                   particleSizeDistribution_[1].radius), 0});
+                                         {std::max(1e-3 * particleSizeDistribution_[0].internalVariable,
+                                                   2 * particleSizeDistribution_[0].internalVariable -
+                                                   particleSizeDistribution_[1].internalVariable), 0});
     }
     // cdf needs to end with a probability of one
     if (particleSizeDistribution_.back().probability < 1)
     {
         logger(INFO, "adding a one at the end of the psd");
-        particleSizeDistribution_.push_back({particleSizeDistribution_.back().radius, 1});
+        particleSizeDistribution_.push_back({particleSizeDistribution_.back().internalVariable, 1});
     }
     // cut off equal subsequent values on the end of the cdf to remove zero size classes.
     for (auto i = particleSizeDistribution_.end() - 1; i != particleSizeDistribution_.begin(); i--)
@@ -257,15 +267,24 @@ void PSD::validateCumulativeDistribution()
  */
 void PSD::validateProbabilityDensityDistribution()
 {
+    // set negative probabilities to 0
+    for (auto& rp : particleSizeDistribution_)
+    {
+        if (rp.probability < 0)
+        {
+            logger(INFO, "negative probability % has been set to 0", rp.probability);
+            rp.probability = 0;
+        }
+    }
     Mdouble sum = 0;
     // check if the psd starts with zero probability (i.e. p_0=0)
     if (particleSizeDistribution_[0].probability != 0)
     {
         logger(INFO, "adding a zero at the beginning of PDF");
         particleSizeDistribution_.insert(particleSizeDistribution_.begin(),
-                                         {std::max(1e-3 * particleSizeDistribution_[0].radius,
-                                                   2 * particleSizeDistribution_[0].radius -
-                                                   particleSizeDistribution_[1].radius), 0});
+                                         {std::max(1e-3 * particleSizeDistribution_[0].internalVariable,
+                                                   2 * particleSizeDistribution_[0].internalVariable -
+                                                   particleSizeDistribution_[1].internalVariable), 0});
     }
     // sum up probabilities to check if it equals to unity (sum(p_i)=1)
     for (auto& it : particleSizeDistribution_)
@@ -300,8 +319,8 @@ void PSD::setDistributionUniform(Mdouble radMin, Mdouble radMax, int numberOfBin
     {
         particleSizeDistribution_.clear();
     }
-    std::vector<Mdouble> probabilities = helpers::linspace(0.0, 1.0, numberOfBins);
-    std::vector<Mdouble> radii = helpers::linspace(radMin, radMax, numberOfBins);
+    std::vector<Mdouble> probabilities = linspace(0.0, 1.0, numberOfBins);
+    std::vector<Mdouble> radii = linspace(radMin, radMax, numberOfBins);
     // combine radii and probabilities
     for (int i = 0; i < radii.size(); ++i)
     {
@@ -329,7 +348,7 @@ void PSD::setDistributionNormal(Mdouble mean, Mdouble standardDeviation, int num
     }
     Mdouble radMin = mean - 3 * standardDeviation;
     Mdouble radMax = mean + 3 * standardDeviation;
-    std::vector<Mdouble> radii = helpers::linspace(radMin, radMax, numberOfBins);
+    std::vector<Mdouble> radii = linspace(radMin, radMax, numberOfBins);
     std::vector<Mdouble> probabilities;
     for (int i = 0; i < radii.size(); i++)
     {
@@ -344,10 +363,11 @@ void PSD::setDistributionNormal(Mdouble mean, Mdouble standardDeviation, int num
 }
 
 /*!
- * \details sets the particle size distribution to a discretised normal (gaussian) cumulative number distribution,
- * which covers the range of 3 * standardDeviation (99,73% of all values covered).
- * \param[in] mean                  Double representing the mean of the particle size distribution
- * \param[in] standardDeviation     Double representing the standard deviation of the particle size distribution
+ * \details sets the particle size distribution to a discretised lognormal cumulative number distribution,
+ * which generates random values of radius following a lognormal distribution and iterates
+ * until the mass-based D50 is close to two times the user-defined mean radius.
+ * \param[in] mean                  Double representing the mean of the particle size distribution in meters (radius)
+ * \param[in] standardDeviation     Double representing the standard deviation of the particle size distribution in meters (radius)
  * \param[in] numberOfBins          Integer determining the number of bins (aka. particle size classes or resolution)
  *                                  of the particle size distribution
  * See https://en.cppreference.com/w/cpp/numeric/random/lognormal_distribution
@@ -361,7 +381,7 @@ void PSD::setDistributionLogNormal(Mdouble mean, Mdouble standardDeviation, int 
     }
     Mdouble radMin = mean - 3 * standardDeviation;
     Mdouble radMax = mean + 3 * standardDeviation;
-    std::vector<Mdouble> radii = helpers::linspace(radMin, radMax, numberOfBins);
+    std::vector<Mdouble> radii = linspace(radMin, radMax, numberOfBins);
     std::vector<Mdouble> probabilities;
     for (int i = 0; i < radii.size(); i++)
     {
@@ -373,10 +393,133 @@ void PSD::setDistributionLogNormal(Mdouble mean, Mdouble standardDeviation, int 
         particleSizeDistribution_.push_back({radii[j], probabilities[j]});
     }
     validateCumulativeDistribution();
-    for (auto& rp : particleSizeDistribution_) {
-        rp.radius = exp(rp.radius);
+    for (auto& p: particleSizeDistribution_)
+    {
+        p.internalVariable = exp(p.internalVariable);
     }
 }
+
+/*!
+ * \details sets the particle size distribution to a discretised cumulative number distribution,
+ * which is a normal distribution in phi units and has the demanded D50. D50 is the mass-based median grain size, while
+ * the Phi scale is a logarithmic scale computed by: Phi = -log2(1000*D). It can be used for visualizing sediment grain
+ * size distributions over a wide range of grain sizes. The combination of D50 and standardDeviation in Phi units is a
+ * representative measure of grain size distribution in the field of Sedimentology.
+ * Source: Donoghue, J.F. (2016). Phi Scale. In: Kennish, M.J. (eds) Encyclopedia of Estuaries. Encyclopedia of Earth Sciences Series.
+ * Springer, Dordrecht. https://doi.org/10.1007/978-94-017-8801-4_277
+ * \param[in] D50                       Double representing the mass-based D50 of the particle size distribution in meters
+ * \param[in] standardDeviationInPhi    Double representing the standard deviation of the particle size distribution (diameter) in phi units
+ * \param[in] numberOfBins              Integer determining the number of bins (aka. particle size classes or resolution)
+ *                                      of the particle size distribution
+ */
+void PSD::setDistributionPhiNormal(Mdouble D50, Mdouble standardDeviationInPhi, int numberOfBins){
+    Mdouble PhiMean = -log2(1000*D50);
+    std::vector<std::pair<Mdouble,Mdouble>> vect = convertPdfPhiToPdfMeter(PhiMean, standardDeviationInPhi, numberOfBins);
+    std::sort(vect.begin(), vect.end());
+    Mdouble D50Test = computeD50(vect);
+    Mdouble res = D50Test - D50;
+    Mdouble tol = D50*1e-5;
+    int itter = 0;
+    Mdouble dPhiMean, slope, res_old;
+    while (res > tol && itter < 100) {
+        if(itter==0) dPhiMean = 0.1;
+        else {
+            slope = (res - res_old)/dPhiMean;
+            dPhiMean = -res/slope;
+        }
+        PhiMean = PhiMean+dPhiMean;
+        vect = convertPdfPhiToPdfMeter(PhiMean, standardDeviationInPhi, numberOfBins);
+        std::sort(vect.begin(), vect.end());
+        D50Test = computeD50(vect);
+        res_old = res;
+        res = D50Test - D50;
+        itter++;
+    }
+    logger(INFO, "D50 %, Final D50Test %", D50, D50Test);
+
+    Mdouble probTot=0;
+    for(int i = 0; i < vect.size(); i++){
+        probTot += vect[i].second;
+    }
+    for (int i = 0; i < vect.size(); i++)
+    {
+        vect[i].second = vect[i].second/probTot;
+    }
+
+    if (!particleSizeDistribution_.empty())
+    {
+        particleSizeDistribution_.clear();
+    }
+    for (int j = 0; j < vect.size(); j++)
+    {
+        particleSizeDistribution_.push_back({vect[j].first*0.5, vect[j].second});
+    }
+    convertProbabilityDensityToCumulative();
+    validateCumulativeDistribution();
+}
+
+/*!
+ * \details generates a normal particle size distribution in Phi units and converts it to the distribution in meters.
+ * \param[in] meanInPhi                  Double representing the mean diameter of the particle size distribution in phi units
+ * \param[in] standardDeviationInPhi     Double representing the standard deviation of the particle size distribution (diameter) in phi units
+ * \param[in] numberOfBins               Integer determining the number of bins (aka. particle size classes or resolution)
+ *                                       of the particle size distribution
+ */
+std::vector< std::pair <Mdouble,Mdouble> > PSD::convertPdfPhiToPdfMeter(Mdouble meanInPhi, Mdouble standardDeviationInPhi, int numberOfBins) {
+    Mdouble dMin = meanInPhi - 6 * standardDeviationInPhi;
+    Mdouble dMax = meanInPhi + 6 * standardDeviationInPhi;
+    std::vector<Mdouble> diameterPhi = helpers::linspace(dMin, dMax, numberOfBins);
+    std::vector<Mdouble> pdfPhi;
+    for (int i = 0; i < diameterPhi.size(); i++) {
+        Mdouble probability = 1 / (standardDeviationInPhi * sqrt(2.0 * constants::pi)) *
+                              exp(-0.5 * pow((diameterPhi[i] - meanInPhi) / standardDeviationInPhi, 2));
+        pdfPhi.push_back(probability);
+    }
+    std::vector<Mdouble> diameter;
+    std::vector<Mdouble> pdf(pdfPhi.size());
+    for(int i = 0; i < diameterPhi.size(); i++){
+        Mdouble D = pow(2, -diameterPhi[i])/1000.0;
+        diameter.push_back(D);
+    }
+    pdf[0] = 0;
+    for(int i= 0; i < diameterPhi.size()-1; i++){
+        Mdouble area = (diameterPhi[i+1]-diameterPhi[i]) * 0.5*(pdfPhi[i+1]+pdfPhi[i]);
+        Mdouble dD = fabs(diameter[i+1]-diameter[i]);
+        pdf[i+1] = 2.0*area/dD - pdf[i];
+    }
+    std::vector< std::pair <Mdouble,Mdouble> > vect;
+    for (int i=0; i<diameter.size(); i++)
+        vect.push_back(std::make_pair(diameter[i],pdf[i]));
+    return vect;
+}
+
+/*!
+ * \details computes the mass-based D50 of the paired diameter and probabilityDensity
+ * \param[in]  vectorOfPair         vector of pair containing paired data of diameter and probabilityDensity
+ */
+Mdouble PSD::computeD50(std::vector< std::pair <Mdouble,Mdouble> > vectorOfPair)
+    {
+        Mdouble D_50 = 0.0;
+        int numberOfBins = vectorOfPair.size();
+        std::vector<Mdouble> Vcum(numberOfBins, 0);
+        Mdouble Vint=0;
+        for (int i = 0; i < Vcum.size()-1; i++)
+        {
+                Mdouble dD = fabs(vectorOfPair[i+1].first-vectorOfPair[i].first);
+                Mdouble V = 0.5*(pow(vectorOfPair[i].first, 3.0) * vectorOfPair[i].second +
+                        pow(vectorOfPair[i+1].first, 3.0) * vectorOfPair[i+1].second) * dD;
+                Vint = Vint + V;
+                Vcum[i+1] = Vint;
+        }
+
+        for(int j=0; j<Vcum.size()-1; ++j){
+            if(Vcum[j]/Vint*100<=50 && Vcum[j+1]/Vint*100>50){
+                D_50 = vectorOfPair[j].first + fabs(vectorOfPair[j+1].first-vectorOfPair[j].first)/(Vcum[j+1]/Vint*100-Vcum[j]/Vint*100)
+                        *(50-Vcum[j]/Vint*100);
+            }
+        }
+        return D_50;
+    }
 
 /*!
  * \details creates the psd vector from radii and probabilities filled in by hand. The Type of PSD will be converted
@@ -389,89 +532,20 @@ void PSD::setDistributionLogNormal(Mdouble mean, Mdouble standardDeviation, int 
  *                                              PROBABILITYDENSITY_LENGTH_DISTRIBUTION,
  *                                              PROBABILITYDENSITY_AREA_DISTRIBUTION.
  */
-MERCURYDPM_DEPRECATED
-void PSD::setPSDFromVector(std::vector<RadiusAndProbability> psdVector, TYPE PSDType)
+void PSD::setPSDFromVector(std::vector<DistributionElements> psdVector, TYPE PSDType)
 {
     particleSizeDistribution_ = psdVector;
-    switch (PSDType)
-    {
-        // default case is a cumulative number distribution (CND)
-        default:
-            validateCumulativeDistribution();
-            break;
-        case TYPE::CUMULATIVE_VOLUME_DISTRIBUTION:
-            validateCumulativeDistribution();
-            convertCumulativeToProbabilityDensity();
-            convertProbabilityDensityToProbabilityDensityNumberDistribution(
-                    TYPE::PROBABILITYDENSITY_VOLUME_DISTRIBUTION);
-            convertProbabilityDensityToCumulative();
-            break;
-        case TYPE::CUMULATIVE_LENGTH_DISTRIBUTION:
-            validateCumulativeDistribution();
-            convertCumulativeToProbabilityDensity();
-            convertProbabilityDensityToProbabilityDensityNumberDistribution(
-                    TYPE::PROBABILITYDENSITY_LENGTH_DISTRIBUTION);
-            convertProbabilityDensityToCumulative();
-            break;
-        case TYPE::CUMULATIVE_AREA_DISTRIBUTION:
-            validateCumulativeDistribution();
-            convertCumulativeToProbabilityDensity();
-            convertProbabilityDensityToProbabilityDensityNumberDistribution(TYPE::PROBABILITYDENSITY_AREA_DISTRIBUTION);
-            convertProbabilityDensityToCumulative();
-            break;
-        case TYPE::PROBABILITYDENSITY_VOLUME_DISTRIBUTION:
-            validateProbabilityDensityDistribution();
-            convertProbabilityDensityToProbabilityDensityNumberDistribution(PSDType);
-            convertProbabilityDensityToCumulative();
-            break;
-        case TYPE::PROBABILITYDENSITY_NUMBER_DISTRIBUTION:
-            validateProbabilityDensityDistribution();
-            convertProbabilityDensityToCumulative();
-            break;
-        case TYPE::PROBABILITYDENSITY_LENGTH_DISTRIBUTION:
-            validateProbabilityDensityDistribution();
-            convertProbabilityDensityToProbabilityDensityNumberDistribution(PSDType);
-            convertProbabilityDensityToCumulative();
-            break;
-        case TYPE::PROBABILITYDENSITY_AREA_DISTRIBUTION:
-            validateProbabilityDensityDistribution();
-            convertProbabilityDensityToProbabilityDensityNumberDistribution(PSDType);
-            convertProbabilityDensityToCumulative();
-            break;
-    }
-}
 
-/*!
- * \details creates the PSD vector from probabilities and radii saved in a .csv file. Radii should be located at
- *          the first column and probabilities at the second column of the file. The Type of PSD will be converted to the
- *          default cumulative number distribution function (CUMULATIVE_NUMBER_DISTRIBUTION) for further processing.
- * \param[in] fileName                          Name of the .csv file containing the radii and probabilities of the PSD.
- * \param[in] PSDType                           Type of the PSD: CUMULATIVE_VOLUME_DISTRIBUTION,
- *                                              CUMULATIVE_NUMBER_DISTRIBUTION, CUMULATIVE_LENGTH_DISTRIBUTION,
- *                                              CUMULATIVE_AREA_DISTRIBUTION, PROBABILITYDENSITY_VOLUME_DISTRIBUTION,
- *                                              PROBABILITYDENSITY_NUMBER_DISTRIBUTION,
- *                                              PROBABILITYDENSITY_LENGTH_DISTRIBUTION PROBABILITYDENSITY_AREA_DISTRIBUTION.
- * \param[in] headings                          If TRUE the file is assumed to have headings and the first row will
- *                                              be skipped. If FALSE the file has no headings and the file will be
- *                                              read in as is. Default is FALSE.
- * \param[in] unitScalingFactorRadii            Scaling factor of radii to match SI-units.
- */
-void PSD::setPSDFromCSV(const std::string& fileName, TYPE PSDType, bool headings, Mdouble unitScalingFactorRadii)
-{
-    // read in csv file using the csvReader class
-    csvReader csv;
-    csv.setHeader(headings);
-    csv.read(fileName);
-    std::vector<Mdouble> radii = csv.getFirstColumn(unitScalingFactorRadii);
-    std::vector<Mdouble> probabilities = csv.getSecondColumn(1.0);
-    logger.assert_always(radii.size() == probabilities.size(), "The radii and probabilities vector have to be the "
-                                                               "same size");
-    // combine radii and probabilities
-    for (int i = 0; i < radii.size(); ++i)
+    // To prevent errors when the PSD is empty, throw a warning and return.
+    ///\todo JWB: Is a PSD ever allowed to be empty? drawSample() will cause a segfault in that case. I'm not throwing
+    /// an error here, as that causes the UnitTests/FullRestartSelfTest to fail, due to the InsertionBoundary being
+    /// allowed to use (and defaults to using) an empty PSD.
+    if (particleSizeDistribution_.empty())
     {
-        particleSizeDistribution_.push_back({radii[i], probabilities[i]});
+        logger(WARN, "Setting an empty PSD!");
+        return;
     }
-    logger.assert_always(!particleSizeDistribution_.empty(), "PSD cannot be empty");
+
     switch (PSDType)
     {
         // default case is a CUMULATIVE_NUMBER_DISTRIBUTION
@@ -518,6 +592,41 @@ void PSD::setPSDFromCSV(const std::string& fileName, TYPE PSDType, bool headings
             convertProbabilityDensityToCumulative();
             break;
     }
+}
+
+/*!
+ * \details creates the PSD vector from probabilities and radii saved in a .csv file. Radii should be located at
+ *          the first column and probabilities at the second column of the file. The Type of PSD will be converted to the
+ *          default cumulative number distribution function (CUMULATIVE_NUMBER_DISTRIBUTION) for further processing.
+ * \param[in] fileName                          Name of the .csv file containing the radii and probabilities of the PSD.
+ * \param[in] PSDType                           Type of the PSD: CUMULATIVE_VOLUME_DISTRIBUTION,
+ *                                              CUMULATIVE_NUMBER_DISTRIBUTION, CUMULATIVE_LENGTH_DISTRIBUTION,
+ *                                              CUMULATIVE_AREA_DISTRIBUTION, PROBABILITYDENSITY_VOLUME_DISTRIBUTION,
+ *                                              PROBABILITYDENSITY_NUMBER_DISTRIBUTION,
+ *                                              PROBABILITYDENSITY_LENGTH_DISTRIBUTION PROBABILITYDENSITY_AREA_DISTRIBUTION.
+ * \param[in] headings                          If TRUE the file is assumed to have headings and the first row will
+ *                                              be skipped. If FALSE the file has no headings and the file will be
+ *                                              read in as is. Default is FALSE.
+ * \param[in] unitScalingFactorRadii            Scaling factor of radii to match SI-units.
+ */
+void PSD::setPSDFromCSV(const std::string& fileName, TYPE PSDType, bool headings, Mdouble unitScalingFactorRadii)
+{
+    // read in csv file using the csvReader class
+    csvReader csv;
+    csv.setHeader(headings);
+    csv.read(fileName);
+    std::vector<Mdouble> radii = csv.getFirstColumn(unitScalingFactorRadii);
+    std::vector<Mdouble> probabilities = csv.getSecondColumn(1.0);
+    logger.assert_always(radii.size() == probabilities.size(), "The radii and probabilities vector have to be the "
+                                                               "same size");
+    // combine radii and probabilities
+    std::vector<DistributionElements> psd;
+    for (int i = 0; i < radii.size(); ++i)
+    {
+        psd.push_back({radii[i], probabilities[i]});
+    }
+    logger.assert_always(!psd.empty(), "PSD cannot be empty");
+    setPSDFromVector(psd, PSDType);
     logger(INFO, "A PSD with size ratio % is now ready to be set", getSizeRatio());
 }
 
@@ -530,7 +639,7 @@ void PSD::convertProbabilityDensityToCumulative()
     // add up probabilities
     for (auto it = particleSizeDistribution_.begin() + 1; it != particleSizeDistribution_.end(); ++it)
     {
-        it->probability = std::min(1.0, it->probability + (it - 1)->probability);
+        it->probability += (it - 1)->probability;
     }
     // check whether cumulative distribution is valid
     validateCumulativeDistribution();
@@ -571,50 +680,100 @@ void PSD::convertProbabilityDensityToProbabilityDensityNumberDistribution(TYPE P
         case TYPE::PROBABILITYDENSITY_LENGTH_DISTRIBUTION:
             for (auto it = particleSizeDistribution_.begin() + 1; it != particleSizeDistribution_.end(); ++it)
             {
-                it->probability /= 0.5 * (it->radius + (it - 1)->radius);
+                it->probability /= 0.5 * (it->internalVariable + (it - 1)->internalVariable);
                 // old conversion
-                //p.probability /= p.radius;
+                //p.probability /= p.internalVariable;
                 // sum up probabilities
                 sum += it->probability;
-            }
-            // normalize
-            for (auto& p : particleSizeDistribution_)
-            {
-                p.probability /= sum;
             }
             break;
         case TYPE::PROBABILITYDENSITY_AREA_DISTRIBUTION:
             for (auto it = particleSizeDistribution_.begin() + 1; it != particleSizeDistribution_.end(); ++it)
             {
                 it->probability /=
-                        1.0 / 3.0 * (square(it->radius) + it->radius * (it - 1)->radius + square((it - 1)->radius));
+                        1.0 / 3.0 * (square(it->internalVariable) + it->internalVariable * (it - 1)->internalVariable +
+                                     square((it - 1)->internalVariable));
                 // old conversion
-                //p.probability /= square(p.radius);
+                //p.probability /= square(p.internalVariable);
                 // sum up probabilities
                 sum += it->probability;
-            }
-            // normalize
-            for (auto& p : particleSizeDistribution_)
-            {
-                p.probability /= sum;
             }
             break;
         case TYPE::PROBABILITYDENSITY_VOLUME_DISTRIBUTION:
             for (auto it = particleSizeDistribution_.begin() + 1; it != particleSizeDistribution_.end(); ++it)
             {
                 it->probability /=
-                        0.25 * (square(it->radius) + square((it - 1)->radius)) * (it->radius + (it - 1)->radius);
+                        0.25 * (square(it->internalVariable) + square((it - 1)->internalVariable)) *
+                        (it->internalVariable + (it - 1)->internalVariable);
                 // old conversion
-                //p.probability /= cubic(p.radius);
+                //p.probability /= cubic(p.internalVariable);
                 // sum up probabilities
                 sum += it->probability;
             }
-            // normalize
-            for (auto& p : particleSizeDistribution_)
+            break;
+    }
+
+    // normalize
+    for (auto& p : particleSizeDistribution_)
+    {
+        p.probability /= sum;
+    }
+}
+
+/*!
+ * \details This is a helper function to have full flexibility in converting from the default
+ * PROBABILITYDENSITY_NUMBER_DISTRIBUTION type to any other PDF type. This can be useful e.g. when wanting to output the
+ * PSD with a certain type.
+ * @param PDFType The PDF type to convert to.
+ */
+void PSD::convertProbabilityDensityNumberDistributionToProbabilityDensity(TYPE PDFType)
+{
+    Mdouble sum = 0;
+    switch  (PDFType)
+    {
+        default:
+            logger(ERROR, "Wrong PDFType");
+            break;
+        case TYPE::PROBABILITYDENSITY_LENGTH_DISTRIBUTION:
+            for (auto it = particleSizeDistribution_.begin() + 1; it != particleSizeDistribution_.end(); ++it)
             {
-                p.probability /= sum;
+                it->probability *= 0.5 * (it->internalVariable + (it - 1)->internalVariable);
+                // old conversion
+                //p.probability *= p.internalVariable;
+                // sum up probabilities
+                sum += it->probability;
             }
             break;
+        case TYPE::PROBABILITYDENSITY_AREA_DISTRIBUTION:
+            for (auto it = particleSizeDistribution_.begin() + 1; it != particleSizeDistribution_.end(); ++it)
+            {
+                it->probability *=
+                        1.0 / 3.0 * (square(it->internalVariable) + it->internalVariable * (it - 1)->internalVariable +
+                                     square((it - 1)->internalVariable));
+                // old conversion
+                //p.probability *= square(p.internalVariable);
+                // sum up probabilities
+                sum += it->probability;
+            }
+            break;
+        case TYPE::PROBABILITYDENSITY_VOLUME_DISTRIBUTION:
+            for (auto it = particleSizeDistribution_.begin() + 1; it != particleSizeDistribution_.end(); ++it)
+            {
+                it->probability *=
+                        0.25 * (square(it->internalVariable) + square((it - 1)->internalVariable)) *
+                        (it->internalVariable + (it - 1)->internalVariable);
+                // old conversion
+                //p.probability *= cubic(p.internalVariable);
+                // sum up probabilities
+                sum += it->probability;
+            }
+            break;
+    }
+
+    // normalize
+    for (auto& p : particleSizeDistribution_)
+    {
+        p.probability /= sum;
     }
 }
 
@@ -622,23 +781,10 @@ void PSD::convertProbabilityDensityToProbabilityDensityNumberDistribution(TYPE P
  * \details converts a PROBABILITYDENSITY_NUMBER_DISTRIBUTION to a PROBABILITYDENSITY_VOLUME_DISTRIBUTION. Used for
  * getVolumetricMeanRadius() and insertManuallyByVolume().
  */
+MERCURYDPM_DEPRECATED
 void PSD::convertProbabilityDensityNumberDistributionToProbabilityDensityVolumeDistribution()
 {
-    Mdouble sum = 0;
-    for (auto it = particleSizeDistribution_.begin() + 1; it != particleSizeDistribution_.end(); ++it)
-    {
-        it->probability *=
-                0.25 * (square(it->radius) + square((it - 1)->radius)) * (it->radius + (it - 1)->radius);
-        // old conversion
-        //p.probability /= cubic(p.radius);
-        // sum up probabilities
-        sum += it->probability;
-    }
-    // normalize
-    for (auto& p : particleSizeDistribution_)
-    {
-        p.probability /= sum;
-    }
+    convertProbabilityDensityNumberDistributionToProbabilityDensity(TYPE::PROBABILITYDENSITY_VOLUME_DISTRIBUTION);
 }
 
 /*!
@@ -649,6 +795,8 @@ void PSD::convertProbabilityDensityNumberDistributionToProbabilityDensityVolumeD
 /// \todo TP: NOT WORKING! If anyone knows how to do it feel free to add
 void PSD::convertCumulativeToCumulativeNumberDistribution(TYPE CDFType)
 {
+    logger(ERROR, "This function is not fully implemented yet!");
+
     Mdouble sum = 0;
     switch (CDFType)
     {
@@ -700,6 +848,7 @@ void PSD::convertCumulativeToCumulativeNumberDistribution(TYPE CDFType)
     }
 }
 
+
 /*!
  * \details Cuts off the CDF at given minimum and maximum quantiles and applies a minimum polydispersity at the base.
  * \param[in] quantileMin                       undersize quantile to cut off the lower part of the CDF.
@@ -713,19 +862,19 @@ void PSD::cutoffCumulativeNumber(Mdouble quantileMin, Mdouble quantileMax, Mdoub
     // to get a minimum polydispersity at the base
     Mdouble radiusMinCut = std::min(radiusMin * (1 + minPolydispersity), radiusMax);
     // cut off min
-    while (particleSizeDistribution_.front().radius <= radiusMinCut)
+    while (particleSizeDistribution_.front().internalVariable <= radiusMinCut)
     {
         particleSizeDistribution_.erase(particleSizeDistribution_.begin());
     }
     particleSizeDistribution_.insert(particleSizeDistribution_.begin(), {radiusMinCut, quantileMin});
     particleSizeDistribution_.insert(particleSizeDistribution_.begin(), {radiusMin, 0});
     // cut off max
-    while (particleSizeDistribution_.back().radius >= radiusMax)
+    while (particleSizeDistribution_.back().internalVariable >= radiusMax)
     {
         particleSizeDistribution_.pop_back();
     }
     Mdouble radiusMaxCut = std::max(radiusMax - (1 - minPolydispersity) * (radiusMax - particleSizeDistribution_.back()
-            .radius), radiusMin);
+            .internalVariable), radiusMin);
     particleSizeDistribution_.push_back({radiusMaxCut, quantileMax});
     particleSizeDistribution_.push_back({radiusMax, 1});
     logger(INFO, "PSD was cut successfully and now has a size ratio of %", getSizeRatio());
@@ -749,9 +898,11 @@ minPolydispersity)
     // squeeze psd
     for (auto& p: particleSizeDistribution_)
     {
-        p.radius = r50 + (p.radius - r50) * squeeze;
+        p.internalVariable = r50 + (p.internalVariable - r50) * squeeze;
     }
 }
+
+
 
 /*!
  * \details Gets the diameter from a certain percentile of the number based PSD.
@@ -772,7 +923,7 @@ Mdouble PSD::getVolumeDx(Mdouble x) const
 {
     PSD psd = *this;
     psd.convertCumulativeToProbabilityDensity();
-    psd.convertProbabilityDensityNumberDistributionToProbabilityDensityVolumeDistribution();
+    psd.convertProbabilityDensityNumberDistributionToProbabilityDensity(TYPE::PROBABILITYDENSITY_VOLUME_DISTRIBUTION);
     psd.convertProbabilityDensityToCumulative();
     return 2.0 * psd.getRadiusByQuantile(x / 100);
 }
@@ -789,10 +940,11 @@ Mdouble PSD::getRadiusByQuantile(Mdouble quantile) const
     auto high = std::lower_bound(particleSizeDistribution_.begin(), particleSizeDistribution_.end(), quantile);
     auto low = std::max(particleSizeDistribution_.begin(), high - 1);
     if (high->probability == low->probability)
-        return high->radius;
+        return high->internalVariable;
     else
-        return low->radius + (high->radius - low->radius) * (quantile - low->probability) /
-                             (high->probability - low->probability);
+        return low->internalVariable +
+               (high->internalVariable - low->internalVariable) * (quantile - low->probability) /
+               (high->probability - low->probability);
 }
 
 /*!
@@ -803,12 +955,12 @@ Mdouble PSD::getRadiusByQuantile(Mdouble quantile) const
 Mdouble PSD::getQuantileByRadius(Mdouble radius) const
 {
     auto high = std::lower_bound(particleSizeDistribution_.begin(), particleSizeDistribution_.end(),
-                                 radius, [](const PSD::RadiusAndProbability& rp, Mdouble value){ return rp.radius < value; });
+                                 radius, [](const DistributionElements& rp, Mdouble value){ return rp.internalVariable < value; });
     auto low = std::max(particleSizeDistribution_.begin(), high - 1);
-    if (high->radius == low->radius)
+    if (high->internalVariable == low->internalVariable)
         return high->probability;
     else
-        return low->probability + (high->probability - low->probability) * (radius - low->radius) / (high->radius - low->radius);
+        return low->probability + (high->probability - low->probability) * (radius - low->internalVariable) / (high->internalVariable - low->internalVariable);
 }
 
 /*!
@@ -820,10 +972,10 @@ Mdouble PSD::getVolumetricMeanRadius() const
 {
     PSD psd = *this;
     psd.convertCumulativeToProbabilityDensity();
-    psd.convertProbabilityDensityNumberDistributionToProbabilityDensityVolumeDistribution();
+    psd.convertProbabilityDensityNumberDistributionToProbabilityDensity(TYPE::PROBABILITYDENSITY_VOLUME_DISTRIBUTION);
     Mdouble mean = 0;
     for (auto it = particleSizeDistribution_.begin() + 1; it != particleSizeDistribution_.end(); ++it)
-        mean += it->probability * 0.5 * (cubic(it->radius) + cubic((it - 1)->radius));
+        mean += it->probability * 0.5 * (cubic(it->internalVariable) + cubic((it - 1)->internalVariable));
     mean = pow(mean, 1. / 3.);
     return mean;
 }
@@ -878,7 +1030,7 @@ void PSD::cutHighSizeRatio()
  */
 Mdouble PSD::getMinRadius() const
 {
-    return particleSizeDistribution_[0].radius;
+    return particleSizeDistribution_[0].internalVariable;
 }
 
 /*!
@@ -887,25 +1039,87 @@ Mdouble PSD::getMinRadius() const
  */
 Mdouble PSD::getMaxRadius() const
 {
-    return particleSizeDistribution_.back().radius;
+    return particleSizeDistribution_.back().internalVariable;
 }
 
 /*!
  * \details Gets the vector containing radii and probabilities of the PSD.
  * \return A vector containing radii and probabilities of the PSD.
  */
-std::vector<PSD::RadiusAndProbability> PSD::getParticleSizeDistribution() const
+std::vector<DistributionElements> PSD::getParticleSizeDistribution() const
 {
     return particleSizeDistribution_;
 }
 
 /*!
- * \details sets the PSD from a vector of the PSD::RadiusAndProbability class; used to read in PSDs from a restart file.
+ * \details This returns the PSD vector converted to the specified type, with an optional scale factor for the internal
+ * variable. This can be used e.g. to output the PSD with a certain type.
+ * @param PSDType The type the PSD should be.
+ * @param scalingFactor The scale factor by which the the internal variable is multiplied.
+ * @return The converted PSD vector.
+ */
+std::vector<DistributionElements> PSD::getParticleSizeDistributionByType(TYPE PSDType, Mdouble scalingFactor) const
+{
+    PSD psd = *this;
+
+    switch (PSDType)
+    {
+        // default case is a CUMULATIVE_NUMBER_DISTRIBUTION
+        default:
+            break;
+        case TYPE::CUMULATIVE_LENGTH_DISTRIBUTION:
+            psd.convertCumulativeToProbabilityDensity();
+            psd.convertProbabilityDensityNumberDistributionToProbabilityDensity(TYPE::PROBABILITYDENSITY_LENGTH_DISTRIBUTION);
+            psd.convertProbabilityDensityToCumulative();
+            break;
+        case TYPE::CUMULATIVE_AREA_DISTRIBUTION:
+            psd.convertCumulativeToProbabilityDensity();
+            psd.convertProbabilityDensityNumberDistributionToProbabilityDensity(TYPE::PROBABILITYDENSITY_AREA_DISTRIBUTION);
+            psd.convertProbabilityDensityToCumulative();
+            break;
+        case TYPE::CUMULATIVE_VOLUME_DISTRIBUTION:
+            psd.convertCumulativeToProbabilityDensity();
+            psd.convertProbabilityDensityNumberDistributionToProbabilityDensity(TYPE::PROBABILITYDENSITY_VOLUME_DISTRIBUTION);
+            psd.convertProbabilityDensityToCumulative();
+            break;
+        case TYPE::PROBABILITYDENSITY_NUMBER_DISTRIBUTION:
+            psd.convertCumulativeToProbabilityDensity();
+            break;
+        case TYPE::PROBABILITYDENSITY_LENGTH_DISTRIBUTION:
+            psd.convertCumulativeToProbabilityDensity();
+            psd.convertProbabilityDensityNumberDistributionToProbabilityDensity(PSDType);
+            break;
+        case TYPE::PROBABILITYDENSITY_AREA_DISTRIBUTION:
+            psd.convertCumulativeToProbabilityDensity();
+            psd.convertProbabilityDensityNumberDistributionToProbabilityDensity(PSDType);
+            break;
+        case TYPE::PROBABILITYDENSITY_VOLUME_DISTRIBUTION:
+            psd.convertCumulativeToProbabilityDensity();
+            psd.convertProbabilityDensityNumberDistributionToProbabilityDensity(PSDType);
+            break;
+    }
+
+    auto psdVector = psd.getParticleSizeDistribution();
+    for (auto& de : psdVector)
+        de.internalVariable *= scalingFactor;
+
+    return psdVector;
+}
+
+/*!
+ * \details sets the PSD from a vector of the DistributionElements class; used to read in PSDs from a restart file.
  * \param[in] particleSizeDistribution      vector containing the radii and probabilities specifying the PSD.
  */
-void PSD::setParticleSizeDistribution(std::vector<PSD::RadiusAndProbability> particleSizeDistribution)
+void PSD::setParticleSizeDistribution(std::vector<DistributionElements> particleSizeDistribution)
 {
     particleSizeDistribution_ = particleSizeDistribution;
+}
+
+void PSD::scaleParticleSize(double scale)
+{
+    for (auto& p : particleSizeDistribution_) {
+        p.internalVariable *= scale;
+    }
 }
 
 /*!
@@ -921,72 +1135,96 @@ int PSD::getInsertedParticleNumber() const
     return sum;
 }
 
+// /*!
+// * \details Compute the raw momenta of the inserted PSD by converting it to a PDF, calculating the moments m_i according
+// * to \f$ m_i = \sum_{j=0}^n \f$ scaling it by the number
+// * of particles inserted into the simulation (moments are computed from a PROBABILITYDENSITY_NUMBER_DISTRIBUTION) and
+// * converting it back to a CDF.
+// * See <a href="https://en.wikipedia.org/wiki/Moment_(mathematics)#Significance_of_the_moments">Wikipedia</a> for
+// * details.
+// */
+//void PSD::computeRawMomenta()
+//{
+//    convertCumulativeToProbabilityDensity();
+//    for (size_t im = 0; im < momenta_.size(); ++im)
+//    {
+//        // prevent summing up of moments for each time step of the simulation
+//        momenta_[im] = 0;
+//        for (auto& it : particleSizeDistribution_)
+//        {
+//            momenta_[im] += std::pow(it.internalVariable, im) * it.probability;
+//        }
+//    }
+//    // zeroth-moment equals particle number for a PROBABILITYDENSITY_NUMBER_DISTRIBUTION
+//    momenta_[0] *= getInsertedParticleNumber();
+//    convertProbabilityDensityToCumulative();
+//}
+//
+// /*!
+// * \details Compute the central momenta of the PSD from their respective raw momenta.
+// */
+//void PSD::computeCentralMomenta()
+//{
+//    computeRawMomenta();
+//    Mdouble mean = momenta_[1];
+//    momenta_[5] += -5 * mean * momenta_[4] + 10 * mean * mean * momenta_[3]
+//                   - 10 * mean * mean * mean * momenta_[2] + 4 * mean * mean * mean * mean * mean;
+//    momenta_[4] += -4 * mean * momenta_[3] + 6 * mean * mean * momenta_[2] - 3 * mean * mean * mean * mean;
+//    momenta_[3] += -3 * mean * momenta_[2] + 2 * mean * mean * mean;
+//    momenta_[2] += -mean * mean;
+//}
+
+// /*!
+// * \details Compute the standardised momenta of the PSD from their respective central momenta.
+// */
+//void PSD::computeStandardisedMomenta()
+//{
+//    computeCentralMomenta();
+//    Mdouble std = std::sqrt(momenta_[2]);
+//    momenta_[3] /= std * std * std;
+//    momenta_[4] /= std * std * std * std;
+//    momenta_[5] /= std * std * std * std * std;
+//}
+
 /*!
- * \details Compute the raw momenta of the inserted PSD by converting it to a PDF, calculating the moments m_i according
- * to \f$ m_i = \sum_{j=0}^n \f$ scaling it by the number
- * of particles inserted into the simulation (moments are computed from a PROBABILITYDENSITY_NUMBER_DISTRIBUTION) and
- * converting it back to a CDF.
- * See <a href="https://en.wikipedia.org/wiki/Moment_(mathematics)#Significance_of_the_moments">Wikipedia</a> for
- * details.
+ * \details Gets the radius of a particle from the PSD.
+ * \param[in] i     An integer which is the index of the vector containing the radius.
+ * \return A double which corresponds to the radius of the particle.
  */
-void PSD::computeRawMomenta()
+Mdouble PSD::getRadius(int index) const
 {
-    convertCumulativeToProbabilityDensity();
-    for (size_t im = 0; im < momenta_.size(); ++im)
+    return particleSizeDistribution_[index].internalVariable;
+}
+
+/*!
+ * \details creates a vector of doubles containing linearly spaced values between Min and Max.
+ * \param[in] Min               A double which is the minimum value of the vector.
+ * \param[in] Max               A double which is the maximum value of the vector.
+ * \param[in] numberOfBins      An integer which is the number of bins of the vector.
+ * \return A vector of doubles containing linearly spaced values between Min and Max.
+ */
+std::vector<Mdouble> PSD::linspace(Mdouble Min, Mdouble Max, int numberOfBins)
+{
+    Mdouble dx = (Max - Min) / static_cast<Mdouble>(numberOfBins - 1);
+    Mdouble val;
+    std::vector<Mdouble> linearVector(numberOfBins);
+    typename std::vector<Mdouble>::iterator x;
+    for (x = linearVector.begin(), val = Min; x != linearVector.end(); ++x, val += dx)
     {
-        // prevent summing up of moments for each time step of the simulation
-        momenta_[im] = 0;
-        for (auto& it : particleSizeDistribution_)
-        {
-            momenta_[im] += std::pow(it.radius, im) * it.probability;
-        }
+        *x = val;
     }
-    // zeroth-moment equals particle number for a PROBABILITYDENSITY_NUMBER_DISTRIBUTION
-    momenta_[0] *= getInsertedParticleNumber();
-    convertProbabilityDensityToCumulative();
-}
-
-/*!
- * \details Compute the central momenta of the PSD from their respective raw momenta.
- */
-void PSD::computeCentralMomenta()
-{
-    computeRawMomenta();
-    Mdouble mean = momenta_[1];
-    momenta_[5] += -5 * mean * momenta_[4] + 10 * mean * mean * momenta_[3]
-                   - 10 * mean * mean * mean * momenta_[2] + 4 * mean * mean * mean * mean * mean;
-    momenta_[4] += -4 * mean * momenta_[3] + 6 * mean * mean * momenta_[2] - 3 * mean * mean * mean * mean;
-    momenta_[3] += -3 * mean * momenta_[2] + 2 * mean * mean * mean;
-    momenta_[2] += -mean * mean;
-}
-
-/*!
- * \details Compute the standardised momenta of the PSD from their respective central momenta.
- */
-void PSD::computeStandardisedMomenta()
-{
-    computeCentralMomenta();
-    Mdouble std = std::sqrt(momenta_[2]);
-    momenta_[3] /= std * std * std;
-    momenta_[4] /= std * std * std * std;
-    momenta_[5] /= std * std * std * std * std;
-}
-
-/*!
- * \details Get momenta of the user defined particleSizeDistributionVector_ vector.
- * \return Array of momenta corresponding to the first six moments of the user defined PSD.
- */
-std::array<Mdouble, 6> PSD::getMomenta() const
-{
-    return momenta_;
+    // ensure that last value is equal to Max.
+    linearVector.pop_back();
+    linearVector.push_back(Max);
+    return linearVector;
 }
 
 /*!
  * \details Required to use std::lower_bound for finding when the probability is higher than a certain value.
- * \return TRUE if probability from a vector of type PSD::RadiusAndProbability is higher than a certain value from a vector of type
- * PSD::RadiusAndProbability and FALSE in the opposite case.
+ * \return TRUE if probability from a vector of type DistributionElements is higher than a certain value from a vector of type
+ * DistributionElements and FALSE in the opposite case.
  */
-bool operator<(const PSD::RadiusAndProbability& l, const PSD::RadiusAndProbability& r)
+bool operator<(const DistributionElements& l, const DistributionElements& r)
 {
     return l.probability < r.probability;
 }
@@ -994,10 +1232,10 @@ bool operator<(const PSD::RadiusAndProbability& l, const PSD::RadiusAndProbabili
 /*!
  * \details required to use std::lower_bound for finding when the probability provided as a double is higher than a
  * certain value.
- * \return TRUE if probability as double is higher than a certain value from a PSD::RadiusAndProbability vector and FALSE in the opposite
+ * \return TRUE if probability as double is higher than a certain value from a DistributionElements vector and FALSE in the opposite
  * case.
  */
-bool operator<(const PSD::RadiusAndProbability& l, const Mdouble prob)
+bool operator<(const DistributionElements& l, const Mdouble prob)
 {
     return l.probability < prob;
 }
@@ -1006,18 +1244,18 @@ bool operator<(const PSD::RadiusAndProbability& l, const Mdouble prob)
  * \details Required to use std::distance to find the index of the PSD size class in which a particle has to be inserted
  * \return A double which determines the size class (radius) a particle will be inserted to.
  */
-Mdouble operator==(PSD::RadiusAndProbability l, const Mdouble r)
+Mdouble operator==(DistributionElements l, const Mdouble r)
 {
-    return l.radius == r;
+    return l.internalVariable == r;
 }
 
 /*!
  * \details reads from input stream. This function is used for restart files.
  * \return a reference to an input stream.
  */
-std::istream& operator>>(std::istream& is, PSD::RadiusAndProbability& p)
+std::istream& operator>>(std::istream& is, DistributionElements& p)
 {
-    is >> p.radius;
+    is >> p.internalVariable;
     is >> p.probability;
     return is;
 }
@@ -1026,9 +1264,8 @@ std::istream& operator>>(std::istream& is, PSD::RadiusAndProbability& p)
  * \details Writes to output stream. This function is used for restart files.
  * \return a reference to an output stream.
  */
-std::ostream& operator<<(std::ostream& os, PSD::RadiusAndProbability& p)
+std::ostream& operator<<(std::ostream& os, DistributionElements& p)
 {
-    os << p.radius << ' ' << p.probability << ' ';
+    os << p.internalVariable << ' ' << p.probability << ' ';
     return os;
 }
-

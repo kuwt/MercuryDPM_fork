@@ -49,7 +49,7 @@ HertzianSinterNormalSpecies::HertzianSinterNormalSpecies()
 }
 
 /*!
- * \param[in] the species that is copied
+ * \param[in] 'the species that is copied'
  */
 HertzianSinterNormalSpecies::HertzianSinterNormalSpecies(const HertzianSinterNormalSpecies& p)
         : BaseNormalForce(p)
@@ -126,7 +126,7 @@ void HertzianSinterNormalSpecies::mix(HertzianSinterNormalSpecies* const S, Hert
  * \param[in] loadingModulus      the loading stiffness of the linear plastic-viscoelastic normal force.
  * \param[in] unloadingModulusMax the maximum unloading stiffness of the linear plastic-viscoelastic normal force.
  * \param[in] cohesionModulus     the cohesive stiffness of the linear plastic-viscoelastic normal force.
- * \param[in] penetrationDepthMax   the maximum penetration depth of the linear plastic-viscoelastic normal force.
+ * \param[in] penetrationDepthMax the maximum penetration depth of the linear plastic-viscoelastic normal force.
  */
 void HertzianSinterNormalSpecies::setPlasticParameters(Mdouble loadingModulus, Mdouble unloadingModulusMax,
                                                        Mdouble cohesionModulus, Mdouble penetrationDepthMax)
@@ -208,7 +208,7 @@ void HertzianSinterNormalSpecies::setPenetrationDepthMax(Mdouble penetrationDept
 
 /*!
  * \details Calculates collision time for stiffest spring constant, divides by 50
- * \param[in] the optimal time step is computed to resolve a collision of two particles of this mass.
+ * \param[in] mass the optimal time step is computed to resolve a collision of two particles of this mass.
  */
 Mdouble HertzianSinterNormalSpecies::computeTimeStep(Mdouble mass)
 {
@@ -225,7 +225,7 @@ Mdouble HertzianSinterNormalSpecies::computeTimeStep(Mdouble mass)
 
 /*!
  * \details should be non-negative
- * \param[in] the linear dissipation coefficient of the linear plastic-viscoelastic normal force.
+ * \param[in] dissipation the linear dissipation coefficient of the linear plastic-viscoelastic normal force.
  */
 void HertzianSinterNormalSpecies::setDissipation(Mdouble dissipation)
 {

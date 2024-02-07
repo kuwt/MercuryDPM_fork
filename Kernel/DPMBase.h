@@ -167,7 +167,7 @@ public:
     
     /*!
      * \brief The work horse of the code
-     * \todo IFCD @AT, TW: Consider moving some things before the time loop to actionsBeforeTimeLoop
+     * \todo IFCD AT, TW: Consider moving some things before the time loop to actionsBeforeTimeLoop
      */
     void solve();
 
@@ -445,7 +445,7 @@ public:
     const File& getStatFile() const;
 
     /*!
-     * \bief Returns a constant reference to an Interactions file
+     * \brief Returns a constant reference to an Interactions file
      */
     const File& getInteractionFile() const;
 
@@ -658,13 +658,13 @@ public:
 
     Mdouble getZCenter() const
     { return 0.5*(max_.Z+min_.Z); }
-    /*
+    /*!
      * \brief Returns the minimum coordinates of the problem domain.
      */
     Vec3D getMin() const
     { return min_; }
 
-    /*
+    /*!
      * \brief Returns the maximum coordinates of the problem domain.
      */
     Vec3D getMax() const
@@ -742,10 +742,10 @@ public:
      */
     Mdouble getTimeStep() const;
 
-    /* Sets the number of omp threads */
+    /*! \brief Sets the number of omp threads */
     void setNumberOfOMPThreads(int numberOfOMPThreads);
 
-    /* Returns the number of omp threads */
+    /*! \brief Returns the number of omp threads */
     int getNumberOfOMPThreads() const;
 
     /*!
@@ -1031,7 +1031,7 @@ public:
     virtual void handleParticleRemoval(unsigned int id);
 
     /*!
-     * \briefHandles the addition of particles to the particleHandler
+     * \brief Handles the addition of particles to the particleHandler
      */
     virtual void handleParticleAddition(unsigned int id, BaseParticle* p);
 

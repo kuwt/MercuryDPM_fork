@@ -207,11 +207,11 @@ double PSDContinuous::getVolumetricMean(std::vector<PSDContinuous> psd) {
 }
 
 const PSD convertPSD2ToPSD(const std::vector<PSDContinuous>& psd2) {
-    std::vector<PSD::RadiusAndProbability> rp;
+    std::vector<DistributionElements> rp;
     for (const auto p : psd2) {
         rp.push_back({p.radius, p.probability});
     }
     PSD psd;
-    psd.setParticleSizeDistribution(rp);
+    psd.setPSDFromVector(rp, PSD::TYPE::CUMULATIVE_NUMBER_DISTRIBUTION);
     return psd;
 }

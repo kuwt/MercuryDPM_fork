@@ -4,10 +4,15 @@ if(NOT MercuryDPM_OOMPH_COUPLING)
     return()
 endif()
 
+#check if git is installed
+if (NOT Git_FOUND)
+    message(FATAL_ERROR "The option you have chosen requires git and you do not have this installed. Please install")
+endif()
+
 # Clone oomph-lib if has not been cloned before
 set(OOMPH_DIR ${PROJECT_SOURCE_DIR}/oomph-lib)
-execute_process(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} COMMAND git submodule init)
-execute_process(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} COMMAND git submodule update --depth 1)
+execute_process(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} COMMAND git submodule init ${OOMPH_DIR})
+execute_process(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} COMMAND git submodule update  ${OOMPH_DIR})
 if(NOT EXISTS ${OOMPH_DIR}/src)
     message(FATAL_ERROR "git clone failed. If this problem persists you can manually clone oomph-lib by running: \n   git submodule init\n   git submodule update")
 endif()
@@ -71,7 +76,7 @@ if (OOMPH_CMAKE)
 else()
     # Otherwise, we assume it is already compiled
     message(STATUS "Coupling to external oomph directory" ${OOMPH_DIR})
-    #check if the oomph-lib src directory exists
+    #check if the oomph-lib Src directory exists
     if (NOT IS_DIRECTORY ${OOMPH_DIR}/src)
         message(FATAL_ERROR "${OOMPH_DIR}/src does not exist.\n $ENV{HOME} Set OOMPH_DIR to the directory where the src/ and build/lib/ folders of oomphlib reside")
     endif()
@@ -84,7 +89,7 @@ else()
     link_directories(${OOMPH_DIR}/build/lib)
 endif()
 
-# include the folders where the oomph-lib src files reside
+# include the folders where the oomph-lib Src files reside
 # (so you can write e.g. #include "mesh.h")
 include_directories(${OOMPH_DIR}/src ${OOMPH_DIR}/src/poisson ${OOMPH_DIR}/src/generic ${OOMPH_DIR}/src/solid ${OOMPH_DIR}/src/constitutive ${OOMPH_DIR}/external_src)
 

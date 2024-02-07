@@ -417,8 +417,8 @@ Quaternion Quaternion::angularVelocityBodyFixedFrameToAngularDisplacement(Vec3D 
             -q2 * v.X + q1 * v.Y + q0 * v.Z);
 }
 
-///Given v = \omega * dt, with omega the angular velocity, this computes the change in angular displacement to be added
-///in the time integration. This is equivalent to applying the matrix \tilde{C}
+///Given v = &omega * dt, with omega the angular velocity, this computes the change in angular displacement to be added
+///in the time integration. This is equivalent to applying the matrix &tilde{C}
 Quaternion Quaternion::angularDisplacementTimeDerivative(Vec3D v) const
 {
     return 0.5 * Quaternion(
@@ -500,8 +500,11 @@ void Quaternion::setAngleZ(Mdouble psi)
 
 Vec3D Quaternion::getAxis() const
 {
-    //logger(ERROR,"o % d % d %",*this,Vec3D(1-2.0*q2*q2-2.0*q3*q3, 2.0*(q1*q2+q3*q0), 2.0*(q1*q3-q2*q0)),Vec3D(q0*q0+q1*q1-q2*q2-q3*q3, 2.0*(q1*q2+q3*q0), 2.0*(q1*q3-q2*q0)));
-    return Vec3D(q0 * q0 - q3 * q3 + q1 * q1 - q2 * q2, 2.0 * (q1 * q2 + q3 * q0), 2.0 * (q1 * q3 - q2 * q0));
+    const Mdouble q00 = q0*q0;
+    const Mdouble q11 = q1*q1;
+    const Mdouble q22 = q2*q2;
+    const Mdouble q33 = q3*q3;
+    return Vec3D(q00 - q33 + q11 - q22, 2.0 * (q1 * q2 + q3 * q0), 2.0 * (q1 * q3 - q2 * q0));
 }
 
 //retrieves the rotation matrix, often called A in literature.

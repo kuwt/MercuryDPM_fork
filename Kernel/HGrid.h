@@ -176,7 +176,10 @@ public:
      * \return The inverse size, i.e. 1/size, of the cells at the given level.
      */
     double getInvCellSize(unsigned int i) const
-    { return invCellSizes_[i]; }
+    {
+        logger.assert_debug(i<invCellSizes_.size(),"Error in getInvCellSize %<%", i, invCellSizes_.size());
+        return invCellSizes_[i];
+    }
     
     /*!
      * \brief Gets all the inverse cell sizes (1/cellSize) for all levels as a vector.
