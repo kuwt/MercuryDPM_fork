@@ -45,9 +45,10 @@ private:
     
     Mdouble rhoSteel = 7850;
     Mdouble rSteel = 0.5;
-    Mdouble dSteel = 4e-3;
+    Mdouble dSteel = 2.e-3;
     Mdouble slidingFrictionSteel = 0.2;
     Mdouble rollingFrictionSteel = 0.0;
+
     Mdouble rhoGlass = 2650;
     Mdouble rGlass = 0.8;
     Mdouble dGlass = 10e-2;

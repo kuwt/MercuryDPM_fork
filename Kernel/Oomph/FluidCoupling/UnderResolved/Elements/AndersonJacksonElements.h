@@ -44,7 +44,6 @@
 #include "../../../../../oomph-lib/src/generic/projection.h"
 #include "../../../../../oomph-lib/src/generic/timesteppers.h"
 
-
 namespace oomph
 {
 
@@ -899,7 +898,7 @@ public:
   {return Body_force_fct_pt;}
 
   /// Implementing voidage and coupling force directly as member variable; Mitchel ///
-  double voidage123;
+  double voidage123 = 1.;
   bool voidageFixed_ = false;
   void setVoidage(const double &voidage_) {voidage123 = voidage_;}
   double getVoidage() {return voidage123;}

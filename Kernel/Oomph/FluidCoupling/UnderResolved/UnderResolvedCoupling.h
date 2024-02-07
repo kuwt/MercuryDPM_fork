@@ -58,8 +58,8 @@ public:
         oomph::Z2ErrorEstimator* error_estimator_pt=new oomph::Z2ErrorEstimator;
         mesh_pt()->spatial_error_estimator_pt()=error_estimator_pt;
     
-        pinBC();
-        setBC();
+        //pinBC();
+        //setBC();
 
         // Pass pointer to Reynolds number to elements
         unsigned long nelem=mesh_pt()->nelement();
@@ -367,17 +367,17 @@ void UnderResolvedCoupling<ELEMENT>::solveSystem(oomph::DocInfo &doc_info_)
             }
             else if (getIncrementalFluidSolve())
             {
-                logger(INFO,"Call to unsteady_newton_solve() with increasing fraction fo body force coupling");
+                logger(DEBUG,"Call to unsteady_newton_solve() with increasing fraction fo body force coupling");
                 int n = 10;
                 double incrementBodySolve = 1.0/n;
                 for (int i = 0; i <= n; i++)
                 {
                     logger(DEBUG,"In bodyForceScaling with i = %, and t = %",i,this->time_pt()->time());
                     setBodyForceFraction(static_cast<double>(i) * incrementBodySolve);
-                    logger(INFO,"getBodyForceFraction() = %", getBodyForceFraction());
+                    logger(DEBUG,"getBodyForceFraction() = %", getBodyForceFraction());
                     oomph::Problem::unsteady_newton_solve(getTimeStepOomph());
 
-                    logger(INFO,"Call to unsteady_newton_solve() with increasing fraction fo Re");
+                    logger(DEBUG,"Call to unsteady_newton_solve() with increasing fraction fo Re");
                     int n2 = 10;
                     double incrementRe = 1.0/n2 * getReynoldsNumber();
                     double newRe = 0.0;
@@ -764,6 +764,8 @@ Vec3D UnderResolvedCoupling<ELEMENT>::getFdOnPart(const unsigned int &iPart, con
     }
     // ---------------------------------------------- Ergun + Wen-Yu ------------------------------------------------ //
 
+    logger(DEBUG, "dF(iPart = %) = (%, %, %)",iPart,dF.X,dF.Y,dF.Z);
+
     return dF;
 }
 
@@ -1135,9 +1137,12 @@ void UnderResolvedCoupling<ELEMENT>::getBodyForceInElemByCoupling(const int &iEl
     elPtr->node_pt(0)->position(posNode0);
     elPtr->node_pt(iNode - 1)->position(posNodeEnd);
     double VolumeElement = abs(posNode0[0] - posNodeEnd[0]) * abs(posNode0[1] - posNodeEnd[1]) * abs(posNode0[2] - posNodeEnd[2]);
-    logger(DEBUG,"Ftotal on el % = {% % %}", iEl_, Ftotal.X, Ftotal.Y, Ftotal.Z);
+    if (Ftotal.Z > 1e-15)
+    {
+        logger(DEBUG, "Ftotal on el % = {% % %}\n", iEl_, Ftotal.X, Ftotal.Y, Ftotal.Z);
+    }
 
-    Ftotal /= VolumeElement;
+    //Ftotal /= VolumeElement;
     Ftotal *= getBodyForceFraction();
     //Ftotal *= (getVelocityScaling()*getVelocityScaling())/(getLengthScaling()*getFluidDynamicViscosity()); // To get right scaling with oomph-lib as they divide by L^2/U mu_ref
 
@@ -1145,7 +1150,7 @@ void UnderResolvedCoupling<ELEMENT>::getBodyForceInElemByCoupling(const int &iEl
 
     if (Ftotal.Z > 1e-15)
     {
-        logger(INFO, "Ftotal on el % = {% % %}\n", iEl_, Ftotal.X, Ftotal.Y, Ftotal.Z);
+        logger(DEBUG, "Ftotal on el % = {% % %}\n", iEl_, Ftotal.X, Ftotal.Y, Ftotal.Z);
     }
 
     oomph::Vector<double> F = convertVecFuncs::convertToOomphVec(Ftotal);

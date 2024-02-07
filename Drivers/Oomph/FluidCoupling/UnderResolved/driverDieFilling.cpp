@@ -10,7 +10,7 @@ int main(int argc, char**argv)
 {
     double domainLength = 2.5e-2; // Enter in m (x-dir)
     double domainWidth = 2.5e-2; // Enter in m (y-dir)
-    double domainDepth = 10e-2; // Enter in m (z-dir)
+    double domainDepth = 10.e-2; // Enter in m (z-dir)
     
     const int nx = 5;
     const int ny = 5;
@@ -31,7 +31,7 @@ int main(int argc, char**argv)
     logger(INFO,"computed Reynolds number = %",computedReynolds);
 
     Mdouble scaleFactorPSizeMCC = 10.0;
-    Mdouble dMin = 4e-3 * scaleFactorPSizeMCC;
+    Mdouble dMin = 2.0e-3 * scaleFactorPSizeMCC;
     Mdouble g = 9.81;
     
     Mdouble tg = sqrt(dMin/g);
