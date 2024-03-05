@@ -54,7 +54,7 @@ $ bash # restart bash such that it doesn't look for cmake in the old location
 
 -# Get paraview-superbuild
 \code{.sh}
-$ sudo apt install git pkg-config #needed to make paraview
+$ sudo apt install git pkg-config #needed to make ParaView
 $ mkdir ParaViewSuperBuild
 $ cd ParaViewSuperBuild
 $ git clone --recursive https://gitlab.kitware.com/paraview/paraview-superbuild.git Source

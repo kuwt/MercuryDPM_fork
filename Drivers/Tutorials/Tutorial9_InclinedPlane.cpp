@@ -163,10 +163,11 @@ int main(int argc, char* argv[])
     problem.eneFile.setFileType(FileType::NO_FILE);
     
     problem.setXBallsAdditionalArguments("-solidf -v0 -s 8");
-    
+  
     problem.setTimeStep(0.005 / 50.0);
+    //![T9: solve]
     problem.solve(argc, argv);
-    
+    //![T9: solve]    
     return 0;
 }
 //! [T9:main]

@@ -98,14 +98,27 @@ int main(int argc, char* argv[])
     auto species = problem.speciesHandler.copyAndAddObject(s);
     //! [T3:speciesProp]
 
-    // Settings for xBalls visualisation
+//! [T3:output]
+    problem.setSaveCount(10);
+    problem.dataFile.setFileType(FileType::ONE_FILE);
+    problem.restartFile.setFileType(FileType::ONE_FILE);
+    problem.fStatFile.setFileType(FileType::NO_FILE);
+    problem.eneFile.setFileType(FileType::NO_FILE);
+//! [T3:output]
+
+//! [T3:visualOutput]
     problem.setXBallsAdditionalArguments("-solidf -v0");
     // Output vtk files for ParaView visualisation
     problem.wallHandler.setWriteVTK(FileType::ONE_FILE);
     problem.setParticlesWriteVTK(true);
+//! [T3:visualOutput]
+
+//! [T3:solve]
     // Output every 100th time step
     problem.setSaveCount(100); // (collision time)/50.0
+    //! [T3:visualOutput]
 
+    //! [T3:solve]
     double mass = species->getMassFromRadius(0.005);
     double collisionTime = species->getCollisionTime(mass);
     double restitution = species->getRestitutionCoefficient(mass);
@@ -113,7 +126,9 @@ int main(int argc, char* argv[])
 
     // Sets time step to 1/50th of the collision time
     problem.setTimeStep(0.005 / 50.0);
+
+    problem.setTimeStep(0.005 / 50.0); // (collision time)/50.0
     problem.solve(argc, argv);
-    
+//! [T3:solve]
     return 0;
 }

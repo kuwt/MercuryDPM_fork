@@ -79,16 +79,16 @@ int main(int argc, char* argv[])
     //The normal spring stiffness and normal dissipation is computed and set as
     //For collision time tc=0.005 and restitution coefficeint rc=1.0
     LinearViscoelasticSpecies species;
-    species.setDensity(2500.0); //sets the species type_0 density
-    species.setStiffness(258.5);//sets the spring stiffness.
+    species.setDensity(2500.0); //sets the species type_0 density in kg/m3
+    species.setStiffness(258.5);//sets the spring stiffness in kN/m.
     species.setDissipation(0.0); //sets the dissipation.
     problem.speciesHandler.copyAndAddObject(species);
 //! [T1:speciesProp]
 
 //! [T1:output]
-    problem.setSaveCount(10);
-    problem.dataFile.setFileType(FileType::ONE_FILE);
-    problem.restartFile.setFileType(FileType::ONE_FILE);
+    problem.setSaveCount(10); // number of time steps skipped between saves
+    problem.dataFile.setFileType(FileType::ONE_FILE); //create file with particle positions, velocities, radii for multiple time steps
+    problem.restartFile.setFileType(FileType::ONE_FILE); //create file with all parameters of the last saved time step
     problem.fStatFile.setFileType(FileType::NO_FILE);
     problem.eneFile.setFileType(FileType::NO_FILE);
     logger(INFO, "run number: %", problem.dataFile.getCounter());

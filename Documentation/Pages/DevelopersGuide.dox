@@ -156,7 +156,7 @@ Other boundaries are possible; see the documentation of BoundaryHandler for more
 ### Overriding functions
 In some cases it is not enough to define suitable initial conditions. This is done by overriding certain functions in the Mercury3D class, just as we are overriding setupInitialConditions.
 
-For example, to define a criterium to stop the simulation, one can override the 
+For example, to define a criterion to stop the simulation, one can override the
     \code{.cpp}
     //include as member function in class definition:
     bool continueSolve() const override
@@ -297,8 +297,8 @@ See \subpage UserDir
 
 \page UserDir How do I create a directory for my codes?
 When you start developing MercuryDPM applications ("Drivers"), you need a directory in which to store them.
-All MercuryDPM developers can should create a directory to store their aplications, and use svn for version control. Here is how you do it:
- -# Open a terminal, enter the subfolder Drivers/USER in the source directory, and svn-copy the template USER directory into a directory named after you, e.g.
+All MercuryDPM developers can should create a directory to store their applications, and use svn for version control. Here is how you do it:
+ -# Open a terminal, enter the sub-folder Drivers/USER in the source directory, and svn-copy the template USER directory into a directory named after you, e.g.
 \code{.cpp}
 MercurySource/Drivers/USER$ svn cp Template Marlin
 \endcode

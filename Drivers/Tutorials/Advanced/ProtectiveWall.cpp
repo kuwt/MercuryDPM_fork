@@ -23,7 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-/* Particles are released from a specific height, roll through a slope and then a protective wall retains them. This is an interactive tutorial which the uset can modify the input parameters. For full documentation of this code, go to http://docs.mercurydpm.org/
+/* Particles are released from a specific height, roll through a slope and then a protective wall retains them. This is an interactive tutorial which the user can modify the input parameters. For full documentation of this code, go to http://docs.mercurydpm.org/
 */
 
 //! [AT_PW:headers]
@@ -232,7 +232,7 @@ int main(int argc, char* argv[])
 {
     //Helper
     logger(INFO,
-           "Write in the terminal after the compilation'./protectiveWall -Np 500 -r 0.01 -h 0.1 -w 0.25 -l 1.0 -s 15.0 -t "
+           "Write in the terminal after the compilation'./ProtectiveWall -Np 500 -r 0.01 -h 0.1 -w 0.25 -l 1.0 -s 15.0 -t "
            "20.0' to run the program");
     
     //! [AT_PW:setUp]

@@ -26,7 +26,7 @@ The basic steps to create a simple Mercury program are:
 
 \subsection Headers 0.0 Define headers
 Here the user includes the headers to use in the simulations. The first header calls <Mercury3D.h> is the base one.
-Furthermore, this pinpong tutorial must have walls and the type of model (species) to be used.
+Furthermore, this PingPong tutorial must have walls and the type of model (species) to be used.
 
 \code{.sh}
 #include <Mercury3D.h>

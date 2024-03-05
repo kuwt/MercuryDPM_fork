@@ -171,11 +171,11 @@ The data file must have one of the following formats
                 colorcoding - together with -cmode only
 -cpower #  modify the -cmode color by the power #/100
 
--cmax  set the largest value occuring to the maximum color
+-cmax  set the largest value occurring to the maximum color
        attention: the meaning of colors changes from frame
        to frame with this option.
 -cmaxset # set the max-value directly
--cmean set the largest value occuring to 4xmean value color
+-cmean set the largest value occurring to 4xmean value color
        attention: the meaning of colors changes from frame
        to frame with this option.
 -coffset # set the min value offset (#=1000000 => offset=1)
@@ -276,10 +276,10 @@ default: particle color marks kinetic energy
 ### Velocity vectors
 
 \verbatim
--vvec       draws only the vetors of velocity
+-vvec       draws only the vectors of velocity
 -v0         draws NOT the vectors of velocity
 -w0         draws NOT the angles and angular velocities
--nodel      doesnot delete the buffer between frames
+-nodel      does not delete the buffer between frames
 
 -vscale #   scale the vectors (length = radius is the default)
             try for example # = 10

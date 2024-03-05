@@ -73,10 +73,11 @@ public:
 };
 //! [T7:class]
 
+//! [T7:main]
 int main(int argc, char* argv[])
 {
     // Problem setup
-    Tutorial7 problem; // instantiate an object of class Tutorial 6
+    Tutorial7 problem; // instantiate an object of class Tutorial 5
     
     problem.setName("Tutorial7");
     problem.setSystemDimensions(2);
@@ -112,3 +113,4 @@ int main(int argc, char* argv[])
     
     return 0;
 }
+//! [T7:main]
