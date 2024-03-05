@@ -3,7 +3,6 @@ import os
 
 import pandas as pd
 import numpy as np
-from DotDict import DotDict
 
 # loadstatistics (version 1.0) by Thomas Weinhart and conversion to Python by Timo Plath
 #
@@ -31,8 +30,6 @@ def load_statistics(filenames,opt=None):
             data = load_file(filenames,opt)
         else:
             data = load_statistics(glob.glob(filenames),opt)
-    # Transform to a DotDict dictionary to be able to easily access the dictionary by dot.notation
-    data = DotDict(data)
     return data
 
 def load_file(filename,opt):
