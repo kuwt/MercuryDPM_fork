@@ -1122,6 +1122,51 @@ void PSD::scaleParticleSize(double scale)
     }
 }
 
+double PSD::scaleParticleSizeAuto(int numberOfParticles, double targetVolume, bool allowScaleDown)
+{
+    // Calculate the mean particle volume, using the Mean Value Theorem for Integrals. I.e. the mean particle volume
+    // over an infinite number of particles.
+    double meanParticleVolume = 0.0;
+    for (auto it = particleSizeDistribution_.begin(); it < particleSizeDistribution_.end() - 1; it++)
+    {
+        double radiusLeft = it->internalVariable;
+        double radiusRight = (it+1)->internalVariable;
+        double probabilityLeft = it->probability;
+        double probabilityRight = (it+1)->probability;
+
+        // The CDF is assumed piecewise linear, so the radius is linearly interpolated.
+        // Integrate the volume from radius left to right, i.e. integral of 4/3 pi r^3 gives 1/3 pi (r_r^4 - r_l^4).
+        double volumeIntegral = (std::pow(radiusRight, 4) - std::pow(radiusLeft, 4)) * constants::pi / 3.0;
+        // Calculate the mean volume that represents this bin.
+        double meanVolume = volumeIntegral / (radiusRight - radiusLeft);
+        // Calculate the volume that this bin accounts for, and add to total.
+        meanParticleVolume += meanVolume * (probabilityRight - probabilityLeft);
+    }
+
+    // The volume that the number of particles currently fills, and the scale factor to make it match the target volume.
+    double totalParticleVolume = numberOfParticles * meanParticleVolume;
+    double scale = std::cbrt(targetVolume / totalParticleVolume);
+
+    // The number of (unscaled) particles needed to fill the target volume.
+    unsigned long long numberOfParticlesExpected = std::pow(scale, 3) * numberOfParticles;
+    logger(INFO, "Rescaling the particle size based on number of particles %, and target volume %.", numberOfParticles, targetVolume);
+    logger(INFO, "Expected number of particles %, scale factor %.", numberOfParticlesExpected, scale);
+
+    // Always scale up, only scale down when requested.
+    if (scale > 1.0 || allowScaleDown)
+    {
+        scaleParticleSize(scale);
+        logger(INFO, "Rescaling applied.");
+    }
+    else
+    {
+        logger(INFO, "Rescaling not applied, since scale factor is less than or equal to 1.");
+        scale = 1.0; // Reassign so that the returned value is correct.
+    }
+
+    return scale;
+}
+
 /*!
  * \details Gets the number of particles already inserted into the simulation by summing up the particles inserted in
  * each class.

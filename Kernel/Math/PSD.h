@@ -249,6 +249,15 @@ public:
     void scaleParticleSize(double scale);
 
     /*!
+     * \brief Scales all particle sizes, such that the total volume of N particles approximately equals the target volume.
+     * @param numberOfParticles The number of particles N.
+     * @param targetVolume The volume to match.
+     * @param allowScaleDown Whether or not to scale down the particle sizes when the scale factor is smaller than 1.
+     * @return The scale factor used.
+     */
+    double scaleParticleSizeAuto(int numberOfParticles, double targetVolume, bool allowScaleDown = false);
+
+    /*!
      * \brief Get the number of particles already inserted into the simulation.
      */
     int getInsertedParticleNumber() const;
