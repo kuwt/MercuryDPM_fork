@@ -207,8 +207,6 @@ constructor();
 */
 void DPMBase::constructor()
 {
-    // sofStop function
-    setSoftStop();
     //constructor();
     dataFile.getFstream().precision(10);
     fStatFile.getFstream().precision(10);
@@ -1987,7 +1985,7 @@ void DPMBase::printTime() const
  */
 bool DPMBase::continueSolve() const
 {
-    return continueFlag_ != 0;
+    return true;
 }
 
 /*!
@@ -4279,11 +4277,12 @@ void DPMBase::initialiseSolve() {
 void DPMBase::solve()
 {
     initialiseSolve();
+    setSoftStop();
 
     // Can be used to measure simulation time
     clock_.tic();
     // This is the main loop over advancing time
-    while (getTime() < getTimeMax() && continueSolve())
+    while (getTime() < getTimeMax() && continueSolve() && continueFlag_)
     {
         computeOneTimeStep();
     }
@@ -5149,23 +5148,26 @@ void DPMBase::performGhostVelocityUpdate()
 /*!
 * \brief signal handler function.
 */
-void DPMBase::signalHandler(int signal) {
-    switch (signal) {
+void DPMBase::signalHandler(int signal)
+{
+    switch (signal)
+    {
         case SIGINT:
-            logger(INFO, "SIGINT has been captured!\nMercuryDPM is writing the files, then it will stop!");
-            // continue Flag must be set to false here!
+            if (!continueFlag_)
+            {
+                logger(INFO, "SIGINT has been captured for the second time!\nMercuryDPM will forcefully exit!");
+                std::exit(SIGINT);
+            }
+
+            logger(INFO, "SIGINT has been captured!\nMercuryDPM will finish the current time step, then it will stop!\nHit Ctrl+C again to forcefully exit.");
             continueFlag_ = false;
-            //exit(SIGTERM); // this will interrupt the simulation
             return;
+
         case SIGTERM:
-            logger(INFO, "\nSIGTERM has been captured!\nMercuryDPM is writing the files, then it will stop!");
-            // continue Flag must be set to false here!
+            logger(INFO, "\nSIGTERM has been captured!\nMercuryDPM will finish the current time step, then it will stop!");
             continueFlag_ = false;
             return;
-        case SIGKILL:
-            logger(INFO, "\nSIGKILL has been captured!\nMercuryDPM is writing the files, then it will stop!");
-            continueFlag_ = false;
-            return;
+
         default:
             logger(INFO, "No Signal to Capture!");
     }
@@ -5175,8 +5177,14 @@ void DPMBase::signalHandler(int signal) {
 /*!
 * \brief function for setting sigaction constructor.
 */
-void DPMBase::setSoftStop() {
-    logger(INFO,"Initiated soft stop");
+void DPMBase::setSoftStop()
+{
+    if (disableSoftStop_)
+    {
+        logger(INFO, "Soft stop disabled.");
+        return;
+    }
+
     struct sigaction act{};
     memset(&act, 0, sizeof(act));
 
@@ -5184,7 +5192,8 @@ void DPMBase::setSoftStop() {
 
     sigaction(SIGINT, &act, nullptr);
     sigaction(SIGTERM, &act, nullptr);
-    sigaction(SIGKILL, &act, nullptr);
+
+    logger(VERBOSE, "Soft stop enabled.");
 }
 
 /*!
