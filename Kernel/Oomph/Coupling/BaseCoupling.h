@@ -142,6 +142,8 @@ public:
     {
         O::actionsBeforeOomphTimeStep();
         this->unsteady_newton_solve(this->time_pt()->dt());
+        // the coupled codes seem to not work if newton_solve is used
+        //this->newton_solve(this->time_pt()->dt());
     }
     
     /**
