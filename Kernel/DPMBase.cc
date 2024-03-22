@@ -1968,7 +1968,10 @@ void DPMBase::printTime() const
 #ifdef MERCURYDPM_USE_MPI
     MPIContainer& communicator = MPIContainer::Instance();
     if (communicator.getProcessorID() != 0)
-      return;
+    {
+        return;
+    }
+
 #endif
   logger(INFO, "t=%3.6, tmax=%3.6", getTime(), getTimeMax());
 }
