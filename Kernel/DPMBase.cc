@@ -1967,13 +1967,10 @@ void DPMBase::printTime() const
 {
 #ifdef MERCURYDPM_USE_MPI
     MPIContainer& communicator = MPIContainer::Instance();
-    if (communicator.getProcessorID() == 0)
-    {
+    if (communicator.getProcessorID() != 0)
+      return;
 #endif
-    logger(INFO, "t=%3.6, tmax=%3.6", getTime(), getTimeMax());
-#ifdef MERCURYDPM_USE_MPI
-    }
-#endif
+  logger(INFO, "t=%3.6, tmax=%3.6", getTime(), getTimeMax());
 }
 
 /*!
@@ -2013,7 +2010,7 @@ void DPMBase::writeEneHeader(std::ostream& os) const
     if (getAppend())
         return;
 
-    /// \todo JMFT: Get rid of aligned columns. They make things too wide. (changed back) 
+    /// \todo JMFT: Get rid of aligned columns. They make things too wide. (changed back)
     /// \todo {Why is there a +6 here? TW: to get the numbers and title aligned}
     /// \todo Add number of particles to this file (change from Jonny to be added later)
     long width = os.precision() + 6;
@@ -2737,7 +2734,7 @@ bool DPMBase::readNextDataFile(unsigned int format)
         positionHistory[i] = p->getPosition();
         //store from reading the restart file which particles are fixed and which species each particle has
     }
-    
+
     BaseParticle* p;
     if (particleHandler.getSize() == 0) {
         logger.assert_always(speciesHandler.getSize()>0,"readData: species needs to be set first");
@@ -3407,7 +3404,7 @@ void DPMBase::computeAllForces()
         }
     }
     logger(DEBUG,"All forces set to zero");
-    
+
     // for omp simulations, reset the newObjects_ variable (used for reduction)
     interactionHandler.resetNewObjectsOMP();
 
@@ -3491,7 +3488,7 @@ void DPMBase::computeAllForces()
         Curr=Curr->getNext();
     }
 #endif
-    
+
     // Check wall forces
     #pragma omp for schedule(dynamic)
     for (int k = 0; k < wallHandler.getNumberOfObjects(); k++) {
@@ -3519,7 +3516,7 @@ void DPMBase::computeAllForces()
         } //end reset forces loop
     }
     #endif
-    
+
     //end outer loop over contacts.
 }
 
