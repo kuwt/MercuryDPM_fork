@@ -4458,6 +4458,7 @@ void DPMBase::removeOldFiles() const
         {
             if (k<3) logger(INFO,"  File % successfully deleted",filename.str());
             filename.clear();
+            filename.str("");
             filename << getName() << j << '.' << ++k;
         }
         // remove files with given extension for FileType::MULTIPLE_FILES_PADDED
@@ -4468,6 +4469,7 @@ void DPMBase::removeOldFiles() const
         {
             if (k<3) logger(INFO,"  File % successfully deleted",filename.str());
             filename.clear();
+            filename.str("");
             filename << getName() << j << '.' << to_string_padded(++k);
         }
     }
