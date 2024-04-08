@@ -1134,11 +1134,20 @@ double PSD::scaleParticleSizeAuto(int numberOfParticles, double targetVolume, bo
         double probabilityLeft = it->probability;
         double probabilityRight = (it+1)->probability;
 
-        // The CDF is assumed piecewise linear, so the radius is linearly interpolated.
-        // Integrate the volume from radius left to right, i.e. integral of 4/3 pi r^3 gives 1/3 pi (r_r^4 - r_l^4).
-        double volumeIntegral = (std::pow(radiusRight, 4) - std::pow(radiusLeft, 4)) * constants::pi / 3.0;
-        // Calculate the mean volume that represents this bin.
-        double meanVolume = volumeIntegral / (radiusRight - radiusLeft);
+        double meanVolume;
+        if (radiusLeft != radiusRight)
+        {
+            // The CDF is assumed piecewise linear, so the radius is linearly interpolated.
+            // Integrate the volume from radius left to right, i.e. integral of 4/3 pi r^3 gives 1/3 pi (r_r^4 - r_l^4).
+            double volumeIntegral = (std::pow(radiusRight, 4) - std::pow(radiusLeft, 4)) * constants::pi / 3.0;
+            // Calculate the mean volume that represents this bin.
+            meanVolume = volumeIntegral / (radiusRight - radiusLeft);
+        }
+        else
+        {
+            meanVolume = std::pow(radiusLeft, 3) * constants::pi * 4.0 / 3.0;
+        }
+
         // Calculate the volume that this bin accounts for, and add to total.
         meanParticleVolume += meanVolume * (probabilityRight - probabilityLeft);
     }
