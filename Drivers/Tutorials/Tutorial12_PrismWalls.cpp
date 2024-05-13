@@ -125,6 +125,7 @@ int main(int argc, char* argv[])
     problem.setGravity(Vec3D(0.0, 0.0, 0.0));
     problem.setXMax(0.5);
     problem.setYMax(0.5);
+    problem.setZMax(0.1);
     problem.setTimeMax(5.0);
 
     //! [T12:speciesProp]
@@ -145,14 +146,15 @@ int main(int argc, char* argv[])
     problem.eneFile.setFileType(FileType::NO_FILE);
     
     problem.setXBallsAdditionalArguments("-solidf -v0 -s .85");
-    
+    problem.wallHandler.setWriteVTK(true);
+    problem.setParticlesWriteVTK(true);
     problem.setTimeStep(.005 / 50.0); // (collision time)/50.0
     //! [T12: constructor]
-    
+
     //! [T12: Solve Problem]
     problem.solve(argc, argv);
     //! [T12: Solve Problem]
-    
+
     return 0;
 }
 //! [T12:main]

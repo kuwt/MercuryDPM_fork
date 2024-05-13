@@ -141,7 +141,7 @@ public:
     //Initially, a wall is inserted in the neck of the hourglass to prevent particles flowing through.
     //This wall is moved to form the base of the hourglass at time 0.9
     void actionsAfterTimeStep() override {
-        if (getTime() < 0.9 && getTime() + getTimeStep() > 0.9)
+        if (getTime() < 0.9 && getTime() + getTimeStep() > 0.9)  //elegant way to pinpoint the time 0.9
         {
             logger(INFO, "Shifting bottom wall downward");
             dynamic_cast<InfiniteWall*>(wallHandler.getLastObject())->set(Vec3D(0, 0, -1), Vec3D(0, 0, getZMin()));

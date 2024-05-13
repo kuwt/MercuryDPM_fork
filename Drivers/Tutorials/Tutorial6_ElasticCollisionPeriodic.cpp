@@ -99,7 +99,8 @@ int main(int argc, char* argv[])
     problem.eneFile.setFileType(FileType::NO_FILE);
     
     problem.setXBallsAdditionalArguments("-solidf -v0 -s .85");
-    
+        problem.wallHandler.setWriteVTK(FileType::ONE_FILE);
+    problem.setParticlesWriteVTK(true);
     problem.setTimeStep(0.005 / 50.0);// (collision time)/50.0
     problem.solve(argc, argv);
     
