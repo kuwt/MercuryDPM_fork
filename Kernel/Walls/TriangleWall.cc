@@ -228,6 +228,7 @@ void TriangleWall::updateVertexAndNormal()
     
     edge_ = {vertex_[1] - vertex_[0], vertex_[2] - vertex_[1], vertex_[0] - vertex_[2]};
     faceNormal_ = Vec3D::cross(edge_[0], edge_[1]);
+    logger.assert_debug(!faceNormal_.isZero(),"Cannon span triangle at (%), (%), (%)", vertex_[0], vertex_[1], vertex_[2]);
     faceNormal_.normalise();
     
     for (int i = 0; i < 3; i++)

@@ -424,7 +424,12 @@ public:
      * \brief Returns the square of the radial cylindrical coordinate, r=sqrt(x^2+y^2).
      */
     Mdouble getRadialCoordinate() const;
-    
+
+    /*!
+     * \brief Returns the representation of this Vec3D in spherical coordinates
+     */
+    Vec3D getSphericalCoordinates() const;
+
     /*!
      * \brief Returns the representation of this Vec3D in cylindrical coordinates
      */

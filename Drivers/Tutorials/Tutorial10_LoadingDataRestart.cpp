@@ -24,12 +24,27 @@
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Tutorial 10: This tutorial shows how to load restart and data files
+/*
+** This file is annotated with DoxyFile comments in order to show the code on
+** the documentation - This is not needed for your real drivers.
+** Please ignore these comments.
+**
+** For full documentation of this code, go to http://docs.mercurydpm.org/Alpha/d0/db0/BeginnerTutorials.html#T10
+*/
 
-#include <Mercury3D.h>
+//! [T10:headers]
+#include "Mercury3D.h"
 #include <Math/Helpers.h>
+#include "Walls/IntersectionOfWalls.h"
+#include "Walls/AxisymmetricIntersectionOfWalls.h"
+#include "Species/LinearViscoelasticSpecies.h"
+//! [T10:headers]
 
+
+//! [T10:main]
 int main(int argc, char* argv[])
 {
+
     //writeToFile is used here to create a restart and a data file, which will be loaded below.
     helpers::writeToFile("Tutorial10.ini.restart",
         "restart_version 1.0 name Tutorial10\n"
@@ -55,6 +70,7 @@ int main(int argc, char* argv[])
         "1 1 1.5  0 0 0  0.5  0 0 0  0 0 0  0\n"
     );
 
+
     DPMBase Tutorial10;
     //use readRestartFile to load information from a restart file
     Tutorial10.readRestartFile("Tutorial10.ini.restart");
@@ -67,4 +83,4 @@ int main(int argc, char* argv[])
 
     return 0;
 }
-
+//! [T10:main]

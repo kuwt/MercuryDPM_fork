@@ -2,6 +2,12 @@
 OPTION (MercuryDPM_USE_OpenMP "Use OpenMP" OFF)
 
 IF(MercuryDPM_USE_OpenMP)
+    # Note: I tried to make OMP work on a mac using clang using the sources below, but I was unsuccessful.
+    # - https://stackoverflow.com/questions/46414660/macos-cmake-and-openmp
+    # - https://stackoverflow.com/questions/60005176/how-to-deal-with-clang-error-unsupported-option-fopenmp-on-travis
+    # It works, however, with the gcc compiler. I used the following flags:
+    # -DCMAKE_CXX_COMPILER=/opt/homebrew/Cellar/gcc/13.2.0/bin/g++-13 -DCMAKE_C_COMPILER=/opt/homebrew/Cellar/gcc/13.2.0/bin/gcc-13 -DMercuryDPM_USE_OpenMP=ON
+
     # Tries to find OpenMP; but does not require it.
     find_package(OpenMP)
     # Adds a precompiler flag, so you can use #ifdef MERCURYDPM_USE_OMP
@@ -18,4 +24,10 @@ IF(MercuryDPM_USE_OpenMP)
     ENDIF()
     # Set compiler flags
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    # display a warning and Disable MercuryDPM_TRIANGEL_WALL_CORRECTION and remove the definition for OpenMP as it is not working correctly
+    IF(MercuryDPM_TRIANGLE_WALL_CORRECTION)
+        message(WARNING "MercuryDPM_TRIANGLE_WALL_CORRECTION is disabled for OpenMP as it is not working correctly")
+        set(MercuryDPM_TRIANGLE_WALL_CORRECTION OFF)
+        remove_definitions( -DMERCURYDPM_TRIANGLE_WALL_CORRECTION )
+    ENDIF()
 ENDIF()

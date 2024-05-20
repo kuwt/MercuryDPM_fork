@@ -141,6 +141,29 @@ public:
         M::finaliseSolve();
     }
 
+    /**
+     * Solves an unsteady problem, returns successful if timeMaxMin has been reached
+     */
+    void solveSurfaceCouplingForgiving(unsigned nStep, double timeMaxMin=-constants::inf) {
+        // solve
+        try {
+            solveSurfaceCoupling(nStep);
+        } catch(OomphLibError& error)  {
+            //Store output if newton solver fails
+            O::saveSolidMesh();
+            M::finaliseSolve();
+            double time = O::time_stepper_pt()->time() - nStep * M::getTimeStep();;
+            double timeMax = M::getTimeMax();;
+            if (time >= timeMaxMin) {
+                // take it as successful if a fraction of the time evolution has finished
+                logger(INFO,"Newton solver failed at t=% (tMax=%), but code will continue.", time, timeMax);
+                exit(0);
+            } else {
+                logger(ERROR,"Newton solver failed at t=% (tMax=%).", time, timeMax);
+            }
+        }
+    }
+
     // solve OomphMercuryProblem, but with fixed solid
     void solveSurfaceCouplingFixedSolid()
     {
@@ -174,7 +197,7 @@ public:
         unsigned nDone = 0; //< last written file number
         while (M::getTime() < M::getTimeMax())
         {
-            O::actionsBeforeOomphTimeStep();
+            this->actionsBeforeOomphTimeStep();
             M::computeOneTimeStep();
             //if (getParticlesWriteVTK() && getVtkWriter()->getFileCounter() > nDone) {
             //    writeToVTK();
@@ -243,7 +266,9 @@ public:
         auto t1 = std::chrono::system_clock::now();
         BaseCoupling<M,O>::solveMercury(nStepsMercury);
         auto t2 = std::chrono::system_clock::now();
-        updateTractionOnFiniteElems();
+        if (solidFeelsParticles_) {
+            updateTractionOnFiniteElems();
+        }
         auto t3 = std::chrono::system_clock::now();
         BaseCoupling<M,O>::solveOomph();
         auto t4 = std::chrono::system_clock::now();
@@ -366,6 +391,7 @@ public:
                 // assign nodal coupling force to the element to be used by element::fill_in_contribution_to_residuals(...)
                 sCoupledElement.bulk_elem_pt->set_nodal_coupling_residual(elemIsCoupled, nodalCouplingForces);
             }
+            logger(VERBOSE, "Update nodal_coupling_residual");
         }
         else
         {
@@ -692,7 +718,15 @@ public:
     void disableLogSurfaceCoupling() {
         logSurfaceCoupling = false;
     }
-    
+
+    void setSolidFeelsParticles(bool val) {
+        solidFeelsParticles_ = val;
+    }
+
+    bool getSolidFeelsParticles() const {
+        return solidFeelsParticles_;
+    }
+
 private:
     
     /// List of surface-coupled elements
@@ -706,8 +740,13 @@ private:
      * Needs to be set before solveSurfaceCoupling is called.
      */
     std::vector<unsigned> coupledBoundaries_;
-    
+
     bool logSurfaceCoupling = true;
+
+    /**
+     * Set false for one-way coupling (solid does not feel particles), true for two-way coupling
+     */
+    bool solidFeelsParticles_ = true;
 };
 
 #endif //SURFACE_COUPLING_H

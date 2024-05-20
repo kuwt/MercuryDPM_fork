@@ -1,4 +1,4 @@
-MercuryDPM 1.0 name roughBottomMultiLayer revision 7622ee90 repository https://bitbucket.org/mercurydpm/mercurydpm.git
+MercuryDPM 1.0 name roughBottomMultiLayer revision daca7dfd repository https://bitbucket.org/mercurydpm/mercurydpm.git
 dataFile    fileType ONE_FILE saveCount 50 counter 21 lastSavedTimeStep 1000
 fStatFile   fileType ONE_FILE saveCount 50 counter 21 lastSavedTimeStep 1000
 eneFile     fileType ONE_FILE saveCount 50 counter 21 lastSavedTimeStep 1000
@@ -30,8 +30,8 @@ BaseParticle id 9 indSpecies 0 position 1.61848662047299 2.88629429564861 -0.339
 BaseParticle id 10 indSpecies 0 position 2.66161774715774 1.43886789794525 -0.976938796262855 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.5 invMass 0 timeStamp 0
 BaseParticle id 11 indSpecies 0 position 0.616125683837588 1.2879578884885 -0.72214479753162 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.5 invMass 0 timeStamp 0
 BaseParticle id 12 indSpecies 0 position 1.26493135749793 0.833674009497942 -0.0825490383730019 orientation 1 0 0 0 velocity 0 0 0 angularVelocity 0 0 0 force 0 0 0 torque 0 0 0 radius 0.5 invMass 0 timeStamp 0
-BaseParticle id 13 indSpecies 0 position 0.51197947183707 0.860178774818612 0.766383657227449 orientation 1 0 0 0 velocity 0.140531306482506 0 -0.0910348048540821 angularVelocity 0 0 0 force 0.4067366430758 0 -0.913545457642601 torque 0 0 0 radius 0.5 invMass 1 timeStamp 3
-BaseParticle id 14 indSpecies 0 position 0.511323467102825 2.17887910578504 0.913558796014269 orientation 1 0 0 0 velocity 0.138619644260049 0 -0.0867411412031621 angularVelocity 0 0 0 force 0.4067366430758 0 -0.913545457642601 torque 0 0 0 radius 0.5 invMass 1 timeStamp 50
+BaseParticle id 13 indSpecies 0 position 0.51197947183707 0.725099923810829 0.998000446889154 orientation 1 0 0 0 velocity 0.140531306482506 0 -0.0910348048540821 angularVelocity 0 0 0 force 0.4067366430758 0 -0.913545457642601 torque 0 0 0 radius 0.5 invMass 1 timeStamp 3
+BaseParticle id 14 indSpecies 0 position 0.51197947183707 1.78721448193564 0.967036536479871 orientation 1 0 0 0 velocity 0.140531306482506 0 -0.0910348048540821 angularVelocity 0 0 0 force 0.4067366430758 0 -0.913545457642601 torque 0 0 0 radius 0.5 invMass 1 timeStamp 3
 Interactions 0
 hGrid method TOPDOWN distribution EXPONENTIAL cellOverSizeRatio 1 numberOfBuckets 130 cellSizes 1 gridNeedsUpdate 0 updateEachTimeStep 1 currentMaxRelativeDisplacement 0 totalCurrentMaxRelativeDisplacement 0
 FixedParticleRadius 0.5 MinInflowParticleRadius 0.5 MaxInflowParticleRadius 0.5 RoughBottomType 2 ChuteAngle 0.418879020478639 MaxFailed 1 NumCreated 2 InflowVelocity 0.1 InflowVelocityVariance 0 InflowHeight 0.02

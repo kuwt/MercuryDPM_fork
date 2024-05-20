@@ -25,6 +25,7 @@
 
 #include "Vector.h"
 #include "SmallVector.h"
+#include "ExtendedMath.h"
 
 /*!
  * \details Alternative constructor, that constructs a Vec3D from a SmallVector size 3
@@ -242,6 +243,45 @@ Mdouble Vec3D::getRadialCoordinateSquared() const
 Mdouble Vec3D::getRadialCoordinate() const
 {
     return std::sqrt(X * X + Y * Y);
+}
+
+/*!
+ * \details Transforms the (Cartesian) vector to spherical coordinates
+ * \return              Transformed vector
+ */
+Vec3D Vec3D::getSphericalCoordinates() const
+{
+    Vec3D sphericalCoord;
+
+    // Calculate radial distance
+    sphericalCoord.X = std::sqrt(X * X + Y * Y + Z * Z);
+
+    // Calculate azimuthal angle (theta)
+    sphericalCoord.Y = std::acos(Z / sphericalCoord.X);
+
+    // Calculate polar angle (phi)
+    if (X == 0.0)
+    {
+        if (Y >= 0.0)
+        {
+            sphericalCoord.Z = constants::pi / 2.0;
+        }
+        else
+        {
+            sphericalCoord.Z = -constants::pi / 2.0;
+        }
+    }
+    else
+    {
+        sphericalCoord.Z = std::atan2(Y, X);
+        // Adjust the range to [0, 2*pi)
+        if (sphericalCoord.Z < 0.0)
+        {
+            sphericalCoord.Z += 2.0 * constants::pi;
+        }
+    }
+
+    return sphericalCoord;
 }
 
 /*!

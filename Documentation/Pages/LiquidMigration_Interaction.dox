@@ -20,7 +20,7 @@ f_{ij}^{nc} = \frac{2\pi r_c \Gamma cos \theta}{ 1 + 1.05s \sqrt{r_c/V} + 2.5s^2
 \f$
 
 where \f$ V \f$ is the bridge volume, \f$ r_c\f$ the average radius of curvature of the spheres, ,
-\f$ \Gamma\f$ the surface tnesion of the liquid air interface and \f$ s\f$ the separation, \f$ \theta\f$
+\f$ \Gamma\f$ the surface tension of the liquid air interface and \f$ s\f$ the separation, \f$ \theta\f$
  is the contact angle.
 
 Header:

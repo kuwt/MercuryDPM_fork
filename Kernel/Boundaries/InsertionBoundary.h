@@ -109,6 +109,22 @@ public:
     virtual void placeParticle(BaseParticle* p, RNG& random) = 0;
 
     /*!
+     * \brief virtual function that shifts the boundary.
+     * \param[in] shift The amount by which the boundary should be shifted.
+     * \details This should be implemented by the children such as
+     * CylinderInsertionBoundary, as the implementation will be geometry-dependent.
+     */
+    virtual void shiftBoundary(Vec3D shift);
+
+    /*!
+     * \brief virtual function that rotates the boundary.
+     * \param[in] angle The angles by which the boundary should be rotated.
+     * \details This should be implemented by the children such as
+     * CylinderInsertionBoundary, as the implementation will be geometry-dependent.
+     */
+    virtual void rotateBoundary(Vec3D angle);
+
+    /*!
      * \brief Fills the boundary with particles.
      */
     void checkBoundaryBeforeTimeStep(DPMBase* md) override;
@@ -348,6 +364,10 @@ protected:
      */
     int chosenSpecies_;
 
+    /*!
+     * \brief pointer to the next particle that should be inserted (needs to be stored across time steps).
+     */
+    BaseParticle* p0= nullptr;
 };
 
 #endif

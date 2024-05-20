@@ -33,14 +33,18 @@
 ** For full documentation of this code, go to http://docs.mercurydpm.org/Alpha/d0/db0/BeginnerTutorials.html#T4
 */
 
+//! [T4:headers]
 #include <Species/LinearViscoelasticSpecies.h>
 #include <Mercury3D.h>
 #include <Walls/InfiniteWall.h>
+//! [T4:headers]
 
+//! [T4:class]
 class Tutorial4 : public Mercury3D
 {
 public:
     
+    //! [T4:initialConditions]
     void setupInitialConditions() override {
         SphericalParticle p0;
         p0.setSpecies(speciesHandler.getObject(0));
@@ -54,9 +58,12 @@ public:
         w0.set(Vec3D(0.0, 0.0, -1.0), Vec3D(0.0, 0.0, getZMin()));
         wallHandler.copyAndAddObject(w0);
     }
-    
-};
+    //! [T4:initialConditions]
 
+};
+//! [T4:class]
+
+//! [T4:main]
 int main(int argc, char* argv[])
 {
     
@@ -64,7 +71,6 @@ int main(int argc, char* argv[])
     Tutorial4 problem;
     
     problem.setName("Tutorial4");
-    problem.setSystemDimensions(3);
     problem.setGravity(Vec3D(0.0, 0.0, -9.81));
     problem.setXMax(1.0);
     problem.setYMax(1.0);
@@ -73,7 +79,7 @@ int main(int argc, char* argv[])
 
     //! [T4:speciesProp]
     // The normal spring stiffness and normal dissipation is computed and set as
-    // For collision time tc=0.005 and restitution coefficeint rc=0.88,
+    // For collision time tc=0.005 and restitution coefficient rc=0.88,
     LinearViscoelasticSpecies species;
     species.setDensity(2500.0); //sets the species type_0 density
     species.setStiffness(258.5);//sets the spring stiffness.
@@ -82,15 +88,16 @@ int main(int argc, char* argv[])
     //! [T4:speciesProp]
     
     problem.setSaveCount(10);
-    problem.dataFile.setFileType(FileType::ONE_FILE);
-    problem.restartFile.setFileType(FileType::ONE_FILE);
+    problem.setFileType(FileType::ONE_FILE);
     problem.fStatFile.setFileType(FileType::NO_FILE);
-    problem.eneFile.setFileType(FileType::NO_FILE);
-    
-    problem.setXBallsAdditionalArguments("-solidf -v0");
-    
+
+    //![T4: time]
+    //time integration parameters
     problem.setTimeStep(0.005 / 50.0); // (collision time)/50.0
+    //![T4: time]
+	//![T4: solve]
     problem.solve(argc, argv);
-    
+    //![T4: solve]
     return 0;
 }
+//! [T4:main]

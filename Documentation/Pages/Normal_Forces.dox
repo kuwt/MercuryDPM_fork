@@ -15,7 +15,7 @@ dissipation that occurs during the real collision.
 <table>
 <tr><th> ::computeNormalForce
 <tr><td>1. Set the relative velocity <td> \ref relativeVelocity_
-<tr><td>2. Set the normal relative velocity <td> \ref setNormalRelativeVelocity_
+<tr><td>2. Set the normal relative velocity <td> \ref NormalRelativeVelocity_
 <tr><td>3. If overlap \f$ \delta^n > 0 \f$  <td> if (getOverlap() > 0)
 <tr><td>4. Normal force <td> normalForce = getStiffness()* getOverlap() - getDissipation()* getNormalRelativeVelocity()
 <tr><td>5. Set normal force <td> setAbsoluteNormalForce(std::abs(normalForce))

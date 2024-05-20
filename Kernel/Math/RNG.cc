@@ -148,7 +148,7 @@ Mdouble RNG::getRandomNumber()
 
 Mdouble RNG::getRandomNumber(Mdouble min, Mdouble max)
 {
-    logger.assert_debug(min <= max, "getRandomNumber: min cannot be larger than max");
+    logger.assert_debug(min <= max, "getRandomNumber: min % cannot be larger than max %", min, max);
     if (type_ == RNGType::LINEAR_CONGRUENTIAL_GENERATOR) {
         return getRandomNumberFromLinearCongruentialGenerator(min, max);
     } else {

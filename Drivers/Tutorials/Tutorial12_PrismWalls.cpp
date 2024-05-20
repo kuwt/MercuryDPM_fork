@@ -34,10 +34,10 @@
 */
 
 //! [T12:headers]
-#include <Species/LinearViscoelasticSpecies.h>
 #include <Mercury3D.h>
 #include <Walls/InfiniteWall.h>
 #include <Walls/IntersectionOfWalls.h>
+#include <Species/LinearViscoelasticSpecies.h>
 //! [T12:headers]
 
 //! [T12:class]
@@ -113,6 +113,7 @@ public:
 };
 //! [T12:class]
 
+//! [T12:main]
 int main(int argc, char* argv[])
 {
     //! [T12: constructor]
@@ -120,15 +121,15 @@ int main(int argc, char* argv[])
     Tutorial12 problem; // instantiate an object of class Tutorial 12
     
     problem.setName("Tutorial12");
-    problem.setSystemDimensions(2);
     problem.setGravity(Vec3D(0.0, 0.0, 0.0));
     problem.setXMax(0.5);
     problem.setYMax(0.5);
+    problem.setZMax(0.1);
     problem.setTimeMax(5.0);
 
     //! [T12:speciesProp]
     // The normal spring stiffness and normal dissipation is computed and set as
-    // For collision time tc=0.005 and restitution coefficeint rc=1.0,
+    // For collision time tc=0.005 and restitution coefficient rc=1.0,
     LinearViscoelasticSpecies species;
     species.setDensity(2500.0); //sets the species type_0 density
     species.setStiffness(258.5);//sets the spring stiffness.
@@ -142,9 +143,9 @@ int main(int argc, char* argv[])
     problem.restartFile.setFileType(FileType::ONE_FILE);
     problem.fStatFile.setFileType(FileType::NO_FILE);
     problem.eneFile.setFileType(FileType::NO_FILE);
-    
-    problem.setXBallsAdditionalArguments("-solidf -v0 -s .85");
-    
+    problem.setParticlesWriteVTK(true);
+    problem.wallHandler.setWriteVTK(FileType::ONE_FILE);
+
     problem.setTimeStep(.005 / 50.0); // (collision time)/50.0
     //! [T12: constructor]
     
@@ -154,3 +155,4 @@ int main(int argc, char* argv[])
     
     return 0;
 }
+//! [T12:main]

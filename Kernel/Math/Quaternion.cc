@@ -23,6 +23,7 @@
 //(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Math/Quaternion.h"
+#include "ExtendedMath.h"
 
 /*!
  * \details Default constructor
@@ -453,7 +454,6 @@ Vec3D Quaternion::getEuler() const
 {
     Mdouble sinp = 2 * (q0 * q2 - q3 * q1);
     Mdouble pitch;
-    const Mdouble pi = 3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117068;
 
     if ((std::abs(sinp) < 1))
     {
@@ -461,7 +461,7 @@ Vec3D Quaternion::getEuler() const
     }
     else
     {
-        pitch = copysign(pi/2., sinp);
+        pitch = copysign(constants::pi, sinp);
     }
 
     return Vec3D(
@@ -504,7 +504,11 @@ Vec3D Quaternion::getAxis() const
     const Mdouble q11 = q1*q1;
     const Mdouble q22 = q2*q2;
     const Mdouble q33 = q3*q3;
-    return Vec3D(q00 - q33 + q11 - q22, 2.0 * (q1 * q2 + q3 * q0), 2.0 * (q1 * q3 - q2 * q0));
+    const Mdouble q12 = q1*q2;
+    const Mdouble q30 = q3*q0;
+    const Mdouble q13 = q1*q3;
+    const Mdouble q20 = q2*q0;
+    return Vec3D(q00 - q33 + q11 - q22, 2.0 * (q12 + q30), 2.0 * (q13 - q20));
 }
 
 //retrieves the rotation matrix, often called A in literature.
@@ -653,8 +657,16 @@ Vec3D Quaternion::rotateBack(const Vec3D& position) const
      */
 Mdouble Quaternion::getDistance(const Vec3D p, const Vec3D p0) const
 {
-    return (q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3) * (p0.X - p.X) +
-           2.0 * ((q1 * q2 + q0 * q3) * (p0.Y - p.Y) + (q1 * q3 - q0 * q2) * (p0.Z - p.Z));
+    const Mdouble q00 = q0 * q0;
+    const Mdouble q02 = 2 * q0 * q2;
+    const Mdouble q03 = 2 * q0 * q3;
+    const Mdouble q11 = q1 * q1;
+    const Mdouble q12 = 2 * q1 * q2;
+    const Mdouble q13 = 2 * q1 * q3;
+    const Mdouble q22 = q2 * q2;
+    const Mdouble q33 = q3 * q3;
+    return (q00 + q11 - q22 - q33) * (p0.X - p.X) +
+           ((q12 + q03) * (p0.Y - p.Y) + (q13 - q02) * (p0.Z - p.Z));
 }
 
 /**

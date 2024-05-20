@@ -209,7 +209,7 @@ public:
         // output
         removeOldFiles();
         setSaveCount(0.02/getTimeStep());
-        fStatFile.setFileType(FileType::NO_FILE);
+        fStatFile.setFileType(FileType::ONE_FILE);
         restartFile.writeFirstAndLastTimeStep();
         setParticlesWriteVTK(true);
         wallHandler.setWriteVTK(FileType::MULTIPLE_FILES);
@@ -301,25 +301,33 @@ int main() {
     // Set name of output files
     dpm.setName("MarbleRun");
     // Set name of output files
-    dpm.loadSTLFile("KnikkerbaanV12_compleet_without_seasaw.STL");
+    dpm.loadSTLFile("MarbleRunV12_complete_without_seasaw_new.STL"); // KnikkerbaanV12_compleet_without_seasaw_org.STL
     dpm.loadBigSeesaw();
     dpm.loadSmallSeesaw();
     // Set physical particle properties
-    dpm.setParticlePosition(Vec3D(0.6,0.8,0.03));
+    //
+    // example settings for:			Demo	sWood	bWood	bSteel	bounce	bGlas   sGlas   Styrof
+    // dpm.setParticleRadius			0.01	0.07625	0.01027	0.01262	0.01567	0.01262	0.0665	0.01485
+    // dpm.setParticleDensity			1000	568	682	7689	930	2373	2435	22
+    // dpm.setSlidingFrictionCoefficient	0.5	0.35	0.37	0.37	0.58	0.31	0.32	0.60
+    // dpm.setRollingFrictionCoefficient	1e-4	8.39e-3	6.99e-3	4.09e-3	8.46e-3	3.96e-3	3.60e-3	1.46e02
+    // dpm.setRestitutionCoefficient		0.5	0.46	0.42	0.22	0.86	0.28	0.33	0.47
+    //
+    dpm.setParticlePosition(Vec3D(0.6,0.8,0.03)); //(0.6,0.8,0.03)
     //dpm.setParticlePosition(Vec3D(0.24,0.23,0.03)); //position above big seesaw
     //dpm.setParticlePosition(Vec3D(0.52,0.25,0.03)); //position above small seesaw
-    dpm.setParticleRadius(0.01);
+    dpm.setParticleRadius(0.010);
     // Set material particle properties
     dpm.setParticleDensity(1000);
     // Set contact properties
-    dpm.setSlidingFrictionCoefficient(0.5);
-    dpm.setRollingFrictionCoefficient(1e-4);
+    dpm.setSlidingFrictionCoefficient(0.50);
+    dpm.setRollingFrictionCoefficient(1.00e-4);
     dpm.setTorsionFrictionCoefficient(0.0);
-    dpm.setRestitutionCoefficient(0.5);
+    dpm.setRestitutionCoefficient(0.50);
     // set gravity direction
     dpm.setGravity(Vec3D(0,-9.8,0));
     // Set simulation time
-    dpm.setTimeMax(2.5);
+    dpm.setTimeMax(15);
     // start the solver
     dpm.solve();
 }

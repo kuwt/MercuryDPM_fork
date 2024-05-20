@@ -1,5 +1,9 @@
 include(${CMAKE_SOURCE_DIR}/Configuration/MasterMake.cmake)
 
+add_subdirectory(SpreadingLayer)
+add_subdirectory(SpreadingLayerOverRoughBase)
+#add_subdirectory(Melting) # this has been superseded by the codes in Papers/Melting
+add_subdirectory(Calibration)
 #Part 1 : All cpp files will be made to exec files
 #########################################
 #Collect all the names of the cpp, note at the moment limited to demos, but will be fixed later

@@ -42,8 +42,9 @@ enum AttributeType
 
 /*!
  * \class ParticleHandler
- * \brief Container to store all BaseParticle.
- * \details The ParticleHandler is a container to store all BaseParticle. It is implemented by a vector of pointers to BaseParticle.
+ * \brief Container to store pointers to all particles.
+ * \details The ParticleHandler is a container that stores pointers to all particles belonging to a simulation.
+ * It is implemented as a vector of pointers of type BaseParticle*.
  */
 class ParticleHandler : public BaseHandler<BaseParticle>
 {
@@ -434,7 +435,9 @@ public:
      * \brief Returns the number of real objects on a local domain. MPI particles and periodic particles are neglected
      */
     unsigned int getNumberOfRealObjectsLocal() const;
-    
+
+    void actionsBeforeTimeStep();
+
     void actionsAfterTimeStep();
 
     double getLiquidFilmVolume() const;

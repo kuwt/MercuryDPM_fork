@@ -477,6 +477,8 @@ public:
             // write outputs of the oomphProb
             if (count++ % saveCount == 0 or time + dt > timeMax) {
                 writeToVTK();
+                // save in case code breaks
+                // saveSolidMesh();
             }
             // abort if problem
             if (Max_res.back()==0) {
@@ -486,6 +488,28 @@ public:
         }
         saveSolidMesh();
         actionsAfterSolve();
+    }
+
+    /**
+     * Solves an unsteady problem, returns successful if timeMaxMin has been reached
+     */
+    void solveUnsteadyForgiving(double timeMax, double timeMaxMin, double dt, unsigned saveCount = 10) {
+        // solve
+        try {
+            solveUnsteady(timeMax, dt, saveCount);
+        } catch(OomphLibError& error)  {
+            //Store output if newton solver fails
+            saveSolidMesh();
+            if (time_stepper_pt()->time()-dt >= timeMaxMin) {
+                // take it as successful if a fraction of the time evolution has finished
+                logger(INFO,"Newton solver failed at t=% (tMax=%), but code will continue.",
+                       time_stepper_pt()->time()-dt, timeMax);
+                exit(0);
+            } else {
+                logger(ERROR,"Newton solver failed at t=% (tMax=%).",
+                       time_stepper_pt()->time()-dt, timeMax);
+            }
+        }
     }
 
     /**
@@ -757,10 +781,24 @@ public:
                 Vector<double> body_force(3);
                 auto bodyForceFct = el_pt->body_force_fct_pt();
                 if (bodyForceFct) bodyForceFct(time(), xi, body_force);
+                // get coupling residual (fails)
+                //std::vector<double> couplingResidual
+                //    {el_pt->get_nodal_coupling_residual(n, 0),
+                //     el_pt->get_nodal_coupling_residual(n, 1),
+                //     el_pt->get_nodal_coupling_residual(n, 2)};
                 // get stress/pressure
                 DenseMatrix<double> sigma(3,3);
                 el_pt->get_stress(s, sigma);
+                // first invariant
                 double pressure = (sigma(0,0)+sigma(1,1)+sigma(2,2))/3;
+                //https://en.wikipedia.org/wiki/Von_Mises_yield_criterion
+                double J2 = 0;
+                for (int i = 0; i < 3; ++i) {
+                    for (int j = 0; j < 3; ++j) {
+                        J2 += 0.5*sigma(i,j)*sigma(i,j);
+                    }
+                }
+                //std::cout << " " << J2;
                 // get strain
                 DenseMatrix<double> strain(3,3);
                 el_pt->get_strain(s, strain);
@@ -769,48 +807,32 @@ public:
                     {el_pt->dnodal_position_dt(n, 0),
                      el_pt->dnodal_position_dt(n, 1),
                      el_pt->dnodal_position_dt(n, 2)};
-                // get coupling force
-                std::vector<double> coupledForce(3,0.0);
-                double couplingWeight = 0.0;
-                auto c_el_pt = dynamic_cast<ScaleCoupledElement<RefineableQDPVDElement<3, 2>>*>(el_pt);
-                if (c_el_pt != nullptr) {
-                    double nnode = c_el_pt->nnode();
-                    double dim = c_el_pt->dim();
-                    Shape psi(nnode);
-                    c_el_pt->shape(s, psi);
-                    for (int n=0; n<nnode; ++n) {
-                        for (int d=0; d<dim; ++d) {
-                            coupledForce[d] += c_el_pt->get_coupling_residual(n, d) * psi(n);
-                        }
-                        couplingWeight += c_el_pt->get_coupling_weight(n) * psi(n);
-                    }
-                }
                 // get boundary (works)
                 std::set<unsigned>* boundaries_pt;
                 n_pt->get_boundaries_pt(boundaries_pt);
-                double b = boundaries_pt ? *boundaries_pt->begin() : -1;
+                double b = boundaries_pt ? *boundaries_pt->begin()+1 : 0;
                 std::vector<double> pin {(double) n_pt->position_is_pinned(0),
                                          (double) n_pt->position_is_pinned(1),
                                          (double) n_pt->position_is_pinned(2)};
                 points.push_back(
                     {x, {
-                             {"Velocity", {dxdt[0], dxdt[1], dxdt[2]}},
-                             {"Displacement", {x[0] - xi[0], x[1] - xi[1], x[2] - xi[2]}},
-                             {"BodyForce", {body_force[0], body_force[1], body_force[2]}},
-                             {"Pin", pin},
-                             {"Velocity2", dudt},
-                             {"CoupledForce",coupledForce},
-                             {"CouplingWeight", {couplingWeight}},
-//                             {"Pressure", {pressure}},
-//                             {"Stress", {sigma(0,0), sigma(0,1), sigma(0,2),
-//                                           sigma(1,0), sigma(1,1), sigma(1,2),
-//                                           sigma(2,0), sigma(2,1), sigma(2,2)}},
+                        {"Velocity", {dxdt[0], dxdt[1], dxdt[2]}},
+                        {"Displacement", {x[0] - xi[0], x[1] - xi[1], x[2] - xi[2]}},
+                        {"BodyForce", {body_force[0], body_force[1], body_force[2]}},
+                        {"Pin", pin},
+                        //{"CouplingResidual", couplingResidual},
+                        {"Velocity2", dudt},
+                        {"Pressure", {pressure}},
+                        {"J2", {J2}},
+                        {"Stress", {sigma(0,0), sigma(0,1), sigma(0,2),
+                                    sigma(1,0), sigma(1,1), sigma(1,2),
+                                    sigma(2,0), sigma(2,1), sigma(2,2)}},
 //                             {"Strain", {strain(0,0), strain(0,1), strain(0,2),
 //                                           strain(1,0), strain(1,1), strain(1,2),
 //                                           strain(2,0), strain(2,1), strain(2,2)}},
-                             //\todo undo this comment, but it causes a problem in the output
-                             {"Boundary", {b}}
-                         }});
+                        //\todo undo this comment, but it causes a problem in the output
+                        {"Boundary", {b}}
+                    }});
 
                 // add to connectivity
                 connectivity.push_back(points.size() - 1);
@@ -831,7 +853,7 @@ public:
 
         //write vtk file
         vtk << "<?xml version=\"1.0\"?>\n"
-               "<!-- time " << getOomphTime() << "-->\n"
+               "<!-- time 10.548-->\n"
                "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n"
                "<UnstructuredGrid>\n"
                "<Piece NumberOfPoints=\""
@@ -863,7 +885,8 @@ public:
                 {
                     for (const auto& value : point.data[i].value)
                     {
-                        vtk << value << " ";
+                        //ensure values are not too small (VTK issue)
+                        vtk << ((!isfinite(value) or fabs(value)<1e-33 or fabs(value)>1e33)?0.0:value) << " ";
                     }
                 }
                 vtk << "\n"
@@ -906,7 +929,7 @@ public:
 
     /// See PVDEquationsBase<DIM>::get_energy
     void getMassMomentumEnergy(double& mass, Vector<double>& com, Vector<double>& linearMomentum, Vector<double>& angularMomentum, double& elasticEnergy,
-                               double& kineticEnergy) {
+                               double& kineticEnergy) const {
         // Initialise mass
         mass = 0;
         // Initialise center of mass

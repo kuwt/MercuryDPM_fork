@@ -8,7 +8,7 @@ This interaction models three different sintering mechanisms.
 
 1. Overlap occurs due to elastic Adhesive contact, which works in the JKR regime.
 2. Overlap drives by adhesive intersurface forces and accommodated by viscoelastic deformation.(Zipping)
-3. Overlap drives by surface tensions and accommodated by viscous flow. (streching)
+3. Overlap drives by surface tensions and accommodated by viscous flow. (stretching)
 
 The following picture shows the sintering regime map.
 
@@ -21,7 +21,7 @@ the dimensionless contact radius is given by the JKR model as
     \frac{a_0}{R} = (\frac{18\pi C_0 \gamma}{R})^{1/3}
 \f$
 
-where \f$ R \f$ is the effective particle radius, \f$ C_0 \f$ instantaneus compliance, \f$ \gamma \f$ surface tension.
+where \f$ R \f$ is the effective particle radius, \f$ C_0 \f$ instantaneous compliance, \f$ \gamma \f$ surface tension.
 
 For intermediate times in the interval \f$ t_0 < t < t_{visc}\f$, the dimensionless contact radius can be estimated by
 viscoelastic adhesive contact as:

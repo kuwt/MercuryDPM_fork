@@ -76,6 +76,14 @@ public:
     Vec3D diag() const;
 
     /*!
+     * Returns the determinant of this matrix
+     * https://www.mathsisfun.com/algebra/matrix-determinant.html
+     */
+    double determinant() const {
+        return XX*(YY*ZZ-YZ*ZY) - XY*(YX*ZZ-YZ*ZX) + XZ*(YX*ZY-YY*ZX);
+    }
+
+    /*!
      * \brief Deviator
      */
     double deviator() const;

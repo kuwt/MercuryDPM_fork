@@ -13,7 +13,7 @@ Each MercuryDPM executable produces three main output files, with the extensions
 
 For instance, building the source file <tt>example.cpp</tt> will create an executable named <tt>example</tt>.
 The output file name is set using DPMBase::getName; the MercuryDPM convention is that the name of the output file names should be equal to the name of the source file.
-Thus, execution will create output files named ‘example.data’, ‘example.fstat’ and ‘example.ene’ (other files such as ‘example.restart’ and ‘example.stat’ might be created, which will be discussed in later sections).
+Thus, execution will create output files named ‘example.data’, ‘example.fstat’ and ‘example.ene’ (other files such as ‘example.restart’ and ‘example.stat’ might be created, which will be discussed in different sections).
 
 \subsection ene The ene file
 
@@ -58,7 +58,7 @@ For each particle, we are given information regarding
 
 The sequence of output lines described above is then repeated for each time step.
 
-\image html data.png "Particle properties reported in the data file"
+\image html data.png   "Particle properties reported in the data file" width=75%
 
 It should be noted that the above is the standard output required for <B>three-dimensional data</B>; for two-dimensional data, only five items of information are given in the initial line of each time step: 
 
@@ -101,9 +101,9 @@ time, i, j, cx, cy, cz, delta, deltat, fn, ft, nx, ny, nz, tx, ty, tz
 - the contact force acting on particle <tt>i</tt>  is split into a normal and tangential component, \f$\vec{f}={\tt fn}\cdot\hat{n}+{\tt fn}\cdot\hat{t}\f$, where
 \f$\hat{n}=({\tt nx}, {\tt ny}, {\tt nz})\f$ and \f$\hat{t}=({\tt tx}, {\tt ty}, {\tt tz})\f$ denote unit vectors normal and tangential to the contact plane, respectively.
 
-\image html fstat.png "Contact properties reported in the fstat file; a non-spherical particle is shown to visualise that the branch vector c-ri is not necessarily parallel to the normal vector n"
+\image html fstat.png "  Contact properties reported in the fstat file; a non-spherical particle is shown to visualise that the branch vector c-ri is not necessarily parallel to the normal vector n" width=75%
 
-f\section VisualisingDataInParaview Visualising data in Paraview
+\section VisualisingDataInParaview Visualising data in ParaView
 
 #### Visualising Mercury Data Using ParaView
 
@@ -114,8 +114,8 @@ ParaView may be downloaded from http://www.paraview.org/download/ and installed 
 sudo apt-get install paraview
 \endverbatim
 
-In order to visualise the data using Paraview, the <tt>data2pvd</tt> tool can be used
-to convert the ‘.data' files output by Mercury into a '.pvd' Paraview datafile
+In order to visualise the data using ParaView, the data2pvd tool can be used
+to convert the ‘.data' files output by Mercury into a '.pvd' ParaView datafile
 and several VTK (.vtu) files.  We will now work through an example, using
 <tt>data2pvd</tt> to visualise a simple data set produced using the example code
 <tt>ChuteDemo</tt>. From your build directory, go to the <tt>ChuteDemos</tt> directory: 
@@ -138,7 +138,7 @@ and run the <tt>ChuteDemo</tt> code:
 
 Once the code has run, you will have a series of files; for now, however, we are only interested in the '.data' files.
 
-####Running <tt>data2pvd</tt>
+####Running data2pvd
 
 Since <tt>data2pvd</tt> creates numerous files, it is advisable to output these to a different directory. First, we will create a directory called <tt>chute_pvd</tt>:
 
@@ -154,6 +154,7 @@ We will then tell <tt>data2pvd</tt> to create the files in the directory:
 
 In the above, the first of the three terms should give the path to the directory in which the <tt>data2pvd</tt> program is found (for a standard installation of Mercury, the path will be exactly as given above); the second is the name of the data file (in the current directory) which you want to visualise; the third gives the name of the directory into which the new files will be output (‘chute_pvd’) and the name of the files to be created ('chute'). 
 
+####Running ParaView
 Once the files have been successfully created, we now start ParaView by simply typing:
 
 \code{.sh}
@@ -214,6 +215,8 @@ documentation for further information.
 In the MercuryCG folder (<tt>MercuryDPM/MercuryBuild/Drivers/MercuryCG</tt>), type ‘<tt>make fstatistics</tt>’ to compile the ‘fstatistics’ analysis package.
 
 For information on how to operate fstatistics, type ‘<tt>./fstatistics -help</tt>’.
+
+in this case : ‘<tt>~/MercuryDPM/MercuryBuild/Drivers/MercuryCG/fstatistics Drivers/ChuteDemos/ChuteDemo‘</tt>
 
 The Mercury analysis package are due to be upgraded in the upcoming Version 1.1, at which point full online documentation and usage instructions will be uploaded.
 

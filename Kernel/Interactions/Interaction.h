@@ -333,6 +333,8 @@ Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInter
 template<class NormalForceInteraction, class FrictionForceInteraction, class AdhesiveForceInteraction>
 void Interaction<NormalForceInteraction, FrictionForceInteraction, AdhesiveForceInteraction>::actionsAfterTimeStep()
 {
+    NormalForceInteraction::actionsAfterTimeStep();
+    FrictionForceInteraction::actionsAfterTimeStep();
     AdhesiveForceInteraction::actionsAfterTimeStep();
 }
 

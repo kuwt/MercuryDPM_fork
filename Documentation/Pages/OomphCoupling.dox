@@ -33,7 +33,7 @@ Now you can include oomph-lib source files into your Driver codes. A good exampl
 
 This code includes the class #SolidProblem, which is derived from the oomph-lib Problem class. This class is defined in the MercuryDPM kernel, and is specifically designed to solve problems with elastic bodies. As you can see, the driver code defines a class of type #SolidProblem, with the element type #RefineableQDPVDElement<3,2>, sets the properties of the elastic solid, then calls solveSteady to solve the linear algebra problem.
 
-You can visualize the results by opening the resulting vtk files in paraview:
+You can visualize the results by opening the resulting vtk files in ParaView:
 \image html Oomph/SCoupling/SolidBeamUnitTest.png
 
 To do coupled simulations, see \ref SCoupling.

@@ -105,9 +105,7 @@ std::string LinearViscoelasticInteraction::getBaseName() const
 void LinearViscoelasticInteraction::computeNormalForce()
 {
     // Compute the relative velocity vector of particle P w.r.t. I
-     setRelativeVelocity(
-            getP()->getVelocityAtContact(getContactPoint()) - getI()->getVelocityAtContact(getContactPoint()));
-
+    setRelativeVelocity( getP()->getVelocityAtContact(getContactPoint()) - getI()->getVelocityAtContact(getContactPoint()));
     // Compute the projection of vrel onto the normal (can be negative)
     setNormalRelativeVelocity(Vec3D::dot(getRelativeVelocity(), getNormal()));
 

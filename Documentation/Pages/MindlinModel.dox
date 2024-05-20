@@ -15,7 +15,7 @@ The tangential model force is given by:
 The tangential force is subdivided into an elastic and dissipative (damping) part.
 
 The tangential spring stiffness \f$ k_t = 8 G_{ij}^* sqrt{R_{ij}^* \delta_{ij}^n} \f$ depends
-on the effective shear modulus for isotropic and homegeneous materials
+on the effective shear modulus for isotropic and homogeneous materials
 \f$ G_{ij}^* = (\frac{1-\nu_i}{G_i} + \frac{1-\nu_j}{G_j})^{-1} \f$, the effective radius
 \f$ R_{ij}^* = \frac{R_i R_j}{R_i + R_j} \f$ and the normal overlap \f$ \delta_{ij}^n \f$ of object \f$ i \f$ and \f$ j \f$.
 

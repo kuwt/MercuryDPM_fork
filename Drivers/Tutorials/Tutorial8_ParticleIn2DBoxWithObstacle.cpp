@@ -92,15 +92,15 @@ int main(int argc, char* argv[])
     Tutorial8 problem; // instantiate an object of class Tutorial 8
     
     problem.setName("Tutorial8");
-    problem.setSystemDimensions(2);
     problem.setGravity(Vec3D(0.0, 0.0, 0.0));
     problem.setXMax(0.5);
     problem.setYMax(0.5);
+    problem.setZMax(0.5);
     problem.setTimeMax(5.0);
 
     //! [T8:speciesProp]
     // The normal spring stiffness and normal dissipation is computed and set as
-    // For collision time tc=0.005 and restitution coefficeint rc=1.0,
+    // For collision time tc=0.005 and restitution coefficient rc=1.0,
     LinearViscoelasticSpecies species;
     species.setDensity(2500.0); //sets the species type_0 density
     species.setStiffness(258.5);//sets the spring stiffness.
@@ -109,14 +109,16 @@ int main(int argc, char* argv[])
 
     //! [T8:speciesProp]
     
-    problem.setSaveCount(10);
+    problem.setSaveCount(50);
     problem.dataFile.setFileType(FileType::ONE_FILE);
     problem.restartFile.setFileType(FileType::ONE_FILE);
     problem.fStatFile.setFileType(FileType::NO_FILE);
     problem.eneFile.setFileType(FileType::NO_FILE);
-    
-    problem.setXBallsAdditionalArguments("-solidf -v0 -s .85");
-    
+
+    //! [T8:visualOutput]
+    problem.wallHandler.setWriteVTK(FileType::ONE_FILE);
+    problem.setParticlesWriteVTK(true);
+
     problem.setTimeStep(.005 / 50.0); // (collision time)/50.0
     problem.solve(argc, argv);
     

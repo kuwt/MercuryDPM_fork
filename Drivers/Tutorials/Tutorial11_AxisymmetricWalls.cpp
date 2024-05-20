@@ -25,6 +25,13 @@
 
 //Tutorial 11 introduces the axisymmetrical walls. Two asymmetrical walls are created into a
 //cylindrical boundary.
+/*
+** This file is annotated with DoxyFile comments in order to show the code on
+** the documentation - This is not needed for your real drivers.
+** Please ignore these comments.
+**
+** For full documentation of this code, go to http://docs.mercurydpm.org/Alpha/d0/db0/BeginnerTutorials.html#T9
+*/
 
 //! [T11:headers]
 #include "Mercury3D.h"

@@ -35,22 +35,6 @@ public:
         Vec3D force;
     };
 
-    std::vector<Droplet> droplets_;
-
-    // volume of liquid stored in droplets
-    double dropletVolume = 0;
-    // volume of liquid absorbed by particles
-    double absorbedVolume = 0;
-    // volume of liquid lost at walls
-    double lostVolume = 0;
-
-private:
-
-    std::function<void(DropletBoundary&)> generateDroplets_
-        = [] (DropletBoundary&) {};
-
-public:
-
     DropletBoundary() {}
     
     DropletBoundary(const DropletBoundary& other) {
@@ -58,6 +42,7 @@ public:
         generateDroplets_ = other.generateDroplets_;
         removeDropletsAtWalls_ = other.removeDropletsAtWalls_;
         dropletSpecies_ = other.dropletSpecies_;
+        dropletTemperature_ = other.dropletTemperature_;
     }
     
     ~DropletBoundary() override {
@@ -104,6 +89,10 @@ public:
         dropletSpecies_ = species;
     }
 
+    void setDropletTemperature(double temperature) {
+        dropletTemperature_ = temperature;
+    }
+
     void actionsBeforeTimeLoop() override
     {
         // When no droplet species were set, use the last species from the handler.
@@ -118,11 +107,32 @@ public:
         // When droplets should repel from the wall, it requires to be checked every time step.
         if (!removeDropletsAtWalls_)
             checkCount = 1;
+
+        if (dropletTemperature_ >= 0.0 && getSpeciesHeatCapacity(dropletSpecies_) == 0.0)
+            logger(ERROR, "DropletBoundary: The heat capacity of the droplet species is 0. For proper heat transfer, make sure the droplets have the correct species and the heat capacity is set.");
     }
+
+private:
+    std::function<void(DropletBoundary&)> generateDroplets_ = [] (DropletBoundary&) {};
+
+    void addHeatTransfer(BaseParticle* particle, double liquidVolume);
+    double getSpeciesHeatCapacity(const ParticleSpecies* species) const;
+
+public:
+    std::vector<Droplet> droplets_;
+
+    // volume of liquid stored in droplets
+    double dropletVolume = 0;
+    // volume of liquid absorbed by particles
+    double absorbedVolume = 0;
+    // volume of liquid lost at walls
+    double lostVolume = 0;
 
 private:
     bool removeDropletsAtWalls_ = true;
     const ParticleSpecies* dropletSpecies_ = nullptr;
+
+    double dropletTemperature_ = -1.0; // Default negative, means no heat transfer.
 };
 
 #endif

@@ -55,7 +55,7 @@ but it is difficult to draw any physically relevant conclusions from it.
 Therefore, granular assemblies are often described using continuum fields, like
 density \f$\rho\f$, momentum \f$\vec j=\rho \vec V\f$, stress
 \f$\mathbf \sigma\f$ and temperature.
-Continuum descriptions have been very sucessful in describing the macroscopic
+Continuum descriptions have been very successful in describing the macroscopic
 physical behavior of granular systems, and describe many phenomena as diverse as
 plastic/inertial flow, soil mechanics, or segregation.
 Other phenomena such as fracturing, jamming/force chains, crystallization have
@@ -82,7 +82,7 @@ In coarse-graining, density is defined first, as the sum over all particle
 masses weighted by the distance to the evaluated position:
 \f[\rho(\vec r)=\sum_i m_i \phi(\vec r,\vec r_i),\f]
 with position \f$r\f$, particle position \f$r_i\f$.
-The coarse-graining function \f$\phi\f$ (aslo called weighting or kernel
+The coarse-graining function \f$\phi\f$ (also called weighting or kernel
 function) is not uniquely defined, but often a Gauss function of width \f$w\f$
 is used,
 \f[ \phi(\vec r,\vec r_i) = c \exp(-\frac{|\vec r-\vec r_i|^2}{2w^2}),\f]
@@ -564,13 +564,13 @@ The first line details the different fields that are computed by fstatistics, e.
 
 The second line details the coarse-graining parameters, mainly the spatial coarse-graining width `w`.
 
-The third line shows the time step (or time intervall at which the data is taken); in this case, the data is time averaged from t=0 to t=8.
+The third line shows the time step (or time interval at which the data is taken); in this case, the data is time averaged from t=0 to t=8.
 
-The remaining lines contains the coordinate of a point and the values of the continuum fields at that point (in the order specified in line 1, so colume 1-3 is the point's coordinate, column 4 is volume fraction, column 5 density, column 6-8 momentum). For globally averaged values, there is only one line of data, with the point's coordinate set to the middle of the domain.
+The remaining lines contains the coordinate of a point and the values of the continuum fields at that point (in the order specified in line 1, so column 1-3 is the point's coordinate, column 4 is volume fraction, column 5 density, column 6-8 momentum). For globally averaged values, there is only one line of data, with the point's coordinate set to the middle of the domain.
 
 \section advanced  Advanced options
 
- However, fstatistics can do much more than return global averages of the continuum fields. In the following, several commonally used options are discussed.
+ However, fstatistics can do much more than return global averages of the continuum fields. In the following, several commonly used options are discussed.
 
 \subsection temp  Temporally-resolved fields
 
@@ -591,7 +591,7 @@ w 0.5 ...
 
 \subsection space Spatially-resolved fields
 The coarse-graining formulations can return data which is averaged over all
-spatial coordinate directions (as shown in the previous examples) or only in certain spactial
+spatial coordinate directions (as shown in the previous examples) or only in certain spatial
 directions. Note, the CG formulation returns fields at ALL points in space;
 however, we have to evaluate these continuum fields at a final number of 'grid points'.
 Use the `-stattype [O,X,Y,Z,XY,XZ,YZ,XYZ]` and `-n [double]` commands to produce spatially resolved fields:

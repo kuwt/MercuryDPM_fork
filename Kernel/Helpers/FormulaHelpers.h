@@ -84,6 +84,11 @@ namespace helpers
      * \brief Returns the correct saveCount if the total number of saves, the final time and the time step is known
      */
     unsigned int getSaveCountFromNumberOfSavesAndTimeMaxAndTimeStep(unsigned int numberOfSaves, Mdouble timeMax, Mdouble timeStep);
+
+    /*!
+     * \brief Returns the shear modulus calculated from Young's modulus and Poisson's ratio. 
+     */
+    Mdouble getShearModulus(Mdouble youngsModulus, Mdouble poisson);
 }
 
 #endif // MERCURYDPM_FORMULA_HELPERS_H

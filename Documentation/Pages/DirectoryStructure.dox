@@ -33,7 +33,7 @@ You don't need to worry about the contains of this directory at all; however, fo
   - self_test : Makes calls to fpdiff.py passing the locations of newly create data and existing golddata. If writes error logs if something is different between the new data file and the golddata.
 
 -# Tools/
-Contains the source files required to use paraview.
+Contains the source files required to use ParaView.
 -# Documentation/
 \n Contains the raw .dox files for creating documentation pages, like the one you are reading right now, as well as the images used in the documentation. 
 -# Configuration/ 
@@ -47,9 +47,9 @@ At the top level of the build directory you will find seven main subdirectories
 -# Kernel/
 \n Contains object files for each .cc file in the Kernel. These files are required to compile a Driver code. Users don't have to worry about these files.
 -# Tools/
-\n Contains the executable needed to view paraview output. The executable is created by typing `make data2pvd` 
+\n Contains the executable needed to view ParaView output. The executable is created by typing `make data2pvd`
 -# Documentation/ 
-\n Contains the documentation. You can create the documentation by typing `make doc` (or `make docClean` if the existing docuentation is corrupt), assuming you set MercuryDPM_BUILD_DOCUMENTATION to true. The main page can then be accessed by opening Documentation/html/index.html in your browser.
+\n Contains the documentation. You can create the documentation by typing `make doc` (or `make docClean` if the existing documentation is corrupt), assuming you set MercuryDPM_BUILD_DOCUMENTATION to true. The main page can then be accessed by opening Documentation/html/index.html in your browser.
 -# Configuration/ 
 \n Contains files needed to create the documentation. These files are automatically created by cmake and should not be modified.
 -# CMakeFiles/ 

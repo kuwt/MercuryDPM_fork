@@ -52,7 +52,7 @@ Time integration is done using Velocity Verlet, see http://en.wikipedia.org/wiki
 ## Variables
 
 In the following sections, we give a short overview over the parameters that can be specified in MercuryDPM, and introduce the variable names which are used throughout this documentation. We also include links to the implementation of each object/parameter. 
-For the more complex type of objects (particles, species, interactions, walls, and boundaries), where multiple implementation exist, we give an overview ofthe common parameters and discuss the most common types.
+For the more complex type of objects (particles, species, interactions, walls, and boundaries), where multiple implementation exist, we give an overview of the common parameters and discuss the most common types.
 
 ### Global variables
 
@@ -88,7 +88,7 @@ Currently, only one type of particle exists, the BaseParticle. Each BaseParticle
 ### Walls
 
 There are several wall types: InfiniteWall, IntersectionOfWalls, AxisymmetricIntersectionOfWalls, Screw, and Coil.
-All these wall types aree derived from a common class, BaseWall, which has the following  properties:
+All these wall types are derived from a common class, BaseWall, which has the following  properties:
  - Position \f$ \vec{r}_i(t)\f$.
  - Velocity \f$ \vec{v}_i(t)\f$.
  - Orientation \f$ \vec{\alpha}_i(t)\f$ (currently only valid for 2D objects). 
