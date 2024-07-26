@@ -2025,7 +2025,8 @@ void DPMBase::writeEneHeader(std::ostream& os) const
        << "elasticEnergy " << std::setw(width)
        << "centerOfMassX " << std::setw(width)
        << "centerOfMassY " << std::setw(width)
-       << "centerOfMassZ\n";
+       << "centerOfMassZ " << std::setw(width)
+       << "collisions\n";
 }
 
 /*!
@@ -2117,6 +2118,7 @@ void DPMBase::writeEneTimeStep(std::ostream& os) const
        << (m == 0 ? constants::NaN : com.X / m) //set to nan because 0/0 implementation in gcc and clang differs
        << " " << std::setw(width) << (m == 0 ? constants::NaN : com.Y / m)
        << " " << std::setw(width) << (m == 0 ? constants::NaN : com.Z / m)
+       << " " << std::setw(width) << interactionHandler.getNumberOfObjects()
        << std::endl;
 }
 
